@@ -127,9 +127,11 @@ import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.common.cmp.PKIResponse;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.SecurityUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.StringUtil;
 import org.xipki.common.XMLUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
@@ -541,7 +543,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             result.addResultEntry(resultEntry);
         }
 
-        if(reqIdIdMap.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(reqIdIdMap))
         {
             for(BigInteger reqId : reqIdIdMap.keySet())
             {
@@ -786,12 +788,12 @@ abstract class X509CmpRequestor extends CmpRequestor
         String namespace = null;
         Element root = doc.getDocumentElement();
         String s = root.getAttribute("version");
-        if(s == null || s.isEmpty())
+        if(StringUtil.isBlank(s))
         {
             s = root.getAttributeNS(namespace, "version");
         }
 
-        int version = (s == null || s.isEmpty()) ? 1 : Integer.parseInt(s);
+        int version = StringUtil.isBlank(s) ? 1 : Integer.parseInt(s);
 
         if(version == 2)
         {
@@ -859,7 +861,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         sb.append("</certprofile>");
 
         // Username
-        if(userLike != null && userLike.isEmpty() == false)
+        if(StringUtil.isNotBlank(userLike))
         {
             sb.append("<userLike>");
             sb.append(userLike);

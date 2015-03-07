@@ -74,7 +74,7 @@ public class QaPolicyQualifiers
                 info = new QaUserNoticePolicyQualifierInfo(value);
             } else
             {
-                throw new RuntimeException("should not reach here");
+                throw new RuntimeException("should not reach here, unknown child of PolicyQualifiers " + localPart);
             }
             list.add(info);
         }

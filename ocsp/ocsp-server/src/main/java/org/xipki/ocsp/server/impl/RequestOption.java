@@ -199,7 +199,8 @@ class RequestOption
                     certpathValidationModel = CertpathValidationModel.PKIX;
                     break;
                 default:
-                    throw new RuntimeException("should not reach here");
+                    throw new RuntimeException("should not reach here, unknown ValidaitonModel " +
+                            certpathConf.getValidationModel());
             }
             try
             {

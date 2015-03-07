@@ -36,6 +36,7 @@
 package org.xipki.ca.client.api;
 
 import org.xipki.common.ParamChecker;
+import org.xipki.common.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -51,7 +52,7 @@ public class CertprofileInfo
     {
         ParamChecker.assertNotEmpty("name", name);
         this.name = name;
-        if(type == null || type.isEmpty())
+        if(StringUtil.isBlank(type))
         {
             this.type = null;
         } else
@@ -59,7 +60,7 @@ public class CertprofileInfo
             this.type = type;
         }
 
-        if(conf == null || conf.isEmpty())
+        if(StringUtil.isBlank(conf))
         {
             this.conf = null;
         } else

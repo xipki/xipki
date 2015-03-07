@@ -45,7 +45,6 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.common.AbstractLoadTest;
 import org.xipki.common.SecurityUtil;
-import org.xipki.common.StringUtil;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.shell.AbstractOCSPStatusCommand;
 
@@ -84,10 +83,10 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
 
         try
         {
-            List<String> tokens = StringUtil.split(this.serialNumbers, ",");
+            List<String> tokens = split(this.serialNumbers, ",");
             for(String token : tokens)
             {
-                List<String> subtokens = StringUtil.split(token.trim(), "- ");
+                List<String> subtokens = split(token.trim(), "- ");
                 int countTokens = subtokens.size();
                 if(countTokens == 1)
                 {

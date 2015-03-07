@@ -43,6 +43,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.StringUtil;
 
@@ -396,7 +397,7 @@ public class CRLControl implements Serializable
             }
         }
 
-        if(extensionOIDs != null && extensionOIDs.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(extensionOIDs))
         {
             StringBuilder extensionsSb = new StringBuilder();
             for(String oid : extensionOIDs)

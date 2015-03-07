@@ -55,6 +55,8 @@ import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import org.xipki.common.CollectionUtil;
+import org.xipki.common.StringUtil;
 import org.xipki.security.api.PasswordCallback;
 import org.xipki.security.api.PasswordResolverException;
 
@@ -104,7 +106,7 @@ public class GuiPasswordCallback implements PasswordCallback
             int n = rows.size();
 
             SecureRandom random = new SecureRandom();
-            while(rows.isEmpty() == false)
+            while(CollectionUtil.isNotEmpty(rows))
             {
                 int row = random.nextInt() % n;
                 if(rows.contains(row) == false)
@@ -208,7 +210,7 @@ public class GuiPasswordCallback implements PasswordCallback
         {
             SecurePasswordInputPanel gui = new SecurePasswordInputPanel();
             String[] options = new String[]{OK};
-            if(prompt == null || prompt.isEmpty())
+            if(StringUtil.isBlank(prompt))
             {
                 prompt = "Password required";
             }

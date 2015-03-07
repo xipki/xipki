@@ -222,7 +222,8 @@ public class P11ListSlotCommand extends SecurityCommand
             }
         } else
         {
-            err("should not reach here");
+            err("should not reach here, unknown P11WritableSlot " +
+                    (p11slot == null ? "null" : p11slot.getClass().getName()));
         }
 
         return null;

@@ -35,7 +35,7 @@
 
 package org.xipki.ca.server.impl;
 
-import org.xipki.ca.api.X509CertWithId;
+import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 
 /**
@@ -45,7 +45,7 @@ import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 class CmpRequestorEntryWrapper
 {
     private CmpRequestorEntry dbEntry;
-    private X509CertWithId cert;
+    private X509CertWithDBCertId cert;
 
     public CmpRequestorEntryWrapper()
     {
@@ -55,10 +55,10 @@ class CmpRequestorEntryWrapper
     {
         this.dbEntry = dbEntry;
         cert = null;
-        cert = new X509CertWithId(dbEntry.getCert());
+        cert = new X509CertWithDBCertId(dbEntry.getCert());
     }
 
-    public X509CertWithId getCert()
+    public X509CertWithDBCertId getCert()
     {
         return cert;
     }

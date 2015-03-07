@@ -56,6 +56,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.AbstractLoadTest;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.IoUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -190,7 +191,7 @@ public class CaDbImporter
 
             rs.close();
 
-            if(CAInfoBundles.isEmpty())
+            if(CollectionUtil.isEmpty(CAInfoBundles))
             {
                 return;
             }

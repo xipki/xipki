@@ -41,6 +41,7 @@ import java.util.List;
 
 import org.xipki.ca.certprofile.internal.x509.jaxb.NameConstraints;
 import org.xipki.ca.certprofile.internal.x509.jaxb.GeneralSubtreeBaseType;
+import org.xipki.common.CollectionUtil;
 
 /**
  * @author Lijun Liao
@@ -53,7 +54,7 @@ public class QaNameConstraints extends QaExtension
 
     public QaNameConstraints(NameConstraints jaxb)
     {
-        if(jaxb.getPermittedSubtrees() != null && jaxb.getPermittedSubtrees().getBase().isEmpty() == false)
+        if(jaxb.getPermittedSubtrees() != null && CollectionUtil.isNotEmpty(jaxb.getPermittedSubtrees().getBase()))
         {
             List<QaGeneralSubtree> list = new LinkedList<>();
             List<GeneralSubtreeBaseType> bases =  jaxb.getPermittedSubtrees().getBase();
@@ -67,7 +68,7 @@ public class QaNameConstraints extends QaExtension
             permittedSubtrees = null;
         }
 
-        if(jaxb.getExcludedSubtrees() != null && jaxb.getExcludedSubtrees().getBase().isEmpty() == false)
+        if(jaxb.getExcludedSubtrees() != null && CollectionUtil.isNotEmpty(jaxb.getExcludedSubtrees().getBase()))
         {
             List<QaGeneralSubtree> list = new LinkedList<>();
             List<GeneralSubtreeBaseType> bases =  jaxb.getExcludedSubtrees().getBase();

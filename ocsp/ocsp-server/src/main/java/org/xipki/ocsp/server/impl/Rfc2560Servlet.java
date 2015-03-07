@@ -62,6 +62,7 @@ import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.common.LogUtil;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.StringUtil;
 import org.xipki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
 
 /**
@@ -123,7 +124,7 @@ public class Rfc2560Servlet extends HttpServlet
             return;
         }
 
-        if(r.getRelativeUri() != null && r.getRelativeUri().isEmpty() == false)
+        if(StringUtil.isNotBlank(r.getRelativeUri()))
         {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;

@@ -59,6 +59,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
@@ -120,7 +121,7 @@ public class P10RequestGenerator
     {
         PKCS10CertificationRequestBuilder p10ReqBuilder =
                 new PKCS10CertificationRequestBuilder(subjectDN, subjectPublicKeyInfo);
-        if(extensions != null && extensions.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(extensions))
         {
             Extensions _extensions = new Extensions(extensions.toArray(new Extension[0]));
             p10ReqBuilder.addAttribute(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest, _extensions);
@@ -150,7 +151,7 @@ public class P10RequestGenerator
     public static GeneralNames createGeneralNames(List<String> taggedValues)
     throws BadInputException
     {
-        if(taggedValues == null || taggedValues.isEmpty())
+        if(CollectionUtil.isEmpty(taggedValues))
         {
             return null;
         }
@@ -168,7 +169,7 @@ public class P10RequestGenerator
             List<String> accessMethodAndLocations, boolean critical)
     throws BadInputException
     {
-        if(accessMethodAndLocations == null || accessMethodAndLocations.isEmpty())
+        if(CollectionUtil.isEmpty(accessMethodAndLocations))
         {
             return null;
         }

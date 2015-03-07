@@ -90,6 +90,7 @@ import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.api.profile.x509.X509Util;
 import org.xipki.ca.certprofile.XmlX509Certprofile;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.ObjectIdentifiers;
@@ -277,7 +278,7 @@ class IdentifiedX509Certprofile
             PublicCAInfo publicCaInfo, X509Certificate crlSignerCert)
     throws CertprofileException, BadCertTemplateException
     {
-        ExtensionValues tuples = new ExtensionValues();
+        ExtensionValues values = new ExtensionValues();
 
         Map<ASN1ObjectIdentifier, ExtensionControl> controls = new HashMap<>(certprofile.getExtensionControls());
 
@@ -326,7 +327,7 @@ class IdentifiedX509Certprofile
                 byte[] skiValue = sha1.digest(publicKeyInfo.getPublicKeyData().getBytes());
 
                 SubjectKeyIdentifier value = new SubjectKeyIdentifier(skiValue);
-                addExtension(tuples, extType, value, extControl,
+                addExtension(values, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
@@ -354,7 +355,7 @@ class IdentifiedX509Certprofile
                     }
                 }
 
-                addExtension(tuples, extType, value, extControl,
+                addExtension(values, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
@@ -368,7 +369,7 @@ class IdentifiedX509Certprofile
             if(addMe)
             {
                 GeneralNames value = publicCaInfo.getSubjectAltName();
-                addExtension(tuples, extType, value, extControl,
+                addExtension(values, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
@@ -382,7 +383,7 @@ class IdentifiedX509Certprofile
             if(addMe)
             {
                 AuthorityInformationAccess value = X509Util.createAuthorityInformationAccess(publicCaInfo.getOcspUris());
-                addExtension(tuples, extType, value, extControl,
+                addExtension(values, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
@@ -414,7 +415,7 @@ class IdentifiedX509Certprofile
                     {
                         throw new CertprofileException(e.getMessage(), e);
                     }
-                    addExtension(tuples, extType, value, extControl,
+                    addExtension(values, extType, value, extControl,
                             neededExtensionTypes, wantedExtensionTypes);
                 }
             }
@@ -436,7 +437,7 @@ class IdentifiedX509Certprofile
                     {
                         throw new CertprofileException(e.getMessage(), e);
                     }
-                    addExtension(tuples, extType, value, extControl,
+                    addExtension(values, extType, value, extControl,
                             neededExtensionTypes, wantedExtensionTypes);
                 }
             }
@@ -452,7 +453,7 @@ class IdentifiedX509Certprofile
             {
                 BasicConstraints value = X509Util.createBasicConstraints(certprofile.isCA(),
                         certprofile.getPathLenBasicConstraint());
-                addExtension(tuples, extType, value, extControl,
+                addExtension(values, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
@@ -499,7 +500,7 @@ class IdentifiedX509Certprofile
                 }
 
                 org.bouncycastle.asn1.x509.KeyUsage value = SecurityUtil.createKeyUsage(usages);
-                addExtension(tuples, extType, value, extControl,
+                addExtension(values, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
@@ -551,7 +552,7 @@ class IdentifiedX509Certprofile
                 }
 
                 ExtendedKeyUsage value = SecurityUtil.createExtendedUsage(usages);
-                addExtension(tuples, extType, value, extControl,
+                addExtension(values, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
@@ -566,7 +567,7 @@ class IdentifiedX509Certprofile
             {
                 // the extension ocsp-nocheck will only be set if requested explicitly
                 DERNull value = DERNull.INSTANCE;
-                addExtension(tuples, extType, value, extControl,
+                addExtension(values, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
@@ -605,7 +606,7 @@ class IdentifiedX509Certprofile
                     }
                 }
 
-                addExtension(tuples, extType, value, extControl,
+                addExtension(values, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
@@ -661,12 +662,12 @@ class IdentifiedX509Certprofile
                         }
                     }
                 }
-                addExtension(tuples, extType, value, extControl,
+                addExtension(values, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
 
-        ExtensionValues subtuples = certprofile.getExtensions(
+        ExtensionValues subvalues = certprofile.getExtensions(
                 Collections.unmodifiableMap(controls), requestedSubject, requestExtensions);
 
         Set<ASN1ObjectIdentifier> extTypes = new HashSet<>(controls.keySet());
@@ -688,10 +689,10 @@ class IdentifiedX509Certprofile
 
                 if(value == null)
                 {
-                    value = subtuples.getExtensionValue(type);
+                    value = subvalues.getExtensionValue(type);
                 }
 
-                addExtension(tuples, type, value, extControl,
+                addExtension(values, type, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
@@ -705,20 +706,20 @@ class IdentifiedX509Certprofile
             }
         }
 
-        if(unprocessedExtTypes.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(unprocessedExtTypes))
         {
             throw new CertprofileException("Could not add required extensions " + toString(unprocessedExtTypes));
         }
 
-        if(neededExtensionTypes.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(neededExtensionTypes))
         {
             throw new BadCertTemplateException("Could not add requested extensions " + toString(neededExtensionTypes));
         }
 
-        return tuples;
+        return values;
     }
 
-    private static void addExtension(ExtensionValues tuples, ASN1ObjectIdentifier extType,
+    private static void addExtension(ExtensionValues values, ASN1ObjectIdentifier extType,
             ExtensionValue extValue, ExtensionControl extControl,
             Set<ASN1ObjectIdentifier> neededExtensionTypes, Set<ASN1ObjectIdentifier> wantedExtensionTypes)
     throws CertprofileException
@@ -736,13 +737,13 @@ class IdentifiedX509Certprofile
             }
         } else
         {
-            tuples.addExtension(extType, extValue);
+            values.addExtension(extType, extValue);
             neededExtensionTypes.remove(extType);
             wantedExtensionTypes.remove(extType);
         }
     }
 
-    private static void addExtension(ExtensionValues tuples, ASN1ObjectIdentifier extType,
+    private static void addExtension(ExtensionValues values, ASN1ObjectIdentifier extType,
             ASN1Encodable extValue, ExtensionControl extControl,
             Set<ASN1ObjectIdentifier> neededExtensionTypes, Set<ASN1ObjectIdentifier> wantedExtensionTypes)
     throws CertprofileException
@@ -760,7 +761,7 @@ class IdentifiedX509Certprofile
             }
         } else
         {
-            tuples.addExtension(extType, extControl.isCritical(), extValue);
+            values.addExtension(extType, extControl.isCritical(), extValue);
             neededExtensionTypes.remove(extType);
             wantedExtensionTypes.remove(extType);
         }
@@ -872,7 +873,7 @@ class IdentifiedX509Certprofile
             }
         }
 
-        if(set.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(set))
         {
             msg.append("extensions ").append(toString(set)).append(" could not be contained in request, ");
         }
@@ -891,7 +892,7 @@ class IdentifiedX509Certprofile
                 }
             }
 
-            if(set.isEmpty() == false)
+            if(CollectionUtil.isNotEmpty(set))
             {
                 msg.append("EE profile contains CA-only extensions ").append(toString(set)).append(", ");
             }
@@ -910,7 +911,7 @@ class IdentifiedX509Certprofile
             }
         }
 
-        if(set.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(set))
         {
             msg.append("Critical only extensions are marked as non-critical ").append(toString(set)).append(", ");
         }
@@ -928,7 +929,7 @@ class IdentifiedX509Certprofile
             }
         }
 
-        if(set.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(set))
         {
             msg.append("None-critical extensions are marked as critical ").append(toString(set)).append(", ");
         }
@@ -963,7 +964,7 @@ class IdentifiedX509Certprofile
                 }
             }
 
-            if(set.isEmpty() == false)
+            if(CollectionUtil.isNotEmpty(set))
             {
                 msg.append("Required extensions are not marked as required ").append(toString(set)).append(", ");
             }
@@ -989,7 +990,7 @@ class IdentifiedX509Certprofile
                 }
             }
 
-            if(set.isEmpty() == false)
+            if(CollectionUtil.isNotEmpty(set))
             {
                 msg.append("EE profile contains CA-only keyUsage ").append(setUsages).append(", ");
             }
@@ -1025,7 +1026,7 @@ class IdentifiedX509Certprofile
             }
             sb.append(", ");
         }
-        if(oids.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(oids))
         {
             int len = sb.length();
             sb.delete(len - 2, len);
@@ -1132,7 +1133,7 @@ class IdentifiedX509Certprofile
             }
             default:
             {
-                throw new RuntimeException("should not reach here");
+                throw new RuntimeException("should not reach here, unknown GeneralName tag "+ tag);
             }
         }
     }

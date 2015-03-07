@@ -149,7 +149,7 @@ public class OCSPQAStatusCommand extends AbstractOCSPStatusCommand
 
             sn = cert.getSerialNumber();
 
-            if(serverURL == null || serverURL.isEmpty())
+            if(isBlank(serverURL))
             {
                 List<String> ocspUrls = SecurityUtil.extractOCSPUrls(cert);
                 if(ocspUrls.size() > 0)
@@ -163,7 +163,7 @@ public class OCSPQAStatusCommand extends AbstractOCSPStatusCommand
             sn = new BigInteger(serialNumber);
         }
 
-        if(serverURL == null || serverURL.isEmpty())
+        if(isBlank(serverURL))
         {
             err("Could not get URL for the OCSP responder");
             return null;
@@ -293,7 +293,7 @@ public class OCSPQAStatusCommand extends AbstractOCSPStatusCommand
                         status = CertStatus.aACompromise;
                         break;
                     default:
-                        throw new RuntimeException("should not reach here");
+                        throw new RuntimeException("should not reach here, unknwon CRLReason " + revocationReason);
                     }
                 }
             }

@@ -48,6 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.StringUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.DatabaseType;
 import org.xipki.datasource.api.exception.BadSqlGrammarException;
@@ -96,7 +97,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             StringBuilder sql = new StringBuilder(coreSql.length() + 50);
             sql.append("SELECT ").append(coreSql);
 
-            if(orderBy != null && orderBy.isEmpty() == false)
+            if(StringUtil.isNotBlank(orderBy))
             {
                 sql.append(" ORDER BY ").append(orderBy);
             }
@@ -203,7 +204,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             StringBuilder sql = new StringBuilder(coreSql.length() + 50);
             sql.append("SELECT ").append(coreSql);
 
-            if(orderBy != null && orderBy.isEmpty() == false)
+            if(StringUtil.isNotBlank(orderBy))
             {
                 sql.append(" ORDER BY ").append(orderBy);
             }
@@ -259,7 +260,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             StringBuilder sql = new StringBuilder(coreSql.length() + 50);
             sql.append("SELECT ").append(coreSql);
 
-            if(orderBy != null && orderBy.isEmpty() == false)
+            if(StringUtil.isNotBlank(orderBy))
             {
                 sql.append(" ORDER BY ").append(orderBy);
             }
@@ -324,7 +325,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         {
             StringBuilder sql = new StringBuilder(coreSql.length() + 50);
 
-            if(orderBy == null || orderBy.isEmpty())
+            if(StringUtil.isBlank(orderBy))
             {
                 sql.append("SELECT ").append(coreSql);
                 if(coreSql.contains(" WHERE"))
@@ -392,7 +393,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             StringBuilder sql = new StringBuilder(coreSql.length() + 50);
             sql.append("SELECT ").append(coreSql);
 
-            if(orderBy != null && orderBy.isEmpty() == false)
+            if(StringUtil.isNotBlank(orderBy))
             {
                 sql.append(" ORDER BY ").append(orderBy);
             }
@@ -448,7 +449,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             StringBuilder sql = new StringBuilder(coreSql.length() + 80);
             sql.append("SELECT ").append(coreSql);
 
-            if(orderBy != null && orderBy.isEmpty() == false)
+            if(StringUtil.isNotBlank(orderBy))
             {
                 sql.append(" ORDER BY ").append(orderBy);
             }

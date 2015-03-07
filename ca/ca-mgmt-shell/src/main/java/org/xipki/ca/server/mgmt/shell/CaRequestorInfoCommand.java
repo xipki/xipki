@@ -60,7 +60,7 @@ public class CaRequestorInfoCommand extends CaCommand
         StringBuilder sb = new StringBuilder();
 
         Set<CAHasRequestorEntry> entries = caManager.getCmpRequestorsForCA(caName);
-        if(entries != null && entries.isEmpty() == false)
+        if(isNotEmpty(entries))
         {
             sb.append("Requestors trusted by CA " + caName).append("\n");
             for(CAHasRequestorEntry entry  : entries)

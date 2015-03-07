@@ -78,7 +78,7 @@ import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.ca.api.DfltEnvironmentParameterResolver;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.X509CertWithId;
+import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.server.impl.X509SelfSignedCertBuilder.GenerateSelfSignedResult;
@@ -102,6 +102,7 @@ import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
@@ -920,7 +921,7 @@ implements CAManager, CmpResponderManager
         requestors.clear();
         List<String> names = queryExecutor.getNamesFromTable("REQUESTOR");
 
-        if(names.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(names))
         {
             for(String name : names)
             {
@@ -999,7 +1000,7 @@ implements CAManager, CmpResponderManager
 
         List<String> names = queryExecutor.getNamesFromTable("CERTPROFILE");
 
-        if(names.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(names))
         {
             for(String name : names)
             {
@@ -1030,7 +1031,7 @@ implements CAManager, CmpResponderManager
 
         List<String> names = queryExecutor.getNamesFromTable("PUBLISHER");
 
-        if(names.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(names))
         {
             for(String name : names)
             {
@@ -1057,7 +1058,7 @@ implements CAManager, CmpResponderManager
 
         List<String> names = queryExecutor.getNamesFromTable("CRLSIGNER");
 
-        if(names.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(names))
         {
             for(String name : names)
             {
@@ -1084,7 +1085,7 @@ implements CAManager, CmpResponderManager
 
         List<String> names = queryExecutor.getNamesFromTable("CMPCONTROL");
 
-        if(names.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(names))
         {
             for(String name : names)
             {
@@ -1113,7 +1114,7 @@ implements CAManager, CmpResponderManager
         ca_has_profiles.clear();
 
         List<String> names = queryExecutor.getNamesFromTable("CA");
-        if(names.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(names))
         {
             for(String name : names)
             {
@@ -1620,7 +1621,7 @@ implements CAManager, CmpResponderManager
 
     @Override
     public void changeCrlSigner(String name, String signer_type, String signer_conf, String signer_cert,
-            CRLControl crlControl)
+    		CRLControl crlControl)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -2000,7 +2001,7 @@ implements CAManager, CmpResponderManager
             throw new CAMgmtException("Cannot find CA named " + caName);
         }
 
-        X509CertWithId certInfo = ca.getCAInfo().getCertificate();
+        X509CertWithDBCertId certInfo = ca.getCAInfo().getCertificate();
         if(certInfo.getCert().getSubjectX500Principal().equals(
                 certInfo.getCert().getIssuerX500Principal()) == false)
         {
@@ -2178,7 +2179,7 @@ implements CAManager, CmpResponderManager
         {
             try
             {
-                certstore.clearPublishQueue((X509CertWithId) null, (String) null);
+                certstore.clearPublishQueue((X509CertWithDBCertId) null, (String) null);
                 return true;
             } catch (OperationException e)
             {

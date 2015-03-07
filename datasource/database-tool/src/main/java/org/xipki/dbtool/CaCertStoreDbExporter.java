@@ -62,6 +62,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
@@ -250,7 +251,7 @@ class CaCertStoreDbExporter extends DbPorter
             for(Integer ca_id : ca_ids)
             {
                 List<Integer> ids = idMap.get(ca_id);
-                if(ids.isEmpty())
+                if(CollectionUtil.isEmpty(ids))
                 {
                     continue;
                 }

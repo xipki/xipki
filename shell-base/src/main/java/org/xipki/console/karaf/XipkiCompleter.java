@@ -33,67 +33,14 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ocsp.api;
+package org.xipki.console.karaf;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.xipki.common.CollectionUtil;
+import org.apache.karaf.shell.console.Completer;
 
 /**
  * @author Lijun Liao
  */
 
-public class CertprofileOption
+public interface XipkiCompleter extends Completer
 {
-    private final Set<String> includes;
-    private final Set<String> excludes;
-
-    public CertprofileOption(Collection<String> includes, Collection<String> excludes)
-    {
-        if(CollectionUtil.isEmpty(includes))
-        {
-            this.includes = null;
-        }
-        else
-        {
-            this.includes = new HashSet<>(includes);
-        }
-
-        if(CollectionUtil.isEmpty(excludes))
-        {
-            this.excludes = null;
-        }
-        else
-        {
-            this.excludes = new HashSet<>(excludes);
-        }
-    }
-
-    public Set<String> getIncludes()
-    {
-        return includes == null ? null : Collections.unmodifiableSet(includes);
-    }
-
-    public Set<String> getExcludes()
-    {
-        return excludes == null ? null : Collections.unmodifiableSet(excludes);
-    }
-
-    public boolean include(String certprofile)
-    {
-        if(includes == null)
-        {
-            return excludes == null ? true : excludes.contains(certprofile) == false;
-        }
-
-        if(includes.contains(certprofile) == false)
-        {
-            return false;
-        }
-
-        return excludes == null ? true : excludes.contains(certprofile) == false;
-    }
 }

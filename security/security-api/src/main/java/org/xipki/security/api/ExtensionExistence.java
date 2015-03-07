@@ -48,6 +48,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
+import org.xipki.common.CollectionUtil;
 
 /**
  *
@@ -170,7 +171,7 @@ public class ExtensionExistence extends ASN1Object
     public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        if(needExtensions != null && needExtensions.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(needExtensions))
         {
             ASN1EncodableVector v = new ASN1EncodableVector();
             for(ASN1ObjectIdentifier m : needExtensions)
@@ -180,7 +181,7 @@ public class ExtensionExistence extends ASN1Object
             vector.add(new DERTaggedObject(true, 0, new DERSequence(v)));
         }
 
-        if(wantExtensions != null && wantExtensions.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(wantExtensions))
         {
             ASN1EncodableVector v = new ASN1EncodableVector();
             for(ASN1ObjectIdentifier m : wantExtensions)

@@ -35,6 +35,8 @@
 
 package org.xipki.dbtool;
 
+import org.xipki.common.StringUtil;
+
 import liquibase.CatalogAndSchema;
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -76,7 +78,7 @@ public class LiquibaseMain
             throw new IllegalArgumentException("dbConf could not be null");
         }
 
-        if(changeLogFile == null || changeLogFile.isEmpty())
+        if(StringUtil.isBlank(changeLogFile))
         {
             throw new IllegalArgumentException("changeLogFile could not be empty");
         }
@@ -107,10 +109,20 @@ public class LiquibaseMain
         CommandLineResourceAccessor clOpener = new CommandLineResourceAccessor(classLoader);
 
         String defaultSchemaName = dbConf.getSchema();
-        this.database = CommandLineUtils.createDatabaseObject(classLoader,
-            dbConf.getUrl(), dbConf.getUsername(), dbConf.getPassword(), dbConf.getDriver(),
-            null, defaultSchemaName,
-            false, false, null, null, null, null);
+        this.database = CommandLineUtils.createDatabaseObject(
+            classLoader, // classLoader
+            dbConf.getUrl(), // url
+            dbConf.getUsername(), // username
+            dbConf.getPassword(), // password
+            dbConf.getDriver(), // driver
+            (String) null, // defaultCatalogName
+            defaultSchemaName,// defaultSchemaName
+            false, // outputDefaultCatalog
+            false, // outputDefaultSchema
+            (String) null, // databaseClass
+            (String) null, // driverPropertiesFile
+            (String) null, // liquibaseCatalogName
+            (String) null); //liquibaseSchemaName
 
         try
         {

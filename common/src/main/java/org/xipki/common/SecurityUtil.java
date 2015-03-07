@@ -202,7 +202,7 @@ public class SecurityUtil
             }
         }
 
-        if(ret.isEmpty())
+        if(CollectionUtil.isEmpty(ret))
         {
             return null;
         }
@@ -867,15 +867,15 @@ public class SecurityUtil
         return ret;
     }
 
-    public static org.bouncycastle.asn1.x509.KeyUsage createKeyUsage(Set<KeyUsage> keyUsages)
+    public static org.bouncycastle.asn1.x509.KeyUsage createKeyUsage(Set<KeyUsage> usages)
     {
-        if(keyUsages == null || keyUsages.isEmpty())
+        if(CollectionUtil.isEmpty(usages))
         {
             return null;
         }
 
         int usage = 0;
-        for (KeyUsage keyUsage : keyUsages)
+        for (KeyUsage keyUsage : usages)
         {
             usage |= keyUsage.getBcUsage();
         }
@@ -883,17 +883,17 @@ public class SecurityUtil
         return new org.bouncycastle.asn1.x509.KeyUsage(usage);
     }
 
-    public static ExtendedKeyUsage createExtendedUsage(Set<ASN1ObjectIdentifier> keyUsages)
+    public static ExtendedKeyUsage createExtendedUsage(Set<ASN1ObjectIdentifier> usages)
     {
-        if(keyUsages == null || keyUsages.isEmpty())
+        if(CollectionUtil.isEmpty(usages))
         {
             return null;
         }
 
-        KeyPurposeId[] kps = new KeyPurposeId[keyUsages.size()];
+        KeyPurposeId[] kps = new KeyPurposeId[usages.size()];
 
         int i = 0;
-        for (ASN1ObjectIdentifier oid : keyUsages)
+        for (ASN1ObjectIdentifier oid : usages)
         {
             kps[i++] = KeyPurposeId.getInstance(oid);
         }

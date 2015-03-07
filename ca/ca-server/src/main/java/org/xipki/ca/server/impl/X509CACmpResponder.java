@@ -129,10 +129,12 @@ import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.LogUtil;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.StringUtil;
 import org.xipki.common.XMLUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xml.sax.SAXException;
@@ -524,7 +526,7 @@ class X509CACmpResponder extends CmpResponder
                                     }
                                 }
 
-                                if(acceptVersions.isEmpty())
+                                if(CollectionUtil.isEmpty(acceptVersions))
                                 {
                                     acceptVersions.add(1);
                                 }
@@ -679,7 +681,8 @@ class X509CACmpResponder extends CmpResponder
      */
     private PKIBody processCcp(CmpRequestorInfo requestor, String user,
             ASN1OctetString tid, PKIHeader reqHeader,
-            CertReqMessages cr, long confirmWaitTime, boolean sendCaCert, AuditEvent auditEvent)
+            CertReqMessages cr, long confirmWaitTime,
+            boolean sendCaCert, AuditEvent auditEvent)
     throws InsuffientPermissionException
     {
         CertRepMessage repMessage = processCertReqMessages(requestor, user, tid, reqHeader, cr,
@@ -693,7 +696,9 @@ class X509CACmpResponder extends CmpResponder
             ASN1OctetString tid,
             PKIHeader reqHeader,
             CertReqMessages kur,
-            boolean keyUpdate, long confirmWaitTime, boolean sendCaCert,
+            boolean keyUpdate,
+            long confirmWaitTime,
+            boolean sendCaCert,
             AuditEvent auditEvent)
     throws InsuffientPermissionException
     {
@@ -952,7 +957,7 @@ class X509CACmpResponder extends CmpResponder
             String warningMsg = certInfo.getWarningMessage();
 
             PKIStatusInfo statusInfo;
-            if(warningMsg == null || warningMsg.isEmpty())
+            if(StringUtil.isBlank(warningMsg))
             {
                 if(certInfo.isAlreadyIssued())
                 {
@@ -1386,7 +1391,7 @@ class X509CACmpResponder extends CmpResponder
         Set<X509CertificateInfo> remainingCerts = pendingCertPool.removeCertificates(transactionId.getOctets());
 
         boolean successfull = true;
-        if(remainingCerts != null && remainingCerts.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(remainingCerts))
         {
             Date invalidityDate = new Date();
             X509CA ca = getCA();
@@ -1460,7 +1465,7 @@ class X509CACmpResponder extends CmpResponder
         {
             Set<X509CertificateInfo> remainingCerts = pendingCertPool.removeConfirmTimeoutedCertificates();
 
-            if(remainingCerts != null && remainingCerts.isEmpty() == false)
+            if(CollectionUtil.isNotEmpty(remainingCerts))
             {
                 Date invalidityDate = new Date();
                 X509CA ca = getCA();
@@ -1525,7 +1530,7 @@ class X509CACmpResponder extends CmpResponder
         StringBuilder sb = new StringBuilder();
         // current maximal support version is 2
         int version = 2;
-        if(acceptVersions.isEmpty() == false && acceptVersions.contains(version) == false)
+        if(CollectionUtil.isNotEmpty(acceptVersions) && acceptVersions.contains(version) == false)
         {
             Integer v = null;
             for(Integer m : acceptVersions)
@@ -1568,7 +1573,7 @@ class X509CACmpResponder extends CmpResponder
                 }
             }
 
-            if(supportedProfileNames.isEmpty() == false)
+            if(CollectionUtil.isNotEmpty(supportedProfileNames))
             {
                 sb.append("<certprofiles>");
                 for(String name : supportedProfileNames)
@@ -1579,7 +1584,7 @@ class X509CACmpResponder extends CmpResponder
                     sb.append("<type>").append(entry.getType()).append("</type>");
                     sb.append("<conf>");
                     String conf = entry.getConf();
-                    if(conf != null && conf.isEmpty() == false)
+                    if(StringUtil.isNotBlank(conf))
                     {
                         sb.append("<![CDATA[");
                         sb.append(conf);
@@ -1663,7 +1668,7 @@ class X509CACmpResponder extends CmpResponder
 
         // Username
         userLike = result.getUserLike();
-        if(userLike != null && userLike.isEmpty() == false)
+        if(StringUtil.isNotBlank(userLike))
         {
             sb.append("<userLike>");
             sb.append(userLike);

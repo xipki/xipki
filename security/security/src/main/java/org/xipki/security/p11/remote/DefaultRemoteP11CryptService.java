@@ -45,6 +45,7 @@ import java.net.URL;
 
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.StringUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11ModuleConf;
 
@@ -68,7 +69,7 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
 
         CmpUtf8Pairs conf = new CmpUtf8Pairs(moduleConf.getNativeLibrary());
         serverUrl = conf.getValue("url");
-        if(serverUrl == null || serverUrl.isEmpty())
+        if(StringUtil.isBlank(serverUrl))
         {
             throw new IllegalArgumentException("url is not specified");
         }

@@ -50,7 +50,7 @@ import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.ca.api.CertPublisherException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
-import org.xipki.ca.api.X509CertWithId;
+import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.publisher.X509CertPublisher;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.common.CertRevocationInfo;
@@ -132,7 +132,7 @@ public class OCSPCertPublisher extends X509CertPublisher
     }
 
     @Override
-    public boolean issuerAdded(X509CertWithId issuer)
+    public boolean issuerAdded(X509CertWithDBCertId issuer)
     {
         try
         {
@@ -148,8 +148,8 @@ public class OCSPCertPublisher extends X509CertPublisher
     @Override
     public boolean certificateAdded(X509CertificateInfo certInfo)
     {
-        X509CertWithId caCert = certInfo.getIssuerCert();
-        X509CertWithId cert = certInfo.getCert();
+        X509CertWithDBCertId caCert = certInfo.getIssuerCert();
+        X509CertWithDBCertId cert = certInfo.getCert();
 
         try
         {
@@ -163,8 +163,8 @@ public class OCSPCertPublisher extends X509CertPublisher
     }
 
     @Override
-    public boolean certificateRevoked(X509CertWithId caCert,
-            X509CertWithId cert,
+    public boolean certificateRevoked(X509CertWithDBCertId caCert,
+            X509CertWithDBCertId cert,
             String certprofile,
             CertRevocationInfo revInfo)
     {
@@ -180,8 +180,8 @@ public class OCSPCertPublisher extends X509CertPublisher
     }
 
     @Override
-    public boolean certificateUnrevoked(X509CertWithId caCert,
-            X509CertWithId cert)
+    public boolean certificateUnrevoked(X509CertWithDBCertId caCert,
+            X509CertWithDBCertId cert)
     {
         try
         {
@@ -194,7 +194,7 @@ public class OCSPCertPublisher extends X509CertPublisher
         }
     }
 
-    private void logAndAudit(String issuer, X509CertWithId cert, Exception e,
+    private void logAndAudit(String issuer, X509CertWithDBCertId cert, Exception e,
             String messagePrefix)
     {
         String subjectText = cert.getSubject();
@@ -225,7 +225,7 @@ public class OCSPCertPublisher extends X509CertPublisher
     }
 
     @Override
-    public boolean crlAdded(X509CertWithId caCert, X509CRL crl)
+    public boolean crlAdded(X509CertWithDBCertId caCert, X509CRL crl)
     {
         return true;
     }
@@ -243,7 +243,7 @@ public class OCSPCertPublisher extends X509CertPublisher
     }
 
     @Override
-    public boolean caRevoked(X509CertWithId caCert, CertRevocationInfo revocationInfo)
+    public boolean caRevoked(X509CertWithDBCertId caCert, CertRevocationInfo revocationInfo)
     {
         try
         {
@@ -258,7 +258,7 @@ public class OCSPCertPublisher extends X509CertPublisher
     }
 
     @Override
-    public boolean caUnrevoked(X509CertWithId caCert)
+    public boolean caUnrevoked(X509CertWithDBCertId caCert)
     {
         try
         {
@@ -273,8 +273,8 @@ public class OCSPCertPublisher extends X509CertPublisher
     }
 
     @Override
-    public boolean certificateRemoved(X509CertWithId issuerCert,
-            X509CertWithId cert)
+    public boolean certificateRemoved(X509CertWithDBCertId issuerCert,
+            X509CertWithDBCertId cert)
     {
         try
         {

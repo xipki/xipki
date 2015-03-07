@@ -69,6 +69,7 @@ import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
 import org.xipki.ca.api.profile.RDNControl;
 import org.xipki.ca.api.profile.SubjectInfo;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.LruCache;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.SecurityUtil;
@@ -248,7 +249,7 @@ extends X509Certprofile
             }
         }
 
-        return ret.isEmpty() ? null : ret.toArray(new RDN[0]);
+        return CollectionUtil.isEmpty(ret) ? null : ret.toArray(new RDN[0]);
     }
 
     protected EnvironmentParameterResolver parameterResolver;
@@ -259,12 +260,12 @@ extends X509Certprofile
     }
 
     protected static void checkAndAddExtension(ASN1ObjectIdentifier type, ExtensionControl occurence,
-            ExtensionValue value, ExtensionValues tuples)
+            ExtensionValue value, ExtensionValues values)
     throws CertprofileException
     {
         if(value != null)
         {
-            tuples.addExtension(type, value);
+            values.addExtension(type, value);
         }
         else if(occurence.isRequired())
         {
@@ -283,7 +284,7 @@ extends X509Certprofile
     throws BadCertTemplateException
     {
         Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = getKeyAlgorithms();
-        if(keyAlgorithms == null || keyAlgorithms.isEmpty())
+        if(CollectionUtil.isEmpty(keyAlgorithms))
         {
             return publicKey;
         }
@@ -401,7 +402,7 @@ extends X509Certprofile
             }
         } else
         {
-            throw new RuntimeException("should not reach here");
+            throw new RuntimeException("should not reach here, unknown KeyParametersOption " + keyParamsOption);
         }
 
         throw new BadCertTemplateException("the given publicKey is not permitted");

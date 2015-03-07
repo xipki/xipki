@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.common.CollectionUtil;
 
 /**
  * @author Lijun Liao
@@ -97,7 +98,7 @@ public class KeyParametersOption
 
         public void setModulusLengths(Set<Range> modulusLengths)
         {
-            if(modulusLengths == null || modulusLengths.isEmpty())
+            if(CollectionUtil.isEmpty(modulusLengths))
             {
                 this.modulusLengths = null;
             } else
@@ -137,7 +138,7 @@ public class KeyParametersOption
 
         public void setHashAlgs(Set<ASN1ObjectIdentifier> hashAlgs)
         {
-            if(hashAlgs == null || hashAlgs.isEmpty())
+            if(CollectionUtil.isEmpty(hashAlgs))
             {
                 this.hashAlgs = null;
             } else
@@ -148,7 +149,7 @@ public class KeyParametersOption
 
         public void setMaskGenAlgs(Set<ASN1ObjectIdentifier> maskGenAlgs)
         {
-            if(maskGenAlgs == null || maskGenAlgs.isEmpty())
+            if(CollectionUtil.isEmpty(maskGenAlgs))
             {
                 this.maskGenAlgs = null;
             } else
@@ -159,7 +160,7 @@ public class KeyParametersOption
 
         public void setSaltLengths(Set<Integer> saltLengths)
         {
-            if(saltLengths == null || saltLengths.isEmpty())
+            if(CollectionUtil.isEmpty(saltLengths))
             {
                 this.saltLengths = null;
             } else
@@ -170,7 +171,7 @@ public class KeyParametersOption
 
         public void setTrailerFields(Set<Integer> trailerFields)
         {
-            if(trailerFields == null || trailerFields.isEmpty())
+            if(CollectionUtil.isEmpty(trailerFields))
             {
                 this.trailerFields = null;
             } else
@@ -232,7 +233,7 @@ public class KeyParametersOption
 
         public void setPLengths(Set<Range> pLengths)
         {
-            if(pLengths == null || pLengths.isEmpty())
+            if(CollectionUtil.isEmpty(pLengths))
             {
                 this.pLengths = null;
             } else
@@ -243,7 +244,7 @@ public class KeyParametersOption
 
         public void setQLengths(Set<Range> qLengths)
         {
-            if(qLengths == null || qLengths.isEmpty())
+            if(CollectionUtil.isEmpty(qLengths))
             {
                 this.qLengths = null;
             } else
@@ -345,7 +346,7 @@ public class KeyParametersOption
 
         public void setPublicKeyParamSets(Set<ASN1ObjectIdentifier> publicKeyParamSets)
         {
-            if(publicKeyParamSets == null || publicKeyParamSets.isEmpty())
+            if(CollectionUtil.isEmpty(publicKeyParamSets))
             {
                 this.publicKeyParamSets = null;
             } else
@@ -356,7 +357,7 @@ public class KeyParametersOption
 
         public void setDigestParamSets(Set<ASN1ObjectIdentifier> digestParamSets)
         {
-            if(digestParamSets == null || digestParamSets.isEmpty())
+            if(CollectionUtil.isEmpty(digestParamSets))
             {
                 this.digestParamSets = null;
             } else
@@ -367,7 +368,7 @@ public class KeyParametersOption
 
         public void setEncryptionParamSets(Set<ASN1ObjectIdentifier> encryptionParamSets)
         {
-            if(encryptionParamSets == null || encryptionParamSets.isEmpty())
+            if(CollectionUtil.isEmpty(encryptionParamSets))
             {
                 this.encryptionParamSets = null;
             } else

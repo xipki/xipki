@@ -104,6 +104,7 @@ import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType.Parameters;
 import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType.Subject;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.StringUtil;
 import org.xipki.common.XMLUtil;
 import org.xml.sax.SAXException;
 
@@ -773,12 +774,12 @@ public class ProfileConfCreatorDemo
             }
         }
 
-        if(prefix != null && prefix.isEmpty() == false)
+        if(StringUtil.isNotBlank(prefix))
         {
             ret.setPrefix(prefix);
         }
 
-        if(suffix != null && suffix.isEmpty() == false)
+        if(StringUtil.isNotBlank(suffix))
         {
             ret.setSuffix(suffix);
         }

@@ -155,6 +155,7 @@ import org.xipki.ca.qa.internal.QaPolicyQualifierInfo;
 import org.xipki.ca.qa.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
 import org.xipki.ca.qa.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
 import org.xipki.ca.qa.internal.QaPolicyQualifiers;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
@@ -271,7 +272,8 @@ public class X509CertprofileQA
                 for(RdnType t : subject.getRdn())
                 {
                     DirectoryStringType directoryStringEnum = null;
-                    if(t.getDirectoryStringType() != null)
+                    org.xipki.ca.certprofile.internal.x509.jaxb.DirectoryStringType stringType = t.getDirectoryStringType();
+                    if(stringType != null)
                     {
                         switch(t.getDirectoryStringType())
                         {
@@ -288,7 +290,7 @@ public class X509CertprofileQA
                                 directoryStringEnum = DirectoryStringType.utf8String;
                                 break;
                             default:
-                                throw new RuntimeException("should not reach here");
+                                throw new RuntimeException("should not reach here, unknown DirectoryStringType " + stringType);
                         }
                     }
                     ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(t.getType().getValue());
@@ -297,7 +299,7 @@ public class X509CertprofileQA
                     this.subjectDNControls.add(occ);
 
                     List<Pattern> patterns = null;
-                    if(t.getRegex().isEmpty() == false)
+                    if(CollectionUtil.isNotEmpty(t.getRegex()))
                     {
                         patterns = new LinkedList<>();
                         for(String regex : t.getRegex())
@@ -523,7 +525,7 @@ public class X509CertprofileQA
         }
 
         // signatureAlgorithm
-        if(signatureAlgorithms != null && signatureAlgorithms.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(signatureAlgorithms))
         {
             ValidationIssue issue = new ValidationIssue("X509.SIGALG", "signature algorithm");
             resultIssues.add(issue);
@@ -843,7 +845,7 @@ public class X509CertprofileQA
             }
         }
 
-        if(wantedExtensionTypes.isEmpty())
+        if(CollectionUtil.isEmpty(wantedExtensionTypes))
         {
             return types;
         }
@@ -876,7 +878,7 @@ public class X509CertprofileQA
             if(required == false)
             {
                 Set<KeyUsageControl> requiredKeyusage = getKeyusage(true);
-                if(requiredKeyusage.isEmpty() == false)
+                if(CollectionUtil.isNotEmpty(requiredKeyusage))
                 {
                     required = true;
                 }
@@ -968,7 +970,7 @@ public class X509CertprofileQA
             if(required == false)
             {
                 Set<ExtKeyUsageControl> requiredExtKeyusage = getExtKeyusage(true);
-                if(requiredExtKeyusage.isEmpty() == false)
+                if(CollectionUtil.isNotEmpty(requiredExtKeyusage))
                 {
                     required = true;
                 }
@@ -1066,7 +1068,7 @@ public class X509CertprofileQA
     private void checkPublicKey(SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException
     {
-        if(keyAlgorithms == null || keyAlgorithms.isEmpty())
+        if(CollectionUtil.isEmpty(keyAlgorithms))
         {
             return;
         }
@@ -1184,7 +1186,8 @@ public class X509CertprofileQA
             }
         } else
         {
-            throw new RuntimeException("should not reach here");
+            throw new RuntimeException("should not reach here, unknown keyParamsOption " +
+                    (keyParamsOption == null ? "null" : keyParamsOption.getClass().getName()));
         }
 
         throw new BadCertTemplateException("the given publicKey is not permitted");
@@ -1371,7 +1374,7 @@ public class X509CertprofileQA
                     correctStringType = (atvValue instanceof DERUTF8String);
                     break;
                 default:
-                    throw new RuntimeException("should not reach here");
+                    throw new RuntimeException("should not reach here, unknown DirectoryStringType " + stringType);
             }
 
             if(correctStringType == false)
@@ -1432,7 +1435,7 @@ public class X509CertprofileQA
                 }
             }
 
-            if(requestedCoreAtvTextValues.isEmpty())
+            if(CollectionUtil.isEmpty(requestedCoreAtvTextValues))
             {
                 if(type.equals(ObjectIdentifiers.DN_SERIALNUMBER) == false)
                 {
@@ -1748,7 +1751,7 @@ public class X509CertprofileQA
                 }
                 else
                 {
-                    throw new RuntimeException("should not reach here");
+                    throw new RuntimeException("should not reach here, unknown child of GeneralName");
                 }
 
                 if(iBase.equals(eBase) == false)
@@ -1854,7 +1857,7 @@ public class X509CertprofileQA
 
         Set<KeyUsageControl> optionalKeyusage = getKeyusage(false);
         if(extControl.isRequest() && requestExtensions != null &&
-                optionalKeyusage.isEmpty() == false)
+                CollectionUtil.isNotEmpty(optionalKeyusage))
         {
             Extension extension = requestExtensions.getExtension(Extension.keyUsage);
             if(extension != null)
@@ -1871,7 +1874,7 @@ public class X509CertprofileQA
             }
         }
 
-        if(expectedUsages.isEmpty())
+        if(CollectionUtil.isEmpty(expectedUsages))
         {
             byte[] constantExtValue = getConstantExtensionValue(Extension.keyUsage);
             if(constantExtValue != null)
@@ -1881,14 +1884,14 @@ public class X509CertprofileQA
         }
 
         Set<String> diffs = str_in_b_not_in_a(expectedUsages, isUsages);
-        if(diffs.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(diffs))
         {
             failureMsg.append("Usages " + diffs.toString() + " are present but not expected");
             failureMsg.append("; ");
         }
 
         diffs = str_in_b_not_in_a(isUsages, expectedUsages);
-        if(diffs.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(diffs))
         {
             failureMsg.append("Usages " + diffs.toString() + " are absent but are required");
             failureMsg.append("; ");
@@ -1924,7 +1927,7 @@ public class X509CertprofileQA
 
         Set<ExtKeyUsageControl> optionalExtKeyusage = getExtKeyusage(false);
         if(extControl.isRequest() && requestExtensions != null &&
-                optionalExtKeyusage != null && optionalExtKeyusage.isEmpty() == false)
+                CollectionUtil.isNotEmpty(optionalExtKeyusage))
         {
             Extension extension = requestExtensions.getExtension(Extension.extendedKeyUsage);
             if(extension != null)
@@ -1941,7 +1944,7 @@ public class X509CertprofileQA
             }
         }
 
-        if(expectedUsages.isEmpty())
+        if(CollectionUtil.isEmpty(expectedUsages))
         {
             byte[] constantExtValue = getConstantExtensionValue(Extension.keyUsage);
             if(constantExtValue != null)
@@ -1951,14 +1954,14 @@ public class X509CertprofileQA
         }
 
         Set<String> diffs = str_in_b_not_in_a(expectedUsages, isUsages);
-        if(diffs.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(diffs))
         {
             failureMsg.append("Usages " + diffs.toString() + " are present but not expected");
             failureMsg.append("; ");
         }
 
         diffs = str_in_b_not_in_a(isUsages, expectedUsages);
-        if(diffs.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(diffs))
         {
             failureMsg.append("Usages " + diffs.toString() + " are absent but are required");
             failureMsg.append("; ");
@@ -2118,7 +2121,7 @@ public class X509CertprofileQA
             }
         }
 
-        if(iMap.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(iMap))
         {
             failureMsg.append("issuerDomainPolicies '" + iMap.keySet() + "' are present but not expected");
             failureMsg.append("; ");
@@ -2389,14 +2392,14 @@ public class X509CertprofileQA
                 }
 
                 Set<String> diffs = str_in_b_not_in_a(eOCSPUris, iOCSPUris);
-                if(diffs.isEmpty() == false)
+                if(CollectionUtil.isNotEmpty(diffs))
                 {
                     failureMsg.append("OCSP URLs ").append(diffs.toString()).append(" are present but not expected");
                     failureMsg.append("; ");
                 }
 
                 diffs = str_in_b_not_in_a(iOCSPUris, eOCSPUris);
-                if(diffs.isEmpty() == false)
+                if(CollectionUtil.isNotEmpty(diffs))
                 {
                     failureMsg.append("OCSP URLs ").append(diffs.toString()).append(" are absent but are required");
                     failureMsg.append("; ");
@@ -2450,14 +2453,14 @@ public class X509CertprofileQA
 
                     Set<String> eCRLUrls = issuerInfo.getCrlURLs();
                     Set<String> diffs = str_in_b_not_in_a(eCRLUrls, iCrlURLs);
-                    if(diffs.isEmpty() == false)
+                    if(CollectionUtil.isNotEmpty(diffs))
                     {
                         failureMsg.append("CRL URLs ").append(diffs.toString()).append(" are present but not expected");
                         failureMsg.append("; ");
                     }
 
                     diffs = str_in_b_not_in_a(iCrlURLs, eCRLUrls);
-                    if(diffs.isEmpty() == false)
+                    if(CollectionUtil.isNotEmpty(diffs))
                     {
                         failureMsg.append("CRL URLs ").append(diffs.toString()).append(" are absent but are required");
                         failureMsg.append("; ");
@@ -2512,14 +2515,14 @@ public class X509CertprofileQA
 
                     Set<String> eCRLUrls = issuerInfo.getCrlURLs();
                     Set<String> diffs = str_in_b_not_in_a(eCRLUrls, iCrlURLs);
-                    if(diffs.isEmpty() == false)
+                    if(CollectionUtil.isNotEmpty(diffs))
                     {
                         failureMsg.append("deltaCRL URLs ").append(diffs.toString()).append(" are present but not expected");
                         failureMsg.append("; ");
                     }
 
                     diffs = str_in_b_not_in_a(iCrlURLs, eCRLUrls);
-                    if(diffs.isEmpty() == false)
+                    if(CollectionUtil.isNotEmpty(diffs))
                     {
                         failureMsg.append("deltaCRL URLs ").append(diffs.toString()).append(" are absent but are required");
                         failureMsg.append("; ");
@@ -2624,14 +2627,14 @@ public class X509CertprofileQA
                 }
 
                 Set<String> diffs = str_in_b_not_in_a(eProfessionOids, iProfessionOids);
-                if(diffs.isEmpty() == false)
+                if(CollectionUtil.isNotEmpty(diffs))
                 {
                     failureMsg.append("ProfessionOIDs ").append(diffs.toString()).append(" are present but not expected");
                     failureMsg.append("; ");
                 }
 
                 diffs = str_in_b_not_in_a(iProfessionOids, eProfessionOids);
-                if(diffs.isEmpty() == false)
+                if(CollectionUtil.isNotEmpty(diffs))
                 {
                     failureMsg.append("ProfessionOIDs ").append(diffs.toString()).append(" are absent but are required");
                     failureMsg.append("; ");
@@ -2649,14 +2652,14 @@ public class X509CertprofileQA
                 }
 
                 diffs = str_in_b_not_in_a(eProfessionItems, iProfessionItems);
-                if(diffs.isEmpty() == false)
+                if(CollectionUtil.isNotEmpty(diffs))
                 {
                     failureMsg.append("ProfessionItems ").append(diffs.toString()).append(" are present but not expected");
                     failureMsg.append("; ");
                 }
 
                 diffs = str_in_b_not_in_a(iProfessionItems, eProfessionItems);
-                if(diffs.isEmpty() == false)
+                if(CollectionUtil.isNotEmpty(diffs))
                 {
                     failureMsg.append("ProfessionItems ").append(diffs.toString()).append(" are absent but are required");
                     failureMsg.append("; ");
@@ -2801,7 +2804,7 @@ public class X509CertprofileQA
             }
             default:
             {
-                throw new RuntimeException("should not reach here");
+                throw new RuntimeException("should not reach here, unknwon GeneralName tag " + tag);
             }
         }
     }
@@ -2937,7 +2940,7 @@ public class X509CertprofileQA
             map.put(new ASN1ObjectIdentifier(m.getType().getValue()), extension);
         }
 
-        if(map.isEmpty())
+        if(CollectionUtil.isEmpty(map))
         {
             return null;
         }

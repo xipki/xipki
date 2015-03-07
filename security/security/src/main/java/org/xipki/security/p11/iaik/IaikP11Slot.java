@@ -130,6 +130,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
@@ -354,13 +355,13 @@ public class IaikP11Slot implements P11WritableSlot
                                 }
                             }
 
-                            if(issuerCerts.isEmpty() == false)
+                            if(CollectionUtil.isNotEmpty(issuerCerts))
                             {
                                 allCerts.put(issuerSubject, issuerCerts);
                             }
                         }
 
-                        if(issuerCerts == null || issuerCerts.isEmpty())
+                        if(CollectionUtil.isEmpty(issuerCerts))
                         {
                             break;
                         }
@@ -632,7 +633,7 @@ public class IaikP11Slot implements P11WritableSlot
 
         try
         {
-            if (isProtectedAuthenticationPath || password == null || password.isEmpty())
+            if (isProtectedAuthenticationPath || CollectionUtil.isEmpty(password))
             {
                 LOG.info("verify on PKCS11Module with PROTECTED_AUTHENTICATION_PATH");
                 // some driver does not accept null PIN
@@ -690,7 +691,7 @@ public class IaikP11Slot implements P11WritableSlot
                 return;
             }
 
-            if(password == null || password.isEmpty())
+            if(CollectionUtil.isEmpty(password))
             {
                 session.login(Session.UserType.USER, null);
             }
@@ -788,7 +789,7 @@ public class IaikP11Slot implements P11WritableSlot
             }
 
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if(tmpObjects == null || tmpObjects.isEmpty())
+            if(CollectionUtil.isEmpty(tmpObjects))
             {
                 return Collections.emptyList();
             }
@@ -897,7 +898,7 @@ public class IaikP11Slot implements P11WritableSlot
             }
 
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if(tmpObjects == null || tmpObjects.isEmpty())
+            if(CollectionUtil.isEmpty(tmpObjects))
             {
                 return null;
             }
@@ -934,7 +935,7 @@ public class IaikP11Slot implements P11WritableSlot
                 template.getDecrypt().setBooleanValue(forDecrypting);
             }
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if(tmpObjects == null || tmpObjects.isEmpty())
+            if(CollectionUtil.isEmpty(tmpObjects))
             {
                 msg.append(" empty");
             }
@@ -1003,7 +1004,7 @@ public class IaikP11Slot implements P11WritableSlot
             }
 
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if(tmpObjects == null || tmpObjects.isEmpty())
+            if(CollectionUtil.isEmpty(tmpObjects))
             {
                 return null;
             }
@@ -1144,7 +1145,7 @@ public class IaikP11Slot implements P11WritableSlot
             }
 
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if(tmpObjects == null || tmpObjects.isEmpty())
+            if(CollectionUtil.isEmpty(tmpObjects))
             {
                 LOG.info("found no certificate identified by {}", getDescription(keyId, keyLabel));
                 return null;
@@ -1173,7 +1174,7 @@ public class IaikP11Slot implements P11WritableSlot
             X509PublicKeyCertificate template = new X509PublicKeyCertificate();
 
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if(tmpObjects == null || tmpObjects.isEmpty())
+            if(CollectionUtil.isEmpty(tmpObjects))
             {
                 msg.append(" empty");
             }
@@ -1412,7 +1413,7 @@ public class IaikP11Slot implements P11WritableSlot
             }
 
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if(tmpObjects == null || tmpObjects.isEmpty())
+            if(CollectionUtil.isEmpty(tmpObjects))
             {
                 msg.append(" empty");
             }
@@ -1773,7 +1774,7 @@ public class IaikP11Slot implements P11WritableSlot
         extensions.add(new Extension(Extension.keyUsage, true,
                 new DEROctetString(new KeyUsage(keyUsage))));
 
-        if(extendedKeyUsage != null && extendedKeyUsage.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(extendedKeyUsage))
         {
             KeyPurposeId[] kps = new KeyPurposeId[extendedKeyUsage.size()];
 

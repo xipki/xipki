@@ -35,7 +35,7 @@
 
 package org.xipki.ca.server.impl.store;
 
-import org.xipki.ca.api.X509CertWithId;
+import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.common.CertRevocationInfo;
 
 /**
@@ -44,7 +44,7 @@ import org.xipki.common.CertRevocationInfo;
 
 public class X509CertWithRevocationInfo
 {
-    private X509CertWithId cert;
+    private X509CertWithDBCertId cert;
     private CertRevocationInfo revInfo;
     private String certprofile;
 
@@ -52,7 +52,7 @@ public class X509CertWithRevocationInfo
     {
     }
 
-    public X509CertWithId getCert()
+    public X509CertWithDBCertId getCert()
     {
         return cert;
     }
@@ -67,7 +67,7 @@ public class X509CertWithRevocationInfo
         return revInfo;
     }
 
-    public void setCert(X509CertWithId cert)
+    public void setCert(X509CertWithDBCertId cert)
     {
         this.cert = cert;
     }

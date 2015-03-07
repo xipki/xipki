@@ -43,6 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.ParamChecker;
 
 /**
@@ -135,7 +136,7 @@ class PendingCertificatePool
             entries.remove(retEntry);
         }
 
-        if(entries.isEmpty())
+        if(CollectionUtil.isEmpty(entries))
         {
             map.remove(hexTid);
         }
@@ -161,7 +162,7 @@ class PendingCertificatePool
 
     synchronized Set<X509CertificateInfo> removeConfirmTimeoutedCertificates()
     {
-        if(map.isEmpty())
+        if(CollectionUtil.isEmpty(map))
         {
             return null;
         }

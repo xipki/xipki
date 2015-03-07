@@ -104,7 +104,7 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
         }
 
         Date invalidityDate = null;
-        if(invalidityDateS != null && invalidityDateS.isEmpty() == false)
+        if(isNotBlank(invalidityDateS))
         {
             invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
         }

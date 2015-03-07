@@ -111,6 +111,7 @@ import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.CertpathValidationModel;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HealthCheckResult;
@@ -119,6 +120,7 @@ import org.xipki.common.LogUtil;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.StringUtil;
 import org.xipki.common.XMLUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -346,7 +348,7 @@ public class OcspServer
                 throw new ConfigurationException("Responder named '" + name + "' defined duplicatedly");
             }
 
-            if(name.isEmpty())
+            if(StringUtil.isBlank(name))
             {
                 throw new ConfigurationException("Responder name could not be empty");
             }
@@ -1022,7 +1024,7 @@ public class OcspServer
                 }
 
                 basicOcspBuilder.addResponse(certID, bcCertStatus, thisUpdate, nextUpdate,
-                        extensions.isEmpty() ? null : new Extensions(extensions.toArray(new Extension[0])));
+                        CollectionUtil.isEmpty(extensions) ? null : new Extensions(extensions.toArray(new Extension[0])));
                 cacheThisUpdate = Math.max(cacheThisUpdate, thisUpdate.getTime());
                 if(nextUpdate != null)
                 {
@@ -1036,7 +1038,7 @@ public class OcspServer
                         new Extension(ObjectIdentifiers.id_pkix_ocsp_extendedRevoke, true, DERNull.INSTANCE.getEncoded()));
             }
 
-            if(responseExtensions.isEmpty() == false)
+            if(CollectionUtil.isNotEmpty(responseExtensions))
             {
                 basicOcspBuilder.setResponseExtensions(
                         new Extensions(responseExtensions.toArray(new Extension[0])));
@@ -1055,7 +1057,7 @@ public class OcspServer
                 }
             }
 
-            if(criticalExtensionOIDs.isEmpty() == false)
+            if(CollectionUtil.isNotEmpty(criticalExtensionOIDs))
             {
                 return createUnsuccessfullOCSPResp(OcspResponseStatus.malformedRequest);
             }
@@ -1432,7 +1434,7 @@ public class OcspServer
         }
         else
         {
-            throw new RuntimeException("Should not reach here");
+            throw new RuntimeException("Should not reach here, unknwon CertStore type");
         }
 
         store.setIncludeArchiveCutoff(
@@ -1575,7 +1577,7 @@ public class OcspServer
         }
 
         Set<X509Certificate> configuredCerts = requestOption.getCerts();
-        if(configuredCerts != null && configuredCerts.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(configuredCerts))
         {
             certstore.addAll(requestOption.getCerts());
         }
