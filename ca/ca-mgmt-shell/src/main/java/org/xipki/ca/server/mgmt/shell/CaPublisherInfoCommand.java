@@ -60,7 +60,7 @@ public class CaPublisherInfoCommand extends CaCommand
         StringBuilder sb = new StringBuilder();
 
         List<PublisherEntry> entries = caManager.getPublishersForCA(caName);
-        if(entries != null && entries.isEmpty() == false)
+        if(isNotEmpty(entries))
         {
             sb.append("Publishers for CA " + caName).append("\n");
             for(PublisherEntry entry  : entries)

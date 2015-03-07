@@ -89,11 +89,13 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.StringUtil;
 import org.xipki.common.XMLUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
@@ -510,7 +512,7 @@ public class SecurityFactoryImpl implements SecurityFactory
             }
             else
             {
-                throw new RuntimeException("should not reach here");
+                throw new RuntimeException("should not reach here, unknown algorithm " + algoS);
             }
 
             try
@@ -1035,7 +1037,7 @@ public class SecurityFactoryImpl implements SecurityFactory
             return;
         }
 
-        if(pkcs11ConfFile == null || pkcs11ConfFile.isEmpty())
+        if(StringUtil.isBlank(pkcs11ConfFile))
         {
             throw new IllegalStateException("pkcs11ConfFile is not set");
         }
@@ -1070,7 +1072,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                 P11PasswordRetriever pwdRetriever;
 
                 PasswordsType passwordsType = moduleType.getPasswords();
-                if(passwordsType == null || passwordsType.getPassword().isEmpty())
+                if(passwordsType == null || CollectionUtil.isEmpty(passwordsType.getPassword()))
                 {
                     pwdRetriever = P11NullPasswordRetriever.INSTANCE;
                 }
@@ -1095,7 +1097,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                 for(NativeLibraryType library : moduleType.getNativeLibraries().getNativeLibrary())
                 {
                     List<String> osNames = library.getOs();
-                    if(osNames == null || osNames.isEmpty())
+                    if(CollectionUtil.isEmpty(osNames))
                     {
                         nativeLibraryPath = library.getPath();
                     }
@@ -1157,7 +1159,7 @@ public class SecurityFactoryImpl implements SecurityFactory
 
     public void setPkcs11ConfFile(String confFile)
     {
-        if(confFile != null && confFile.isEmpty())
+        if(StringUtil.isBlank(confFile))
         {
             this.pkcs11ConfFile = null;
         }
@@ -1170,7 +1172,7 @@ public class SecurityFactoryImpl implements SecurityFactory
     private static Set<P11SlotIdentifier> getSlots(SlotsType type)
     throws ConfigurationException
     {
-        if(type == null || type.getSlot().isEmpty())
+        if(type == null || CollectionUtil.isEmpty(type.getSlot()))
         {
             return null;
         }
@@ -1258,7 +1260,7 @@ public class SecurityFactoryImpl implements SecurityFactory
         }
 
         signerTypeMap = signerTypeMap.trim();
-        if(signerTypeMap.isEmpty())
+        if(StringUtil.isBlank(signerTypeMap))
         {
             LOG.debug("signerTypeMap is empty");
             return;

@@ -37,6 +37,8 @@ package org.xipki.ca.server.mgmt.api;
 
 import java.util.Set;
 
+import org.xipki.common.CollectionUtil;
+
 /**
  * @author Lijun Liao
  */
@@ -79,7 +81,7 @@ public enum Permission
 
     public static String toString(Set<Permission> permissions)
     {
-        if(permissions == null || permissions.isEmpty())
+        if(CollectionUtil.isEmpty(permissions))
         {
             return null;
         }

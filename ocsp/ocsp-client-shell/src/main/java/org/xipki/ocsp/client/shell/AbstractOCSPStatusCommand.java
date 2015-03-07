@@ -39,7 +39,6 @@ import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
-import org.xipki.common.StringUtil;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
@@ -120,7 +119,7 @@ public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
 
         if(prefSigAlgs != null)
         {
-            options.setPreferredSignatureAlgorithms2(StringUtil.split(prefSigAlgs, ",;: \t"));
+            options.setPreferredSignatureAlgorithms2(split(prefSigAlgs, ",;: \t"));
         }
 
         return options;

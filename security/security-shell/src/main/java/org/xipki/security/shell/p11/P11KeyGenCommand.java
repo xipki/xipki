@@ -73,7 +73,7 @@ public abstract class P11KeyGenCommand extends KeyGenCommand
 
     protected String getSubject()
     {
-        if(subject == null || subject.isEmpty())
+        if(isBlank(subject))
         {
             return "CN=" + label;
         }

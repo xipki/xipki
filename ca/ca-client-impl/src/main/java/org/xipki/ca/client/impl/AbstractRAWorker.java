@@ -55,6 +55,7 @@ import org.xipki.ca.client.api.dto.EnrollCertResultType;
 import org.xipki.ca.client.api.dto.ErrorResultEntryType;
 import org.xipki.ca.client.api.dto.ErrorResultType;
 import org.xipki.ca.client.api.dto.ResultEntryType;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.security.api.SecurityFactory;
 
@@ -116,7 +117,7 @@ public abstract class AbstractRAWorker
 
         List<CMPCertificate> cmpCaPubs = result.getCACertificates();
 
-        if(cmpCaPubs != null && cmpCaPubs.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(cmpCaPubs))
         {
             List<Certificate> caPubs = new ArrayList<>(cmpCaPubs.size());
             for(CMPCertificate cmpCaPub : cmpCaPubs)

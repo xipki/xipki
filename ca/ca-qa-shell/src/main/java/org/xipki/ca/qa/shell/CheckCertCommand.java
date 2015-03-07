@@ -85,7 +85,7 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
     throws Exception
     {
         Set<String> issuerNames = qaSystemManager.getIssuerNames();
-        if(issuerNames.isEmpty())
+        if(isEmpty(issuerNames))
         {
             err("No issuer is configured");
             return  null;

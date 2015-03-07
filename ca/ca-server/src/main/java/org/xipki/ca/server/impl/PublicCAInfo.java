@@ -51,7 +51,7 @@ import org.bouncycastle.util.Arrays;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.api.X509CertWithId;
+import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
 
@@ -66,7 +66,7 @@ class PublicCAInfo
     private final byte[] subjectKeyIdentifier;
     private final GeneralNames  subjectAltName;
     private final BigInteger serialNumber;
-    private final X509CertWithId caCertificate;
+    private final X509CertWithDBCertId caCertificate;
     private X509Certificate crlSignerCertificate;
     private final List<String> ocspUris;
     private final List<String> crlUris;
@@ -79,7 +79,7 @@ class PublicCAInfo
     throws OperationException
     {
         ParamChecker.assertNotNull("caCertificate", caCertificate);
-        this.caCertificate = new X509CertWithId(caCertificate);
+        this.caCertificate = new X509CertWithDBCertId(caCertificate);
         this.serialNumber = caCertificate.getSerialNumber();
         this.subject = caCertificate.getSubjectX500Principal();
         this.x500Subject = X500Name.getInstance(subject.getEncoded());
@@ -215,7 +215,7 @@ class PublicCAInfo
         return serialNumber;
     }
 
-    public X509CertWithId getCaCertificate()
+    public X509CertWithDBCertId getCaCertificate()
     {
         return caCertificate;
     }

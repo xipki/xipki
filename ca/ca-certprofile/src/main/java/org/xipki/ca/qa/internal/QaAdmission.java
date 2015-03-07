@@ -42,6 +42,7 @@ import java.util.List;
 import org.bouncycastle.util.Arrays;
 import org.xipki.ca.certprofile.internal.x509.jaxb.Admission;
 import org.xipki.ca.certprofile.internal.x509.jaxb.OidWithDescType;
+import org.xipki.common.CollectionUtil;
 
 /**
  * @author Lijun Liao
@@ -60,7 +61,7 @@ public class QaAdmission extends QaExtension
         this.addProfessionInfo = jaxb.getAddProfessionInfo();
 
         List<String> items = jaxb.getProfessionItem();
-        if(items.isEmpty())
+        if(CollectionUtil.isEmpty(items))
         {
             professionItems = null;
         } else

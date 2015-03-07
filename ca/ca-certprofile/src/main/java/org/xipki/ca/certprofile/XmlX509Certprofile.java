@@ -107,10 +107,12 @@ import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType.KeyAlgorithms;
 import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType.Parameters;
 import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType.Subject;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -277,9 +279,11 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                 for(RdnType t : subject.getRdn())
                 {
                     DirectoryStringType directoryStringEnum = null;
-                    if(t.getDirectoryStringType() != null)
+                    org.xipki.ca.certprofile.internal.x509.jaxb.DirectoryStringType stringType =
+                            t.getDirectoryStringType();
+                    if(stringType != null)
                     {
-                        switch(t.getDirectoryStringType())
+                        switch(stringType)
                         {
                             case BMP_STRING:
                                 directoryStringEnum = DirectoryStringType.bmpString;
@@ -294,7 +298,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                                 directoryStringEnum = DirectoryStringType.utf8String;
                                 break;
                             default:
-                                throw new RuntimeException("should not reach here");
+                                throw new RuntimeException("should not reach here, undefined DirectoryStringType " +
+                                        stringType);
                         }
                     }
                     ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(t.getType().getValue());
@@ -302,7 +307,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                     this.subjectDNControls.add(occ);
 
                     List<Pattern> patterns = null;
-                    if(t.getRegex().isEmpty() == false)
+                    if(CollectionUtil.isNotEmpty(t.getRegex()))
                     {
                         patterns = new LinkedList<>();
                         for(String regex : t.getRegex())
@@ -455,7 +460,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                     List<String> professionItems;
 
                     List<String> items = type == null ? null : extConf.getProfessionItem();
-                    if(items == null || items.isEmpty())
+                    if(CollectionUtil.isEmpty(items))
                     {
                         professionItems = null;
                     }
@@ -685,7 +690,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         }
 
         List<Pattern> patterns = option.getPatterns();
-        if(patterns == null || patterns.isEmpty())
+        if(CollectionUtil.isEmpty(patterns))
         {
             return values;
         }
@@ -718,10 +723,10 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             X500Name requestedSubject, Extensions requestedExtensions)
     throws CertprofileException, BadCertTemplateException
     {
-        ExtensionValues tuples = new ExtensionValues();
-        if(extensionOccurences == null || extensionOccurences.isEmpty())
+        ExtensionValues values = new ExtensionValues();
+        if(CollectionUtil.isEmpty(extensionOccurences))
         {
-            return tuples;
+            return values;
         }
 
         Map<ASN1ObjectIdentifier, ExtensionControl> occurences = new HashMap<>(extensionOccurences);
@@ -739,14 +744,14 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         ASN1ObjectIdentifier type = Extension.certificatePolicies;
         if(certificatePolicies != null && occurences.remove(type) != null)
         {
-            tuples.addExtension(type, certificatePolicies);
+            values.addExtension(type, certificatePolicies);
         }
 
         // Policy Mappings
         type = Extension.policyMappings;
         if(policyMappings != null && occurences.remove(type) != null)
         {
-            tuples.addExtension(type, policyMappings);
+            values.addExtension(type, policyMappings);
         }
 
         // SubjectAltName
@@ -765,14 +770,14 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         type = Extension.nameConstraints;
         if(nameConstraints != null && occurences.remove(type) != null)
         {
-            tuples.addExtension(type, nameConstraints);
+            values.addExtension(type, nameConstraints);
         }
 
         // PolicyConstrains
         type = Extension.policyConstraints;
         if(policyConstraints != null && occurences.remove(type) != null)
         {
-            tuples.addExtension(type, policyConstraints);
+            values.addExtension(type, policyConstraints);
         }
 
         // ExtendedKeyUsage
@@ -785,7 +790,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         type = Extension.inhibitAnyPolicy;
         if(inhibitAnyPolicy != null && occurences.remove(type) != null)
         {
-            tuples.addExtension(type, inhibitAnyPolicy);
+            values.addExtension(type, inhibitAnyPolicy);
         }
 
         // Freshest CRL
@@ -801,7 +806,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         type = ObjectIdentifiers.id_extension_admission;
         if(admission != null && occurences.remove(type) != null)
         {
-            tuples.addExtension(type, admission);
+            values.addExtension(type, admission);
         }
 
         // OCSP Nocheck
@@ -818,13 +823,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                     ExtensionValue extensionValue = constantExtensions.get(m);
                     if(extensionValue != null)
                     {
-                        tuples.addExtension(m, extensionValue);
+                        values.addExtension(m, extensionValue);
                     }
                 }
             }
         }
 
-        return tuples;
+        return values;
     }
 
     @Override
@@ -912,11 +917,11 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             byte[] addProfessionInfo)
     throws CertprofileException
     {
-        if(professionItems == null || professionItems.isEmpty())
+        if(CollectionUtil.isEmpty(professionItems))
         {
-            if(professionOIDs == null || professionOIDs.isEmpty())
+            if(CollectionUtil.isEmpty(professionOIDs))
             {
-                if(registrationNumber == null || registrationNumber.isEmpty())
+                if(StringUtil.isBlank(registrationNumber))
                 {
                     if(addProfessionInfo == null || addProfessionInfo.length == 0)
                     {
@@ -1040,7 +1045,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             }
         }
 
-        throw new RuntimeException("Should not reach here: undefined extension " + type.getId());
+        throw new RuntimeException("Should not reach here: undefined extension " +
+                ObjectIdentifiers.oidToDisplayName(type));
     }
 
 }

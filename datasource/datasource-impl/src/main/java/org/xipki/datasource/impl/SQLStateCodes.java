@@ -99,7 +99,7 @@ public class SQLStateCodes
         case UNKNOWN:
             return new SQLStateCodes();
         default:
-            throw new RuntimeException("should not reach here");
+            throw new RuntimeException("should not reach here, unknown database type " + dbType);
         }
     }
 

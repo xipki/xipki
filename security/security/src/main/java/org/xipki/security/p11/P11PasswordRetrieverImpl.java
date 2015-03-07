@@ -40,6 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.xipki.common.CollectionUtil;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.p11.P11PasswordRetriever;
@@ -59,7 +60,7 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever
         private SingleRetriever(Set<P11SlotIdentifier> slots, List<String> singlePasswords)
         {
             this.slots = slots;
-            if(singlePasswords == null || singlePasswords.isEmpty())
+            if(CollectionUtil.isEmpty(singlePasswords))
             {
                 this.singlePasswords = null;
             }
@@ -129,7 +130,7 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever
     public List<char[]> getPassword(P11SlotIdentifier slotId)
     throws PasswordResolverException
     {
-        if(singleRetrievers.isEmpty())
+        if(CollectionUtil.isEmpty(singleRetrievers))
         {
             return null;
         }

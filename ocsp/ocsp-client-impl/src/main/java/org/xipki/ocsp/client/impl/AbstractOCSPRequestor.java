@@ -65,7 +65,9 @@ import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DigestCalculator;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.StringUtil;
 import org.xipki.ocsp.client.api.InvalidOCSPResponseException;
 import org.xipki.ocsp.client.api.OCSPNonceUnmatchedException;
 import org.xipki.ocsp.client.api.OCSPRequestor;
@@ -293,7 +295,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             extensions.add(extn);
         }
 
-        if(extensions.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(extensions))
         {
             reqBuilder.setRequestExtensions(
                     new Extensions(extensions.toArray(new Extension[0])));
@@ -317,18 +319,18 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                 {
                     if(signer == null)
                     {
-                        if(signerType == null || signerType.isEmpty())
+                        if(StringUtil.isBlank(signerType))
                         {
                             throw new OCSPRequestorException("signerType is not configured");
                         }
 
-                        if(signerConf == null || signerConf.isEmpty())
+                        if(StringUtil.isBlank(signerConf))
                         {
                             throw new OCSPRequestorException("signerConf is not configured");
                         }
 
                         X509Certificate cert = null;
-                        if(signerCertFile != null && signerCertFile.isEmpty() == false)
+                        if(StringUtil.isNotBlank(signerCertFile))
                         {
                             try
                             {

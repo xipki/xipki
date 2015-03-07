@@ -68,7 +68,7 @@ public abstract class CRLCommand extends ClientCommand
     throws Exception
     {
         Set<String> caNames = raWorker.getCaNames();
-        if(caNames.isEmpty())
+        if(isEmpty(caNames))
         {
             err("No CA is configured");
             return  null;

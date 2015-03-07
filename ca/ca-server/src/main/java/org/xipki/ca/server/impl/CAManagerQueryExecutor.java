@@ -62,7 +62,7 @@ import org.xipki.ca.api.CertPublisherException;
 import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.X509CertWithId;
+import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.impl.store.CertificateStore;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
@@ -83,6 +83,7 @@ import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
@@ -430,7 +431,7 @@ class CAManagerQueryExecutor
             while(rs.next())
             {
                 String name = rs.getString("NAME");
-                if(name != null && name.isEmpty() == false)
+                if(StringUtil.isNotBlank(name))
                 {
                     names.add(name);
                 }
@@ -763,19 +764,19 @@ class CAManagerQueryExecutor
                 Set<Permission> permissions = getPermissions(s);
 
                 List<String> lCrlUris = null;
-                if(crl_uris != null && crl_uris.isEmpty() == false)
+                if(StringUtil.isNotBlank(crl_uris))
                 {
                     lCrlUris = StringUtil.split(crl_uris, " \t");
                 }
 
                 List<String> lDeltaCrlUris = null;
-                if(delta_crl_uris != null && delta_crl_uris.isEmpty() == false)
+                if(StringUtil.isNotBlank(delta_crl_uris))
                 {
                     lDeltaCrlUris = StringUtil.split(delta_crl_uris, " \t");
                 }
 
                 List<String> lOcspUris = null;
-                if(ocsp_uris != null && ocsp_uris.isEmpty() == false)
+                if(StringUtil.isNotBlank(ocsp_uris))
                 {
                     lOcspUris = StringUtil.split(ocsp_uris, " \t");
                 }
@@ -825,7 +826,7 @@ class CAManagerQueryExecutor
                 {
                     if(masterMode)
                     {
-                        X509CertWithId cm = new X509CertWithId(entry.getCertificate());
+                        X509CertWithDBCertId cm = new X509CertWithDBCertId(entry.getCertificate());
                         certstore.addCa(cm);
                     }
 
@@ -2187,7 +2188,7 @@ class CAManagerQueryExecutor
         }
 
         typeMap = typeMap.trim();
-        if(typeMap.isEmpty())
+        if(StringUtil.isBlank(typeMap))
         {
             return null;
         }
@@ -2253,7 +2254,7 @@ class CAManagerQueryExecutor
 
     private static String toString(Set<String> tokens, String seperator)
     {
-        if(tokens == null || tokens.isEmpty())
+        if(CollectionUtil.isEmpty(tokens))
         {
             return null;
         }

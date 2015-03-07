@@ -67,7 +67,7 @@ public class CaProfileInfoCommand extends CaCommand
         else
         {
             Set<String> entries = caManager.getCertprofilesForCA(caName);
-            if(entries != null && entries.isEmpty() == false)
+            if(isNotEmpty(entries))
             {
                 sb.append("Certificate Profiles supported by CA " + caName).append("\n");
 

@@ -41,6 +41,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.xipki.common.CollectionUtil;
+import org.xipki.common.ParamChecker;
+
 /**
  * @author Lijun Liao
  */
@@ -53,13 +56,10 @@ public class P11Control
 
     public P11Control(String defaultModuleName, Set<P11ModuleConf> moduleConfs)
     {
-        if(defaultModuleName == null || defaultModuleName.isEmpty())
-        {
-            throw new IllegalArgumentException("defaultModuleName could not be null or empty");
-        }
+        ParamChecker.assertNotEmpty("defaultModuleName", defaultModuleName);
 
         this.defaultModuleName = defaultModuleName;
-        if(moduleConfs == null || moduleConfs.isEmpty())
+        if(CollectionUtil.isEmpty(moduleConfs))
         {
             this.moduleConfs = Collections.emptyMap();
             this.moduleNames = Collections.emptySet();

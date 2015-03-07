@@ -47,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.LogUtil;
+import org.xipki.common.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -94,7 +95,7 @@ public class HealthCheckServlet extends HttpServlet
                 return;
             }
 
-            if(r.getRelativeUri() != null && r.getRelativeUri().isEmpty() == false)
+            if(StringUtil.isNotBlank(r.getRelativeUri()))
             {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;

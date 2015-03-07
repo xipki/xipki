@@ -65,6 +65,7 @@ import org.xipki.ca.qa.shell.internal.jaxb.X509IssuerType;
 import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.XMLUtil;
+import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xml.sax.SAXException;
 
 /**
@@ -97,7 +98,7 @@ public class QASystemManager
 
     public void init()
     {
-        if(confFile == null || confFile.isEmpty())
+        if(XipkiOsgiCommandSupport.isBlank(confFile))
         {
             LOG.error("confFile could not be null and empty");
             return;

@@ -49,7 +49,7 @@ import org.xipki.common.SecurityUtil;
  * @author Lijun Liao
  */
 
-public class X509CertWithId
+public class X509CertWithDBCertId
 {
     private Integer certId;
     private final X509Certificate cert;
@@ -58,12 +58,12 @@ public class X509CertWithId
     private final byte[] subjectKeyIdentifer;
     private final X500Name subjectAsX500Name;
 
-    public X509CertWithId(X509Certificate cert)
+    public X509CertWithDBCertId(X509Certificate cert)
     {
         this(cert, null);
     }
 
-    public X509CertWithId(X509Certificate cert, byte[] encodedCert)
+    public X509CertWithDBCertId(X509Certificate cert, byte[] encodedCert)
     {
         ParamChecker.assertNotNull("cert", cert);
 

@@ -87,6 +87,7 @@ import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
@@ -94,6 +95,7 @@ import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.StringUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
@@ -381,7 +383,7 @@ public class CrlCertStatusStore extends CertStatusStore
 
             // Construct CrlID
             ASN1EncodableVector v = new ASN1EncodableVector();
-            if(crlUrl != null && crlUrl.isEmpty() == false)
+            if(StringUtil.isNotBlank(crlUrl))
             {
                 v.add(new DERTaggedObject(true, 0, new DERIA5String(crlUrl, true)));
             }
@@ -529,7 +531,7 @@ public class CrlCertStatusStore extends CertStatusStore
             Map<BigInteger, X509CRLEntry> revokedCertMap = null;
 
             // merge the revoked list
-            if(revokedCertListInDeltaCRL != null && revokedCertListInDeltaCRL.isEmpty() == false)
+            if(CollectionUtil.isNotEmpty(revokedCertListInDeltaCRL))
             {
                 revokedCertMap = new HashMap<BigInteger, X509CRLEntry>();
                 for(X509CRLEntry entry : revokedCertListInFullCRL)

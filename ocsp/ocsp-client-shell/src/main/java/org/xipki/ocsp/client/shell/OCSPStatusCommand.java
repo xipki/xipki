@@ -120,8 +120,7 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
     protected Object _doExecute()
     throws Exception
     {
-        if((serialNumbers == null || serialNumbers.isEmpty()) &&
-                (certFiles == null || certFiles.isEmpty()))
+        if(isEmpty(serialNumbers) && isEmpty(certFiles))
         {
             err("Neither serialNumbers nor certFiles is set");
             return null;
@@ -131,7 +130,7 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
 
         Map<BigInteger, byte[]> encodedCerts = null;
         List<BigInteger> sns = new LinkedList<>();
-        if(certFiles != null && certFiles.isEmpty() == false)
+        if(isNotEmpty(certFiles))
         {
             encodedCerts = new HashMap<>(certFiles.size());
 
@@ -147,7 +146,7 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
                     return null;
                 }
 
-                if(serverURL == null || serverURL.isEmpty())
+                if(isBlank(serverURL))
                 {
                     List<String> ocspUrls = SecurityUtil.extractOCSPUrls(cert);
                     if(ocspUrls.size() > 0)
@@ -169,7 +168,7 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
                 encodedCerts.put(sn, encodedCert);
             }
 
-            if(serverURL == null || serverURL.isEmpty())
+            if(isBlank(serverURL))
             {
                 serverURL = ocspUrl;
             }
@@ -183,7 +182,7 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
             }
         }
 
-        if(serverURL == null || serverURL.isEmpty())
+        if(isBlank(serverURL))
         {
             err("Could not get URL for the OCSP responder");
             return null;

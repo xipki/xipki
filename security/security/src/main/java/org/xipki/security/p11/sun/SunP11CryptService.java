@@ -58,6 +58,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.SecurityUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
@@ -223,7 +224,7 @@ public final class SunP11CryptService implements P11CryptService
                         }
 
                         char[] keyPwd = null;
-                        if(password != null && password.isEmpty() == false)
+                        if(CollectionUtil.isNotEmpty(password))
                         {
                             keyPwd = password.get(0);
                         }

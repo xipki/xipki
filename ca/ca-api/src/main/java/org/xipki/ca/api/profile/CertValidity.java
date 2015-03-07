@@ -180,7 +180,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
 
             return c.getTime();
         default:
-            throw new RuntimeException("should not reach here");
+            throw new RuntimeException("should not reach here, unknown CertValidity.Unit " + unit);
         }
     }
 
@@ -211,7 +211,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
         case YEAR:
             return (365 * validity + validity / 4) * 24;
         default:
-            throw new RuntimeException("should not reach here");
+            throw new RuntimeException("should not reach here, unknown CertValidity.Unit " + unit);
         }
     }
 
@@ -254,7 +254,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
         case YEAR:
             return validity + "y";
         default:
-            throw new RuntimeException("should not reach here");
+            throw new RuntimeException("should not reach here, unknown CertValidity.Unit " + unit);
         }
     }
 

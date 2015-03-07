@@ -37,6 +37,7 @@ package org.xipki.dbtool;
 
 import java.util.Properties;
 
+import org.xipki.common.StringUtil;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 
@@ -89,7 +90,7 @@ public class LiquibaseDatabaseConf
             {
                 driverClassName = "oracle.jdbc.driver.OracleDriver";
                 String s = dbProps.getProperty("dataSource.URL");
-                if(s != null && s.isEmpty() == false)
+                if(StringUtil.isNotBlank(s))
                 {
                     urlBuilder.append(s);
                 }
@@ -186,7 +187,7 @@ public class LiquibaseDatabaseConf
             throw new IllegalArgumentException("Unsupported configuration");
         }
 
-        if(passwordResolver != null && password != null && password.isEmpty() == false)
+        if(passwordResolver != null && StringUtil.isNotBlank(password))
         {
             password = new String(passwordResolver.resolvePassword(password));
         }

@@ -107,7 +107,7 @@ import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestorInfo;
-import org.xipki.ca.api.X509CertWithId;
+import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
@@ -127,6 +127,7 @@ import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.KeyUsage;
@@ -134,6 +135,7 @@ import org.xipki.common.LogUtil;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.StringUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.SecurityFactory;
@@ -220,7 +222,7 @@ class X509CA
 
                 final int numEntries = 100;
 
-                X509CertWithId caCert = caInfo.getCertificate();
+                X509CertWithDBCertId caCert = caInfo.getCertificate();
                 long expiredAt = task.getExpiredAt();
 
                 List<BigInteger> serials;
@@ -581,7 +583,7 @@ class X509CA
             }
         }
 
-        X509CertWithId caCert = caInfo.getCertificate();
+        X509CertWithDBCertId caCert = caInfo.getCertificate();
 
         X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
         if(crlSigner != null)
@@ -826,7 +828,7 @@ class X509CA
             BigInteger startSerial = BigInteger.ONE;
             final int numEntries = 100;
 
-            X509CertWithId caCert = caInfo.getCertificate();
+            X509CertWithDBCertId caCert = caInfo.getCertificate();
             List<CertRevocationInfoWithSerial> revInfos;
             boolean isFirstCRLEntry = true;
 
@@ -950,7 +952,7 @@ class X509CA
 
                 if(onlyUserCerts && onlyCACerts)
                 {
-                    throw new RuntimeException("should not reach here");
+                    throw new RuntimeException("should not reach here, onlyUserCerts and onlyCACerts are both true");
                 }
 
                 IssuingDistributionPoint idp = new IssuingDistributionPoint(
@@ -1009,7 +1011,7 @@ class X509CA
                         ASN1EncodableVector v = new ASN1EncodableVector();
                         v.add(cert);
                         String profileName = certInfo.getProfileName();
-                        if(profileName != null && profileName.isEmpty() == false)
+                        if(StringUtil.isNotBlank(profileName))
                         {
                             v.add(new DERUTF8String(certInfo.getProfileName()));
                         }
@@ -1150,34 +1152,30 @@ class X509CA
                 new Object[]{caInfo.getName(), certprofileName, subjectText});
 
         boolean successfull = false;
-
         try
         {
-            try
-            {
-                X509CertificateInfo ret = intern_generateCertificate(
-                        requestedByRA, requestor,
-                        certprofileName, user,
-                        subject, publicKeyInfo,
-                        notBefore, notAfter, extensions, false);
-                successfull = true;
+            X509CertificateInfo ret = intern_generateCertificate(
+                    requestedByRA, requestor,
+                    certprofileName, user,
+                    subject, publicKeyInfo,
+                    notBefore, notAfter, extensions, false);
+            successfull = true;
 
-                String prefix = ret.isAlreadyIssued() ? "RETURN_OLD_CERT" : "SUCCESSFULL";
-                LOG.info("{} generateCertificate: CA={}, profile={},"
-                        + " subject='{}', serialNumber={}",
-                        new Object[]{prefix, caInfo.getName(), certprofileName,
-                            ret.getCert().getSubject(), ret.getCert().getCert().getSerialNumber()});
-                return ret;
-            }catch(RuntimeException e)
+            String prefix = ret.isAlreadyIssued() ? "RETURN_OLD_CERT" : "SUCCESSFULL";
+            LOG.info("{} generateCertificate: CA={}, profile={},"
+                    + " subject='{}', serialNumber={}",
+                    new Object[]{prefix, caInfo.getName(), certprofileName,
+                        ret.getCert().getSubject(), ret.getCert().getCert().getSerialNumber()});
+            return ret;
+        }catch(RuntimeException e)
+        {
+            final String message = "RuntimeException in generateCertificate()";
+            if(LOG.isWarnEnabled())
             {
-                final String message = "RuntimeException in generateCertificate()";
-                if(LOG.isWarnEnabled())
-                {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                }
-                LOG.debug(message, e);
-                throw new OperationException(ErrorCode.System_Failure, "RuntimeException:  " + e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
             }
+            LOG.debug(message, e);
+            throw new OperationException(ErrorCode.System_Failure, "RuntimeException:  " + e.getMessage());
         }finally
         {
             if(successfull == false)
@@ -1338,7 +1336,7 @@ class X509CA
             }
         }
 
-        if(publishers.isEmpty())
+        if(CollectionUtil.isEmpty(publishers))
         {
             return true;
         }
@@ -1375,7 +1373,7 @@ class X509CA
         try
         {
             List<BigInteger> serials;
-            X509CertWithId caCert = caInfo.getCertificate();
+            X509CertWithDBCertId caCert = caInfo.getCertificate();
 
             Date notExpiredAt = null;
 
@@ -1515,7 +1513,7 @@ class X509CA
 
     private boolean publishCertsInQueue(IdentifiedX509CertPublisher publisher)
     {
-        X509CertWithId caCert = caInfo.getCertificate();
+        X509CertWithDBCertId caCert = caInfo.getCertificate();
 
         final int numEntries = 500;
 
@@ -1536,7 +1534,7 @@ class X509CA
                 return false;
             }
 
-            if(certIds == null || certIds.isEmpty())
+            if(CollectionUtil.isEmpty(certIds))
             {
                 break;
             }
@@ -1590,7 +1588,7 @@ class X509CA
 
     private boolean publishCRL(X509CRL crl)
     {
-        X509CertWithId caCert = caInfo.getCertificate();
+        X509CertWithDBCertId caCert = caInfo.getCertificate();
         if(certstore.addCRL(caCert, crl) == false)
         {
             return false;
@@ -1623,7 +1621,7 @@ class X509CA
         if(caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber))
         {
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
-                    "Not allow to revoke CA certificate");
+                    "Insufficient permission to revoke CA certificate");
         }
 
         if(reason == null)
@@ -1637,7 +1635,7 @@ class X509CA
             case AA_COMPROMISE:
             case REMOVE_FROM_CRL:
                 throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
-                        "Not allow to revoke certificate with reason " + reason.getDescription());
+                        "Insufficient permission revoke certificate with reason " + reason.getDescription());
             case UNSPECIFIED:
             case KEY_COMPROMISE:
             case AFFILIATION_CHANGED:
@@ -1650,31 +1648,31 @@ class X509CA
         return do_revokeCertificate(serialNumber, reason, invalidityTime, false);
     }
 
-    public X509CertWithId unrevokeCertificate(BigInteger serialNumber)
+    public X509CertWithDBCertId unrevokeCertificate(BigInteger serialNumber)
     throws OperationException
     {
         if(caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber))
         {
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
-                    "Not allow to unrevoke CA certificate");
+                    "Insufficient permission unrevoke CA certificate");
         }
 
         return do_unrevokeCertificate(serialNumber, false);
     }
 
-    public X509CertWithId removeCertificate(BigInteger serialNumber)
+    public X509CertWithDBCertId removeCertificate(BigInteger serialNumber)
     throws OperationException
     {
         if(caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber))
         {
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
-                    "Not allow to remove CA certificate");
+                    "Insufficient permission remove CA certificate");
         }
 
         return do_removeCertificate(serialNumber);
     }
 
-    private X509CertWithId do_removeCertificate(BigInteger serialNumber)
+    private X509CertWithDBCertId do_removeCertificate(BigInteger serialNumber)
     throws OperationException
     {
         X509CertWithRevocationInfo certWithRevInfo =
@@ -1685,7 +1683,7 @@ class X509CA
         }
 
         boolean successful = true;
-        X509CertWithId certToRemove = certWithRevInfo.getCert();
+        X509CertWithDBCertId certToRemove = certWithRevInfo.getCert();
         for(IdentifiedX509CertPublisher publisher : getPublishers())
         {
             boolean singleSuccessful;
@@ -1797,12 +1795,12 @@ class X509CA
         return revokedCert;
     }
 
-    private X509CertWithId do_unrevokeCertificate(BigInteger serialNumber, boolean force)
+    private X509CertWithDBCertId do_unrevokeCertificate(BigInteger serialNumber, boolean force)
     throws OperationException
     {
         LOG.info("START unrevokeCertificate: ca={}, serialNumber={}", caInfo.getName(), serialNumber);
 
-        X509CertWithId unrevokedCert = null;
+        X509CertWithDBCertId unrevokedCert = null;
 
         unrevokedCert = certstore.unrevokeCertificate(
                 caInfo.getCertificate(), serialNumber, force, shouldPublishToDeltaCRLCache());
@@ -1998,7 +1996,7 @@ class X509CA
         }
 
         Set<ASN1ObjectIdentifier> permittedSigAlgs = certprofile.getSignatureAlgorithms();
-        if(permittedSigAlgs != null && permittedSigAlgs.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(permittedSigAlgs))
         {
             ASN1ObjectIdentifier sigAlgId = signer.getAlgorithmIdentifier().getAlgorithm();
             if(permittedSigAlgs.contains(sigAlgId) == false)
@@ -2155,27 +2153,27 @@ class X509CA
         else
         {
             // try to get certificate with the same subject, key and certificate profile
-            SubjectKeyProfileBundle triple = certstore.getLatestCert(caInfo.getCertificate(),
+            SubjectKeyProfileBundle bundle = certstore.getLatestCert(caInfo.getCertificate(),
                     sha1FpSubject, sha1FpPublicKey, certprofileName);
 
-            if(triple != null)
+            if(bundle != null)
             {
                 /*
                  * If there exists a certificate whose public key, subject and profile match the request,
                  * returns the certificate if it is not revoked, otherwise OperationException with
                  * ErrorCode CERT_REVOKED will be thrown
                  */
-                if(triple.isRevoked())
+                if(bundle.isRevoked())
                 {
                     throw new OperationException(ErrorCode.CERT_REVOKED);
                 }
                 else
                 {
-                    X509CertWithId issuedCert = certstore.getCertForId(triple.getCertId());
+                    X509CertWithDBCertId issuedCert = certstore.getCertForId(bundle.getCertId());
                     if(issuedCert == null)
                     {
                         throw new OperationException(ErrorCode.System_Failure,
-                            "Find no certificate in table RAWCERT for CERT_ID " + triple.getCertId());
+                            "Find no certificate in table RAWCERT for CERT_ID " + bundle.getCertId());
                     }
                     else
                     {
@@ -2215,7 +2213,7 @@ class X509CA
                 }
                 else
                 {
-                    throw new RuntimeException("should not reach here");
+                    throw new RuntimeException("should not reach here, unknown key DuplicationMode " + keyMode);
                 }
             }
 
@@ -2244,7 +2242,7 @@ class X509CA
                 }
                 else
                 {
-                    throw new RuntimeException("should not reach here");
+                    throw new RuntimeException("should not reach here, unknown subject DuplicationMode " + keyMode);
                 }
 
                 if(certIssued)
@@ -2365,7 +2363,7 @@ class X509CA
                 }
                 else
                 {
-                    throw new RuntimeException("should not reach here");
+                    throw new RuntimeException("should not reach here, unknown CA ValidityMode " + mode);
                 }
             }
 
@@ -2442,7 +2440,7 @@ class X509CA
                             "Could not verify the signature of generated certificate");
                 }
 
-                X509CertWithId certWithMeta = new X509CertWithId(cert, encodedCert);
+                X509CertWithDBCertId certWithMeta = new X509CertWithDBCertId(cert, encodedCert);
 
                 ret = new X509CertificateInfo(certWithMeta, caInfo.getCertificate(),
                         subjectPublicKeyData, certprofileName);
@@ -2494,7 +2492,7 @@ class X509CA
         for(RDN rdn : rdns)
         {
             String textValue = SecurityUtil.rdnValueToString(rdn.getFirst().getValue());
-            if(textValue == null || textValue.isEmpty())
+            if(StringUtil.isBlank(textValue))
             {
                 changed = true;
             }
@@ -2538,7 +2536,7 @@ class X509CA
         }
 
         Set<CAHasRequestorEntry> requestorEntries = caManager.getCmpRequestorsForCA(caInfo.getName());
-        if(requestorEntries == null || requestorEntries.isEmpty())
+        if(CollectionUtil.isEmpty(requestorEntries))
         {
             return null;
         }

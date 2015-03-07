@@ -40,6 +40,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import jline.console.ConsoleReader;
 
@@ -295,4 +300,46 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         System.out.println(message);
     }
 
+    public static boolean isBlank(String s)
+    {
+        return s == null || s.isEmpty();
+    }
+
+    public static boolean isNotBlank(String s)
+    {
+        return s != null && s.isEmpty() == false;
+    }
+
+    public static boolean isEmpty(Collection<?> c)
+    {
+        return c == null || c.isEmpty();
+    }
+
+    public static boolean isNotEmpty(Collection<?> c)
+    {
+        return c != null && c.isEmpty() == false;
+    }
+
+    public static List<String> split(String str, String delim)
+    {
+        if(str == null)
+        {
+            return null;
+        }
+
+        if(str.isEmpty())
+        {
+            return Collections.emptyList();
+        }
+
+        StringTokenizer st = new StringTokenizer(str, delim);
+        List<String> ret = new ArrayList<>(st.countTokens());
+
+        while(st.hasMoreTokens())
+        {
+            ret.add(st.nextToken());
+        }
+
+        return ret;
+    }
 }

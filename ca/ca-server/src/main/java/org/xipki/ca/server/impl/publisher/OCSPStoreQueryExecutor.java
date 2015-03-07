@@ -54,7 +54,7 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.X509CertWithId;
+import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
@@ -122,16 +122,16 @@ class OCSPStoreQueryExecutor
      * @throws NoSuchAlgorithmException
      * @throws CertificateEncodingException
      */
-    void addCert(X509CertWithId issuer,
-            X509CertWithId certificate,
+    void addCert(X509CertWithDBCertId issuer,
+            X509CertWithDBCertId certificate,
             String certprofile)
     throws DataAccessException, CertificateEncodingException
     {
         addCert(issuer, certificate, certprofile, null);
     }
 
-    void addCert(X509CertWithId issuer,
-            X509CertWithId certificate,
+    void addCert(X509CertWithDBCertId issuer,
+            X509CertWithDBCertId certificate,
             String certprofile,
             CertRevocationInfo revInfo)
     throws DataAccessException, CertificateEncodingException
@@ -139,8 +139,8 @@ class OCSPStoreQueryExecutor
         addOrUpdateCert(issuer, certificate, certprofile, revInfo);
     }
 
-    private void addOrUpdateCert(X509CertWithId issuer,
-            X509CertWithId certificate,
+    private void addOrUpdateCert(X509CertWithDBCertId issuer,
+            X509CertWithDBCertId certificate,
             String certprofile,
             CertRevocationInfo revInfo)
     throws DataAccessException, CertificateEncodingException
@@ -352,8 +352,8 @@ class OCSPStoreQueryExecutor
         }
     }
 
-    void revokeCert(X509CertWithId caCert,
-            X509CertWithId cert,
+    void revokeCert(X509CertWithDBCertId caCert,
+            X509CertWithDBCertId cert,
             String certprofile,
             CertRevocationInfo revInfo)
     throws DataAccessException, CertificateEncodingException
@@ -361,8 +361,8 @@ class OCSPStoreQueryExecutor
         addOrUpdateCert(caCert, cert, certprofile, revInfo);
     }
 
-    void unrevokeCert(X509CertWithId issuer,
-            X509CertWithId cert)
+    void unrevokeCert(X509CertWithDBCertId issuer,
+            X509CertWithDBCertId cert)
     throws DataAccessException
     {
         Integer issuerId =  issuerStore.getIdForCert(issuer.getEncodedCert());
@@ -427,8 +427,8 @@ class OCSPStoreQueryExecutor
 
     }
 
-    void removeCert(X509CertWithId issuer,
-            X509CertWithId cert)
+    void removeCert(X509CertWithDBCertId issuer,
+            X509CertWithDBCertId cert)
     throws DataAccessException
     {
         Integer issuerId =  issuerStore.getIdForCert(issuer.getEncodedCert());
@@ -455,7 +455,7 @@ class OCSPStoreQueryExecutor
         }
     }
 
-    void revokeCa(X509CertWithId caCert, CertRevocationInfo revocationInfo)
+    void revokeCa(X509CertWithDBCertId caCert, CertRevocationInfo revocationInfo)
     throws DataAccessException, CertificateEncodingException
     {
         Date revocationTime = revocationInfo.getRevocationTime();
@@ -487,7 +487,7 @@ class OCSPStoreQueryExecutor
         }
     }
 
-    void unrevokeCa(X509CertWithId caCert)
+    void unrevokeCa(X509CertWithDBCertId caCert)
     throws DataAccessException, CertificateEncodingException
     {
         int issuerId = getIssuerId(caCert);
@@ -512,7 +512,7 @@ class OCSPStoreQueryExecutor
         }
     }
 
-    private int getIssuerId(X509CertWithId issuerCert)
+    private int getIssuerId(X509CertWithDBCertId issuerCert)
     throws DataAccessException, CertificateEncodingException
     {
         Integer id = issuerStore.getIdForCert(issuerCert.getEncodedCert());
@@ -524,7 +524,7 @@ class OCSPStoreQueryExecutor
         return id.intValue();
     }
 
-    void addIssuer(X509CertWithId issuerCert)
+    void addIssuer(X509CertWithDBCertId issuerCert)
     throws CertificateEncodingException, DataAccessException
     {
         if(issuerStore.getIdForCert(issuerCert.getEncodedCert()) != null)

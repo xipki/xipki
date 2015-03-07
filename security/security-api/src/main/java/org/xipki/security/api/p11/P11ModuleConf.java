@@ -39,6 +39,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.xipki.common.CollectionUtil;
+import org.xipki.common.ParamChecker;
+
 /**
  * @author Lijun Liao
  */
@@ -60,15 +63,8 @@ public class P11ModuleConf
             String name, String nativeLibrary, P11PasswordRetriever passwordRetriever,
             Set<P11SlotIdentifier> includeSlots, Set<P11SlotIdentifier> excludeSlots)
     {
-        if(name == null || name.isEmpty())
-        {
-            throw new IllegalArgumentException("name could not be null or empty");
-        }
-
-        if(nativeLibrary == null || nativeLibrary.isEmpty())
-        {
-            throw new IllegalArgumentException("nativeLibrary could not be null or empty");
-        }
+        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotEmpty("nativeLibrary", nativeLibrary);
 
         this.name = name.toLowerCase();
         this.nativeLibrary = nativeLibrary;
@@ -117,7 +113,7 @@ public class P11ModuleConf
     public boolean isSlotIncluded(P11SlotIdentifier slot)
     {
         boolean included;
-        if(includeSlots == null || includeSlots.isEmpty())
+        if(CollectionUtil.isEmpty(includeSlots))
         {
             included = true;
         }
@@ -139,7 +135,7 @@ public class P11ModuleConf
             return false;
         }
 
-        if(excludeSlots == null || excludeSlots.isEmpty())
+        if(CollectionUtil.isEmpty(excludeSlots))
         {
             return included;
         }

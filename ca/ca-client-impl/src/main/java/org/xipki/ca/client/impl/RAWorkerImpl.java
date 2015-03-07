@@ -123,6 +123,7 @@ import org.xipki.ca.client.impl.jaxb.FileOrValueType;
 import org.xipki.ca.client.impl.jaxb.ObjectFactory;
 import org.xipki.ca.client.impl.jaxb.RequestorType;
 import org.xipki.ca.client.impl.jaxb.ResponderType;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.IoUtil;
@@ -240,7 +241,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             }
         }
 
-        if(errorCANames.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(errorCANames))
         {
             for(String caName : errorCANames)
             {
@@ -497,7 +498,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             LOG.info(sb.toString());
             caNames = autoConfCAs(caNames);
 
-            if(caNames.isEmpty() == false)
+            if(CollectionUtil.isNotEmpty(caNames))
             {
                 final String msg = "Could not configured following CAs " + caNames;
                 if(devMode)
@@ -569,7 +570,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     {
         ParamChecker.assertNotNull("enrollCertEntries", enrollCertEntries);
 
-        if(enrollCertEntries.isEmpty())
+        if(CollectionUtil.isEmpty(enrollCertEntries))
         {
             return null;
         }
@@ -616,7 +617,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         ParamChecker.assertNotNull("request", request);
 
         List<EnrollCertRequestEntryType> requestEntries = request.getRequestEntries();
-        if(requestEntries.isEmpty())
+        if(CollectionUtil.isEmpty(requestEntries))
         {
             return null;
         }
@@ -744,7 +745,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         ParamChecker.assertNotNull("request", request);
 
         List<RevokeCertRequestEntryType> requestEntries = request.getRequestEntries();
-        if(requestEntries.isEmpty())
+        if(CollectionUtil.isEmpty(requestEntries))
         {
             return Collections.emptyMap();
         }
@@ -1170,7 +1171,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         ParamChecker.assertNotNull("request", request);
 
         List<IssuerSerialEntryType> requestEntries = request.getRequestEntries();
-        if(requestEntries.isEmpty())
+        if(CollectionUtil.isEmpty(requestEntries))
         {
             return Collections.emptyMap();
         }
@@ -1228,7 +1229,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         ParamChecker.assertNotNull("request", request);
 
         List<IssuerSerialEntryType> requestEntries = request.getRequestEntries();
-        if(requestEntries.isEmpty())
+        if(CollectionUtil.isEmpty(requestEntries))
         {
             return Collections.emptyMap();
         }
@@ -1268,7 +1269,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         }
 
         Set<String> profileNames = ca.getProfileNames();
-        if(profileNames == null || profileNames.isEmpty())
+        if(CollectionUtil.isEmpty(profileNames))
         {
             return Collections.emptySet();
         }

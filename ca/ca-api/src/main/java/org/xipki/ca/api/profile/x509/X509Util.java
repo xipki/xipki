@@ -58,6 +58,7 @@ import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
 import org.bouncycastle.asn1.x509.UserNotice;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.xipki.ca.api.CertprofileException;
+import org.xipki.common.CollectionUtil;
 
 /**
  * @author Lijun Liao
@@ -89,7 +90,7 @@ public class X509Util
 
     public static AuthorityInformationAccess createAuthorityInformationAccess(List<String> ocspUris)
     {
-        if(ocspUris == null || ocspUris.isEmpty())
+        if(CollectionUtil.isEmpty(ocspUris))
         {
             return null;
         }
@@ -109,7 +110,7 @@ public class X509Util
             X500Name caSubject, X500Name crlSignerSubject)
     throws IOException, CertprofileException
     {
-        if(crlUris == null || crlUris.isEmpty())
+        if(CollectionUtil.isEmpty(crlUris))
         {
             return null;
         }
@@ -141,7 +142,7 @@ public class X509Util
     public static CertificatePolicies createCertificatePolicies(List<CertificatePolicyInformation> policyInfos)
     throws CertprofileException
     {
-        if(policyInfos == null || policyInfos.isEmpty())
+        if(CollectionUtil.isEmpty(policyInfos))
         {
             return null;
         }

@@ -230,7 +230,7 @@ abstract class CmpResponder
                     errorStatus = "Request is protected by signature but the requestor is not authorized";
                     break;
                 default:
-                    throw new RuntimeException("Should not reach here");
+                    throw new RuntimeException("Should not reach here, unknown ProtectionResult " + pr);
                 }
                 requestor = (CmpRequestorInfo) verificationResult.getRequestor();
             } catch (Exception e)

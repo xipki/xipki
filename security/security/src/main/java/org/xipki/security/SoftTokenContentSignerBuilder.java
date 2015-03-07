@@ -87,6 +87,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.SecurityUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.api.ConcurrentContentSigner;
@@ -262,7 +263,7 @@ public class SoftTokenContentSignerBuilder
             }
         }
 
-        if(signers.isEmpty())
+        if(CollectionUtil.isEmpty(signers))
         {
             BcContentSignerBuilder signerBuilder;
             AsymmetricKeyParameter keyparam;

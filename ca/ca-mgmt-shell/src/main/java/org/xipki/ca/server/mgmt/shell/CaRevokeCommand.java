@@ -112,7 +112,7 @@ public class CaRevokeCommand extends CaCommand
         }
 
         Date revocationDate = null;
-        if(revocationDateS != null && revocationDateS.isEmpty() == false)
+        if(isNotBlank(revocationDateS))
         {
             revocationDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(revocationDateS);
         }
@@ -122,7 +122,7 @@ public class CaRevokeCommand extends CaCommand
         }
 
         Date invalidityDate = null;
-        if(invalidityDateS != null && invalidityDateS.isEmpty() == false)
+        if(isNotBlank(invalidityDateS))
         {
             invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
         }

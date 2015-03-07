@@ -62,6 +62,7 @@ import org.xipki.common.AbstractLoadTest;
 import org.xipki.common.CRLReason;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
+import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 
@@ -263,7 +264,7 @@ class CALoadTestRevoke extends AbstractLoadTest
                     break;
                 }
 
-                if(serialNumbers == null || serialNumbers.isEmpty())
+                if(XipkiOsgiCommandSupport.isEmpty(serialNumbers))
                 {
                     break;
                 }

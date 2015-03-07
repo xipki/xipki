@@ -48,7 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.api.X509CertWithId;
+import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.impl.store.CertificateStore;
 import org.xipki.ca.server.mgmt.api.CAStatus;
@@ -257,7 +257,7 @@ class X509CAInfo
         caEntry.setMaxValidity(maxValidity);
     }
 
-    public X509CertWithId getCertificate()
+    public X509CertWithDBCertId getCertificate()
     {
         return publicCAInfo.getCaCertificate();
     }

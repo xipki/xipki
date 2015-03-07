@@ -222,7 +222,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
             }
             else
             {
-                throw new RuntimeException("should not reach here");
+                throw new RuntimeException("should not reach here, unknown child of KeyEntry");
             }
 
             String randomDNStr = entry.getRandomDN();
