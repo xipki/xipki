@@ -75,6 +75,8 @@ import org.xipki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.CollectionUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.RequestResponsePair;
 import org.xipki.common.SecurityUtil;
 import org.xipki.common.StringUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
@@ -187,7 +189,7 @@ public abstract class CmpRequestor
         return request;
     }
 
-    protected PKIResponse signAndSend(PKIMessage request)
+    protected PKIResponse signAndSend(PKIMessage request, RequestResponseDebug debug)
     throws CmpRequestorException
     {
         if(signRequest)
@@ -210,6 +212,14 @@ public abstract class CmpRequestor
             throw new CmpRequestorException(e.getMessage(), e);
         }
 
+        RequestResponsePair reqResp = null;
+        if(debug != null)
+        {
+            reqResp = new RequestResponsePair();
+            debug.add(reqResp);
+            reqResp.setRequest(encodedRequest);
+        }
+
         byte[] encodedResponse;
         try
         {
@@ -218,6 +228,11 @@ public abstract class CmpRequestor
         {
             LOG.error("Error while send the PKI request {} to server", request);
             throw new CmpRequestorException("TRANSPORT_ERROR", e);
+        }
+
+        if(reqResp != null)
+        {
+            reqResp.setResponse(encodedResponse);
         }
 
         GeneralPKIMessage response;

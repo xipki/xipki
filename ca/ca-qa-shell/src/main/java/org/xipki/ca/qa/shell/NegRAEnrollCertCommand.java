@@ -44,6 +44,7 @@ import org.xipki.ca.client.api.CertificateOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.shell.ClientCommand;
 import org.xipki.common.IoUtil;
+import org.xipki.common.RequestResponseDebug;
 import org.xipki.console.karaf.UnexpectedResultException;
 
 /**
@@ -74,9 +75,17 @@ public class NegRAEnrollCertCommand extends ClientCommand
     protected Object _doExecute()
     throws Exception
     {
-        CertificationRequest p10Req = CertificationRequest.getInstance(
-                IoUtil.read(p10File));
-        EnrollCertResult result = raWorker.requestCert(p10Req, profile, caName, user);
+        CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));
+
+        EnrollCertResult result;
+        RequestResponseDebug debug = getRequestResponseDebug();
+        try
+        {
+            result = raWorker.requestCert(p10Req, profile, caName, user, debug);
+        }finally
+        {
+            saveRequestResponse(debug);
+        }
 
         X509Certificate cert = null;
         if(result != null)

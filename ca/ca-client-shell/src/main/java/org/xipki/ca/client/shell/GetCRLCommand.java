@@ -47,6 +47,7 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.RAWorkerException;
+import org.xipki.common.RequestResponseDebug;
 import org.xipki.console.karaf.UnexpectedResultException;
 
 /**
@@ -69,7 +70,14 @@ public class GetCRLCommand extends CRLCommand
     protected X509CRL retrieveCRL(String caName)
     throws RAWorkerException, PKIErrorException
     {
-        return raWorker.downloadCRL(caName);
+        RequestResponseDebug debug = getRequestResponseDebug();
+        try
+        {
+            return raWorker.downloadCRL(caName, debug);
+        }finally
+        {
+            saveRequestResponse(debug);
+        }
     }
 
     @Override
@@ -131,12 +139,16 @@ public class GetCRLCommand extends CRLCommand
                 byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
                 BigInteger baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
+                RequestResponseDebug debug = getRequestResponseDebug();
                 try
                 {
-                    crl = raWorker.downloadCRL(caName, baseCrlNumber);
+                    crl = raWorker.downloadCRL(caName, baseCrlNumber, debug);
                 }catch(PKIErrorException e)
                 {
                     throw new UnexpectedResultException("Received no baseCRL from server: " + e.getMessage());
+                } finally
+                {
+                    saveRequestResponse(debug);
                 }
 
                 if(crl == null)

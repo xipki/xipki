@@ -40,6 +40,7 @@ import java.util.Set;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.client.api.RemoveExpiredCertsResult;
+import org.xipki.common.RequestResponseDebug;
 
 /**
  * @author Lijun Liao
@@ -95,7 +96,16 @@ public class RemoveExpiredCertsCommand extends ClientCommand
             }
         }
 
-        RemoveExpiredCertsResult result = raWorker.removeExpiredCerts(caName, profile, userLike, overlapSeconds);
+        RemoveExpiredCertsResult result;
+        RequestResponseDebug debug = getRequestResponseDebug();
+        try
+        {
+            result = raWorker.removeExpiredCerts(caName, profile, userLike, overlapSeconds, debug);
+        }finally
+        {
+            saveRequestResponse(debug);
+        }
+
         int n = result.getNumOfCerts();
 
         String prefix;

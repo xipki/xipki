@@ -41,7 +41,6 @@ import java.util.Properties;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.ca.client.shell.ClientCommand;
 import org.xipki.common.AbstractLoadTest;
 import org.xipki.common.IoUtil;
 import org.xipki.datasource.api.DataSourceFactory;
@@ -53,7 +52,7 @@ import org.xipki.security.api.SecurityFactory;
  */
 
 @Command(scope = "xipki-client", name = "loadtest-revoke", description="CA Client Revoke Load test")
-public class CALoadTestRevokeCommand extends ClientCommand
+public class CALoadTestRevokeCommand extends CALoadTestCommand
 {
     @Option(name = "-cacert",
             required = true,

@@ -66,6 +66,8 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DigestCalculator;
 import org.xipki.common.CollectionUtil;
+import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.RequestResponsePair;
 import org.xipki.common.SecurityUtil;
 import org.xipki.common.StringUtil;
 import org.xipki.ocsp.client.api.InvalidOCSPResponseException;
@@ -104,7 +106,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
 
     @Override
     public OCSPResp ask(X509Certificate issuerCert, X509Certificate cert, URL responderUrl,
-            RequestOptions requestOptions)
+            RequestOptions requestOptions, RequestResponseDebug debug)
     throws OCSPResponseException, OCSPRequestorException
     {
         try
@@ -118,12 +120,12 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             throw new OCSPRequestorException(e.getMessage(), e);
         }
 
-        return ask(issuerCert, new BigInteger[]{cert.getSerialNumber()}, responderUrl, requestOptions);
+        return ask(issuerCert, new BigInteger[]{cert.getSerialNumber()}, responderUrl, requestOptions, debug);
     }
 
     @Override
     public OCSPResp ask(X509Certificate issuerCert, X509Certificate[] certs, URL responderUrl,
-            RequestOptions requestOptions)
+            RequestOptions requestOptions, RequestResponseDebug debug)
     throws OCSPResponseException, OCSPRequestorException
     {
         BigInteger[] serialNumbers = new BigInteger[certs.length];
@@ -143,20 +145,20 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             serialNumbers[i++] = cert.getSerialNumber();
         }
 
-        return ask(issuerCert, serialNumbers, responderUrl, requestOptions);
+        return ask(issuerCert, serialNumbers, responderUrl, requestOptions, debug);
     }
 
     @Override
     public OCSPResp ask(X509Certificate issuerCert, BigInteger serialNumber, URL responderUrl,
-            RequestOptions requestOptions)
+            RequestOptions requestOptions, RequestResponseDebug debug)
     throws OCSPResponseException, OCSPRequestorException
     {
-        return ask(issuerCert, new BigInteger[]{serialNumber}, responderUrl, requestOptions);
+        return ask(issuerCert, new BigInteger[]{serialNumber}, responderUrl, requestOptions, debug);
     }
 
     @Override
     public OCSPResp ask(X509Certificate issuerCert, BigInteger[] serialNumbers, URL responderUrl,
-            RequestOptions requestOptions)
+            RequestOptions requestOptions, RequestResponseDebug debug)
     throws OCSPResponseException, OCSPRequestorException
     {
         if(requestOptions == null)
@@ -180,6 +182,14 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             throw new OCSPRequestorException("could not encode OCSP request: " + e.getMessage(), e);
         }
 
+        RequestResponsePair msgPair = null;
+        if(debug != null)
+        {
+            msgPair = new RequestResponsePair();
+            debug.add(msgPair);
+            msgPair.setRequest(encodedReq);
+        }
+
         byte[] encodedResp;
         try
         {
@@ -187,6 +197,11 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         } catch (IOException e)
         {
             throw new ResponderUnreachableException("IOException: " + e.getMessage(), e);
+        }
+
+        if(debug != null)
+        {
+            msgPair.setRequest(encodedResp);
         }
 
         OCSPResp ocspResp;

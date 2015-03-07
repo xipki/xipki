@@ -46,6 +46,7 @@ import org.xipki.ca.client.api.CertIDOrError;
 import org.xipki.ca.client.shell.UnRevRemoveCertCommand;
 import org.xipki.common.CRLReason;
 import org.xipki.common.DateUtil;
+import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.SecurityUtil;
 import org.xipki.console.karaf.UnexpectedResultException;
 
@@ -121,12 +122,28 @@ public class NegRevokeCertCommand extends UnRevRemoveCertCommand
                     throw new UnexpectedResultException(errorMsg);
                 }
             }
-            certIdOrError = raWorker.revokeCert(cert, crlReason.getCode(), invalidityDate);
+            RequestResponseDebug debug = getRequestResponseDebug();
+            try
+            {
+                certIdOrError = raWorker.revokeCert(cert, crlReason.getCode(), invalidityDate, debug);
+            }finally
+            {
+                saveRequestResponse(debug);
+            }
+
         }
         else
         {
             X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-            certIdOrError = raWorker.revokeCert(issuer, new BigInteger(serialNumber), crlReason.getCode(), invalidityDate);
+            RequestResponseDebug debug = getRequestResponseDebug();
+            try
+            {
+                certIdOrError = raWorker.revokeCert(issuer, new BigInteger(serialNumber), crlReason.getCode(),
+                        invalidityDate, debug);
+            }finally
+            {
+                saveRequestResponse(debug);
+            }
         }
 
         if(certIdOrError.getError() == null)

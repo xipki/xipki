@@ -66,6 +66,8 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.xipki.common.CRLReason;
 import org.xipki.common.IoUtil;
+import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.RequestResponsePair;
 import org.xipki.common.SecurityUtil;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
@@ -96,6 +98,14 @@ public class OCSPQAStatusCommand extends AbstractOCSPStatusCommand
     @Option(name = "-url",
             required = false, description = "OCSP responder URL")
     protected String serverURL;
+
+    @Option(name = "-reqout",
+            required = false, description = "write DER encoded OCSP request to fie")
+    protected String reqout;
+
+    @Option(name = "-respout",
+            required = false, description = "write DER encoded OCSP response to fie")
+    protected String respout;
 
     @Option(name = "-expStatus",
             required = true,
@@ -179,7 +189,36 @@ public class OCSPQAStatusCommand extends AbstractOCSPStatusCommand
 
         RequestOptions options = getRequestOptions();
 
-        OCSPResp response = requestor.ask(issuerCert, sn, serverUrl, options);
+        boolean saveReq = isNotBlank(reqout);
+        boolean saveResp = isNotBlank(respout);
+        RequestResponseDebug debug = null;
+        if(saveReq || saveResp)
+        {
+            debug = new RequestResponseDebug();
+        }
+        OCSPResp response = requestor.ask(issuerCert, sn, serverUrl, options, debug);
+        if(debug != null && debug.size() > 0)
+        {
+            RequestResponsePair reqResp = debug.get(0);
+            if(saveReq)
+            {
+                byte[] bytes = reqResp.getRequest();
+                if(bytes != null)
+                {
+                    IoUtil.save(reqout, bytes);
+                }
+            }
+
+            if(saveResp)
+            {
+                byte[] bytes = reqResp.getResponse();
+                if(bytes != null)
+                {
+                    IoUtil.save(respout, bytes);
+                }
+            }
+        }
+
         BasicOCSPResp basicResp = OCSPUtils.extractBasicOCSPResp(response);
 
         // check the signature if available

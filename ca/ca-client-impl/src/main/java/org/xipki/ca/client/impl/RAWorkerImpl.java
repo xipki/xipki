@@ -129,6 +129,7 @@ import org.xipki.common.HealthCheckResult;
 import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.SecurityUtil;
 import org.xipki.common.XMLUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
@@ -218,7 +219,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
             try
             {
-                CAInfo caInfo = ca.getRequestor().retrieveCAInfo(name);
+                CAInfo caInfo = ca.getRequestor().retrieveCAInfo(name, null);
                 if(ca.isCertAutoconf())
                 {
                     ca.setCert(caInfo.getCert());
@@ -551,7 +552,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
     @Override
     public EnrollCertResult requestCert(CertificationRequest p10Request, String profile, String caName,
-            String username)
+            String username, RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         EnrollCertEntryType entry = new EnrollCertEntryType(p10Request, profile);
@@ -559,13 +560,13 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
         final String id = "p10-1";
         entries.put(id, entry);
-        return requestCerts(EnrollCertRequestType.Type.CERT_REQ, entries, caName, username);
+        return requestCerts(EnrollCertRequestType.Type.CERT_REQ, entries, caName, username, debug);
     }
 
     @Override
     public EnrollCertResult requestCerts(EnrollCertRequestType.Type type,
             Map<String, EnrollCertEntryType> enrollCertEntries,
-            String caName, String username)
+            String caName, String username, RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("enrollCertEntries", enrollCertEntries);
@@ -607,11 +608,12 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             enrollCertRequest.addRequestEntry(requestEntry);
         }
 
-        return requestCerts(enrollCertRequest, caName, username);
+        return requestCerts(enrollCertRequest, caName, username, debug);
     }
 
     @Override
-    public EnrollCertResult requestCerts(EnrollCertRequestType request, String caName, String username)
+    public EnrollCertResult requestCerts(EnrollCertRequestType request, String caName, String username,
+            RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("request", request);
@@ -653,7 +655,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         CmpResultType result;
         try
         {
-            result = ca.getRequestor().requestCertificate(request, username);
+            result = ca.getRequestor().requestCertificate(request, username, debug);
         } catch (CmpRequestorException e)
         {
             throw new RAWorkerException(e.getMessage(), e);
@@ -718,15 +720,17 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     @Override
-    public CertIDOrError revokeCert(X509Certificate cert, int reason, Date invalidityDate)
+    public CertIDOrError revokeCert(X509Certificate cert, int reason, Date invalidityDate,
+            RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
-        return revokeCert(issuer, cert.getSerialNumber(), reason, invalidityDate);
+        return revokeCert(issuer, cert.getSerialNumber(), reason, invalidityDate,debug);
     }
 
     @Override
-    public CertIDOrError revokeCert(X500Name issuer, BigInteger serial, int reason, Date invalidityDate)
+    public CertIDOrError revokeCert(X500Name issuer, BigInteger serial, int reason, Date invalidityDate,
+            RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         final String id = "cert-1";
@@ -734,12 +738,13 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 new RevokeCertRequestEntryType(id, issuer, serial, reason, invalidityDate);
         RevokeCertRequestType request = new RevokeCertRequestType();
         request.addRequestEntry(entry);
-        Map<String, CertIDOrError> result = revokeCerts(request);
+        Map<String, CertIDOrError> result = revokeCerts(request, debug);
         return result == null ? null : result.get(id);
     }
 
     @Override
-    public Map<String, CertIDOrError> revokeCerts(RevokeCertRequestType request)
+    public Map<String, CertIDOrError> revokeCerts(RevokeCertRequestType request,
+            RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("request", request);
@@ -766,7 +771,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         CmpResultType result;
         try
         {
-            result = cmpRequestor.revokeCertificate(request);
+            result = cmpRequestor.revokeCertificate(request, debug);
         } catch (CmpRequestorException e)
         {
             throw new RAWorkerException(e.getMessage(), e);
@@ -817,14 +822,14 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     @Override
-    public X509CRL downloadCRL(String caName)
+    public X509CRL downloadCRL(String caName, RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
-        return downloadCRL(caName, null);
+        return downloadCRL(caName, (BigInteger) null, debug);
     }
 
     @Override
-    public X509CRL downloadCRL(String caName, BigInteger crlNumber)
+    public X509CRL downloadCRL(String caName, BigInteger crlNumber, RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("caName", caName);
@@ -838,7 +843,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         CmpResultType result;
         try
         {
-            result = crlNumber == null ? requestor.downloadCurrentCRL() : requestor.downloadCRL(crlNumber);
+            result = crlNumber == null ? requestor.downloadCurrentCRL(debug) : requestor.downloadCRL(crlNumber, debug);
         } catch (CmpRequestorException e)
         {
             throw new RAWorkerException(e.getMessage(), e);
@@ -860,7 +865,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     @Override
-    public X509CRL generateCRL(String caName)
+    public X509CRL generateCRL(String caName, RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("caName", caName);
@@ -874,7 +879,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         CmpResultType result;
         try
         {
-            result = requestor.generateCRL();
+            result = requestor.generateCRL(debug);
         } catch (CmpRequestorException e)
         {
             throw new RAWorkerException(e.getMessage(), e);
@@ -1144,7 +1149,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     @Override
-    public CertIDOrError unrevokeCert(X500Name issuer, BigInteger serial)
+    public CertIDOrError unrevokeCert(X500Name issuer, BigInteger serial, RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         final String id = "cert-1";
@@ -1152,20 +1157,21 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 new IssuerSerialEntryType(id, issuer, serial);
         UnrevokeOrRemoveCertRequestType request = new UnrevokeOrRemoveCertRequestType();
         request.addRequestEntry(entry);
-        Map<String, CertIDOrError> result = unrevokeCerts(request);
+        Map<String, CertIDOrError> result = unrevokeCerts(request, debug);
         return result == null ? null : result.get(id);
     }
 
     @Override
-    public CertIDOrError unrevokeCert(X509Certificate cert)
+    public CertIDOrError unrevokeCert(X509Certificate cert, RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
-        return unrevokeCert(issuer, cert.getSerialNumber());
+        return unrevokeCert(issuer, cert.getSerialNumber(), debug);
     }
 
     @Override
-    public Map<String, CertIDOrError> unrevokeCerts(UnrevokeOrRemoveCertRequestType request)
+    public Map<String, CertIDOrError> unrevokeCerts(UnrevokeOrRemoveCertRequestType request,
+            RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("request", request);
@@ -1192,7 +1198,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         CmpResultType result;
         try
         {
-            result = cmpRequestor.unrevokeCertificate(request);
+            result = cmpRequestor.unrevokeCertificate(request, debug);
         } catch (CmpRequestorException e)
         {
             throw new RAWorkerException(e.getMessage(), e);
@@ -1202,7 +1208,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     @Override
-    public CertIDOrError removeCert(X500Name issuer, BigInteger serial)
+    public CertIDOrError removeCert(X500Name issuer, BigInteger serial, RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         final String id = "cert-1";
@@ -1210,20 +1216,21 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 new IssuerSerialEntryType(id, issuer, serial);
         UnrevokeOrRemoveCertRequestType request = new UnrevokeOrRemoveCertRequestType();
         request.addRequestEntry(entry);
-        Map<String, CertIDOrError> result = removeCerts(request);
+        Map<String, CertIDOrError> result = removeCerts(request, debug);
         return result == null ? null : result.get(id);
     }
 
     @Override
-    public CertIDOrError removeCert(X509Certificate cert)
+    public CertIDOrError removeCert(X509Certificate cert, RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
-        return removeCert(issuer, cert.getSerialNumber());
+        return removeCert(issuer, cert.getSerialNumber(), debug);
     }
 
     @Override
-    public Map<String, CertIDOrError> removeCerts(UnrevokeOrRemoveCertRequestType request)
+    public Map<String, CertIDOrError> removeCerts(UnrevokeOrRemoveCertRequestType request,
+            RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("request", request);
@@ -1250,7 +1257,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         CmpResultType result;
         try
         {
-            result = cmpRequestor.removeCertificate(request);
+            result = cmpRequestor.removeCertificate(request, debug);
         } catch (CmpRequestorException e)
         {
             throw new RAWorkerException(e.getMessage(), e);
@@ -1283,8 +1290,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     @Override
-    public RemoveExpiredCertsResult removeExpiredCerts(String caName,
-            String certprofile, String userLike, long overlapSeconds)
+    public RemoveExpiredCertsResult removeExpiredCerts(String caName, String certprofile,
+            String userLike, long overlapSeconds, RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("caName", caName);
@@ -1297,7 +1304,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         X509CmpRequestor requestor = casMap.get(caName).getRequestor();
         try
         {
-            return requestor.removeExpiredCerts(certprofile, userLike, overlapSeconds);
+            return requestor.removeExpiredCerts(certprofile, userLike, overlapSeconds, debug);
         } catch (CmpRequestorException e)
         {
             throw new RAWorkerException(e.getMessage(), e);

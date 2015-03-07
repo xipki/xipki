@@ -35,7 +35,13 @@
 
 package org.xipki.ca.client.shell;
 
+import java.io.IOException;
+
+import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.client.api.RAWorker;
+import org.xipki.common.IoUtil;
+import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.RequestResponsePair;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 /**
@@ -44,6 +50,14 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 public abstract class ClientCommand extends XipkiOsgiCommandSupport
 {
+    @Option(name = "-reqout",
+            required = false, description = "write DER encoded OCSP request to fie")
+    protected String reqout;
+
+    @Option(name = "-respout",
+            required = false, description = "write DER encoded OCSP response to fie")
+    protected String respout;
+
     protected RAWorker raWorker;
 
     public final void setRaWorker(RAWorker raWorker)
@@ -51,4 +65,80 @@ public abstract class ClientCommand extends XipkiOsgiCommandSupport
         this.raWorker = raWorker;
     }
 
+    protected RequestResponseDebug getRequestResponseDebug()
+    {
+        boolean saveReq = isNotBlank(reqout);
+        boolean saveResp = isNotBlank(respout);
+        if(saveReq || saveResp)
+        {
+            return new RequestResponseDebug();
+        }
+        return null;
+    }
+
+    protected void saveRequestResponse(RequestResponseDebug debug)
+    {
+        boolean saveReq = isNotBlank(reqout);
+        boolean saveResp = isNotBlank(respout);
+        if(saveReq == false && saveResp == false)
+        {
+            return;
+        }
+
+        if(debug == null || debug.size() == 0)
+        {
+            return;
+        }
+
+        final int n = debug.size();
+        for(int i = 0; i < n; i++)
+        {
+            RequestResponsePair reqResp = debug.get(i);
+            if(saveReq)
+            {
+                byte[] bytes = reqResp.getRequest();
+                if(bytes != null)
+                {
+                    String fn = (n == 1) ? reqout : appendIndex(reqout, i);
+                    try
+                    {
+                        IoUtil.save(fn, bytes);
+                    } catch (IOException e)
+                    {
+                        err("IOException: " + e.getMessage());
+                    }
+                }
+            }
+
+            if(saveResp)
+            {
+                byte[] bytes = reqResp.getResponse();
+                if(bytes != null)
+                {
+                    String fn = (n == 1) ? respout : appendIndex(respout, i);
+                    try
+                    {
+                        IoUtil.save(fn, bytes);
+                    }catch(IOException e)
+                    {
+                        err("IOException: " + e.getMessage());
+                    }
+                }
+            }
+        }
+    }
+
+    private static String appendIndex(String filename, int index)
+    {
+        int idx = filename.lastIndexOf('.');
+        if(idx == -1 || idx == filename.length() - 1)
+        {
+            return filename + "-" + index;
+        }
+
+        StringBuilder sb = new StringBuilder(filename);
+        sb.insert(idx, index);
+        sb.insert(idx, '-');
+        return sb.toString();
+    }
 }

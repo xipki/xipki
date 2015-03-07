@@ -37,7 +37,6 @@ package org.xipki.ca.client.shell.loadtest;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.client.shell.ClientCommand;
 import org.xipki.common.AbstractLoadTest;
 
 /**
@@ -45,7 +44,7 @@ import org.xipki.common.AbstractLoadTest;
  */
 
 @Command(scope = "xipki-client", name = "loadtest-template-enroll", description="CA Client Template Enroll Load test")
-public class CALoadTestTemplateEnrollCommand extends ClientCommand
+public class CALoadTestTemplateEnrollCommand extends CALoadTestCommand
 {
 
     @Option(name = "-template",
