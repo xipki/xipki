@@ -51,11 +51,11 @@ public class HealthCommand extends ClientCommand
 
     @Option(name = "-ca",
             required = false, description = "Required if multiple CAs are configured. CA name")
-    protected String caName;
+    private String caName;
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show status verbosely")
-    protected Boolean verbose = Boolean.FALSE;
+    private Boolean verbose = Boolean.FALSE;
 
     @Override
     protected Object _doExecute()

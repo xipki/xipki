@@ -86,35 +86,35 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
 {
     @Option(name = "-serial",
             description = "Serial number")
-    protected String serialNumber;
+    private String serialNumber;
 
     @Option(name = "-cert",
             description = "Certificate")
-    protected String certFile;
+    private String certFile;
 
     @Option(name = "-expError",
             description = "Expected error. Valid values are , " + OCSPError.errorText)
-    protected String expectedErrorText;
+    private String expectedErrorText;
 
     @Option(name = "-expStatus",
             description = "Expected status. Valid values are " + CertStatus.certStatusesText)
-    protected String expectedStatusText;
+    private String expectedStatusText;
 
     @Option(name = "-expSigalg",
             description = "Expected signature algorithm")
-    protected String expectedSigalgo;
+    private String expectedSigalgo;
 
     @Option(name = "-expNextupdate",
             description = "Occurence of nextUpdate. Valid values are " + Occurrence.occurencesText)
-    protected String nextUpdateOccurrenceText = Occurrence.optional.name();
+    private String nextUpdateOccurrenceText = Occurrence.optional.name();
 
     @Option(name = "-expCerthash",
             description = "Occurence of certHash. Valid values are " + Occurrence.occurencesText)
-    protected String certhashOccurrenceText = Occurrence.optional.name();
+    private String certhashOccurrenceText = Occurrence.optional.name();
 
     @Option(name = "-expNonce",
             description = "Occurence of nonce. Valid values are " + Occurrence.occurencesText)
-    protected String nonceOccurrenceText = Occurrence.optional.name();
+    private String nonceOccurrenceText = Occurrence.optional.name();
 
     @Override
     protected Object _doExecute()

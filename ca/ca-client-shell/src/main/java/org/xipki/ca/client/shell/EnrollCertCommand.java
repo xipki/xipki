@@ -80,19 +80,19 @@ public abstract class EnrollCertCommand extends ClientCommand
             required = false,
             description = "Subject to be requested.\n"
                     + "The default is the subject of self-signed certifite.")
-    protected String subject;
+    private String subject;
 
     @Option(name = "-profile",
             required = true, description = "Required. Certificate profile")
-    protected String profile;
+    private String profile;
 
     @Option(name = "-out",
             required = true, description = "Where to save the certificate")
-    protected String outputFile;
+    private String outputFile;
 
     @Option(name = "-user",
             required = false, description = "Username")
-    protected String user;
+    private String user;
 
     @Option(name = "-hash",
             required = false, description = "Hash algorithm name for the POPO computation")
@@ -100,34 +100,34 @@ public abstract class EnrollCertCommand extends ClientCommand
 
     @Option(name = "-ca",
             required = false, description = "Required if the profile is supported by more than one CA")
-    protected String caName;
+    private String caName;
 
     @Option(name = "-keyusage",
             required = false, multiValued = true, description = "keyusage. Multi-valued.")
-    protected List<String> keyusages;
+    private List<String> keyusages;
 
     @Option(name = "-extKeyusage",
             required = false, multiValued = true, description = "extended keyusage. Multi-valued.")
-    protected List<String> extkeyusages;
+    private List<String> extkeyusages;
 
     @Option(name = "-subjectAltName",
             required = false, multiValued = true, description = "SubjectAltName. Multi-valued.")
-    protected List<String> subjectAltNames;
+    private List<String> subjectAltNames;
 
     @Option(name = "-subjectInfoAccess",
             required = false, multiValued = true, description = "SubjectInfoAccess. Multi-valued")
-    protected List<String> subjectInfoAccesses;
+    private List<String> subjectInfoAccesses;
 
     @Option(name = "-needExtension",
             required = false, multiValued = true,
             description = "Types of extension that must be contaied in the certificate. Multi-valued")
-    protected List<String> needExtensionTypes;
+    private List<String> needExtensionTypes;
 
     @Option(name = "-wantExtension",
             required = false, multiValued = true,
             description = "Types of extension that should be contaied in the certificate if possible.\n"
                     + "Multi-valued")
-    protected List<String> wantExtensionTypes;
+    private List<String> wantExtensionTypes;
 
     protected SecurityFactory securityFactory;
 

@@ -59,12 +59,12 @@ public class GetCRLCommand extends CRLCommand
 {
     @Option(name = "-with-basecrl",
             required = false, description = "Indicates whether to retrieve the baseCRL if the current CRL is a delta CRL")
-    protected Boolean withBaseCRL = Boolean.FALSE;
+    private Boolean withBaseCRL = Boolean.FALSE;
 
     @Option(name = "-basecrl-out",
             required = false, description = "Where to save the baseCRL"
                     + "\nThe default is <out>-baseCRL")
-    protected String baseCRLOut;
+    private String baseCRLOut;
 
     @Override
     protected X509CRL retrieveCRL(String caName)

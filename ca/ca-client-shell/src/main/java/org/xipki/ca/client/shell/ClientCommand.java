@@ -52,11 +52,11 @@ public abstract class ClientCommand extends XipkiOsgiCommandSupport
 {
     @Option(name = "-reqout",
             required = false, description = "write DER encoded OCSP request to fie")
-    protected String reqout;
+    private String reqout;
 
     @Option(name = "-respout",
             required = false, description = "write DER encoded OCSP response to fie")
-    protected String respout;
+    private String respout;
 
     protected RAWorker raWorker;
 

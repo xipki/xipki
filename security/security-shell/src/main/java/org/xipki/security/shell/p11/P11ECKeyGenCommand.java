@@ -50,7 +50,7 @@ public class P11ECKeyGenCommand extends P11KeyGenCommand
     @Option(name = "-curve",
             description = "EC Curve name",
             required = false)
-    protected String curveName = "brainpoolp256r1";
+    private String curveName = "brainpoolp256r1";
 
     @Override
     protected Object _doExecute()

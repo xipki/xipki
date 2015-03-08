@@ -65,7 +65,7 @@ public abstract class P11SecurityCommand extends SecurityCommand
             required = false, description = "Name of the PKCS#11 module.")
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
-    protected P11KeyIdentifier getKeyIdentifier()
+    public P11KeyIdentifier getKeyIdentifier()
     throws Exception
     {
         P11KeyIdentifier keyIdentifier;

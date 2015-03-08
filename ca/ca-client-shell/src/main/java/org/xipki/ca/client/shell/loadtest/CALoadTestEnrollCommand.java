@@ -54,28 +54,28 @@ public class CALoadTestEnrollCommand extends CALoadTestCommand
     @Option(name = "-profile",
             required = true,
             description = "Required. Certificate profile")
-    protected String certprofile;
+    private String certprofile;
 
     @Option(name = "-subject",
             required = true,
             description = "Required. Subject template")
-    protected String subjectTemplate;
+    private String subjectTemplate;
 
     @Option(name = "-randomDN",
             required = false,
             description = "DN name to be incremented, valid values are\n"
                     + "GIVENNAME, SURNAME, STREET, POSTALCODE, O, OU and CN")
-    protected String randomDNStr = "O";
+    private String randomDNStr = "O";
 
     @Option(name = "-duration",
             required = false,
             description = "Required. Duration in seconds")
-    protected Integer durationInSecond = 30;
+    private Integer durationInSecond = 30;
 
     @Option(name = "-thread",
             required = false,
             description = "Number of threads")
-    protected Integer numThreads = 5;
+    private Integer numThreads = 5;
 
     @Option(name="-keyType",
             required = false,
@@ -90,12 +90,12 @@ public class CALoadTestEnrollCommand extends CALoadTestCommand
     @Option(name = "-curve",
             description = "EC curve name or OID of EC key",
             required = false)
-    protected String curveName = "brainpoolp256r1";
+    private String curveName = "brainpoolp256r1";
 
     @Option(name = "-n",
             description = "Number of certificates to be requested in one request",
             required = false)
-    protected Integer n = 1;
+    private Integer n = 1;
 
     @Override
     protected Object _doExecute()
