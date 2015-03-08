@@ -73,11 +73,11 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
 
     @Option(name = "-q", aliases="--quiet",
             required = false, description = "Quiet mode")
-    protected Boolean quiet = Boolean.FALSE;
+    private Boolean quiet = Boolean.FALSE;
 
     @Option(name = "-logLevel",
             description = "Log level, valid values are debug, info, warning, severe, off")
-    protected String logLevel = "warning";
+    private String logLevel = "warning";
 
     protected void resetAndInit(LiquibaseDatabaseConf dbConf, String schemaFile)
     throws Exception
@@ -116,7 +116,7 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
 
     }
 
-    protected static Properties getDbConfPoperties(String dbconfFile)
+    private static Properties getDbConfPoperties(String dbconfFile)
     throws FileNotFoundException, IOException
     {
         Properties props = new Properties();

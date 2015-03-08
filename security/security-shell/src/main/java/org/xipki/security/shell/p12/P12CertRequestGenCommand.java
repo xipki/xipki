@@ -54,13 +54,13 @@ public class P12CertRequestGenCommand extends CertRequestGenCommand
 {
     @Option(name = "-p12",
             required = true, description = "Required. PKCS#12 keystore file")
-    protected String p12File;
+    private String p12File;
 
     @Option(name = "-pwd", aliases = { "--password" },
             required = false, description = "Password of the PKCS#12 file")
-    protected String password;
+    private String password;
 
-    protected char[] getPassword()
+    private char[] getPassword()
     {
         char[] pwdInChar = readPasswordIfNotSet(password);
         if(pwdInChar != null)
@@ -70,7 +70,7 @@ public class P12CertRequestGenCommand extends CertRequestGenCommand
         return pwdInChar;
     }
 
-    protected KeyStore getKeyStore()
+    public KeyStore getKeyStore()
     throws Exception
     {
         KeyStore ks;

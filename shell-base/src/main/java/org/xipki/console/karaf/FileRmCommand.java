@@ -53,15 +53,15 @@ public class FileRmCommand extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "file",
             required = true, description = "File or directory to be deleted")
-    protected String targetPath;
+    private String targetPath;
 
     @Option(name = "-r", aliases="--recursive",
             required = false, description = "remove directories and their contents recursively")
-    protected Boolean recursive = Boolean.FALSE;
+    private Boolean recursive = Boolean.FALSE;
 
     @Option(name = "-f", aliases="--force",
             required = false, description = "ignore nonexistent files, never prompt")
-    protected Boolean force = Boolean.FALSE;
+    private Boolean force = Boolean.FALSE;
 
     @Override
     protected Object _doExecute()

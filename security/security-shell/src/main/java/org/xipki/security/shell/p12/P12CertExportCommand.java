@@ -53,7 +53,7 @@ public class P12CertExportCommand extends P12SecurityCommand
 {
     @Option(name = "-out",
             required = true, description = "Required. Where to save the certificate")
-    protected String outFile;
+    private String outFile;
 
     @Override
     protected Object _doExecute()

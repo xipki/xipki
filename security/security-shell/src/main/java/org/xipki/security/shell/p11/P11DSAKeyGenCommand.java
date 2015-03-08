@@ -50,12 +50,12 @@ public class P11DSAKeyGenCommand extends P11KeyGenCommand
     @Option(name = "-plen",
             description = "Bit length of the prime",
             required = false)
-    protected Integer pLen = 2048;
+    private Integer pLen = 2048;
 
     @Option(name = "-qlen",
             description = "Bit length of the sub-prime",
             required = false)
-    protected Integer qLen;
+    private Integer qLen;
 
     @Override
     protected Object _doExecute()

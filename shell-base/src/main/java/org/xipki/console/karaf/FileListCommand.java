@@ -54,7 +54,7 @@ public class FileListCommand extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "file",
             required = true, description = "File or directory")
-    protected String targetPath;
+    private String targetPath;
 
     @Override
     protected Object _doExecute()
