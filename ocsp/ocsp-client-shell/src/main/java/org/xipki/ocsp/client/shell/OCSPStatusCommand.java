@@ -85,12 +85,8 @@ import org.xipki.security.SignerUtil;
  */
 
 @Command(scope = "xipki-ocsp", name = "status", description="Request certificate status")
-public class OCSPStatusCommand extends AbstractOCSPStatusCommand
+public class OCSPStatusCommand extends BaseOCSPStatusCommand
 {
-    @Option(name = "-respIssuer",
-            required = false, description = "Certificate file of the responder's issuer")
-    protected String respIssuerFile;
-
     @Option(name = "-serial",
             multiValued = true,
             description = "Serial number")
@@ -101,30 +97,9 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
             description = "Certificate")
     protected List<String> certFiles;
 
-    @Option(name = "-url",
-            required = false, description = "OCSP responder URL")
-    protected String serverURL;
-
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show status verbosely")
     protected Boolean verbose = Boolean.FALSE;
-
-    @Option(name = "-reqout",
-            required = false, description = "write DER encoded OCSP request to fie")
-    protected String reqout;
-
-    @Option(name = "-respout",
-            required = false, description = "write DER encoded OCSP response to fie")
-    protected String respout;
-
-    private static final Map<ASN1ObjectIdentifier, String> extensionOidNameMap = new HashMap<>();
-    static
-    {
-        extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff, "ArchiveCutoff");
-        extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_crl, "CrlID");
-        extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, "Nonce");
-        extensionOidNameMap.put(OCSPRequestor.id_pkix_ocsp_extendedRevoke, "ExtendedRevoke");
-    }
 
     @Override
     protected Object _doExecute()
