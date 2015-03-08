@@ -18,6 +18,8 @@
         <entry key="-expCerthash" value-ref="occurrenceCompleter"/>
         <entry key="-expNonce" value-ref="occurrenceCompleter"/>
         <entry key="-expSigalg" value-ref="occurrenceCompleter"/>
+        <entry key="-reqout" value-ref="filePathCompleter"/>
+        <entry key="-respout" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
   </command-bundle>
