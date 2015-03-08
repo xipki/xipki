@@ -3,6 +3,7 @@
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <reference id="ocspRequestor" interface="org.xipki.ocsp.client.api.OCSPRequestor"/>
   <bean id="certStatusCompleter" class="org.xipki.ocsp.qa.shell.completer.CertStatusCompleter"/>
+  <bean id="ocspErrorCompleter" class="org.xipki.ocsp.qa.shell.completer.OCSPErrorCompleter"/>
   <bean id="occurrenceCompleter" class="org.xipki.ocsp.qa.shell.completer.OccurrenceCompleter"/>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
@@ -14,6 +15,7 @@
         <entry key="-issuer" value-ref="filePathCompleter"/>
         <entry key="-respIssuer" value-ref="filePathCompleter"/>
         <entry key="-expStatus" value-ref="certStatusCompleter"/>
+        <entry key="-expError" value-ref="ocspErrorCompleter"/>
         <entry key="-expNextupdate" value-ref="occurrenceCompleter"/>
         <entry key="-expCerthash" value-ref="occurrenceCompleter"/>
         <entry key="-expNonce" value-ref="occurrenceCompleter"/>
