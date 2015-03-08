@@ -128,7 +128,7 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
     throws FileNotFoundException, IOException, PasswordResolverException
     {
         Map<String, LiquibaseDatabaseConf> ret = new HashMap<>();
-        Properties props = getPropertiesFromFile("ca-config/ca.properties");
+        Properties props = getPropertiesFromFile("xipki/ca-config/ca.properties");
         for(Object objKey : props.keySet())
         {
             String key = (String) objKey;

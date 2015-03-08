@@ -49,7 +49,7 @@ import org.xipki.security.api.PasswordResolver;
 @Command(scope = "xipki-db", name = "export-ca", description="Export CA database")
 public class ExportCaCommand extends XipkiOsgiCommandSupport
 {
-    private static final String DFLT_DBCONF_FILE = "ca-config/ca-db.properties";
+    private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ca-db.properties";
     private static final int DFLT_NUM_CERTS_IN_BUNDLE = 1000;
     private static final int DFLT_NUM_CRLS = 30;
 

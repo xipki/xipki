@@ -47,7 +47,7 @@ import org.xipki.dbtool.LiquibaseDatabaseConf;
 @Command(scope = "xipki-db", name = "initdb-ca", description="Reset and initialize the CA database")
 public class InitDbCaCommand extends LiquibaseCommand
 {
-    private static final String schemaFile = "sql/ca-init.xml";
+    private static final String schemaFile = "xipki/sql/ca-init.xml";
 
     @Override
     protected Object _doExecute()
