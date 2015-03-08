@@ -71,7 +71,7 @@ import org.xipki.common.RequestResponsePair;
 import org.xipki.common.SecurityUtil;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
-import org.xipki.ocsp.client.shell.AbstractOCSPStatusCommand;
+import org.xipki.ocsp.client.shell.BaseOCSPStatusCommand;
 import org.xipki.ocsp.client.shell.OCSPUtils;
 import org.xipki.security.KeyUtil;
 import org.xipki.security.SignerUtil;
@@ -81,12 +81,8 @@ import org.xipki.security.SignerUtil;
  */
 
 @Command(scope = "xipki-qa", name = "ocsp-status", description="Request certificate status (QA)")
-public class OCSPQAStatusCommand extends AbstractOCSPStatusCommand
+public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
 {
-    @Option(name = "-respIssuer",
-            required = false, description = "Certificate file of the responder's issuer")
-    protected String respIssuerFile;
-
     @Option(name = "-serial",
             description = "Serial number")
     protected String serialNumber;
@@ -94,18 +90,6 @@ public class OCSPQAStatusCommand extends AbstractOCSPStatusCommand
     @Option(name = "-cert",
             description = "Certificate")
     protected String certFile;
-
-    @Option(name = "-url",
-            required = false, description = "OCSP responder URL")
-    protected String serverURL;
-
-    @Option(name = "-reqout",
-            required = false, description = "write DER encoded OCSP request to fie")
-    protected String reqout;
-
-    @Option(name = "-respout",
-            required = false, description = "write DER encoded OCSP response to fie")
-    protected String respout;
 
     @Option(name = "-expStatus",
             required = true,
