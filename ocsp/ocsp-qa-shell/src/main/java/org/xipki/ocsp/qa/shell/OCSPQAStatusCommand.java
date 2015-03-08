@@ -251,21 +251,21 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
                 throw e;
             }
 
-            if(expectedOcspError.getCode() == e.getStatus())
+            if(expectedOcspError.getStatus() == e.getStatus())
             {
                 return null;
             }
             else
             {
-                throw new ViolationException("OCSP error expected='" + expectedOcspError.getCode() +
-                        "', is='" + e.getStatus() + "'");
+                throw new ViolationException("OCSP error expected='" + expectedOcspError.name() +
+                        "', is='" + OCSPError.getOCSPError(e.getStatus()).name() + "'");
             }
         }
 
         if(expectedOcspError != null)
         {
-            throw new ViolationException("OCSP error expected='" + expectedOcspError.getCode() +
-                    "', is='0'");
+            throw new ViolationException("OCSP error expected='" + expectedOcspError.name() +
+                    "', is='successful'");
         }
 
         // check the signature if available
