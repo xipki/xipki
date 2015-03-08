@@ -49,7 +49,7 @@ import org.xipki.security.api.PasswordResolver;
 @Command(scope = "xipki-db", name = "export-ocsp", description="Export OCSP database")
 public class ExportOcspCommand extends XipkiOsgiCommandSupport
 {
-    private static final String DFLT_DBCONF_FILE = "ca-config/ocsp-db.properties";
+    private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
     private static final int DFLT_NUM_CERTS_IN_BUNDLE = 1000;
 
     @Option(name = "-dbconf",

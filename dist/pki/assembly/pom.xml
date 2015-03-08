@@ -134,7 +134,7 @@
                   <artifactId>iaikPkcs11Wrapper-native</artifactId>
                   <version>${pkcs11Wrapper.version}</version>
                   <type>zip</type>
-                  <outputDirectory>target/native-lib</outputDirectory>
+                  <outputDirectory>target/xipki/native-lib</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -154,7 +154,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>sql/**</includes>
-                  <outputDirectory>target</outputDirectory>
+                  <outputDirectory>target/xipki</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -174,7 +174,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>target</outputDirectory>
+                  <outputDirectory>target/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
@@ -182,7 +182,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>target</outputDirectory>
+                  <outputDirectory>target/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
@@ -190,7 +190,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>target</outputDirectory>
+                  <outputDirectory>target/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
@@ -198,7 +198,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>target</outputDirectory>
+                  <outputDirectory>target/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
@@ -206,7 +206,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>target</outputDirectory>
+                  <outputDirectory>target/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
@@ -214,7 +214,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>target</outputDirectory>
+                  <outputDirectory>target/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
@@ -222,7 +222,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>target</outputDirectory>
+                  <outputDirectory>target/xipki</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -242,7 +242,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>target</outputDirectory>
+                  <outputDirectory>target/xipki</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>

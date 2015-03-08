@@ -27,23 +27,23 @@ xipki-ca:env-add -name certprofileType.map -value \
 xipki-ca:cmpcontrol-add -name cmpcontrol1 --msgTimeBias 300 --sendCaCert yes
 
 ## Certificate Profiles
-xipki-ca:profile-add -name RCA-Cross -type XML -confFile demo/profile/Certprofile_RootCA_Cross.xml
+xipki-ca:profile-add -name RCA-Cross -type XML -confFile xipki/demo/profile/Certprofile_RootCA_Cross.xml
 
-xipki-ca:profile-add -name SubCA -type XML -confFile demo/profile/Certprofile_SubCA.xml
+xipki-ca:profile-add -name SubCA -type XML -confFile xipki/demo/profile/Certprofile_SubCA.xml
 
-xipki-ca:profile-add -name SubCA.Complex -type XML -confFile demo/profile/Certprofile_SubCA_Complex.xml
+xipki-ca:profile-add -name SubCA.Complex -type XML -confFile xipki/demo/profile/Certprofile_SubCA_Complex.xml
 
-xipki-ca:profile-add -name OCSP -type XML -confFile demo/profile/Certprofile_OCSP.xml
+xipki-ca:profile-add -name OCSP -type XML -confFile xipki/demo/profile/Certprofile_OCSP.xml
 
-xipki-ca:profile-add -name multipleOUs -type XML -confFile demo/profile/Certprofile_multipleOUs.xml
+xipki-ca:profile-add -name multipleOUs -type XML -confFile xipki/demo/profile/Certprofile_multipleOUs.xml
 
-xipki-ca:profile-add -name TLS -type XML -confFile demo/profile/Certprofile_TLS.xml
+xipki-ca:profile-add -name TLS -type XML -confFile xipki/demo/profile/Certprofile_TLS.xml
 
-xipki-ca:profile-add -name TLS_C -type XML -confFile demo/profile/Certprofile_TLS_C.xml
+xipki-ca:profile-add -name TLS_C -type XML -confFile xipki/demo/profile/Certprofile_TLS_C.xml
 
-xipki-ca:profile-add -name TLSwithIncSN -type XML -confFile demo/profile/Certprofile_TLSwithIncSN.xml
+xipki-ca:profile-add -name TLSwithIncSN -type XML -confFile xipki/demo/profile/Certprofile_TLSwithIncSN.xml
 
-xipki-ca:profile-add -name gSMC_K -type XML -confFile demo/profile/Certprofile_gSMC_K.xml
+xipki-ca:profile-add -name gSMC_K -type XML -confFile xipki/demo/profile/Certprofile_gSMC_K.xml
 
 xipki-ca:profile-add -name DEMO -type DemoEE1
 

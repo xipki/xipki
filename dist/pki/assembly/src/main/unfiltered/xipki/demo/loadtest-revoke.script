@@ -8,7 +8,7 @@ sleep 1000
 
 echo "Revoke load test"
 xipki-client:loadtest-revoke \
- -cacert output/SubCA1.der -cadb ca-config/ca-db.properties \
+ -cacert output/SubCA1.der -cadb xipki/ca-config/ca-db.properties \
  -excludeSerials 1 -duration 15 -thread 8
 
 #################################################################

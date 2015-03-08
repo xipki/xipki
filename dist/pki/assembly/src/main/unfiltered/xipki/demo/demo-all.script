@@ -1,0 +1,17 @@
+source ./xipki/demo/rsa-demo.script
+
+source ./xipki/demo/rsapss-demo.script
+
+source ./xipki/demo/dsa-demo.script
+
+source ./xipki/demo/ec-demo.script
+
+source ./xipki/demo/hsm-rsa-demo.script
+
+source ./xipki/demo/hsm-rsapss-demo.script
+
+source ./xipki/demo/hsm-dsa-demo.script
+
+source ./xipki/demo/hsm-ec-demo.script
+
+

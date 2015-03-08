@@ -22,34 +22,34 @@
   </X509Issuers>
   <X509Certprofiles>
     <X509Certprofile name="RCA">
-      <file>demo/profile/Certprofile_RootCA.xml</file>
+      <file>xipki/demo/profile/Certprofile_RootCA.xml</file>
     </X509Certprofile>
     <X509Certprofile name="RCA-Cross">
-      <file>demo/profile/Certprofile_RootCA_Cross.xml</file>
+      <file>xipki/demo/profile/Certprofile_RootCA_Cross.xml</file>
     </X509Certprofile>
     <X509Certprofile name="SubCA">
-      <file>demo/profile/Certprofile_SubCA.xml</file>
+      <file>xipki/demo/profile/Certprofile_SubCA.xml</file>
     </X509Certprofile>
     <X509Certprofile name="SubCA.Complex">
-      <file>demo/profile/Certprofile_SubCA_Complex.xml</file>
+      <file>xipki/demo/profile/Certprofile_SubCA_Complex.xml</file>
     </X509Certprofile>
     <X509Certprofile name="OCSP">
-      <file>demo/profile/Certprofile_OCSP.xml</file>
+      <file>xipki/demo/profile/Certprofile_OCSP.xml</file>
     </X509Certprofile>
     <X509Certprofile name="multipleOUs">
-      <file>demo/profile/Certprofile_multipleOUs.xml</file>
+      <file>xipki/demo/profile/Certprofile_multipleOUs.xml</file>
     </X509Certprofile>
     <X509Certprofile name="TLS">
-      <file>demo/profile/Certprofile_TLS.xml</file>
+      <file>xipki/demo/profile/Certprofile_TLS.xml</file>
     </X509Certprofile>
     <X509Certprofile name="TLS_C">
-      <file>demo/profile/Certprofile_TLS_C.xml</file>
+      <file>xipki/demo/profile/Certprofile_TLS_C.xml</file>
     </X509Certprofile>
     <X509Certprofile name="TLSwithIncSN">
-      <file>demo/profile/Certprofile_TLSwithIncSN.xml</file>
+      <file>xipki/demo/profile/Certprofile_TLSwithIncSN.xml</file>
     </X509Certprofile>
     <X509Certprofile name="gSMC_K">
-      <file>demo/profile/Certprofile_gSMC_K.xml</file>
+      <file>xipki/demo/profile/Certprofile_gSMC_K.xml</file>
     </X509Certprofile>
   </X509Certprofiles>
 </QAConf>

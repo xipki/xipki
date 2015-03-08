@@ -13,7 +13,7 @@
   -->
   <cm:property-placeholder persistent-id="org.xipki.ocsp.server" update-strategy="reload">
     <cm:default-properties>
-      <cm:property name="confFile" value="ocsp-config/ocsp-responder.xml"/>
+      <cm:property name="confFile" value="xipki/ocsp-config/ocsp-responder.xml"/>
       <cm:property name="urlPatterns" value="/ocsp/*"/>
       <cm:property name="healthUrlPatterns" value="/health/ocsp/*"/>
     </cm:default-properties>

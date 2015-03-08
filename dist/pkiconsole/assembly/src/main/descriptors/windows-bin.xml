@@ -77,10 +77,9 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
-    <!-- native libraries -->
     <fileSet>
-      <directory>${project.build.directory}/native-lib</directory>
-      <outputDirectory>native-lib</outputDirectory>
+      <directory>${project.build.directory}/xipki</directory>
+      <outputDirectory>xipki</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
@@ -114,4 +113,20 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
   </fileSets>
+  <files>
+    <file>
+      <source>${project.basedir}/../../../LICENSE</source>
+      <outputDirectory>/</outputDirectory>
+      <destName>LICENSE</destName>
+      <fileMode>0644</fileMode>
+      <lineEnding>dos</lineEnding>
+    </file>
+    <file>
+      <source>${project.build.directory}/windows-dependencies/apache-karaf-${karaf.version}/LICENSE</source>
+      <outputDirectory>Licenses</outputDirectory>
+      <destName>karaf-LICENSE.txt</destName>
+      <fileMode>0644</fileMode>
+      <lineEnding>dos</lineEnding>
+    </file>
+  </files>
 </assembly>
