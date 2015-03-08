@@ -53,7 +53,12 @@ public enum CertStatus
     cessationOfOperation,
     certificateHold,
     privilegeWithdrawn,
-    aACompromise;
+    aACompromise,
+    malformedRequest,
+    internalError,
+    tryLater,
+    sigRequired,
+    unauthorized;
 
     public static final String certStatusesText =
             "issuerUnknown, unknown, good, rev_noreason, unspecified, keyCompromise, " +

@@ -33,26 +33,45 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ocsp.qa.shell.completer;
-
-import org.xipki.console.karaf.EnumCompleter;
-import org.xipki.ocsp.qa.shell.OCSPError;
+package org.xipki.ocsp.qa.shell;
 
 /**
  * @author Lijun Liao
  */
 
-public class CertStatusCompleter extends EnumCompleter
+public enum OCSPError
 {
-    public CertStatusCompleter()
-    {
-        StringBuilder enums = new StringBuilder();
+    malformedRequest(1),
+    internalError(2),
+    tryLater(3),
+    sigRequired(4),
+    unauthorized(5);
 
-        for(OCSPError entry : OCSPError.values())
+    public static final String errorText =
+            "malformedRequest, internalError, tryLater, sigRequired, unauthorized";
+
+    private final int code;
+
+    private OCSPError(int code)
+    {
+        this.code = code;
+    }
+
+    public int getCode()
+    {
+        return code;
+    }
+
+    public static OCSPError getOCSPError(String name)
+    {
+        for(OCSPError entry : values())
         {
-            enums.append(entry.name()).append(",");
+            if(entry.name().equals(name))
+            {
+                return entry;
+            }
         }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+
+        throw new IllegalArgumentException("Unknown OCSP error '" + name + "'");
     }
 }
