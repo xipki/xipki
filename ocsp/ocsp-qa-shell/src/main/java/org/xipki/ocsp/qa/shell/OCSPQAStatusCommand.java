@@ -72,6 +72,7 @@ import org.xipki.common.SecurityUtil;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.shell.BaseOCSPStatusCommand;
+import org.xipki.ocsp.client.shell.OCSPResponseUnsuccessfulException;
 import org.xipki.ocsp.client.shell.OCSPUtils;
 import org.xipki.security.KeyUtil;
 import org.xipki.security.SignerUtil;
@@ -91,8 +92,11 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
             description = "Certificate")
     protected String certFile;
 
+    @Option(name = "-expError",
+            description = "Expected error. Valid values are , " + OCSPError.errorText)
+    protected String expectedErrorText;
+
     @Option(name = "-expStatus",
-            required = true,
             description = "Expected status. Valid values are " + CertStatus.certStatusesText)
     protected String expectedStatusText;
 
@@ -116,12 +120,38 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
     protected Object _doExecute()
     throws Exception
     {
-        if(serialNumber == null && certFile == null)
+        if(isBlank(serialNumber) && isBlank(certFile))
         {
-            throw new Exception("Neither serialNumber nor certFile is set");
+            throw new Exception("Neither serialNumber nor certFile is set, this is not permitted");
         }
 
-        CertStatus expectedStatus = CertStatus.getCertStatus(expectedStatusText);
+        if(isNotBlank(serialNumber) && isNotBlank(certFile))
+        {
+            throw new Exception("Both serialNumber and certFile are set, this is not permitted");
+        }
+
+        if(isBlank(expectedErrorText) && isBlank(expectedStatusText))
+        {
+            throw new Exception("Neither expError nor expStatus is set, this is not permitted");
+        }
+
+        if(isNotBlank(expectedErrorText) && isNotBlank(expectedStatusText))
+        {
+            throw new Exception("Both expError and expStatus are set, this is not permitted");
+        }
+
+        OCSPError expectedOcspError = null;
+        if(isNotBlank(expectedErrorText))
+        {
+            expectedOcspError = OCSPError.getOCSPError(expectedErrorText);
+        }
+
+        CertStatus expectedStatus = null;
+        if(isNotBlank(expectedStatusText))
+        {
+            expectedStatus = CertStatus.getCertStatus(expectedStatusText);
+        }
+
         Occurrence nextupdateOccurrence = Occurrence.getOccurrence(nextUpdateOccurrenceText);
         Occurrence certhashOccurrence = Occurrence.getOccurrence(certhashOccurrenceText);
         Occurrence nonceOccurrence = Occurrence.getOccurrence(nonceOccurrenceText);
@@ -180,30 +210,63 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
         {
             debug = new RequestResponseDebug();
         }
-        OCSPResp response = requestor.ask(issuerCert, sn, serverUrl, options, debug);
-        if(debug != null && debug.size() > 0)
-        {
-            RequestResponsePair reqResp = debug.get(0);
-            if(saveReq)
-            {
-                byte[] bytes = reqResp.getRequest();
-                if(bytes != null)
-                {
-                    IoUtil.save(reqout, bytes);
-                }
-            }
 
-            if(saveResp)
+        OCSPResp response = null;
+        try
+        {
+            response = requestor.ask(issuerCert, sn, serverUrl, options, debug);
+        } finally
+        {
+            if(debug != null && debug.size() > 0)
             {
-                byte[] bytes = reqResp.getResponse();
-                if(bytes != null)
+                RequestResponsePair reqResp = debug.get(0);
+                if(saveReq)
                 {
-                    IoUtil.save(respout, bytes);
+                    byte[] bytes = reqResp.getRequest();
+                    if(bytes != null)
+                    {
+                        IoUtil.save(reqout, bytes);
+                    }
+                }
+
+                if(saveResp)
+                {
+                    byte[] bytes = reqResp.getResponse();
+                    if(bytes != null)
+                    {
+                        IoUtil.save(respout, bytes);
+                    }
                 }
             }
         }
 
-        BasicOCSPResp basicResp = OCSPUtils.extractBasicOCSPResp(response);
+        BasicOCSPResp basicResp = null;
+        try
+        {
+            basicResp = OCSPUtils.extractBasicOCSPResp(response);
+        }catch(OCSPResponseUnsuccessfulException e)
+        {
+            if(expectedOcspError == null)
+            {
+                throw e;
+            }
+
+            if(expectedOcspError.getCode() == e.getStatus())
+            {
+                return null;
+            }
+            else
+            {
+                throw new ViolationException("OCSP error expected='" + expectedOcspError.getCode() +
+                        "', is='" + e.getStatus() + "'");
+            }
+        }
+
+        if(expectedOcspError != null)
+        {
+            throw new ViolationException("OCSP error expected='" + expectedOcspError.getCode() +
+                    "', is='0'");
+        }
 
         // check the signature if available
         if(null == basicResp.getSignature())

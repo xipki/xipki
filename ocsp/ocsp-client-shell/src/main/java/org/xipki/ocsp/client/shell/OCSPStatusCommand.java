@@ -191,26 +191,32 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
             debug = new RequestResponseDebug();
         }
 
-        OCSPResp response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrl,
-                options, debug);
-        if(debug != null && debug.size() > 0)
+        OCSPResp response;
+        try
         {
-            RequestResponsePair reqResp = debug.get(0);
-            if(saveReq)
+            response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrl,
+                options, debug);
+        }finally
+        {
+            if(debug != null && debug.size() > 0)
             {
-                byte[] bytes = reqResp.getRequest();
-                if(bytes != null)
+                RequestResponsePair reqResp = debug.get(0);
+                if(saveReq)
                 {
-                    IoUtil.save(reqout, bytes);
+                    byte[] bytes = reqResp.getRequest();
+                    if(bytes != null)
+                    {
+                        IoUtil.save(reqout, bytes);
+                    }
                 }
-            }
 
-            if(saveResp)
-            {
-                byte[] bytes = reqResp.getResponse();
-                if(bytes != null)
+                if(saveResp)
                 {
-                    IoUtil.save(respout, bytes);
+                    byte[] bytes = reqResp.getResponse();
+                    if(bytes != null)
+                    {
+                        IoUtil.save(respout, bytes);
+                    }
                 }
             }
         }
