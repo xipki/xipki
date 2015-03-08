@@ -52,7 +52,7 @@ import org.xipki.ca.server.mgmt.api.PublisherEntry;
 public class PublisherInfoCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "Publisher name", required = false)
-    protected String name;
+    private String name;
 
     @Override
     protected Object _doExecute()

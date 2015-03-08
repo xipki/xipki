@@ -51,7 +51,7 @@ import org.apache.karaf.shell.commands.Command;
 public class EnvInfoCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "Environment parameter name", required = false)
-    protected String name;
+    private String name;
 
     @Override
     protected Object _doExecute()

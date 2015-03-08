@@ -48,11 +48,11 @@ public class CaPublisherRemoveCommand extends CaCommand
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
-    protected String caName;
+    private String caName;
 
     @Option(name = "-publisher",
             required = true, description = "Publisher name")
-    protected String publisherName;
+    private String publisherName;
 
     @Override
     protected Object _doExecute()

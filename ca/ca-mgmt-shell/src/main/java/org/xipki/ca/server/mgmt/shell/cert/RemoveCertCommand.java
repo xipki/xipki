@@ -50,12 +50,12 @@ public class RemoveCertCommand extends CaCommand
 {
     @Option(name = "-ca",
             required = true, description = "Required. CA name")
-    protected String caName;
+    private String caName;
 
     @Option(name = "-serial",
             required = true,
             description = "Serial number")
-    protected Long serialNumber;
+    private Long serialNumber;
 
     @Override
     protected Object _doExecute()

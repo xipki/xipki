@@ -57,23 +57,23 @@ public class RAEnrollCertCommand extends ClientCommand
 
     @Option(name = "-p10",
             required = true, description = "Required. PKCS#10 request file")
-    protected String p10File;
+    private String p10File;
 
     @Option(name = "-profile",
             required = true, description = "Required. Certificate profile")
-    protected String profile;
+    private String profile;
 
     @Option(name = "-out",
             required = true, description = "Where to save the certificate")
-    protected String outputFile;
+    private String outputFile;
 
     @Option(name = "-user",
             required = false, description = "Username")
-    protected String user;
+    private String user;
 
     @Option(name = "-ca",
             required = false, description = "Required if the profile is supported by more than one CA")
-    protected String caName;
+    private String caName;
 
     @Override
     protected Object _doExecute()

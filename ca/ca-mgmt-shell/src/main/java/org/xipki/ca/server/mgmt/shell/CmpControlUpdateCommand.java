@@ -48,35 +48,35 @@ public class CmpControlUpdateCommand extends CaCommand
     @Option(name = "-name",
             description = "Required. CMP control name",
             required = true, multiValued = false)
-    protected String name;
+    private String name;
 
     @Option(name = "-cc", aliases = { "--confirmCert" },
             description = "Whether confirm of certificate is required.\n"
                 + "Valid values are 'yes' and 'no'")
-    protected String confirmCertS;
+    private String confirmCertS;
 
     @Option(name = "-scc", aliases = { "--sendCaCert" },
             description = "Whether CA certificate is included in response.\n"
                 + "Valid values are 'yes' and 'no'")
-    protected String sendCaCertS;
+    private String sendCaCertS;
 
     @Option(name = "-src", aliases = { "--sendResponderCert" },
             description = "Whether responder certificate is included in response.\n"
                 + "Valid values are 'yes' and 'no'")
-    protected String sendResponderCertS;
+    private String sendResponderCertS;
 
     @Option(name = "-mt", aliases = { "--messageTime" },
             description = "Whether message time is required in request.\n"
                 + "Valid values are 'yes' and 'no'")
-    protected String requireMessageTimeS;
+    private String requireMessageTimeS;
 
     @Option(name = "-mtb", aliases = { "--msgTimeBias" },
             description = "Message time bias in seconds")
-    protected Integer messageTimeBias;
+    private Integer messageTimeBias;
 
     @Option(name = "-cwt", aliases = { "--confirmWaitTime" },
             description = "Maximal confirmation time in seconds")
-    protected Integer confirmWaitTime;
+    private Integer confirmWaitTime;
 
     @Override
     protected Object _doExecute()

@@ -57,24 +57,24 @@ public class EnrollCertCommand extends CaCommand
 
     @Option(name = "-ca",
             required = true, description = "Required. CA name")
-    protected String caName;
+    private String caName;
 
     @Option(name = "-p10",
             required = true, description = "Required. PKCS#10 request file")
-    protected String p10File;
+    private String p10File;
 
     @Option(name = "-out",
             description = "Required. Where to save the certificate",
             required = true)
-    protected String outFile;
+    private String outFile;
 
     @Option(name = "-profile",
             required = true, description = "Required. Profile name")
-    protected String profileName;
+    private String profileName;
 
     @Option(name = "-user",
             required = false, description = "Username")
-    protected String user;
+    private String user;
 
     @Override
     protected Object _doExecute()

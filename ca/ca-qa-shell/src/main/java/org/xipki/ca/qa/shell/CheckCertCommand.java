@@ -60,23 +60,23 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
 {
     @Option(name = "-cert",
             required = true, description = "Required. Certificate file")
-    protected String certFile;
+    private String certFile;
 
     @Option(name = "-issuer",
             required = false, description = "Required if multiple issuers are configured. Issuer name")
-    protected String issuerName;
+    private String issuerName;
 
     @Option(name = "-p10",
             required = true, description = "Required. PKCS#10 request file")
-    protected String p10File;
+    private String p10File;
 
     @Option(name = "-profile",
             required = true, description = "Required. Certificate profile")
-    protected String profileName;
+    private String profileName;
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show status verbosely")
-    protected Boolean verbose = Boolean.FALSE;
+    private Boolean verbose = Boolean.FALSE;
 
     private QASystemManager qaSystemManager;
 

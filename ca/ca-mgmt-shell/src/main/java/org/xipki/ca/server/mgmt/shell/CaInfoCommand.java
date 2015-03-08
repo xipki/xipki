@@ -53,11 +53,11 @@ import org.xipki.ca.server.mgmt.api.X509CAEntry;
 public class CaInfoCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CA name", required = false)
-    protected String caName;
+    private String caName;
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show CA information verbosely")
-    protected Boolean verbose = Boolean.FALSE;
+    private Boolean verbose = Boolean.FALSE;
 
     @Override
     protected Object _doExecute()

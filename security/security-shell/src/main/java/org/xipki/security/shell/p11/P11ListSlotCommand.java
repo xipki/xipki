@@ -79,15 +79,15 @@ public class P11ListSlotCommand extends SecurityCommand
 {
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show object information verbosely")
-    protected Boolean verbose = Boolean.FALSE;
+    private Boolean verbose = Boolean.FALSE;
 
     @Option(name = "-module",
             required = false, description = "Name of the PKCS#11 module.")
-    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+    private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Option(name = "-slot",
             required = false, description = "Slot index")
-    protected Integer slotIndex;
+    private Integer slotIndex;
 
     @Override
     protected Object _doExecute()

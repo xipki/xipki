@@ -46,7 +46,7 @@ import org.apache.karaf.shell.commands.Command;
 public class PublisherRemoveCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "Publisher name", required = true)
-    protected String name;
+    private String name;
 
     @Override
     protected Object _doExecute()

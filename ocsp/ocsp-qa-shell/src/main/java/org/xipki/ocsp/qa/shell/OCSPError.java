@@ -74,7 +74,7 @@ public enum OCSPError
 
         throw new IllegalArgumentException("Unknown OCSP error '" + name + "'");
     }
-    
+
     public static OCSPError getOCSPError(int status)
     {
         for(OCSPError entry : values())

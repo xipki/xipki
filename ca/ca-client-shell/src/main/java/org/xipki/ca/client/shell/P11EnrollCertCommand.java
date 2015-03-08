@@ -56,21 +56,21 @@ public class P11EnrollCertCommand extends EnrollCertCommand
 {
     @Option(name = "-slot",
             required = true, description = "Required. Slot index")
-    protected Integer slotIndex;
+    private Integer slotIndex;
 
     @Option(name = "-key-id",
             required = false, description = "Id of the private key in the PKCS#11 device.\n"
                     + "Either keyId or keyLabel must be specified")
-    protected String keyId;
+    private String keyId;
 
     @Option(name = "-key-label",
             required = false, description = "Label of the private key in the PKCS#11 device.\n"
                     + "Either keyId or keyLabel must be specified")
-    protected String keyLabel;
+    private String keyLabel;
 
     @Option(name = "-module",
             required = false, description = "Name of the PKCS#11 module.")
-    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+    private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Override
     protected ConcurrentContentSigner getSigner()

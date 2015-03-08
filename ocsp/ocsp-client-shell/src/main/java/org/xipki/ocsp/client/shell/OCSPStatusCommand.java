@@ -90,16 +90,16 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
     @Option(name = "-serial",
             multiValued = true,
             description = "Serial number")
-    protected List<String> serialNumbers;
+    private List<String> serialNumbers;
 
     @Option(name = "-cert",
             multiValued = true,
             description = "Certificate")
-    protected List<String> certFiles;
+    private List<String> certFiles;
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show status verbosely")
-    protected Boolean verbose = Boolean.FALSE;
+    private Boolean verbose = Boolean.FALSE;
 
     @Override
     protected Object _doExecute()

@@ -54,19 +54,19 @@ public class ImportOcspFromCaCommand extends XipkiOsgiCommandSupport
 
     @Option(name = "-dbconf",
             description = "Database configuration file")
-    protected String dbconfFile = DFLT_DBCONF_FILE;
+    private String dbconfFile = DFLT_DBCONF_FILE;
 
     @Option(name = "-indir",
             description = "Required. Input directory",
             required = true)
-    protected String indir;
+    private String indir;
 
     @Option(name = "-publisher",
             description = "Publisher name")
-    protected String publisherName = DFLT_PUBLISHER;
+    private String publisherName = DFLT_PUBLISHER;
 
     @Option(name = "-resume")
-    protected Boolean resume = Boolean.FALSE;
+    private Boolean resume = Boolean.FALSE;
 
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
