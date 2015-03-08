@@ -50,16 +50,16 @@ public enum OCSPError
     public static final String errorText =
             "malformedRequest, internalError, tryLater, sigRequired, unauthorized";
 
-    private final int code;
+    private final int status;
 
-    private OCSPError(int code)
+    private OCSPError(int status)
     {
-        this.code = code;
+        this.status = status;
     }
 
-    public int getCode()
+    public int getStatus()
     {
-        return code;
+        return status;
     }
 
     public static OCSPError getOCSPError(String name)
@@ -74,4 +74,18 @@ public enum OCSPError
 
         throw new IllegalArgumentException("Unknown OCSP error '" + name + "'");
     }
+    
+    public static OCSPError getOCSPError(int status)
+    {
+        for(OCSPError entry : values())
+        {
+            if(entry.status == status)
+            {
+                return entry;
+            }
+        }
+
+        throw new IllegalArgumentException("Unknown OCSPResponse status '" + status + "'");
+    }
+
 }
