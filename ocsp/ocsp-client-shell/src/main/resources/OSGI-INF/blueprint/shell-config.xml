@@ -11,6 +11,8 @@
         <entry key="-cert" value-ref="filePathCompleter"/>
         <entry key="-issuer" value-ref="filePathCompleter"/>
         <entry key="-respIssuer" value-ref="filePathCompleter"/>
+        <entry key="-reqout" value-ref="filePathCompleter"/>
+        <entry key="-respout" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>

@@ -24,6 +24,8 @@
         <entry key="-out" value-ref="filePathCompleter"/>
         <entry key="-p10" value-ref="filePathCompleter"/>
         <entry key="-ca" value-ref="caNameCompleter"/>
+        <entry key="-reqout" value-ref="filePathCompleter"/>
+        <entry key="-respout" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -37,6 +39,8 @@
         <entry key="-ca" value-ref="caNameCompleter"/>
         <entry key="-keyusage" value-ref="keyusageCompleter"/>
         <entry key="-extKeyusage" value-ref="extKeyusageCompleter"/>
+        <entry key="-reqout" value-ref="filePathCompleter"/>
+        <entry key="-respout" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -50,6 +54,8 @@
         <entry key="-ca" value-ref="caNameCompleter"/>
         <entry key="-keyusage" value-ref="keyusageCompleter"/>
         <entry key="-extKeyusage" value-ref="extKeyusageCompleter"/>
+        <entry key="-reqout" value-ref="filePathCompleter"/>
+        <entry key="-respout" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -60,6 +66,8 @@
         <entry key="-cert" value-ref="filePathCompleter"/>
         <entry key="-cacert" value-ref="filePathCompleter"/>
         <entry key="-reason" value-ref="crlReasonCompleter"/>
+        <entry key="-reqout" value-ref="filePathCompleter"/>
+        <entry key="-respout" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -69,6 +77,8 @@
       <optional-completers>
         <entry key="-cert" value-ref="filePathCompleter"/>
         <entry key="-cacert" value-ref="filePathCompleter"/>
+        <entry key="-reqout" value-ref="filePathCompleter"/>
+        <entry key="-respout" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -78,6 +88,8 @@
       <optional-completers>
         <entry key="-cert" value-ref="filePathCompleter"/>
         <entry key="-cacert" value-ref="filePathCompleter"/>
+        <entry key="-reqout" value-ref="filePathCompleter"/>
+        <entry key="-respout" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -86,6 +98,8 @@
       </action>
       <optional-completers>
         <entry key="-ca" value-ref="caNameCompleter"/>
+        <entry key="-reqout" value-ref="filePathCompleter"/>
+        <entry key="-respout" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -95,6 +109,8 @@
       <optional-completers>
         <entry key="-out" value-ref="filePathCompleter"/>
         <entry key="-ca" value-ref="caNameCompleter"/>
+        <entry key="-reqout" value-ref="filePathCompleter"/>
+        <entry key="-respout" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -105,6 +121,8 @@
         <entry key="-out" value-ref="filePathCompleter"/>
         <entry key="-ca" value-ref="caNameCompleter"/>
         <entry key="-basecrl-out" value-ref="filePathCompleter"/>
+        <entry key="-reqout" value-ref="filePathCompleter"/>
+        <entry key="-respout" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
