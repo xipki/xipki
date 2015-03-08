@@ -24,18 +24,18 @@ xipki-tk:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/SubCA1.p12 \
 xipki-tk:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/SubCAwithCRL1.p12 \
   -subject "CN=SubCAwithCRL1"
 
-source ./demo/prepare.script
+source ./xipki/demo/prepare.script
 
-source ./demo/p12.script
+source ./xipki/demo/p12.script
 
-source ./demo/ra.script
+source ./xipki/demo/ra.script
 
-source ./demo/ca-qa.script
+source ./xipki/demo/ca-qa.script
 
-source ./demo/ocsp.script
+source ./xipki/demo/ocsp.script
 
-#source ./demo/loadtest-enroll.script
+#source ./xipki/demo/loadtest-enroll.script
 
-#source ./demo/loadtest-ocsp.script
+#source ./xipki/demo/loadtest-ocsp.script
 
 

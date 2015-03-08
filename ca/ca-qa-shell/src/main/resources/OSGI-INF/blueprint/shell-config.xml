@@ -8,7 +8,7 @@
   -->
   <cm:property-placeholder persistent-id="org.xipki.ca.qa.shell" update-strategy="reload">
     <cm:default-properties>
-      <cm:property name="confFile" value="ca-qa-shell/qa-conf.xml"/>
+      <cm:property name="confFile" value="xipki/ca-qa-shell/qa-conf.xml"/>
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>

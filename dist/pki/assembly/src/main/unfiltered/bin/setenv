@@ -47,7 +47,7 @@
 UNAME=`uname -s`_`uname -m`
 UNAME=`echo $UNAME | tr '[:upper:]' '[:lower:]'`
 
-NATIVE_LIB="native-lib/unix/$UNAME"
+NATIVE_LIB="xipki/native-lib/unix/$UNAME"
 
 #KARAF_OPTS="$KARAF_OPTS -DNSSLIB=/point/to/firefox"
 KARAF_OPTS="$KARAF_OPTS -Djava.library.path=$NATIVE_LIB"

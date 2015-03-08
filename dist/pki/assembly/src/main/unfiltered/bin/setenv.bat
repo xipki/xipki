@@ -56,7 +56,7 @@ rem Additional available Karaf options
 rem SET KARAF_OPTS
 
 if "%PROCESSOR_ARCHITECTURE%"=="x86" goto 32BIT
-SET NATIVE_LIB=native-lib\windows\win_x64
+SET NATIVE_LIB=xipki\native-lib\windows\win_x64
 goto OS_END
 :32BIT
 SET NATIVE_LIB=native-lib\windows\win_x86

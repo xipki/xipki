@@ -28,16 +28,16 @@ xipki-tk:ec -curve secp256r1 -slot 1 -key-label $SubCAwithCRL_KEY_LABEL
 
 feature:uninstall xipki-security-shell
 
-source ./demo/prepare.script
+source ./xipki/demo/prepare.script
 
-source ./demo/hsm.script
+source ./xipki/demo/hsm.script
 
-source ./demo/ra.script
+source ./xipki/demo/ra.script
 
-source ./demo/ca-qa.script
+source ./xipki/demo/ca-qa.script
 
-source ./demo/ocsp.script
+source ./xipki/demo/ocsp.script
 
-#source ./demo/loadtest-enroll.script
+#source ./xipki/demo/loadtest-enroll.script
 
-#source ./demo/loadtest-ocsp.script
+#source ./xipki/demo/loadtest-ocsp.script

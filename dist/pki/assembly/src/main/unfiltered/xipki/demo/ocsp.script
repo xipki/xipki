@@ -39,12 +39,12 @@ xipki-qa:ocsp-status -issuer output/SubCA1.der -cert output/TLS_C2.der \
 echo "QA: Good (POST, CRL)"
 xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -cert output/OCSP1.der \
   -expStatus good -expCerthash required -expSigalg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+  -url $URL_CRL -respIssuer output/SubCAwithCRL1.der
 
 echo "QA: Revoked, reason = keyCompromise (POST, CRL)"
 xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -cert output/OCSP2.der \
   -expStatus keyCompromise -expCerthash required -expSigalg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+  -url $URL_CRL -respIssuer output/SubCAwithCRL1.der
 
 echo "QA: Good (POST, CRL)"
 xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -serial 99999 \
@@ -90,12 +90,12 @@ xipki-qa:ocsp-status -issuer output/SubCA1.der -cert output/TLS_C2.der -httpget 
 echo "QA: Good (GET, CRL)"
 xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -cert output/OCSP1.der -httpget \
   -expStatus good -expCerthash required -expSigalg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+  -url $URL_CRL -respIssuer output/SubCAwithCRL1.der
 
 echo "QA: Revoked, reason = keyCompromise (GET, CRL)"
 xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -cert output/OCSP2.der -httpget \
   -expStatus keyCompromise -expCerthash required -expSigalg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+  -url $URL_CRL -respIssuer output/SubCAwithCRL1.der
 
 echo "QA: Good (GET, CRL)"
 xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -serial 99999 -httpget \
@@ -141,12 +141,12 @@ xipki-qa:ocsp-status -issuer output/SubCA1.der -cert output/TLS_C2.der -sign \
 echo "QA: Good (POST, SIGNED, CRL)"
 xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -cert output/OCSP1.der -sign \
   -expStatus good -expCerthash required -expSigalg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+  -url $URL_CRL -respIssuer output/SubCAwithCRL1.der
  
 echo "QA: Revoked, reason = keyCompromise (POST, SIGNED, CRL)"
 xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -cert output/OCSP2.der -sign \
   -expStatus keyCompromise -expCerthash required -expSigalg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+  -url $URL_CRL -respIssuer output/SubCAwithCRL1.der
  
 echo "QA: Good (POST, SIGNED, CRL)"
 xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -serial 99999 -sign \

@@ -42,7 +42,7 @@
   <datasources>
     <datasource name="datasource1">
       <conf>
-        <file>ca-config/ocsp-db.properties</file>
+        <file>xipki/ca-config/ocsp-db.properties</file>
       </conf>
     </datasource>
   </datasources>

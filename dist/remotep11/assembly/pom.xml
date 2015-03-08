@@ -127,7 +127,7 @@
                   <artifactId>iaikPkcs11Wrapper-native</artifactId>
                   <version>${pkcs11Wrapper.version}</version>
                   <type>zip</type>
-                  <outputDirectory>target/native-lib</outputDirectory>
+                  <outputDirectory>target/xipki/native-lib</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
