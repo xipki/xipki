@@ -23,7 +23,7 @@ xipki-ca:gen-rca -name RCA1 \
   -maxValidity 10y \
   -signerType PKCS11 \
   -signerConf algo?$CA_SIGNER_ALGO%slot?1%key-label?$RCA_KEY_LABEL \
-  -ocspUri http://rca.example.org/ocsp/responder1 \
+  -ocspUri http://localhost:8080/ocsp/responder1 \
   -cmpControl cmpcontrol1 \
   --duplicateSubject permitted \
   --duplicateKey permitted \
@@ -100,7 +100,7 @@ xipki-ca:ca-add -name SubCA1 \
   -maxValidity 5y \
   -signerType PKCS11 \
   -signerConf algo?$CA_SIGNER_ALGO%slot?1%key-label?$SubCA_KEY_LABEL \
-  -ocspUri http://subca.example.org/ocsp/responder1 \
+  -ocspUri http://localhost:8080/ocsp/responder1 \
   -cmpControl cmpcontrol1 \
   --duplicateSubject permitted \
   --duplicateKey permitted
@@ -130,7 +130,7 @@ xipki-ca:ca-add -name SubCAwithCRL1 \
   -maxValidity 5y \
   -signerType PKCS11 \
   -signerConf algo?$CA_SIGNER_ALGO%slot?1%key-label?$SubCAwithCRL_KEY_LABEL \
-  -ocspUri http://subca.example.org/ocsp/responder2 \
+  -ocspUri http://localhost:8080/ocsp/responder2 \
   -crlUri http://subcawithcrl.example.org/crl \
   -deltaCrlUri http://subcawithcrl.example.org/deltacrl \
   -crlSigner CASIGN.CRLSIGNER \
