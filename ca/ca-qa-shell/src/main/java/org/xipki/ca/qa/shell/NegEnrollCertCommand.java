@@ -67,15 +67,15 @@ public abstract class NegEnrollCertCommand extends ClientCommand
             required = false,
             description = "Subject to be requested.\n"
                     + "The default is the subject of self-signed certifite.")
-    protected String subject;
+    private String subject;
 
     @Option(name = "-profile",
             required = true, description = "Required. Certificate profile")
-    protected String profile;
+    private String profile;
 
     @Option(name = "-user",
             required = false, description = "Username")
-    protected String user;
+    private String user;
 
     @Option(name = "-hash",
             required = false, description = "Hash algorithm name for the POPO computation")
@@ -83,7 +83,7 @@ public abstract class NegEnrollCertCommand extends ClientCommand
 
     @Option(name = "-ca",
             required = false, description = "Required if the profile is supported by more than one CA")
-    protected String caName;
+    private String caName;
 
     protected SecurityFactory securityFactory;
 

@@ -53,15 +53,15 @@ public class ImportCaCommand extends XipkiOsgiCommandSupport
 
     @Option(name = "-dbconf",
             description = "Database configuration file")
-    protected String dbconfFile = DFLT_DBCONF_FILE;
+    private String dbconfFile = DFLT_DBCONF_FILE;
 
     @Option(name = "-indir",
             description = "Required. Input directory",
             required = true)
-    protected String indir;
+    private String indir;
 
     @Option(name = "-resume")
-    protected Boolean resume = Boolean.FALSE;
+    private Boolean resume = Boolean.FALSE;
 
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;

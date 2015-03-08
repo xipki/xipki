@@ -55,17 +55,17 @@ public class ResponderUpdateCommand extends CaCommand
     @Option(name = "-signerType",
             description = "Type of the responder signer",
             required = true)
-    protected String signerType;
+    private String signerType;
 
     @Option(name = "-signerConf",
             description = "Conf of the responder signer or 'NULL'")
-    protected String signerConf;
+    private String signerConf;
 
     @Option(name = "-cert",
             description = "Requestor certificate file or 'NULL'")
-    protected String certFile;
+    private String certFile;
 
-    protected SecurityFactory securityFactory;
+    private SecurityFactory securityFactory;
 
     public void setSecurityFactory(SecurityFactory securityFactory)
     {

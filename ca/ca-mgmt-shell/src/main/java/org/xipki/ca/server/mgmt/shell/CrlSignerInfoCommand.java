@@ -53,11 +53,11 @@ import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 public class CrlSignerInfoCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CRL signer name", required = false)
-    protected String name;
+    private String name;
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show CRL signer information verbosely")
-    protected Boolean verbose = Boolean.FALSE;
+    private Boolean verbose = Boolean.FALSE;
 
     @Override
     protected Object _doExecute()

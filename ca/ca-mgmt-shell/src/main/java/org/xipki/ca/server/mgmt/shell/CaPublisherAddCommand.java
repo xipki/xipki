@@ -50,11 +50,11 @@ public class CaPublisherAddCommand extends CaCommand
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
-    protected String caName;
+    private String caName;
 
     @Option(name = "-publisher",
         required = true, multiValued = true, description = "Required. Publisher name. Multivalued")
-    protected List<String> publisherNames;
+    private List<String> publisherNames;
 
     @Override
     protected Object _doExecute()

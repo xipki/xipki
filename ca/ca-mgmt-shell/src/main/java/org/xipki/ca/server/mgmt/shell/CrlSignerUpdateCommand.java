@@ -55,23 +55,23 @@ public class CrlSignerUpdateCommand extends CaCommand
     @Option(name = "-name",
             description = "Required. CRL signer name",
             required = true, multiValued = false)
-    protected String name;
+    private String name;
 
     @Option(name = "-signerType",
             description = "CRL signer type, use 'CA' to sign the CRL by the CA itself")
-    protected String signerType;
+    private String signerType;
 
     @Option(name = "-signerConf",
             description = "CRL signer configuration")
-    protected String signerConf;
+    private String signerConf;
 
     @Option(name = "-cert",
             description = "CRL signer's certificate file or 'NULL'")
-    protected String signerCert;
+    private String signerCert;
 
     @Option(name = "-crlControl",
             description = "CRL control")
-    protected String crlControlS;
+    private String crlControlS;
 
     @Override
     protected Object _doExecute()

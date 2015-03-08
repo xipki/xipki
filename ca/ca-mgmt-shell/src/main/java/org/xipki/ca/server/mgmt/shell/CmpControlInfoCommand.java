@@ -52,7 +52,7 @@ import org.xipki.ca.server.mgmt.api.CmpControl;
 public class CmpControlInfoCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CMP control name", required = false)
-    protected String name;
+    private String name;
 
     @Override
     protected Object _doExecute()

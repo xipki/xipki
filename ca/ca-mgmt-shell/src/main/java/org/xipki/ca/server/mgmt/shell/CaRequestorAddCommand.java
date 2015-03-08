@@ -54,27 +54,27 @@ public class CaRequestorAddCommand extends CaCommand
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
-    protected String caName;
+    private String caName;
 
     @Option(name = "-requestor",
             required = true, description = "Required. Requestor name")
-    protected String requestorName;
+    private String requestorName;
 
     @Option(name = "-ra",
             description = "Whether as RA.\n"
                     + "Valid values are 'yes' and 'no'")
-    protected String raS = "no";
+    private String raS = "no";
 
     @Option(name = "-permission",
             description = "Required. Permission, multi options is allowed. allowed values are\n"
                     + permissionsText,
             required = true, multiValued = true)
-    protected Set<String> permissions;
+    private Set<String> permissions;
 
     @Option(name = "-profile",
             description = "Required. Profile name or 'all' for all profiles, multi options is allowed",
             required = true, multiValued = true)
-    protected Set<String> profiles;
+    private Set<String> profiles;
 
     @Override
     protected Object _doExecute()

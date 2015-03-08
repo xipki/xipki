@@ -47,12 +47,12 @@ import org.apache.karaf.shell.commands.Option;
 public class CaPublishRCACertCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CA name", required = true)
-    protected String caName;
+    private String caName;
 
     @Option(name = "-profile",
             description = "Required. Certificate profile name",
             required = true)
-    protected String certprofile;
+    private String certprofile;
 
     @Override
     protected Object _doExecute()

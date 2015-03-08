@@ -51,20 +51,20 @@ public class RemoveExpiredCertsCommand extends ClientCommand
 {
     @Option(name = "-ca",
             required = false, description = "Required if multiple CAs are configured. CA name")
-    protected String caName;
+    private String caName;
 
     @Option(name = "-profile",
             required = true, description = "Required. Certificate profile.")
-    protected String profile;
+    private String profile;
 
     @Option(name = "-user",
             required = false, description = "Username, wildcards '%' and '*' are allowed.\n"
                     + "'all' for all users")
-    protected String userLike;
+    private String userLike;
 
     @Option(name = "-overlap",
             required = false, description = "Overlap in seconds")
-    protected Long overlapSeconds = 24L * 60 * 60;
+    private Long overlapSeconds = 24L * 60 * 60;
 
     @Override
     protected Object _doExecute()

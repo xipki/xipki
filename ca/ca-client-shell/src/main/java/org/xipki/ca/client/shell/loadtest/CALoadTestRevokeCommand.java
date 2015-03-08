@@ -57,32 +57,32 @@ public class CALoadTestRevokeCommand extends CALoadTestCommand
     @Option(name = "-cacert",
             required = true,
             description = "CA Certificate file")
-    protected String caCertFile;
+    private String caCertFile;
 
     @Option(name = "-duration",
             required = false,
             description = "Required. Maximal duration in seconds")
-    protected Integer durationInSecond = 30;
+    private Integer durationInSecond = 30;
 
     @Option(name = "-thread",
             required = false,
             description = "Number of threads")
-    protected Integer numThreads = 5;
+    private Integer numThreads = 5;
 
     @Option(name = "-cadb",
             required = true,
             description = "CA database configuration file")
-    protected String caDbConfFile;
+    private String caDbConfFile;
 
     @Option(name = "-maxCerts",
             required = false,
             description = "maximal number of certificates to be revoked. 0 for unlimited")
-    protected Integer maxCerts = 0;
+    private Integer maxCerts = 0;
 
     @Option(name = "-n",
             description = "Number of certificates to be revoked in one request",
             required = false)
-    protected Integer n = 1;
+    private Integer n = 1;
 
     private DataSourceFactory dataSourceFactory;
     private SecurityFactory securityFactory;

@@ -50,19 +50,19 @@ public class ProfileUpdateCommand extends CaCommand
     @Option(name = "-name",
                 description = "Required. Profile name",
                 required = true, multiValued = false)
-    protected String name;
+    private String name;
 
     @Option(name = "-type",
             description = "Profile type")
-    protected String type;
+    private String type;
 
     @Option(name = "-conf",
             description = "Profile configuration or 'NULL'")
-    protected String conf;
+    private String conf;
 
     @Option(name = "-confFile",
             description = "Profile configuration file")
-    protected String confFile;
+    private String confFile;
 
     @Override
     protected Object _doExecute()

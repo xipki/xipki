@@ -52,15 +52,15 @@ public class P11CertDeleteCommand extends SecurityCommand
 {
     @Option(name = "-slot",
             required = true, description = "Required. Slot index")
-    protected Integer slotIndex;
+    private Integer slotIndex;
 
     @Option(name = "-key-id",
             required = true, description = "Required. Id of the certificate in the PKCS#11 device")
-    protected String keyId;
+    private String keyId;
 
     @Option(name = "-module",
             required = false, description = "Name of the PKCS#11 module.")
-    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+    private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Override
     protected Object _doExecute()

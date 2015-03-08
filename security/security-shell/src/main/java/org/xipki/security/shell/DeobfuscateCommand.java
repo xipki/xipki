@@ -48,7 +48,7 @@ public class DeobfuscateCommand extends SecurityCommand
 {
     @Option(name = "-pwd", aliases = { "--password" },
             required = true, description = "Required. Obfuscated password, starts with OBF:")
-    protected String passwordHint;
+    private String passwordHint;
 
     @Override
     protected Object _doExecute()

@@ -62,77 +62,77 @@ public class CaUpdateCommand extends CaCommand
 {
     @Option(name = "-name",
             required = true, description = "Required. CA name")
-    protected String caName;
+    private String caName;
 
     @Option(name = "-status",
             description = "CA status, active|inactive")
-    protected String caStatus;
+    private String caStatus;
 
     @Option(name = "-ocspUri",
             description = "OCSP URI or 'NULL', multi options is allowed",
             multiValued = true)
-    protected List<String> ocspUris;
+    private List<String> ocspUris;
 
     @Option(name = "-crlUri",
             description = "CRL URI or 'NULL', multi options is allowed",
             multiValued = true)
-    protected List<String> crlUris;
+    private List<String> crlUris;
 
     @Option(name = "-deltaCrlUri",
             description = "Delta CRL URI or 'NULL', multi options is allowed",
             multiValued = true)
-    protected List<String> deltaCrlUris;
+    private List<String> deltaCrlUris;
 
     @Option(name = "-permission",
             description = "Permission, multi options is allowed. allowed values are\n" + permissionsText,
             multiValued = true)
-    protected Set<String> permissions;
+    private Set<String> permissions;
 
     @Option(name = "-maxValidity",
             description = "Maximal validity")
-    protected String maxValidity;
+    private String maxValidity;
 
     @Option(name = "-expirationPeriod",
             description = "Days before expiration time of CA to issue certificates")
-    protected Integer expirationPeriod;
+    private Integer expirationPeriod;
 
     @Option(name = "-crlSigner",
             description = "CRL signer name or 'NULL'")
-    protected String crlSignerName;
+    private String crlSignerName;
 
     @Option(name = "-cmpControl",
             description = "CMP control name or 'NULL'")
-    protected String cmpControlName;
+    private String cmpControlName;
 
     @Option(name = "-numCrls",
             description = "Number of CRLs to be kept in database")
-    protected Integer numCrls;
+    private Integer numCrls;
 
     @Option(name = "-cert",
             description = "CA certificate file")
-    protected String certFile;
+    private String certFile;
 
     @Option(name = "-signerType",
             description = "CA signer type")
-    protected String signerType;
+    private String signerType;
 
     @Option(name = "-signerConf",
             description = "CA signer configuration or 'NULL'")
-    protected String signerConf;
+    private String signerConf;
 
     @Option(name = "-dk", aliases = { "--duplicateKey" },
             description = "Mode of duplicate key.\n"
                     + "\t1: forbidden\n"
                     + "\t2: forbiddenWithinProfile\n"
                     + "\t3: permitted")
-    protected String duplicateKeyS;
+    private String duplicateKeyS;
 
     @Option(name = "-ds", aliases = { "--duplicateSubject" },
             description = "Mode of duplicate subject.\n"
                     + "\t1: forbidden\n"
                     + "\t2: forbiddenWithinProfile\n"
                     + "\t3: permitted")
-    protected String duplicateSubjectS;
+    private String duplicateSubjectS;
 
     @Option(name = "-validityMode",
             description = "Mode of valditity.\n"
@@ -140,9 +140,9 @@ public class CaUpdateCommand extends CaCommand
                     + "\tLAX:    notBefore + validity after CA's notAfter is permitted\n"
                     + "\tCUTOFF: notAfter of issued certificates will be set to the earlier time of\n"
                     + "\t        notBefore + validity and CA's notAfter")
-    protected String validityModeS;
+    private String validityModeS;
 
-    protected SecurityFactory securityFactory;
+    private SecurityFactory securityFactory;
 
     public void setSecurityFactory(SecurityFactory securityFactory)
     {

@@ -51,7 +51,7 @@ import org.apache.karaf.shell.commands.Command;
 public class CaAliasInfoCommand extends CaCommand
 {
     @Argument(index = 0, name = "alias", description = "CA alias", required = false)
-    protected String caAlias;
+    private String caAlias;
 
     @Override
     protected Object _doExecute()

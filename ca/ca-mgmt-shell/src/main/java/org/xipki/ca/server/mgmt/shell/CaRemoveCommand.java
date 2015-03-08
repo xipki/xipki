@@ -46,7 +46,7 @@ import org.apache.karaf.shell.commands.Command;
 public class CaRemoveCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CA name", required = true)
-    protected String name;
+    private String name;
 
     @Override
     protected Object _doExecute()

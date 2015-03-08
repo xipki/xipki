@@ -53,11 +53,11 @@ import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 public class RequestorInfoCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "Requestor name", required = false)
-    protected String name;
+    private String name;
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show requestor information verbosely")
-    protected Boolean verbose = Boolean.FALSE;
+    private Boolean verbose = Boolean.FALSE;
 
     @Override
     protected Object _doExecute()

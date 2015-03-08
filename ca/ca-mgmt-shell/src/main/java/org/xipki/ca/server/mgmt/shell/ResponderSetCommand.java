@@ -53,15 +53,15 @@ public class ResponderSetCommand extends CaCommand
     @Option(name = "-signerType",
             description = "Required. Type of the responder signer",
             required = true)
-    protected String signerType;
+    private String signerType;
 
     @Option(name = "-signerConf",
             description = "Conf of the responder signer")
-    protected String signerConf;
+    private String signerConf;
 
     @Option(name = "-cert",
             description = "Requestor certificate")
-    protected String certFile;
+    private String certFile;
 
     private SecurityFactory securityFactory;
 

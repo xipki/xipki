@@ -59,16 +59,16 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
     @Option(name = "-p10",
             description = "Required. PKCS#10 request of the Root CA",
             required = true)
-    protected String p10ReqFile;
+    private String p10ReqFile;
 
     @Option(name = "-profile",
             description = "Required. Profile of the Root CA",
             required = true)
-    protected String rcaProfile;
+    private String rcaProfile;
 
     @Option(name = "-out",
             description = "Where to save the generated CA certificate")
-    protected String rcaCertOutFile;
+    private String rcaCertOutFile;
 
     @Override
     protected Object _doExecute()

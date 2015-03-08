@@ -49,7 +49,7 @@ public class ResponderInfoCommand extends CaCommand
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show responder information verbosely")
-    protected Boolean verbose = Boolean.FALSE;
+    private Boolean verbose = Boolean.FALSE;
 
     @Override
     protected Object _doExecute()

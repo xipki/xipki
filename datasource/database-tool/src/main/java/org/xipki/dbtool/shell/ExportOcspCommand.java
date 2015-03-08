@@ -54,19 +54,19 @@ public class ExportOcspCommand extends XipkiOsgiCommandSupport
 
     @Option(name = "-dbconf",
             description = "Database configuration file.")
-    protected String dbconfFile = DFLT_DBCONF_FILE;
+    private String dbconfFile = DFLT_DBCONF_FILE;
 
     @Option(name = "-outdir",
             description = "Required. Output directory",
             required = true)
-    protected String outdir;
+    private String outdir;
 
     @Option(name = "-n",
             description = "Number of certificates in one zip file")
-    protected Integer numCertsInBundle = DFLT_NUM_CERTS_IN_BUNDLE;
+    private Integer numCertsInBundle = DFLT_NUM_CERTS_IN_BUNDLE;
 
     @Option(name = "-resume")
-    protected Boolean resume = Boolean.FALSE;
+    private Boolean resume = Boolean.FALSE;
 
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;

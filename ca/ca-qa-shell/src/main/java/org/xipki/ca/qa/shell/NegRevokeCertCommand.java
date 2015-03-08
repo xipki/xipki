@@ -68,12 +68,12 @@ public class NegRevokeCertCommand extends UnRevRemoveCertCommand
                     "  5: cessationOfOperation\n" +
                     "  6: certificateHold\n" +
                     "  9: privilegeWithdrawn")
-    protected String reason;
+    private String reason;
 
     @Option(name = "-invDate",
             required = false,
             description = "Invalidity date, UTC time of format yyyyMMddHHmmss")
-    protected String invalidityDateS;
+    private String invalidityDateS;
 
     @Override
     protected Object _doExecute()
