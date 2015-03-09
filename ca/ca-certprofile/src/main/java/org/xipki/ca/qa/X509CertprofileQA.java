@@ -723,12 +723,10 @@ public class X509CertprofileQA
                 {
                     // IssuerAltName
                     checkExtensionIssuerAltNames(failureMsg,extensionValue, issuerInfo);
-                    continue;
                 } else if(Extension.basicConstraints.equals(oid))
                 {
                     // Basic Constraints
                     checkExtensionBasicConstraints(failureMsg, extensionValue);
-                    continue;
                 } else if(Extension.nameConstraints.equals(oid))
                 {
                     // Name Constraints
@@ -754,12 +752,10 @@ public class X509CertprofileQA
                 {
                     // Freshest CRL
                     checkExtensionDeltaCrlDistributionPoints(failureMsg, extensionValue, issuerInfo);
-                    continue;
                 } else if(Extension.authorityInfoAccess.equals(oid))
                 {
                     // Authority Information Access
                     checkExtensionAuthorityInfoAccess(failureMsg, extensionValue, issuerInfo);
-                    continue;
                 } else if(Extension.subjectInfoAccess.equals(oid))
                 {
                     // SubjectInfoAccess
@@ -772,7 +768,6 @@ public class X509CertprofileQA
                 {
                     // ocsp-nocheck
                     checkExtensionOcspNocheck(extensionValue, failureMsg);
-                    continue;
                 } else
                 {
                     byte[] expected = getExpectedExtValue(oid, requestExtensions, extControl);
