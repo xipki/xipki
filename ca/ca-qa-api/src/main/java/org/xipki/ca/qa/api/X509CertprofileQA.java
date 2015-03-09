@@ -33,36 +33,19 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.internal;
+package org.xipki.ca.qa.api;
 
-import org.bouncycastle.util.Arrays;
-import org.xipki.common.ParamChecker;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaExtensionValue
+public interface X509CertprofileQA
 {
-    private final boolean critical;
-    private final byte[] value;
-
-    public QaExtensionValue(boolean critical, byte[] value)
-    {
-        ParamChecker.assertNotNull("value", value);
-
-        this.critical = critical;
-        this.value = Arrays.clone(value);
-    }
-
-    public boolean isCritical()
-    {
-        return critical;
-    }
-
-    public byte[] getValue()
-    {
-        return Arrays.clone(value);
-    }
-
+    ValidationResult checkCert(byte[] certBytes, X509IssuerInfo issuerInfo,
+            X500Name requestedSubject, SubjectPublicKeyInfo requestedPublicKey,
+            Extensions requestedExtensions);
 }

@@ -33,70 +33,75 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa;
+package org.xipki.ca.qa.impl.internal;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bouncycastle.util.Arrays;
+import org.xipki.ca.certprofile.x509.jaxb.Admission;
+import org.xipki.ca.certprofile.x509.jaxb.OidWithDescType;
 import org.xipki.common.CollectionUtil;
-import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class ValidationResult
+public class QaAdmission extends QaExtension
 {
-    private final List<ValidationIssue> validationIssues;
-    private final List<ValidationIssue> failedValidationIssues;
-    private final List<ValidationIssue> successfulValidationIssues;
+    private final String registrationNumber;
+    private final byte[] addProfessionInfo;
+    private final List<String> professionOIDs;
+    private final List<String> professionItems;
 
-    public ValidationResult(ValidationIssue validationIssues)
+    public QaAdmission(Admission jaxb)
     {
-        this(Arrays.asList(validationIssues));
-    }
+        this.registrationNumber = jaxb.getRegistrationNumber();
+        this.addProfessionInfo = jaxb.getAddProfessionInfo();
 
-    public ValidationResult(List<ValidationIssue> validationIssues)
-    {
-        ParamChecker.assertNotEmpty("validationIssues", validationIssues);
-
-        List<ValidationIssue> failedIssues = new LinkedList<>();
-        List<ValidationIssue> successfulIssues = new LinkedList<>();
-        for(ValidationIssue issue : validationIssues)
+        List<String> items = jaxb.getProfessionItem();
+        if(CollectionUtil.isEmpty(items))
         {
-            if(issue.isFailed())
-            {
-                failedIssues.add(issue);
-            } else
-            {
-                successfulIssues.add(issue);
-            }
+            professionItems = null;
+        } else
+        {
+            professionItems = Collections.unmodifiableList(items);
         }
 
-        this.validationIssues = validationIssues;
-        this.failedValidationIssues = failedIssues;
-        this.successfulValidationIssues = successfulIssues;
+        List<OidWithDescType> oids = jaxb.getProfessionOid();
+        if(oids == null)
+        {
+            this.professionOIDs = null;
+        } else
+        {
+            List<String> list = new LinkedList<>();
+            for(OidWithDescType oid : oids)
+            {
+                list.add(oid.getValue());
+            }
+            this.professionOIDs = Collections.unmodifiableList(list);
+        }
     }
 
-    public boolean isAllSuccessful()
+    public String getRegistrationNumber()
     {
-        return CollectionUtil.isEmpty(failedValidationIssues);
+        return registrationNumber;
     }
 
-    public List<ValidationIssue> getValidationIssues()
+    public byte[] getAddProfessionInfo()
     {
-        return validationIssues;
+        return Arrays.clone(addProfessionInfo);
     }
 
-    public List<ValidationIssue> getFailedValidationIssues()
+    public List<String> getProfessionOIDs()
     {
-        return failedValidationIssues;
+        return professionOIDs;
     }
 
-    public List<ValidationIssue> getSuccessfulValidationIssues()
+    public List<String> getProfessionItems()
     {
-        return successfulValidationIssues;
+        return professionItems;
     }
 
 }

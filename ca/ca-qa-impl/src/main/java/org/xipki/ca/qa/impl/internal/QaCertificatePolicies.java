@@ -33,14 +33,14 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.internal;
+package org.xipki.ca.qa.impl.internal;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicies;
-import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicyInformationType;
+import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies;
+import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType;
 import org.xipki.common.ParamChecker;
 
 /**

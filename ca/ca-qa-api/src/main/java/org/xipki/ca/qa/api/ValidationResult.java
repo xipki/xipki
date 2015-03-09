@@ -33,46 +33,70 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.internal;
+package org.xipki.ca.qa.api;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class QaPolicyQualifierInfo
+public class ValidationResult
 {
+    private final List<ValidationIssue> validationIssues;
+    private final List<ValidationIssue> failedValidationIssues;
+    private final List<ValidationIssue> successfulValidationIssues;
 
-    public static class QaCPSUriPolicyQualifier extends QaPolicyQualifierInfo
+    public ValidationResult(ValidationIssue validationIssues)
     {
-        private final String cPSUri;
-
-        public QaCPSUriPolicyQualifier(String cPSUri)
-        {
-            ParamChecker.assertNotEmpty("cPSUri", cPSUri);
-            this.cPSUri = cPSUri;
-        }
-
-        public String getCPSUri()
-        {
-            return cPSUri;
-        }
+        this(Arrays.asList(validationIssues));
     }
 
-    public static class QaUserNoticePolicyQualifierInfo extends QaPolicyQualifierInfo
+    public ValidationResult(List<ValidationIssue> validationIssues)
     {
-        private final String userNotice;
+        ParamChecker.assertNotEmpty("validationIssues", validationIssues);
 
-        public QaUserNoticePolicyQualifierInfo(String userNotice)
+        List<ValidationIssue> failedIssues = new LinkedList<>();
+        List<ValidationIssue> successfulIssues = new LinkedList<>();
+        for(ValidationIssue issue : validationIssues)
         {
-            ParamChecker.assertNotEmpty("userNotice", userNotice);
-            this.userNotice = userNotice;
+            if(issue.isFailed())
+            {
+                failedIssues.add(issue);
+            } else
+            {
+                successfulIssues.add(issue);
+            }
         }
 
-        public String getUserNotice()
-        {
-            return userNotice;
-        }
+        this.validationIssues = validationIssues;
+        this.failedValidationIssues = failedIssues;
+        this.successfulValidationIssues = successfulIssues;
     }
+
+    public boolean isAllSuccessful()
+    {
+        return CollectionUtil.isEmpty(failedValidationIssues);
+    }
+
+    public List<ValidationIssue> getValidationIssues()
+    {
+        return validationIssues;
+    }
+
+    public List<ValidationIssue> getFailedValidationIssues()
+    {
+        return failedValidationIssues;
+    }
+
+    public List<ValidationIssue> getSuccessfulValidationIssues()
+    {
+        return successfulValidationIssues;
+    }
+
 }

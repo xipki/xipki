@@ -33,12 +33,54 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.internal;
+package org.xipki.ca.qa.api;
+
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class QaExtension
+public class ValidationIssue
 {
+    private final String code;
+    private final String description;
+    private boolean failed;
+    private String message;
+
+    public ValidationIssue(String code, String description)
+    {
+        ParamChecker.assertNotEmpty("code", code);
+        ParamChecker.assertNotEmpty("description", description);
+        this.code = code;
+        this.description = description;
+        this.failed = false;
+    }
+
+    public boolean isFailed()
+    {
+        return failed;
+    }
+
+    public String getMessage()
+    {
+        return message;
+    }
+
+    public void setFailureMessage(String message)
+    {
+        this.failed = true;
+        this.message = message;
+    }
+
+    public String getCode()
+    {
+        return code;
+    }
+
+    public String getDescription()
+    {
+        return description;
+    }
+
 }

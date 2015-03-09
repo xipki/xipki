@@ -33,38 +33,70 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.internal;
+package org.xipki.ca.qa.impl.internal;
 
-import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyConstraints;
+import org.xipki.ca.certprofile.x509.jaxb.GeneralSubtreeBaseType;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaPolicyConstraints extends QaExtension
+public class QaGeneralSubtree
 {
-    private final Integer requireExplicitPolicy;
-    private final Integer inhibitPolicyMapping;
+    private final GeneralSubtreeBaseType jaxb;
 
-    public QaPolicyConstraints(PolicyConstraints jaxb)
+    public QaGeneralSubtree(GeneralSubtreeBaseType jaxb)
     {
-        if(jaxb.getRequireExplicitPolicy() == null && jaxb.getInhibitPolicyMapping() == null)
+        ParamChecker.assertNotNull("jaxb", jaxb);
+        Integer i = jaxb.getMinimum();
+        if(i != null && i < 0)
         {
-            throw new IllegalArgumentException("at least one of requireExplicitPolicy and inhibitPolicyMapping must be set");
+            throw new IllegalArgumentException("negative minimum is not allowed: " + i);
         }
 
-        this.requireExplicitPolicy = jaxb.getRequireExplicitPolicy();
-        this.inhibitPolicyMapping = jaxb.getInhibitPolicyMapping();
+        i = jaxb.getMaximum();
+        if(i != null && i < 0)
+        {
+            throw new IllegalArgumentException("negative maximum is not allowed: " + i);
+        }
+
+        this.jaxb = jaxb;
     }
 
-    public Integer getRequireExplicitPolicy()
+    public String getRfc822Name()
     {
-        return requireExplicitPolicy;
+        return jaxb.getRfc822Name();
     }
 
-    public Integer getInhibitPolicyMapping()
+    public String getDNSName()
     {
-        return inhibitPolicyMapping;
+        return jaxb.getDNSName();
+    }
+
+    public String getDirectoryName()
+    {
+        return jaxb.getDirectoryName();
+    }
+
+    public String getUri()
+    {
+        return jaxb.getUri();
+    }
+
+    public String getIpAddress()
+    {
+        return jaxb.getIpAddress();
+    }
+
+    public Integer getMinimum()
+    {
+        return jaxb.getMinimum();
+    }
+
+    public Integer getMaximum()
+    {
+        return jaxb.getMaximum();
     }
 
 }

@@ -33,42 +33,58 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.internal;
+package org.xipki.ca.qa.impl.internal;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyMappings;
-import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyIdMappingType;
+import javax.xml.bind.JAXBElement;
+
+import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
+import org.xipki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
+import org.xipki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaPolicyMappingsOption extends QaExtension
+public class QaPolicyQualifiers
 {
-    private final Map<String, String> policyMappings;
-
-    public QaPolicyMappingsOption(PolicyMappings jaxb)
+    private final List<QaPolicyQualifierInfo> policyQualifiers;
+    public QaPolicyQualifiers(PolicyQualifiers jaxb)
     {
-        this.policyMappings = new HashMap<>();
-        for(PolicyIdMappingType type : jaxb.getMapping())
+        ParamChecker.assertNotNull("jaxb", jaxb);
+
+        List<QaPolicyQualifierInfo> list = new LinkedList<>();
+
+        List<JAXBElement<String>> elements = jaxb.getCpsUriOrUserNotice();
+        for(JAXBElement<String> element : elements)
         {
-            String issuerDomainPolicy = type.getIssuerDomainPolicy().getValue();
-            String subjectDomainPolicy = type.getSubjectDomainPolicy().getValue();
-            policyMappings.put(issuerDomainPolicy, subjectDomainPolicy);
+            String value = element.getValue();
+            String localPart = element.getName().getLocalPart();
+
+            QaPolicyQualifierInfo info;
+            if("cpsUri".equals(localPart))
+            {
+                info = new QaCPSUriPolicyQualifier(value);
+            } else if("userNotice".equals(localPart))
+            {
+                info = new QaUserNoticePolicyQualifierInfo(value);
+            } else
+            {
+                throw new RuntimeException("should not reach here, unknown child of PolicyQualifiers " + localPart);
+            }
+            list.add(info);
         }
+
+        this.policyQualifiers = Collections.unmodifiableList(list);
     }
 
-    public String getSubjectDomainPolicy(String issuerDomainPolicy)
+    public List<QaPolicyQualifierInfo> getPolicyQualifiers()
     {
-        return policyMappings.get(issuerDomainPolicy);
-    }
-
-    public Set<String> getIssuerDomainPolicies()
-    {
-        return policyMappings.keySet();
+        return policyQualifiers;
     }
 
 }

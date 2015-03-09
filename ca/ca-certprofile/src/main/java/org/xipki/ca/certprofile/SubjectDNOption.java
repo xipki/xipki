@@ -33,58 +33,63 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.internal;
+package org.xipki.ca.certprofile;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-
-import javax.xml.bind.JAXBElement;
-
-import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
-import org.xipki.ca.qa.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
-import org.xipki.ca.qa.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
-import org.xipki.common.ParamChecker;
+import java.util.regex.Pattern;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaPolicyQualifiers
+public class SubjectDNOption
 {
-    private final List<QaPolicyQualifierInfo> policyQualifiers;
-    public QaPolicyQualifiers(PolicyQualifiers jaxb)
+    private final String prefix;
+    private final String suffix;
+    private final List<Pattern> patterns;
+    private final Integer minLen;
+    private final Integer maxLen;
+
+    public SubjectDNOption(String prefix, String suffix, List<Pattern> patterns,
+            Integer minLen, Integer maxLen)
     {
-        ParamChecker.assertNotNull("jaxb", jaxb);
-
-        List<QaPolicyQualifierInfo> list = new LinkedList<>();
-
-        List<JAXBElement<String>> elements = jaxb.getCpsUriOrUserNotice();
-        for(JAXBElement<String> element : elements)
+        this.prefix = prefix;
+        this.suffix = suffix;
+        if(patterns == null)
         {
-            String value = element.getValue();
-            String localPart = element.getName().getLocalPart();
-
-            QaPolicyQualifierInfo info;
-            if("cpsUri".equals(localPart))
-            {
-                info = new QaCPSUriPolicyQualifier(value);
-            } else if("userNotice".equals(localPart))
-            {
-                info = new QaUserNoticePolicyQualifierInfo(value);
-            } else
-            {
-                throw new RuntimeException("should not reach here, unknown child of PolicyQualifiers " + localPart);
-            }
-            list.add(info);
+            this.patterns = null;
+        } else
+        {
+            this.patterns = Collections.unmodifiableList(patterns);
         }
-
-        this.policyQualifiers = Collections.unmodifiableList(list);
+        this.minLen = minLen;
+        this.maxLen = maxLen;
     }
 
-    public List<QaPolicyQualifierInfo> getPolicyQualifiers()
+    public String getPrefix()
     {
-        return policyQualifiers;
+        return prefix;
+    }
+
+    public String getSufix()
+    {
+        return suffix;
+    }
+
+    public List<Pattern> getPatterns()
+    {
+        return patterns;
+    }
+
+    public Integer getMinLen()
+    {
+        return minLen;
+    }
+
+    public Integer getMaxLen()
+    {
+        return maxLen;
     }
 
 }

@@ -33,70 +33,36 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.internal;
+package org.xipki.ca.qa.impl.internal;
 
-import org.xipki.ca.certprofile.internal.x509.jaxb.GeneralSubtreeBaseType;
+import org.bouncycastle.util.Arrays;
 import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaGeneralSubtree
+public class QaExtensionValue
 {
-    private final GeneralSubtreeBaseType jaxb;
+    private final boolean critical;
+    private final byte[] value;
 
-    public QaGeneralSubtree(GeneralSubtreeBaseType jaxb)
+    public QaExtensionValue(boolean critical, byte[] value)
     {
-        ParamChecker.assertNotNull("jaxb", jaxb);
-        Integer i = jaxb.getMinimum();
-        if(i != null && i < 0)
-        {
-            throw new IllegalArgumentException("negative minimum is not allowed: " + i);
-        }
+        ParamChecker.assertNotNull("value", value);
 
-        i = jaxb.getMaximum();
-        if(i != null && i < 0)
-        {
-            throw new IllegalArgumentException("negative maximum is not allowed: " + i);
-        }
-
-        this.jaxb = jaxb;
+        this.critical = critical;
+        this.value = Arrays.clone(value);
     }
 
-    public String getRfc822Name()
+    public boolean isCritical()
     {
-        return jaxb.getRfc822Name();
+        return critical;
     }
 
-    public String getDNSName()
+    public byte[] getValue()
     {
-        return jaxb.getDNSName();
-    }
-
-    public String getDirectoryName()
-    {
-        return jaxb.getDirectoryName();
-    }
-
-    public String getUri()
-    {
-        return jaxb.getUri();
-    }
-
-    public String getIpAddress()
-    {
-        return jaxb.getIpAddress();
-    }
-
-    public Integer getMinimum()
-    {
-        return jaxb.getMinimum();
-    }
-
-    public Integer getMaximum()
-    {
-        return jaxb.getMaximum();
+        return Arrays.clone(value);
     }
 
 }

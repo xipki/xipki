@@ -33,9 +33,9 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.internal;
+package org.xipki.ca.qa.impl.internal;
 
-import org.xipki.ca.certprofile.internal.x509.jaxb.InhibitAnyPolicy;
+import org.xipki.ca.certprofile.x509.jaxb.InhibitAnyPolicy;
 
 /**
  * @author Lijun Liao

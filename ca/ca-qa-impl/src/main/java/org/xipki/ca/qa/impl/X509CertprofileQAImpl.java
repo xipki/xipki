@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa;
+package org.xipki.ca.qa.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -124,37 +124,41 @@ import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.api.profile.x509.X509Certprofile;
-import org.xipki.ca.certprofile.internal.SubjectDNOption;
-import org.xipki.ca.certprofile.internal.XmlX509CertprofileUtil;
-import org.xipki.ca.certprofile.internal.x509.jaxb.Admission;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ConstantExtValue;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtendedKeyUsage;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.InhibitAnyPolicy;
-import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyConstraints;
-import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyMappings;
-import org.xipki.ca.certprofile.internal.x509.jaxb.RangeType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.RangesType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.RdnType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.SubjectAltName;
-import org.xipki.ca.certprofile.internal.x509.jaxb.SubjectInfoAccess;
-import org.xipki.ca.certprofile.internal.x509.jaxb.SubjectInfoAccess.Access;
-import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType.Subject;
-import org.xipki.ca.qa.internal.QaAdmission;
-import org.xipki.ca.qa.internal.QaCertificatePolicies;
-import org.xipki.ca.qa.internal.QaCertificatePolicies.QaCertificatePolicyInformation;
-import org.xipki.ca.qa.internal.QaExtensionValue;
-import org.xipki.ca.qa.internal.QaGeneralSubtree;
-import org.xipki.ca.qa.internal.QaInhibitAnyPolicy;
-import org.xipki.ca.qa.internal.QaNameConstraints;
-import org.xipki.ca.qa.internal.QaPolicyConstraints;
-import org.xipki.ca.qa.internal.QaPolicyMappingsOption;
-import org.xipki.ca.qa.internal.QaPolicyQualifierInfo;
-import org.xipki.ca.qa.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
-import org.xipki.ca.qa.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
-import org.xipki.ca.qa.internal.QaPolicyQualifiers;
+import org.xipki.ca.certprofile.SubjectDNOption;
+import org.xipki.ca.certprofile.XmlX509CertprofileUtil;
+import org.xipki.ca.certprofile.x509.jaxb.Admission;
+import org.xipki.ca.certprofile.x509.jaxb.ConstantExtValue;
+import org.xipki.ca.certprofile.x509.jaxb.ExtendedKeyUsage;
+import org.xipki.ca.certprofile.x509.jaxb.ExtensionType;
+import org.xipki.ca.certprofile.x509.jaxb.ExtensionsType;
+import org.xipki.ca.certprofile.x509.jaxb.InhibitAnyPolicy;
+import org.xipki.ca.certprofile.x509.jaxb.PolicyConstraints;
+import org.xipki.ca.certprofile.x509.jaxb.PolicyMappings;
+import org.xipki.ca.certprofile.x509.jaxb.RangeType;
+import org.xipki.ca.certprofile.x509.jaxb.RangesType;
+import org.xipki.ca.certprofile.x509.jaxb.RdnType;
+import org.xipki.ca.certprofile.x509.jaxb.SubjectAltName;
+import org.xipki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
+import org.xipki.ca.certprofile.x509.jaxb.SubjectInfoAccess.Access;
+import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
+import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
+import org.xipki.ca.qa.api.ValidationIssue;
+import org.xipki.ca.qa.api.ValidationResult;
+import org.xipki.ca.qa.api.X509CertprofileQA;
+import org.xipki.ca.qa.api.X509IssuerInfo;
+import org.xipki.ca.qa.impl.internal.QaAdmission;
+import org.xipki.ca.qa.impl.internal.QaCertificatePolicies;
+import org.xipki.ca.qa.impl.internal.QaExtensionValue;
+import org.xipki.ca.qa.impl.internal.QaGeneralSubtree;
+import org.xipki.ca.qa.impl.internal.QaInhibitAnyPolicy;
+import org.xipki.ca.qa.impl.internal.QaNameConstraints;
+import org.xipki.ca.qa.impl.internal.QaPolicyConstraints;
+import org.xipki.ca.qa.impl.internal.QaPolicyMappingsOption;
+import org.xipki.ca.qa.impl.internal.QaPolicyQualifierInfo;
+import org.xipki.ca.qa.impl.internal.QaPolicyQualifiers;
+import org.xipki.ca.qa.impl.internal.QaCertificatePolicies.QaCertificatePolicyInformation;
+import org.xipki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
+import org.xipki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
 import org.xipki.common.CollectionUtil;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.HashAlgoType;
@@ -171,10 +175,10 @@ import org.xipki.security.api.ExtensionExistence;
  * @author Lijun Liao
  */
 
-public class X509CertprofileQA
+public class X509CertprofileQAImpl implements X509CertprofileQA
 {
     private static final byte[] DERNull = new byte[]{5, 0};
-    private static final Logger LOG = LoggerFactory.getLogger(X509CertprofileQA.class);
+    private static final Logger LOG = LoggerFactory.getLogger(X509CertprofileQAImpl.class);
     private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     private static final long SECOND = 1000L;
 
@@ -221,13 +225,13 @@ public class X509CertprofileQA
 
     private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
 
-    public X509CertprofileQA(String data)
+    public X509CertprofileQAImpl(String data)
     throws CertprofileException
     {
         this(data.getBytes());
     }
 
-    public X509CertprofileQA(byte[] dataBytes)
+    public X509CertprofileQAImpl(byte[] dataBytes)
     throws CertprofileException
     {
         try
@@ -272,7 +276,7 @@ public class X509CertprofileQA
                 for(RdnType t : subject.getRdn())
                 {
                     DirectoryStringType directoryStringEnum = null;
-                    org.xipki.ca.certprofile.internal.x509.jaxb.DirectoryStringType stringType = t.getDirectoryStringType();
+                    org.xipki.ca.certprofile.x509.jaxb.DirectoryStringType stringType = t.getDirectoryStringType();
                     if(stringType != null)
                     {
                         switch(t.getDirectoryStringType())
@@ -325,8 +329,8 @@ public class X509CertprofileQA
             ASN1ObjectIdentifier type = Extension.basicConstraints;
             if(extensionControls.containsKey(type))
             {
-                org.xipki.ca.certprofile.internal.x509.jaxb.BasicConstraints extConf =
-                        (org.xipki.ca.certprofile.internal.x509.jaxb.BasicConstraints)
+                org.xipki.ca.certprofile.x509.jaxb.BasicConstraints extConf =
+                        (org.xipki.ca.certprofile.x509.jaxb.BasicConstraints)
                             getExtensionValue(type, extensionsType);
                 if(extConf != null)
                 {
@@ -338,8 +342,8 @@ public class X509CertprofileQA
             type = Extension.keyUsage;
             if(extensionControls.containsKey(type))
             {
-                org.xipki.ca.certprofile.internal.x509.jaxb.KeyUsage extConf =
-                        (org.xipki.ca.certprofile.internal.x509.jaxb.KeyUsage)
+                org.xipki.ca.certprofile.x509.jaxb.KeyUsage extConf =
+                        (org.xipki.ca.certprofile.x509.jaxb.KeyUsage)
                             getExtensionValue(type, extensionsType);
                 if(extConf != null)
                 {
@@ -362,8 +366,8 @@ public class X509CertprofileQA
             type = Extension.authorityKeyIdentifier;
             if(extensionControls.containsKey(type))
             {
-                org.xipki.ca.certprofile.internal.x509.jaxb.AuthorityKeyIdentifier extConf =
-                        (org.xipki.ca.certprofile.internal.x509.jaxb.AuthorityKeyIdentifier)
+                org.xipki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier extConf =
+                        (org.xipki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier)
                                 getExtensionValue(type, extensionsType);
                 if(extConf != null)
                 {
@@ -375,8 +379,8 @@ public class X509CertprofileQA
             type = Extension.certificatePolicies;
             if(extensionControls.containsKey(type))
             {
-                org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicies extConf =
-                        (org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicies)
+                org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies extConf =
+                        (org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies)
                             getExtensionValue(type, extensionsType);
                 if(extConf != null)
                 {
@@ -400,8 +404,8 @@ public class X509CertprofileQA
             type = Extension.nameConstraints;
             if(extensionControls.containsKey(type))
             {
-                org.xipki.ca.certprofile.internal.x509.jaxb.NameConstraints extConf =
-                        (org.xipki.ca.certprofile.internal.x509.jaxb.NameConstraints) getExtensionValue(type, extensionsType);
+                org.xipki.ca.certprofile.x509.jaxb.NameConstraints extConf =
+                        (org.xipki.ca.certprofile.x509.jaxb.NameConstraints) getExtensionValue(type, extensionsType);
                 if(extConf != null)
                 {
                     this.nameConstraints = new QaNameConstraints(extConf);
@@ -484,6 +488,7 @@ public class X509CertprofileQA
         }
     }
 
+    @Override
     public ValidationResult checkCert(byte[] certBytes, X509IssuerInfo issuerInfo,
             X500Name requestedSubject, SubjectPublicKeyInfo requestedPublicKey,
             Extensions requestedExtensions)

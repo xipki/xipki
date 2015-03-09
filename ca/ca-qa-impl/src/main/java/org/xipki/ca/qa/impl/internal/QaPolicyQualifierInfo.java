@@ -33,63 +33,46 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.certprofile.internal;
+package org.xipki.ca.qa.impl.internal;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.Pattern;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class SubjectDNOption
+public abstract class QaPolicyQualifierInfo
 {
-    private final String prefix;
-    private final String suffix;
-    private final List<Pattern> patterns;
-    private final Integer minLen;
-    private final Integer maxLen;
 
-    public SubjectDNOption(String prefix, String suffix, List<Pattern> patterns,
-            Integer minLen, Integer maxLen)
+    public static class QaCPSUriPolicyQualifier extends QaPolicyQualifierInfo
     {
-        this.prefix = prefix;
-        this.suffix = suffix;
-        if(patterns == null)
+        private final String cPSUri;
+
+        public QaCPSUriPolicyQualifier(String cPSUri)
         {
-            this.patterns = null;
-        } else
-        {
-            this.patterns = Collections.unmodifiableList(patterns);
+            ParamChecker.assertNotEmpty("cPSUri", cPSUri);
+            this.cPSUri = cPSUri;
         }
-        this.minLen = minLen;
-        this.maxLen = maxLen;
+
+        public String getCPSUri()
+        {
+            return cPSUri;
+        }
     }
 
-    public String getPrefix()
+    public static class QaUserNoticePolicyQualifierInfo extends QaPolicyQualifierInfo
     {
-        return prefix;
-    }
+        private final String userNotice;
 
-    public String getSufix()
-    {
-        return suffix;
-    }
+        public QaUserNoticePolicyQualifierInfo(String userNotice)
+        {
+            ParamChecker.assertNotEmpty("userNotice", userNotice);
+            this.userNotice = userNotice;
+        }
 
-    public List<Pattern> getPatterns()
-    {
-        return patterns;
+        public String getUserNotice()
+        {
+            return userNotice;
+        }
     }
-
-    public Integer getMinLen()
-    {
-        return minLen;
-    }
-
-    public Integer getMaxLen()
-    {
-        return maxLen;
-    }
-
 }

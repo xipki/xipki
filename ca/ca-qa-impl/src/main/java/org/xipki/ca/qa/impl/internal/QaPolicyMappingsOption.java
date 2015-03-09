@@ -33,54 +33,42 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa;
+package org.xipki.ca.qa.impl.internal;
 
-import org.xipki.common.ParamChecker;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.xipki.ca.certprofile.x509.jaxb.PolicyMappings;
+import org.xipki.ca.certprofile.x509.jaxb.PolicyIdMappingType;
 
 /**
  * @author Lijun Liao
  */
 
-public class ValidationIssue
+public class QaPolicyMappingsOption extends QaExtension
 {
-    private final String code;
-    private final String description;
-    private boolean failed;
-    private String message;
+    private final Map<String, String> policyMappings;
 
-    public ValidationIssue(String code, String description)
+    public QaPolicyMappingsOption(PolicyMappings jaxb)
     {
-        ParamChecker.assertNotEmpty("code", code);
-        ParamChecker.assertNotEmpty("description", description);
-        this.code = code;
-        this.description = description;
-        this.failed = false;
+        this.policyMappings = new HashMap<>();
+        for(PolicyIdMappingType type : jaxb.getMapping())
+        {
+            String issuerDomainPolicy = type.getIssuerDomainPolicy().getValue();
+            String subjectDomainPolicy = type.getSubjectDomainPolicy().getValue();
+            policyMappings.put(issuerDomainPolicy, subjectDomainPolicy);
+        }
     }
 
-    public boolean isFailed()
+    public String getSubjectDomainPolicy(String issuerDomainPolicy)
     {
-        return failed;
+        return policyMappings.get(issuerDomainPolicy);
     }
 
-    public String getMessage()
+    public Set<String> getIssuerDomainPolicies()
     {
-        return message;
-    }
-
-    public void setFailureMessage(String message)
-    {
-        this.failed = true;
-        this.message = message;
-    }
-
-    public String getCode()
-    {
-        return code;
-    }
-
-    public String getDescription()
-    {
-        return description;
+        return policyMappings.keySet();
     }
 
 }
