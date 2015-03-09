@@ -82,31 +82,29 @@ import org.xipki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.api.profile.x509.X509Util;
-import org.xipki.ca.certprofile.internal.SubjectDNOption;
-import org.xipki.ca.certprofile.internal.XmlX509CertprofileUtil;
-import org.xipki.ca.certprofile.internal.x509.jaxb.Admission;
-import org.xipki.ca.certprofile.internal.x509.jaxb.AuthorityKeyIdentifier;
-import org.xipki.ca.certprofile.internal.x509.jaxb.BasicConstraints;
-import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicies;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ConstantExtValue;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtendedKeyUsage;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.InhibitAnyPolicy;
-import org.xipki.ca.certprofile.internal.x509.jaxb.KeyUsage;
-import org.xipki.ca.certprofile.internal.x509.jaxb.NameConstraints;
-import org.xipki.ca.certprofile.internal.x509.jaxb.NameValueType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.OidWithDescType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyConstraints;
-import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyMappings;
-import org.xipki.ca.certprofile.internal.x509.jaxb.RdnType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.SubjectAltName;
-import org.xipki.ca.certprofile.internal.x509.jaxb.SubjectInfoAccess;
-import org.xipki.ca.certprofile.internal.x509.jaxb.SubjectInfoAccess.Access;
-import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType.KeyAlgorithms;
-import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType.Parameters;
-import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType.Subject;
+import org.xipki.ca.certprofile.x509.jaxb.Admission;
+import org.xipki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier;
+import org.xipki.ca.certprofile.x509.jaxb.BasicConstraints;
+import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies;
+import org.xipki.ca.certprofile.x509.jaxb.ConstantExtValue;
+import org.xipki.ca.certprofile.x509.jaxb.ExtendedKeyUsage;
+import org.xipki.ca.certprofile.x509.jaxb.ExtensionType;
+import org.xipki.ca.certprofile.x509.jaxb.ExtensionsType;
+import org.xipki.ca.certprofile.x509.jaxb.InhibitAnyPolicy;
+import org.xipki.ca.certprofile.x509.jaxb.KeyUsage;
+import org.xipki.ca.certprofile.x509.jaxb.NameConstraints;
+import org.xipki.ca.certprofile.x509.jaxb.NameValueType;
+import org.xipki.ca.certprofile.x509.jaxb.OidWithDescType;
+import org.xipki.ca.certprofile.x509.jaxb.PolicyConstraints;
+import org.xipki.ca.certprofile.x509.jaxb.PolicyMappings;
+import org.xipki.ca.certprofile.x509.jaxb.RdnType;
+import org.xipki.ca.certprofile.x509.jaxb.SubjectAltName;
+import org.xipki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
+import org.xipki.ca.certprofile.x509.jaxb.SubjectInfoAccess.Access;
+import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
+import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
+import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Parameters;
+import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
 import org.xipki.common.CollectionUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ObjectIdentifiers;
@@ -279,7 +277,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                 for(RdnType t : subject.getRdn())
                 {
                     DirectoryStringType directoryStringEnum = null;
-                    org.xipki.ca.certprofile.internal.x509.jaxb.DirectoryStringType stringType =
+                    org.xipki.ca.certprofile.x509.jaxb.DirectoryStringType stringType =
                             t.getDirectoryStringType();
                     if(stringType != null)
                     {

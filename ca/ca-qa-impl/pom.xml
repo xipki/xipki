@@ -9,7 +9,7 @@
     <groupId>org.xipki</groupId>
     <version>2.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>ca-qa-shell</artifactId>
+  <artifactId>ca-qa-impl</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
@@ -20,25 +20,15 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ca-client-shell</artifactId>
+      <artifactId>ca-certprofile</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Import-Package>
-              org.apache.felix.service.command,
-              org.apache.felix.gogo.commands,
-              org.apache.karaf.shell.console,
-              *
-            </Import-Package>
-          </instructions>
-        </configuration>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

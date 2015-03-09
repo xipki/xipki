@@ -33,31 +33,19 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell.completer;
+package org.xipki.ca.qa.api;
 
-import java.util.Set;
-
-import org.xipki.ca.qa.api.QASystemManager;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 
 /**
  * @author Lijun Liao
  */
 
-public class X509IssuerNameCompleter extends DynamicEnumCompleter
+public interface X509CertprofileQA
 {
-
-    protected QASystemManager qaSystemManager;
-
-    public void setQaSystemManager(QASystemManager qaSystemManager)
-    {
-        this.qaSystemManager = qaSystemManager;
-    }
-
-    @Override
-    protected Set<String> getEnums()
-    {
-        return qaSystemManager.getIssuerNames();
-    }
-
+    ValidationResult checkCert(byte[] certBytes, X509IssuerInfo issuerInfo,
+            X500Name requestedSubject, SubjectPublicKeyInfo requestedPublicKey,
+            Extensions requestedExtensions);
 }

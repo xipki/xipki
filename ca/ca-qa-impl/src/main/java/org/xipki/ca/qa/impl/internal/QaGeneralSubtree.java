@@ -33,31 +33,70 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell.completer;
+package org.xipki.ca.qa.impl.internal;
 
-import java.util.Set;
-
-import org.xipki.ca.qa.api.QASystemManager;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.xipki.ca.certprofile.x509.jaxb.GeneralSubtreeBaseType;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class X509IssuerNameCompleter extends DynamicEnumCompleter
+public class QaGeneralSubtree
 {
+    private final GeneralSubtreeBaseType jaxb;
 
-    protected QASystemManager qaSystemManager;
-
-    public void setQaSystemManager(QASystemManager qaSystemManager)
+    public QaGeneralSubtree(GeneralSubtreeBaseType jaxb)
     {
-        this.qaSystemManager = qaSystemManager;
+        ParamChecker.assertNotNull("jaxb", jaxb);
+        Integer i = jaxb.getMinimum();
+        if(i != null && i < 0)
+        {
+            throw new IllegalArgumentException("negative minimum is not allowed: " + i);
+        }
+
+        i = jaxb.getMaximum();
+        if(i != null && i < 0)
+        {
+            throw new IllegalArgumentException("negative maximum is not allowed: " + i);
+        }
+
+        this.jaxb = jaxb;
     }
 
-    @Override
-    protected Set<String> getEnums()
+    public String getRfc822Name()
     {
-        return qaSystemManager.getIssuerNames();
+        return jaxb.getRfc822Name();
+    }
+
+    public String getDNSName()
+    {
+        return jaxb.getDNSName();
+    }
+
+    public String getDirectoryName()
+    {
+        return jaxb.getDirectoryName();
+    }
+
+    public String getUri()
+    {
+        return jaxb.getUri();
+    }
+
+    public String getIpAddress()
+    {
+        return jaxb.getIpAddress();
+    }
+
+    public Integer getMinimum()
+    {
+        return jaxb.getMinimum();
+    }
+
+    public Integer getMaximum()
+    {
+        return jaxb.getMaximum();
     }
 
 }

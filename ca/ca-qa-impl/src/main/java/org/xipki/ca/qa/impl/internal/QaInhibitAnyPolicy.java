@@ -33,31 +33,26 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell.completer;
+package org.xipki.ca.qa.impl.internal;
 
-import java.util.Set;
-
-import org.xipki.ca.qa.api.QASystemManager;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.xipki.ca.certprofile.x509.jaxb.InhibitAnyPolicy;
 
 /**
  * @author Lijun Liao
  */
 
-public class X509IssuerNameCompleter extends DynamicEnumCompleter
+public class QaInhibitAnyPolicy extends QaExtension
 {
+    private final int skipCerts;
 
-    protected QASystemManager qaSystemManager;
-
-    public void setQaSystemManager(QASystemManager qaSystemManager)
+    public QaInhibitAnyPolicy(InhibitAnyPolicy jaxb)
     {
-        this.qaSystemManager = qaSystemManager;
+        this.skipCerts = jaxb.getSkipCerts();
     }
 
-    @Override
-    protected Set<String> getEnums()
+    public int getSkipCerts()
     {
-        return qaSystemManager.getIssuerNames();
+        return skipCerts;
     }
 
 }

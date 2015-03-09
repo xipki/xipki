@@ -33,31 +33,42 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell.completer;
+package org.xipki.ca.qa.impl.internal;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
-import org.xipki.ca.qa.api.QASystemManager;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.xipki.ca.certprofile.x509.jaxb.PolicyMappings;
+import org.xipki.ca.certprofile.x509.jaxb.PolicyIdMappingType;
 
 /**
  * @author Lijun Liao
  */
 
-public class X509IssuerNameCompleter extends DynamicEnumCompleter
+public class QaPolicyMappingsOption extends QaExtension
 {
+    private final Map<String, String> policyMappings;
 
-    protected QASystemManager qaSystemManager;
-
-    public void setQaSystemManager(QASystemManager qaSystemManager)
+    public QaPolicyMappingsOption(PolicyMappings jaxb)
     {
-        this.qaSystemManager = qaSystemManager;
+        this.policyMappings = new HashMap<>();
+        for(PolicyIdMappingType type : jaxb.getMapping())
+        {
+            String issuerDomainPolicy = type.getIssuerDomainPolicy().getValue();
+            String subjectDomainPolicy = type.getSubjectDomainPolicy().getValue();
+            policyMappings.put(issuerDomainPolicy, subjectDomainPolicy);
+        }
     }
 
-    @Override
-    protected Set<String> getEnums()
+    public String getSubjectDomainPolicy(String issuerDomainPolicy)
     {
-        return qaSystemManager.getIssuerNames();
+        return policyMappings.get(issuerDomainPolicy);
+    }
+
+    public Set<String> getIssuerDomainPolicies()
+    {
+        return policyMappings.keySet();
     }
 
 }

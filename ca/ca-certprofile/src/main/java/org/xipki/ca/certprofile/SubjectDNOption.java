@@ -33,31 +33,63 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell.completer;
+package org.xipki.ca.certprofile;
 
-import java.util.Set;
-
-import org.xipki.ca.qa.api.QASystemManager;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * @author Lijun Liao
  */
 
-public class X509IssuerNameCompleter extends DynamicEnumCompleter
+public class SubjectDNOption
 {
+    private final String prefix;
+    private final String suffix;
+    private final List<Pattern> patterns;
+    private final Integer minLen;
+    private final Integer maxLen;
 
-    protected QASystemManager qaSystemManager;
-
-    public void setQaSystemManager(QASystemManager qaSystemManager)
+    public SubjectDNOption(String prefix, String suffix, List<Pattern> patterns,
+            Integer minLen, Integer maxLen)
     {
-        this.qaSystemManager = qaSystemManager;
+        this.prefix = prefix;
+        this.suffix = suffix;
+        if(patterns == null)
+        {
+            this.patterns = null;
+        } else
+        {
+            this.patterns = Collections.unmodifiableList(patterns);
+        }
+        this.minLen = minLen;
+        this.maxLen = maxLen;
     }
 
-    @Override
-    protected Set<String> getEnums()
+    public String getPrefix()
     {
-        return qaSystemManager.getIssuerNames();
+        return prefix;
+    }
+
+    public String getSufix()
+    {
+        return suffix;
+    }
+
+    public List<Pattern> getPatterns()
+    {
+        return patterns;
+    }
+
+    public Integer getMinLen()
+    {
+        return minLen;
+    }
+
+    public Integer getMaxLen()
+    {
+        return maxLen;
     }
 
 }

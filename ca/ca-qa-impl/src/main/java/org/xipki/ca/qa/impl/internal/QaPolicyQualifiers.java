@@ -33,31 +33,58 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell.completer;
+package org.xipki.ca.qa.impl.internal;
 
-import java.util.Set;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.xipki.ca.qa.api.QASystemManager;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+import javax.xml.bind.JAXBElement;
+
+import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
+import org.xipki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
+import org.xipki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class X509IssuerNameCompleter extends DynamicEnumCompleter
+public class QaPolicyQualifiers
 {
-
-    protected QASystemManager qaSystemManager;
-
-    public void setQaSystemManager(QASystemManager qaSystemManager)
+    private final List<QaPolicyQualifierInfo> policyQualifiers;
+    public QaPolicyQualifiers(PolicyQualifiers jaxb)
     {
-        this.qaSystemManager = qaSystemManager;
+        ParamChecker.assertNotNull("jaxb", jaxb);
+
+        List<QaPolicyQualifierInfo> list = new LinkedList<>();
+
+        List<JAXBElement<String>> elements = jaxb.getCpsUriOrUserNotice();
+        for(JAXBElement<String> element : elements)
+        {
+            String value = element.getValue();
+            String localPart = element.getName().getLocalPart();
+
+            QaPolicyQualifierInfo info;
+            if("cpsUri".equals(localPart))
+            {
+                info = new QaCPSUriPolicyQualifier(value);
+            } else if("userNotice".equals(localPart))
+            {
+                info = new QaUserNoticePolicyQualifierInfo(value);
+            } else
+            {
+                throw new RuntimeException("should not reach here, unknown child of PolicyQualifiers " + localPart);
+            }
+            list.add(info);
+        }
+
+        this.policyQualifiers = Collections.unmodifiableList(list);
     }
 
-    @Override
-    protected Set<String> getEnums()
+    public List<QaPolicyQualifierInfo> getPolicyQualifiers()
     {
-        return qaSystemManager.getIssuerNames();
+        return policyQualifiers;
     }
 
 }

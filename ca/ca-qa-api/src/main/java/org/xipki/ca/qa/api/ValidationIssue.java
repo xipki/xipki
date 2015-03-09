@@ -33,31 +33,54 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell.completer;
+package org.xipki.ca.qa.api;
 
-import java.util.Set;
-
-import org.xipki.ca.qa.api.QASystemManager;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class X509IssuerNameCompleter extends DynamicEnumCompleter
+public class ValidationIssue
 {
+    private final String code;
+    private final String description;
+    private boolean failed;
+    private String message;
 
-    protected QASystemManager qaSystemManager;
-
-    public void setQaSystemManager(QASystemManager qaSystemManager)
+    public ValidationIssue(String code, String description)
     {
-        this.qaSystemManager = qaSystemManager;
+        ParamChecker.assertNotEmpty("code", code);
+        ParamChecker.assertNotEmpty("description", description);
+        this.code = code;
+        this.description = description;
+        this.failed = false;
     }
 
-    @Override
-    protected Set<String> getEnums()
+    public boolean isFailed()
     {
-        return qaSystemManager.getIssuerNames();
+        return failed;
+    }
+
+    public String getMessage()
+    {
+        return message;
+    }
+
+    public void setFailureMessage(String message)
+    {
+        this.failed = true;
+        this.message = message;
+    }
+
+    public String getCode()
+    {
+        return code;
+    }
+
+    public String getDescription()
+    {
+        return description;
     }
 
 }

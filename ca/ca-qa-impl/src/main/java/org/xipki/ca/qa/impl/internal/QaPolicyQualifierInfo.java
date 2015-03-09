@@ -33,31 +33,46 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell.completer;
+package org.xipki.ca.qa.impl.internal;
 
-import java.util.Set;
-
-import org.xipki.ca.qa.api.QASystemManager;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class X509IssuerNameCompleter extends DynamicEnumCompleter
+public abstract class QaPolicyQualifierInfo
 {
 
-    protected QASystemManager qaSystemManager;
-
-    public void setQaSystemManager(QASystemManager qaSystemManager)
+    public static class QaCPSUriPolicyQualifier extends QaPolicyQualifierInfo
     {
-        this.qaSystemManager = qaSystemManager;
+        private final String cPSUri;
+
+        public QaCPSUriPolicyQualifier(String cPSUri)
+        {
+            ParamChecker.assertNotEmpty("cPSUri", cPSUri);
+            this.cPSUri = cPSUri;
+        }
+
+        public String getCPSUri()
+        {
+            return cPSUri;
+        }
     }
 
-    @Override
-    protected Set<String> getEnums()
+    public static class QaUserNoticePolicyQualifierInfo extends QaPolicyQualifierInfo
     {
-        return qaSystemManager.getIssuerNames();
-    }
+        private final String userNotice;
 
+        public QaUserNoticePolicyQualifierInfo(String userNotice)
+        {
+            ParamChecker.assertNotEmpty("userNotice", userNotice);
+            this.userNotice = userNotice;
+        }
+
+        public String getUserNotice()
+        {
+            return userNotice;
+        }
+    }
 }
