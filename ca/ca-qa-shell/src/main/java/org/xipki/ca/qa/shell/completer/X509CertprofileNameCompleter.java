@@ -37,7 +37,7 @@ package org.xipki.ca.qa.shell.completer;
 
 import java.util.Set;
 
-import org.xipki.ca.qa.shell.QASystemManager;
+import org.xipki.ca.qa.api.QASystemManager;
 import org.xipki.console.karaf.DynamicEnumCompleter;
 
 /**

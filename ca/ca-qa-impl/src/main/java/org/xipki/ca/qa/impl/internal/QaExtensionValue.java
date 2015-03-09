@@ -33,31 +33,36 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell.completer;
+package org.xipki.ca.qa.impl.internal;
 
-import java.util.Set;
-
-import org.xipki.ca.qa.api.QASystemManager;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.bouncycastle.util.Arrays;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class X509IssuerNameCompleter extends DynamicEnumCompleter
+public class QaExtensionValue
 {
+    private final boolean critical;
+    private final byte[] value;
 
-    protected QASystemManager qaSystemManager;
-
-    public void setQaSystemManager(QASystemManager qaSystemManager)
+    public QaExtensionValue(boolean critical, byte[] value)
     {
-        this.qaSystemManager = qaSystemManager;
+        ParamChecker.assertNotNull("value", value);
+
+        this.critical = critical;
+        this.value = Arrays.clone(value);
     }
 
-    @Override
-    protected Set<String> getEnums()
+    public boolean isCritical()
     {
-        return qaSystemManager.getIssuerNames();
+        return critical;
+    }
+
+    public byte[] getValue()
+    {
+        return Arrays.clone(value);
     }
 
 }

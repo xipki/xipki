@@ -33,31 +33,21 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell.completer;
+package org.xipki.ca.qa.api;
 
 import java.util.Set;
-
-import org.xipki.ca.qa.api.QASystemManager;
-import org.xipki.console.karaf.DynamicEnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public class X509IssuerNameCompleter extends DynamicEnumCompleter
+public interface QASystemManager
 {
+    Set<String> getIssuerNames();
 
-    protected QASystemManager qaSystemManager;
+    X509IssuerInfo getIssuer(String issuerName);
 
-    public void setQaSystemManager(QASystemManager qaSystemManager)
-    {
-        this.qaSystemManager = qaSystemManager;
-    }
+    Set<String> getCertprofileNames();
 
-    @Override
-    protected Set<String> getEnums()
-    {
-        return qaSystemManager.getIssuerNames();
-    }
-
+    X509CertprofileQA getCertprofile(String certprofileName);
 }

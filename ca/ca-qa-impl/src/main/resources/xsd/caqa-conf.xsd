@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (c) 2014 - 2015 Lijun Liao
+-->
+<xs:schema xmlns="http://xipki.org/caqa/conf/v1"
+  targetNamespace="http://xipki.org/caqa/conf/v1"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+  elementFormDefault="qualified"
+  version="1.0"
+  jxb:version="2.0">
+  <xs:annotation>
+    <xs:appinfo>
+      <jxb:schemaBindings>
+        <jxb:package name="org.xipki.ca.qa.impl.jaxb"/>
+      </jxb:schemaBindings>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="QAConf" type="QAConfType"/>
+  <xs:complexType name="QAConfType">
+    <xs:sequence>
+      <xs:element name="X509Issuers" type="X509IssuersType" minOccurs="0"/>
+      <xs:element name="X509Certprofiles" type="X509CertprofilesType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="X509IssuersType">
+    <xs:sequence>
+      <xs:element name="X509Issuer" type="X509IssuerType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="X509IssuerType">
+    <xs:sequence>
+      <xs:element name="cert" type="fileOrValueType"/>
+      <xs:element name="ocspUrl" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="crlUrl" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="deltaCrlUrl" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="X509CertprofilesType">
+    <xs:sequence>
+      <xs:element name="X509Certprofile" type="X509CertprofileType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="X509CertprofileType">
+    <xs:complexContent>
+      <xs:extension base="fileOrValueType">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="fileOrValueType">
+    <xs:choice>
+      <xs:element name="value" type="xs:base64Binary"/>
+      <xs:element name="file" type="xs:string"/>
+    </xs:choice>
+  </xs:complexType>
+</xs:schema>

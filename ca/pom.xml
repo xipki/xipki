@@ -18,6 +18,8 @@
     <module>ca-client-impl</module>
     <module>ca-client-shell</module>
     <module>ca-certprofile</module>
+    <module>ca-qa-api</module>
+    <module>ca-qa-impl</module>
     <module>ca-qa-shell</module>
     <module>ca-api</module>
     <module>ca-mgmt-api</module>
