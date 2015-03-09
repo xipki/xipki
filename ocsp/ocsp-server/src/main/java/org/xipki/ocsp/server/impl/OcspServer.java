@@ -1253,7 +1253,7 @@ public class OcspServer
         if(auditLoggingService != null)
         {
             PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());
-            auditEvent.setUserId("SYSTEM");
+            auditEvent.setUserId("OCSP-SYSTEM");
             auditEvent.setEventType(eventType);
             auditEvent.setAffectedResource("CORE");
             if(successfull)
