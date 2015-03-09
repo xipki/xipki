@@ -2152,7 +2152,7 @@ implements CAManager, CmpResponderManager
         if(auditLoggingService != null)
         {
             PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());
-            auditEvent.setUserId("SYSTEM");
+            auditEvent.setUserId("CA-SYSTEM");
             auditEvent.setEventType(eventType);
             auditEvent.setAffectedResource("CORE");
             if(successfull)
