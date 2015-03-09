@@ -61,6 +61,8 @@ import org.xipki.security.api.PasswordResolverException;
 
 public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
 {
+    private static final String DFLT_CACONF_FILE = "xipki/ca-config/ca.properties";
+
     private static final Set<String> yesNo = new HashSet<>();
 
     private PasswordResolver passwordResolver;
@@ -78,6 +80,10 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
     @Option(name = "-logLevel",
             description = "Log level, valid values are debug, info, warning, severe, off")
     private String logLevel = "warning";
+
+    @Option(name = "-caconf",
+            description = "CA configuration file")
+    private String caconfFile = DFLT_CACONF_FILE;
 
     protected void resetAndInit(LiquibaseDatabaseConf dbConf, String schemaFile)
     throws Exception
@@ -128,7 +134,7 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
     throws FileNotFoundException, IOException, PasswordResolverException
     {
         Map<String, LiquibaseDatabaseConf> ret = new HashMap<>();
-        Properties props = getPropertiesFromFile("xipki/ca-config/ca.properties");
+        Properties props = getPropertiesFromFile(caconfFile);
         for(Object objKey : props.keySet())
         {
             String key = (String) objKey;
