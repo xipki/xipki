@@ -36,13 +36,14 @@
 package org.xipki.ocsp.qa.shell;
 
 import java.math.BigInteger;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
@@ -65,12 +66,8 @@ import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.xipki.common.CRLReason;
-import org.xipki.common.IoUtil;
-import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.RequestResponsePair;
 import org.xipki.common.SecurityUtil;
 import org.xipki.ocsp.client.api.OCSPRequestor;
-import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.shell.BaseOCSPStatusCommand;
 import org.xipki.ocsp.client.shell.OCSPResponseUnsuccessfulException;
 import org.xipki.ocsp.client.shell.OCSPUtils;
@@ -84,21 +81,14 @@ import org.xipki.security.SignerUtil;
 @Command(scope = "xipki-qa", name = "ocsp-status", description="Request certificate status (QA)")
 public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
 {
-    @Option(name = "-serial",
-            description = "Serial number")
-    private String serialNumber;
-
-    @Option(name = "-cert",
-            description = "Certificate")
-    private String certFile;
-
     @Option(name = "-expError",
             description = "Expected error. Valid values are , " + OCSPError.errorText)
     private String expectedErrorText;
 
     @Option(name = "-expStatus",
-            description = "Expected status. Valid values are " + CertStatus.certStatusesText)
-    private String expectedStatusText;
+            multiValued = true,
+            description = "Expected status. Valid values are \n" + CertStatus.certStatusesText + ",\nmulti values allowed")
+    private List<String> expectedStatusTexts;
 
     @Option(name = "-expSigalg",
             description = "Expected signature algorithm")
@@ -117,128 +107,59 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
     private String nonceOccurrenceText = Occurrence.optional.name();
 
     @Override
-    protected Object _doExecute()
+    protected void checkParameters(X509Certificate respIssuer,
+            List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
     throws Exception
     {
-        if(isBlank(serialNumber) && isBlank(certFile))
-        {
-            throw new Exception("Neither serialNumber nor certFile is set, this is not permitted");
-        }
-
-        if(isNotBlank(serialNumber) && isNotBlank(certFile))
-        {
-            throw new Exception("Both serialNumber and certFile are set, this is not permitted");
-        }
-
-        if(isBlank(expectedErrorText) && isBlank(expectedStatusText))
+        if(isBlank(expectedErrorText) && isEmpty(expectedStatusTexts))
         {
             throw new Exception("Neither expError nor expStatus is set, this is not permitted");
         }
 
-        if(isNotBlank(expectedErrorText) && isNotBlank(expectedStatusText))
+        if(isNotBlank(expectedErrorText) && isNotEmpty(expectedStatusTexts))
         {
             throw new Exception("Both expError and expStatus are set, this is not permitted");
         }
 
+        if(isNotEmpty(expectedStatusTexts))
+        {
+            if(expectedStatusTexts.size() != serialNumbers.size())
+            {
+                throw new Exception("Number of expStatus is invalid: " + (expectedStatusTexts.size()) +
+                        ", it should be " + serialNumbers.size());
+            }
+        }
+    }
+
+    @Override
+    protected Object processResponse(OCSPResp response,
+            X509Certificate respIssuer, List<BigInteger> serialNumbers,
+            Map<BigInteger, byte[]> encodedCerts)
+    throws Exception
+    {
         OCSPError expectedOcspError = null;
         if(isNotBlank(expectedErrorText))
         {
             expectedOcspError = OCSPError.getOCSPError(expectedErrorText);
         }
 
-        CertStatus expectedStatus = null;
-        if(isNotBlank(expectedStatusText))
+        Map<BigInteger, CertStatus> expectedStatuses = null;
+        if(isNotEmpty(expectedStatusTexts))
         {
-            expectedStatus = CertStatus.getCertStatus(expectedStatusText);
+            expectedStatuses = new HashMap<>();
+            final int n = serialNumbers.size();
+
+            for(int i = 0; i < n; i++)
+            {
+                String expectedStatusText = expectedStatusTexts.get(i);
+                expectedStatuses.put(serialNumbers.get(i),
+                        CertStatus.getCertStatus(expectedStatusText));
+            }
         }
 
         Occurrence nextupdateOccurrence = Occurrence.getOccurrence(nextUpdateOccurrenceText);
         Occurrence certhashOccurrence = Occurrence.getOccurrence(certhashOccurrenceText);
         Occurrence nonceOccurrence = Occurrence.getOccurrence(nonceOccurrenceText);
-
-        X509Certificate issuerCert = SecurityUtil.parseCert(issuerCertFile);
-
-        byte[] encodedCert = null;
-        BigInteger sn;
-        if(certFile != null)
-        {
-            encodedCert = IoUtil.read(certFile);
-            X509Certificate cert = SecurityUtil.parseCert(certFile);
-
-            if(SecurityUtil.issues(issuerCert, cert) == false)
-            {
-                err("certificate " + certFile + " is not issued by the given CA");
-                return null;
-            }
-
-            sn = cert.getSerialNumber();
-
-            if(isBlank(serverURL))
-            {
-                List<String> ocspUrls = SecurityUtil.extractOCSPUrls(cert);
-                if(ocspUrls.size() > 0)
-                {
-                    serverURL = ocspUrls.get(0);
-                }
-            }
-        }
-        else
-        {
-            sn = new BigInteger(serialNumber);
-        }
-
-        if(isBlank(serverURL))
-        {
-            err("Could not get URL for the OCSP responder");
-            return null;
-        }
-
-        X509Certificate respIssuer  = null;
-        if(respIssuerFile != null)
-        {
-            respIssuer = SecurityUtil.parseCert(IoUtil.expandFilepath(respIssuerFile));
-        }
-
-        URL serverUrl = new URL(serverURL);
-
-        RequestOptions options = getRequestOptions();
-
-        boolean saveReq = isNotBlank(reqout);
-        boolean saveResp = isNotBlank(respout);
-        RequestResponseDebug debug = null;
-        if(saveReq || saveResp)
-        {
-            debug = new RequestResponseDebug();
-        }
-
-        OCSPResp response = null;
-        try
-        {
-            response = requestor.ask(issuerCert, sn, serverUrl, options, debug);
-        } finally
-        {
-            if(debug != null && debug.size() > 0)
-            {
-                RequestResponsePair reqResp = debug.get(0);
-                if(saveReq)
-                {
-                    byte[] bytes = reqResp.getRequest();
-                    if(bytes != null)
-                    {
-                        IoUtil.save(reqout, bytes);
-                    }
-                }
-
-                if(saveResp)
-                {
-                    byte[] bytes = reqResp.getResponse();
-                    if(bytes != null)
-                    {
-                        IoUtil.save(respout, bytes);
-                    }
-                }
-            }
-        }
 
         BasicOCSPResp basicResp = null;
         try
@@ -271,7 +192,31 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
         // check the signature if available
         if(null == basicResp.getSignature())
         {
-            throw new Exception("Response is not signed");
+            throw new ViolationException("Response is not signed");
+        }
+
+        if(expectedSigalgo != null)
+        {
+            ASN1ObjectIdentifier sigAlgOid = basicResp.getSignatureAlgOID();
+
+            String sigAlgName;
+            if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgOid))
+            {
+                BasicOCSPResponse asn1BasicOCSPResp =
+                        BasicOCSPResponse.getInstance(basicResp.getEncoded());
+                sigAlgName = SignerUtil.getSignatureAlgoName(
+                        asn1BasicOCSPResp.getSignatureAlgorithm());
+            }
+            else
+            {
+                sigAlgName = SignerUtil.getSignatureAlgoName(new AlgorithmIdentifier(sigAlgOid));
+            }
+
+            if(sigAlgName.equalsIgnoreCase(expectedSigalgo) == false)
+            {
+                throw new ViolationException("expected signature algorithm is '" + expectedSigalgo +
+                        "', but is '" + sigAlgName + "");
+            }
         }
 
         SingleResp[] singleResponses = basicResp.getResponses();
@@ -279,26 +224,30 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
         int n = singleResponses == null ? 0 : singleResponses.length;
         if(n == 0)
         {
-            throw new Exception("Received no status from server");
+            throw new ViolationException("Received no status from server");
         }
-        else if(n != 1)
+        else if(n != serialNumbers.size())
         {
-            throw new Exception("Received status with " + n +
-                    " single responses from server, but 1 was requested");
+            throw new ViolationException("Received status with " + n +
+                    " single responses from server, but " + serialNumbers.size() + " was requested");
         }
 
-        SingleResp singleResp = singleResponses[0];
         X509CertificateHolder[] responderCerts = basicResp.getCerts();
         if(responderCerts == null || responderCerts.length < 1)
         {
-            throw new Exception("No responder certificate is contained in the response");
+            throw new ViolationException("No responder certificate is contained in the response");
         }
 
         X509CertificateHolder respSigner = responderCerts[0];
 
-        if(respSigner.isValidOn(singleResp.getThisUpdate()) == false)
+        for(int i = 0; i < n; i++)
         {
-            throw new Exception("Responder certificate is not valid on " + singleResp.getThisUpdate());
+            SingleResp singleResp = singleResponses[i];
+            if(respSigner.isValidOn(singleResp.getThisUpdate()) == false)
+            {
+                throw new ViolationException("Responder certificate is not valid on the thisUpdate[ " + i + "]" +
+                        singleResp.getThisUpdate());
+            }
         }
 
         PublicKey responderPubKey = KeyUtil.generatePublicKey(responderCerts[0].getSubjectPublicKeyInfo());
@@ -306,7 +255,7 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
         boolean sigValid = basicResp.isSignatureValid(cvp);
         if(sigValid == false)
         {
-            throw new Exception("Response is equipped with invalid signature");
+            throw new ViolationException("Response is equipped with invalid signature");
         }
 
         if(respIssuer != null)
@@ -318,14 +267,46 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
             }
             else
             {
-                throw new Exception("Responder signer is not trusted");
+                throw new ViolationException("Responder signer is not trusted");
             }
         }
 
-        boolean extendedRevoke = basicResp.getExtension(OCSPRequestor.id_pkix_ocsp_extendedRevoke) != null;
         Extension nonceExtn = basicResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
         checkOccurrence("nonce", nonceExtn, nonceOccurrence);
 
+        boolean extendedRevoke = basicResp.getExtension(OCSPRequestor.id_pkix_ocsp_extendedRevoke) != null;
+
+        for(int i = 0; i < n; i++)
+        {
+            SingleResp singleResp = singleResponses[i];
+            BigInteger serialNumber = singleResp.getCertID().getSerialNumber();
+            CertStatus expectedStatus = expectedStatuses.get(serialNumber);
+
+            byte[] encodedCert = null;
+            if(encodedCerts != null)
+            {
+                encodedCert = encodedCerts.get(serialNumber);
+            }
+
+            try
+            {
+                checkSingleCert(singleResp, expectedStatus, encodedCert,
+                        extendedRevoke, nextupdateOccurrence, certhashOccurrence);
+            }catch(Exception e)
+            {
+                throw new ViolationException("SingleResponse[" + i + "]: " + e.getMessage());
+            }
+        }
+
+        return null;
+    }
+
+    private void checkSingleCert(SingleResp singleResp,
+            CertStatus expectedStatus, byte[] encodedCert,
+            boolean extendedRevoke, Occurrence nextupdateOccurrence,
+            Occurrence certhashOccurrence)
+    throws Exception
+    {
         CertificateStatus singleCertStatus = singleResp.getCertStatus();
 
         CertStatus status ;
@@ -371,7 +352,7 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
                         status = CertStatus.certificateHold;
                         break;
                     case REMOVE_FROM_CRL:
-                        throw new Exception("REMOVE_FROM_CRL as reason in OCSP response is invalid");
+                        throw new ViolationException("REMOVE_FROM_CRL as reason in OCSP response is invalid");
                     case PRIVILEGE_WITHDRAWN:
                         status = CertStatus.privilegeWithdrawn;
                         break;
@@ -394,7 +375,7 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
         }
         else
         {
-            throw new Exception("Unknown certstatus: " + singleCertStatus.getClass().getName());
+            throw new ViolationException("Unknown certstatus: " + singleCertStatus.getClass().getName());
         }
 
         if(expectedStatus != status)
@@ -425,32 +406,6 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
                 }
             }
         }
-
-        if(expectedSigalgo != null)
-        {
-            ASN1ObjectIdentifier sigAlgOid = basicResp.getSignatureAlgOID();
-
-            String sigAlgName;
-            if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgOid))
-            {
-                BasicOCSPResponse asn1BasicOCSPResp =
-                        BasicOCSPResponse.getInstance(basicResp.getEncoded());
-                sigAlgName = SignerUtil.getSignatureAlgoName(
-                        asn1BasicOCSPResp.getSignatureAlgorithm());
-            }
-            else
-            {
-                sigAlgName = SignerUtil.getSignatureAlgoName(new AlgorithmIdentifier(sigAlgOid));
-            }
-
-            if(sigAlgName.equalsIgnoreCase(expectedSigalgo) == false)
-            {
-                throw new ViolationException("expected signature algorithm is '" + expectedSigalgo +
-                        "', but is '" + sigAlgName + "");
-            }
-        }
-
-        return null;
     }
 
     private static void checkOccurrence(String targetName, Object target, Occurrence occurrence)
@@ -476,5 +431,4 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
             break;
         }
     }
-
 }
