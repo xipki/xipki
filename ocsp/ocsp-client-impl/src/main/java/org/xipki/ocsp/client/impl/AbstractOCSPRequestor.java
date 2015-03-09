@@ -42,6 +42,7 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -63,6 +64,7 @@ import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPReq;
 import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.cert.ocsp.OCSPResp;
+import org.bouncycastle.cert.ocsp.SingleResp;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DigestCalculator;
 import org.xipki.common.CollectionUtil;
@@ -75,6 +77,7 @@ import org.xipki.ocsp.client.api.OCSPNonceUnmatchedException;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.OCSPRequestorException;
 import org.xipki.ocsp.client.api.OCSPResponseException;
+import org.xipki.ocsp.client.api.OCSPTargetUnmatchedException;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.api.ResponderUnreachableException;
 import org.xipki.security.api.ConcurrentContentSigner;
@@ -233,10 +236,10 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         }
 
         BasicOCSPResp basicOCSPResp = (BasicOCSPResp) respObject;
-        Extension nonceExtn = basicOCSPResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
 
         if(nonce != null)
         {
+            Extension nonceExtn = basicOCSPResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
             if(nonceExtn == null)
             {
                 throw new OCSPNonceUnmatchedException(nonce, null);
@@ -245,6 +248,80 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             if(Arrays.equals(nonce, receivedNonce) == false)
             {
                 throw new OCSPNonceUnmatchedException(nonce, receivedNonce);
+            }
+        }
+
+        SingleResp[] singleResponses = basicOCSPResp.getResponses();
+        final int countSingleResponses = singleResponses == null ? 0 : singleResponses.length;
+        if(countSingleResponses != serialNumbers.length)
+        {
+            StringBuilder sb = new StringBuilder(100);
+            sb.append("Response with ").append(countSingleResponses).append(" singleRessponse");
+            if(countSingleResponses > 1)
+            {
+                sb.append("s");
+            }
+            sb.append(" is returned, expected is ").append(serialNumbers.length);
+            throw new OCSPTargetUnmatchedException(sb.toString());
+        }
+
+        CertificateID certID = ocspReq.getRequestList()[0].getCertID();
+        ASN1ObjectIdentifier issuerHashAlg = certID.getHashAlgOID();
+        byte[] issuerKeyHash = certID.getIssuerKeyHash();
+        byte[] issuerNameHash = certID.getIssuerNameHash();
+
+        if(serialNumbers.length == 1)
+        {
+            SingleResp m = singleResponses[0];
+            CertificateID cid = m.getCertID();
+            boolean issuerMatch = issuerHashAlg.equals(cid.getHashAlgOID()) &&
+                    Arrays.equals(issuerKeyHash, cid.getIssuerKeyHash()) &&
+                    Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
+
+            if(issuerMatch == false)
+            {
+                throw new OCSPTargetUnmatchedException("The issuer is not requested");
+            }
+
+            BigInteger serialNumber = cid.getSerialNumber();
+            if(serialNumbers[0].equals(serialNumber) == false)
+            {
+                throw new OCSPTargetUnmatchedException("The serialNumber is not requested");
+            }
+        }
+        else
+        {
+            List<BigInteger> tmpSerials1 = Arrays.asList(serialNumbers);
+            List<BigInteger> tmpSerials2 = new ArrayList<>(tmpSerials1);
+
+            for(int i = 0; i < singleResponses.length; i++)
+            {
+                SingleResp m = singleResponses[i];
+                CertificateID cid = m.getCertID();
+                boolean issuerMatch = issuerHashAlg.equals(cid.getHashAlgOID()) &&
+                        Arrays.equals(issuerKeyHash, cid.getIssuerKeyHash()) &&
+                        Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
+
+                if(issuerMatch == false)
+                {
+                    throw new OCSPTargetUnmatchedException("The issuer specified in singleResponse[" + i +
+                            "] is not requested");
+                }
+
+                BigInteger serialNumber = cid.getSerialNumber();
+                if(tmpSerials2.remove(serialNumber) == false)
+                {
+                    if(tmpSerials1.contains(serialNumber))
+                    {
+                        throw new OCSPTargetUnmatchedException("serialNumber " + serialNumber +
+                                "is contained in at least two singleResponses");
+                    }
+                    else
+                    {
+                        throw new OCSPTargetUnmatchedException("The serialNumber specified in singleResponse[" + i +
+                                "] is not requested");
+                    }
+                }
             }
         }
 
