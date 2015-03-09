@@ -36,15 +36,12 @@
 package org.xipki.ocsp.client.shell;
 
 import java.math.BigInteger;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -71,12 +68,8 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.CRLReason;
-import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.IoUtil;
-import org.xipki.common.RequestResponsePair;
 import org.xipki.common.SecurityUtil;
 import org.xipki.ocsp.client.api.OCSPRequestor;
-import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.KeyUtil;
 import org.xipki.security.SignerUtil;
 
@@ -87,140 +80,22 @@ import org.xipki.security.SignerUtil;
 @Command(scope = "xipki-ocsp", name = "status", description="Request certificate status")
 public class OCSPStatusCommand extends BaseOCSPStatusCommand
 {
-    @Option(name = "-serial",
-            multiValued = true,
-            description = "Serial number")
-    private List<String> serialNumbers;
-
-    @Option(name = "-cert",
-            multiValued = true,
-            description = "Certificate")
-    private List<String> certFiles;
-
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show status verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object _doExecute()
+    protected void checkParameters(X509Certificate respIssuer,
+            List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
     throws Exception
     {
-        if(isEmpty(serialNumbers) && isEmpty(certFiles))
-        {
-            err("Neither serialNumbers nor certFiles is set");
-            return null;
-        }
+    }
 
-        X509Certificate issuerCert = SecurityUtil.parseCert(issuerCertFile);
-
-        Map<BigInteger, byte[]> encodedCerts = null;
-        List<BigInteger> sns = new LinkedList<>();
-        if(isNotEmpty(certFiles))
-        {
-            encodedCerts = new HashMap<>(certFiles.size());
-
-            String ocspUrl = null;
-            for(String certFile : certFiles)
-            {
-                byte[] encodedCert = IoUtil.read(certFile);
-                X509Certificate cert = SecurityUtil.parseCert(certFile);
-
-                if(SecurityUtil.issues(issuerCert, cert) == false)
-                {
-                    err("certificate " + certFile + " is not issued by the given issuer");
-                    return null;
-                }
-
-                if(isBlank(serverURL))
-                {
-                    List<String> ocspUrls = SecurityUtil.extractOCSPUrls(cert);
-                    if(ocspUrls.size() > 0)
-                    {
-                        String url = ocspUrls.get(0);
-                        if(ocspUrl != null && ocspUrl.equals(url) == false)
-                        {
-                            err("given certificates have different OCSP responder URL in certificate");
-                            return null;
-                        } else
-                        {
-                            ocspUrl = url;
-                        }
-                    }
-                }
-
-                BigInteger sn = cert.getSerialNumber();
-                sns.add(sn);
-                encodedCerts.put(sn, encodedCert);
-            }
-
-            if(isBlank(serverURL))
-            {
-                serverURL = ocspUrl;
-            }
-        }
-        else
-        {
-            for(String serialNumber : serialNumbers)
-            {
-                BigInteger sn = new BigInteger(serialNumber);
-                sns.add(sn);
-            }
-        }
-
-        if(isBlank(serverURL))
-        {
-            err("Could not get URL for the OCSP responder");
-            return null;
-        }
-
-        X509Certificate respIssuer  = null;
-        if(respIssuerFile != null)
-        {
-            respIssuer = SecurityUtil.parseCert(IoUtil.expandFilepath(respIssuerFile));
-        }
-
-        URL serverUrl = new URL(serverURL);
-
-        RequestOptions options = getRequestOptions();
-
-        boolean saveReq = isNotBlank(reqout);
-        boolean saveResp = isNotBlank(respout);
-        RequestResponseDebug debug = null;
-        if(saveReq || saveResp)
-        {
-            debug = new RequestResponseDebug();
-        }
-
-        OCSPResp response;
-        try
-        {
-            response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrl,
-                options, debug);
-        }finally
-        {
-            if(debug != null && debug.size() > 0)
-            {
-                RequestResponsePair reqResp = debug.get(0);
-                if(saveReq)
-                {
-                    byte[] bytes = reqResp.getRequest();
-                    if(bytes != null)
-                    {
-                        IoUtil.save(reqout, bytes);
-                    }
-                }
-
-                if(saveResp)
-                {
-                    byte[] bytes = reqResp.getResponse();
-                    if(bytes != null)
-                    {
-                        IoUtil.save(respout, bytes);
-                    }
-                }
-            }
-        }
-
+    @Override
+    protected Object processResponse(OCSPResp response, X509Certificate respIssuer,
+            List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+    throws Exception
+    {
         BasicOCSPResp basicResp = OCSPUtils.extractBasicOCSPResp(response);
 
         boolean extendedRevoke = basicResp.getExtension(OCSPRequestor.id_pkix_ocsp_extendedRevoke) != null;
@@ -230,15 +105,13 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
         int n = singleResponses == null ? 0 : singleResponses.length;
         if(n == 0)
         {
-            err("Received no status from server");
-            return null;
+            throw new Exception("Received no status from server");
         }
 
-        if(n != sns.size())
+        if(n != serialNumbers.size())
         {
-            err("Received status with " + n +
-                    " single responses from server, but " + sns.size() + " were requested");
-            return null;
+            throw new Exception("Received status with " + n +
+                    " single responses from server, but " + serialNumbers.size() + " were requested");
         }
 
         Date[] thisUpdates = new Date[n];

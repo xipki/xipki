@@ -35,13 +35,24 @@
 
 package org.xipki.ocsp.client.shell;
 
+import java.math.BigInteger;
+import java.net.URL;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
+import org.bouncycastle.cert.ocsp.OCSPResp;
+import org.xipki.common.IoUtil;
+import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.RequestResponsePair;
+import org.xipki.common.SecurityUtil;
 import org.xipki.ocsp.client.api.OCSPRequestor;
+import org.xipki.ocsp.client.api.RequestOptions;
 
 /**
  * @author Lijun Liao
@@ -51,19 +62,29 @@ public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
 {
     @Option(name = "-respIssuer",
             required = false, description = "Certificate file of the responder's issuer")
-    protected String respIssuerFile;
+    private String respIssuerFile;
 
     @Option(name = "-url",
             required = false, description = "OCSP responder URL")
-    protected String serverURL;
+    private String serverURL;
 
     @Option(name = "-reqout",
             required = false, description = "write DER encoded OCSP request to fie")
-    protected String reqout;
+    private String reqout;
 
     @Option(name = "-respout",
             required = false, description = "write DER encoded OCSP response to fie")
-    protected String respout;
+    private String respout;
+
+    @Option(name = "-serial",
+            multiValued = true,
+            description = "Serial number, multi values allowed")
+    private List<String> serialNumbers;
+
+    @Option(name = "-cert",
+            multiValued = true,
+            description = "Certificate, multi values allowed")
+    private List<String> certFiles;
 
     protected static final Map<ASN1ObjectIdentifier, String> extensionOidNameMap = new HashMap<>();
     static
@@ -73,4 +94,134 @@ public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
         extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, "Nonce");
         extensionOidNameMap.put(OCSPRequestor.id_pkix_ocsp_extendedRevoke, "ExtendedRevoke");
     }
+
+    protected abstract void checkParameters(X509Certificate respIssuer,
+            List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+    throws Exception;
+
+    protected abstract Object processResponse(OCSPResp response, X509Certificate respIssuer,
+            List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+    throws Exception;
+
+    @Override
+    protected final Object _doExecute()
+    throws Exception
+    {
+        if(isEmpty(serialNumbers) && isEmpty(certFiles))
+        {
+            throw new Exception("Neither serialNumbers nor certFiles is set");
+        }
+
+        X509Certificate issuerCert = SecurityUtil.parseCert(issuerCertFile);
+
+        Map<BigInteger, byte[]> encodedCerts = null;
+        List<BigInteger> sns = new LinkedList<>();
+        if(isNotEmpty(certFiles))
+        {
+            encodedCerts = new HashMap<>(certFiles.size());
+
+            String ocspUrl = null;
+            for(String certFile : certFiles)
+            {
+                byte[] encodedCert = IoUtil.read(certFile);
+                X509Certificate cert = SecurityUtil.parseCert(certFile);
+
+                if(SecurityUtil.issues(issuerCert, cert) == false)
+                {
+                    throw new Exception("certificate " + certFile + " is not issued by the given issuer");
+                }
+
+                if(isBlank(serverURL))
+                {
+                    List<String> ocspUrls = SecurityUtil.extractOCSPUrls(cert);
+                    if(ocspUrls.size() > 0)
+                    {
+                        String url = ocspUrls.get(0);
+                        if(ocspUrl != null && ocspUrl.equals(url) == false)
+                        {
+                            throw new Exception("given certificates have different OCSP responder URL in certificate");
+                        } else
+                        {
+                            ocspUrl = url;
+                        }
+                    }
+                }
+
+                BigInteger sn = cert.getSerialNumber();
+                sns.add(sn);
+                encodedCerts.put(sn, encodedCert);
+            }
+
+            if(isBlank(serverURL))
+            {
+                serverURL = ocspUrl;
+            }
+        }
+        else
+        {
+            for(String serialNumber : serialNumbers)
+            {
+                BigInteger sn = new BigInteger(serialNumber);
+                sns.add(sn);
+            }
+        }
+
+        if(isBlank(serverURL))
+        {
+            throw new Exception("Could not get URL for the OCSP responder");
+        }
+
+        X509Certificate respIssuer  = null;
+        if(respIssuerFile != null)
+        {
+            respIssuer = SecurityUtil.parseCert(IoUtil.expandFilepath(respIssuerFile));
+        }
+
+        URL serverUrl = new URL(serverURL);
+
+        RequestOptions options = getRequestOptions();
+
+        checkParameters(respIssuer, sns, encodedCerts);
+
+        boolean saveReq = isNotBlank(reqout);
+        boolean saveResp = isNotBlank(respout);
+        RequestResponseDebug debug = null;
+        if(saveReq || saveResp)
+        {
+            debug = new RequestResponseDebug();
+        }
+
+        OCSPResp response;
+        try
+        {
+            response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrl,
+                options, debug);
+        }finally
+        {
+            if(debug != null && debug.size() > 0)
+            {
+                RequestResponsePair reqResp = debug.get(0);
+                if(saveReq)
+                {
+                    byte[] bytes = reqResp.getRequest();
+                    if(bytes != null)
+                    {
+                        IoUtil.save(reqout, bytes);
+                    }
+                }
+
+                if(saveResp)
+                {
+                    byte[] bytes = reqResp.getResponse();
+                    if(bytes != null)
+                    {
+                        IoUtil.save(respout, bytes);
+                    }
+                }
+            }
+        }
+
+        return processResponse(response, respIssuer, sns, encodedCerts);
+    }
+
 }
