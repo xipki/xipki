@@ -49,6 +49,7 @@ import org.xipki.ca.qa.ValidationResult;
 import org.xipki.ca.qa.X509CertprofileQA;
 import org.xipki.ca.qa.X509IssuerInfo;
 import org.xipki.common.IoUtil;
+import org.xipki.console.karaf.UnexpectedResultException;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 /**
@@ -147,7 +148,11 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
 
         }
 
-        System.out.println(sb);
+        out(sb.toString());
+        if(result.isAllSuccessful() == false)
+        {
+            throw new UnexpectedResultException("certificate is invalid");
+        }
         return null;
     }
 
