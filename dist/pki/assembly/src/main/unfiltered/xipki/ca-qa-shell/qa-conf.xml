@@ -5,17 +5,19 @@
       <cert>
         <file>output/RCA1.der</file>
       </cert>
+      <ocspUrl>http://localhost:8080/ocsp/responder1</ocspUrl>
     </X509Issuer>
     <X509Issuer name="SubCA">
       <cert>
         <file>output/SubCA1.der</file>
       </cert>
-      <ocspUrl>http://example.org/ocsp</ocspUrl>
+      <ocspUrl>http://localhost:8080/ocsp/responder1</ocspUrl>
     </X509Issuer>
     <X509Issuer name="SubCAwithCRL">
       <cert>
         <file>output/SubCAwithCRL1.der</file>
       </cert>
+      <ocspUrl>http://localhost:8080/ocsp/responder2</ocspUrl>
       <crlUrl>http://example.org/crl</crlUrl>
       <deltaCrlUrl>http://example.org/deltacrl</deltaCrlUrl>
     </X509Issuer>

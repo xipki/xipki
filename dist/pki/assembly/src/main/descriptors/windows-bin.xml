@@ -158,14 +158,14 @@
     </file>
     <file>
       <source>${project.basedir}/../../../LICENSE</source>
-      <outputDirectory>/</outputDirectory>
-      <destName>LICENSE</destName>
+      <outputDirectory>license</outputDirectory>
+      <destName>xipki-LICENSE</destName>
       <fileMode>0644</fileMode>
       <lineEnding>dos</lineEnding>
     </file>
     <file>
       <source>${project.build.directory}/windows-dependencies/apache-karaf-${karaf.version}/LICENSE</source>
-      <outputDirectory>Licenses</outputDirectory>
+      <outputDirectory>license</outputDirectory>
       <destName>karaf-LICENSE.txt</destName>
       <fileMode>0644</fileMode>
       <lineEnding>dos</lineEnding>
