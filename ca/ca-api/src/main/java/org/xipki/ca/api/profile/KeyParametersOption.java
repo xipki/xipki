@@ -39,7 +39,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.common.CollectionUtil;
+import org.xipki.common.util.CollectionUtil;
 
 /**
  * @author Lijun Liao

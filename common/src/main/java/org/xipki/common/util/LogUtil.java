@@ -33,35 +33,18 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common;
-
-import java.util.Collection;
-import java.util.Map;
+package org.xipki.common.util;
 
 /**
  * @author Lijun Liao
  */
 
-public class CollectionUtil
+public class LogUtil
 {
-    public static boolean isEmpty(Collection<?> c)
-    {
-        return c == null || c.isEmpty();
-    }
 
-    public static boolean isNotEmpty(Collection<?> c)
+    public static String buildExceptionLogFormat(String message)
     {
-        return c != null && c.isEmpty() == false;
-    }
-
-    public static boolean isEmpty(Map<?, ?> m)
-    {
-        return m == null || m.isEmpty();
-    }
-
-    public static boolean isNotEmpty(Map<?, ?> m)
-    {
-        return m != null && m.isEmpty() == false;
+        return StringUtil.isBlank(message) ? "{}: {}" : message + ", {}: {}";
     }
 
 }

@@ -43,7 +43,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.common.IoUtil;
+import org.xipki.common.util.IoUtil;
 import org.xipki.ocsp.client.api.RequestOptions;
 
 /**

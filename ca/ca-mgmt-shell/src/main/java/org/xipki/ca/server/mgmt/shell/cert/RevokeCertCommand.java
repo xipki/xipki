@@ -43,7 +43,7 @@ import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
 import org.xipki.common.CRLReason;
-import org.xipki.common.DateUtil;
+import org.xipki.common.util.DateUtil;
 
 /**
  * @author Lijun Liao

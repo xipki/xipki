@@ -45,9 +45,9 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.Arrays;
-import org.xipki.common.CollectionUtil;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.SecurityUtil;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.SecurityUtil;
 
 /**
  * @author Lijun Liao

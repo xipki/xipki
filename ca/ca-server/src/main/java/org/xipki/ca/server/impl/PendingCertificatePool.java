@@ -43,8 +43,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
-import org.xipki.common.CollectionUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.CollectionUtil;
 
 /**
  * @author Lijun Liao

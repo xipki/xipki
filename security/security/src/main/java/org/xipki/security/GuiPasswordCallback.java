@@ -55,8 +55,8 @@ import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import org.xipki.common.CollectionUtil;
-import org.xipki.common.StringUtil;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.security.api.PasswordCallback;
 import org.xipki.security.api.PasswordResolverException;
 

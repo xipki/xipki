@@ -48,7 +48,7 @@ import java.util.Set;
 import jline.console.ConsoleReader;
 
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.IoUtil;
+import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
 import org.xipki.dbtool.LiquibaseMain;

@@ -57,8 +57,8 @@ import javax.crypto.NoSuchPaddingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.SecurityUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.SecurityUtil;
 import org.xipki.security.SignerUtil;
 import org.xipki.security.SoftTokenContentSignerBuilder;
 import org.xipki.security.api.SignerException;

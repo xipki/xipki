@@ -41,7 +41,7 @@ import java.util.List;
 
 import org.xipki.ca.certprofile.x509.jaxb.NameConstraints;
 import org.xipki.ca.certprofile.x509.jaxb.GeneralSubtreeBaseType;
-import org.xipki.common.CollectionUtil;
+import org.xipki.common.util.CollectionUtil;
 
 /**
  * @author Lijun Liao

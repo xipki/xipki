@@ -37,7 +37,7 @@ package org.xipki.ocsp.server.impl;
 
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.HashAlgoType;
-import org.xipki.common.StringUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.ocsp.server.impl.jaxb.CacheType;
 import org.xipki.ocsp.server.impl.jaxb.EmbedCertsMode;
 import org.xipki.ocsp.server.impl.jaxb.ResponseOptionType;

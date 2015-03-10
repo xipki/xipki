@@ -44,7 +44,7 @@ import java.util.Set;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.client.api.CertprofileInfo;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.StringUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao

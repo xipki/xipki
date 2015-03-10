@@ -35,7 +35,7 @@
 
 package org.xipki.dbtool;
 
-import org.xipki.common.StringUtil;
+import org.xipki.common.util.StringUtil;
 
 import liquibase.CatalogAndSchema;
 import liquibase.Liquibase;

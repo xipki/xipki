@@ -157,18 +157,18 @@ import org.xipki.ca.qa.impl.internal.QaPolicyQualifiers;
 import org.xipki.ca.qa.impl.internal.QaCertificatePolicies.QaCertificatePolicyInformation;
 import org.xipki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
 import org.xipki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
-import org.xipki.common.CollectionUtil;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
 import org.xipki.common.KeyUsage;
-import org.xipki.common.LogUtil;
 import org.xipki.common.LruCache;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.SecurityUtil;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.SecurityUtil;
 import org.xipki.security.api.ExtensionExistence;
 
 /**

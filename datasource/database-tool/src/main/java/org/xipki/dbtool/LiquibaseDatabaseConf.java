@@ -37,7 +37,7 @@ package org.xipki.dbtool;
 
 import java.util.Properties;
 
-import org.xipki.common.StringUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 

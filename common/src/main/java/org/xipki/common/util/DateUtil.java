@@ -33,18 +33,45 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common;
+package org.xipki.common.util;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * @author Lijun Liao
  */
 
-public class LogUtil
+public class DateUtil
 {
+    private static final SimpleDateFormat sdf;
 
-    public static String buildExceptionLogFormat(String message)
+    static
     {
-        return StringUtil.isBlank(message) ? "{}: {}" : message + ", {}: {}";
+        sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
+    public static Date parseUTCTimeyyyyMMddhhmmss(String utcTime)
+    {
+        if(utcTime == null || utcTime.length() != 14)
+        {
+            throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
+        }
+        try
+        {
+            return sdf.parse(utcTime);
+        }catch(ParseException e)
+        {
+            throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args)
+    {
+        System.out.println(parseUTCTimeyyyyMMddhhmmss("20150223134459"));
     }
 
 }

@@ -43,9 +43,9 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.CollectionUtil;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.StringUtil;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  *
