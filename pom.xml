@@ -37,7 +37,7 @@
     <karaf.version>3.0.3</karaf.version>
     <!-- the following OSGi version is used in karaf 3.0.3 -->
     <osgi.version>5.0.0</osgi.version>
-    <bc.version>1.51</bc.version>
+    <bc.version>1.52</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
     <servlet-api.version>2.5</servlet-api.version>
     <junit.version>4.8.2</junit.version>
