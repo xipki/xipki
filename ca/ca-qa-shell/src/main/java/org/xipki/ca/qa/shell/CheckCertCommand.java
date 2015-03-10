@@ -45,11 +45,11 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.ca.qa.api.QASystemManager;
-import org.xipki.ca.qa.api.ValidationIssue;
-import org.xipki.ca.qa.api.ValidationResult;
 import org.xipki.ca.qa.api.X509CertprofileQA;
 import org.xipki.ca.qa.api.X509IssuerInfo;
 import org.xipki.common.IoUtil;
+import org.xipki.common.qa.ValidationIssue;
+import org.xipki.common.qa.ValidationResult;
 import org.xipki.console.karaf.UnexpectedResultException;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 

@@ -33,54 +33,59 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.api;
-
-import org.xipki.common.ParamChecker;
+package org.xipki.ocsp.qa.api;
 
 /**
  * @author Lijun Liao
  */
 
-public class ValidationIssue
+public enum OcspError
 {
-    private final String code;
-    private final String description;
-    private boolean failed;
-    private String message;
+    malformedRequest(1),
+    internalError(2),
+    tryLater(3),
+    sigRequired(4),
+    unauthorized(5);
 
-    public ValidationIssue(String code, String description)
+    public static final String errorText =
+            "malformedRequest, internalError, tryLater, sigRequired, unauthorized";
+
+    private final int status;
+
+    private OcspError(int status)
     {
-        ParamChecker.assertNotEmpty("code", code);
-        ParamChecker.assertNotEmpty("description", description);
-        this.code = code;
-        this.description = description;
-        this.failed = false;
+        this.status = status;
     }
 
-    public boolean isFailed()
+    public int getStatus()
     {
-        return failed;
+        return status;
     }
 
-    public String getMessage()
+    public static OcspError getOCSPError(String name)
     {
-        return message;
+        for(OcspError entry : values())
+        {
+            if(entry.name().equals(name))
+            {
+                return entry;
+            }
+        }
+
+        throw new IllegalArgumentException("Unknown OCSP error '" + name + "'");
     }
 
-    public void setFailureMessage(String message)
+    public static OcspError getOCSPError(int status)
     {
-        this.failed = true;
-        this.message = message;
-    }
+        for(OcspError entry : values())
+        {
+            if(entry.status == status)
+            {
+                return entry;
+            }
+        }
 
-    public String getCode()
-    {
-        return code;
-    }
-
-    public String getDescription()
-    {
-        return description;
+        throw new IllegalArgumentException("Unknown OCSPResponse status '" + status + "'");
     }
 
 }

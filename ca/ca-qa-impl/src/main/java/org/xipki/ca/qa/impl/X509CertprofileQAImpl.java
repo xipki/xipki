@@ -142,8 +142,6 @@ import org.xipki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
 import org.xipki.ca.certprofile.x509.jaxb.SubjectInfoAccess.Access;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
-import org.xipki.ca.qa.api.ValidationIssue;
-import org.xipki.ca.qa.api.ValidationResult;
 import org.xipki.ca.qa.api.X509CertprofileQA;
 import org.xipki.ca.qa.api.X509IssuerInfo;
 import org.xipki.ca.qa.impl.internal.QaAdmission;
@@ -169,6 +167,8 @@ import org.xipki.common.LruCache;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.qa.ValidationIssue;
+import org.xipki.common.qa.ValidationResult;
 import org.xipki.security.api.ExtensionExistence;
 
 /**

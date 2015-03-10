@@ -33,70 +33,54 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.api;
+package org.xipki.common.qa;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.xipki.common.CollectionUtil;
 import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class ValidationResult
+public class ValidationIssue
 {
-    private final List<ValidationIssue> validationIssues;
-    private final List<ValidationIssue> failedValidationIssues;
-    private final List<ValidationIssue> successfulValidationIssues;
+    private final String code;
+    private final String description;
+    private boolean failed;
+    private String message;
 
-    public ValidationResult(ValidationIssue validationIssues)
+    public ValidationIssue(String code, String description)
     {
-        this(Arrays.asList(validationIssues));
+        ParamChecker.assertNotEmpty("code", code);
+        ParamChecker.assertNotEmpty("description", description);
+        this.code = code;
+        this.description = description;
+        this.failed = false;
     }
 
-    public ValidationResult(List<ValidationIssue> validationIssues)
+    public boolean isFailed()
     {
-        ParamChecker.assertNotEmpty("validationIssues", validationIssues);
-
-        List<ValidationIssue> failedIssues = new LinkedList<>();
-        List<ValidationIssue> successfulIssues = new LinkedList<>();
-        for(ValidationIssue issue : validationIssues)
-        {
-            if(issue.isFailed())
-            {
-                failedIssues.add(issue);
-            } else
-            {
-                successfulIssues.add(issue);
-            }
-        }
-
-        this.validationIssues = validationIssues;
-        this.failedValidationIssues = failedIssues;
-        this.successfulValidationIssues = successfulIssues;
+        return failed;
     }
 
-    public boolean isAllSuccessful()
+    public String getMessage()
     {
-        return CollectionUtil.isEmpty(failedValidationIssues);
+        return message;
     }
 
-    public List<ValidationIssue> getValidationIssues()
+    public void setFailureMessage(String message)
     {
-        return validationIssues;
+        this.failed = true;
+        this.message = message;
     }
 
-    public List<ValidationIssue> getFailedValidationIssues()
+    public String getCode()
     {
-        return failedValidationIssues;
+        return code;
     }
 
-    public List<ValidationIssue> getSuccessfulValidationIssues()
+    public String getDescription()
     {
-        return successfulValidationIssues;
+        return description;
     }
 
 }
