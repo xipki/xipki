@@ -33,45 +33,35 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common;
+package org.xipki.common.util;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author Lijun Liao
  */
 
-public class DateUtil
+public class CollectionUtil
 {
-    private static final SimpleDateFormat sdf;
-
-    static
+    public static boolean isEmpty(Collection<?> c)
     {
-        sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return c == null || c.isEmpty();
     }
 
-    public static Date parseUTCTimeyyyyMMddhhmmss(String utcTime)
+    public static boolean isNotEmpty(Collection<?> c)
     {
-        if(utcTime == null || utcTime.length() != 14)
-        {
-            throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
-        }
-        try
-        {
-            return sdf.parse(utcTime);
-        }catch(ParseException e)
-        {
-            throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': " + e.getMessage());
-        }
+        return c != null && c.isEmpty() == false;
     }
 
-    public static void main(String[] args)
+    public static boolean isEmpty(Map<?, ?> m)
     {
-        System.out.println(parseUTCTimeyyyyMMddhhmmss("20150223134459"));
+        return m == null || m.isEmpty();
+    }
+
+    public static boolean isNotEmpty(Map<?, ?> m)
+    {
+        return m != null && m.isEmpty() == false;
     }
 
 }

@@ -45,7 +45,7 @@ import java.net.URL;
 
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.StringUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11ModuleConf;
 

@@ -45,9 +45,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.XMLUtil;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType;
