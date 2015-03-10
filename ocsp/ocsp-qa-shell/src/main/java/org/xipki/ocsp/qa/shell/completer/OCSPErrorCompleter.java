@@ -36,7 +36,7 @@
 package org.xipki.ocsp.qa.shell.completer;
 
 import org.xipki.console.karaf.EnumCompleter;
-import org.xipki.ocsp.qa.shell.CertStatus;
+import org.xipki.ocsp.qa.api.OcspCertStatus;
 
 /**
  * @author Lijun Liao
@@ -48,7 +48,7 @@ public class OCSPErrorCompleter extends EnumCompleter
     {
         StringBuilder enums = new StringBuilder();
 
-        for(CertStatus entry : CertStatus.values())
+        for(OcspCertStatus entry : OcspCertStatus.values())
         {
             enums.append(entry.name()).append(",");
         }

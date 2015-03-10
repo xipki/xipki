@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0" default-activation="lazy">
+  <!-- Allow the use of system properties -->
+  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
+  <bean id="ocspQA" class="org.xipki.ocsp.qa.impl.OcspQAImpl" init-method="init" destroy-method="shutdown">
+  </bean>
+  <service ref="ocspQA" interface="org.xipki.ocsp.qa.api.OcspQA"/>  
+</blueprint>
