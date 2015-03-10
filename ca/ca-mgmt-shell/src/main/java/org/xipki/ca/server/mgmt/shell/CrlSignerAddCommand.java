@@ -41,7 +41,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
-import org.xipki.common.SecurityUtil;
+import org.xipki.common.util.SecurityUtil;
 import org.xipki.security.api.SecurityFactory;
 
 /**

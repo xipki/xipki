@@ -42,7 +42,7 @@ import java.util.List;
 import org.bouncycastle.util.Arrays;
 import org.xipki.ca.certprofile.x509.jaxb.Admission;
 import org.xipki.ca.certprofile.x509.jaxb.OidWithDescType;
-import org.xipki.common.CollectionUtil;
+import org.xipki.common.util.CollectionUtil;
 
 /**
  * @author Lijun Liao

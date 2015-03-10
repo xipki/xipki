@@ -129,13 +129,13 @@ import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.CollectionUtil;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.HealthCheckResult;
-import org.xipki.common.LogUtil;
-import org.xipki.common.SecurityUtil;
-import org.xipki.common.StringUtil;
-import org.xipki.common.XMLUtil;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.XMLUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xml.sax.SAXException;
 

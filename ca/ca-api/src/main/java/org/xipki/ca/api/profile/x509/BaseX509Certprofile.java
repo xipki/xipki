@@ -69,11 +69,11 @@ import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
 import org.xipki.ca.api.profile.RDNControl;
 import org.xipki.ca.api.profile.SubjectInfo;
-import org.xipki.common.CollectionUtil;
 import org.xipki.common.LruCache;
 import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.SecurityUtil;
-import org.xipki.common.StringUtil;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao

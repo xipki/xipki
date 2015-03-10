@@ -42,7 +42,7 @@ import java.security.cert.X509Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.SecurityUtil;
+import org.xipki.common.util.SecurityUtil;
 
 /**
  * @author Lijun Liao

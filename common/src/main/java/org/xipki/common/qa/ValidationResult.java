@@ -39,8 +39,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.xipki.common.CollectionUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.CollectionUtil;
 
 /**
  * @author Lijun Liao

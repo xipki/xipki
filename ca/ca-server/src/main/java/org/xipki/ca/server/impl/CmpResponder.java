@@ -73,9 +73,9 @@ import org.xipki.ca.common.cmp.ProtectionResult;
 import org.xipki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.SecurityUtil;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.SecurityUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 

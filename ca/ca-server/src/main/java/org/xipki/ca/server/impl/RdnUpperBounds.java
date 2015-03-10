@@ -44,7 +44,7 @@ import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.SecurityUtil;
+import org.xipki.common.util.SecurityUtil;
 
 /**
  * @author Lijun Liao

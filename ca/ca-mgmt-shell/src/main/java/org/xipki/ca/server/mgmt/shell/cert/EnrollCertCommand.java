@@ -44,7 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
-import org.xipki.common.IoUtil;
+import org.xipki.common.util.IoUtil;
 
 /**
  * @author Lijun Liao

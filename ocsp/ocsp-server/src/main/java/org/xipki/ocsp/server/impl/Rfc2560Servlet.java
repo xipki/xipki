@@ -60,9 +60,9 @@ import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
-import org.xipki.common.LogUtil;
-import org.xipki.common.SecurityUtil;
-import org.xipki.common.StringUtil;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
 
 /**

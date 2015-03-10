@@ -50,7 +50,7 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.common.CustomObjectIdentifiers;
-import org.xipki.common.SecurityUtil;
+import org.xipki.common.util.SecurityUtil;
 
 /**
  * @author Lijun Liao

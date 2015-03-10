@@ -56,7 +56,7 @@ import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.SecurityUtil;
+import org.xipki.common.util.SecurityUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.security.api.PasswordResolver;

@@ -55,8 +55,8 @@ import org.xipki.ca.server.impl.CertRevocationInfoWithSerial;
 import org.xipki.ca.server.impl.CertStatus;
 import org.xipki.ca.server.impl.SubjectKeyProfileBundle;
 import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.LogUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 

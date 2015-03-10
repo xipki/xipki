@@ -62,7 +62,7 @@ import org.xipki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.SecurityUtil;
+import org.xipki.common.util.SecurityUtil;
 import org.xipki.console.karaf.UnexpectedResultException;
 import org.xipki.security.P10RequestGenerator;
 import org.xipki.security.api.ConcurrentContentSigner;

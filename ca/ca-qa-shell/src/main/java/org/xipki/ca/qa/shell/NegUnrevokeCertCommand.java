@@ -43,7 +43,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.client.api.CertIDOrError;
 import org.xipki.ca.client.shell.UnRevRemoveCertCommand;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.SecurityUtil;
+import org.xipki.common.util.SecurityUtil;
 import org.xipki.console.karaf.UnexpectedResultException;
 
 /**

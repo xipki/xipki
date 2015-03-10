@@ -105,12 +105,12 @@ import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Parameters;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
-import org.xipki.common.CollectionUtil;
-import org.xipki.common.LogUtil;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.SecurityUtil;
-import org.xipki.common.StringUtil;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao

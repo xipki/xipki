@@ -43,8 +43,8 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.ca.client.api.CertificateOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.shell.ClientCommand;
-import org.xipki.common.IoUtil;
 import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.UnexpectedResultException;
 
 /**

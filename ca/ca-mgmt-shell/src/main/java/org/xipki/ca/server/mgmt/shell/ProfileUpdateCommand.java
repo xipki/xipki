@@ -37,7 +37,7 @@ package org.xipki.ca.server.mgmt.shell;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.IoUtil;
+import org.xipki.common.util.IoUtil;
 
 /**
  * @author Lijun Liao

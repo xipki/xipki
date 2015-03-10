@@ -61,7 +61,7 @@ import org.xipki.ca.client.api.dto.RevokeCertRequestType;
 import org.xipki.common.AbstractLoadTest;
 import org.xipki.common.CRLReason;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.SecurityUtil;
+import org.xipki.common.util.SecurityUtil;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;

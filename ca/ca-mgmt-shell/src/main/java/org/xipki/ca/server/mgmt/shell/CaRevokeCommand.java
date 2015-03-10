@@ -45,7 +45,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.DateUtil;
+import org.xipki.common.util.DateUtil;
 
 /**
  * @author Lijun Liao

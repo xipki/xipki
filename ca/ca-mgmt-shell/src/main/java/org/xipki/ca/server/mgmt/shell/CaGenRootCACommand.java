@@ -47,7 +47,7 @@ import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.IoUtil;
+import org.xipki.common.util.IoUtil;
 
 /**
  * @author Lijun Liao

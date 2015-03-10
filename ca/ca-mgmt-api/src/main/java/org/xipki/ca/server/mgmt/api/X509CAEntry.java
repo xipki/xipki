@@ -48,11 +48,11 @@ import java.util.Set;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.CollectionUtil;
-import org.xipki.common.IoUtil;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.SecurityUtil;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.SecurityUtil;
 
 /**
  * @author Lijun Liao

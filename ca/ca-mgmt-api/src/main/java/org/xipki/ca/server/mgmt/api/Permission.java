@@ -37,7 +37,7 @@ package org.xipki.ca.server.mgmt.api;
 
 import java.util.Set;
 
-import org.xipki.common.CollectionUtil;
+import org.xipki.common.util.CollectionUtil;
 
 /**
  * @author Lijun Liao
