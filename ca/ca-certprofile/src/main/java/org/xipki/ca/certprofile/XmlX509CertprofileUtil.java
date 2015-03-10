@@ -107,10 +107,10 @@ import org.xipki.ca.certprofile.x509.jaxb.RangesType;
 import org.xipki.ca.certprofile.x509.jaxb.UsageType;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
-import org.xipki.common.CollectionUtil;
 import org.xipki.common.KeyUsage;
-import org.xipki.common.SecurityUtil;
-import org.xipki.common.XMLUtil;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.XMLUtil;
 import org.xml.sax.SAXException;
 
 /**

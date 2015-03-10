@@ -36,7 +36,7 @@
 package org.xipki.ca.client.api;
 
 import org.xipki.common.ParamChecker;
-import org.xipki.common.StringUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao

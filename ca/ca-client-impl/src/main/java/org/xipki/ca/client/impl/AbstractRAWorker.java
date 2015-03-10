@@ -55,8 +55,8 @@ import org.xipki.ca.client.api.dto.EnrollCertResultType;
 import org.xipki.ca.client.api.dto.ErrorResultEntryType;
 import org.xipki.ca.client.api.dto.ErrorResultType;
 import org.xipki.ca.client.api.dto.ResultEntryType;
-import org.xipki.common.CollectionUtil;
-import org.xipki.common.LogUtil;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.LogUtil;
 import org.xipki.security.api.SecurityFactory;
 
 /**

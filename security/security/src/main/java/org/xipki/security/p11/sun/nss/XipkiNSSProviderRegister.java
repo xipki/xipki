@@ -39,7 +39,7 @@ import java.security.Security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.LogUtil;
+import org.xipki.common.util.LogUtil;
 
 /**
  * @author Lijun Liao

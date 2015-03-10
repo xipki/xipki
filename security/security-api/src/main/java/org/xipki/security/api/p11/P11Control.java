@@ -41,8 +41,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.xipki.common.CollectionUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.CollectionUtil;
 
 /**
  * @author Lijun Liao

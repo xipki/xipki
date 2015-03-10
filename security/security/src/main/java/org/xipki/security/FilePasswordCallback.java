@@ -39,8 +39,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.xipki.common.IoUtil;
-import org.xipki.common.StringUtil;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.security.api.PasswordCallback;
 import org.xipki.security.api.PasswordResolverException;
 

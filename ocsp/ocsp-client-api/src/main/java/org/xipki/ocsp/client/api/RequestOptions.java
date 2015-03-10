@@ -50,7 +50,7 @@ import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.xipki.common.CollectionUtil;
+import org.xipki.common.util.CollectionUtil;
 
 /**
  * @author Lijun Liao

@@ -35,7 +35,7 @@
 
 package org.xipki.ca.client.api;
 
-import org.xipki.common.SecurityUtil;
+import org.xipki.common.util.SecurityUtil;
 
 /**
  * @author Lijun Liao

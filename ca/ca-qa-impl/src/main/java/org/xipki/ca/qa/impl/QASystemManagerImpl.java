@@ -63,10 +63,10 @@ import org.xipki.ca.qa.impl.jaxb.ObjectFactory;
 import org.xipki.ca.qa.impl.jaxb.QAConfType;
 import org.xipki.ca.qa.impl.jaxb.X509CertprofileType;
 import org.xipki.ca.qa.impl.jaxb.X509IssuerType;
-import org.xipki.common.IoUtil;
-import org.xipki.common.LogUtil;
-import org.xipki.common.StringUtil;
-import org.xipki.common.XMLUtil;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.XMLUtil;
 import org.xml.sax.SAXException;
 
 /**

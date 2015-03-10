@@ -42,7 +42,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.common.AbstractLoadTest;
-import org.xipki.common.IoUtil;
+import org.xipki.common.util.IoUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.security.api.SecurityFactory;

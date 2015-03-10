@@ -47,10 +47,10 @@ import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.xipki.common.IoUtil;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
-import org.xipki.common.SecurityUtil;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.SecurityUtil;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
 

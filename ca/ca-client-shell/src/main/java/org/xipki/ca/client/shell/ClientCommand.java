@@ -39,9 +39,9 @@ import java.io.IOException;
 
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.client.api.RAWorker;
-import org.xipki.common.IoUtil;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
+import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 /**

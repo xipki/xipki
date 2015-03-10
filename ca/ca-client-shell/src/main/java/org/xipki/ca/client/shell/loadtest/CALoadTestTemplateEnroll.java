@@ -79,7 +79,7 @@ import org.xipki.ca.client.shell.internal.loadtest.jaxb.ObjectFactory;
 import org.xipki.common.AbstractLoadTest;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.XMLUtil;
+import org.xipki.common.util.XMLUtil;
 import org.xml.sax.SAXException;
 
 /**

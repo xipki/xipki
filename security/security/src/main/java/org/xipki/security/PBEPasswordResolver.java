@@ -40,7 +40,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.common.StringUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.security.api.PasswordCallback;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SinglePasswordResolver;

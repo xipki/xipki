@@ -54,8 +54,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.xipki.common.AbstractLoadTest;
-import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.IoUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xml.sax.SAXException;

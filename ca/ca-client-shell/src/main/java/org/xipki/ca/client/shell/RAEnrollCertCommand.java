@@ -43,8 +43,8 @@ import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.ca.client.api.CertificateOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
-import org.xipki.common.IoUtil;
 import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.UnexpectedResultException;
 
 /**

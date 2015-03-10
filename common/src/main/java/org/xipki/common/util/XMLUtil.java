@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common;
+package org.xipki.common.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

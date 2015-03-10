@@ -59,7 +59,7 @@ import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.common.SecurityUtil;
+import org.xipki.common.util.SecurityUtil;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11Identity;
 import org.xipki.security.api.p11.P11KeyIdentifier;

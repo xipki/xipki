@@ -56,7 +56,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.SecurityUtil;
+import org.xipki.common.util.SecurityUtil;
 import org.xipki.security.DefaultConcurrentContentSigner;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
