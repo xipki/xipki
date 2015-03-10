@@ -33,59 +33,28 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ocsp.qa.shell;
+package org.xipki.ocsp.qa.api;
+
+import java.math.BigInteger;
+import java.security.cert.X509Certificate;
+import java.util.List;
+import java.util.Map;
+
+import org.bouncycastle.cert.ocsp.OCSPResp;
+import org.xipki.common.qa.ValidationResult;
 
 /**
  * @author Lijun Liao
  */
 
-public enum OCSPError
+public interface OcspQA
 {
-    malformedRequest(1),
-    internalError(2),
-    tryLater(3),
-    sigRequired(4),
-    unauthorized(5);
-
-    public static final String errorText =
-            "malformedRequest, internalError, tryLater, sigRequired, unauthorized";
-
-    private final int status;
-
-    private OCSPError(int status)
-    {
-        this.status = status;
-    }
-
-    public int getStatus()
-    {
-        return status;
-    }
-
-    public static OCSPError getOCSPError(String name)
-    {
-        for(OCSPError entry : values())
-        {
-            if(entry.name().equals(name))
-            {
-                return entry;
-            }
-        }
-
-        throw new IllegalArgumentException("Unknown OCSP error '" + name + "'");
-    }
-
-    public static OCSPError getOCSPError(int status)
-    {
-        for(OCSPError entry : values())
-        {
-            if(entry.status == status)
-            {
-                return entry;
-            }
-        }
-
-        throw new IllegalArgumentException("Unknown OCSPResponse status '" + status + "'");
-    }
-
+    ValidationResult checkOCSP(
+            OCSPResp response,
+            X509Certificate issuer,
+            List<BigInteger> serialNumbers,
+            Map<BigInteger, byte[]> encodedCerts,
+            OcspError expectedOcspError,
+            Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
+            OcspResponseOption responseOption);
 }

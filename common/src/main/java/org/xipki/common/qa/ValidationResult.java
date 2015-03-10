@@ -33,26 +33,70 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ocsp.qa.shell.completer;
+package org.xipki.common.qa;
 
-import org.xipki.console.karaf.EnumCompleter;
-import org.xipki.ocsp.qa.api.Occurrence;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.xipki.common.CollectionUtil;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class OccurrenceCompleter extends EnumCompleter
+public class ValidationResult
 {
-    public OccurrenceCompleter()
-    {
-        StringBuilder enums = new StringBuilder();
+    private final List<ValidationIssue> validationIssues;
+    private final List<ValidationIssue> failedValidationIssues;
+    private final List<ValidationIssue> successfulValidationIssues;
 
-        for(Occurrence entry : Occurrence.values())
-        {
-            enums.append(entry.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    public ValidationResult(ValidationIssue validationIssues)
+    {
+        this(Arrays.asList(validationIssues));
     }
+
+    public ValidationResult(List<ValidationIssue> validationIssues)
+    {
+        ParamChecker.assertNotEmpty("validationIssues", validationIssues);
+
+        List<ValidationIssue> failedIssues = new LinkedList<>();
+        List<ValidationIssue> successfulIssues = new LinkedList<>();
+        for(ValidationIssue issue : validationIssues)
+        {
+            if(issue.isFailed())
+            {
+                failedIssues.add(issue);
+            } else
+            {
+                successfulIssues.add(issue);
+            }
+        }
+
+        this.validationIssues = validationIssues;
+        this.failedValidationIssues = failedIssues;
+        this.successfulValidationIssues = successfulIssues;
+    }
+
+    public boolean isAllSuccessful()
+    {
+        return CollectionUtil.isEmpty(failedValidationIssues);
+    }
+
+    public List<ValidationIssue> getValidationIssues()
+    {
+        return validationIssues;
+    }
+
+    public List<ValidationIssue> getFailedValidationIssues()
+    {
+        return failedValidationIssues;
+    }
+
+    public List<ValidationIssue> getSuccessfulValidationIssues()
+    {
+        return successfulValidationIssues;
+    }
+
 }

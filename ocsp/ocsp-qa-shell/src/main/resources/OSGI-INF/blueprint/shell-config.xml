@@ -5,10 +5,11 @@
   <bean id="certStatusCompleter" class="org.xipki.ocsp.qa.shell.completer.CertStatusCompleter"/>
   <bean id="ocspErrorCompleter" class="org.xipki.ocsp.qa.shell.completer.OCSPErrorCompleter"/>
   <bean id="occurrenceCompleter" class="org.xipki.ocsp.qa.shell.completer.OccurrenceCompleter"/>
+  <reference id="ocspQA" interface="org.xipki.ocsp.qa.api.OcspQA"/>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
       <action class="org.xipki.ocsp.qa.shell.OCSPQAStatusCommand">
-        <property name="requestor" ref="ocspRequestor"/>
+        <property name="ocspQA" ref="ocspQa"/>
       </action>
       <optional-completers>
         <entry key="-cert" value-ref="filePathCompleter"/>

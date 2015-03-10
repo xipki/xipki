@@ -86,6 +86,10 @@ public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
             description = "Certificate, multi values allowed")
     private List<String> certFiles;
 
+    @Option(name = "-v", aliases="--verbose",
+            required = false, description = "Show status verbosely")
+    protected Boolean verbose = Boolean.FALSE;
+
     protected static final Map<ASN1ObjectIdentifier, String> extensionOidNameMap = new HashMap<>();
     static
     {
@@ -100,7 +104,7 @@ public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
     throws Exception;
 
     protected abstract Object processResponse(OCSPResp response, X509Certificate respIssuer,
-            List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+            X509Certificate issuer, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
     throws Exception;
 
     @Override
@@ -221,7 +225,7 @@ public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
             }
         }
 
-        return processResponse(response, respIssuer, sns, encodedCerts);
+        return processResponse(response, respIssuer, issuerCert, sns, encodedCerts);
     }
 
 }

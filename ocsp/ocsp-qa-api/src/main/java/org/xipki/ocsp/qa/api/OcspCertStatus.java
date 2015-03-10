@@ -33,23 +33,42 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ocsp.qa.shell;
+package org.xipki.ocsp.qa.api;
 
 /**
  * @author Lijun Liao
  */
 
-public enum Occurrence
+public enum OcspCertStatus
 {
-    required,
-    optional,
-    forbidden;
+    issuerUnknown,
+    unknown,
+    good,
+    rev_noreason,
+    unspecified,
+    keyCompromise,
+    cACompromise,
+    affiliationChanged,
+    superseded,
+    cessationOfOperation,
+    certificateHold,
+    removeFromCRL,
+    privilegeWithdrawn,
+    aACompromise,
+    malformedRequest,
+    internalError,
+    tryLater,
+    sigRequired,
+    unauthorized;
 
-    public static final String occurencesText = "required, optional and forbidden";
+    public static final String certStatusesText =
+            "issuerUnknown, unknown, good, rev_noreason, unspecified, keyCompromise, " +
+            "cACompromise, affiliationChanged, superseded, cessationOfOperation, " +
+            "certificateHold, removeFromCRL, privilegeWithdrawn, aACompromise";
 
-    public static Occurrence getOccurrence(String name)
+    public static OcspCertStatus getCertStatus(String name)
     {
-        for(Occurrence entry : values())
+        for(OcspCertStatus entry : values())
         {
             if(entry.name().equals(name))
             {
@@ -57,7 +76,6 @@ public enum Occurrence
             }
         }
 
-        throw new IllegalArgumentException("Unknown Occurrence '" + name + "'");
+        throw new IllegalArgumentException("Unknown CertStatus '" + name + "'");
     }
-
 }

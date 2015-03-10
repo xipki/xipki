@@ -46,14 +46,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -79,10 +77,6 @@ import org.xipki.security.SignerUtil;
 @Command(scope = "xipki-ocsp", name = "status", description="Request certificate status")
 public class OCSPStatusCommand extends BaseOCSPStatusCommand
 {
-    @Option(name = "-v", aliases="--verbose",
-            required = false, description = "Show status verbosely")
-    private Boolean verbose = Boolean.FALSE;
-
     @Override
     protected void checkParameters(X509Certificate respIssuer,
             List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
@@ -92,7 +86,7 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
 
     @Override
     protected Object processResponse(OCSPResp response, X509Certificate respIssuer,
-            List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+            X509Certificate issuer, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
     throws Exception
     {
         BasicOCSPResp basicResp = OCSPUtils.extractBasicOCSPResp(response);
@@ -311,16 +305,7 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
                 }
                 else
                 {
-                    ASN1ObjectIdentifier sigAlgOid = sigAlg.getAlgorithm();
-                    String sigAlgName;
-                    if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgOid))
-                    {
-                        sigAlgName = SignerUtil.getSignatureAlgoName(sigAlg);
-                    }
-                    else
-                    {
-                        sigAlgName = SignerUtil.getSignatureAlgoName(new AlgorithmIdentifier(sigAlgOid));
-                    }
+                    String sigAlgName = SignerUtil.getSignatureAlgoName(sigAlg);
                     if(sigAlgName == null)
                     {
                         sigAlgName = "UNKNOWN";
