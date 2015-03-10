@@ -52,7 +52,6 @@ import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
-import org.bouncycastle.asn1.ocsp.BasicOCSPResponse;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -305,20 +304,18 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
                     msg.append(time.getTimeString());
                 }
 
-                ASN1ObjectIdentifier sigAlgOid = basicResp.getSignatureAlgOID();
-                if(sigAlgOid == null)
+                AlgorithmIdentifier sigAlg = basicResp.getSignatureAlgorithmID();
+                if(sigAlg == null)
                 {
                     msg.append(("\nresponse is not signed"));
                 }
                 else
                 {
+                    ASN1ObjectIdentifier sigAlgOid = sigAlg.getAlgorithm();
                     String sigAlgName;
                     if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgOid))
                     {
-                        BasicOCSPResponse asn1BasicOCSPResp =
-                                BasicOCSPResponse.getInstance(basicResp.getEncoded());
-                        sigAlgName = SignerUtil.getSignatureAlgoName(
-                                asn1BasicOCSPResp.getSignatureAlgorithm());
+                        sigAlgName = SignerUtil.getSignatureAlgoName(sigAlg);
                     }
                     else
                     {
