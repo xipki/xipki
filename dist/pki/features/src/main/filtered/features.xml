@@ -112,6 +112,8 @@
   </feature>
   <feature name="xipki-ocspqa-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-ocspclient-shell</feature>
+    <bundle>mvn:org.xipki/ocsp-qa-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ocsp-qa-impl/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-qa-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-database-tool" version="${project.version}" resolver="(obr)">
