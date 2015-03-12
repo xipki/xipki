@@ -142,6 +142,7 @@ class IdentifiedX509Certprofile
         noneRequestExtensionTypes.add(Extension.cRLDistributionPoints);
         noneRequestExtensionTypes.add(Extension.freshestCRL);
         noneRequestExtensionTypes.add(Extension.basicConstraints);
+        noneRequestExtensionTypes.add(Extension.inhibitAnyPolicy);
     }
 
     private final CertprofileEntry entry;
