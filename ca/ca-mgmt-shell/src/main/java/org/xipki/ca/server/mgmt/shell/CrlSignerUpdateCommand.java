@@ -95,8 +95,8 @@ public class CrlSignerUpdateCommand extends CaCommand
             crlControl = CRLControl.getInstance(crlControlS);
         }
 
-        caManager.changeCrlSigner(name, signerType, signerConf, signerCertConf, crlControl);
-        out("updated CRL signer " + name);
+        boolean b = caManager.changeCrlSigner(name, signerType, signerConf, signerCertConf, crlControl);
+        output(b, "updated", "could not update", "CRL signer " + name);
         return null;
     }
 }

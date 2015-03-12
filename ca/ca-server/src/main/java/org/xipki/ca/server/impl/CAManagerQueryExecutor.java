@@ -298,11 +298,12 @@ class CAManagerQueryExecutor
         }
     }
 
-    void changeSystemEvent(SystemEvent systemEvent)
+    boolean changeSystemEvent(SystemEvent systemEvent)
     throws CAMgmtException
     {
         deleteSystemEvent(systemEvent.getName());
         addSystemEvent(systemEvent);
+        return true;
     }
 
     Map<String, String> createEnvParameters()
@@ -935,7 +936,7 @@ class CAManagerQueryExecutor
         }
     }
 
-    void deleteRowWithName(String name, String table)
+    boolean deleteRowWithName(String name, String table)
     throws CAMgmtException
     {
         final String sql = new StringBuilder("DELETE FROM ").append(table).append(" WHERE NAME=?").toString();
@@ -944,11 +945,7 @@ class CAManagerQueryExecutor
         {
             ps = prepareStatement(sql);
             ps.setString(1, name);
-            int rows = ps.executeUpdate();
-            if(rows != 1)
-            {
-                throw new CAMgmtException("Could not remove " + table + " " + name);
-            }
+            return ps.executeUpdate() > 0;
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -959,7 +956,7 @@ class CAManagerQueryExecutor
         }
     }
 
-    void deleteRows(String table)
+    boolean deleteRows(String table)
     throws CAMgmtException
     {
         final String sql = "DELETE FROM " + table;
@@ -968,6 +965,7 @@ class CAManagerQueryExecutor
         {
             stmt = createStatement();
             stmt.executeQuery(sql);
+            return true;
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -1948,7 +1946,7 @@ class CAManagerQueryExecutor
         }
     }
 
-    void removeCA(String caName)
+    boolean removeCA(String caName)
     throws CAMgmtException
     {
         final String sql = "DELETE FROM CA WHERE NAME=?";
@@ -1958,7 +1956,7 @@ class CAManagerQueryExecutor
         {
             ps = prepareStatement(sql);
             ps.setString(1, caName);
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -1969,7 +1967,7 @@ class CAManagerQueryExecutor
         }
     }
 
-    void removeCaAlias(String aliasName)
+    boolean removeCaAlias(String aliasName)
     throws CAMgmtException
     {
         final String sql = "DELETE FROM CAALIAS WHERE NAME=?";
@@ -1979,8 +1977,12 @@ class CAManagerQueryExecutor
         {
             ps = prepareStatement(sql);
             ps.setString(1, aliasName);
-            ps.executeUpdate();
-            LOG.info("remove CA alias '{}'", aliasName);
+            boolean b = ps.executeUpdate() > 0;
+            if(b)
+            {
+                LOG.info("remove CA alias '{}'", aliasName);
+            }
+            return b;
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -1991,7 +1993,7 @@ class CAManagerQueryExecutor
         }
     }
 
-    void removeCertprofileFromCA(String profileName, String caName)
+    boolean removeCertprofileFromCA(String profileName, String caName)
     throws CAMgmtException
     {
         final String sql = "DELETE FROM CA_HAS_CERTPROFILE WHERE CA_NAME=? AND CERTPROFILE_NAME=?";
@@ -2001,8 +2003,12 @@ class CAManagerQueryExecutor
             ps = prepareStatement(sql);
             ps.setString(1, caName);
             ps.setString(2, profileName);
-            ps.executeUpdate();
-            LOG.info("remove profile '{}' from CA '{}'", profileName, caName);
+            boolean b = ps.executeUpdate() > 0;
+            if(b)
+            {
+                LOG.info("remove profile '{}' from CA '{}'", profileName, caName);
+            }
+            return b;
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -2013,7 +2019,7 @@ class CAManagerQueryExecutor
         }
     }
 
-    void removeCmpRequestorFromCA(String requestorName, String caName)
+    boolean removeCmpRequestorFromCA(String requestorName, String caName)
     throws CAMgmtException
     {
         final String sql = "DELETE FROM CA_HAS_REQUESTOR WHERE CA_NAME=? AND REQUESTOR_NAME=?";
@@ -2023,8 +2029,12 @@ class CAManagerQueryExecutor
             ps = prepareStatement(sql);
             ps.setString(1, caName);
             ps.setString(2, requestorName);
-            ps.executeUpdate();
-            LOG.info("remove requestor '{}' from CA '{}'", requestorName, caName);
+            boolean b = ps.executeUpdate() > 0;
+            if(b)
+            {
+                LOG.info("remove requestor '{}' from CA '{}'", requestorName, caName);
+            }
+            return b;
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -2035,7 +2045,7 @@ class CAManagerQueryExecutor
         }
     }
 
-    void removePublisherFromCA(String publisherName, String caName)
+    boolean removePublisherFromCA(String publisherName, String caName)
     throws CAMgmtException
     {
         final String sql = "DELETE FROM CA_HAS_PUBLISHER WHERE CA_NAME=? AND PUBLISHER_NAME=?";
@@ -2045,8 +2055,12 @@ class CAManagerQueryExecutor
             ps = prepareStatement(sql);
             ps.setString(1, caName);
             ps.setString(2, publisherName);
-            ps.executeUpdate();
-            LOG.info("remove publisher '{}' from CA '{}'", publisherName, caName);
+            boolean b = ps.executeUpdate() > 0;
+            if(b)
+            {
+                LOG.info("remove publisher '{}' from CA '{}'", publisherName, caName);
+            }
+            return b;
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -2057,7 +2071,7 @@ class CAManagerQueryExecutor
         }
     }
 
-    void revokeCa(String caName, CertRevocationInfo revocationInfo)
+    boolean revokeCa(String caName, CertRevocationInfo revocationInfo)
     throws CAMgmtException
     {
         String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INVALIDITY_TIME=? WHERE NAME=?";
@@ -2076,7 +2090,12 @@ class CAManagerQueryExecutor
             ps.setLong(i++, revocationInfo.getRevocationTime().getTime() / 1000);
             ps.setLong(i++, revocationInfo.getInvalidityTime().getTime() / 1000);
             ps.setString(i++, caName);
-            ps.executeUpdate();
+            boolean b = ps.executeUpdate() > 0;
+            if(b)
+            {
+                LOG.info("revoked CA '{}'", caName);
+            }
+            return b;
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -2125,7 +2144,7 @@ class CAManagerQueryExecutor
         }
     }
 
-    void unlockCA()
+    boolean unlockCA()
     throws DataAccessException, CAMgmtException
     {
         final String sql = "DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'";
@@ -2134,6 +2153,7 @@ class CAManagerQueryExecutor
         {
             stmt = createStatement();
             stmt.execute(sql);
+            return stmt.getUpdateCount() > 0;
         }catch(SQLException e)
         {
             throw dataSource.translate(sql, e);
@@ -2143,7 +2163,7 @@ class CAManagerQueryExecutor
         }
     }
 
-    void unrevokeCa(String caName)
+    boolean unrevokeCa(String caName)
     throws CAMgmtException
     {
         LOG.info("Unrevoking of CA '{}'", caName);
@@ -2159,7 +2179,7 @@ class CAManagerQueryExecutor
             ps.setNull(i++, Types.INTEGER);
             ps.setNull(i++, Types.INTEGER);
             ps.setString(i++, caName);
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);

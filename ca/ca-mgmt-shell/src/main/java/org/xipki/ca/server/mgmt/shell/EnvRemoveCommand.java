@@ -52,8 +52,8 @@ public class EnvRemoveCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        caManager.removeEnvParam(name);
-        out("removed environment parameter " + name);
+        boolean b = caManager.removeEnvParam(name);
+        output(b, "removed", "could not remove", "environment parameter " + name);
         return null;
     }
 }

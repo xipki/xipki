@@ -128,9 +128,8 @@ public class CaRevokeCommand extends CaCommand
         }
 
         CertRevocationInfo revInfo = new CertRevocationInfo(crlReason, revocationDate, invalidityDate);
-        caManager.revokeCa(caName, revInfo);
-
-        out("revoked CA " + caName);
+        boolean b = caManager.revokeCa(caName, revInfo);
+        output(b, "revoked", "could not revoke", "CA " + caName);
 
         return null;
     }

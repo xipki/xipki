@@ -60,8 +60,8 @@ public class EnvUpdateCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        caManager.changeEnvParam(name, value);
-        out("updated the environment " + name + "=" + getRealString(value));
+        boolean b = caManager.changeEnvParam(name, value);
+        output(b, "updated", "could not update", "the environment " + name + "=" + getRealString(value));
         return null;
     }
 }

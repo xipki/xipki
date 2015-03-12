@@ -59,8 +59,8 @@ public class CaAliasAddCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        caManager.addCaAlias(caAlias, caName);
-        out("added CA alias " + caAlias + " associated with CA " + caName);
+        boolean b = caManager.addCaAlias(caAlias, caName);
+        output(b, "added", "could not add", "CA alias " + caAlias + " associated with CA " + caName);
         return null;
-    }
+    }    
 }

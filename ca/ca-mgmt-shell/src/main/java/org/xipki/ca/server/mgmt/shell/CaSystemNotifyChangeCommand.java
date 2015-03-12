@@ -41,24 +41,16 @@ import org.apache.karaf.shell.commands.Command;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "unlock", description="unlock the CA syste")
-public class UnlockCACommand extends CaCommand
+@Command(scope = "xipki-ca", name = "notify-change", description="notify the chagne of CA system")
+public class CaSystemNotifyChangeCommand extends CaCommand
 {
+
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        boolean unlocked = caManager.unlockCA();
-
-        if(unlocked)
-        {
-            out("unlocked CA system, calling xipki-ca:ca-restart to restart CA system");
-        }
-        else
-        {
-            err("could not unlock CA system");
-        }
-
+        boolean b = caManager.notifyCAChange();
+        output(b, "notified", "could not notify", "the change of CA system");
         return null;
     }
 }

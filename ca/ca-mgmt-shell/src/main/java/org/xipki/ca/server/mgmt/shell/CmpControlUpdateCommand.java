@@ -87,9 +87,9 @@ public class CmpControlUpdateCommand extends CaCommand
         Boolean requireMessageTime = isEnabled(requireMessageTimeS, "messageTime");
         Boolean requireConfirmCert = isEnabled(confirmCertS, "confirmCert");
 
-        caManager.changeCmpControl(name, requireConfirmCert, requireMessageTime, messageTimeBias, confirmWaitTime,
+        boolean b = caManager.changeCmpControl(name, requireConfirmCert, requireMessageTime, messageTimeBias, confirmWaitTime,
                 sendCaCert, sendResponderCert);
-        out("updated CMP control");
+        output(b, "updated", "could not update", "CMP control");
         return null;
     }
 }

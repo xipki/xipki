@@ -105,8 +105,8 @@ public class CrlSignerAddCommand extends CaCommand
         {
             entry.setCertificate(signerCert);
         }
-        caManager.addCrlSigner(entry);
-        out("added CRL signer " + name);
+        boolean b = caManager.addCrlSigner(entry);
+        output(b, "added", "could not add", "CRL signer " + name);
         return null;
     }
 

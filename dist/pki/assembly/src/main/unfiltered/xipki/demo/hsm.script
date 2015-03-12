@@ -117,7 +117,7 @@ xipki-ca:capub-add -ca SubCA1 -publisher OCSP.PUBLISHER
 xipki-ca:careq-add -requestor requestor -permission all -ra yes -profile all -ca SubCA1
 
 ## Restart the CA
-#xipki-ca:ca-restart
+#xipki-ca:restart
 
 #################################################################
 #                       ADD SubCA with CRL                      #
@@ -147,4 +147,4 @@ xipki-ca:caprofile-add -ca SubCAwithCRL1 -profile OCSP -profile DEMO -profile mu
 xipki-ca:careq-add -requestor requestor -permission all -ra yes -profile all -ca SubCAwithCRL1
 
 ## Restart the CA
-xipki-ca:ca-restart
+xipki-ca:restart

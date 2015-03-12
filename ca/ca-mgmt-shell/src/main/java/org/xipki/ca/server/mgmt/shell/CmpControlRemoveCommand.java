@@ -52,8 +52,8 @@ public class CmpControlRemoveCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        caManager.removeCmpControl(name);
-        out("removed CMP control");
+        boolean b = caManager.removeCmpControl(name);
+        output(b, "removed", "could not remove", "CMP control");
         return null;
     }
 }

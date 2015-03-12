@@ -52,8 +52,8 @@ public class PublisherRemoveCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        caManager.removePublisher(name);
-        out("removed certificate profile " + name);
+        boolean b = caManager.removePublisher(name);
+        output(b, "removed", "could not remove", "certificate profile " + name);
         return null;
     }
 }

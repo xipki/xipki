@@ -51,15 +51,16 @@ import org.xipki.common.CertRevocationInfo;
 
 public interface CAManager
 {
-    public static final String NULL = "NULL";
+    static final String NULL = "NULL";
 
     CASystemStatus getCASystemStatus();
 
     boolean unlockCA();
 
-    void notifyCAChange();
+    boolean notifyCAChange()
+    throws CAMgmtException;
 
-    void publishRootCA(String caName, String certprofile)
+    boolean publishRootCA(String caName, String certprofile)
     throws CAMgmtException;
 
     boolean republishCertificates(String caName, List<String> publisherNames)
@@ -68,15 +69,15 @@ public interface CAManager
     boolean clearPublishQueue(String caName, List<String> publisherNames)
     throws CAMgmtException;
 
-    void removeCA(String caName)
+    boolean removeCA(String caName)
     throws CAMgmtException;
 
     boolean restartCaSystem();
 
-    void addCaAlias(String aliasName, String caName)
+    boolean addCaAlias(String aliasName, String caName)
     throws CAMgmtException;
 
-    void removeCaAlias(String aliasName)
+    boolean removeCaAlias(String aliasName)
     throws CAMgmtException;
 
     String getAliasName(String caName);
@@ -96,12 +97,12 @@ public interface CAManager
 
     Set<String> getCaNames();
 
-    void addCA(X509CAEntry newCaDbEntry)
+    boolean addCA(X509CAEntry newCaDbEntry)
     throws CAMgmtException;
 
     X509CAEntry getCA(String caName);
 
-    void changeCA(String name, CAStatus status,
+    boolean changeCA(String name, CAStatus status,
             X509Certificate cert,
             Set<String> crl_uris, Set<String> delta_crl_uris, Set<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
@@ -110,16 +111,16 @@ public interface CAManager
             Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
     throws CAMgmtException;
 
-    void removeCertprofileFromCA(String profileName, String caName)
+    boolean removeCertprofileFromCA(String profileName, String caName)
     throws CAMgmtException;
 
-    void addCertprofileToCA(String profileName, String caName)
+    boolean addCertprofileToCA(String profileName, String caName)
     throws CAMgmtException;
 
-    void removePublisherFromCA(String publisherName, String caName)
+    boolean removePublisherFromCA(String publisherName, String caName)
     throws CAMgmtException;
 
-    void addPublisherToCA(String publisherName, String caName)
+    boolean addPublisherToCA(String publisherName, String caName)
     throws CAMgmtException;
 
     Set<String> getCertprofilesForCA(String caName);
@@ -128,77 +129,77 @@ public interface CAManager
 
     CmpRequestorEntry getCmpRequestor(String name);
 
-    void addCmpRequestor(CmpRequestorEntry dbEntry)
+    boolean addCmpRequestor(CmpRequestorEntry dbEntry)
     throws CAMgmtException;
 
-    void removeCmpRequestor(String requestorName)
+    boolean removeCmpRequestor(String requestorName)
     throws CAMgmtException;
 
-    void changeCmpRequestor(String name, String cert)
+    boolean changeCmpRequestor(String name, String cert)
     throws CAMgmtException;
 
-    void removeCmpRequestorFromCA(String requestorName, String caName)
+    boolean removeCmpRequestorFromCA(String requestorName, String caName)
     throws CAMgmtException;
 
-    void addCmpRequestorToCA(CAHasRequestorEntry requestor, String caName)
+    boolean addCmpRequestorToCA(CAHasRequestorEntry requestor, String caName)
     throws CAMgmtException;
 
     CertprofileEntry getCertprofile(String profileName);
 
-    void removeCertprofile(String profileName)
+    boolean removeCertprofile(String profileName)
     throws CAMgmtException;
 
-    void changeCertprofile(String name, String type, String conf)
+    boolean changeCertprofile(String name, String type, String conf)
     throws CAMgmtException;
 
-    void addCertprofile(CertprofileEntry dbEntry)
+    boolean addCertprofile(CertprofileEntry dbEntry)
     throws CAMgmtException;
 
-    void setCmpResponder(CmpResponderEntry dbEntry)
+    boolean setCmpResponder(CmpResponderEntry dbEntry)
     throws CAMgmtException;
 
-    void removeCmpResponder()
+    boolean removeCmpResponder()
     throws CAMgmtException;
 
-    void changeCmpResponder(String type, String conf, String cert)
+    boolean changeCmpResponder(String type, String conf, String cert)
     throws CAMgmtException;
 
     CmpResponderEntry getCmpResponder();
 
-    void addCrlSigner(X509CrlSignerEntry dbEntry)
+    boolean addCrlSigner(X509CrlSignerEntry dbEntry)
     throws CAMgmtException;
 
-    void removeCrlSigner(String crlSignerName)
+    boolean removeCrlSigner(String crlSignerName)
     throws CAMgmtException;
 
-    void changeCrlSigner(String name, String signer_type, String signer_conf, String signer_cert,
+    boolean changeCrlSigner(String name, String signer_type, String signer_conf, String signer_cert,
             CRLControl crlControl)
     throws CAMgmtException;
 
     X509CrlSignerEntry getCrlSigner(String name);
 
-    void addPublisher(PublisherEntry dbEntry)
+    boolean addPublisher(PublisherEntry dbEntry)
     throws CAMgmtException;
 
     List<PublisherEntry> getPublishersForCA(String caName);
 
     PublisherEntry getPublisher(String publisherName);
 
-    void removePublisher(String publisherName)
+    boolean removePublisher(String publisherName)
     throws CAMgmtException;
 
-    void changePublisher(String name, String type, String conf)
+    boolean changePublisher(String name, String type, String conf)
     throws CAMgmtException;
 
     CmpControl getCmpControl(String name);
 
-    void addCmpControl(CmpControl dbEntry)
+    boolean addCmpControl(CmpControl dbEntry)
     throws CAMgmtException;
 
-    void removeCmpControl(String name)
+    boolean removeCmpControl(String name)
     throws CAMgmtException;
 
-    void changeCmpControl(String name, Boolean requireConfirmCert,
+    boolean changeCmpControl(String name, Boolean requireConfirmCert,
             Boolean requireMessageTime, Integer messageTimeBias,
             Integer confirmWaitTime, Boolean sendCaCert, Boolean sendResponderCert)
     throws CAMgmtException;
@@ -207,19 +208,19 @@ public interface CAManager
 
     String getEnvParam(String name);
 
-    void addEnvParam(String name, String value)
+    boolean addEnvParam(String name, String value)
     throws CAMgmtException;
 
-    void removeEnvParam(String envParamName)
+    boolean removeEnvParam(String envParamName)
     throws CAMgmtException;
 
-    void changeEnvParam(String name, String value)
+    boolean changeEnvParam(String name, String value)
     throws CAMgmtException;
 
-    void revokeCa(String caName, CertRevocationInfo revocationInfo)
+    boolean revokeCa(String caName, CertRevocationInfo revocationInfo)
     throws CAMgmtException;
 
-    void unrevokeCa(String caName)
+    boolean unrevokeCa(String caName)
     throws CAMgmtException;
 
     boolean revokeCertificate(String caName, BigInteger serialNumber, CRLReason reason, Date invalidityTime)
@@ -234,7 +235,7 @@ public interface CAManager
     X509Certificate generateCertificate(String caName, String profileName, String user, byte[] encodedPkcs10Request)
     throws CAMgmtException;
 
-    public X509Certificate generateSelfSignedCA(
+    X509Certificate generateSelfSignedCA(
             String name, String certprofileName, byte[] p10Req,
             CAStatus status, long nextSerial, int nextCrlNumber,
             List<String> crl_uris, List<String> delta_crl_uris, List<String> ocsp_uris,

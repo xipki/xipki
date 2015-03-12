@@ -52,8 +52,8 @@ public class CaRemoveCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        caManager.removeCA(name);
-        out("removed CA " + name);
+        boolean b = caManager.removeCA(name);
+        output(b, "removed", "could not remove", "CA " + name);
         return null;
     }
 }

@@ -48,8 +48,8 @@ public class ResponderRemoveCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        caManager.removeCmpResponder();
-        out("removed CMP responder");
+        boolean b = caManager.removeCmpResponder();
+        output(b, "removed", "could not remove", "CMP responder");
         return null;
     }
 }

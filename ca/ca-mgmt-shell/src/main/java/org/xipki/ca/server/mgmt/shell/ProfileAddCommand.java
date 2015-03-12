@@ -76,8 +76,8 @@ public class ProfileAddCommand extends CaCommand
         }
 
         CertprofileEntry entry = new CertprofileEntry(name, type, conf);
-        caManager.addCertprofile(entry);
-        out("added certificate profile " + name);
+        boolean b = caManager.addCertprofile(entry);
+        output(b, "added", "could not add", "certificate profile " + name);
         return null;
     }
 }

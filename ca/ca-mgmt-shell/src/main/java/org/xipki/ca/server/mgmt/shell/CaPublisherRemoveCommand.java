@@ -58,8 +58,8 @@ public class CaPublisherRemoveCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        caManager.removePublisherFromCA(publisherName, caName);
-        out("removed publisher " + publisherName + " from CA " + caName);
+        boolean b = caManager.removePublisherFromCA(publisherName, caName);
+        output(b, "removed", "could not remove", "publisher " + publisherName + " from CA " + caName);
         return null;
     }
 }

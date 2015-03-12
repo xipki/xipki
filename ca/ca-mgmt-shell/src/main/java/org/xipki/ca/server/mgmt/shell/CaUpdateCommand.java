@@ -310,7 +310,7 @@ public class CaUpdateCommand extends CaCommand
             _maxValidity = CertValidity.getInstance(maxValidity);
         }
 
-        caManager.changeCA(
+        boolean b = caManager.changeCA(
                 caName,
                 status,
                 caCert,
@@ -329,7 +329,7 @@ public class CaUpdateCommand extends CaCommand
                 expirationPeriod,
                 validityMode);
 
-        out("updated CA " + caName);
+        output(b, "updated", "could not update", "CA " + caName);
         return null;
     }
 }

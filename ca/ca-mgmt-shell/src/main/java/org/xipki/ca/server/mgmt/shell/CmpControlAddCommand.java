@@ -107,9 +107,8 @@ public class CmpControlAddCommand extends CaCommand
             entry.setConfirmWaitTime(confirmWaitTime);
         }
 
-        caManager.addCmpControl(entry);
-        out("added CMP control " + name);
-
+        boolean b = caManager.addCmpControl(entry);
+        output(b, "added", "could not add", "CMP control " + name);
         return null;
     }
 }

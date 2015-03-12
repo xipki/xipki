@@ -14,7 +14,7 @@ feature:install xipki-camgmt-shell
 
 sleep 1000
 
-xipki-ca:ca-restart
+xipki-ca:restart
 
 #################################################################
 #                       PREPARE ENVIRONMENET                    #

@@ -47,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.mgmt.hessian.common.HessianCAManager;
+import org.xipki.ca.mgmt.hessian.common.HessianCAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
@@ -145,10 +146,10 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public void publishRootCA(String caName, String certprofile)
+    public boolean publishRootCA(String caName, String certprofile)
     throws CAMgmtException
     {
-        client.publishRootCA(caName, certprofile);
+        return client.publishRootCA(caName, certprofile);
     }
 
     @Override
@@ -166,10 +167,10 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public void removeCA(String caName)
+    public boolean removeCA(String caName)
     throws CAMgmtException
     {
-        client.removeCA(caName);
+        return client.removeCA(caName);
     }
 
     @Override
@@ -179,23 +180,24 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public void notifyCAChange()
+    public boolean notifyCAChange()
+    throws HessianCAMgmtException
     {
-        client.notifyCAChange();
+        return client.notifyCAChange();
     }
 
     @Override
-    public void addCaAlias(String aliasName, String caName)
+    public boolean addCaAlias(String aliasName, String caName)
     throws CAMgmtException
     {
-        client.addCaAlias(aliasName, caName);
+        return client.addCaAlias(aliasName, caName);
     }
 
     @Override
-    public void removeCaAlias(String aliasName)
+    public boolean removeCaAlias(String aliasName)
     throws CAMgmtException
     {
-        client.removeCaAlias(aliasName);
+        return client.removeCaAlias(aliasName);
     }
 
     @Override
@@ -253,10 +255,10 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public void addCA(X509CAEntry newCaDbEntry)
+    public boolean addCA(X509CAEntry newCaDbEntry)
     throws CAMgmtException
     {
-        client.addCA(newCaDbEntry);
+        return client.addCA(newCaDbEntry);
     }
 
     @Override
@@ -266,7 +268,7 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public void changeCA(String name, CAStatus status,
+    public boolean changeCA(String name, CAStatus status,
             X509Certificate cert, Set<String> crl_uris,
             Set<String> delta_crl_uris, Set<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
@@ -275,38 +277,38 @@ public class CAManagerClient implements CAManager
             Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
     throws CAMgmtException
     {
-        client.changeCA(name, status, cert, crl_uris, delta_crl_uris, ocsp_uris,
+        return client.changeCA(name, status, cert, crl_uris, delta_crl_uris, ocsp_uris,
                 max_validity, signer_type, signer_conf, crlsigner_name, cmpcontrol_name,
                 duplicate_key, duplicate_subject,
                 permissions, numCrls, expirationPeriod, validityMode);
     }
 
     @Override
-    public void removeCertprofileFromCA(String profileName, String caName)
+    public boolean removeCertprofileFromCA(String profileName, String caName)
     throws CAMgmtException
     {
-        client.removeCertprofileFromCA(profileName, caName);
+        return client.removeCertprofileFromCA(profileName, caName);
     }
 
     @Override
-    public void addCertprofileToCA(String profileName, String caName)
+    public boolean addCertprofileToCA(String profileName, String caName)
     throws CAMgmtException
     {
-        client.addCertprofileToCA(profileName, caName);
+        return client.addCertprofileToCA(profileName, caName);
     }
 
     @Override
-    public void removePublisherFromCA(String publisherName, String caName)
+    public boolean removePublisherFromCA(String publisherName, String caName)
     throws CAMgmtException
     {
-        client.removePublisherFromCA(publisherName, caName);
+        return client.removePublisherFromCA(publisherName, caName);
     }
 
     @Override
-    public void addPublisherToCA(String publisherName, String caName)
+    public boolean addPublisherToCA(String publisherName, String caName)
     throws CAMgmtException
     {
-        client.addPublisherToCA(publisherName, caName);
+        return client.addPublisherToCA(publisherName, caName);
     }
 
     @Override
@@ -328,38 +330,38 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public void addCmpRequestor(CmpRequestorEntry dbEntry)
+    public boolean addCmpRequestor(CmpRequestorEntry dbEntry)
     throws CAMgmtException
     {
-        client.addCmpRequestor(dbEntry);
+        return client.addCmpRequestor(dbEntry);
     }
 
     @Override
-    public void removeCmpRequestor(String requestorName)
+    public boolean removeCmpRequestor(String requestorName)
     throws CAMgmtException
     {
-        client.removeCmpRequestor(requestorName);
+        return client.removeCmpRequestor(requestorName);
     }
 
     @Override
-    public void changeCmpRequestor(String name, String cert)
+    public boolean changeCmpRequestor(String name, String cert)
     throws CAMgmtException
     {
-        client.changeCmpRequestor(name, cert);
+        return client.changeCmpRequestor(name, cert);
     }
 
     @Override
-    public void removeCmpRequestorFromCA(String requestorName, String caName)
+    public boolean removeCmpRequestorFromCA(String requestorName, String caName)
     throws CAMgmtException
     {
-        client.removeCmpRequestorFromCA(requestorName, caName);
+        return client.removeCmpRequestorFromCA(requestorName, caName);
     }
 
     @Override
-    public void addCmpRequestorToCA(CAHasRequestorEntry requestor, String caName)
+    public boolean addCmpRequestorToCA(CAHasRequestorEntry requestor, String caName)
     throws CAMgmtException
     {
-        client.addCmpRequestorToCA(requestor, caName);
+        return client.addCmpRequestorToCA(requestor, caName);
     }
 
     @Override
@@ -369,45 +371,45 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public void removeCertprofile(String profileName)
+    public boolean removeCertprofile(String profileName)
     throws CAMgmtException
     {
-        client.removeCertprofile(profileName);
+        return client.removeCertprofile(profileName);
     }
 
     @Override
-    public void changeCertprofile(String name, String type, String conf)
+    public boolean changeCertprofile(String name, String type, String conf)
     throws CAMgmtException
     {
-        client.changeCertprofile(name, type, conf);
+        return client.changeCertprofile(name, type, conf);
     }
 
     @Override
-    public void addCertprofile(CertprofileEntry dbEntry)
+    public boolean addCertprofile(CertprofileEntry dbEntry)
     throws CAMgmtException
     {
-        client.addCertprofile(dbEntry);
+        return client.addCertprofile(dbEntry);
     }
 
     @Override
-    public void setCmpResponder(CmpResponderEntry dbEntry)
+    public boolean setCmpResponder(CmpResponderEntry dbEntry)
     throws CAMgmtException
     {
-        client.setCmpResponder(dbEntry);
+        return client.setCmpResponder(dbEntry);
     }
 
     @Override
-    public void removeCmpResponder()
+    public boolean removeCmpResponder()
     throws CAMgmtException
     {
-        client.removeCmpResponder();
+        return client.removeCmpResponder();
     }
 
     @Override
-    public void changeCmpResponder(String type, String conf, String cert)
+    public boolean changeCmpResponder(String type, String conf, String cert)
     throws CAMgmtException
     {
-        client.changeCmpResponder(type, conf, cert);
+        return client.changeCmpResponder(type, conf, cert);
     }
 
     @Override
@@ -417,25 +419,25 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public void addCrlSigner(X509CrlSignerEntry dbEntry)
+    public boolean addCrlSigner(X509CrlSignerEntry dbEntry)
     throws CAMgmtException
     {
-        client.addCrlSigner(dbEntry);
+        return client.addCrlSigner(dbEntry);
     }
 
     @Override
-    public void removeCrlSigner(String crlSignerName)
+    public boolean removeCrlSigner(String crlSignerName)
     throws CAMgmtException
     {
-        client.removeCrlSigner(crlSignerName);
+        return client.removeCrlSigner(crlSignerName);
     }
 
     @Override
-    public void changeCrlSigner(String name, String signer_type,
+    public boolean changeCrlSigner(String name, String signer_type,
             String signer_conf, String signer_cert, CRLControl crlControl)
     throws CAMgmtException
     {
-        client.changeCrlSigner(name, signer_type, signer_conf, signer_cert, crlControl);
+        return client.changeCrlSigner(name, signer_type, signer_conf, signer_cert, crlControl);
     }
 
     @Override
@@ -445,10 +447,10 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public void addPublisher(PublisherEntry dbEntry)
+    public boolean addPublisher(PublisherEntry dbEntry)
     throws CAMgmtException
     {
-        client.addPublisher(dbEntry);
+        return client.addPublisher(dbEntry);
     }
 
     @Override
@@ -464,17 +466,17 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public void removePublisher(String publisherName)
+    public boolean removePublisher(String publisherName)
     throws CAMgmtException
     {
-        client.removePublisher(publisherName);
+        return client.removePublisher(publisherName);
     }
 
     @Override
-    public void changePublisher(String name, String type, String conf)
+    public boolean changePublisher(String name, String type, String conf)
     throws CAMgmtException
     {
-        client.changePublisher(name, type, conf);
+        return client.changePublisher(name, type, conf);
     }
 
     @Override
@@ -484,27 +486,27 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public void addCmpControl(CmpControl dbEntry)
+    public boolean addCmpControl(CmpControl dbEntry)
     throws CAMgmtException
     {
-        client.addCmpControl(dbEntry);
+        return client.addCmpControl(dbEntry);
     }
 
     @Override
-    public void removeCmpControl(String name)
+    public boolean removeCmpControl(String name)
     throws CAMgmtException
     {
-        client.removeCmpControl(name);
+        return client.removeCmpControl(name);
     }
 
     @Override
-    public void changeCmpControl(String name, Boolean requireConfirmCert,
+    public boolean changeCmpControl(String name, Boolean requireConfirmCert,
             Boolean requireMessageTime, Integer messageTimeBias,
             Integer confirmWaitTime, Boolean sendCaCert,
             Boolean sendResponderCert)
     throws CAMgmtException
     {
-        client.changeCmpControl(name, requireConfirmCert, requireMessageTime, messageTimeBias,
+        return client.changeCmpControl(name, requireConfirmCert, requireMessageTime, messageTimeBias,
                 confirmWaitTime, sendCaCert, sendResponderCert);
     }
 
@@ -521,38 +523,38 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public void addEnvParam(String name, String value)
+    public boolean addEnvParam(String name, String value)
     throws CAMgmtException
     {
-        client.addEnvParam(name, value);
+        return client.addEnvParam(name, value);
     }
 
     @Override
-    public void removeEnvParam(String envParamName)
+    public boolean removeEnvParam(String envParamName)
     throws CAMgmtException
     {
-        client.removeEnvParam(envParamName);
+        return client.removeEnvParam(envParamName);
     }
 
     @Override
-    public void changeEnvParam(String name, String value)
+    public boolean changeEnvParam(String name, String value)
     throws CAMgmtException
     {
-        client.changeEnvParam(name, value);
+        return client.changeEnvParam(name, value);
     }
 
     @Override
-    public void revokeCa(String caName, CertRevocationInfo revocationInfo)
+    public boolean revokeCa(String caName, CertRevocationInfo revocationInfo)
     throws CAMgmtException
     {
-        client.revokeCa(caName, revocationInfo);
+        return client.revokeCa(caName, revocationInfo);
     }
 
     @Override
-    public void unrevokeCa(String caName)
+    public boolean unrevokeCa(String caName)
     throws CAMgmtException
     {
-        client.unrevokeCa(caName);
+        return client.unrevokeCa(caName);
     }
 
     @Override
