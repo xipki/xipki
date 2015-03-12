@@ -42,7 +42,7 @@ import org.xipki.security.OBFPasswordResolver;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "obfuscate", description="Obfuscate password")
+@Command(scope = "xipki-tk", name = "obfuscate", description="obfuscate password")
 public class ObfuscateCommand extends SecurityCommand
 {
     @Override
@@ -52,7 +52,7 @@ public class ObfuscateCommand extends SecurityCommand
         char[] password = readPassword("Please enter the password");
 
         String passwordHint = OBFPasswordResolver.obfuscate(new String(password));
-        out("The obfuscated password is: '" + passwordHint + "'");
+        out("the obfuscated password is: '" + passwordHint + "'");
         return null;
     }
 

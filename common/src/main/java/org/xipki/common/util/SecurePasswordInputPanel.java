@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.console.karaf;
+package org.xipki.common.util;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -59,7 +59,7 @@ import javax.swing.UnsupportedLookAndFeelException;
  * @author Lijun Liao
  */
 
-class SecurePasswordInputPanel extends Panel
+public class SecurePasswordInputPanel extends Panel
 {
 
     private static final long serialVersionUID = 1L;
@@ -192,7 +192,7 @@ class SecurePasswordInputPanel extends Panel
         System.out.println("'" + new String(password2) + "'");
     }
 
-    static char[] readPassword(String prompt)
+    public static char[] readPassword(String prompt)
     {
         LookAndFeel currentLookAndFeel = UIManager.getLookAndFeel();
         try

@@ -47,15 +47,15 @@ import org.xipki.security.shell.SecurityCommand;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "rm-cert", description="Remove certificate from PKCS#11 device")
+@Command(scope = "xipki-tk", name = "rm-cert", description="remove certificate from PKCS#11 device")
 public class P11CertDeleteCommand extends SecurityCommand
 {
     @Option(name = "-slot",
-            required = true, description = "Required. Slot index")
+            required = true, description = "required. Slot index")
     private Integer slotIndex;
 
     @Option(name = "-key-id",
-            required = true, description = "Required. Id of the certificate in the PKCS#11 device")
+            required = true, description = "required. Id of the certificate in the PKCS#11 device")
     private String keyId;
 
     @Option(name = "-module",
@@ -70,7 +70,7 @@ public class P11CertDeleteCommand extends SecurityCommand
         P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId), null);
         slot.removeCerts(keyIdentifier);
         securityFactory.getP11CryptService(moduleName).refresh();
-        out("Deleted certificates");
+        out("deleted certificates");
         return null;
     }
 

@@ -33,42 +33,56 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell.completer;
+package org.xipki.console.karaf.impl.completer;
 
-import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.common.ObjectIdentifiers;
+import org.bouncycastle.asn1.nist.NISTNamedCurves;
+import org.bouncycastle.asn1.sec.SECNamedCurves;
+import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
+import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.xipki.console.karaf.ECCurveNameCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public class ExtKeyusageCompleter extends DynamicEnumCompleter
+public class ECCurveNameCompleterImpl extends DynamicEnumCompleter
+implements ECCurveNameCompleter
 {
-    private static final Set<String> usages;
-
-    static
-    {
-        Set<String> set = new HashSet<>();
-        set.add(ObjectIdentifiers.id_kp_clientAuth.getId());
-        set.add(ObjectIdentifiers.id_kp_codeSigning.getId());
-        set.add(ObjectIdentifiers.id_kp_emailProtection.getId());
-        set.add(ObjectIdentifiers.id_kp_ipsecEndSystem.getId());
-        set.add(ObjectIdentifiers.id_kp_ipsecTunnel.getId());
-        set.add(ObjectIdentifiers.id_kp_OCSPSigning.getId());
-        set.add(ObjectIdentifiers.id_kp_serverAuth.getId());
-        set.add(ObjectIdentifiers.id_kp_timeStamping.getId());
-
-        usages = Collections.unmodifiableSet(set);
-    }
 
     @Override
     protected Set<String> getEnums()
     {
-        return usages;
+        Set<String> curveNames = new HashSet<>();
+        Enumeration<?> names = X962NamedCurves.getNames();
+        while(names.hasMoreElements())
+        {
+            curveNames.add((String) names.nextElement());
+        }
+
+        names = SECNamedCurves.getNames();
+        while(names.hasMoreElements())
+        {
+            curveNames.add((String) names.nextElement());
+        }
+
+        names = TeleTrusTNamedCurves.getNames();
+        while(names.hasMoreElements())
+        {
+            curveNames.add((String) names.nextElement());
+        }
+
+        names = NISTNamedCurves.getNames();
+        while(names.hasMoreElements())
+        {
+            curveNames.add((String) names.nextElement());
+        }
+
+        return curveNames;
     }
 
 }

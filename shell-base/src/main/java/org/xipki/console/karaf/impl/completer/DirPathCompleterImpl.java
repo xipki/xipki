@@ -33,50 +33,23 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.console.karaf;
+package org.xipki.console.karaf.impl.completer;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.regex.Pattern;
+import org.xipki.console.karaf.DirPathCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-class MyFilenameFilter implements FilenameFilter
+public class DirPathCompleterImpl
+extends PathCompleter
+implements DirPathCompleter
 {
-    private static final Pattern ignorePattern;
-
-    static
-    {
-        String ignoreRegex = System.getProperty("org.xipki.console.ignore.regex");
-        if(ignoreRegex == null)
-        {
-            if(Configuration.isWindows() == false)
-            {
-                ignoreRegex = "\\..*";
-            }
-        }
-
-        if(ignoreRegex == null || ignoreRegex.isEmpty())
-        {
-            ignorePattern = null;
-        }
-        else
-        {
-            ignorePattern = Pattern.compile(ignoreRegex);
-        }
-    }
 
     @Override
-    public boolean accept(File dir, String name)
+    protected boolean isDirOnly()
     {
-        if(ignorePattern == null)
-        {
-            return true;
-        }
-
-        return ignorePattern.matcher(name).matches() == false;
+        return true;
     }
 
 }

@@ -42,7 +42,7 @@ import org.xipki.security.PBEPasswordResolver;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "pbe-enc", description="Encrypt password with master password")
+@Command(scope = "xipki-tk", name = "pbe-enc", description="encrypt password with master password")
 public class PBEEncryptCommand extends SecurityCommand
 {
     @Override
@@ -53,7 +53,7 @@ public class PBEEncryptCommand extends SecurityCommand
         char[] password = readPassword("Please enter the password");
 
         String passwordHint = PBEPasswordResolver.encryptPassword(masterPassword, password);
-        out("The encrypted password is: '" + passwordHint + "'");
+        out("the encrypted password is: '" + passwordHint + "'");
         return null;
     }
 

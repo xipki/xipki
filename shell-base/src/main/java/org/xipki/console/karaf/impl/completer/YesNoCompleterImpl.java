@@ -33,7 +33,10 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.console.karaf;
+package org.xipki.console.karaf.impl.completer;
+
+import org.xipki.console.karaf.EnumCompleter;
+import org.xipki.console.karaf.YesNoCompleter;
 
 /**
  * @author Lijun Liao

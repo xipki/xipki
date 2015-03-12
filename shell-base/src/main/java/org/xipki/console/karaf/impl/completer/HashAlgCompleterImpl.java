@@ -33,12 +33,20 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.console.karaf;
+package org.xipki.console.karaf.impl.completer;
+
+import org.xipki.console.karaf.HashAlgCompleter;
+import org.xipki.console.karaf.EnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public interface DirPathCompleter extends XipkiCompleter
+public class HashAlgCompleterImpl extends EnumCompleter
+implements HashAlgCompleter
 {
+    public HashAlgCompleterImpl()
+    {
+        setTokens("SHA1,SHA224,SHA256,SHA384,SHA512");
+    }
 }

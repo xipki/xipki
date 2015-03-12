@@ -33,12 +33,19 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.console.karaf;
+package org.xipki.common;
 
 /**
  * @author Lijun Liao
  */
 
-public interface DirPathCompleter extends XipkiCompleter
+@SuppressWarnings("serial")
+public class InvalidOIDorNameException extends Exception
 {
+
+    public InvalidOIDorNameException(String declaredOidOrName)
+    {
+        super("Invalid ObjectIdentifer or name '" + declaredOidOrName + "'");
+    }
+
 }

@@ -33,37 +33,20 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell.completer;
+package org.xipki.console.karaf.impl.completer;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.xipki.common.KeyUsage;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.xipki.console.karaf.EnumCompleter;
+import org.xipki.console.karaf.SignerTypeCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public class KeyusageCompleter extends DynamicEnumCompleter
+public class SignerTypeCompleterImpl extends EnumCompleter
+implements SignerTypeCompleter
 {
-    private static final Set<String> usages;
-
-    static
+    public SignerTypeCompleterImpl()
     {
-        Set<String> set = new HashSet<>();
-        for(KeyUsage usage : KeyUsage.values())
-        {
-            set.add(usage.getName());
-        }
-        usages = Collections.unmodifiableSet(set);
+        setTokens("JKS, PKCS11, PKCS12");
     }
-
-    @Override
-    protected Set<String> getEnums()
-    {
-        return usages;
-    }
-
 }

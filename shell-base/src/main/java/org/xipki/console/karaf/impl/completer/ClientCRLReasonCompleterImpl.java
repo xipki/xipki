@@ -33,40 +33,28 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.console.karaf;
+package org.xipki.console.karaf.impl.completer;
+
+import org.xipki.common.CRLReason;
+import org.xipki.console.karaf.ClientCRLReasonCompleter;
+import org.xipki.console.karaf.EnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public class UnexpectedResultException extends Exception
+public class ClientCRLReasonCompleterImpl extends EnumCompleter
+implements ClientCRLReasonCompleter
 {
-
-    private static final long serialVersionUID = 189176458485831187L;
-
-    public UnexpectedResultException()
+    public ClientCRLReasonCompleterImpl()
     {
-    }
+        StringBuilder enums = new StringBuilder();
 
-    public UnexpectedResultException(String message)
-    {
-        super(message);
+        for(CRLReason reason : CRLReason.PERMITTED_CLIENT_CRLREASONS)
+        {
+            enums.append(reason.getDescription()).append(",");
+        }
+        enums.deleteCharAt(enums.length() - 1);
+        setTokens(enums.toString());
     }
-
-    public UnexpectedResultException(Throwable cause)
-    {
-        super(cause);
-    }
-
-    public UnexpectedResultException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
-
-    public UnexpectedResultException(String message, Throwable cause,
-            boolean enableSuppression, boolean writableStackTrace)
-    {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
-
 }

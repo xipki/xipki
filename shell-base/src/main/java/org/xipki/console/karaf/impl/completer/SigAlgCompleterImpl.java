@@ -33,12 +33,31 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.console.karaf;
+package org.xipki.console.karaf.impl.completer;
+
+import org.xipki.console.karaf.EnumCompleter;
+import org.xipki.console.karaf.SigAlgCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public interface DirPathCompleter extends XipkiCompleter
+public class SigAlgCompleterImpl extends EnumCompleter
+implements SigAlgCompleter
 {
+    public SigAlgCompleterImpl()
+    {
+        String[] encAlgs = new String[]{"RSA", "RSAandMGF1", "ECDSA", "DSA"};
+        String[] hashAlgs = new String[]{"SHA1", "SHA224", "SHA256", "SHA384", "SHA512"};
+        StringBuilder enums = new StringBuilder(200);
+        for(String encAlg : encAlgs)
+        {
+            for(String hashAlg : hashAlgs)
+            {
+                enums.append(hashAlg).append("with").append(encAlg).append(",");
+            }
+        }
+        enums.deleteCharAt(enums.length() - 1);
+        setTokens(enums.toString());
+    }
 }

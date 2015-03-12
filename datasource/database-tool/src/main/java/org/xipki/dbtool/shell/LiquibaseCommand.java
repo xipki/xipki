@@ -74,11 +74,11 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
     }
 
     @Option(name = "-q", aliases="--quiet",
-            required = false, description = "Quiet mode")
+            required = false, description = "quiet mode")
     private Boolean quiet = Boolean.FALSE;
 
     @Option(name = "-logLevel",
-            description = "Log level, valid values are debug, info, warning, severe, off")
+            description = "log level, valid values are debug, info, warning, severe, off")
     private String logLevel = "warning";
 
     @Option(name = "-caconf",
@@ -93,7 +93,7 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
         {
             if(confirm("reset and initialize") == false)
             {
-                out("Cancelled");
+                out("cancelled");
                 return;
             }
         }
@@ -163,14 +163,14 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
     {
         StringBuilder msg = new StringBuilder();
         msg.append("\n--------------------------------------------\n");
-        msg.append("DRIVER      = ").append(dbParams.getDriver()).append("\n");
-        msg.append("USER        = ").append(dbParams.getUsername()).append("\n");
-        msg.append("URL         = ").append(dbParams.getUrl()).append("\n");
+        msg.append("driver      = ").append(dbParams.getDriver()).append("\n");
+        msg.append("user        = ").append(dbParams.getUsername()).append("\n");
+        msg.append("url         = ").append(dbParams.getUrl()).append("\n");
         if(dbParams.getSchema() != null)
         {
-            msg.append("SCHEMA      = ").append(dbParams.getSchema()).append("\n");
+            msg.append("schema      = ").append(dbParams.getSchema()).append("\n");
         }
-        msg.append("SCHEMA_FILE = ").append(schemaFile).append("\n");
+        msg.append("schema file = ").append(schemaFile).append("\n");
 
         System.out.println(msg);
     }
