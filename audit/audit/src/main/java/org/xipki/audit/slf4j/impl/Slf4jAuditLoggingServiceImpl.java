@@ -35,16 +35,12 @@
 
 package org.xipki.audit.slf4j.impl;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
-import org.xipki.audit.api.AuditEventDataType;
 import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditStatus;
@@ -57,8 +53,6 @@ import org.xipki.audit.api.PCIAuditEvent;
 public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
 {
     private static final Logger LOG = LoggerFactory.getLogger(Slf4jAuditLoggingServiceImpl.class);
-
-    private static final DateFormat df = new SimpleDateFormat("yyyy.MM.dd '-' HH:mm:ss.SSS z");
 
     public Slf4jAuditLoggingServiceImpl()
     {
@@ -120,42 +114,22 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
         sb.append(":\tstatus: ").append(status.name());
         List<AuditEventData> eventDataArray = event.getEventDatas();
 
+        long duration = event.getDuration();
+        if(duration >= 0)
+        {
+            sb.append("\tduration: ").append(duration);
+        }
+
         if ((eventDataArray != null) && (eventDataArray.size() > 0))
         {
-            for (AuditEventData element : eventDataArray)
+            for (AuditEventData m : eventDataArray)
             {
-                sb.append("\t");
-                sb.append(element.getName());
-                sb.append(": ");
-
-                AuditEventDataType eventDataType = element.getEventDataType();
-                switch(eventDataType)
+                if(duration >= 0 && "duration".equalsIgnoreCase(m.getName()))
                 {
-                case BINARY:
-                    sb.append(toHexString(element.getBinaryValue()));
-                    break;
-                case NUMBER:
-                    sb.append(element.getNumberValue());
-                    break;
-                case TEXT:
-                    sb.append(element.getTextValue());
-                    break;
-                case TIMESTAMP:
-                    Date t = element.getTimestampValue();
-                    String value;
-                    if(t == null)
-                    {
-                        value = "undefined";
-                    } else
-                    {
-                        synchronized (df)
-                        {
-                            value = df.format(element.getTimestampValue());
-                        }
-                    }
-                    sb.append(value);
-                    break;
+                    continue;
                 }
+
+                sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
             }
         }
 
@@ -190,24 +164,5 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
         {
             LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}", AuditLevel.ERROR.getAlignedText(), t.getMessage());
         }
-    }
-
-    private static final char[] HEX_CHAR_TABLE = "0123456789ABCDEF".toCharArray();
-    private static String toHexString(byte[] raw)
-    {
-        if(raw == null)
-        {
-            return "";
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for (byte b : raw)
-        {
-            int v = (b < 0) ? 256 + b : b;
-            sb.append(HEX_CHAR_TABLE[v >>> 4]);
-            sb.append(HEX_CHAR_TABLE[v & 0x0F]);
-            sb.append(" ");
-        }
-        return sb.toString();
     }
 }

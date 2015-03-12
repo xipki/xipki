@@ -43,7 +43,7 @@ import java.util.List;
  * @author Lijun Liao
  */
 
-public class ChildAuditEvent
+public class AuditChildEvent
 {
     /**
      * The data array belonging to the event.
@@ -57,7 +57,7 @@ public class ChildAuditEvent
 
     private AuditStatus status;
 
-    public ChildAuditEvent()
+    public AuditChildEvent()
     {
         this.level = AuditLevel.INFO;
     }
