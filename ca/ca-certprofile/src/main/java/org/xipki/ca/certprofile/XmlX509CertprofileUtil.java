@@ -572,7 +572,7 @@ public class XmlX509CertprofileUtil
             org.xipki.ca.certprofile.x509.jaxb.KeyUsage extConf)
     {
         List<UsageType> usages = extConf.getUsage();
-        Set<KeyUsageControl> controls = new HashSet<>(usages.size());
+        Set<KeyUsageControl> controls = new HashSet<>();
 
         for(UsageType m : usages)
         {
@@ -617,7 +617,7 @@ public class XmlX509CertprofileUtil
     public static Set<ExtKeyUsageControl> buildExtKeyUsageOptions(ExtendedKeyUsage extConf)
     {
         List<Usage> usages = extConf.getUsage();
-        Set<ExtKeyUsageControl> controls = new HashSet<>(usages.size());
+        Set<ExtKeyUsageControl> controls = new HashSet<>();
 
         for(Usage m : usages)
         {

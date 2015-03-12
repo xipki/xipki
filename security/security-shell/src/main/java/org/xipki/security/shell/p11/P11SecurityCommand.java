@@ -48,17 +48,17 @@ import org.xipki.security.shell.SecurityCommand;
 public abstract class P11SecurityCommand extends SecurityCommand
 {
     @Option(name = "-slot",
-            required = true, description = "Required. Slot index")
+            required = true, description = "required. Slot index")
     protected Integer slotIndex;
 
     @Option(name = "-key-id",
-            required = false, description = "Id of the private key in the PKCS#11 device.\n"
-                    + "Either keyId or keyLabel must be specified")
+            required = false, description = "id of the private key in the PKCS#11 device.\n"
+                    + "either keyId or keyLabel must be specified")
     protected String keyId;
 
     @Option(name = "-key-label",
-            required = false, description = "Label of the private key in the PKCS#11 device.\n"
-                    + "Either keyId or keyLabel must be specified")
+            required = false, description = "label of the private key in the PKCS#11 device.\n"
+                    + "either keyId or keyLabel must be specified")
     protected String keyLabel;
 
     @Option(name = "-module",
@@ -79,7 +79,7 @@ public abstract class P11SecurityCommand extends SecurityCommand
         }
         else
         {
-            throw new Exception("Exactly one of keyId or keyLabel should be specified");
+            throw new Exception("exactly one of keyId or keyLabel should be specified");
         }
         return keyIdentifier;
     }

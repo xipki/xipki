@@ -33,42 +33,12 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell.completer;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.xipki.common.ObjectIdentifiers;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+package org.xipki.console.karaf;
 
 /**
  * @author Lijun Liao
  */
 
-public class ExtKeyusageCompleter extends DynamicEnumCompleter
+public interface SignerTypeCompleter extends XipkiCompleter
 {
-    private static final Set<String> usages;
-
-    static
-    {
-        Set<String> set = new HashSet<>();
-        set.add(ObjectIdentifiers.id_kp_clientAuth.getId());
-        set.add(ObjectIdentifiers.id_kp_codeSigning.getId());
-        set.add(ObjectIdentifiers.id_kp_emailProtection.getId());
-        set.add(ObjectIdentifiers.id_kp_ipsecEndSystem.getId());
-        set.add(ObjectIdentifiers.id_kp_ipsecTunnel.getId());
-        set.add(ObjectIdentifiers.id_kp_OCSPSigning.getId());
-        set.add(ObjectIdentifiers.id_kp_serverAuth.getId());
-        set.add(ObjectIdentifiers.id_kp_timeStamping.getId());
-
-        usages = Collections.unmodifiableSet(set);
-    }
-
-    @Override
-    protected Set<String> getEnums()
-    {
-        return usages;
-    }
-
 }

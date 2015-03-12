@@ -51,7 +51,7 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-client", name = "loadtest-revoke", description="CA Client Revoke Load test")
+@Command(scope = "xipki-cli", name = "loadtest-revoke", description="CA Client Revoke Load test")
 public class CALoadTestRevokeCommand extends CALoadTestCommand
 {
     @Option(name = "-cacert",
@@ -61,7 +61,7 @@ public class CALoadTestRevokeCommand extends CALoadTestCommand
 
     @Option(name = "-duration",
             required = false,
-            description = "Required. Maximal duration in seconds")
+            description = "required. Maximal duration in seconds")
     private Integer durationInSecond = 30;
 
     @Option(name = "-thread",
@@ -93,25 +93,25 @@ public class CALoadTestRevokeCommand extends CALoadTestCommand
     {
         if(numThreads < 1)
         {
-            err("Invalid number of threads " + numThreads);
+            err("invalid number of threads " + numThreads);
             return null;
         }
 
         if(durationInSecond < 1)
         {
-            err("Invalid duration " + durationInSecond);
+            err("invalid duration " + durationInSecond);
             return null;
         }
 
         StringBuilder startMsg = new StringBuilder();
 
-        startMsg.append("Threads:         ").append(numThreads).append("\n");
-        startMsg.append("Max. Duration:   ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
+        startMsg.append("threads:         ").append(numThreads).append("\n");
+        startMsg.append("max. Duration:   ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
         startMsg.append("cacert:          ").append(caCertFile).append("\n");
         startMsg.append("cadb:            ").append(caDbConfFile).append("\n");
         startMsg.append("maxCerts:        ").append(maxCerts).append("\n");
-        startMsg.append("#Certs/Request:  ").append(n).append("\n");
-        startMsg.append("Unit:            ").append(n).append(" certificate");
+        startMsg.append("#certs/Request:  ").append(n).append("\n");
+        startMsg.append("unit:            ").append(n).append(" certificate");
         if(n > 1)
         {
             startMsg.append("s");

@@ -35,10 +35,11 @@
 
 package org.xipki.ocsp.client.shell;
 
+import java.util.List;
+
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
+import org.xipki.common.util.SecurityUtil;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
@@ -50,31 +51,31 @@ import org.xipki.ocsp.client.api.RequestOptions;
 public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
 {
     @Option(name = "-issuer",
-            required = true, description = "Required. Issuer certificate file")
+            required = true, description = "required. Issuer certificate file")
     protected String issuerCertFile;
 
     @Option(name = "-nonce",
-            description = "Use nonce")
-    protected Boolean useNonce = Boolean.FALSE;
+            description = "use nonce")
+    protected Boolean usenonce = Boolean.FALSE;
 
     @Option(name = "-nonceLen",
             description = "nonce length in octects")
     protected Integer nonceLen;
 
     @Option(name = "-hash",
-            required = false, description = "Hash algorithm name")
+            required = false, description = "hash algorithm name")
     protected String hashAlgo = "SHA256";
 
-    @Option(name = "-sigalgs",
-            required = false, description = "Comma-separated preferred signature algorithms")
-    protected String prefSigAlgs;
+    @Option(name = "-sigalg",
+            required = false, description = "comma-separated preferred signature algorithms, multi-valued")
+    protected List<String> prefSigAlgs;
 
     @Option(name = "-httpget",
-            required = false, description = "Use HTTP GET for small request")
+            required = false, description = "use HTTP GET for small request")
     protected Boolean useHttpGetForSmallRequest = Boolean.FALSE;
 
     @Option(name = "-sign",
-            required = false, description = "Sign request")
+            required = false, description = "sign request")
     protected Boolean signRequest = Boolean.FALSE;
 
     protected OCSPRequestor requestor;
@@ -82,33 +83,9 @@ public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
     protected RequestOptions getRequestOptions()
     throws Exception
     {
-        ASN1ObjectIdentifier hashAlgoOid;
-
-        hashAlgo = hashAlgo.trim().toUpperCase();
-
-        if("SHA1".equalsIgnoreCase(hashAlgo) || "SHA-1".equalsIgnoreCase(hashAlgo))
-        {
-            hashAlgoOid = X509ObjectIdentifiers.id_SHA1;
-        }
-        else if("SHA256".equalsIgnoreCase(hashAlgo) || "SHA-256".equalsIgnoreCase(hashAlgo))
-        {
-            hashAlgoOid = NISTObjectIdentifiers.id_sha256;
-        }
-        else if("SHA384".equalsIgnoreCase(hashAlgo) || "SHA-384".equalsIgnoreCase(hashAlgo))
-        {
-            hashAlgoOid = NISTObjectIdentifiers.id_sha384;
-        }
-        else if("SHA512".equalsIgnoreCase(hashAlgo) || "SHA-512".equalsIgnoreCase(hashAlgo))
-        {
-            hashAlgoOid = NISTObjectIdentifiers.id_sha512;
-        }
-        else
-        {
-            throw new Exception("Unsupported hash algorithm " + hashAlgo);
-        }
-
+        ASN1ObjectIdentifier hashAlgoOid = SecurityUtil.getHashAlg(hashAlgo);
         RequestOptions options = new RequestOptions();
-        options.setUseNonce(useNonce.booleanValue());
+        options.setUseNonce(usenonce.booleanValue());
         if(nonceLen != null)
         {
             options.setNonceLen(nonceLen);
@@ -117,11 +94,10 @@ public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
         options.setSignRequest(signRequest.booleanValue());
         options.setUseHttpGetForRequest(useHttpGetForSmallRequest.booleanValue());
 
-        if(prefSigAlgs != null)
+        if(isNotEmpty(prefSigAlgs))
         {
-            options.setPreferredSignatureAlgorithms2(split(prefSigAlgs, ",;: \t"));
+            options.setPreferredSignatureAlgorithms2(prefSigAlgs);
         }
-
         return options;
     }
 

@@ -33,26 +33,20 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ocsp.qa.shell.completer;
+package org.xipki.console.karaf.impl.completer;
 
 import org.xipki.console.karaf.EnumCompleter;
-import org.xipki.ocsp.qa.api.OcspCertStatus;
+import org.xipki.console.karaf.YesNoCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public class OCSPErrorCompleter extends EnumCompleter
+public class YesNoCompleterImpl extends EnumCompleter
+implements YesNoCompleter
 {
-    public OCSPErrorCompleter()
+    public YesNoCompleterImpl()
     {
-        StringBuilder enums = new StringBuilder();
-
-        for(OcspCertStatus entry : OcspCertStatus.values())
-        {
-            enums.append(entry.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+        setTokens("yes, no");
     }
 }

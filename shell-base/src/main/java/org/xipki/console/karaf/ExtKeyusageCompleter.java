@@ -33,37 +33,12 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.shell.completer;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.xipki.common.KeyUsage;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+package org.xipki.console.karaf;
 
 /**
  * @author Lijun Liao
  */
 
-public class KeyusageCompleter extends DynamicEnumCompleter
+public interface ExtKeyusageCompleter extends XipkiCompleter
 {
-    private static final Set<String> usages;
-
-    static
-    {
-        Set<String> set = new HashSet<>();
-        for(KeyUsage usage : KeyUsage.values())
-        {
-            set.add(usage.getName());
-        }
-        usages = Collections.unmodifiableSet(set);
-    }
-
-    @Override
-    protected Set<String> getEnums()
-    {
-        return usages;
-    }
-
 }

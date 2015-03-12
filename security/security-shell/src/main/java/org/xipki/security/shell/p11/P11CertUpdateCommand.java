@@ -49,12 +49,12 @@ import org.xipki.security.api.p11.P11WritableSlot;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "update-cert", description="Update certificate in PKCS#11 device")
+@Command(scope = "xipki-tk", name = "update-cert", description="update certificate in PKCS#11 device")
 public class P11CertUpdateCommand extends P11SecurityCommand
 {
 
     @Option(name = "-cert",
-            required = true, description = "Required. Certificate file")
+            required = true, description = "required. Certificate file")
     private String certFile;
 
     @Option(name = "-cacert",
@@ -79,7 +79,7 @@ public class P11CertUpdateCommand extends P11SecurityCommand
 
         slot.updateCertificate(keyIdentifier, newCert, caCerts, securityFactory);
         securityFactory.getP11CryptService(moduleName).refresh();
-        out("Updated certificate");
+        out("updated certificate");
         return null;
     }
 

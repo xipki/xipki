@@ -33,40 +33,56 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.console.karaf;
+package org.xipki.console.karaf.impl.completer;
+
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.bouncycastle.asn1.nist.NISTNamedCurves;
+import org.bouncycastle.asn1.sec.SECNamedCurves;
+import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
+import org.bouncycastle.asn1.x9.X962NamedCurves;
+import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.xipki.console.karaf.ECCurveNameCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public class UnexpectedResultException extends Exception
+public class ECCurveNameCompleterImpl extends DynamicEnumCompleter
+implements ECCurveNameCompleter
 {
 
-    private static final long serialVersionUID = 189176458485831187L;
-
-    public UnexpectedResultException()
+    @Override
+    protected Set<String> getEnums()
     {
-    }
+        Set<String> curveNames = new HashSet<>();
+        Enumeration<?> names = X962NamedCurves.getNames();
+        while(names.hasMoreElements())
+        {
+            curveNames.add((String) names.nextElement());
+        }
 
-    public UnexpectedResultException(String message)
-    {
-        super(message);
-    }
+        names = SECNamedCurves.getNames();
+        while(names.hasMoreElements())
+        {
+            curveNames.add((String) names.nextElement());
+        }
 
-    public UnexpectedResultException(Throwable cause)
-    {
-        super(cause);
-    }
+        names = TeleTrusTNamedCurves.getNames();
+        while(names.hasMoreElements())
+        {
+            curveNames.add((String) names.nextElement());
+        }
 
-    public UnexpectedResultException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+        names = NISTNamedCurves.getNames();
+        while(names.hasMoreElements())
+        {
+            curveNames.add((String) names.nextElement());
+        }
 
-    public UnexpectedResultException(String message, Throwable cause,
-            boolean enableSuppression, boolean writableStackTrace)
-    {
-        super(message, cause, enableSuppression, writableStackTrace);
+        return curveNames;
     }
 
 }

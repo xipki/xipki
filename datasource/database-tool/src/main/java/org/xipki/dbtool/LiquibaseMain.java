@@ -168,21 +168,21 @@ public class LiquibaseMain
     {
         LockService lockService = LockServiceFactory.getInstance().getLockService(database);
         lockService.forceReleaseLock();
-        System.out.println("Successfully released the database");
+        System.out.println("successfully released the database");
     }
 
     public void dropAll()
     throws Exception
     {
         liquibase.dropAll();
-        System.out.println("Successfully dropped the database");
+        System.out.println("successfully dropped the database");
     }
 
     public void update()
     throws Exception
     {
         liquibase.update((String) null);
-        System.out.println("Successfully updated the database");
+        System.out.println("successfully updated the database");
     }
 
     public void shutdown()

@@ -33,50 +33,44 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.console.karaf;
+package org.xipki.console.karaf.impl.completer;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.regex.Pattern;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.xipki.common.ObjectIdentifiers;
+import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.xipki.console.karaf.ExtKeyusageCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-class MyFilenameFilter implements FilenameFilter
+public class ExtKeyusageCompleterImpl extends DynamicEnumCompleter
+implements ExtKeyusageCompleter
 {
-    private static final Pattern ignorePattern;
+    private static final Set<String> usages;
 
     static
     {
-        String ignoreRegex = System.getProperty("org.xipki.console.ignore.regex");
-        if(ignoreRegex == null)
-        {
-            if(Configuration.isWindows() == false)
-            {
-                ignoreRegex = "\\..*";
-            }
-        }
+        Set<String> set = new HashSet<>();
+        set.add(ObjectIdentifiers.id_kp_clientAuth.getId());
+        set.add(ObjectIdentifiers.id_kp_codeSigning.getId());
+        set.add(ObjectIdentifiers.id_kp_emailProtection.getId());
+        set.add(ObjectIdentifiers.id_kp_ipsecEndSystem.getId());
+        set.add(ObjectIdentifiers.id_kp_ipsecTunnel.getId());
+        set.add(ObjectIdentifiers.id_kp_OCSPSigning.getId());
+        set.add(ObjectIdentifiers.id_kp_serverAuth.getId());
+        set.add(ObjectIdentifiers.id_kp_timeStamping.getId());
 
-        if(ignoreRegex == null || ignoreRegex.isEmpty())
-        {
-            ignorePattern = null;
-        }
-        else
-        {
-            ignorePattern = Pattern.compile(ignoreRegex);
-        }
+        usages = Collections.unmodifiableSet(set);
     }
 
     @Override
-    public boolean accept(File dir, String name)
+    protected Set<String> getEnums()
     {
-        if(ignorePattern == null)
-        {
-            return true;
-        }
-
-        return ignorePattern.matcher(name).matches() == false;
+        return usages;
     }
 
 }

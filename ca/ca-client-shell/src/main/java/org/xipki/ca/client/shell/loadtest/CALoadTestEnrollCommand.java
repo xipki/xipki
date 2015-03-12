@@ -47,29 +47,29 @@ import org.xipki.common.AbstractLoadTest;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-client", name = "loadtest-enroll", description="CA Client Enroll Load test")
+@Command(scope = "xipki-cli", name = "loadtest-enroll", description="CA Client Enroll Load test")
 public class CALoadTestEnrollCommand extends CALoadTestCommand
 {
 
     @Option(name = "-profile",
             required = true,
-            description = "Required. Certificate profile")
+            description = "required. Certificate profile")
     private String certprofile;
 
     @Option(name = "-subject",
             required = true,
-            description = "Required. Subject template")
+            description = "required. Subject template")
     private String subjectTemplate;
 
     @Option(name = "-randomDN",
             required = false,
-            description = "DN name to be incremented, valid values are\n"
-                    + "GIVENNAME, SURNAME, STREET, POSTALCODE, O, OU and CN")
-    private String randomDNStr = "O";
+            description = "dN name to be incremented, valid values are\n"
+                    + "gIVENNAME, SURNAME, STREET, POSTALCODE, O, OU and CN")
+    private String randomDNStr = "o";
 
     @Option(name = "-duration",
             required = false,
-            description = "Required. Duration in seconds")
+            description = "required. Duration in seconds")
     private Integer durationInSecond = 30;
 
     @Option(name = "-thread",
@@ -79,16 +79,16 @@ public class CALoadTestEnrollCommand extends CALoadTestCommand
 
     @Option(name="-keyType",
             required = false,
-            description = "Key type to be requested. Valid values are RSA, EC and DSA")
+            description = "key type to be requested. Valid values are RSA, EC and DSA")
     private String keyType = "RSA";
 
     @Option(name="-keysize",
             required = false,
-            description = "Modulus length of RSA key or p length of DSA key")
+            description = "modulus length of RSA key or p length of DSA key")
     private Integer keysize = 2048;
 
     @Option(name = "-curve",
-            description = "EC curve name or OID of EC key",
+            description = "eC curve name or OID of EC key",
             required = false)
     private String curveName = "brainpoolp256r1";
 
@@ -103,25 +103,25 @@ public class CALoadTestEnrollCommand extends CALoadTestCommand
     {
         if(numThreads < 1)
         {
-            err("Invalid number of threads " + numThreads);
+            err("invalid number of threads " + numThreads);
             return null;
         }
 
         if(durationInSecond < 1)
         {
-            err("Invalid duration " + durationInSecond);
+            err("invalid duration " + durationInSecond);
             return null;
         }
 
         StringBuilder startMsg = new StringBuilder();
 
-        startMsg.append("Threads:         ").append(numThreads).append("\n");
-        startMsg.append("Duration:        ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
-        startMsg.append("SubjectTemplate: ").append(subjectTemplate).append("\n");
-        startMsg.append("Profile:         ").append(certprofile).append("\n");
-        startMsg.append("KeyType:         ").append(keyType).append("\n");
-        startMsg.append("#Certs/Request:  ").append(n).append("\n");
-        startMsg.append("Unit:            ").append(n).append(" certificate");
+        startMsg.append("threads:         ").append(numThreads).append("\n");
+        startMsg.append("duration:        ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
+        startMsg.append("subjectTemplate: ").append(subjectTemplate).append("\n");
+        startMsg.append("profile:         ").append(certprofile).append("\n");
+        startMsg.append("keyType:         ").append(keyType).append("\n");
+        startMsg.append("#certs/Request:  ").append(n).append("\n");
+        startMsg.append("unit:            ").append(n).append(" certificate");
         if(n > 1)
         {
             startMsg.append("s");
@@ -135,13 +135,13 @@ public class CALoadTestEnrollCommand extends CALoadTestCommand
             randomDN = RandomDN.getInstance(randomDNStr);
             if(randomDN == null)
             {
-                err("Invalid randomDN " + randomDNStr);
+                err("invalid randomDN " + randomDNStr);
                 return null;
             }
         }
 
         KeyEntry keyEntry;
-        if("EC".equalsIgnoreCase(keyType))
+        if("eC".equalsIgnoreCase(keyType))
         {
             keyEntry = new ECKeyEntry(curveName);
         }
@@ -155,7 +155,7 @@ public class CALoadTestEnrollCommand extends CALoadTestCommand
         }
         else
         {
-            err("Invalid keyType " + keyType);
+            err("invalid keyType " + keyType);
             return null;
         }
 

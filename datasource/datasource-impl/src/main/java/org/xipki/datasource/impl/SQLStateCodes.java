@@ -208,7 +208,7 @@ public class SQLStateCodes
             return Collections.emptySet();
         }
 
-        Set<String> set = new HashSet<>(strs.length);
+        Set<String> set = new HashSet<>();
         for(String str : strs)
         {
             set.add(str);

@@ -42,7 +42,7 @@ import java.util.Set;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.RAWorkerException;
-import org.xipki.console.karaf.UnexpectedResultException;
+import org.xipki.common.qa.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
@@ -52,11 +52,11 @@ public abstract class CRLCommand extends ClientCommand
 {
 
     @Option(name = "-ca",
-            required = false, description = "Required if multiple CAs are configured. CA name")
+            required = false, description = "required if multiple CAs are configured. CA name")
     protected String caName;
 
     @Option(name = "-out",
-            description = "Required. Where to save the CRL",
+            description = "required. Where to save the CRL",
             required = true)
     protected String outFile;
 
@@ -70,7 +70,7 @@ public abstract class CRLCommand extends ClientCommand
         Set<String> caNames = raWorker.getCaNames();
         if(isEmpty(caNames))
         {
-            err("No CA is configured");
+            err("no CA is configured");
             return  null;
         }
 
@@ -88,7 +88,7 @@ public abstract class CRLCommand extends ClientCommand
             }
             else
             {
-                err("No caname is specified, one of " + caNames + " is required");
+                err("no caname is specified, one of " + caNames + " is required");
                 return null;
             }
         }
@@ -99,15 +99,15 @@ public abstract class CRLCommand extends ClientCommand
             crl = retrieveCRL(caName);
         }catch(PKIErrorException e)
         {
-            throw new UnexpectedResultException("Received no CRL from server: " + e.getMessage());
+            throw new UnexpectedResultException("received no CRL from server: " + e.getMessage());
         }
 
         if(crl == null)
         {
-            throw new UnexpectedResultException("Received no CRL from server");
+            throw new UnexpectedResultException("received no CRL from server");
         }
 
-        saveVerbose("Saved CRL to file", new File(outFile), crl.getEncoded());
+        saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
         return null;
     }
 

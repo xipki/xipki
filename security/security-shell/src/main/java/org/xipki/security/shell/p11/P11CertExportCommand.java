@@ -47,12 +47,12 @@ import org.xipki.security.api.p11.P11WritableSlot;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "export-cert", description="Export certificate from PKCS#11 device")
+@Command(scope = "xipki-tk", name = "export-cert", description="export certificate from PKCS#11 device")
 public class P11CertExportCommand extends P11SecurityCommand
 {
 
     @Option(name = "-out",
-            required = true, description = "Required. Where to save the certificate")
+            required = true, description = "required. Where to save the certificate")
     private String outFile;
 
     @Override
@@ -64,9 +64,9 @@ public class P11CertExportCommand extends P11SecurityCommand
         X509Certificate cert = slot.exportCert(keyIdentifier);
         if(cert == null)
         {
-            err("Could not export certificate " + keyIdentifier);
+            err("could not export certificate " + keyIdentifier);
         }
-        saveVerbose("Saved certificate to file", new File(outFile), cert.getEncoded());
+        saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
         return null;
     }
 

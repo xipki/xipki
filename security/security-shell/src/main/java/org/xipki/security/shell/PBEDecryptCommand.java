@@ -43,28 +43,29 @@ import org.xipki.security.PBEPasswordResolver;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "pbe-dec", description="Decrypt password with master password")
+@Command(scope = "xipki-tk", name = "pbe-dec", description="decrypt password with master password")
 public class PBEDecryptCommand extends SecurityCommand
 {
     @Option(name = "-pwd", aliases = { "--password" },
-            required = true, description = "Required. Encrypted password, starts with PBE:")
+            required = true, description = "required. Encrypted password, starts with PBE:")
     private String passwordHint;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        if(passwordHint.startsWith("PBE:") == false)
+        if(passwordHint.length() < 5 ||
+                passwordHint.substring(0, 4).equalsIgnoreCase("PBE:") == false)
         {
             err("encrypted password '" + passwordHint + "' does not start with PBE:");
             return null;
         }
 
-        char[] masterPassword = readPassword("Please enter the master password");
+        char[] masterPassword = readPassword("please enter the master password");
         try
         {
             char[] password = PBEPasswordResolver.resolvePassword(masterPassword, passwordHint);
-            out("The decrypted password is: '" + new String(password) + "'");
+            out("the decrypted password is: '" + new String(password) + "'");
         }catch(Exception e)
         {
             err(e.getMessage());

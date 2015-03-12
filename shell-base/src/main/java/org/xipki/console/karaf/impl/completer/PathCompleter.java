@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.console.karaf;
+package org.xipki.console.karaf.impl.completer;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -44,7 +44,7 @@ import java.util.List;
  * @author Lijun Liao
  */
 
-public abstract class PathCompleter
+abstract class PathCompleter
 {
     protected abstract boolean isDirOnly();
 

@@ -35,7 +35,6 @@
 
 package org.xipki.ca.client.shell;
 
-import java.math.BigInteger;
 import java.rmi.UnexpectedException;
 import java.security.cert.X509Certificate;
 
@@ -50,7 +49,7 @@ import org.xipki.common.util.SecurityUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-client", name = "remove-cert", description="Remove certificate")
+@Command(scope = "xipki-cli", name = "remove-cert", description="remove certificate")
 public class RemoveCertCommand extends UnRevRemoveCertCommand
 {
 
@@ -58,7 +57,7 @@ public class RemoveCertCommand extends UnRevRemoveCertCommand
     protected Object _doExecute()
     throws Exception
     {
-        if(certFile == null && (caCertFile == null || serialNumber == null))
+        if(certFile == null && (caCertFile == null || getSerialNumber() == null))
         {
             err("either cert or (cacert, serial) must be specified");
             return null;
@@ -98,7 +97,7 @@ public class RemoveCertCommand extends UnRevRemoveCertCommand
             RequestResponseDebug debug = getRequestResponseDebug();
             try
             {
-                certIdOrError = raWorker.removeCert(issuer, new BigInteger(serialNumber), debug);
+                certIdOrError = raWorker.removeCert(issuer, getSerialNumber(), debug);
             }finally
             {
                 saveRequestResponse(debug);
@@ -108,11 +107,11 @@ public class RemoveCertCommand extends UnRevRemoveCertCommand
         if(certIdOrError.getError() != null)
         {
             PKIStatusInfo error = certIdOrError.getError();
-            throw new UnexpectedException("Removing certificate failed: " + error);
+            throw new UnexpectedException("removing certificate failed: " + error);
         }
         else
         {
-            out("Removed certificate");
+            out("removed certificate");
         }
         return null;
     }

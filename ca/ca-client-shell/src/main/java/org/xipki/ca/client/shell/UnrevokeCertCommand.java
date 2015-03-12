@@ -35,7 +35,6 @@
 
 package org.xipki.ca.client.shell;
 
-import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.commands.Command;
@@ -43,21 +42,21 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.client.api.CertIDOrError;
 import org.xipki.ca.common.cmp.PKIStatusInfo;
 import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.util.SecurityUtil;
-import org.xipki.console.karaf.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-client", name = "unrevoke", description="Unrevoke certificate")
+@Command(scope = "xipki-cli", name = "unrevoke", description="unrevoke certificate")
 public class UnrevokeCertCommand extends UnRevRemoveCertCommand
 {
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        if(certFile == null && (caCertFile == null || serialNumber == null))
+        if(certFile == null && (caCertFile == null || getSerialNumber() == null))
         {
             err("either cert or (cacert, serial) must be specified");
             return null;
@@ -97,7 +96,7 @@ public class UnrevokeCertCommand extends UnRevRemoveCertCommand
             RequestResponseDebug debug = getRequestResponseDebug();
             try
             {
-                certIdOrError = raWorker.unrevokeCert(issuer, new BigInteger(serialNumber), debug);
+                certIdOrError = raWorker.unrevokeCert(issuer, getSerialNumber(), debug);
             }finally
             {
                 saveRequestResponse(debug);
@@ -107,11 +106,11 @@ public class UnrevokeCertCommand extends UnRevRemoveCertCommand
         if(certIdOrError.getError() != null)
         {
             PKIStatusInfo error = certIdOrError.getError();
-            throw new UnexpectedResultException("Releasing revocation failed: " + error);
+            throw new UnexpectedResultException("releasing revocation failed: " + error);
         }
         else
         {
-            out("Unrevoked certificate");
+            out("unrevoked certificate");
         }
         return null;
     }

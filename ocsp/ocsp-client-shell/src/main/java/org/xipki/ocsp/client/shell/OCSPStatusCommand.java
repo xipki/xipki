@@ -74,7 +74,7 @@ import org.xipki.security.SignerUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ocsp", name = "status", description="Request certificate status")
+@Command(scope = "xipki-ocsp", name = "status", description="request certificate status")
 public class OCSPStatusCommand extends BaseOCSPStatusCommand
 {
     @Override
@@ -98,12 +98,12 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
         int n = singleResponses == null ? 0 : singleResponses.length;
         if(n == 0)
         {
-            throw new Exception("Received no status from server");
+            throw new Exception("received no status from server");
         }
 
         if(n != serialNumbers.size())
         {
-            throw new Exception("Received status with " + n +
+            throw new Exception("received status with " + n +
                     " single responses from server, but " + serialNumbers.size() + " were requested");
         }
 
@@ -116,14 +116,14 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
         // check the signature if available
         if(null == basicResp.getSignature())
         {
-            out("Response is not signed");
+            out("response is not signed");
         }
         else
         {
             X509CertificateHolder[] responderCerts = basicResp.getCerts();
             if(responderCerts == null || responderCerts.length < 1)
             {
-                err("No responder certificate is contained in the response");
+                err("no responder certificate is contained in the response");
             }
             else
             {
@@ -134,7 +134,7 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
                     validOn = respSigner.isValidOn(thisUpdate);
                     if(validOn == false)
                     {
-                        err("Responder certificate is not valid on " + thisUpdate);
+                        err("responder certificate is not valid on " + thisUpdate);
                         break;
                     }
                 }
@@ -147,7 +147,7 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
 
                     if(sigValid == false)
                     {
-                        err("Response is equipped with invalid signature");
+                        err("response is equipped with invalid signature");
                     }
                     else
                     {
@@ -169,19 +169,19 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
 
                             if(certValid == false)
                             {
-                                err("Response is equipped with valid signature but the OCSP signer is not trusted");
+                                err("response is equipped with valid signature but the OCSP signer is not trusted");
                             }
                         }
                         else
                         {
-                            out("Response is equipped with valid signature");
+                            out("response is equipped with valid signature");
                         }
                     }
                 }
 
                 if(verbose.booleanValue())
                 {
-                    out("Responder is " + SecurityUtil.getRFC4519Name(responderCerts[0].getSubject()));
+                    out("responder is " + SecurityUtil.getRFC4519Name(responderCerts[0].getSubject()));
                 }
             }
         }
@@ -200,7 +200,7 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
             String status ;
             if(singleCertStatus == null)
             {
-                status = "Good";
+                status = "good";
             }
             else if(singleCertStatus instanceof RevokedStatus)
             {
@@ -220,11 +220,11 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
                             reason == CRLReason.CERTIFICATE_HOLD.getCode() &&
                             revTime.getTime() == 0)
                     {
-                        status = "Unknown (RFC6960)";
+                        status = "unknown (RFC6960)";
                     }
                     else
                     {
-                        StringBuilder sb = new StringBuilder("Revoked, reason = ");
+                        StringBuilder sb = new StringBuilder("revoked, reason = ");
                         sb.append(CRLReason.forReasonCode(reason).getDescription());
                         sb.append(", revocationTime = ");
                         sb.append(revTime);
@@ -238,12 +238,12 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
                 }
                 else
                 {
-                    status = "Revoked, no reason, revocationTime = " + revTime;
+                    status = "revoked, no reason, revocationTime = " + revTime;
                 }
             }
             else if(singleCertStatus instanceof UnknownStatus)
             {
-                status = "Unknown (RFC2560)";
+                status = "unknown (RFC2560)";
             }
             else
             {
@@ -251,7 +251,7 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
             }
 
             StringBuilder msg = new StringBuilder();
-            msg.append("SerialNumber: ").append(serialNumber);
+            msg.append("serialNumber: ").append(serialNumber);
             msg.append("\nCertificate status: ").append(status);
 
             if(verbose.booleanValue())
@@ -308,7 +308,7 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
                     String sigAlgName = SignerUtil.getSignatureAlgoName(sigAlg);
                     if(sigAlgName == null)
                     {
-                        sigAlgName = "UNKNOWN";
+                        sigAlgName = "unknown";
                     }
                     msg.append("\nresponse is signed with ").append(sigAlgName);
                 }

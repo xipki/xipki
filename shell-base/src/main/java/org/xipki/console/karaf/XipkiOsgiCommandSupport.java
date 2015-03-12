@@ -40,17 +40,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import jline.console.ConsoleReader;
 
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.SecurePasswordInputPanel;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -160,7 +160,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
 
         if(promptPrefix == null || promptPrefix.isEmpty())
         {
-            promptPrefix = "Saved to file";
+            promptPrefix = "saved to file";
         }
 
         out(promptPrefix + " " + saveTo.getPath());
@@ -266,7 +266,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         }
     }
 
-    public static String expandFilepath(String path)
+    protected static String expandFilepath(String path)
     {
         if (path.startsWith("~" + File.separator))
         {
@@ -278,7 +278,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         }
     }
 
-    public static File expandFilepath(File file)
+    protected static File expandFilepath(File file)
     {
         String path = file.getPath();
         String expandedPath = expandFilepath(path);
@@ -300,46 +300,45 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         System.out.println(message);
     }
 
-    public static boolean isBlank(String s)
+    protected static boolean isBlank(String s)
     {
-        return s == null || s.isEmpty();
+        return StringUtil.isBlank(s);
     }
 
-    public static boolean isNotBlank(String s)
+    protected static boolean isNotBlank(String s)
     {
-        return s != null && s.isEmpty() == false;
+        return StringUtil.isNotBlank(s);
     }
 
-    public static boolean isEmpty(Collection<?> c)
+    protected static boolean isEmpty(Collection<?> c)
     {
-        return c == null || c.isEmpty();
+        return CollectionUtil.isEmpty(c);
     }
 
-    public static boolean isNotEmpty(Collection<?> c)
+    protected static boolean isNotEmpty(Collection<?> c)
     {
-        return c != null && c.isEmpty() == false;
+        return CollectionUtil.isNotEmpty(c);
     }
 
-    public static List<String> split(String str, String delim)
+    protected static List<String> split(String str, String delim)
     {
-        if(str == null)
+        return StringUtil.split(str, delim);
+    }
+
+    protected static BigInteger toBigInt(String s)
+    {
+        s = s.trim();
+        if(s.startsWith("0x") || s.startsWith("0X"))
         {
-            return null;
+            if(s.length() > 2)
+            {
+                return new BigInteger(s.substring(2), 16);
+            }
+            else
+            {
+                throw new NumberFormatException("invalid integer '" + s + "'");
+            }
         }
-
-        if(str.isEmpty())
-        {
-            return Collections.emptyList();
-        }
-
-        StringTokenizer st = new StringTokenizer(str, delim);
-        List<String> ret = new ArrayList<>(st.countTokens());
-
-        while(st.hasMoreTokens())
-        {
-            ret.add(st.nextToken());
-        }
-
-        return ret;
+        return new BigInteger(s);
     }
 }

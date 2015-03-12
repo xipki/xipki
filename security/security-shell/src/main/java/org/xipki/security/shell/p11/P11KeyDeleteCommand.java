@@ -43,7 +43,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "delete-key", description="Generate EC keypair in PKCS#11 device")
+@Command(scope = "xipki-tk", name = "delete-key", description="generate EC keypair in PKCS#11 device")
 public class P11KeyDeleteCommand extends P11SecurityCommand
 {
     @Override
@@ -56,10 +56,10 @@ public class P11KeyDeleteCommand extends P11SecurityCommand
         if(deleted)
         {
             securityFactory.getP11CryptService(moduleName).refresh();
-            out("Deleted key and certificates");
+            out("deleted key and certificates");
         } else
         {
-            out("Could not delete key and certificate that do not exist");
+            out("could not delete key and certificate that do not exist");
         }
         return null;
     }

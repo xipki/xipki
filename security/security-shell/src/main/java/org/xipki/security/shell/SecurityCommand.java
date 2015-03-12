@@ -73,7 +73,7 @@ public abstract class SecurityCommand extends XipkiOsgiCommandSupport
         P11CryptService p11CryptService = securityFactory.getP11CryptService(moduleName);
         if(p11CryptService == null)
         {
-            throw new SignerException("Could not initialize P11CryptService " + moduleName);
+            throw new SignerException("could not initialize P11CryptService " + moduleName);
         }
 
         P11Module module;
@@ -106,7 +106,7 @@ public abstract class SecurityCommand extends XipkiOsgiCommandSupport
         P11WritableSlot slot = module.getSlot(slotId);
         if(slot == null)
         {
-            throw new SignerException("Could not get slot " + slotIndex + " of module " + moduleName);
+            throw new SignerException("could not get slot " + slotIndex + " of module " + moduleName);
         }
         return slot;
     }

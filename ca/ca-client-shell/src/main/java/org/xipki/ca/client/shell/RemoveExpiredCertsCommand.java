@@ -46,24 +46,24 @@ import org.xipki.common.RequestResponseDebug;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-client", name = "remove-expired-certs", description="Remove expired certificates")
+@Command(scope = "xipki-cli", name = "remove-expired-certs", description="remove expired certificates")
 public class RemoveExpiredCertsCommand extends ClientCommand
 {
     @Option(name = "-ca",
-            required = false, description = "Required if multiple CAs are configured. CA name")
+            required = false, description = "required if multiple CAs are configured. CA name")
     private String caName;
 
     @Option(name = "-profile",
-            required = true, description = "Required. Certificate profile.")
+            required = true, description = "required. Certificate profile.")
     private String profile;
 
     @Option(name = "-user",
-            required = false, description = "Username, wildcards '%' and '*' are allowed.\n"
+            required = false, description = "username, wildcards '%' and '*' are allowed.\n"
                     + "'all' for all users")
     private String userLike;
 
     @Option(name = "-overlap",
-            required = false, description = "Overlap in seconds")
+            required = false, description = "overlap in seconds")
     private Long overlapSeconds = 24L * 60 * 60;
 
     @Override
@@ -73,7 +73,7 @@ public class RemoveExpiredCertsCommand extends ClientCommand
         Set<String> caNames = raWorker.getCaNames();
         if(isEmpty(caNames))
         {
-            err("No CA is configured");
+            err("no CA is configured");
             return  null;
         }
 
@@ -91,7 +91,7 @@ public class RemoveExpiredCertsCommand extends ClientCommand
             }
             else
             {
-                err("No caname is specified, one of " + caNames + " is required");
+                err("no caname is specified, one of " + caNames + " is required");
                 return null;
             }
         }
@@ -111,11 +111,11 @@ public class RemoveExpiredCertsCommand extends ClientCommand
         String prefix;
         if(n == 0)
         {
-            prefix = "No certificate";
+            prefix = "no certificate";
         }
         else if(n == 1)
         {
-            prefix = "One certificate";
+            prefix = "one certificate";
         }
         else
         {

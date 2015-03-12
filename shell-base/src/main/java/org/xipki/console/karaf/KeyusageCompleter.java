@@ -39,11 +39,6 @@ package org.xipki.console.karaf;
  * @author Lijun Liao
  */
 
-public class YesNoCompleterImpl extends EnumCompleter
-implements YesNoCompleter
+public interface KeyusageCompleter extends XipkiCompleter
 {
-    public YesNoCompleterImpl()
-    {
-        setTokens("yes, no");
-    }
 }

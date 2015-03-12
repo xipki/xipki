@@ -78,6 +78,7 @@ import org.bouncycastle.asn1.DERUniversalString;
 import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.bouncycastle.asn1.cmp.PKIStatus;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
@@ -101,8 +102,10 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
+import org.xipki.common.InvalidOIDorNameException;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.ObjectIdentifiers;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
@@ -854,6 +857,7 @@ public class SecurityUtil
     }
 
     public static List<ASN1ObjectIdentifier> textToASN1ObjectIdentifers(List<String> oidTexts)
+    throws InvalidOIDorNameException
     {
         if(oidTexts == null)
         {
@@ -863,13 +867,50 @@ public class SecurityUtil
         List<ASN1ObjectIdentifier> ret = new ArrayList<>(oidTexts.size());
         for(String oidText : oidTexts)
         {
-            ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(oidText);
+            if(oidText.isEmpty())
+            {
+                continue;
+            }
+
+            ASN1ObjectIdentifier oid = toOID(oidText);
             if(ret.contains(oid) == false)
             {
                 ret.add(oid);
             }
         }
         return ret;
+    }
+
+    private static ASN1ObjectIdentifier toOID(String s)
+    throws InvalidOIDorNameException
+    {
+        final int n = s.length();
+        boolean isName = false;
+        for(int i = 0; i < n; i++)
+        {
+            char c = s.charAt(i);
+            if(((c >= '0' && c <= '1') || c == '.') == false)
+            {
+                isName = true;
+            }
+        }
+
+        if(isName == false)
+        {
+            try
+            {
+                return new ASN1ObjectIdentifier(s);
+            }catch(IllegalArgumentException e)
+            {
+            }
+        }
+
+        ASN1ObjectIdentifier oid = ObjectIdentifiers.nameToOID(s);
+        if(oid == null)
+        {
+            throw new InvalidOIDorNameException(s);
+        }
+        return oid;
     }
 
     public static org.bouncycastle.asn1.x509.KeyUsage createKeyUsage(Set<KeyUsage> usages)
@@ -944,7 +985,7 @@ public class SecurityUtil
         {
             CmpUtf8Pairs pairs = new CmpUtf8Pairs(conf);
             String value = pairs.getValue("password");
-            if(value != null && value.startsWith("PBE:") == false && value.startsWith("pbe:") == false)
+            if(value != null && StringUtil.startsWithIgnoreCase(value, "PBE:") == false)
             {
                 pairs.putUtf8Pair("password", "<sensitve>");
             }
@@ -969,6 +1010,38 @@ public class SecurityUtil
         } catch (IllegalArgumentException e)
         {
             throw new CertificateEncodingException("Invalid extension " + type.getId() + ": " + e.getMessage());
+        }
+    }
+
+    public static ASN1ObjectIdentifier getHashAlg(String hashAlgName)
+    {
+        hashAlgName = hashAlgName.trim();
+        ParamChecker.assertNotEmpty("hashAlgName", hashAlgName);
+        hashAlgName = hashAlgName.replace("-", "").toUpperCase();
+
+        if("SHA1".equalsIgnoreCase(hashAlgName))
+        {
+            return X509ObjectIdentifiers.id_SHA1;
+        }
+        else if("SHA224".equalsIgnoreCase(hashAlgName))
+        {
+            return NISTObjectIdentifiers.id_sha224;
+        }
+        else if("SHA256".equalsIgnoreCase(hashAlgName))
+        {
+            return NISTObjectIdentifiers.id_sha256;
+        }
+        else if("SHA384".equalsIgnoreCase(hashAlgName))
+        {
+            return NISTObjectIdentifiers.id_sha384;
+        }
+        else if("SHA512".equalsIgnoreCase(hashAlgName))
+        {
+            return NISTObjectIdentifiers.id_sha512;
+        }
+        else
+        {
+            throw new RuntimeException("Unsupported hash algorithm " + hashAlgName);
         }
     }
 
