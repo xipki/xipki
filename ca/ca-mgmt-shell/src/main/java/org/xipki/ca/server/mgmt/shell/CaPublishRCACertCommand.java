@@ -58,8 +58,8 @@ public class CaPublishRCACertCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        caManager.publishRootCA(caName, certprofile);
-        out("published CA certificate of root CA " + caName);
+        boolean b = caManager.publishRootCA(caName, certprofile);
+        output(b, "published", "could not publish", "CA certificate of root CA " + caName);
         return null;
     }
 }

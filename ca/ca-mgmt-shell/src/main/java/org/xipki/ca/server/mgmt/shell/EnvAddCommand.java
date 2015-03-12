@@ -60,8 +60,8 @@ public class EnvAddCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        caManager.addEnvParam(name, value);
-        out("added environment parameter " + name);
+        boolean b = caManager.addEnvParam(name, value);
+        output(b, "added", "could not add", "environment parameter " + name);
         return null;
     }
 }

@@ -93,8 +93,8 @@ public class ResponderUpdateCommand extends CaCommand
             signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, securityFactory.getPasswordResolver());
         }
 
-        caManager.changeCmpResponder(signerType, signerConf, cert);
-        out("updated CMP responder");
+        boolean b = caManager.changeCmpResponder(signerType, signerConf, cert);
+        output(b, "updated", "could not update", "CMP responder");
         return null;
     }
 

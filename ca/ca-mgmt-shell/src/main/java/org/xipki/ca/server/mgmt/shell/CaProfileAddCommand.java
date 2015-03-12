@@ -63,8 +63,8 @@ public class CaProfileAddCommand extends CaCommand
     {
         for(String name : profileNames)
         {
-            caManager.addCertprofileToCA(name, caName);
-            out("associated certificate profile " + name + " to CA " + caName);
+            boolean b = caManager.addCertprofileToCA(name, caName);
+            output(b, "associated", "could not assiciate", "certificate profile " + name + " to CA " + caName);
         }
         return null;
     }

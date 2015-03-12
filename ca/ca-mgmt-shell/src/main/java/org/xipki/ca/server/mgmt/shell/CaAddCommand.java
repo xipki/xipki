@@ -165,9 +165,8 @@ public class CaAddCommand extends CaAddOrGenCommand
 
         entry.setPermissions(_permissions);
 
-        caManager.addCA(entry);
-
-        out("added CA " + caName);
+        boolean b = caManager.addCA(entry);
+        output(b, "added", "could not add", "CA " + caName);
 
         return null;
     }

@@ -81,15 +81,8 @@ public class RepublishCommand extends CaCommand
             caName = null;
         }
 
-        boolean successfull = caManager.republishCertificates(caName, publisherNames);
-        if(successfull)
-        {
-            out("replubished certificates");
-        }
-        else
-        {
-            err("replubishing certificates failed");
-        }
+        boolean b = caManager.republishCertificates(caName, publisherNames);
+        output(b, "replubished", "could not republish", "certificates");
         return null;
     }
 }

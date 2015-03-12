@@ -58,8 +58,8 @@ public class CaRequestorRemoveCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        caManager.removeCmpRequestorFromCA(requestorName, caName);
-        out("removed requestor " + requestorName + " from CA " + caName);
+        boolean b = caManager.removeCmpRequestorFromCA(requestorName, caName);
+        output(b, "removed", "could not remove", "requestor " + requestorName + " from CA " + caName);
         return null;
     }
 }

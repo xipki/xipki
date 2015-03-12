@@ -35,59 +35,30 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.karaf.shell.commands.Command;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "ca-restart", description="restart CA system")
-public class CaRestartCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "unlock", description="unlock the CA syste")
+public class CaSystemUnlockCommand extends CaCommand
 {
-
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        boolean successfull = caManager.restartCaSystem();
-        if(successfull == false)
+        boolean unlocked = caManager.unlockCA();
+
+        if(unlocked)
         {
-            err("could not restart CA system");
-            return null;
-        }
-
-        StringBuilder sb = new StringBuilder("restarted CA system");
-        Set<String> names = new HashSet<>(caManager.getCaNames());
-
-        if(names.size() > 0)
-        {
-            sb.append(" with following CAs: ");
-            Set<String> caAliasNames = caManager.getCaAliasNames();
-            for(String aliasName : caAliasNames)
-            {
-                String name = caManager.getCaName(aliasName);
-                names.remove(name);
-
-                sb.append(name).append(" (alias ").append(aliasName).append(")").append(", ");
-            }
-
-            for(String name : names)
-            {
-                sb.append(name).append(", ");
-            }
-
-            int len = sb.length();
-            sb.delete(len-2, len);
+            out("unlocked CA system, calling xipki-ca:restart to restart CA system");
         }
         else
         {
-            sb.append(": no CA is configured");
+            err("could not unlock CA system");
         }
 
-        out(sb.toString());
         return null;
     }
 }

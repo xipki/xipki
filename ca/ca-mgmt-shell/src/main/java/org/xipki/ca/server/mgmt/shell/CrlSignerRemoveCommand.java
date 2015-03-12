@@ -52,8 +52,8 @@ public class CrlSignerRemoveCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        caManager.removeCrlSigner(name);
-        out("removed CRL signer " + name);
+        boolean b = caManager.removeCrlSigner(name);
+        output(b, "removed", "could not remove", "CRL signer " + name);
         return null;
     }
 }

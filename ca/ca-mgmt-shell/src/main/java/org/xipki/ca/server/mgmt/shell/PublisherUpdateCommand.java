@@ -79,8 +79,8 @@ public class PublisherUpdateCommand extends CaCommand
             conf = new String(IoUtil.read(confFile));
         }
 
-        caManager.changePublisher(name, type, conf);
-        out("updated certificate profile " + name);
+        boolean b = caManager.changePublisher(name, type, conf);
+        output(b, "updated", "could not update", "certificate profile " + name);
         return null;
     }
 }

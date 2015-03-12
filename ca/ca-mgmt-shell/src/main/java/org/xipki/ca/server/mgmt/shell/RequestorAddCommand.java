@@ -63,8 +63,8 @@ public class RequestorAddCommand extends CaCommand
     {
         CmpRequestorEntry entry = new CmpRequestorEntry(name);
         entry.setCert(SecurityUtil.parseCert(certFile));
-        caManager.addCmpRequestor(entry);
-        out("added CMP requestor " + name);
+        boolean b = caManager.addCmpRequestor(entry);
+        output(b, "added", "could not add", "CMP requestor " + name);
         return null;
     }
 }

@@ -518,8 +518,7 @@ implements CAManager, CmpResponderManager
         }
 
         SystemEvent newLockInfo = new SystemEvent(EVENT_LOCK, lockInstanceId, System.currentTimeMillis() / 1000L);
-        queryExecutor.changeSystemEvent(newLockInfo);
-        return true;
+        return queryExecutor.changeSystemEvent(newLockInfo);
     }
 
     @Override
@@ -608,13 +607,15 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public void notifyCAChange()
+    public boolean notifyCAChange()
+    throws CAMgmtException
     {
         try
         {
             SystemEvent systemEvent = new SystemEvent(EVENT_CACHAGNE, lockInstanceId, System.currentTimeMillis() / 1000L);
             queryExecutor.changeSystemEvent(systemEvent);
             LOG.info("notified the change of CA system");
+            return true;
         }catch(CAMgmtException e)
         {
             final String message = "Error while notifying Slave CAs to restart";
@@ -623,6 +624,7 @@ implements CAManager, CmpResponderManager
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
             }
             LOG.debug(message, e);
+            return false;
         }
     }
 
@@ -1126,7 +1128,7 @@ implements CAManager, CmpResponderManager
         cAsInitialized = true;
     }
 
-    private void createCA(String name)
+    private boolean createCA(String name)
     throws CAMgmtException
     {
         caInfos.remove(name);
@@ -1152,6 +1154,8 @@ implements CAManager, CmpResponderManager
 
         Set<String> publisherNames = queryExecutor.createCAhasPublishers(name);
         ca_has_publishers.put(name, publisherNames);
+
+        return true;
     }
 
     private void markLastSeqValues()
@@ -1173,7 +1177,7 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public void addCA(X509CAEntry newCaDbEntry)
+    public boolean addCA(X509CAEntry newCaDbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1187,6 +1191,7 @@ implements CAManager, CmpResponderManager
         queryExecutor.addCA(newCaDbEntry);
         createCA(name);
         startCA(name);
+        return true;
     }
 
     @Override
@@ -1198,7 +1203,7 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public void changeCA(String name, CAStatus status, X509Certificate cert,
+    public boolean changeCA(String name, CAStatus status, X509Certificate cert,
             Set<String> crl_uris, Set<String> delta_crl_uris, Set<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
             String crlsigner_name, String cmpcontrol_name, DuplicationMode duplicate_key,
@@ -1219,28 +1224,32 @@ implements CAManager, CmpResponderManager
         if(changed == false)
         {
             LOG.info("No change of CA '{}' is processed", name);
-            return;
+        }
+        else
+        {
+            createCA(name);
+            startCA(name);
         }
 
-        createCA(name);
-        startCA(name);
+        return changed;
     }
 
     @Override
-    public void removeCertprofileFromCA(String profileName, String caName)
+    public boolean removeCertprofileFromCA(String profileName, String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
         caName = caName.toUpperCase();
-        queryExecutor.removeCertprofileFromCA(profileName, caName);
-        if(ca_has_profiles.containsKey(caName))
+        boolean b = queryExecutor.removeCertprofileFromCA(profileName, caName);
+        if(b && ca_has_profiles.containsKey(caName))
         {
             ca_has_profiles.get(caName).remove(profileName);
         }
+        return b;
     }
 
     @Override
-    public void addCertprofileToCA(String profileName, String caName)
+    public boolean addCertprofileToCA(String profileName, String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1255,32 +1264,37 @@ implements CAManager, CmpResponderManager
         {
             if(profileNames.contains(profileName))
             {
-                return;
+                return false;
             }
         }
         profileNames.add(profileName);
 
         queryExecutor.addCertprofileToCA(profileName, caName);
         ca_has_profiles.get(caName).add(profileName);
+        return true;
     }
 
     @Override
-    public void removePublisherFromCA(String publisherName, String caName)
+    public boolean removePublisherFromCA(String publisherName, String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
         caName = caName.toUpperCase();
-        queryExecutor.removePublisherFromCA(publisherName, caName);
+        boolean b = queryExecutor.removePublisherFromCA(publisherName, caName);
 
-        Set<String> publisherNames = ca_has_publishers.get(caName);
-        if(publisherNames != null)
+        if(b)
         {
-            publisherNames.remove(publisherName);
+            Set<String> publisherNames = ca_has_publishers.get(caName);
+            if(publisherNames != null)
+            {
+                publisherNames.remove(publisherName);
+            }
         }
+        return b;
     }
 
     @Override
-    public void addPublisherToCA(String publisherName, String caName)
+    public boolean addPublisherToCA(String publisherName, String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1295,13 +1309,15 @@ implements CAManager, CmpResponderManager
         {
             if(publisherNames.contains(publisherName))
             {
-                return;
+                return false;
             }
         }
-        publisherNames.add(publisherName);
+
         queryExecutor.addPublisherToCA(publisherName, caName);
+        publisherNames.add(publisherName);
         ca_has_publishers.get(caName).add(publisherName);
         publishers.get(publisherName).issuerAdded(caInfos.get(caName).getCertificate());
+        return true;
     }
 
     @Override
@@ -1330,18 +1346,17 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public void addCmpRequestor(CmpRequestorEntry dbEntry)
+    public boolean addCmpRequestor(CmpRequestorEntry dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
         String name = dbEntry.getName();
         if(requestors.containsKey(name))
         {
-            throw new CAMgmtException("CMP requestor named " + name + " exists");
+            return false;
         }
 
         queryExecutor.addCmpRequestor(dbEntry);
-
         requestors.put(name, queryExecutor.createRequestor(name));
 
         try
@@ -1355,11 +1370,14 @@ implements CAManager, CmpResponderManager
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
             }
             LOG.debug(message, e);
+            throw new CAMgmtException(message + ": " + e.getErrorCode() + ", " + e.getMessage());
         }
+
+        return true;
     }
 
     @Override
-    public void removeCmpRequestor(String requestorName)
+    public boolean removeCmpRequestor(String requestorName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1368,52 +1386,54 @@ implements CAManager, CmpResponderManager
             removeCmpRequestorFromCA(requestorName, caName);
         }
 
-        queryExecutor.deleteRowWithName(requestorName, "REQUESTOR");
-        requestors.remove(requestorName);
-        LOG.info("remove requestor '{}'", requestorName);
+        boolean b = queryExecutor.deleteRowWithName(requestorName, "REQUESTOR");
+        if(b)
+        {
+            requestors.remove(requestorName);
+            LOG.info("remove requestor '{}'", requestorName);
+        }
+        return b;
     }
 
     @Override
-    public void changeCmpRequestor(String name, String cert)
+    public boolean changeCmpRequestor(String name, String cert)
     throws CAMgmtException
     {
         asssertMasterMode();
         if(cert == null)
         {
-            return;
+            return false;
         }
 
         boolean changed = queryExecutor.changeCmpRequestor(name, cert);
-        if(changed == false)
+        if(changed)
         {
-            LOG.info("No change of CMP control '{}' is processed", name);
-            return;
+            requestors.remove(name);
+            CmpRequestorEntryWrapper requestor = queryExecutor.createRequestor(name);
+            if(requestor != null)
+            {
+                requestors.put(name, requestor);
+            }
         }
-
-        requestors.remove(name);
-        CmpRequestorEntryWrapper requestor = queryExecutor.createRequestor(name);
-        if(requestor != null)
-        {
-            requestors.put(name, requestor);
-        }
+        return changed;
     }
 
     @Override
-    public void removeCmpRequestorFromCA(String requestorName, String caName)
+    public boolean removeCmpRequestorFromCA(String requestorName, String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
         caName = caName.toUpperCase();
-        queryExecutor.removeCmpRequestorFromCA(requestorName, caName);
-
-        if(ca_has_requestors.containsKey(caName))
+        boolean b = queryExecutor.removeCmpRequestorFromCA(requestorName, caName);
+        if(b && ca_has_requestors.containsKey(caName))
         {
             ca_has_requestors.get(caName).remove(requestorName);
         }
+        return b;
     }
 
     @Override
-    public void addCmpRequestorToCA(CAHasRequestorEntry requestor, String caName)
+    public boolean addCmpRequestorToCA(CAHasRequestorEntry requestor, String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1440,14 +1460,14 @@ implements CAManager, CmpResponderManager
             // already added
             if(foundEntry)
             {
-                throw new CAMgmtException("ca_has_requestor with CANAME=" + caName +
-                        " and REQUESTOR_NAME="+ requestorName + " exists");
+                return false;
             }
         }
 
         cmpRequestors.add(requestor);
         queryExecutor.addCmpRequestorToCA(requestor, caName);
         ca_has_requestors.get(caName).add(requestor);
+        return true;
     }
 
     @Override
@@ -1458,7 +1478,7 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public void removeCertprofile(String profileName)
+    public boolean removeCertprofile(String profileName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1467,14 +1487,18 @@ implements CAManager, CmpResponderManager
             removeCertprofileFromCA(profileName, caName);
         }
 
-        queryExecutor.deleteRowWithName(profileName, "CERTPROFILE");
-        LOG.info("remove profile '{}'", profileName);
-        IdentifiedX509Certprofile profile = certprofiles.remove(profileName);
-        queryExecutor.shutdownCertprofile(profile);
+        boolean b = queryExecutor.deleteRowWithName(profileName, "CERTPROFILE");
+        if(b)
+        {
+            LOG.info("remove profile '{}'", profileName);
+            IdentifiedX509Certprofile profile = certprofiles.remove(profileName);
+            queryExecutor.shutdownCertprofile(profile);
+        }
+        return b;
     }
 
     @Override
-    public void changeCertprofile(String name, String type, String conf)
+    public boolean changeCertprofile(String name, String type, String conf)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1484,23 +1508,22 @@ implements CAManager, CmpResponderManager
         }
 
         boolean changed = queryExecutor.changeCertprofile(name, type, conf);
-        if(changed == false)
+        if(changed)
         {
-            LOG.info("No change of certprofile '{}' is processed", name);
-            return;
+            IdentifiedX509Certprofile profile = certprofiles.remove(name);
+            queryExecutor.shutdownCertprofile(profile);
+            profile = queryExecutor.createCertprofile(name, envParameterResolver);
+            if(profile != null)
+            {
+                certprofiles.put(name, profile);
+            }
         }
 
-        IdentifiedX509Certprofile profile = certprofiles.remove(name);
-        queryExecutor.shutdownCertprofile(profile);
-        profile = queryExecutor.createCertprofile(name, envParameterResolver);
-        if(profile != null)
-        {
-            certprofiles.put(name, profile);
-        }
+        return changed;
     }
 
     @Override
-    public void addCertprofile(CertprofileEntry dbEntry)
+    public boolean addCertprofile(CertprofileEntry dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1529,10 +1552,12 @@ implements CAManager, CmpResponderManager
             }
             LOG.debug(message, e);
         }
+
+        return true;
     }
 
     @Override
-    public void setCmpResponder(CmpResponderEntry dbEntry)
+    public boolean setCmpResponder(CmpResponderEntry dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1543,37 +1568,45 @@ implements CAManager, CmpResponderManager
 
         queryExecutor.setCmpResponder(dbEntry);
         responder = queryExecutor.createResponder(securityFactory);
+
+        return true;
     }
 
     @Override
-    public void removeCmpResponder()
+    public boolean removeCmpResponder()
     throws CAMgmtException
     {
         asssertMasterMode();
-        queryExecutor.deleteRows("RESPONDER");
-        LOG.info("remove responder");
-        responder = null;
+        boolean b = queryExecutor.deleteRows("RESPONDER");
+        if(b)
+        {
+            LOG.info("remove responder");
+            responder = null;
+        }
+        return b;
     }
 
     @Override
-    public void changeCmpResponder(String type, String conf, String cert)
+    public boolean changeCmpResponder(String type, String conf, String cert)
     throws CAMgmtException
     {
         asssertMasterMode();
         if(type == null && conf == null && cert == null)
         {
-            return;
+            return false;
         }
 
         boolean changed = queryExecutor.changeCmpResponder(type, conf, cert);
         if(changed == false)
         {
             LOG.info("No change of CMP responder is processed");
-            return;
+            return false;
         }
 
         responder = null;
         responder = queryExecutor.createResponder(securityFactory);
+
+        return true;
     }
 
     @Override
@@ -1588,57 +1621,60 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public void addCrlSigner(X509CrlSignerEntry dbEntry)
+    public boolean addCrlSigner(X509CrlSignerEntry dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
         String name = dbEntry.getName();
         if(crlSigners.containsKey(name))
         {
-            throw new CAMgmtException("CRL signer named " + name + " exists");
+            return false;
         }
         queryExecutor.addCrlSigner(dbEntry);
         crlSigners.put(name, queryExecutor.createCrlSigner(name));
+        return true;
     }
 
     @Override
-    public void removeCrlSigner(String crlSignerName)
+    public boolean removeCrlSigner(String crlSignerName)
     throws CAMgmtException
     {
         asssertMasterMode();
-        queryExecutor.deleteRowWithName(crlSignerName, "CRLSIGNER");
-        for(String caName : caInfos.keySet())
+        boolean b = queryExecutor.deleteRowWithName(crlSignerName, "CRLSIGNER");
+        if(b)
         {
-            X509CAInfo caInfo = caInfos.get(caName);
-            if(crlSignerName.equals(caInfo.getCrlSignerName()))
+            for(String caName : caInfos.keySet())
             {
-                caInfo.setCrlSignerName(null);
+                X509CAInfo caInfo = caInfos.get(caName);
+                if(crlSignerName.equals(caInfo.getCrlSignerName()))
+                {
+                    caInfo.setCrlSignerName(null);
+                }
             }
-        }
 
-        crlSigners.remove(crlSignerName);
-        LOG.info("remove CRLSigner '{}'", crlSignerName);
+            crlSigners.remove(crlSignerName);
+            LOG.info("remove CRLSigner '{}'", crlSignerName);
+        }
+        return b;
     }
 
     @Override
-    public void changeCrlSigner(String name, String signer_type, String signer_conf, String signer_cert,
+    public boolean changeCrlSigner(String name, String signer_type, String signer_conf, String signer_cert,
             CRLControl crlControl)
     throws CAMgmtException
     {
         asssertMasterMode();
         boolean changed = queryExecutor.changeCrlSigner(name, signer_type, signer_conf, signer_cert, crlControl);
-        if(changed == false)
+        if(changed)
         {
-            LOG.info("No change of CRL signer '{}' is processed", name);
-            return;
+            X509CrlSignerEntryWrapper crlSigner = crlSigners.remove(name);
+            crlSigner = queryExecutor.createCrlSigner(name);
+            if(crlSigner != null)
+            {
+                crlSigners.put(name, crlSigner);
+            }
         }
-
-        X509CrlSignerEntryWrapper crlSigner = crlSigners.remove(name);
-        crlSigner = queryExecutor.createCrlSigner(name);
-        if(crlSigner != null)
-        {
-            crlSigners.put(name, crlSigner);
-        }
+        return changed;
     }
 
     @Override
@@ -1653,7 +1689,7 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public void addPublisher(PublisherEntry dbEntry)
+    public boolean addPublisher(PublisherEntry dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1684,6 +1720,8 @@ implements CAManager, CmpResponderManager
             }
             LOG.debug(message, e);
         }
+
+        return true;
     }
 
     @Override
@@ -1714,7 +1752,7 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public void removePublisher(String publisherName)
+    public boolean removePublisher(String publisherName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1723,32 +1761,34 @@ implements CAManager, CmpResponderManager
             removePublisherFromCA(publisherName, caName);
         }
 
-        queryExecutor.deleteRowWithName(publisherName, "PUBLISHER");
-        LOG.info("remove publisher '{}'", publisherName);
-        IdentifiedX509CertPublisher publisher = publishers.remove(publisherName);
-        queryExecutor.shutdownPublisher(publisher);
+        boolean b = queryExecutor.deleteRowWithName(publisherName, "PUBLISHER");
+        if(b)
+        {
+            LOG.info("remove publisher '{}'", publisherName);
+            IdentifiedX509CertPublisher publisher = publishers.remove(publisherName);
+            queryExecutor.shutdownPublisher(publisher);
+        }
+        return b;
     }
 
     @Override
-    public void changePublisher(String name, String type, String conf)
+    public boolean changePublisher(String name, String type, String conf)
     throws CAMgmtException
     {
         asssertMasterMode();
         boolean changed = queryExecutor.changePublisher(name, type, conf);
-        if(changed == false)
+        if(changed)
         {
-            LOG.info("No change of publisher '{}' is processed", name);
-            return;
+            IdentifiedX509CertPublisher publisher = publishers.remove(name);
+            queryExecutor.shutdownPublisher(publisher);
+            publisher = queryExecutor.createPublisher(name, dataSources,
+                    securityFactory.getPasswordResolver(), envParameterResolver);
+            if(publisher != null)
+            {
+                publishers.put(name, publisher);
+            }
         }
-
-        IdentifiedX509CertPublisher publisher = publishers.remove(name);
-        queryExecutor.shutdownPublisher(publisher);
-        publisher = queryExecutor.createPublisher(name, dataSources,
-                securityFactory.getPasswordResolver(), envParameterResolver);
-        if(publisher != null)
-        {
-            publishers.put(name, publisher);
-        }
+        return changed;
     }
 
     @Override
@@ -1758,42 +1798,47 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public void addCmpControl(CmpControl dbEntry)
+    public boolean addCmpControl(CmpControl dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
         final String name = dbEntry.getName();
         if(cmpControls.containsKey(name))
         {
-            throw new CAMgmtException("CMPControl named " + name + " exists");
+            return false;
         }
 
         queryExecutor.addCmpControl(dbEntry);
         cmpControls.put(name, dbEntry);
+        return true;
     }
 
     @Override
-    public void removeCmpControl(String name)
+    public boolean removeCmpControl(String name)
     throws CAMgmtException
     {
         asssertMasterMode();
-        queryExecutor.deleteRowWithName(name, "CMPCONTROL");
+        boolean b = queryExecutor.deleteRowWithName(name, "CMPCONTROL");
 
-        for(String caName : caInfos.keySet())
+        if(b)
         {
-            X509CAInfo caInfo = caInfos.get(caName);
-            if(name.equals(caInfo.getCmpControlName()))
+            for(String caName : caInfos.keySet())
             {
-                caInfo.setCmpControlName(null);
+                X509CAInfo caInfo = caInfos.get(caName);
+                if(name.equals(caInfo.getCmpControlName()))
+                {
+                    caInfo.setCmpControlName(null);
+                }
             }
-        }
 
-        cmpControls.remove(name);
-        LOG.info("remove CMPControl '{}'", name);
+            cmpControls.remove(name);
+            LOG.info("remove CMPControl '{}'", name);
+        }
+        return b;
     }
 
     @Override
-    public void changeCmpControl(String name, Boolean requireConfirmCert,
+    public boolean changeCmpControl(String name, Boolean requireConfirmCert,
             Boolean requireMessageTime, Integer messageTimeBias,
             Integer confirmWaitTime, Boolean sendCaCert, Boolean sendResponderCert)
     throws CAMgmtException
@@ -1802,21 +1847,19 @@ implements CAManager, CmpResponderManager
         if(requireConfirmCert == null && requireMessageTime == null && messageTimeBias == null
                 && confirmWaitTime == null && sendCaCert == null && sendResponderCert == null)
         {
-            return;
+            return false;
         }
 
         boolean changed = queryExecutor.changeCmpControl(name,
                 requireConfirmCert, requireMessageTime,
                 messageTimeBias, confirmWaitTime,
                 sendCaCert, sendResponderCert);
-        if(changed == false)
+        if(changed)
         {
-            LOG.info("No change of CMP control '{}' is processed", name);
-            return;
+            CmpControl cmpControl = queryExecutor.createCmpControl(name);
+            cmpControls.put(name, cmpControl);
         }
-
-        CmpControl cmpControl = queryExecutor.createCmpControl(name);
-        cmpControls.put(name, cmpControl);
+        return changed;
     }
 
     public EnvironmentParameterResolver getEnvParameterResolver()
@@ -1837,30 +1880,35 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public void addEnvParam(String name, String value)
+    public boolean addEnvParam(String name, String value)
     throws CAMgmtException
     {
         asssertMasterMode();
         if(envParameterResolver.getEnvParam(name) != null)
         {
-            throw new CAMgmtException("Environemt parameter named " + name + " exists");
+            return false;
         }
         queryExecutor.addEnvParam(name, value);
         envParameterResolver.addEnvParam(name, value);
+        return true;
     }
 
     @Override
-    public void removeEnvParam(String envParamName)
+    public boolean removeEnvParam(String envParamName)
     throws CAMgmtException
     {
         asssertMasterMode();
-        queryExecutor.deleteRowWithName(envParamName, "ENVIRONMENT");
-        LOG.info("remove environment param '{}'", envParamName);
-        envParameterResolver.removeEnvParam(envParamName);
+        boolean b = queryExecutor.deleteRowWithName(envParamName, "ENVIRONMENT");
+        if(b)
+        {
+            LOG.info("remove environment param '{}'", envParamName);
+            envParameterResolver.removeEnvParam(envParamName);
+        }
+        return b;
     }
 
     @Override
-    public void changeEnvParam(String name, String value)
+    public boolean changeEnvParam(String name, String value)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1873,13 +1921,11 @@ implements CAManager, CmpResponderManager
         }
 
         boolean changed = queryExecutor.changeEnvParam(name, value);
-        if(changed == false)
+        if(changed)
         {
-            LOG.info("No change of environment '{}' is processed", name);
-            return;
+            envParameterResolver.addEnvParam(name, value);
         }
-
-        envParameterResolver.addEnvParam(name, value);
+        return changed;
     }
 
     public String getCaConfFile()
@@ -1893,26 +1939,32 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public void addCaAlias(String aliasName, String caName)
+    public boolean addCaAlias(String aliasName, String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
         caName = caName.toUpperCase();
         if(caAliases.get(aliasName) != null)
         {
-            throw new CAMgmtException("CA alias " + aliasName + " exists");
+            return false;
         }
+
         queryExecutor.addCaAlias(aliasName, caName);
         caAliases.put(aliasName, caName);
+        return true;
     }
 
     @Override
-    public void removeCaAlias(String aliasName)
+    public boolean removeCaAlias(String aliasName)
     throws CAMgmtException
     {
         asssertMasterMode();
-        queryExecutor.removeCaAlias(aliasName);
-        caAliases.remove(aliasName);
+        boolean b = queryExecutor.removeCaAlias(aliasName);
+        if(b)
+        {
+            caAliases.remove(aliasName);
+        }
+        return b;
     }
 
     @Override
@@ -1944,54 +1996,59 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public void removeCA(String caName)
+    public boolean removeCA(String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
         caName = caName.toUpperCase();
-        queryExecutor.removeCA(caName);
+        boolean b = queryExecutor.removeCA(caName);
 
-        CAMgmtException exception = null;
-
-        X509CAInfo caInfo = caInfos.get(caName);
-        if(caInfo == null || caInfo.getCaEntry().getNextSerial() > 0)
+        if(b)
         {
-            // drop the serial number sequence
-            final String sequenceName = caInfo.getCaEntry().getSerialSeqName();
-            try
+            CAMgmtException exception = null;
+
+            X509CAInfo caInfo = caInfos.get(caName);
+            if(caInfo == null || caInfo.getCaEntry().getNextSerial() > 0)
             {
-                dataSource.dropSequence(sequenceName);
-            }catch(DataAccessException e)
+                // drop the serial number sequence
+                final String sequenceName = caInfo.getCaEntry().getSerialSeqName();
+                try
+                {
+                    dataSource.dropSequence(sequenceName);
+                }catch(DataAccessException e)
+                {
+                    final String message = "Error in dropSequence " + sequenceName;
+                    if(LOG.isWarnEnabled())
+                    {
+                        LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
+                    if(exception == null)
+                    {
+                        exception = new CAMgmtException(e.getMessage(), e);
+                    }
+                }
+            }
+
+            LOG.info("remove CA '{}'", caName);
+            caInfos.remove(caName);
+            ca_has_profiles.remove(caName);
+            ca_has_publishers.remove(caName);
+            ca_has_requestors.remove(caName);
+            x509cas.remove(caName);
+            responders.remove(caName);
+
+            if(exception != null)
             {
-                final String message = "Error in dropSequence " + sequenceName;
-                if(LOG.isWarnEnabled())
-                {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                }
-                LOG.debug(message, e);
-                if(exception == null)
-                {
-                    exception = new CAMgmtException(e.getMessage(), e);
-                }
+                throw exception;
             }
         }
 
-        LOG.info("remove CA '{}'", caName);
-        caInfos.remove(caName);
-        ca_has_profiles.remove(caName);
-        ca_has_publishers.remove(caName);
-        ca_has_requestors.remove(caName);
-        x509cas.remove(caName);
-        responders.remove(caName);
-
-        if(exception != null)
-        {
-            throw exception;
-        }
+        return b;
     }
 
     @Override
-    public void publishRootCA(String caName, String certprofile)
+    public boolean publishRootCA(String caName, String certprofile)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -2021,6 +2078,7 @@ implements CAManager, CmpResponderManager
             throw new CAMgmtException(e.getMessage(), e);
         }
         ca.publishCertificate(ci);
+        return true;
     }
 
     @Override
@@ -2060,7 +2118,7 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public void revokeCa(String caName, CertRevocationInfo revocationInfo)
+    public boolean revokeCa(String caName, CertRevocationInfo revocationInfo)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -2070,7 +2128,7 @@ implements CAManager, CmpResponderManager
         caName = caName.toUpperCase();
         if(x509cas.containsKey(caName) == false)
         {
-            throw new CAMgmtException("Could not find CA named " + caName);
+            return false;
         }
 
         LOG.info("Revoking CA '{}'", caName);
@@ -2086,22 +2144,26 @@ implements CAManager, CmpResponderManager
             }
         }
 
-        queryExecutor.revokeCa(caName, revocationInfo);
+        boolean b = queryExecutor.revokeCa(caName, revocationInfo);
 
-        try
+        if(b)
         {
-            ca.revoke(revocationInfo);
-        } catch (OperationException e)
-        {
-            throw new CAMgmtException("Error while revoking CA " + e.getMessage(), e);
+            try
+            {
+                ca.revoke(revocationInfo);
+            } catch (OperationException e)
+            {
+                throw new CAMgmtException("Error while revoking CA " + e.getMessage(), e);
+            }
+            LOG.info("Revoked CA '{}'", caName);
+            auditLogPCIEvent(true, "REVOKE CA " + caName);
         }
-        LOG.info("Revoked CA '{}'", caName);
 
-        auditLogPCIEvent(true, "REVOKE CA " + caName);
+        return b;
     }
 
     @Override
-    public void unrevokeCa(String caName)
+    public boolean unrevokeCa(String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -2114,19 +2176,24 @@ implements CAManager, CmpResponderManager
 
         LOG.info("Unrevoking of CA '{}'", caName);
 
-        queryExecutor.unrevokeCa(caName);
+        boolean b =queryExecutor.unrevokeCa(caName);
 
-        X509CA ca = x509cas.get(caName);
-        try
+        if(b)
         {
-            ca.unrevoke();
-        } catch (OperationException e)
-        {
-            throw new CAMgmtException("Error while unrevoking of CA " + e.getMessage(), e);
+            X509CA ca = x509cas.get(caName);
+            try
+            {
+                ca.unrevoke();
+            } catch (OperationException e)
+            {
+                throw new CAMgmtException("Error while unrevoking of CA " + e.getMessage(), e);
+            }
+            LOG.info("Unrevoked CA '{}'", caName);
+
+            auditLogPCIEvent(true, "UNREVOKE CA " + caName);
         }
-        LOG.info("Unrevoked CA '{}'", caName);
 
-        auditLogPCIEvent(true, "UNREVOKE CA " + caName);
+        return b;
     }
 
     public void setAuditServiceRegister(AuditLoggingServiceRegister serviceRegister)
