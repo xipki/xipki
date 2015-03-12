@@ -104,7 +104,7 @@ implements HessianCAManager
     {
     }
 
-    public void setCaManager(CAManager caManager)
+    public  void setCaManager(CAManager caManager)
     {
         this.caManager = caManager;
     }
@@ -122,12 +122,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void publishRootCA(String caName, String certprofile)
+    public boolean publishRootCA(String caName, String certprofile)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.publishRootCA(caName, certprofile);
+            return caManager.publishRootCA(caName, certprofile);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -161,12 +161,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void removeCA(String caName)
+    public boolean removeCA(String caName)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.removeCA(caName);
+            return caManager.removeCA(caName);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -180,18 +180,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void notifyCAChange()
-    {
-        caManager.notifyCAChange();
-    }
-
-    @Override
-    public void addCaAlias(String aliasName, String caName)
+    public boolean notifyCAChange()
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.addCaAlias(aliasName, caName);
+            return caManager.notifyCAChange();
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -199,12 +193,25 @@ implements HessianCAManager
     }
 
     @Override
-    public void removeCaAlias(String aliasName)
+    public boolean addCaAlias(String aliasName, String caName)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.removeCaAlias(aliasName);
+            return caManager.addCaAlias(aliasName, caName);
+        } catch (CAMgmtException e)
+        {
+            throw new HessianCAMgmtException(e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean removeCaAlias(String aliasName)
+    throws HessianCAMgmtException
+    {
+        try
+        {
+            return caManager.removeCaAlias(aliasName);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -266,12 +273,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void addCA(X509CAEntry newCaDbEntry)
+    public boolean addCA(X509CAEntry newCaDbEntry)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.addCA(newCaDbEntry);
+            return caManager.addCA(newCaDbEntry);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -285,7 +292,7 @@ implements HessianCAManager
     }
 
     @Override
-    public void changeCA(String name, CAStatus status,
+    public boolean changeCA(String name, CAStatus status,
             X509Certificate cert, Set<String> crl_uris,
             Set<String> delta_crl_uris, Set<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
@@ -296,7 +303,7 @@ implements HessianCAManager
     {
         try
         {
-            caManager.changeCA(name, status, cert, crl_uris, delta_crl_uris, ocsp_uris,
+            return caManager.changeCA(name, status, cert, crl_uris, delta_crl_uris, ocsp_uris,
                     max_validity, signer_type, signer_conf, crlsigner_name, cmpcontrol_name,
                     duplicate_key, duplicate_subject,
                     permissions, numCrls, expirationPeriod, validityMode);
@@ -307,12 +314,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void removeCertprofileFromCA(String profileName, String caName)
+    public boolean removeCertprofileFromCA(String profileName, String caName)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.removeCertprofileFromCA(profileName, caName);
+            return caManager.removeCertprofileFromCA(profileName, caName);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -320,12 +327,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void addCertprofileToCA(String profileName, String caName)
+    public boolean addCertprofileToCA(String profileName, String caName)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.addCertprofileToCA(profileName, caName);
+            return caManager.addCertprofileToCA(profileName, caName);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -333,12 +340,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void removePublisherFromCA(String publisherName, String caName)
+    public boolean removePublisherFromCA(String publisherName, String caName)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.removePublisherFromCA(publisherName, caName);
+            return caManager.removePublisherFromCA(publisherName, caName);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -346,12 +353,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void addPublisherToCA(String publisherName, String caName)
+    public boolean addPublisherToCA(String publisherName, String caName)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.addPublisherToCA(publisherName, caName);
+            return caManager.addPublisherToCA(publisherName, caName);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -377,12 +384,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void addCmpRequestor(CmpRequestorEntry dbEntry)
+    public boolean addCmpRequestor(CmpRequestorEntry dbEntry)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.addCmpRequestor(dbEntry);
+            return caManager.addCmpRequestor(dbEntry);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -390,12 +397,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void removeCmpRequestor(String requestorName)
+    public boolean removeCmpRequestor(String requestorName)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.removeCmpRequestor(requestorName);
+            return caManager.removeCmpRequestor(requestorName);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -403,12 +410,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void changeCmpRequestor(String name, String cert)
+    public boolean changeCmpRequestor(String name, String cert)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.changeCmpRequestor(name, cert);
+            return caManager.changeCmpRequestor(name, cert);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -416,12 +423,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void removeCmpRequestorFromCA(String requestorName, String caName)
+    public boolean removeCmpRequestorFromCA(String requestorName, String caName)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.removeCmpRequestorFromCA(requestorName, caName);
+            return caManager.removeCmpRequestorFromCA(requestorName, caName);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -429,12 +436,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void addCmpRequestorToCA(CAHasRequestorEntry requestor, String caName)
+    public boolean addCmpRequestorToCA(CAHasRequestorEntry requestor, String caName)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.addCmpRequestorToCA(requestor, caName);
+            return caManager.addCmpRequestorToCA(requestor, caName);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -448,12 +455,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void removeCertprofile(String profileName)
+    public boolean removeCertprofile(String profileName)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.removeCertprofile(profileName);
+            return caManager.removeCertprofile(profileName);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -461,12 +468,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void changeCertprofile(String name, String type, String conf)
+    public boolean changeCertprofile(String name, String type, String conf)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.changeCertprofile(name, type, conf);
+            return caManager.changeCertprofile(name, type, conf);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -474,12 +481,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void addCertprofile(CertprofileEntry dbEntry)
+    public boolean addCertprofile(CertprofileEntry dbEntry)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.addCertprofile(dbEntry);
+            return caManager.addCertprofile(dbEntry);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -487,12 +494,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void setCmpResponder(CmpResponderEntry dbEntry)
+    public boolean setCmpResponder(CmpResponderEntry dbEntry)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.setCmpResponder(dbEntry);
+            return caManager.setCmpResponder(dbEntry);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -500,12 +507,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void removeCmpResponder()
+    public boolean removeCmpResponder()
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.removeCmpResponder();
+            return caManager.removeCmpResponder();
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -513,12 +520,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void changeCmpResponder(String type, String conf, String cert)
+    public boolean changeCmpResponder(String type, String conf, String cert)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.changeCmpResponder(type, conf, cert);
+            return caManager.changeCmpResponder(type, conf, cert);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -532,12 +539,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void addCrlSigner(X509CrlSignerEntry dbEntry)
+    public boolean addCrlSigner(X509CrlSignerEntry dbEntry)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.addCrlSigner(dbEntry);
+            return caManager.addCrlSigner(dbEntry);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -545,12 +552,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void removeCrlSigner(String crlSignerName)
+    public boolean removeCrlSigner(String crlSignerName)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.removeCrlSigner(crlSignerName);
+            return caManager.removeCrlSigner(crlSignerName);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -558,13 +565,13 @@ implements HessianCAManager
     }
 
     @Override
-    public void changeCrlSigner(String name, String signer_type,
+    public boolean changeCrlSigner(String name, String signer_type,
             String signer_conf, String signer_cert, CRLControl crlControl)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.changeCrlSigner(name, signer_type, signer_conf, signer_cert, crlControl);
+            return caManager.changeCrlSigner(name, signer_type, signer_conf, signer_cert, crlControl);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -578,12 +585,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void addPublisher(PublisherEntry dbEntry)
+    public boolean addPublisher(PublisherEntry dbEntry)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.addPublisher(dbEntry);
+            return caManager.addPublisher(dbEntry);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -603,12 +610,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void removePublisher(String publisherName)
+    public boolean removePublisher(String publisherName)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.removePublisher(publisherName);
+            return caManager.removePublisher(publisherName);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -616,12 +623,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void changePublisher(String name, String type, String conf)
+    public boolean changePublisher(String name, String type, String conf)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.changePublisher(name, type, conf);
+            return caManager.changePublisher(name, type, conf);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -635,12 +642,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void addCmpControl(CmpControl dbEntry)
+    public boolean addCmpControl(CmpControl dbEntry)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.addCmpControl(dbEntry);
+            return caManager.addCmpControl(dbEntry);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -648,12 +655,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void removeCmpControl(String name)
+    public boolean removeCmpControl(String name)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.removeCmpControl(name);
+            return caManager.removeCmpControl(name);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -661,7 +668,7 @@ implements HessianCAManager
     }
 
     @Override
-    public void changeCmpControl(String name, Boolean requireConfirmCert,
+    public boolean changeCmpControl(String name, Boolean requireConfirmCert,
             Boolean requireMessageTime, Integer messageTimeBias,
             Integer confirmWaitTime, Boolean sendCaCert,
             Boolean sendResponderCert)
@@ -669,7 +676,7 @@ implements HessianCAManager
     {
         try
         {
-            caManager.changeCmpControl(name, requireConfirmCert, requireMessageTime, messageTimeBias,
+            return caManager.changeCmpControl(name, requireConfirmCert, requireMessageTime, messageTimeBias,
                     confirmWaitTime, sendCaCert, sendResponderCert);
         } catch (CAMgmtException e)
         {
@@ -690,12 +697,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void addEnvParam(String name, String value)
+    public boolean addEnvParam(String name, String value)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.addEnvParam(name, value);
+            return caManager.addEnvParam(name, value);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -703,12 +710,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void removeEnvParam(String envParamName)
+    public boolean removeEnvParam(String envParamName)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.removeEnvParam(envParamName);
+            return caManager.removeEnvParam(envParamName);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -716,12 +723,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void changeEnvParam(String name, String value)
+    public boolean changeEnvParam(String name, String value)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.changeEnvParam(name, value);
+            return caManager.changeEnvParam(name, value);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -729,12 +736,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void revokeCa(String caName, CertRevocationInfo revocationInfo)
+    public boolean revokeCa(String caName, CertRevocationInfo revocationInfo)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.revokeCa(caName, revocationInfo);
+            return caManager.revokeCa(caName, revocationInfo);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -742,12 +749,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void unrevokeCa(String caName)
+    public boolean unrevokeCa(String caName)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.unrevokeCa(caName);
+            return caManager.unrevokeCa(caName);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -950,27 +957,27 @@ implements HessianCAManager
         trustedUserCerts.clear();
     }
 
-    public void setTruststoreFile(String truststoreFile)
+    public  void setTruststoreFile(String truststoreFile)
     {
         this.truststoreFile = truststoreFile;
     }
 
-    public void setTruststoreType(String truststoreType)
+    public  void setTruststoreType(String truststoreType)
     {
         this.truststoreType = truststoreType;
     }
 
-    public void setTruststoreProvider(String truststoreProvider)
+    public  void setTruststoreProvider(String truststoreProvider)
     {
         this.truststoreProvider = truststoreProvider;
     }
 
-    public void setTruststorePassword(String truststorePassword)
+    public  void setTruststorePassword(String truststorePassword)
     {
         this.truststorePassword = truststorePassword;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory)
+    public  void setSecurityFactory(SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;
     }
