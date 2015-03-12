@@ -45,7 +45,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
-import org.xipki.audit.api.AuditEventDataType;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
@@ -74,7 +73,7 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
     /**
      * The default port is 514.
      */
-    public static final int    DEFAULT_SYSLOG_PORT = 514;
+    public static final int DEFAULT_SYSLOG_PORT = 514;
     /**
      * The default mode is TCP.
      */
@@ -154,32 +153,23 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
         }
         sb.append("\tstatus: ").append(status.name());
 
+        long duration = event.getDuration();
+        if(duration >= 0)
+        {
+            sb.append("\tduration: ").append(duration);
+        }
+
         List<AuditEventData> eventDataArray = event.getEventDatas();
 
         if ((eventDataArray != null) && (eventDataArray.size() > 0))
         {
-            for (AuditEventData element : eventDataArray)
+            for (AuditEventData m : eventDataArray)
             {
-                sb.append("\t");
-                sb.append(element.getName());
-                sb.append(": ");
-
-                AuditEventDataType eventDataType = element.getEventDataType();
-                switch(eventDataType)
+                if(duration >= 0 && "duration".equalsIgnoreCase(m.getName()))
                 {
-                case BINARY:
-                    sb.append(toHexString(element.getBinaryValue()));
-                    break;
-                case NUMBER:
-                    sb.append(element.getNumberValue());
-                    break;
-                case TEXT:
-                    sb.append(element.getTextValue());
-                    break;
-                case TIMESTAMP:
-                    sb.append(df.format(element.getTimestampValue()));
-                    break;
+                    continue;
                 }
+                sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
             }
         }
 
@@ -458,19 +448,5 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
     private static boolean notEmpty(String text)
     {
         return text != null && text.isEmpty() == false;
-    }
-
-    private static final char[] HEX_CHAR_TABLE = "0123456789ABCDEF".toCharArray();
-    private static String toHexString(byte[] raw)
-    {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : raw)
-        {
-            int v = (b < 0) ? 256 + b : b;
-            sb.append(HEX_CHAR_TABLE[v >>> 4]);
-            sb.append(HEX_CHAR_TABLE[v & 0x0F]);
-            sb.append(" ");
-        }
-        return sb.toString();
     }
 }

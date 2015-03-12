@@ -42,4 +42,6 @@ package org.xipki.audit.api;
 public interface AuditLoggingServiceRegister
 {
     AuditLoggingService getAuditLoggingService();
+
+    boolean isAuditEnabled();
 }

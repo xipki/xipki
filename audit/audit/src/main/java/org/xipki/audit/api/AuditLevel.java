@@ -41,12 +41,8 @@ package org.xipki.audit.api;
 
 public enum AuditLevel
 {
-    EMERGENCY(0, "EMERGENCY"),
-    ALERT    (1, "ALERT    "),
-    CRITICAL (2, "CRITICAL "),
     ERROR    (3, "ERROR    "),
     WARN     (4, "WARN     "),
-    NOTICE   (5, "NOTICE   "),
     INFO     (6, "INFO     "),
     DEBUG    (7, "DEBUG    ");
 

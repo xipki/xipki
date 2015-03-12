@@ -51,9 +51,18 @@ public class AuditLoggingServiceRegisterImpl implements AuditLoggingServiceRegis
     private ConcurrentLinkedDeque<AuditLoggingService> services = new ConcurrentLinkedDeque<>();
     private Slf4jAuditLoggingServiceImpl defaultAuditLoggingService = new Slf4jAuditLoggingServiceImpl();
 
+    private boolean auditEnabled;
+
     public AuditLoggingService getAuditLoggingService()
     {
-        return services.isEmpty() ? defaultAuditLoggingService : services.getLast();
+        if(auditEnabled)
+        {
+            return services.isEmpty() ? defaultAuditLoggingService : services.getLast();
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public void bindService(AuditLoggingService service)
@@ -93,5 +102,16 @@ public class AuditLoggingServiceRegisterImpl implements AuditLoggingServiceRegis
         {
             LOG.debug("Caught Exception({}). service is probably destroyed.", e.getMessage());
         }
+    }
+
+    public void setAuditEnabled(boolean auditEnabled)
+    {
+        this.auditEnabled = auditEnabled;
+    }
+
+    @Override
+    public boolean isAuditEnabled()
+    {
+        return auditEnabled;
     }
 }
