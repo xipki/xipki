@@ -62,8 +62,8 @@ import org.xipki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.util.SecurityUtil;
-import org.xipki.console.karaf.UnexpectedResultException;
 import org.xipki.security.P10RequestGenerator;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.ExtensionExistence;
@@ -78,28 +78,28 @@ public abstract class EnrollCertCommand extends ClientCommand
 {
     @Option(name = "-subject",
             required = false,
-            description = "Subject to be requested.\n"
-                    + "The default is the subject of self-signed certifite.")
+            description = "subject to be requested.\n"
+                    + "the default is the subject of self-signed certifite.")
     private String subject;
 
     @Option(name = "-profile",
-            required = true, description = "Required. Certificate profile")
+            required = true, description = "required. Certificate profile")
     private String profile;
 
     @Option(name = "-out",
-            required = true, description = "Where to save the certificate")
+            required = true, description = "where to save the certificate")
     private String outputFile;
 
     @Option(name = "-user",
-            required = false, description = "Username")
+            required = false, description = "username")
     private String user;
 
     @Option(name = "-hash",
-            required = false, description = "Hash algorithm name for the POPO computation")
+            required = false, description = "hash algorithm name for the POPO computation")
     protected String hashAlgo = "SHA256";
 
     @Option(name = "-ca",
-            required = false, description = "Required if the profile is supported by more than one CA")
+            required = false, description = "required if the profile is supported by more than one CA")
     private String caName;
 
     @Option(name = "-keyusage",
@@ -111,22 +111,23 @@ public abstract class EnrollCertCommand extends ClientCommand
     private List<String> extkeyusages;
 
     @Option(name = "-subjectAltName",
-            required = false, multiValued = true, description = "SubjectAltName. Multi-valued.")
+            required = false, multiValued = true, description = "subjectAltName. Multi-valued.")
     private List<String> subjectAltNames;
 
     @Option(name = "-subjectInfoAccess",
-            required = false, multiValued = true, description = "SubjectInfoAccess. Multi-valued")
+            required = false, multiValued = true, description = "subjectInfoAccess. Multi-valued")
     private List<String> subjectInfoAccesses;
 
     @Option(name = "-needExtension",
             required = false, multiValued = true,
-            description = "Types of extension that must be contaied in the certificate. Multi-valued")
+            description = "types of extension that must be contaied in the certificate.\n"
+                    + "OID or name, multi-valued")
     private List<String> needExtensionTypes;
 
     @Option(name = "-wantExtension",
             required = false, multiValued = true,
-            description = "Types of extension that should be contaied in the certificate if possible.\n"
-                    + "Multi-valued")
+            description = "types of extension that should be contaied in the certificate if possible.\n"
+                    + "OID or name, multi-valued")
     private List<String> wantExtensionTypes;
 
     protected SecurityFactory securityFactory;
@@ -251,11 +252,11 @@ public abstract class EnrollCertCommand extends ClientCommand
 
         if(cert == null)
         {
-            throw new UnexpectedResultException("No certificate received from the server");
+            throw new UnexpectedResultException("no certificate received from the server");
         }
 
         File certFile = new File(outputFile);
-        saveVerbose("Certificate saved to file", certFile, cert.getEncoded());
+        saveVerbose("certificate saved to file", certFile, cert.getEncoded());
 
         return null;
     }

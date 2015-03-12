@@ -49,15 +49,15 @@ import org.xipki.security.shell.CertRequestGenCommand;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "req-p12", description="Generate PKCS#10 request with PKCS#12 keystore")
+@Command(scope = "xipki-tk", name = "req-p12", description="generate PKCS#10 request with PKCS#12 keystore")
 public class P12CertRequestGenCommand extends CertRequestGenCommand
 {
     @Option(name = "-p12",
-            required = true, description = "Required. PKCS#12 keystore file")
+            required = true, description = "required. PKCS#12 keystore file")
     private String p12File;
 
     @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#12 file")
+            required = false, description = "password of the PKCS#12 file")
     private String password;
 
     private char[] getPassword()

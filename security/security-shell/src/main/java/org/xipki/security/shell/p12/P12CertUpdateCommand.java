@@ -54,11 +54,11 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "update-cert-p12", description="Update certificate in PKCS#12 keystore")
+@Command(scope = "xipki-tk", name = "update-cert-p12", description="update certificate in PKCS#12 keystore")
 public class P12CertUpdateCommand extends P12SecurityCommand
 {
     @Option(name = "-cert",
-            required = true, description = "Required. Certificate file")
+            required = true, description = "required. Certificate file")
     private String certFile;
 
     @Option(name = "-cacert",
@@ -90,7 +90,7 @@ public class P12CertUpdateCommand extends P12SecurityCommand
 
         if(keyname == null)
         {
-            throw new SignerException("Could not find private key");
+            throw new SignerException("could not find private key");
         }
 
         Key key = ks.getKey(keyname, pwd);
@@ -111,7 +111,7 @@ public class P12CertUpdateCommand extends P12SecurityCommand
         {
             fOut = new FileOutputStream(p12File);
             ks.store(fOut, pwd);
-            out("Updated certificate");
+            out("updated certificate");
             return null;
         }finally
         {

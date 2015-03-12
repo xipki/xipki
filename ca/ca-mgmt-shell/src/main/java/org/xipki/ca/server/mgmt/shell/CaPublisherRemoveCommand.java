@@ -42,16 +42,16 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "capub-remove", description="Remove publisher from CA")
+@Command(scope = "xipki-ca", name = "capub-remove", description="remove publisher from CA")
 public class CaPublisherRemoveCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "Required. CA name",
+            description = "required. CA name",
             required = true)
     private String caName;
 
     @Option(name = "-publisher",
-            required = true, description = "Publisher name")
+            required = true, description = "publisher name")
     private String publisherName;
 
     @Override

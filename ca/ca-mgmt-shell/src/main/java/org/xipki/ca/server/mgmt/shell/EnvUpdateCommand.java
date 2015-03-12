@@ -42,17 +42,17 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "env-update", description="Update environment parameter")
+@Command(scope = "xipki-ca", name = "env-update", description="update environment parameter")
 public class EnvUpdateCommand extends CaCommand
 {
 
     @Option(name = "-name",
-                description = "Required. Parameter Name",
+                description = "required. Parameter Name",
                 required = true, multiValued = false)
     private String name;
 
     @Option(name = "-value",
-            description = "Required. Environment paremter value",
+            description = "required. Environment paremter value",
             required = true)
     private String value;
 
@@ -61,7 +61,7 @@ public class EnvUpdateCommand extends CaCommand
     throws Exception
     {
         caManager.changeEnvParam(name, value);
-        out("Updated the environment " + name + "=" + getRealString(value));
+        out("updated the environment " + name + "=" + getRealString(value));
         return null;
     }
 }

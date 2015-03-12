@@ -44,7 +44,7 @@ import org.apache.karaf.shell.commands.Command;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "ca-restart", description="Restart CA system")
+@Command(scope = "xipki-ca", name = "ca-restart", description="restart CA system")
 public class CaRestartCommand extends CaCommand
 {
 
@@ -55,11 +55,11 @@ public class CaRestartCommand extends CaCommand
         boolean successfull = caManager.restartCaSystem();
         if(successfull == false)
         {
-            err("Could not restart CA system");
+            err("could not restart CA system");
             return null;
         }
 
-        StringBuilder sb = new StringBuilder("Restarted CA system");
+        StringBuilder sb = new StringBuilder("restarted CA system");
         Set<String> names = new HashSet<>(caManager.getCaNames());
 
         if(names.size() > 0)

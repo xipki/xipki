@@ -47,7 +47,7 @@ import org.apache.karaf.shell.commands.Command;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "caalias-info", description="Show information of CA aliases")
+@Command(scope = "xipki-ca", name = "caalias-info", description="show information of CA aliases")
 public class CaAliasInfoCommand extends CaCommand
 {
     @Argument(index = 0, name = "alias", description = "CA alias", required = false)
@@ -91,7 +91,7 @@ public class CaAliasInfoCommand extends CaCommand
             }
             else
             {
-                sb.append("Could not find CA alias '" + caAlias + "'");
+                sb.append("could not find CA alias '" + caAlias + "'");
             }
         }
 

@@ -44,16 +44,16 @@ import org.xipki.security.api.P12KeypairGenerationResult;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "dsa-p12", description="Generate RSA keypair in PKCS#12 keystore")
+@Command(scope = "xipki-tk", name = "dsa-p12", description="generate RSA keypair in PKCS#12 keystore")
 public class P12DSAKeyGenCommand extends P12KeyGenCommand
 {
     @Option(name = "-plen",
-            description = "Bit length of the prime",
+            description = "bit length of the prime",
             required = false)
     private Integer pLen = 2048;
 
     @Option(name = "-qlen",
-            description = "Bit length of the sub-prime",
+            description = "bit length of the sub-prime",
             required = false)
     private Integer qLen;
 

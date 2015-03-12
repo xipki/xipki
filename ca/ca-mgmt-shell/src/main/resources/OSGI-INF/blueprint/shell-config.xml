@@ -4,18 +4,16 @@
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <reference id="yesNoCompleter" interface="org.xipki.console.karaf.YesNoCompleter"/>
+  <reference id="clientCrlReasonCompleter" interface="org.xipki.console.karaf.ClientCRLReasonCompleter"/>  
+  <reference id="signerTypeCompleter" interface="org.xipki.console.karaf.SignerTypeCompleter"/>
   <bean id="caStatusCompleter" class="org.xipki.console.karaf.EnumCompleter">
     <property name="tokens" value="active, inactive"/>
-  </bean>
-  <bean id="signerTypeCompleter" class="org.xipki.console.karaf.EnumCompleter">
-    <property name="tokens" value="JKS, PKCS11, PKCS12"/>
   </bean>
   <bean id="crlSignerTypeCompleter" class="org.xipki.console.karaf.EnumCompleter">
     <property name="tokens" value="CA, JKS, PKCS11, PKCS12"/>
   </bean>
   <bean id="duplicationModeCompleter" class="org.xipki.ca.server.mgmt.shell.completer.DuplicationModeCompleter"/>
   <bean id="validityModeCompleter" class="org.xipki.ca.server.mgmt.shell.completer.ValidityModeCompleter"/>
-  <bean id="crlReasonCompleter" class="org.xipki.ca.server.mgmt.shell.completer.ClientCRLReasonCompleter"/>
   <bean id="caCrlReasonCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CACRLReasonCompleter"/>
   <bean id="rcaNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.RcaNameCompleter">
     <property name="caManager" ref="caManager"/>
@@ -596,7 +594,7 @@
       </action>
       <optional-completers>
         <entry key="-ca" value-ref="caNameCompleter"/>
-        <entry key="-reason" value-ref="crlReasonCompleter"/>
+        <entry key="-reason" value-ref="clientCrlReasonCompleter"/>
       </optional-completers>
     </command>
     <!-- Enroll Certificate -->

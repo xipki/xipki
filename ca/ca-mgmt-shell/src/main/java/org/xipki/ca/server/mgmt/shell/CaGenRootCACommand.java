@@ -53,21 +53,21 @@ import org.xipki.common.util.IoUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "gen-rca", description="Generate selfsigned CA")
+@Command(scope = "xipki-ca", name = "gen-rca", description="generate selfsigned CA")
 public class CaGenRootCACommand extends CaAddOrGenCommand
 {
     @Option(name = "-p10",
-            description = "Required. PKCS#10 request of the Root CA",
+            description = "required. PKCS#10 request of the Root CA",
             required = true)
     private String p10ReqFile;
 
     @Option(name = "-profile",
-            description = "Required. Profile of the Root CA",
+            description = "required. Profile of the Root CA",
             required = true)
     private String rcaProfile;
 
     @Option(name = "-out",
-            description = "Where to save the generated CA certificate")
+            description = "where to save the generated CA certificate")
     private String rcaCertOutFile;
 
     @Override
@@ -123,7 +123,7 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
             Permission _permission = Permission.getPermission(permission);
             if(_permission == null)
             {
-                throw new ConfigurationException("Invalid permission: " + permission);
+                throw new ConfigurationException("invalid permission: " + permission);
             }
             _permissions.add(_permission);
         }
@@ -152,10 +152,10 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
 
         if(rcaCertOutFile != null)
         {
-            saveVerbose("Saved root certificate to file", new File(rcaCertOutFile), rcaCert.getEncoded());
+            saveVerbose("saved root certificate to file", new File(rcaCertOutFile), rcaCert.getEncoded());
         }
 
-        out("Generated root CA " + caName);
+        out("generated root CA " + caName);
         return null;
     }
 

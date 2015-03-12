@@ -51,21 +51,21 @@ import org.xipki.security.shell.CertRequestGenCommand;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "req", description="Generate PKCS#10 request with PKCS#11 device")
+@Command(scope = "xipki-tk", name = "req", description="generate PKCS#10 request with PKCS#11 device")
 public class P11CertRequestGenCommand extends CertRequestGenCommand
 {
     @Option(name = "-slot",
-            required = true, description = "Required. Slot index")
+            required = true, description = "required. Slot index")
     private Integer slotIndex;
 
     @Option(name = "-key-id",
-            required = false, description = "Id of the private key in the PKCS#11 device.\n"
-                    + "Either keyId or keyLabel must be specified")
+            required = false, description = "id of the private key in the PKCS#11 device.\n"
+                    + "either keyId or keyLabel must be specified")
     private String keyId;
 
     @Option(name = "-key-label",
-            required = false, description = "Label of the private key in the PKCS#11 device.\n"
-                    + "Either keyId or keyLabel must be specified")
+            required = false, description = "label of the private key in the PKCS#11 device.\n"
+                    + "either keyId or keyLabel must be specified")
     private String keyLabel;
 
     @Option(name = "-module",
@@ -86,7 +86,7 @@ public class P11CertRequestGenCommand extends CertRequestGenCommand
         }
         else
         {
-            throw new Exception("Exactly one of keyId or keyLabel should be specified");
+            throw new Exception("exactly one of keyId or keyLabel should be specified");
         }
         return keyIdentifier;
     }

@@ -215,7 +215,10 @@ public class OCSPCertPublisher extends X509CertPublisher
             auditEvent.setName("SYSTEM");
             auditEvent.setLevel(AuditLevel.ERROR);
             auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData(new AuditEventData("id", cert.getCertId()));
+            if(cert.getCertId() != null)
+            {
+                auditEvent.addEventData(new AuditEventData("id", cert.getCertId().toString()));
+            }
             auditEvent.addEventData(new AuditEventData("issuer", issuer));
             auditEvent.addEventData(new AuditEventData("subject", subjectText));
             auditEvent.addEventData(new AuditEventData("serialNumber", serialText));

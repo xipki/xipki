@@ -9,14 +9,9 @@
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
   <reference id="raWorker" interface="org.xipki.ca.client.api.RAWorker"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
-  <reference id="dataSourceFactory" interface="org.xipki.datasource.api.DataSourceFactory" availability="optional"/>
-  <bean id="crlReasonCompleter" class="org.xipki.ca.client.shell.completer.ClientCRLReasonCompleter"/>
-  <bean id="curveNameCompleter" class="org.xipki.ca.client.shell.completer.ECCurveNameCompleter"/>
+  <reference id="clientCrlReasonCompleter" interface="org.xipki.console.karaf.ClientCRLReasonCompleter"/>
   <bean id="caNameCompleter" class="org.xipki.ca.client.shell.completer.CaNameCompleter">
     <property name="raWorker" ref="raWorker"/>
-  </bean>
-  <bean id="p11ModuleNameCompleter" class="org.xipki.ca.client.shell.completer.P11ModuleNameCompleter">
-    <property name="securityFactory" ref="securityFactory"/>
   </bean>
   <reference id="qaSystemManager" interface="org.xipki.ca.qa.api.QASystemManager"/>
   <bean id="x509IssuerNameCompleter" class="org.xipki.ca.qa.shell.completer.X509IssuerNameCompleter">
@@ -69,7 +64,7 @@
       <optional-completers>
         <entry key="-cert" value-ref="filePathCompleter"/>
         <entry key="-cacert" value-ref="filePathCompleter"/>
-        <entry key="-reason" value-ref="crlReasonCompleter"/>
+        <entry key="-reason" value-ref="clientCrlReasonCompleter"/>
         <entry key="-reqout" value-ref="filePathCompleter"/>
         <entry key="-respout" value-ref="filePathCompleter"/>
       </optional-completers>

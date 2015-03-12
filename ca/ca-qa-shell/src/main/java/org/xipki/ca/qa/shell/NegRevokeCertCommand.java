@@ -35,7 +35,6 @@
 
 package org.xipki.ca.qa.shell;
 
-import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
@@ -46,21 +45,21 @@ import org.xipki.ca.client.api.CertIDOrError;
 import org.xipki.ca.client.shell.UnRevRemoveCertCommand;
 import org.xipki.common.CRLReason;
 import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.SecurityUtil;
-import org.xipki.console.karaf.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-qa", name = "neg-revoke", description="Revoke certificate (negative, for QA)")
+@Command(scope = "xipki-qa", name = "neg-revoke", description="revoke certificate (negative, for QA)")
 public class NegRevokeCertCommand extends UnRevRemoveCertCommand
 {
 
     @Option(name = "-reason",
             required = true,
-            description = "Required. Reason, valid values are \n" +
+            description = "required. Reason, valid values are \n" +
                     "  0: unspecified\n" +
                     "  1: keyCompromise\n" +
                     "  3: affiliationChanged\n" +
@@ -72,14 +71,14 @@ public class NegRevokeCertCommand extends UnRevRemoveCertCommand
 
     @Option(name = "-invDate",
             required = false,
-            description = "Invalidity date, UTC time of format yyyyMMddHHmmss")
+            description = "invalidity date, UTC time of format yyyyMMddHHmmss")
     private String invalidityDateS;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        if(certFile == null && (caCertFile == null || serialNumber == null))
+        if(certFile == null && (caCertFile == null || getSerialNumber() == null))
         {
             err("either cert or (cacert, serial) must be specified");
             return null;
@@ -138,7 +137,7 @@ public class NegRevokeCertCommand extends UnRevRemoveCertCommand
             RequestResponseDebug debug = getRequestResponseDebug();
             try
             {
-                certIdOrError = raWorker.revokeCert(issuer, new BigInteger(serialNumber), crlReason.getCode(),
+                certIdOrError = raWorker.revokeCert(issuer, getSerialNumber(), crlReason.getCode(),
                         invalidityDate, debug);
             }finally
             {
@@ -148,7 +147,7 @@ public class NegRevokeCertCommand extends UnRevRemoveCertCommand
 
         if(certIdOrError.getError() == null)
         {
-            throw new UnexpectedResultException("Revocation sucessful but expected failure");
+            throw new UnexpectedResultException("revocation sucessful but expected failure");
         }
         return null;
     }

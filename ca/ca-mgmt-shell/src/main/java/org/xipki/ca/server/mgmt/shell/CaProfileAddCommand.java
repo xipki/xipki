@@ -44,7 +44,7 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "caprofile-add", description="Add certificate profiles to CA")
+@Command(scope = "xipki-ca", name = "caprofile-add", description="add certificate profiles to CA")
 public class CaProfileAddCommand extends CaCommand
 {
     @Option(name = "-ca",
@@ -53,7 +53,7 @@ public class CaProfileAddCommand extends CaCommand
     private String caName;
 
     @Option(name = "-profile",
-        description = "Required. Profile profileNames, multi values allowed",
+        description = "required. Profile profileNames, multi values allowed",
         required = true, multiValued = true)
     private List<String> profileNames;
 

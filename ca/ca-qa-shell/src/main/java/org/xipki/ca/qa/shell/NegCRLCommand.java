@@ -42,7 +42,7 @@ import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.RAWorkerException;
 import org.xipki.ca.client.shell.ClientCommand;
-import org.xipki.console.karaf.UnexpectedResultException;
+import org.xipki.common.qa.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
@@ -52,7 +52,7 @@ public abstract class NegCRLCommand extends ClientCommand
 {
 
     @Option(name = "-ca",
-            required = false, description = "Required if multiple CAs are configured. CA name")
+            required = false, description = "required if multiple CAs are configured. CA name")
     private String caName;
 
     protected abstract X509CRL retrieveCRL(String caName)
@@ -65,7 +65,7 @@ public abstract class NegCRLCommand extends ClientCommand
         Set<String> caNames = raWorker.getCaNames();
         if(isEmpty(caNames))
         {
-            err("No CA is configured");
+            err("no CA is configured");
             return  null;
         }
 
@@ -83,7 +83,7 @@ public abstract class NegCRLCommand extends ClientCommand
             }
             else
             {
-                err("No caname is specified, one of " + caNames + " is required");
+                err("no caname is specified, one of " + caNames + " is required");
                 return null;
             }
         }
@@ -98,7 +98,7 @@ public abstract class NegCRLCommand extends ClientCommand
 
         if(crl != null)
         {
-            throw new UnexpectedResultException("No CRL is expected, but received one");
+            throw new UnexpectedResultException("no CRL is expected, but received one");
         }
 
         return null;

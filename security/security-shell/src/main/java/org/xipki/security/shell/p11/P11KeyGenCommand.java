@@ -52,19 +52,19 @@ public abstract class P11KeyGenCommand extends KeyGenCommand
 {
 
     @Option(name = "-slot",
-            required = true, description = "Required. Slot index")
+            required = true, description = "required. Slot index")
     protected Integer slotIndex;
 
     @Option(name = "-key-label",
-            required = true, description = "Required. Label of the PKCS#11 objects")
+            required = true, description = "required. Label of the PKCS#11 objects")
     protected String label;
 
     @Option(name = "-subject",
-            required = false, description = "Subject in the self-signed certificate")
+            required = false, description = "subject in the self-signed certificate")
     protected String subject;
 
     @Option(name = "-certout",
-            required = false, description = "Where to save the self-signed certificate")
+            required = false, description = "where to save the self-signed certificate")
     protected String outputFilename;
 
     @Option(name = "-module",
@@ -94,7 +94,7 @@ public abstract class P11KeyGenCommand extends KeyGenCommand
         if(outputFilename != null)
         {
             File certFile = new File(outputFilename);
-            saveVerbose("\tSaved self-signed certificate to file", certFile, keyAndCert.getCertificate().getEncoded());
+            saveVerbose("\tsaved self-signed certificate to file", certFile, keyAndCert.getCertificate().getEncoded());
         }
 
         securityFactory.getP11CryptService(moduleName).refresh();

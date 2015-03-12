@@ -54,7 +54,7 @@ import org.xipki.security.api.ConcurrentContentSigner;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "ca-add", description="Add CA")
+@Command(scope = "xipki-ca", name = "ca-add", description="add CA")
 public class CaAddCommand extends CaAddOrGenCommand
 {
     @Option(name = "-cert",
@@ -158,7 +158,7 @@ public class CaAddCommand extends CaAddOrGenCommand
             Permission _permission = Permission.getPermission(permission);
             if(_permission == null)
             {
-                throw new ConfigurationException("Invalid permission: " + permission);
+                throw new ConfigurationException("invalid permission: " + permission);
             }
             _permissions.add(_permission);
         }

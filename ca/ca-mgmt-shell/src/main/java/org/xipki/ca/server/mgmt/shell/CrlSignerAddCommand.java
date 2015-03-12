@@ -48,16 +48,16 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "crlsigner-add", description="Add CRL signer")
+@Command(scope = "xipki-ca", name = "crlsigner-add", description="add CRL signer")
 public class CrlSignerAddCommand extends CaCommand
 {
     @Option(name = "-name",
-            description = "Required. CRL signer name",
+            description = "required. CRL signer name",
             required = true, multiValued = false)
     private String name;
 
     @Option(name = "-signerType",
-            description = "Required. CRL signer type, use 'CA' to sign the CRL by the CA itself",
+            description = "required. CRL signer type, use 'CA' to sign the CRL by the CA itself",
             required = true)
     private String signerType;
 
@@ -70,7 +70,7 @@ public class CrlSignerAddCommand extends CaCommand
     private String signerCertFile;
 
     @Option(name = "-crlControl",
-            required = true, description = "Required. CRL control")
+            required = true, description = "required. CRL control")
     private String crlControlS;
 
     private SecurityFactory securityFactory;

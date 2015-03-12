@@ -42,7 +42,7 @@ import org.apache.karaf.shell.commands.Command;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "ca-unrevoke", description="Unrevoke CA")
+@Command(scope = "xipki-ca", name = "ca-unrevoke", description="unrevoke CA")
 public class CaUnrevokeCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CA name", required = true)

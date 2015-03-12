@@ -44,16 +44,16 @@ import org.xipki.security.api.p11.P11WritableSlot;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "dsa", description="Generate DSA keypair in PKCS#11 device")
+@Command(scope = "xipki-tk", name = "dsa", description="generate DSA keypair in PKCS#11 device")
 public class P11DSAKeyGenCommand extends P11KeyGenCommand
 {
     @Option(name = "-plen",
-            description = "Bit length of the prime",
+            description = "bit length of the prime",
             required = false)
     private Integer pLen = 2048;
 
     @Option(name = "-qlen",
-            description = "Bit length of the sub-prime",
+            description = "bit length of the sub-prime",
             required = false)
     private Integer qLen;
 

@@ -33,42 +33,28 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.shell.completer;
+package org.xipki.console.karaf.impl.completer;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.xipki.common.ObjectIdentifiers;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.xipki.common.CRLReason;
+import org.xipki.console.karaf.ClientCRLReasonCompleter;
+import org.xipki.console.karaf.EnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public class ExtKeyusageCompleter extends DynamicEnumCompleter
+public class ClientCRLReasonCompleterImpl extends EnumCompleter
+implements ClientCRLReasonCompleter
 {
-    private static final Set<String> usages;
-
-    static
+    public ClientCRLReasonCompleterImpl()
     {
-        Set<String> set = new HashSet<>();
-        set.add(ObjectIdentifiers.id_kp_clientAuth.getId());
-        set.add(ObjectIdentifiers.id_kp_codeSigning.getId());
-        set.add(ObjectIdentifiers.id_kp_emailProtection.getId());
-        set.add(ObjectIdentifiers.id_kp_ipsecEndSystem.getId());
-        set.add(ObjectIdentifiers.id_kp_ipsecTunnel.getId());
-        set.add(ObjectIdentifiers.id_kp_OCSPSigning.getId());
-        set.add(ObjectIdentifiers.id_kp_serverAuth.getId());
-        set.add(ObjectIdentifiers.id_kp_timeStamping.getId());
+        StringBuilder enums = new StringBuilder();
 
-        usages = Collections.unmodifiableSet(set);
+        for(CRLReason reason : CRLReason.PERMITTED_CLIENT_CRLREASONS)
+        {
+            enums.append(reason.getDescription()).append(",");
+        }
+        enums.deleteCharAt(enums.length() - 1);
+        setTokens(enums.toString());
     }
-
-    @Override
-    protected Set<String> getEnums()
-    {
-        return usages;
-    }
-
 }

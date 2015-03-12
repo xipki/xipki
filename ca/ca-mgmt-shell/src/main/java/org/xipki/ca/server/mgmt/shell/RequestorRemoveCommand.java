@@ -42,10 +42,10 @@ import org.apache.karaf.shell.commands.Command;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "requestor-rm", description="Remove requestor")
+@Command(scope = "xipki-ca", name = "requestor-rm", description="remove requestor")
 public class RequestorRemoveCommand extends CaCommand
 {
-    @Argument(index = 0, name = "name", description = "Requestor name", required = true)
+    @Argument(index = 0, name = "name", description = "requestor name", required = true)
     private String name;
 
     @Override

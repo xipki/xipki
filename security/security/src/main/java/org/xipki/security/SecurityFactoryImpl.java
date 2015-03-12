@@ -394,12 +394,12 @@ public class SecurityFactoryImpl implements SecurityFactory
                 String keyLabel = keyValues.getValue("key-label");
 
                 InputStream keystoreStream;
-                if(s.startsWith("base64:"))
+                if(StringUtil.startsWithIgnoreCase(s, "base64:"))
                 {
                     keystoreStream = new ByteArrayInputStream(
                             Base64.decode(s.substring("base64:".length())));
                 }
-                else if(s.startsWith("file:"))
+                else if(StringUtil.startsWithIgnoreCase(s, "file:"))
                 {
                     String fn = s.substring("file:".length());
                     try
@@ -439,7 +439,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                 }
             }
         }
-        else if(type.toLowerCase().startsWith("java:"))
+        else if(StringUtil.startsWithIgnoreCase(type, "java:"))
         {
             if(hashAlgo == null)
             {
@@ -627,32 +627,7 @@ public class SecurityFactoryImpl implements SecurityFactory
         {
             if(mgf1)
             {
-                ASN1ObjectIdentifier hashAlgoOid;
-                if("SHA1".equalsIgnoreCase(hashAlgo))
-                {
-                    hashAlgoOid = X509ObjectIdentifiers.id_SHA1;
-                }
-                else if("SHA224".equalsIgnoreCase(hashAlgo))
-                {
-                    hashAlgoOid = NISTObjectIdentifiers.id_sha224;
-                }
-                else if("SHA256".equalsIgnoreCase(hashAlgo))
-                {
-                    hashAlgoOid = NISTObjectIdentifiers.id_sha256;
-                }
-                else if("SHA384".equalsIgnoreCase(hashAlgo))
-                {
-                    hashAlgoOid = NISTObjectIdentifiers.id_sha384;
-                }
-                else if("SHA512".equalsIgnoreCase(hashAlgo))
-                {
-                    hashAlgoOid = NISTObjectIdentifiers.id_sha512;
-                }
-                else
-                {
-                    throw new RuntimeException("Unsupported hash algorithm " + hashAlgo);
-                }
-
+                ASN1ObjectIdentifier hashAlgoOid = SecurityUtil.getHashAlg(hashAlgo);
                 try
                 {
                     signatureAlgId = SignerUtil.buildRSAPSSAlgorithmIdentifier(hashAlgoOid);
@@ -1186,7 +1161,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                 String str = slotType.getId().trim();
                 try
                 {
-                    if(str.startsWith("0x") || str.startsWith("0X"))
+                    if(StringUtil.startsWithIgnoreCase(str, "0X"))
                     {
                         slotId = Long.parseLong(str.substring(2), 16);
                     }

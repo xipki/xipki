@@ -48,10 +48,10 @@ import org.xipki.ca.server.mgmt.api.PublisherEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "publisher-info", description="Show information of publishers")
+@Command(scope = "xipki-ca", name = "publisher-info", description="show information of publishers")
 public class PublisherInfoCommand extends CaCommand
 {
-    @Argument(index = 0, name = "name", description = "Publisher name", required = false)
+    @Argument(index = 0, name = "name", description = "publisher name", required = false)
     private String name;
 
     @Override

@@ -228,7 +228,7 @@ public class Rfc6712Servlet extends HttpServlet
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
             auditLevel = AuditLevel.ERROR;
-            auditStatus = AuditStatus.ERROR;
+            auditStatus = AuditStatus.FAILED;
             auditMessage = "internal error";
         }
         finally
@@ -255,8 +255,7 @@ public class Rfc6712Servlet extends HttpServlet
                         auditEvent.addEventData(new AuditEventData("message", auditMessage));
                     }
 
-                    auditEvent.addEventData(new AuditEventData("duration",
-                            System.currentTimeMillis() - auditEvent.getTimestamp().getTime()));
+                    auditEvent.setDuration(System.currentTimeMillis() - auditEvent.getTimestamp().getTime());
 
                     if(auditEvent.containsChildAuditEvents() == false)
                     {

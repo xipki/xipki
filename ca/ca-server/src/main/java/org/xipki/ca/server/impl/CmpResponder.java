@@ -369,7 +369,7 @@ abstract class CmpResponder
             if(auditEvent !=  null)
             {
                 auditEvent.setLevel(AuditLevel.ERROR);
-                auditEvent.setStatus(AuditStatus.ERROR);
+                auditEvent.setStatus(AuditStatus.FAILED);
                 auditEvent.addEventData(new AuditEventData("message", "could not sign the PKIMessage"));
             }
             return new PKIMessage(pkiMessage.getHeader(), body);

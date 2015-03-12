@@ -56,16 +56,16 @@ import org.xipki.common.util.SecurityUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "extract-cert", description="Extract certificates from CRL")
+@Command(scope = "xipki-tk", name = "extract-cert", description="extract certificates from CRL")
 public class ExtractCertFromCRLCommand extends SecurityCommand
 {
 
     @Option(name = "-crl",
-            required = true, description = "Required. CRL file")
+            required = true, description = "required. CRL file")
     private String crlFile;
 
     @Option(name = "-out",
-            required = true, description = "Required. Zip file to save the extracted certificates")
+            required = true, description = "required. Zip file to save the extracted certificates")
     private String outFile;
 
     @Override
@@ -77,7 +77,7 @@ public class ExtractCertFromCRLCommand extends SecurityCommand
         byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
         if(extnValue == null)
         {
-            err("No certificate is contained in " + crlFile);
+            err("no certificate is contained in " + crlFile);
             return null;
         }
 
@@ -86,7 +86,7 @@ public class ExtractCertFromCRLCommand extends SecurityCommand
         int n = asn1Set.size();
         if(n == 0)
         {
-            err("No certificate is contained in " + crlFile);
+            err("no certificate is contained in " + crlFile);
             return null;
         }
 
@@ -124,7 +124,7 @@ public class ExtractCertFromCRLCommand extends SecurityCommand
         zip.flush();
         zip.close();
 
-        saveVerbose("Extracted " + n + " certificates to", new File(outFile), out.toByteArray());
+        saveVerbose("extracted " + n + " certificates to", new File(outFile), out.toByteArray());
         return null;
     }
 

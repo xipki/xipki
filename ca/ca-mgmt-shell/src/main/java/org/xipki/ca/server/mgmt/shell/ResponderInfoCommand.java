@@ -43,12 +43,12 @@ import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "responder-info", description="Show information of responder")
+@Command(scope = "xipki-ca", name = "responder-info", description="show information of responder")
 public class ResponderInfoCommand extends CaCommand
 {
 
     @Option(name = "-v", aliases="--verbose",
-            required = false, description = "Show responder information verbosely")
+            required = false, description = "show responder information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Override

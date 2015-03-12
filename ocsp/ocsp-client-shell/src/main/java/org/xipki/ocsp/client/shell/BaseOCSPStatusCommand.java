@@ -61,7 +61,7 @@ import org.xipki.ocsp.client.api.RequestOptions;
 public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
 {
     @Option(name = "-respIssuer",
-            required = false, description = "Certificate file of the responder's issuer")
+            required = false, description = "certificate file of the responder's issuer")
     private String respIssuerFile;
 
     @Option(name = "-url",
@@ -78,16 +78,16 @@ public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
 
     @Option(name = "-serial",
             multiValued = true,
-            description = "Serial number, multi values allowed")
+            description = "serial number, multi-valued")
     private List<String> serialNumbers;
 
     @Option(name = "-cert",
             multiValued = true,
-            description = "Certificate, multi values allowed")
+            description = "certificate, multi-valued")
     private List<String> certFiles;
 
     @Option(name = "-v", aliases="--verbose",
-            required = false, description = "Show status verbosely")
+            required = false, description = "show status verbosely")
     protected Boolean verbose = Boolean.FALSE;
 
     protected static final Map<ASN1ObjectIdentifier, String> extensionOidNameMap = new HashMap<>();
@@ -165,14 +165,14 @@ public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
         {
             for(String serialNumber : serialNumbers)
             {
-                BigInteger sn = new BigInteger(serialNumber);
+                BigInteger sn = toBigInt(serialNumber);
                 sns.add(sn);
             }
         }
 
         if(isBlank(serverURL))
         {
-            throw new Exception("Could not get URL for the OCSP responder");
+            throw new Exception("could not get URL for the OCSP responder");
         }
 
         X509Certificate respIssuer  = null;

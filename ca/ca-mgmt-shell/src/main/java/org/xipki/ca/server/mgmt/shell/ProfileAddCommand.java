@@ -44,26 +44,26 @@ import org.xipki.common.util.IoUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "profile-add", description="Add certificate profile")
+@Command(scope = "xipki-ca", name = "profile-add", description="add certificate profile")
 public class ProfileAddCommand extends CaCommand
 {
 
     @Option(name = "-name",
-                description = "Required. Profile name",
+                description = "required. Profile name",
                 required = true, multiValued = false)
     private String name;
 
     @Option(name = "-type",
-            description = "Required. Profile type",
+            description = "required. Profile type",
             required = true)
     private String type;
 
     @Option(name = "-conf",
-            description = "Profile configuration")
+            description = "profile configuration")
     private String conf;
 
     @Option(name = "-confFile",
-            description = "Profile configuration file")
+            description = "profile configuration file")
     private String confFile;
 
     @Override

@@ -49,11 +49,11 @@ import org.xipki.common.util.SecurityUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "crlsigner-update", description="Update CRL signer")
+@Command(scope = "xipki-ca", name = "crlsigner-update", description="update CRL signer")
 public class CrlSignerUpdateCommand extends CaCommand
 {
     @Option(name = "-name",
-            description = "Required. CRL signer name",
+            description = "required. CRL signer name",
             required = true, multiValued = false)
     private String name;
 

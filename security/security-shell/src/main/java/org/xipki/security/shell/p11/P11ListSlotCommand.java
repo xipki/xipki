@@ -74,11 +74,11 @@ import org.xipki.security.shell.SecurityCommand;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "list", description="List objects in PKCS#11 device")
+@Command(scope = "xipki-tk", name = "list", description="list objects in PKCS#11 device")
 public class P11ListSlotCommand extends SecurityCommand
 {
     @Option(name = "-v", aliases="--verbose",
-            required = false, description = "Show object information verbosely")
+            required = false, description = "show object information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Option(name = "-module",
@@ -86,7 +86,7 @@ public class P11ListSlotCommand extends SecurityCommand
     private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Option(name = "-slot",
-            required = false, description = "Slot index")
+            required = false, description = "slot index")
     private Integer slotIndex;
 
     @Override
@@ -96,11 +96,11 @@ public class P11ListSlotCommand extends SecurityCommand
         P11Module module = getP11Module(moduleName);
         if(module == null)
         {
-            err("Undefined module " + moduleName);
+            err("undefined module " + moduleName);
             return null;
         }
 
-        out("Module: " + moduleName);
+        out("module: " + moduleName);
         List<P11SlotIdentifier> slots = module.getSlotIdentifiers();
         if(slotIndex == null)
         {

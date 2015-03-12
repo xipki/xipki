@@ -96,6 +96,7 @@ import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.security.api.ExtensionExistence;
 
 /**
@@ -160,7 +161,7 @@ class IdentifiedX509Certprofile
         {
             tmpCertprofile = new XmlX509Certprofile();
         }
-        else if(type.toLowerCase().startsWith("java:"))
+        else if(StringUtil.startsWithIgnoreCase(type, "java:"))
         {
             className = type.substring("java:".length());
             try

@@ -52,6 +52,7 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -257,7 +258,7 @@ class X509CA
                                     if(removed)
                                     {
                                         auditEvent.setLevel(AuditLevel.INFO);
-                                        auditEvent.setStatus(AuditStatus.OK);
+                                        auditEvent.setStatus(AuditStatus.SUCCESSFUL);
                                     }
                                     else
                                     {
@@ -297,9 +298,8 @@ class X509CA
                 AuditLoggingService audit = getAuditLoggingService();
                 if(audit != null && task != null);
                 {
-                    long durationMillis = System.currentTimeMillis() - startTime;
                     AuditEvent auditEvent = newAuditEvent();
-                    auditEvent.addEventData(new AuditEventData("duration", durationMillis));
+                    auditEvent.setDuration(System.currentTimeMillis() - startTime);
                     auditEvent.addEventData(new AuditEventData("CA", caInfo.getName()));
                     auditEvent.addEventData(new AuditEventData("cerProfile", task.getCertprofile()));
                     auditEvent.addEventData(new AuditEventData("user", task.getUserLike()));
@@ -310,7 +310,7 @@ class X509CA
                     if(allCertsRemoved)
                     {
                         auditEvent.setLevel(AuditLevel.INFO);
-                        auditEvent.setStatus(AuditStatus.OK);
+                        auditEvent.setStatus(AuditStatus.SUCCESSFUL);
                     }
                     else
                     {
@@ -498,7 +498,7 @@ class X509CA
                     }
                 }catch(Throwable t)
                 {
-                    auditEvent.setStatus(AuditStatus.ERROR);
+                    auditEvent.setStatus(AuditStatus.FAILED);
                     auditEvent.setLevel(AuditLevel.ERROR);
                     final String message = "CRL_GEN_INTERVAL: Error";
                     if(LOG.isErrorEnabled())
@@ -508,7 +508,7 @@ class X509CA
                     LOG.debug(message, t);
                 }finally
                 {
-                    auditEvent.addEventData(new AuditEventData("duration", System.currentTimeMillis() - start.getTime()));
+                    auditEvent.setDuration(System.currentTimeMillis() - start.getTime());
                 }
 
                 if(serviceRegister != null)
@@ -532,7 +532,7 @@ class X509CA
     private static final long DAY = MS_PER_SECOND * SECOND_PER_MIN * MIN_PER_DAY;
 
     private static Logger LOG = LoggerFactory.getLogger(X509CA.class);
-
+    private final DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd-HH:mm:ss.SSSz");
     private final CertificateFactory cf;
 
     private final X509CAInfo caInfo;
@@ -789,7 +789,12 @@ class X509CA
             auditEvent.addEventData(new AuditEventData("crlType", deltaCRL ? "DELTA_CRL" : "FULL_CRL"));
             if(nextUpdate != null)
             {
-                auditEvent.addEventData(new AuditEventData("nextUpdate", nextUpdate));
+                String value;
+                synchronized (dateFormat)
+                {
+                    value = dateFormat.format(nextUpdate);
+                }
+                auditEvent.addEventData(new AuditEventData("nextUpdate", value));
             }
             else
             {
@@ -916,7 +921,7 @@ class X509CA
             BigInteger crlNumber = caInfo.nextCRLNumber();
             if(auditEvent != null)
             {
-                auditEvent.addEventData(new AuditEventData("crlNumber", crlNumber));
+                auditEvent.addEventData(new AuditEventData("crlNumber", crlNumber.toString()));
             }
 
             try

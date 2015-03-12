@@ -48,31 +48,31 @@ import org.xipki.common.ConfigurationException;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "careq-add", description="Add requestor to CA")
+@Command(scope = "xipki-ca", name = "careq-add", description="add requestor to CA")
 public class CaRequestorAddCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "Required. CA name",
+            description = "required. CA name",
             required = true)
     private String caName;
 
     @Option(name = "-requestor",
-            required = true, description = "Required. Requestor name")
+            required = true, description = "required. Requestor name")
     private String requestorName;
 
     @Option(name = "-ra",
-            description = "Whether as RA.\n"
+            description = "whether as RA.\n"
                     + "Valid values are 'yes' and 'no'")
     private String raS = "no";
 
     @Option(name = "-permission",
-            description = "Required. Permission, multi options is allowed. allowed values are\n"
+            description = "required. Permission, multi options is allowed. allowed values are\n"
                     + permissionsText,
             required = true, multiValued = true)
     private Set<String> permissions;
 
     @Option(name = "-profile",
-            description = "Required. Profile name or 'all' for all profiles, multi options is allowed",
+            description = "required. Profile name or 'all' for all profiles, multi options is allowed",
             required = true, multiValued = true)
     private Set<String> profiles;
 
@@ -91,7 +91,7 @@ public class CaRequestorAddCommand extends CaCommand
             Permission _permission = Permission.getPermission(permission);
             if(_permission == null)
             {
-                throw new ConfigurationException("Invalid permission: " + permission);
+                throw new ConfigurationException("invalid permission: " + permission);
             }
             _permissions.add(_permission);
         }

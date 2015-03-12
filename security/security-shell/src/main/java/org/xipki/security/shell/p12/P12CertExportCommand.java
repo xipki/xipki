@@ -48,11 +48,11 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "export-cert-p12", description="Export certificate from PKCS#12 keystore")
+@Command(scope = "xipki-tk", name = "export-cert-p12", description="export certificate from PKCS#12 keystore")
 public class P12CertExportCommand extends P12SecurityCommand
 {
     @Option(name = "-out",
-            required = true, description = "Required. Where to save the certificate")
+            required = true, description = "required. Where to save the certificate")
     private String outFile;
 
     @Override
@@ -75,11 +75,11 @@ public class P12CertExportCommand extends P12SecurityCommand
 
         if(keyname == null)
         {
-            throw new SignerException("Could not find private key");
+            throw new SignerException("could not find private key");
         }
 
         X509Certificate cert = (X509Certificate) ks.getCertificate(keyname);
-        saveVerbose("Saved certificate to file", new File(outFile), cert.getEncoded());
+        saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
 
         return null;
     }

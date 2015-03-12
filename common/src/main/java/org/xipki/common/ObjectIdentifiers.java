@@ -415,12 +415,37 @@ public class ObjectIdentifiers
 
     public static String getName(ASN1ObjectIdentifier type)
     {
-        String name = RFC4519Style.INSTANCE.oidToDisplayName(type);
+        String name = oidNameMap.get(type);
+
         if(StringUtil.isBlank(name))
         {
-            name = oidNameMap.get(type);
+            try
+            {
+                name = RFC4519Style.INSTANCE.oidToDisplayName(type);
+            }catch(IllegalArgumentException e)
+            {
+            }
         }
         return name;
+    }
+
+    public static ASN1ObjectIdentifier nameToOID(String name)
+    {
+        for(ASN1ObjectIdentifier oid : oidNameMap.keySet())
+        {
+            if(oidNameMap.get(oid).equalsIgnoreCase(name))
+            {
+                return oid;
+            }
+        }
+
+        try
+        {
+            return RFC4519Style.INSTANCE.attrNameToOID(name);
+        }catch(IllegalArgumentException e)
+        {
+            return null;
+        }
     }
 
     public static List<ASN1ObjectIdentifier> getForwardDNs()

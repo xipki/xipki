@@ -47,16 +47,16 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-qa", name = "neg-enroll-p12", description="Enroll certificate (PKCS#12 keystore, negative, for QA)")
+@Command(scope = "xipki-qa", name = "neg-enroll-p12", description="enroll certificate (PKCS#12 keystore, negative, for QA)")
 public class NegP12EnrollCertCommand extends NegEnrollCertCommand
 {
 
     @Option(name = "-p12",
-            required = true, description = "Required. PKCS#12 request file")
+            required = true, description = "required. PKCS#12 request file")
     private String p12File;
 
     @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#12 file")
+            required = false, description = "password of the PKCS#12 file")
     private String password;
 
     @Override

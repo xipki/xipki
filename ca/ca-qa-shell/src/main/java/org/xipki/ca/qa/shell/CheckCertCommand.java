@@ -47,37 +47,37 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.ca.qa.api.QASystemManager;
 import org.xipki.ca.qa.api.X509CertprofileQA;
 import org.xipki.ca.qa.api.X509IssuerInfo;
+import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.UnexpectedResultException;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-qa", name = "check-cert", description="Check the certificate")
+@Command(scope = "xipki-qa", name = "check-cert", description="check the certificate")
 public class CheckCertCommand extends XipkiOsgiCommandSupport
 {
     @Option(name = "-cert",
-            required = true, description = "Required. Certificate file")
+            required = true, description = "required. Certificate file")
     private String certFile;
 
     @Option(name = "-issuer",
-            required = false, description = "Required if multiple issuers are configured. Issuer name")
+            required = false, description = "required if multiple issuers are configured. Issuer name")
     private String issuerName;
 
     @Option(name = "-p10",
-            required = true, description = "Required. PKCS#10 request file")
+            required = true, description = "required. PKCS#10 request file")
     private String p10File;
 
     @Option(name = "-profile",
-            required = true, description = "Required. Certificate profile")
+            required = true, description = "required. Certificate profile")
     private String profileName;
 
     @Option(name = "-v", aliases="--verbose",
-            required = false, description = "Show status verbosely")
+            required = false, description = "show status verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     private QASystemManager qaSystemManager;
@@ -89,7 +89,7 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
         Set<String> issuerNames = qaSystemManager.getIssuerNames();
         if(isEmpty(issuerNames))
         {
-            err("No issuer is configured");
+            err("no issuer is configured");
             return  null;
         }
 
@@ -97,7 +97,7 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
         {
             if(issuerNames.size() != 1)
             {
-                err("No issuer is specified");
+                err("no issuer is specified");
                 return null;
             }
 
@@ -106,7 +106,7 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
 
         if(issuerNames.contains(issuerName) == false)
         {
-            err("Issuer " + issuerName + " is not within the configured issuers " + issuerNames);
+            err("issuer " + issuerName + " is not within the configured issuers " + issuerNames);
             return null;
         }
 
@@ -115,7 +115,7 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
         X509CertprofileQA qa = qaSystemManager.getCertprofile(profileName);
         if(qa == null)
         {
-            err("Found no certificate profile named '" + profileName + "'");
+            err("found no certificate profile named '" + profileName + "'");
             return null;
         }
 
@@ -167,7 +167,7 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
         sb.append(prefix);
         sb.append(issue.getCode());
         sb.append(", ").append(issue.getDescription());
-        sb.append(", ").append(issue.isFailed() ? "failure" : "successful");
+        sb.append(", ").append(issue.isFailed() ? "failed" : "successful");
         if(issue.getMessage() != null)
         {
             sb.append(", ").append(issue.getMessage());

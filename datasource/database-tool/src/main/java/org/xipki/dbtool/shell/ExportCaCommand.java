@@ -46,7 +46,7 @@ import org.xipki.security.api.PasswordResolver;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "export-ca", description="Export CA database")
+@Command(scope = "xipki-db", name = "export-ca", description="export CA database")
 public class ExportCaCommand extends XipkiOsgiCommandSupport
 {
     private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ca-db.properties";
@@ -54,16 +54,16 @@ public class ExportCaCommand extends XipkiOsgiCommandSupport
     private static final int DFLT_NUM_CRLS = 30;
 
     @Option(name = "-dbconf",
-            description = "Database configuration file")
+            description = "database configuration file")
     private String dbconfFile = DFLT_DBCONF_FILE;
 
     @Option(name = "-outdir",
-            description = "Required. Output directory",
+            description = "required. Output directory",
             required = true)
     private String outdir;
 
     @Option(name = "-n",
-            description = "Number of certificates in one zip file")
+            description = "number of certificates in one zip file")
     private Integer numCertsInBundle = DFLT_NUM_CERTS_IN_BUNDLE;
 
     @Option(name = "-numcrls",

@@ -42,7 +42,9 @@ import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.cert.CRLException;
 import java.security.cert.X509CRL;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -112,10 +114,10 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.xipki.audit.api.AuditChildEvent;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditStatus;
-import org.xipki.audit.api.ChildAuditEvent;
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
@@ -151,6 +153,7 @@ class X509CACmpResponder extends CmpResponder
 
     private static final Logger LOG = LoggerFactory.getLogger(X509CACmpResponder.class);
 
+    private final DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd-HH:mm:ss.SSSz");
     private final PendingCertificatePool pendingCertPool;
 
     private final String caName;
@@ -634,7 +637,7 @@ class X509CACmpResponder extends CmpResponder
 
                 if(pkiStatus.getPkiFailureInfo() == PKIFailureInfo.systemFailure)
                 {
-                    auditStatus = AuditStatus.ERROR;
+                    auditStatus = AuditStatus.FAILED;
                 }
                 auditEvent.setStatus(auditStatus);
 
@@ -709,10 +712,10 @@ class X509CACmpResponder extends CmpResponder
 
         for(int i = 0; i < certReqMsgs.length; i++)
         {
-            ChildAuditEvent childAuditEvent = null;
+            AuditChildEvent childAuditEvent = null;
             if(auditEvent != null)
             {
-                childAuditEvent = new ChildAuditEvent();
+                childAuditEvent = new AuditChildEvent();
                 auditEvent.addChildAuditEvent(childAuditEvent);
             }
 
@@ -721,7 +724,7 @@ class X509CACmpResponder extends CmpResponder
             ASN1Integer certReqId = reqMsg.getCertReq().getCertReqId();
             if(childAuditEvent != null)
             {
-                childAuditEvent.addEventData(new AuditEventData("certReqId", certReqId.getPositiveValue().intValue()));
+                childAuditEvent.addEventData(new AuditEventData("certReqId", certReqId.getPositiveValue().toString()));
             }
 
             if(req.hasProofOfPossession() == false)
@@ -788,7 +791,7 @@ class X509CACmpResponder extends CmpResponder
 
                         if(childAuditEvent != null)
                         {
-                            childAuditEvent.setStatus(AuditStatus.ERROR);
+                            childAuditEvent.setStatus(AuditStatus.FAILED);
                             childAuditEvent.addEventData(new AuditEventData("message", "badCertTemplate"));
                         }
                     }
@@ -816,10 +819,10 @@ class X509CACmpResponder extends CmpResponder
         CertResponse certResp;
         ASN1Integer certReqId = new ASN1Integer(-1);
 
-        ChildAuditEvent childAuditEvent = null;
+        AuditChildEvent childAuditEvent = null;
         if(auditEvent != null)
         {
-            childAuditEvent = new ChildAuditEvent();
+            childAuditEvent = new AuditChildEvent();
             auditEvent.addChildAuditEvent(childAuditEvent);
         }
 
@@ -881,7 +884,7 @@ class X509CACmpResponder extends CmpResponder
                         e.getMessage()));
                 if(childAuditEvent != null)
                 {
-                    childAuditEvent.setStatus(AuditStatus.ERROR);
+                    childAuditEvent.setStatus(AuditStatus.FAILED);
                     childAuditEvent.addEventData(new AuditEventData("message", "badCertTemplate"));
                 }
             }
@@ -906,7 +909,7 @@ class X509CACmpResponder extends CmpResponder
             String certprofileName,
             boolean keyUpdate,
             long confirmWaitTime,
-            ChildAuditEvent childAuditEvent)
+            AuditChildEvent childAuditEvent)
     throws InsuffientPermissionException
     {
         checkPermission(requestor, certprofileName);
@@ -990,7 +993,6 @@ class X509CACmpResponder extends CmpResponder
             LOG.warn("generate certificate, OperationException: code={}, message={}",
                     code.name(), e.getErrorMessage());
 
-            AuditStatus auditStatus;
             String auditMessage;
 
             int failureInfo;
@@ -998,78 +1000,64 @@ class X509CACmpResponder extends CmpResponder
             {
                 case ALREADY_ISSUED:
                     failureInfo = PKIFailureInfo.badRequest;
-                    auditStatus = AuditStatus.FAILED;
                     auditMessage = "ALREADY_ISSUED";
                     break;
                 case BAD_CERT_TEMPLATE:
                     failureInfo = PKIFailureInfo.badCertTemplate;
-                    auditStatus = AuditStatus.FAILED;
                     auditMessage = "BAD_CERT_TEMPLATE";
                     break;
                 case BAD_REQUEST:
                     failureInfo = PKIFailureInfo.badRequest;
-                    auditStatus = AuditStatus.ERROR;
                     auditMessage = "BAD_REQUEST";
                 case CERT_REVOKED:
                     failureInfo = PKIFailureInfo.certRevoked;
-                    auditStatus = AuditStatus.FAILED;
                     auditMessage = "CERT_REVOKED";
                     break;
                 case CRL_FAILURE:
                     failureInfo = PKIFailureInfo.systemFailure;
-                    auditStatus = AuditStatus.ERROR;
                     auditMessage = "CRL_FAILURE";
                     break;
                 case DATABASE_FAILURE:
                     failureInfo = PKIFailureInfo.systemFailure;
-                    auditStatus = AuditStatus.ERROR;
                     auditMessage = "DATABASE_FAILURE";
                     break;
                 case NOT_PERMITTED:
                     failureInfo = PKIFailureInfo.notAuthorized;
-                    auditStatus = AuditStatus.FAILED;
                     auditMessage = "NOT_PERMITTED";
                     break;
                 case INSUFFICIENT_PERMISSION:
                     failureInfo = PKIFailureInfo.notAuthorized;
-                    auditStatus = AuditStatus.ERROR;
                     auditMessage = "INSUFFICIENT_PERMISSION";
                     break;
                 case INVALID_EXTENSION:
                     failureInfo = PKIFailureInfo.systemFailure;
-                    auditStatus = AuditStatus.ERROR;
                     auditMessage = "INVALID_EXTENSION";
                     break;
                 case System_Failure:
                     failureInfo = PKIFailureInfo.systemFailure;
-                    auditStatus = AuditStatus.ERROR;
                     auditMessage = "System_Failure";
                     break;
                 case System_Unavailable:
                     failureInfo = PKIFailureInfo.systemUnavail;
-                    auditStatus = AuditStatus.FAILED;
                     auditMessage = "System_Unavailable";
                     break;
                 case UNKNOWN_CERT:
                     failureInfo = PKIFailureInfo.badCertId;
-                    auditStatus = AuditStatus.FAILED;
                     auditMessage = "UNKNOWN_CERT";
                     break;
                 case UNKNOWN_CERT_PROFILE:
                     failureInfo = PKIFailureInfo.badCertTemplate;
-                    auditStatus = AuditStatus.FAILED;
                     auditMessage = "UNKNOWN_CERT_PROFILE";
                     break;
                 default:
                     failureInfo = PKIFailureInfo.systemFailure;
-                    auditStatus = AuditStatus.ERROR;
                     auditMessage = "InternalErrorCode " + e.getErrorCode();
                     break;
             }
 
             if(childAuditEvent != null)
             {
-                childAuditEvent.setStatus(auditStatus);
+                childAuditEvent.setStatus(AuditStatus.FAILED);
                 childAuditEvent.addEventData(new AuditEventData("message", auditMessage));
             }
 
@@ -1098,10 +1086,10 @@ class X509CACmpResponder extends CmpResponder
         int n = revContent.length;
         for (int i = 0; i < n; i++)
         {
-            ChildAuditEvent childAuditEvent = null;
+            AuditChildEvent childAuditEvent = null;
             if(auditEvent != null)
             {
-                childAuditEvent = new ChildAuditEvent();
+                childAuditEvent = new AuditChildEvent();
                 auditEvent.addChildAuditEvent(childAuditEvent);
             }
 
@@ -1120,7 +1108,7 @@ class X509CACmpResponder extends CmpResponder
                 }
                 else
                 {
-                    eventData = new AuditEventData("serialNumber", serialNumber.getPositiveValue());
+                    eventData = new AuditEventData("serialNumber", serialNumber.getPositiveValue().toString());
                 }
                 childAuditEvent.addEventData(eventData);
             }
@@ -1202,7 +1190,12 @@ class X509CACmpResponder extends CmpResponder
                         childAuditEvent.addEventData(new AuditEventData("reason", reason.getDescription()));
                         if(invalidityDate != null)
                         {
-                            childAuditEvent.addEventData(new AuditEventData("invalidityDate", invalidityDate));
+                            String value;
+                            synchronized (dateFormat)
+                            {
+                                value = dateFormat.format(invalidityDate);
+                            }
+                            childAuditEvent.addEventData(new AuditEventData("invalidityDate", value));
                         }
                     }
 
@@ -1227,7 +1220,6 @@ class X509CACmpResponder extends CmpResponder
                 LOG.warn("{} certificate, OperationException: code={}, message={}",
                         new Object[]{permission.name(), code.name(), e.getErrorMessage()});
 
-                AuditStatus auditStatus;
                 String auditMessage;
 
                 int failureInfo;
@@ -1235,64 +1227,53 @@ class X509CACmpResponder extends CmpResponder
                 {
                     case BAD_REQUEST:
                         failureInfo = PKIFailureInfo.badRequest;
-                        auditStatus = AuditStatus.FAILED;
                         auditMessage = "BAD_REQUEST";
                         break;
                     case CERT_REVOKED:
                         failureInfo = PKIFailureInfo.certRevoked;
-                        auditStatus = AuditStatus.FAILED;
                         auditMessage = "CERT_REVOKED";
                         break;
                     case CERT_UNREVOKED:
                         failureInfo = PKIFailureInfo.notAuthorized;
-                        auditStatus = AuditStatus.FAILED;
                         auditMessage = "CERT_UNREVOKED";
                         break;
                     case DATABASE_FAILURE:
                         failureInfo = PKIFailureInfo.systemFailure;
-                        auditStatus = AuditStatus.ERROR;
                         auditMessage = "DATABASE_FAILURE";
                         break;
                     case INVALID_EXTENSION:
                         failureInfo = PKIFailureInfo.unacceptedExtension;
-                        auditStatus = AuditStatus.FAILED;
                         auditMessage = "INVALID_EXTENSION";
                         break;
                     case INSUFFICIENT_PERMISSION:
                         failureInfo = PKIFailureInfo.notAuthorized;
-                        auditStatus = AuditStatus.ERROR;
                         auditMessage = "INSUFFICIENT_PERMISSION";
                         break;
                     case NOT_PERMITTED:
                         failureInfo = PKIFailureInfo.notAuthorized;
-                        auditStatus = AuditStatus.FAILED;
                         auditMessage = "NOT_PERMITTED";
                         break;
                     case System_Failure:
                         failureInfo = PKIFailureInfo.systemFailure;
-                        auditStatus = AuditStatus.ERROR;
                         auditMessage = "System_Failure";
                         break;
                     case System_Unavailable:
                         failureInfo = PKIFailureInfo.systemUnavail;
-                        auditStatus = AuditStatus.FAILED;
                         auditMessage = "System_Unavailable";
                         break;
                     case UNKNOWN_CERT:
                         failureInfo = PKIFailureInfo.badCertId;
-                        auditStatus = AuditStatus.FAILED;
                         auditMessage = "UNKNOWN_CERT";
                         break;
                     default:
                         failureInfo = PKIFailureInfo.systemFailure;
-                        auditStatus = AuditStatus.ERROR;
                         auditMessage = "InternalErrorCode " + e.getErrorCode();
                         break;
                 }
 
                 if(childAuditEvent != null)
                 {
-                    childAuditEvent.setStatus(auditStatus);
+                    childAuditEvent.setStatus(AuditStatus.FAILED);
                     childAuditEvent.addEventData(new AuditEventData("message", auditMessage));
                 }
 

@@ -43,25 +43,25 @@ import org.xipki.common.util.IoUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "profile-update", description="Update certificate profile")
+@Command(scope = "xipki-ca", name = "profile-update", description="update certificate profile")
 public class ProfileUpdateCommand extends CaCommand
 {
 
     @Option(name = "-name",
-                description = "Required. Profile name",
+                description = "required. Profile name",
                 required = true, multiValued = false)
     private String name;
 
     @Option(name = "-type",
-            description = "Profile type")
+            description = "profile type")
     private String type;
 
     @Option(name = "-conf",
-            description = "Profile configuration or 'NULL'")
+            description = "profile configuration or 'NULL'")
     private String conf;
 
     @Option(name = "-confFile",
-            description = "Profile configuration file")
+            description = "profile configuration file")
     private String confFile;
 
     @Override
@@ -70,7 +70,7 @@ public class ProfileUpdateCommand extends CaCommand
     {
         if(type == null && conf == null && confFile == null)
         {
-            System.out.println("Nothing to update");
+            System.out.println("nothing to update");
             return null;
         }
 

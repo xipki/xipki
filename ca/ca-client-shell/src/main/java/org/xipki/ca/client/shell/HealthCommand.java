@@ -45,16 +45,16 @@ import org.xipki.common.HealthCheckResult;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-client", name = "health", description="Check healty status of CA")
+@Command(scope = "xipki-cli", name = "health", description="check healty status of CA")
 public class HealthCommand extends ClientCommand
 {
 
     @Option(name = "-ca",
-            required = false, description = "Required if multiple CAs are configured. CA name")
+            required = false, description = "required if multiple CAs are configured. CA name")
     private String caName;
 
     @Option(name = "-v", aliases="--verbose",
-            required = false, description = "Show status verbosely")
+            required = false, description = "show status verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Override
@@ -64,7 +64,7 @@ public class HealthCommand extends ClientCommand
         Set<String> caNames = raWorker.getCaNames();
         if(isEmpty(caNames))
         {
-            err("No CA is configured");
+            err("no CA is configured");
             return  null;
         }
 
@@ -81,14 +81,14 @@ public class HealthCommand extends ClientCommand
                 caName = caNames.iterator().next();
             } else
             {
-                err("No caname is specified, one of " + caNames + " is required");
+                err("no caname is specified, one of " + caNames + " is required");
                 return null;
             }
         }
 
         HealthCheckResult healthResult = raWorker.getHealthCheckResult(caName);
         StringBuilder sb = new StringBuilder();
-        sb.append("Healthy status for CA ");
+        sb.append("healthy status for CA ");
         sb.append(caName);
         sb.append(": ");
         sb.append(healthResult.isHealthy() ? "healthy" : "not healthy");

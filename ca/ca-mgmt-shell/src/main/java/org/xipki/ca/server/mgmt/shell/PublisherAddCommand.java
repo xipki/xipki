@@ -44,26 +44,26 @@ import org.xipki.common.util.IoUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "publisher-add", description="Add publisher")
+@Command(scope = "xipki-ca", name = "publisher-add", description="add publisher")
 public class PublisherAddCommand extends CaCommand
 {
 
     @Option(name = "-name",
-                description = "Required. Publisher Name",
+                description = "required. Publisher Name",
                 required = true, multiValued = false)
     private String name;
 
     @Option(name = "-type",
-            description = "Required. Publisher type",
+            description = "required. Publisher type",
             required = true)
     private String type;
 
     @Option(name = "-conf",
-            description = "Publisher configuration")
+            description = "publisher configuration")
     private String conf;
 
     @Option(name = "-confFile",
-            description = "Publisher configuration file")
+            description = "publisher configuration file")
     private String confFile;
 
     @Override

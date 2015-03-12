@@ -57,13 +57,13 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
 {
     @Option(name = "-serial",
             required = true,
-            description = "Required. Serial numbers.\n"
-                    + "Comma-separated serial numbers or ranges")
+            description = "required. Serial numbers.\n"
+                    + "comma-separated serial numbers or ranges")
     private String serialNumbers;
 
     @Option(name = "-duration",
             required = false,
-            description = "Duration in seconds")
+            description = "duration in seconds")
     private int durationInSecond = 30;
 
     @Option(name = "-thread",
@@ -120,7 +120,7 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
 
         if(numThreads < 1)
         {
-            err("Invalid number of threads " + numThreads);
+            err("invalid number of threads " + numThreads);
             return null;
         }
 
@@ -135,12 +135,12 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
 
         StringBuilder startMsg = new StringBuilder();
 
-        startMsg.append("Threads:        ").append(numThreads).append("\n");
-        startMsg.append("Duration:       ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
-        startMsg.append("Serial numbers: ").append(this.serialNumbers).append("\n");
-        startMsg.append("Issuer cert:    ").append(issuerCertFile).append("\n");
-        startMsg.append("Server URL:     ").append(serverUrl.toString()).append("\n");
-        startMsg.append("Hash:           ").append(hashAlgo).append("\n");
+        startMsg.append("threads:        ").append(numThreads).append("\n");
+        startMsg.append("duration:       ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
+        startMsg.append("serial numbers: ").append(this.serialNumbers).append("\n");
+        startMsg.append("issuer cert:    ").append(issuerCertFile).append("\n");
+        startMsg.append("server URL:     ").append(serverUrl.toString()).append("\n");
+        startMsg.append("hash:           ").append(hashAlgo).append("\n");
         System.out.print(startMsg.toString());
 
         X509Certificate issuerCert = SecurityUtil.parseCert(issuerCertFile);

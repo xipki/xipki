@@ -57,11 +57,11 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "ca-update", description="Update CA")
+@Command(scope = "xipki-ca", name = "ca-update", description="update CA")
 public class CaUpdateCommand extends CaCommand
 {
     @Option(name = "-name",
-            required = true, description = "Required. CA name")
+            required = true, description = "required. CA name")
     private String caName;
 
     @Option(name = "-status",
@@ -79,21 +79,21 @@ public class CaUpdateCommand extends CaCommand
     private List<String> crlUris;
 
     @Option(name = "-deltaCrlUri",
-            description = "Delta CRL URI or 'NULL', multi options is allowed",
+            description = "delta CRL URI or 'NULL', multi options is allowed",
             multiValued = true)
     private List<String> deltaCrlUris;
 
     @Option(name = "-permission",
-            description = "Permission, multi options is allowed. allowed values are\n" + permissionsText,
+            description = "permission, multi options is allowed. allowed values are\n" + permissionsText,
             multiValued = true)
     private Set<String> permissions;
 
     @Option(name = "-maxValidity",
-            description = "Maximal validity")
+            description = "maximal validity")
     private String maxValidity;
 
     @Option(name = "-expirationPeriod",
-            description = "Days before expiration time of CA to issue certificates")
+            description = "days before expiration time of CA to issue certificates")
     private Integer expirationPeriod;
 
     @Option(name = "-crlSigner",
@@ -121,21 +121,21 @@ public class CaUpdateCommand extends CaCommand
     private String signerConf;
 
     @Option(name = "-dk", aliases = { "--duplicateKey" },
-            description = "Mode of duplicate key.\n"
+            description = "mode of duplicate key.\n"
                     + "\t1: forbidden\n"
                     + "\t2: forbiddenWithinProfile\n"
                     + "\t3: permitted")
     private String duplicateKeyS;
 
     @Option(name = "-ds", aliases = { "--duplicateSubject" },
-            description = "Mode of duplicate subject.\n"
+            description = "mode of duplicate subject.\n"
                     + "\t1: forbidden\n"
                     + "\t2: forbiddenWithinProfile\n"
                     + "\t3: permitted")
     private String duplicateSubjectS;
 
     @Option(name = "-validityMode",
-            description = "Mode of valditity.\n"
+            description = "mode of valditity.\n"
                     + "\tSTRICT: Reject if the notBefore + validity behinds CA's notAfter \n"
                     + "\tLAX:    notBefore + validity after CA's notAfter is permitted\n"
                     + "\tCUTOFF: notAfter of issued certificates will be set to the earlier time of\n"
@@ -208,7 +208,7 @@ public class CaUpdateCommand extends CaCommand
                 Permission _permission = Permission.getPermission(permission);
                 if(_permission == null)
                 {
-                    throw new ConfigurationException("Invalid permission: " + permission);
+                    throw new ConfigurationException("invalid permission: " + permission);
                 }
                 _permissions.add(_permission);
             }
@@ -300,7 +300,7 @@ public class CaUpdateCommand extends CaCommand
             validityMode = ValidityMode.getInstance(validityModeS);
             if(validityMode == null)
             {
-                throw new ConfigurationException("Invalid validity mode: " + validityModeS);
+                throw new ConfigurationException("invalid validity mode: " + validityModeS);
             }
         }
 

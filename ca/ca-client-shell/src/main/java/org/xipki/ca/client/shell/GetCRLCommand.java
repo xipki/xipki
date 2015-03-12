@@ -48,21 +48,21 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.RAWorkerException;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.console.karaf.UnexpectedResultException;
+import org.xipki.common.qa.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-client", name = "getcrl", description="Download CRL")
+@Command(scope = "xipki-cli", name = "getcrl", description="download CRL")
 public class GetCRLCommand extends CRLCommand
 {
     @Option(name = "-with-basecrl",
-            required = false, description = "Indicates whether to retrieve the baseCRL if the current CRL is a delta CRL")
+            required = false, description = "indicates whether to retrieve the baseCRL if the current CRL is a delta CRL")
     private Boolean withBaseCRL = Boolean.FALSE;
 
     @Option(name = "-basecrl-out",
-            required = false, description = "Where to save the baseCRL"
+            required = false, description = "where to save the baseCRL"
                     + "\nThe default is <out>-baseCRL")
     private String baseCRLOut;
 
@@ -87,7 +87,7 @@ public class GetCRLCommand extends CRLCommand
         Set<String> caNames = raWorker.getCaNames();
         if(isEmpty(caNames))
         {
-            err("No CA is configured");
+            err("no CA is configured");
             return  null;
         }
 
@@ -105,7 +105,7 @@ public class GetCRLCommand extends CRLCommand
             }
             else
             {
-                err("No caname is specified, one of " + caNames + " is required");
+                err("no caname is specified, one of " + caNames + " is required");
                 return null;
             }
         }
@@ -116,15 +116,15 @@ public class GetCRLCommand extends CRLCommand
             crl = retrieveCRL(caName);
         }catch(PKIErrorException e)
         {
-            throw new UnexpectedResultException("Received no CRL from server: " + e.getMessage());
+            throw new UnexpectedResultException("received no CRL from server: " + e.getMessage());
         }
 
         if(crl == null)
         {
-            throw new UnexpectedResultException("Received no CRL from server");
+            throw new UnexpectedResultException("received no CRL from server");
         }
 
-        saveVerbose("Saved CRL to file", new File(outFile), crl.getEncoded());
+        saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
 
         if(withBaseCRL.booleanValue())
         {
@@ -145,7 +145,7 @@ public class GetCRLCommand extends CRLCommand
                     crl = raWorker.downloadCRL(caName, baseCrlNumber, debug);
                 }catch(PKIErrorException e)
                 {
-                    throw new UnexpectedResultException("Received no baseCRL from server: " + e.getMessage());
+                    throw new UnexpectedResultException("received no baseCRL from server: " + e.getMessage());
                 } finally
                 {
                     saveRequestResponse(debug);
@@ -153,11 +153,11 @@ public class GetCRLCommand extends CRLCommand
 
                 if(crl == null)
                 {
-                    throw new UnexpectedResultException("Received no baseCRL from server");
+                    throw new UnexpectedResultException("received no baseCRL from server");
                 }
                 else
                 {
-                    saveVerbose("Saved baseCRL to file", new File(baseCRLOut), crl.getEncoded());
+                    saveVerbose("saved baseCRL to file", new File(baseCRLOut), crl.getEncoded());
                 }
             }
         }

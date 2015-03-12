@@ -103,4 +103,14 @@ public class StringUtil
 
         return ret;
     }
+
+    public static boolean startsWithIgnoreCase(String s, String prefix)
+    {
+        if(s.length() < prefix.length())
+        {
+            return false;
+        }
+
+        return prefix.equalsIgnoreCase(s.substring(0, prefix.length()));
+    }
 }

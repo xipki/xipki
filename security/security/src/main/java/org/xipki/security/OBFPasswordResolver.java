@@ -37,6 +37,7 @@ package org.xipki.security;
 
 import java.nio.charset.StandardCharsets;
 
+import org.xipki.common.util.StringUtil;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SinglePasswordResolver;
 
@@ -51,7 +52,7 @@ public class OBFPasswordResolver  implements SinglePasswordResolver
     @Override
     public boolean canResolveProtocol(String protocol)
     {
-        return "OBF".equals(protocol);
+        return "OBF".equalsIgnoreCase(protocol);
     }
 
     @Override
@@ -97,7 +98,7 @@ public class OBFPasswordResolver  implements SinglePasswordResolver
     /* ------------------------------------------------------------ */
     public static String deobfuscate(String s)
     {
-        if (s.startsWith(__OBFUSCATE))
+        if (StringUtil.startsWithIgnoreCase(s, __OBFUSCATE))
         {
             s = s.substring(4);
         }

@@ -39,15 +39,6 @@ package org.xipki.console.karaf;
  * @author Lijun Liao
  */
 
-public class DirPathCompleterImpl
-extends PathCompleter
-implements DirPathCompleter
+public interface ExtKeyusageCompleter extends XipkiCompleter
 {
-
-    @Override
-    protected boolean isDirOnly()
-    {
-        return true;
-    }
-
 }

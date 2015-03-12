@@ -45,11 +45,11 @@ import org.xipki.ca.server.mgmt.api.PublisherEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "capub-info", description="Show information of publishers in given CA")
+@Command(scope = "xipki-ca", name = "capub-info", description="show information of publishers in given CA")
 public class CaPublisherInfoCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "Required. CA name",
+            description = "required. CA name",
             required = true)
     private String caName;
 
@@ -62,7 +62,7 @@ public class CaPublisherInfoCommand extends CaCommand
         List<PublisherEntry> entries = caManager.getPublishersForCA(caName);
         if(isNotEmpty(entries))
         {
-            sb.append("Publishers for CA " + caName).append("\n");
+            sb.append("publishers for CA " + caName).append("\n");
             for(PublisherEntry entry  : entries)
             {
                 sb.append("\t").append(entry.getName()).append("\n");
@@ -70,7 +70,7 @@ public class CaPublisherInfoCommand extends CaCommand
         }
         else
         {
-            sb.append("\tNo publisher for CA " + caName + " is configured");
+            sb.append("\tno publisher for CA " + caName + " is configured");
         }
 
         out(sb.toString());

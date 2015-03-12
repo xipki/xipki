@@ -44,31 +44,31 @@ import org.xipki.ca.client.api.CertificateOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.shell.ClientCommand;
 import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-qa", name = "neg-ra-enroll", description="Enroll certificate as RA (negative, for QA)")
+@Command(scope = "xipki-qa", name = "neg-ra-enroll", description="enroll certificate as RA (negative, for QA)")
 public class NegRAEnrollCertCommand extends ClientCommand
 {
 
     @Option(name = "-p10",
-            required = true, description = "Required. PKCS#10 request file")
+            required = true, description = "required. PKCS#10 request file")
     private String p10File;
 
     @Option(name = "-profile",
-            required = true, description = "Required. Certificate profile")
+            required = true, description = "required. Certificate profile")
     private String profile;
 
     @Option(name = "-user",
-            required = false, description = "Username")
+            required = false, description = "username")
     private String user;
 
     @Option(name = "-ca",
-            required = false, description = "Required if the profile is supported by more than one CA")
+            required = false, description = "required if the profile is supported by more than one CA")
     private String caName;
 
     @Override
@@ -97,7 +97,7 @@ public class NegRAEnrollCertCommand extends ClientCommand
 
         if(cert != null)
         {
-            throw new UnexpectedResultException("No certificate is excepted, but received one");
+            throw new UnexpectedResultException("no certificate is excepted, but received one");
         }
 
         return null;

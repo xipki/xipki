@@ -106,7 +106,7 @@ import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
-import org.xipki.audit.api.ChildAuditEvent;
+import org.xipki.audit.api.AuditChildEvent;
 import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
@@ -734,10 +734,10 @@ public class OcspServer
             long cacheNextUpdate = Long.MAX_VALUE;
             for(int i = 0; i < n; i++)
             {
-                ChildAuditEvent childAuditEvent = null;
+                AuditChildEvent childAuditEvent = null;
                 if(auditEvent != null)
                 {
-                    childAuditEvent = new ChildAuditEvent();
+                    childAuditEvent = new AuditChildEvent();
                     auditEvent.addChildAuditEvent(childAuditEvent);
                 }
 
@@ -799,7 +799,7 @@ public class OcspServer
                 {
                     if(childAuditEvent != null)
                     {
-                        fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
+                        fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                                 "No CertStatusStore can answer the request");
                     }
                     if(exceptionOccurs)
@@ -956,7 +956,7 @@ public class OcspServer
                         LOG.debug(message, e);
                         if(childAuditEvent != null)
                         {
-                            fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
+                            fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                                     "CertHash.getEncoded() with IOException");
                         }
                         return createUnsuccessfullOCSPResp(OcspResponseStatus.internalError);
@@ -1106,7 +1106,7 @@ public class OcspServer
                 LOG.debug(message, e);
                 if(auditEvent != null)
                 {
-                    fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
+                    fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                             "BasicOCSPRespBuilder.build() with OCSPException");
                 }
                 return createUnsuccessfullOCSPResp(OcspResponseStatus.internalError);
@@ -1143,7 +1143,7 @@ public class OcspServer
                 LOG.debug(message, e);
                 if(auditEvent != null)
                 {
-                    fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
+                    fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                             "OCSPRespBuilder.build() with OCSPException");
                 }
                 return createUnsuccessfullOCSPResp(OcspResponseStatus.internalError);
@@ -1160,7 +1160,7 @@ public class OcspServer
 
             if(auditEvent != null)
             {
-                fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
+                fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                         "internal error");
             }
 
@@ -1219,7 +1219,7 @@ public class OcspServer
         }
     }
 
-    private static void fillAuditEvent(ChildAuditEvent auditEvent, AuditLevel level, AuditStatus status, String message)
+    private static void fillAuditEvent(AuditChildEvent auditEvent, AuditLevel level, AuditStatus status, String message)
     {
         if(level != null)
         {
@@ -1263,7 +1263,7 @@ public class OcspServer
             }
             else
             {
-                auditEvent.setStatus(AuditStatus.ERROR.name());
+                auditEvent.setStatus(AuditStatus.FAILED.name());
                 auditEvent.setLevel(AuditLevel.ERROR);
             }
             auditLoggingService.logEvent(auditEvent);
@@ -1509,7 +1509,7 @@ public class OcspServer
             LOG.warn("securityFactory.getContentVerifierProvider, InvalidKeyException: {}", e.getMessage());
             if(auditEvent != null)
             {
-                fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.ERROR, e.getMessage());
+                fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED, e.getMessage());
             }
             return createUnsuccessfullOCSPResp(OcspResponseStatus.unauthorized);
         }

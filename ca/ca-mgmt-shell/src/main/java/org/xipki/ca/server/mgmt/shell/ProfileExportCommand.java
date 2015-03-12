@@ -45,16 +45,16 @@ import org.xipki.ca.server.mgmt.api.CertprofileEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "profile-export", description="Export profile configuration")
+@Command(scope = "xipki-ca", name = "profile-export", description="export profile configuration")
 public class ProfileExportCommand extends CaCommand
 {
     @Option(name = "-name",
-            description = "Required. Profile name",
+            description = "required. Profile name",
             required = true, multiValued = false)
     private String name;
 
     @Option(name = "-out",
-            description = "Required. Where to save the profile configuration",
+            description = "required. Where to save the profile configuration",
             required = true)
     private String confFile;
 
@@ -65,11 +65,11 @@ public class ProfileExportCommand extends CaCommand
         CertprofileEntry entry = caManager.getCertprofile(name);
         if(entry == null)
         {
-            err("No cert profile named " + name + " is defined");
+            err("no cert profile named " + name + " is defined");
             return null;
         }
 
-        saveVerbose("Saved cert profile configuration to", new File(confFile), entry.getConf().getBytes("UTF-8"));
+        saveVerbose("saved cert profile configuration to", new File(confFile), entry.getConf().getBytes("uTF-8"));
         return null;
     }
 }

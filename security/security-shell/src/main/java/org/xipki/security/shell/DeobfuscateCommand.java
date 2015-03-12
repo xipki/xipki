@@ -43,18 +43,19 @@ import org.xipki.security.OBFPasswordResolver;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "deobfuscate", description="Deobfuscate password")
+@Command(scope = "xipki-tk", name = "deobfuscate", description="deobfuscate password")
 public class DeobfuscateCommand extends SecurityCommand
 {
     @Option(name = "-pwd", aliases = { "--password" },
-            required = true, description = "Required. Obfuscated password, starts with OBF:")
+            required = true, description = "required. Obfuscated password, starts with OBF:")
     private String passwordHint;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        if(passwordHint.startsWith("OBF:") == false)
+        if(passwordHint.length() < 5 ||
+                passwordHint.substring(0, 4).equalsIgnoreCase("OBF:") == false)
         {
             err("encrypted password '" + passwordHint + "' does not start with OBF:");
             return null;
@@ -63,7 +64,7 @@ public class DeobfuscateCommand extends SecurityCommand
         try
         {
             String password = OBFPasswordResolver.deobfuscate(passwordHint);
-            out("The deobfuscated password is: '" + new String(password) + "'");
+            out("the deobfuscated password is: '" + new String(password) + "'");
         }catch(Exception e)
         {
             err(e.getMessage());

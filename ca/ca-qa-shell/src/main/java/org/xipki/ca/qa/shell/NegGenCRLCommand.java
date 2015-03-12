@@ -46,7 +46,7 @@ import org.xipki.common.RequestResponseDebug;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-qa", name = "neg-gencrl", description="Generate CRL (negative, for QA)")
+@Command(scope = "xipki-qa", name = "neg-gencrl", description="generate CRL (negative, for QA)")
 public class NegGenCRLCommand extends NegCRLCommand
 {
 

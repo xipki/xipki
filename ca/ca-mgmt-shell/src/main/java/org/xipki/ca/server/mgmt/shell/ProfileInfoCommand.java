@@ -49,14 +49,14 @@ import org.xipki.ca.server.mgmt.api.CertprofileEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "profile-info", description="Show information of profiles")
+@Command(scope = "xipki-ca", name = "profile-info", description="show information of profiles")
 public class ProfileInfoCommand extends CaCommand
 {
-    @Argument(index = 0, name = "name", description = "Certificate profile name", required = false)
+    @Argument(index = 0, name = "name", description = "certificate profile name", required = false)
     private String name;
 
     @Option(name = "-v", aliases="--verbose",
-            required = false, description = "Show certificate profile information verbosely")
+            required = false, description = "show certificate profile information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Override

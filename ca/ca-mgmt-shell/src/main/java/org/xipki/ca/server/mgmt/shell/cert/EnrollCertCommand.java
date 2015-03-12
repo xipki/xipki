@@ -50,30 +50,30 @@ import org.xipki.common.util.IoUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "enroll-cert", description="Enroll certificate")
+@Command(scope = "xipki-ca", name = "enroll-cert", description="enroll certificate")
 public class EnrollCertCommand extends CaCommand
 {
     private static final Logger LOG = LoggerFactory.getLogger(EnrollCertCommand.class);
 
     @Option(name = "-ca",
-            required = true, description = "Required. CA name")
+            required = true, description = "required. CA name")
     private String caName;
 
     @Option(name = "-p10",
-            required = true, description = "Required. PKCS#10 request file")
+            required = true, description = "required. PKCS#10 request file")
     private String p10File;
 
     @Option(name = "-out",
-            description = "Required. Where to save the certificate",
+            description = "required. Where to save the certificate",
             required = true)
     private String outFile;
 
     @Option(name = "-profile",
-            required = true, description = "Required. Profile name")
+            required = true, description = "required. Profile name")
     private String profileName;
 
     @Option(name = "-user",
-            required = false, description = "Username")
+            required = false, description = "username")
     private String user;
 
     @Override
@@ -92,11 +92,11 @@ public class EnrollCertCommand extends CaCommand
         try
         {
             X509Certificate cert = caManager.generateCertificate(caName, profileName, user, encodedP10Request);
-            saveVerbose("Saved certificate to file", new File(outFile), cert.getEncoded());
+            saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
         } catch (Exception e)
         {
-            LOG.warn("Exception: {}", e.getMessage());
-            LOG.debug("Exception", e);
+            LOG.warn("exception: {}", e.getMessage());
+            LOG.debug("exception", e);
             err("ERROR: " + e.getMessage());
             return null;
         }

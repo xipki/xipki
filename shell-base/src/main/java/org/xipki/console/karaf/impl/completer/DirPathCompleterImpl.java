@@ -33,26 +33,23 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.shell.completer;
+package org.xipki.console.karaf.impl.completer;
 
-import org.xipki.common.CRLReason;
-import org.xipki.console.karaf.EnumCompleter;
+import org.xipki.console.karaf.DirPathCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public class ClientCRLReasonCompleter extends EnumCompleter
+public class DirPathCompleterImpl
+extends PathCompleter
+implements DirPathCompleter
 {
-    public ClientCRLReasonCompleter()
-    {
-        StringBuilder enums = new StringBuilder();
 
-        for(CRLReason reason : CRLReason.PERMITTED_CLIENT_CRLREASONS)
-        {
-            enums.append(reason.getDescription()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    @Override
+    protected boolean isDirOnly()
+    {
+        return true;
     }
+
 }
