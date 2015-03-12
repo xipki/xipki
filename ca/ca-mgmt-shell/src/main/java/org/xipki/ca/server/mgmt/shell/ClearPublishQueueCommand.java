@@ -83,7 +83,7 @@ public class ClearPublishQueueCommand extends CaCommand
 
         boolean b = caManager.clearPublishQueue(caName, publisherNames);
         output(b, "cleared", "could not clear",
-        		"publish queue of CA " + caName + " for publishers " + toString(publisherNames));
+                "publish queue of CA " + caName + " for publishers " + toString(publisherNames));
         return null;
     }
 }

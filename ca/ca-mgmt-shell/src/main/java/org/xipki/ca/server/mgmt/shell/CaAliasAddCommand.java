@@ -62,5 +62,5 @@ public class CaAliasAddCommand extends CaCommand
         boolean b = caManager.addCaAlias(caAlias, caName);
         output(b, "added", "could not add", "CA alias " + caAlias + " associated with CA " + caName);
         return null;
-    }    
+    }
 }

@@ -83,16 +83,16 @@ public abstract class CaCommand extends XipkiOsgiCommandSupport
         sb.append("}");
         return sb.toString();
     }
-    
+
     protected void output(boolean successful, String posPrefix, String negPrefix, String message)
     {
-    	if(successful)
-    	{
-    		out(posPrefix + " " + message);
-    	}
-    	else
-    	{
-    		err(negPrefix + " " + message);
-    	}
+        if(successful)
+        {
+            out(posPrefix + " " + message);
+        }
+        else
+        {
+            err(negPrefix + " " + message);
+        }
     }
 }
