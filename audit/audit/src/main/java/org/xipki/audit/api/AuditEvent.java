@@ -76,7 +76,9 @@ public class AuditEvent
 
     private AuditStatus status;
 
-    private final List<ChildAuditEvent> childAuditEvents = new LinkedList<>();
+    private long duration = -1;
+
+    private final List<AuditChildEvent> childAuditEvents = new LinkedList<>();
 
     public AuditEvent(Date timestamp)
     {
@@ -144,7 +146,7 @@ public class AuditEvent
         }
         eventDatas.add(eventData);
 
-        for(ChildAuditEvent cae : childAuditEvents)
+        for(AuditChildEvent cae : childAuditEvents)
         {
             cae.removeEventData(eventData.getName());
         }
@@ -162,7 +164,7 @@ public class AuditEvent
         this.status = status;
     }
 
-    public void addChildAuditEvent(ChildAuditEvent childAuditEvent)
+    public void addChildAuditEvent(AuditChildEvent childAuditEvent)
     {
         childAuditEvents.add(childAuditEvent);
     }
@@ -181,7 +183,7 @@ public class AuditEvent
         }
 
         List<AuditEvent> expandedEvents = new ArrayList<>(size);
-        for(ChildAuditEvent child : childAuditEvents)
+        for(AuditChildEvent child : childAuditEvents)
         {
             AuditEvent event = new AuditEvent(timestamp);
             event.setApplicationName(applicationName);
@@ -215,9 +217,21 @@ public class AuditEvent
                 event.addEventData(eventData);
             }
 
+            event.setDuration(duration);
+
             expandedEvents.add(event);
         }
 
         return expandedEvents;
+    }
+
+    public long getDuration()
+    {
+        return duration;
+    }
+
+    public void setDuration(long duration)
+    {
+        this.duration = duration;
     }
 }

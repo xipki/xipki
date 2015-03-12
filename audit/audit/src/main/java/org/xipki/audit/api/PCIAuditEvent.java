@@ -47,7 +47,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * This file is copied from PCISyslogMessage from syslog4j.org
+ * This file is copied from PCISyslogMessage from syslog4j.org (LGPL v2.1)
  *
  * PCISyslogMessage provides support for audit trails defined by section
  * 10.3 of the PCI Data Security Standard (PCI DSS) versions 1.1 and 1.2.
