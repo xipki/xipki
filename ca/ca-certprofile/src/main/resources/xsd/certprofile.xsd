@@ -19,7 +19,7 @@
   <xs:complexType name="X509ProfileType">
     <xs:sequence>
       <xs:element name="appInfo" type="anyType" minOccurs="0"/>
-      <xs:element name="version" type="xs:int">
+      <xs:element name="version" type="xs:int" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
             version of the certificate, e.g. 3 for v3 certificate.

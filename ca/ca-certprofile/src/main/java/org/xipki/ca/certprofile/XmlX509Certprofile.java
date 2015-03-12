@@ -200,11 +200,18 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         {
             X509ProfileType conf = XmlX509CertprofileUtil.parse(new ByteArrayInputStream(data.getBytes()));
 
-            int intVersion = conf.getVersion();
-            this.version = X509CertVersion.getInstance(intVersion);
-            if(this.version == null)
+            if(conf.getVersion() != null)
             {
-                throw new CertprofileException("invalid version " + intVersion);
+                int intVersion = conf.getVersion().intValue();
+                this.version = X509CertVersion.getInstance(intVersion);
+                if(this.version == null)
+                {
+                    throw new CertprofileException("invalid version " + intVersion);
+                }
+            }
+            else
+            {
+                this.version = X509CertVersion.V3;
             }
 
             if(conf.getSignatureAlgorithms() != null)
