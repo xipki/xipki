@@ -49,16 +49,16 @@ import org.xipki.security.shell.SecurityCommand;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "add-cert", description="Add certificate to PKCS#11 device")
+@Command(scope = "xipki-tk", name = "add-cert", description="add certificate to PKCS#11 device")
 public class P11CertAddCommand extends SecurityCommand
 {
 
     @Option(name = "-slot",
-            required = true, description = "Required. Slot index")
+            required = true, description = "required. Slot index")
     private Integer slotIndex;
 
     @Option(name = "-cert",
-            required = true, description = "Required. Certificate file")
+            required = true, description = "required. Certificate file")
     private String certFile;
 
     @Option(name = "-module",
@@ -72,7 +72,7 @@ public class P11CertAddCommand extends SecurityCommand
         X509Certificate cert = SecurityUtil.parseCert(certFile);
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier p11KeyId = slot.addCert(cert);
-        out("Added certificate under " + p11KeyId);
+        out("added certificate under " + p11KeyId);
         securityFactory.getP11CryptService(moduleName).refresh();
         return null;
     }

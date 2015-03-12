@@ -144,14 +144,14 @@ public class Rfc2560Servlet extends HttpServlet
         AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
         String auditMessage = null;
 
-        long startInUs = 0;
+        long start = 0;
 
         AuditLoggingService auditLoggingService = auditServiceRegister == null ? null :
             auditServiceRegister.getAuditLoggingService();
 
         if(auditLoggingService != null && responder.getAuditOption() != null)
         {
-            startInUs = System.nanoTime()/1000;
+            start = System.currentTimeMillis();
             auditEvent = new AuditEvent(new Date());
             auditEvent.setApplicationName("OCSP");
             auditEvent.setName("PERF");
@@ -254,7 +254,7 @@ public class Rfc2560Servlet extends HttpServlet
                 response.setContentLength(0);
 
                 auditLevel = AuditLevel.ERROR;
-                auditStatus = AuditStatus.ERROR;
+                auditStatus = AuditStatus.FAILED;
             }
             else
             {
@@ -322,7 +322,7 @@ public class Rfc2560Servlet extends HttpServlet
             response.setContentLength(0);
 
             auditLevel = AuditLevel.ERROR;
-            auditStatus = AuditStatus.ERROR;
+            auditStatus = AuditStatus.FAILED;
             auditMessage = "internal error";
         }
         finally
@@ -349,19 +349,7 @@ public class Rfc2560Servlet extends HttpServlet
                         auditEvent.addEventData(new AuditEventData("message", auditMessage));
                     }
 
-                    long durationInUs = System.nanoTime() / 1000 - startInUs;
-                    String durationText;
-                    if(durationInUs > 5000)
-                    {
-                        durationText = Long.toString(durationInUs / 1000);
-                    }
-                    else
-                    {
-                        durationText = Double.toString(Double.valueOf(durationInUs) / 1000);
-                    }
-
-                    auditEvent.addEventData(new AuditEventData("duration",
-                            durationText));
+                    auditEvent.setDuration(System.currentTimeMillis() - start);
 
                     if(auditEvent.containsChildAuditEvents() == false)
                     {

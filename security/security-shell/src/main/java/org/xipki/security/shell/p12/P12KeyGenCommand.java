@@ -49,30 +49,30 @@ import org.xipki.security.shell.KeyGenCommand;
 public abstract class P12KeyGenCommand extends KeyGenCommand
 {
     @Option(name = "-subject",
-            required = true, description = "Required. Subject in the self-signed certificate")
+            required = true, description = "required. Subject in the self-signed certificate")
     protected String subject;
 
     @Option(name = "-out",
-            required = true, description = "Required. Where to save the key")
+            required = true, description = "required. Where to save the key")
     protected String keyOutFile;
 
     @Option(name = "-certout",
-            required = false, description = "Where to save the self-signed certificate")
+            required = false, description = "where to save the self-signed certificate")
     protected String certOutFile;
 
     @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#12 file")
+            required = false, description = "password of the PKCS#12 file")
     protected String password;
 
     protected void saveKeyAndCert(P12KeypairGenerationResult keyAndCert)
     throws IOException
     {
         File p12File = new File(keyOutFile);
-        saveVerbose("Saved PKCS#12 keystore to file", p12File, keyAndCert.getKeystore());
+        saveVerbose("saved PKCS#12 keystore to file", p12File, keyAndCert.getKeystore());
         if(certOutFile != null)
         {
             File certFile = new File(certOutFile);
-            saveVerbose("Saved self-signed certificate to file", certFile,
+            saveVerbose("saved self-signed certificate to file", certFile,
                     keyAndCert.getCertificate().getEncoded());
         }
     }

@@ -2,9 +2,10 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" default-activation="lazy">
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
-  <bean id="curveNameCompleter" class="org.xipki.security.shell.completer.ECCurveNameCompleter"/>
-  <bean id="keyusageCompleter" class="org.xipki.security.shell.completer.KeyusageCompleter"/>
-  <bean id="extKeyusageCompleter" class="org.xipki.security.shell.completer.ExtKeyusageCompleter"/>
+  <reference id="ecCurveNameCompleter" interface="org.xipki.console.karaf.ECCurveNameCompleter"/>
+  <reference id="keyusageCompleter" interface="org.xipki.console.karaf.KeyusageCompleter"/>
+  <reference id="extKeyusageCompleter" interface="org.xipki.console.karaf.ExtKeyusageCompleter"/>
+  <reference id="extNameCompleter" interface="org.xipki.console.karaf.ExtensionNameCompleter"/>
   <bean id="p11ModuleNameCompleter" class="org.xipki.security.shell.completer.P11ModuleNameCompleter">
     <property name="securityFactory" ref="securityFactory"/>
   </bean>
@@ -58,7 +59,7 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-curve" value-ref="curveNameCompleter"/>
+        <entry key="-curve" value-ref="ecCurveNameCompleter"/>
         <entry key="-certout" value-ref="filePathCompleter"/>
         <entry key="-module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
@@ -68,7 +69,7 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-curve" value-ref="curveNameCompleter"/>
+        <entry key="-curve" value-ref="ecCurveNameCompleter"/>
         <entry key="-out" value-ref="filePathCompleter"/>
         <entry key="-certout" value-ref="filePathCompleter"/>
       </optional-completers>
@@ -82,6 +83,8 @@
         <entry key="-module" value-ref="p11ModuleNameCompleter"/>
         <entry key="-keyusage" value-ref="keyusageCompleter"/>
         <entry key="-extKeyusage" value-ref="extKeyusageCompleter"/>
+        <entry key="-needExtension" value-ref="extNameCompleter"/>
+        <entry key="-wantExtension" value-ref="extNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -93,6 +96,8 @@
         <entry key="-p12" value-ref="filePathCompleter"/>
         <entry key="-keyusage" value-ref="keyusageCompleter"/>
         <entry key="-extKeyusage" value-ref="extKeyusageCompleter"/>
+        <entry key="-needExtension" value-ref="extNameCompleter"/>
+        <entry key="-wantExtension" value-ref="extNameCompleter"/>        
       </optional-completers>
     </command>
     <command>

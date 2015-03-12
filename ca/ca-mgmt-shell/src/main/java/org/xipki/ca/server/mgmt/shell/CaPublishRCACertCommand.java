@@ -43,14 +43,14 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "publish-self", description="Publish the certificate of root CA")
+@Command(scope = "xipki-ca", name = "publish-self", description="publish the certificate of root CA")
 public class CaPublishRCACertCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CA name", required = true)
     private String caName;
 
     @Option(name = "-profile",
-            description = "Required. Certificate profile name",
+            description = "required. Certificate profile name",
             required = true)
     private String certprofile;
 

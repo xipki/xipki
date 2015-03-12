@@ -249,7 +249,7 @@ public class SQLErrorCodes
             return Collections.emptySet();
         }
 
-        Set<String> set = new HashSet<>(strs.length);
+        Set<String> set = new HashSet<>();
         for(String str : strs)
         {
             set.add(str);
@@ -264,7 +264,7 @@ public class SQLErrorCodes
             return Collections.emptySet();
         }
 
-        Set<String> set = new HashSet<>(ints.length);
+        Set<String> set = new HashSet<>();
         for(int i : ints)
         {
             set.add(Integer.toString(i));

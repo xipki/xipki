@@ -35,8 +35,6 @@
 
 package org.xipki.security.shell.p11;
 
-import java.math.BigInteger;
-
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
@@ -46,18 +44,18 @@ import org.xipki.security.api.p11.P11WritableSlot;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "rsa", description="Generate RSA keypair in PKCS#11 device")
+@Command(scope = "xipki-tk", name = "rsa", description="generate RSA keypair in PKCS#11 device")
 public class P11RSAKeyGenCommand extends P11KeyGenCommand
 {
     @Option(name = "-keysize",
-            description = "Keysize in bit",
+            description = "keysize in bit",
             required = false)
     private Integer keysize = 2048;
 
     @Option(name = "-e",
             description = "public exponent",
             required = false)
-    private String publicExponent = "65537";
+    private String publicExponent = "0x10001";
 
     @Override
     protected Object _doExecute()
@@ -65,14 +63,13 @@ public class P11RSAKeyGenCommand extends P11KeyGenCommand
     {
         if(keysize % 1024 != 0)
         {
-            err("Keysize is not multiple of 1024: " + keysize);
+            err("keysize is not multiple of 1024: " + keysize);
             return null;
         }
 
-        BigInteger _publicExponent = new BigInteger(publicExponent);
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         P11KeypairGenerationResult keyAndCert = slot.generateRSAKeypairAndCert(
-                keysize, _publicExponent,
+                keysize, toBigInt(publicExponent),
                 label, getSubject(),
                 getKeyUsage(),
                 getExtendedKeyUsage());

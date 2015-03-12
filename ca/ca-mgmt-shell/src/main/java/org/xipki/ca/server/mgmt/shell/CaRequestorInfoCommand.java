@@ -45,11 +45,11 @@ import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "careq-info", description="Show information of requestors in CA")
+@Command(scope = "xipki-ca", name = "careq-info", description="show information of requestors in CA")
 public class CaRequestorInfoCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "Required. CA name",
+            description = "required. CA name",
             required = true)
     private String caName;
 
@@ -62,7 +62,7 @@ public class CaRequestorInfoCommand extends CaCommand
         Set<CAHasRequestorEntry> entries = caManager.getCmpRequestorsForCA(caName);
         if(isNotEmpty(entries))
         {
-            sb.append("Requestors trusted by CA " + caName).append("\n");
+            sb.append("requestors trusted by CA " + caName).append("\n");
             for(CAHasRequestorEntry entry  : entries)
             {
                 sb.append("\t").append(entry).append("\n");
@@ -70,7 +70,7 @@ public class CaRequestorInfoCommand extends CaCommand
         }
         else
         {
-            sb.append("\tNo requestor for CA " + caName + " is configured");
+            sb.append("\tno requestor for CA " + caName + " is configured");
         }
         out(sb.toString());
 

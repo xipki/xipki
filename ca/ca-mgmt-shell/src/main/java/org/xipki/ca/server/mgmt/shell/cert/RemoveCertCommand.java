@@ -35,8 +35,6 @@
 
 package org.xipki.ca.server.mgmt.shell.cert;
 
-import java.math.BigInteger;
-
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
@@ -45,17 +43,17 @@ import org.xipki.ca.server.mgmt.shell.CaCommand;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "remove-cert", description="Remove certificate")
+@Command(scope = "xipki-ca", name = "remove-cert", description="remove certificate")
 public class RemoveCertCommand extends CaCommand
 {
     @Option(name = "-ca",
-            required = true, description = "Required. CA name")
+            required = true, description = "required. CA name")
     private String caName;
 
     @Option(name = "-serial",
             required = true,
-            description = "Serial number")
-    private Long serialNumber;
+            description = "serial number")
+    private String serialNumberS;
 
     @Override
     protected Object _doExecute()
@@ -68,15 +66,15 @@ public class RemoveCertCommand extends CaCommand
         }
 
         boolean successful =
-                caManager.removeCertificate(caName, BigInteger.valueOf(serialNumber));
+                caManager.removeCertificate(caName, toBigInt(serialNumberS));
 
         if(successful)
         {
-            out("Removed certificate");
+            out("removed certificate");
         }
         else
         {
-            err("Could not remove certificate");
+            err("could not remove certificate");
         }
 
         return null;

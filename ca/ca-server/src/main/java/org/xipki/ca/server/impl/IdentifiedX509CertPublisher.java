@@ -48,6 +48,7 @@ import org.xipki.ca.server.impl.publisher.OCSPCertPublisher;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.security.api.PasswordResolver;
 
@@ -74,7 +75,7 @@ class IdentifiedX509CertPublisher
         {
             realPublisher = new OCSPCertPublisher();
         }
-        else if(type.toLowerCase().startsWith("java:"))
+        else if(StringUtil.startsWithIgnoreCase(type, "java:"))
         {
             String className = type.substring("java:".length());
             try

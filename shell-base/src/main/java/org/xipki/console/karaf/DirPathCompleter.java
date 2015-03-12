@@ -41,5 +41,4 @@ package org.xipki.console.karaf;
 
 public interface DirPathCompleter extends XipkiCompleter
 {
-
 }

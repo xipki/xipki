@@ -44,35 +44,35 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.ca.client.api.CertificateOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-client", name = "ra-enroll", description="Enroll certificate as RA")
+@Command(scope = "xipki-cli", name = "ra-enroll", description="enroll certificate as RA")
 public class RAEnrollCertCommand extends ClientCommand
 {
 
     @Option(name = "-p10",
-            required = true, description = "Required. PKCS#10 request file")
+            required = true, description = "required. PKCS#10 request file")
     private String p10File;
 
     @Option(name = "-profile",
-            required = true, description = "Required. Certificate profile")
+            required = true, description = "required. Certificate profile")
     private String profile;
 
     @Option(name = "-out",
-            required = true, description = "Where to save the certificate")
+            required = true, description = "where to save the certificate")
     private String outputFile;
 
     @Option(name = "-user",
-            required = false, description = "Username")
+            required = false, description = "username")
     private String user;
 
     @Option(name = "-ca",
-            required = false, description = "Required if the profile is supported by more than one CA")
+            required = false, description = "required if the profile is supported by more than one CA")
     private String caName;
 
     @Override
@@ -102,11 +102,11 @@ public class RAEnrollCertCommand extends ClientCommand
 
         if(cert == null)
         {
-            throw new UnexpectedResultException("No certificate received from the server");
+            throw new UnexpectedResultException("no certificate received from the server");
         }
 
         File certFile = new File(outputFile);
-        saveVerbose("Certificate saved to file", certFile, cert.getEncoded());
+        saveVerbose("certificate saved to file", certFile, cert.getEncoded());
 
         return null;
     }

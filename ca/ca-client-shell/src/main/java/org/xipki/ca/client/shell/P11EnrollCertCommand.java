@@ -51,21 +51,21 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-client", name = "enroll", description="Enroll certificate (PKCS#11 token)")
+@Command(scope = "xipki-cli", name = "enroll", description="enroll certificate (PKCS#11 token)")
 public class P11EnrollCertCommand extends EnrollCertCommand
 {
     @Option(name = "-slot",
-            required = true, description = "Required. Slot index")
+            required = true, description = "required. Slot index")
     private Integer slotIndex;
 
     @Option(name = "-key-id",
-            required = false, description = "Id of the private key in the PKCS#11 device.\n"
-                    + "Either keyId or keyLabel must be specified")
+            required = false, description = "id of the private key in the PKCS#11 device.\n"
+                    + "either keyId or keyLabel must be specified")
     private String keyId;
 
     @Option(name = "-key-label",
-            required = false, description = "Label of the private key in the PKCS#11 device.\n"
-                    + "Either keyId or keyLabel must be specified")
+            required = false, description = "label of the private key in the PKCS#11 device.\n"
+                    + "either keyId or keyLabel must be specified")
     private String keyLabel;
 
     @Option(name = "-module",
@@ -98,7 +98,7 @@ public class P11EnrollCertCommand extends EnrollCertCommand
         }
         else
         {
-            throw new SignerException("Exactly one of keyId or keyLabel should be specified");
+            throw new SignerException("exactly one of keyId or keyLabel should be specified");
         }
         return keyIdentifier;
     }

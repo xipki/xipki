@@ -33,26 +33,56 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.mgmt.shell.completer;
+package org.xipki.console.karaf.impl.completer;
 
-import org.xipki.common.CRLReason;
-import org.xipki.console.karaf.EnumCompleter;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.bouncycastle.asn1.nist.NISTNamedCurves;
+import org.bouncycastle.asn1.sec.SECNamedCurves;
+import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
+import org.bouncycastle.asn1.x9.X962NamedCurves;
+import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.xipki.console.karaf.ECCurveNameCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public class ClientCRLReasonCompleter extends EnumCompleter
+public class ECCurveNameCompleterImpl extends DynamicEnumCompleter
+implements ECCurveNameCompleter
 {
-    public ClientCRLReasonCompleter()
-    {
-        StringBuilder enums = new StringBuilder();
 
-        for(CRLReason reason : CRLReason.PERMITTED_CLIENT_CRLREASONS)
+    @Override
+    protected Set<String> getEnums()
+    {
+        Set<String> curveNames = new HashSet<>();
+        Enumeration<?> names = X962NamedCurves.getNames();
+        while(names.hasMoreElements())
         {
-            enums.append(reason.getDescription()).append(",");
+            curveNames.add((String) names.nextElement());
         }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+
+        names = SECNamedCurves.getNames();
+        while(names.hasMoreElements())
+        {
+            curveNames.add((String) names.nextElement());
+        }
+
+        names = TeleTrusTNamedCurves.getNames();
+        while(names.hasMoreElements())
+        {
+            curveNames.add((String) names.nextElement());
+        }
+
+        names = NISTNamedCurves.getNames();
+        while(names.hasMoreElements())
+        {
+            curveNames.add((String) names.nextElement());
+        }
+
+        return curveNames;
     }
+
 }

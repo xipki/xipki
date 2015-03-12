@@ -49,14 +49,14 @@ import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "requestor-info", description="Show information of requestors")
+@Command(scope = "xipki-ca", name = "requestor-info", description="show information of requestors")
 public class RequestorInfoCommand extends CaCommand
 {
-    @Argument(index = 0, name = "name", description = "Requestor name", required = false)
+    @Argument(index = 0, name = "name", description = "requestor name", required = false)
     private String name;
 
     @Option(name = "-v", aliases="--verbose",
-            required = false, description = "Show requestor information verbosely")
+            required = false, description = "show requestor information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Override
@@ -92,7 +92,7 @@ public class RequestorInfoCommand extends CaCommand
             CmpRequestorEntry entry = caManager.getCmpRequestor(name);
             if(entry == null)
             {
-                sb.append("Could not find CMP requestor '" + name + "'");
+                sb.append("could not find CMP requestor '" + name + "'");
             }
             else
             {

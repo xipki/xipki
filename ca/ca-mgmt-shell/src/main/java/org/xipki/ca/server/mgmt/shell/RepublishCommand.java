@@ -44,17 +44,17 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "republish", description="Republish certificates")
+@Command(scope = "xipki-ca", name = "republish", description="republish certificates")
 public class RepublishCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "Required. CA name or 'all' for all CAs",
+            description = "required. CA name or 'all' for all CAs",
             required = true)
     private String caName;
 
     @Option(name = "-publisher",
         required = true, multiValued = true,
-        description = "Required. Publisher name or 'all' for all publishers. Multivalued")
+        description = "required. Publisher name or 'all' for all publishers. Multivalued")
     private List<String> publisherNames;
 
     @Override
@@ -84,11 +84,11 @@ public class RepublishCommand extends CaCommand
         boolean successfull = caManager.republishCertificates(caName, publisherNames);
         if(successfull)
         {
-            out("Replubished certificates");
+            out("replubished certificates");
         }
         else
         {
-            err("Replubishing certificates failed");
+            err("replubishing certificates failed");
         }
         return null;
     }

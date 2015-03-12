@@ -1,28 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" default-activation="lazy">
+  <reference id="ocspQA" interface="org.xipki.ocsp.qa.api.OcspQA"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <reference id="ocspRequestor" interface="org.xipki.ocsp.client.api.OCSPRequestor"/>
+  <reference id="sigAlgCompleter" interface="org.xipki.console.karaf.SigAlgCompleter"/>
+  <reference id="hashAlgCompleter" interface="org.xipki.console.karaf.HashAlgCompleter"/>
   <bean id="certStatusCompleter" class="org.xipki.ocsp.qa.shell.completer.CertStatusCompleter"/>
-  <bean id="ocspErrorCompleter" class="org.xipki.ocsp.qa.shell.completer.OCSPErrorCompleter"/>
-  <bean id="occurrenceCompleter" class="org.xipki.ocsp.qa.shell.completer.OccurrenceCompleter"/>
-  <reference id="ocspQA" interface="org.xipki.ocsp.qa.api.OcspQA"/>
+  <bean id="ocspErrorCompleter" class="org.xipki.ocsp.qa.shell.completer.OcspErrorCompleter"/>
+  <bean id="occurrenceCompleter" class="org.xipki.ocsp.qa.shell.completer.OccurrenceCompleter"/>  
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
       <action class="org.xipki.ocsp.qa.shell.OCSPQAStatusCommand">
-        <property name="ocspQA" ref="ocspQa"/>
+        <property name="requestor" ref="ocspRequestor"/>
+        <property name="ocspQA" ref="ocspQA"/>
       </action>
       <optional-completers>
         <entry key="-cert" value-ref="filePathCompleter"/>
         <entry key="-issuer" value-ref="filePathCompleter"/>
         <entry key="-respIssuer" value-ref="filePathCompleter"/>
+        <entry key="-reqout" value-ref="filePathCompleter"/>
+        <entry key="-respout" value-ref="filePathCompleter"/>
+        <entry key="-sigalg" value-ref="sigAlgCompleter"/>
+        <entry key="-hash" value-ref="hashAlgCompleter"/>
         <entry key="-expStatus" value-ref="certStatusCompleter"/>
         <entry key="-expError" value-ref="ocspErrorCompleter"/>
         <entry key="-expNextupdate" value-ref="occurrenceCompleter"/>
         <entry key="-expCerthash" value-ref="occurrenceCompleter"/>
         <entry key="-expNonce" value-ref="occurrenceCompleter"/>
-        <entry key="-expSigalg" value-ref="occurrenceCompleter"/>
-        <entry key="-reqout" value-ref="filePathCompleter"/>
-        <entry key="-respout" value-ref="filePathCompleter"/>
+        <entry key="-expSigAlg" value-ref="sigAlgCompleter"/>
+        <entry key="-expCerthashAlg" value-ref="hashAlgCompleter"/>
       </optional-completers>
     </command>
   </command-bundle>

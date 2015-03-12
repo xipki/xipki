@@ -47,11 +47,11 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "caprofile-info", description="Show information of certificate profiles in given CA")
+@Command(scope = "xipki-ca", name = "caprofile-info", description="show information of certificate profiles in given CA")
 public class CaProfileInfoCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "Required. CA name",
+            description = "required. CA name",
             required = true)
     private String caName;
 
@@ -62,14 +62,14 @@ public class CaProfileInfoCommand extends CaCommand
         StringBuilder sb = new StringBuilder();
         if(caManager.getCA(caName) == null)
         {
-            sb.append("Could not find CA '" + caName + "'");
+            sb.append("could not find CA '" + caName + "'");
         }
         else
         {
             Set<String> entries = caManager.getCertprofilesForCA(caName);
             if(isNotEmpty(entries))
             {
-                sb.append("Certificate Profiles supported by CA " + caName).append("\n");
+                sb.append("certificate Profiles supported by CA " + caName).append("\n");
 
                 List<String> sorted = new ArrayList<>(entries);
                 Collections.sort(sorted);
@@ -81,7 +81,7 @@ public class CaProfileInfoCommand extends CaCommand
             }
             else
             {
-                sb.append("\tNo profile for CA " + caName + " is configured");
+                sb.append("\tno profile for CA " + caName + " is configured");
             }
         }
 

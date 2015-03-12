@@ -33,40 +33,20 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.console.karaf;
+package org.xipki.console.karaf.impl.completer;
+
+import org.xipki.console.karaf.EnumCompleter;
+import org.xipki.console.karaf.YesNoCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public class UnexpectedResultException extends Exception
+public class YesNoCompleterImpl extends EnumCompleter
+implements YesNoCompleter
 {
-
-    private static final long serialVersionUID = 189176458485831187L;
-
-    public UnexpectedResultException()
+    public YesNoCompleterImpl()
     {
+        setTokens("yes, no");
     }
-
-    public UnexpectedResultException(String message)
-    {
-        super(message);
-    }
-
-    public UnexpectedResultException(Throwable cause)
-    {
-        super(cause);
-    }
-
-    public UnexpectedResultException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
-
-    public UnexpectedResultException(String message, Throwable cause,
-            boolean enableSuppression, boolean writableStackTrace)
-    {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
-
 }

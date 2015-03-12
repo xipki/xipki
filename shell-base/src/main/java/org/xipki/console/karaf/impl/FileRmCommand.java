@@ -33,102 +33,103 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.console.karaf;
+package org.xipki.console.karaf.impl;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.IOException;
 
 import jline.console.ConsoleReader;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
+import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-file", name = "ls", description="List directory contents")
-public class FileListCommand extends XipkiOsgiCommandSupport
+@Command(scope = "xipki-file", name = "rm", description="remove file or directory")
+public class FileRmCommand extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "file",
-            required = true, description = "File or directory")
+            required = true, description = "file or directory to be deleted")
     private String targetPath;
+
+    @Option(name = "-r", aliases="--recursive",
+            required = false, description = "remove directories and their contents recursively")
+    private Boolean recursive = Boolean.FALSE;
+
+    @Option(name = "-f", aliases="--force",
+            required = false, description = "ignore nonexistent files, never prompt")
+    private Boolean force = Boolean.FALSE;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
+        ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
+
         File target = new File(expandFilepath(targetPath));
         if(target.exists() == false)
         {
-            err("cannot access " + targetPath + ": No such file or directory");
             return null;
         }
 
         if(target.isDirectory())
         {
-            List<String> l = new LinkedList<>();
-            File[] children = target.listFiles();
-            int maxLen = -1;
-            for(File child : children)
+            if(recursive == false)
             {
-                String name  = child.getName();
-                if(child.isDirectory())
-                {
-                    name += File.separator;
-                }
-                l.add(name);
-                maxLen = Math.max(maxLen, name.length());
+                err("Please use option --recursive to delete directory");
+                return null;
             }
-            if(isNotEmpty(l))
+
+            if(force || confirm(reader, "remove directory " + targetPath))
             {
-                Collections.sort(l);
-                List<String> l2 = new LinkedList<>();
-
-                for(String s : l)
-                {
-                    int diffLen = maxLen - s.length();
-                    if(diffLen > 0)
-                    {
-                        for(int i = 0; i < diffLen; i++)
-                        {
-                            s += " ";
-                        }
-                    }
-                    l2.add(s);
-                }
-
-                ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
-                int width = reader.getTerminal().getWidth();
-
-                int n = width / (maxLen + 1);
-                if(n == 0)
-                {
-                    for(String s :l2)
-                    {
-                        out(s);
-                    }
-                } else
-                {
-                    for(int i = 0; i < l2.size(); i += n)
-                    {
-                        StringBuilder sb = new StringBuilder();
-                        for(int j = i; j < Math.min(l2.size(), i + n); j++)
-                        {
-                            sb.append(l2.get(j)).append(" ");
-                        }
-                        out(sb.toString());
-                    }
-                }
+                FileUtils.deleteDirectory(target);
+                out("removed directory " + targetPath);
             }
         }
         else
         {
-            out(targetPath);
+            if(force || confirm(reader, "remove file " + targetPath))
+            {
+                target.delete();
+                out("removed file " + targetPath);
+            }
         }
 
         return null;
+    }
+
+    private boolean confirm(ConsoleReader reader, String prompt)
+    throws IOException
+    {
+        String answer = reader.readLine();
+        if(answer == null)
+        {
+            throw new IOException("interrupted");
+        }
+
+        int tries = 0;
+
+        while(tries < 3)
+        {
+            if("yes".equalsIgnoreCase(answer))
+            {
+                return true;
+            }
+            else if("no".equalsIgnoreCase(answer))
+            {
+                return false;
+            }
+            else
+            {
+                tries++;
+                out("Please answer with yes or no. ");
+            }
+        }
+
+        return false;
     }
 }

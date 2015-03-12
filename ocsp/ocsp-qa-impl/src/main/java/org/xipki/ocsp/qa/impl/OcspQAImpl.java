@@ -202,7 +202,7 @@ public class OcspQAImpl implements OcspQA
                     {
                         AlgorithmIdentifier sigAlg = basicResp.getSignatureAlgorithmID();
                         String sigAlgName = SignerUtil.getSignatureAlgoName(sigAlg);
-                        if(sigAlgName.equalsIgnoreCase(expectedSigalgo) == false)
+                        if(equalsAlgName(sigAlgName, expectedSigalgo) == false)
                         {
                             issue.setFailureMessage("is '" + sigAlgName +"', but expected '" + expectedSigalgo + "'");
                         }
@@ -476,6 +476,18 @@ public class OcspQAImpl implements OcspQA
             }
         }
         return issue;
+    }
+
+    private static boolean equalsAlgName(String a, String b)
+    {
+        if(a.equalsIgnoreCase(b))
+        {
+            return true;
+        }
+
+        a = a.replace("-", "");
+        b = b.replace("-", "");
+        return a.equalsIgnoreCase(b);
     }
 
 }

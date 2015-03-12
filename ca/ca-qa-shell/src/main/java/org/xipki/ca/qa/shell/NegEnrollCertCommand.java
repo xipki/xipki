@@ -52,7 +52,7 @@ import org.xipki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.ca.client.shell.ClientCommand;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.console.karaf.UnexpectedResultException;
+import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
@@ -65,24 +65,24 @@ public abstract class NegEnrollCertCommand extends ClientCommand
 {
     @Option(name = "-subject",
             required = false,
-            description = "Subject to be requested.\n"
-                    + "The default is the subject of self-signed certifite.")
+            description = "subject to be requested.\n"
+                    + "the default is the subject of self-signed certifite.")
     private String subject;
 
     @Option(name = "-profile",
-            required = true, description = "Required. Certificate profile")
+            required = true, description = "required. Certificate profile")
     private String profile;
 
     @Option(name = "-user",
-            required = false, description = "Username")
+            required = false, description = "username")
     private String user;
 
     @Option(name = "-hash",
-            required = false, description = "Hash algorithm name for the POPO computation")
+            required = false, description = "hash algorithm name for the POPO computation")
     protected String hashAlgo = "SHA256";
 
     @Option(name = "-ca",
-            required = false, description = "Required if the profile is supported by more than one CA")
+            required = false, description = "required if the profile is supported by more than one CA")
     private String caName;
 
     protected SecurityFactory securityFactory;
@@ -147,7 +147,7 @@ public abstract class NegEnrollCertCommand extends ClientCommand
 
         if(cert != null)
         {
-            throw new UnexpectedResultException("No certificate is excepted, but received one");
+            throw new UnexpectedResultException("no certificate is excepted, but received one");
         }
 
         return null;

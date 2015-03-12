@@ -35,8 +35,6 @@
 
 package org.xipki.ca.server.mgmt.shell.cert;
 
-import java.math.BigInteger;
-
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
@@ -46,17 +44,17 @@ import org.xipki.ca.server.mgmt.shell.CaCommand;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "unrevoke-cert", description="Unrevoke certificate")
+@Command(scope = "xipki-ca", name = "unrevoke-cert", description="unrevoke certificate")
 public class UnrevokeCertCommand extends CaCommand
 {
     @Option(name = "-ca",
-            required = true, description = "Required. CA name")
+            required = true, description = "required. CA name")
     private String caName;
 
     @Option(name = "-serial",
             required = true,
-            description = "Serial number")
-    private Long serialNumber;
+            description = "serial number")
+    private String serialNumberS;
 
     @Override
     protected Object _doExecute()
@@ -69,15 +67,15 @@ public class UnrevokeCertCommand extends CaCommand
             return null;
         }
 
-        boolean successful = caManager.unrevokeCertificate(caName, BigInteger.valueOf(serialNumber));
+        boolean successful = caManager.unrevokeCertificate(caName, toBigInt(serialNumberS));
 
         if(successful)
         {
-            out("Unrevoked certificate");
+            out("unrevoked certificate");
         }
         else
         {
-            err("Could not unrevoke certificate");
+            err("could not unrevoke certificate");
         }
 
         return null;

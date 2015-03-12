@@ -35,7 +35,6 @@
 
 package org.xipki.ca.client.shell;
 
-import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
@@ -46,20 +45,20 @@ import org.xipki.ca.client.api.CertIDOrError;
 import org.xipki.ca.common.cmp.PKIStatusInfo;
 import org.xipki.common.CRLReason;
 import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.SecurityUtil;
-import org.xipki.console.karaf.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-client", name = "revoke", description="Revoke certificate")
+@Command(scope = "xipki-cli", name = "revoke", description="revoke certificate")
 public class RevokeCertCommand extends UnRevRemoveCertCommand
 {
     @Option(name = "-reason",
             required = true,
-            description = "Required. Reason, valid values are \n" +
+            description = "required. Reason, valid values are \n" +
                     "  0: unspecified\n" +
                     "  1: keyCompromise\n" +
                     "  3: affiliationChanged\n" +
@@ -71,14 +70,14 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
 
     @Option(name = "-invDate",
             required = false,
-            description = "Invalidity date, UTC time of format yyyyMMddHHmmss")
+            description = "invalidity date, UTC time of format yyyyMMddHHmmss")
     private String invalidityDateS;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        if(certFile == null && (caCertFile == null || serialNumber == null))
+        if(certFile == null && (caCertFile == null || getSerialNumber() == null))
         {
             err("either cert or (cacert, serial) must be specified");
             return null;
@@ -137,7 +136,7 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
             RequestResponseDebug debug = getRequestResponseDebug();
             try
             {
-                certIdOrError = raWorker.revokeCert(issuer, new BigInteger(serialNumber), crlReason.getCode(),
+                certIdOrError = raWorker.revokeCert(issuer, getSerialNumber(), crlReason.getCode(),
                         invalidityDate, debug);
             }finally
             {
@@ -148,11 +147,11 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
         if(certIdOrError.getError() != null)
         {
             PKIStatusInfo error = certIdOrError.getError();
-            throw new UnexpectedResultException("Revocation failed: " + error);
+            throw new UnexpectedResultException("revocation failed: " + error);
         }
         else
         {
-            out("Revoked certificate");
+            out("revoked certificate");
         }
         return null;
     }

@@ -44,17 +44,17 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "clear-publishqueue", description="Clear publish queue")
+@Command(scope = "xipki-ca", name = "clear-publishqueue", description="clear publish queue")
 public class ClearPublishQueueCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "Required. CA name or 'all' for all CAs",
+            description = "required. CA name or 'all' for all CAs",
             required = true)
     private String caName;
 
     @Option(name = "-publisher",
         required = true, multiValued = true,
-        description = "Required. Publisher name or 'all' for all publishers. Multivalued")
+        description = "required. Publisher name or 'all' for all publishers. Multivalued")
     private List<String> publisherNames;
 
     @Override

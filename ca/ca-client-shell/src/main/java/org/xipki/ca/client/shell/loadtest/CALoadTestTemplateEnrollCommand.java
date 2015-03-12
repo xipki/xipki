@@ -43,18 +43,18 @@ import org.xipki.common.AbstractLoadTest;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-client", name = "loadtest-template-enroll", description="CA Client Template Enroll Load test")
+@Command(scope = "xipki-cli", name = "loadtest-template-enroll", description="CA Client Template Enroll Load test")
 public class CALoadTestTemplateEnrollCommand extends CALoadTestCommand
 {
 
     @Option(name = "-template",
             required = true,
-            description = "Required. Template file")
+            description = "required. Template file")
     private String templateFile;
 
     @Option(name = "-duration",
             required = false,
-            description = "Required. Duration in seconds")
+            description = "required. Duration in seconds")
     private Integer durationInSecond = 30;
 
     @Option(name = "-thread",
@@ -68,13 +68,13 @@ public class CALoadTestTemplateEnrollCommand extends CALoadTestCommand
     {
         if(numThreads < 1)
         {
-            err("Invalid number of threads " + numThreads);
+            err("invalid number of threads " + numThreads);
             return null;
         }
 
         if(durationInSecond < 1)
         {
-            err("Invalid duration " + durationInSecond);
+            err("invalid duration " + durationInSecond);
             return null;
         }
 
@@ -82,11 +82,11 @@ public class CALoadTestTemplateEnrollCommand extends CALoadTestCommand
         CALoadTestTemplateEnroll loadTest = new CALoadTestTemplateEnroll(raWorker, templateFile);
         int n = loadTest.getNumberOfCertsInOneRequest();
 
-        startMsg.append("Threads:         ").append(numThreads).append("\n");
-        startMsg.append("Duration:        ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
-        startMsg.append("Template:        ").append(templateFile).append("\n");
-        startMsg.append("#Certs/Request:  ").append(n).append("\n");
-        startMsg.append("Unit:            ").append(n).append(" certificate");
+        startMsg.append("threads:         ").append(numThreads).append("\n");
+        startMsg.append("duration:        ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
+        startMsg.append("template:        ").append(templateFile).append("\n");
+        startMsg.append("#certs/Request:  ").append(n).append("\n");
+        startMsg.append("unit:            ").append(n).append(" certificate");
         if(n > 1)
         {
             startMsg.append("s");

@@ -39,6 +39,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.security.api.PasswordResolver;
 
 /**
@@ -51,7 +52,8 @@ class ShellUtil
             PasswordResolver passwordResolver)
     throws Exception
     {
-        if(signerConf.contains("file:") == false && signerConf.contains("base64:") == false )
+        if(signerConf.contains("file:") == false && signerConf.contains("base64:") == false
+                && signerConf.contains("FILE:") == false && signerConf.contains("BASE64:") == false)
         {
             return signerConf;
         }
@@ -67,12 +69,12 @@ class ShellUtil
         }
 
         byte[] keystoreBytes;
-        if(keystoreConf.startsWith("file:"))
+        if(StringUtil.startsWithIgnoreCase(keystoreConf, "file:"))
         {
             String keystoreFile = keystoreConf.substring("file:".length());
             keystoreBytes = IoUtil.read(keystoreFile);
         }
-        else if(keystoreConf.startsWith("base64:"))
+        else if(StringUtil.startsWithIgnoreCase(keystoreConf, "base64:"))
         {
             keystoreBytes = Base64.decode(keystoreConf.substring("base64:".length()));
         }

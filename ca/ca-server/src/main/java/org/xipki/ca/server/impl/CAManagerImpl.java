@@ -108,6 +108,7 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
@@ -407,7 +408,7 @@ implements CAManager, CmpResponderManager
             for(Object objKey : caConfProps.keySet())
             {
                 String key = (String) objKey;
-                if(key.startsWith("datasource."))
+                if(StringUtil.startsWithIgnoreCase(key, "datasource."))
                 {
                     String datasourceFile = caConfProps.getProperty(key);
                     try
@@ -2162,7 +2163,7 @@ implements CAManager, CmpResponderManager
             }
             else
             {
-                auditEvent.setStatus(AuditStatus.ERROR.name());
+                auditEvent.setStatus(AuditStatus.FAILED.name());
                 auditEvent.setLevel(AuditLevel.ERROR);
             }
             auditLoggingService.logEvent(auditEvent);
@@ -2489,12 +2490,12 @@ implements CAManager, CmpResponderManager
         String keyLabel     = utf8Pairs.getValue("key-label");
 
         byte[] keystoreBytes;
-        if(keystoreConf.startsWith("file:"))
+        if(StringUtil.startsWithIgnoreCase(keystoreConf, "file:"))
         {
             String keystoreFile = keystoreConf.substring("file:".length());
             keystoreBytes = IoUtil.read(keystoreFile);
         }
-        else if(keystoreConf.startsWith("base64:"))
+        else if(StringUtil.startsWithIgnoreCase(keystoreConf, "base64:"))
         {
             keystoreBytes = Base64.decode(keystoreConf.substring("base64:".length()));
         }

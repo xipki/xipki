@@ -49,14 +49,14 @@ import org.xipki.ca.server.mgmt.api.X509CAEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "ca-info", description="Show information of CAs")
+@Command(scope = "xipki-ca", name = "ca-info", description="show information of CAs")
 public class CaInfoCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CA name", required = false)
     private String caName;
 
     @Option(name = "-v", aliases="--verbose",
-            required = false, description = "Show CA information verbosely")
+            required = false, description = "show CA information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Override
@@ -96,7 +96,7 @@ public class CaInfoCommand extends CaCommand
             X509CAEntry entry = caManager.getCA(caName);
             if(entry == null)
             {
-                sb.append("Could not find CA '" + caName + "'");
+                sb.append("could not find CA '" + caName + "'");
             }
             else
             {

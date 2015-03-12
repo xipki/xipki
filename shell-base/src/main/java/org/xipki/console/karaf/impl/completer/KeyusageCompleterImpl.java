@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.shell.completer;
+package org.xipki.console.karaf.impl.completer;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -41,12 +41,14 @@ import java.util.Set;
 
 import org.xipki.common.KeyUsage;
 import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.xipki.console.karaf.KeyusageCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public class KeyusageCompleter extends DynamicEnumCompleter
+public class KeyusageCompleterImpl extends DynamicEnumCompleter
+implements KeyusageCompleter
 {
     private static final Set<String> usages;
 

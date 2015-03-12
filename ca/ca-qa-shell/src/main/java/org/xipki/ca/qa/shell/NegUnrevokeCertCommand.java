@@ -35,7 +35,6 @@
 
 package org.xipki.ca.qa.shell;
 
-import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.commands.Command;
@@ -43,14 +42,14 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.client.api.CertIDOrError;
 import org.xipki.ca.client.shell.UnRevRemoveCertCommand;
 import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.util.SecurityUtil;
-import org.xipki.console.karaf.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-qa", name = "neg-unrevoke", description="Unrevoke certificate (negative, for QA)")
+@Command(scope = "xipki-qa", name = "neg-unrevoke", description="unrevoke certificate (negative, for QA)")
 public class NegUnrevokeCertCommand extends UnRevRemoveCertCommand
 {
 
@@ -58,7 +57,7 @@ public class NegUnrevokeCertCommand extends UnRevRemoveCertCommand
     protected Object _doExecute()
     throws Exception
     {
-        if(certFile == null && (caCertFile == null || serialNumber == null))
+        if(certFile == null && (caCertFile == null || getSerialNumber() == null))
         {
             err("either cert or (cacert, serial) must be specified");
             return null;
@@ -97,7 +96,7 @@ public class NegUnrevokeCertCommand extends UnRevRemoveCertCommand
             RequestResponseDebug debug = getRequestResponseDebug();
             try
             {
-                certIdOrError = raWorker.unrevokeCert(issuer, new BigInteger(serialNumber), debug);
+                certIdOrError = raWorker.unrevokeCert(issuer, getSerialNumber(), debug);
             }finally
             {
                 saveRequestResponse(debug);
@@ -106,7 +105,7 @@ public class NegUnrevokeCertCommand extends UnRevRemoveCertCommand
 
         if(certIdOrError.getError() == null)
         {
-            throw new UnexpectedResultException("Releasing revocation successful but expected failure");
+            throw new UnexpectedResultException("releasing revocation successful but expected failure");
         }
         return null;
     }

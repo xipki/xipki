@@ -33,26 +33,44 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ocsp.qa.shell.completer;
+package org.xipki.console.karaf.impl.completer;
 
-import org.xipki.console.karaf.EnumCompleter;
-import org.xipki.ocsp.qa.api.OcspCertStatus;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.xipki.common.ObjectIdentifiers;
+import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.xipki.console.karaf.ExtKeyusageCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public class OCSPErrorCompleter extends EnumCompleter
+public class ExtKeyusageCompleterImpl extends DynamicEnumCompleter
+implements ExtKeyusageCompleter
 {
-    public OCSPErrorCompleter()
-    {
-        StringBuilder enums = new StringBuilder();
+    private static final Set<String> usages;
 
-        for(OcspCertStatus entry : OcspCertStatus.values())
-        {
-            enums.append(entry.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    static
+    {
+        Set<String> set = new HashSet<>();
+        set.add(ObjectIdentifiers.id_kp_clientAuth.getId());
+        set.add(ObjectIdentifiers.id_kp_codeSigning.getId());
+        set.add(ObjectIdentifiers.id_kp_emailProtection.getId());
+        set.add(ObjectIdentifiers.id_kp_ipsecEndSystem.getId());
+        set.add(ObjectIdentifiers.id_kp_ipsecTunnel.getId());
+        set.add(ObjectIdentifiers.id_kp_OCSPSigning.getId());
+        set.add(ObjectIdentifiers.id_kp_serverAuth.getId());
+        set.add(ObjectIdentifiers.id_kp_timeStamping.getId());
+
+        usages = Collections.unmodifiableSet(set);
     }
+
+    @Override
+    protected Set<String> getEnums()
+    {
+        return usages;
+    }
+
 }

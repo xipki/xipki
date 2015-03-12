@@ -42,16 +42,16 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "caprofile-rm", description="Remove certificate profile from CA")
+@Command(scope = "xipki-ca", name = "caprofile-rm", description="remove certificate profile from CA")
 public class CaProfileRemoveCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "Required. CA name",
+            description = "required. CA name",
             required = true)
     private String caName;
 
     @Option(name = "-profile",
-            required = true, description = "Required. Certificate profile name")
+            required = true, description = "required. Certificate profile name")
     private String profileName;
 
     @Override

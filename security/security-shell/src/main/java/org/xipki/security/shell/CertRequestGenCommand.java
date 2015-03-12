@@ -65,16 +65,16 @@ public abstract class CertRequestGenCommand extends SecurityCommand
 {
     @Option(name = "-subject",
             required = false,
-            description = "Subject in the PKCS#10 request.\n"
-                    + "The default is the subject of self-signed certifite")
+            description = "subject in the PKCS#10 request.\n"
+                    + "the default is the subject of self-signed certifite")
     private String subject;
 
     @Option(name = "-hash",
-            required = false, description = "Hash algorithm name")
+            required = false, description = "hash algorithm name")
     private String hashAlgo = "SHA256";
 
     @Option(name = "-out",
-            required = true, description = "Required. Output file name")
+            required = true, description = "required. Output file name")
     private String outputFilename;
 
     @Option(name = "-keyusage",
@@ -86,22 +86,22 @@ public abstract class CertRequestGenCommand extends SecurityCommand
     private List<String> extkeyusages;
 
     @Option(name = "-subjectAltName",
-            required = false, multiValued = true, description = "SubjectAltName. Multi-valued.")
+            required = false, multiValued = true, description = "subjectAltName. Multi-valued.")
     private List<String> subjectAltNames;
 
     @Option(name = "-subjectInfoAccess",
-            required = false, multiValued = true, description = "SubjectInfoAccess. Multi-valued")
+            required = false, multiValued = true, description = "subjectInfoAccess. Multi-valued")
     private List<String> subjectInfoAccesses;
 
     @Option(name = "-needExtension",
             required = false, multiValued = true,
-            description = "Types of extension that must be contaied in the certificate. Multi-valued")
+            description = "types of extension that must be contaied in the certificate. Multi-valued")
     private List<String> needExtensionTypes;
 
     @Option(name = "-wantExtension",
             required = false, multiValued = true,
-            description = "Types of extension that should be contaied in the certificate if possible.\n"
-                    + "Multi-valued")
+            description = "types of extension that should be contaied in the certificate if possible.\n"
+                    + "multi-valued")
     private List<String> wantExtensionTypes;
 
     protected abstract ConcurrentContentSigner getSigner(String hashAlgo)
@@ -166,7 +166,8 @@ public abstract class CertRequestGenCommand extends SecurityCommand
 
         if(isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes))
         {
-            ExtensionExistence ee = new ExtensionExistence(SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
+            ExtensionExistence ee = new ExtensionExistence(
+                    SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
                     SecurityUtil.textToASN1ObjectIdentifers(wantExtensionTypes));
             extensions.add(new Extension(
                     CustomObjectIdentifiers.id_cmp_request_extensions, false, ee.toASN1Primitive().getEncoded()));
@@ -200,7 +201,7 @@ public abstract class CertRequestGenCommand extends SecurityCommand
         }
 
         File file = new File(outputFilename);
-        saveVerbose("Saved PKCS#10 request to file", file, p10Req.getEncoded());
+        saveVerbose("saved PKCS#10 request to file", file, p10Req.getEncoded());
         return null;
     }
 

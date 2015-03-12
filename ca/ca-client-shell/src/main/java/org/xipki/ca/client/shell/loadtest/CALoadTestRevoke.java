@@ -61,8 +61,8 @@ import org.xipki.ca.client.api.dto.RevokeCertRequestType;
 import org.xipki.common.AbstractLoadTest;
 import org.xipki.common.CRLReason;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.SecurityUtil;
-import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 
@@ -264,7 +264,7 @@ class CALoadTestRevoke extends AbstractLoadTest
                     break;
                 }
 
-                if(XipkiOsgiCommandSupport.isEmpty(serialNumbers))
+                if(CollectionUtil.isEmpty(serialNumbers))
                 {
                     break;
                 }

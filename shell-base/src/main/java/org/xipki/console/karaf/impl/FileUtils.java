@@ -33,11 +33,13 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.console.karaf;
+package org.xipki.console.karaf.impl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import org.xipki.console.karaf.impl.completer.Configuration;
 
 /**
  * @author Lijun Liao

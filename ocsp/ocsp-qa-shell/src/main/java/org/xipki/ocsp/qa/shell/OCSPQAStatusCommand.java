@@ -44,9 +44,10 @@ import java.util.Map;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.cert.ocsp.OCSPResp;
+import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
-import org.xipki.console.karaf.UnexpectedResultException;
+import org.xipki.common.util.SecurityUtil;
 import org.xipki.ocsp.client.shell.BaseOCSPStatusCommand;
 import org.xipki.ocsp.qa.api.Occurrence;
 import org.xipki.ocsp.qa.api.OcspCertStatus;
@@ -58,32 +59,36 @@ import org.xipki.ocsp.qa.api.OcspResponseOption;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-qa", name = "ocsp-status", description="Request certificate status (QA)")
+@Command(scope = "xipki-qa", name = "ocsp-status", description="request certificate status (QA)")
 public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
 {
     @Option(name = "-expError",
-            description = "Expected error. Valid values are , " + OcspError.errorText)
-    private String expectedErrorText;
+            description = "expected error. Valid values are , " + OcspError.errorText)
+    private String errorText;
 
     @Option(name = "-expStatus",
             multiValued = true,
-            description = "Expected status. Valid values are \n" + OcspCertStatus.certStatusesText + ",\nmulti values allowed")
-    private List<String> expectedStatusTexts;
+            description = "expected status. Valid values are \n" + OcspCertStatus.certStatusesText + ",\nmulti values allowed")
+    private List<String> statusTexts;
 
-    @Option(name = "-expSigalg",
-            description = "Expected signature algorithm")
-    private String expectedSigalgo;
+    @Option(name = "-expSigAlg",
+            description = "expected signature algorithm")
+    private String sigAlg;
 
     @Option(name = "-expNextupdate",
-            description = "Occurence of nextUpdate. Valid values are " + Occurrence.occurencesText)
+            description = "occurence of nextUpdate. Valid values are " + Occurrence.occurencesText)
     private String nextUpdateOccurrenceText = Occurrence.optional.name();
 
     @Option(name = "-expCerthash",
-            description = "Occurence of certHash. Valid values are " + Occurrence.occurencesText)
+            description = "occurence of certHash. Valid values are " + Occurrence.occurencesText)
     private String certhashOccurrenceText = Occurrence.optional.name();
 
+    @Option(name = "-expCerthashAlg",
+            description = "occurence of certHash")
+    private String certhashAlg;
+
     @Option(name = "-expNonce",
-            description = "Occurence of nonce. Valid values are " + Occurrence.occurencesText)
+            description = "occurence of nonce. Valid values are " + Occurrence.occurencesText)
     private String nonceOccurrenceText = Occurrence.optional.name();
 
     private OcspQA ocspQA;
@@ -98,21 +103,21 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
             List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
     throws Exception
     {
-        if(isBlank(expectedErrorText) && isEmpty(expectedStatusTexts))
+        if(isBlank(errorText) && isEmpty(statusTexts))
         {
             throw new Exception("Neither expError nor expStatus is set, this is not permitted");
         }
 
-        if(isNotBlank(expectedErrorText) && isNotEmpty(expectedStatusTexts))
+        if(isNotBlank(errorText) && isNotEmpty(statusTexts))
         {
-            throw new Exception("Both expError and expStatus are set, this is not permitted");
+            throw new Exception("both expError and expStatus are set, this is not permitted");
         }
 
-        if(isNotEmpty(expectedStatusTexts))
+        if(isNotEmpty(statusTexts))
         {
-            if(expectedStatusTexts.size() != serialNumbers.size())
+            if(statusTexts.size() != serialNumbers.size())
             {
-                throw new Exception("Number of expStatus is invalid: " + (expectedStatusTexts.size()) +
+                throw new Exception("Number of expStatus is invalid: " + (statusTexts.size()) +
                         ", it should be " + serialNumbers.size());
             }
         }
@@ -125,20 +130,20 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
     throws Exception
     {
         OcspError expectedOcspError = null;
-        if(isNotBlank(expectedErrorText))
+        if(isNotBlank(errorText))
         {
-            expectedOcspError = OcspError.getOCSPError(expectedErrorText);
+            expectedOcspError = OcspError.getOCSPError(errorText);
         }
 
         Map<BigInteger, OcspCertStatus> expectedStatuses = null;
-        if(isNotEmpty(expectedStatusTexts))
+        if(isNotEmpty(statusTexts))
         {
             expectedStatuses = new HashMap<>();
             final int n = serialNumbers.size();
 
             for(int i = 0; i < n; i++)
             {
-                String expectedStatusText = expectedStatusTexts.get(i);
+                String expectedStatusText = statusTexts.get(i);
                 expectedStatuses.put(serialNumbers.get(i),
                         OcspCertStatus.getCertStatus(expectedStatusText));
             }
@@ -152,6 +157,11 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
         responseOption.setNonceOccurrence(
                 Occurrence.getOccurrence(nonceOccurrenceText));
         responseOption.setRespIssuer(respIssuer);
+        responseOption.setSignatureAlgName(sigAlg);
+        if(isNotBlank(certhashAlg))
+        {
+            responseOption.setCerthashAlgId(SecurityUtil.getHashAlg(certhashAlg));
+        }
 
         ValidationResult result = ocspQA.checkOCSP(response,
                 issuer,
@@ -172,7 +182,6 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
                 sb.append("\n");
                 format(issue, "    ", sb);
             }
-
         }
 
         out(sb.toString());
@@ -188,7 +197,7 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
         sb.append(prefix);
         sb.append(issue.getCode());
         sb.append(", ").append(issue.getDescription());
-        sb.append(", ").append(issue.isFailed() ? "failure" : "successful");
+        sb.append(", ").append(issue.isFailed() ? "failed" : "successful");
         if(issue.getMessage() != null)
         {
             sb.append(", ").append(issue.getMessage());

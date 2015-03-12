@@ -42,10 +42,10 @@ import org.apache.karaf.shell.commands.Command;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "env-rm", description="Remove environment parameter")
+@Command(scope = "xipki-ca", name = "env-rm", description="remove environment parameter")
 public class EnvRemoveCommand extends CaCommand
 {
-    @Argument(index = 0, name = "name", description = "Environment parameter name", required = true)
+    @Argument(index = 0, name = "name", description = "environment parameter name", required = true)
     private String name;
 
     @Override

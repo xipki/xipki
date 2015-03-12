@@ -35,8 +35,6 @@
 
 package org.xipki.security.shell.p12;
 
-import java.math.BigInteger;
-
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.security.P12KeypairGenerator;
@@ -46,13 +44,18 @@ import org.xipki.security.api.P12KeypairGenerationResult;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "rsa-p12", description="Generate RSA keypair in PKCS#12 keystore")
+@Command(scope = "xipki-tk", name = "rsa-p12", description="generate RSA keypair in PKCS#12 keystore")
 public class P12RSAKeyGenCommand extends P12KeyGenCommand
 {
     @Option(name = "-keysize",
-            description = "Keysize in bit",
+            description = "keysize in bit",
             required = false)
     private Integer keysize = 2048;
+
+    @Option(name = "-e",
+            description = "public exponent",
+            required = false)
+    private String publicExponent = "0x10001";
 
     @Override
     protected Object _doExecute()
@@ -60,12 +63,13 @@ public class P12RSAKeyGenCommand extends P12KeyGenCommand
     {
         if(keysize % 1024 != 0)
         {
-            err("Keysize is not multiple of 1024: " + keysize);
+            err("keysize is not multiple of 1024: " + keysize);
             return null;
         }
 
         P12KeypairGenerator gen = new P12KeypairGenerator.RSAIdentityGenerator(
-                keysize, BigInteger.valueOf(0x10001), getPassword(), subject,
+                keysize, toBigInt(publicExponent),
+                getPassword(), subject,
                 getKeyUsage(), getExtendedKeyUsage());
 
         P12KeypairGenerationResult keyAndCert = gen.generateIdentity();

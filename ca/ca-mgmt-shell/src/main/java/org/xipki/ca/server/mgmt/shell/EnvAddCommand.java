@@ -42,17 +42,17 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "env-add", description="Add environment parameter")
+@Command(scope = "xipki-ca", name = "env-add", description="add environment parameter")
 public class EnvAddCommand extends CaCommand
 {
 
     @Option(name = "-name",
-            description = "Required. Parameter Name",
+            description = "required. Parameter Name",
             required = true, multiValued = false)
     private String name;
 
     @Option(name = "-value",
-            description = "Required. Environment paremter value",
+            description = "required. Environment paremter value",
             required = true)
     private String value;
 

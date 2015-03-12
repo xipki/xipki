@@ -44,16 +44,16 @@ import org.xipki.common.util.SecurityUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "requestor-add", description="Add requestor")
+@Command(scope = "xipki-ca", name = "requestor-add", description="add requestor")
 public class RequestorAddCommand extends CaCommand
 {
     @Option(name = "-name",
-            description = "Required. Requestor name",
+            description = "required. Requestor name",
             required = true, multiValued = false)
     private String name;
 
     @Option(name = "-cert",
-            description = "Required. Requestor certificate file",
+            description = "required. Requestor certificate file",
             required = true)
     private String certFile;
 

@@ -49,7 +49,7 @@ import org.xipki.security.api.SecurityFactory;
 public abstract class CaAddOrGenCommand extends CaCommand
 {
     @Option(name = "-name",
-            required = true, description = "Required. CA name")
+            required = true, description = "required. CA name")
     protected String caName;
 
     @Option(name = "-status",
@@ -67,33 +67,33 @@ public abstract class CaAddOrGenCommand extends CaCommand
     protected List<String> crlUris;
 
     @Option(name = "-deltaCrlUri",
-            description = "Delta CRL URI, multi options is allowed",
+            description = "delta CRL URI, multi options is allowed",
             multiValued = true)
     protected List<String> deltaCrlUris;
 
     @Option(name = "-permission",
-            description = "Required. Permission, multi options is allowed. allowed values are\n"
+            description = "required. Permission, multi options is allowed. allowed values are\n"
                     + permissionsText,
             required = true, multiValued = true)
     protected Set<String> permissions;
 
     @Option(name = "-nextSerial",
-            description = "Required. Serial number for the next certificate, 0 for random serial number",
+            description = "required. Serial number for the next certificate, 0 for random serial number",
             required = true)
     protected Long nextSerial;
 
     @Option(name = "-nextCrlNo",
-            description = "Required. CRL number for the next CRL",
+            description = "required. CRL number for the next CRL",
             required = true)
     protected Integer nextCrlNumber ;
 
     @Option(name = "-maxValidity",
-            description = "Required. maximal validity.",
+            description = "required. maximal validity.",
             required = true)
     protected String maxValidity;
 
     @Option(name = "-crlSigner",
-            description = "CRL signer name")
+            description = "cRL signer name")
     protected String crlSignerName;
 
     @Option(name = "-cmpControl",
@@ -105,11 +105,11 @@ public abstract class CaAddOrGenCommand extends CaCommand
     protected Integer numCrls = 30;
 
     @Option(name = "-expirationPeriod",
-            description = "Days before expiration time of CA to issue certificates")
+            description = "days before expiration time of CA to issue certificates")
     protected Integer expirationPeriod = 365;
 
     @Option(name = "-signerType",
-            description = "Required. CA signer type",
+            description = "required. CA signer type",
             required = true)
     protected String signerType;
 
@@ -118,21 +118,21 @@ public abstract class CaAddOrGenCommand extends CaCommand
     protected String signerConf;
 
     @Option(name = "-dk", aliases = { "--duplicateKey" },
-            description = "Mode of duplicate key.\n"
+            description = "mode of duplicate key.\n"
                     + "\t1: forbidden\n"
                     + "\t2: forbiddenWithinProfile\n"
                     + "\t3: permitted")
     protected String duplicateKeyS = "forbiddenWithinProfile";
 
     @Option(name = "-ds", aliases = { "--duplicateSubject" },
-            description = "Mode of duplicate subject.\n"
+            description = "mode of duplicate subject.\n"
                     + "\t1: forbidden\n"
                     + "\t2: forbiddenWithinProfile\n"
                     + "\t3: permitted")
     protected String duplicateSubjectS = "forbiddenWithinProfile";
 
     @Option(name = "-validityMode",
-            description = "Mode of valditity.\n"
+            description = "mode of valditity.\n"
                     + "\tSTRICT: Reject if the notBefore + validity behinds CA's notAfter \n"
                     + "\tLAX:    notBefore + validity after CA's notAfter is permitted\n"
                     + "\tCUTOFF: notAfter of issued certificates will be set to the earlier time of\n"

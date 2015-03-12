@@ -166,7 +166,7 @@ public class LiquibaseDatabaseConf
                 url= dbProps.getProperty("db.url");
             }
 
-            if(url.startsWith("jdbc:db2:"))
+            if(StringUtil.startsWithIgnoreCase(url, "jdbc:db2:"))
             {
                 String sep = ":currentSchema=";
                 int idx = url.indexOf(sep);

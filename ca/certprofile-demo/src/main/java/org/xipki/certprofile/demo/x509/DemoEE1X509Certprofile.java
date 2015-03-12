@@ -70,7 +70,7 @@ public class DemoEE1X509Certprofile extends AbstractEEX509Certprofile
     {
         validity = new CertValidity(10, Unit.YEAR);
 
-        Set<KeyUsageControl> _keyUsage = new HashSet<>(2);
+        Set<KeyUsageControl> _keyUsage = new HashSet<>();
         _keyUsage.add(new KeyUsageControl(KeyUsage.digitalSignature, true));
         _keyUsage.add(new KeyUsageControl(KeyUsage.dataEncipherment, true));
         keyUsage = Collections.unmodifiableSet(_keyUsage);

@@ -49,20 +49,20 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "responder-update", description="Update responder")
+@Command(scope = "xipki-ca", name = "responder-update", description="update responder")
 public class ResponderUpdateCommand extends CaCommand
 {
     @Option(name = "-signerType",
-            description = "Type of the responder signer",
+            description = "type of the responder signer",
             required = true)
     private String signerType;
 
     @Option(name = "-signerConf",
-            description = "Conf of the responder signer or 'NULL'")
+            description = "conf of the responder signer or 'NULL'")
     private String signerConf;
 
     @Option(name = "-cert",
-            description = "Requestor certificate file or 'NULL'")
+            description = "requestor certificate file or 'NULL'")
     private String certFile;
 
     private SecurityFactory securityFactory;

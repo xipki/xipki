@@ -35,6 +35,7 @@
 
 package org.xipki.ca.client.shell;
 
+import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -54,7 +55,7 @@ import org.xipki.common.util.SecurityUtil;
 public abstract class UnRevRemoveCertCommand extends ClientCommand
 {
     @Option(name = "-cert",
-            description = "Certificate file")
+            description = "certificate file")
     protected String certFile;
 
     @Option(name = "-cacert",
@@ -62,15 +63,29 @@ public abstract class UnRevRemoveCertCommand extends ClientCommand
     protected String caCertFile;
 
     @Option(name = "-serial",
-            description = "Serial number")
-    protected String serialNumber;
+            description = "serial number")
+    private String serialNumberS;
+
+    private BigInteger serialNumber;
+
+    protected BigInteger getSerialNumber()
+    {
+        if(serialNumber == null)
+        {
+            if(isNotBlank(serialNumberS))
+            {
+                this.serialNumber = toBigInt(serialNumberS);
+            }
+        }
+        return serialNumber;
+    }
 
     protected String checkCertificate(X509Certificate cert, X509Certificate caCert)
     throws CertificateEncodingException
     {
         if(cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal()) == false)
         {
-            return "The given certificate is not issued by the given CA";
+            return "the given certificate is not issued by the given CA";
         }
 
         byte[] caSki = SecurityUtil.extractSKI(caCert);
@@ -79,7 +94,7 @@ public abstract class UnRevRemoveCertCommand extends ClientCommand
         {
             if(Arrays.equals(aki, caSki) == false)
             {
-                return "The given certificate is not issued by the given CA";
+                return "the given certificate is not issued by the given CA";
             }
         }
 

@@ -43,25 +43,25 @@ import org.xipki.common.util.IoUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "publisher-update", description="Update publisher")
+@Command(scope = "xipki-ca", name = "publisher-update", description="update publisher")
 public class PublisherUpdateCommand extends CaCommand
 {
 
     @Option(name = "-name",
-                description = "Required. Publisher Name",
+                description = "required. Publisher Name",
                 required = true, multiValued = false)
     private String name;
 
     @Option(name = "-type",
-            description = "Publisher type")
+            description = "publisher type")
     private String type;
 
     @Option(name = "-conf",
-            description = "Publisher configuration or 'NULL'")
+            description = "publisher configuration or 'NULL'")
     private String conf;
 
     @Option(name = "-confFile",
-            description = "Profile configuration file")
+            description = "profile configuration file")
     private String confFile;
 
     @Override
@@ -70,7 +70,7 @@ public class PublisherUpdateCommand extends CaCommand
     {
         if(type == null && conf == null && confFile == null)
         {
-            err("Nothing to update");
+            err("nothing to update");
             return null;
         }
 

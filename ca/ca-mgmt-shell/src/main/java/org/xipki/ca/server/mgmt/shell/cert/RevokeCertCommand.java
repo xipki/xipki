@@ -35,7 +35,6 @@
 
 package org.xipki.ca.server.mgmt.shell.cert;
 
-import java.math.BigInteger;
 import java.util.Date;
 
 import org.apache.karaf.shell.commands.Command;
@@ -49,21 +48,21 @@ import org.xipki.common.util.DateUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "revoke-cert", description="Revoke certificate")
+@Command(scope = "xipki-ca", name = "revoke-cert", description="revoke certificate")
 public class RevokeCertCommand extends CaCommand
 {
     @Option(name = "-ca",
-            required = true, description = "Required. CA name")
+            required = true, description = "required. CA name")
     private String caName;
 
     @Option(name = "-serial",
             required = true,
-            description = "Serial number")
-    private Long serialNumber;
+            description = "serial number")
+    private String serialNumberS;
 
     @Option(name = "-reason",
             required = true,
-            description = "Required. Reason, valid values are \n" +
+            description = "required. Reason, valid values are \n" +
                     " 0: unspecified\n" +
                     " 1: keyCompromise\n" +
                     " 3: affiliationChanged\n" +
@@ -75,7 +74,7 @@ public class RevokeCertCommand extends CaCommand
 
     @Option(name = "-invDate",
             required = false,
-            description = "Invalidity date, UTC time of format yyyyMMddHHmmss")
+            description = "invalidity date, UTC time of format yyyyMMddHHmmss")
     private String invalidityDateS;
 
     @Override
@@ -108,16 +107,16 @@ public class RevokeCertCommand extends CaCommand
             invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
         }
 
-        boolean successful = caManager.revokeCertificate(caName, BigInteger.valueOf(serialNumber),
+        boolean successful = caManager.revokeCertificate(caName, toBigInt(serialNumberS),
                 crlReason, invalidityDate);
 
         if(successful)
         {
-            out("Revoked certificate");
+            out("revoked certificate");
         }
         else
         {
-            err("Could not revoke certificate");
+            err("could not revoke certificate");
         }
 
         return null;

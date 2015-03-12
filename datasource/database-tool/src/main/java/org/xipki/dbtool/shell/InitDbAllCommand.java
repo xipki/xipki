@@ -44,7 +44,7 @@ import org.xipki.dbtool.LiquibaseDatabaseConf;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "initdb", description="Reset and initialize the CA and OCSP databases")
+@Command(scope = "xipki-db", name = "initdb", description="reset and initialize the CA and OCSP databases")
 public class InitDbAllCommand extends LiquibaseCommand
 {
     private static final String ca_schemaFile = "xipki/sql/ca-init.xml";

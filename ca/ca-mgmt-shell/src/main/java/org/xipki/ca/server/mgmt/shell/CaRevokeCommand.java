@@ -51,7 +51,7 @@ import org.xipki.common.util.DateUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "ca-revoke", description="Revoke CA")
+@Command(scope = "xipki-ca", name = "ca-revoke", description="revoke CA")
 public class CaRevokeCommand extends CaCommand
 {
     public static List<CRLReason> permitted_reasons = Collections.unmodifiableList(
@@ -66,10 +66,10 @@ public class CaRevokeCommand extends CaCommand
 
     @Option(name = "-reason",
             required = true,
-            description = "Required. Reason, valid values are \n" +
+            description = "required. Reason, valid values are \n" +
                     " 0: unspecified\n" +
                     " 1: keyCompromise\n" +
-                    " 2: cACompromise\n" +
+                    " 2: CACompromise\n" +
                     " 3: affiliationChanged\n" +
                     " 4: superseded\n" +
                     " 5: cessationOfOperation\n" +
@@ -79,12 +79,12 @@ public class CaRevokeCommand extends CaCommand
 
     @Option(name = "-revDate",
             required = false,
-            description = "Revocation date, UTC time of format yyyyMMddHHmmss.\nThe default is current time")
+            description = "revocation date, UTC time of format yyyyMMddHHmmss.\nThe default is current time")
     private String revocationDateS;
 
     @Option(name = "-invDate",
             required = false,
-            description = "Invalidity date, UTC time of format yyyyMMddHHmmss")
+            description = "invalidity date, UTC time of format yyyyMMddHHmmss")
     private String invalidityDateS;
 
     @Override

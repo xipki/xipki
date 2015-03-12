@@ -44,16 +44,16 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "capub-add", description="Add publishers to CA")
+@Command(scope = "xipki-ca", name = "capub-add", description="add publishers to CA")
 public class CaPublisherAddCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "Required. CA name",
+            description = "required. CA name",
             required = true)
     private String caName;
 
     @Option(name = "-publisher",
-        required = true, multiValued = true, description = "Required. Publisher name. Multivalued")
+        required = true, multiValued = true, description = "required. Publisher name. Multivalued")
     private List<String> publisherNames;
 
     @Override
