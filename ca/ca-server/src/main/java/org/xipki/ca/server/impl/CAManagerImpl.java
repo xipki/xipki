@@ -2008,7 +2008,7 @@ implements CAManager, CmpResponderManager
             CAMgmtException exception = null;
 
             X509CAInfo caInfo = caInfos.get(caName);
-            if(caInfo == null || caInfo.getCaEntry().getNextSerial() > 0)
+            if(caInfo != null && caInfo.getCaEntry().getNextSerial() > 0)
             {
                 // drop the serial number sequence
                 final String sequenceName = caInfo.getCaEntry().getSerialSeqName();
