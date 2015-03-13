@@ -49,8 +49,9 @@ import org.xipki.ca.server.mgmt.api.PublisherEntry;
 public class CaPublisherInfoCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "required. CA name",
-            required = true)
+            required = true,
+            description = "CA name\n"
+                    + "required")
     private String caName;
 
     @Override

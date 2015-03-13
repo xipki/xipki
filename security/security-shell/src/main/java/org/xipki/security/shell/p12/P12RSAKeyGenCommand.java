@@ -48,13 +48,11 @@ import org.xipki.security.api.P12KeypairGenerationResult;
 public class P12RSAKeyGenCommand extends P12KeyGenCommand
 {
     @Option(name = "-keysize",
-            description = "keysize in bit",
-            required = false)
+            description = "keysize in bit")
     private Integer keysize = 2048;
 
     @Option(name = "-e",
-            description = "public exponent",
-            required = false)
+            description = "public exponent")
     private String publicExponent = "0x10001";
 
     @Override

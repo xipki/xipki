@@ -66,24 +66,16 @@ public class CaRevokeCommand extends CaCommand
 
     @Option(name = "-reason",
             required = true,
-            description = "required. Reason, valid values are \n" +
-                    " 0: unspecified\n" +
-                    " 1: keyCompromise\n" +
-                    " 2: CACompromise\n" +
-                    " 3: affiliationChanged\n" +
-                    " 4: superseded\n" +
-                    " 5: cessationOfOperation\n" +
-                    " 6: certificateHold\n" +
-                    " 9: privilegeWithdrawn")
+            description = "CRL reason\n"
+                    + "required")
     private String reason;
 
     @Option(name = "-revDate",
-            required = false,
-            description = "revocation date, UTC time of format yyyyMMddHHmmss.\nThe default is current time")
+            description = "revocation date, UTC time of format yyyyMMddHHmmss\n"
+                    + "default is current time")
     private String revocationDateS;
 
     @Option(name = "-invDate",
-            required = false,
             description = "invalidity date, UTC time of format yyyyMMddHHmmss")
     private String invalidityDateS;
 

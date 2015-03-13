@@ -48,21 +48,23 @@ import org.xipki.security.shell.SecurityCommand;
 public abstract class P11SecurityCommand extends SecurityCommand
 {
     @Option(name = "-slot",
-            required = true, description = "required. Slot index")
+            required = true,
+            description = "slot index\n"
+                    + "required")
     protected Integer slotIndex;
 
     @Option(name = "-key-id",
-            required = false, description = "id of the private key in the PKCS#11 device.\n"
+            description = "id of the private key in the PKCS#11 device\n"
                     + "either keyId or keyLabel must be specified")
     protected String keyId;
 
     @Option(name = "-key-label",
-            required = false, description = "label of the private key in the PKCS#11 device.\n"
+            description = "label of the private key in the PKCS#11 device\n"
                     + "either keyId or keyLabel must be specified")
     protected String keyLabel;
 
     @Option(name = "-module",
-            required = false, description = "Name of the PKCS#11 module.")
+            description = "name of the PKCS#11 module")
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     public P11KeyIdentifier getKeyIdentifier()

@@ -57,13 +57,15 @@ import org.xipki.common.util.IoUtil;
 public class CaGenRootCACommand extends CaAddOrGenCommand
 {
     @Option(name = "-p10",
-            description = "required. PKCS#10 request of the Root CA",
-            required = true)
+            required = true,
+            description = "PKCS#10 request of the Root CA\n"
+                    + "required")
     private String p10ReqFile;
 
     @Option(name = "-profile",
-            description = "required. Profile of the Root CA",
-            required = true)
+            required = true,
+            description = "profile of the Root CA\n"
+                    + "required")
     private String rcaProfile;
 
     @Option(name = "-out",

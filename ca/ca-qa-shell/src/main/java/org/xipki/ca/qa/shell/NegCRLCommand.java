@@ -52,7 +52,8 @@ public abstract class NegCRLCommand extends ClientCommand
 {
 
     @Option(name = "-ca",
-            required = false, description = "required if multiple CAs are configured. CA name")
+            description = "CA name\n"
+                    + "required if multiple CAs are configured")
     private String caName;
 
     protected abstract X509CRL retrieveCRL(String caName)

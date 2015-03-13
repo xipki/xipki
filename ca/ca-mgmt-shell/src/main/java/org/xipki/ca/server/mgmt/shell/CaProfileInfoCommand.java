@@ -51,8 +51,9 @@ import org.apache.karaf.shell.commands.Option;
 public class CaProfileInfoCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "required. CA name",
-            required = true)
+            required = true,
+            description = "CA name\n"
+                    + "required")
     private String caName;
 
     @Override

@@ -49,13 +49,15 @@ import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 public class ProfileExportCommand extends CaCommand
 {
     @Option(name = "-name",
-            description = "required. Profile name",
-            required = true, multiValued = false)
+            required = true,
+            description = "profile name\n"
+                    + "required")
     private String name;
 
     @Option(name = "-out",
-            description = "required. Where to save the profile configuration",
-            required = true)
+            required = true,
+            description = "where to save the profile configuration\n"
+                    + "required")
     private String confFile;
 
     @Override

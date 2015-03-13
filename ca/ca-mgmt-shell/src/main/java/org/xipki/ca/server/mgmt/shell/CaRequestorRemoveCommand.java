@@ -46,12 +46,15 @@ import org.apache.karaf.shell.commands.Option;
 public class CaRequestorRemoveCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "required. CA name",
-            required = true)
+            required = true,
+            description = "CA name\n"
+                    + "required")
     private String caName;
 
     @Option(name = "-requestor",
-            required = true, description = "required. Requestor name")
+            required = true,
+            description = "requestor name\n"
+                    + "required")
     private String requestorName;
 
     @Override

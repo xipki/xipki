@@ -61,33 +61,35 @@ import org.xipki.ocsp.client.api.RequestOptions;
 public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
 {
     @Option(name = "-respIssuer",
-            required = false, description = "certificate file of the responder's issuer")
+            description = "certificate file of the responder's issuer")
     private String respIssuerFile;
 
     @Option(name = "-url",
-            required = false, description = "OCSP responder URL")
+            description = "OCSP responder URL")
     private String serverURL;
 
     @Option(name = "-reqout",
-            required = false, description = "write DER encoded OCSP request to fie")
+            description = "where to save the request")
     private String reqout;
 
     @Option(name = "-respout",
-            required = false, description = "write DER encoded OCSP response to fie")
+            description = "where to save the response")
     private String respout;
 
     @Option(name = "-serial",
             multiValued = true,
-            description = "serial number, multi-valued")
+            description = "serial number\n"
+                    + "multi-valued")
     private List<String> serialNumbers;
 
     @Option(name = "-cert",
             multiValued = true,
-            description = "certificate, multi-valued")
+            description = "certificate\n"
+                    + "multi-valued")
     private List<String> certFiles;
 
     @Option(name = "-v", aliases="--verbose",
-            required = false, description = "show status verbosely")
+            description = "show status verbosely")
     protected Boolean verbose = Boolean.FALSE;
 
     protected static final Map<ASN1ObjectIdentifier, String> extensionOidNameMap = new HashMap<>();

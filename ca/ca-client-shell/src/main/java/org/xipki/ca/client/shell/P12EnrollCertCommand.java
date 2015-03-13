@@ -51,11 +51,13 @@ import org.xipki.security.api.SignerException;
 public class P12EnrollCertCommand extends EnrollCertCommand
 {
     @Option(name = "-p12",
-            required = true, description = "required. PKCS#12 request file")
+            required = true,
+            description = "PKCS#12 request file\n"
+                    + "required")
     private String p12File;
 
     @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "password of the PKCS#12 file")
+            description = "password of the PKCS#12 file")
     private String password;
 
     @Override

@@ -48,8 +48,9 @@ public class PublisherUpdateCommand extends CaCommand
 {
 
     @Option(name = "-name",
-                description = "required. Publisher Name",
-                required = true, multiValued = false)
+            required = true,
+            description = "publisher name\n"
+                    + "required")
     private String name;
 
     @Option(name = "-type",

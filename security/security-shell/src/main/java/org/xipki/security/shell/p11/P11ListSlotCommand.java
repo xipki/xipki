@@ -78,15 +78,15 @@ import org.xipki.security.shell.SecurityCommand;
 public class P11ListSlotCommand extends SecurityCommand
 {
     @Option(name = "-v", aliases="--verbose",
-            required = false, description = "show object information verbosely")
+            description = "show object information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Option(name = "-module",
-            required = false, description = "Name of the PKCS#11 module.")
+            description = "name of the PKCS#11 module.")
     private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Option(name = "-slot",
-            required = false, description = "slot index")
+            description = "slot index")
     private Integer slotIndex;
 
     @Override

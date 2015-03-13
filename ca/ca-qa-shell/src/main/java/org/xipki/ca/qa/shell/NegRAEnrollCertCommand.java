@@ -56,19 +56,24 @@ public class NegRAEnrollCertCommand extends ClientCommand
 {
 
     @Option(name = "-p10",
-            required = true, description = "required. PKCS#10 request file")
+            required = true,
+            description = "PKCS#10 request file\n"
+                    + "required")
     private String p10File;
 
     @Option(name = "-profile",
-            required = true, description = "required. Certificate profile")
+            required = true,
+            description = "certificate profile\n"
+                    + "required")
     private String profile;
 
     @Option(name = "-user",
-            required = false, description = "username")
+            description = "username")
     private String user;
 
     @Option(name = "-ca",
-            required = false, description = "required if the profile is supported by more than one CA")
+            description = "CA name\n"
+                    + "required if the profile is supported by more than one CA")
     private String caName;
 
     @Override

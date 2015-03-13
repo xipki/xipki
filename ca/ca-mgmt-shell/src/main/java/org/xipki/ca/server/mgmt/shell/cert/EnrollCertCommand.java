@@ -56,24 +56,31 @@ public class EnrollCertCommand extends CaCommand
     private static final Logger LOG = LoggerFactory.getLogger(EnrollCertCommand.class);
 
     @Option(name = "-ca",
-            required = true, description = "required. CA name")
+            required = true,
+            description = "CA name\n"
+                    + "required")
     private String caName;
 
     @Option(name = "-p10",
-            required = true, description = "required. PKCS#10 request file")
+            required = true,
+            description = "PKCS#10 request file\n"
+                    + "required")
     private String p10File;
 
     @Option(name = "-out",
-            description = "required. Where to save the certificate",
-            required = true)
+            required = true,
+            description = "where to save the certificate\n"
+                    + "required")
     private String outFile;
 
     @Option(name = "-profile",
-            required = true, description = "required. Profile name")
+            required = true,
+            description = "profile name\n"
+                    + "required")
     private String profileName;
 
     @Option(name = "-user",
-            required = false, description = "username")
+            description = "username")
     private String user;
 
     @Override

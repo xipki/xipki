@@ -48,13 +48,15 @@ import org.apache.karaf.shell.commands.Option;
 public class CaProfileAddCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = " Required. CA name",
-            required = true)
+            required = true,
+            description = "CA name\n"
+                    + "required")
     private String caName;
 
     @Option(name = "-profile",
-        description = "required. Profile profileNames, multi values allowed",
-        required = true, multiValued = true)
+            required = true, multiValued = true,
+            description = "profile profileNames\n"
+                + "required, multi-valued")
     private List<String> profileNames;
 
     @Override

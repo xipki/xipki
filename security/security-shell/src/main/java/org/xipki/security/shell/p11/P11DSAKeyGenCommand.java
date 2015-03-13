@@ -48,13 +48,11 @@ import org.xipki.security.api.p11.P11WritableSlot;
 public class P11DSAKeyGenCommand extends P11KeyGenCommand
 {
     @Option(name = "-plen",
-            description = "bit length of the prime",
-            required = false)
+            description = "bit length of the prime")
     private Integer pLen = 2048;
 
     @Option(name = "-qlen",
-            description = "bit length of the sub-prime",
-            required = false)
+            description = "bit length of the sub-prime")
     private Integer qLen;
 
     @Override

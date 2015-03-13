@@ -53,8 +53,9 @@ import org.xipki.common.util.SecurityUtil;
 public class CrlSignerUpdateCommand extends CaCommand
 {
     @Option(name = "-name",
-            description = "required. CRL signer name",
-            required = true, multiValued = false)
+            required = true,
+            description = "CRL signer name\n"
+                    + "required")
     private String name;
 
     @Option(name = "-signerType",

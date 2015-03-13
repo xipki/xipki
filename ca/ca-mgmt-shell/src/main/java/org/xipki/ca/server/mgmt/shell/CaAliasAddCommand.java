@@ -46,13 +46,15 @@ import org.apache.karaf.shell.commands.Option;
 public class CaAliasAddCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "required. CA name",
-            required = true)
+            required = true,
+            description = "CA name\n"
+                    + "required")
     private String caName;
 
     @Option(name = "-alias",
-            description = "required. CA alias",
-            required = true)
+            required = true,
+            description = "CA alias\n"
+                    + "required")
     private String caAlias;
 
     @Override

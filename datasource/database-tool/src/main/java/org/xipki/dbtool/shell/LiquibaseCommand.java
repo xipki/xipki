@@ -74,7 +74,7 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
     }
 
     @Option(name = "-q", aliases="--quiet",
-            required = false, description = "quiet mode")
+            description = "quiet mode")
     private Boolean quiet = Boolean.FALSE;
 
     @Option(name = "-logLevel",

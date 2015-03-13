@@ -46,28 +46,25 @@ import org.apache.karaf.shell.commands.Option;
 public class CmpControlUpdateCommand extends CaCommand
 {
     @Option(name = "-name",
-            description = "required. CMP control name",
-            required = true, multiValued = false)
+            required = true,
+            description = "CMP control name\n"
+                    + "required")
     private String name;
 
     @Option(name = "-cc", aliases = { "--confirmCert" },
-            description = "whether confirm of certificate is required.\n"
-                + "Valid values are 'yes' and 'no'")
+            description = "whether confirm of certificate is required")
     private String confirmCertS;
 
     @Option(name = "-scc", aliases = { "--sendCaCert" },
-            description = "whether CA certificate is included in response.\n"
-                + "Valid values are 'yes' and 'no'")
+            description = "whether CA certificate is included in response")
     private String sendCaCertS;
 
     @Option(name = "-src", aliases = { "--sendResponderCert" },
-            description = "whether responder certificate is included in response.\n"
-                + "Valid values are 'yes' and 'no'")
+            description = "whether responder certificate is included in response")
     private String sendResponderCertS;
 
     @Option(name = "-mt", aliases = { "--messageTime" },
-            description = "whether message time is required in request.\n"
-                + "Valid values are 'yes' and 'no'")
+            description = "whether message time is required in request")
     private String requireMessageTimeS;
 
     @Option(name = "-mtb", aliases = { "--msgTimeBias" },

@@ -58,8 +58,9 @@ public class ExportCaCommand extends XipkiOsgiCommandSupport
     private String dbconfFile = DFLT_DBCONF_FILE;
 
     @Option(name = "-outdir",
-            description = "required. Output directory",
-            required = true)
+            required = true,
+            description = "output directory\n"
+                    + "required")
     private String outdir;
 
     @Option(name = "-n",
@@ -67,7 +68,7 @@ public class ExportCaCommand extends XipkiOsgiCommandSupport
     private Integer numCertsInBundle = DFLT_NUM_CERTS_IN_BUNDLE;
 
     @Option(name = "-numcrls",
-            description = "Number of CRLs in one zip file")
+            description = "number of CRLs in one zip file")
     private Integer numCrls = DFLT_NUM_CRLS;
 
     @Option(name = "-resume")

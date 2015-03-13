@@ -54,15 +54,19 @@ public class P11CertAddCommand extends SecurityCommand
 {
 
     @Option(name = "-slot",
-            required = true, description = "required. Slot index")
+            required = true,
+            description = "slot index\n"
+                    + "required")
     private Integer slotIndex;
 
     @Option(name = "-cert",
-            required = true, description = "required. Certificate file")
+            required = true,
+            description = "certificate file\n"
+                    + "required")
     private String certFile;
 
     @Option(name = "-module",
-            required = false, description = "Name of the PKCS#11 module.")
+            description = "name of the PKCS#11 module.")
     private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Override

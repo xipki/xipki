@@ -47,28 +47,25 @@ import org.xipki.ca.server.mgmt.api.CmpControl;
 public class CmpControlAddCommand extends CaCommand
 {
     @Option(name = "-name",
-            description = "required. CMP control name",
-            required = true, multiValued = false)
+            required = true,
+            description = "CMP control name\n"
+                    + "required")
     private String name;
 
     @Option(name = "-cc", aliases = { "--confirmCert" },
-            description = "whether confirm of certificate is required.\n"
-                + "Valid values are 'yes' and 'no'")
+            description = "whether confirm of certificate is required")
     private String confirmCertS = "no";
 
     @Option(name = "-scc", aliases = { "--sendCaCert" },
-            description = "whether CA certificate is included in response.\n"
-                + "Valid values are 'yes' and 'no'")
+            description = "whether CA certificate is included in response")
     private String sendCaCertS = "no";
 
     @Option(name = "-src", aliases = { "--sendResponderCert" },
-            description = "whether responder certificate is included in response.\n"
-                + "Valid values are 'yes' and 'no'")
+            description = "whether responder certificate is included in response")
     private String sendResponderCertS = "yes";
 
     @Option(name = "-mt", aliases = { "--messageTime" },
-            description = "whether message time is required in request.\n"
-                + "Valid values are 'yes' and 'no'")
+            description = "whether message time is required in request")
     private String requireMessageTimeS = "yes";
 
     @Option(name = "-mtb", aliases = { "--msgTimeBias" },

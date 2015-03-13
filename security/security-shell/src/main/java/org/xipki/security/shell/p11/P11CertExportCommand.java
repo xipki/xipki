@@ -52,7 +52,9 @@ public class P11CertExportCommand extends P11SecurityCommand
 {
 
     @Option(name = "-out",
-            required = true, description = "required. Where to save the certificate")
+            required = true,
+            description = "where to save the certificate\n"
+                    + "required")
     private String outFile;
 
     @Override
