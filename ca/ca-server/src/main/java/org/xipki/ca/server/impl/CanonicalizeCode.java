@@ -202,6 +202,12 @@ public class CanonicalizeCode
      */
     private static String canonicalizeLine(String line)
     {
+        if(line.trim().startsWith("//"))
+        {
+    		// comments
+            return line;
+        }
+
         StringBuilder sb = new StringBuilder();
         int len = line.length();
 
