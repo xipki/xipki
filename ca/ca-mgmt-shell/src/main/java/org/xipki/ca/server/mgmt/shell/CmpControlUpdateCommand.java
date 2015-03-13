@@ -48,7 +48,7 @@ public class CmpControlUpdateCommand extends CaCommand
     @Option(name = "-name",
             required = true,
             description = "CMP control name\n"
-                    + "required")
+                    + "(required)")
     private String name;
 
     @Option(name = "-cc", aliases = { "--confirmCert" },

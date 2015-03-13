@@ -54,7 +54,8 @@ public class FileRmCommand extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "file",
             required = true,
-            description = "file or directory to be deleted")
+            description = "file or directory to be deleted\n"
+                    + "(required)")
     private String targetPath;
 
     @Option(name = "-r", aliases="--recursive",

@@ -50,7 +50,7 @@ public abstract class P12SecurityCommand extends SecurityCommand
     @Option(name = "-p12",
             required = true,
             description = "PKCS#12 keystore file\n"
-                    + "required")
+                    + "(required)")
     protected String p12File;
 
     @Option(name = "-pwd", aliases = { "--password" },

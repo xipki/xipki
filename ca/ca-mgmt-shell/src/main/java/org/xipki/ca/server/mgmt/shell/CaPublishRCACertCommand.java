@@ -52,7 +52,7 @@ public class CaPublishRCACertCommand extends CaCommand
     @Option(name = "-profile",
             required = true,
             description = "certificate profile name\n"
-                    + "required")
+                    + "(required)")
     private String certprofile;
 
     @Override

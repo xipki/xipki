@@ -53,7 +53,7 @@ public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
     @Option(name = "-issuer",
             required = true,
             description = "issuer certificate file\n"
-                    + "required")
+                    + "(required)")
     protected String issuerCertFile;
 
     @Option(name = "-nonce",
@@ -71,7 +71,7 @@ public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
     @Option(name = "-sigalg",
             multiValued = true,
             description = "comma-separated preferred signature algorithms\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     protected List<String> prefSigAlgs;
 
     @Option(name = "-httpget",

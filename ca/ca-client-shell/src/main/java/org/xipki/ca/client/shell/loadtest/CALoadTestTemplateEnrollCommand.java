@@ -50,12 +50,11 @@ public class CALoadTestTemplateEnrollCommand extends CALoadTestCommand
     @Option(name = "-template",
             required = true,
             description = "template file\n"
-                    + "required")
+                    + "(required)")
     private String templateFile;
 
     @Option(name = "-duration",
-            description = "duration in seconds\n"
-                    + "required")
+            description = "duration in seconds")
     private Integer durationInSecond = 30;
 
     @Option(name = "-thread",

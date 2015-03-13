@@ -57,7 +57,7 @@ public class CALoadTestRevokeCommand extends CALoadTestCommand
     @Option(name = "-cacert",
             required = true,
             description = "CA Certificate file\n"
-                    + "required")
+                    + "(required)")
     private String caCertFile;
 
     @Option(name = "-duration",
@@ -71,7 +71,7 @@ public class CALoadTestRevokeCommand extends CALoadTestCommand
     @Option(name = "-cadb",
             required = true,
             description = "CA database configuration file\n"
-                    + "required")
+                    + "(required)")
     private String caDbConfFile;
 
     @Option(name = "-maxCerts",
@@ -80,8 +80,7 @@ public class CALoadTestRevokeCommand extends CALoadTestCommand
     private Integer maxCerts = 0;
 
     @Option(name = "-n",
-            description = "number of certificates to be revoked in one request",
-            required = false)
+            description = "number of certificates to be revoked in one request")
     private Integer n = 1;
 
     private DataSourceFactory dataSourceFactory;

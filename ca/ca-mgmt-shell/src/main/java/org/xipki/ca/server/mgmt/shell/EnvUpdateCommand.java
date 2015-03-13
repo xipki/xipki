@@ -49,13 +49,13 @@ public class EnvUpdateCommand extends CaCommand
     @Option(name = "-name",
             required = true,
                 description = "parameter name\n"
-                    + "required")
+                    + "(required)")
     private String name;
 
     @Option(name = "-value",
             required = true,
             description = "environment paremter value\n"
-                    + "required")
+                    + "(required)")
     private String value;
 
     @Override

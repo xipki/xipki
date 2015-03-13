@@ -50,7 +50,7 @@ public class ProfileUpdateCommand extends CaCommand
     @Option(name = "-name",
             required = true,
             description = "profile name\n"
-                    + "required")
+                    + "(required)")
     private String name;
 
     @Option(name = "-type",

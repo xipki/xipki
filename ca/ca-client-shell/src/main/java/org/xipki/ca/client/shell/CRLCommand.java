@@ -53,13 +53,13 @@ public abstract class CRLCommand extends ClientCommand
 
     @Option(name = "-ca",
             description = "CA name\n"
-                    + "required if multiple CAs are configured")
+                    + "(required if multiple CAs are configured)")
     protected String caName;
 
     @Option(name = "-out",
             required = true,
             description = "where to save the CRL\n"
-                    + "required")
+                    + "(required)")
     protected String outFile;
 
     protected abstract X509CRL retrieveCRL(String caName)

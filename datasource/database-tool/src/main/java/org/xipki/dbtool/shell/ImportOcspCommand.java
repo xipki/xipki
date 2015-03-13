@@ -58,7 +58,7 @@ public class ImportOcspCommand extends XipkiOsgiCommandSupport
     @Option(name = "-indir",
             required = true,
             description = "input directory\n"
-                    + "required")
+                    + "(required)")
     private String indir;
 
     @Option(name = "-resume")

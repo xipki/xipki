@@ -79,13 +79,13 @@ public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
     @Option(name = "-serial",
             multiValued = true,
             description = "serial number\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     private List<String> serialNumbers;
 
     @Option(name = "-cert",
             multiValued = true,
             description = "certificate\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     private List<String> certFiles;
 
     @Option(name = "-v", aliases="--verbose",

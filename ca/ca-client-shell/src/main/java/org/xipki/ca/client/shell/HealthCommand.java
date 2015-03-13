@@ -51,7 +51,7 @@ public class HealthCommand extends ClientCommand
 
     @Option(name = "-ca",
             description = "CA name\n"
-                    + "required if multiple CAs are configured")
+                    + "(required if multiple CAs are configured)")
     private String caName;
 
     @Option(name = "-v", aliases="--verbose",

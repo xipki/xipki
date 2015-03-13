@@ -52,7 +52,7 @@ import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 @Command(scope = "xipki-ca", name = "crlsigner-info", description="show information of CRL signers")
 public class CrlSignerInfoCommand extends CaCommand
 {
-    @Argument(index = 0, name = "name", description = "CRL signer name", required = false)
+    @Argument(index = 0, name = "name", description = "CRL signer name")
     private String name;
 
     @Option(name = "-v", aliases="--verbose",

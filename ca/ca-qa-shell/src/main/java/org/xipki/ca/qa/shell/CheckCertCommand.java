@@ -63,7 +63,7 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
     @Option(name = "-cert",
             required = true,
             description = "certificate file\n"
-                    + "required")
+                    + "(required)")
     private String certFile;
 
     @Option(name = "-issuer",
@@ -74,13 +74,13 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
     @Option(name = "-p10",
             required = true,
             description = "PKCS#10 request file\n"
-                    + "required")
+                    + "(required)")
     private String p10File;
 
     @Option(name = "-profile",
             required = true,
             description = "certificate profile\n"
-                    + "required")
+                    + "(required)")
     private String profileName;
 
     @Option(name = "-v", aliases="--verbose",

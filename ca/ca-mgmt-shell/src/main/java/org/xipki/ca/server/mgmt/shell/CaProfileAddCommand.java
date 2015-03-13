@@ -50,13 +50,13 @@ public class CaProfileAddCommand extends CaCommand
     @Option(name = "-ca",
             required = true,
             description = "CA name\n"
-                    + "required")
+                    + "(required)")
     private String caName;
 
     @Option(name = "-profile",
             required = true, multiValued = true,
             description = "profile profileNames\n"
-                + "required, multi-valued")
+                + "(required, multi-valued)")
     private List<String> profileNames;
 
     @Override

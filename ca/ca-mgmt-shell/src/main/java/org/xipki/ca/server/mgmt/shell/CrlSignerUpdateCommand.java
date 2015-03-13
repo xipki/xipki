@@ -55,7 +55,7 @@ public class CrlSignerUpdateCommand extends CaCommand
     @Option(name = "-name",
             required = true,
             description = "CRL signer name\n"
-                    + "required")
+                    + "(required)")
     private String name;
 
     @Option(name = "-signerType",

@@ -71,7 +71,7 @@ public abstract class NegEnrollCertCommand extends ClientCommand
     @Option(name = "-profile",
             required = true,
             description = "certificate profile\n"
-                    + "required")
+                    + "(required)")
     private String profile;
 
     @Option(name = "-user",

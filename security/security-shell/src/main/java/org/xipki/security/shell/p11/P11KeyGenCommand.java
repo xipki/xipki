@@ -54,13 +54,13 @@ public abstract class P11KeyGenCommand extends KeyGenCommand
     @Option(name = "-slot",
             required = true,
             description = "slot index\n"
-                    + "required")
+                    + "(required)")
     protected Integer slotIndex;
 
     @Option(name = "-key-label",
             required = true,
             description = "label of the PKCS#11 objects\n"
-                    + "required")
+                    + "(required)")
     protected String label;
 
     @Option(name = "-subject",

@@ -52,7 +52,7 @@ import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 @Command(scope = "xipki-ca", name = "requestor-info", description="show information of requestors")
 public class RequestorInfoCommand extends CaCommand
 {
-    @Argument(index = 0, name = "name", description = "requestor name", required = false)
+    @Argument(index = 0, name = "name", description = "requestor name")
     private String name;
 
     @Option(name = "-v", aliases="--verbose",

@@ -54,7 +54,7 @@ public class NegP12EnrollCertCommand extends NegEnrollCertCommand
     @Option(name = "-p12",
             required = true,
             description = "PKCS#12 request file\n"
-                    + "required")
+                    + "(required)")
     private String p12File;
 
     @Option(name = "-pwd", aliases = { "--password" },

@@ -55,7 +55,7 @@ public class ResponderUpdateCommand extends CaCommand
     @Option(name = "-signerType",
             required = true,
             description = "type of the responder signer\n"
-                    + "required")
+                    + "(required)")
     private String signerType;
 
     @Option(name = "-signerConf",

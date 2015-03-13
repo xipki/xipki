@@ -50,13 +50,13 @@ public class RepublishCommand extends CaCommand
     @Option(name = "-ca",
             required = true,
             description = "CA name or 'all' for all CAs\n"
-                    + "required")
+                    + "(required)")
     private String caName;
 
     @Option(name = "-publisher",
             required = true, multiValued = true,
             description = "publisher name or 'all' for all publishers\n"
-                    + "required, multi-valued")
+                    + "(required, multi-valued)")
     private List<String> publisherNames;
 
     @Override

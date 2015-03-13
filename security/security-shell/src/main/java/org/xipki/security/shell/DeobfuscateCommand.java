@@ -37,6 +37,7 @@ package org.xipki.security.shell;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.xipki.common.util.StringUtil;
 import org.xipki.security.OBFPasswordResolver;
 
 /**
@@ -49,15 +50,14 @@ public class DeobfuscateCommand extends SecurityCommand
     @Option(name = "-pwd", aliases = { "--password" },
             required = true,
             description = "obfuscated password, starts with OBF:\n"
-                    + "required")
+                    + "(required)")
     private String passwordHint;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        if(passwordHint.length() < 5 ||
-                passwordHint.substring(0, 4).equalsIgnoreCase("OBF:") == false)
+        if(StringUtil.startsWithIgnoreCase(passwordHint, "PBE:") == false)
         {
             err("encrypted password '" + passwordHint + "' does not start with OBF:");
             return null;
