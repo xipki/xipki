@@ -48,8 +48,10 @@ import org.xipki.security.api.p11.P11WritableSlot;
 public class P11ECKeyGenCommand extends P11KeyGenCommand
 {
     @Option(name = "-curve",
-            description = "EC Curve name")
-    private String curveName = "brainpoolp256r1";
+            required = true,
+            description = "EC curve name\n"
+                    + "required")
+    private String curveName;
 
     @Override
     protected Object _doExecute()
