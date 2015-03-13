@@ -35,7 +35,6 @@
 
 package org.xipki.ca.server.mgmt.shell.completer;
 
-import org.xipki.ca.server.mgmt.shell.CaCommand;
 import org.xipki.console.karaf.EnumCompleter;
 
 /**
@@ -44,8 +43,9 @@ import org.xipki.console.karaf.EnumCompleter;
 
 public class PermissionCompleter extends EnumCompleter
 {
+
     public PermissionCompleter()
     {
-        setTokens(CaCommand.permissionsText);
+        setTokens("enroll, revoke, unrevoke, remove, key-update, gen-crl, get-crl, enroll-cross, all");
     }
 }
