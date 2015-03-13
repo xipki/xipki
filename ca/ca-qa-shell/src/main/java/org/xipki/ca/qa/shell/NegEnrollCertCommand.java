@@ -64,25 +64,27 @@ import org.xipki.security.api.SignerException;
 public abstract class NegEnrollCertCommand extends ClientCommand
 {
     @Option(name = "-subject",
-            required = false,
             description = "subject to be requested.\n"
-                    + "the default is the subject of self-signed certifite.")
+                    + "default is the subject of self-signed certifite.")
     private String subject;
 
     @Option(name = "-profile",
-            required = true, description = "required. Certificate profile")
+            required = true,
+            description = "certificate profile\n"
+                    + "required")
     private String profile;
 
     @Option(name = "-user",
-            required = false, description = "username")
+            description = "username")
     private String user;
 
     @Option(name = "-hash",
-            required = false, description = "hash algorithm name for the POPO computation")
+            description = "hash algorithm name for the POPO computation")
     protected String hashAlgo = "SHA256";
 
     @Option(name = "-ca",
-            required = false, description = "required if the profile is supported by more than one CA")
+            description = "CA name\n"
+                    + "required if the profile is supported by more than one CA")
     private String caName;
 
     protected SecurityFactory securityFactory;

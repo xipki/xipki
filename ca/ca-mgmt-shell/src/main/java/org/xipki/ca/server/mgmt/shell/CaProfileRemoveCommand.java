@@ -46,12 +46,14 @@ import org.apache.karaf.shell.commands.Option;
 public class CaProfileRemoveCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "required. CA name",
+            description = "CA name\n"
+                    + "required",
             required = true)
     private String caName;
 
     @Option(name = "-profile",
-            required = true, description = "required. Certificate profile name")
+            required = true, description = "certificate profile name\n"
+                    + "required")
     private String profileName;
 
     @Override

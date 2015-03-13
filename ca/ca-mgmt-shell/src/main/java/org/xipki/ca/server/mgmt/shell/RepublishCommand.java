@@ -48,13 +48,15 @@ import org.apache.karaf.shell.commands.Option;
 public class RepublishCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "required. CA name or 'all' for all CAs",
-            required = true)
+            required = true,
+            description = "CA name or 'all' for all CAs\n"
+                    + "required")
     private String caName;
 
     @Option(name = "-publisher",
-        required = true, multiValued = true,
-        description = "required. Publisher name or 'all' for all publishers. Multivalued")
+            required = true, multiValued = true,
+            description = "publisher name or 'all' for all publishers\n"
+                    + "required, multi-valued")
     private List<String> publisherNames;
 
     @Override

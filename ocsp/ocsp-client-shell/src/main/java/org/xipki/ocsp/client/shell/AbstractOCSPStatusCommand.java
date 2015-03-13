@@ -51,7 +51,9 @@ import org.xipki.ocsp.client.api.RequestOptions;
 public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
 {
     @Option(name = "-issuer",
-            required = true, description = "required. Issuer certificate file")
+            required = true,
+            description = "issuer certificate file\n"
+                    + "required")
     protected String issuerCertFile;
 
     @Option(name = "-nonce",
@@ -63,19 +65,21 @@ public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
     protected Integer nonceLen;
 
     @Option(name = "-hash",
-            required = false, description = "hash algorithm name")
+            description = "hash algorithm name")
     protected String hashAlgo = "SHA256";
 
     @Option(name = "-sigalg",
-            required = false, description = "comma-separated preferred signature algorithms, multi-valued")
+            multiValued = true,
+            description = "comma-separated preferred signature algorithms\n"
+                    + "multi-valued")
     protected List<String> prefSigAlgs;
 
     @Option(name = "-httpget",
-            required = false, description = "use HTTP GET for small request")
+            description = "use HTTP GET for small request")
     protected Boolean useHttpGetForSmallRequest = Boolean.FALSE;
 
     @Option(name = "-sign",
-            required = false, description = "sign request")
+            description = "sign request")
     protected Boolean signRequest = Boolean.FALSE;
 
     protected OCSPRequestor requestor;

@@ -48,12 +48,15 @@ import org.xipki.ca.server.mgmt.shell.CaCommand;
 public class UnrevokeCertCommand extends CaCommand
 {
     @Option(name = "-ca",
-            required = true, description = "required. CA name")
+            required = true,
+            description = "CA name\n"
+                    + "required")
     private String caName;
 
     @Option(name = "-serial",
             required = true,
-            description = "serial number")
+            description = "serial number\n"
+                    + "required")
     private String serialNumberS;
 
     @Override

@@ -58,18 +58,11 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
 {
     @Option(name = "-reason",
             required = true,
-            description = "required. Reason, valid values are \n" +
-                    "  0: unspecified\n" +
-                    "  1: keyCompromise\n" +
-                    "  3: affiliationChanged\n" +
-                    "  4: superseded\n" +
-                    "  5: cessationOfOperation\n" +
-                    "  6: certificateHold\n" +
-                    "  9: privilegeWithdrawn")
+            description = "CRL reason\n"
+                    + "required")
     private String reason;
 
     @Option(name = "-invDate",
-            required = false,
             description = "invalidity date, UTC time of format yyyyMMddHHmmss")
     private String invalidityDateS;
 

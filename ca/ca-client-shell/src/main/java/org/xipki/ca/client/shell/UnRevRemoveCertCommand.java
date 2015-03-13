@@ -59,7 +59,7 @@ public abstract class UnRevRemoveCertCommand extends ClientCommand
     protected String certFile;
 
     @Option(name = "-cacert",
-            description = "CA Certificate file")
+            description = "CA certificate file")
     protected String caCertFile;
 
     @Option(name = "-serial",

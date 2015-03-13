@@ -57,22 +57,22 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
 {
     @Option(name = "-serial",
             required = true,
-            description = "required. Serial numbers.\n"
-                    + "comma-separated serial numbers or ranges")
+            description = "serial numbers, comma-separated serial numbers or ranges\n"
+                    + "required")
     private String serialNumbers;
 
     @Option(name = "-duration",
-            required = false,
             description = "duration in seconds")
     private int durationInSecond = 30;
 
     @Option(name = "-thread",
-            required = false,
-            description = "Number of threads")
+            description = "number of threads")
     private Integer numThreads = 5;
 
     @Option(name = "-url",
-            required = true, description = "OCSP responder URL")
+            required = true,
+            description = "OCSP responder URL\n"
+                    + "required")
     private String serverURL;
 
     @Override

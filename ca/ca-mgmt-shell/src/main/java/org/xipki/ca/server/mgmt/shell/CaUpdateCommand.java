@@ -61,31 +61,37 @@ import org.xipki.security.api.SecurityFactory;
 public class CaUpdateCommand extends CaCommand
 {
     @Option(name = "-name",
-            required = true, description = "required. CA name")
+            required = true,
+            description = "CA name\n"
+                    + "required")
     private String caName;
 
     @Option(name = "-status",
-            description = "CA status, active|inactive")
+            description = "CA status")
     private String caStatus;
 
     @Option(name = "-ocspUri",
-            description = "OCSP URI or 'NULL', multi options is allowed",
-            multiValued = true)
+            multiValued = true,
+            description = "OCSP URI or 'NULL'\n"
+                    + "multi-valued")
     private List<String> ocspUris;
 
     @Option(name = "-crlUri",
-            description = "CRL URI or 'NULL', multi options is allowed",
-            multiValued = true)
+            multiValued = true,
+            description = "CRL distribution point URI or 'NULL'\n"
+                    + "multi-valued")
     private List<String> crlUris;
 
     @Option(name = "-deltaCrlUri",
-            description = "delta CRL URI or 'NULL', multi options is allowed",
-            multiValued = true)
+            multiValued = true,
+            description = "delta CRL distribution point URI or 'NULL'\n"
+                    + "multi-valued")
     private List<String> deltaCrlUris;
 
     @Option(name = "-permission",
-            description = "permission, multi options is allowed. allowed values are\n" + permissionsText,
-            multiValued = true)
+            multiValued = true,
+            description = "permission\n"
+                    + "multi-valued")
     private Set<String> permissions;
 
     @Option(name = "-maxValidity",
@@ -105,7 +111,7 @@ public class CaUpdateCommand extends CaCommand
     private String cmpControlName;
 
     @Option(name = "-numCrls",
-            description = "Number of CRLs to be kept in database")
+            description = "number of CRLs to be kept in database")
     private Integer numCrls;
 
     @Option(name = "-cert",
@@ -121,25 +127,15 @@ public class CaUpdateCommand extends CaCommand
     private String signerConf;
 
     @Option(name = "-dk", aliases = { "--duplicateKey" },
-            description = "mode of duplicate key.\n"
-                    + "\t1: forbidden\n"
-                    + "\t2: forbiddenWithinProfile\n"
-                    + "\t3: permitted")
+            description = "mode of duplicate key")
     private String duplicateKeyS;
 
     @Option(name = "-ds", aliases = { "--duplicateSubject" },
-            description = "mode of duplicate subject.\n"
-                    + "\t1: forbidden\n"
-                    + "\t2: forbiddenWithinProfile\n"
-                    + "\t3: permitted")
+            description = "mode of duplicate subject")
     private String duplicateSubjectS;
 
     @Option(name = "-validityMode",
-            description = "mode of valditity.\n"
-                    + "\tSTRICT: Reject if the notBefore + validity behinds CA's notAfter \n"
-                    + "\tLAX:    notBefore + validity after CA's notAfter is permitted\n"
-                    + "\tCUTOFF: notAfter of issued certificates will be set to the earlier time of\n"
-                    + "\t        notBefore + validity and CA's notAfter")
+            description = "mode of valditity")
     private String validityModeS;
 
     private SecurityFactory securityFactory;

@@ -52,28 +52,31 @@ import org.xipki.common.ConfigurationException;
 public class CaRequestorAddCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "required. CA name",
-            required = true)
+            required = true,
+            description = "CA name\n"
+                    + "required")
     private String caName;
 
     @Option(name = "-requestor",
-            required = true, description = "required. Requestor name")
+            required = true,
+            description = "requestor name\n"
+                    + "required")
     private String requestorName;
 
     @Option(name = "-ra",
-            description = "whether as RA.\n"
-                    + "Valid values are 'yes' and 'no'")
+            description = "whether as RA")
     private String raS = "no";
 
     @Option(name = "-permission",
-            description = "required. Permission, multi options is allowed. allowed values are\n"
-                    + permissionsText,
-            required = true, multiValued = true)
+            required = true, multiValued = true,
+            description = "permission\n"
+                    + "required, multi-valued")
     private Set<String> permissions;
 
     @Option(name = "-profile",
-            description = "required. Profile name or 'all' for all profiles, multi options is allowed",
-            required = true, multiValued = true)
+            required = true, multiValued = true,
+            description = "profile name or 'all' for all profiles\n"
+                    + "required, multi-valued")
     private Set<String> profiles;
 
     @Override

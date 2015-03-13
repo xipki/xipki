@@ -48,13 +48,11 @@ import org.xipki.security.api.p11.P11WritableSlot;
 public class P11RSAKeyGenCommand extends P11KeyGenCommand
 {
     @Option(name = "-keysize",
-            description = "keysize in bit",
-            required = false)
+            description = "keysize in bit")
     private Integer keysize = 2048;
 
     @Option(name = "-e",
-            description = "public exponent",
-            required = false)
+            description = "public exponent")
     private String publicExponent = "0x10001";
 
     @Override

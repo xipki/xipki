@@ -51,13 +51,15 @@ import org.xipki.common.util.SecurityUtil;
 public class RequestorUpdateCommand extends CaCommand
 {
     @Option(name = "-name",
-            description = "required. Requestor name",
-            required = true)
+            required = true,
+            description = "requestor name\n"
+                    + "required")
     private String name;
 
     @Option(name = "-cert",
-            description = "required. Requestor certificate file",
-            required = true)
+            required = true,
+            description = "requestor certificate file\n"
+                    + "required")
     private String certFile;
 
     @Override

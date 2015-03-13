@@ -53,8 +53,9 @@ import org.xipki.security.api.SecurityFactory;
 public class ResponderUpdateCommand extends CaCommand
 {
     @Option(name = "-signerType",
-            description = "type of the responder signer",
-            required = true)
+            required = true,
+            description = "type of the responder signer\n"
+                    + "required")
     private String signerType;
 
     @Option(name = "-signerConf",

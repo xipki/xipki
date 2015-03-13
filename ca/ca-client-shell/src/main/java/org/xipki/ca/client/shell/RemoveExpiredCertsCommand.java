@@ -50,20 +50,23 @@ import org.xipki.common.RequestResponseDebug;
 public class RemoveExpiredCertsCommand extends ClientCommand
 {
     @Option(name = "-ca",
-            required = false, description = "required if multiple CAs are configured. CA name")
+            description = "CA name\n"
+                    + "required if multiple CAs are configured")
     private String caName;
 
     @Option(name = "-profile",
-            required = true, description = "required. Certificate profile.")
+            required = true,
+            description = "certificate profile\n"
+                    + "required")
     private String profile;
 
     @Option(name = "-user",
-            required = false, description = "username, wildcards '%' and '*' are allowed.\n"
+            description = "username, wildcards '%' and '*' are allowed\n"
                     + "'all' for all users")
     private String userLike;
 
     @Option(name = "-overlap",
-            required = false, description = "overlap in seconds")
+            description = "overlap in seconds")
     private Long overlapSeconds = 24L * 60 * 60;
 
     @Override

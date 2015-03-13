@@ -52,7 +52,9 @@ import org.xipki.security.api.SignerException;
 public class P12CertExportCommand extends P12SecurityCommand
 {
     @Option(name = "-out",
-            required = true, description = "required. Where to save the certificate")
+            required = true,
+            description = "where to save the certificate\n"
+                    + "required")
     private String outFile;
 
     @Override

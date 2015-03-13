@@ -56,7 +56,8 @@ public class CaInfoCommand extends CaCommand
     private String caName;
 
     @Option(name = "-v", aliases="--verbose",
-            required = false, description = "show CA information verbosely")
+            required = false,
+            description = "show CA information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Override

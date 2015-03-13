@@ -46,12 +46,15 @@ import org.apache.karaf.shell.commands.Option;
 public class CaPublisherRemoveCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "required. CA name",
-            required = true)
+            required = true,
+            description = "CA name\n"
+                    + "required")
     private String caName;
 
     @Option(name = "-publisher",
-            required = true, description = "publisher name")
+            required = true,
+            description = "publisher name\n"
+                    + "required")
     private String publisherName;
 
     @Override

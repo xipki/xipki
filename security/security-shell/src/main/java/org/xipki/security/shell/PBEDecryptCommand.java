@@ -47,7 +47,9 @@ import org.xipki.security.PBEPasswordResolver;
 public class PBEDecryptCommand extends SecurityCommand
 {
     @Option(name = "-pwd", aliases = { "--password" },
-            required = true, description = "required. Encrypted password, starts with PBE:")
+            required = true,
+            description = "encrypted password, starts with PBE:\n"
+                    + "required")
     private String passwordHint;
 
     @Override

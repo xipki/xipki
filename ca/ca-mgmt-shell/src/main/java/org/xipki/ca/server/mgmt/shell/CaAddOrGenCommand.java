@@ -49,51 +49,59 @@ import org.xipki.security.api.SecurityFactory;
 public abstract class CaAddOrGenCommand extends CaCommand
 {
     @Option(name = "-name",
-            required = true, description = "required. CA name")
+            required = true,
+            description = "CA name"
+                    + "\nrequired")
     protected String caName;
 
     @Option(name = "-status",
-            description = "CA status, active|inactive")
+            description = "CA status")
     protected String caStatus = "active";
 
     @Option(name = "-ocspUri",
-            description = "OCSP URI, multi options is allowed",
-            multiValued = true)
+            multiValued = true,
+            description = "OCSP URI\n"
+                    + "multi-valued")
     protected List<String> ocspUris;
 
     @Option(name = "-crlUri",
-            description = "CRL URI, multi options is allowed",
-            multiValued = true)
+            multiValued = true,
+            description = "CRL distribution point\n"
+                    + "multi-valued")
     protected List<String> crlUris;
 
     @Option(name = "-deltaCrlUri",
-            description = "delta CRL URI, multi options is allowed",
-            multiValued = true)
+            multiValued = true,
+            description = "CRL distribution point\n"
+                    + "multi-valued")
     protected List<String> deltaCrlUris;
 
     @Option(name = "-permission",
-            description = "required. Permission, multi options is allowed. allowed values are\n"
-                    + permissionsText,
-            required = true, multiValued = true)
+            required = true, multiValued = true,
+            description = "permission\n"
+                    + "required, multi-valued")
     protected Set<String> permissions;
 
     @Option(name = "-nextSerial",
-            description = "required. Serial number for the next certificate, 0 for random serial number",
-            required = true)
+            required = true,
+            description = "serial number for the next certificate, 0 for random serial number\n"
+                    + "required")
     protected Long nextSerial;
 
     @Option(name = "-nextCrlNo",
-            description = "required. CRL number for the next CRL",
-            required = true)
+            required = true,
+            description = "CRL number for the next CRL\n"
+                    + "required")
     protected Integer nextCrlNumber ;
 
     @Option(name = "-maxValidity",
-            description = "required. maximal validity.",
-            required = true)
+            required = true,
+            description = "maximal validity\n"
+                    + "required")
     protected String maxValidity;
 
     @Option(name = "-crlSigner",
-            description = "cRL signer name")
+            description = "CRL signer name")
     protected String crlSignerName;
 
     @Option(name = "-cmpControl",
@@ -101,7 +109,7 @@ public abstract class CaAddOrGenCommand extends CaCommand
     protected String cmpControlName;
 
     @Option(name = "-numCrls",
-            description = "Number of CRLs to be kept in database")
+            description = "number of CRLs to be kept in database")
     protected Integer numCrls = 30;
 
     @Option(name = "-expirationPeriod",
@@ -109,8 +117,9 @@ public abstract class CaAddOrGenCommand extends CaCommand
     protected Integer expirationPeriod = 365;
 
     @Option(name = "-signerType",
-            description = "required. CA signer type",
-            required = true)
+            required = true,
+            description = "CA signer type\n"
+                    + "required")
     protected String signerType;
 
     @Option(name = "-signerConf",
@@ -118,25 +127,15 @@ public abstract class CaAddOrGenCommand extends CaCommand
     protected String signerConf;
 
     @Option(name = "-dk", aliases = { "--duplicateKey" },
-            description = "mode of duplicate key.\n"
-                    + "\t1: forbidden\n"
-                    + "\t2: forbiddenWithinProfile\n"
-                    + "\t3: permitted")
+            description = "mode of duplicate key")
     protected String duplicateKeyS = "forbiddenWithinProfile";
 
     @Option(name = "-ds", aliases = { "--duplicateSubject" },
-            description = "mode of duplicate subject.\n"
-                    + "\t1: forbidden\n"
-                    + "\t2: forbiddenWithinProfile\n"
-                    + "\t3: permitted")
+            description = "mode of duplicate subject")
     protected String duplicateSubjectS = "forbiddenWithinProfile";
 
     @Option(name = "-validityMode",
-            description = "mode of valditity.\n"
-                    + "\tSTRICT: Reject if the notBefore + validity behinds CA's notAfter \n"
-                    + "\tLAX:    notBefore + validity after CA's notAfter is permitted\n"
-                    + "\tCUTOFF: notAfter of issued certificates will be set to the earlier time of\n"
-                    + "\t        notBefore + validity and CA's notAfter")
+            description = "mode of valditity")
     protected String validityModeS = "STRICT";
 
     protected SecurityFactory securityFactory;

@@ -56,7 +56,7 @@ public class RequestorInfoCommand extends CaCommand
     private String name;
 
     @Option(name = "-v", aliases="--verbose",
-            required = false, description = "show requestor information verbosely")
+            description = "show requestor information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Override

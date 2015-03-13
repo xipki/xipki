@@ -49,13 +49,15 @@ public class ProfileAddCommand extends CaCommand
 {
 
     @Option(name = "-name",
-                description = "required. Profile name",
-                required = true, multiValued = false)
+            required = true,
+            description = "profile name\n"
+                    + "required")
     private String name;
 
     @Option(name = "-type",
-            description = "required. Profile type",
-            required = true)
+            required = true,
+            description = "profile type\n"
+                    + "required")
     private String type;
 
     @Option(name = "-conf",

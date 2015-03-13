@@ -52,13 +52,15 @@ import org.xipki.security.api.SecurityFactory;
 public class CrlSignerAddCommand extends CaCommand
 {
     @Option(name = "-name",
-            description = "required. CRL signer name",
-            required = true, multiValued = false)
+            required = true,
+            description = "CRL signer name\n"
+                    + "required")
     private String name;
 
     @Option(name = "-signerType",
-            description = "required. CRL signer type, use 'CA' to sign the CRL by the CA itself",
-            required = true)
+            required = true,
+            description = "CRL signer type, use 'CA' to sign the CRL by the CA itself\n"
+                    + "required")
     private String signerType;
 
     @Option(name = "-signerConf",
@@ -70,7 +72,9 @@ public class CrlSignerAddCommand extends CaCommand
     private String signerCertFile;
 
     @Option(name = "-crlControl",
-            required = true, description = "required. CRL control")
+            required = true,
+            description = "CRL control\n"
+                    + "required")
     private String crlControlS;
 
     private SecurityFactory securityFactory;

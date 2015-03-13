@@ -48,12 +48,15 @@ import org.apache.karaf.shell.commands.Option;
 public class CaPublisherAddCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "required. CA name",
-            required = true)
+            required = true,
+            description = "CA name\n"
+                    + "required")
     private String caName;
 
     @Option(name = "-publisher",
-        required = true, multiValued = true, description = "required. Publisher name. Multivalued")
+        required = true, multiValued = true,
+        description = "publisher name\n"
+                + "required, multi-valued")
     private List<String> publisherNames;
 
     @Override

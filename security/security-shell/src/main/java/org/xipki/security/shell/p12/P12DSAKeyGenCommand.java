@@ -48,13 +48,11 @@ import org.xipki.security.api.P12KeypairGenerationResult;
 public class P12DSAKeyGenCommand extends P12KeyGenCommand
 {
     @Option(name = "-plen",
-            description = "bit length of the prime",
-            required = false)
+            description = "bit length of the prime")
     private Integer pLen = 2048;
 
     @Option(name = "-qlen",
-            description = "bit length of the sub-prime",
-            required = false)
+            description = "bit length of the sub-prime")
     private Integer qLen;
 
     @Override
