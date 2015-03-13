@@ -55,7 +55,7 @@ public class P12CertRequestGenCommand extends CertRequestGenCommand
     @Option(name = "-p12",
             required = true,
             description = "PKCS#12 keystore file\n"
-                    + "required")
+                    + "(required)")
     private String p12File;
 
     @Option(name = "-pwd", aliases = { "--password" },

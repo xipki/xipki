@@ -57,7 +57,7 @@ public class P11CertRequestGenCommand extends CertRequestGenCommand
     @Option(name = "-slot",
             required = true,
             description = "slot index\n"
-                    + "required")
+                    + "(required)")
     private Integer slotIndex;
 
     @Option(name = "-key-id",

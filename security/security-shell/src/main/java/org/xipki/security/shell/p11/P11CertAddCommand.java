@@ -56,13 +56,13 @@ public class P11CertAddCommand extends SecurityCommand
     @Option(name = "-slot",
             required = true,
             description = "slot index\n"
-                    + "required")
+                    + "(required)")
     private Integer slotIndex;
 
     @Option(name = "-cert",
             required = true,
             description = "certificate file\n"
-                    + "required")
+                    + "(required)")
     private String certFile;
 
     @Option(name = "-module",

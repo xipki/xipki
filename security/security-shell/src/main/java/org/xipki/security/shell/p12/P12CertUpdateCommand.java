@@ -60,7 +60,7 @@ public class P12CertUpdateCommand extends P12SecurityCommand
     @Option(name = "-cert",
             required = true,
             description = "certificate file\n"
-                    + "required")
+                    + "(required)")
     private String certFile;
 
     @Option(name = "-cacert",

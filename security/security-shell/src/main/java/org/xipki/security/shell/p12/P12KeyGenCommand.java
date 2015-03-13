@@ -51,13 +51,13 @@ public abstract class P12KeyGenCommand extends KeyGenCommand
     @Option(name = "-subject",
             required = true,
             description = "subject in the self-signed certificate\n"
-                    + "required")
+                    + "(required)")
     protected String subject;
 
     @Option(name = "-out",
             required = true,
             description = "where to save the key\n"
-                    + "required")
+                    + "(required)")
     protected String keyOutFile;
 
     @Option(name = "-certout",
