@@ -53,48 +53,42 @@ public class CALoadTestEnrollCommand extends CALoadTestCommand
 
     @Option(name = "-profile",
             required = true,
-            description = "required. Certificate profile")
+            description = "certificate profile\n"
+                    + "required")
     private String certprofile;
 
     @Option(name = "-subject",
             required = true,
-            description = "required. Subject template")
+            description = "subject template\n"
+                    + "required")
     private String subjectTemplate;
 
     @Option(name = "-randomDN",
-            required = false,
-            description = "dN name to be incremented, valid values are\n"
-                    + "gIVENNAME, SURNAME, STREET, POSTALCODE, O, OU and CN")
-    private String randomDNStr = "o";
+            description = "DN name to be incremented")
+    private String randomDNStr = "O";
 
     @Option(name = "-duration",
-            required = false,
-            description = "required. Duration in seconds")
+            description = "duration in seconds")
     private Integer durationInSecond = 30;
 
     @Option(name = "-thread",
-            required = false,
-            description = "Number of threads")
+            description = "number of threads")
     private Integer numThreads = 5;
 
     @Option(name="-keyType",
-            required = false,
-            description = "key type to be requested. Valid values are RSA, EC and DSA")
+            description = "key type to be requested")
     private String keyType = "RSA";
 
     @Option(name="-keysize",
-            required = false,
             description = "modulus length of RSA key or p length of DSA key")
     private Integer keysize = 2048;
 
     @Option(name = "-curve",
-            description = "eC curve name or OID of EC key",
-            required = false)
+            description = "EC curve name or OID of EC key")
     private String curveName = "brainpoolp256r1";
 
     @Option(name = "-n",
-            description = "Number of certificates to be requested in one request",
-            required = false)
+            description = "number of certificates to be requested in one request")
     private Integer n = 1;
 
     @Override
@@ -141,7 +135,7 @@ public class CALoadTestEnrollCommand extends CALoadTestCommand
         }
 
         KeyEntry keyEntry;
-        if("eC".equalsIgnoreCase(keyType))
+        if("EC".equalsIgnoreCase(keyType))
         {
             keyEntry = new ECKeyEntry(curveName);
         }

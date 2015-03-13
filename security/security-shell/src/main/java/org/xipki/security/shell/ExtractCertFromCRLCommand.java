@@ -61,11 +61,15 @@ public class ExtractCertFromCRLCommand extends SecurityCommand
 {
 
     @Option(name = "-crl",
-            required = true, description = "required. CRL file")
+            required = true,
+            description = "CRL file\n"
+                    + "required")
     private String crlFile;
 
     @Option(name = "-out",
-            required = true, description = "required. Zip file to save the extracted certificates")
+            required = true,
+            description = "zip file to save the extracted certificates\n"
+                    + "required")
     private String outFile;
 
     @Override

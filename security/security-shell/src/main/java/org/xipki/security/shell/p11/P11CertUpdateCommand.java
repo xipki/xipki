@@ -54,11 +54,15 @@ public class P11CertUpdateCommand extends P11SecurityCommand
 {
 
     @Option(name = "-cert",
-            required = true, description = "required. Certificate file")
+            required = true,
+            description = "certificate file\n"
+                    + "required")
     private String certFile;
 
     @Option(name = "-cacert",
-            required = false, multiValued = true, description = "CA Certificate files")
+            multiValued = true,
+            description = "CA Certificate files\n"
+                    + "multi-valued")
     private Set<String> caCertFiles;
 
     @Override

@@ -54,7 +54,8 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 public class FileListCommand extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "file",
-            required = true, description = "file or directory")
+            required = true,
+            description = "file or directory")
     private String targetPath;
 
     @Override

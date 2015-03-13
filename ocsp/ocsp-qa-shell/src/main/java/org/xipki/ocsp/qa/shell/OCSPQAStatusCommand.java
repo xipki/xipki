@@ -63,12 +63,13 @@ import org.xipki.ocsp.qa.api.OcspResponseOption;
 public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
 {
     @Option(name = "-expError",
-            description = "expected error. Valid values are , " + OcspError.errorText)
+            description = "expected error")
     private String errorText;
 
     @Option(name = "-expStatus",
             multiValued = true,
-            description = "expected status. Valid values are \n" + OcspCertStatus.certStatusesText + ",\nmulti values allowed")
+            description = "expected status\n"
+                    + "multi-valued")
     private List<String> statusTexts;
 
     @Option(name = "-expSigAlg",
@@ -76,11 +77,11 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
     private String sigAlg;
 
     @Option(name = "-expNextupdate",
-            description = "occurence of nextUpdate. Valid values are " + Occurrence.occurencesText)
+            description = "occurence of nextUpdate")
     private String nextUpdateOccurrenceText = Occurrence.optional.name();
 
     @Option(name = "-expCerthash",
-            description = "occurence of certHash. Valid values are " + Occurrence.occurencesText)
+            description = "occurence of certHash")
     private String certhashOccurrenceText = Occurrence.optional.name();
 
     @Option(name = "-expCerthashAlg",
@@ -88,7 +89,7 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
     private String certhashAlg;
 
     @Option(name = "-expNonce",
-            description = "occurence of nonce. Valid values are " + Occurrence.occurencesText)
+            description = "occurence of nonce")
     private String nonceOccurrenceText = Occurrence.optional.name();
 
     private OcspQA ocspQA;
@@ -105,7 +106,7 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
     {
         if(isBlank(errorText) && isEmpty(statusTexts))
         {
-            throw new Exception("Neither expError nor expStatus is set, this is not permitted");
+            throw new Exception("neither expError nor expStatus is set, this is not permitted");
         }
 
         if(isNotBlank(errorText) && isNotEmpty(statusTexts))
@@ -117,7 +118,7 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
         {
             if(statusTexts.size() != serialNumbers.size())
             {
-                throw new Exception("Number of expStatus is invalid: " + (statusTexts.size()) +
+                throw new Exception("number of expStatus is invalid: " + (statusTexts.size()) +
                         ", it should be " + serialNumbers.size());
             }
         }

@@ -55,21 +55,23 @@ import org.xipki.security.shell.CertRequestGenCommand;
 public class P11CertRequestGenCommand extends CertRequestGenCommand
 {
     @Option(name = "-slot",
-            required = true, description = "required. Slot index")
+            required = true,
+            description = "slot index\n"
+                    + "required")
     private Integer slotIndex;
 
     @Option(name = "-key-id",
-            required = false, description = "id of the private key in the PKCS#11 device.\n"
+            description = "id of the private key in the PKCS#11 device\n"
                     + "either keyId or keyLabel must be specified")
     private String keyId;
 
     @Option(name = "-key-label",
-            required = false, description = "label of the private key in the PKCS#11 device.\n"
+            description = "label of the private key in the PKCS#11 device\n"
                     + "either keyId or keyLabel must be specified")
     private String keyLabel;
 
     @Option(name = "-module",
-            required = false, description = "Name of the PKCS#11 module.")
+            description = "name of the PKCS#11 module")
     private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     private P11KeyIdentifier getKeyIdentifier()

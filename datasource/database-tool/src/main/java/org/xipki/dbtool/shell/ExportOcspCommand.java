@@ -57,8 +57,9 @@ public class ExportOcspCommand extends XipkiOsgiCommandSupport
     private String dbconfFile = DFLT_DBCONF_FILE;
 
     @Option(name = "-outdir",
-            description = "required. Output directory",
-            required = true)
+            required = true,
+            description = "output directory\n"
+                    + "required")
     private String outdir;
 
     @Option(name = "-n",
