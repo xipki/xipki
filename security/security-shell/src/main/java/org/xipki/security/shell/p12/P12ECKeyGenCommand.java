@@ -50,8 +50,8 @@ public class P12ECKeyGenCommand extends P12KeyGenCommand
 {
     @Option(name = "-curve",
             required = true,
-            description = "EC curve name\n"
-                    + "required")
+            description = "EC curve name or OID\n"
+                    + "(required)")
     private String curveName;
 
     @Override

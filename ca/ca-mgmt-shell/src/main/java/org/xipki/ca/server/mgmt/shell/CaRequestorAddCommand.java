@@ -54,13 +54,13 @@ public class CaRequestorAddCommand extends CaCommand
     @Option(name = "-ca",
             required = true,
             description = "CA name\n"
-                    + "required")
+                    + "(required)")
     private String caName;
 
     @Option(name = "-requestor",
             required = true,
             description = "requestor name\n"
-                    + "required")
+                    + "(required)")
     private String requestorName;
 
     @Option(name = "-ra",
@@ -70,13 +70,13 @@ public class CaRequestorAddCommand extends CaCommand
     @Option(name = "-permission",
             required = true, multiValued = true,
             description = "permission\n"
-                    + "required, multi-valued")
+                    + "(required, multi-valued)")
     private Set<String> permissions;
 
     @Option(name = "-profile",
             required = true, multiValued = true,
             description = "profile name or 'all' for all profiles\n"
-                    + "required, multi-valued")
+                    + "(required, multi-valued)")
     private Set<String> profiles;
 
     @Override

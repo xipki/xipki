@@ -48,13 +48,13 @@ public class CaAliasAddCommand extends CaCommand
     @Option(name = "-ca",
             required = true,
             description = "CA name\n"
-                    + "required")
+                    + "(required)")
     private String caName;
 
     @Option(name = "-alias",
             required = true,
             description = "CA alias\n"
-                    + "required")
+                    + "(required)")
     private String caAlias;
 
     @Override

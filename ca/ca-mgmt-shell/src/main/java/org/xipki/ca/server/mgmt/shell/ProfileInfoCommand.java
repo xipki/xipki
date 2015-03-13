@@ -52,7 +52,7 @@ import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 @Command(scope = "xipki-ca", name = "profile-info", description="show information of profiles")
 public class ProfileInfoCommand extends CaCommand
 {
-    @Argument(index = 0, name = "name", description = "certificate profile name", required = false)
+    @Argument(index = 0, name = "name", description = "certificate profile name")
     private String name;
 
     @Option(name = "-v", aliases="--verbose",

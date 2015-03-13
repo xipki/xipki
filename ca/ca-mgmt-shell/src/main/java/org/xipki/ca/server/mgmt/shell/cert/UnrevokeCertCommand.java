@@ -50,13 +50,13 @@ public class UnrevokeCertCommand extends CaCommand
     @Option(name = "-ca",
             required = true,
             description = "CA name\n"
-                    + "required")
+                    + "(required)")
     private String caName;
 
     @Option(name = "-serial",
             required = true,
             description = "serial number\n"
-                    + "required")
+                    + "(required)")
     private String serialNumberS;
 
     @Override

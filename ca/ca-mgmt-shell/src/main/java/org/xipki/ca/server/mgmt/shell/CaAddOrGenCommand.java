@@ -50,8 +50,8 @@ public abstract class CaAddOrGenCommand extends CaCommand
 {
     @Option(name = "-name",
             required = true,
-            description = "CA name"
-                    + "\nrequired")
+            description = "CA name\n"
+                    + "(required)")
     protected String caName;
 
     @Option(name = "-status",
@@ -61,43 +61,43 @@ public abstract class CaAddOrGenCommand extends CaCommand
     @Option(name = "-ocspUri",
             multiValued = true,
             description = "OCSP URI\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     protected List<String> ocspUris;
 
     @Option(name = "-crlUri",
             multiValued = true,
             description = "CRL distribution point\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     protected List<String> crlUris;
 
     @Option(name = "-deltaCrlUri",
             multiValued = true,
             description = "CRL distribution point\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     protected List<String> deltaCrlUris;
 
     @Option(name = "-permission",
             required = true, multiValued = true,
             description = "permission\n"
-                    + "required, multi-valued")
+                    + "(required, multi-valued)")
     protected Set<String> permissions;
 
     @Option(name = "-nextSerial",
             required = true,
             description = "serial number for the next certificate, 0 for random serial number\n"
-                    + "required")
+                    + "(required)")
     protected Long nextSerial;
 
     @Option(name = "-nextCrlNo",
             required = true,
             description = "CRL number for the next CRL\n"
-                    + "required")
+                    + "(required)")
     protected Integer nextCrlNumber ;
 
     @Option(name = "-maxValidity",
             required = true,
             description = "maximal validity\n"
-                    + "required")
+                    + "(required)")
     protected String maxValidity;
 
     @Option(name = "-crlSigner",
@@ -119,7 +119,7 @@ public abstract class CaAddOrGenCommand extends CaCommand
     @Option(name = "-signerType",
             required = true,
             description = "CA signer type\n"
-                    + "required")
+                    + "(required)")
     protected String signerType;
 
     @Option(name = "-signerConf",

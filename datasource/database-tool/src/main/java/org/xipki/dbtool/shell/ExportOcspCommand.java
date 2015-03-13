@@ -59,7 +59,7 @@ public class ExportOcspCommand extends XipkiOsgiCommandSupport
     @Option(name = "-outdir",
             required = true,
             description = "output directory\n"
-                    + "required")
+                    + "(required)")
     private String outdir;
 
     @Option(name = "-n",

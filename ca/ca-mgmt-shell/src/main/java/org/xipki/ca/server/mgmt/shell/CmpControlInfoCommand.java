@@ -51,7 +51,7 @@ import org.xipki.ca.server.mgmt.api.CmpControl;
 @Command(scope = "xipki-ca", name = "cmpcontrol-info", description="show information of CMP control")
 public class CmpControlInfoCommand extends CaCommand
 {
-    @Argument(index = 0, name = "name", description = "CMP control name", required = false)
+    @Argument(index = 0, name = "name", description = "CMP control name")
     private String name;
 
     @Override

@@ -51,13 +51,13 @@ public class ProfileExportCommand extends CaCommand
     @Option(name = "-name",
             required = true,
             description = "profile name\n"
-                    + "required")
+                    + "(required)")
     private String name;
 
     @Option(name = "-out",
             required = true,
             description = "where to save the profile configuration\n"
-                    + "required")
+                    + "(required)")
     private String confFile;
 
     @Override

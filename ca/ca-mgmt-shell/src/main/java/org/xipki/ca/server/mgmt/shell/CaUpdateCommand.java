@@ -63,7 +63,7 @@ public class CaUpdateCommand extends CaCommand
     @Option(name = "-name",
             required = true,
             description = "CA name\n"
-                    + "required")
+                    + "(required)")
     private String caName;
 
     @Option(name = "-status",
@@ -73,25 +73,25 @@ public class CaUpdateCommand extends CaCommand
     @Option(name = "-ocspUri",
             multiValued = true,
             description = "OCSP URI or 'NULL'\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     private List<String> ocspUris;
 
     @Option(name = "-crlUri",
             multiValued = true,
             description = "CRL distribution point URI or 'NULL'\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     private List<String> crlUris;
 
     @Option(name = "-deltaCrlUri",
             multiValued = true,
             description = "delta CRL distribution point URI or 'NULL'\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     private List<String> deltaCrlUris;
 
     @Option(name = "-permission",
             multiValued = true,
             description = "permission\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     private Set<String> permissions;
 
     @Option(name = "-maxValidity",

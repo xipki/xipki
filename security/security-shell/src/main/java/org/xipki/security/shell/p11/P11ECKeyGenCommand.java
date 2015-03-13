@@ -50,7 +50,7 @@ public class P11ECKeyGenCommand extends P11KeyGenCommand
     @Option(name = "-curve",
             required = true,
             description = "EC curve name\n"
-                    + "required")
+                    + "(required)")
     private String curveName;
 
     @Override

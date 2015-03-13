@@ -51,7 +51,7 @@ import org.xipki.ca.server.mgmt.api.PublisherEntry;
 @Command(scope = "xipki-ca", name = "publisher-info", description="show information of publishers")
 public class PublisherInfoCommand extends CaCommand
 {
-    @Argument(index = 0, name = "name", description = "publisher name", required = false)
+    @Argument(index = 0, name = "name", description = "publisher name")
     private String name;
 
     @Override

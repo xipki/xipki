@@ -77,73 +77,69 @@ import org.xipki.security.api.SignerException;
 public abstract class EnrollCertCommand extends ClientCommand
 {
     @Option(name = "-subject",
-            required = false,
-            description = "subject to be requested.\n"
-                    + "default is the subject of self-signed certifite.")
+            description = "subject to be requested\n"
+                    + "(defaults to subject of self-signed certifite)")
     private String subject;
 
     @Option(name = "-profile",
             required = true,
             description = "certificate profile\n"
-                    + "required")
+                    + "(required)")
     private String profile;
 
     @Option(name = "-out",
             required = true,
             description = "where to save the certificate\n"
-                    + "required")
+                    + "(required)")
     private String outputFile;
 
     @Option(name = "-user",
-            required = false,
             description = "username")
     private String user;
 
     @Option(name = "-hash",
-            required = false,
             description = "hash algorithm name for the POPO computation")
     protected String hashAlgo = "SHA256";
 
     @Option(name = "-ca",
-            required = false,
             description = "CA name\n"
-                    + "required if the profile is supported by more than one CA")
+                    + "(required if the profile is supported by more than one CA)")
     private String caName;
 
     @Option(name = "-keyusage",
-            required = false, multiValued = true,
+            multiValued = true,
             description = "keyusage\n"
-                    + "multi-valued.")
+                    + "(multi-valued)")
     private List<String> keyusages;
 
     @Option(name = "-extKeyusage",
-            required = false, multiValued = true,
+            multiValued = true,
             description = "extended keyusage\n"
-                    + "multi-valued.")
+                    + "(multi-valued)")
     private List<String> extkeyusages;
 
     @Option(name = "-subjectAltName",
-            required = false, multiValued = true,
-            description = "subjectAltName.\n"
-                    + "multi-valued.")
+            multiValued = true,
+            description = "subjectAltName\n"
+                    + "(multi-valued)")
     private List<String> subjectAltNames;
 
     @Option(name = "-subjectInfoAccess",
             multiValued = true,
             description = "subjectInfoAccess.\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     private List<String> subjectInfoAccesses;
 
     @Option(name = "-needExtension",
             multiValued = true,
             description = "type (OID or name) of extension that must be contaied in the certificate\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     private List<String> needExtensionTypes;
 
     @Option(name = "-wantExtension",
             multiValued = true,
             description = "type (OID or name) of extension that should be contaied in the certificate if possible\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     private List<String> wantExtensionTypes;
 
     protected SecurityFactory securityFactory;

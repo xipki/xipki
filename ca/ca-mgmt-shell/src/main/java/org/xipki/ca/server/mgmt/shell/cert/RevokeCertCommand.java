@@ -54,19 +54,19 @@ public class RevokeCertCommand extends CaCommand
     @Option(name = "-ca",
             required = true,
             description = " CA name\n"
-                    + "required")
+                    + "(required)")
     private String caName;
 
     @Option(name = "-serial",
             required = true,
             description = "serial number\n"
-                    + "required")
+                    + "(required)")
     private String serialNumberS;
 
     @Option(name = "-reason",
             required = true,
             description = "CRL reason\n"
-                    + "required")
+                    + "(required)")
     private String reason;
 
     @Option(name = "-invDate",

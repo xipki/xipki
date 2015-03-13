@@ -52,11 +52,10 @@ import org.xipki.ca.server.mgmt.api.X509CAEntry;
 @Command(scope = "xipki-ca", name = "ca-info", description="show information of CAs")
 public class CaInfoCommand extends CaCommand
 {
-    @Argument(index = 0, name = "name", description = "CA name", required = false)
+    @Argument(index = 0, name = "name", description = "CA name")
     private String caName;
 
     @Option(name = "-v", aliases="--verbose",
-            required = false,
             description = "show CA information verbosely")
     private Boolean verbose = Boolean.FALSE;
 

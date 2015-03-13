@@ -50,7 +50,7 @@ import org.apache.karaf.shell.commands.Command;
 @Command(scope = "xipki-ca", name = "caalias-info", description="show information of CA aliases")
 public class CaAliasInfoCommand extends CaCommand
 {
-    @Argument(index = 0, name = "alias", description = "CA alias", required = false)
+    @Argument(index = 0, name = "alias", description = "CA alias")
     private String caAlias;
 
     @Override

@@ -53,7 +53,7 @@ public class CaProfileInfoCommand extends CaCommand
     @Option(name = "-ca",
             required = true,
             description = "CA name\n"
-                    + "required")
+                    + "(required)")
     private String caName;
 
     @Override

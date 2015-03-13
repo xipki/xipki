@@ -67,12 +67,12 @@ public class CaRevokeCommand extends CaCommand
     @Option(name = "-reason",
             required = true,
             description = "CRL reason\n"
-                    + "required")
+                    + "(required)")
     private String reason;
 
     @Option(name = "-revDate",
             description = "revocation date, UTC time of format yyyyMMddHHmmss\n"
-                    + "default is current time")
+                    + "(defaults to current time)")
     private String revocationDateS;
 
     @Option(name = "-invDate",

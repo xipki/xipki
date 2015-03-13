@@ -69,7 +69,7 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
     @Option(name = "-expStatus",
             multiValued = true,
             description = "expected status\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     private List<String> statusTexts;
 
     @Option(name = "-expSigAlg",
