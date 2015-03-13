@@ -46,9 +46,6 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 public abstract class CaCommand extends XipkiOsgiCommandSupport
 {
-    public final static String permissionsText =
-            "enroll, revoke, unrevoke, remove, key-update, gen-crl, get-crl, enroll-cross, all";
-
     protected CAManager caManager;
 
     public void setCaManager(CAManager caManager)
