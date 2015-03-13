@@ -64,43 +64,53 @@ import org.xipki.security.api.ExtensionExistence;
 public abstract class CertRequestGenCommand extends SecurityCommand
 {
     @Option(name = "-subject",
-            required = false,
-            description = "subject in the PKCS#10 request.\n"
-                    + "the default is the subject of self-signed certifite")
+            description = "subject in the PKCS#10 request\n"
+                    + "default is the subject of self-signed certifite")
     private String subject;
 
     @Option(name = "-hash",
-            required = false, description = "hash algorithm name")
+            description = "hash algorithm name")
     private String hashAlgo = "SHA256";
 
     @Option(name = "-out",
-            required = true, description = "required. Output file name")
+            required = true,
+            description = "output file name\n"
+                    + "required")
     private String outputFilename;
 
     @Option(name = "-keyusage",
-            required = false, multiValued = true, description = "keyusage. Multi-valued.")
+            multiValued = true,
+            description = "keyusage\n"
+                    + "multi-valued")
     private List<String> keyusages;
 
     @Option(name = "-extKeyusage",
-            required = false, multiValued = true, description = "extended keyusage. Multi-valued.")
+            multiValued = true,
+            description = "extended keyusage\n"
+                    + "multi-valued")
     private List<String> extkeyusages;
 
     @Option(name = "-subjectAltName",
-            required = false, multiValued = true, description = "subjectAltName. Multi-valued.")
+            multiValued = true,
+            description = "subjectAltName\n"
+                    + "multi-valued")
     private List<String> subjectAltNames;
 
     @Option(name = "-subjectInfoAccess",
-            required = false, multiValued = true, description = "subjectInfoAccess. Multi-valued")
+            multiValued = true,
+            description = "subjectInfoAccess\n"
+                    + "multi-valued")
     private List<String> subjectInfoAccesses;
 
     @Option(name = "-needExtension",
-            required = false, multiValued = true,
-            description = "types of extension that must be contaied in the certificate. Multi-valued")
+            multiValued = true,
+            description = "types of extension that must be contaied in the certificate\n"
+                    + "multi-valued")
     private List<String> needExtensionTypes;
 
     @Option(name = "-wantExtension",
-            required = false, multiValued = true,
-            description = "types of extension that should be contaied in the certificate if possible.\n"
+            multiValued = true,
+            description = "types of extension that should be contaied in the certificate if possible\n"
                     + "multi-valued")
     private List<String> wantExtensionTypes;
 

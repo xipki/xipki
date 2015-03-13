@@ -52,23 +52,27 @@ public abstract class P11KeyGenCommand extends KeyGenCommand
 {
 
     @Option(name = "-slot",
-            required = true, description = "required. Slot index")
+            required = true,
+            description = "slot index\n"
+                    + "required")
     protected Integer slotIndex;
 
     @Option(name = "-key-label",
-            required = true, description = "required. Label of the PKCS#11 objects")
+            required = true,
+            description = "label of the PKCS#11 objects\n"
+                    + "required")
     protected String label;
 
     @Option(name = "-subject",
-            required = false, description = "subject in the self-signed certificate")
+            description = "subject in the self-signed certificate")
     protected String subject;
 
     @Option(name = "-certout",
-            required = false, description = "where to save the self-signed certificate")
+            description = "where to save the self-signed certificate")
     protected String outputFilename;
 
     @Option(name = "-module",
-            required = false, description = "Name of the PKCS#11 module.")
+            description = "Name of the PKCS#11 module.")
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     protected String getSubject()

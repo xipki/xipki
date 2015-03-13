@@ -57,8 +57,9 @@ public class ImportOcspFromCaCommand extends XipkiOsgiCommandSupport
     private String dbconfFile = DFLT_DBCONF_FILE;
 
     @Option(name = "-indir",
-            description = "required. Input directory",
-            required = true)
+            required = true,
+            description = "input directory\n"
+                    + "required")
     private String indir;
 
     @Option(name = "-publisher",
