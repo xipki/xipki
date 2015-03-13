@@ -665,7 +665,7 @@ class X509CA
                 CertificateList crl = CertificateList.getInstance(encodedCrl);
                 successfull = true;
 
-                LOG.info("SUCCESSFULL getCurrentCRL: ca={}, thisUpdate={}", caInfo.getName(),
+                LOG.info("SUCCESSFUL getCurrentCRL: ca={}, thisUpdate={}", caInfo.getName(),
                         crl.getThisUpdate().getTime());
 
                 return crl;
@@ -703,7 +703,7 @@ class X509CA
                 numOfRemovedCRLs = 0;
             }
             successfull = true;
-            LOG.info("SUCCESSFULL cleanupCRLs: ca={}, numOfRemovedCRLs={}", caInfo.getName(),
+            LOG.info("SUCCESSFUL cleanupCRLs: ca={}, numOfRemovedCRLs={}", caInfo.getName(),
                     numOfRemovedCRLs);
         } catch (RuntimeException e)
         {
@@ -1064,7 +1064,7 @@ class X509CA
                 publishCRL(crl);
 
                 successfull = true;
-                LOG.info("SUCCESSFULL generateCRL: ca={}, crlNumber={}, thisUpdate={}",
+                LOG.info("SUCCESSFUL generateCRL: ca={}, crlNumber={}, thisUpdate={}",
                         new Object[]{caInfo.getName(), crlNumber, crl.getThisUpdate()});
 
                 // clean up the CRL
@@ -1166,7 +1166,7 @@ class X509CA
                     notBefore, notAfter, extensions, false);
             successfull = true;
 
-            String prefix = ret.isAlreadyIssued() ? "RETURN_OLD_CERT" : "SUCCESSFULL";
+            String prefix = ret.isAlreadyIssued() ? "RETURN_OLD_CERT" : "SUCCESSFUL";
             LOG.info("{} generateCertificate: CA={}, profile={},"
                     + " subject='{}', serialNumber={}",
                     new Object[]{prefix, caInfo.getName(), certprofileName,
@@ -1216,7 +1216,7 @@ class X509CA
                     subject, publicKeyInfo,
                     notBefore, notAfter, extensions, false);
             successfull = true;
-            LOG.info("SUCCESSFULL generateCertificate: CA={}, profile={},"
+            LOG.info("SUCCESSFUL generateCertificate: CA={}, profile={},"
                     + " subject='{}', serialNumber={}",
                     new Object[]{caInfo.getName(), certprofileName,
                         ret.getCert().getSubject(), ret.getCert().getCert().getSerialNumber()});
@@ -1792,7 +1792,7 @@ class X509CA
         }
 
         String resultText = revokedCert == null ? "CERT_NOT_EXIST" : "REVOKED";
-        LOG.info("SUCCESSFULL revokeCertificate: ca={}, serialNumber={}, reason={},"
+        LOG.info("SUCCESSFUL revokeCertificate: ca={}, serialNumber={}, reason={},"
                 + " invalidityTime={}, revocationResult={}",
                 new Object[]{caInfo.getName(), serialNumber, reason.getDescription(),
                         invalidityTime, resultText});
@@ -1857,7 +1857,7 @@ class X509CA
         }
 
         String resultText = unrevokedCert == null ? "CERT_NOT_EXIST" : "UNREVOKED";
-        LOG.info("SUCCESSFULL unrevokeCertificate: ca={}, serialNumber={}, revocationResult={}",
+        LOG.info("SUCCESSFUL unrevokeCertificate: ca={}, serialNumber={}, revocationResult={}",
                 new Object[]{caInfo.getName(), serialNumber, resultText});
 
         return unrevokedCert;
