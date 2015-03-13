@@ -84,8 +84,10 @@ public class CALoadTestEnrollCommand extends CALoadTestCommand
     private Integer keysize = 2048;
 
     @Option(name = "-curve",
-            description = "EC curve name or OID of EC key")
-    private String curveName = "brainpoolp256r1";
+            required = true,
+            description = "EC curve name or OID of EC key\n"
+                    + "required")
+    private String curveName;
 
     @Option(name = "-n",
             description = "number of certificates to be requested in one request")
