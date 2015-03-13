@@ -649,7 +649,7 @@ class X509CA
     public CertificateList getCRL(BigInteger crlNumber)
     throws OperationException
     {
-        LOG.info("START getCurrentCRL: ca={}, crlNumber={}", caInfo.getName(), crlNumber);
+        LOG.info("     START getCurrentCRL: ca={}, crlNumber={}", caInfo.getName(), crlNumber);
         boolean successfull = false;
 
         try
@@ -678,7 +678,7 @@ class X509CA
         {
             if(successfull == false)
             {
-                LOG.info("FAILED getCurrentCRL: ca={}", caInfo.getName());
+                LOG.info("    FAILED getCurrentCRL: ca={}", caInfo.getName());
             }
         }
     }
@@ -687,7 +687,7 @@ class X509CA
     throws OperationException
     {
         int numCrls = caInfo.getNumCrls();
-        LOG.info("START cleanupCRLs: ca={}, numCrls={}", caInfo.getName(), numCrls);
+        LOG.info("     START cleanupCRLs: ca={}, numCrls={}", caInfo.getName(), numCrls);
 
         boolean successfull = false;
 
@@ -714,7 +714,7 @@ class X509CA
         {
             if(successfull == false)
             {
-                LOG.info("FAILED cleanupCRLs: ca={}", caInfo.getName());
+                LOG.info("    FAILED cleanupCRLs: ca={}", caInfo.getName());
             }
         }
     }
@@ -781,7 +781,7 @@ class X509CA
                     "CRL generation is not allowed");
         }
 
-        LOG.info("START generateCRL: ca={}, deltaCRL={}, nextUpdate={}",
+        LOG.info("     START generateCRL: ca={}, deltaCRL={}, nextUpdate={}",
                 new Object[]{caInfo.getName(), deltaCRL, nextUpdate});
 
         if(auditEvent != null)
@@ -1088,7 +1088,7 @@ class X509CA
         {
             if(successfull == false)
             {
-                LOG.info("FAILED generateCRL: ca={}", caInfo.getName());
+                LOG.info("    FAILED generateCRL: ca={}", caInfo.getName());
             }
         }
     }
@@ -1153,7 +1153,7 @@ class X509CA
     throws OperationException
     {
         final String subjectText = SecurityUtil.getRFC4519Name(subject);
-        LOG.info("START generateCertificate: CA={}, profile={}, subject='{}'",
+        LOG.info("     START generateCertificate: CA={}, profile={}, subject='{}'",
                 new Object[]{caInfo.getName(), certprofileName, subjectText});
 
         boolean successfull = false;
@@ -1185,7 +1185,7 @@ class X509CA
         {
             if(successfull == false)
             {
-                LOG.warn("FAILED generateCertificate: CA={}, profile={}, subject='{}'",
+                LOG.warn("    FAILED generateCertificate: CA={}, profile={}, subject='{}'",
                         new Object[]{caInfo.getName(), certprofileName, subjectText});
             }
         }
@@ -1204,7 +1204,7 @@ class X509CA
     throws OperationException
     {
         final String subjectText = SecurityUtil.getRFC4519Name(subject);
-        LOG.info("START regenerateCertificate: CA={}, profile={}, subject='{}'",
+        LOG.info("     START regenerateCertificate: CA={}, profile={}, subject='{}'",
                 new Object[]{caInfo.getName(), certprofileName, subjectText});
 
         boolean successfull = false;
@@ -1235,7 +1235,7 @@ class X509CA
         {
             if(successfull == false)
             {
-                LOG.warn("FAILED regenerateCertificate: CA={}, profile={}, subject='{}'",
+                LOG.warn("    FAILED regenerateCertificate: CA={}, profile={}, subject='{}'",
                         new Object[]{caInfo.getName(), certprofileName, subjectText});
             }
         }
@@ -1734,7 +1734,7 @@ class X509CA
             CRLReason reason, Date invalidityTime, boolean force)
     throws OperationException
     {
-        LOG.info("START revokeCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}",
+        LOG.info("     START revokeCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}",
                 new Object[]{caInfo.getName(), serialNumber, reason.getDescription(), invalidityTime});
 
         X509CertWithRevocationInfo revokedCert = null;
@@ -1803,7 +1803,7 @@ class X509CA
     private X509CertWithDBCertId do_unrevokeCertificate(BigInteger serialNumber, boolean force)
     throws OperationException
     {
-        LOG.info("START unrevokeCertificate: ca={}, serialNumber={}", caInfo.getName(), serialNumber);
+        LOG.info("     START unrevokeCertificate: ca={}, serialNumber={}", caInfo.getName(), serialNumber);
 
         X509CertWithDBCertId unrevokedCert = null;
 
