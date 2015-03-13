@@ -54,13 +54,13 @@ public class CALoadTestEnrollCommand extends CALoadTestCommand
     @Option(name = "-profile",
             required = true,
             description = "certificate profile\n"
-                    + "required")
+                    + "(required)")
     private String certprofile;
 
     @Option(name = "-subject",
             required = true,
             description = "subject template\n"
-                    + "required")
+                    + "(required)")
     private String subjectTemplate;
 
     @Option(name = "-randomDN",
@@ -86,7 +86,7 @@ public class CALoadTestEnrollCommand extends CALoadTestCommand
     @Option(name = "-curve",
             required = true,
             description = "EC curve name or OID of EC key\n"
-                    + "required")
+                    + "(required)")
     private String curveName;
 
     @Option(name = "-n",

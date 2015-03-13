@@ -59,7 +59,7 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
     @Option(name = "-reason",
             required = true,
             description = "CRL reason\n"
-                    + "required")
+                    + "(required)")
     private String reason;
 
     @Option(name = "-invDate",

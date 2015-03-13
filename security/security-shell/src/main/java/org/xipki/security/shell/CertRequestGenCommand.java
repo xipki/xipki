@@ -75,43 +75,43 @@ public abstract class CertRequestGenCommand extends SecurityCommand
     @Option(name = "-out",
             required = true,
             description = "output file name\n"
-                    + "required")
+                    + "(required)")
     private String outputFilename;
 
     @Option(name = "-keyusage",
             multiValued = true,
             description = "keyusage\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     private List<String> keyusages;
 
     @Option(name = "-extKeyusage",
             multiValued = true,
             description = "extended keyusage\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     private List<String> extkeyusages;
 
     @Option(name = "-subjectAltName",
             multiValued = true,
             description = "subjectAltName\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     private List<String> subjectAltNames;
 
     @Option(name = "-subjectInfoAccess",
             multiValued = true,
             description = "subjectInfoAccess\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     private List<String> subjectInfoAccesses;
 
     @Option(name = "-needExtension",
             multiValued = true,
             description = "types of extension that must be contaied in the certificate\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     private List<String> needExtensionTypes;
 
     @Option(name = "-wantExtension",
             multiValued = true,
             description = "types of extension that should be contaied in the certificate if possible\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     private List<String> wantExtensionTypes;
 
     protected abstract ConcurrentContentSigner getSigner(String hashAlgo)

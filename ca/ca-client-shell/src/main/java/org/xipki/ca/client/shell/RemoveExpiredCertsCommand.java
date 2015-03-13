@@ -51,13 +51,13 @@ public class RemoveExpiredCertsCommand extends ClientCommand
 {
     @Option(name = "-ca",
             description = "CA name\n"
-                    + "required if multiple CAs are configured")
+                    + "(required if multiple CAs are configured)")
     private String caName;
 
     @Option(name = "-profile",
             required = true,
             description = "certificate profile\n"
-                    + "required")
+                    + "(required)")
     private String profile;
 
     @Option(name = "-user",

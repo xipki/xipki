@@ -55,7 +55,8 @@ public class FileListCommand extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "file",
             required = true,
-            description = "file or directory")
+            description = "file or directory\n"
+                    + "(required)")
     private String targetPath;
 
     @Override

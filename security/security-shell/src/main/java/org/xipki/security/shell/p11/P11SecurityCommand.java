@@ -50,7 +50,7 @@ public abstract class P11SecurityCommand extends SecurityCommand
     @Option(name = "-slot",
             required = true,
             description = "slot index\n"
-                    + "required")
+                    + "(required)")
     protected Integer slotIndex;
 
     @Option(name = "-key-id",
