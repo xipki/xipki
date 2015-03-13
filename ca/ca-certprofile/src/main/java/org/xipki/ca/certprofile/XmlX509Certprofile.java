@@ -36,6 +36,7 @@
 package org.xipki.ca.certprofile;
 
 import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -69,8 +70,8 @@ import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.DirectoryStringType;
 import org.xipki.ca.api.profile.ExtensionControl;
-import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.ExtensionValue;
+import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.RDNControl;
@@ -198,7 +199,16 @@ public class XmlX509Certprofile extends BaseX509Certprofile
 
         try
         {
-            X509ProfileType conf = XmlX509CertprofileUtil.parse(new ByteArrayInputStream(data.getBytes()));
+            byte[] bytes;
+            try
+            {
+                bytes = data.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e)
+            {
+                bytes = data.getBytes();
+            }
+
+            X509ProfileType conf = XmlX509CertprofileUtil.parse(new ByteArrayInputStream(bytes));
 
             if(conf.getVersion() != null)
             {
