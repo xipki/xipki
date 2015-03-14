@@ -46,18 +46,16 @@ public class CustomObjectIdentifiers
 {
     private static final ASN1ObjectIdentifier id_private_dummy = new ASN1ObjectIdentifier("1.2.3.4.5.6");
 
-    private static final ASN1ObjectIdentifier id_ext                      = id_private_dummy.branch("1");
-    private static final ASN1ObjectIdentifier id_cmp                      = id_private_dummy.branch("2");
-    private static final ASN1ObjectIdentifier id_remotep11                = id_private_dummy.branch("3");
+    private static final ASN1ObjectIdentifier id_ext                       = id_private_dummy.branch("1");
+    public static final ASN1ObjectIdentifier id_ext_crl_certset            = id_ext.branch("1");
+    public static final ASN1ObjectIdentifier id_ext_cmp_request_extensions = id_ext.branch("2");
 
-    public static final ASN1ObjectIdentifier id_ext_crl_certset           = id_ext.branch("1");
-
-    public static final ASN1ObjectIdentifier id_cmp_generateCRL           = id_cmp.branch("1");
-    public static final ASN1ObjectIdentifier id_cmp_request_extensions    = id_cmp.branch("2");
-
-    public static final ASN1ObjectIdentifier id_cmp_getSystemInfo         = id_cmp.branch("3");
-    public static final ASN1ObjectIdentifier id_cmp_removeExpiredCerts    = id_cmp.branch("4");
-
+    public static final ASN1ObjectIdentifier id_cmp                       = id_private_dummy.branch("2");
+    /*public static final ASN1ObjectIdentifier id_cmp_generateCRL            = id_cmp.branch("1");
+    public static final ASN1ObjectIdentifier id_cmp_getSystemInfo          = id_cmp.branch("2");
+    public static final ASN1ObjectIdentifier id_cmp_removeExpiredCerts     = id_cmp.branch("3");
+    */
+    private static final ASN1ObjectIdentifier id_remotep11                 = id_cmp.branch("4");
     public static final ASN1ObjectIdentifier id_remotep11_version         = id_remotep11.branch("1");
     public static final ASN1ObjectIdentifier id_remotep11_pso_rsa_x509    = id_remotep11.branch("2");
     public static final ASN1ObjectIdentifier id_remotep11_pso_rsa_pkcs    = id_remotep11.branch("3");
