@@ -55,6 +55,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Enumerated;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -133,6 +134,7 @@ import org.xipki.common.CRLReason;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.HealthCheckResult;
+import org.xipki.common.XipkiCmpAction;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.SecurityUtil;
@@ -163,9 +165,7 @@ class X509CACmpResponder extends CmpResponder
     static
     {
         knownGenMsgIds.add(CMPObjectIdentifiers.it_currentCRL.getId());
-        knownGenMsgIds.add(CustomObjectIdentifiers.id_cmp_generateCRL.getId());
-        knownGenMsgIds.add(CustomObjectIdentifiers.id_cmp_getSystemInfo.getId());
-        knownGenMsgIds.add(CustomObjectIdentifiers.id_cmp_removeExpiredCerts.getId());
+        knownGenMsgIds.add(CustomObjectIdentifiers.id_cmp.getId());
     }
 
     public X509CACmpResponder(CAManagerImpl caManager, String caName)
@@ -471,8 +471,8 @@ class X509CACmpResponder extends CmpResponder
                             if(CMPObjectIdentifiers.it_currentCRL.equals(infoType))
                             {
                                 eventType = "CRL_DOWNLOAD";
-                                CertificateList crl;
                                 checkPermission(_requestor, Permission.GET_CRL);
+                                CertificateList crl = ca.getCurrentCRL();
 
                                 if(itv.getInfoValue() == null)
                                 { // as defined in RFC 4210
@@ -488,66 +488,115 @@ class X509CACmpResponder extends CmpResponder
                                 if(crl == null)
                                 {
                                     statusMessage = "No CRL is available";
-                                    failureInfo = PKIFailureInfo.badRequest;
                                 }
                                 else
                                 {
                                     itvResp = new InfoTypeAndValue(infoType, crl);
                                 }
                             }
-                            else if(CustomObjectIdentifiers.id_cmp_generateCRL.equals(infoType))
+                            else if(CustomObjectIdentifiers.id_cmp.equals(infoType))
                             {
-                                eventType = "CRL_GEN_ONDEMAND";
-
-                                checkPermission(_requestor, Permission.GEN_CRL);
-                                X509CRL _crl = ca.generateCRLonDemand(auditEvent);
-                                if(_crl == null)
-                                {
-                                    statusMessage = "CRL generation is not activated";
-                                    failureInfo = PKIFailureInfo.badRequest;
-                                }
-                                else
-                                {
-                                    CertificateList crl = CertificateList.getInstance(_crl.getEncoded());
-                                    itvResp = new InfoTypeAndValue(infoType, crl);
-                                }
-                            }
-                            else if(CustomObjectIdentifiers.id_cmp_getSystemInfo.equals(infoType))
-                            {
-                                eventType = "GET_SYSTEMINFO";
                                 ASN1Encodable asn1 = itv.getInfoValue();
+                                ASN1Integer asn1Code = null;
+                                ASN1Encodable reqValue = null;
 
-                                Set<Integer> acceptVersions = new HashSet<>();
-                                if(asn1 != null)
+                                try
                                 {
-                                    ASN1Sequence seq = DERSequence.getInstance(asn1);
-                                    int size = seq.size();
-                                    for(int i = 0; i < size; i++)
+                                    ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
+                                    asn1Code = ASN1Integer.getInstance(seq.getObjectAt(0));
+                                    if(seq.size() > 1)
                                     {
-                                        ASN1Integer a = ASN1Integer.getInstance(seq.getObjectAt(i));
-                                        acceptVersions.add(a.getPositiveValue().intValue());
+                                        reqValue = seq.getObjectAt(1);
+                                    }
+                                }catch(IllegalArgumentException e)
+                                {
+                                    statusMessage = "Invalid value of the InfoTypeAndValue for " +
+                                            CustomObjectIdentifiers.id_cmp.getId();
+                                }
+
+                                if(statusMessage == null)
+                                {
+                                    int intCode = asn1Code.getPositiveValue().intValue();
+                                    XipkiCmpAction action = XipkiCmpAction.getInstanceForCode(intCode);
+                                    ASN1Encodable respValue = null;
+
+                                    if(action == null)
+                                    {
+                                        statusMessage = "Invalid XiPKI action code '" + intCode + "'";
+                                    }
+                                    else if(XipkiCmpAction.GEN_CRL == action)
+                                    {
+                                        eventType = "CRL_GEN_ONDEMAND";
+                                        checkPermission(_requestor, Permission.GEN_CRL);
+                                        X509CRL _crl = ca.generateCRLonDemand(auditEvent);
+                                        if(_crl == null)
+                                        {
+                                            statusMessage = "CRL generation is not activated";
+                                        }
+                                        else
+                                        {
+                                            respValue = CertificateList.getInstance(_crl.getEncoded());
+                                        }
+                                    }
+                                    else if(XipkiCmpAction.GET_CRL == action)
+                                    {
+                                        eventType = "CRL_DOWNLOAD";
+                                        checkPermission(_requestor, Permission.GET_CRL);
+
+                                        ASN1Integer crlNumber = ASN1Integer.getInstance(reqValue);
+                                        respValue = ca.getCRL(crlNumber.getPositiveValue());
+                                        if(respValue == null)
+                                        {
+                                            statusMessage = "No CRL is available";
+                                        }
+                                    }
+                                    else if(XipkiCmpAction.GET_CAINFO == action)
+                                    {
+                                        eventType = "GET_SYSTEMINFO";
+
+                                        Set<Integer> acceptVersions = new HashSet<>();
+                                        if(reqValue != null)
+                                        {
+                                            ASN1Sequence seq = DERSequence.getInstance(reqValue);
+                                            int size = seq.size();
+                                            for(int i = 0; i < size; i++)
+                                            {
+                                                ASN1Integer a = ASN1Integer.getInstance(seq.getObjectAt(i));
+                                                acceptVersions.add(a.getPositiveValue().intValue());
+                                            }
+                                        }
+
+                                        if(CollectionUtil.isEmpty(acceptVersions))
+                                        {
+                                            acceptVersions.add(1);
+                                        }
+
+                                        String systemInfo = getSystemInfo(_requestor, acceptVersions);
+                                        respValue = new DERUTF8String(systemInfo);
+                                    }
+                                    else if(XipkiCmpAction.REMOVE_EXPIRED_CERTS == action)
+                                    {
+                                        checkPermission(_requestor, Permission.REMOVE_CERT);
+
+                                        String info = removeExpiredCerts(_requestor, itv.getInfoValue());
+                                        respValue = new DERUTF8String(info);
+                                    }
+                                    else
+                                    {
+                                        statusMessage = "Unsupported XiPKI action code '" + intCode + "'";
+                                    }
+
+                                    if(statusMessage == null)
+                                    {
+                                        ASN1EncodableVector v = new ASN1EncodableVector();
+                                        v.add(asn1Code);
+                                        if(respValue != null)
+                                        {
+                                            v.add(respValue);
+                                        }
+                                        itvResp = new InfoTypeAndValue(infoType, new DERSequence(v));
                                     }
                                 }
-
-                                if(CollectionUtil.isEmpty(acceptVersions))
-                                {
-                                    acceptVersions.add(1);
-                                }
-
-                                String systemInfo = getSystemInfo(_requestor, acceptVersions);
-                                itvResp = new InfoTypeAndValue(infoType, new DERUTF8String(systemInfo));
-                            }
-                            else if(CustomObjectIdentifiers.id_cmp_removeExpiredCerts.equals(infoType))
-                            {
-                                eventType = "REMOVE_EXIPIRED_CERTS_TRIGGER";
-                                checkPermission(_requestor, Permission.REMOVE_CERT);
-
-                                String info = removeExpiredCerts(_requestor, itv.getInfoValue());
-                                itvResp = new InfoTypeAndValue(infoType, new DERUTF8String(info));
-                            }
-                            else
-                            {
-                                throw new RuntimeException("should not reach here");
                             }
 
                             if(itvResp != null)
