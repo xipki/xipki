@@ -44,10 +44,14 @@ import java.util.List;
 import java.util.Random;
 
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.cmp.ErrorMsgContent;
 import org.bouncycastle.asn1.cmp.GenMsgContent;
 import org.bouncycastle.asn1.cmp.GenRepContent;
@@ -73,9 +77,11 @@ import org.xipki.ca.common.cmp.PKIResponse;
 import org.xipki.ca.common.cmp.ProtectionResult;
 import org.xipki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
+import org.xipki.common.XipkiCmpAction;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
@@ -288,6 +294,49 @@ public abstract class CmpRequestor
         return extractGeneralRepContent(response, exepectedType, true);
     }
 
+    protected ASN1Encodable extractXipkiActionRepContent(PKIResponse response, XipkiCmpAction action)
+    throws CmpRequestorException
+    {
+        ASN1Encodable itvValue = extractGeneralRepContent(response, CustomObjectIdentifiers.id_cmp.getId(), true);
+        return extractXipkiActionContent(itvValue, action);
+    }
+
+    protected ASN1Encodable extractXipkiActionContent(ASN1Encodable itvValue, XipkiCmpAction action)
+    throws CmpRequestorException
+    {
+        ASN1Sequence seq;
+        try
+        {
+            seq = ASN1Sequence.getInstance(itvValue);
+        }catch(IllegalArgumentException e)
+        {
+            throw new CmpRequestorException("Invalid syntax of the response");
+        }
+        int n = seq.size();
+        if(n != 1 && n != 2)
+        {
+            throw new CmpRequestorException("Invalid syntax of the response");
+        }
+
+        int _actionCode;
+        try
+        {
+            ASN1Integer _action = ASN1Integer.getInstance(seq.getObjectAt(0));
+            _actionCode = _action.getPositiveValue().intValue();
+        }catch(IllegalArgumentException e)
+        {
+            throw new CmpRequestorException("Invalid syntax of the response");
+        }
+
+        if(action.getCode() != _actionCode)
+        {
+            throw new CmpRequestorException("Received XiPKI action '" + _actionCode +
+                    "' instead the exceptected '" + action.getCode()  + "'");
+        }
+
+        return (n == 1) ? null : seq.getObjectAt(1);
+    }
+
     private ASN1Encodable extractGeneralRepContent(PKIResponse response, String exepectedType, boolean requireProtectionCheck)
     throws CmpRequestorException
     {
@@ -456,6 +505,25 @@ public abstract class CmpRequestor
         boolean signatureValid = pMsg.verify(verifierProvider);
         return new ProtectionVerificationResult(cert,
                 signatureValid ? ProtectionResult.VALID : ProtectionResult.INVALID);
+    }
+
+    protected PKIMessage buildMessageWithXipkAction(XipkiCmpAction action, ASN1Encodable value)
+    throws CmpRequestorException
+    {
+        PKIHeader header = buildPKIHeader(null);
+
+        ASN1EncodableVector v = new ASN1EncodableVector();
+        v.add(new ASN1Integer(action.getCode()));
+        if(value != null)
+        {
+            v.add(value);
+        }
+        InfoTypeAndValue itv = new InfoTypeAndValue(CustomObjectIdentifiers.id_cmp, new DERSequence(v));
+        GenMsgContent genMsgContent = new GenMsgContent(itv);
+        PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
+
+        PKIMessage pkiMessage = new PKIMessage(header, body);
+        return pkiMessage;
     }
 
     protected PKIMessage buildMessageWithGeneralMsgContent(ASN1ObjectIdentifier type, ASN1Encodable value)

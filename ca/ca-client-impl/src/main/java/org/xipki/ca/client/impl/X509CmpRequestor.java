@@ -130,6 +130,7 @@ import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.XipkiCmpAction;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
@@ -188,10 +189,10 @@ abstract class X509CmpRequestor extends CmpRequestor
     public CmpResultType generateCRL(RequestResponseDebug debug)
     throws CmpRequestorException
     {
-        ASN1ObjectIdentifier type = CustomObjectIdentifiers.id_cmp_generateCRL;
-        PKIMessage request = buildMessageWithGeneralMsgContent(type, null);
+        XipkiCmpAction action = XipkiCmpAction.GEN_CRL;
+        PKIMessage request = buildMessageWithXipkAction(action, null);
         PKIResponse response = signAndSend(request, debug);
-        return evaluateCRLResponse(response, type);
+        return evaluateCRLResponse(response, action);
     }
 
     public CmpResultType downloadCurrentCRL(RequestResponseDebug debug)
@@ -203,19 +204,24 @@ abstract class X509CmpRequestor extends CmpRequestor
     public CmpResultType downloadCRL(BigInteger crlNumber, RequestResponseDebug debug)
     throws CmpRequestorException
     {
-        ASN1ObjectIdentifier type = CMPObjectIdentifiers.it_currentCRL;
-
-        ASN1Integer value = null;
-        if(crlNumber != null)
+        XipkiCmpAction action = null;
+        PKIMessage request;
+        if(crlNumber == null)
         {
-            value = new ASN1Integer(crlNumber);
+            ASN1ObjectIdentifier type = CMPObjectIdentifiers.it_currentCRL;
+            request = buildMessageWithGeneralMsgContent(type, null);
         }
-        PKIMessage request = buildMessageWithGeneralMsgContent(type, value);
+        else
+        {
+            action = XipkiCmpAction.GET_CRL;
+            request = buildMessageWithXipkAction(action, new ASN1Integer(crlNumber));
+        }
+
         PKIResponse response = signAndSend(request, debug);
-        return evaluateCRLResponse(response, type);
+        return evaluateCRLResponse(response, action);
     }
 
-    private CmpResultType evaluateCRLResponse(PKIResponse response, ASN1ObjectIdentifier exepectedType)
+    private CmpResultType evaluateCRLResponse(PKIResponse response, XipkiCmpAction xipkiAction)
     throws CmpRequestorException
     {
         ErrorResultType errorResult = checkAndBuildErrorResultIfRequired(response);
@@ -239,28 +245,41 @@ abstract class X509CmpRequestor extends CmpRequestor
                     PKIBody.TYPE_ERROR + "]");
         }
 
+        ASN1ObjectIdentifier expectedType = xipkiAction == null ?
+                CMPObjectIdentifiers.it_currentCRL : CustomObjectIdentifiers.id_cmp;
+
         GenRepContent genRep = (GenRepContent) respBody.getContent();
 
         InfoTypeAndValue[] itvs = genRep.toInfoTypeAndValueArray();
-        InfoTypeAndValue itvCurrentCRL = null;
+        InfoTypeAndValue itv = null;
         if(itvs != null && itvs.length > 0)
         {
-            for(InfoTypeAndValue itv : itvs)
+            for(InfoTypeAndValue m : itvs)
             {
-                if(exepectedType.equals(itv.getInfoType()))
+                if(expectedType.equals(m.getInfoType()))
                 {
-                    itvCurrentCRL = itv;
+                    itv = m;
                     break;
                 }
             }
         }
-        if(itvCurrentCRL == null)
+        if(itv == null)
         {
             throw new CmpRequestorException("The response does not contain InfoTypeAndValue "
-                    + exepectedType);
+                    + expectedType);
         }
 
-        CertificateList certList = CertificateList.getInstance(itvCurrentCRL.getInfoValue());
+        ASN1Encodable certListAsn1Object;
+        if(xipkiAction == null)
+        {
+            certListAsn1Object = itv.getInfoValue();
+        }
+        else
+        {
+            certListAsn1Object = extractXipkiActionContent(itv.getInfoValue(), xipkiAction);
+        }
+
+        CertificateList certList = CertificateList.getInstance(certListAsn1Object);
 
         X509CRL crl;
         try
@@ -771,10 +790,11 @@ abstract class X509CmpRequestor extends CmpRequestor
         ASN1EncodableVector v = new ASN1EncodableVector();
         v.add(new ASN1Integer(2));
         ASN1Sequence acceptVersions = new DERSequence(v);
-        PKIMessage request = buildMessageWithGeneralMsgContent(
-                CustomObjectIdentifiers.id_cmp_getSystemInfo, acceptVersions);
+
+        XipkiCmpAction action = XipkiCmpAction.GET_CAINFO;
+        PKIMessage request = buildMessageWithXipkAction(action, acceptVersions);
         PKIResponse response = signAndSend(request, debug);
-        ASN1Encodable itvValue = extractGeneralRepContent(response, CustomObjectIdentifiers.id_cmp_getSystemInfo.getId());
+        ASN1Encodable itvValue = extractXipkiActionRepContent(response, action);
         DERUTF8String utf8Str = DERUTF8String.getInstance(itvValue);
         String systemInfoStr = utf8Str.getString();
 
@@ -879,11 +899,10 @@ abstract class X509CmpRequestor extends CmpRequestor
         sb.append("</removeExpiredCertsReq>");
 
         String requestInfo = sb.toString();
-        PKIMessage request = buildMessageWithGeneralMsgContent(
-                CustomObjectIdentifiers.id_cmp_removeExpiredCerts,
-                new DERUTF8String(requestInfo));
+        XipkiCmpAction action = XipkiCmpAction.REMOVE_EXPIRED_CERTS;
+        PKIMessage request = buildMessageWithXipkAction(action, new DERUTF8String(requestInfo));
         PKIResponse response = signAndSend(request, debug);
-        ASN1Encodable itvValue = extractGeneralRepContent(response, CustomObjectIdentifiers.id_cmp_removeExpiredCerts.getId());
+        ASN1Encodable itvValue = extractXipkiActionRepContent(response, action);
         DERUTF8String utf8Str = DERUTF8String.getInstance(itvValue);
         String resultInfoStr = utf8Str.getString();
 
