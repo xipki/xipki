@@ -101,14 +101,16 @@ class CmpResponder
         }
         String tidStr = Hex.toHexString(tid.getOctets());
 
-        PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
+        PKIHeaderBuilder respHeaderBuilder = new PKIHeaderBuilder(
                 reqHeader.getPvno().getValue().intValue(),
                 sender,
                 reqHeader.getSender());
-        respHeader.setTransactionID(tid);
+        respHeaderBuilder.setTransactionID(tid);
 
         PKIBody reqBody = message.getBody();
         final int type = reqBody.getType();
+
+        PKIHeader respHeader = respHeaderBuilder.build();
 
         if(type != PKIBody.TYPE_GEN_MSG)
         {
@@ -119,7 +121,7 @@ class CmpResponder
 
             PKIBody respBody = new PKIBody(PKIBody.TYPE_ERROR, emc);
 
-            return new PKIMessage(respHeader.build(), respBody);
+            return new PKIMessage(respHeader, respBody);
         }
 
         GenMsgContent genMsgBody = (GenMsgContent) reqBody.getContent();
@@ -139,185 +141,187 @@ class CmpResponder
             }
         }
 
-        PKIStatus status = PKIStatus.rejection;
-        String statusMessage = null;
-        int failureInfo = PKIFailureInfo.badRequest;
-
-        PKIBody respBody = null;
-
         if(itv == null)
         {
-            statusMessage = String.format("PKIBody type %s is only supported with the sub-knownTypes",
+            final String statusMessage = String.format("PKIBody type %s is only supported with the sub-knownTypes",
                     XipkiCmpConstants.id_xipki_cmp.getId());
-            failureInfo = PKIFailureInfo.badRequest;
+            return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, statusMessage);
         }
-        else
+
+        try
         {
+            ASN1Encodable asn1 = itv.getInfoValue();
+            ASN1Integer asn1Code = null;
+            ASN1Encodable reqValue = null;
+
             try
             {
-                ASN1Encodable asn1 = itv.getInfoValue();
-                ASN1Integer asn1Code = null;
-                ASN1Encodable reqValue = null;
-
-                try
+                ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
+                asn1Code = ASN1Integer.getInstance(seq.getObjectAt(0));
+                if(seq.size() > 1)
                 {
-                    ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
-                    asn1Code = ASN1Integer.getInstance(seq.getObjectAt(0));
-                    if(seq.size() > 1)
-                    {
-                        reqValue = seq.getObjectAt(1);
-                    }
-                }catch(IllegalArgumentException e)
-                {
-                    statusMessage = "Invalid value of the InfoTypeAndValue for " +
-                            XipkiCmpConstants.id_xipki_cmp.getId();
+                    reqValue = seq.getObjectAt(1);
                 }
+            }catch(IllegalArgumentException e)
+            {
+                final String statusMessage = "Invalid value of the InfoTypeAndValue for " +
+                        XipkiCmpConstants.id_xipki_cmp.getId();
+                return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, statusMessage);
+            }
 
-                if(statusMessage == null)
+            int action = asn1Code.getPositiveValue().intValue();
+            ASN1Encodable respItvInfoValue;
+
+            P11CryptService p11CryptService = localP11CryptServicePool.getP11CryptService(moduleName);
+
+            switch(action)
+            {
+                case XipkiCmpConstants.ACTION_REMOTEP11_VERSION:
                 {
-                    int action = asn1Code.getPositiveValue().intValue();
-                    ASN1Encodable respItvInfoValue = null;
-
-                    P11CryptService p11CryptService = localP11CryptServicePool.getP11CryptService(moduleName);
-
-                    switch(action)
+                    respItvInfoValue = new ASN1Integer(localP11CryptServicePool.getVersion());
+                    break;
+                }
+                case XipkiCmpConstants.ACTION_REMOTEP11_PSO_DSA:
+                case XipkiCmpConstants.ACTION_REMOTEP11_PSO_ECDSA:
+                case XipkiCmpConstants.ACTION_REMOTEP11_PSO_RSA_PKCS:
+                case XipkiCmpConstants.ACTION_REMOTEP11_PSO_RSA_X509:
+                {
+                    byte[] psoMessage = null;
+                    P11SlotIdentifier slot = null;
+                    P11KeyIdentifier keyId = null;
                     {
-                    case XipkiCmpConstants.ACTION_REMOTEP11_VERSION:
-                    {
-                        respItvInfoValue = new ASN1Integer(localP11CryptServicePool.getVersion());
-                        break;
+                        try
+                        {
+                            PSOTemplate psoTemplate = PSOTemplate.getInstance(reqValue);
+                            psoMessage = psoTemplate.getMessage();
+                            SlotAndKeyIdentifer slotAndKeyIdentifier = psoTemplate.getSlotAndKeyIdentifer();
+                            slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
+                            KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
+                            keyId = keyIdentifier.getKeyId();
+                        }catch(IllegalArgumentException e)
+                        {
+                            final String statusMessage = "invalid PSOTemplate";
+                            return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, statusMessage);
+                        }
                     }
-                    case XipkiCmpConstants.ACTION_REMOTEP11_PSO_DSA:
-                    case XipkiCmpConstants.ACTION_REMOTEP11_PSO_ECDSA:
-                    case XipkiCmpConstants.ACTION_REMOTEP11_PSO_RSA_PKCS:
-                    case XipkiCmpConstants.ACTION_REMOTEP11_PSO_RSA_X509:
+
+                    byte[] signature;
+
+                    if(XipkiCmpConstants.ACTION_REMOTEP11_PSO_ECDSA == action)
                     {
-                        PSOTemplate psoTemplate = PSOTemplate.getInstance(reqValue);
-                        byte[] psoMessage = psoTemplate.getMessage();
-                        SlotAndKeyIdentifer slotAndKeyIdentifier = psoTemplate.getSlotAndKeyIdentifer();
-                        P11SlotIdentifier slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
-                        KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
-
-                        P11KeyIdentifier keyId = keyIdentifier.getKeyId();
-
-                        byte[] signature;
-
-                        if(XipkiCmpConstants.ACTION_REMOTEP11_PSO_ECDSA == action)
-                        {
-                            signature = p11CryptService.CKM_ECDSA(psoMessage, slot, keyId);
-                        }
-                        else if(XipkiCmpConstants.ACTION_REMOTEP11_PSO_DSA == action)
-                        {
-                            signature = p11CryptService.CKM_DSA(psoMessage, slot, keyId);
-                        }
-                        else if(XipkiCmpConstants.ACTION_REMOTEP11_PSO_RSA_X509 == action)
-                        {
-                            signature = p11CryptService.CKM_RSA_X509(psoMessage, slot, keyId);
-                        }
-                        else if(XipkiCmpConstants.ACTION_REMOTEP11_PSO_RSA_PKCS == action)
-                        {
-                            signature = p11CryptService.CKM_RSA_PKCS(psoMessage, slot, keyId);
-                        }
-                        else
-                        {
-                            throw new RuntimeException("should not reach here");
-                        }
-
-                        respItvInfoValue = new DEROctetString(signature);
-                        break;
+                        signature = p11CryptService.CKM_ECDSA(psoMessage, slot, keyId);
                     }
-                    case XipkiCmpConstants.ACTION_REMOTEP11_GET_CERTIFICATE:
-                    case XipkiCmpConstants.ACTION_REMOTEP11_GET_PUBLICKEY:
+                    else if(XipkiCmpConstants.ACTION_REMOTEP11_PSO_DSA == action)
+                    {
+                        signature = p11CryptService.CKM_DSA(psoMessage, slot, keyId);
+                    }
+                    else if(XipkiCmpConstants.ACTION_REMOTEP11_PSO_RSA_X509 == action)
+                    {
+                        signature = p11CryptService.CKM_RSA_X509(psoMessage, slot, keyId);
+                    }
+                    else if(XipkiCmpConstants.ACTION_REMOTEP11_PSO_RSA_PKCS == action)
+                    {
+                        signature = p11CryptService.CKM_RSA_PKCS(psoMessage, slot, keyId);
+                    }
+                    else
+                    {
+                        throw new RuntimeException("should not reach here");
+                    }
+
+                    respItvInfoValue = new DEROctetString(signature);
+                    break;
+                }
+                case XipkiCmpConstants.ACTION_REMOTEP11_GET_CERTIFICATE:
+                case XipkiCmpConstants.ACTION_REMOTEP11_GET_PUBLICKEY:
+                {
+                    P11SlotIdentifier slot = null;
+                    P11KeyIdentifier keyId = null;
+                    try
                     {
                         SlotAndKeyIdentifer slotAndKeyIdentifier = SlotAndKeyIdentifer.getInstance(reqValue);
-                        P11SlotIdentifier slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
+                        slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
                         KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
-
-                        P11KeyIdentifier keyId = keyIdentifier.getKeyId();
-
-                        byte[] encodeCertOrKey;
-                        if(XipkiCmpConstants.ACTION_REMOTEP11_GET_CERTIFICATE == action)
-                        {
-                            encodeCertOrKey = p11CryptService.getCertificate(slot, keyId).getEncoded();
-                        }
-                        else if(XipkiCmpConstants.ACTION_REMOTEP11_GET_PUBLICKEY== action)
-                        {
-                            encodeCertOrKey = p11CryptService.getPublicKey(slot, keyId).getEncoded();
-                        }
-                        else
-                        {
-                            throw new RuntimeException("should not reach here");
-                        }
-
-                        respItvInfoValue = new DEROctetString(encodeCertOrKey);
-                        break;
-                    }
-                    case XipkiCmpConstants.ACTION_REMOTEP11_LIST_SLOTS:
+                        keyId = keyIdentifier.getKeyId();
+                    } catch(IllegalArgumentException e)
                     {
-                        P11SlotIdentifier[] slotIds = p11CryptService.getSlotIdentifiers();
-
-                        ASN1EncodableVector vector = new ASN1EncodableVector();
-                        for(P11SlotIdentifier slotId : slotIds)
-                        {
-                            vector.add(new SlotIdentifier(slotId));
-                        }
-                        respItvInfoValue = new DERSequence(vector);
-                        break;
-                    }
-                    case XipkiCmpConstants.ACTION_REMOTEP11_LIST_KEYLABELS:
-                    {
-                        SlotIdentifier slotId = SlotIdentifier.getInstance(reqValue);
-                        String[] keyLabels = p11CryptService.getKeyLabels(slotId.getSlotId());
-
-                        ASN1EncodableVector vector = new ASN1EncodableVector();
-                        for(String keyLabel : keyLabels)
-                        {
-                            vector.add(new DERUTF8String(keyLabel));
-                        }
-                        respItvInfoValue = new DERSequence(vector);
-                        break;
-                    }
-                    default:
-                    {
-                        statusMessage = "Unsupported XiPKI action code '" + action + "'";
-                        break;
-                    }
+                        final String statusMessage = "invalid SlotAndKeyIdentifier";
+                        return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, statusMessage);
                     }
 
-                    if(statusMessage == null)
+                    byte[] encodeCertOrKey;
+                    if(XipkiCmpConstants.ACTION_REMOTEP11_GET_CERTIFICATE == action)
                     {
-                        status = PKIStatus.granted;
-                        ASN1EncodableVector v = new ASN1EncodableVector();
-                        v.add(new ASN1Integer(action));
-                        if(respItvInfoValue != null)
-                        {
-                            v.add(respItvInfoValue);
-                        }
-                        InfoTypeAndValue respItv = new InfoTypeAndValue(XipkiCmpConstants.id_xipki_cmp,
-                                new DERSequence(v));
-                        GenRepContent genRepContent = new GenRepContent(respItv);
-                        respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
+                        encodeCertOrKey = p11CryptService.getCertificate(slot, keyId).getEncoded();
                     }
+                    else if(XipkiCmpConstants.ACTION_REMOTEP11_GET_PUBLICKEY== action)
+                    {
+                        encodeCertOrKey = p11CryptService.getPublicKey(slot, keyId).getEncoded();
+                    }
+                    else
+                    {
+                        throw new RuntimeException("should not reach here");
+                    }
+
+                    respItvInfoValue = new DEROctetString(encodeCertOrKey);
+                    break;
                 }
-            } catch (Throwable t)
-            {
-                LOG.error("Error while processing CMP message {}, message: {}", tidStr, t.getMessage());
-                LOG.debug("Error while processing CMP message " + tidStr, t);
-                failureInfo = PKIFailureInfo.systemFailure;
-                statusMessage = t.getMessage();
+                case XipkiCmpConstants.ACTION_REMOTEP11_LIST_SLOTS:
+                {
+                    P11SlotIdentifier[] slotIds = p11CryptService.getSlotIdentifiers();
+
+                    ASN1EncodableVector vector = new ASN1EncodableVector();
+                    for(P11SlotIdentifier slotId : slotIds)
+                    {
+                        vector.add(new SlotIdentifier(slotId));
+                    }
+                    respItvInfoValue = new DERSequence(vector);
+                    break;
+                }
+                case XipkiCmpConstants.ACTION_REMOTEP11_LIST_KEYLABELS:
+                {
+                    SlotIdentifier slotId = SlotIdentifier.getInstance(reqValue);
+                    String[] keyLabels = p11CryptService.getKeyLabels(slotId.getSlotId());
+
+                    ASN1EncodableVector vector = new ASN1EncodableVector();
+                    for(String keyLabel : keyLabels)
+                    {
+                        vector.add(new DERUTF8String(keyLabel));
+                    }
+                    respItvInfoValue = new DERSequence(vector);
+                    break;
+                }
+                default:
+                {
+                    final String statusMessage = "Unsupported XiPKI action code '" + action + "'";
+                    return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, statusMessage);
+                }
             }
-        }
 
-        if(respBody == null)
+            ASN1EncodableVector v = new ASN1EncodableVector();
+            v.add(new ASN1Integer(action));
+            if(respItvInfoValue != null)
+            {
+                v.add(respItvInfoValue);
+            }
+            InfoTypeAndValue respItv = new InfoTypeAndValue(XipkiCmpConstants.id_xipki_cmp,
+                    new DERSequence(v));
+            GenRepContent genRepContent = new GenRepContent(respItv);
+            PKIBody respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
+            return new PKIMessage(respHeader, respBody);
+        } catch (Throwable t)
         {
-            ErrorMsgContent emc = new ErrorMsgContent(
-                new PKIStatusInfo(status,
-                        (statusMessage == null) ? null : new PKIFreeText(statusMessage),
-                        new PKIFailureInfo(failureInfo)));
-            respBody = new PKIBody(PKIBody.TYPE_ERROR, emc);
+            LOG.error("Error while processing CMP message {}, message: {}", tidStr, t.getMessage());
+            LOG.debug("Error while processing CMP message " + tidStr, t);
+            return createRejectionPKIMessage(respHeader, PKIFailureInfo.systemFailure, t.getMessage());
         }
+    }
 
-        return new PKIMessage(respHeader.build(), respBody);
+    private PKIMessage createRejectionPKIMessage(PKIHeader header, int pkiFailureInfo, String statusMessage)
+    {
+        ErrorMsgContent emc = new ErrorMsgContent(
+                new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(statusMessage), new PKIFailureInfo(pkiFailureInfo)));
+        PKIBody respBody = new PKIBody(PKIBody.TYPE_ERROR, emc);
+        return new PKIMessage(header, respBody);
     }
 
     private byte[] randomTransactionId()
