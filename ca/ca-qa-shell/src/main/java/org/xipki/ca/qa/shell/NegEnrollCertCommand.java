@@ -46,7 +46,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
 import org.bouncycastle.operator.ContentSigner;
-import org.xipki.ca.client.api.CertificateOrError;
+import org.xipki.ca.client.api.CertOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
@@ -143,7 +143,7 @@ public abstract class NegEnrollCertCommand extends ClientCommand
         if(result != null)
         {
             String id = result.getAllIds().iterator().next();
-            CertificateOrError certOrError = result.getCertificateOrError(id);
+            CertOrError certOrError = result.getCertificateOrError(id);
             cert = (X509Certificate) certOrError.getCertificate();
         }
 

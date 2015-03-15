@@ -45,7 +45,7 @@ import org.xipki.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class EnrollCertResultType implements CmpResultType
+public class EnrollCertResultType
 {
     private List<CMPCertificate> cACertificates;
     private List<ResultEntryType> resultEntries;

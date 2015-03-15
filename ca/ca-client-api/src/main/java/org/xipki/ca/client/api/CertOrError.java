@@ -33,13 +33,46 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.api.dto;
+package org.xipki.ca.client.api;
+
+import java.security.cert.Certificate;
+
+import org.xipki.ca.common.cmp.PKIStatusInfo;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public interface CmpResultType
+public class CertOrError
 {
+    private final Certificate certificate;
+    private final PKIStatusInfo error;
+
+    public CertOrError(Certificate certificate)
+    {
+        ParamChecker.assertNotNull("certificate", certificate);
+
+        this.certificate = certificate;
+        this.error = null;
+    }
+
+    public CertOrError(PKIStatusInfo error)
+    {
+        ParamChecker.assertNotNull("error", error);
+
+        this.certificate = null;
+        this.error = error;
+    }
+
+    public Certificate getCertificate()
+    {
+        return certificate;
+    }
+
+    public PKIStatusInfo getError()
+    {
+        return error;
+    }
 
 }
