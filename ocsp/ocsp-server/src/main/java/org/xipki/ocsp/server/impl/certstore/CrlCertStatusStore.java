@@ -435,6 +435,12 @@ public class CrlCertStatusStore extends CertStatusStore
             Set<CertWithInfo> certs = new HashSet<>();
             String oidExtnCerts = XipkiCmpConstants.id_ext_crl_certset.getId();
             byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
+            if(extnValue == null)
+            {
+            	// try the legacy OID
+                extnValue = crl.getExtensionValue("1.3.6.1.4.1.12655.100");
+            }
+
             if(extnValue != null)
             {
                 extnValue = removeTagAndLenFromExtensionValue(extnValue);
