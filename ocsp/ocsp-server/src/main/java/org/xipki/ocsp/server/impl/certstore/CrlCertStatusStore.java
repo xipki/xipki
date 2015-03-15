@@ -87,7 +87,7 @@ import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.CustomObjectIdentifiers;
+import org.xipki.common.XipkiCmpConstants;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
 import org.xipki.common.ParamChecker;
@@ -433,7 +433,7 @@ public class CrlCertStatusStore extends CertStatusStore
             // extract the certificate, only in full CRL, not in delta CRL
             boolean certsIncluded = false;
             Set<CertWithInfo> certs = new HashSet<>();
-            String oidExtnCerts = CustomObjectIdentifiers.id_ext_crl_certset.getId();
+            String oidExtnCerts = XipkiCmpConstants.id_ext_crl_certset.getId();
             byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
             if(extnValue != null)
             {

@@ -59,7 +59,7 @@ import org.xipki.ca.client.api.CertificateOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
-import org.xipki.common.CustomObjectIdentifiers;
+import org.xipki.common.XipkiCmpConstants;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.qa.UnexpectedResultException;
@@ -217,7 +217,7 @@ public abstract class EnrollCertCommand extends ClientCommand
             ExtensionExistence ee = new ExtensionExistence(SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
                     SecurityUtil.textToASN1ObjectIdentifers(wantExtensionTypes));
             extensions.add(new Extension(
-                    CustomObjectIdentifiers.id_ext_cmp_request_extensions, false, ee.toASN1Primitive().getEncoded()));
+                    XipkiCmpConstants.id_ext_cmp_request_extensions, false, ee.toASN1Primitive().getEncoded()));
         }
 
         if(isNotEmpty(extensions))

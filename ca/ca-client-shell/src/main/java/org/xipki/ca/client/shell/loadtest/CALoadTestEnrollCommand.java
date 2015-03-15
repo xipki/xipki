@@ -42,6 +42,7 @@ import org.xipki.ca.client.shell.loadtest.KeyEntry.ECKeyEntry;
 import org.xipki.ca.client.shell.loadtest.KeyEntry.RSAKeyEntry;
 import org.xipki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
 import org.xipki.common.AbstractLoadTest;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -84,9 +85,7 @@ public class CALoadTestEnrollCommand extends CALoadTestCommand
     private Integer keysize = 2048;
 
     @Option(name = "-curve",
-            required = true,
-            description = "EC curve name or OID of EC key\n"
-                    + "(required)")
+            description = "EC curve name or OID of EC key")
     private String curveName;
 
     @Option(name = "-n",
@@ -106,6 +105,12 @@ public class CALoadTestEnrollCommand extends CALoadTestCommand
         if(durationInSecond < 1)
         {
             err("invalid duration " + durationInSecond);
+            return null;
+        }
+
+        if("EC".equalsIgnoreCase(keyType) && StringUtil.isBlank(curveName))
+        {
+            err("curveName is not specified");
             return null;
         }
 

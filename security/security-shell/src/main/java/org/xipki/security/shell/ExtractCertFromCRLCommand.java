@@ -49,7 +49,7 @@ import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.common.CustomObjectIdentifiers;
+import org.xipki.common.XipkiCmpConstants;
 import org.xipki.common.util.SecurityUtil;
 
 /**
@@ -77,7 +77,7 @@ public class ExtractCertFromCRLCommand extends SecurityCommand
     throws Exception
     {
         X509CRL crl = SecurityUtil.parseCRL(crlFile);
-        String oidExtnCerts = CustomObjectIdentifiers.id_ext_crl_certset.getId();
+        String oidExtnCerts = XipkiCmpConstants.id_ext_crl_certset.getId();
         byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
         if(extnValue == null)
         {

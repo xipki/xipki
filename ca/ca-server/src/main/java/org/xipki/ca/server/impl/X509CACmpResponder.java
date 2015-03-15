@@ -132,9 +132,8 @@ import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.HealthCheckResult;
-import org.xipki.common.XipkiCmpAction;
+import org.xipki.common.XipkiCmpConstants;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.SecurityUtil;
@@ -165,7 +164,7 @@ class X509CACmpResponder extends CmpResponder
     static
     {
         knownGenMsgIds.add(CMPObjectIdentifiers.it_currentCRL.getId());
-        knownGenMsgIds.add(CustomObjectIdentifiers.id_cmp.getId());
+        knownGenMsgIds.add(XipkiCmpConstants.id_xipki_cmp.getId());
     }
 
     public X509CACmpResponder(CAManagerImpl caManager, String caName)
@@ -494,7 +493,7 @@ class X509CACmpResponder extends CmpResponder
                                     itvResp = new InfoTypeAndValue(infoType, crl);
                                 }
                             }
-                            else if(CustomObjectIdentifiers.id_cmp.equals(infoType))
+                            else if(XipkiCmpConstants.id_xipki_cmp.equals(infoType))
                             {
                                 ASN1Encodable asn1 = itv.getInfoValue();
                                 ASN1Integer asn1Code = null;
@@ -511,21 +510,17 @@ class X509CACmpResponder extends CmpResponder
                                 }catch(IllegalArgumentException e)
                                 {
                                     statusMessage = "Invalid value of the InfoTypeAndValue for " +
-                                            CustomObjectIdentifiers.id_cmp.getId();
+                                            XipkiCmpConstants.id_xipki_cmp.getId();
                                 }
 
                                 if(statusMessage == null)
                                 {
-                                    int intCode = asn1Code.getPositiveValue().intValue();
-                                    XipkiCmpAction action = XipkiCmpAction.getInstanceForCode(intCode);
+                                    int action = asn1Code.getPositiveValue().intValue();
                                     ASN1Encodable respValue = null;
 
-                                    if(action == null)
+                                    switch(action)
                                     {
-                                        statusMessage = "Invalid XiPKI action code '" + intCode + "'";
-                                    }
-                                    else if(XipkiCmpAction.GEN_CRL == action)
-                                    {
+                                    case XipkiCmpConstants.ACTION_GEN_CRL:
                                         eventType = "CRL_GEN_ONDEMAND";
                                         checkPermission(_requestor, Permission.GEN_CRL);
                                         X509CRL _crl = ca.generateCRLonDemand(auditEvent);
@@ -537,9 +532,8 @@ class X509CACmpResponder extends CmpResponder
                                         {
                                             respValue = CertificateList.getInstance(_crl.getEncoded());
                                         }
-                                    }
-                                    else if(XipkiCmpAction.GET_CRL == action)
-                                    {
+                                        break;
+                                    case XipkiCmpConstants.ACTION_GET_CRL:
                                         eventType = "CRL_DOWNLOAD";
                                         checkPermission(_requestor, Permission.GET_CRL);
 
@@ -549,9 +543,8 @@ class X509CACmpResponder extends CmpResponder
                                         {
                                             statusMessage = "No CRL is available";
                                         }
-                                    }
-                                    else if(XipkiCmpAction.GET_CAINFO == action)
-                                    {
+                                        break;
+                                    case XipkiCmpConstants.ACTION_GET_CAINFO:
                                         eventType = "GET_SYSTEMINFO";
 
                                         Set<Integer> acceptVersions = new HashSet<>();
@@ -573,17 +566,16 @@ class X509CACmpResponder extends CmpResponder
 
                                         String systemInfo = getSystemInfo(_requestor, acceptVersions);
                                         respValue = new DERUTF8String(systemInfo);
-                                    }
-                                    else if(XipkiCmpAction.REMOVE_EXPIRED_CERTS == action)
-                                    {
+                                        break;
+                                    case XipkiCmpConstants.ACTION_REMOVE_EXPIRED_CERTS:
                                         checkPermission(_requestor, Permission.REMOVE_CERT);
 
                                         String info = removeExpiredCerts(_requestor, itv.getInfoValue());
                                         respValue = new DERUTF8String(info);
-                                    }
-                                    else
-                                    {
-                                        statusMessage = "Unsupported XiPKI action code '" + intCode + "'";
+                                        break;
+                                    default:
+                                        statusMessage = "Unsupported XiPKI action code '" + action + "'";
+                                        break;
                                     }
 
                                     if(statusMessage == null)
