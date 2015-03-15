@@ -9,7 +9,7 @@ sleep 2000
 # Loadtest Template
 echo "Template enroll load test"
 xipki-cli:loadtest-template-enroll \
-  -template demo/loadtest-template.xml \
+  -template xipki/demo/loadtest-template.xml \
   -duration 10 -thread 8
 
 # Loadtest RSA key
