@@ -44,7 +44,7 @@ import org.xipki.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class RevokeCertResultType implements CmpResultType
+public class RevokeCertResultType
 {
     private List<ResultEntryType> resultEntries;
 

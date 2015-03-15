@@ -47,10 +47,10 @@ public class EnrollCertResult
 {
 
     private final Certificate caCertificate;
-    private final Map<String, CertificateOrError> certificatesOrErrors;
+    private final Map<String, CertOrError> certificatesOrErrors;
 
     public EnrollCertResult(Certificate caCertificate,
-            Map<String, CertificateOrError> certificatesOrErrors)
+            Map<String, CertOrError> certificatesOrErrors)
     {
         this.caCertificate = caCertificate;
         this.certificatesOrErrors = certificatesOrErrors;
@@ -61,7 +61,7 @@ public class EnrollCertResult
         return caCertificate;
     }
 
-    public CertificateOrError getCertificateOrError(String id)
+    public CertOrError getCertificateOrError(String id)
     {
         return certificatesOrErrors.get(id);
     }

@@ -71,7 +71,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.client.api.dto.ErrorResultType;
+import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.common.cmp.PKIResponse;
 import org.xipki.ca.common.cmp.ProtectionResult;
@@ -288,13 +288,13 @@ public abstract class CmpRequestor
     }
 
     protected ASN1Encodable extractGeneralRepContent(PKIResponse response, String exepectedType)
-    throws CmpRequestorException
+    throws CmpRequestorException, PKIErrorException
     {
         return extractGeneralRepContent(response, exepectedType, true);
     }
 
     protected ASN1Encodable extractXipkiActionRepContent(PKIResponse response, int action)
-    throws CmpRequestorException
+    throws CmpRequestorException, PKIErrorException
     {
         ASN1Encodable itvValue = extractGeneralRepContent(response, XipkiCmpConstants.id_xipki_cmp.getId(), true);
         return extractXipkiActionContent(itvValue, action);
@@ -336,16 +336,11 @@ public abstract class CmpRequestor
     }
 
     private ASN1Encodable extractGeneralRepContent(PKIResponse response, String exepectedType, boolean requireProtectionCheck)
-    throws CmpRequestorException
+    throws CmpRequestorException, PKIErrorException
     {
         if(requireProtectionCheck)
         {
-            ErrorResultType errorResult = checkAndBuildErrorResultIfRequired(response);
-            if(errorResult != null)
-            {
-                throw new CmpRequestorException(SecurityUtil.formatPKIStatusInfo(
-                        errorResult.getStatus(), errorResult.getPkiFailureInfo(), errorResult.getStatusMessage()));
-            }
+            checkProtection(response);
         }
 
         PKIBody respBody = response.getPkiMessage().getBody();
@@ -444,11 +439,11 @@ public abstract class CmpRequestor
         return hBuilder.build();
     }
 
-    protected ErrorResultType buildErrorResult(ErrorMsgContent bodyContent)
+    protected PKIErrorException buildErrorResult(ErrorMsgContent bodyContent)
     {
         org.xipki.ca.common.cmp.PKIStatusInfo statusInfo = new org.xipki.ca.common.cmp.PKIStatusInfo(
                 bodyContent.getPKIStatusInfo());
-        return new ErrorResultType(statusInfo.getStatus(), statusInfo.getPkiFailureInfo(), statusInfo.getStatusMessage());
+        return new PKIErrorException(statusInfo.getStatus(), statusInfo.getPkiFailureInfo(), statusInfo.getStatusMessage());
     }
 
     private byte[] randomTransactionId()
@@ -544,24 +539,19 @@ public abstract class CmpRequestor
         return pkiMessage;
     }
 
-    protected ErrorResultType checkAndBuildErrorResultIfRequired(PKIResponse response)
+    protected void checkProtection(PKIResponse response)
+    throws PKIErrorException
     {
         ProtectionVerificationResult protectionVerificationResult = response.getProtectionVerificationResult();
-        if(response.hasProtection() == false)
+        if(response.hasProtection())
         {
-            return null;
+            if(protectionVerificationResult == null ||
+                    protectionVerificationResult.getProtectionResult() != ProtectionResult.VALID)
+            {
+                throw new PKIErrorException(ClientErrorCode.PKIStatus_RESPONSE_ERROR, PKIFailureInfo.badMessageCheck,
+                        "message check of the response failed");
+            }
         }
-
-        boolean accept = protectionVerificationResult != null &&
-                    protectionVerificationResult.getProtectionResult() == ProtectionResult.VALID;
-        if(accept)
-        {
-            return null;
-        }
-
-        return new ErrorResultType(ClientErrorCode.PKIStatus_RESPONSE_ERROR,
-                PKIFailureInfo.badMessageCheck,
-                "message check of the response failed");
     }
 
     public boolean isSendRequestorCert()
