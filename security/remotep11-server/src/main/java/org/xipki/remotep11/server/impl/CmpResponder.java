@@ -42,6 +42,7 @@ import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
@@ -62,7 +63,7 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.CustomObjectIdentifiers;
+import org.xipki.common.XipkiCmpConstants;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11SlotIdentifier;
@@ -79,31 +80,8 @@ class CmpResponder
 {
     private static final Logger LOG = LoggerFactory.getLogger(CmpResponder.class);
 
-    private static final ASN1ObjectIdentifier[] knownTypes = new ASN1ObjectIdentifier[]
-    {
-            CustomObjectIdentifiers.id_remotep11_version,
-            CustomObjectIdentifiers.id_remotep11_pso_ecdsa,
-            CustomObjectIdentifiers.id_remotep11_pso_dsa,
-            CustomObjectIdentifiers.id_remotep11_pso_rsa_x509,
-            CustomObjectIdentifiers.id_remotep11_pso_rsa_pkcs,
-            CustomObjectIdentifiers.id_remotep11_get_certificate,
-            CustomObjectIdentifiers.id_remotep11_get_publickey,
-            CustomObjectIdentifiers.id_remotep11_list_slots,
-            CustomObjectIdentifiers.id_remotep11_list_keylabels};
-
-    private static final String UNKOWNTYPE_MSG = "PKIBody type %s is only supported with the sub-knownTypes " +
-            CustomObjectIdentifiers.id_remotep11_version.getId() + ", " +
-            CustomObjectIdentifiers.id_remotep11_pso_ecdsa.getId() + ", " +
-            CustomObjectIdentifiers.id_remotep11_pso_dsa.getId() + ", " +
-            CustomObjectIdentifiers.id_remotep11_pso_rsa_x509.getId() + ", " +
-            CustomObjectIdentifiers.id_remotep11_pso_rsa_pkcs.getId() + ", " +
-            CustomObjectIdentifiers.id_remotep11_get_certificate.getId() + ", " +
-            CustomObjectIdentifiers.id_remotep11_get_publickey.getId() + ", " +
-            CustomObjectIdentifiers.id_remotep11_list_slots.getId() + " and" +
-            CustomObjectIdentifiers.id_remotep11_list_keylabels.getId();
-
     private final SecureRandom random = new SecureRandom();
-    private final GeneralName sender = CustomObjectIdentifiers.CMP_SERVER;
+    private final GeneralName sender = XipkiCmpConstants.remoteP11_cmp_server;
 
     CmpResponder()
     {
@@ -147,23 +125,15 @@ class CmpResponder
         GenMsgContent genMsgBody = (GenMsgContent) reqBody.getContent();
         InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
 
-        InfoTypeAndValue itvP11 = null;
+        InfoTypeAndValue itv = null;
         if(itvs != null && itvs.length > 0)
         {
-            for(InfoTypeAndValue itv : itvs)
+            for(InfoTypeAndValue m : itvs)
             {
-                ASN1ObjectIdentifier itvType = itv.getInfoType();
-                for(ASN1ObjectIdentifier knownType : knownTypes)
+                ASN1ObjectIdentifier itvType = m.getInfoType();
+                if(XipkiCmpConstants.id_xipki_cmp.equals(itvType))
                 {
-                    if(knownType.equals(itvType))
-                    {
-                        itvP11 = itv;
-                        break;
-                    }
-                }
-
-                if(itvP11 != null)
-                {
+                    itv = m;
                     break;
                 }
             }
@@ -175,113 +145,159 @@ class CmpResponder
 
         PKIBody respBody = null;
 
-        if(itvP11 == null)
+        if(itv == null)
         {
-            statusMessage = String.format(UNKOWNTYPE_MSG, type);
+            statusMessage = String.format("PKIBody type %s is only supported with the sub-knownTypes",
+                    XipkiCmpConstants.id_xipki_cmp.getId());
             failureInfo = PKIFailureInfo.badRequest;
         }
         else
         {
-            P11CryptService p11CryptService = localP11CryptServicePool.getP11CryptService(moduleName);
-
-            ASN1ObjectIdentifier itvType = itvP11.getInfoType();
-
-            ASN1Encodable respItvInfoValue = null;
             try
             {
-                if(CustomObjectIdentifiers.id_remotep11_version.equals(itvType))
+                ASN1Encodable asn1 = itv.getInfoValue();
+                ASN1Integer asn1Code = null;
+                ASN1Encodable reqValue = null;
+
+                try
                 {
-                    respItvInfoValue = new ASN1Integer(localP11CryptServicePool.getVersion());
-                }
-                else if(CustomObjectIdentifiers.id_remotep11_pso_ecdsa.equals(itvType) ||
-                        CustomObjectIdentifiers.id_remotep11_pso_dsa.equals(itvType) ||
-                        CustomObjectIdentifiers.id_remotep11_pso_rsa_x509.equals(itvType) ||
-                        CustomObjectIdentifiers.id_remotep11_pso_rsa_pkcs.equals(itvType))
+                    ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
+                    asn1Code = ASN1Integer.getInstance(seq.getObjectAt(0));
+                    if(seq.size() > 1)
+                    {
+                        reqValue = seq.getObjectAt(1);
+                    }
+                }catch(IllegalArgumentException e)
                 {
-                    PSOTemplate psoTemplate = PSOTemplate.getInstance(itvP11.getInfoValue());
-                    byte[] psoMessage = psoTemplate.getMessage();
-                    SlotAndKeyIdentifer slotAndKeyIdentifier = psoTemplate.getSlotAndKeyIdentifer();
-                    P11SlotIdentifier slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
-                    KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
-
-                    P11KeyIdentifier keyId = keyIdentifier.getKeyId();
-
-                    byte[] signature;
-
-                    if(CustomObjectIdentifiers.id_remotep11_pso_ecdsa.equals(itvType))
-                    {
-                        signature = p11CryptService.CKM_ECDSA(psoMessage, slot, keyId);
-                    }
-                    else if(CustomObjectIdentifiers.id_remotep11_pso_dsa.equals(itvType))
-                    {
-                        signature = p11CryptService.CKM_DSA(psoMessage, slot, keyId);
-                    }
-                    else if(CustomObjectIdentifiers.id_remotep11_pso_rsa_x509.equals(itvType))
-                    {
-                        signature = p11CryptService.CKM_RSA_X509(psoMessage, slot, keyId);
-                    }
-                    else if(CustomObjectIdentifiers.id_remotep11_pso_rsa_pkcs.equals(itvType))
-                    {
-                        signature = p11CryptService.CKM_RSA_PKCS(psoMessage, slot, keyId);
-                    }
-                    else
-                    {
-                        throw new RuntimeException("should not reach here");
-                    }
-
-                    respItvInfoValue = new DEROctetString(signature);
-                }
-                else if(CustomObjectIdentifiers.id_remotep11_get_certificate.equals(itvType) ||
-                        CustomObjectIdentifiers.id_remotep11_get_publickey.equals(itvType))
-                {
-                    SlotAndKeyIdentifer slotAndKeyIdentifier = SlotAndKeyIdentifer.getInstance(itvP11.getInfoValue());
-                    P11SlotIdentifier slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
-                    KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
-
-                    P11KeyIdentifier keyId = keyIdentifier.getKeyId();
-
-                    byte[] encodeCertOrKey;
-                    if(CustomObjectIdentifiers.id_remotep11_get_certificate.equals(itvType))
-                    {
-                        encodeCertOrKey = p11CryptService.getCertificate(slot, keyId).getEncoded();
-                    }
-                    else
-                    {
-                        encodeCertOrKey = p11CryptService.getPublicKey(slot, keyId).getEncoded();
-                    }
-
-                    respItvInfoValue = new DEROctetString(encodeCertOrKey);
-                }
-                else if(CustomObjectIdentifiers.id_remotep11_list_slots.equals(itvType))
-                {
-                    P11SlotIdentifier[] slotIds = p11CryptService.getSlotIdentifiers();
-
-                    ASN1EncodableVector vector = new ASN1EncodableVector();
-                    for(P11SlotIdentifier slotId : slotIds)
-                    {
-                        vector.add(new SlotIdentifier(slotId));
-                    }
-                    respItvInfoValue = new DERSequence(vector);
-                }
-                else if(CustomObjectIdentifiers.id_remotep11_list_keylabels.equals(itvType))
-                {
-                    SlotIdentifier slotId = SlotIdentifier.getInstance(itvP11.getInfoValue());
-                    String[] keyLabels = p11CryptService.getKeyLabels(slotId.getSlotId());
-
-                    ASN1EncodableVector vector = new ASN1EncodableVector();
-                    for(String keyLabel : keyLabels)
-                    {
-                        vector.add(new DERUTF8String(keyLabel));
-                    }
-                    respItvInfoValue = new DERSequence(vector);
+                    statusMessage = "Invalid value of the InfoTypeAndValue for " +
+                            XipkiCmpConstants.id_xipki_cmp.getId();
                 }
 
-                if(respItvInfoValue != null)
+                if(statusMessage == null)
                 {
-                    status = PKIStatus.granted;
-                    InfoTypeAndValue itv = new InfoTypeAndValue(itvType, respItvInfoValue);
-                    GenRepContent genRepContent = new GenRepContent(itv);
-                    respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
+                    int action = asn1Code.getPositiveValue().intValue();
+                    ASN1Encodable respItvInfoValue = null;
+
+                    P11CryptService p11CryptService = localP11CryptServicePool.getP11CryptService(moduleName);
+
+                    switch(action)
+                    {
+                    case XipkiCmpConstants.ACTION_REMOTEP11_VERSION:
+                    {
+                        respItvInfoValue = new ASN1Integer(localP11CryptServicePool.getVersion());
+                        break;
+                    }
+                    case XipkiCmpConstants.ACTION_REMOTEP11_PSO_DSA:
+                    case XipkiCmpConstants.ACTION_REMOTEP11_PSO_ECDSA:
+                    case XipkiCmpConstants.ACTION_REMOTEP11_PSO_RSA_PKCS:
+                    case XipkiCmpConstants.ACTION_REMOTEP11_PSO_RSA_X509:
+                    {
+                        PSOTemplate psoTemplate = PSOTemplate.getInstance(reqValue);
+                        byte[] psoMessage = psoTemplate.getMessage();
+                        SlotAndKeyIdentifer slotAndKeyIdentifier = psoTemplate.getSlotAndKeyIdentifer();
+                        P11SlotIdentifier slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
+                        KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
+
+                        P11KeyIdentifier keyId = keyIdentifier.getKeyId();
+
+                        byte[] signature;
+
+                        if(XipkiCmpConstants.ACTION_REMOTEP11_PSO_ECDSA == action)
+                        {
+                            signature = p11CryptService.CKM_ECDSA(psoMessage, slot, keyId);
+                        }
+                        else if(XipkiCmpConstants.ACTION_REMOTEP11_PSO_DSA == action)
+                        {
+                            signature = p11CryptService.CKM_DSA(psoMessage, slot, keyId);
+                        }
+                        else if(XipkiCmpConstants.ACTION_REMOTEP11_PSO_RSA_X509 == action)
+                        {
+                            signature = p11CryptService.CKM_RSA_X509(psoMessage, slot, keyId);
+                        }
+                        else if(XipkiCmpConstants.ACTION_REMOTEP11_PSO_RSA_PKCS == action)
+                        {
+                            signature = p11CryptService.CKM_RSA_PKCS(psoMessage, slot, keyId);
+                        }
+                        else
+                        {
+                            throw new RuntimeException("should not reach here");
+                        }
+
+                        respItvInfoValue = new DEROctetString(signature);
+                        break;
+                    }
+                    case XipkiCmpConstants.ACTION_REMOTEP11_GET_CERTIFICATE:
+                    case XipkiCmpConstants.ACTION_REMOTEP11_GET_PUBLICKEY:
+                    {
+                        SlotAndKeyIdentifer slotAndKeyIdentifier = SlotAndKeyIdentifer.getInstance(reqValue);
+                        P11SlotIdentifier slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
+                        KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
+
+                        P11KeyIdentifier keyId = keyIdentifier.getKeyId();
+
+                        byte[] encodeCertOrKey;
+                        if(XipkiCmpConstants.ACTION_REMOTEP11_GET_CERTIFICATE == action)
+                        {
+                            encodeCertOrKey = p11CryptService.getCertificate(slot, keyId).getEncoded();
+                        }
+                        else if(XipkiCmpConstants.ACTION_REMOTEP11_GET_PUBLICKEY== action)
+                        {
+                            encodeCertOrKey = p11CryptService.getPublicKey(slot, keyId).getEncoded();
+                        }
+                        else
+                        {
+                            throw new RuntimeException("should not reach here");
+                        }
+
+                        respItvInfoValue = new DEROctetString(encodeCertOrKey);
+                        break;
+                    }
+                    case XipkiCmpConstants.ACTION_REMOTEP11_LIST_SLOTS:
+                    {
+                        P11SlotIdentifier[] slotIds = p11CryptService.getSlotIdentifiers();
+
+                        ASN1EncodableVector vector = new ASN1EncodableVector();
+                        for(P11SlotIdentifier slotId : slotIds)
+                        {
+                            vector.add(new SlotIdentifier(slotId));
+                        }
+                        respItvInfoValue = new DERSequence(vector);
+                        break;
+                    }
+                    case XipkiCmpConstants.ACTION_REMOTEP11_LIST_KEYLABELS:
+                    {
+                        SlotIdentifier slotId = SlotIdentifier.getInstance(reqValue);
+                        String[] keyLabels = p11CryptService.getKeyLabels(slotId.getSlotId());
+
+                        ASN1EncodableVector vector = new ASN1EncodableVector();
+                        for(String keyLabel : keyLabels)
+                        {
+                            vector.add(new DERUTF8String(keyLabel));
+                        }
+                        respItvInfoValue = new DERSequence(vector);
+                        break;
+                    }
+                    default:
+                    {
+                        statusMessage = "Unsupported XiPKI action code '" + action + "'";
+                        break;
+                    }
+                    }
+
+                    if(statusMessage == null)
+                    {
+                        status = PKIStatus.granted;
+                        ASN1EncodableVector v = new ASN1EncodableVector();
+                        v.add(new ASN1Integer(action));
+                        if(respItvInfoValue != null)
+                        {
+                            v.add(respItvInfoValue);
+                        }
+                        InfoTypeAndValue respItv = new InfoTypeAndValue(XipkiCmpConstants.id_xipki_cmp,
+                                new DERSequence(v));
+                        GenRepContent genRepContent = new GenRepContent(respItv);
+                        respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
+                    }
                 }
             } catch (Throwable t)
             {

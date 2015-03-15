@@ -77,11 +77,10 @@ import org.xipki.ca.common.cmp.PKIResponse;
 import org.xipki.ca.common.cmp.ProtectionResult;
 import org.xipki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
-import org.xipki.common.XipkiCmpAction;
+import org.xipki.common.XipkiCmpConstants;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
@@ -294,14 +293,14 @@ public abstract class CmpRequestor
         return extractGeneralRepContent(response, exepectedType, true);
     }
 
-    protected ASN1Encodable extractXipkiActionRepContent(PKIResponse response, XipkiCmpAction action)
+    protected ASN1Encodable extractXipkiActionRepContent(PKIResponse response, int action)
     throws CmpRequestorException
     {
-        ASN1Encodable itvValue = extractGeneralRepContent(response, CustomObjectIdentifiers.id_cmp.getId(), true);
+        ASN1Encodable itvValue = extractGeneralRepContent(response, XipkiCmpConstants.id_xipki_cmp.getId(), true);
         return extractXipkiActionContent(itvValue, action);
     }
 
-    protected ASN1Encodable extractXipkiActionContent(ASN1Encodable itvValue, XipkiCmpAction action)
+    protected ASN1Encodable extractXipkiActionContent(ASN1Encodable itvValue, int action)
     throws CmpRequestorException
     {
         ASN1Sequence seq;
@@ -318,20 +317,19 @@ public abstract class CmpRequestor
             throw new CmpRequestorException("Invalid syntax of the response");
         }
 
-        int _actionCode;
+        int _action;
         try
         {
-            ASN1Integer _action = ASN1Integer.getInstance(seq.getObjectAt(0));
-            _actionCode = _action.getPositiveValue().intValue();
+            _action = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue().intValue();
         }catch(IllegalArgumentException e)
         {
             throw new CmpRequestorException("Invalid syntax of the response");
         }
 
-        if(action.getCode() != _actionCode)
+        if(action != _action)
         {
-            throw new CmpRequestorException("Received XiPKI action '" + _actionCode +
-                    "' instead the exceptected '" + action.getCode()  + "'");
+            throw new CmpRequestorException("Received XiPKI action '" + _action +
+                    "' instead the exceptected '" + action  + "'");
         }
 
         return (n == 1) ? null : seq.getObjectAt(1);
@@ -507,18 +505,18 @@ public abstract class CmpRequestor
                 signatureValid ? ProtectionResult.VALID : ProtectionResult.INVALID);
     }
 
-    protected PKIMessage buildMessageWithXipkAction(XipkiCmpAction action, ASN1Encodable value)
+    protected PKIMessage buildMessageWithXipkAction(int action, ASN1Encodable value)
     throws CmpRequestorException
     {
         PKIHeader header = buildPKIHeader(null);
 
         ASN1EncodableVector v = new ASN1EncodableVector();
-        v.add(new ASN1Integer(action.getCode()));
+        v.add(new ASN1Integer(action));
         if(value != null)
         {
             v.add(value);
         }
-        InfoTypeAndValue itv = new InfoTypeAndValue(CustomObjectIdentifiers.id_cmp, new DERSequence(v));
+        InfoTypeAndValue itv = new InfoTypeAndValue(XipkiCmpConstants.id_xipki_cmp, new DERSequence(v));
         GenMsgContent genMsgContent = new GenMsgContent(itv);
         PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
 
