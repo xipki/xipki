@@ -127,10 +127,9 @@ import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.common.cmp.PKIResponse;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.XipkiCmpAction;
+import org.xipki.common.XipkiCmpConstants;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
@@ -189,7 +188,7 @@ abstract class X509CmpRequestor extends CmpRequestor
     public CmpResultType generateCRL(RequestResponseDebug debug)
     throws CmpRequestorException
     {
-        XipkiCmpAction action = XipkiCmpAction.GEN_CRL;
+        int action = XipkiCmpConstants.ACTION_GEN_CRL;
         PKIMessage request = buildMessageWithXipkAction(action, null);
         PKIResponse response = signAndSend(request, debug);
         return evaluateCRLResponse(response, action);
@@ -204,7 +203,7 @@ abstract class X509CmpRequestor extends CmpRequestor
     public CmpResultType downloadCRL(BigInteger crlNumber, RequestResponseDebug debug)
     throws CmpRequestorException
     {
-        XipkiCmpAction action = null;
+        Integer action = null;
         PKIMessage request;
         if(crlNumber == null)
         {
@@ -213,7 +212,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         }
         else
         {
-            action = XipkiCmpAction.GET_CRL;
+            action = XipkiCmpConstants.ACTION_GET_CRL;
             request = buildMessageWithXipkAction(action, new ASN1Integer(crlNumber));
         }
 
@@ -221,7 +220,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         return evaluateCRLResponse(response, action);
     }
 
-    private CmpResultType evaluateCRLResponse(PKIResponse response, XipkiCmpAction xipkiAction)
+    private CmpResultType evaluateCRLResponse(PKIResponse response, Integer xipkiAction)
     throws CmpRequestorException
     {
         ErrorResultType errorResult = checkAndBuildErrorResultIfRequired(response);
@@ -246,7 +245,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         }
 
         ASN1ObjectIdentifier expectedType = xipkiAction == null ?
-                CMPObjectIdentifiers.it_currentCRL : CustomObjectIdentifiers.id_cmp;
+                CMPObjectIdentifiers.it_currentCRL : XipkiCmpConstants.id_xipki_cmp;
 
         GenRepContent genRep = (GenRepContent) respBody.getContent();
 
@@ -791,7 +790,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         v.add(new ASN1Integer(2));
         ASN1Sequence acceptVersions = new DERSequence(v);
 
-        XipkiCmpAction action = XipkiCmpAction.GET_CAINFO;
+        int action = XipkiCmpConstants.ACTION_GET_CAINFO;
         PKIMessage request = buildMessageWithXipkAction(action, acceptVersions);
         PKIResponse response = signAndSend(request, debug);
         ASN1Encodable itvValue = extractXipkiActionRepContent(response, action);
@@ -899,7 +898,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         sb.append("</removeExpiredCertsReq>");
 
         String requestInfo = sb.toString();
-        XipkiCmpAction action = XipkiCmpAction.REMOVE_EXPIRED_CERTS;
+        int action = XipkiCmpConstants.ACTION_REMOVE_EXPIRED_CERTS;
         PKIMessage request = buildMessageWithXipkAction(action, new DERUTF8String(requestInfo));
         PKIResponse response = signAndSend(request, debug);
         ASN1Encodable itvValue = extractXipkiActionRepContent(response, action);
