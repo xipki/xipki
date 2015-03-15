@@ -1715,7 +1715,7 @@ public class OcspServer
 
     public static void main(String[] args)
     {
-        String confFile = "../../dist/pki/assembly/src/main/unfiltered/ocsp-config/ocsp-responder.xml";
+        String confFile = "../../dist/pki/assembly/src/main/unfiltered/xipki/ocsp-config/ocsp-responder.xml";
         try
         {
             parseConf(confFile);
