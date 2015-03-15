@@ -41,7 +41,7 @@ import java.security.cert.X509CRL;
  * @author Lijun Liao
  */
 
-public class CRLResultType implements CmpResultType
+public class CRLResultType
 {
     private X509CRL crl;
 

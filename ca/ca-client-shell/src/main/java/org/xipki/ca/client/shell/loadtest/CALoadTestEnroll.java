@@ -48,7 +48,7 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.client.api.CertificateOrError;
+import org.xipki.ca.client.api.CertOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.RAWorker;
@@ -178,7 +178,7 @@ class CALoadTestEnroll extends AbstractLoadTest
             int nSuccess = 0;
             for(String id : ids)
             {
-                CertificateOrError certOrError = result.getCertificateOrError(id);
+                CertOrError certOrError = result.getCertificateOrError(id);
                 X509Certificate cert = (X509Certificate) certOrError.getCertificate();
 
                 if(cert != null)

@@ -41,7 +41,7 @@ import java.security.cert.X509Certificate;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.xipki.ca.client.api.CertificateOrError;
+import org.xipki.ca.client.api.CertOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.qa.UnexpectedResultException;
@@ -103,7 +103,7 @@ public class RAEnrollCertCommand extends ClientCommand
         if(result != null)
         {
             String id = result.getAllIds().iterator().next();
-            CertificateOrError certOrError = result.getCertificateOrError(id);
+            CertOrError certOrError = result.getCertificateOrError(id);
             cert = (X509Certificate) certOrError.getCertificate();
         }
 

@@ -35,6 +35,7 @@
 
 package org.xipki.ca.client.api;
 
+import org.bouncycastle.asn1.cmp.PKIStatusInfo;
 import org.xipki.common.util.SecurityUtil;
 
 /**
@@ -48,6 +49,16 @@ public class PKIErrorException extends Exception
     private final int status;
     private final int pkiFailureInfo;
     private final String statusMessage;
+
+    public PKIErrorException(PKIStatusInfo statusInfo)
+    {
+        this(new org.xipki.ca.common.cmp.PKIStatusInfo(statusInfo));
+    }
+
+    public PKIErrorException(org.xipki.ca.common.cmp.PKIStatusInfo statusInfo)
+    {
+        this(statusInfo.getStatus(), statusInfo.getPkiFailureInfo(), statusInfo.getStatusMessage());
+    }
 
     public PKIErrorException(int status, int pkiFailureInfo, String statusMessage)
     {

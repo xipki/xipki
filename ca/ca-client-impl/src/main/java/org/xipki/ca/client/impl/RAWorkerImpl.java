@@ -55,6 +55,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -94,6 +95,7 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.client.api.CertIDOrError;
+import org.xipki.ca.client.api.CertOrError;
 import org.xipki.ca.client.api.CertprofileInfo;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.PKIErrorException;
@@ -101,13 +103,12 @@ import org.xipki.ca.client.api.RAWorker;
 import org.xipki.ca.client.api.RAWorkerException;
 import org.xipki.ca.client.api.RemoveExpiredCertsResult;
 import org.xipki.ca.client.api.dto.CRLResultType;
-import org.xipki.ca.client.api.dto.CmpResultType;
 import org.xipki.ca.client.api.dto.EnrollCertEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
+import org.xipki.ca.client.api.dto.EnrollCertResultEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertResultType;
 import org.xipki.ca.client.api.dto.ErrorResultEntryType;
-import org.xipki.ca.client.api.dto.ErrorResultType;
 import org.xipki.ca.client.api.dto.IssuerSerialEntryType;
 import org.xipki.ca.client.api.dto.ResultEntryType;
 import org.xipki.ca.client.api.dto.RevokeCertRequestEntryType;
@@ -133,6 +134,7 @@ import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xml.sax.SAXException;
 
@@ -140,7 +142,7 @@ import org.xml.sax.SAXException;
  * @author Lijun Liao
  */
 
-public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
+public final class RAWorkerImpl implements RAWorker
 {
     private class ClientConfigUpdater implements Runnable
     {
@@ -180,11 +182,14 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RAWorkerImpl.class);
+    private static final ProofOfPossession raVerified = new ProofOfPossession();
 
     private static Object jaxbUnmarshallerLock = new Object();
     private static Unmarshaller jaxbUnmarshaller;
 
     private final Map<String, CAConf> casMap = new HashMap<>();
+
+    private SecurityFactory securityFactory;
 
     private String confFile;
     private Map<X509Certificate, Boolean> tryXipkiNSStoVerifyMap = new ConcurrentHashMap<>();
@@ -192,6 +197,11 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
     public RAWorkerImpl()
     {
+    }
+
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
+        this.securityFactory = securityFactory;
     }
 
     /**
@@ -652,7 +662,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             throw new RAWorkerException("could not find CA named " + caName);
         }
 
-        CmpResultType result;
+        EnrollCertResultType result;
         try
         {
             result = ca.getRequestor().requestCertificate(request, username, debug);
@@ -661,18 +671,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             throw new RAWorkerException(e.getMessage(), e);
         }
 
-        if(result instanceof ErrorResultType)
-        {
-            throw createPKIErrorException((ErrorResultType) result);
-        }
-        else if(result instanceof EnrollCertResultType)
-        {
-            return parseEnrollCertResult((EnrollCertResultType) result, caName);
-        }
-        else
-        {
-            throw new RuntimeException("Unknown result type: " + result.getClass().getName());
-        }
+        return parseEnrollCertResult((EnrollCertResultType) result, caName);
     }
 
     private void checkCertprofileSupportInCA(String certprofile, String caName)
@@ -768,7 +767,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
         final String caName = getCaNameByIssuer(issuer);
         X509CmpRequestor cmpRequestor = casMap.get(caName).getRequestor();
-        CmpResultType result;
+        RevokeCertResultType result;
         try
         {
             result = cmpRequestor.revokeCertificate(request, debug);
@@ -780,45 +779,34 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         return parseRevokeCertResult(result);
     }
 
-    private Map<String, CertIDOrError> parseRevokeCertResult(CmpResultType result)
-    throws RAWorkerException, PKIErrorException
+    private Map<String, CertIDOrError> parseRevokeCertResult(RevokeCertResultType result)
+    throws RAWorkerException
     {
-        if(result instanceof ErrorResultType)
-        {
-            throw createPKIErrorException((ErrorResultType) result);
-        }
-        else if(result instanceof RevokeCertResultType)
-        {
-            Map<String, CertIDOrError> ret = new HashMap<>();
+        Map<String, CertIDOrError> ret = new HashMap<>();
 
-            RevokeCertResultType _result = (RevokeCertResultType) result;
-            for(ResultEntryType _entry : _result.getResultEntries())
+        RevokeCertResultType _result = (RevokeCertResultType) result;
+        for(ResultEntryType _entry : _result.getResultEntries())
+        {
+            CertIDOrError certIdOrError;
+            if(_entry instanceof RevokeCertResultEntryType)
             {
-                CertIDOrError certIdOrError;
-                if(_entry instanceof RevokeCertResultEntryType)
-                {
-                    RevokeCertResultEntryType entry = (RevokeCertResultEntryType) _entry;
-                    certIdOrError = new CertIDOrError(entry.getCertID());
-                }
-                else if(_entry instanceof ErrorResultEntryType)
-                {
-                    ErrorResultEntryType entry = (ErrorResultEntryType) _entry;
-                    certIdOrError = new CertIDOrError(entry.getStatusInfo());
-                }
-                else
-                {
-                    throw new RAWorkerException("unknwon type " + _entry);
-                }
-
-                ret.put(_entry.getId(), certIdOrError);
+                RevokeCertResultEntryType entry = (RevokeCertResultEntryType) _entry;
+                certIdOrError = new CertIDOrError(entry.getCertID());
+            }
+            else if(_entry instanceof ErrorResultEntryType)
+            {
+                ErrorResultEntryType entry = (ErrorResultEntryType) _entry;
+                certIdOrError = new CertIDOrError(entry.getStatusInfo());
+            }
+            else
+            {
+                throw new RAWorkerException("unknwon type " + _entry);
             }
 
-            return ret;
+            ret.put(_entry.getId(), certIdOrError);
         }
-        else
-        {
-            throw new RuntimeException("Unknown result type: " + result.getClass().getName());
-        }
+
+        return ret;
     }
 
     @Override
@@ -840,28 +828,23 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         }
 
         X509CmpRequestor requestor = casMap.get(caName).getRequestor();
-        CmpResultType result;
+        CRLResultType result;
         try
         {
-            result = crlNumber == null ? requestor.downloadCurrentCRL(debug) : requestor.downloadCRL(crlNumber, debug);
+            if(crlNumber == null)
+            {
+                result = requestor.downloadCurrentCRL(debug);
+            }
+            else
+            {
+                result = requestor.downloadCRL(crlNumber, debug);
+            }
         } catch (CmpRequestorException e)
         {
             throw new RAWorkerException(e.getMessage(), e);
         }
 
-        if(result instanceof ErrorResultType)
-        {
-            throw createPKIErrorException((ErrorResultType) result);
-        }
-        else if(result instanceof CRLResultType)
-        {
-            CRLResultType downloadCRLResult = (CRLResultType) result;
-            return downloadCRLResult.getCRL();
-        }
-        else
-        {
-            throw new RuntimeException("Unknown result type: " + result.getClass().getName());
-        }
+        return result.getCRL();
     }
 
     @Override
@@ -876,27 +859,13 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         }
 
         X509CmpRequestor requestor = casMap.get(caName).getRequestor();
-        CmpResultType result;
         try
         {
-            result = requestor.generateCRL(debug);
+            CRLResultType result = requestor.generateCRL(debug);
+            return result.getCRL();
         } catch (CmpRequestorException e)
         {
             throw new RAWorkerException(e.getMessage(), e);
-        }
-
-        if(result instanceof ErrorResultType)
-        {
-            throw createPKIErrorException((ErrorResultType) result);
-        }
-        else if(result instanceof CRLResultType)
-        {
-            CRLResultType downloadCRLResult = (CRLResultType) result;
-            return downloadCRLResult.getCRL();
-        }
-        else
-        {
-            throw new RuntimeException("Unknown result type: " + result.getClass().getName());
         }
     }
 
@@ -955,8 +924,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         return caName;
     }
 
-    @Override
-    protected java.security.cert.Certificate getCertificate(CMPCertificate cmpCert)
+    private java.security.cert.Certificate getCertificate(CMPCertificate cmpCert)
     throws CertificateException
     {
         Certificate bcCert = cmpCert.getX509v3PKCert();
@@ -1022,8 +990,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         }
     }
 
-    @Override
-    protected boolean verify(java.security.cert.Certificate caCert,
+    private boolean verify(java.security.cert.Certificate caCert,
             java.security.cert.Certificate cert)
     {
         if(caCert instanceof X509Certificate == false)
@@ -1195,7 +1162,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
         final String caName = getCaNameByIssuer(issuer);
         X509CmpRequestor cmpRequestor = casMap.get(caName).getRequestor();
-        CmpResultType result;
+        RevokeCertResultType result;
         try
         {
             result = cmpRequestor.unrevokeCertificate(request, debug);
@@ -1254,7 +1221,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
         final String caName = getCaNameByIssuer(issuer);
         X509CmpRequestor cmpRequestor = casMap.get(caName).getRequestor();
-        CmpResultType result;
+        RevokeCertResultType result;
         try
         {
             result = cmpRequestor.removeCertificate(request, debug);
@@ -1442,6 +1409,92 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 throw new ConfigurationException("invalid root element type");
             }
         }
+    }
+
+    private EnrollCertResult parseEnrollCertResult(EnrollCertResultType result, String caName)
+    throws RAWorkerException
+    {
+        Map<String, CertOrError> certOrErrors = new HashMap<>();
+        for(ResultEntryType resultEntry : result.getResultEntries())
+        {
+            CertOrError certOrError;
+            if(resultEntry instanceof EnrollCertResultEntryType)
+            {
+                EnrollCertResultEntryType entry = (EnrollCertResultEntryType) resultEntry;
+                try
+                {
+                    java.security.cert.Certificate cert = getCertificate(entry.getCert());
+                    certOrError = new CertOrError(cert);
+                } catch (CertificateException e)
+                {
+                    throw new RAWorkerException(
+                            "CertificateParsingException for request (id=" + entry.getId()+"): " + e.getMessage());
+                }
+            }
+            else if(resultEntry instanceof ErrorResultEntryType)
+            {
+                certOrError = new CertOrError(
+                        ((ErrorResultEntryType) resultEntry).getStatusInfo());
+            }
+            else
+            {
+                certOrError = null;
+            }
+
+            certOrErrors.put(resultEntry.getId(), certOrError);
+        }
+
+        java.security.cert.Certificate caCert = null;
+
+        List<CMPCertificate> cmpCaPubs = result.getCACertificates();
+
+        if(CollectionUtil.isNotEmpty(cmpCaPubs))
+        {
+            List<java.security.cert.Certificate> caPubs = new ArrayList<>(cmpCaPubs.size());
+            for(CMPCertificate cmpCaPub : cmpCaPubs)
+            {
+                try
+                {
+                    caPubs.add(getCertificate(cmpCaPub));
+                } catch (CertificateException e)
+                {
+                    final String message = "Could not extract the caPub from CMPCertificate";
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
+                }
+            }
+
+            for(CertOrError certOrError : certOrErrors.values())
+            {
+                java.security.cert.Certificate cert = certOrError.getCertificate();
+                if(cert == null)
+                {
+                    continue;
+                }
+
+                if(caCert == null)
+                {
+                    for(java.security.cert.Certificate caPub : caPubs)
+                    {
+                        if(verify(caPub, cert))
+                        {
+                            caCert = caPub;
+                        }
+                    }
+                }
+                else if(verify(caCert, cert) == false)
+                {
+                    LOG.warn("Not all certificates issued by CA embedded in caPubs, ignore the caPubs");
+                    caCert = null;
+                    break;
+                }
+            }
+        }
+
+        return new EnrollCertResult(caCert, certOrErrors);
     }
 
 }
