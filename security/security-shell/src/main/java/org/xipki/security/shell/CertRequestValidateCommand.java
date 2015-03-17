@@ -33,37 +33,44 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.api.dto;
+package org.xipki.security.shell;
 
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.IoUtil;
 
 /**
  * @author Lijun Liao
  */
 
-public class EnrollCertEntryType
+@Command(scope = "xipki-tk", name = "validate-req", description="Validate PKCS#10 request")
+public class CertRequestValidateCommand extends SecurityCommand
 {
-    private final CertificationRequest p10Request;
-    private final String profile;
 
-    public EnrollCertEntryType(CertificationRequest p10Request, String profile)
+    @Option(name = "-p10",
+            required = true,
+            description = "PKCS#10 request file\n"
+                    + "(required)")
+    private String p10File;
+
+    @Override
+    protected Object _doExecute()
+    throws Exception
     {
-        ParamChecker.assertNotNull("p10Request", p10Request);
-        ParamChecker.assertNotEmpty("profile", profile);
+        CertificationRequest p10Req = CertificationRequest.getInstance(
+                IoUtil.read(p10File));
 
-        this.p10Request = p10Request;
-        this.profile = profile;
-    }
+        if(securityFactory.verifyPOPO(p10Req))
+        {
+            out("The POP is valid");
+        }
+        else
+        {
+            err("The POP is invalid");
+        }
 
-    public CertificationRequest getP10Request()
-    {
-        return p10Request;
-    }
-
-    public String getProfile()
-    {
-        return profile;
+        return null;
     }
 
 }

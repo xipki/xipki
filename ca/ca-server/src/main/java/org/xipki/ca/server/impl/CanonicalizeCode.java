@@ -151,31 +151,33 @@ public class CanonicalizeCode
                     skip = false;
                 }
 
-                if(skip == false)
+                if(skip)
                 {
-                    String canonicalizedLine = canonicalizeLine(line);
-                    boolean addThisLine = true;
-                    if(canonicalizedLine.isEmpty())
+                	continue;
+                }
+
+                String canonicalizedLine = canonicalizeLine(line);
+                boolean addThisLine = true;
+                if(canonicalizedLine.isEmpty())
+                {
+                    if(lastLineEmpty == false)
                     {
-                        if(lastLineEmpty == false)
-                        {
-                            lastLineEmpty = true;
-                        }
-                        else
-                        {
-                            addThisLine = false;
-                        }
+                        lastLineEmpty = true;
                     }
                     else
                     {
-                        lastLineEmpty = false;
+                        addThisLine = false;
                     }
+                }
+                else
+                {
+                    lastLineEmpty = false;
+                }
 
-                    if(addThisLine)
-                    {
-                        writer.write(canonicalizedLine.getBytes());
-                        writer.write('\n');
-                    }
+                if(addThisLine)
+                {
+                    writer.write(canonicalizedLine.getBytes());
+                    writer.write('\n');
                 }
             }
         }finally

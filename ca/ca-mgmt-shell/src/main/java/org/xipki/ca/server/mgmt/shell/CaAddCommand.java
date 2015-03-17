@@ -104,7 +104,8 @@ public class CaAddCommand extends CaAddOrGenCommand
 
         if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
         {
-            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, securityFactory.getPasswordResolver());
+            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf,
+                    securityFactory.getPasswordResolver());
         }
 
         // check whether the signer and certificate match
@@ -167,7 +168,6 @@ public class CaAddCommand extends CaAddOrGenCommand
 
         boolean b = caManager.addCA(entry);
         output(b, "added", "could not add", "CA " + caName);
-
         return null;
     }
 }

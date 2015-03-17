@@ -231,7 +231,7 @@ abstract class CmpResponder
                     break;
                 default:
                     throw new RuntimeException("Should not reach here, unknown ProtectionResult " + pr);
-                }
+                } // end switch
                 requestor = (CmpRequestorInfo) verificationResult.getRequestor();
             } catch (Exception e)
             {

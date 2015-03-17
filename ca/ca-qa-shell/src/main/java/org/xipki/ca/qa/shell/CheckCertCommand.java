@@ -153,7 +153,6 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
                 sb.append("\n");
                 format(issue, "    ", sb);
             }
-
         }
 
         out(sb.toString());

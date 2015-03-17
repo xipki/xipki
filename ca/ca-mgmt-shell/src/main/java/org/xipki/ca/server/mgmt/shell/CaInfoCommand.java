@@ -105,7 +105,6 @@ public class CaInfoCommand extends CaCommand
         }
 
         out(sb.toString());
-
         return null;
     }
 }

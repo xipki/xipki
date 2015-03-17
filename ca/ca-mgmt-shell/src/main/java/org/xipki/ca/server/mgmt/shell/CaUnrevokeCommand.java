@@ -60,7 +60,6 @@ public class CaUnrevokeCommand extends CaCommand
 
         boolean b = caManager.unrevokeCa(caName);
         output(b, "unrevoked", "could not unrevoke", "CA " + caName);
-
         return null;
     }
 }

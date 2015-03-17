@@ -123,7 +123,7 @@ class X509CrlSignerEntryWrapper
 
         if(SecurityUtil.hasKeyusage(signer.getCertificate(), KeyUsage.cRLSign) == false)
         {
-            throw new OperationException(ErrorCode.System_Failure,
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "CRL signer does not have keyusage cRLSign");
         }
     }

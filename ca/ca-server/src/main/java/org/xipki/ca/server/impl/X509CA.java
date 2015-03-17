@@ -579,7 +579,7 @@ class X509CA
                 }
                 LOG.debug(message, e);
 
-                throw new OperationException(ErrorCode.System_Failure, "SigenrException: " + e.getMessage());
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE, "SigenrException: " + e.getMessage());
             }
         }
 
@@ -595,7 +595,7 @@ class X509CA
                 {
                     final String msg = "CRL signer does not have keyusage cRLSign";
                     LOG.error(msg);
-                    throw new OperationException(ErrorCode.System_Failure, msg);
+                    throw new OperationException(ErrorCode.SYSTEM_FAILURE, msg);
                 }
             }
         }
@@ -671,7 +671,7 @@ class X509CA
                 return crl;
             } catch (RuntimeException e)
             {
-                throw new OperationException(ErrorCode.System_Failure,
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                         e.getClass().getName() + ": " + e.getMessage());
             }
         }finally
@@ -707,7 +707,7 @@ class X509CA
                     numOfRemovedCRLs);
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure,
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     e.getClass().getName() + ": " + e.getMessage());
         }
         finally
@@ -731,7 +731,7 @@ class X509CA
 
         if(crlGenInProcess.get())
         {
-            throw new OperationException(ErrorCode.System_Unavailable,
+            throw new OperationException(ErrorCode.SYSTEM_UNAVAILABLE,
                     "TRY_LATER");
         }
 
@@ -1007,7 +1007,7 @@ class X509CA
                             certInfo = certstore.getCertificateInfoForSerial(caCert, serial);
                         } catch (CertificateException e)
                         {
-                            throw new OperationException(ErrorCode.System_Failure,
+                            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                                     "CertificateException: " + e.getMessage());
                         }
 
@@ -1046,7 +1046,7 @@ class X509CA
                 contentSigner = concurrentSigner.borrowContentSigner();
             } catch (NoIdleSignerException e)
             {
-                throw new OperationException(ErrorCode.System_Failure, "NoIdleSignerException: " + e.getMessage());
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE, "NoIdleSignerException: " + e.getMessage());
             }
 
             X509CRLHolder crlHolder;
@@ -1180,7 +1180,7 @@ class X509CA
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
             }
             LOG.debug(message, e);
-            throw new OperationException(ErrorCode.System_Failure, "RuntimeException:  " + e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "RuntimeException:  " + e.getMessage());
         }finally
         {
             if(successfull == false)
@@ -1230,7 +1230,7 @@ class X509CA
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
             }
             LOG.debug(message, e);
-            throw new OperationException(ErrorCode.System_Failure, "RuntimeException:  " + e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "RuntimeException:  " + e.getMessage());
         } finally
         {
             if(successfull == false)
@@ -1905,7 +1905,7 @@ class X509CA
                 boolean successfull = publisher.caRevoked(caInfo.getCertificate(), revocationInfo);
                 if(successfull == false)
                 {
-                    throw new OperationException(ErrorCode.System_Failure, "Publishing CA revocation failed");
+                    throw new OperationException(ErrorCode.SYSTEM_FAILURE, "Publishing CA revocation failed");
                 }
             }
             catch (RuntimeException e)
@@ -1916,7 +1916,7 @@ class X509CA
                     LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
                 }
                 LOG.debug(message, e);
-                throw new OperationException(ErrorCode.System_Failure, message);
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
             }
         }
     }
@@ -1937,7 +1937,7 @@ class X509CA
                 boolean successfull = publisher.caUnrevoked(caInfo.getCertificate());
                 if(successfull == false)
                 {
-                    throw new OperationException(ErrorCode.System_Failure, "Publishing CA revocation failed");
+                    throw new OperationException(ErrorCode.SYSTEM_FAILURE, "Publishing CA revocation failed");
                 }
             }
             catch (RuntimeException e)
@@ -1948,7 +1948,7 @@ class X509CA
                     LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
                 }
                 LOG.debug(message, e);
-                throw new OperationException(ErrorCode.System_Failure, message);
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
             }
         }
     }
@@ -1974,7 +1974,7 @@ class X509CA
         ConcurrentContentSigner signer = caInfo.getSigner();
         if(signer == null)
         {
-            throw new OperationException(ErrorCode.System_Failure, "Signer of the CA is not initialized");
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "Signer of the CA is not initialized");
         }
 
         if(caInfo.getRevocationInfo() != null)
@@ -1991,7 +1991,7 @@ class X509CA
 
         if(certprofile.getVersion() != X509CertVersion.V3)
         {
-            throw new OperationException(ErrorCode.System_Failure, "unknown cert version " + certprofile);
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "unknown cert version " + certprofile);
         }
 
         if(certprofile.isOnlyForRA() && requestedByRA == false)
@@ -2006,7 +2006,7 @@ class X509CA
             ASN1ObjectIdentifier sigAlgId = signer.getAlgorithmIdentifier().getAlgorithm();
             if(permittedSigAlgs.contains(sigAlgId) == false)
             {
-                throw new OperationException(ErrorCode.System_Failure,
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                         "Signature algorithm  " + sigAlgId.getId() + " is not permitted");
             }
         }
@@ -2110,7 +2110,7 @@ class X509CA
             subjectInfo = certprofile.getSubject(requestedSubject);
         }catch(CertprofileException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, "exception in cert profile " + certprofileName);
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "exception in cert profile " + certprofileName);
         } catch (BadCertTemplateException e)
         {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
@@ -2177,7 +2177,7 @@ class X509CA
                     X509CertWithDBCertId issuedCert = certstore.getCertForId(bundle.getCertId());
                     if(issuedCert == null)
                     {
-                        throw new OperationException(ErrorCode.System_Failure,
+                        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                             "Find no certificate in table RAWCERT for CERT_ID " + bundle.getCertId());
                     }
                     else
@@ -2189,7 +2189,7 @@ class X509CA
                                     caInfo.getCertificate(), subjectPublicKeyData, certprofileName);
                         } catch (CertificateEncodingException e)
                         {
-                            throw new OperationException(ErrorCode.System_Failure,
+                            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                                     "could not construct CertificateInfo: " + e.getMessage());
                         }
                         certInfo.setAlreadyIssued(true);
@@ -2259,7 +2259,7 @@ class X509CA
                         latestSN = certstore.getLatestSN((X500Name) objs[0]);
                     }catch(BadFormatException e)
                     {
-                        throw new OperationException(ErrorCode.System_Failure, "BadFormatException: " + e.getMessage());
+                        throw new OperationException(ErrorCode.SYSTEM_FAILURE, "BadFormatException: " + e.getMessage());
                     }
 
                     boolean foundUniqueSubject = false;
@@ -2273,7 +2273,7 @@ class X509CA
                             latestSN = (String) objs[1];
                         }catch (BadFormatException e)
                         {
-                            throw new OperationException(ErrorCode.System_Failure, "BadFormatException: " + e.getMessage());
+                            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "BadFormatException: " + e.getMessage());
                         }
 
                         foundUniqueSubject = (certstore.certIssuedForSubject(caInfo.getCertificate(),
@@ -2423,7 +2423,7 @@ class X509CA
                     contentSigner = signer.borrowContentSigner();
                 } catch (NoIdleSignerException e)
                 {
-                    throw new OperationException(ErrorCode.System_Failure, "NoIdleSignerException: " + e.getMessage());
+                    throw new OperationException(ErrorCode.SYSTEM_FAILURE, "NoIdleSignerException: " + e.getMessage());
                 }
 
                 Certificate bcCert;
@@ -2441,7 +2441,7 @@ class X509CA
                         new ByteArrayInputStream(encodedCert));
                 if(verifySignature(cert) == false)
                 {
-                    throw new OperationException(ErrorCode.System_Failure,
+                    throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                             "Could not verify the signature of generated certificate");
                 }
 
@@ -2454,7 +2454,7 @@ class X509CA
 
                 if(intern_publishCertificate(ret) == 1)
                 {
-                    throw new OperationException(ErrorCode.System_Failure, "could not save certificate");
+                    throw new OperationException(ErrorCode.SYSTEM_FAILURE, "could not save certificate");
                 }
             } catch (BadCertTemplateException e)
             {
@@ -2468,7 +2468,7 @@ class X509CA
                 }
                 LOG.debug(message, t2);
 
-                throw new OperationException(ErrorCode.System_Failure, t2.getClass().getName() + ": " + t2.getMessage());
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE, t2.getClass().getName() + ": " + t2.getMessage());
             }
 
             if(msgBuilder.length() > 2)

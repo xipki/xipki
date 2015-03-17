@@ -1738,21 +1738,18 @@ class CAManagerQueryExecutor
                 if(txt == null)
                 {
                     m.append("null");
-                } else
+                }
+                else
                 {
-                    if(txt != null)
+                    try
                     {
-                        try
-                        {
-                            String subject = SecurityUtil.canonicalizName(
-                                    SecurityUtil.parseBase64EncodedCert(txt).getSubjectX500Principal());
-                            m.append(subject);
-                        } catch (CertificateException | IOException e)
-                        {
-                            m.append("ERROR");
-                        }
+                        String subject = SecurityUtil.canonicalizName(
+                                SecurityUtil.parseBase64EncodedCert(txt).getSubjectX500Principal());
+                        m.append(subject);
+                    } catch (CertificateException | IOException e)
+                    {
+                        m.append("ERROR");
                     }
-
                 }
                 m.append("'; ");
                 ps.setString(iCert, txt);

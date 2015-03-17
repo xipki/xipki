@@ -92,7 +92,6 @@ public class PublisherInfoCommand extends CaCommand
         }
 
         out(sb.toString());
-
         return null;
     }
 }

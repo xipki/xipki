@@ -97,7 +97,6 @@ public class CrlSignerInfoCommand extends CaCommand
         }
 
         out(sb.toString());
-
         return null;
     }
 }

@@ -731,7 +731,7 @@ class CertStoreQueryExecutor
                 {
                     message = "no row is modified, but exactly one is expected";
                 }
-                throw new OperationException(ErrorCode.System_Failure, message);
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
             }
         }catch(SQLException e)
         {
@@ -809,7 +809,7 @@ class CertStoreQueryExecutor
                 {
                     message = "no row is modified, but exactly one is expected";
                 }
-                throw new OperationException(ErrorCode.System_Failure, message);
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
             }
         }catch(SQLException e)
         {
@@ -894,7 +894,7 @@ class CertStoreQueryExecutor
                 {
                     message = "no row is modified, but exactly one is expected";
                 }
-                throw new OperationException(ErrorCode.System_Failure, message);
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
             }
         }catch(SQLException e)
         {
@@ -1402,7 +1402,7 @@ class CertStoreQueryExecutor
             }
         } catch (IOException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, "IOException: " + e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "IOException: " + e.getMessage());
         }catch(SQLException e)
         {
             throw dataSource.translate(sql, e);
@@ -1441,10 +1441,10 @@ class CertStoreQueryExecutor
                     cert = SecurityUtil.parseCert(encodedCert);
                 } catch (CertificateException e)
                 {
-                    throw new OperationException(ErrorCode.System_Failure, "CertificateException: " + e.getMessage());
+                    throw new OperationException(ErrorCode.SYSTEM_FAILURE, "CertificateException: " + e.getMessage());
                 } catch (IOException e)
                 {
-                    throw new OperationException(ErrorCode.System_Failure, "IOException: " + e.getMessage());
+                    throw new OperationException(ErrorCode.SYSTEM_FAILURE, "IOException: " + e.getMessage());
                 }
                 return new X509CertWithDBCertId(cert, encodedCert);
             }
@@ -1498,7 +1498,7 @@ class CertStoreQueryExecutor
                     cert = SecurityUtil.parseCert(certBytes);
                 } catch (CertificateException | IOException e)
                 {
-                    throw new OperationException(ErrorCode.System_Failure, e.getClass().getName() + ": " + e.getMessage());
+                    throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getClass().getName() + ": " + e.getMessage());
                 }
 
                 CertRevocationInfo revInfo = null;
@@ -1601,7 +1601,7 @@ class CertStoreQueryExecutor
         } catch (IOException e)
         {
             LOG.warn("getCertificateInfo()", e);
-            throw new OperationException(ErrorCode.System_Failure, "IOException: " + e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "IOException: " + e.getMessage());
         }catch(SQLException e)
         {
             throw dataSource.translate(sql, e);

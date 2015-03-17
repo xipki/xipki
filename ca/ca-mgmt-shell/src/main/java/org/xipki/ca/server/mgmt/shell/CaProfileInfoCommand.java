@@ -47,7 +47,8 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "caprofile-info", description="show information of certificate profiles in given CA")
+@Command(scope = "xipki-ca", name = "caprofile-info",
+        description="show information of certificate profiles in given CA")
 public class CaProfileInfoCommand extends CaCommand
 {
     @Option(name = "-ca",
@@ -63,7 +64,7 @@ public class CaProfileInfoCommand extends CaCommand
         StringBuilder sb = new StringBuilder();
         if(caManager.getCA(caName) == null)
         {
-            sb.append("could not find CA '" + caName + "'");
+            sb.append("could not find CA '").append(caName).append("'");
         }
         else
         {
@@ -87,7 +88,6 @@ public class CaProfileInfoCommand extends CaCommand
         }
 
         out(sb.toString());
-
         return null;
     }
 }

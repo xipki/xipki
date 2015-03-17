@@ -46,7 +46,7 @@ import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.ca.client.api.dto.EnrollCertEntryType;
+import org.xipki.ca.client.api.dto.P10EnrollCertEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.ca.client.api.dto.RevokeCertRequestType;
 import org.xipki.ca.client.api.dto.UnrevokeOrRemoveCertRequestType;
@@ -68,7 +68,7 @@ public interface RAWorker
     throws RAWorkerException, PKIErrorException;
 
     EnrollCertResult requestCerts(EnrollCertRequestType.Type type,
-            Map<String, EnrollCertEntryType> enrollCertEntries, String caName, String username,
+            Map<String, P10EnrollCertEntryType> enrollCertEntries, String caName, String username,
             RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException;
 

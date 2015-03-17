@@ -234,6 +234,11 @@ class X509CACmpResponder extends CmpResponder
         }
 
         CmpRequestorInfo _requestor = (CmpRequestorInfo) requestor;
+        if(_requestor != null && auditEvent != null)
+        {
+            auditEvent.addEventData(new AuditEventData("requestor",
+                    _requestor.getCert().getSubject()));
+        }
 
         PKIHeader reqHeader = message.getHeader();
         PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
@@ -247,404 +252,57 @@ class X509CACmpResponder extends CmpResponder
         final int type = reqBody.getType();
 
         CmpControl cmpControl = getCmpControl();
-        long confirmWaitTime = cmpControl.getConfirmWaitTime();
-        if(confirmWaitTime < 0)
-        {
-            confirmWaitTime *= -1;
-        }
-        confirmWaitTime *= 1000; // second to millisecond
-
-        String eventType = null;
 
         try
         {
             switch(type)
             {
-                case PKIBody.TYPE_CERT_REQ:
-                case PKIBody.TYPE_KEY_UPDATE_REQ:
-                case PKIBody.TYPE_P10_CERT_REQ:
-                case PKIBody.TYPE_CROSS_CERT_REQ:
-                    boolean sendCaCert = cmpControl.isSendCaCert();
-                    switch(type)
-                    {
-                        case PKIBody.TYPE_CERT_REQ:
-                            eventType = "CERT_REQ";
-                            checkPermission(_requestor, Permission.ENROLL_CERT);
-                            respBody = processCr(_requestor, user, tid, reqHeader,
-                                    (CertReqMessages) reqBody.getContent(), confirmWaitTime, sendCaCert, auditEvent);
-                            break;
-                        case PKIBody.TYPE_KEY_UPDATE_REQ:
-                            eventType = "KEY_UPDATE";
-                            checkPermission(_requestor, Permission.KEY_UPDATE);
-                            respBody = processKur(_requestor, user, tid, reqHeader,
-                                    (CertReqMessages) reqBody.getContent(), confirmWaitTime, sendCaCert, auditEvent);
-                            break;
-                        case PKIBody.TYPE_P10_CERT_REQ:
-                            eventType = "CERT_REQ";
-                            checkPermission(_requestor, Permission.ENROLL_CERT);
-                            respBody = processP10cr(_requestor, user, tid, reqHeader,
-                                    (CertificationRequest) reqBody.getContent(), confirmWaitTime, sendCaCert, auditEvent);
-                            break;
-                        //case PKIBody.TYPE_CROSS_CERT_REQ:
-                        default:
-                            eventType = "CROSS_CERT_REQ";
-                            checkPermission(_requestor, Permission.CROSS_CERT_ENROLL);
-                            respBody = processCcp(_requestor, user, tid, reqHeader,
-                                    (CertReqMessages) reqBody.getContent(), confirmWaitTime, sendCaCert, auditEvent);
-                            break;
-                    }
-
-                    boolean successfull = false;
-
-                    InfoTypeAndValue tv = null;
-
-                    if(cmpControl.isRequireConfirmCert() == false && CmpUtil.isImplictConfirm(reqHeader))
-                    {
-                        pendingCertPool.removeCertificates(tid.getOctets());
-                        tv = CmpUtil.getImplictConfirmGeneralInfo();
-                        successfull = true;
-                    }
-                    else
-                    {
-                        Date now = new Date();
-                        respHeader.setMessageTime(new ASN1GeneralizedTime(now));
-                        tv = new InfoTypeAndValue(
-                                CMPObjectIdentifiers.it_confirmWaitTime,
-                                new ASN1GeneralizedTime(new Date(System.currentTimeMillis() + confirmWaitTime)));
-                    }
-                    if(tv != null)
-                    {
-                        respHeader.setGeneralInfo(tv);
-                    }
-
-                    if(successfull == false)
-                    {
-                        ErrorMsgContent emc = new ErrorMsgContent(
-                                new PKIStatusInfo(PKIStatus.rejection,
-                                        null,
-                                        new PKIFailureInfo(PKIFailureInfo.systemFailure)));
-
-                        respBody = new PKIBody(PKIBody.TYPE_ERROR, emc);
-                    }
-
-                    break;
-                case PKIBody.TYPE_CERT_CONFIRM:
-                {
-                    eventType = "CERT_CONFIRM";
-                    CertConfirmContent certConf = (CertConfirmContent) reqBody.getContent();
-                    respBody = confirmCertificates(tid, certConf);
-                    break;
-                }
-                case PKIBody.TYPE_REVOCATION_REQ:
-                {
-                    Permission requiredPermission = null;
-                    boolean allRevdetailsOfSameType = true;
-
-                    RevReqContent rr = (RevReqContent) reqBody.getContent();
-                    RevDetails[] revContent = rr.toRevDetailsArray();
-
-                    int n = revContent.length;
-                    for (int i = 0; i < n; i++)
-                    {
-                        RevDetails revDetails = revContent[i];
-                        Extensions crlDetails = revDetails.getCrlEntryDetails();
-                        int reasonCode = CRLReason.UNSPECIFIED.getCode();
-                        if(crlDetails != null)
-                        {
-                            ASN1ObjectIdentifier extId = Extension.reasonCode;
-                            ASN1Encodable extValue = crlDetails.getExtensionParsedValue(extId);
-                            if(extValue != null)
-                            {
-                                reasonCode = ((ASN1Enumerated) extValue).getValue().intValue();
-                            }
-                        }
-                        if(reasonCode == XiPKI_CRL_REASON_REMOVE)
-                        {
-                            if(requiredPermission == null)
-                            {
-                                eventType = "CERT_REMOVE";
-                                requiredPermission = Permission.REMOVE_CERT;
-                            }
-                            else if(requiredPermission != Permission.REMOVE_CERT)
-                            {
-                                allRevdetailsOfSameType = false;
-                                break;
-                            }
-                        }
-                        else if(reasonCode == CRLReason.REMOVE_FROM_CRL.getCode())
-                        {
-                            if(requiredPermission == null)
-                            {
-                                eventType = "CERT_UNREVOKE";
-                                requiredPermission = Permission.UNREVOKE_CERT;
-                            }
-                            else if(requiredPermission != Permission.UNREVOKE_CERT)
-                            {
-                                allRevdetailsOfSameType = false;
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            if(requiredPermission == null)
-                            {
-                                eventType = "CERT_REVOKE";
-                                requiredPermission = Permission.REVOKE_CERT;
-                            }
-                            else if(requiredPermission != Permission.REVOKE_CERT)
-                            {
-                                allRevdetailsOfSameType = false;
-                                break;
-                            }
-                        }
-                    }
-
-                    if(allRevdetailsOfSameType == false)
-                    {
-                        ErrorMsgContent emc = new ErrorMsgContent(
-                                new PKIStatusInfo(PKIStatus.rejection,
-                                        new PKIFreeText("Not all revDetails are of the same type"),
-                                        new PKIFailureInfo(PKIFailureInfo.badRequest)));
-
-                        respBody = new PKIBody(PKIBody.TYPE_ERROR, emc);
-                    }
-                    else
-                    {
-                        checkPermission(_requestor, requiredPermission);
-                        respBody = revokeOrUnrevokeOrRemoveCertificates(rr, auditEvent, requiredPermission);
-                    }
-
-                    break;
-                }
-                case PKIBody.TYPE_CONFIRM:
-                {
-                    eventType = "CONFIRM";
-                    respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
-                }
-                case PKIBody.TYPE_ERROR:
-                {
-                    eventType = "ERROR";
-                    revokePendingCertificates(tid);
-                    respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
-                    break;
-                }
-                case PKIBody.TYPE_GEN_MSG:
-                {
-                    eventType = "GEN_MSG";
-                    GenMsgContent genMsgBody = (GenMsgContent) reqBody.getContent();
-                    InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
-
-                    InfoTypeAndValue itv = null;
-                    if(itvs != null && itvs.length > 0)
-                    {
-                        for(InfoTypeAndValue _itv : itvs)
-                        {
-                            String itvType = _itv.getInfoType().getId();
-                            if(knownGenMsgIds.contains(itvType))
-                            {
-                                itv = _itv;
-                                break;
-                            }
-                        }
-                    }
-
-                    respBody = null;
-
-                    PKIStatus status = PKIStatus.rejection;
-                    String statusMessage = null;
-                    int failureInfo = PKIFailureInfo.badRequest;
-
-                    if(itv == null)
-                    {
-                        statusMessage = "PKIBody type " + type + " is only supported with the sub-types "
-                                + knownGenMsgIds.toString();
-                    }
-                    else
-                    {
-                        InfoTypeAndValue itvResp = null;
-                        ASN1ObjectIdentifier infoType = itv.getInfoType();
-
-                        try
-                        {
-                            X509CA ca = getCA();
-                            if(CMPObjectIdentifiers.it_currentCRL.equals(infoType))
-                            {
-                                eventType = "CRL_DOWNLOAD";
-                                checkPermission(_requestor, Permission.GET_CRL);
-                                CertificateList crl = ca.getCurrentCRL();
-
-                                if(itv.getInfoValue() == null)
-                                { // as defined in RFC 4210
-                                    crl = ca.getCurrentCRL();
-                                }
-                                else
-                                {
-                                    // xipki extension
-                                    ASN1Integer crlNumber = ASN1Integer.getInstance(itv.getInfoValue());
-                                    crl = ca.getCRL(crlNumber.getPositiveValue());
-                                }
-
-                                if(crl == null)
-                                {
-                                    statusMessage = "No CRL is available";
-                                }
-                                else
-                                {
-                                    itvResp = new InfoTypeAndValue(infoType, crl);
-                                }
-                            }
-                            else if(XipkiCmpConstants.id_xipki_cmp.equals(infoType))
-                            {
-                                ASN1Encodable asn1 = itv.getInfoValue();
-                                ASN1Integer asn1Code = null;
-                                ASN1Encodable reqValue = null;
-
-                                try
-                                {
-                                    ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
-                                    asn1Code = ASN1Integer.getInstance(seq.getObjectAt(0));
-                                    if(seq.size() > 1)
-                                    {
-                                        reqValue = seq.getObjectAt(1);
-                                    }
-                                }catch(IllegalArgumentException e)
-                                {
-                                    statusMessage = "Invalid value of the InfoTypeAndValue for " +
-                                            XipkiCmpConstants.id_xipki_cmp.getId();
-                                }
-
-                                if(statusMessage == null)
-                                {
-                                    int action = asn1Code.getPositiveValue().intValue();
-                                    ASN1Encodable respValue = null;
-
-                                    switch(action)
-                                    {
-                                    case XipkiCmpConstants.ACTION_GEN_CRL:
-                                        eventType = "CRL_GEN_ONDEMAND";
-                                        checkPermission(_requestor, Permission.GEN_CRL);
-                                        X509CRL _crl = ca.generateCRLonDemand(auditEvent);
-                                        if(_crl == null)
-                                        {
-                                            statusMessage = "CRL generation is not activated";
-                                        }
-                                        else
-                                        {
-                                            respValue = CertificateList.getInstance(_crl.getEncoded());
-                                        }
-                                        break;
-                                    case XipkiCmpConstants.ACTION_GET_CRL:
-                                        eventType = "CRL_DOWNLOAD";
-                                        checkPermission(_requestor, Permission.GET_CRL);
-
-                                        ASN1Integer crlNumber = ASN1Integer.getInstance(reqValue);
-                                        respValue = ca.getCRL(crlNumber.getPositiveValue());
-                                        if(respValue == null)
-                                        {
-                                            statusMessage = "No CRL is available";
-                                        }
-                                        break;
-                                    case XipkiCmpConstants.ACTION_GET_CAINFO:
-                                        eventType = "GET_SYSTEMINFO";
-
-                                        Set<Integer> acceptVersions = new HashSet<>();
-                                        if(reqValue != null)
-                                        {
-                                            ASN1Sequence seq = DERSequence.getInstance(reqValue);
-                                            int size = seq.size();
-                                            for(int i = 0; i < size; i++)
-                                            {
-                                                ASN1Integer a = ASN1Integer.getInstance(seq.getObjectAt(i));
-                                                acceptVersions.add(a.getPositiveValue().intValue());
-                                            }
-                                        }
-
-                                        if(CollectionUtil.isEmpty(acceptVersions))
-                                        {
-                                            acceptVersions.add(1);
-                                        }
-
-                                        String systemInfo = getSystemInfo(_requestor, acceptVersions);
-                                        respValue = new DERUTF8String(systemInfo);
-                                        break;
-                                    case XipkiCmpConstants.ACTION_REMOVE_EXPIRED_CERTS:
-                                        checkPermission(_requestor, Permission.REMOVE_CERT);
-
-                                        String info = removeExpiredCerts(_requestor, itv.getInfoValue());
-                                        respValue = new DERUTF8String(info);
-                                        break;
-                                    default:
-                                        statusMessage = "Unsupported XiPKI action code '" + action + "'";
-                                        break;
-                                    }
-
-                                    if(statusMessage == null)
-                                    {
-                                        ASN1EncodableVector v = new ASN1EncodableVector();
-                                        v.add(asn1Code);
-                                        if(respValue != null)
-                                        {
-                                            v.add(respValue);
-                                        }
-                                        itvResp = new InfoTypeAndValue(infoType, new DERSequence(v));
-                                    }
-                                }
-                            }
-
-                            if(itvResp != null)
-                            {
-                                status = PKIStatus.granted;
-                                GenRepContent genRepContent = new GenRepContent(itvResp);
-                                respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
-                            }
-                        } catch (OperationException e)
-                        {
-                            failureInfo = PKIFailureInfo.systemFailure;
-                            ErrorCode code = e.getErrorCode();
-                            switch(code)
-                            {
-                                case BAD_REQUEST:
-                                    failureInfo = PKIFailureInfo.badRequest;
-                                    statusMessage = e.getErrorMessage();
-                                    break;
-                                case DATABASE_FAILURE:
-                                case System_Failure:
-                                    statusMessage = code.name();
-                                    break;
-                                default:
-                                    statusMessage = code.name() + ": " + e.getErrorMessage();
-                                    break;
-                            }
-                        } catch (CRLException e)
-                        {
-                            failureInfo = PKIFailureInfo.systemFailure;
-                            statusMessage = "CRLException: " + e.getMessage();
-                        }
-                    }
-
-                    if(respBody == null)
-                    {
-                        ErrorMsgContent emc = new ErrorMsgContent(
-                            new PKIStatusInfo(status,
-                                    (statusMessage == null) ? null : new PKIFreeText(statusMessage),
-                                    new PKIFailureInfo(failureInfo)));
-                        respBody = new PKIBody(PKIBody.TYPE_ERROR, emc);
-                    }
-
-                    break;
-                }
-                default:
-                {
-                    eventType = "PKIBody." + type;
-                    ErrorMsgContent emc = new ErrorMsgContent(
-                            new PKIStatusInfo(PKIStatus.rejection,
-                                    new PKIFreeText("unsupported type " + type),
-                                    new PKIFailureInfo(PKIFailureInfo.badRequest)));
-
-                    respBody = new PKIBody(PKIBody.TYPE_ERROR, emc);
-                    break;
-                }
+            case PKIBody.TYPE_CERT_REQ:
+            case PKIBody.TYPE_KEY_UPDATE_REQ:
+            case PKIBody.TYPE_P10_CERT_REQ:
+            case PKIBody.TYPE_CROSS_CERT_REQ:
+            {
+            	respBody = doEnrollCert(respHeader, cmpControl, reqHeader, reqBody,
+            			_requestor, user, tid, auditEvent);
+                break;
             }
+            case PKIBody.TYPE_CERT_CONFIRM:
+            {
+            	addAutitEventType(auditEvent, "CERT_CONFIRM");
+                CertConfirmContent certConf = (CertConfirmContent) reqBody.getContent();
+                respBody = confirmCertificates(tid, certConf);
+                break;
+            }
+            case PKIBody.TYPE_REVOCATION_REQ:
+            {
+            	respBody = doRevokeOrUnrevokeOrRemoveCertificates(respHeader, cmpControl, reqHeader, reqBody,
+            			_requestor, user, tid, auditEvent);
+                break;
+            }
+            case PKIBody.TYPE_CONFIRM:
+            {
+                addAutitEventType(auditEvent, "CONFIRM");
+                respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
+            }
+            case PKIBody.TYPE_ERROR:
+            {
+            	addAutitEventType(auditEvent, "ERROR");
+                revokePendingCertificates(tid);
+                respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
+                break;
+            }
+            case PKIBody.TYPE_GEN_MSG:
+            {
+            	respBody = doGeneralMsg(respHeader, cmpControl, reqHeader, reqBody, _requestor, user, tid, auditEvent);
+                break;
+            }
+            default:
+            {
+                addAutitEventType(auditEvent, "PKIBody." + type);
+                respBody = createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badRequest, "unsupported type " + type);
+                break;
+            }
+            } // end switch(type)
         }catch(InsuffientPermissionException e)
         {
             ErrorMsgContent emc = new ErrorMsgContent(
@@ -657,17 +315,6 @@ class X509CACmpResponder extends CmpResponder
 
         if(auditEvent != null)
         {
-            if(eventType != null)
-            {
-                auditEvent.addEventData(new AuditEventData("eventType", eventType));
-            }
-
-            if(_requestor != null)
-            {
-                auditEvent.addEventData(new AuditEventData("requestor",
-                        _requestor.getCert().getSubject()));
-            }
-
             if(respBody.getType() == PKIBody.TYPE_ERROR)
             {
                 ErrorMsgContent errorMsgContent = (ErrorMsgContent) respBody.getContent();
@@ -1074,11 +721,11 @@ class X509CACmpResponder extends CmpResponder
                     failureInfo = PKIFailureInfo.systemFailure;
                     auditMessage = "INVALID_EXTENSION";
                     break;
-                case System_Failure:
+                case SYSTEM_FAILURE:
                     failureInfo = PKIFailureInfo.systemFailure;
                     auditMessage = "System_Failure";
                     break;
-                case System_Unavailable:
+                case SYSTEM_UNAVAILABLE:
                     failureInfo = PKIFailureInfo.systemUnavail;
                     auditMessage = "System_Unavailable";
                     break;
@@ -1106,7 +753,7 @@ class X509CACmpResponder extends CmpResponder
             switch(code)
             {
                 case DATABASE_FAILURE:
-                case System_Failure:
+                case SYSTEM_FAILURE:
                     errorMessage = code.name();
                     break;
                 default:
@@ -1294,11 +941,11 @@ class X509CACmpResponder extends CmpResponder
                         failureInfo = PKIFailureInfo.notAuthorized;
                         auditMessage = "NOT_PERMITTED";
                         break;
-                    case System_Failure:
+                    case SYSTEM_FAILURE:
                         failureInfo = PKIFailureInfo.systemFailure;
                         auditMessage = "System_Failure";
                         break;
-                    case System_Unavailable:
+                    case SYSTEM_UNAVAILABLE:
                         failureInfo = PKIFailureInfo.systemUnavail;
                         auditMessage = "System_Unavailable";
                         break;
@@ -1322,7 +969,7 @@ class X509CACmpResponder extends CmpResponder
                 switch(code)
                 {
                     case DATABASE_FAILURE:
-                    case System_Failure:
+                    case SYSTEM_FAILURE:
                         errorMessage = code.name();
                         break;
                     default:
@@ -1758,6 +1405,400 @@ class X509CACmpResponder extends CmpResponder
     protected CmpRequestorInfo getRequestor(X500Name requestorSender)
     {
         return getCA().getRequestor(requestorSender);
+    }
+    
+    private PKIBody doEnrollCert(
+    		PKIHeaderBuilder respHeader, CmpControl cmpControl, 
+    		PKIHeader reqHeader, PKIBody reqBody, 
+    		CmpRequestorInfo requestor, String user,
+            ASN1OctetString tid, AuditEvent auditEvent)
+    throws InsuffientPermissionException
+    {
+        long confirmWaitTime = cmpControl.getConfirmWaitTime();
+        if(confirmWaitTime < 0)
+        {
+            confirmWaitTime *= -1;
+        }
+        confirmWaitTime *= 1000; // second to millisecond
+        boolean sendCaCert = cmpControl.isSendCaCert();
+        
+        PKIBody respBody;
+
+        int type = reqBody.getType();
+        switch(type)
+        {
+        case PKIBody.TYPE_CERT_REQ:
+        	addAutitEventType(auditEvent, "CERT_REQ");
+            checkPermission(requestor, Permission.ENROLL_CERT);
+            respBody = processCr(requestor, user, tid, reqHeader,
+                    (CertReqMessages) reqBody.getContent(), confirmWaitTime, sendCaCert, auditEvent);
+            break;
+        case PKIBody.TYPE_KEY_UPDATE_REQ:
+        	addAutitEventType(auditEvent, "KEY_UPDATE");
+            checkPermission(requestor, Permission.KEY_UPDATE);
+            respBody = processKur(requestor, user, tid, reqHeader,
+                    (CertReqMessages) reqBody.getContent(), confirmWaitTime, sendCaCert, auditEvent);
+            break;
+        case PKIBody.TYPE_P10_CERT_REQ:
+        	addAutitEventType(auditEvent, "CERT_REQ");
+            checkPermission(requestor, Permission.ENROLL_CERT);
+            respBody = processP10cr(requestor, user, tid, reqHeader,
+                    (CertificationRequest) reqBody.getContent(), confirmWaitTime, sendCaCert, auditEvent);
+            break;
+        case PKIBody.TYPE_CROSS_CERT_REQ:
+        	addAutitEventType(auditEvent, "CROSS_CERT_REQ");
+            checkPermission(requestor, Permission.CROSS_CERT_ENROLL);
+            respBody = processCcp(requestor, user, tid, reqHeader,
+                    (CertReqMessages) reqBody.getContent(), confirmWaitTime, sendCaCert, auditEvent);
+            break;
+        default:
+        	throw new RuntimeException("should not reach here");
+        } // switch type        
+
+        boolean successfull = false;
+
+        InfoTypeAndValue tv = null;
+        if(cmpControl.isRequireConfirmCert() == false && CmpUtil.isImplictConfirm(reqHeader))
+        {
+            pendingCertPool.removeCertificates(tid.getOctets());
+            tv = CmpUtil.getImplictConfirmGeneralInfo();
+            successfull = true;
+        }
+        else
+        {
+            Date now = new Date();
+            respHeader.setMessageTime(new ASN1GeneralizedTime(now));
+            tv = new InfoTypeAndValue(
+                    CMPObjectIdentifiers.it_confirmWaitTime,
+                    new ASN1GeneralizedTime(new Date(System.currentTimeMillis() + confirmWaitTime)));
+        }
+
+        if(tv != null)
+        {
+            respHeader.setGeneralInfo(tv);
+        }
+
+        if(successfull)
+        {
+        	return respBody;
+        }
+
+        ErrorMsgContent emc = new ErrorMsgContent(
+                new PKIStatusInfo(PKIStatus.rejection,
+                        null,
+                        new PKIFailureInfo(PKIFailureInfo.systemFailure)));
+
+        return new PKIBody(PKIBody.TYPE_ERROR, emc);
+    }
+    
+    private PKIBody doRevokeOrUnrevokeOrRemoveCertificates(
+    		PKIHeaderBuilder respHeader, CmpControl cmpControl, 
+    		PKIHeader reqHeader, PKIBody reqBody, 
+    		CmpRequestorInfo requestor, String user,
+            ASN1OctetString tid, AuditEvent auditEvent)
+    throws InsuffientPermissionException
+    {
+        Permission requiredPermission = null;
+        boolean allRevdetailsOfSameType = true;
+
+        RevReqContent rr = (RevReqContent) reqBody.getContent();
+        RevDetails[] revContent = rr.toRevDetailsArray();
+
+        int n = revContent.length;
+        for (int i = 0; i < n; i++)
+        {
+            RevDetails revDetails = revContent[i];
+            Extensions crlDetails = revDetails.getCrlEntryDetails();
+            int reasonCode = CRLReason.UNSPECIFIED.getCode();
+            if(crlDetails != null)
+            {
+                ASN1ObjectIdentifier extId = Extension.reasonCode;
+                ASN1Encodable extValue = crlDetails.getExtensionParsedValue(extId);
+                if(extValue != null)
+                {
+                    reasonCode = ((ASN1Enumerated) extValue).getValue().intValue();
+                }
+            }
+            if(reasonCode == XiPKI_CRL_REASON_REMOVE)
+            {
+                if(requiredPermission == null)
+                {
+                    addAutitEventType(auditEvent, "CERT_REMOVE");
+                    requiredPermission = Permission.REMOVE_CERT;
+                }
+                else if(requiredPermission != Permission.REMOVE_CERT)
+                {
+                    allRevdetailsOfSameType = false;
+                    break;
+                }
+            }
+            else if(reasonCode == CRLReason.REMOVE_FROM_CRL.getCode())
+            {
+                if(requiredPermission == null)
+                {
+                    addAutitEventType(auditEvent, "CERT_UNREVOKE");
+                    requiredPermission = Permission.UNREVOKE_CERT;
+                }
+                else if(requiredPermission != Permission.UNREVOKE_CERT)
+                {
+                    allRevdetailsOfSameType = false;
+                    break;
+                }
+            }
+            else
+            {
+                if(requiredPermission == null)
+                {
+                    addAutitEventType(auditEvent, "CERT_REVOKE");
+                    requiredPermission = Permission.REVOKE_CERT;
+                }
+                else if(requiredPermission != Permission.REVOKE_CERT)
+                {
+                    allRevdetailsOfSameType = false;
+                    break;
+                }
+            }
+        }
+
+        if(allRevdetailsOfSameType == false)
+        {
+            ErrorMsgContent emc = new ErrorMsgContent(
+                    new PKIStatusInfo(PKIStatus.rejection,
+                            new PKIFreeText("Not all revDetails are of the same type"),
+                            new PKIFailureInfo(PKIFailureInfo.badRequest)));
+
+            return new PKIBody(PKIBody.TYPE_ERROR, emc);
+        }
+        else
+        {
+            checkPermission(requestor, requiredPermission);
+            return revokeOrUnrevokeOrRemoveCertificates(rr, auditEvent, requiredPermission);
+        }
+    }
+    
+    private PKIBody doGeneralMsg(
+    		PKIHeaderBuilder respHeader, CmpControl cmpControl, 
+    		PKIHeader reqHeader, PKIBody reqBody, 
+    		CmpRequestorInfo requestor, String user,
+            ASN1OctetString tid, AuditEvent auditEvent)
+    throws InsuffientPermissionException
+    {
+//TODO        eventType = "GEN_MSG";
+        GenMsgContent genMsgBody = (GenMsgContent) reqBody.getContent();
+        InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
+
+        InfoTypeAndValue itv = null;
+        if(itvs != null && itvs.length > 0)
+        {
+            for(InfoTypeAndValue _itv : itvs)
+            {
+                String itvType = _itv.getInfoType().getId();
+                if(knownGenMsgIds.contains(itvType))
+                {
+                    itv = _itv;
+                    break;
+                }
+            }
+        }
+
+        respBody = null;
+
+        PKIStatus status = PKIStatus.rejection;
+        String statusMessage = null;
+        int failureInfo = PKIFailureInfo.badRequest;
+
+        if(itv == null)
+        {
+            statusMessage = "PKIBody type " + PKIBody.TYPE_GEN_MSG + " is only supported with the sub-types "
+                    + knownGenMsgIds.toString();
+        }
+        else
+        {
+            InfoTypeAndValue itvResp = null;
+            ASN1ObjectIdentifier infoType = itv.getInfoType();
+
+            try
+            {
+                X509CA ca = getCA();
+                if(CMPObjectIdentifiers.it_currentCRL.equals(infoType))
+                {
+                    addAutitEventType(auditEvent, "CRL_DOWNLOAD");
+                    checkPermission(requestor, Permission.GET_CRL);
+                    CertificateList crl = ca.getCurrentCRL();
+
+                    if(itv.getInfoValue() == null)
+                    { // as defined in RFC 4210
+                        crl = ca.getCurrentCRL();
+                    }
+                    else
+                    {
+                        // xipki extension
+                        ASN1Integer crlNumber = ASN1Integer.getInstance(itv.getInfoValue());
+                        crl = ca.getCRL(crlNumber.getPositiveValue());
+                    }
+
+                    if(crl == null)
+                    {
+                        statusMessage = "No CRL is available";
+                    }
+                    else
+                    {
+                        itvResp = new InfoTypeAndValue(infoType, crl);
+                    }
+                }
+                else if(XipkiCmpConstants.id_xipki_cmp.equals(infoType))
+                {
+                    ASN1Encodable asn1 = itv.getInfoValue();
+                    ASN1Integer asn1Code = null;
+                    ASN1Encodable reqValue = null;
+
+                    try
+                    {
+                        ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
+                        asn1Code = ASN1Integer.getInstance(seq.getObjectAt(0));
+                        if(seq.size() > 1)
+                        {
+                            reqValue = seq.getObjectAt(1);
+                        }
+                    }catch(IllegalArgumentException e)
+                    {
+                        statusMessage = "Invalid value of the InfoTypeAndValue for " +
+                                XipkiCmpConstants.id_xipki_cmp.getId();
+                    }
+
+                    if(statusMessage == null)
+                    {
+                        int action = asn1Code.getPositiveValue().intValue();
+                        ASN1Encodable respValue = null;
+
+                        switch(action)
+                        {
+                        case XipkiCmpConstants.ACTION_GEN_CRL:
+                            addAutitEventType(auditEvent, "CRL_GEN_ONDEMAND");
+                            checkPermission(requestor, Permission.GEN_CRL);
+                            X509CRL _crl = ca.generateCRLonDemand(auditEvent);
+                            if(_crl == null)
+                            {
+                                statusMessage = "CRL generation is not activated";
+                            }
+                            else
+                            {
+                                respValue = CertificateList.getInstance(_crl.getEncoded());
+                            }
+                            break;
+                        case XipkiCmpConstants.ACTION_GET_CRL:
+                            addAutitEventType(auditEvent, "CRL_DOWNLOAD");
+                            checkPermission(requestor, Permission.GET_CRL);
+
+                            ASN1Integer crlNumber = ASN1Integer.getInstance(reqValue);
+                            respValue = ca.getCRL(crlNumber.getPositiveValue());
+                            if(respValue == null)
+                            {
+                                statusMessage = "No CRL is available";
+                            }
+                            break;
+                        case XipkiCmpConstants.ACTION_GET_CAINFO:
+                            addAutitEventType(auditEvent, "GET_SYSTEMINFO");
+                            Set<Integer> acceptVersions = new HashSet<>();
+                            if(reqValue != null)
+                            {
+                                ASN1Sequence seq = DERSequence.getInstance(reqValue);
+                                int size = seq.size();
+                                for(int i = 0; i < size; i++)
+                                {
+                                    ASN1Integer a = ASN1Integer.getInstance(seq.getObjectAt(i));
+                                    acceptVersions.add(a.getPositiveValue().intValue());
+                                }
+                            }
+
+                            if(CollectionUtil.isEmpty(acceptVersions))
+                            {
+                                acceptVersions.add(1);
+                            }
+
+                            String systemInfo = getSystemInfo(requestor, acceptVersions);
+                            respValue = new DERUTF8String(systemInfo);
+                            break;
+                        case XipkiCmpConstants.ACTION_REMOVE_EXPIRED_CERTS:
+                            checkPermission(requestor, Permission.REMOVE_CERT);
+
+                            String info = removeExpiredCerts(requestor, itv.getInfoValue());
+                            respValue = new DERUTF8String(info);
+                            break;
+                        default:
+                            statusMessage = "Unsupported XiPKI action code '" + action + "'";
+                            break;
+                        }
+
+                        if(statusMessage == null)
+                        {
+                            ASN1EncodableVector v = new ASN1EncodableVector();
+                            v.add(asn1Code);
+                            if(respValue != null)
+                            {
+                                v.add(respValue);
+                            }
+                            itvResp = new InfoTypeAndValue(infoType, new DERSequence(v));
+                        }
+                    }
+                }
+
+                if(itvResp != null)
+                {
+                    status = PKIStatus.granted;
+                    GenRepContent genRepContent = new GenRepContent(itvResp);
+                    respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
+                }
+            } catch (OperationException e)
+            {
+                failureInfo = PKIFailureInfo.systemFailure;
+                ErrorCode code = e.getErrorCode();
+                switch(code)
+                {
+                    case BAD_REQUEST:
+                        failureInfo = PKIFailureInfo.badRequest;
+                        statusMessage = e.getErrorMessage();
+                        break;
+                    case DATABASE_FAILURE:
+                    case SYSTEM_FAILURE:
+                        statusMessage = code.name();
+                        break;
+                    default:
+                        statusMessage = code.name() + ": " + e.getErrorMessage();
+                        break;
+                }
+            } catch (CRLException e)
+            {
+                failureInfo = PKIFailureInfo.systemFailure;
+                statusMessage = "CRLException: " + e.getMessage();
+            }
+        }
+
+        if(respBody == null)
+        {
+            ErrorMsgContent emc = new ErrorMsgContent(
+                new PKIStatusInfo(status,
+                        (statusMessage == null) ? null : new PKIFreeText(statusMessage),
+                        new PKIFailureInfo(failureInfo)));
+            respBody = new PKIBody(PKIBody.TYPE_ERROR, emc);
+        }    	
+    }
+    
+    private static PKIBody createErrorMsgPKIBody(PKIStatus pkiStatus, int failureInfo, String statusMessage)
+    {
+        ErrorMsgContent emc = new ErrorMsgContent(
+                new PKIStatusInfo(pkiStatus,
+                        (statusMessage == null) ? null : new PKIFreeText(statusMessage),
+                        new PKIFailureInfo(failureInfo)));
+        return new PKIBody(PKIBody.TYPE_ERROR, emc);
+    }
+    
+    private static void addAutitEventType(AuditEvent auditEvent, String eventType)
+    {
+    	if(auditEvent != null)
+    	{
+            auditEvent.addEventData(new AuditEventData("eventType", "CERT_REQ"));
+    	}
     }
 
 }

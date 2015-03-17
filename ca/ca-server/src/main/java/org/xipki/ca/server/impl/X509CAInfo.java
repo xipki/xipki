@@ -108,7 +108,7 @@ class X509CAInfo
             bcCert = Certificate.getInstance(encodedCert);
         } catch (CertificateEncodingException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, "could not encode the CA certificate");
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "could not encode the CA certificate");
         }
         this.certInCMPFormat = new CMPCertificate(bcCert);
 
@@ -129,7 +129,7 @@ class X509CAInfo
 
         if(greatestSerialNumber == null)
         {
-            throw new OperationException(ErrorCode.System_Failure,
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "Could not retrieve the greatest serial number for ca " + caEntry.getName());
         }
 

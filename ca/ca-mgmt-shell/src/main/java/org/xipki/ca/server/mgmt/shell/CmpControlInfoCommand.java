@@ -92,7 +92,6 @@ public class CmpControlInfoCommand extends CaCommand
         }
 
         out(sb.toString());
-
         return null;
     }
 }

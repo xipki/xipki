@@ -148,7 +148,7 @@ class X509SelfSignedCertBuilder
             signer = securityFactory.createSigner(signerType, signerConf, (X509Certificate[]) null);
         } catch (SignerException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getClass().getName() + ": " + e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getClass().getName() + ": " + e.getMessage());
         }
 
         // this certificate is the dummy one which can be considered only as public key container
@@ -158,7 +158,7 @@ class X509SelfSignedCertBuilder
             bcCert = Certificate.getInstance(signer.getCertificate().getEncoded());
         } catch (Exception e)
         {
-            throw new OperationException(ErrorCode.System_Failure, "Could not reparse certificate: " + e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "Could not reparse certificate: " + e.getMessage());
         }
         SubjectPublicKeyInfo publicKeyInfo = bcCert.getSubjectPublicKeyInfo();
 
@@ -207,7 +207,7 @@ class X509SelfSignedCertBuilder
             subjectInfo = certprofile.getSubject(requestedSubject);
         }catch(CertprofileException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, "exception in cert profile " + certprofile.getName());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "exception in cert profile " + certprofile.getName());
         } catch (BadCertTemplateException e)
         {
             LOG.warn("certprofile.getSubject", e);
@@ -285,7 +285,7 @@ class X509SelfSignedCertBuilder
         } catch (NoIdleSignerException | CertificateException | IOException | CertprofileException |
                 NoSuchAlgorithmException | NoSuchProviderException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getClass().getName() + ": " + e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getClass().getName() + ": " + e.getMessage());
         }
     }
 

@@ -43,11 +43,5 @@ public interface AuditLoggingService
 {
     void logEvent(AuditEvent event);
 
-    /**
-     * Logging an PCI audit event.
-     *
-     * @param event
-     *            The event.
-     */
     void logEvent(PCIAuditEvent event);
 }

@@ -102,7 +102,6 @@ public class CaRequestorAddCommand extends CaCommand
 
         boolean b = caManager.addCmpRequestorToCA(entry, caName);
         output(b, "added", "could not add", "requestor " + requestorName + " to CA " + caName);
-
         return null;
     }
 }
