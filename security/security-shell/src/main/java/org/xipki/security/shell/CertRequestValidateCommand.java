@@ -33,15 +33,44 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.audit.api;
+package org.xipki.security.shell;
+
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.xipki.common.util.IoUtil;
 
 /**
  * @author Lijun Liao
  */
 
-public interface AuditLoggingService
+@Command(scope = "xipki-tk", name = "validate-req", description="Validate PKCS#10 request")
+public class CertRequestValidateCommand extends SecurityCommand
 {
-    void logEvent(AuditEvent event);
 
-    void logEvent(PCIAuditEvent event);
+    @Option(name = "-p10",
+            required = true,
+            description = "PKCS#10 request file\n"
+                    + "(required)")
+    private String p10File;
+
+    @Override
+    protected Object _doExecute()
+    throws Exception
+    {
+        CertificationRequest p10Req = CertificationRequest.getInstance(
+                IoUtil.read(p10File));
+
+        if(securityFactory.verifyPOPO(p10Req))
+        {
+            out("The POP is valid");
+        }
+        else
+        {
+            err("The POP is invalid");
+        }
+
+        return null;
+    }
+
 }

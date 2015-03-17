@@ -70,16 +70,16 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
         {
             switch(event.getLevel())
             {
-                case DEBUG:
-                    if(LOG.isDebugEnabled())
-                    {
-                        LOG.debug("{}", createMessage(event));
-                    }
-                    break;
-                default:
-                    LOG.info("{}", createMessage(event));
-                    break;
-            }
+            case DEBUG:
+                if(LOG.isDebugEnabled())
+                {
+                    LOG.debug("{}", createMessage(event));
+                }
+                break;
+            default:
+                LOG.info("{}", createMessage(event));
+                break;
+            } // end switch
         }catch(Throwable t)
         {
             LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}", AuditLevel.ERROR.getAlignedText(), t.getMessage());
@@ -148,16 +148,16 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
             AuditLevel al = event.getLevel();
             switch(al)
             {
-                case DEBUG:
-                    if(LOG.isDebugEnabled())
-                    {
-                        LOG.debug("{} | {}", al.getAlignedText(), event.createMessage());
-                    }
-                    break;
-                default:
-                    LOG.info("{} | {}", al.getAlignedText(), event.createMessage());
-                    break;
-            }
+            case DEBUG:
+                if(LOG.isDebugEnabled())
+                {
+                    LOG.debug("{} | {}", al.getAlignedText(), event.createMessage());
+                }
+                break;
+            default:
+                LOG.info("{} | {}", al.getAlignedText(), event.createMessage());
+                break;
+            } // end switch
 
             event.createMessage();
         }catch(Throwable t)
