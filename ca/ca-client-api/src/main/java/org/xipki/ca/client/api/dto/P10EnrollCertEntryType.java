@@ -33,15 +33,37 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.audit.api;
+package org.xipki.ca.client.api.dto;
+
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public interface AuditLoggingService
+public class P10EnrollCertEntryType
 {
-    void logEvent(AuditEvent event);
+    private final CertificationRequest p10Request;
+    private final String profile;
 
-    void logEvent(PCIAuditEvent event);
+    public P10EnrollCertEntryType(CertificationRequest p10Request, String profile)
+    {
+        ParamChecker.assertNotNull("p10Request", p10Request);
+        ParamChecker.assertNotEmpty("profile", profile);
+
+        this.p10Request = p10Request;
+        this.profile = profile;
+    }
+
+    public CertificationRequest getP10Request()
+    {
+        return p10Request;
+    }
+
+    public String getProfile()
+    {
+        return profile;
+    }
+
 }

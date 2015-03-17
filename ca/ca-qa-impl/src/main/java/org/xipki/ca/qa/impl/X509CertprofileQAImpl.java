@@ -275,28 +275,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
                 for(RdnType t : subject.getRdn())
                 {
-                    DirectoryStringType directoryStringEnum = null;
-                    org.xipki.ca.certprofile.x509.jaxb.DirectoryStringType stringType = t.getDirectoryStringType();
-                    if(stringType != null)
-                    {
-                        switch(t.getDirectoryStringType())
-                        {
-                            case BMP_STRING:
-                                directoryStringEnum = DirectoryStringType.bmpString;
-                                break;
-                            case PRINTABLE_STRING:
-                                directoryStringEnum = DirectoryStringType.printableString;
-                                break;
-                            case TELETEX_STRING:
-                                directoryStringEnum = DirectoryStringType.teletexString;
-                                break;
-                            case UTF_8_STRING:
-                                directoryStringEnum = DirectoryStringType.utf8String;
-                                break;
-                            default:
-                                throw new RuntimeException("should not reach here, unknown DirectoryStringType " + stringType);
-                        }
-                    }
+                    DirectoryStringType directoryStringEnum =
+                            XmlX509CertprofileUtil.convertDirectoryStringType(t.getDirectoryStringType());
                     ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(t.getType().getValue());
                     RDNControl occ = new RDNControl(type,
                             getInt(t.getMinOccurs(), 1), getInt(t.getMaxOccurs(), 1), directoryStringEnum);
@@ -1207,28 +1187,28 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
         switch (encoded[0])
         {
-            case 0x02: // compressed
-            case 0x03: // compressed
+        case 0x02: // compressed
+        case 0x03: // compressed
+        {
+            if (encoded.length != (expectedLength + 1))
             {
-                if (encoded.length != (expectedLength + 1))
-                {
-                    throw new BadCertTemplateException("Incorrect length for compressed encoding");
-                }
-                break;
+                throw new BadCertTemplateException("Incorrect length for compressed encoding");
             }
-            case 0x04: // uncompressed
-            case 0x06: // hybrid
-            case 0x07: // hybrid
-            {
-                if (encoded.length != (2 * expectedLength + 1))
-                {
-                    throw new BadCertTemplateException("Incorrect length for uncompressed/hybrid encoding");
-                }
-                break;
-            }
-            default:
-                throw new BadCertTemplateException("Invalid point encoding 0x" + Integer.toString(encoded[0], 16));
+            break;
         }
+        case 0x04: // uncompressed
+        case 0x06: // hybrid
+        case 0x07: // hybrid
+        {
+            if (encoded.length != (2 * expectedLength + 1))
+            {
+                throw new BadCertTemplateException("Incorrect length for uncompressed/hybrid encoding");
+            }
+            break;
+        }
+        default:
+            throw new BadCertTemplateException("Invalid point encoding 0x" + Integer.toString(encoded[0], 16));
+        }// end switch
     }
 
     private List<ValidationIssue> checkSubject(X500Name subject, X500Name requestedSubject)
@@ -1311,7 +1291,6 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             }
         }
 
-        StringBuilder failureMsg = new StringBuilder();
         List<String> requestedCoreAtvTextValues = new LinkedList<>();
         if(requestedRdns != null)
         {
@@ -1321,31 +1300,14 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 requestedCoreAtvTextValues.add(textValue);
             }
 
-            // sort the requestedRDNs
             if(rdnOption != null && rdnOption.getPatterns() != null)
             {
-                List<String> sorted = new ArrayList<>(requestedCoreAtvTextValues.size());
-                for(Pattern p : rdnOption.getPatterns())
-                {
-                    for(String value : requestedCoreAtvTextValues)
-                    {
-                        if(sorted.contains(value) == false && p.matcher(value).matches())
-                        {
-                            sorted.add(value);
-                        }
-                    }
-                }
-                for(String value : requestedCoreAtvTextValues)
-                {
-                    if(sorted.contains(value) == false)
-                    {
-                        sorted.add(value);
-                    }
-                }
-                requestedCoreAtvTextValues = sorted;
+                // sort the requestedRDNs
+                requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues, rdnOption.getPatterns());
             }
         }
 
+        StringBuilder failureMsg = new StringBuilder();
         for(int i = 0; i < rdns.length; i++)
         {
             RDN rdn = rdns[i];
@@ -1361,21 +1323,21 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             boolean correctStringType = true;
             switch(stringType)
             {
-                case bmpString:
-                    correctStringType = (atvValue instanceof DERBMPString);
-                    break;
-                case printableString:
-                    correctStringType = (atvValue instanceof DERPrintableString);
-                    break;
-                case teletexString:
-                    correctStringType = (atvValue instanceof DERT61String);
-                    break;
-                case utf8String:
-                    correctStringType = (atvValue instanceof DERUTF8String);
-                    break;
-                default:
-                    throw new RuntimeException("should not reach here, unknown DirectoryStringType " + stringType);
-            }
+            case bmpString:
+                correctStringType = (atvValue instanceof DERBMPString);
+                break;
+            case printableString:
+                correctStringType = (atvValue instanceof DERPrintableString);
+                break;
+            case teletexString:
+                correctStringType = (atvValue instanceof DERT61String);
+                break;
+            case utf8String:
+                correctStringType = (atvValue instanceof DERUTF8String);
+                break;
+            default:
+                throw new RuntimeException("should not reach here, unknown DirectoryStringType " + stringType);
+            } // end switch
 
             if(correctStringType == false)
             {
@@ -1390,7 +1352,6 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             if(rdnOption != null)
             {
                 String prefix = rdnOption.getPrefix();
-
                 if(prefix != null)
                 {
                     if(coreAtvTextValue.startsWith(prefix) == false)
@@ -1399,7 +1360,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                                 "' does not start with prefix '" + prefix + "'");
                         failureMsg.append("; ");
                         continue;
-                    } else
+                    }
+                    else
                     {
                         coreAtvTextValue = coreAtvTextValue.substring(prefix.length());
                     }
@@ -1414,7 +1376,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                                 "' does not end with suffx '" + suffix + "'");
                         failureMsg.append("; ");
                         continue;
-                    } else
+                    }
+                    else
                     {
                         coreAtvTextValue = coreAtvTextValue.substring(0, coreAtvTextValue.length() - suffix.length());
                     }
@@ -1446,7 +1409,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             {
                 String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(i);
                 if(ObjectIdentifiers.DN_CN.equals(type) &&
-                        specialBehavior != null && "gematik_gSMC_K".equals(specialBehavior))
+                        specialBehavior != null &&
+                        "gematik_gSMC_K".equals(specialBehavior))
                 {
                     if(coreAtvTextValue.startsWith(requestedCoreAtvTextValue + "-") == false)
                     {
@@ -1454,9 +1418,11 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                                 requestedCoreAtvTextValue + "-'");
                         failureMsg.append("; ");
                     }
-                } else if(type.equals(ObjectIdentifiers.DN_SERIALNUMBER))
+                }
+                else if(type.equals(ObjectIdentifiers.DN_SERIALNUMBER))
                 {
-                } else
+                }
+                else
                 {
                     if(coreAtvTextValue.equals(requestedCoreAtvTextValue) == false)
                     {
@@ -1615,19 +1581,21 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 X500Name x500GenName = null;
                 for(GeneralName genName : genNames)
                 {
-                    if(genName.getTagNo() == GeneralName.directoryName)
+                    if(genName.getTagNo() != GeneralName.directoryName)
                     {
-                        if(x500GenName != null)
-                        {
-                            failureMsg.append("authorityCertIssuer contains at least two directoryName "
-                                    + "but expected one");
-                            failureMsg.append("; ");
-                            break;
-                        }
-                        else
-                        {
-                            x500GenName = (X500Name) genName.getName();
-                        }
+                        continue;
+                    }
+
+                    if(x500GenName != null)
+                    {
+                        failureMsg.append("authorityCertIssuer contains at least two directoryName "
+                                + "but expected one");
+                        failureMsg.append("; ");
+                        break;
+                    }
+                    else
+                    {
+                        x500GenName = (X500Name) genName.getName();
                     }
                 }
 
@@ -1699,66 +1667,66 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         {
             failureMsg.append("Size of " + description + " is '" + iSize + "' but expected '" + eSize + "'");
             failureMsg.append("; ");
-        } else
+            return;
+        }
+
+        for(int i = 0; i < iSize; i++)
         {
-            for(int i = 0; i < iSize; i++)
+            GeneralSubtree iSubtree = subtrees[i];
+            QaGeneralSubtree eSubtree = expectedSubtrees.get(i);
+            BigInteger bigInt = iSubtree.getMinimum();
+            int iMinimum = bigInt == null ? 0 : bigInt.intValue();
+            Integer _int = eSubtree.getMinimum();
+            int eMinimum = _int == null ? 0 : _int.intValue();
+            String desc = description + " [" + i + "]";
+            if(iMinimum != eMinimum)
             {
-                GeneralSubtree iSubtree = subtrees[i];
-                QaGeneralSubtree eSubtree = expectedSubtrees.get(i);
-                BigInteger bigInt = iSubtree.getMinimum();
-                int iMinimum = bigInt == null ? 0 : bigInt.intValue();
-                Integer _int = eSubtree.getMinimum();
-                int eMinimum = _int == null ? 0 : _int.intValue();
-                String desc = description + " [" + i + "]";
-                if(iMinimum != eMinimum)
-                {
-                    failureMsg.append("minimum of " + desc + " is '" + iMinimum + "' but expected '" + eMinimum + "'");
-                    failureMsg.append("; ");
-                }
+                failureMsg.append("minimum of " + desc + " is '" + iMinimum + "' but expected '" + eMinimum + "'");
+                failureMsg.append("; ");
+            }
 
-                bigInt = iSubtree.getMaximum();
-                Integer iMaximum = bigInt == null ? null : bigInt.intValue();
-                Integer eMaximum = eSubtree.getMaximum();
-                if(iMaximum != eMaximum)
-                {
-                    failureMsg.append("maxmum of " + desc + " is '" + iMaximum + "' but expected '" + eMaximum + "'");
-                    failureMsg.append("; ");
-                }
+            bigInt = iSubtree.getMaximum();
+            Integer iMaximum = bigInt == null ? null : bigInt.intValue();
+            Integer eMaximum = eSubtree.getMaximum();
+            if(iMaximum != eMaximum)
+            {
+                failureMsg.append("maxmum of " + desc + " is '" + iMaximum + "' but expected '" + eMaximum + "'");
+                failureMsg.append("; ");
+            }
 
-                GeneralName iBase = iSubtree.getBase();
+            GeneralName iBase = iSubtree.getBase();
 
-                GeneralName eBase;
-                if(eSubtree.getDirectoryName() != null)
-                {
-                    eBase = new GeneralName(SecurityUtil.reverse(
-                            new X500Name(eSubtree.getDirectoryName())));
-                }
-                else if(eSubtree.getDNSName() != null)
-                {
-                    eBase = new GeneralName(GeneralName.dNSName, eSubtree.getDNSName());
-                }
-                else if(eSubtree.getIpAddress() != null)
-                {
-                    eBase = new GeneralName(GeneralName.iPAddress, eSubtree.getIpAddress());
-                }
-                else if(eSubtree.getRfc822Name() != null)
-                {
-                    eBase = new GeneralName(GeneralName.rfc822Name, eSubtree.getRfc822Name());
-                }
-                else if(eSubtree.getUri() != null)
-                {
-                    eBase = new GeneralName(GeneralName.uniformResourceIdentifier, eSubtree.getUri());
-                }
-                else
-                {
-                    throw new RuntimeException("should not reach here, unknown child of GeneralName");
-                }
+            GeneralName eBase;
+            if(eSubtree.getDirectoryName() != null)
+            {
+                eBase = new GeneralName(SecurityUtil.reverse(
+                        new X500Name(eSubtree.getDirectoryName())));
+            }
+            else if(eSubtree.getDNSName() != null)
+            {
+                eBase = new GeneralName(GeneralName.dNSName, eSubtree.getDNSName());
+            }
+            else if(eSubtree.getIpAddress() != null)
+            {
+                eBase = new GeneralName(GeneralName.iPAddress, eSubtree.getIpAddress());
+            }
+            else if(eSubtree.getRfc822Name() != null)
+            {
+                eBase = new GeneralName(GeneralName.rfc822Name, eSubtree.getRfc822Name());
+            }
+            else if(eSubtree.getUri() != null)
+            {
+                eBase = new GeneralName(GeneralName.uniformResourceIdentifier, eSubtree.getUri());
+            }
+            else
+            {
+                throw new RuntimeException("should not reach here, unknown child of GeneralName");
+            }
 
-                if(iBase.equals(eBase) == false)
-                {
-                    failureMsg.append("base of " + desc + " is '" + iBase + "' but expected '" + eBase + "'");
-                    failureMsg.append("; ");
-                }
+            if(iBase.equals(eBase) == false)
+            {
+                failureMsg.append("base of " + desc + " is '" + iBase + "' but expected '" + eBase + "'");
+                failureMsg.append("; ");
             }
         }
     }
@@ -1996,60 +1964,62 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             {
                 failureMsg.append("certificate policy '" + iPolicyId + "' is not expected");
                 failureMsg.append("; ");
-            } else
+                continue;
+            }
+
+            QaPolicyQualifiers eCpPq = eCp.getPolicyQualifiers();
+            if(eCpPq == null)
             {
-                QaPolicyQualifiers eCpPq = eCp.getPolicyQualifiers();
-                if(eCpPq != null)
+                continue;
+            }
+
+            ASN1Sequence iPolicyQualifiers = iPolicyInformation.getPolicyQualifiers();
+            List<String> iCpsUris = new LinkedList<>();
+            List<String> iUserNotices = new LinkedList<>();
+
+            int n = iPolicyQualifiers.size();
+            for(int i = 0; i < n; i++)
+            {
+                PolicyQualifierInfo iPolicyQualifierInfo =
+                        (PolicyQualifierInfo) iPolicyQualifiers.getObjectAt(i);
+                ASN1ObjectIdentifier iPolicyQualifierId = iPolicyQualifierInfo.getPolicyQualifierId();
+                ASN1Encodable iQualifier = iPolicyQualifierInfo.getQualifier();
+                if(PolicyQualifierId.id_qt_cps.equals(iPolicyQualifierId))
                 {
-                    ASN1Sequence iPolicyQualifiers = iPolicyInformation.getPolicyQualifiers();
-                    List<String> iCpsUris = new LinkedList<>();
-                    List<String> iUserNotices = new LinkedList<>();
-
-                    int n = iPolicyQualifiers.size();
-                    for(int i = 0; i < n; i++)
+                    String iCpsUri = ((DERIA5String) iQualifier).getString();
+                    iCpsUris.add(iCpsUri);
+                } else if (PolicyQualifierId.id_qt_unotice.equals(iPolicyQualifierId))
+                {
+                    UserNotice iUserNotice = UserNotice.getInstance(iQualifier);
+                    if(iUserNotice.getExplicitText() != null)
                     {
-                        PolicyQualifierInfo iPolicyQualifierInfo =
-                                (PolicyQualifierInfo) iPolicyQualifiers.getObjectAt(i);
-                        ASN1ObjectIdentifier iPolicyQualifierId = iPolicyQualifierInfo.getPolicyQualifierId();
-                        ASN1Encodable iQualifier = iPolicyQualifierInfo.getQualifier();
-                        if(PolicyQualifierId.id_qt_cps.equals(iPolicyQualifierId))
-                        {
-                            String iCpsUri = ((DERIA5String) iQualifier).getString();
-                            iCpsUris.add(iCpsUri);
-                        } else if (PolicyQualifierId.id_qt_unotice.equals(iPolicyQualifierId))
-                        {
-                            UserNotice iUserNotice = UserNotice.getInstance(iQualifier);
-                            if(iUserNotice.getExplicitText() != null)
-                            {
-                                iUserNotices.add(iUserNotice.getExplicitText().getString());
-                            }
-                        }
+                        iUserNotices.add(iUserNotice.getExplicitText().getString());
                     }
+                }
+            }
 
-                    List<QaPolicyQualifierInfo> qualifierInfos = eCpPq.getPolicyQualifiers();
-                    for(QaPolicyQualifierInfo qualifierInfo : qualifierInfos)
+            List<QaPolicyQualifierInfo> qualifierInfos = eCpPq.getPolicyQualifiers();
+            for(QaPolicyQualifierInfo qualifierInfo : qualifierInfos)
+            {
+                if(qualifierInfo instanceof QaCPSUriPolicyQualifier)
+                {
+                    String value = ((QaCPSUriPolicyQualifier) qualifierInfo).getCPSUri();
+                    if(iCpsUris.contains(value) == false)
                     {
-                        if(qualifierInfo instanceof QaCPSUriPolicyQualifier)
-                        {
-                            String value = ((QaCPSUriPolicyQualifier) qualifierInfo).getCPSUri();
-                            if(iCpsUris.contains(value) == false)
-                            {
-                                failureMsg.append("CPSUri '" + value + "' is absent but is required");
-                                failureMsg.append("; ");
-                            }
-                        }else if(qualifierInfo instanceof QaUserNoticePolicyQualifierInfo)
-                        {
-                            String value = ((QaUserNoticePolicyQualifierInfo) qualifierInfo).getUserNotice();
-                            if(iUserNotices.contains(value) == false)
-                            {
-                                failureMsg.append("userNotice '" + value + "' is absent but is required");
-                                failureMsg.append("; ");
-                            }
-                        }else
-                        {
-                            throw new RuntimeException("should not reach here");
-                        }
+                        failureMsg.append("CPSUri '" + value + "' is absent but is required");
+                        failureMsg.append("; ");
                     }
+                }else if(qualifierInfo instanceof QaUserNoticePolicyQualifierInfo)
+                {
+                    String value = ((QaUserNoticePolicyQualifierInfo) qualifierInfo).getUserNotice();
+                    if(iUserNotices.contains(value) == false)
+                    {
+                        failureMsg.append("userNotice '" + value + "' is absent but is required");
+                        failureMsg.append("; ");
+                    }
+                }else
+                {
+                    throw new RuntimeException("should not reach here");
                 }
             }
         }
@@ -2066,12 +2036,13 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 }
             }
 
-            if(present == false)
+            if(present)
             {
-                failureMsg.append("certificate policy '" + cp.getPolicyId() + "' is "
-                        + "absent but is required");
-                failureMsg.append("; ");
+                continue;
             }
+
+            failureMsg.append("certificate policy '").append(cp.getPolicyId()).append("' is absent but is required");
+            failureMsg.append("; ");
         }
     }
 
@@ -2330,16 +2301,15 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         {
             failureMsg.append("issuerAlternativeName is present but expected 'none'");
             failureMsg.append("; ");
+            return;
         }
-        else
+
+        byte[] caSubjectAltExtensionValue = caSubjectAltExtension.getExtnValue().getOctets();
+        if(Arrays.equals(caSubjectAltExtensionValue, extensionValue) == false)
         {
-            byte[] caSubjectAltExtensionValue = caSubjectAltExtension.getExtnValue().getOctets();
-            if(Arrays.equals(caSubjectAltExtensionValue, extensionValue) == false)
-            {
-                failureMsg.append("is '" + hex(extensionValue) + "' but expected '" +
-                        hex(caSubjectAltExtensionValue) + "'");
-                failureMsg.append("; ");
-            }
+            failureMsg.append("is '" + hex(extensionValue) + "' but expected '" +
+                    hex(caSubjectAltExtensionValue) + "'");
+            failureMsg.append("; ");
         }
     }
 
@@ -2351,60 +2321,58 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         {
             failureMsg.append("AIA is present but expected is 'none'");
             failureMsg.append("; ");
+            return;
         }
-        else
-        {
-            AuthorityInformationAccess iAIA = AuthorityInformationAccess.getInstance(extensionValue);
-            AccessDescription[] iAccessDescriptions = iAIA.getAccessDescriptions();
-            List<AccessDescription> iOCSPAccessDescriptions = new LinkedList<>();
-            for(AccessDescription iAccessDescription : iAccessDescriptions)
-            {
-                if(iAccessDescription.getAccessMethod().equals(X509ObjectIdentifiers.id_ad_ocsp))
-                {
-                    iOCSPAccessDescriptions.add(iAccessDescription);
-                }
-            }
 
-            int n = iOCSPAccessDescriptions.size();
-            if(n != eOCSPUris.size())
+        AuthorityInformationAccess iAIA = AuthorityInformationAccess.getInstance(extensionValue);
+        AccessDescription[] iAccessDescriptions = iAIA.getAccessDescriptions();
+        List<AccessDescription> iOCSPAccessDescriptions = new LinkedList<>();
+        for(AccessDescription iAccessDescription : iAccessDescriptions)
+        {
+            if(iAccessDescription.getAccessMethod().equals(X509ObjectIdentifiers.id_ad_ocsp))
             {
-                failureMsg.append("Number of AIA OCSP URIs is '").append(n);
-                failureMsg.append("' but expected is '").append(eOCSPUris.size()).append("'");
+                iOCSPAccessDescriptions.add(iAccessDescription);
+            }
+        }
+
+        int n = iOCSPAccessDescriptions.size();
+        if(n != eOCSPUris.size())
+        {
+            failureMsg.append("Number of AIA OCSP URIs is '").append(n);
+            failureMsg.append("' but expected is '").append(eOCSPUris.size()).append("'");
+            failureMsg.append("; ");
+            return;
+        }
+
+        Set<String> iOCSPUris = new HashSet<>();
+        for(int i = 0; i < n; i++)
+        {
+            GeneralName iAccessLocation = iOCSPAccessDescriptions.get(i).getAccessLocation();
+            if(iAccessLocation.getTagNo() != GeneralName.uniformResourceIdentifier)
+            {
+                failureMsg.append("Tag of accessLocation of AIA OCSP is '").append(iAccessLocation.getTagNo());
+                failureMsg.append("' but expected is '").append(GeneralName.uniformResourceIdentifier).append("'");
                 failureMsg.append("; ");
             }
             else
             {
-                Set<String> iOCSPUris = new HashSet<>();
-                for(int i = 0; i < n; i++)
-                {
-                    GeneralName iAccessLocation = iOCSPAccessDescriptions.get(i).getAccessLocation();
-                    if(iAccessLocation.getTagNo() != GeneralName.uniformResourceIdentifier)
-                    {
-                        failureMsg.append("Tag of accessLocation of AIA OCSP is '").append(iAccessLocation.getTagNo());
-                        failureMsg.append("' but expected is '").append(GeneralName.uniformResourceIdentifier).append("'");
-                        failureMsg.append("; ");
-                    }
-                    else
-                    {
-                        String iOCSPUri = ((ASN1String) iAccessLocation.getName()).getString();
-                        iOCSPUris.add(iOCSPUri);
-                    }
-                }
-
-                Set<String> diffs = str_in_b_not_in_a(eOCSPUris, iOCSPUris);
-                if(CollectionUtil.isNotEmpty(diffs))
-                {
-                    failureMsg.append("OCSP URLs ").append(diffs.toString()).append(" are present but not expected");
-                    failureMsg.append("; ");
-                }
-
-                diffs = str_in_b_not_in_a(iOCSPUris, eOCSPUris);
-                if(CollectionUtil.isNotEmpty(diffs))
-                {
-                    failureMsg.append("OCSP URLs ").append(diffs.toString()).append(" are absent but are required");
-                    failureMsg.append("; ");
-                }
+                String iOCSPUri = ((ASN1String) iAccessLocation.getName()).getString();
+                iOCSPUris.add(iOCSPUri);
             }
+        }
+
+        Set<String> diffs = str_in_b_not_in_a(eOCSPUris, iOCSPUris);
+        if(CollectionUtil.isNotEmpty(diffs))
+        {
+            failureMsg.append("OCSP URLs ").append(diffs.toString()).append(" are present but not expected");
+            failureMsg.append("; ");
+        }
+
+        diffs = str_in_b_not_in_a(iOCSPUris, eOCSPUris);
+        if(CollectionUtil.isNotEmpty(diffs))
+        {
+            failureMsg.append("OCSP URLs ").append(diffs.toString()).append(" are absent but are required");
+            failureMsg.append("; ");
         }
     }
 
@@ -2418,54 +2386,53 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         {
             failureMsg.append("Size of CRLDistributionPoints is '").append(n).append("' but expected is '1'");
             failureMsg.append("; ");
+            return;
         }
-        else
+
+        Set<String> iCrlURLs = new HashSet<>();
+        for(DistributionPoint entry : iDistributionPoints)
         {
-            Set<String> iCrlURLs = new HashSet<>();
-            for(DistributionPoint entry : iDistributionPoints)
+            int asn1Type = entry.getDistributionPoint().getType();
+            if(asn1Type != DistributionPointName.FULL_NAME)
             {
-                int asn1Type = entry.getDistributionPoint().getType();
-                if(asn1Type != DistributionPointName.FULL_NAME)
+                failureMsg.append("Tag of DistributionPointName of CRLDistibutionPoints is '").append(asn1Type);
+                failureMsg.append("' but expected is '").append(DistributionPointName.FULL_NAME).append("'");
+                failureMsg.append("; ");
+                continue;
+            }
+
+            GeneralNames iDistributionPointNames = (GeneralNames) entry.getDistributionPoint().getName();
+            GeneralName[] names = iDistributionPointNames.getNames();
+
+            for(int i = 0; i < names.length; i++)
+            {
+                GeneralName name = names[i];
+                if(name.getTagNo() != GeneralName.uniformResourceIdentifier)
                 {
-                    failureMsg.append("Tag of DistributionPointName of CRLDistibutionPoints is '").append(asn1Type);
-                    failureMsg.append("' but expected is '").append(DistributionPointName.FULL_NAME).append("'");
+                    failureMsg.append("Tag of CRL URL is '").append(name.getTagNo());
+                    failureMsg.append("' but expected is '").append(GeneralName.uniformResourceIdentifier).append("'");
                     failureMsg.append("; ");
-                } else
-                {
-                    GeneralNames iDistributionPointNames = (GeneralNames) entry.getDistributionPoint().getName();
-                    GeneralName[] names = iDistributionPointNames.getNames();
-
-                    for(int i = 0; i < names.length; i++)
-                    {
-                        GeneralName name = names[i];
-                        if(name.getTagNo() != GeneralName.uniformResourceIdentifier)
-                        {
-                            failureMsg.append("Tag of CRL URL is '").append(name.getTagNo());
-                            failureMsg.append("' but expected is '").append(GeneralName.uniformResourceIdentifier).append("'");
-                            failureMsg.append("; ");
-                        }
-                        else
-                        {
-                            String uri = ((ASN1String) name.getName()).getString();
-                            iCrlURLs.add(uri);
-                        }
-                    }
-
-                    Set<String> eCRLUrls = issuerInfo.getCrlURLs();
-                    Set<String> diffs = str_in_b_not_in_a(eCRLUrls, iCrlURLs);
-                    if(CollectionUtil.isNotEmpty(diffs))
-                    {
-                        failureMsg.append("CRL URLs ").append(diffs.toString()).append(" are present but not expected");
-                        failureMsg.append("; ");
-                    }
-
-                    diffs = str_in_b_not_in_a(iCrlURLs, eCRLUrls);
-                    if(CollectionUtil.isNotEmpty(diffs))
-                    {
-                        failureMsg.append("CRL URLs ").append(diffs.toString()).append(" are absent but are required");
-                        failureMsg.append("; ");
-                    }
                 }
+                else
+                {
+                    String uri = ((ASN1String) name.getName()).getString();
+                    iCrlURLs.add(uri);
+                }
+            }
+
+            Set<String> eCRLUrls = issuerInfo.getCrlURLs();
+            Set<String> diffs = str_in_b_not_in_a(eCRLUrls, iCrlURLs);
+            if(CollectionUtil.isNotEmpty(diffs))
+            {
+                failureMsg.append("CRL URLs ").append(diffs.toString()).append(" are present but not expected");
+                failureMsg.append("; ");
+            }
+
+            diffs = str_in_b_not_in_a(iCrlURLs, eCRLUrls);
+            if(CollectionUtil.isNotEmpty(diffs))
+            {
+                failureMsg.append("CRL URLs ").append(diffs.toString()).append(" are absent but are required");
+                failureMsg.append("; ");
             }
         }
     }
@@ -2480,54 +2447,53 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         {
             failureMsg.append("Size of CRLDistributionPoints (deltaCRL) is '").append(n).append("' but expected is '1'");
             failureMsg.append("; ");
+            return;
         }
-        else
+
+        Set<String> iCrlURLs = new HashSet<>();
+        for(DistributionPoint entry : iDistributionPoints)
         {
-            Set<String> iCrlURLs = new HashSet<>();
-            for(DistributionPoint entry : iDistributionPoints)
+            int asn1Type = entry.getDistributionPoint().getType();
+            if(asn1Type != DistributionPointName.FULL_NAME)
             {
-                int asn1Type = entry.getDistributionPoint().getType();
-                if(asn1Type != DistributionPointName.FULL_NAME)
+                failureMsg.append("Tag of DistributionPointName of CRLDistibutionPoints (deltaCRL) is '").append(asn1Type);
+                failureMsg.append("' but expected is '").append(DistributionPointName.FULL_NAME).append("'");
+                failureMsg.append("; ");
+                continue;
+            }
+
+            GeneralNames iDistributionPointNames = (GeneralNames) entry.getDistributionPoint().getName();
+            GeneralName[] names = iDistributionPointNames.getNames();
+
+            for(int i = 0; i < names.length; i++)
+            {
+                GeneralName name = names[i];
+                if(name.getTagNo() != GeneralName.uniformResourceIdentifier)
                 {
-                    failureMsg.append("Tag of DistributionPointName of CRLDistibutionPoints (deltaCRL) is '").append(asn1Type);
-                    failureMsg.append("' but expected is '").append(DistributionPointName.FULL_NAME).append("'");
+                    failureMsg.append("Tag of deltaCRL URL is '").append(name.getTagNo());
+                    failureMsg.append("' but expected is '").append(GeneralName.uniformResourceIdentifier).append("'");
                     failureMsg.append("; ");
-                } else
-                {
-                    GeneralNames iDistributionPointNames = (GeneralNames) entry.getDistributionPoint().getName();
-                    GeneralName[] names = iDistributionPointNames.getNames();
-
-                    for(int i = 0; i < names.length; i++)
-                    {
-                        GeneralName name = names[i];
-                        if(name.getTagNo() != GeneralName.uniformResourceIdentifier)
-                        {
-                            failureMsg.append("Tag of deltaCRL URL is '").append(name.getTagNo());
-                            failureMsg.append("' but expected is '").append(GeneralName.uniformResourceIdentifier).append("'");
-                            failureMsg.append("; ");
-                        }
-                        else
-                        {
-                            String uri = ((ASN1String) name.getName()).getString();
-                            iCrlURLs.add(uri);
-                        }
-                    }
-
-                    Set<String> eCRLUrls = issuerInfo.getCrlURLs();
-                    Set<String> diffs = str_in_b_not_in_a(eCRLUrls, iCrlURLs);
-                    if(CollectionUtil.isNotEmpty(diffs))
-                    {
-                        failureMsg.append("deltaCRL URLs ").append(diffs.toString()).append(" are present but not expected");
-                        failureMsg.append("; ");
-                    }
-
-                    diffs = str_in_b_not_in_a(iCrlURLs, eCRLUrls);
-                    if(CollectionUtil.isNotEmpty(diffs))
-                    {
-                        failureMsg.append("deltaCRL URLs ").append(diffs.toString()).append(" are absent but are required");
-                        failureMsg.append("; ");
-                    }
                 }
+                else
+                {
+                    String uri = ((ASN1String) name.getName()).getString();
+                    iCrlURLs.add(uri);
+                }
+            }
+
+            Set<String> eCRLUrls = issuerInfo.getCrlURLs();
+            Set<String> diffs = str_in_b_not_in_a(eCRLUrls, iCrlURLs);
+            if(CollectionUtil.isNotEmpty(diffs))
+            {
+                failureMsg.append("deltaCRL URLs ").append(diffs.toString()).append(" are present but not expected");
+                failureMsg.append("; ");
+            }
+
+            diffs = str_in_b_not_in_a(iCrlURLs, eCRLUrls);
+            if(CollectionUtil.isNotEmpty(diffs))
+            {
+                failureMsg.append("deltaCRL URLs ").append(diffs.toString()).append(" are absent but are required");
+                failureMsg.append("; ");
             }
         }
     }
@@ -2556,115 +2522,114 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         {
             failureMsg.append("Size of Admissions is '").append(n).append("' but expected is '1'");
             failureMsg.append("; ");
+            return;
         }
-        else
+
+        Admissions iAdmission = iAdmissions[0];
+        ProfessionInfo[] iProfessionInfos = iAdmission.getProfessionInfos();
+        n = iProfessionInfos == null ? 0 : iProfessionInfos.length;
+        if(n != 1)
         {
-            Admissions iAdmission = iAdmissions[0];
-            ProfessionInfo[] iProfessionInfos = iAdmission.getProfessionInfos();
-            n = iProfessionInfos == null ? 0 : iProfessionInfos.length;
-            if(n != 1)
+            failureMsg.append("Size of ProfessionInfo is '").append(n).append("' but expected is '1'");
+            failureMsg.append("; ");
+            return;
+        }
+
+        ProfessionInfo iProfessionInfo = iProfessionInfos[0];
+        String iRegistrationNumber = iProfessionInfo.getRegistrationNumber();
+        String eRegistrationNumber = conf.getRegistrationNumber();
+        if(eRegistrationNumber == null)
+        {
+            if(iRegistrationNumber != null)
             {
-                failureMsg.append("Size of ProfessionInfo is '").append(n).append("' but expected is '1'");
+                failureMsg.append("RegistrationNumber is '").append(iRegistrationNumber);
+                failureMsg.append("' but expected is 'null'");
                 failureMsg.append("; ");
-            } else
-            {
-                ProfessionInfo iProfessionInfo = iProfessionInfos[0];
-                String iRegistrationNumber = iProfessionInfo.getRegistrationNumber();
-                String eRegistrationNumber = conf.getRegistrationNumber();
-                if(eRegistrationNumber == null)
-                {
-                    if(iRegistrationNumber != null)
-                    {
-                        failureMsg.append("RegistrationNumber is '").append(iRegistrationNumber);
-                        failureMsg.append("' but expected is 'null'");
-                        failureMsg.append("; ");
-                    }
-                } else if(eRegistrationNumber.equals(iRegistrationNumber) == false)
-                {
-                    failureMsg.append("RegistrationNumber is '").append(iRegistrationNumber);
-                    failureMsg.append("' but expected is '").append(eRegistrationNumber).append("'");
-                    failureMsg.append("; ");
-                }
-
-                byte[] iAddProfessionInfo = null;
-                if(iProfessionInfo.getAddProfessionInfo() != null)
-                {
-                    iAddProfessionInfo = iProfessionInfo.getAddProfessionInfo().getOctets();
-                }
-                byte[] eAddProfessionInfo = conf.getAddProfessionInfo();
-                if(eAddProfessionInfo == null)
-                {
-                    if(iAddProfessionInfo != null)
-                    {
-                        failureMsg.append("AddProfessionInfo is '").append(hex(iAddProfessionInfo));
-                        failureMsg.append("' but expected is 'null'");
-                        failureMsg.append("; ");
-                    }
-                } else
-                {
-                    if(iAddProfessionInfo == null)
-                    {
-                        failureMsg.append("AddProfessionInfo is 'null' but expected is '").append(hex(eAddProfessionInfo));
-                        failureMsg.append("'");
-                        failureMsg.append("; ");
-                    } else if(Arrays.equals(eAddProfessionInfo, iAddProfessionInfo) == false)
-                    {
-                        failureMsg.append("AddProfessionInfo is '").append(hex(iAddProfessionInfo));
-                        failureMsg.append("' but expected is '").append(hex(eAddProfessionInfo)).append("'");
-                        failureMsg.append("; ");
-                    }
-                }
-
-                List<String> eProfessionOids = conf.getProfessionOIDs();
-                ASN1ObjectIdentifier[] _iProfessionOids = iProfessionInfo.getProfessionOIDs();
-                List<String> iProfessionOids = new LinkedList<>();
-                if(_iProfessionOids != null)
-                {
-                    for(ASN1ObjectIdentifier entry : _iProfessionOids)
-                    {
-                        iProfessionOids.add(entry.getId());
-                    }
-                }
-
-                Set<String> diffs = str_in_b_not_in_a(eProfessionOids, iProfessionOids);
-                if(CollectionUtil.isNotEmpty(diffs))
-                {
-                    failureMsg.append("ProfessionOIDs ").append(diffs.toString()).append(" are present but not expected");
-                    failureMsg.append("; ");
-                }
-
-                diffs = str_in_b_not_in_a(iProfessionOids, eProfessionOids);
-                if(CollectionUtil.isNotEmpty(diffs))
-                {
-                    failureMsg.append("ProfessionOIDs ").append(diffs.toString()).append(" are absent but are required");
-                    failureMsg.append("; ");
-                }
-
-                List<String> eProfessionItems = conf.getProfessionItems();
-                DirectoryString[] items = iProfessionInfo.getProfessionItems();
-                List<String> iProfessionItems = new LinkedList<>();
-                if(items != null)
-                {
-                    for(DirectoryString item : items)
-                    {
-                        iProfessionItems.add(item.getString());
-                    }
-                }
-
-                diffs = str_in_b_not_in_a(eProfessionItems, iProfessionItems);
-                if(CollectionUtil.isNotEmpty(diffs))
-                {
-                    failureMsg.append("ProfessionItems ").append(diffs.toString()).append(" are present but not expected");
-                    failureMsg.append("; ");
-                }
-
-                diffs = str_in_b_not_in_a(iProfessionItems, eProfessionItems);
-                if(CollectionUtil.isNotEmpty(diffs))
-                {
-                    failureMsg.append("ProfessionItems ").append(diffs.toString()).append(" are absent but are required");
-                    failureMsg.append("; ");
-                }
             }
+        } else if(eRegistrationNumber.equals(iRegistrationNumber) == false)
+        {
+            failureMsg.append("RegistrationNumber is '").append(iRegistrationNumber);
+            failureMsg.append("' but expected is '").append(eRegistrationNumber).append("'");
+            failureMsg.append("; ");
+        }
+
+        byte[] iAddProfessionInfo = null;
+        if(iProfessionInfo.getAddProfessionInfo() != null)
+        {
+            iAddProfessionInfo = iProfessionInfo.getAddProfessionInfo().getOctets();
+        }
+        byte[] eAddProfessionInfo = conf.getAddProfessionInfo();
+        if(eAddProfessionInfo == null)
+        {
+            if(iAddProfessionInfo != null)
+            {
+                failureMsg.append("AddProfessionInfo is '").append(hex(iAddProfessionInfo));
+                failureMsg.append("' but expected is 'null'");
+                failureMsg.append("; ");
+            }
+        } else
+        {
+            if(iAddProfessionInfo == null)
+            {
+                failureMsg.append("AddProfessionInfo is 'null' but expected is '").append(hex(eAddProfessionInfo));
+                failureMsg.append("'");
+                failureMsg.append("; ");
+            } else if(Arrays.equals(eAddProfessionInfo, iAddProfessionInfo) == false)
+            {
+                failureMsg.append("AddProfessionInfo is '").append(hex(iAddProfessionInfo));
+                failureMsg.append("' but expected is '").append(hex(eAddProfessionInfo)).append("'");
+                failureMsg.append("; ");
+            }
+        }
+
+        List<String> eProfessionOids = conf.getProfessionOIDs();
+        ASN1ObjectIdentifier[] _iProfessionOids = iProfessionInfo.getProfessionOIDs();
+        List<String> iProfessionOids = new LinkedList<>();
+        if(_iProfessionOids != null)
+        {
+            for(ASN1ObjectIdentifier entry : _iProfessionOids)
+            {
+                iProfessionOids.add(entry.getId());
+            }
+        }
+
+        Set<String> diffs = str_in_b_not_in_a(eProfessionOids, iProfessionOids);
+        if(CollectionUtil.isNotEmpty(diffs))
+        {
+            failureMsg.append("ProfessionOIDs ").append(diffs.toString()).append(" are present but not expected");
+            failureMsg.append("; ");
+        }
+
+        diffs = str_in_b_not_in_a(iProfessionOids, eProfessionOids);
+        if(CollectionUtil.isNotEmpty(diffs))
+        {
+            failureMsg.append("ProfessionOIDs ").append(diffs.toString()).append(" are absent but are required");
+            failureMsg.append("; ");
+        }
+
+        List<String> eProfessionItems = conf.getProfessionItems();
+        DirectoryString[] items = iProfessionInfo.getProfessionItems();
+        List<String> iProfessionItems = new LinkedList<>();
+        if(items != null)
+        {
+            for(DirectoryString item : items)
+            {
+                iProfessionItems.add(item.getString());
+            }
+        }
+
+        diffs = str_in_b_not_in_a(eProfessionItems, iProfessionItems);
+        if(CollectionUtil.isNotEmpty(diffs))
+        {
+            failureMsg.append("ProfessionItems ").append(diffs.toString()).append(" are present but not expected");
+            failureMsg.append("; ");
+        }
+
+        diffs = str_in_b_not_in_a(iProfessionItems, eProfessionItems);
+        if(CollectionUtil.isNotEmpty(diffs))
+        {
+            failureMsg.append("ProfessionItems ").append(diffs.toString()).append(" are absent but are required");
+            failureMsg.append("; ");
         }
     }
 
@@ -2740,73 +2705,73 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
         switch(tag)
         {
-            case GeneralName.rfc822Name:
-            case GeneralName.dNSName:
-            case GeneralName.uniformResourceIdentifier:
-            case GeneralName.iPAddress:
-            case GeneralName.registeredID:
-            case GeneralName.directoryName:
+        case GeneralName.rfc822Name:
+        case GeneralName.dNSName:
+        case GeneralName.uniformResourceIdentifier:
+        case GeneralName.iPAddress:
+        case GeneralName.registeredID:
+        case GeneralName.directoryName:
+        {
+            return new GeneralName(tag, reqName.getName());
+        }
+        case GeneralName.otherName:
+        {
+            ASN1Sequence reqSeq = ASN1Sequence.getInstance(reqName.getName());
+            ASN1ObjectIdentifier type = ASN1ObjectIdentifier.getInstance(reqSeq.getObjectAt(0));
+            if(mode.getAllowedTypes().contains(type) == false)
             {
-                return new GeneralName(tag, reqName.getName());
+                throw new BadCertTemplateException("otherName.type " + type.getId() + " is not allowed");
             }
-            case GeneralName.otherName:
+
+            ASN1Encodable value = ((ASN1TaggedObject) reqSeq.getObjectAt(1)).getObject();
+            String text;
+            if(value instanceof ASN1String == false)
             {
-                ASN1Sequence reqSeq = ASN1Sequence.getInstance(reqName.getName());
-                ASN1ObjectIdentifier type = ASN1ObjectIdentifier.getInstance(reqSeq.getObjectAt(0));
-                if(mode.getAllowedTypes().contains(type) == false)
-                {
-                    throw new BadCertTemplateException("otherName.type " + type.getId() + " is not allowed");
-                }
-
-                ASN1Encodable value = ((ASN1TaggedObject) reqSeq.getObjectAt(1)).getObject();
-                String text;
-                if(value instanceof ASN1String == false)
-                {
-                    throw new BadCertTemplateException("otherName.value is not a String");
-                } else
-                {
-                    text = ((ASN1String) value).getString();
-                }
-
-                ASN1EncodableVector vector = new ASN1EncodableVector();
-                vector.add(type);
-                vector.add(new DERTaggedObject(true, 0, new DERUTF8String(text)));
-                DERSequence seq = new DERSequence(vector);
-
-                return new GeneralName(GeneralName.otherName, seq);
+                throw new BadCertTemplateException("otherName.value is not a String");
+            } else
+            {
+                text = ((ASN1String) value).getString();
             }
-            case GeneralName.ediPartyName:
+
+            ASN1EncodableVector vector = new ASN1EncodableVector();
+            vector.add(type);
+            vector.add(new DERTaggedObject(true, 0, new DERUTF8String(text)));
+            DERSequence seq = new DERSequence(vector);
+
+            return new GeneralName(GeneralName.otherName, seq);
+        }
+        case GeneralName.ediPartyName:
+        {
+            ASN1Sequence reqSeq = ASN1Sequence.getInstance(reqName.getName());
+
+            int n = reqSeq.size();
+            String nameAssigner = null;
+            int idx = 0;
+            if(n > 1)
             {
-                ASN1Sequence reqSeq = ASN1Sequence.getInstance(reqName.getName());
-
-                int n = reqSeq.size();
-                String nameAssigner = null;
-                int idx = 0;
-                if(n > 1)
-                {
-                    DirectoryString ds = DirectoryString.getInstance(
-                            ((ASN1TaggedObject) reqSeq.getObjectAt(idx++)).getObject());
-                    nameAssigner = ds.getString();
-                }
-
                 DirectoryString ds = DirectoryString.getInstance(
                         ((ASN1TaggedObject) reqSeq.getObjectAt(idx++)).getObject());
-                String partyName = ds.getString();
+                nameAssigner = ds.getString();
+            }
 
-                ASN1EncodableVector vector = new ASN1EncodableVector();
-                if(nameAssigner != null)
-                {
-                    vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
-                }
-                vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
-                ASN1Sequence seq = new DERSequence(vector);
-                return new GeneralName(GeneralName.ediPartyName, seq);
-            }
-            default:
+            DirectoryString ds = DirectoryString.getInstance(
+                    ((ASN1TaggedObject) reqSeq.getObjectAt(idx++)).getObject());
+            String partyName = ds.getString();
+
+            ASN1EncodableVector vector = new ASN1EncodableVector();
+            if(nameAssigner != null)
             {
-                throw new RuntimeException("should not reach here, unknwon GeneralName tag " + tag);
+                vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
             }
+            vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
+            ASN1Sequence seq = new DERSequence(vector);
+            return new GeneralName(GeneralName.ediPartyName, seq);
         }
+        default:
+        {
+            throw new RuntimeException("should not reach here, unknwon GeneralName tag " + tag);
+        }
+        } // end switch
     }
 
     private static Set<String> getKeyUsage(byte[] extensionValue)
@@ -2946,5 +2911,28 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
 
         return Collections.unmodifiableMap(map);
+    }
+
+    private static List<String> sort(List<String> contentList, List<Pattern> patternList)
+    {
+        List<String> sorted = new ArrayList<>(contentList.size());
+        for(Pattern p : patternList)
+        {
+            for(String value : contentList)
+            {
+                if(sorted.contains(value) == false && p.matcher(value).matches())
+                {
+                    sorted.add(value);
+                }
+            }
+        }
+        for(String value : contentList)
+        {
+            if(sorted.contains(value) == false)
+            {
+                sorted.add(value);
+            }
+        }
+        return sorted;
     }
 }
