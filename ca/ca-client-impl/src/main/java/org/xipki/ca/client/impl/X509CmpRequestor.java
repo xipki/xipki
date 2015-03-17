@@ -353,43 +353,43 @@ abstract class X509CmpRequestor extends CmpRequestor
             int status = statusInfo.getStatus().intValue();
             IssuerSerialEntryType re = reqEntries.get(i);
 
-            if(status == PKIStatus.GRANTED || status == PKIStatus.GRANTED_WITH_MODS)
-            {
-                CertId certId = null;
-                if(revCerts != null)
-                {
-                    for(CertId _certId : revCerts)
-                    {
-                        if(re.getIssuer().equals(_certId.getIssuer().getName()) &&
-                                re.getSerialNumber().equals(_certId.getSerialNumber().getValue()))
-                        {
-                            certId = _certId;
-                            break;
-                        }
-                    }
-                }
-
-                if(certId == null)
-                {
-                    LOG.warn("certId is not present in response for (issuer='{}', serialNumber={})",
-                            SecurityUtil.getRFC4519Name(re.getIssuer()), re.getSerialNumber());
-                    certId = new CertId(new GeneralName(re.getIssuer()), re.getSerialNumber());
-                    continue;
-                }
-
-                ResultEntryType resultEntry = new RevokeCertResultEntryType(re.getId(), certId);
-                result.addResultEntry(resultEntry);
-            }
-            else
+            if(status != PKIStatus.GRANTED && status != PKIStatus.GRANTED_WITH_MODS)
             {
                 PKIFreeText text = statusInfo.getStatusString();
                 String statusString = text == null ? null : text.getStringAt(0).getString();
 
-                ResultEntryType resultEntry = new ErrorResultEntryType(re.getId(), status,
-                            statusInfo.getFailInfo().intValue(),
-                            statusString);
+                ResultEntryType resultEntry = new ErrorResultEntryType(
+                        re.getId(), status,
+                        statusInfo.getFailInfo().intValue(),
+                        statusString);
                 result.addResultEntry(resultEntry);
+                continue;
             }
+
+            CertId certId = null;
+            if(revCerts != null)
+            {
+                for(CertId _certId : revCerts)
+                {
+                    if(re.getIssuer().equals(_certId.getIssuer().getName()) &&
+                            re.getSerialNumber().equals(_certId.getSerialNumber().getValue()))
+                    {
+                        certId = _certId;
+                        break;
+                    }
+                }
+            }
+
+            if(certId == null)
+            {
+                LOG.warn("certId is not present in response for (issuer='{}', serialNumber={})",
+                        SecurityUtil.getRFC4519Name(re.getIssuer()), re.getSerialNumber());
+                certId = new CertId(new GeneralName(re.getIssuer()), re.getSerialNumber());
+                continue;
+            }
+
+            ResultEntryType resultEntry = new RevokeCertResultEntryType(re.getId(), certId);
+            result.addResultEntry(resultEntry);
         }
 
         return result;
@@ -788,8 +788,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             throw new CmpRequestorException("Could not parse the returned systemInfo for CA " + caName, e);
         }
 
-        X509Certificate caCert;
-        String namespace = null;
+        final String namespace = null;
         Element root = doc.getDocumentElement();
         String s = root.getAttribute("version");
         if(StringUtil.isBlank(s))
@@ -801,6 +800,8 @@ abstract class X509CmpRequestor extends CmpRequestor
 
         if(version == 2)
         {
+            X509Certificate caCert;
+
             String b64CACert = XMLUtil.getValueOfFirstElementChild(root, namespace, "CACert");
             try
             {

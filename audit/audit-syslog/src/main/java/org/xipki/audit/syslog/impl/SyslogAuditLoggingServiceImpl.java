@@ -160,17 +160,13 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
         }
 
         List<AuditEventData> eventDataArray = event.getEventDatas();
-
-        if ((eventDataArray != null) && (eventDataArray.size() > 0))
+        for (AuditEventData m : eventDataArray)
         {
-            for (AuditEventData m : eventDataArray)
+            if(duration >= 0 && "duration".equalsIgnoreCase(m.getName()))
             {
-                if(duration >= 0 && "duration".equalsIgnoreCase(m.getName()))
-                {
-                    continue;
-                }
-                sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
+                continue;
             }
+            sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
         }
 
         String msg = sb.toString();

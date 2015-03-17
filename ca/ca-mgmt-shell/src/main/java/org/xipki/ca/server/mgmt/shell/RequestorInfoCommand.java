@@ -101,7 +101,6 @@ public class RequestorInfoCommand extends CaCommand
         }
 
         out(sb.toString());
-
         return null;
     }
 }

@@ -408,23 +408,25 @@ implements CAManager, CmpResponderManager
             for(Object objKey : caConfProps.keySet())
             {
                 String key = (String) objKey;
-                if(StringUtil.startsWithIgnoreCase(key, "datasource."))
+                if(StringUtil.startsWithIgnoreCase(key, "datasource.") == false)
                 {
-                    String datasourceFile = caConfProps.getProperty(key);
-                    try
-                    {
-                        String datasourceName = key.substring("datasource.".length());
-                        DataSourceWrapper datasource = dataSourceFactory.createDataSourceForFile(
-                                datasourceName, datasourceFile, securityFactory.getPasswordResolver());
+                	continue;
+                }
+                
+                String datasourceFile = caConfProps.getProperty(key);
+                try
+                {
+                    String datasourceName = key.substring("datasource.".length());
+                    DataSourceWrapper datasource = dataSourceFactory.createDataSourceForFile(
+                            datasourceName, datasourceFile, securityFactory.getPasswordResolver());
 
-                        Connection conn = datasource.getConnection();
-                        datasource.returnConnection(conn);
+                    Connection conn = datasource.getConnection();
+                    datasource.returnConnection(conn);
 
-                        this.dataSources.put(datasourceName, datasource);
-                    } catch (DataAccessException | PasswordResolverException | IOException | RuntimeException e)
-                    {
-                        throw new CAMgmtException(e.getClass().getName() + " while parsing datasoure " + datasourceFile, e);
-                    }
+                    this.dataSources.put(datasourceName, datasource);
+                } catch (DataAccessException | PasswordResolverException | IOException | RuntimeException e)
+                {
+                    throw new CAMgmtException(e.getClass().getName() + " while parsing datasoure " + datasourceFile, e);
                 }
             }
 
@@ -1281,16 +1283,17 @@ implements CAManager, CmpResponderManager
         asssertMasterMode();
         caName = caName.toUpperCase();
         boolean b = queryExecutor.removePublisherFromCA(publisherName, caName);
-
-        if(b)
+        if(b == false)
         {
-            Set<String> publisherNames = ca_has_publishers.get(caName);
-            if(publisherNames != null)
-            {
-                publisherNames.remove(publisherName);
-            }
+        	return false;
         }
-        return b;
+
+        Set<String> publisherNames = ca_has_publishers.get(caName);
+        if(publisherNames != null)
+        {
+            publisherNames.remove(publisherName);
+        }
+        return true;
     }
 
     @Override
@@ -1387,12 +1390,14 @@ implements CAManager, CmpResponderManager
         }
 
         boolean b = queryExecutor.deleteRowWithName(requestorName, "REQUESTOR");
-        if(b)
+        if(b == false)        	
         {
-            requestors.remove(requestorName);
-            LOG.info("remove requestor '{}'", requestorName);
+        	return false;
         }
-        return b;
+        
+        requestors.remove(requestorName);
+        LOG.info("removed requestor '{}'", requestorName);
+        return true;
     }
 
     @Override
@@ -1406,16 +1411,18 @@ implements CAManager, CmpResponderManager
         }
 
         boolean changed = queryExecutor.changeCmpRequestor(name, cert);
-        if(changed)
+        if(changed == false)
         {
-            requestors.remove(name);
-            CmpRequestorEntryWrapper requestor = queryExecutor.createRequestor(name);
-            if(requestor != null)
-            {
-                requestors.put(name, requestor);
-            }
+        	return false;
         }
-        return changed;
+
+        requestors.remove(name);
+        CmpRequestorEntryWrapper requestor = queryExecutor.createRequestor(name);
+        if(requestor != null)
+        {
+            requestors.put(name, requestor);
+        }
+        return true;
     }
 
     @Override
@@ -1488,13 +1495,15 @@ implements CAManager, CmpResponderManager
         }
 
         boolean b = queryExecutor.deleteRowWithName(profileName, "CERTPROFILE");
-        if(b)
+        if(b == false)
         {
-            LOG.info("remove profile '{}'", profileName);
-            IdentifiedX509Certprofile profile = certprofiles.remove(profileName);
-            queryExecutor.shutdownCertprofile(profile);
+        	return false;
         }
-        return b;
+        
+        LOG.info("removed profile '{}'", profileName);
+        IdentifiedX509Certprofile profile = certprofiles.remove(profileName);
+        queryExecutor.shutdownCertprofile(profile);
+        return true;
     }
 
     @Override
@@ -1508,18 +1517,19 @@ implements CAManager, CmpResponderManager
         }
 
         boolean changed = queryExecutor.changeCertprofile(name, type, conf);
-        if(changed)
+        if(changed == false)
         {
-            IdentifiedX509Certprofile profile = certprofiles.remove(name);
-            queryExecutor.shutdownCertprofile(profile);
-            profile = queryExecutor.createCertprofile(name, envParameterResolver);
-            if(profile != null)
-            {
-                certprofiles.put(name, profile);
-            }
+        	return false;
         }
 
-        return changed;
+        IdentifiedX509Certprofile profile = certprofiles.remove(name);
+        queryExecutor.shutdownCertprofile(profile);
+        profile = queryExecutor.createCertprofile(name, envParameterResolver);
+        if(profile != null)
+        {
+            certprofiles.put(name, profile);
+        }
+        return true;
     }
 
     @Override
@@ -1578,12 +1588,14 @@ implements CAManager, CmpResponderManager
     {
         asssertMasterMode();
         boolean b = queryExecutor.deleteRows("RESPONDER");
-        if(b)
+        if(b == false)
         {
-            LOG.info("remove responder");
-            responder = null;
+        	return false;
         }
-        return b;
+        
+        LOG.info("removed responder");
+        responder = null;
+        return true;
     }
 
     @Override
@@ -1641,21 +1653,22 @@ implements CAManager, CmpResponderManager
     {
         asssertMasterMode();
         boolean b = queryExecutor.deleteRowWithName(crlSignerName, "CRLSIGNER");
-        if(b)
+        if(b == false)
         {
-            for(String caName : caInfos.keySet())
-            {
-                X509CAInfo caInfo = caInfos.get(caName);
-                if(crlSignerName.equals(caInfo.getCrlSignerName()))
-                {
-                    caInfo.setCrlSignerName(null);
-                }
-            }
-
-            crlSigners.remove(crlSignerName);
-            LOG.info("remove CRLSigner '{}'", crlSignerName);
+        	return false;
         }
-        return b;
+        for(String caName : caInfos.keySet())
+        {
+            X509CAInfo caInfo = caInfos.get(caName);
+            if(crlSignerName.equals(caInfo.getCrlSignerName()))
+            {
+                caInfo.setCrlSignerName(null);
+            }
+        }
+
+        crlSigners.remove(crlSignerName);
+        LOG.info("removed CRLSigner '{}'", crlSignerName);
+        return true;
     }
 
     @Override
@@ -1665,16 +1678,18 @@ implements CAManager, CmpResponderManager
     {
         asssertMasterMode();
         boolean changed = queryExecutor.changeCrlSigner(name, signer_type, signer_conf, signer_cert, crlControl);
-        if(changed)
+        if(changed == false)
         {
-            X509CrlSignerEntryWrapper crlSigner = crlSigners.remove(name);
-            crlSigner = queryExecutor.createCrlSigner(name);
-            if(crlSigner != null)
-            {
-                crlSigners.put(name, crlSigner);
-            }
+        	return false;
         }
-        return changed;
+
+        X509CrlSignerEntryWrapper crlSigner = crlSigners.remove(name);
+        crlSigner = queryExecutor.createCrlSigner(name);
+        if(crlSigner != null)
+        {
+            crlSigners.put(name, crlSigner);
+        }
+        return true;
     }
 
     @Override
@@ -1762,13 +1777,15 @@ implements CAManager, CmpResponderManager
         }
 
         boolean b = queryExecutor.deleteRowWithName(publisherName, "PUBLISHER");
-        if(b)
+        if(b == false)
         {
-            LOG.info("remove publisher '{}'", publisherName);
-            IdentifiedX509CertPublisher publisher = publishers.remove(publisherName);
-            queryExecutor.shutdownPublisher(publisher);
+        	return false;
         }
-        return b;
+
+        LOG.info("removed publisher '{}'", publisherName);
+        IdentifiedX509CertPublisher publisher = publishers.remove(publisherName);
+        queryExecutor.shutdownPublisher(publisher);
+        return true;
     }
 
     @Override
@@ -1777,18 +1794,20 @@ implements CAManager, CmpResponderManager
     {
         asssertMasterMode();
         boolean changed = queryExecutor.changePublisher(name, type, conf);
-        if(changed)
+        if(changed == false)
         {
-            IdentifiedX509CertPublisher publisher = publishers.remove(name);
-            queryExecutor.shutdownPublisher(publisher);
-            publisher = queryExecutor.createPublisher(name, dataSources,
-                    securityFactory.getPasswordResolver(), envParameterResolver);
-            if(publisher != null)
-            {
-                publishers.put(name, publisher);
-            }
+        	return false;
         }
-        return changed;
+
+        IdentifiedX509CertPublisher publisher = publishers.remove(name);
+        queryExecutor.shutdownPublisher(publisher);
+        publisher = queryExecutor.createPublisher(name, dataSources,
+                securityFactory.getPasswordResolver(), envParameterResolver);
+        if(publisher != null)
+        {
+            publishers.put(name, publisher);
+        }
+        return true;
     }
 
     @Override
@@ -1819,22 +1838,23 @@ implements CAManager, CmpResponderManager
     {
         asssertMasterMode();
         boolean b = queryExecutor.deleteRowWithName(name, "CMPCONTROL");
-
-        if(b)
+        if(b == false)
         {
-            for(String caName : caInfos.keySet())
-            {
-                X509CAInfo caInfo = caInfos.get(caName);
-                if(name.equals(caInfo.getCmpControlName()))
-                {
-                    caInfo.setCmpControlName(null);
-                }
-            }
-
-            cmpControls.remove(name);
-            LOG.info("remove CMPControl '{}'", name);
+        	return false;
         }
-        return b;
+
+        for(String caName : caInfos.keySet())
+        {
+            X509CAInfo caInfo = caInfos.get(caName);
+            if(name.equals(caInfo.getCmpControlName()))
+            {
+                caInfo.setCmpControlName(null);
+            }
+        }
+
+        cmpControls.remove(name);
+        LOG.info("removed CMPControl '{}'", name);
+        return true;
     }
 
     @Override
@@ -1854,12 +1874,14 @@ implements CAManager, CmpResponderManager
                 requireConfirmCert, requireMessageTime,
                 messageTimeBias, confirmWaitTime,
                 sendCaCert, sendResponderCert);
-        if(changed)
+        if(changed == false)
         {
-            CmpControl cmpControl = queryExecutor.createCmpControl(name);
-            cmpControls.put(name, cmpControl);
+        	return false;
         }
-        return changed;
+
+        CmpControl cmpControl = queryExecutor.createCmpControl(name);
+        cmpControls.put(name, cmpControl);
+        return true;
     }
 
     public EnvironmentParameterResolver getEnvParameterResolver()
@@ -1899,12 +1921,14 @@ implements CAManager, CmpResponderManager
     {
         asssertMasterMode();
         boolean b = queryExecutor.deleteRowWithName(envParamName, "ENVIRONMENT");
-        if(b)
+        if(b == false)
         {
-            LOG.info("remove environment param '{}'", envParamName);
-            envParameterResolver.removeEnvParam(envParamName);
+        	return false;
         }
-        return b;
+
+        LOG.info("removed environment param '{}'", envParamName);
+        envParameterResolver.removeEnvParam(envParamName);
+        return true;
     }
 
     @Override
@@ -1921,11 +1945,13 @@ implements CAManager, CmpResponderManager
         }
 
         boolean changed = queryExecutor.changeEnvParam(name, value);
-        if(changed)
+        if(changed == false)
         {
-            envParameterResolver.addEnvParam(name, value);
+        	return false;
         }
-        return changed;
+
+        envParameterResolver.addEnvParam(name, value);
+        return true;
     }
 
     public String getCaConfFile()
@@ -1960,11 +1986,13 @@ implements CAManager, CmpResponderManager
     {
         asssertMasterMode();
         boolean b = queryExecutor.removeCaAlias(aliasName);
-        if(b)
+        if(b == false)
         {
-            caAliases.remove(aliasName);
+        	return false;
         }
-        return b;
+
+        caAliases.remove(aliasName);
+        return true;
     }
 
     @Override
@@ -2002,49 +2030,49 @@ implements CAManager, CmpResponderManager
         asssertMasterMode();
         caName = caName.toUpperCase();
         boolean b = queryExecutor.removeCA(caName);
-
-        if(b)
+        if(b == false)
         {
-            CAMgmtException exception = null;
+        	return false;
+        }
 
-            X509CAInfo caInfo = caInfos.get(caName);
-            if(caInfo != null && caInfo.getCaEntry().getNextSerial() > 0)
+        CAMgmtException exception = null;
+
+        X509CAInfo caInfo = caInfos.get(caName);
+        if(caInfo != null && caInfo.getCaEntry().getNextSerial() > 0)
+        {
+            // drop the serial number sequence
+            final String sequenceName = caInfo.getCaEntry().getSerialSeqName();
+            try
             {
-                // drop the serial number sequence
-                final String sequenceName = caInfo.getCaEntry().getSerialSeqName();
-                try
+                dataSource.dropSequence(sequenceName);
+            }catch(DataAccessException e)
+            {
+                final String message = "Error in dropSequence " + sequenceName;
+                if(LOG.isWarnEnabled())
                 {
-                    dataSource.dropSequence(sequenceName);
-                }catch(DataAccessException e)
-                {
-                    final String message = "Error in dropSequence " + sequenceName;
-                    if(LOG.isWarnEnabled())
-                    {
-                        LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                    }
-                    LOG.debug(message, e);
-                    if(exception == null)
-                    {
-                        exception = new CAMgmtException(e.getMessage(), e);
-                    }
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
                 }
-            }
-
-            LOG.info("remove CA '{}'", caName);
-            caInfos.remove(caName);
-            ca_has_profiles.remove(caName);
-            ca_has_publishers.remove(caName);
-            ca_has_requestors.remove(caName);
-            x509cas.remove(caName);
-            responders.remove(caName);
-
-            if(exception != null)
-            {
-                throw exception;
+                LOG.debug(message, e);
+                if(exception == null)
+                {
+                    exception = new CAMgmtException(e.getMessage(), e);
+                }
             }
         }
 
-        return b;
+        LOG.info("removed CA '{}'", caName);
+        caInfos.remove(caName);
+        ca_has_profiles.remove(caName);
+        ca_has_publishers.remove(caName);
+        ca_has_requestors.remove(caName);
+        x509cas.remove(caName);
+        responders.remove(caName);
+
+        if(exception != null)
+        {
+            throw exception;
+        }
+        return true;
     }
 
     @Override
@@ -2145,21 +2173,21 @@ implements CAManager, CmpResponderManager
         }
 
         boolean b = queryExecutor.revokeCa(caName, revocationInfo);
-
-        if(b)
+        if(b == false)
         {
-            try
-            {
-                ca.revoke(revocationInfo);
-            } catch (OperationException e)
-            {
-                throw new CAMgmtException("Error while revoking CA " + e.getMessage(), e);
-            }
-            LOG.info("Revoked CA '{}'", caName);
-            auditLogPCIEvent(true, "REVOKE CA " + caName);
+        	return false;
         }
 
-        return b;
+        try
+        {
+            ca.revoke(revocationInfo);
+        } catch (OperationException e)
+        {
+            throw new CAMgmtException("Error while revoking CA " + e.getMessage(), e);
+        }
+        LOG.info("Revoked CA '{}'", caName);
+        auditLogPCIEvent(true, "REVOKE CA " + caName);
+        return true;
     }
 
     @Override
@@ -2177,23 +2205,23 @@ implements CAManager, CmpResponderManager
         LOG.info("Unrevoking of CA '{}'", caName);
 
         boolean b =queryExecutor.unrevokeCa(caName);
-
-        if(b)
+        if(b == false)
         {
-            X509CA ca = x509cas.get(caName);
-            try
-            {
-                ca.unrevoke();
-            } catch (OperationException e)
-            {
-                throw new CAMgmtException("Error while unrevoking of CA " + e.getMessage(), e);
-            }
-            LOG.info("Unrevoked CA '{}'", caName);
-
-            auditLogPCIEvent(true, "UNREVOKE CA " + caName);
+        	return false;
         }
 
-        return b;
+        X509CA ca = x509cas.get(caName);
+        try
+        {
+            ca.unrevoke();
+        } catch (OperationException e)
+        {
+            throw new CAMgmtException("Error while unrevoking of CA " + e.getMessage(), e);
+        }
+        LOG.info("Unrevoked CA '{}'", caName);
+
+        auditLogPCIEvent(true, "UNREVOKE CA " + caName);
+        return true;
     }
 
     public void setAuditServiceRegister(AuditLoggingServiceRegister serviceRegister)
@@ -2217,24 +2245,26 @@ implements CAManager, CmpResponderManager
     {
         AuditLoggingService auditLoggingService =
                 auditServiceRegister == null ? null : auditServiceRegister.getAuditLoggingService();
-        if(auditLoggingService != null)
+        if(auditLoggingService == null)
         {
-            PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());
-            auditEvent.setUserId("CA-SYSTEM");
-            auditEvent.setEventType(eventType);
-            auditEvent.setAffectedResource("CORE");
-            if(successfull)
-            {
-                auditEvent.setStatus(AuditStatus.SUCCESSFUL.name());
-                auditEvent.setLevel(AuditLevel.INFO);
-            }
-            else
-            {
-                auditEvent.setStatus(AuditStatus.FAILED.name());
-                auditEvent.setLevel(AuditLevel.ERROR);
-            }
-            auditLoggingService.logEvent(auditEvent);
+        	return;
         }
+        
+        PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());
+        auditEvent.setUserId("CA-SYSTEM");
+        auditEvent.setEventType(eventType);
+        auditEvent.setAffectedResource("CORE");
+        if(successfull)
+        {
+            auditEvent.setStatus(AuditStatus.SUCCESSFUL.name());
+            auditEvent.setLevel(AuditLevel.INFO);
+        }
+        else
+        {
+            auditEvent.setStatus(AuditStatus.FAILED.name());
+            auditEvent.setLevel(AuditLevel.ERROR);
+        }
+        auditLoggingService.logEvent(auditEvent);
     }
 
     @Override
@@ -2268,20 +2298,22 @@ implements CAManager, CmpResponderManager
 
     private void shutdownScheduledThreadPoolExecutor()
     {
-        if(scheduledThreadPoolExecutor != null)
+        if(scheduledThreadPoolExecutor == null)
         {
-            scheduledThreadPoolExecutor.shutdown();
-            while(scheduledThreadPoolExecutor.isTerminated() == false)
-            {
-                try
-                {
-                    Thread.sleep(100);
-                }catch(InterruptedException e)
-                {
-                }
-            }
-            scheduledThreadPoolExecutor = null;
+        	return;
         }
+
+        scheduledThreadPoolExecutor.shutdown();
+        while(scheduledThreadPoolExecutor.isTerminated() == false)
+        {
+            try
+            {
+                Thread.sleep(100);
+            }catch(InterruptedException e)
+            {
+            }
+        }
+        scheduledThreadPoolExecutor = null;
     }
 
     @Override

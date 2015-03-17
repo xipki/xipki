@@ -157,36 +157,9 @@ public class X509Util
             List<CertificatePolicyQualifier> qualifiers = policyInfo.getQualifiers();
 
             ASN1Sequence policyQualifiers = null;
-            if(qualifiers != null)
+            if(CollectionUtil.isNotEmpty(qualifiers))
             {
-                List<PolicyQualifierInfo> qualifierInfos = new ArrayList<>(qualifiers.size());
-                for(CertificatePolicyQualifier qualifier : qualifiers)
-                {
-                    PolicyQualifierInfo qualifierInfo ;
-                    if(qualifier.getCpsUri() != null)
-                    {
-                        qualifierInfo = new PolicyQualifierInfo(qualifier.getCpsUri());
-                    }
-                    else if(qualifier.getUserNotice() != null)
-                    {
-                        UserNotice userNotice = new UserNotice(null, qualifier.getUserNotice());
-                        qualifierInfo = new PolicyQualifierInfo(PKCSObjectIdentifiers.id_spq_ets_unotice,
-                                userNotice);
-                    }
-                    else
-                    {
-                        qualifierInfo = null;
-                    }
-
-                    if(qualifierInfo != null)
-                    {
-                        qualifierInfos.add(qualifierInfo);
-                    }
-                    //PolicyQualifierId qualifierId
-                }
-
-                policyQualifiers = new DERSequence(qualifierInfos.toArray(new PolicyQualifierInfo[0]));
-
+                policyQualifiers = createPolicyQualifiers(qualifiers);
             }
 
             ASN1ObjectIdentifier policyOid = new ASN1ObjectIdentifier(policyId);
@@ -202,6 +175,37 @@ public class X509Util
         }
 
         return new CertificatePolicies(pInfos);
+    }
+
+    private static ASN1Sequence createPolicyQualifiers(List<CertificatePolicyQualifier> qualifiers)
+    {
+        List<PolicyQualifierInfo> qualifierInfos = new ArrayList<>(qualifiers.size());
+        for(CertificatePolicyQualifier qualifier : qualifiers)
+        {
+            PolicyQualifierInfo qualifierInfo ;
+            if(qualifier.getCpsUri() != null)
+            {
+                qualifierInfo = new PolicyQualifierInfo(qualifier.getCpsUri());
+            }
+            else if(qualifier.getUserNotice() != null)
+            {
+                UserNotice userNotice = new UserNotice(null, qualifier.getUserNotice());
+                qualifierInfo = new PolicyQualifierInfo(PKCSObjectIdentifiers.id_spq_ets_unotice,
+                        userNotice);
+            }
+            else
+            {
+                qualifierInfo = null;
+            }
+
+            if(qualifierInfo != null)
+            {
+                qualifierInfos.add(qualifierInfo);
+            }
+            //PolicyQualifierId qualifierId
+        }
+
+        return new DERSequence(qualifierInfos.toArray(new PolicyQualifierInfo[0]));
     }
 
 }

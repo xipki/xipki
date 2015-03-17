@@ -128,7 +128,7 @@ class PublicCAInfo
             this.subject = new X500Principal(subject.getEncoded());
         } catch (IOException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, "invalid SubjectAltName extension in CA certificate");
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "invalid SubjectAltName extension in CA certificate");
         }
 
         if(subjectKeyIdentifier == null)

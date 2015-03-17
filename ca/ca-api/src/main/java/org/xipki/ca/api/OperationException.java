@@ -53,8 +53,8 @@ public class OperationException extends Exception
         INSUFFICIENT_PERMISSION,
         INVALID_EXTENSION,
         NOT_PERMITTED,
-        System_Unavailable,
-        System_Failure,
+        SYSTEM_FAILURE,
+        SYSTEM_UNAVAILABLE,
         UNKNOWN_CERT,
         UNKNOWN_CERT_PROFILE
     }

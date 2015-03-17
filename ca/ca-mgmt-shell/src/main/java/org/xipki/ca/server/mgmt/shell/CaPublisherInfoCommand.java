@@ -75,7 +75,6 @@ public class CaPublisherInfoCommand extends CaCommand
         }
 
         out(sb.toString());
-
         return null;
     }
 }

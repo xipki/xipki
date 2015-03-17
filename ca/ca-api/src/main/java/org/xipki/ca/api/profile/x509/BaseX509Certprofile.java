@@ -299,7 +299,8 @@ extends X509Certprofile
         if(keyParamsOption instanceof AllowAllParametersOption)
         {
             return publicKey;
-        } else if(keyParamsOption instanceof ECParamatersOption)
+        }
+        else if(keyParamsOption instanceof ECParamatersOption)
         {
             ECParamatersOption ecOption = (ECParamatersOption) keyParamsOption;
             // parameters
@@ -347,7 +348,8 @@ extends X509Certprofile
                 throw new BadCertTemplateException("Invalid public key: " + e.getMessage());
             }
             return publicKey;
-        } else if(keyParamsOption instanceof RSAParametersOption)
+        }
+        else if(keyParamsOption instanceof RSAParametersOption)
         {
             RSAParametersOption rsaOption = (RSAParametersOption) keyParamsOption;
 
@@ -366,7 +368,8 @@ extends X509Certprofile
             {
                 return publicKey;
             }
-        } else if(keyParamsOption instanceof DSAParametersOption)
+        }
+        else if(keyParamsOption instanceof DSAParametersOption)
         {
             DSAParametersOption dsaOption = (DSAParametersOption) keyParamsOption;
             ASN1Encodable params = publicKey.getAlgorithm().getParameters();
@@ -400,7 +403,8 @@ extends X509Certprofile
             {
                 return publicKey;
             }
-        } else
+        }
+        else
         {
             throw new RuntimeException("should not reach here, unknown KeyParametersOption " + keyParamsOption);
         }

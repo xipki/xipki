@@ -96,7 +96,6 @@ public class CaAliasInfoCommand extends CaCommand
         }
 
         out(sb.toString());
-
         return null;
     }
 }

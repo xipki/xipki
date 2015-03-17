@@ -137,7 +137,8 @@ public class HealthCheckServlet extends HttpServlet
             byte[] respBytes = healthResult.toJsonMessage(true).getBytes();
             response.setContentLength(respBytes.length);
             response.getOutputStream().write(respBytes);
-        }catch(EOFException e)
+        }
+        catch(EOFException e)
         {
             final String message = "Connection reset by peer";
             if(LOG.isErrorEnabled())

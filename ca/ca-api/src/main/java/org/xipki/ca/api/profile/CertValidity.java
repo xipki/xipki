@@ -65,16 +65,9 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
             this.suffix = suffix;
         }
 
-        public Unit getCertValidtyUnitForSuffix(String suffx)
+        public String getSuffix()
         {
-            for(Unit entry : values())
-            {
-                if(entry.suffix.equalsIgnoreCase(suffix))
-                {
-                    return entry;
-                }
-            }
-            return null;
+            return suffix;
         }
     }
 
@@ -152,7 +145,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
         case HOUR:
             return new Date(referenceDate.getTime() + 60L * 60 * SECOND - SECOND);
         case DAY:
-            return new Date(referenceDate.getTime() + 24L * 60 * 60 * 1000 - SECOND);
+            return new Date(referenceDate.getTime() + 24L * 60 * 60 * SECOND - SECOND);
         case YEAR:
             Calendar c = Calendar.getInstance(utc);
             c.setTime(referenceDate);

@@ -69,6 +69,7 @@ import org.bouncycastle.asn1.x509.GeneralSubtree;
 import org.bouncycastle.asn1.x509.NameConstraints;
 import org.bouncycastle.asn1.x509.PolicyMappings;
 import org.xipki.ca.api.CertprofileException;
+import org.xipki.ca.api.profile.DirectoryStringType;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.GeneralNameMode;
@@ -428,99 +429,8 @@ public class XmlX509CertprofileUtil
         Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = new HashMap<>();
         for(AlgorithmType type : keyAlgos.getAlgorithm())
         {
-            KeyParametersOption keyParamsOption;
-
-            if(type.getParameters() == null || type.getParameters().getAny() == null)
-            {
-                keyParamsOption = KeyParametersOption.allowAll;
-            }
-            else
-            {
-                Object paramsObj = type.getParameters().getAny();
-                if(paramsObj instanceof ECParameters)
-                {
-                    ECParameters params = (ECParameters) paramsObj;
-                    KeyParametersOption.ECParamatersOption option = new KeyParametersOption.ECParamatersOption();
-                    keyParamsOption = option;
-
-                    if(params.getCurves() != null)
-                    {
-                        Curves curves = params.getCurves();
-                        Set<ASN1ObjectIdentifier> curveOids = toOIDSet(curves.getCurve());
-                        option.setCurveOids(curveOids);
-                    }
-
-                    if(params.getPointEncodings() != null)
-                    {
-                        List<Byte> bytes = params.getPointEncodings().getPointEncoding();
-                        Set<Byte> pointEncodings = new HashSet<>(bytes);
-                        option.setPointEncodings(pointEncodings);
-                    }
-                }
-                else if(paramsObj instanceof RSAParameters)
-                {
-                    RSAParameters params = (RSAParameters) paramsObj;
-                    KeyParametersOption.RSAParametersOption option = new KeyParametersOption.RSAParametersOption();
-                    keyParamsOption = option;
-
-                    Set<Range> modulusLengths = buildParametersMap(params.getModulusLength());
-                    option.setModulusLengths(modulusLengths);
-                }
-                else if(paramsObj instanceof RSAPSSParameters)
-                {
-                    RSAPSSParameters params = (RSAPSSParameters) paramsObj;
-                    KeyParametersOption.RSAPSSParametersOption option = new KeyParametersOption.RSAPSSParametersOption();
-                    keyParamsOption = option;
-
-                    Set<Range> modulusLengths = buildParametersMap(params.getModulusLength());
-                    option.setModulusLengths(modulusLengths);
-                }
-                else if(paramsObj instanceof DSAParameters)
-                {
-                    DSAParameters params = (DSAParameters) paramsObj;
-                    KeyParametersOption.DSAParametersOption option = new KeyParametersOption.DSAParametersOption();
-                    keyParamsOption = option;
-
-                    Set<Range> pLengths = buildParametersMap(params.getPLength());
-                    option.setPLengths(pLengths);
-
-                    Set<Range> qLengths = buildParametersMap(params.getQLength());
-                    option.setQLengths(qLengths);
-                }
-                else if(paramsObj instanceof DHParameters)
-                {
-                    DHParameters params = (DHParameters) paramsObj;
-                    KeyParametersOption.DHParametersOption option = new KeyParametersOption.DHParametersOption();
-                    keyParamsOption = option;
-
-                    Set<Range> pLengths = buildParametersMap(params.getPLength());
-                    option.setPLengths(pLengths);
-
-                    Set<Range> qLengths = buildParametersMap(params.getQLength());
-                    option.setQLengths(qLengths);
-                }
-                else if(paramsObj instanceof GostParameters)
-                {
-                    GostParameters params = (GostParameters) paramsObj;
-                    KeyParametersOption.GostParametersOption option = new KeyParametersOption.GostParametersOption();
-                    keyParamsOption = option;
-
-                    Set<ASN1ObjectIdentifier> set = toOIDSet(params.getPublicKeyParamSet());
-                    option.setPublicKeyParamSets(set);
-
-                    set = toOIDSet(params.getDigestParamSet());
-                    option.setDigestParamSets(set);
-
-                    set = toOIDSet(params.getEncryptionParamSet());
-                    option.setEncryptionParamSets(set);
-                }
-                else
-                {
-                    throw new CertprofileException("unknown public key parameters type " + paramsObj.getClass().getName());
-                }
-            }
-
             List<OidWithDescType> algIds = type.getAlgorithm();
+            List<ASN1ObjectIdentifier> oids = new ArrayList<>(algIds.size());
             for(OidWithDescType algId : algIds)
             {
                 ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(algId.getValue());
@@ -528,6 +438,12 @@ public class XmlX509CertprofileUtil
                 {
                     throw new CertprofileException("duplicate definition of keyAlgorithm " + oid.getId());
                 }
+                oids.add(oid);
+            }
+
+            KeyParametersOption keyParamsOption = convertKeyParametersOption(type);
+            for(ASN1ObjectIdentifier oid : oids)
+            {
                 keyAlgorithms.put(oid, keyParamsOption);
             }
         }
@@ -685,4 +601,123 @@ public class XmlX509CertprofileUtil
         return Collections.unmodifiableSet(oids);
     }
 
+    private static final KeyParametersOption convertKeyParametersOption(AlgorithmType type)
+    throws CertprofileException
+    {
+        if(type.getParameters() == null || type.getParameters().getAny() == null)
+        {
+            return KeyParametersOption.allowAll;
+        }
+
+        Object paramsObj = type.getParameters().getAny();
+        if(paramsObj instanceof ECParameters)
+        {
+            ECParameters params = (ECParameters) paramsObj;
+            KeyParametersOption.ECParamatersOption option = new KeyParametersOption.ECParamatersOption();
+
+            if(params.getCurves() != null)
+            {
+                Curves curves = params.getCurves();
+                Set<ASN1ObjectIdentifier> curveOids = toOIDSet(curves.getCurve());
+                option.setCurveOids(curveOids);
+            }
+
+            if(params.getPointEncodings() != null)
+            {
+                List<Byte> bytes = params.getPointEncodings().getPointEncoding();
+                Set<Byte> pointEncodings = new HashSet<>(bytes);
+                option.setPointEncodings(pointEncodings);
+            }
+
+            return option;
+        }
+        else if(paramsObj instanceof RSAParameters)
+        {
+            RSAParameters params = (RSAParameters) paramsObj;
+            KeyParametersOption.RSAParametersOption option = new KeyParametersOption.RSAParametersOption();
+
+            Set<Range> modulusLengths = buildParametersMap(params.getModulusLength());
+            option.setModulusLengths(modulusLengths);
+
+            return option;
+        }
+        else if(paramsObj instanceof RSAPSSParameters)
+        {
+            RSAPSSParameters params = (RSAPSSParameters) paramsObj;
+            KeyParametersOption.RSAPSSParametersOption option = new KeyParametersOption.RSAPSSParametersOption();
+
+            Set<Range> modulusLengths = buildParametersMap(params.getModulusLength());
+            option.setModulusLengths(modulusLengths);
+
+            return option;
+        }
+        else if(paramsObj instanceof DSAParameters)
+        {
+            DSAParameters params = (DSAParameters) paramsObj;
+            KeyParametersOption.DSAParametersOption option = new KeyParametersOption.DSAParametersOption();
+
+            Set<Range> pLengths = buildParametersMap(params.getPLength());
+            option.setPLengths(pLengths);
+
+            Set<Range> qLengths = buildParametersMap(params.getQLength());
+            option.setQLengths(qLengths);
+
+            return option;
+        }
+        else if(paramsObj instanceof DHParameters)
+        {
+            DHParameters params = (DHParameters) paramsObj;
+            KeyParametersOption.DHParametersOption option = new KeyParametersOption.DHParametersOption();
+
+            Set<Range> pLengths = buildParametersMap(params.getPLength());
+            option.setPLengths(pLengths);
+
+            Set<Range> qLengths = buildParametersMap(params.getQLength());
+            option.setQLengths(qLengths);
+
+            return option;
+        }
+        else if(paramsObj instanceof GostParameters)
+        {
+            GostParameters params = (GostParameters) paramsObj;
+            KeyParametersOption.GostParametersOption option = new KeyParametersOption.GostParametersOption();
+
+            Set<ASN1ObjectIdentifier> set = toOIDSet(params.getPublicKeyParamSet());
+            option.setPublicKeyParamSets(set);
+
+            set = toOIDSet(params.getDigestParamSet());
+            option.setDigestParamSets(set);
+
+            set = toOIDSet(params.getEncryptionParamSet());
+            option.setEncryptionParamSets(set);
+
+            return option;
+        }
+        else
+        {
+            throw new CertprofileException("unknown public key parameters type " + paramsObj.getClass().getName());
+        }
+    }
+
+    public static final DirectoryStringType convertDirectoryStringType(
+            org.xipki.ca.certprofile.x509.jaxb.DirectoryStringType jaxbType)
+    {
+        if(jaxbType == null)
+        {
+            return null;
+        }
+        switch(jaxbType)
+        {
+        case BMP_STRING:
+            return DirectoryStringType.bmpString;
+        case PRINTABLE_STRING:
+            return DirectoryStringType.printableString;
+        case TELETEX_STRING:
+            return DirectoryStringType.teletexString;
+        case UTF_8_STRING:
+            return DirectoryStringType.utf8String;
+        default:
+            throw new RuntimeException("should not reach here, undefined DirectoryStringType " + jaxbType);
+        }
+    }
 }

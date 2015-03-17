@@ -240,35 +240,7 @@ public class Rfc6712Servlet extends HttpServlet
             {
                 if(auditEvent != null)
                 {
-                    if(auditLevel != null)
-                    {
-                        auditEvent.setLevel(auditLevel);
-                    }
-
-                    if(auditStatus != null)
-                    {
-                        auditEvent.setStatus(auditStatus);
-                    }
-
-                    if(auditMessage != null)
-                    {
-                        auditEvent.addEventData(new AuditEventData("message", auditMessage));
-                    }
-
-                    auditEvent.setDuration(System.currentTimeMillis() - auditEvent.getTimestamp().getTime());
-
-                    if(auditEvent.containsChildAuditEvents() == false)
-                    {
-                        auditLoggingService.logEvent(auditEvent);
-                    }
-                    else
-                    {
-                        List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
-                        for(AuditEvent event : expandedAuditEvents)
-                        {
-                            auditLoggingService.logEvent(event);
-                        }
-                    }
+                	audit(auditLoggingService, auditEvent, auditLevel, auditStatus, auditMessage);
                 }
             }
         }
@@ -299,6 +271,40 @@ public class Rfc6712Servlet extends HttpServlet
     public void setAuditServiceRegister(AuditLoggingServiceRegister auditServiceRegister)
     {
         this.auditServiceRegister = auditServiceRegister;
+    }
+    
+    private static void audit(AuditLoggingService auditLoggingService, 
+    		AuditEvent auditEvent, AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage)
+    {
+        if(auditLevel != null)
+        {
+            auditEvent.setLevel(auditLevel);
+        }
+
+        if(auditStatus != null)
+        {
+            auditEvent.setStatus(auditStatus);
+        }
+
+        if(auditMessage != null)
+        {
+            auditEvent.addEventData(new AuditEventData("message", auditMessage));
+        }
+
+        auditEvent.setDuration(System.currentTimeMillis() - auditEvent.getTimestamp().getTime());
+
+        if(auditEvent.containsChildAuditEvents() == false)
+        {
+            auditLoggingService.logEvent(auditEvent);
+        }
+        else
+        {
+            List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
+            for(AuditEvent event : expandedAuditEvents)
+            {
+                auditLoggingService.logEvent(event);
+            }
+        }
     }
 
 }

@@ -148,6 +148,7 @@ public class QASystemManagerImpl implements QASystemManager
                     LOG.debug(message, e);
                     continue;
                 }
+
                 X509IssuerInfo issuerInfo;
                 try
                 {
@@ -163,6 +164,7 @@ public class QASystemManagerImpl implements QASystemManager
                     LOG.debug(message, e);
                     continue;
                 }
+
                 x509IssuerInfoMap.put(issuerType.getName(), issuerInfo);
                 LOG.info("configured X509 issuer {}", issuerType.getName());
             }

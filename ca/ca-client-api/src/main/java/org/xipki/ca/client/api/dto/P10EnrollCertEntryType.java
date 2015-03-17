@@ -33,61 +33,37 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.mgmt.shell;
+package org.xipki.ca.client.api.dto;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "env-info", description="show information of CA environment parameters")
-public class EnvInfoCommand extends CaCommand
+public class P10EnrollCertEntryType
 {
-    @Argument(index = 0, name = "name", description = "environment parameter name")
-    private String name;
+    private final CertificationRequest p10Request;
+    private final String profile;
 
-    @Override
-    protected Object _doExecute()
-    throws Exception
+    public P10EnrollCertEntryType(CertificationRequest p10Request, String profile)
     {
-        StringBuilder sb = new StringBuilder();
+        ParamChecker.assertNotNull("p10Request", p10Request);
+        ParamChecker.assertNotEmpty("profile", profile);
 
-        if(name == null)
-        {
-            Set<String> paramNames = caManager.getEnvParamNames();
-            int n = paramNames.size();
-
-            if(n == 0 || n == 1)
-            {
-                sb.append(((n == 0) ? "no" : "1") + " environment parameter is configured\n");
-            }
-            else
-            {
-                sb.append(n + " enviroment paramters are configured:\n");
-            }
-
-            List<String> sorted = new ArrayList<>(paramNames);
-            Collections.sort(sorted);
-
-            for(String paramName : sorted)
-            {
-                sb.append("\t").append(paramName).append("\n");
-            }
-        }
-        else
-        {
-            String paramValue = caManager.getEnvParam(name);
-            sb.append(name).append("\n\t").append(paramValue);
-        }
-
-        out(sb.toString());
-        return null;
+        this.p10Request = p10Request;
+        this.profile = profile;
     }
+
+    public CertificationRequest getP10Request()
+    {
+        return p10Request;
+    }
+
+    public String getProfile()
+    {
+        return profile;
+    }
+
 }

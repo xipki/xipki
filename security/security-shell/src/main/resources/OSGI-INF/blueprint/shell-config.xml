@@ -191,5 +191,13 @@
         <entry key="-out" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
+    <command>
+      <action class="org.xipki.security.shell.CertRequestValidateCommand">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="-p10" value-ref="filePathCompleter"/>
+      </optional-completers>
+    </command>
   </command-bundle>
 </blueprint>

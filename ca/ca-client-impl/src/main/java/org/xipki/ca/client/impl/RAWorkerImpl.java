@@ -103,13 +103,13 @@ import org.xipki.ca.client.api.RAWorker;
 import org.xipki.ca.client.api.RAWorkerException;
 import org.xipki.ca.client.api.RemoveExpiredCertsResult;
 import org.xipki.ca.client.api.dto.CRLResultType;
-import org.xipki.ca.client.api.dto.EnrollCertEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.ca.client.api.dto.EnrollCertResultEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertResultType;
 import org.xipki.ca.client.api.dto.ErrorResultEntryType;
 import org.xipki.ca.client.api.dto.IssuerSerialEntryType;
+import org.xipki.ca.client.api.dto.P10EnrollCertEntryType;
 import org.xipki.ca.client.api.dto.ResultEntryType;
 import org.xipki.ca.client.api.dto.RevokeCertRequestEntryType;
 import org.xipki.ca.client.api.dto.RevokeCertRequestType;
@@ -350,7 +350,8 @@ public final class RAWorkerImpl implements RAWorker
                 if(caType.getCaCert().getAutoconf() != null)
                 {
                     ca.setCertAutoconf(true);
-                } else
+                }
+                else
                 {
                     ca.setCertAutoconf(true);
                     ca.setCert(SecurityUtil.parseCert(readData(caType.getCaCert().getCert())));
@@ -361,7 +362,8 @@ public final class RAWorkerImpl implements RAWorker
                 if(certprofilesType.getAutoconf() != null)
                 {
                     ca.setCertprofilesAutoconf(true);
-                } else
+                }
+                else
                 {
                     ca.setCertprofilesAutoconf(false);
 
@@ -565,8 +567,8 @@ public final class RAWorkerImpl implements RAWorker
             String username, RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
-        EnrollCertEntryType entry = new EnrollCertEntryType(p10Request, profile);
-        Map<String, EnrollCertEntryType> entries = new HashMap<>();
+        P10EnrollCertEntryType entry = new P10EnrollCertEntryType(p10Request, profile);
+        Map<String, P10EnrollCertEntryType> entries = new HashMap<>();
 
         final String id = "p10-1";
         entries.put(id, entry);
@@ -575,7 +577,7 @@ public final class RAWorkerImpl implements RAWorker
 
     @Override
     public EnrollCertResult requestCerts(EnrollCertRequestType.Type type,
-            Map<String, EnrollCertEntryType> enrollCertEntries,
+            Map<String, P10EnrollCertEntryType> enrollCertEntries,
             String caName, String username, RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
@@ -590,9 +592,14 @@ public final class RAWorkerImpl implements RAWorker
 
         for(String id : enrollCertEntries.keySet())
         {
-            EnrollCertEntryType entry = enrollCertEntries.get(id);
+            P10EnrollCertEntryType entry = enrollCertEntries.get(id);
 
             CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
+            CertificationRequest p10Req = entry.getP10Request();
+            if(securityFactory.verifyPOPO(p10Req) == false)
+            {
+                throw new PKIErrorException(PKIStatus.REJECTION, PKIFailureInfo.badPOP, "invalid POP of " + id);
+            }
 
             CertificationRequestInfo p10ReqInfo = entry.getP10Request().getCertificationRequestInfo();
             certTempBuilder.setPublicKey(p10ReqInfo.getSubjectPublicKeyInfo());
@@ -677,44 +684,46 @@ public final class RAWorkerImpl implements RAWorker
     private void checkCertprofileSupportInCA(String certprofile, String caName)
     throws RAWorkerException
     {
+        if(caName != null)
+        {
+            if(casMap.containsKey(caName) == false)
+            {
+                throw new RAWorkerException("unknown ca: " + caName);
+            }
+            else
+            {
+                CAConf ca = casMap.get(caName);
+                if(ca.supportsProfile(certprofile) == false)
+                {
+                    throw new RAWorkerException("cert profile " + certprofile + " is not supported by the CA " + caName);
+                }
+            }
+            return;
+        }
+
+        for(CAConf ca : casMap.values())
+        {
+            if(ca.isCAInfoConfigured() == false)
+            {
+                continue;
+            }
+            if(ca.supportsProfile(certprofile))
+            {
+                if(caName == null)
+                {
+                    caName = ca.getName();
+                }
+                else
+                {
+                    throw new RAWorkerException("Certificate profile " + certprofile +
+                            " supported by more than one CA, please specify the CA name.");
+                }
+            }
+        }
+
         if(caName == null)
         {
-            for(CAConf ca : casMap.values())
-            {
-                if(ca.isCAInfoConfigured() == false)
-                {
-                    continue;
-                }
-                if(ca.supportsProfile(certprofile))
-                {
-                    if(caName == null)
-                    {
-                        caName = ca.getName();
-                    }
-                    else
-                    {
-                        throw new RAWorkerException("Certificate profile " + certprofile +
-                                " supported by more than one CA, please specify the CA name.");
-                    }
-                }
-            }
-
-            if(caName == null)
-            {
-                throw new RAWorkerException("Unsupported certificate profile " + certprofile);
-            }
-        }
-        else if(casMap.containsKey(caName) == false)
-        {
-            throw new RAWorkerException("unknown ca: " + caName);
-        }
-        else
-        {
-            CAConf ca = casMap.get(caName);
-            if(ca.supportsProfile(certprofile) == false)
-            {
-                throw new RAWorkerException("cert profile " + certprofile + " is not supported by the CA " + caName);
-            }
+            throw new RAWorkerException("Unsupported certificate profile " + certprofile);
         }
     }
 
@@ -1023,40 +1032,32 @@ public final class RAWorkerImpl implements RAWorker
         {
             if(tryXipkiNSStoVerify == null)
             {
-                if(caPublicKey instanceof ECPublicKey)
+                if(caPublicKey instanceof ECPublicKey || Security.getProvider(provider) == null)
                 {
                     tryXipkiNSStoVerify = Boolean.FALSE;
                     tryXipkiNSStoVerifyMap.put(_caCert, tryXipkiNSStoVerify);
                 }
                 else
                 {
-                    if(Security.getProvider(provider) == null)
+                    byte[] tbs = _cert.getTBSCertificate();
+                    byte[] signatureValue = _cert.getSignature();
+                    String sigAlgName = _cert.getSigAlgName();
+                    try
                     {
+                        Signature verifier = Signature.getInstance(sigAlgName, provider);
+                        verifier.initVerify(caPublicKey);
+                        verifier.update(tbs);
+                        boolean sigValid = verifier.verify(signatureValue);
+
+                        LOG.info("Use {} to verify {} signature", provider, sigAlgName);
+                        tryXipkiNSStoVerify = Boolean.TRUE;
+                        tryXipkiNSStoVerifyMap.put(_caCert, tryXipkiNSStoVerify);
+                        return sigValid;
+                    }catch(Exception e)
+                    {
+                        LOG.info("Could not use {} to verify {} signature", provider, sigAlgName);
                         tryXipkiNSStoVerify = Boolean.FALSE;
                         tryXipkiNSStoVerifyMap.put(_caCert, tryXipkiNSStoVerify);
-                    }
-                    else
-                    {
-                        byte[] tbs = _cert.getTBSCertificate();
-                        byte[] signatureValue = _cert.getSignature();
-                        String sigAlgName = _cert.getSigAlgName();
-                        try
-                        {
-                            Signature verifier = Signature.getInstance(sigAlgName, provider);
-                            verifier.initVerify(caPublicKey);
-                            verifier.update(tbs);
-                            boolean sigValid = verifier.verify(signatureValue);
-
-                            LOG.info("Use {} to verify {} signature", provider, sigAlgName);
-                            tryXipkiNSStoVerify = Boolean.TRUE;
-                            tryXipkiNSStoVerifyMap.put(_caCert, tryXipkiNSStoVerify);
-                            return sigValid;
-                        }catch(Exception e)
-                        {
-                            LOG.info("Could not use {} to verify {} signature", provider, sigAlgName);
-                            tryXipkiNSStoVerify = Boolean.FALSE;
-                            tryXipkiNSStoVerifyMap.put(_caCert, tryXipkiNSStoVerify);
-                        }
                     }
                 }
             }
@@ -1444,53 +1445,71 @@ public final class RAWorkerImpl implements RAWorker
             certOrErrors.put(resultEntry.getId(), certOrError);
         }
 
-        java.security.cert.Certificate caCert = null;
-
         List<CMPCertificate> cmpCaPubs = result.getCACertificates();
 
-        if(CollectionUtil.isNotEmpty(cmpCaPubs))
+        if(CollectionUtil.isEmpty(cmpCaPubs))
         {
-            List<java.security.cert.Certificate> caPubs = new ArrayList<>(cmpCaPubs.size());
-            for(CMPCertificate cmpCaPub : cmpCaPubs)
+            return new EnrollCertResult(null, certOrErrors);
+        }
+
+        List<java.security.cert.Certificate> caPubs = new ArrayList<>(cmpCaPubs.size());
+        for(CMPCertificate cmpCaPub : cmpCaPubs)
+        {
+            try
             {
-                try
+                caPubs.add(getCertificate(cmpCaPub));
+            } catch (CertificateException e)
+            {
+                final String message = "Could not extract the caPub from CMPCertificate";
+                if(LOG.isErrorEnabled())
                 {
-                    caPubs.add(getCertificate(cmpCaPub));
-                } catch (CertificateException e)
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(message, e);
+            }
+        }
+
+        java.security.cert.Certificate caCert = null;
+        for(CertOrError certOrError : certOrErrors.values())
+        {
+            java.security.cert.Certificate cert = certOrError.getCertificate();
+            if(cert == null)
+            {
+                continue;
+            }
+
+            for(java.security.cert.Certificate caPub : caPubs)
+            {
+                if(verify(caPub, cert))
                 {
-                    final String message = "Could not extract the caPub from CMPCertificate";
-                    if(LOG.isErrorEnabled())
-                    {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                    }
-                    LOG.debug(message, e);
+                    caCert = caPub;
+                    break;
                 }
             }
 
-            for(CertOrError certOrError : certOrErrors.values())
+            if(caCert != null)
             {
-                java.security.cert.Certificate cert = certOrError.getCertificate();
-                if(cert == null)
-                {
-                    continue;
-                }
+                break;
+            }
+        }
 
-                if(caCert == null)
-                {
-                    for(java.security.cert.Certificate caPub : caPubs)
-                    {
-                        if(verify(caPub, cert))
-                        {
-                            caCert = caPub;
-                        }
-                    }
-                }
-                else if(verify(caCert, cert) == false)
-                {
-                    LOG.warn("Not all certificates issued by CA embedded in caPubs, ignore the caPubs");
-                    caCert = null;
-                    break;
-                }
+        if(caCert == null)
+        {
+            return new EnrollCertResult(null, certOrErrors);
+        }
+
+        for(CertOrError certOrError : certOrErrors.values())
+        {
+            java.security.cert.Certificate cert = certOrError.getCertificate();
+            if(cert == null)
+            {
+                continue;
+            }
+
+            if(verify(caCert, cert) == false)
+            {
+                LOG.warn("Not all certificates are issued by CA embedded in caPubs, ignore the caPubs");
+                return new EnrollCertResult(null, certOrErrors);
             }
         }
 

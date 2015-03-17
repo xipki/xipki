@@ -112,7 +112,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -128,7 +128,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -144,7 +144,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -160,7 +160,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -176,7 +176,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -205,7 +205,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -234,7 +234,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -250,7 +250,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -267,7 +267,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -299,7 +299,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -315,7 +315,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -331,7 +331,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -378,7 +378,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -438,7 +438,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -457,7 +457,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -476,7 +476,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -493,7 +493,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -510,7 +510,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -527,7 +527,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -544,7 +544,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -560,7 +560,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -576,7 +576,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -598,7 +598,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -620,7 +620,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -642,7 +642,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -658,7 +658,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -674,7 +674,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -686,7 +686,7 @@ public class CertificateStore
             return queryExecutor.getLatestSN(nameWithSN);
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -702,7 +702,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -718,7 +718,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -734,7 +734,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -749,7 +749,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -764,7 +764,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -779,7 +779,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -794,7 +794,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -809,7 +809,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -824,7 +824,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -839,7 +839,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -854,7 +854,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -869,7 +869,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -884,7 +884,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
@@ -899,7 +899,7 @@ public class CertificateStore
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 }
