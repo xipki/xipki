@@ -144,7 +144,7 @@ public class LiquibaseDatabaseConf
             }
             else
             {
-                throw new IllegalArgumentException("Unsupported datasbase type " + dataSourceClassName);
+                throw new IllegalArgumentException("unsupported datasbase type " + dataSourceClassName);
             }
 
             url = urlBuilder.toString();
@@ -184,7 +184,7 @@ public class LiquibaseDatabaseConf
         }
         else
         {
-            throw new IllegalArgumentException("Unsupported configuration");
+            throw new IllegalArgumentException("unsupported configuration");
         }
 
         if(passwordResolver != null && StringUtil.isNotBlank(password))

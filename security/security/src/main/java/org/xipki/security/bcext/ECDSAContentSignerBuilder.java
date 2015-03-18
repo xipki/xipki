@@ -44,6 +44,8 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 
 /**
+ * Copied from BouncyCastle under license MIT
+ *
  * @author Lijun Liao
  */
 

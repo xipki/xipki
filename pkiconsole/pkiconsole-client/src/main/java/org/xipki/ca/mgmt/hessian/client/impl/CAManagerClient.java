@@ -590,7 +590,7 @@ public class CAManagerClient implements CAManager
             return SecurityUtil.parseCert(encodedCert);
         } catch (CertificateException | IOException e)
         {
-            throw new CAMgmtException("Could not parse the certificate: " + e.getMessage(), e);
+            throw new CAMgmtException("could not parse the certificate: " + e.getMessage(), e);
         }
     }
 

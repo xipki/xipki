@@ -81,8 +81,8 @@ public class XMLUtil
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         } catch (ParserConfigurationException e)
         {
-            System.err.println("Could not initialize the XMLDocumentBuilder. Message: " + e.getMessage());
-            System.err.println("Could not initialize the XMLDocumentBuilder" + e.getMessage());
+            System.err.println("could not initialize the XMLDocumentBuilder. Message: " + e.getMessage());
+            System.err.println("could not initialize the XMLDocumentBuilder" + e.getMessage());
         }
         if(builder != null)
         {

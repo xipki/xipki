@@ -163,7 +163,7 @@ public class KeystoreP11Module implements P11Module
 
         if(_slotId == null)
         {
-            throw new SignerException("Could not find slot identified by " + slotId);
+            throw new SignerException("could not find slot identified by " + slotId);
         }
 
         List<char[]> pwd;

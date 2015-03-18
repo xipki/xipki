@@ -127,7 +127,7 @@ public class IoUtil
 
     public static byte[] leftmost(byte[] bytes, int bitCount)
     {
-        int byteLenKey = (bitCount + 7)/8;
+        int byteLenKey = (bitCount + 7) / 8;
 
         if (bitCount >= (bytes.length << 3))
         {
@@ -137,7 +137,7 @@ public class IoUtil
         byte[] truncatedBytes = new byte[byteLenKey];
         System.arraycopy(bytes, 0, truncatedBytes, 0, byteLenKey);
 
-        if (bitCount%8 > 0) // shift the bits to the right
+        if (bitCount % 8 > 0) // shift the bits to the right
         {
             int shiftBits = 8-(bitCount%8);
 

@@ -80,12 +80,12 @@ public class KeystoreP11ModulePool
 
         try
         {
-            LOG.info("Removed module {}", moduleName);
+            LOG.info("removed module {}", moduleName);
             module.close();
-            LOG.info("Finalized module {}", moduleName);
+            LOG.info("finalized module {}", moduleName);
         }catch(Throwable t)
         {
-            final String message = "Could not finalize the module " + moduleName;
+            final String message = "could not finalize the module " + moduleName;
             if(LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());

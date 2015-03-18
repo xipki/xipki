@@ -79,7 +79,7 @@ public class NSSSignatureSpi extends SignatureSpi
     private final MessageDigest md;
     private final Cipher cipher;
 
-    private static final String MSG_UNSUPPORTED_ALGO = "Unsupported signature algorithm (digestAlgo: %s, encryptionAlgo: %s)";
+    private static final String MSG_UNSUPPORTED_ALGO = "unsupported signature algorithm (digestAlgo: %s, encryptionAlgo: %s)";
 
     private NSSSignatureSpi(String algorithm)
     {
@@ -146,14 +146,14 @@ public class NSSSignatureSpi extends SignatureSpi
                     service = Signature.getInstance(algorithm, "SunEC");
                 } catch (NoSuchAlgorithmException | NoSuchProviderException e2)
                 {
-                    throw new ProviderException("Signature " + algorithm + "not supported");
+                    throw new ProviderException("signature " + algorithm + "not supported");
                 }
             }
         }
 
         if(service == null)
         {
-            final String errorMsg = "Unsupported algorithm " + algorithm;
+            final String errorMsg = "unsupported algorithm " + algorithm;
             throw new ProviderException(errorMsg);
         }
 
@@ -170,15 +170,15 @@ public class NSSSignatureSpi extends SignatureSpi
                 service = Cipher.getInstance(algorithm, XipkiNSSProvider.nssProvider);
             } catch (NoSuchAlgorithmException e)
             {
-                throw new ProviderException("Cipher " + algorithm + " not supported");
+                throw new ProviderException("cipher " + algorithm + " not supported");
             } catch (NoSuchPaddingException e)
             {
-                throw new ProviderException("Cipher " + algorithm + " not supported");
+                throw new ProviderException("cipher " + algorithm + " not supported");
             }
         }
         if(service == null)
         {
-            final String errorMsg = "Unsupported algorithm " + algorithm;
+            final String errorMsg = "unsupported algorithm " + algorithm;
             throw new ProviderException(errorMsg);
         }
 
@@ -200,7 +200,7 @@ public class NSSSignatureSpi extends SignatureSpi
 
         if(service == null)
         {
-            final String errorMsg = "Cannot find any provider for algorithm " + algorithm;
+            final String errorMsg = "could not find any provider for algorithm " + algorithm;
             try
             {
                 service = MessageDigest.getInstance(algorithm);

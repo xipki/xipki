@@ -152,7 +152,7 @@ public class Rfc6712Servlet extends HttpServlet
             response.getOutputStream().write(pkiRespBytes);
         }catch(EOFException e)
         {
-            final String message = "Connection reset by peer";
+            final String message = "connection reset by peer";
             LOG.error(message + ". {}: {}", e.getClass().getName(), e.getMessage());
             LOG.debug(message, e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

@@ -178,7 +178,7 @@ public class KeystoreP11Identity extends P11Identity
     {
         if(publicKey instanceof RSAPublicKey == false)
         {
-            throw new SignerException("Operation CKM_RSA_PKCS is not allowed for " +
+            throw new SignerException("operation CKM_RSA_PKCS is not allowed for " +
                     publicKey.getAlgorithm() + " public key");
         }
 
@@ -191,7 +191,7 @@ public class KeystoreP11Identity extends P11Identity
     {
         if(publicKey instanceof RSAPublicKey == false)
         {
-            throw new SignerException("Operation CKM_RSA_X509 is not allowed for " +
+            throw new SignerException("operation CKM_RSA_X509 is not allowed for " +
                     publicKey.getAlgorithm() + " public key");
         }
         return do_rsa_sign(hash);
@@ -226,7 +226,7 @@ public class KeystoreP11Identity extends P11Identity
     {
         if(publicKey instanceof ECPublicKey == false)
         {
-            throw new SignerException("Operation CKM_ECDSA is not allowed for " + publicKey.getAlgorithm() + " public key");
+            throw new SignerException("operation CKM_ECDSA is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
 
         return do_dsa_sign(hash);
@@ -237,7 +237,7 @@ public class KeystoreP11Identity extends P11Identity
     {
         if(publicKey instanceof DSAPublicKey == false)
         {
-            throw new SignerException("Operation CKM_DSA is not allowed for " + publicKey.getAlgorithm() + " public key");
+            throw new SignerException("operation CKM_DSA is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
         return do_dsa_sign(hash);
     }

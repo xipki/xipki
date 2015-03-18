@@ -93,7 +93,7 @@ public class IaikP11Module implements P11Module
 
         if(slotList == null || slotList.length == 0)
         {
-            throw new SignerException("No slot with present card could be found");
+            throw new SignerException("no slot with present card could be found");
         }
 
         List<P11SlotIdentifier> tmpSlotIds = new LinkedList<>();
@@ -131,7 +131,7 @@ public class IaikP11Module implements P11Module
                 LOG.debug("{}", msg);
             }catch(Throwable t)
             {
-                final String message = "Unexpected error";
+                final String message = "unexpected error";
                 if(LOG.isErrorEnabled())
                 {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
@@ -166,7 +166,7 @@ public class IaikP11Module implements P11Module
 
         if(slot == null)
         {
-            throw new SignerException("Could not find slot identified by " + slotId);
+            throw new SignerException("could not find slot identified by " + slotId);
         }
 
         List<char[]> pwd;

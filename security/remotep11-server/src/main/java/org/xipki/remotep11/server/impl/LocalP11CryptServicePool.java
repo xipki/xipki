@@ -104,8 +104,8 @@ public class LocalP11CryptServicePool
             initialized = true;
         }catch(Exception e)
         {
-            LOG.error("Exception thrown. {}: {}", e.getClass().getName(), e.getMessage());
-            LOG.debug("Exception thrown", e);
+            LOG.error("exception thrown. {}: {}", e.getClass().getName(), e.getMessage());
+            LOG.debug("exception thrown", e);
             throw e;
         }
     }

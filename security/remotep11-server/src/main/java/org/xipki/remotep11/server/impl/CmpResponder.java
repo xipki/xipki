@@ -164,7 +164,7 @@ class CmpResponder
                 }
             }catch(IllegalArgumentException e)
             {
-                final String statusMessage = "Invalid value of the InfoTypeAndValue for " +
+                final String statusMessage = "invalid value of the InfoTypeAndValue for " +
                         XipkiCmpConstants.id_xipki_cmp.getId();
                 return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, statusMessage);
             }
@@ -292,7 +292,7 @@ class CmpResponder
                 }
                 default:
                 {
-                    final String statusMessage = "Unsupported XiPKI action code '" + action + "'";
+                    final String statusMessage = "unsupported XiPKI action code '" + action + "'";
                     return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, statusMessage);
                 }
             }
@@ -310,8 +310,8 @@ class CmpResponder
             return new PKIMessage(respHeader, respBody);
         } catch (Throwable t)
         {
-            LOG.error("Error while processing CMP message {}, message: {}", tidStr, t.getMessage());
-            LOG.debug("Error while processing CMP message " + tidStr, t);
+            LOG.error("error while processing CMP message {}, message: {}", tidStr, t.getMessage());
+            LOG.debug("error while processing CMP message " + tidStr, t);
             return createRejectionPKIMessage(respHeader, PKIFailureInfo.systemFailure, t.getMessage());
         }
     }

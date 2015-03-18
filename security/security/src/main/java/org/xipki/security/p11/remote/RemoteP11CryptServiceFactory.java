@@ -102,8 +102,8 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
                     services.put(moduleConf.getName(), service);
                 }catch(Exception e)
                 {
-                    LOG.error("Could not createP11CryptService: {}", e.getMessage());
-                    LOG.debug("Could not createP11CryptService", e);
+                    LOG.error("could not createP11CryptService: {}", e.getMessage());
+                    LOG.debug("could not createP11CryptService", e);
                     throw new SignerException(e.getMessage(), e);
                 }
             }
@@ -115,7 +115,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
     private static void logServiceInfo(String url, RemoteP11CryptService service)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("Initialized RemoteP11CryptService (url=").append(url).append(")\n");
+        sb.append("initialized RemoteP11CryptService (url=").append(url).append(")\n");
 
         P11SlotIdentifier[] slotIds;
         try
@@ -132,7 +132,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
 
         if(slotIds == null || slotIds.length == 0)
         {
-            sb.append("\tNo slot is available");
+            sb.append("\tno slot is available");
             LOG.warn("{}", sb);
             return;
         }

@@ -45,7 +45,7 @@ public class InvalidOIDorNameException extends Exception
 
     public InvalidOIDorNameException(String declaredOidOrName)
     {
-        super("Invalid ObjectIdentifer or name '" + declaredOidOrName + "'");
+        super("invalid ObjectIdentifer or name '" + declaredOidOrName + "'");
     }
 
 }

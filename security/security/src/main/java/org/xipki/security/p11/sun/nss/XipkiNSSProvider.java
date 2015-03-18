@@ -150,7 +150,7 @@ extends Provider
             }
         }catch(Throwable t)
         {
-            throw new ProviderException("Cannot initialize SunPKCS11 NSS provider", t);
+            throw new ProviderException("could not initialize SunPKCS11 NSS provider", t);
         }
 
         // Signature RSA

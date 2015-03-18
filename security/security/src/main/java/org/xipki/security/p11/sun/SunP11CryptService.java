@@ -281,7 +281,7 @@ public final class SunP11CryptService implements P11CryptService
                 }
             }catch(Throwable t)
             {
-                final String message = "Could not initialize PKCS11 slot " + i + " (module: " + moduleConf.getName() + ")";
+                final String message = "could not initialize PKCS11 slot " + i + " (module: " + moduleConf.getName() + ")";
                 if(LOG.isWarnEnabled())
                 {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
@@ -380,7 +380,7 @@ public final class SunP11CryptService implements P11CryptService
         SunP11Identity identity = getIdentity(slotId, keyId);
         if(identity == null)
         {
-            throw new SignerException("Found no key with " + keyId);
+            throw new SignerException("found no key with " + keyId);
         }
 
         return identity.CKM_RSA_PKCS(encodedDigestInfo);
@@ -396,7 +396,7 @@ public final class SunP11CryptService implements P11CryptService
         SunP11Identity identity = getIdentity(slotId, keyId);
         if(identity == null)
         {
-            throw new SignerException("Found no key with " + keyId);
+            throw new SignerException("found no key with " + keyId);
         }
 
         return identity.CKM_RSA_X509(hash);
@@ -411,7 +411,7 @@ public final class SunP11CryptService implements P11CryptService
         SunP11Identity identity = getIdentity(slotId, keyId);
         if(identity == null)
         {
-            throw new SignerException("Found no key with " + keyId);
+            throw new SignerException("found no key with " + keyId);
         }
 
         return identity.CKM_ECDSA(hash);
@@ -426,7 +426,7 @@ public final class SunP11CryptService implements P11CryptService
         SunP11Identity identity = getIdentity(slotId, keyId);
         if(identity == null)
         {
-            throw new SignerException("Found no key with " + keyId);
+            throw new SignerException("found no key with " + keyId);
         }
 
         return identity.CKM_DSA(hash);
@@ -454,7 +454,7 @@ public final class SunP11CryptService implements P11CryptService
     {
         if(keyId.getKeyLabel() == null)
         {
-            throw new SignerException("Only key referencing by key-label is supported");
+            throw new SignerException("only key referencing by key-label is supported");
         }
 
         for(SunP11Identity identity : identities)
