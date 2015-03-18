@@ -107,7 +107,7 @@ public class CmpUtf8Pairs
             int sepIdx = token.indexOf(NAME_TERM);
             if(sepIdx == -1 || sepIdx == token.length() - 1)
             {
-                throw new IllegalArgumentException("Invalid token: " + token);
+                throw new IllegalArgumentException("invalid token: " + token);
             }
             String name = token.substring(0, sepIdx);
             name = decodeNameOrValue(name);

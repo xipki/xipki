@@ -264,7 +264,7 @@ public class DbCertStatusStore extends CertStatusStore
                             {
                                 if(existingIssuer.matchHash(hashAlgoType, hashNameBytes, hashKeyBytes))
                                 {
-                                    throw new Exception("Found at least two issuers with the same subject and key");
+                                    throw new Exception("found at least two issuers with the same subject and key");
                                 }
                             }
                         }
@@ -293,7 +293,7 @@ public class DbCertStatusStore extends CertStatusStore
             }
         }catch(Exception e)
         {
-            final String message = "Could not executing initializeStore()";
+            final String message = "could not executing initializeStore()";
             if(LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -325,12 +325,12 @@ public class DbCertStatusStore extends CertStatusStore
 
         if(initialized == false)
         {
-            throw new CertStatusStoreException("Initialization of CertStore is still in process");
+            throw new CertStatusStoreException("initialization of CertStore is still in process");
         }
 
         if(initializationFailed)
         {
-            throw new CertStatusStoreException("Initialization of CertStore failed");
+            throw new CertStatusStoreException("initialization of CertStore failed");
         }
 
         HashAlgoType certHashAlgo = null;
@@ -509,7 +509,7 @@ public class DbCertStatusStore extends CertStatusStore
         }
         if(ps == null)
         {
-            throw new DataAccessException("Cannot create prepared statement for " + sqlQuery);
+            throw new DataAccessException("could not create prepared statement for " + sqlQuery);
         }
         return ps;
     }

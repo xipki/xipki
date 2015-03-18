@@ -105,7 +105,7 @@ public final class IaikP11CryptService implements P11CryptService
     {
         if(System.currentTimeMillis() - lastRefresh < MIN_RECONNECT_INTERVAL)
         {
-            LOG.info("Just refreshed within one minute, skip this reconnect()");
+            LOG.info("just refreshed within one minute, skip this reconnect()");
             return lastRefreshSuccessfull;
         }
 
@@ -120,14 +120,14 @@ public final class IaikP11CryptService implements P11CryptService
     public synchronized void refresh()
     throws SignerException
     {
-        LOG.info("Refreshing PKCS#11 module {}", moduleConf.getName());
+        LOG.info("refreshing PKCS#11 module {}", moduleConf.getName());
         lastRefreshSuccessfull = false;
         try
         {
             this.extModule = IaikP11ModulePool.getInstance().getModule(moduleConf);
         }catch(SignerException e)
         {
-            final String message = "Could not initialize the PKCS#11 Module for " + moduleConf.getName();
+            final String message = "could not initialize the PKCS#11 Module for " + moduleConf.getName();
             if(LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -147,7 +147,7 @@ public final class IaikP11CryptService implements P11CryptService
                 slot = extModule.getSlot(slotId);
                 if(slot == null)
                 {
-                    LOG.warn("Could not initialize slot " + slotId);
+                    LOG.warn("could not initialize slot " + slotId);
                     continue;
                 }
             } catch (SignerException e)
@@ -187,7 +187,7 @@ public final class IaikP11CryptService implements P11CryptService
         if(LOG.isInfoEnabled())
         {
             StringBuilder sb = new StringBuilder();
-            sb.append("Initialized ").append(this.identities.size()).append(" PKCS#11 Keys:\n");
+            sb.append("initialized ").append(this.identities.size()).append(" PKCS#11 Keys:\n");
             for(IaikP11Identity identity : this.identities)
             {
                 sb.append("\t(slot ").append(identity.getSlotId());
@@ -198,7 +198,7 @@ public final class IaikP11CryptService implements P11CryptService
             LOG.info(sb.toString());
         }
 
-        LOG.info("Refreshed PKCS#11 module {}", moduleConf.getName());
+        LOG.info("refreshed PKCS#11 module {}", moduleConf.getName());
     }
 
     @Override
@@ -364,7 +364,7 @@ public final class IaikP11CryptService implements P11CryptService
         IaikP11Identity identity = getIdentity2(slotId, keyId);
         if(identity == null)
         {
-            throw new SignerException("Found no identity with " + keyId + " in slot " + slotId);
+            throw new SignerException("found no identity with " + keyId + " in slot " + slotId);
         }
         return identity;
     }

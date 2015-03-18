@@ -196,159 +196,154 @@ class OCSPStoreQueryExecutor
             {
                 releaseDbResources(ps, null);
             }
+            return;
         }
-        else
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("INSERT INTO CERT ");
+        sb.append("(ID, LAST_UPDATE, SERIAL, SUBJECT");
+        sb.append(", NOTBEFORE, NOTAFTER, REVOKED, ISSUER_ID, PROFILE");
+        if(revoked)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.append("INSERT INTO CERT ");
-            sb.append("(ID, LAST_UPDATE, SERIAL, SUBJECT");
-            sb.append(", NOTBEFORE, NOTAFTER, REVOKED, ISSUER_ID, PROFILE");
+            sb.append(", REV_TIME, REV_INVALIDITY_TIME, REV_REASON");
+        }
+        sb.append(")");
+        sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?");
+        if(revoked)
+        {
+            sb.append(", ?, ?, ?");
+        }
+        sb.append(")");
+
+        final String SQL_ADD_CERT = sb.toString();
+
+        final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, CERT) VALUES (?, ?)";
+
+        final String SQL_ADD_CERTHASH = "INSERT INTO CERTHASH "
+                + " (CERT_ID, SHA1, SHA224, SHA256, SHA384, SHA512)"
+                + " VALUES (?, ?, ?, ?, ?, ?)";
+
+        int certId = nextCertId();
+        byte[] encodedCert = certificate.getEncodedCert();
+        String b64Cert = Base64.toBase64String(encodedCert);
+        String sha1Fp = HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
+        String sha224Fp = HashCalculator.hexHash(HashAlgoType.SHA224, encodedCert);
+        String sha256Fp = HashCalculator.hexHash(HashAlgoType.SHA256, encodedCert);
+        String sha384Fp = HashCalculator.hexHash(HashAlgoType.SHA384, encodedCert);
+        String sha512Fp = HashCalculator.hexHash(HashAlgoType.SHA512, encodedCert);
+
+        PreparedStatement[] pss = borrowPreparedStatements(SQL_ADD_CERT, SQL_ADD_RAWCERT, SQL_ADD_CERTHASH);
+        // all statements have the same connection
+        Connection conn = null;
+
+        try
+        {
+            PreparedStatement ps_addcert = pss[0];
+            PreparedStatement ps_addRawcert = pss[1];
+            PreparedStatement ps_addCerthash = pss[2];
+            conn = ps_addcert.getConnection();
+
+            // CERT
+            X509Certificate cert = certificate.getCert();
+            int idx = 2;
+            ps_addcert.setLong(idx++, System.currentTimeMillis()/1000);
+            ps_addcert.setLong(idx++, serialNumber.longValue());
+            ps_addcert.setString(idx++, certificate.getSubject());
+            ps_addcert.setLong(idx++, cert.getNotBefore().getTime()/1000);
+            ps_addcert.setLong(idx++, cert.getNotAfter().getTime()/1000);
+            setBoolean(ps_addcert, idx++, revoked);
+            ps_addcert.setInt(idx++, issuerId);
+            ps_addcert.setString(idx++, certprofile);
+
             if(revoked)
             {
-                sb.append(", REV_TIME, REV_INVALIDITY_TIME, REV_REASON");
-            }
-            sb.append(")");
-            sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?");
-            if(revoked)
-            {
-                sb.append(", ?, ?, ?");
-            }
-            sb.append(")");
-
-            final String SQL_ADD_CERT = sb.toString();
-
-            final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, CERT) VALUES (?, ?)";
-
-            final String SQL_ADD_CERTHASH = "INSERT INTO CERTHASH "
-                    + " (CERT_ID, SHA1, SHA224, SHA256, SHA384, SHA512)"
-                    + " VALUES (?, ?, ?, ?, ?, ?)";
-
-            int certId = nextCertId();
-            byte[] encodedCert = certificate.getEncodedCert();
-            String b64Cert = Base64.toBase64String(encodedCert);
-            String sha1Fp = HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
-            String sha224Fp = HashCalculator.hexHash(HashAlgoType.SHA224, encodedCert);
-            String sha256Fp = HashCalculator.hexHash(HashAlgoType.SHA256, encodedCert);
-            String sha384Fp = HashCalculator.hexHash(HashAlgoType.SHA384, encodedCert);
-            String sha512Fp = HashCalculator.hexHash(HashAlgoType.SHA512, encodedCert);
-
-            PreparedStatement[] pss = borrowPreparedStatements(SQL_ADD_CERT, SQL_ADD_RAWCERT, SQL_ADD_CERTHASH);
-            // all statements have the same connection
-            Connection conn = null;
-
-            try
-            {
-                PreparedStatement ps_addcert = pss[0];
-                PreparedStatement ps_addRawcert = pss[1];
-                PreparedStatement ps_addCerthash = pss[2];
-                conn = ps_addcert.getConnection();
-
-                // CERT
-                X509Certificate cert = certificate.getCert();
-                int idx = 2;
-                ps_addcert.setLong(idx++, System.currentTimeMillis()/1000);
-                ps_addcert.setLong(idx++, serialNumber.longValue());
-                ps_addcert.setString(idx++, certificate.getSubject());
-                ps_addcert.setLong(idx++, cert.getNotBefore().getTime()/1000);
-                ps_addcert.setLong(idx++, cert.getNotAfter().getTime()/1000);
-                setBoolean(ps_addcert, idx++, revoked);
-                ps_addcert.setInt(idx++, issuerId);
-                ps_addcert.setString(idx++, certprofile);
-
-                if(revoked)
+                ps_addcert.setLong(idx++, revInfo.getRevocationTime().getTime()/1000);
+                if(revInfo.getInvalidityTime() != null)
                 {
-                    ps_addcert.setLong(idx++, revInfo.getRevocationTime().getTime()/1000);
-                    if(revInfo.getInvalidityTime() != null)
-                    {
-                        ps_addcert.setLong(idx++, revInfo.getInvalidityTime().getTime()/1000);
-                    }else
-                    {
-                        ps_addcert.setNull(idx++, Types.BIGINT);
-                    }
-                    ps_addcert.setInt(idx++, revInfo.getReason() == null? 0 : revInfo.getReason().getCode());
+                    ps_addcert.setLong(idx++, revInfo.getInvalidityTime().getTime()/1000);
+                }else
+                {
+                    ps_addcert.setNull(idx++, Types.BIGINT);
+                }
+                ps_addcert.setInt(idx++, revInfo.getReason() == null? 0 : revInfo.getReason().getCode());
+            }
+
+            // RAWCERT
+            idx = 2;
+            ps_addRawcert.setString(idx++, b64Cert);
+
+            // CERTHASH
+            idx = 2;
+            ps_addCerthash.setString(idx++, sha1Fp);
+            ps_addCerthash.setString(idx++, sha224Fp);
+            ps_addCerthash.setString(idx++, sha256Fp);
+            ps_addCerthash.setString(idx++, sha384Fp);
+            ps_addCerthash.setString(idx++, sha512Fp);
+
+            final int tries = 3;
+            for(int i = 0; i < tries; i++)
+            {
+                if(i > 0)
+                {
+                    certId = nextCertId();
                 }
 
-                // RAWCERT
-                idx = 2;
-                ps_addRawcert.setString(idx++, b64Cert);
+                ps_addcert.setInt(1, certId);
+                ps_addCerthash.setInt(1, certId);
+                ps_addRawcert.setInt(1, certId);
 
-                // CERTHASH
-                idx = 2;
-                ps_addCerthash.setString(idx++, sha1Fp);
-                ps_addCerthash.setString(idx++, sha224Fp);
-                ps_addCerthash.setString(idx++, sha256Fp);
-                ps_addCerthash.setString(idx++, sha384Fp);
-                ps_addCerthash.setString(idx++, sha512Fp);
-
-                final int tries = 3;
-                for(int i = 0; i < tries; i++)
+                final boolean origAutoCommit = conn.getAutoCommit();
+                conn.setAutoCommit(false);
+                String sql = null;
+                try
                 {
-                    if(i > 0)
+                    sql = SQL_ADD_CERT;
+                    ps_addcert.executeUpdate();
+
+                    sql = SQL_ADD_CERTHASH;
+                    ps_addRawcert.executeUpdate();
+
+                    sql = SQL_ADD_CERTHASH;
+                    ps_addCerthash.executeUpdate();
+
+                    sql = "(commit add cert to OCSP)";
+                    conn.commit();
+                }catch(SQLException e)
+                {
+                    conn.rollback();
+                    DataAccessException tEx = dataSource.translate(sql, e);
+                    if(tEx instanceof DuplicateKeyException && i < tries - 1)
                     {
-                        certId = nextCertId();
+                        continue;
                     }
-
-                    ps_addcert.setInt(1, certId);
-                    ps_addCerthash.setInt(1, certId);
-                    ps_addRawcert.setInt(1, certId);
-
-                    final boolean origAutoCommit = conn.getAutoCommit();
-                    conn.setAutoCommit(false);
-                    String sql = null;
-                    try
-                    {
-                        sql = SQL_ADD_CERT;
-                        ps_addcert.executeUpdate();
-
-                        sql = SQL_ADD_CERTHASH;
-                        ps_addRawcert.executeUpdate();
-
-                        sql = SQL_ADD_CERTHASH;
-                        ps_addCerthash.executeUpdate();
-
-                        sql = "(commit add cert to OCSP)";
-                        conn.commit();
-                    }catch(SQLException e)
-                    {
-                        conn.rollback();
-                        DataAccessException tEx = dataSource.translate(sql, e);
-                        if(tEx instanceof DuplicateKeyException && i < tries - 1)
-                        {
-                            continue;
-                        }
-                        LOG.error("datasource {} SQLException while adding certificate with id {}: {}",
-                                dataSource.getDatasourceName(), certId, e.getMessage());
-                        throw tEx;
-                    }
-                    finally
-                    {
-                        conn.setAutoCommit(origAutoCommit);
-                    }
-
-                    break;
+                    LOG.error("datasource {} SQLException while adding certificate with id {}: {}",
+                            dataSource.getDatasourceName(), certId, e.getMessage());
+                    throw tEx;
                 }
-            } catch(SQLException e)
-            {
-                throw dataSource.translate(null, e);
-            } finally
+                finally
+                {
+                    conn.setAutoCommit(origAutoCommit);
+                }
+
+                break;
+            }
+        } catch(SQLException e)
+        {
+            throw dataSource.translate(null, e);
+        } finally
+        {
+            for(PreparedStatement ps : pss)
             {
                 try
                 {
-                    for(PreparedStatement ps : pss)
-                    {
-                        try
-                        {
-                            ps.close();
-                        }catch(Throwable t)
-                        {
-                            LOG.warn("Could not close PreparedStatement", t);
-                        }
-                    }
-                }finally
+                    ps.close();
+                }catch(Throwable t)
                 {
-                    dataSource.returnConnection(conn);
+                    LOG.warn("could not close PreparedStatement", t);
                 }
+
             }
+            dataSource.returnConnection(conn);
         }
     }
 
@@ -518,7 +513,7 @@ class OCSPStoreQueryExecutor
         Integer id = issuerStore.getIdForCert(issuerCert.getEncodedCert());
         if(id == null)
         {
-            throw new IllegalStateException("Could not find issuer, "
+            throw new IllegalStateException("could not find issuer, "
                     + "please start XiPKI in master mode first the restart this XiPKI system");
         }
         return id.intValue();
@@ -603,11 +598,11 @@ class OCSPStoreQueryExecutor
         Connection c = dataSource.getConnection();
         if(c != null)
         {
-            ps = dataSource.prepareStatement(c,sqlQuery);
+            ps = dataSource.prepareStatement(c, sqlQuery);
         }
         if(ps == null)
         {
-            throw new DataAccessException("Cannot create prepared statement for " + sqlQuery);
+            throw new DataAccessException("could not create prepared statement for " + sqlQuery);
         }
         return ps;
     }
@@ -624,28 +619,31 @@ class OCSPStoreQueryExecutor
             for(int i = 0; i < n; i++)
             {
                 pss[i] = dataSource.prepareStatement(c, sqlQueries[i]);
-                if(pss[i] == null)
+                if(pss[i] != null)
                 {
-                    for(int j = 0; j < i; j++)
-                    {
-                        try
-                        {
-                            pss[j].close();
-                        }catch(Throwable t)
-                        {
-                            LOG.warn("Could not close preparedStatement", t);
-                        }
-                    }
+                    continue;
+                }
+
+                for(int j = 0; j < i; j++)
+                {
                     try
                     {
-                        c.close();
+                        pss[j].close();
                     }catch(Throwable t)
                     {
-                        LOG.warn("Could not close connection", t);
+                        LOG.warn("could not close preparedStatement", t);
                     }
-
-                    throw new DataAccessException("Cannot create prepared statement for " + sqlQueries[i]);
                 }
+
+                try
+                {
+                    c.close();
+                }catch(Throwable t)
+                {
+                    LOG.warn("could not close connection", t);
+                }
+
+                throw new DataAccessException("could not create prepared statement for " + sqlQueries[i]);
             }
         }
 

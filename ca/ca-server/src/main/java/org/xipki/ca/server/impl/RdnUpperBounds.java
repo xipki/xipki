@@ -122,7 +122,7 @@ class RdnUpperBounds
                 String value = SecurityUtil.rdnValueToString(atv.getValue());
                 if(value.length() > ub)
                 {
-                    throw new BadCertTemplateException("Attribute " +
+                    throw new BadCertTemplateException("attribute " +
                             ObjectIdentifiers.getName(type) + " overrides the upper bound (" +
                             value.length() + " > " + ub + "): '" + value + "'");
                 }

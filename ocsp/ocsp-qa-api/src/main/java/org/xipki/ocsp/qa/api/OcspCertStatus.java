@@ -61,12 +61,7 @@ public enum OcspCertStatus
     sigRequired,
     unauthorized;
 
-    public static final String certStatusesText =
-            "issuerUnknown, unknown, good, rev_noreason, unspecified, keyCompromise, " +
-            "cACompromise, affiliationChanged, superseded, cessationOfOperation, " +
-            "certificateHold, removeFromCRL, privilegeWithdrawn, aACompromise";
-
-    public static OcspCertStatus getCertStatus(String name)
+    public static OcspCertStatus getInstance(String name)
     {
         for(OcspCertStatus entry : values())
         {
@@ -76,6 +71,6 @@ public enum OcspCertStatus
             }
         }
 
-        throw new IllegalArgumentException("Unknown CertStatus '" + name + "'");
+        return null;
     }
 }

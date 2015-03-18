@@ -89,7 +89,7 @@ public class CertificateStore
                     certInfo.getUser());
         } catch (Exception e)
         {
-            LOG.error("Could not save certificate {}: {}. Message: {}",
+            LOG.error("could not save certificate {}: {}. Message: {}",
                     new Object[]{certInfo.getCert().getSubject(),
                         Base64.toBase64String(certInfo.getCert().getEncodedCert()),
                         e.getMessage()});
@@ -190,7 +190,7 @@ public class CertificateStore
                     caCert, serialNumber, revInfo, force, publishToDeltaCRLCache);
             if(revokedCert == null)
             {
-                LOG.info("Could not revoke non-existing certificate issuer='{}', serialNumber={}",
+                LOG.info("could not revoke non-existing certificate issuer='{}', serialNumber={}",
                     caCert.getSubject(), serialNumber);
             }
             else
@@ -219,7 +219,7 @@ public class CertificateStore
                     caCert, serialNumber, force, publishToDeltaCRLCache);
             if(unrevokedCert == null)
             {
-                LOG.info("Could not unrevoke non-existing certificate issuer='{}', serialNumber={}",
+                LOG.info("could not unrevoke non-existing certificate issuer='{}', serialNumber={}",
                     caCert.getSubject(), serialNumber);
             }
             else
@@ -279,7 +279,7 @@ public class CertificateStore
             return true;
         } catch (Exception e)
         {
-            LOG.error("Could not add CRL ca={}, thisUpdate={}: {}, ",
+            LOG.error("could not add CRL ca={}, thisUpdate={}: {}, ",
                 new Object[]{caCert.getSubject(),
                     crl.getThisUpdate(), e.getMessage()});
             LOG.debug("Exception", e);
@@ -342,7 +342,7 @@ public class CertificateStore
             return queryExecutor.getEncodedCRL(caCert, crlNumber);
         } catch (Exception e)
         {
-            LOG.error("Could not get CRL ca={}: error message: {}",
+            LOG.error("could not get CRL ca={}: error message: {}",
                     caCert.getSubject(),
                     e.getMessage());
             LOG.debug("Exception", e);
@@ -357,7 +357,7 @@ public class CertificateStore
             return queryExecutor.cleanupCRLs(caCert, numCRLs);
         } catch (Exception e)
         {
-            LOG.error("Could not cleanup CRLs ca={}: error message: {}",
+            LOG.error("could not cleanup CRLs ca={}: error message: {}",
                     caCert.getSubject(),
                     e.getMessage());
             LOG.debug("Exception", e);

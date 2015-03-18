@@ -114,7 +114,7 @@ public class SignerUtil
     {
         if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()) == false)
         {
-            throw new OperatorCreationException("Signature algorithm " + sigAlgId.getAlgorithm() + " is not allowed");
+            throw new OperatorCreationException("signature algorithm " + sigAlgId.getAlgorithm() + " is not allowed");
         }
 
         BcDigestProvider digestProvider = BcDefaultDigestProvider.INSTANCE;
@@ -182,7 +182,7 @@ public class SignerUtil
         else
         {
             throw new NoSuchAlgorithmException(
-                    "Unknown digest algorithm " + digestAlgOID);
+                    "unknown digest algorithm " + digestAlgOID);
         }
 
         AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlgOID, DERNull.INSTANCE);
@@ -228,7 +228,7 @@ public class SignerUtil
         }
         else
         {
-            throw new NoSuchAlgorithmException("No signature algorithm for DSA with digest algorithm " + digAlgOid.getId());
+            throw new NoSuchAlgorithmException("no signature algorithm for DSA with digest algorithm " + digAlgOid.getId());
         }
         return new AlgorithmIdentifier(sid);
     }
@@ -402,7 +402,7 @@ public class SignerUtil
         }
         else
         {
-            throw new NoSuchAlgorithmException("Unknown signature algorithm" + algOid.getId());
+            throw new NoSuchAlgorithmException("unknown signature algorithm" + algOid.getId());
         }
 
         return new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);

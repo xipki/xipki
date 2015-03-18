@@ -83,7 +83,7 @@ public class SignatureSigner implements ContentSigner
             signer.initSign(key);
         } catch (InvalidKeyException e)
         {
-            throw new RuntimeOperatorException("Could not initSign", e);
+            throw new RuntimeOperatorException("could not initSign", e);
         }
         return stream;
     }

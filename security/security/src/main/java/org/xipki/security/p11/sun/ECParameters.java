@@ -149,12 +149,12 @@ public final class ECParameters extends AlgorithmParametersSpi
             namedCurve = SunNamedCurveExtender.lookupCurve(name);
         } else
         {
-            throw new InvalidParameterSpecException("Only ECParameterSpec and ECGenParameterSpec supported");
+            throw new InvalidParameterSpecException("only ECParameterSpec and ECGenParameterSpec supported");
         }
 
         if (namedCurve == null)
         {
-            throw new InvalidParameterSpecException("Not a supported curve: " + paramSpec);
+            throw new InvalidParameterSpecException("not a supported curve: " + paramSpec);
         }
     }
 
@@ -169,7 +169,7 @@ public final class ECParameters extends AlgorithmParametersSpi
                 ECParameterSpec spec = SunNamedCurveExtender.lookupCurve(oid.getId());
                 if (spec == null)
                 {
-                    throw new IOException("Unknown named curve: " + oid);
+                    throw new IOException("unknown named curve: " + oid);
                 }
 
                 namedCurve = spec;
@@ -224,7 +224,7 @@ public final class ECParameters extends AlgorithmParametersSpi
             return spec.cast(new ECGenParameterSpec(name));
         }
 
-        throw new InvalidParameterSpecException("Only ECParameterSpec and ECGenParameterSpec supported");
+        throw new InvalidParameterSpecException("only ECParameterSpec and ECGenParameterSpec supported");
     }
 
     protected byte[] engineGetEncoded()
@@ -243,7 +243,7 @@ public final class ECParameters extends AlgorithmParametersSpi
     {
         if (namedCurve == null)
         {
-            return "Not initialized";
+            return "not initialized";
         }
 
         return namedCurve.toString();

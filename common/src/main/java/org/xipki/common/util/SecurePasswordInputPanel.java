@@ -161,26 +161,25 @@ public class SecurePasswordInputPanel extends Panel
                     button.setText(text);
                 }
                 caps = !caps;
+                return;
+            }
+
+            if(BACKSPACE.equals(pressedKey))
+            {
+                if(password.length() > 0)
+                {
+                    password = password.substring(0, password.length() - 1);
+                }
+            }
+            else if(CLEAR.equals(pressedKey))
+            {
+                password = "";
             }
             else
             {
-                if(BACKSPACE.equals(pressedKey))
-                {
-                    if(password.length() > 0)
-                    {
-                        password = password.substring(0, password.length() - 1);
-                    }
-                }
-                else if(CLEAR.equals(pressedKey))
-                {
-                    password = "";
-                }
-                else
-                {
-                    password += btn.getText();
-                }
-                passwordField.setText(password);
+                password += btn.getText();
             }
+            passwordField.setText(password);
         }
     }
 

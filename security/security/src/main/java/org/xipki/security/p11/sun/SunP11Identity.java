@@ -93,7 +93,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
         if((certificateChain == null || certificateChain.length == 0 || certificateChain[0] == null)
                 && publicKey == null)
         {
-            throw new IllegalArgumentException("Neither certificate nor publicKey is non-null");
+            throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
         }
 
         this.slotId = slotId;
@@ -159,7 +159,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
         }
         else
         {
-            throw new IllegalArgumentException("Currently only RSA, EC and DSA public key are supported, but not " +
+            throw new IllegalArgumentException("currently only RSA, EC and DSA public key are supported, but not " +
                     this.publicKey.getAlgorithm() + " (class: " + this.publicKey.getClass().getName() + ")");
         }
     }
@@ -211,7 +211,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
     {
         if(publicKey instanceof RSAPublicKey == false)
         {
-            throw new SignerException("Operation CKM_RSA_X509 is not allowed for " + publicKey.getAlgorithm() + " public key");
+            throw new SignerException("operation CKM_RSA_X509 is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
 
         synchronized (rsaCipher)
@@ -232,7 +232,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
     {
         if(publicKey instanceof ECPublicKey == false)
         {
-            throw new SignerException("Operation CKM_ECDSA is not allowed for " + publicKey.getAlgorithm() + " public key");
+            throw new SignerException("operation CKM_ECDSA is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
 
         byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);
@@ -255,7 +255,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
     {
         if(publicKey instanceof DSAPublicKey == false)
         {
-            throw new SignerException("Operation CKM_DSA is not allowed for " + publicKey.getAlgorithm() + " public key");
+            throw new SignerException("operation CKM_DSA is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
 
         byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);

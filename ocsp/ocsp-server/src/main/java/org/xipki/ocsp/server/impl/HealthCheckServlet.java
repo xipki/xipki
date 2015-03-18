@@ -118,7 +118,7 @@ public class HealthCheckServlet extends HttpServlet
             response.getOutputStream().write(respBytes);
         }catch(EOFException e)
         {
-            final String message = "Connection reset by peer";
+            final String message = "connection reset by peer";
             if(LOG.isErrorEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());

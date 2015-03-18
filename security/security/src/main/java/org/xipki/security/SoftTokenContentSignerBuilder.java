@@ -122,7 +122,7 @@ public class SoftTokenContentSignerBuilder
     {
         if(("PKCS12".equalsIgnoreCase(keystoreType) || "JKS".equalsIgnoreCase(keystoreType)) == false)
         {
-            throw new IllegalArgumentException("Unsupported keystore type: " + keystoreType);
+            throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
         }
 
         ParamChecker.assertNotNull("keystoreStream", keystoreStream);
@@ -167,7 +167,7 @@ public class SoftTokenContentSignerBuilder
 
             if( (key instanceof RSAPrivateKey || key instanceof DSAPrivateKey || key instanceof ECPrivateKey) == false)
             {
-                throw new SignerException("Unsupported key " + key.getClass().getName());
+                throw new SignerException("unsupported key " + key.getClass().getName());
             }
 
             Set<Certificate> caCerts = new HashSet<>();
@@ -228,7 +228,7 @@ public class SoftTokenContentSignerBuilder
             String algoName = SignerUtil.getSignatureAlgoName(signatureAlgId);
             if(algoName == null)
             {
-                throw new OperatorCreationException("Unsupported signature algorithm " + algOid.getId());
+                throw new OperatorCreationException("unsupported signature algorithm " + algOid.getId());
             }
 
             boolean useGivenProvider = true;
@@ -255,11 +255,11 @@ public class SoftTokenContentSignerBuilder
 
             if(useGivenProvider)
             {
-                LOG.info("Use {} to sign {} signature", PROVIDER_XIPKI_NSS, algoName);
+                LOG.info("use {} to sign {} signature", PROVIDER_XIPKI_NSS, algoName);
             }
             else
             {
-                LOG.info("Could not use {} to sign {} signature", PROVIDER_XIPKI_NSS, algoName);
+                LOG.info("could not use {} to sign {} signature", PROVIDER_XIPKI_NSS, algoName);
             }
         }
 
@@ -286,7 +286,7 @@ public class SoftTokenContentSignerBuilder
                 }
                 else
                 {
-                    throw new OperatorCreationException("Unsupported key " + key.getClass().getName());
+                    throw new OperatorCreationException("unsupported key " + key.getClass().getName());
                 }
             } catch (InvalidKeyException e)
             {
@@ -427,7 +427,7 @@ public class SoftTokenContentSignerBuilder
         {
             if(forEncryption == false)
             {
-                throw new RuntimeCryptoException("Verification mode not supported.");
+                throw new RuntimeCryptoException("verification mode not supported.");
             }
 
             if (param instanceof ParametersWithRandom)
@@ -457,7 +457,7 @@ public class SoftTokenContentSignerBuilder
             } catch (InvalidKeyException e)
             {
                 e.printStackTrace();
-                throw new RuntimeCryptoException("Could not initialize the cipher: " + e.getMessage());
+                throw new RuntimeCryptoException("could not initialize the cipher: " + e.getMessage());
             }
         }
 

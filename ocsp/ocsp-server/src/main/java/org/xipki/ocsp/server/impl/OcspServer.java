@@ -303,11 +303,11 @@ public class OcspServer
         {
             if(successfull)
             {
-                LOG.info("Started OCSPResponder server");
+                LOG.info("started OCSPResponder server");
             }
             else
             {
-                LOG.error("Could not start OCSPResponder server");
+                LOG.error("could not start OCSPResponder server");
             }
             auditLogPCIEvent(successfull, "START");
         }
@@ -345,12 +345,12 @@ public class OcspServer
             String name = m.getName();
             if(c.contains(m))
             {
-                throw new ConfigurationException("Responder named '" + name + "' defined duplicatedly");
+                throw new ConfigurationException("responder named '" + name + "' defined duplicatedly");
             }
 
             if(StringUtil.isBlank(name))
             {
-                throw new ConfigurationException("Responder name could not be empty");
+                throw new ConfigurationException("responder name could not be empty");
             }
 
             for(int i = 0; i < name.length(); i++)
@@ -370,7 +370,7 @@ public class OcspServer
             String name = m.getName();
             if(c.contains(m))
             {
-                throw new ConfigurationException("Signer option named '" + name + "' defined duplicatedly");
+                throw new ConfigurationException("signer option named '" + name + "' defined duplicatedly");
             }
         }
 
@@ -532,31 +532,31 @@ public class OcspServer
             String n = option.getAuditOptionName();
             if(n != null && auditOptions.containsKey(n) == false)
             {
-                throw new ConfigurationException("No auditOption named '" + n + "' is defined");
+                throw new ConfigurationException("no auditOption named '" + n + "' is defined");
             }
 
             n = option.getCertprofileOptionName();
             if(n != null && certprofileOptions.containsKey(n) == false)
             {
-                throw new ConfigurationException("No certprofileOption named '" + n + "' is defined");
+                throw new ConfigurationException("no certprofileOption named '" + n + "' is defined");
             }
 
             n = option.getRequestOptionName();
             if(requestOptions.containsKey(n) == false)
             {
-                throw new ConfigurationException("No requestOption named '" + n + "' is defined");
+                throw new ConfigurationException("no requestOption named '" + n + "' is defined");
             }
 
             n = option.getResponseOptionName();
             if(responseOptions.containsKey(n) == false)
             {
-                throw new ConfigurationException("No responseOption named '" + n + "' is defined");
+                throw new ConfigurationException("no responseOption named '" + n + "' is defined");
             }
 
             n = option.getSignerName();
             if(signers.containsKey(n) == false)
             {
-                throw new ConfigurationException("No signer named '" + n + "' is defined");
+                throw new ConfigurationException("no signer named '" + n + "' is defined");
             }
 
             List<String> names = option.getStoreNames();
@@ -564,7 +564,7 @@ public class OcspServer
             {
                 if(stores.containsKey(name) == false)
                 {
-                    throw new ConfigurationException("No store named '" + name + "' is defined");
+                    throw new ConfigurationException("no store named '" + name + "' is defined");
                 }
             }
             responderOptions.put(m.getName(), option);
@@ -622,7 +622,7 @@ public class OcspServer
 
     public void shutdown()
     {
-        LOG.info("Stopped OCSP Responder");
+        LOG.info("stopped OCSP Responder");
         for(CertStatusStore store : stores.values())
         {
             try
@@ -800,7 +800,7 @@ public class OcspServer
                     if(childAuditEvent != null)
                     {
                         fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
-                                "No CertStatusStore can answer the request");
+                                "no CertStatusStore can answer the request");
                     }
                     if(exceptionOccurs)
                     {
@@ -1434,7 +1434,7 @@ public class OcspServer
         }
         else
         {
-            throw new RuntimeException("Should not reach here, unknwon CertStore type");
+            throw new RuntimeException("should not reach here, unknwon CertStore type");
         }
 
         store.setIncludeArchiveCutoff(

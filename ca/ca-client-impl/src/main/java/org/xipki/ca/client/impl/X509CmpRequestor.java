@@ -180,7 +180,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             return dbf.newDocumentBuilder();
         } catch (ParserConfigurationException e)
         {
-            throw new RuntimeException("Could not create XML document builder", e);
+            throw new RuntimeException("could not create XML document builder", e);
         }
     }
 
@@ -211,7 +211,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         }
         else
         {
-            action = XipkiCmpConstants.ACTION_GET_CRL;
+            action = XipkiCmpConstants.ACTION_GET_CRL_WITH_SN;
             request = buildMessageWithXipkAction(action, new ASN1Integer(crlNumber));
         }
 
@@ -234,7 +234,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         }
         else if(PKIBody.TYPE_GEN_REP != bodyType)
         {
-            throw new CmpRequestorException("Unknown PKI body type " + bodyType +
+            throw new CmpRequestorException("unknown PKI body type " + bodyType +
                     " instead the exceptected [" + PKIBody.TYPE_GEN_REP  + ", " +
                     PKIBody.TYPE_ERROR + "]");
         }
@@ -259,7 +259,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         }
         if(itv == null)
         {
-            throw new CmpRequestorException("The response does not contain InfoTypeAndValue "
+            throw new CmpRequestorException("the response does not contain InfoTypeAndValue "
                     + expectedType);
         }
 
@@ -281,7 +281,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             crl = new X509CRLObject(certList);
         } catch (CRLException e)
         {
-            throw new CmpRequestorException("Returned CRL is invalid: " + e.getMessage());
+            throw new CmpRequestorException("returned CRL is invalid: " + e.getMessage());
         }
 
         CRLResultType result = new CRLResultType();
@@ -331,7 +331,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         }
         else if(PKIBody.TYPE_REVOCATION_REP != bodyType)
         {
-            throw new CmpRequestorException("Unknown PKI body type " + bodyType +
+            throw new CmpRequestorException("unknown PKI body type " + bodyType +
                     " instead the exceptected [" + PKIBody.TYPE_REVOCATION_REP  + ", " +
                     PKIBody.TYPE_ERROR + "]");
         }
@@ -340,7 +340,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         PKIStatusInfo[] statuses = content.getStatus();
         if(statuses == null || statuses.length != reqEntries.size())
         {
-            throw new CmpRequestorException("Incorrect number of status entries in response '" + statuses.length +
+            throw new CmpRequestorException("incorrect number of status entries in response '" + statuses.length +
                     "' instead the exceptected '" + reqEntries.size() + "'");
         }
 
@@ -453,7 +453,7 @@ abstract class X509CmpRequestor extends CmpRequestor
 
         else if(expectedBodyType != bodyType)
         {
-            throw new CmpRequestorException("Unknown PKI body type " + bodyType +
+            throw new CmpRequestorException("unknown PKI body type " + bodyType +
                     " instead the exceptected [" + expectedBodyType  + ", " +
                     PKIBody.TYPE_ERROR + "]");
         }
@@ -785,7 +785,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             doc = xmlDocBuilder.parse(new ByteArrayInputStream(systemInfoStr.getBytes("UTF-8")));
         } catch (SAXException | IOException e)
         {
-            throw new CmpRequestorException("Could not parse the returned systemInfo for CA " + caName, e);
+            throw new CmpRequestorException("could not parse the returned systemInfo for CA " + caName, e);
         }
 
         final String namespace = null;
@@ -808,7 +808,7 @@ abstract class X509CmpRequestor extends CmpRequestor
                 caCert = SecurityUtil.parseBase64EncodedCert(b64CACert);
             } catch (CertificateException | IOException e)
             {
-                throw new CmpRequestorException("Could no parse the CA certificate", e);
+                throw new CmpRequestorException("could no parse the CA certificate", e);
             }
 
             Element profilesElement = XMLUtil.getFirstElementChild(root, namespace, "certprofiles");
@@ -898,7 +898,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             doc = xmlDocBuilder.parse(new ByteArrayInputStream(resultInfoStr.getBytes("UTF-8")));
         } catch (SAXException | IOException e)
         {
-            throw new CmpRequestorException("Could not parse the returned removeExpiredCertsResp", e);
+            throw new CmpRequestorException("could not parse the returned removeExpiredCertsResp", e);
         }
 
         String namespace = null;
@@ -912,7 +912,7 @@ abstract class X509CmpRequestor extends CmpRequestor
                 result.setNumOfCerts(Integer.parseInt(nodeValue));
             }catch(NumberFormatException e)
             {
-                throw new CmpRequestorException("Invalid numCerts '" + nodeValue + "'");
+                throw new CmpRequestorException("invalid numCerts '" + nodeValue + "'");
             }
         }
 
@@ -936,7 +936,7 @@ abstract class X509CmpRequestor extends CmpRequestor
                 result.setExpiredAt(Long.parseLong(nodeValue));
             }catch(NumberFormatException e)
             {
-                throw new CmpRequestorException("Invalid expiredAt '" + nodeValue + "'");
+                throw new CmpRequestorException("invalid expiredAt '" + nodeValue + "'");
             }
         }
 

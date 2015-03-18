@@ -54,6 +54,8 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.PKCS12BagAttributeCarrie
 import org.bouncycastle.jce.interfaces.PKCS12BagAttributeCarrier;
 
 /**
+ * Copied from BouncyCastle under license MIT
+ *
  * @author Lijun Liao
  */
 

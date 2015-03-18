@@ -86,12 +86,12 @@ public class IaikP11ModulePool
 
         try
         {
-            LOG.info("Removed module {}", moduleName);
+            LOG.info("removed module {}", moduleName);
             module.close();
-            LOG.info("Finalized module {}", moduleName);
+            LOG.info("finalized module {}", moduleName);
         }catch(Throwable t)
         {
-            final String message = "Could not finalize the module " + moduleName;
+            final String message = "could not finalize the module " + moduleName;
             if(LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
@@ -128,7 +128,7 @@ public class IaikP11ModulePool
             module = Module.getInstance(moduleConf.getNativeLibrary());
         }catch(IOException e)
         {
-            final String msg = "Could not load the PKCS#11 module " + moduleConf.getName();
+            final String msg = "could not load the PKCS#11 module " + moduleConf.getName();
             if(LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(), e.getMessage());
@@ -171,7 +171,7 @@ public class IaikP11ModulePool
         }
         catch (Throwable t)
         {
-            final String message = "Unexpected Exception: ";
+            final String message = "unexpected Exception: ";
             if(LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());

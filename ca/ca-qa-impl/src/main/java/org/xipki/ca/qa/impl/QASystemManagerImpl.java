@@ -112,7 +112,7 @@ public class QASystemManagerImpl implements QASystemManager
             qaConf = parseQAConf(issuerConfStream);
         }catch(IOException | JAXBException | SAXException e)
         {
-            final String message = "Could not parse the QA configuration";
+            final String message = "could not parse the QA configuration";
             String exceptionMessage;
             if(e instanceof JAXBException)
             {
@@ -140,7 +140,7 @@ public class QASystemManagerImpl implements QASystemManager
                     certBytes = readData(issuerType.getCert());
                 } catch (IOException e)
                 {
-                    final String message = "Could not read the certificate bytes of issuer " + issuerType.getName();
+                    final String message = "could not read the certificate bytes of issuer " + issuerType.getName();
                     if(LOG.isErrorEnabled())
                     {
                         LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -156,7 +156,7 @@ public class QASystemManagerImpl implements QASystemManager
                             issuerType.getCrlUrl(), issuerType.getDeltaCrlUrl(), certBytes);
                 } catch (CertificateException e)
                 {
-                    final String message = "Could not parse certificate of issuer " + issuerType.getName();
+                    final String message = "could not parse certificate of issuer " + issuerType.getName();
                     if(LOG.isErrorEnabled())
                     {
                         LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -183,7 +183,7 @@ public class QASystemManagerImpl implements QASystemManager
                     LOG.info("configured X509 certificate profile {}", name);
                 }catch(IOException | CertprofileException e)
                 {
-                    final String message = "Could not parse QA certificate profile " + name;
+                    final String message = "could not parse QA certificate profile " + name;
                     if(LOG.isErrorEnabled())
                     {
                         LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());

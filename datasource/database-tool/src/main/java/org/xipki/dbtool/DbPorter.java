@@ -230,7 +230,7 @@ public class DbPorter
             return schemaFact.newSchema(schemaUrl);
         } catch (SAXException e)
         {
-            throw new JAXBException("Error while loading schemas for the specified classes\nDetails:\n" + e.getMessage());
+            throw new JAXBException("error while loading schemas for the specified classes\nDetails:\n" + e.getMessage());
         }
     }
 

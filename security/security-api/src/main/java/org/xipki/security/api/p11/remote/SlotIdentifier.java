@@ -114,7 +114,7 @@ public class SlotIdentifier extends ASN1Object
             }
             else
             {
-                throw new IllegalArgumentException("Unknown tag " + tagNo);
+                throw new IllegalArgumentException("unknown tag " + tagNo);
             }
         }
 

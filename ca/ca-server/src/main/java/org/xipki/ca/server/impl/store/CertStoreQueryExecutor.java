@@ -332,7 +332,7 @@ class CertStoreQueryExecutor
                         ps.close();
                     }catch(Throwable t)
                     {
-                        LOG.warn("Could not close PreparedStatement", t);
+                        LOG.warn("could not close PreparedStatement", t);
                     }
                 }
             }finally
@@ -667,7 +667,7 @@ class CertStoreQueryExecutor
         X509CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(caCert, serialNumber);
         if(certWithRevInfo == null)
         {
-            LOG.warn("Certificate with issuer='{}' and serialNumber={} does not exist",
+            LOG.warn("certificate with issuer='{}' and serialNumber={} does not exist",
                     caCert.getSubject(), serialNumber);
             return null;
         }
@@ -758,7 +758,7 @@ class CertStoreQueryExecutor
         X509CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(caCert, serialNumber);
         if(certWithRevInfo == null)
         {
-            LOG.warn("Certificate with issuer='{}' and serialNumber={} does not exist",
+            LOG.warn("certificate with issuer='{}' and serialNumber={} does not exist",
                     caCert.getSubject(), serialNumber);
             return null;
         }
@@ -1383,21 +1383,21 @@ class CertStoreQueryExecutor
                         caCert, cert.getPublicKey().getEncoded(), certprofileName);
 
                 boolean revoked = rs.getBoolean("REVOKED");
-
-                if(revoked)
+                if(revoked == false)
                 {
-                    int rev_reasonCode = rs.getInt("REV_REASON");
-                    CRLReason rev_reason = CRLReason.forReasonCode(rev_reasonCode);
-                    long rev_time = rs.getLong("REV_TIME");
-                    long invalidity_time = rs.getLong("REV_INVALIDITY_TIME");
-
-                    Date invalidityTime = (invalidity_time == 0 || invalidity_time == rev_time) ?
-                            null : new Date(invalidity_time * 1000);
-                    CertRevocationInfo revInfo = new CertRevocationInfo(rev_reason,
-                            new Date(rev_time * 1000), invalidityTime);
-                    certInfo.setRevocationInfo(revInfo);
+                    return certInfo;
                 }
 
+                int rev_reasonCode = rs.getInt("REV_REASON");
+                CRLReason rev_reason = CRLReason.forReasonCode(rev_reasonCode);
+                long rev_time = rs.getLong("REV_TIME");
+                long invalidity_time = rs.getLong("REV_INVALIDITY_TIME");
+
+                Date invalidityTime = (invalidity_time == 0 || invalidity_time == rev_time) ?
+                        null : new Date(invalidity_time * 1000);
+                CertRevocationInfo revInfo = new CertRevocationInfo(rev_reason,
+                        new Date(rev_time * 1000), invalidityTime);
+                certInfo.setRevocationInfo(revInfo);
                 return certInfo;
             }
         } catch (IOException e)
@@ -1582,20 +1582,20 @@ class CertStoreQueryExecutor
                         caCert, subjectPublicKeyInfo, certprofileName);
 
                 boolean revoked = rs.getBoolean("REVOKED");
-
-                if(revoked)
+                if(revoked == false)
                 {
-                    int rev_reasonCode = rs.getInt("REV_REASON");
-                    CRLReason rev_reason = CRLReason.forReasonCode(rev_reasonCode);
-                    long rev_time = rs.getLong("REV_TIME");
-                    long invalidity_time = rs.getLong("REV_INVALIDITY_TIME");
-
-                    Date invalidityTime = invalidity_time == 0 ? null : new Date(invalidity_time * 1000);
-                    CertRevocationInfo revInfo = new CertRevocationInfo(rev_reason,
-                            new Date(rev_time * 1000), invalidityTime);
-                    certInfo.setRevocationInfo(revInfo);
+                    return certInfo;
                 }
 
+                int rev_reasonCode = rs.getInt("REV_REASON");
+                CRLReason rev_reason = CRLReason.forReasonCode(rev_reasonCode);
+                long rev_time = rs.getLong("REV_TIME");
+                long invalidity_time = rs.getLong("REV_INVALIDITY_TIME");
+
+                Date invalidityTime = invalidity_time == 0 ? null : new Date(invalidity_time * 1000);
+                CertRevocationInfo revInfo = new CertRevocationInfo(rev_reason,
+                        new Date(rev_time * 1000), invalidityTime);
+                certInfo.setRevocationInfo(revInfo);
                 return certInfo;
             }
         } catch (IOException e)
@@ -2010,7 +2010,7 @@ class CertStoreQueryExecutor
         Integer id =  caInfoStore.getCaIdForCert(encodedCert);
         if(id == null)
         {
-            throw new IllegalStateException("Could not find CA with subject  '" + caCert.getSubject() + "' in table " +
+            throw new IllegalStateException("could not find CA with subject  '" + caCert.getSubject() + "' in table " +
                     caInfoStore.getTable() + ", please start XiPKI in master mode first the restart this XiPKI system");
         }
         return id.intValue();
@@ -2093,7 +2093,8 @@ class CertStoreQueryExecutor
                     if(e instanceof DuplicateKeyException && i < tries - 1)
                     {
                         continue;
-                    } else
+                    }
+                    else
                     {
                         throw e;
                     }
@@ -2199,7 +2200,7 @@ class CertStoreQueryExecutor
         Integer id = store.getId(name);
         if(id == null)
         {
-            throw new IllegalStateException("Could not find entry named " + name + " in table " +
+            throw new IllegalStateException("could not find entry named " + name + " in table " +
                     store.getTable() + ", please start XiPKI in master mode first and then restart this XiPKI system");
         }
         return id.intValue();
@@ -2240,39 +2241,43 @@ class CertStoreQueryExecutor
     private PreparedStatement[] borrowPreparedStatements(String... sqlQueries)
     throws DataAccessException
     {
-        PreparedStatement[] pss = new PreparedStatement[sqlQueries.length];
-
         Connection c = dataSource.getConnection();
-        if(c != null)
+        if(c == null)
         {
-            final int n = sqlQueries.length;
-            for(int i = 0; i < n; i++)
+            throw new DataAccessException("could not get connection");
+        }
+
+        final int n = sqlQueries.length;
+        PreparedStatement[] pss = new PreparedStatement[n];
+        for(int i = 0; i < n; i++)
+        {
+            pss[i] = dataSource.prepareStatement(c, sqlQueries[i]);
+            if(pss[i] != null)
             {
-                pss[i] = dataSource.prepareStatement(c, sqlQueries[i]);
-                if(pss[i] == null)
+                continue;
+            }
+
+            // destroy all already initialized statements
+            for(int j = 0; j < i; j++)
+            {
+                try
                 {
-                    for(int j = 0; j < i; j++)
-                    {
-                        try
-                        {
-                            pss[j].close();
-                        }catch(Throwable t)
-                        {
-                            LOG.warn("Could not close preparedStatement", t);
-                        }
-                    }
-
-                    try
-                    {
-                        c.close();
-                    }catch(Throwable t)
-                    {
-                        LOG.warn("Could not close connection", t);
-                    }
-
-                    throw new DataAccessException("Cannot create prepared statement for " + sqlQueries[i]);
+                    pss[j].close();
+                }catch(Throwable t)
+                {
+                    LOG.warn("could not close preparedStatement", t);
                 }
             }
+
+            try
+            {
+                c.close();
+            }catch(Throwable t)
+            {
+                LOG.warn("could not close connection", t);
+            }
+
+            throw new DataAccessException("could not create prepared statement for " + sqlQueries[i]);
         }
 
         return pss;
@@ -2290,7 +2295,7 @@ class CertStoreQueryExecutor
 
         if(ps == null)
         {
-            throw new DataAccessException("Cannot create prepared statement for " + sqlQuery);
+            throw new DataAccessException("could not create prepared statement for " + sqlQuery);
         }
 
         return ps;

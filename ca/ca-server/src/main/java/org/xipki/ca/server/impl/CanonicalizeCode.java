@@ -153,7 +153,7 @@ public class CanonicalizeCode
 
                 if(skip)
                 {
-                	continue;
+                    continue;
                 }
 
                 String canonicalizedLine = canonicalizeLine(line);

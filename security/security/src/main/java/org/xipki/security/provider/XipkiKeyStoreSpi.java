@@ -242,28 +242,28 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
             Certificate[] chain)
     throws KeyStoreException
     {
-        throw new KeyStoreException("Keystore is read only");
+        throw new KeyStoreException("keystore is read only");
     }
 
     @Override
     public void engineSetKeyEntry(String alias, byte[] key, Certificate[] chain)
     throws KeyStoreException
     {
-        throw new KeyStoreException("Keystore is read only");
+        throw new KeyStoreException("keystore is read only");
     }
 
     @Override
     public void engineSetCertificateEntry(String alias, Certificate cert)
     throws KeyStoreException
     {
-        throw new KeyStoreException("Keystore is read only");
+        throw new KeyStoreException("keystore is read only");
     }
 
     @Override
     public void engineDeleteEntry(String alias)
     throws KeyStoreException
     {
-        throw new KeyStoreException("Keystore is read only");
+        throw new KeyStoreException("keystore is read only");
     }
 
     @Override

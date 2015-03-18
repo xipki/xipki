@@ -92,7 +92,7 @@ public class PasswordResolverImpl implements PasswordResolver
             }
         } catch (Exception e)
         {
-            LOG.debug("Caught Exception({}). service is probably destroyed.", e.getMessage());
+            LOG.debug("caught Exception({}). service is probably destroyed.", e.getMessage());
         }
     }
 

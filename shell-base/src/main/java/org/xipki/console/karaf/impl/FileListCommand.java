@@ -66,7 +66,7 @@ public class FileListCommand extends XipkiOsgiCommandSupport
         File target = new File(expandFilepath(targetPath));
         if(target.exists() == false)
         {
-            err("cannot access " + targetPath + ": no such file or directory");
+            err("could not access " + targetPath + ": no such file or directory");
             return null;
         }
 

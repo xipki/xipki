@@ -68,7 +68,7 @@ public class P11Identity implements Comparable<P11Identity>
         if((certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
                 && publicKey == null)
         {
-            throw new IllegalArgumentException("Neither certificate nor publicKey is non-null");
+            throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
         }
 
         this.slotId = slotId;
@@ -90,7 +90,7 @@ public class P11Identity implements Comparable<P11Identity>
         }
         else
         {
-            throw new IllegalArgumentException("Currently only RSA, DSA and EC public key are supported, but not " +
+            throw new IllegalArgumentException("currently only RSA, DSA and EC public key are supported, but not " +
                     this.publicKey.getAlgorithm() + " (class: " + this.publicKey.getClass().getName() + ")");
         }
     }

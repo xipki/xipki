@@ -51,6 +51,8 @@ import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 import org.xipki.security.SignerUtil;
 
 /**
+ * Copied from BouncyCastle under license MIT
+ *
  * @author Lijun Liao
  */
 

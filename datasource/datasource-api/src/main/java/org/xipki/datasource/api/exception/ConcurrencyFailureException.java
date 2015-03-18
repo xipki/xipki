@@ -47,7 +47,7 @@ package org.xipki.datasource.api.exception;
  * @since 1.1
  * @see OptimisticLockingFailureException
  * @see PessimisticLockingFailureException
- * @see CannotAcquireLockException
+ * @see could notAcquireLockException
  * @see DeadlockLoserDataAccessException
  */
 @SuppressWarnings("serial")

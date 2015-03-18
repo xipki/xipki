@@ -232,7 +232,7 @@ class CALoadTestRevoke extends AbstractLoadTest
 
                 if(n == 0)
                 {
-                    System.out.println("No unrevoked certificate");
+                    System.out.println("no unrevoked certificate");
                     System.out.flush();
                 }
 

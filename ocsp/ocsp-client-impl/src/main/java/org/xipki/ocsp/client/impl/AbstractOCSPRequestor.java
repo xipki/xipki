@@ -256,7 +256,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         if(countSingleResponses != serialNumbers.length)
         {
             StringBuilder sb = new StringBuilder(100);
-            sb.append("Response with ").append(countSingleResponses).append(" singleRessponse");
+            sb.append("response with ").append(countSingleResponses).append(" singleRessponse");
             if(countSingleResponses > 1)
             {
                 sb.append("s");
@@ -280,13 +280,13 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
 
             if(issuerMatch == false)
             {
-                throw new OCSPTargetUnmatchedException("The issuer is not requested");
+                throw new OCSPTargetUnmatchedException("the issuer is not requested");
             }
 
             BigInteger serialNumber = cid.getSerialNumber();
             if(serialNumbers[0].equals(serialNumber) == false)
             {
-                throw new OCSPTargetUnmatchedException("The serialNumber is not requested");
+                throw new OCSPTargetUnmatchedException("the serialNumber is not requested");
             }
         }
         else
@@ -304,7 +304,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
 
                 if(issuerMatch == false)
                 {
-                    throw new OCSPTargetUnmatchedException("The issuer specified in singleResponse[" + i +
+                    throw new OCSPTargetUnmatchedException("the issuer specified in singleResponse[" + i +
                             "] is not requested");
                 }
 
@@ -318,7 +318,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                     }
                     else
                     {
-                        throw new OCSPTargetUnmatchedException("The serialNumber specified in singleResponse[" + i +
+                        throw new OCSPTargetUnmatchedException("the serialNumber specified in singleResponse[" + i +
                                 "] is not requested");
                     }
                 }
@@ -430,7 +430,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                             } catch (CertificateException e)
                             {
                                 throw new OCSPRequestorException(
-                                        "Could not parse certificate " + signerCertFile + ": " + e.getMessage());
+                                        "could not parse certificate " + signerCertFile + ": " + e.getMessage());
                             }
                         }
 
@@ -439,7 +439,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                             signer = getSecurityFactory().createSigner(signerType, signerConf, cert);
                         } catch (Exception e)
                         {
-                            throw new OCSPRequestorException("Could not create signer: " + e.getMessage());
+                            throw new OCSPRequestorException("could not create signer: " + e.getMessage());
                         }
                     }
                 }

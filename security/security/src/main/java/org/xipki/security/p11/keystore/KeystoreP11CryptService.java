@@ -106,7 +106,7 @@ public class KeystoreP11CryptService implements P11CryptService
             this.module = KeystoreP11ModulePool.getInstance().getModule(moduleConf);
         }catch(SignerException e)
         {
-            final String message = "Could not initialize the PKCS#11 Module for " + moduleConf.getName();
+            final String message = "could not initialize the PKCS#11 Module for " + moduleConf.getName();
             if(LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -126,7 +126,7 @@ public class KeystoreP11CryptService implements P11CryptService
                 slot = module.getSlot(slotId);
                 if(slot == null)
                 {
-                    LOG.warn("Could not initialize slot " + slotId);
+                    LOG.warn("could not initialize slot " + slotId);
                     continue;
                 }
                 slot.refresh();
@@ -168,7 +168,7 @@ public class KeystoreP11CryptService implements P11CryptService
         if(LOG.isInfoEnabled())
         {
             StringBuilder sb = new StringBuilder();
-            sb.append("Initialized ").append(this.identities.size()).append(" PKCS#11 Keys:\n");
+            sb.append("initialized ").append(this.identities.size()).append(" PKCS#11 Keys:\n");
             for(KeystoreP11Identity identity : this.identities)
             {
                 sb.append("\t(slot ").append(identity.getSlotId());
@@ -179,7 +179,7 @@ public class KeystoreP11CryptService implements P11CryptService
             LOG.info(sb.toString());
         }
 
-        LOG.info("Refreshed PKCS#11 module {}", moduleConf.getName());
+        LOG.info("refreshed PKCS#11 module {}", moduleConf.getName());
     }
 
     @Override
@@ -202,7 +202,7 @@ public class KeystoreP11CryptService implements P11CryptService
         KeystoreP11Identity identity = getIdentity(slotId, keyId);
         if(identity == null)
         {
-            throw new SignerException("Found no key with " + keyId);
+            throw new SignerException("found no key with " + keyId);
         }
 
         return identity.CKM_RSA_X509(hash);
@@ -215,7 +215,7 @@ public class KeystoreP11CryptService implements P11CryptService
         KeystoreP11Identity identity = getIdentity(slotId, keyId);
         if(identity == null)
         {
-            throw new SignerException("Found no key with " + keyId);
+            throw new SignerException("found no key with " + keyId);
         }
 
         return identity.CKM_ECDSA(hash);
@@ -228,7 +228,7 @@ public class KeystoreP11CryptService implements P11CryptService
         KeystoreP11Identity identity = getIdentity(slotId, keyId);
         if(identity == null)
         {
-            throw new SignerException("Found no key with " + keyId);
+            throw new SignerException("found no key with " + keyId);
         }
 
         return identity.CKM_DSA(hash);
@@ -296,7 +296,7 @@ public class KeystoreP11CryptService implements P11CryptService
     {
         if(keyId.getKeyLabel() == null)
         {
-            throw new SignerException("Only key referencing by key-label is supported");
+            throw new SignerException("only key referencing by key-label is supported");
         }
 
         for(KeystoreP11Identity identity : identities)

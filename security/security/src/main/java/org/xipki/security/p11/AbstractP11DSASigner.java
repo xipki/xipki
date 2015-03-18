@@ -68,7 +68,7 @@ abstract class AbstractP11DSASigner implements Signer
     {
         if(forSigning == false)
         {
-            throw new RuntimeCryptoException("Verification mode not supported.");
+            throw new RuntimeCryptoException("verification mode not supported.");
         }
 
         if(param instanceof P11KeyParameter == false)

@@ -106,11 +106,11 @@ public class HealthCheckServlet extends HttpServlet
                 String auditMessage;
                 if(caName == null)
                 {
-                    auditMessage = "No CA is specified";
+                    auditMessage = "n CA is specified";
                 }
                 else if(responder == null)
                 {
-                    auditMessage = "Unknown CA '" + caName + "'";
+                    auditMessage = "unknown CA '" + caName + "'";
                 }
                 else
                 {
@@ -140,7 +140,7 @@ public class HealthCheckServlet extends HttpServlet
         }
         catch(EOFException e)
         {
-            final String message = "Connection reset by peer";
+            final String message = "connection reset by peer";
             if(LOG.isErrorEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
