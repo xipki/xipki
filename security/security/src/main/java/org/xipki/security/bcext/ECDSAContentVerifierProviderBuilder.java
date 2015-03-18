@@ -50,6 +50,8 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 
 /**
+ * Copied from BouncyCastle under license MIT
+ *
  * @author Lijun Liao
  */
 
@@ -67,6 +69,11 @@ public class ECDSAContentVerifierProviderBuilder
     throws OperatorCreationException
     {
         AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
+        if(digAlg == null)
+        {
+            throw new OperatorCreationException("could not retrieve digest algorithm from the signature algorithm " +
+                    sigAlgId.getAlgorithm().getId());
+        }
         Digest dig = digestProvider.get(digAlg);
 
         return new DSADigestSigner(new ECDSASigner(), dig);

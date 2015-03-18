@@ -58,7 +58,7 @@ public class P11PlainRSASigner implements AsymmetricBlockCipher
     {
         if(forEncryption == false)
         {
-            throw new RuntimeCryptoException("Verification mode not supported.");
+            throw new RuntimeCryptoException("verification mode not supported.");
         }
 
         if(param instanceof P11RSAKeyParameter == false)

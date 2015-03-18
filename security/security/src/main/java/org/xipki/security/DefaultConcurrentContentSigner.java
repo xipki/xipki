@@ -88,7 +88,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
             }
             else
             {
-                LOG.info("Use org.xipki.signservice.timeout: {}", vi);
+                LOG.info("use org.xipki.signservice.timeout: {}", vi);
                 defaultSignServiceTimeout = vi;
             }
         }
@@ -140,7 +140,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
 
         if(signer == null)
         {
-            throw new NoIdleSignerException("No idle signer available");
+            throw new NoIdleSignerException("no idle signer available");
         }
 
         busySigners.addLast(signer);

@@ -123,7 +123,7 @@ public class Rfc6712Servlet extends HttpServlet
                 response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
 
                 auditStatus = AuditStatus.FAILED;
-                auditMessage = "unsupporte media type " + request.getContentType();
+                auditMessage = "unsupported media type " + request.getContentType();
                 return;
             }
 
@@ -149,11 +149,11 @@ public class Rfc6712Servlet extends HttpServlet
             {
                 if(caName == null)
                 {
-                    auditMessage = "No CA is specified";
+                    auditMessage = "no CA is specified";
                 }
                 else if(responder == null)
                 {
-                    auditMessage = "Unknown CA '" + caName + "'";
+                    auditMessage = "unknown CA '" + caName + "'";
                 }
                 else
                 {
@@ -211,7 +211,7 @@ public class Rfc6712Servlet extends HttpServlet
             response.getOutputStream().write(pkiRespBytes);
         }catch(EOFException e)
         {
-            final String message = "Connection reset by peer";
+            final String message = "connection reset by peer";
             if(LOG.isErrorEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -240,7 +240,7 @@ public class Rfc6712Servlet extends HttpServlet
             {
                 if(auditEvent != null)
                 {
-                	audit(auditLoggingService, auditEvent, auditLevel, auditStatus, auditMessage);
+                    audit(auditLoggingService, auditEvent, auditLevel, auditStatus, auditMessage);
                 }
             }
         }
@@ -272,9 +272,9 @@ public class Rfc6712Servlet extends HttpServlet
     {
         this.auditServiceRegister = auditServiceRegister;
     }
-    
-    private static void audit(AuditLoggingService auditLoggingService, 
-    		AuditEvent auditEvent, AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage)
+
+    private static void audit(AuditLoggingService auditLoggingService,
+            AuditEvent auditEvent, AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage)
     {
         if(auditLevel != null)
         {

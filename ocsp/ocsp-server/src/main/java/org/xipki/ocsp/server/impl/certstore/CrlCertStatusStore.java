@@ -371,7 +371,7 @@ public class CrlCertStatusStore extends CertStatusStore
 
             if(deltaCrl != null)
             {
-                LOG.info("Try to update CRL with CRLNumber={} and DeltaCRL with CRLNumber={}", crlNumber, deltaCrlNumber);
+                LOG.info("try to update CRL with CRLNumber={} and DeltaCRL with CRLNumber={}", crlNumber, deltaCrlNumber);
                 newThisUpdate = deltaCrl.getThisUpdate();
                 newNextUpdate = deltaCrl.getNextUpdate();
             }
@@ -469,7 +469,7 @@ public class CrlCertStatusStore extends CertStatusStore
 
                     if(caName.equals(bcCert.getIssuer()) == false)
                     {
-                        throw new CertStatusStoreException("Invalid entry in CRL Extension certs");
+                        throw new CertStatusStoreException("iInvalid entry in CRL Extension certs");
                     }
 
                     if(profileName == null)
@@ -485,7 +485,7 @@ public class CrlCertStatusStore extends CertStatusStore
             {
                 if(extnValue != null)
                 {
-                    LOG.warn("Ignore certsDir '{}', since certificates are included in CRL Extension certs", certsDirname);
+                    LOG.warn("ignore certsDir '{}', since certificates are included in CRL Extension certs", certsDirname);
                 }
                 else
                 {
@@ -508,7 +508,7 @@ public class CrlCertStatusStore extends CertStatusStore
                     {
                         if(caCert.getSubjectX500Principal().equals(thisIssuer) == false)
                         {
-                            throw new CertStatusStoreException("Invalid CRLEntry");
+                            throw new CertStatusStoreException("invalid CRLEntry");
                         }
                     }
                 }
@@ -527,7 +527,7 @@ public class CrlCertStatusStore extends CertStatusStore
                         {
                             if(caCert.getSubjectX500Principal().equals(thisIssuer) == false)
                             {
-                                throw new CertStatusStoreException("Invalid CRLEntry");
+                                throw new CertStatusStoreException("invalid CRLEntry");
                             }
                         }
                     }
@@ -628,7 +628,7 @@ public class CrlCertStatusStore extends CertStatusStore
 
                         if(cert == null)
                         {
-                            LOG.info("Could not find certificate (issuer = '{}', serialNumber = '{}'",
+                            LOG.info("could not find certificate (issuer = '{}', serialNumber = '{}'",
                                     SecurityUtil.getRFC4519Name(caName), serialNumber);
                         }
                         else
@@ -673,10 +673,10 @@ public class CrlCertStatusStore extends CertStatusStore
             this.initializationFailed = false;
             this.initialized = true;
             updateCRLSuccessfull = true;
-            LOG.info("Updated CertStore {}", getName());
+            LOG.info("updated CertStore {}", getName());
         } catch (Exception e)
         {
-            final String message = "Could not execute initializeStore()";
+            final String message = "could not execute initializeStore()";
             if(LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -750,12 +750,12 @@ public class CrlCertStatusStore extends CertStatusStore
 
         if(initialized == false)
         {
-            throw new CertStatusStoreException("Initialization of CertStore is still in process");
+            throw new CertStatusStoreException("initialization of CertStore is still in process");
         }
 
         if(initializationFailed)
         {
-            throw new CertStatusStoreException("Initialization of CertStore failed");
+            throw new CertStatusStoreException("initialization of CertStore failed");
         }
 
         HashAlgoType certHashAlgo = null;
@@ -925,19 +925,19 @@ public class CrlCertStatusStore extends CertStatusStore
 
         if(certsDir.exists() == false)
         {
-            LOG.warn("The folder " + certsDirname + " does not exist, ignore it");
+            LOG.warn("the folder " + certsDirname + " does not exist, ignore it");
             return Collections.emptySet();
         }
 
         if(certsDir.isDirectory() == false)
         {
-            LOG.warn("The path " + certsDirname + " does not point to a folder, ignore it");
+            LOG.warn("the path " + certsDirname + " does not point to a folder, ignore it");
             return Collections.emptySet();
         }
 
         if(certsDir.canRead() == false)
         {
-            LOG.warn("The folder " + certsDirname + " cannot be read, ignore it");
+            LOG.warn("the folder " + certsDirname + " could not be read, ignore it");
             return Collections.emptySet();
         }
 
@@ -971,7 +971,7 @@ public class CrlCertStatusStore extends CertStatusStore
                 bcCert = Certificate.getInstance(encoded);
             }catch(IllegalArgumentException | IOException e)
             {
-                LOG.warn("Cannot parse certificate {}, ignore it", certFile.getPath());
+                LOG.warn("could not parse certificate {}, ignore it", certFile.getPath());
                 continue;
             }
 
@@ -989,7 +989,7 @@ public class CrlCertStatusStore extends CertStatusStore
                     aki = SecurityUtil.extractAKI(bcCert);
                 }catch(CertificateEncodingException e)
                 {
-                    final String message = "Could not extract AuthorityKeyIdentifier";
+                    final String message = "could not extract AuthorityKeyIdentifier";
                     if(LOG.isErrorEnabled())
                     {
                         LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());

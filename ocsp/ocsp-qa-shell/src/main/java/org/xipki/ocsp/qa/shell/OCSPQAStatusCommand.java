@@ -93,6 +93,11 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
     private String nonceOccurrenceText = Occurrence.optional.name();
 
     private OcspQA ocspQA;
+    private OcspError expectedOcspError;
+    private Map<BigInteger, OcspCertStatus> expectedStatuses = null;
+    private Occurrence expectedNextUpdateOccurrence;
+    private Occurrence expectedCerthashOccurrence;
+    private Occurrence expectedNonceOccurrence;
 
     public void setOcspQA(OcspQA ocspQA)
     {
@@ -114,6 +119,15 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
             throw new Exception("both expError and expStatus are set, this is not permitted");
         }
 
+        if(isNotBlank(errorText))
+        {
+            expectedOcspError = OcspError.getInstance(errorText);
+            if(expectedOcspError == null)
+            {
+                throw new Exception("invalid OCSP error status '" + errorText + "'");
+            }
+        }
+
         if(isNotEmpty(statusTexts))
         {
             if(statusTexts.size() != serialNumbers.size())
@@ -121,7 +135,26 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
                 throw new Exception("number of expStatus is invalid: " + (statusTexts.size()) +
                         ", it should be " + serialNumbers.size());
             }
+
+            expectedStatuses = new HashMap<>();
+            final int n = serialNumbers.size();
+
+            for(int i = 0; i < n; i++)
+            {
+                String expectedStatusText = statusTexts.get(i);
+                OcspCertStatus certStatus = OcspCertStatus.getInstance(expectedStatusText);
+                if(certStatus == null)
+                {
+                    throw new Exception("invalid cert status '" + expectedStatusText + "'");
+                }
+                expectedStatuses.put(serialNumbers.get(i), certStatus);
+            }
         }
+
+        expectedCerthashOccurrence = getOccurrence(certhashOccurrenceText);
+        expectedNextUpdateOccurrence = getOccurrence(nextUpdateOccurrenceText);
+        expectedNonceOccurrence = getOccurrence(nonceOccurrenceText);
+
     }
 
     @Override
@@ -130,33 +163,10 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
             Map<BigInteger, byte[]> encodedCerts)
     throws Exception
     {
-        OcspError expectedOcspError = null;
-        if(isNotBlank(errorText))
-        {
-            expectedOcspError = OcspError.getOCSPError(errorText);
-        }
-
-        Map<BigInteger, OcspCertStatus> expectedStatuses = null;
-        if(isNotEmpty(statusTexts))
-        {
-            expectedStatuses = new HashMap<>();
-            final int n = serialNumbers.size();
-
-            for(int i = 0; i < n; i++)
-            {
-                String expectedStatusText = statusTexts.get(i);
-                expectedStatuses.put(serialNumbers.get(i),
-                        OcspCertStatus.getCertStatus(expectedStatusText));
-            }
-        }
-
         OcspResponseOption responseOption = new OcspResponseOption();
-        responseOption.setNextUpdateOccurrence(
-                Occurrence.getOccurrence(nextUpdateOccurrenceText));
-        responseOption.setCerthashOccurrence(
-                Occurrence.getOccurrence(certhashOccurrenceText));
-        responseOption.setNonceOccurrence(
-                Occurrence.getOccurrence(nonceOccurrenceText));
+        responseOption.setNextUpdateOccurrence(expectedNextUpdateOccurrence);
+        responseOption.setCerthashOccurrence(expectedCerthashOccurrence);
+        responseOption.setNonceOccurrence(expectedNonceOccurrence);
         responseOption.setRespIssuer(respIssuer);
         responseOption.setSignatureAlgName(sigAlg);
         if(isNotBlank(certhashAlg))
@@ -203,6 +213,17 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
         {
             sb.append(", ").append(issue.getMessage());
         }
+    }
+
+    private static Occurrence getOccurrence(String text)
+    throws Exception
+    {
+        Occurrence ret = Occurrence.getInstance(text);
+        if(ret == null)
+        {
+            throw new Exception("invalid occurrence '" + text + "'");
+        }
+        return ret;
     }
 
 }

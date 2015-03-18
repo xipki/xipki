@@ -86,7 +86,7 @@ class ResponseOption
                 }
                 else
                 {
-                    throw new ConfigurationException("Hash algorithm " +token + " is unsupported");
+                    throw new ConfigurationException("hash algorithm " +token + " is unsupported");
                 }
             }
         }

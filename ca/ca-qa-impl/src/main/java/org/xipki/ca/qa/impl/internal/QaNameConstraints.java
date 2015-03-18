@@ -84,7 +84,7 @@ public class QaNameConstraints extends QaExtension
 
         if(permittedSubtrees == null && excludedSubtrees == null)
         {
-            throw new IllegalArgumentException("At least one of permittedSubtrees and excludesSubtrees should be non-null");
+            throw new IllegalArgumentException("at least one of permittedSubtrees and excludesSubtrees should be non-null");
         }
     }
 

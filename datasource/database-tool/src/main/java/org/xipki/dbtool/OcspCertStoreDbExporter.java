@@ -107,7 +107,7 @@ class OcspCertStoreDbExporter extends DbPorter
             File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
             if(processLogFile.exists() == false)
             {
-                throw new Exception("Could not process with '-resume' option");
+                throw new Exception("could not process with '-resume' option");
             }
         }
         this.resume = resume;
@@ -134,7 +134,8 @@ class OcspCertStoreDbExporter extends DbPorter
 
             if(certstore.getVersion() > VERSION)
             {
-                throw new Exception("Cannot continue with CertStore greater than " + VERSION + ": " + certstore.getVersion());
+                throw new Exception(
+                        "could not continue with CertStore greater than " + VERSION + ": " + certstore.getVersion());
             }
         }
         else
@@ -142,7 +143,7 @@ class OcspCertStoreDbExporter extends DbPorter
             certstore = new CertStoreType();
             certstore.setVersion(VERSION);
         }
-        System.out.println("Exporting OCSP certstore from database");
+        System.out.println("exporting OCSP certstore from database");
 
         if(resume == false)
         {
@@ -161,7 +162,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
         if(exception == null)
         {
-            System.out.println(" Exported OCSP certstore from database");
+            System.out.println(" exported OCSP certstore from database");
         }
         else
         {
@@ -172,7 +173,7 @@ class OcspCertStoreDbExporter extends DbPorter
     private void export_issuer(CertStoreType certstore)
     throws DataAccessException
     {
-        System.out.println("Exporting table ISSUER");
+        System.out.println("exporting table ISSUER");
         Issuers issuers = new Issuers();
         certstore.setIssuers(issuers);
         final String sql = "SELECT ID, CERT, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME FROM ISSUER";
@@ -219,7 +220,7 @@ class OcspCertStoreDbExporter extends DbPorter
             releaseResources(stmt, rs);
         }
 
-        System.out.println(" Exported table ISSUER");
+        System.out.println(" exported table ISSUER");
     }
 
     private Exception export_cert(CertStoreType certstore, File processLogFile)
@@ -232,7 +233,7 @@ class OcspCertStoreDbExporter extends DbPorter
         {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-certs-");
-            System.err.println("\nExporting table CERT and RAWCERT has been cancelled due to error,\n"
+            System.err.println("\nexporting table CERT and RAWCERT has been cancelled due to error,\n"
                     + "please continue with the option '-resume'");
             LOG.error("Exception", e);
             return e;
@@ -270,7 +271,7 @@ class OcspCertStoreDbExporter extends DbPorter
             minCertId = (int) getMin("CERT", "ID");
         }
 
-        System.out.println("Exporting tables CERT, CERTHASH and RAWCERT from ID " + minCertId);
+        System.out.println("exporting tables CERT, CERTHASH and RAWCERT from ID " + minCertId);
 
         String certSql = "SELECT ID, ISSUER_ID, LAST_UPDATE, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE " +
                 " FROM CERT WHERE ID >= ? AND ID < ?";
@@ -354,7 +355,7 @@ class OcspCertStoreDbExporter extends DbPorter
                     byte[] certBytes = rawCertMaps.remove(id);
                     if(certBytes == null)
                     {
-                        String msg = "Found no certificate in table RAWCERT for cert_id '" + id + "'";
+                        String msg = "found no certificate in table RAWCERT for cert_id '" + id + "'";
                         LOG.error(msg);
                         continue;
                     }
@@ -469,7 +470,7 @@ class OcspCertStoreDbExporter extends DbPorter
         // all successful, delete the processLogFile
         processLogFile.delete();
 
-        System.out.println(" Exported " + sum + " certificates from tables cert, certhash and rawcert");
+        System.out.println(" exported " + sum + " certificates from tables cert, certhash and rawcert");
     }
 
     private void finalizeZip(ZipOutputStream zipOutStream, CertsType certsType)

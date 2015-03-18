@@ -65,6 +65,6 @@ public enum CertArt
                 return value;
             }
         }
-        throw new IllegalArgumentException("invalid code " + code);
+        return null;
     }
 }

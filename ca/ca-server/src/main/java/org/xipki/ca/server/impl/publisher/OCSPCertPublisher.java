@@ -200,7 +200,7 @@ public class OCSPCertPublisher extends X509CertPublisher
         String subjectText = cert.getSubject();
         String serialText = cert.getCert().getSerialNumber().toString();
 
-        LOG.error("{} (issuser={}: subject='{}', serialNumber={}). Message: {}",
+        LOG.error("{} (issuser='{}': subject='{}', serialNumber={}). Message: {}",
                 new Object[]{messagePrefix, issuer, subjectText, serialText, e.getMessage()});
 
         LOG.debug("error", e);
@@ -208,23 +208,25 @@ public class OCSPCertPublisher extends X509CertPublisher
         AuditLoggingService auditLoggingService = auditServiceRegister == null ? null :
             auditServiceRegister.getAuditLoggingService();
 
-        if(auditLoggingService != null)
+        if(auditLoggingService == null)
         {
-            AuditEvent auditEvent = new AuditEvent(new Date());
-            auditEvent.setApplicationName("CAPublisher");
-            auditEvent.setName("SYSTEM");
-            auditEvent.setLevel(AuditLevel.ERROR);
-            auditEvent.setStatus(AuditStatus.FAILED);
-            if(cert.getCertId() != null)
-            {
-                auditEvent.addEventData(new AuditEventData("id", cert.getCertId().toString()));
-            }
-            auditEvent.addEventData(new AuditEventData("issuer", issuer));
-            auditEvent.addEventData(new AuditEventData("subject", subjectText));
-            auditEvent.addEventData(new AuditEventData("serialNumber", serialText));
-            auditEvent.addEventData(new AuditEventData("message", messagePrefix));
-            auditLoggingService.logEvent(auditEvent);
+            return;
         }
+
+        AuditEvent auditEvent = new AuditEvent(new Date());
+        auditEvent.setApplicationName("CAPublisher");
+        auditEvent.setName("SYSTEM");
+        auditEvent.setLevel(AuditLevel.ERROR);
+        auditEvent.setStatus(AuditStatus.FAILED);
+        if(cert.getCertId() != null)
+        {
+            auditEvent.addEventData(new AuditEventData("id", cert.getCertId().toString()));
+        }
+        auditEvent.addEventData(new AuditEventData("issuer", issuer));
+        auditEvent.addEventData(new AuditEventData("subject", subjectText));
+        auditEvent.addEventData(new AuditEventData("serialNumber", serialText));
+        auditEvent.addEventData(new AuditEventData("message", messagePrefix));
+        auditLoggingService.logEvent(auditEvent);
     }
 
     @Override
@@ -255,7 +257,7 @@ public class OCSPCertPublisher extends X509CertPublisher
         } catch (Exception e)
         {
             String issuerText = SecurityUtil.getRFC4519Name(caCert.getCert().getIssuerX500Principal());
-            logAndAudit(issuerText, caCert, e, "Could not publish revocation of CA");
+            logAndAudit(issuerText, caCert, e, "could not publish revocation of CA");
             return false;
         }
     }
@@ -270,7 +272,7 @@ public class OCSPCertPublisher extends X509CertPublisher
         } catch (Exception e)
         {
             String issuerText = SecurityUtil.getRFC4519Name(caCert.getCert().getIssuerX500Principal());
-            logAndAudit(issuerText, caCert, e, "Could not publish unrevocation of CA");
+            logAndAudit(issuerText, caCert, e, "could not publish unrevocation of CA");
             return false;
         }
     }
@@ -286,7 +288,7 @@ public class OCSPCertPublisher extends X509CertPublisher
         } catch (Exception e)
         {
             String issuerText = SecurityUtil.getRFC4519Name(issuerCert.getCert().getIssuerX500Principal());
-            logAndAudit(issuerText, issuerCert, e, "Could not publish removal of certificate");
+            logAndAudit(issuerText, issuerCert, e, "could not publish removal of certificate");
             return false;
         }
     }

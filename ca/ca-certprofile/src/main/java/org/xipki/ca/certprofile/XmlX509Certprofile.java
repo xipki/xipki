@@ -207,7 +207,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
             }
             LOG.debug(message, e);
-            throw new CertprofileException("RuntimeException thrown while initializing certprofile: " + e.getMessage());
+            throw new CertprofileException("caught RuntimeException while initializing certprofile: " + e.getMessage());
         }
     }
 
@@ -1030,7 +1030,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             }
         }
 
-        throw new RuntimeException("Should not reach here: undefined extension " +
+        throw new RuntimeException("should not reach here: undefined extension " +
                 ObjectIdentifiers.oidToDisplayName(type));
     }
 

@@ -101,7 +101,7 @@ class CaConfigurationDbExporter extends DbPorter
         CAConfigurationType caconf = new CAConfigurationType();
         caconf.setVersion(VERSION);
 
-        System.out.println("Exporting CA configuration from database");
+        System.out.println("exporting CA configuration from database");
 
         export_cmpcontrol(caconf);
         export_responder(caconf);
@@ -125,7 +125,7 @@ class CaConfigurationDbExporter extends DbPorter
             throw XMLUtil.convert(e);
         }
 
-        System.out.println(" Exported CA configuration from database");
+        System.out.println(" exported CA configuration from database");
     }
 
     private void export_cmpcontrol(CAConfigurationType caconf)
@@ -133,7 +133,7 @@ class CaConfigurationDbExporter extends DbPorter
     {
         Cmpcontrols cmpcontrols = new Cmpcontrols();
         caconf.setCmpcontrols(cmpcontrols);
-        System.out.println("Exporting table CMPCONTROL");
+        System.out.println("exporting table CMPCONTROL");
         final String sql = "SELECT NAME, REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT, "
                 + " REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME"
                 + " FROM CMPCONTROL";
@@ -173,13 +173,13 @@ class CaConfigurationDbExporter extends DbPorter
             releaseResources(stmt, rs);
         }
 
-        System.out.println(" Exported table CMPCONTROL");
+        System.out.println(" exported table CMPCONTROL");
     }
 
     private void export_environment(CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("Exporting table ENVIRONMENT");
+        System.out.println("exporting table ENVIRONMENT");
         Environments environments = new Environments();
         final String sql = "SELECT NAME, VALUE2 FROM ENVIRONMENT";
 
@@ -210,13 +210,13 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setEnvironments(environments);
-        System.out.println(" Exported table ENVIRONMENT");
+        System.out.println(" exported table ENVIRONMENT");
     }
 
     private void export_crlsigner(CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("Exporting table CRLSIGNER");
+        System.out.println("exporting table CRLSIGNER");
         Crlsigners crlsigners = new Crlsigners();
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("SELECT NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL");
@@ -256,13 +256,13 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setCrlsigners(crlsigners);
-        System.out.println(" Exported table CRLSIGNER");
+        System.out.println(" exported table CRLSIGNER");
     }
 
     private void export_caalias(CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("Exporting table CAALIAS");
+        System.out.println("exporting table CAALIAS");
         Caaliases caaliases = new Caaliases();
         final String sql = "SELECT NAME, CA_NAME FROM CAALIAS";
 
@@ -293,13 +293,13 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setCaaliases(caaliases);
-        System.out.println(" Exported table CAALIAS");
+        System.out.println(" exported table CAALIAS");
     }
 
     private void export_requestor(CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("Exporting table REQUESTOR");
+        System.out.println("exporting table REQUESTOR");
         Requestors requestors = new Requestors();
         final String sql = "SELECT NAME, CERT FROM REQUESTOR";
 
@@ -330,13 +330,13 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setRequestors(requestors);
-        System.out.println(" Exported table REQUESTOR");
+        System.out.println(" exported table REQUESTOR");
     }
 
     private void export_responder(CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("Exporting table RESPONDER");
+        System.out.println("exporting table RESPONDER");
         ResponderType responder = null;
         final String sql = "SELECT TYPE, CERT, CONF FROM RESPONDER";
 
@@ -367,13 +367,13 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setResponder(responder);
-        System.out.println(" Exported table RESPONDER");
+        System.out.println(" exported table RESPONDER");
     }
 
     private void export_publisher(CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("Exporting table PUBLISHER");
+        System.out.println("exporting table PUBLISHER");
         Publishers publishers = new Publishers();
         final String sql = "SELECT NAME, TYPE, CONF FROM PUBLISHER";
 
@@ -406,13 +406,13 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setPublishers(publishers);
-        System.out.println(" Exported table PUBLISHER");
+        System.out.println(" exported table PUBLISHER");
     }
 
     private void export_certprofile(CAConfigurationType caconf)
     throws DataAccessException, IOException
     {
-        System.out.println("Exporting table CERTPROFILE");
+        System.out.println("exporting table CERTPROFILE");
         Certprofiles certprofiles = new Certprofiles();
         StringBuilder sqlBuilder = new StringBuilder("SELECT");
         sqlBuilder.append(" NAME");
@@ -472,13 +472,13 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setCertprofiles(certprofiles);
-        System.out.println(" Exported table CERTPROFILE");
+        System.out.println(" exported table CERTPROFILE");
     }
 
     private void export_ca(CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("Exporting table CA");
+        System.out.println("exporting table CA");
         Cas cas = new Cas();
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("SELECT NAME,");
@@ -591,13 +591,13 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setCas(cas);
-        System.out.println(" Exported table CA");
+        System.out.println(" exported table CA");
     }
 
     private void export_ca_has_requestor(CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("Exporting table CA_HAS_REQUESTOR");
+        System.out.println("exporting table CA_HAS_REQUESTOR");
         CaHasRequestors ca_has_requestors = new CaHasRequestors();
         final String sql = "SELECT CA_NAME, REQUESTOR_NAME, RA, PERMISSIONS, PROFILES FROM CA_HAS_REQUESTOR";
 
@@ -634,13 +634,13 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setCaHasRequestors(ca_has_requestors);
-        System.out.println(" Exported table CA_HAS_REQUESTOR");
+        System.out.println(" exported table CA_HAS_REQUESTOR");
     }
 
     private void export_ca_has_publisher(CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("Exporting table CA_HAS_PUBLISHER");
+        System.out.println("exporting table CA_HAS_PUBLISHER");
         CaHasPublishers ca_has_publishers = new CaHasPublishers();
         final String sql = "SELECT CA_NAME, PUBLISHER_NAME FROM CA_HAS_PUBLISHER";
 
@@ -671,13 +671,13 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setCaHasPublishers(ca_has_publishers);
-        System.out.println(" Exported table CA_HAS_PUBLISHER");
+        System.out.println(" exported table CA_HAS_PUBLISHER");
     }
 
     private void export_ca_has_certprofile(CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("Exporting table CA_HAS_CERTPROFILE");
+        System.out.println("exporting table CA_HAS_CERTPROFILE");
         CaHasCertprofiles ca_has_certprofiles = new CaHasCertprofiles();
         final String sql = "SELECT CA_NAME, CERTPROFILE_NAME FROM CA_HAS_CERTPROFILE";
 
@@ -708,7 +708,7 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setCaHasCertprofiles(ca_has_certprofiles);
-        System.out.println(" Exported table CA_HAS_CERTPROFILE");
+        System.out.println(" exported table CA_HAS_CERTPROFILE");
     }
 
 }

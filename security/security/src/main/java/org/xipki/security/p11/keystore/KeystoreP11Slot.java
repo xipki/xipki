@@ -115,11 +115,11 @@ public class KeystoreP11Slot implements P11WritableSlot
         ParamChecker.assertNotNull("slotId", slotId);
         if(password == null)
         {
-            throw new IllegalArgumentException("No password is configured");
+            throw new IllegalArgumentException("no password is configured");
         }
         else if(password.size() != 1)
         {
-            throw new IllegalArgumentException("Exactly 1 password must be specified, but not " + password.size());
+            throw new IllegalArgumentException("exactly 1 password must be specified, but not " + password.size());
         }
 
         this.slotDir = slotDir;
@@ -142,7 +142,7 @@ public class KeystoreP11Slot implements P11WritableSlot
 
         if(keystoreFiles == null || keystoreFiles.length == 0)
         {
-            LOG.info("No key found in directory", slotDir);
+            LOG.info("no key found in directory {}", slotDir);
             return;
         }
 
@@ -184,7 +184,7 @@ public class KeystoreP11Slot implements P11WritableSlot
 
                 if(keyname == null)
                 {
-                    LOG.info("No key is contained in file {}, ignore it", fn);
+                    LOG.info("no key is contained in file {}, ignore it", fn);
                     continue;
                 }
 
@@ -193,7 +193,7 @@ public class KeystoreP11Slot implements P11WritableSlot
                 if( (privKey instanceof RSAPrivateKey || privKey instanceof DSAPrivateKey ||
                         privKey instanceof ECPrivateKey) == false)
                 {
-                    throw new SignerException("Unsupported key " + privKey.getClass().getName());
+                    throw new SignerException("unsupported key " + privKey.getClass().getName());
                 }
 
                 Set<Certificate> caCerts = new HashSet<>();
@@ -215,7 +215,7 @@ public class KeystoreP11Slot implements P11WritableSlot
                 currentIdentifies.add(p11Identity);
             }catch(Throwable t)
             {
-                final String message = "Could not initialize key " + file.getPath();
+                final String message = "could not initialize key " + file.getPath();
                 if(LOG.isWarnEnabled())
                 {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
@@ -285,7 +285,7 @@ public class KeystoreP11Slot implements P11WritableSlot
         KeystoreP11Identity identity = getIdentity(keyIdentifier);
         if(identity == null)
         {
-            throw new SignerException("Could not find identity " + keyIdentifier);
+            throw new SignerException("could not find identity " + keyIdentifier);
         }
 
         assertMatch(newCert, keyIdentifier, securityFactory);
@@ -321,7 +321,7 @@ public class KeystoreP11Slot implements P11WritableSlot
 
         if(keyname == null)
         {
-            throw new SignerException("Could not find private key");
+            throw new SignerException("could not find private key");
         }
 
         Key key = ks.getKey(keyname, password);
@@ -367,17 +367,17 @@ public class KeystoreP11Slot implements P11WritableSlot
 
         if (keySize < 1024)
         {
-            throw new IllegalArgumentException("Keysize not allowed: " + keySize);
+            throw new IllegalArgumentException("keysize not allowed: " + keySize);
         }
 
         if(keySize % 1024 != 0)
         {
-            throw new IllegalArgumentException("Key size is not multiple of 1024: " + keySize);
+            throw new IllegalArgumentException("key size is not multiple of 1024: " + keySize);
         }
 
         if(labelExists(label))
         {
-            throw new IllegalArgumentException("Label " + label + " exists, please specify another one");
+            throw new IllegalArgumentException("label " + label + " exists, please specify another one");
         }
 
         P12KeypairGenerator gen = new P12KeypairGenerator.RSAIdentityGenerator(
@@ -403,17 +403,17 @@ public class KeystoreP11Slot implements P11WritableSlot
 
         if (pLength < 1024)
         {
-            throw new IllegalArgumentException("Keysize not allowed: " + pLength);
+            throw new IllegalArgumentException("keysize not allowed: " + pLength);
         }
 
         if(pLength % 1024 != 0)
         {
-            throw new IllegalArgumentException("Key size is not multiple of 1024: " + pLength);
+            throw new IllegalArgumentException("key size is not multiple of 1024: " + pLength);
         }
 
         if(labelExists(label))
         {
-            throw new IllegalArgumentException("Label " + label + " exists, please specify another one");
+            throw new IllegalArgumentException("label " + label + " exists, please specify another one");
         }
 
         P12KeypairGenerator gen = new P12KeypairGenerator.DSAIdentityGenerator(
@@ -440,7 +440,7 @@ public class KeystoreP11Slot implements P11WritableSlot
 
         if(labelExists(label))
         {
-            throw new IllegalArgumentException("Label " + label + " exists, please specify another one");
+            throw new IllegalArgumentException("label " + label + " exists, please specify another one");
         }
 
         ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(

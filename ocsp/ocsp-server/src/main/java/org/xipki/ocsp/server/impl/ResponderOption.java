@@ -73,7 +73,7 @@ class ResponderOption
         }
         else
         {
-            throw new ConfigurationException("Invalid OCSP mode '" + s + "'");
+            throw new ConfigurationException("invalid OCSP mode '" + s + "'");
         }
 
         this.signerName = conf.getSigner();

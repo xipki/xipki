@@ -43,10 +43,10 @@ package org.xipki.datasource.api.exception;
  * if a corresponding database error is encountered.
  *
  * <p>Serves as superclass for more specific exceptions, like
- * CannotAcquireLockException and DeadlockLoserDataAccessException.
+ * could notAcquireLockException and DeadlockLoserDataAccessException.
  *
  * @author Thomas Risberg
- * @see CannotAcquireLockException
+ * @see could notAcquireLockException
  * @see DeadlockLoserDataAccessException
  * @see OptimisticLockingFailureException
  */

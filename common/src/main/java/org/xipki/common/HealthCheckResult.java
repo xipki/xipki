@@ -353,8 +353,8 @@ public class HealthCheckResult
                 {
                     m--;
                 }
-            }
-        }
+            } // end if
+        } // end for
 
         throw new IllegalArgumentException("invalid text: '" + text + "'");
     }

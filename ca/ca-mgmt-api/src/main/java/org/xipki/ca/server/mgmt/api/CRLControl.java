@@ -225,7 +225,7 @@ public class CRLControl implements Serializable
             UpdateMode mode = UpdateMode.getUpdateMode(s);
             if(mode == null)
             {
-                throw new ConfigurationException("Invalid " + KEY_updateMode + ": " + s);
+                throw new ConfigurationException("invalid " + KEY_updateMode + ": " + s);
             }
             control.setUpdateMode(mode);
         }
@@ -560,18 +560,18 @@ public class CRLControl implements Serializable
 
         if(fullCRLIntervals < deltaCRLIntervals)
         {
-            throw new ConfigurationException("fullCRLIntervals cannot be less than deltaCRLIntervals " +
+            throw new ConfigurationException("fullCRLIntervals could not be less than deltaCRLIntervals " +
                     fullCRLIntervals + " < " + deltaCRLIntervals);
         }
 
         if(fullCRLIntervals < 1)
         {
-            throw new ConfigurationException("fullCRLIntervals cannot be less than 1: " + fullCRLIntervals);
+            throw new ConfigurationException("fullCRLIntervals could not be less than 1: " + fullCRLIntervals);
         }
 
         if(deltaCRLIntervals < 0)
         {
-            throw new ConfigurationException("deltaCRLIntervals cannot be less than 0: " + deltaCRLIntervals);
+            throw new ConfigurationException("deltaCRLIntervals could not be less than 0: " + deltaCRLIntervals);
         }
     }
 }

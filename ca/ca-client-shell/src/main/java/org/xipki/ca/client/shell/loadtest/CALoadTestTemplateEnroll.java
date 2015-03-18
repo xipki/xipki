@@ -229,7 +229,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
             RandomDN randomDN = RandomDN.getInstance(randomDNStr);
             if(randomDN == null)
             {
-                throw new ConfigurationException("Invalid randomDN " + randomDNStr);
+                throw new ConfigurationException("invalid randomDN " + randomDNStr);
             }
 
             LoadTestEntry loadtestEntry = new LoadTestEntry(entry.getCertprofile(),

@@ -58,7 +58,7 @@ public class GuiPasswordCallback implements PasswordCallback
         char[] password = SecurePasswordInputPanel.readPassword(prompt);
         if(password == null)
         {
-            throw new PasswordResolverException("User has cancelled");
+            throw new PasswordResolverException("user has cancelled");
         }
         return password;
     }

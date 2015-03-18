@@ -104,7 +104,7 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
         if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK)
         {
             inputstream.close();
-            throw new IOException("Bad Response: "
+            throw new IOException("bad response: "
                     + httpUrlConnection.getResponseCode() + "  "
                     + httpUrlConnection.getResponseMessage());
         }
@@ -120,7 +120,7 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
         if (isValidContentType == false)
         {
             inputstream.close();
-            throw new IOException("Bad Response: Mime type " + responseContentType + " not supported!");
+            throw new IOException("bad response: mime type " + responseContentType + " not supported!");
         }
 
         return IoUtil.read(inputstream);

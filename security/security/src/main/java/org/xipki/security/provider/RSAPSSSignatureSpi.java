@@ -255,7 +255,7 @@ class RSAPSSSignatureSpi
         }
         else
         {
-            throw new InvalidParameterException("Only PSSParameterSpec supported");
+            throw new InvalidParameterException("only PSSParameterSpec supported");
         }
     }
 

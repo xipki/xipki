@@ -248,7 +248,7 @@ public abstract class P12KeypairGenerator
         }
         else
         {
-            throw new IllegalArgumentException("Unknown type of key " + key.getClass().getName());
+            throw new IllegalArgumentException("unknown type of key " + key.getClass().getName());
         }
 
         return builder.build(KeyUtil.generatePrivateKeyParameter(key));
@@ -345,7 +345,7 @@ public abstract class P12KeypairGenerator
                 this.curveOid = getCurveOID(this.curveName);
                 if(this.curveOid == null)
                 {
-                    throw new IllegalArgumentException("No OID is defined for the curve " + this.curveName);
+                    throw new IllegalArgumentException("no OID is defined for the curve " + this.curveName);
                 }
             }
         }

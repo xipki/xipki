@@ -107,14 +107,14 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
         {
             if(processLogFile.exists() == false)
             {
-                throw new InvalidInputException("Could not process with '-resume' option");
+                throw new InvalidInputException("could not process with '-resume' option");
             }
         }
         else
         {
             if(processLogFile.exists())
             {
-                throw new InvalidInputException("Please either specify '-resume' option or delete the file " +
+                throw new InvalidInputException("please either specify '-resume' option or delete the file " +
                         processLogFile.getPath() + " first");
             }
         }
@@ -138,7 +138,8 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
 
         if(certstore.getVersion() > VERSION)
         {
-            throw new InvalidInputException("Cannot import CertStore greater than " + VERSION + ": " + certstore.getVersion());
+            throw new InvalidInputException(
+                    "could not import CertStore greater than " + VERSION + ": " + certstore.getVersion());
         }
 
         CAConfigurationType caConf;
@@ -155,11 +156,11 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
 
         if(caConf.getVersion() > VERSION)
         {
-            throw new InvalidInputException("Cannot import CA Configuration greater than " +
+            throw new InvalidInputException("could not import CA Configuration greater than " +
                     VERSION + ": " + certstore.getVersion());
         }
 
-        System.out.println("Importing CA certstore to OCSP database");
+        System.out.println("importing CA certstore to OCSP database");
         try
         {
             PublisherType publisherType = null;
@@ -174,7 +175,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
 
             if(publisherType == null)
             {
-                throw new InvalidInputException("Unknown publisher " + publisherName);
+                throw new InvalidInputException("unknown publisher " + publisherName);
             }
 
             String type = publisherType.getType();
@@ -233,10 +234,10 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
             processLogFile.delete();
         }catch(Exception e)
         {
-            System.err.println("Error while importing OCSP certstore to database");
+            System.err.println("error while importing OCSP certstore to database");
             throw e;
         }
-        System.out.println(" Imported OCSP certstore to database");
+        System.out.println(" imported OCSP certstore to database");
     }
 
     private List<Integer> getIssuerIds(Cainfos issuers, List<CaType> cas)
@@ -270,7 +271,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
     private List<Integer> import_issuer(Cainfos issuers, List<CaType> cas)
     throws DataAccessException, CertificateException
     {
-        System.out.println("Importing table ISSUER");
+        System.out.println("importing table ISSUER");
         final String sql = OcspCertStoreDbImporter.SQL_ADD_CAINFO;
         PreparedStatement ps = prepareStatement(sql);
 
@@ -350,11 +351,11 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                     ps.execute();
                 }catch(SQLException e)
                 {
-                    System.err.println("Error while importing issuer with id=" + issuer.getId());
+                    System.err.println("error while importing issuer with id=" + issuer.getId());
                     throw translate(sql, e);
                 }catch(CertificateException e)
                 {
-                    System.err.println("Error while importing issuer with id=" + issuer.getId());
+                    System.err.println("error while importing issuer with id=" + issuer.getId());
                     throw e;
                 }
             }
@@ -363,7 +364,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
             releaseResources(ps, null);
         }
 
-        System.out.println(" Imported table ISSUER");
+        System.out.println(" imported table ISSUER");
         return relatedCaIds;
     }
 
@@ -395,7 +396,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
         final long startTime = System.currentTimeMillis();
         int sum = 0;
 
-        System.out.println("Importing certificates from ID " + minId);
+        System.out.println("importing certificates from ID " + minId);
         printHeader();
 
         PreparedStatement ps_cert = prepareStatement(OcspCertStoreDbImporter.SQL_ADD_CERT);
@@ -421,8 +422,8 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                     }
                 }catch(Exception e)
                 {
-                    System.err.println("\nError while importing certificates from file " + certsFile +
-                            ".\nPlease continue with the option '-resume'");
+                    System.err.println("\nerror while importing certificates from file " + certsFile +
+                            ".\nplease continue with the option '-resume'");
                     LOG.error("Exception", e);
                     throw e;
                 }
@@ -436,7 +437,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
 
         printTrailer();
         DbPorter.echoToFile(MSG_CERTS_FINISHED, processLogFile);
-        System.out.println("Processed " + sum + " certificates");
+        System.out.println("processed " + sum + " certificates");
     }
 
     private int[] do_import_cert(PreparedStatement ps_cert,

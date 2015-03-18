@@ -140,18 +140,18 @@ implements CAManager, CmpResponderManager
             inProcess = true;
             try
             {
-                LOG.debug("Publishing certificates in PUBLISHQUEUE");
+                LOG.debug("publishing certificates in PUBLISHQUEUE");
                 for(String name : x509cas.keySet())
                 {
                     X509CA ca = x509cas.get(name);
                     boolean b = ca.publishCertsInQueue();
                     if(b)
                     {
-                        LOG.debug(" Published certificates of CA '{}' in PUBLISHQUEUE", name);
+                        LOG.debug(" published certificates of CA '{}' in PUBLISHQUEUE", name);
                     }
                     else
                     {
-                        LOG.error("Publishing certificates of CA '{}' in PUBLISHQUEUE failed", name);
+                        LOG.error("publishing certificates of CA '{}' in PUBLISHQUEUE failed", name);
                     }
                 }
             }catch(Throwable t)
@@ -183,7 +183,7 @@ implements CAManager, CmpResponderManager
                     certstore.deleteCertsInProcessOlderThan(new Date(System.currentTimeMillis() - 10 * 60 * 1000L));
                 } catch (Throwable t)
                 {
-                    final String message = "Could not call certstore.deleteCertsInProcessOlderThan";
+                    final String message = "could not call certstore.deleteCertsInProcessOlderThan";
                     if(LOG.isErrorEnabled())
                     {
                         LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
@@ -218,17 +218,17 @@ implements CAManager, CmpResponderManager
 
                 if(LOG.isDebugEnabled())
                 {
-                    LOG.debug("Check the restart CA system event: CA changed at={}, lastStartTime={}",
+                    LOG.debug("check the restart CA system event: CA changed at={}, lastStartTime={}",
                             new Date(caChangedTime * 1000L), lastStartTime);
                 }
 
                 if(caChangedTime > lastStartTime.getTime() / 1000L)
                 {
-                    LOG.info("Received event to restart CA");
+                    LOG.info("received event to restart CA");
                     restartCaSystem();
                 } else
                 {
-                    LOG.debug("Received no event to restart CA");
+                    LOG.debug("received no event to restart CA");
                 }
             }catch(Throwable t)
             {
@@ -410,9 +410,9 @@ implements CAManager, CmpResponderManager
                 String key = (String) objKey;
                 if(StringUtil.startsWithIgnoreCase(key, "datasource.") == false)
                 {
-                	continue;
+                    continue;
                 }
-                
+
                 String datasourceFile = caConfProps.getProperty(key);
                 try
                 {
@@ -453,7 +453,7 @@ implements CAManager, CmpResponderManager
 
             if(lockedSuccessfull == false)
             {
-                final String msg = "Could not lock the CA database. In general this indicates that another CA software in "
+                final String msg = "could not lock the CA database. In general this indicates that another CA software in "
                         + "active mode is accessing the "
                         + "database or the last shutdown of CA software in active mode is not normal.";
                 throw new CAMgmtException(msg);
@@ -514,7 +514,7 @@ implements CAManager, CmpResponderManager
             }
             else
             {
-                LOG.error("Cannot lock CA, it has been locked by {} since {}", lockedBy, lockedAt);
+                LOG.error("could not lock CA, it has been locked by {} since {}", lockedBy, lockedAt);
                 return false;
             }
         }
@@ -528,7 +528,7 @@ implements CAManager, CmpResponderManager
     {
         if(masterMode == false)
         {
-            LOG.error("Could not unlock CA in slave mode");
+            LOG.error("could not unlock CA in slave mode");
             return false;
         }
 
@@ -541,7 +541,7 @@ implements CAManager, CmpResponderManager
             successfull = true;
         }catch(DataAccessException | CAMgmtException e)
         {
-            final String message = "Error in unlockCA()";
+            final String message = "error in unlockCA()";
             if(LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -551,11 +551,11 @@ implements CAManager, CmpResponderManager
 
         if(successfull)
         {
-            LOG.info("Unlocked CA");
+            LOG.info("unlocked CA");
         }
         else
         {
-            LOG.error("Unlocking CA failed");
+            LOG.error("unlocking CA failed");
         }
         auditLogPCIEvent(successfull, "UNLOCK");
         return successfull;
@@ -600,7 +600,7 @@ implements CAManager, CmpResponderManager
 
         if(caSystemStarted == false)
         {
-            String msg = "Could not restart CA system";
+            String msg = "could not restart CA system";
             LOG.error(msg);
         }
 
@@ -620,7 +620,7 @@ implements CAManager, CmpResponderManager
             return true;
         }catch(CAMgmtException e)
         {
-            final String message = "Error while notifying Slave CAs to restart";
+            final String message = "error while notifying Slave CAs to restart";
             if(LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -649,7 +649,7 @@ implements CAManager, CmpResponderManager
 
         if(caSystemStarted == false)
         {
-            String msg = "Could not start CA system";
+            String msg = "could not start CA system";
             LOG.error(msg);
         }
 
@@ -669,7 +669,7 @@ implements CAManager, CmpResponderManager
 
         try
         {
-            LOG.info("Starting CA system");
+            LOG.info("starting CA system");
             try
             {
                 init();
@@ -702,7 +702,7 @@ implements CAManager, CmpResponderManager
 
             caSystemSetuped = true;
             StringBuilder sb = new StringBuilder();
-            sb.append("Started CA system");
+            sb.append("started CA system");
             Set<String> names = new HashSet<>(getCaNames());
 
             if(names.size() > 0)
@@ -805,7 +805,7 @@ implements CAManager, CmpResponderManager
 
     public void shutdown()
     {
-        LOG.info("Stopping CA system");
+        LOG.info("stopping CA system");
         shutdownScheduledThreadPoolExecutor();
 
         if(persistentScheduledThreadPoolExecutor != null)
@@ -863,7 +863,7 @@ implements CAManager, CmpResponderManager
             }
         }
 
-        LOG.info("Stopped CA system");
+        LOG.info("stopped CA system");
         auditLogPCIEvent(true, "SHUTDOWN");
     }
 
@@ -1225,7 +1225,7 @@ implements CAManager, CmpResponderManager
                 expirationPeriod, validityMode);
         if(changed == false)
         {
-            LOG.info("No change of CA '{}' is processed", name);
+            LOG.info("no change of CA '{}' is processed", name);
         }
         else
         {
@@ -1285,7 +1285,7 @@ implements CAManager, CmpResponderManager
         boolean b = queryExecutor.removePublisherFromCA(publisherName, caName);
         if(b == false)
         {
-        	return false;
+            return false;
         }
 
         Set<String> publisherNames = ca_has_publishers.get(caName);
@@ -1367,7 +1367,7 @@ implements CAManager, CmpResponderManager
             certstore.addRequestorName(name);
         }catch(OperationException e)
         {
-            final String message = "Exception while publishing requestor name to certStore";
+            final String message = "exception while publishing requestor name to certStore";
             if(LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -1390,11 +1390,11 @@ implements CAManager, CmpResponderManager
         }
 
         boolean b = queryExecutor.deleteRowWithName(requestorName, "REQUESTOR");
-        if(b == false)        	
+        if(b == false)
         {
-        	return false;
+            return false;
         }
-        
+
         requestors.remove(requestorName);
         LOG.info("removed requestor '{}'", requestorName);
         return true;
@@ -1413,7 +1413,7 @@ implements CAManager, CmpResponderManager
         boolean changed = queryExecutor.changeCmpRequestor(name, cert);
         if(changed == false)
         {
-        	return false;
+            return false;
         }
 
         requestors.remove(name);
@@ -1497,9 +1497,9 @@ implements CAManager, CmpResponderManager
         boolean b = queryExecutor.deleteRowWithName(profileName, "CERTPROFILE");
         if(b == false)
         {
-        	return false;
+            return false;
         }
-        
+
         LOG.info("removed profile '{}'", profileName);
         IdentifiedX509Certprofile profile = certprofiles.remove(profileName);
         queryExecutor.shutdownCertprofile(profile);
@@ -1519,7 +1519,7 @@ implements CAManager, CmpResponderManager
         boolean changed = queryExecutor.changeCertprofile(name, type, conf);
         if(changed == false)
         {
-        	return false;
+            return false;
         }
 
         IdentifiedX509Certprofile profile = certprofiles.remove(name);
@@ -1540,7 +1540,7 @@ implements CAManager, CmpResponderManager
         String name = dbEntry.getName();
         if(certprofiles.containsKey(name))
         {
-            throw new CAMgmtException("Certprofile named " + name + " exists");
+            throw new CAMgmtException("certprofile named " + name + " exists");
         }
         queryExecutor.addCertprofile(dbEntry);
 
@@ -1555,7 +1555,7 @@ implements CAManager, CmpResponderManager
             certstore.addCertprofileName(name);
         }catch(OperationException e)
         {
-            final String message = "Exception while publishing certprofile name to certStore";
+            final String message = "exception while publishing certprofile name to certStore";
             if(LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -1590,9 +1590,9 @@ implements CAManager, CmpResponderManager
         boolean b = queryExecutor.deleteRows("RESPONDER");
         if(b == false)
         {
-        	return false;
+            return false;
         }
-        
+
         LOG.info("removed responder");
         responder = null;
         return true;
@@ -1611,7 +1611,7 @@ implements CAManager, CmpResponderManager
         boolean changed = queryExecutor.changeCmpResponder(type, conf, cert);
         if(changed == false)
         {
-            LOG.info("No change of CMP responder is processed");
+            LOG.info("no change of CMP responder is processed");
             return false;
         }
 
@@ -1655,7 +1655,7 @@ implements CAManager, CmpResponderManager
         boolean b = queryExecutor.deleteRowWithName(crlSignerName, "CRLSIGNER");
         if(b == false)
         {
-        	return false;
+            return false;
         }
         for(String caName : caInfos.keySet())
         {
@@ -1680,7 +1680,7 @@ implements CAManager, CmpResponderManager
         boolean changed = queryExecutor.changeCrlSigner(name, signer_type, signer_conf, signer_cert, crlControl);
         if(changed == false)
         {
-        	return false;
+            return false;
         }
 
         X509CrlSignerEntryWrapper crlSigner = crlSigners.remove(name);
@@ -1711,7 +1711,7 @@ implements CAManager, CmpResponderManager
         String name = dbEntry.getName();
         if(publishers.containsKey(name))
         {
-            throw new CAMgmtException("Publisher named " + name + " exists");
+            throw new CAMgmtException("publisher named " + name + " exists");
         }
 
         queryExecutor.addPublisher(dbEntry);
@@ -1728,7 +1728,7 @@ implements CAManager, CmpResponderManager
             certstore.addPublisherName(name);
         }catch(OperationException e)
         {
-            final String message = "Exception while publishing publisher nameto certStore";
+            final String message = "exception while publishing publisher nameto certStore";
             if(LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -1779,7 +1779,7 @@ implements CAManager, CmpResponderManager
         boolean b = queryExecutor.deleteRowWithName(publisherName, "PUBLISHER");
         if(b == false)
         {
-        	return false;
+            return false;
         }
 
         LOG.info("removed publisher '{}'", publisherName);
@@ -1796,7 +1796,7 @@ implements CAManager, CmpResponderManager
         boolean changed = queryExecutor.changePublisher(name, type, conf);
         if(changed == false)
         {
-        	return false;
+            return false;
         }
 
         IdentifiedX509CertPublisher publisher = publishers.remove(name);
@@ -1840,7 +1840,7 @@ implements CAManager, CmpResponderManager
         boolean b = queryExecutor.deleteRowWithName(name, "CMPCONTROL");
         if(b == false)
         {
-        	return false;
+            return false;
         }
 
         for(String caName : caInfos.keySet())
@@ -1876,7 +1876,7 @@ implements CAManager, CmpResponderManager
                 sendCaCert, sendResponderCert);
         if(changed == false)
         {
-        	return false;
+            return false;
         }
 
         CmpControl cmpControl = queryExecutor.createCmpControl(name);
@@ -1923,7 +1923,7 @@ implements CAManager, CmpResponderManager
         boolean b = queryExecutor.deleteRowWithName(envParamName, "ENVIRONMENT");
         if(b == false)
         {
-        	return false;
+            return false;
         }
 
         LOG.info("removed environment param '{}'", envParamName);
@@ -1941,13 +1941,13 @@ implements CAManager, CmpResponderManager
 
         if(envParameterResolver.getEnvParam(name) == null)
         {
-            throw new CAMgmtException("Could not find environment paramter " + name);
+            throw new CAMgmtException("could not find environment paramter " + name);
         }
 
         boolean changed = queryExecutor.changeEnvParam(name, value);
         if(changed == false)
         {
-        	return false;
+            return false;
         }
 
         envParameterResolver.addEnvParam(name, value);
@@ -1988,7 +1988,7 @@ implements CAManager, CmpResponderManager
         boolean b = queryExecutor.removeCaAlias(aliasName);
         if(b == false)
         {
-        	return false;
+            return false;
         }
 
         caAliases.remove(aliasName);
@@ -2032,7 +2032,7 @@ implements CAManager, CmpResponderManager
         boolean b = queryExecutor.removeCA(caName);
         if(b == false)
         {
-        	return false;
+            return false;
         }
 
         CAMgmtException exception = null;
@@ -2047,7 +2047,7 @@ implements CAManager, CmpResponderManager
                 dataSource.dropSequence(sequenceName);
             }catch(DataAccessException e)
             {
-                final String message = "Error in dropSequence " + sequenceName;
+                final String message = "error in dropSequence " + sequenceName;
                 if(LOG.isWarnEnabled())
                 {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -2084,7 +2084,7 @@ implements CAManager, CmpResponderManager
         X509CA ca = x509cas.get(caName);
         if(ca == null)
         {
-            throw new CAMgmtException("Cannot find CA named " + caName);
+            throw new CAMgmtException("could not find CA named " + caName);
         }
 
         X509CertWithDBCertId certInfo = ca.getCAInfo().getCertificate();
@@ -2132,13 +2132,13 @@ implements CAManager, CmpResponderManager
             X509CA ca = x509cas.get(name);
             if(ca == null)
             {
-                throw new CAMgmtException("Cannot find CA named " + name);
+                throw new CAMgmtException("could not find CA named " + name);
             }
 
             boolean successfull = ca.republishCertificates(publisherNames);
             if(successfull == false)
             {
-                throw new CAMgmtException("Republishing certificates of CA " + name + " failed");
+                throw new CAMgmtException("republishing certificates of CA " + name + " failed");
             }
         }
 
@@ -2159,7 +2159,7 @@ implements CAManager, CmpResponderManager
             return false;
         }
 
-        LOG.info("Revoking CA '{}'", caName);
+        LOG.info("revoking CA '{}'", caName);
         X509CA ca = x509cas.get(caName);
 
         CertRevocationInfo currentRevInfo = ca.getCAInfo().getRevocationInfo();
@@ -2175,7 +2175,7 @@ implements CAManager, CmpResponderManager
         boolean b = queryExecutor.revokeCa(caName, revocationInfo);
         if(b == false)
         {
-        	return false;
+            return false;
         }
 
         try
@@ -2183,9 +2183,9 @@ implements CAManager, CmpResponderManager
             ca.revoke(revocationInfo);
         } catch (OperationException e)
         {
-            throw new CAMgmtException("Error while revoking CA " + e.getMessage(), e);
+            throw new CAMgmtException("error while revoking CA " + e.getMessage(), e);
         }
-        LOG.info("Revoked CA '{}'", caName);
+        LOG.info("revoked CA '{}'", caName);
         auditLogPCIEvent(true, "REVOKE CA " + caName);
         return true;
     }
@@ -2199,15 +2199,15 @@ implements CAManager, CmpResponderManager
         ParamChecker.assertNotEmpty("caName", caName);
         if(x509cas.containsKey(caName) == false)
         {
-            throw new CAMgmtException("Could not find CA named " + caName);
+            throw new CAMgmtException("could not find CA named " + caName);
         }
 
-        LOG.info("Unrevoking of CA '{}'", caName);
+        LOG.info("unrevoking of CA '{}'", caName);
 
         boolean b =queryExecutor.unrevokeCa(caName);
         if(b == false)
         {
-        	return false;
+            return false;
         }
 
         X509CA ca = x509cas.get(caName);
@@ -2216,9 +2216,9 @@ implements CAManager, CmpResponderManager
             ca.unrevoke();
         } catch (OperationException e)
         {
-            throw new CAMgmtException("Error while unrevoking of CA " + e.getMessage(), e);
+            throw new CAMgmtException("error while unrevoking of CA " + e.getMessage(), e);
         }
-        LOG.info("Unrevoked CA '{}'", caName);
+        LOG.info("unrevoked CA '{}'", caName);
 
         auditLogPCIEvent(true, "UNREVOKE CA " + caName);
         return true;
@@ -2247,9 +2247,9 @@ implements CAManager, CmpResponderManager
                 auditServiceRegister == null ? null : auditServiceRegister.getAuditLoggingService();
         if(auditLoggingService == null)
         {
-        	return;
+            return;
         }
-        
+
         PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());
         auditEvent.setUserId("CA-SYSTEM");
         auditEvent.setEventType(eventType);
@@ -2290,7 +2290,7 @@ implements CAManager, CmpResponderManager
             X509CA ca = x509cas.get(caName);
             if(ca == null)
             {
-                throw new CAMgmtException("Cannot find CA named " + caName);
+                throw new CAMgmtException("could not find CA named " + caName);
             }
             return ca.clearPublishQueue(publisherNames);
         }
@@ -2300,7 +2300,7 @@ implements CAManager, CmpResponderManager
     {
         if(scheduledThreadPoolExecutor == null)
         {
-        	return;
+            return;
         }
 
         scheduledThreadPoolExecutor.shutdown();
@@ -2378,7 +2378,7 @@ implements CAManager, CmpResponderManager
             p10cr = CertificationRequest.getInstance(encodedPkcs10Request);
         }catch(Exception e)
         {
-            throw new CAMgmtException("Invalid PKCS#10 request. ERROR: " + e.getMessage());
+            throw new CAMgmtException("invalid PKCS#10 request. ERROR: " + e.getMessage());
         }
 
         if(securityFactory.verifyPOPO(p10cr) == false)
@@ -2420,7 +2420,7 @@ implements CAManager, CmpResponderManager
         X509CA ca = x509cas.get(caName.toUpperCase());
         if(ca == null)
         {
-            throw new CAMgmtException("Unknown CA " + caName);
+            throw new CAMgmtException("unknown CA " + caName);
         }
         return ca;
     }
@@ -2562,7 +2562,7 @@ implements CAManager, CmpResponderManager
     {
         if(masterMode == false)
         {
-            throw new CAMgmtException("Operation not allowed in slave mode");
+            throw new CAMgmtException("operation not allowed in slave mode");
         }
     }
 

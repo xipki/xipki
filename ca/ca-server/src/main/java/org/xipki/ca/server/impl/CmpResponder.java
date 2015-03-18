@@ -221,16 +221,16 @@ abstract class CmpResponder
                     errorStatus = null;
                     break;
                 case INVALID:
-                    errorStatus = "Request is protected by signature but invalid";
+                    errorStatus = "request is protected by signature but invalid";
                     break;
                 case NOT_SIGNATURE_BASED:
-                    errorStatus = "Request is not protected by signature";
+                    errorStatus = "request is not protected by signature";
                     break;
                 case SENDER_NOT_AUTHORIZED:
-                    errorStatus = "Request is protected by signature but the requestor is not authorized";
+                    errorStatus = "request is protected by signature but the requestor is not authorized";
                     break;
                 default:
-                    throw new RuntimeException("Should not reach here, unknown ProtectionResult " + pr);
+                    throw new RuntimeException("should not reach here, unknown ProtectionResult " + pr);
                 } // end switch
                 requestor = (CmpRequestorInfo) verificationResult.getRequestor();
             } catch (Exception e)
@@ -241,7 +241,7 @@ abstract class CmpResponder
                     LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(), e.getMessage());
                 }
                 LOG.debug(msg, e);
-                errorStatus = "Request has invalid signature based protection";
+                errorStatus = "request has invalid signature based protection";
             }
         }
         else if(tlsClientCert != null)
@@ -265,12 +265,12 @@ abstract class CmpResponder
             {
                 LOG.warn("tid={}: not authorized requestor (TLS client '{}')",
                         tid, SecurityUtil.getRFC4519Name(tlsClientCert.getSubjectX500Principal()));
-                errorStatus = "Requestor (TLS client certificate) is not authorized";
+                errorStatus = "requestor (TLS client certificate) is not authorized";
             }
         }
         else
         {
-            errorStatus = "Request has no protection";
+            errorStatus = "request has no protection";
             requestor = null;
         }
 

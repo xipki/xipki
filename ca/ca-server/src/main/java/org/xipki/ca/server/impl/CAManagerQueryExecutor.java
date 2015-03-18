@@ -139,7 +139,7 @@ class CAManagerQueryExecutor
             dsConnection = dataSource.getConnection();
         } catch (DataAccessException e)
         {
-            throw new CAMgmtException("Could not get connection", e);
+            throw new CAMgmtException("could not get connection", e);
         }
 
         try
@@ -147,7 +147,7 @@ class CAManagerQueryExecutor
             return dataSource.createStatement(dsConnection);
         }catch(DataAccessException e)
         {
-            throw new CAMgmtException("Could not create statement", e);
+            throw new CAMgmtException("could not create statement", e);
         }
     }
 
@@ -166,7 +166,7 @@ class CAManagerQueryExecutor
             dsConnection = dataSource.getConnection();
         } catch (DataAccessException e)
         {
-            throw new CAMgmtException("Could not get connection", e);
+            throw new CAMgmtException("could not get connection", e);
         }
 
         try
@@ -174,7 +174,7 @@ class CAManagerQueryExecutor
             return dataSource.prepareStatement(dsConnection, sql);
         }catch(DataAccessException e)
         {
-            throw new CAMgmtException("Could not get connection", e);
+            throw new CAMgmtException("could not get connection", e);
         }
     }
 
@@ -479,7 +479,7 @@ class CAManagerQueryExecutor
                     return ret;
                 } catch(CertPublisherException | RuntimeException e)
                 {
-                    final String message = "Invalid configuration for the certPublisher " + name;
+                    final String message = "invalid configuration for the certPublisher " + name;
                     if(LOG.isErrorEnabled())
                     {
                         LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -651,7 +651,7 @@ class CAManagerQueryExecutor
             {
                 if(dbEntry != null)
                 {
-                    errorMsg = "More than one CMPResponder is configured, but maximal one is allowed";
+                    errorMsg = "more than one CMPResponder is configured, but maximal one is allowed";
                 }
 
                 dbEntry = new CmpResponderEntry();
@@ -1036,7 +1036,7 @@ class CAManagerQueryExecutor
 
             if(LOG.isInfoEnabled())
             {
-                LOG.info("added CA '{}': {}", name, newCaDbEntry.toString(false, true));
+                LOG.info("add CA '{}': {}", name, newCaDbEntry.toString(false, true));
             }
         }catch(SQLException e)
         {
@@ -1063,7 +1063,7 @@ class CAManagerQueryExecutor
             ps.setString(1, aliasName);
             ps.setString(2, caName);
             ps.executeUpdate();
-            LOG.info("add CA alias '{}' for CA '{}'", aliasName, caName);
+            LOG.info("added CA alias '{}' for CA '{}'", aliasName, caName);
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -1092,7 +1092,7 @@ class CAManagerQueryExecutor
 
             ps.executeUpdate();
 
-            LOG.info("add profile '{}': {}", name, dbEntry);
+            LOG.info("added profile '{}': {}", name, dbEntry);
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -1114,7 +1114,7 @@ class CAManagerQueryExecutor
             ps.setString(1, caName);
             ps.setString(2, profileName);
             ps.executeUpdate();
-            LOG.info("add profile '{}' to CA '{}'", profileName, caName);
+            LOG.info("added profile '{}' to CA '{}'", profileName, caName);
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -1175,7 +1175,7 @@ class CAManagerQueryExecutor
             ps.executeUpdate();
             if(LOG.isInfoEnabled())
             {
-                LOG.info("add requestor '{}': {}", name, dbEntry.toString(false));
+                LOG.info("added requestor '{}': {}", name, dbEntry.toString(false));
             }
         }catch(SQLException e)
         {
@@ -1215,7 +1215,7 @@ class CAManagerQueryExecutor
             ps.setString(idx++, profilesText);
 
             ps.executeUpdate();
-            LOG.info("add requestor '{}' to CA '{}': ra: {}; permission: {}; profile: {}",
+            LOG.info("added requestor '{}' to CA '{}': ra: {}; permission: {}; profile: {}",
                     requestorName, caName, ra, permissionText, profilesText);
         }catch(SQLException e)
         {
@@ -1251,7 +1251,7 @@ class CAManagerQueryExecutor
             ps.setString(idx++, crlControl);
 
             ps.executeUpdate();
-            LOG.info("add CRL signer '{}': {}", name, dbEntry.toString(false, true));
+            LOG.info("added CRL signer '{}': {}", name, dbEntry.toString(false, true));
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -1277,7 +1277,7 @@ class CAManagerQueryExecutor
             ps.setString(1, name);
             ps.setString(2, value);
             ps.executeUpdate();
-            LOG.info("add environment param '{}': {}", name, value);
+            LOG.info("added environment param '{}': {}", name, value);
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -1304,7 +1304,7 @@ class CAManagerQueryExecutor
             ps.setString(3, conf);
 
             ps.executeUpdate();
-            LOG.info("add publisher '{}': {}", name, dbEntry);
+            LOG.info("added publisher '{}': {}", name, dbEntry);
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -1326,7 +1326,7 @@ class CAManagerQueryExecutor
             ps.setString(1, caName);
             ps.setString(2, publisherName);
             ps.executeUpdate();
-            LOG.info("add publisher '{}' to CA '{}'", publisherName, caName);
+            LOG.info("added publisher '{}' to CA '{}'", publisherName, caName);
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -1567,7 +1567,7 @@ class CAManagerQueryExecutor
                 m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
             }
 
-            LOG.info("change profile '{}': {}", name, m);
+            LOG.info("changed profile '{}': {}", name, m);
             return true;
         }catch(SQLException e)
         {
@@ -1648,7 +1648,7 @@ class CAManagerQueryExecutor
                 m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
             }
 
-            LOG.info("change CMP control: {}", m);
+            LOG.info("changed CMP control: {}", m);
             return true;
         }catch(SQLException e)
         {
@@ -1685,7 +1685,7 @@ class CAManagerQueryExecutor
                     subject = "ERROR";
                 }
             }
-            LOG.info("change CMP requestor '{}': {}", name, subject);
+            LOG.info("changed CMP requestor '{}': {}", name, subject);
             return true;
         }catch(SQLException e)
         {
@@ -1763,7 +1763,7 @@ class CAManagerQueryExecutor
             {
                 m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
             }
-            LOG.info("change CMP responder: {}", m);
+            LOG.info("changed CMP responder: {}", m);
             return true;
         }catch(SQLException e)
         {
@@ -1852,7 +1852,7 @@ class CAManagerQueryExecutor
             {
                 m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
             }
-            LOG.info("change CRL signer '{}': {}", name, m);
+            LOG.info("changed CRL signer '{}': {}", name, m);
             return true;
         }catch(SQLException e)
         {
@@ -1876,7 +1876,7 @@ class CAManagerQueryExecutor
             ps.setString(1, getRealString(value));
             ps.setString(2, name);
             ps.executeUpdate();
-            LOG.info("change environment param '{}': {}", name, value);
+            LOG.info("changed environment param '{}': {}", name, value);
             return true;
         }catch(SQLException e)
         {
@@ -1931,7 +1931,7 @@ class CAManagerQueryExecutor
             {
                 m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
             }
-            LOG.info("change publisher '{}': {}", name, m);
+            LOG.info("changed publisher '{}': {}", name, m);
             return true;
         }catch(SQLException e)
         {
@@ -1977,7 +1977,7 @@ class CAManagerQueryExecutor
             boolean b = ps.executeUpdate() > 0;
             if(b)
             {
-                LOG.info("remove CA alias '{}'", aliasName);
+                LOG.info("removed CA alias '{}'", aliasName);
             }
             return b;
         }catch(SQLException e)
@@ -2003,7 +2003,7 @@ class CAManagerQueryExecutor
             boolean b = ps.executeUpdate() > 0;
             if(b)
             {
-                LOG.info("remove profile '{}' from CA '{}'", profileName, caName);
+                LOG.info("removed profile '{}' from CA '{}'", profileName, caName);
             }
             return b;
         }catch(SQLException e)
@@ -2029,7 +2029,7 @@ class CAManagerQueryExecutor
             boolean b = ps.executeUpdate() > 0;
             if(b)
             {
-                LOG.info("remove requestor '{}' from CA '{}'", requestorName, caName);
+                LOG.info("removed requestor '{}' from CA '{}'", requestorName, caName);
             }
             return b;
         }catch(SQLException e)
@@ -2055,7 +2055,7 @@ class CAManagerQueryExecutor
             boolean b = ps.executeUpdate() > 0;
             if(b)
             {
-                LOG.info("remove publisher '{}' from CA '{}'", publisherName, caName);
+                LOG.info("removed publisher '{}' from CA '{}'", publisherName, caName);
             }
             return b;
         }catch(SQLException e)
@@ -2127,7 +2127,7 @@ class CAManagerQueryExecutor
 
             ps.executeUpdate();
 
-            LOG.info("change responder: {}", dbEntry.toString(false, true));
+            LOG.info("changed responder: {}", dbEntry.toString(false, true));
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -2252,7 +2252,7 @@ class CAManagerQueryExecutor
             Permission p = Permission.getPermission(permissionText);
             if(p == null)
             {
-                throw new CAMgmtException("Unknown permission " + permissionText);
+                throw new CAMgmtException("unknown permission " + permissionText);
             }
             if(p == Permission.ALL)
             {

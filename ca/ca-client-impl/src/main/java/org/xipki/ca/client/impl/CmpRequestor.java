@@ -176,7 +176,7 @@ public abstract class CmpRequestor
     {
         if(requestor == null)
         {
-            throw new CmpRequestorException("No request signer is configured");
+            throw new CmpRequestorException("no request signer is configured");
         }
 
         if(responderCert == null)
@@ -189,7 +189,7 @@ public abstract class CmpRequestor
             request = CmpUtil.addProtection(request, requestor, sender, sendRequestorCert);
         } catch (CMPException | NoIdleSignerException e)
         {
-            throw new CmpRequestorException("Could not sign the request", e);
+            throw new CmpRequestorException("could not sign the request", e);
         }
         return request;
     }
@@ -213,7 +213,7 @@ public abstract class CmpRequestor
             encodedRequest = request.getEncoded();
         } catch (IOException e)
         {
-            LOG.error("Error while encode the PKI request {}", request);
+            LOG.error("error while encode the PKI request {}", request);
             throw new CmpRequestorException(e.getMessage(), e);
         }
 
@@ -231,7 +231,7 @@ public abstract class CmpRequestor
             encodedResponse = send(encodedRequest);
         } catch (IOException e)
         {
-            LOG.error("Error while send the PKI request {} to server", request);
+            LOG.error("error while send the PKI request {} to server", request);
             throw new CmpRequestorException("TRANSPORT_ERROR", e);
         }
 
@@ -248,7 +248,7 @@ public abstract class CmpRequestor
         {
             if(LOG.isErrorEnabled())
             {
-                LOG.error("Error while decode the received PKI message: {}", Hex.toHexString(encodedResponse));
+                LOG.error("error while decode the received PKI message: {}", Hex.toHexString(encodedResponse));
             }
             throw new CmpRequestorException(e.getMessage(), e);
         }
@@ -258,7 +258,7 @@ public abstract class CmpRequestor
         GeneralName recipient = respHeader.getRecipient();
         if(sender.equals(recipient) == false)
         {
-            LOG.warn("tid={}: Unknown CMP requestor '{}'", tid, recipient);
+            LOG.warn("tid={}: unknown CMP requestor '{}'", tid, recipient);
         }
 
         PKIResponse ret = new PKIResponse(response);
@@ -280,7 +280,7 @@ public abstract class CmpRequestor
             int bodyType = respBody.getType();
             if(bodyType != PKIBody.TYPE_ERROR)
             {
-                throw new CmpRequestorException("Response is not signed");
+                throw new CmpRequestorException("response is not signed");
             }
         }
 
@@ -309,12 +309,12 @@ public abstract class CmpRequestor
             seq = ASN1Sequence.getInstance(itvValue);
         }catch(IllegalArgumentException e)
         {
-            throw new CmpRequestorException("Invalid syntax of the response");
+            throw new CmpRequestorException("invalid syntax of the response");
         }
         int n = seq.size();
         if(n != 1 && n != 2)
         {
-            throw new CmpRequestorException("Invalid syntax of the response");
+            throw new CmpRequestorException("invalid syntax of the response");
         }
 
         int _action;
@@ -323,12 +323,12 @@ public abstract class CmpRequestor
             _action = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue().intValue();
         }catch(IllegalArgumentException e)
         {
-            throw new CmpRequestorException("Invalid syntax of the response");
+            throw new CmpRequestorException("invalid syntax of the response");
         }
 
         if(action != _action)
         {
-            throw new CmpRequestorException("Received XiPKI action '" + _action +
+            throw new CmpRequestorException("received XiPKI action '" + _action +
                     "' instead the exceptected '" + action  + "'");
         }
 
@@ -354,7 +354,7 @@ public abstract class CmpRequestor
         }
         else if(PKIBody.TYPE_GEN_REP != bodyType)
         {
-            throw new CmpRequestorException("Unknown PKI body type " + bodyType +
+            throw new CmpRequestorException("unknown PKI body type " + bodyType +
                     " instead the exceptected [" + PKIBody.TYPE_GEN_REP  + ", " +
                     PKIBody.TYPE_ERROR + "]");
         }
@@ -376,7 +376,7 @@ public abstract class CmpRequestor
         }
         if(itv == null)
         {
-            throw new CmpRequestorException("The response does not contain InfoTypeAndValue "
+            throw new CmpRequestorException("the response does not contain InfoTypeAndValue "
                     + exepectedType);
         }
 

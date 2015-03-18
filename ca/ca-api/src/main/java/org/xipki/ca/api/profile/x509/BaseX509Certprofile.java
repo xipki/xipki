@@ -269,7 +269,7 @@ extends X509Certprofile
         }
         else if(occurence.isRequired())
         {
-            throw new CertprofileException("Could not add required extension " + type.getId());
+            throw new CertprofileException("could not add required extension " + type.getId());
         }
     }
 
@@ -317,7 +317,7 @@ extends X509Certprofile
                 }
             } else
             {
-                throw new BadCertTemplateException("Only namedCurve or implictCA EC public key is supported");
+                throw new BadCertTemplateException("only namedCurve or implictCA EC public key is supported");
             }
 
             // point encoding
@@ -331,7 +331,7 @@ extends X509Certprofile
                 byte pointEncoding = keyData[0];
                 if(ecOption.getPointEncodings().contains(pointEncoding) == false)
                 {
-                    throw new BadCertTemplateException("Unaccepted EC point encoding " + pointEncoding);
+                    throw new BadCertTemplateException("unaccepted EC point encoding " + pointEncoding);
                 }
             }
 
@@ -345,7 +345,7 @@ extends X509Certprofile
             }catch(Exception e)
             {
                 LOG.debug("populateFromPubKeyInfo", e);
-                throw new BadCertTemplateException("Invalid public key: " + e.getMessage());
+                throw new BadCertTemplateException("invalid public key: " + e.getMessage());
             }
             return publicKey;
         }
@@ -441,13 +441,13 @@ extends X509Certprofile
             }
             if(occu == null)
             {
-                throw new BadCertTemplateException("Subject DN of type " + oidToDisplayName(type) + " is not allowed");
+                throw new BadCertTemplateException("subject DN of type " + oidToDisplayName(type) + " is not allowed");
             }
 
             RDN[] rdns = requestedSubject.getRDNs(type);
             if(rdns.length > occu.getMaxOccurs() || rdns.length < occu.getMinOccurs())
             {
-                throw new BadCertTemplateException("Occurrence of subject DN of type " + oidToDisplayName(type) +
+                throw new BadCertTemplateException("occurrence of subject DN of type " + oidToDisplayName(type) +
                         " not within the allowed range. " + rdns.length +
                         " is not within [" +occu.getMinOccurs() + ", " + occu.getMaxOccurs() + "]");
             }
@@ -472,7 +472,7 @@ extends X509Certprofile
 
             if(present == false)
             {
-                throw new BadCertTemplateException("Requied subject DN of type " +
+                throw new BadCertTemplateException("requied subject DN of type " +
                         oidToDisplayName(occurence.getType()) + " is not present");
             }
         }
@@ -541,7 +541,7 @@ extends X509Certprofile
             {
                 if (encoded.length != (expectedLength + 1))
                 {
-                    throw new BadCertTemplateException("Incorrect length for compressed encoding");
+                    throw new BadCertTemplateException("incorrect length for compressed encoding");
                 }
                 break;
             }
@@ -551,12 +551,12 @@ extends X509Certprofile
             {
                 if (encoded.length != (2 * expectedLength + 1))
                 {
-                    throw new BadCertTemplateException("Incorrect length for uncompressed/hybrid encoding");
+                    throw new BadCertTemplateException("incorrect length for uncompressed/hybrid encoding");
                 }
                 break;
             }
             default:
-                throw new BadCertTemplateException("Invalid point encoding 0x" + Integer.toString(encoded[0], 16));
+                throw new BadCertTemplateException("invalid point encoding 0x" + Integer.toString(encoded[0], 16));
         }
     }
 

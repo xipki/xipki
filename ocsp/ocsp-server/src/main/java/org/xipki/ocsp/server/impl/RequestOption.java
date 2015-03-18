@@ -167,7 +167,7 @@ class RequestOption
                 }
                 else
                 {
-                    throw new ConfigurationException("Hash algorithm " + token + " is unsupported");
+                    throw new ConfigurationException("hash algorithm " + token + " is unsupported");
                 }
             }
         }
@@ -207,7 +207,7 @@ class RequestOption
                 this.trustAnchors = getCerts(certpathConf.getTrustAnchors());
             }catch(Exception e)
             {
-                throw new ConfigurationException("Error while initializing the trustAnchors: " + e.getMessage(), e);
+                throw new ConfigurationException("error while initializing the trustAnchors: " + e.getMessage(), e);
             }
 
             CertCollectionType certsType = certpathConf.getCerts();
@@ -222,7 +222,7 @@ class RequestOption
                     this.certs = getCerts(certsType);
                 }catch(Exception e)
                 {
-                    throw new ConfigurationException("Error while initializing the certs: " + e.getMessage(), e);
+                    throw new ConfigurationException("error while initializing the certs: " + e.getMessage(), e);
                 }
             }
         }

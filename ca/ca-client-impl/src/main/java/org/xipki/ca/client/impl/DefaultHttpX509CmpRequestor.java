@@ -72,7 +72,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor
             this.serverUrl = new URL(serverUrl);
         } catch (MalformedURLException e)
         {
-            throw new IllegalArgumentException("Invalid url: " + serverUrl);
+            throw new IllegalArgumentException("invalid url: " + serverUrl);
         }
     }
 
@@ -90,7 +90,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor
             this.serverUrl = new URL(serverUrl);
         } catch (MalformedURLException e)
         {
-            throw new IllegalArgumentException("Invalid url: " + serverUrl);
+            throw new IllegalArgumentException("invalid url: " + serverUrl);
         }
     }
 
@@ -115,7 +115,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor
         if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK)
         {
             inputStream.close();
-            throw new IOException("Bad Response: "
+            throw new IOException("bad response: "
                     + httpUrlConnection.getResponseCode() + "  "
                     + httpUrlConnection.getResponseMessage());
         }
@@ -131,7 +131,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor
         if (isValidContentType == false)
         {
             inputStream.close();
-            throw new IOException("Bad Response: Mime type "
+            throw new IOException("bad response: mime type "
                     + responseContentType
                     + " not supported!");
         }

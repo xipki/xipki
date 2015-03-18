@@ -158,7 +158,7 @@ class X509SelfSignedCertBuilder
             bcCert = Certificate.getInstance(signer.getCertificate().getEncoded());
         } catch (Exception e)
         {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "Could not reparse certificate: " + e.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "could not reparse certificate: " + e.getMessage());
         }
         SubjectPublicKeyInfo publicKeyInfo = bcCert.getSubjectPublicKeyInfo();
 
@@ -300,13 +300,15 @@ class X509SelfSignedCertBuilder
     {
         ExtensionValues extensionTuples = profile.getExtensions(requestedSubject, extensions, requestedPublicKeyInfo,
                 publicCaInfo, null);
-        if(extensionTuples != null)
+        if(extensionTuples == null)
         {
-            for(ASN1ObjectIdentifier extType : extensionTuples.getExtensionTypes())
-            {
-                ExtensionValue extValue = extensionTuples.getExtensionValue(extType);
-                certBuilder.addExtension(extType, extValue.isCritical(), extValue.getValue());
-            }
+            return;
+        }
+
+        for(ASN1ObjectIdentifier extType : extensionTuples.getExtensionTypes())
+        {
+            ExtensionValue extValue = extensionTuples.getExtensionValue(extType);
+            certBuilder.addExtension(extType, extValue.isCritical(), extValue.getValue());
         }
     }
 

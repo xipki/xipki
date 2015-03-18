@@ -100,7 +100,7 @@ public class AuditLoggingServiceRegisterImpl implements AuditLoggingServiceRegis
             }
         } catch (Exception e)
         {
-            LOG.debug("Caught Exception({}). service is probably destroyed.", e.getMessage());
+            LOG.debug("caught Exception({}). service is probably destroyed.", e.getMessage());
         }
     }
 

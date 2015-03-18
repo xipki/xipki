@@ -130,7 +130,7 @@ class X509CAInfo
         if(greatestSerialNumber == null)
         {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    "Could not retrieve the greatest serial number for ca " + caEntry.getName());
+                    "could not retrieve the greatest serial number for ca " + caEntry.getName());
         }
 
         long nextSerial = greatestSerialNumber + 1;
@@ -141,7 +141,7 @@ class X509CAInfo
 
         if(caEntry.getNextSerial() < nextSerial)
         {
-            LOG.info("Corrected the next_serial of {} from {} to {}",
+            LOG.info("corrected the next_serial of {} from {} to {}",
                     new Object[]{caEntry.getName(), caEntry.getNextSerial(), nextSerial});
             caEntry.setNextSerial(nextSerial);
             certStore.commitNextSerialIfLess(getName(), nextSerial);
@@ -454,14 +454,14 @@ class X509CAInfo
         {
             switch(permission)
             {
-                case REMOVE_CERT:
-                case UNREVOKE_CERT:
-                case REVOKE_CERT:
-                    break;
-                default:
-                    signerRequired = true;
-                    break;
-            }
+            case REMOVE_CERT:
+            case UNREVOKE_CERT:
+            case REVOKE_CERT:
+                break;
+            default:
+                signerRequired = true;
+                break;
+            } // end switch(permission)
 
             if(signerRequired)
             {

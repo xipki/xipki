@@ -78,7 +78,7 @@ public class FilePasswordCallback implements PasswordCallback
             }
         }catch(IOException e)
         {
-            throw new PasswordResolverException("Could not read file " + passwordFile, e);
+            throw new PasswordResolverException("could not read file " + passwordFile, e);
         }finally
         {
             if(reader != null)
@@ -94,7 +94,7 @@ public class FilePasswordCallback implements PasswordCallback
 
         if(passwordHint == null)
         {
-            throw new PasswordResolverException("No password is specified in file " + passwordFile);
+            throw new PasswordResolverException("no password is specified in file " + passwordFile);
         }
 
         if(StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordResolver.__OBFUSCATE))
