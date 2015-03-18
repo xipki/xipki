@@ -97,7 +97,7 @@ public class P11ContentSignerBuilder
 
         if(keyExists == false)
         {
-            throw new SignerException("Key with " + keyId + " does not exist");
+            throw new SignerException("key with " + keyId + " does not exist");
         }
 
         this.cryptService = cryptService;
@@ -175,7 +175,7 @@ public class P11ContentSignerBuilder
                 }
                 else
                 {
-                    throw new OperatorCreationException("Unsupported key " + publicKey.getClass().getName());
+                    throw new OperatorCreationException("unsupported key " + publicKey.getClass().getName());
                 }
                 signers.add(signer);
             }
@@ -190,7 +190,7 @@ public class P11ContentSignerBuilder
             privateKey = new P11PrivateKey(cryptService, slot, keyId);
         } catch (InvalidKeyException e)
         {
-            throw new OperatorCreationException("Could not construct P11PrivateKey: " + e.getMessage(), e);
+            throw new OperatorCreationException("could not construct P11PrivateKey: " + e.getMessage(), e);
         }
 
         DefaultConcurrentContentSigner concurrentSigner = new DefaultConcurrentContentSigner(signers, privateKey);

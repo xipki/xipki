@@ -94,7 +94,7 @@ public class HashCalculator
         ParamChecker.assertNotNull("data", data);
         if(mdsMap.containsKey(hashAlgoType) == false)
         {
-            throw new IllegalArgumentException("Unknown hash algo " + hashAlgoType);
+            throw new IllegalArgumentException("unknown hash algo " + hashAlgoType);
         }
 
         BlockingDeque<MessageDigest> mds = mdsMap.get(hashAlgoType);
@@ -113,7 +113,7 @@ public class HashCalculator
 
         if(md == null)
         {
-            throw new RuntimeOperatorException("Could not get idle MessageDigest");
+            throw new RuntimeOperatorException("could not get idle MessageDigest");
         }
 
         try

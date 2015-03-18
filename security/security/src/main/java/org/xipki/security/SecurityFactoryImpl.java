@@ -281,12 +281,12 @@ public class SecurityFactoryImpl implements SecurityFactory
                     parallelism = Integer.parseInt(s);
                 }catch(NumberFormatException e)
                 {
-                    throw new SignerException("Invalid parallelism " + s);
+                    throw new SignerException("invalid parallelism " + s);
                 }
 
                 if(parallelism < 1)
                 {
-                    throw new SignerException("Invalid parallelism " + s);
+                    throw new SignerException("invalid parallelism " + s);
                 }
             }
 
@@ -306,7 +306,7 @@ public class SecurityFactoryImpl implements SecurityFactory
 
                 if((slotIndex == null && slotId == null) || (slotIndex != null && slotId != null))
                 {
-                    throw new SignerException("Exactly one of slot (index) and slot-id must be specified");
+                    throw new SignerException("exactly one of slot (index) and slot-id must be specified");
                 }
                 P11SlotIdentifier slot = new P11SlotIdentifier(slotIndex, slotId);
 
@@ -320,7 +320,7 @@ public class SecurityFactoryImpl implements SecurityFactory
 
                 if((keyId == null && keyLabel == null) || (keyId != null && keyLabel != null))
                 {
-                    throw new SignerException("Exactly one of key-id and key-label must be specified");
+                    throw new SignerException("exactly one of key-id and key-label must be specified");
                 }
 
                 P11KeyIdentifier keyIdentifier;
@@ -385,7 +385,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                             password = passwordResolver.resolvePassword(passwordHint);
                         }catch(PasswordResolverException e)
                         {
-                            throw new SignerException("Could not resolve password. Message: " + e.getMessage());
+                            throw new SignerException("could not resolve password. Message: " + e.getMessage());
                         }
                     }
                 }
@@ -407,12 +407,12 @@ public class SecurityFactoryImpl implements SecurityFactory
                         keystoreStream = new FileInputStream(IoUtil.expandFilepath(fn));
                     } catch (FileNotFoundException e)
                     {
-                        throw new SignerException("File not found: " + fn);
+                        throw new SignerException("file not found: " + fn);
                     }
                 }
                 else
                 {
-                    throw new SignerException("Unknown keystore content format");
+                    throw new SignerException("unknown keystore content format");
                 }
 
                 SoftTokenContentSignerBuilder signerBuilder = new SoftTokenContentSignerBuilder(
@@ -609,7 +609,7 @@ public class SecurityFactoryImpl implements SecurityFactory
             }
             else
             {
-                throw new SignerException("Unsupported signature algorithm " + algoS);
+                throw new SignerException("unsupported signature algorithm " + algoS);
             }
 
             signatureAlgId = withNullParam ? new AlgorithmIdentifier(algOid, DERNull.INSTANCE) :
@@ -661,7 +661,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                 }
                 else
                 {
-                    throw new RuntimeException("Unsupported hash algorithm " + hashAlgo);
+                    throw new RuntimeException("unsupported hash algorithm " + hashAlgo);
                 }
 
                 signatureAlgId = new AlgorithmIdentifier(sigAlgoOid, DERNull.INSTANCE);
@@ -692,7 +692,7 @@ public class SecurityFactoryImpl implements SecurityFactory
             }
             else
             {
-                throw new RuntimeException("Unsupported hash algorithm " + hashAlgo);
+                throw new RuntimeException("unsupported hash algorithm " + hashAlgo);
             }
 
             signatureAlgId = new AlgorithmIdentifier(sigAlgoOid);
@@ -722,14 +722,14 @@ public class SecurityFactoryImpl implements SecurityFactory
             }
             else
             {
-                throw new RuntimeException("Unsupported hash algorithm " + hashAlgo);
+                throw new RuntimeException("unsupported hash algorithm " + hashAlgo);
             }
 
             signatureAlgId = new AlgorithmIdentifier(sigAlgoOid);
         }
         else
         {
-            throw new SignerException("Unsupported key type " + pubKey.getClass().getName());
+            throw new SignerException("unsupported key type " + pubKey.getClass().getName());
         }
 
         return signatureAlgId;
@@ -956,7 +956,7 @@ public class SecurityFactoryImpl implements SecurityFactory
 
         if(p11CryptServiciceFactoryInitialized)
         {
-            throw new SignerException("Initialization of P11CryptServiceFactory has been processed and failed, no retry");
+            throw new SignerException("initialization of P11CryptServiceFactory has been processed and failed, no retry");
         }
 
         try
@@ -1041,7 +1041,7 @@ public class SecurityFactoryImpl implements SecurityFactory
 
                 if(confs.containsKey(name))
                 {
-                    throw new ConfigurationException("Multiple modules with the same module name is not permitted");
+                    throw new ConfigurationException("multiple modules with the same module name is not permitted");
                 }
 
                 P11PasswordRetriever pwdRetriever;
@@ -1096,7 +1096,7 @@ public class SecurityFactoryImpl implements SecurityFactory
 
                 if(nativeLibraryPath == null)
                 {
-                    throw new ConfigurationException("Could not find PKCS#11 library for OS " + osName);
+                    throw new ConfigurationException("could not find PKCS#11 library for OS " + osName);
                 }
 
                 P11ModuleConf conf = new P11ModuleConf(name,
@@ -1107,13 +1107,13 @@ public class SecurityFactoryImpl implements SecurityFactory
             final String defaultModuleName = modulesType.getDefaultModule();
             if(confs.containsKey(defaultModuleName) == false)
             {
-                throw new ConfigurationException("Default module " + defaultModuleName + " is not defined");
+                throw new ConfigurationException("default module " + defaultModuleName + " is not defined");
             }
 
             this.p11Control = new P11Control(defaultModuleName, new HashSet<>(confs.values()));
         } catch (JAXBException | SAXException | ConfigurationException e)
         {
-            final String message = "Invalid configuration file " + pkcs11ConfFile;
+            final String message = "invalid configuration file " + pkcs11ConfFile;
             if(LOG.isErrorEnabled())
             {
                 final String exceptionMessage;

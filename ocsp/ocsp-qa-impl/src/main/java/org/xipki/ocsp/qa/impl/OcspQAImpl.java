@@ -117,7 +117,7 @@ public class OcspQAImpl implements OcspQA
 
         // Response status
         {
-            ValidationIssue issue = new ValidationIssue("OCSP.STATUS", "Response.status");
+            ValidationIssue issue = new ValidationIssue("OCSP.STATUS", "response.status");
             resultIssues.add(issue);
             if(expectedOcspError != null)
             {
@@ -164,7 +164,7 @@ public class OcspQAImpl implements OcspQA
             int n = singleResponses == null ? 0 : singleResponses.length;
             if(n == 0)
             {
-                issue.setFailureMessage("Received no status from server");
+                issue.setFailureMessage("received no status from server");
             }
             else if(n != serialNumbers.size())
             {
@@ -186,7 +186,7 @@ public class OcspQAImpl implements OcspQA
                 resultIssues.add(issue);
                 if(hasSignature == false)
                 {
-                    issue.setFailureMessage("Response is not signed");
+                    issue.setFailureMessage("response is not signed");
                 }
             }
 
@@ -221,7 +221,7 @@ public class OcspQAImpl implements OcspQA
                 if(responderCerts == null || responderCerts.length < 1)
                 {
                     sigSignerCertIssue.setFailureMessage("No responder certificate is contained in the response");
-                    sigValIssue.setFailureMessage("Could not find certificate to validate signature");
+                    sigValIssue.setFailureMessage("could not find certificate to validate signature");
                 }
                 else
                 {
@@ -235,7 +235,7 @@ public class OcspQAImpl implements OcspQA
                         SingleResp singleResp = singleResponses[i];
                         if(respSigner.isValidOn(singleResp.getThisUpdate()) == false)
                         {
-                            issue.setFailureMessage("Responder certificate is not valid on the thisUpdate[ " + i + "]" +
+                            issue.setFailureMessage("responder certificate is not valid on the thisUpdate[ " + i + "]" +
                                     singleResp.getThisUpdate());
                         }
                     }
@@ -255,11 +255,11 @@ public class OcspQAImpl implements OcspQA
                                 }
                                 else
                                 {
-                                    issue.setFailureMessage("Responder signer is not trusted");
+                                    issue.setFailureMessage("responder signer is not trusted");
                                 }
                             }catch(Exception e)
                             {
-                                issue.setFailureMessage("Responder signer is not trusted");
+                                issue.setFailureMessage("responder signer is not trusted");
                             }
                         }
                     }
@@ -395,7 +395,7 @@ public class OcspQAImpl implements OcspQA
             }
             else
             {
-                issue.setFailureMessage("Unknown certstatus: " + singleCertStatus.getClass().getName());
+                issue.setFailureMessage("unknown certstatus: " + singleCertStatus.getClass().getName());
             }
 
             if(issue.isFailed() == false && expectedStatus != status)

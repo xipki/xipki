@@ -149,12 +149,12 @@ public class OcspLoadTest extends AbstractLoadTest
             int n = singleResponses == null ? 0 : singleResponses.length;
             if(n == 0)
             {
-                LOG.warn("Received no status from server");
+                LOG.warn("received no status from server");
                 return false;
             }
             else if(n != 1)
             {
-                LOG.warn("Received status with {} single responses from server, but 1 was requested", n);
+                LOG.warn("received status with {} single responses from server, but 1 was requested", n);
                 return false;
             }
             else
@@ -165,7 +165,7 @@ public class OcspLoadTest extends AbstractLoadTest
                 String status ;
                 if(singleCertStatus == null)
                 {
-                    status = "Good";
+                    status = "good";
                 }
                 else if(singleCertStatus instanceof RevokedStatus)
                 {
@@ -175,24 +175,24 @@ public class OcspLoadTest extends AbstractLoadTest
                     if(revStatus.hasRevocationReason())
                     {
                         int reason = revStatus.getRevocationReason();
-                        status = "Revoked, reason = "+ reason + ", revocationTime = " + revTime;
+                        status = "revoked, reason = "+ reason + ", revocationTime = " + revTime;
                     }
                     else
                     {
-                        status = "Revoked, no reason, revocationTime = " + revTime;
+                        status = "revoked, no reason, revocationTime = " + revTime;
                     }
                 }
                 else if(singleCertStatus instanceof UnknownStatus)
                 {
-                    status = "Unknown";
+                    status = "unknown";
                 }
                 else
                 {
-                    LOG.warn("Status: ERROR");
+                    LOG.warn("status: ERROR");
                     return false;
                 }
 
-                LOG.info("SN: {}, Status: {}", sn, status);
+                LOG.info("SN: {}, status: {}", sn, status);
                 return true;
             }
         }

@@ -59,7 +59,7 @@ public class SshdBcBugfix
             clazz = Class.forName(classname_SecurityUtils);
         }catch(ClassNotFoundException e)
         {
-            LOG.info("Could not find class " + classname_SecurityUtils);
+            LOG.info("could not find class " + classname_SecurityUtils);
             return;
         }
 
@@ -88,7 +88,7 @@ public class SshdBcBugfix
             Class<?>[] params)
     {
         Method serviceMethod = null;
-        final String desc = "Method " + clz.getName() + "." + methodName;
+        final String desc = "method " + clz.getName() + "." + methodName;
 
         try
         {
@@ -104,8 +104,8 @@ public class SshdBcBugfix
             return serviceMethod;
         } catch (SecurityException | NoSuchMethodException e)
         {
-            LOG.warn("Could not get " + desc + ", {}: {}", e.getClass().getName(), e.getMessage());
-            LOG.debug("Could not get " + desc, e);
+            LOG.warn("could not get " + desc + ", {}: {}", e.getClass().getName(), e.getMessage());
+            LOG.debug("could not get " + desc, e);
         }
 
         return null;

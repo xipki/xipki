@@ -49,6 +49,8 @@ import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.util.KeyUtil;
 
 /**
+ * Copied from BouncyCastle under license MIT
+ *
  * A provider representation for a RSA private key, with CRT factors included.
  * @author Lijun Liao
  */

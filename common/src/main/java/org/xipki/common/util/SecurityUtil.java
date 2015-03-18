@@ -752,7 +752,7 @@ public class SecurityUtil
             return ASN1OctetString.getInstance(encodedSkiValue.getParsedValue()).getOctets();
         } catch (IllegalArgumentException e)
         {
-            throw new CertificateEncodingException("Invalid extension SubjectKeyIdentifier: " + e.getMessage());
+            throw new CertificateEncodingException("invalid extension SubjectKeyIdentifier: " + e.getMessage());
         }
     }
 
@@ -771,7 +771,7 @@ public class SecurityUtil
             return aki.getKeyIdentifier();
         } catch (IllegalArgumentException e)
         {
-            throw new CertificateEncodingException("Invalid extension AuthorityKeyIdentifier: " + e.getMessage());
+            throw new CertificateEncodingException("invalid extension AuthorityKeyIdentifier: " + e.getMessage());
         }
     }
 
@@ -821,7 +821,7 @@ public class SecurityUtil
             return aki == null ? null : aki.getKeyIdentifier();
         } catch (IllegalArgumentException e)
         {
-            throw new CertificateEncodingException("Invalid extension AuthorityKeyIdentifier: " + e.getMessage());
+            throw new CertificateEncodingException("invalid extension AuthorityKeyIdentifier: " + e.getMessage());
         }
     }
 
@@ -839,7 +839,7 @@ public class SecurityUtil
             }
             catch (IOException e)
             {
-                throw new IllegalArgumentException("Other value has no encoded form");
+                throw new IllegalArgumentException("other value has no encoded form");
             }
         }
     }
@@ -1009,7 +1009,7 @@ public class SecurityUtil
             return ASN1OctetString.getInstance(fullExtValue).getOctets();
         } catch (IllegalArgumentException e)
         {
-            throw new CertificateEncodingException("Invalid extension " + type.getId() + ": " + e.getMessage());
+            throw new CertificateEncodingException("invalid extension " + type.getId() + ": " + e.getMessage());
         }
     }
 

@@ -461,7 +461,7 @@ public class XmlX509CertprofileUtil
             ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
             if(controls.containsKey(oid))
             {
-                throw new CertprofileException("Duplicated definition of extension " + oid.getId());
+                throw new CertprofileException("duplicated definition of extension " + oid.getId());
             }
             controls.put(oid, new ExtensionControl(m.isCritical(), m.isRequired(), m.isPermittedInRequest()));
         }
@@ -572,7 +572,7 @@ public class XmlX509CertprofileUtil
                 value = parser.readObject();
             } catch (IOException e)
             {
-                throw new CertprofileException("Could not parse the constant extension value", e);
+                throw new CertprofileException("could not parse the constant extension value", e);
             }
             ExtensionValue extension = new ExtensionValue(m.isCritical(), value);
             map.put(new ASN1ObjectIdentifier(m.getType().getValue()), extension);

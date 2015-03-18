@@ -303,7 +303,7 @@ public abstract class KeyEntry
                 curveOid = P12KeypairGenerator.ECDSAIdentityGenerator.getCurveOID(curveName);
                 if(curveOid == null)
                 {
-                    throw new IllegalArgumentException("No OID is defined for the curve " + curveName);
+                    throw new IllegalArgumentException("no OID is defined for the curve " + curveName);
                 }
             }
             algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey,

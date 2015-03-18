@@ -101,7 +101,7 @@ public class P11PrivateKey implements PrivateKey
         }
         else
         {
-            throw new InvalidKeyException("Unknown public key: " + publicKey);
+            throw new InvalidKeyException("unknown public key: " + publicKey);
         }
     }
 
@@ -133,7 +133,7 @@ public class P11PrivateKey implements PrivateKey
     {
         if("RSA".equals(algorithm) == false)
         {
-            throw new SignatureException("Could not compute RSA signature with " + algorithm + " key");
+            throw new SignatureException("could not compute RSA signature with " + algorithm + " key");
         }
 
         try
@@ -150,7 +150,7 @@ public class P11PrivateKey implements PrivateKey
     {
         if("RSA".equals(algorithm) == false)
         {
-            throw new SignatureException("Could not compute RSA signature with " + algorithm + " key");
+            throw new SignatureException("could not compute RSA signature with " + algorithm + " key");
         }
 
         try
@@ -167,7 +167,7 @@ public class P11PrivateKey implements PrivateKey
     {
         if("EC".equals(algorithm) == false)
         {
-            throw new SignatureException("Could not compute ECDSA signature with " + algorithm + " key");
+            throw new SignatureException("could not compute ECDSA signature with " + algorithm + " key");
         }
 
         try
@@ -184,7 +184,7 @@ public class P11PrivateKey implements PrivateKey
     {
         if("DSA".equals(algorithm) == false)
         {
-            throw new SignatureException("Could not compute DSA signature with " + algorithm + " key");
+            throw new SignatureException("could not compute DSA signature with " + algorithm + " key");
         }
 
         try

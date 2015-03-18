@@ -45,9 +45,7 @@ public enum Occurrence
     optional,
     forbidden;
 
-    public static final String occurencesText = "required, optional and forbidden";
-
-    public static Occurrence getOccurrence(String name)
+    public static Occurrence getInstance(String name)
     {
         for(Occurrence entry : values())
         {
@@ -57,7 +55,7 @@ public enum Occurrence
             }
         }
 
-        throw new IllegalArgumentException("Unknown Occurrence '" + name + "'");
+        return null;
     }
 
 }

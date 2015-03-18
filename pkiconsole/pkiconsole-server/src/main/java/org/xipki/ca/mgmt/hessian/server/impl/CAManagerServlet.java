@@ -815,7 +815,7 @@ implements HessianCAManager
             throw new HessianCAMgmtException(e.getMessage());
         } catch (CertificateEncodingException e)
         {
-            throw new HessianCAMgmtException("Could not encode generated certificate: " + e.getMessage());
+            throw new HessianCAMgmtException("could not encode generated certificate: " + e.getMessage());
         }
     }
 
@@ -943,7 +943,7 @@ implements HessianCAManager
             }
         }catch(Exception e)
         {
-            final String message = "Could not initialize CAManagerServlet";
+            final String message = "could not initialize CAManagerServlet";
             if(LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());

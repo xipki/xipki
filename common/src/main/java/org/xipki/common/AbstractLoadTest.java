@@ -69,14 +69,14 @@ public abstract class AbstractLoadTest
                 runnable = getTestor();
             } catch (Exception e)
             {
-                System.err.println("Cannot initialize Testor\nError message: " + e.getMessage());
+                System.err.println("could not initialize Testor\nError message: " + e.getMessage());
                 return;
             }
 
             runnables.add(runnable);
         }
 
-        System.out.println("Testing using " + threads + " threads.");
+        System.out.println("testing using " + threads + " threads.");
         resetStartTime();
 
         ExecutorService executor = Executors.newFixedThreadPool(threads);
@@ -237,10 +237,10 @@ public abstract class AbstractLoadTest
     {
         StringBuilder sb = new StringBuilder();
         long ms = (System.currentTimeMillis() - startTime);
-        sb.append("\nFinished in " + formatTime(ms/1000) + "\n");
-        sb.append("Account: " + account.get() + " " + unit + "\n");
-        sb.append(" Failed: " + errorAccount.get() + " " + unit + "\n");
-        sb.append("Average: " + (account.get() * 1000 / ms) + " " + unit + "/s\n");
+        sb.append("\nfinished in " + formatTime(ms/1000) + "\n");
+        sb.append("account: " + account.get() + " " + unit + "\n");
+        sb.append(" failed: " + errorAccount.get() + " " + unit + "\n");
+        sb.append("average: " + (account.get() * 1000 / ms) + " " + unit + "/s\n");
         System.out.println(sb.toString());
     }
 

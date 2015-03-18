@@ -79,7 +79,7 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
             _serverUrl = new URL(serverUrl);
         } catch (MalformedURLException e)
         {
-            throw new IllegalArgumentException("Invalid url: " + serverUrl);
+            throw new IllegalArgumentException("invalid url: " + serverUrl);
         }
     }
 
@@ -127,7 +127,7 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
             }
             if (isValidContentType == false)
             {
-                throw new IOException("Bad Response: Mime type "
+                throw new IOException("bad response: mime type "
                         + responseContentType
                         + " not supported!");
             }

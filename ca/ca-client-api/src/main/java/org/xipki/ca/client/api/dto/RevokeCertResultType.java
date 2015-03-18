@@ -59,7 +59,7 @@ public class RevokeCertResultType
 
         if((resultEntry instanceof RevokeCertResultEntryType || resultEntry instanceof ErrorResultEntryType) == false)
         {
-            throw new IllegalArgumentException("Unaccepted parameter of class " + resultEntry.getClass().getName());
+            throw new IllegalArgumentException("unaccepted parameter of class " + resultEntry.getClass().getName());
         }
 
         if(resultEntries == null)

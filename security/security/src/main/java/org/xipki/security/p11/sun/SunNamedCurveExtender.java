@@ -107,8 +107,8 @@ public class SunNamedCurveExtender
             class_NamedCurve = Class.forName(classname_NamedCurve);
         }catch(ClassNotFoundException e)
         {
-            LOG.warn("Could not load class {}", classname_NamedCurve);
-            LOG.debug("Could not load class " + classname_NamedCurve, e);
+            LOG.warn("could not load class {}", classname_NamedCurve);
+            LOG.debug("could not load class " + classname_NamedCurve, e);
             successfull = false;
         }
 
@@ -164,7 +164,7 @@ public class SunNamedCurveExtender
         {
             if(successfull == false)
             {
-                LOG.warn("Could not initialize");
+                LOG.warn("could not initialize");
                 return;
             }
 
@@ -187,7 +187,7 @@ public class SunNamedCurveExtender
 
             }catch(Throwable t)
             {
-                final String message = "Uncatched Error";
+                final String message = "uncatched Error";
                 if(LOG.isErrorEnabled())
                 {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
@@ -229,7 +229,7 @@ public class SunNamedCurveExtender
             field_SPLIT_PATTERN.set(null, SPLIT_PATTERN);
         } catch (IllegalArgumentException | IllegalAccessException e)
         {
-            final String message = "Could not set Field SPLIT_PATTERN";
+            final String message = "could not set Field SPLIT_PATTERN";
             if(LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -249,7 +249,7 @@ public class SunNamedCurveExtender
 
             if(curveId == null)
             {
-                LOG.info("Cound not find curve OID for curve {}, ignore it", curveName);
+                LOG.info("cound not find curve OID for curve {}, ignore it", curveName);
                 continue;
             }
 
@@ -285,12 +285,12 @@ public class SunNamedCurveExtender
                 }
                 else
                 {
-                    LOG.warn("Could not add {}", curveDesc);
+                    LOG.warn("could not add {}", curveDesc);
                 }
             }
             else
             {
-                LOG.info("Unknown curve type {}", curve.getClass().getName());
+                LOG.info("unknown curve type {}", curve.getClass().getName());
             }
         }
 
@@ -299,7 +299,7 @@ public class SunNamedCurveExtender
             field_SPLIT_PATTERN.set(null, null);
         } catch (IllegalArgumentException | IllegalAccessException e)
         {
-            final String message = "Could not set Field SPLIT_PATTERN";
+            final String message = "could not set Field SPLIT_PATTERN";
             if(LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -355,7 +355,7 @@ public class SunNamedCurveExtender
             ASN1ObjectIdentifier curveId = getCurveId(curveName);
             if(curveId == null)
             {
-                LOG.debug("Cound not find curve OID for curve {}, ignore it", curveName);
+                LOG.debug("cound not find curve OID for curve {}, ignore it", curveName);
                 continue;
             }
 
@@ -390,12 +390,12 @@ public class SunNamedCurveExtender
                 }
                 else
                 {
-                    LOG.warn("Could not add {}", curveDesc);
+                    LOG.warn("could not add {}", curveDesc);
                 }
             }
             else
             {
-                LOG.info("Unknown curve type {}", curve.getClass().getName());
+                LOG.info("unknown curve type {}", curve.getClass().getName());
             }
         }
 
@@ -407,7 +407,7 @@ public class SunNamedCurveExtender
             field_specCollection.set(null, namedCurves);
         } catch (IllegalArgumentException | IllegalAccessException | ClassCastException e)
         {
-            final String message = "Could not update change the value of field CurveDB.specCollection.";
+            final String message = "could not update change the value of field CurveDB.specCollection.";
             if(LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -496,7 +496,7 @@ public class SunNamedCurveExtender
             Class<?>[] params)
     {
         Method serviceMethod = null;
-        final String desc = "Method " + clz.getName() + "." + methodName;
+        final String desc = "method " + clz.getName() + "." + methodName;
 
         try
         {
@@ -512,7 +512,7 @@ public class SunNamedCurveExtender
             return serviceMethod;
         } catch (SecurityException | NoSuchMethodException e)
         {
-            final String message = "Could not get " + desc;
+            final String message = "could not get " + desc;
             if(LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -535,7 +535,7 @@ public class SunNamedCurveExtender
             return field;
         } catch (NoSuchFieldException e)
         {
-            final String message = "Could not get " + desc;
+            final String message = "could not get " + desc;
             if(LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -604,7 +604,7 @@ public class SunNamedCurveExtender
 
     private static void logAddedCurves(Map<String, String> addedCurves)
     {
-        StringBuilder sb = new StringBuilder("The following named curves are added to the SUN's list of named curves:\n");
+        StringBuilder sb = new StringBuilder("the following named curves are added to the SUN's list of named curves:\n");
 
         Set<String> tmp = addedCurves.keySet();
         List<String> names = new ArrayList<>(tmp);

@@ -234,7 +234,7 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
             return;
         }
 
-        LOG.info("Initializing: {}", SyslogAuditLoggingServiceImpl.class);
+        LOG.info("initializing: {}", SyslogAuditLoggingServiceImpl.class);
 
         try
         {
@@ -332,7 +332,7 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
 
     public void destroy()
     {
-        LOG.info("Destroying: {}", SyslogAuditLoggingServiceImpl.class);
+        LOG.info("destroying: {}", SyslogAuditLoggingServiceImpl.class);
         try
         {
             if (syslog != null)
@@ -341,7 +341,7 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
                 syslog.getConfig().removeAllMessageModifiers();
                 syslog.shutdown();
             }
-            LOG.info("Destroyed: {}", SyslogAuditLoggingServiceImpl.class);
+            LOG.info("destroyed: {}", SyslogAuditLoggingServiceImpl.class);
         }
         catch (SyslogRuntimeException sre)
         {

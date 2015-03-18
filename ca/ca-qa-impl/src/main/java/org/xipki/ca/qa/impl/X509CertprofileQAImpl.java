@@ -1080,7 +1080,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 }
             } else
             {
-                throw new BadCertTemplateException("Only namedCurve or implictCA EC public key is supported");
+                throw new BadCertTemplateException("only namedCurve or implictCA EC public key is supported");
             }
 
             // point encoding
@@ -1094,7 +1094,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 byte pointEncoding = keyData[0];
                 if(ecOption.getPointEncodings().contains(pointEncoding) == false)
                 {
-                    throw new BadCertTemplateException("Unaccepted EC point encoding " + pointEncoding);
+                    throw new BadCertTemplateException("unaccepted EC point encoding " + pointEncoding);
                 }
             }
 
@@ -1107,7 +1107,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             }catch(Exception e)
             {
                 LOG.debug("populateFromPubKeyInfo", e);
-                throw new BadCertTemplateException("Invalid public key: " + e.getMessage());
+                throw new BadCertTemplateException("invalid public key: " + e.getMessage());
             }
 
             return;
@@ -1192,7 +1192,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         {
             if (encoded.length != (expectedLength + 1))
             {
-                throw new BadCertTemplateException("Incorrect length for compressed encoding");
+                throw new BadCertTemplateException("incorrect length for compressed encoding");
             }
             break;
         }
@@ -1202,12 +1202,12 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         {
             if (encoded.length != (2 * expectedLength + 1))
             {
-                throw new BadCertTemplateException("Incorrect length for uncompressed/hybrid encoding");
+                throw new BadCertTemplateException("incorrect length for uncompressed/hybrid encoding");
             }
             break;
         }
         default:
-            throw new BadCertTemplateException("Invalid point encoding 0x" + Integer.toString(encoded[0], 16));
+            throw new BadCertTemplateException("invalid point encoding 0x" + Integer.toString(encoded[0], 16));
         }// end switch
     }
 
@@ -1314,7 +1314,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             AttributeTypeAndValue[] atvs = rdn.getTypesAndValues();
             if(atvs.length > 1)
             {
-                failureMsg.append("Size of RDN + [" + i + "] is '" + atvs.length + "' but expected '1'");
+                failureMsg.append("size of RDN + [" + i + "] is '" + atvs.length + "' but expected '1'");
                 failureMsg.append("; ");
                 continue;
             }
@@ -1665,7 +1665,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         int eSize = expectedSubtrees == null ? 0 : expectedSubtrees.size();
         if(iSize != eSize)
         {
-            failureMsg.append("Size of " + description + " is '" + iSize + "' but expected '" + eSize + "'");
+            failureMsg.append("size of " + description + " is '" + iSize + "' but expected '" + eSize + "'");
             failureMsg.append("; ");
             return;
         }
@@ -1854,14 +1854,14 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         Set<String> diffs = str_in_b_not_in_a(expectedUsages, isUsages);
         if(CollectionUtil.isNotEmpty(diffs))
         {
-            failureMsg.append("Usages " + diffs.toString() + " are present but not expected");
+            failureMsg.append("usages " + diffs.toString() + " are present but not expected");
             failureMsg.append("; ");
         }
 
         diffs = str_in_b_not_in_a(isUsages, expectedUsages);
         if(CollectionUtil.isNotEmpty(diffs))
         {
-            failureMsg.append("Usages " + diffs.toString() + " are absent but are required");
+            failureMsg.append("usages " + diffs.toString() + " are absent but are required");
             failureMsg.append("; ");
         }
     }
@@ -1924,14 +1924,14 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         Set<String> diffs = str_in_b_not_in_a(expectedUsages, isUsages);
         if(CollectionUtil.isNotEmpty(diffs))
         {
-            failureMsg.append("Usages " + diffs.toString() + " are present but not expected");
+            failureMsg.append("usages " + diffs.toString() + " are present but not expected");
             failureMsg.append("; ");
         }
 
         diffs = str_in_b_not_in_a(isUsages, expectedUsages);
         if(CollectionUtil.isNotEmpty(diffs))
         {
-            failureMsg.append("Usages " + diffs.toString() + " are absent but are required");
+            failureMsg.append("usages " + diffs.toString() + " are absent but are required");
             failureMsg.append("; ");
         }
     }
@@ -2338,7 +2338,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         int n = iOCSPAccessDescriptions.size();
         if(n != eOCSPUris.size())
         {
-            failureMsg.append("Number of AIA OCSP URIs is '").append(n);
+            failureMsg.append("number of AIA OCSP URIs is '").append(n);
             failureMsg.append("' but expected is '").append(eOCSPUris.size()).append("'");
             failureMsg.append("; ");
             return;
@@ -2350,7 +2350,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             GeneralName iAccessLocation = iOCSPAccessDescriptions.get(i).getAccessLocation();
             if(iAccessLocation.getTagNo() != GeneralName.uniformResourceIdentifier)
             {
-                failureMsg.append("Tag of accessLocation of AIA OCSP is '").append(iAccessLocation.getTagNo());
+                failureMsg.append("tag of accessLocation of AIA OCSP is '").append(iAccessLocation.getTagNo());
                 failureMsg.append("' but expected is '").append(GeneralName.uniformResourceIdentifier).append("'");
                 failureMsg.append("; ");
             }
@@ -2384,7 +2384,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         int n = iDistributionPoints == null ? 0 : iDistributionPoints.length;
         if(n != 1)
         {
-            failureMsg.append("Size of CRLDistributionPoints is '").append(n).append("' but expected is '1'");
+            failureMsg.append("size of CRLDistributionPoints is '").append(n).append("' but expected is '1'");
             failureMsg.append("; ");
             return;
         }
@@ -2395,7 +2395,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             int asn1Type = entry.getDistributionPoint().getType();
             if(asn1Type != DistributionPointName.FULL_NAME)
             {
-                failureMsg.append("Tag of DistributionPointName of CRLDistibutionPoints is '").append(asn1Type);
+                failureMsg.append("tag of DistributionPointName of CRLDistibutionPoints is '").append(asn1Type);
                 failureMsg.append("' but expected is '").append(DistributionPointName.FULL_NAME).append("'");
                 failureMsg.append("; ");
                 continue;
@@ -2409,7 +2409,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 GeneralName name = names[i];
                 if(name.getTagNo() != GeneralName.uniformResourceIdentifier)
                 {
-                    failureMsg.append("Tag of CRL URL is '").append(name.getTagNo());
+                    failureMsg.append("tag of CRL URL is '").append(name.getTagNo());
                     failureMsg.append("' but expected is '").append(GeneralName.uniformResourceIdentifier).append("'");
                     failureMsg.append("; ");
                 }
@@ -2445,7 +2445,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         int n = iDistributionPoints == null ? 0 : iDistributionPoints.length;
         if(n != 1)
         {
-            failureMsg.append("Size of CRLDistributionPoints (deltaCRL) is '").append(n).append("' but expected is '1'");
+            failureMsg.append("size of CRLDistributionPoints (deltaCRL) is '").append(n).append("' but expected is '1'");
             failureMsg.append("; ");
             return;
         }
@@ -2456,7 +2456,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             int asn1Type = entry.getDistributionPoint().getType();
             if(asn1Type != DistributionPointName.FULL_NAME)
             {
-                failureMsg.append("Tag of DistributionPointName of CRLDistibutionPoints (deltaCRL) is '").append(asn1Type);
+                failureMsg.append("tag of DistributionPointName of CRLDistibutionPoints (deltaCRL) is '").append(asn1Type);
                 failureMsg.append("' but expected is '").append(DistributionPointName.FULL_NAME).append("'");
                 failureMsg.append("; ");
                 continue;
@@ -2470,7 +2470,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 GeneralName name = names[i];
                 if(name.getTagNo() != GeneralName.uniformResourceIdentifier)
                 {
-                    failureMsg.append("Tag of deltaCRL URL is '").append(name.getTagNo());
+                    failureMsg.append("tag of deltaCRL URL is '").append(name.getTagNo());
                     failureMsg.append("' but expected is '").append(GeneralName.uniformResourceIdentifier).append("'");
                     failureMsg.append("; ");
                 }
@@ -2520,7 +2520,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         int n = iAdmissions == null ? 0 : iAdmissions.length;
         if(n != 1)
         {
-            failureMsg.append("Size of Admissions is '").append(n).append("' but expected is '1'");
+            failureMsg.append("size of Admissions is '").append(n).append("' but expected is '1'");
             failureMsg.append("; ");
             return;
         }
@@ -2530,7 +2530,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         n = iProfessionInfos == null ? 0 : iProfessionInfos.length;
         if(n != 1)
         {
-            failureMsg.append("Size of ProfessionInfo is '").append(n).append("' but expected is '1'");
+            failureMsg.append("size of ProfessionInfo is '").append(n).append("' but expected is '1'");
             failureMsg.append("; ");
             return;
         }
@@ -2870,7 +2870,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             }
         }
 
-        throw new RuntimeException("Should not reach here: undefined extension " + type.getId());
+        throw new RuntimeException("should not reach here: undefined extension " + type.getId());
     }
 
     public static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(
@@ -2899,7 +2899,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 parser.readObject();
             } catch (IOException e)
             {
-                throw new CertprofileException("Could not parse the constant extension value", e);
+                throw new CertprofileException("could not parse the constant extension value", e);
             }
             QaExtensionValue extension = new QaExtensionValue(m.isCritical(), encodedValue);
             map.put(new ASN1ObjectIdentifier(m.getType().getValue()), extension);

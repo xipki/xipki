@@ -73,14 +73,14 @@ class IaikP11Identity extends P11Identity
     {
         if(publicKey instanceof RSAPublicKey == false)
         {
-            throw new SignerException("Operation CKM_RSA_PKCS is not allowed for " +
+            throw new SignerException("operation CKM_RSA_PKCS is not allowed for " +
                     publicKey.getAlgorithm() + " public key");
         }
 
         IaikP11Slot slot = module.getSlot(slotId);
         if(slot == null)
         {
-            throw new SignerException("Could not find slot " + slotId);
+            throw new SignerException("could not find slot " + slotId);
         }
 
         return slot.CKM_RSA_PKCS(encodedDigestInfo, keyId);
@@ -92,14 +92,14 @@ class IaikP11Identity extends P11Identity
     {
         if(publicKey instanceof RSAPublicKey == false)
         {
-            throw new SignerException("Operation CKM_RSA_X509 is not allowed for " +
+            throw new SignerException("operation CKM_RSA_X509 is not allowed for " +
                     publicKey.getAlgorithm() + " public key");
         }
 
         IaikP11Slot slot = module.getSlot(slotId);
         if(slot == null)
         {
-            throw new SignerException("Could not find slot " + slotId);
+            throw new SignerException("could not find slot " + slotId);
         }
 
         return slot.CKM_RSA_X509(hash, keyId);
@@ -111,13 +111,13 @@ class IaikP11Identity extends P11Identity
     {
         if(publicKey instanceof ECPublicKey == false)
         {
-            throw new SignerException("Operation CKM_ECDSA is not allowed for " + publicKey.getAlgorithm() + " public key");
+            throw new SignerException("operation CKM_ECDSA is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
 
         IaikP11Slot slot = module.getSlot(slotId);
         if(slot == null)
         {
-            throw new SignerException("Could not find slot " + slotId);
+            throw new SignerException("could not find slot " + slotId);
         }
 
         byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);
@@ -132,13 +132,13 @@ class IaikP11Identity extends P11Identity
     {
         if(publicKey instanceof DSAPublicKey == false)
         {
-            throw new SignerException("Operation CKM_DSA is not allowed for " + publicKey.getAlgorithm() + " public key");
+            throw new SignerException("operation CKM_DSA is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
 
         IaikP11Slot slot = module.getSlot(slotId);
         if(slot == null)
         {
-            throw new SignerException("Could not find slot " + slotId);
+            throw new SignerException("could not find slot " + slotId);
         }
         byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);
         byte[] signature = slot.CKM_DSA(truncatedDigest, keyId);

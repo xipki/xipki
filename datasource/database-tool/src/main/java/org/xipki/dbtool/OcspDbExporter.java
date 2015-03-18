@@ -140,7 +140,7 @@ public class OcspDbExporter
                 LOG.error("dataSource.shutdown()", e);
             }
             long end = System.currentTimeMillis();
-            System.out.println("Finished in " + AbstractLoadTest.formatTime((end - start) / 1000).trim());
+            System.out.println("inished in " + AbstractLoadTest.formatTime((end - start) / 1000).trim());
         }
     }
 

@@ -238,12 +238,12 @@ public final class RAWorkerImpl implements RAWorker
                 {
                     ca.setCertprofiles(caInfo.getCertprofiles());
                 }
-                LOG.info("Retrieved CAInfo for CA " + name);
+                LOG.info("retrieved CAInfo for CA " + name);
             } catch(Throwable t)
             {
                 errorCANames.add(name);
                 caNamesWithError.add(name);
-                final String message = "Could not retrieve CAInfo for CA " + name;
+                final String message = "could not retrieve CAInfo for CA " + name;
                 if(LOG.isWarnEnabled())
                 {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
@@ -277,7 +277,7 @@ public final class RAWorkerImpl implements RAWorker
         File configFile = new File(IoUtil.expandFilepath(confFile));
         if(configFile.exists() == false)
         {
-            throw new FileNotFoundException("Cound not find configuration file " + confFile);
+            throw new FileNotFoundException("cound not find configuration file " + confFile);
         }
 
         CAClientType config = parse(new FileInputStream(configFile));
@@ -295,7 +295,7 @@ public final class RAWorkerImpl implements RAWorker
 
         if(numActiveCAs == 0)
         {
-            LOG.warn("No active CA is configured");
+            LOG.warn("no active CA is configured");
         }
 
         Boolean b = config.isDevMode();
@@ -311,7 +311,7 @@ public final class RAWorkerImpl implements RAWorker
                 cert = SecurityUtil.parseCert(readData(m.getCert()));
             } catch (CertificateException e)
             {
-                final String message = "Could not configure responder " + m.getName();
+                final String message = "could not configure responder " + m.getName();
                 if(LOG.isWarnEnabled())
                 {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -342,7 +342,7 @@ public final class RAWorkerImpl implements RAWorker
                 X509Certificate responder = responders.get(caType.getResponder());
                 if(responder == null)
                 {
-                    throw new ConfigurationException("No responder named " + caType.getResponder() + " is configured");
+                    throw new ConfigurationException("no responder named " + caType.getResponder() + " is configured");
                 }
                 CAConf ca = new CAConf(caName, caType.getUrl(), caType.getHealthUrl(), caType.getRequestor(), responder);
 
@@ -390,7 +390,7 @@ public final class RAWorkerImpl implements RAWorker
                 configuredCaNames.add(caName);
             }catch(IOException | CertificateException e)
             {
-                final String message = "Could not configure CA " + caName;
+                final String message = "could not configure CA " + caName;
                 if(LOG.isWarnEnabled())
                 {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -443,10 +443,10 @@ public final class RAWorkerImpl implements RAWorker
             {
                 if(requestorConf.isSignRequest())
                 {
-                    throw new ConfigurationException("Signer of requestor must be configured");
+                    throw new ConfigurationException("signer of requestor must be configured");
                 } else if(requestorCert == null)
                 {
-                    throw new ConfigurationException("At least one of certificate and signer of requestor must be configured");
+                    throw new ConfigurationException("at least one of certificate and signer of requestor must be configured");
                 }
             }
         }
@@ -480,7 +480,7 @@ public final class RAWorkerImpl implements RAWorker
             }
             else
             {
-                throw new ConfigurationException("Could not find requestor named " + requestorName +
+                throw new ConfigurationException("could not find requestor named " + requestorName +
                         " for CA " + ca.getName());
             }
 
@@ -505,7 +505,7 @@ public final class RAWorkerImpl implements RAWorker
             }
 
             Set<String> caNames = casMap.keySet();
-            StringBuilder sb = new StringBuilder("Configuring CAs ");
+            StringBuilder sb = new StringBuilder("configuring CAs ");
             sb.append(caNames);
 
             LOG.info(sb.toString());
@@ -513,7 +513,7 @@ public final class RAWorkerImpl implements RAWorker
 
             if(CollectionUtil.isNotEmpty(caNames))
             {
-                final String msg = "Could not configured following CAs " + caNames;
+                final String msg = "could not configured following CAs " + caNames;
                 if(devMode)
                 {
                     LOG.warn(msg);
@@ -649,7 +649,7 @@ public final class RAWorkerImpl implements RAWorker
             caName = getCANameForProfile(profile);
             if(caName == null)
             {
-                throw new RAWorkerException("Certprofile " + profile + " is not supported by any CA");
+                throw new RAWorkerException("cert profile " + profile + " is not supported by any CA");
             }
         }
 
@@ -715,7 +715,7 @@ public final class RAWorkerImpl implements RAWorker
                 }
                 else
                 {
-                    throw new RAWorkerException("Certificate profile " + certprofile +
+                    throw new RAWorkerException("cert profile " + certprofile +
                             " supported by more than one CA, please specify the CA name.");
                 }
             }
@@ -723,7 +723,7 @@ public final class RAWorkerImpl implements RAWorker
 
         if(caName == null)
         {
-            throw new RAWorkerException("Unsupported certificate profile " + certprofile);
+            throw new RAWorkerException("unsupported cert profile " + certprofile);
         }
     }
 
@@ -770,7 +770,7 @@ public final class RAWorkerImpl implements RAWorker
             {
                 throw new PKIErrorException(
                         PKIStatus.REJECTION, PKIFailureInfo.badRequest,
-                        "Revoking certificates issued by more than one CA is not allowed");
+                        "revoking certificates issued by more than one CA is not allowed");
             }
         }
 
@@ -833,7 +833,7 @@ public final class RAWorkerImpl implements RAWorker
 
         if(casMap.containsKey(caName) == false)
         {
-            throw new IllegalArgumentException("Unknown CAConf " + caName);
+            throw new IllegalArgumentException("unknown CAConf " + caName);
         }
 
         X509CmpRequestor requestor = casMap.get(caName).getRequestor();
@@ -864,7 +864,7 @@ public final class RAWorkerImpl implements RAWorker
 
         if(casMap.containsKey(caName) == false)
         {
-            throw new IllegalArgumentException("Unknown CAConf " + caName);
+            throw new IllegalArgumentException("unknown CAConf " + caName);
         }
 
         X509CmpRequestor requestor = casMap.get(caName).getRequestor();
@@ -885,7 +885,7 @@ public final class RAWorkerImpl implements RAWorker
 
         if(issuer == null )
         {
-            throw new RAWorkerException("Invalid issuer");
+            throw new RAWorkerException("invalid issuer");
         }
 
         for(String name : casMap.keySet())
@@ -902,7 +902,7 @@ public final class RAWorkerImpl implements RAWorker
             }
         }
 
-        throw new RAWorkerException("Unknown CA for issuer: " + issuer);
+        throw new RAWorkerException("unknown CA for issuer: " + issuer);
     }
 
     private String getCANameForProfile(String certprofile)
@@ -924,7 +924,7 @@ public final class RAWorkerImpl implements RAWorker
                 }
                 else
                 {
-                    throw new RAWorkerException("Certificate profile " + certprofile +
+                    throw new RAWorkerException("cert profile " + certprofile +
                             " supported by more than one CA, please specify the CA name.");
                 }
             }
@@ -967,7 +967,7 @@ public final class RAWorkerImpl implements RAWorker
             caName = getCANameForProfile(profileName);
             if(caName == null)
             {
-                throw new RAWorkerException("Certprofile " + profileName + " is not supported by any CA");
+                throw new RAWorkerException("cert profile " + profileName + " is not supported by any CA");
             }
         }
         else
@@ -1049,13 +1049,13 @@ public final class RAWorkerImpl implements RAWorker
                         verifier.update(tbs);
                         boolean sigValid = verifier.verify(signatureValue);
 
-                        LOG.info("Use {} to verify {} signature", provider, sigAlgName);
+                        LOG.info("use {} to verify {} signature", provider, sigAlgName);
                         tryXipkiNSStoVerify = Boolean.TRUE;
                         tryXipkiNSStoVerifyMap.put(_caCert, tryXipkiNSStoVerify);
                         return sigValid;
                     }catch(Exception e)
                     {
-                        LOG.info("Could not use {} to verify {} signature", provider, sigAlgName);
+                        LOG.info("could not use {} to verify {} signature", provider, sigAlgName);
                         tryXipkiNSStoVerify = Boolean.FALSE;
                         tryXipkiNSStoVerifyMap.put(_caCert, tryXipkiNSStoVerify);
                     }
@@ -1157,7 +1157,7 @@ public final class RAWorkerImpl implements RAWorker
             {
                 throw new PKIErrorException(
                         PKIStatus.REJECTION, PKIFailureInfo.badRequest,
-                        "Unrevoking certificates issued by more than one CA is not allowed");
+                        "unrevoking certificates issued by more than one CA is not allowed");
             }
         }
 
@@ -1216,7 +1216,7 @@ public final class RAWorkerImpl implements RAWorker
             {
                 throw new PKIErrorException(
                         PKIStatus.REJECTION, PKIFailureInfo.badRequest,
-                        "Removing certificates issued by more than one CA is not allowed");
+                        "removing certificates issued by more than one CA is not allowed");
             }
         }
 
@@ -1266,7 +1266,7 @@ public final class RAWorkerImpl implements RAWorker
 
         if(casMap.containsKey(caName) == false)
         {
-            throw new IllegalArgumentException("Unknown CAConf " + caName);
+            throw new IllegalArgumentException("unknown CAConf " + caName);
         }
 
         X509CmpRequestor requestor = casMap.get(caName).getRequestor();
@@ -1287,7 +1287,7 @@ public final class RAWorkerImpl implements RAWorker
 
         if(casMap.containsKey(caName) == false)
         {
-            throw new IllegalArgumentException("Unknown CAConf " + caName);
+            throw new IllegalArgumentException("unknown CAConf " + caName);
         }
 
         String healthUrlStr = casMap.get(caName).getHealthUrl();
@@ -1312,7 +1312,7 @@ public final class RAWorkerImpl implements RAWorker
             if (responseCode != HttpURLConnection.HTTP_OK && responseCode != HttpURLConnection.HTTP_INTERNAL_ERROR)
             {
                 inputStream.close();
-                throw new IOException("Bad Response: "
+                throw new IOException("bad response: "
                         + httpUrlConnection.getResponseCode() + "  "
                         + httpUrlConnection.getResponseMessage());
             }
@@ -1329,7 +1329,7 @@ public final class RAWorkerImpl implements RAWorker
             if (isValidContentType == false)
             {
                 inputStream.close();
-                throw new IOException("Bad Response: Mime type " + responseContentType + " not supported!");
+                throw new IOException("bad response: mime type " + responseContentType + " not supported!");
             }
 
             byte[] responseBytes = IoUtil.read(inputStream);
@@ -1460,7 +1460,7 @@ public final class RAWorkerImpl implements RAWorker
                 caPubs.add(getCertificate(cmpCaPub));
             } catch (CertificateException e)
             {
-                final String message = "Could not extract the caPub from CMPCertificate";
+                final String message = "could not extract the caPub from CMPCertificate";
                 if(LOG.isErrorEnabled())
                 {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -1508,7 +1508,7 @@ public final class RAWorkerImpl implements RAWorker
 
             if(verify(caCert, cert) == false)
             {
-                LOG.warn("Not all certificates are issued by CA embedded in caPubs, ignore the caPubs");
+                LOG.warn("not all certificates are issued by CA embedded in caPubs, ignore the caPubs");
                 return new EnrollCertResult(null, certOrErrors);
             }
         }

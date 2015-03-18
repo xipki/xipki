@@ -58,7 +58,7 @@ public class XipkiCmpConstants
             new GeneralName(GeneralName.uniformResourceIdentifier, "http://xipki.org/remotep11/client");
 
     public static final int ACTION_GEN_CRL = 1;
-    public static final int ACTION_GET_CRL = 2;
+    public static final int ACTION_GET_CRL_WITH_SN = 2;
     public static final int ACTION_GET_CAINFO = 3;
     public static final int ACTION_REMOVE_EXPIRED_CERTS = 4;
     public static final int ACTION_REMOTEP11_VERSION = 80;

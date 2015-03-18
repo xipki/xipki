@@ -162,7 +162,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                     ret = rs.getLong(1);
                 } else
                 {
-                    throw new DataAccessException("Could not increment the sequence " + sequenceName);
+                    throw new DataAccessException("could not increment the sequence " + sequenceName);
                 }
             }catch(SQLException e)
             {
@@ -602,8 +602,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             {
                 e = (SQLException) cause;
             }
-            LOG.error("Could not create connection to database {}", e.getMessage());
-            LOG.debug("Could not create connection to database", e);
+            LOG.error("could not create connection to database {}", e.getMessage());
+            LOG.debug("could not create connection to database", e);
             throw translate(null, e);
         }
     }
@@ -626,8 +626,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             {
                 e = (SQLException) cause;
             }
-            LOG.error("Could not create connection to database {}", e.getMessage());
-            LOG.debug("Could not create connection to database", e);
+            LOG.error("could not create connection to database {}", e.getMessage());
+            LOG.debug("could not create connection to database", e);
         }
     }
 
@@ -639,8 +639,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             service.shutdown();
         } catch (Exception e)
         {
-            LOG.warn("Could not shutdown datasource: {}", e.getMessage());
-            LOG.debug("Could not close datasource", e);
+            LOG.warn("could not shutdown datasource: {}", e.getMessage());
+            LOG.debug("could not close datasource", e);
         }
     }
 
@@ -686,7 +686,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 rs.close();
             }catch(Throwable t)
             {
-                LOG.warn("Cannot close ResultSet", t);
+                LOG.warn("could not close ResultSet", t);
             }
         }
 
@@ -705,7 +705,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 ps.close();
             }catch(Throwable t)
             {
-                LOG.warn("Cannot close statement", t);
+                LOG.warn("could not close statement", t);
             }finally
             {
                 if(conn != null)
@@ -725,7 +725,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 rs.close();
             }catch(Throwable t)
             {
-                LOG.warn("Cannot close ResultSet", t);
+                LOG.warn("could not close ResultSet", t);
             }
         }
 
@@ -736,7 +736,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 ps.close();
             }catch(Throwable t)
             {
-                LOG.warn("Cannot close statement", t);
+                LOG.warn("could not close statement", t);
             }
         }
     }
@@ -1076,7 +1076,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                         }
                     } else
                     {
-                        throw new DataAccessException("Could not increment the sequence " + sequenceName);
+                        throw new DataAccessException("could not increment the sequence " + sequenceName);
                     }
                 }finally
                 {

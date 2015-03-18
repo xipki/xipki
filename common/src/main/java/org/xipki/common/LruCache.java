@@ -99,7 +99,7 @@ public class LruCache<K, V>
     /**
      * Returns the value for {@code key} if it exists in the cache or can be
      * created by {@code #create}. If a value was returned, it is moved to the
-     * head of the queue. This returns null if a value is not cached and cannot
+     * head of the queue. This returns null if a value is not cached and could not
      * be created.
      */
     public final V get(K key)

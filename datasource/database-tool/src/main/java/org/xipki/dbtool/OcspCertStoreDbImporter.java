@@ -117,14 +117,14 @@ class OcspCertStoreDbImporter extends DbPorter
         {
             if(processLogFile.exists() == false)
             {
-                throw new Exception("Could not process with '-resume' option");
+                throw new Exception("could not process with '-resume' option");
             }
         }
         else
         {
             if(processLogFile.exists())
             {
-                throw new Exception("Please either specify '-resume' option or delete the file " +
+                throw new Exception("please either specify '-resume' option or delete the file " +
                         processLogFile.getPath() + " first");
             }
         }
@@ -148,11 +148,11 @@ class OcspCertStoreDbImporter extends DbPorter
 
         if(certstore.getVersion() > VERSION)
         {
-            throw new Exception("Cannot import CertStore greater than " + VERSION + ": " + certstore.getVersion());
+            throw new Exception("could not import CertStore greater than " + VERSION + ": " + certstore.getVersion());
         }
 
         File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
-        System.out.println("Importing OCSP certstore to database");
+        System.out.println("importing OCSP certstore to database");
         try
         {
             if(resume == false)
@@ -163,16 +163,16 @@ class OcspCertStoreDbImporter extends DbPorter
             processLogFile.delete();
         }catch(Exception e)
         {
-            System.err.println("Error while importing OCSP certstore to database");
+            System.err.println("error while importing OCSP certstore to database");
             throw e;
         }
-        System.out.println(" Imported OCSP certstore to database");
+        System.out.println(" imported OCSP certstore to database");
     }
 
     private void import_issuer(Issuers issuers)
     throws DataAccessException, CertificateException
     {
-        System.out.println("Importing table ISSUER");
+        System.out.println("importing table ISSUER");
         PreparedStatement ps = prepareStatement(SQL_ADD_CAINFO);
 
         try
@@ -230,11 +230,11 @@ class OcspCertStoreDbImporter extends DbPorter
                     ps.execute();
                 }catch(SQLException e)
                 {
-                    System.err.println("Error while importing issuer with id=" + issuer.getId());
+                    System.err.println("error while importing issuer with id=" + issuer.getId());
                     throw translate(SQL_ADD_CAINFO, e);
                 }catch(CertificateException e)
                 {
-                    System.err.println("Error while importing issuer with id=" + issuer.getId());
+                    System.err.println("error while importing issuer with id=" + issuer.getId());
                     throw e;
                 }
             }
@@ -242,7 +242,7 @@ class OcspCertStoreDbImporter extends DbPorter
         {
             releaseResources(ps, null);
         }
-        System.out.println(" Imported table ISSUER");
+        System.out.println(" imported table ISSUER");
     }
 
     private void import_cert(CertsFiles certsfiles, File processLogFile)
@@ -273,7 +273,7 @@ class OcspCertStoreDbImporter extends DbPorter
         final long startTime = System.currentTimeMillis();
         int sum = 0;
 
-        System.out.println("Importing certificates from ID " + minId);
+        System.out.println("importing certificates from ID " + minId);
         printHeader();
 
         PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
@@ -298,8 +298,8 @@ class OcspCertStoreDbImporter extends DbPorter
                     }
                 }catch(Exception e)
                 {
-                    System.err.println("\nError while importing certificates from file " + certsFile +
-                            ".\nPlease continue with the option '-resume'");
+                    System.err.println("\nerror while importing certificates from file " + certsFile +
+                            ".\nplease continue with the option '-resume'");
                     LOG.error("Exception", e);
                     throw e;
                 }
@@ -317,7 +317,7 @@ class OcspCertStoreDbImporter extends DbPorter
 
         printTrailer();
         echoToFile(MSG_CERTS_FINISHED, processLogFile);
-        System.out.println("Processed " + sum + " certificates");
+        System.out.println("processed " + sum + " certificates");
     }
 
     private int[] do_import_cert(PreparedStatement ps_cert,
