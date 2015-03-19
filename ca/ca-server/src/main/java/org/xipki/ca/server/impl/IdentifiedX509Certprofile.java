@@ -616,6 +616,7 @@ class IdentifiedX509Certprofile
             values.addExtension(extType, extControl.isCritical(), extValue);
             neededExtensionTypes.remove(extType);
             wantedExtensionTypes.remove(extType);
+            return;
         }
 
         if(extControl.isRequired() == false)

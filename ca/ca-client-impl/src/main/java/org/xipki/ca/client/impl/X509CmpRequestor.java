@@ -143,8 +143,6 @@ import org.xml.sax.SAXException;
 
 abstract class X509CmpRequestor extends CmpRequestor
 {
-    public static final int XiPKI_CRL_REASON_REMOVE = 101;
-
     private final static DigestCalculatorProvider digesetCalculatorProvider = new BcDigestCalculatorProvider();
     private static final BigInteger MINUS_ONE = BigInteger.valueOf(-1);
 
@@ -311,7 +309,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             RequestResponseDebug debug)
     throws CmpRequestorException, PKIErrorException
     {
-        PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request, XiPKI_CRL_REASON_REMOVE);
+        PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request, XipkiCmpConstants.CRL_REASON_REMOVE);
         PKIResponse response = signAndSend(reqMessage, debug);
         return parse(response, request.getRequestEntries());
     }
