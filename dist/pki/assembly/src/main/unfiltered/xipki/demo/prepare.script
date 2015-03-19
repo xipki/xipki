@@ -20,45 +20,45 @@ xipki-ca:restart
 #                       PREPARE ENVIRONMENET                    #
 #################################################################
 
-xipki-ca:env-add -name certprofileType.map -value \
+xipki-ca:env-add --name certprofileType.map --value \
  "DemoEE1?java:org.xipki.certprofile.demo.x509.DemoEE1X509Certprofile%DemoEE2?java:org.xipki.certprofile.demo.x509.DemoEE2X509Certprofile%"
 
 ## CMP control: messageTimeBias is set to 300 seconds.
-xipki-ca:cmpcontrol-add -name cmpcontrol1 --msgTimeBias 300 --sendCaCert yes
+xipki-ca:cmpcontrol-add --name cmpcontrol1 --message-time-bias 300 --send-ca yes
 
 ## Certificate Profiles
-xipki-ca:profile-add -name RCA-Cross -type XML -confFile xipki/demo/profile/Certprofile_RootCA_Cross.xml
+xipki-ca:profile-add --name RCA-Cross --type XML --conf-file xipki/demo/profile/Certprofile_RootCA_Cross.xml
 
-xipki-ca:profile-add -name SubCA -type XML -confFile xipki/demo/profile/Certprofile_SubCA.xml
+xipki-ca:profile-add --name SubCA --type XML --conf-file xipki/demo/profile/Certprofile_SubCA.xml
 
-xipki-ca:profile-add -name SubCA.Complex -type XML -confFile xipki/demo/profile/Certprofile_SubCA_Complex.xml
+xipki-ca:profile-add --name SubCA.Complex --type XML --conf-file xipki/demo/profile/Certprofile_SubCA_Complex.xml
 
-xipki-ca:profile-add -name OCSP -type XML -confFile xipki/demo/profile/Certprofile_OCSP.xml
+xipki-ca:profile-add --name OCSP --type XML --conf-file xipki/demo/profile/Certprofile_OCSP.xml
 
-xipki-ca:profile-add -name multipleOUs -type XML -confFile xipki/demo/profile/Certprofile_multipleOUs.xml
+xipki-ca:profile-add --name multipleOUs --type XML --conf-file xipki/demo/profile/Certprofile_multipleOUs.xml
 
-xipki-ca:profile-add -name TLS -type XML -confFile xipki/demo/profile/Certprofile_TLS.xml
+xipki-ca:profile-add --name TLS --type XML --conf-file xipki/demo/profile/Certprofile_TLS.xml
 
-xipki-ca:profile-add -name TLS_C -type XML -confFile xipki/demo/profile/Certprofile_TLS_C.xml
+xipki-ca:profile-add --name TLS_C --type XML --conf-file xipki/demo/profile/Certprofile_TLS_C.xml
 
-xipki-ca:profile-add -name TLSwithIncSN -type XML -confFile xipki/demo/profile/Certprofile_TLSwithIncSN.xml
+xipki-ca:profile-add --name TLSwithIncSN --type XML --conf-file xipki/demo/profile/Certprofile_TLSwithIncSN.xml
 
-xipki-ca:profile-add -name gSMC_K -type XML -confFile xipki/demo/profile/Certprofile_gSMC_K.xml
+xipki-ca:profile-add --name gSMC_K --type XML --conf-file xipki/demo/profile/Certprofile_gSMC_K.xml
 
-xipki-ca:profile-add -name DEMO -type DemoEE1
+xipki-ca:profile-add --name DEMO --type DemoEE1
 
 ## Publishers
-xipki-ca:publisher-add -name OCSP.PUBLISHER -type OCSP \
-  -conf datasource?ocsp%publish.goodcerts?true
+xipki-ca:publisher-add --name OCSP.PUBLISHER --type OCSP \
+  --conf  datasource?ocsp%publish.goodcerts?true
 
 # CMP Responder
-xipki-ca:responder-set -signerType JKS \
-  -signerConf password?1234%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?SHA256withRSA
+xipki-ca:responder-set --signer-type  JKS \
+  --signer-conf  password?1234%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?SHA256withRSA
 
 # CMP Requestors
-xipki-ca:requestor-add -cert etc/tlskeys/tls-client.der -name requestor
+xipki-ca:requestor-add --cert etc/tlskeys/tls-client.der --name requestor
 
 ## CRL Signer
 # Generate CRL every day at 02:00 UTC with 90 minutes overlap time
-xipki-ca:crlsigner-add -signerType CA -name CASIGN.CRLSIGNER \
-  -crlControl updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?02:00%
+xipki-ca:crlsigner-add --signer-type  CA --name CASIGN.CRLSIGNER \
+  --crl-control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?02:00%
