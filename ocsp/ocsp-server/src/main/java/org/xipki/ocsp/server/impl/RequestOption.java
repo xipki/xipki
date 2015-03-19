@@ -192,16 +192,17 @@ class RequestOption
         {
             switch(certpathConf.getValidationModel())
             {
-                case CHAIN:
-                    certpathValidationModel = CertpathValidationModel.CHAIN;
-                    break;
-                case PKIX:
-                    certpathValidationModel = CertpathValidationModel.PKIX;
-                    break;
-                default:
-                    throw new RuntimeException("should not reach here, unknown ValidaitonModel " +
-                            certpathConf.getValidationModel());
-            }
+            case CHAIN:
+                certpathValidationModel = CertpathValidationModel.CHAIN;
+                break;
+            case PKIX:
+                certpathValidationModel = CertpathValidationModel.PKIX;
+                break;
+            default:
+                throw new RuntimeException("should not reach here, unknown ValidaitonModel " +
+                        certpathConf.getValidationModel());
+            } // end switch
+
             try
             {
                 this.trustAnchors = getCerts(certpathConf.getTrustAnchors());

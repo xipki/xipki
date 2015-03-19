@@ -98,16 +98,13 @@ public class DbCertStatusStore extends CertStatusStore
             {
                 return issuer.getRevocationInfo() == null;
             }
-            else
-            {
-                if(issuer.getRevocationInfo() == null)
-                {
-                    return false;
-                }
 
-                return revocationTimeMs == issuer.getRevocationInfo().getRevocationTime().getTime();
+            if(issuer.getRevocationInfo() == null)
+            {
+                return false;
             }
 
+            return revocationTimeMs == issuer.getRevocationInfo().getRevocationTime().getTime();
         }
     }
 
@@ -413,7 +410,7 @@ public class DbCertStatusStore extends CertStatusStore
                             certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, certHash, thisUpdate,
                                     null, certprofile);
                         }
-                    }
+                    } // end if(ignore)
                 }
                 else
                 {
@@ -425,7 +422,7 @@ public class DbCertStatusStore extends CertStatusStore
                     {
                         certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
                     }
-                }
+                } // end if(rs.next())
             } catch(SQLException e)
             {
                 throw dataSource.translate(sql, e);
