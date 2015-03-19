@@ -213,10 +213,10 @@ public class Rfc2560Servlet extends HttpServlet
                     auditStatus = AuditStatus.FAILED;
                     auditMessage = "request too large";
                     return;
-                }
+                } // if(CT_REQUEST)
 
                 requestStream = request.getInputStream();
-            }
+            } // end if(getMethod)
 
             OCSPRequest ocspRequest;
             try
@@ -299,9 +299,9 @@ public class Rfc2560Servlet extends HttpServlet
                     }
 
                     response.setHeader("Cache-Control", "max-age=" + maxAge + ",public,no-transform,must-revalidate");
-                }
+                } // end if(getMethod && cacheInfo != null)
                 response.getOutputStream().write(encodedOcspResp);
-            }
+            } // end if (ocspRespWithCacheInfo)
         }catch(EOFException e)
         {
             final String message = "Connection reset by peer";
@@ -362,10 +362,10 @@ public class Rfc2560Servlet extends HttpServlet
                         {
                             auditLoggingService.logEvent(event);
                         }
-                    }
-                }
-            }
-        }
+                    } 
+                } // end if(auditEvent != null)
+            } // end inner try
+        } // end external try
     }
 
     public void setAuditServiceRegister(AuditLoggingServiceRegister auditServiceRegister)

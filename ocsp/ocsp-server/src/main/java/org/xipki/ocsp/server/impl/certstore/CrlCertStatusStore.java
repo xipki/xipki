@@ -251,7 +251,7 @@ public class CrlCertStatusStore extends CertStatusStore
                         }
                     }
                 }
-            }
+            } // end if(force)
 
             byte[] newFp = sha1Fp(fullCrlFile);
             boolean crlFileChanged = Arrays.equals(newFp, fpOfCrlFile) == false;
@@ -303,16 +303,14 @@ public class CrlCertStatusStore extends CertStatusStore
             if(caCert.getSubjectX500Principal().equals(issuer) == false)
             {
                 caAsCrlIssuer = false;
-                if(issuerCert != null)
-                {
-                    if(issuerCert.getSubjectX500Principal().equals(issuer) == false)
-                    {
-                        throw new IllegalArgumentException("The issuerCert and CRL do not match");
-                    }
-                }
-                else
+                if(issuerCert == null)
                 {
                     throw new IllegalArgumentException("issuerCert could not be null");
+                }
+
+                if(issuerCert.getSubjectX500Principal().equals(issuer) == false)
+                {
+                    throw new IllegalArgumentException("The issuerCert and CRL do not match");
                 }
             }
 
@@ -469,7 +467,7 @@ public class CrlCertStatusStore extends CertStatusStore
 
                     if(caName.equals(bcCert.getIssuer()) == false)
                     {
-                        throw new CertStatusStoreException("iInvalid entry in CRL Extension certs");
+                        throw new CertStatusStoreException("invalid entry in CRL Extension certs");
                     }
 
                     if(profileName == null)
@@ -504,12 +502,10 @@ public class CrlCertStatusStore extends CertStatusStore
                 for(X509CRLEntry revokedCert : revokedCertListInFullCRL)
                 {
                     X500Principal thisIssuer = revokedCert.getCertificateIssuer();
-                    if(thisIssuer != null)
+                    if(thisIssuer != null &&
+                            caCert.getSubjectX500Principal().equals(thisIssuer) == false)
                     {
-                        if(caCert.getSubjectX500Principal().equals(thisIssuer) == false)
-                        {
-                            throw new CertStatusStoreException("invalid CRLEntry");
-                        }
+                        throw new CertStatusStoreException("invalid CRLEntry");
                     }
                 }
             }
@@ -523,12 +519,10 @@ public class CrlCertStatusStore extends CertStatusStore
                     for(X509CRLEntry revokedCert : revokedCertListInDeltaCRL)
                     {
                         X500Principal thisIssuer = revokedCert.getCertificateIssuer();
-                        if(thisIssuer != null)
+                        if(thisIssuer != null &&
+                                caCert.getSubjectX500Principal().equals(thisIssuer) == false)
                         {
-                            if(caCert.getSubjectX500Principal().equals(thisIssuer) == false)
-                            {
-                                throw new CertStatusStoreException("invalid CRLEntry");
-                            }
+                            throw new CertStatusStoreException("invalid CRLEntry");
                         }
                     }
                 }
@@ -645,8 +639,8 @@ public class CrlCertStatusStore extends CertStatusStore
                             (cert == null) ? null : cert.profileName,
                             certHashes);
                     newCertStatusInfoMap.put(serialNumber, crlCertStatusInfo);
-                }
-            }
+                } // end while(it.hasNext())
+            } // end if(it)
 
             for(CertWithInfo cert : certs)
             {
@@ -873,16 +867,18 @@ public class CrlCertStatusStore extends CertStatusStore
     private void auditLogPCIEvent(AuditLevel auditLevel, String eventType, String auditStatus)
     {
         AuditLoggingService auditLoggingService = getAuditLoggingService();
-        if(auditLoggingService != null)
+        if(auditLoggingService == null)
         {
-            PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());
-            auditEvent.setUserId("SYSTEM");
-            auditEvent.setEventType(eventType);
-            auditEvent.setAffectedResource("CRL-Updater");
-            auditEvent.setStatus(auditStatus);
-            auditEvent.setLevel(auditLevel);
-            auditLoggingService.logEvent(auditEvent);
+            return;
         }
+
+        PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());
+        auditEvent.setUserId("SYSTEM");
+        auditEvent.setEventType(eventType);
+        auditEvent.setAffectedResource("CRL-Updater");
+        auditEvent.setStatus(auditStatus);
+        auditEvent.setLevel(auditLevel);
+        auditLoggingService.logEvent(auditEvent);
     }
 
     @Override
@@ -901,11 +897,13 @@ public class CrlCertStatusStore extends CertStatusStore
     public void shutdown()
     throws CertStatusStoreException
     {
-        if(scheduledThreadPoolExecutor != null)
+        if(scheduledThreadPoolExecutor == null)
         {
-            scheduledThreadPoolExecutor.shutdown();
-            scheduledThreadPoolExecutor = null;
+            return;
         }
+
+        scheduledThreadPoolExecutor.shutdown();
+        scheduledThreadPoolExecutor = null;
     }
 
     public boolean isUseUpdateDatesFromCRL()

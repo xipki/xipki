@@ -134,21 +134,16 @@ class ResponderSigner
 
     private static String getSignatureAlgorithmName(AlgorithmIdentifier sigAlgId)
     {
-        String algoName;
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
-        if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid))
+        if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid) == false)
         {
-            ASN1Encodable asn1Encodable = sigAlgId.getParameters();
-            RSASSAPSSparams param = RSASSAPSSparams.getInstance(asn1Encodable);
-            ASN1ObjectIdentifier digestAlgOid = param.getHashAlgorithm().getAlgorithm();
-            algoName = digestAlgOid.getId() + "WITHRSAANDMGF1";
-        }
-        else
-        {
-            algoName = algOid.getId();
+        	return algOid.getId();
         }
 
-        return algoName;
+        ASN1Encodable asn1Encodable = sigAlgId.getParameters();
+        RSASSAPSSparams param = RSASSAPSSparams.getInstance(asn1Encodable);
+        ASN1ObjectIdentifier digestAlgOid = param.getHashAlgorithm().getAlgorithm();
+        return digestAlgOid.getId() + "WITHRSAANDMGF1";
     }
 
     public X500Name getResponderId()
