@@ -52,21 +52,21 @@ public class ImportOcspFromCaCommand extends XipkiOsgiCommandSupport
     private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
     private static final String DFLT_PUBLISHER = "OCSP.PUBLISHER";
 
-    @Option(name = "-dbconf",
+    @Option(name = "--db-conf",
             description = "database configuration file")
     private String dbconfFile = DFLT_DBCONF_FILE;
 
-    @Option(name = "-indir",
+    @Option(name = "--in-dir",
             required = true,
             description = "input directory\n"
                     + "(required)")
     private String indir;
 
-    @Option(name = "-publisher",
+    @Option(name = "--publisher",
             description = "publisher name")
     private String publisherName = DFLT_PUBLISHER;
 
-    @Option(name = "-resume")
+    @Option(name = "--resume")
     private Boolean resume = Boolean.FALSE;
 
     private DataSourceFactory dataSourceFactory;

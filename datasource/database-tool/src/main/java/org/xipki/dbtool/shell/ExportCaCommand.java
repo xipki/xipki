@@ -53,11 +53,11 @@ public class ExportCaCommand extends XipkiOsgiCommandSupport
     private static final int DFLT_NUM_CERTS_IN_BUNDLE = 1000;
     private static final int DFLT_NUM_CRLS = 30;
 
-    @Option(name = "-dbconf",
+    @Option(name = "--db-conf",
             description = "database configuration file")
     private String dbconfFile = DFLT_DBCONF_FILE;
 
-    @Option(name = "-outdir",
+    @Option(name = "--out-dir",
             required = true,
             description = "output directory\n"
                     + "(required)")
@@ -67,11 +67,11 @@ public class ExportCaCommand extends XipkiOsgiCommandSupport
             description = "number of certificates in one zip file")
     private Integer numCertsInBundle = DFLT_NUM_CERTS_IN_BUNDLE;
 
-    @Option(name = "-numcrls",
+    @Option(name = "--num-crls",
             description = "number of CRLs in one zip file")
     private Integer numCrls = DFLT_NUM_CRLS;
 
-    @Option(name = "-resume")
+    @Option(name = "--resume")
     private Boolean resume = Boolean.FALSE;
 
     private DataSourceFactory dataSourceFactory;
