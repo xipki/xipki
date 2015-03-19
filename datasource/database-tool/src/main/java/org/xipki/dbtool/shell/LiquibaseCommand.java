@@ -73,15 +73,15 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
         yesNo.add("no");
     }
 
-    @Option(name = "-q", aliases="--quiet",
+    @Option(name = "--quiet", aliases="-q",
             description = "quiet mode")
     private Boolean quiet = Boolean.FALSE;
 
-    @Option(name = "-logLevel",
+    @Option(name = "--log-level",
             description = "log level, valid values are debug, info, warning, severe, off")
     private String logLevel = "warning";
 
-    @Option(name = "-caconf",
+    @Option(name = "--ca-conf",
             description = "CA configuration file")
     private String caconfFile = DFLT_CACONF_FILE;
 
