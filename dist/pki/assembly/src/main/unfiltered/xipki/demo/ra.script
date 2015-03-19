@@ -1,9 +1,9 @@
-xipki-tk:rsa-p12 --password 1234 --out output/RCA2.p12 \
-  --subject "CN=RCA2,O=xipki,C=DE"
+xipki-tk:rsa-p12 --password 1234 --out output/Cross1.p12 \
+  --subject "CN=Cross1,O=xipki,C=DE"
 
-xipki-tk:req-p12 --p12 output/RCA2.p12 --password 1234 --out output/RCA2.p10
+xipki-tk:req-p12 --p12 output/Cross1.p12 --password 1234 --out output/Cross1.p10
 
-xipki-ca:enroll-cert --ca RCA1 --profile RCA-Cross --p10 output/RCA2.p10 --out output/RCA2-cross.der
+xipki-ca:enroll-cert --ca RCA1 --profile Cross --p10 output/Cross1.p10 --out output/Cross1.der
 
 #################################################################
 #              MANAGE CERTIFICATE WITH RA CLIENT                #

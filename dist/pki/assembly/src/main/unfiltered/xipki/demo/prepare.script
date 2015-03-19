@@ -27,7 +27,7 @@ xipki-ca:env-add --name certprofileType.map --value \
 xipki-ca:cmpcontrol-add --name cmpcontrol1 --message-time-bias 300 --send-ca yes
 
 ## Certificate Profiles
-xipki-ca:profile-add --name RCA-Cross --type XML --conf-file xipki/demo/profile/Certprofile_RootCA_Cross.xml
+xipki-ca:profile-add --name Cross --type XML --conf-file xipki/demo/profile/Certprofile_Cross.xml
 
 xipki-ca:profile-add --name SubCA --type XML --conf-file xipki/demo/profile/Certprofile_SubCA.xml
 

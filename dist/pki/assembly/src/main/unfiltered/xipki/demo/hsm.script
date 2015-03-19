@@ -38,7 +38,7 @@ xipki-ca:caalias-add --ca RCA1 --alias RCA
 xipki-ca:profile-rm RCA
 
 ## Add Profiles
-xipki-ca:caprofile-add --ca RCA1 --profile RCA-Cross
+xipki-ca:caprofile-add --ca RCA1 --profile Cross
 
 xipki-ca:caprofile-add --ca RCA1 --profile SubCA
 

@@ -152,12 +152,12 @@ public class ProfileConfCreatorDemo
             m.setProperty("com.sun.xml.internal.bind.indentString", "  ");
 
             // RootCA
-            X509ProfileType profile = Certprofile_RootCA(false);
+            X509ProfileType profile = Certprofile_RootCA();
             marshall(m, profile, "Certprofile_RootCA.xml");
 
-            // RootCA-Cross
-            profile = Certprofile_RootCA(true);
-            marshall(m, profile, "Certprofile_RootCA_Cross.xml");
+            // Cross
+            profile = Certprofile_Cross();
+            marshall(m, profile, "Certprofile_Cross.xml");
 
             // SubCA
             profile = Certprofile_SubCA();
@@ -216,10 +216,10 @@ public class ProfileConfCreatorDemo
 
     }
 
-    private static X509ProfileType Certprofile_RootCA(boolean cross)
+    private static X509ProfileType Certprofile_RootCA()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("Certprofile RootCA" + (cross ? " Cross" : ""),
+        X509ProfileType profile = getBaseProfile("Certprofile RootCA",
                 true, "10y", false);
 
         // Subject
@@ -246,17 +246,51 @@ public class ProfileConfCreatorDemo
         ExtensionValueType extensionValue = null;
         list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
 
-        // Extensions - AuthorityKeyIdentifier
-        if(cross)
-        {
-            extensionValue = createAuthorityKeyIdentifier(false);
-            list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
-        }
-
         // Extensions - keyUsage
         extensionValue = createKeyUsages(
                 new KeyUsageEnum[]{KeyUsageEnum.KEY_CERT_SIGN},
                 new KeyUsageEnum[]{KeyUsageEnum.C_RL_SIGN});
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
+
+        return profile;
+    }
+
+    private static X509ProfileType Certprofile_Cross()
+    throws Exception
+    {
+        X509ProfileType profile = getBaseProfile("Certprofile Cross",  true, "10y", false);
+
+        // Subject
+        Subject subject = profile.getSubject();
+        subject.setIncSerialNumber(false);
+
+        List<RdnType> rdnControls = subject.getRdn();
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+
+        // Extensions
+        ExtensionsType extensions = profile.getExtensions();
+
+        List<ExtensionType> list = extensions.getExtension();
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+        list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+        // Extensions - basicConstraints
+        ExtensionValueType extensionValue = null;
+        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityKeyIdentifier
+        extensionValue = createAuthorityKeyIdentifier(false);
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
+
+        // Extensions - keyUsage
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.KEY_CERT_SIGN}, null);
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
