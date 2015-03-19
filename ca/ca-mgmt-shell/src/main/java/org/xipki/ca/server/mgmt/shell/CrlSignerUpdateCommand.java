@@ -52,25 +52,25 @@ import org.xipki.common.util.SecurityUtil;
 @Command(scope = "xipki-ca", name = "crlsigner-update", description="update CRL signer")
 public class CrlSignerUpdateCommand extends CaCommand
 {
-    @Option(name = "-name",
+    @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CRL signer name\n"
                     + "(required)")
     private String name;
 
-    @Option(name = "-signerType",
+    @Option(name = "--signer-type",
             description = "CRL signer type, use 'CA' to sign the CRL by the CA itself")
     private String signerType;
 
-    @Option(name = "-signerConf",
+    @Option(name = "--signer-conf",
             description = "CRL signer configuration")
     private String signerConf;
 
-    @Option(name = "-cert",
+    @Option(name = "--cert",
             description = "CRL signer's certificate file or 'NULL'")
     private String signerCert;
 
-    @Option(name = "-crlControl",
+    @Option(name = "--crl-control",
             description = "CRL control")
     private String crlControlS;
 

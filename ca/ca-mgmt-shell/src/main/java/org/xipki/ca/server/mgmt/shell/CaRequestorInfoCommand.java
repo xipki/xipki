@@ -48,7 +48,7 @@ import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 @Command(scope = "xipki-ca", name = "careq-info", description="show information of requestors in CA")
 public class CaRequestorInfoCommand extends CaCommand
 {
-    @Option(name = "-ca",
+    @Option(name = "--ca",
             required = true,
             description = "CA name\n"
                     + "(required)")

@@ -51,25 +51,25 @@ import org.xipki.common.util.DateUtil;
 @Command(scope = "xipki-ca", name = "revoke-cert", description="revoke certificate")
 public class RevokeCertCommand extends CaCommand
 {
-    @Option(name = "-ca",
+    @Option(name = "--ca",
             required = true,
             description = " CA name\n"
                     + "(required)")
     private String caName;
 
-    @Option(name = "-serial",
+    @Option(name = "--serial", aliases = "-s",
             required = true,
             description = "serial number\n"
                     + "(required)")
     private String serialNumberS;
 
-    @Option(name = "-reason",
+    @Option(name = "--reason", aliases = "-r",
             required = true,
             description = "CRL reason\n"
                     + "(required)")
     private String reason;
 
-    @Option(name = "-invDate",
+    @Option(name = "--inv-date",
             description = "invalidity date, UTC time of format yyyyMMddHHmmss")
     private String invalidityDateS;
 

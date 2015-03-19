@@ -51,29 +51,29 @@ import org.xipki.common.ConfigurationException;
 @Command(scope = "xipki-ca", name = "careq-add", description="add requestor to CA")
 public class CaRequestorAddCommand extends CaCommand
 {
-    @Option(name = "-ca",
+    @Option(name = "--ca",
             required = true,
             description = "CA name\n"
                     + "(required)")
     private String caName;
 
-    @Option(name = "-requestor",
+    @Option(name = "--requestor",
             required = true,
             description = "requestor name\n"
                     + "(required)")
     private String requestorName;
 
-    @Option(name = "-ra",
+    @Option(name = "--ra",
             description = "whether as RA")
     private String raS = "no";
 
-    @Option(name = "-permission",
+    @Option(name = "--permission",
             required = true, multiValued = true,
             description = "permission\n"
                     + "(required, multi-valued)")
     private Set<String> permissions;
 
-    @Option(name = "-profile",
+    @Option(name = "--profile",
             required = true, multiValued = true,
             description = "profile name or 'all' for all profiles\n"
                     + "(required, multi-valued)")

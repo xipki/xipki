@@ -51,7 +51,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
 public class P11CertExportCommand extends P11SecurityCommand
 {
 
-    @Option(name = "-out",
+    @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")

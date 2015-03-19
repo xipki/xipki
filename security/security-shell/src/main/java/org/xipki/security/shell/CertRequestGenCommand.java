@@ -63,52 +63,52 @@ import org.xipki.security.api.ExtensionExistence;
 
 public abstract class CertRequestGenCommand extends SecurityCommand
 {
-    @Option(name = "-subject",
+    @Option(name = "--subject", aliases = "-s",
             description = "subject in the PKCS#10 request\n"
                     + "default is the subject of self-signed certifite")
     private String subject;
 
-    @Option(name = "-hash",
+    @Option(name = "--hash",
             description = "hash algorithm name")
     private String hashAlgo = "SHA256";
 
-    @Option(name = "-out",
+    @Option(name = "--out", aliases = "-o",
             required = true,
             description = "output file name\n"
                     + "(required)")
     private String outputFilename;
 
-    @Option(name = "-keyusage",
+    @Option(name = "--keyusage",
             multiValued = true,
             description = "keyusage\n"
                     + "(multi-valued)")
     private List<String> keyusages;
 
-    @Option(name = "-extKeyusage",
+    @Option(name = "--ext-keyusage",
             multiValued = true,
             description = "extended keyusage\n"
                     + "(multi-valued)")
     private List<String> extkeyusages;
 
-    @Option(name = "-subjectAltName",
+    @Option(name = "--subject-alt-name",
             multiValued = true,
             description = "subjectAltName\n"
                     + "(multi-valued)")
     private List<String> subjectAltNames;
 
-    @Option(name = "-subjectInfoAccess",
+    @Option(name = "--subject-info-access",
             multiValued = true,
             description = "subjectInfoAccess\n"
                     + "(multi-valued)")
     private List<String> subjectInfoAccesses;
 
-    @Option(name = "-needExtension",
+    @Option(name = "--need-extension",
             multiValued = true,
             description = "types of extension that must be contaied in the certificate\n"
                     + "(multi-valued)")
     private List<String> needExtensionTypes;
 
-    @Option(name = "-wantExtension",
+    @Option(name = "--want-extension",
             multiValued = true,
             description = "types of extension that should be contaied in the certificate if possible\n"
                     + "(multi-valued)")

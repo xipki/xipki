@@ -64,18 +64,18 @@ public class CaRevokeCommand extends CaCommand
     @Argument(index = 0, name = "name", description = "CA name", required = true)
     private String caName;
 
-    @Option(name = "-reason",
+    @Option(name = "--reason",
             required = true,
             description = "CRL reason\n"
                     + "(required)")
     private String reason;
 
-    @Option(name = "-revDate",
+    @Option(name = "--rev-date",
             description = "revocation date, UTC time of format yyyyMMddHHmmss\n"
                     + "(defaults to current time)")
     private String revocationDateS;
 
-    @Option(name = "-invDate",
+    @Option(name = "--inv-date",
             description = "invalidity date, UTC time of format yyyyMMddHHmmss")
     private String invalidityDateS;
 

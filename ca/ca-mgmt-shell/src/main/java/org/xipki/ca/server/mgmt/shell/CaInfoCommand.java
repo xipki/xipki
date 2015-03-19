@@ -55,7 +55,7 @@ public class CaInfoCommand extends CaCommand
     @Argument(index = 0, name = "name", description = "CA name")
     private String caName;
 
-    @Option(name = "-v", aliases="--verbose",
+    @Option(name = "--verbose", aliases = "-v",
             description = "show CA information verbosely")
     private Boolean verbose = Boolean.FALSE;
 

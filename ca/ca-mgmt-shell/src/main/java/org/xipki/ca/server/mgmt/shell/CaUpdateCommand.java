@@ -60,81 +60,81 @@ import org.xipki.security.api.SecurityFactory;
 @Command(scope = "xipki-ca", name = "ca-update", description="update CA")
 public class CaUpdateCommand extends CaCommand
 {
-    @Option(name = "-name",
+    @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CA name\n"
                     + "(required)")
     private String caName;
 
-    @Option(name = "-status",
+    @Option(name = "--status",
             description = "CA status")
     private String caStatus;
 
-    @Option(name = "-ocspUri",
+    @Option(name = "--ocsp-uri",
             multiValued = true,
             description = "OCSP URI or 'NULL'\n"
                     + "(multi-valued)")
     private List<String> ocspUris;
 
-    @Option(name = "-crlUri",
+    @Option(name = "--crl-uri",
             multiValued = true,
             description = "CRL distribution point URI or 'NULL'\n"
                     + "(multi-valued)")
     private List<String> crlUris;
 
-    @Option(name = "-deltaCrlUri",
+    @Option(name = "--deltacrl-uri",
             multiValued = true,
             description = "delta CRL distribution point URI or 'NULL'\n"
                     + "(multi-valued)")
     private List<String> deltaCrlUris;
 
-    @Option(name = "-permission",
+    @Option(name = "--permission",
             multiValued = true,
             description = "permission\n"
                     + "(multi-valued)")
     private Set<String> permissions;
 
-    @Option(name = "-maxValidity",
+    @Option(name = "--max-validity",
             description = "maximal validity")
     private String maxValidity;
 
-    @Option(name = "-expirationPeriod",
+    @Option(name = "--expiration-period",
             description = "days before expiration time of CA to issue certificates")
     private Integer expirationPeriod;
 
-    @Option(name = "-crlSigner",
+    @Option(name = "--crl-signer",
             description = "CRL signer name or 'NULL'")
     private String crlSignerName;
 
-    @Option(name = "-cmpControl",
+    @Option(name = "--cmp-control",
             description = "CMP control name or 'NULL'")
     private String cmpControlName;
 
-    @Option(name = "-numCrls",
+    @Option(name = "--num-crls",
             description = "number of CRLs to be kept in database")
     private Integer numCrls;
 
-    @Option(name = "-cert",
+    @Option(name = "--cert",
             description = "CA certificate file")
     private String certFile;
 
-    @Option(name = "-signerType",
+    @Option(name = "--signer-type",
             description = "CA signer type")
     private String signerType;
 
-    @Option(name = "-signerConf",
+    @Option(name = "--signer-conf",
             description = "CA signer configuration or 'NULL'")
     private String signerConf;
 
-    @Option(name = "-dk", aliases = { "--duplicateKey" },
+    @Option(name = "--duplicate-key",
             description = "mode of duplicate key")
     private String duplicateKeyS;
 
-    @Option(name = "-ds", aliases = { "--duplicateSubject" },
+    @Option(name = "--duplicate-subject",
             description = "mode of duplicate subject")
     private String duplicateSubjectS;
 
-    @Option(name = "-validityMode",
+    @Option(name = "--validity-mode",
             description = "mode of valditity")
     private String validityModeS;
 

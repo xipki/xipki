@@ -57,13 +57,13 @@ import org.xipki.common.util.SecurityUtil;
 public class NegRevokeCertCommand extends UnRevRemoveCertCommand
 {
 
-    @Option(name = "-reason",
+    @Option(name = "--reason",
             required = true,
             description = "CRL reason\n"
                     + "(required)")
     private String reason;
 
-    @Option(name = "-invDate",
+    @Option(name = "--inv-date",
             description = "invalidity date, UTC time of format yyyyMMddHHmmss")
     private String invalidityDateS;
 
@@ -71,7 +71,7 @@ public class NegRevokeCertCommand extends UnRevRemoveCertCommand
     protected Object _doExecute()
     throws Exception
     {
-        if(certFile == null && (caCertFile == null || getSerialNumber() == null))
+        if(certFile == null && (issuerCertFile == null || getSerialNumber() == null))
         {
             err("either cert or (cacert, serial) must be specified");
             return null;
@@ -97,9 +97,9 @@ public class NegRevokeCertCommand extends UnRevRemoveCertCommand
         }
 
         X509Certificate caCert = null;
-        if(caCertFile != null)
+        if(issuerCertFile != null)
         {
-            caCert = SecurityUtil.parseCert(caCertFile);
+            caCert = SecurityUtil.parseCert(issuerCertFile);
         }
 
         CertIDOrError certIdOrError;

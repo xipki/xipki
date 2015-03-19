@@ -51,12 +51,12 @@ import org.xipki.common.qa.UnexpectedResultException;
 public abstract class CRLCommand extends ClientCommand
 {
 
-    @Option(name = "-ca",
+    @Option(name = "--ca",
             description = "CA name\n"
                     + "(required if multiple CAs are configured)")
     protected String caName;
 
-    @Option(name = "-out",
+    @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the CRL\n"
                     + "(required)")

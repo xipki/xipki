@@ -55,7 +55,7 @@ public class ProfileInfoCommand extends CaCommand
     @Argument(index = 0, name = "name", description = "certificate profile name")
     private String name;
 
-    @Option(name = "-v", aliases="--verbose",
+    @Option(name = "--verbose", aliases="-v",
             description = "show certificate profile information verbosely")
     private Boolean verbose = Boolean.FALSE;
 

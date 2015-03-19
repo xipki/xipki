@@ -60,35 +60,35 @@ import org.xipki.ocsp.client.api.RequestOptions;
 
 public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
 {
-    @Option(name = "-respIssuer",
+    @Option(name = "--resp-issuer",
             description = "certificate file of the responder's issuer")
     private String respIssuerFile;
 
-    @Option(name = "-url",
+    @Option(name = "--url",
             description = "OCSP responder URL")
     private String serverURL;
 
-    @Option(name = "-reqout",
+    @Option(name = "--req-out",
             description = "where to save the request")
     private String reqout;
 
-    @Option(name = "-respout",
+    @Option(name = "--resp-out",
             description = "where to save the response")
     private String respout;
 
-    @Option(name = "-serial",
+    @Option(name = "--serial", aliases = "-s",
             multiValued = true,
             description = "serial number\n"
                     + "(multi-valued)")
     private List<String> serialNumbers;
 
-    @Option(name = "-cert",
+    @Option(name = "--cert", aliases = "-c",
             multiValued = true,
             description = "certificate\n"
                     + "(multi-valued)")
     private List<String> certFiles;
 
-    @Option(name = "-v", aliases="--verbose",
+    @Option(name = "--verbose", aliases="-v",
             description = "show status verbosely")
     protected Boolean verbose = Boolean.FALSE;
 

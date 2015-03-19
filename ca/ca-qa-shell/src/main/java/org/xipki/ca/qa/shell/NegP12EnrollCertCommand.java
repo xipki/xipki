@@ -51,13 +51,13 @@ import org.xipki.security.api.SignerException;
 public class NegP12EnrollCertCommand extends NegEnrollCertCommand
 {
 
-    @Option(name = "-p12",
+    @Option(name = "--p12",
             required = true,
             description = "PKCS#12 request file\n"
                     + "(required)")
     private String p12File;
 
-    @Option(name = "-pwd", aliases = { "--password" },
+    @Option(name = "--password",
             description = "password of the PKCS#12 file")
     private String password;
 

@@ -50,19 +50,19 @@ import org.xipki.security.shell.SecurityCommand;
 @Command(scope = "xipki-tk", name = "rm-cert", description="remove certificate from PKCS#11 device")
 public class P11CertDeleteCommand extends SecurityCommand
 {
-    @Option(name = "-slot",
+    @Option(name = "--slot",
             required = true,
             description = "slot index\n"
                     + "(required)")
     private Integer slotIndex;
 
-    @Option(name = "-key-id",
+    @Option(name = "--key-id",
             required = true,
             description = "id of the certificate in the PKCS#11 device\n"
                     + "(required)")
     private String keyId;
 
-    @Option(name = "-module",
+    @Option(name = "--module",
             description = "name of the PKCS#11 module.")
     private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 

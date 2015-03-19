@@ -50,13 +50,13 @@ import org.xipki.common.util.SecurityUtil;
 @Command(scope = "xipki-ca", name = "requestor-update", description="update requestor")
 public class RequestorUpdateCommand extends CaCommand
 {
-    @Option(name = "-name",
+    @Option(name = "--name", aliases = "-n",
             required = true,
             description = "requestor name\n"
                     + "(required)")
     private String name;
 
-    @Option(name = "-cert",
+    @Option(name = "--cert",
             required = true,
             description = "requestor certificate file\n"
                     + "(required)")

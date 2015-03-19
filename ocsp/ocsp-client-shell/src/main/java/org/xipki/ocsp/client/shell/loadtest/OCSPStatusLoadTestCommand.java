@@ -55,21 +55,21 @@ import org.xipki.ocsp.client.shell.AbstractOCSPStatusCommand;
 @Command(scope = "xipki-ocsp", name = "loadtest-status", description="OCSP Load test")
 public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
 {
-    @Option(name = "-serial",
+    @Option(name = "--serial",
             required = true,
             description = "serial numbers, comma-separated serial numbers or ranges\n"
                     + "required")
     private String serialNumbers;
 
-    @Option(name = "-duration",
+    @Option(name = "--duration",
             description = "duration in seconds")
     private int durationInSecond = 30;
 
-    @Option(name = "-thread",
+    @Option(name = "--thread",
             description = "number of threads")
     private Integer numThreads = 5;
 
-    @Option(name = "-url",
+    @Option(name = "--url",
             required = true,
             description = "OCSP responder URL\n"
                     + "required")

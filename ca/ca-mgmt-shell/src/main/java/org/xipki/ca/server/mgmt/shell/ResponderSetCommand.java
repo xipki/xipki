@@ -50,17 +50,17 @@ import org.xipki.security.api.SecurityFactory;
 @Command(scope = "xipki-ca", name = "responder-set", description="set responder")
 public class ResponderSetCommand extends CaCommand
 {
-    @Option(name = "-signerType",
+    @Option(name = "--signer-type",
             required = true,
             description = "type of the responder signer\n"
                     + "(required)")
     private String signerType;
 
-    @Option(name = "-signerConf",
+    @Option(name = "--signer-conf",
             description = "conf of the responder signer")
     private String signerConf;
 
-    @Option(name = "-cert",
+    @Option(name = "--cert",
             description = "requestor certificate")
     private String certFile;
 

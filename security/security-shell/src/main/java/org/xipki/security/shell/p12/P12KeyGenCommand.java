@@ -48,23 +48,23 @@ import org.xipki.security.shell.KeyGenCommand;
 
 public abstract class P12KeyGenCommand extends KeyGenCommand
 {
-    @Option(name = "-subject",
+    @Option(name = "--subject", aliases = "-s",
             required = true,
             description = "subject in the self-signed certificate\n"
                     + "(required)")
     protected String subject;
 
-    @Option(name = "-out",
+    @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the key\n"
                     + "(required)")
     protected String keyOutFile;
 
-    @Option(name = "-certout",
+    @Option(name = "--cert-out",
             description = "where to save the self-signed certificate")
     protected String certOutFile;
 
-    @Option(name = "-pwd", aliases = { "--password" },
+    @Option(name = "--password",
             description = "password of the PKCS#12 file")
     protected String password;
 

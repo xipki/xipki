@@ -10,13 +10,13 @@
         <property name="requestor" ref="ocspRequestor"/>
       </action>
       <optional-completers>
-        <entry key="-cert" value-ref="filePathCompleter"/>
-        <entry key="-issuer" value-ref="filePathCompleter"/>
-        <entry key="-respIssuer" value-ref="filePathCompleter"/>
-        <entry key="-reqout" value-ref="filePathCompleter"/>
-        <entry key="-respout" value-ref="filePathCompleter"/>
-        <entry key="-sigalg" value-ref="sigAlgCompleter"/>
-        <entry key="-hash" value-ref="hashAlgCompleter"/>
+        <entry key="--cert" value-ref="filePathCompleter"/>
+        <entry key="--issuer" value-ref="filePathCompleter"/>
+        <entry key="--resp-issuer" value-ref="filePathCompleter"/>
+        <entry key="--req-out" value-ref="filePathCompleter"/>
+        <entry key="--resp-out" value-ref="filePathCompleter"/>
+        <entry key="--sig-alg" value-ref="sigAlgCompleter"/>
+        <entry key="--hash" value-ref="hashAlgCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -24,9 +24,9 @@
         <property name="requestor" ref="ocspRequestor"/>
       </action>
       <optional-completers>
-        <entry key="-issuer" value-ref="filePathCompleter"/>
-        <entry key="-sigalg" value-ref="sigAlgCompleter"/>
-        <entry key="-hash" value-ref="hashAlgCompleter"/>
+        <entry key="--issuer" value-ref="filePathCompleter"/>
+        <entry key="--sig-alg" value-ref="sigAlgCompleter"/>
+        <entry key="--hash" value-ref="hashAlgCompleter"/>
       </optional-completers>
     </command>
   </command-bundle>

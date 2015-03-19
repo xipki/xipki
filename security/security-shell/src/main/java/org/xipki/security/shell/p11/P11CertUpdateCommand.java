@@ -53,16 +53,16 @@ import org.xipki.security.api.p11.P11WritableSlot;
 public class P11CertUpdateCommand extends P11SecurityCommand
 {
 
-    @Option(name = "-cert",
+    @Option(name = "--cert",
             required = true,
             description = "certificate file\n"
                     + "(required)")
     private String certFile;
 
-    @Option(name = "-cacert",
+    @Option(name = "--ca-cert",
             multiValued = true,
             description = "CA Certificate files\n"
-                    + "multi-valued")
+                    + "(multi-valued)")
     private Set<String> caCertFiles;
 
     @Override

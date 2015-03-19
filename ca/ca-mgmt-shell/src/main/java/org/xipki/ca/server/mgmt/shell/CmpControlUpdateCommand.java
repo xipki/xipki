@@ -45,33 +45,33 @@ import org.apache.karaf.shell.commands.Option;
 @Command(scope = "xipki-ca", name = "cmpcontrol-update", description="update CMP control")
 public class CmpControlUpdateCommand extends CaCommand
 {
-    @Option(name = "-name",
+    @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CMP control name\n"
                     + "(required)")
     private String name;
 
-    @Option(name = "-cc", aliases = { "--confirmCert" },
+    @Option(name = "--confirm-cert",
             description = "whether confirm of certificate is required")
     private String confirmCertS;
 
-    @Option(name = "-scc", aliases = { "--sendCaCert" },
+    @Option(name = "--send-ca",
             description = "whether CA certificate is included in response")
     private String sendCaCertS;
 
-    @Option(name = "-src", aliases = { "--sendResponderCert" },
+    @Option(name = "--send-responder",
             description = "whether responder certificate is included in response")
     private String sendResponderCertS;
 
-    @Option(name = "-mt", aliases = { "--messageTime" },
+    @Option(name = "--need-message-time",
             description = "whether message time is required in request")
     private String requireMessageTimeS;
 
-    @Option(name = "-mtb", aliases = { "--msgTimeBias" },
+    @Option(name = "--message-time-bias",
             description = "message time bias in seconds")
     private Integer messageTimeBias;
 
-    @Option(name = "-cwt", aliases = { "--confirmWaitTime" },
+    @Option(name = "--waittime-confirm",
             description = "maximal confirmation time in seconds")
     private Integer confirmWaitTime;
 

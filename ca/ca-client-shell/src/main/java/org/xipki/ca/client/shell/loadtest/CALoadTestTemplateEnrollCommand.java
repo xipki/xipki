@@ -47,17 +47,17 @@ import org.xipki.common.AbstractLoadTest;
 public class CALoadTestTemplateEnrollCommand extends CALoadTestCommand
 {
 
-    @Option(name = "-template",
+    @Option(name = "--template", aliases = "-t",
             required = true,
             description = "template file\n"
                     + "(required)")
     private String templateFile;
 
-    @Option(name = "-duration",
+    @Option(name = "--duration",
             description = "duration in seconds")
     private Integer durationInSecond = 30;
 
-    @Option(name = "-thread",
+    @Option(name = "--thread",
             description = "number of threads")
     private Integer numThreads = 5;
 

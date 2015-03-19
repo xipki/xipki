@@ -26,10 +26,10 @@
         <property name="qaSystemManager" ref="qaSystemManager"/>
       </action>
       <optional-completers>
-        <entry key="-cert" value-ref="filePathCompleter"/>
-        <entry key="-p10" value-ref="filePathCompleter"/>
-        <entry key="-issuer" value-ref="x509IssuerNameCompleter"/>
-        <entry key="-profile" value-ref="x509CertprofileNameCompleter"/>
+        <entry key="--cert" value-ref="filePathCompleter"/>
+        <entry key="--p10" value-ref="filePathCompleter"/>
+        <entry key="--issuer" value-ref="x509IssuerNameCompleter"/>
+        <entry key="--profile" value-ref="x509CertprofileNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -37,11 +37,11 @@
         <property name="raWorker" ref="raWorker"/>
       </action>
       <optional-completers>
-        <entry key="-out" value-ref="filePathCompleter"/>
-        <entry key="-p10" value-ref="filePathCompleter"/>
-        <entry key="-ca" value-ref="caNameCompleter"/>
-        <entry key="-reqout" value-ref="filePathCompleter"/>
-        <entry key="-respout" value-ref="filePathCompleter"/>
+        <entry key="--out" value-ref="filePathCompleter"/>
+        <entry key="--p10" value-ref="filePathCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
+        <entry key="--req-out" value-ref="filePathCompleter"/>
+        <entry key="--resp-out" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -50,11 +50,11 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-out" value-ref="filePathCompleter"/>
-        <entry key="-p12" value-ref="filePathCompleter"/>
-        <entry key="-ca" value-ref="caNameCompleter"/>
-        <entry key="-reqout" value-ref="filePathCompleter"/>
-        <entry key="-respout" value-ref="filePathCompleter"/>
+        <entry key="--out" value-ref="filePathCompleter"/>
+        <entry key="--p12" value-ref="filePathCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
+        <entry key="--req-out" value-ref="filePathCompleter"/>
+        <entry key="--resp-out" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -62,11 +62,11 @@
         <property name="raWorker" ref="raWorker"/>
       </action>
       <optional-completers>
-        <entry key="-cert" value-ref="filePathCompleter"/>
-        <entry key="-cacert" value-ref="filePathCompleter"/>
-        <entry key="-reason" value-ref="clientCrlReasonCompleter"/>
-        <entry key="-reqout" value-ref="filePathCompleter"/>
-        <entry key="-respout" value-ref="filePathCompleter"/>
+        <entry key="--cert" value-ref="filePathCompleter"/>
+        <entry key="--ca-cert" value-ref="filePathCompleter"/>
+        <entry key="--reason" value-ref="clientCrlReasonCompleter"/>
+        <entry key="--req-out" value-ref="filePathCompleter"/>
+        <entry key="--resp-out" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -74,10 +74,10 @@
         <property name="raWorker" ref="raWorker"/>
       </action>
       <optional-completers>
-        <entry key="-cert" value-ref="filePathCompleter"/>
-        <entry key="-cacert" value-ref="filePathCompleter"/>
-        <entry key="-reqout" value-ref="filePathCompleter"/>
-        <entry key="-respout" value-ref="filePathCompleter"/>
+        <entry key="--cert" value-ref="filePathCompleter"/>
+        <entry key="--ca-cert" value-ref="filePathCompleter"/>
+        <entry key="--req-out" value-ref="filePathCompleter"/>
+        <entry key="--resp-out" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -85,10 +85,10 @@
         <property name="raWorker" ref="raWorker"/>
       </action>
       <optional-completers>
-        <entry key="-out" value-ref="filePathCompleter"/>
-        <entry key="-ca" value-ref="caNameCompleter"/>
-        <entry key="-reqout" value-ref="filePathCompleter"/>
-        <entry key="-respout" value-ref="filePathCompleter"/>
+        <entry key="--out" value-ref="filePathCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
+        <entry key="--req-out" value-ref="filePathCompleter"/>
+        <entry key="--resp-out" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -96,11 +96,10 @@
         <property name="raWorker" ref="raWorker"/>
       </action>
       <optional-completers>
-        <entry key="-out" value-ref="filePathCompleter"/>
-        <entry key="-ca" value-ref="caNameCompleter"/>
-        <entry key="-basecrl-out" value-ref="filePathCompleter"/>
-        <entry key="-reqout" value-ref="filePathCompleter"/>
-        <entry key="-respout" value-ref="filePathCompleter"/>
+        <entry key="--out" value-ref="filePathCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
+        <entry key="--req-out" value-ref="filePathCompleter"/>
+        <entry key="--resp-out" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
   </command-bundle>

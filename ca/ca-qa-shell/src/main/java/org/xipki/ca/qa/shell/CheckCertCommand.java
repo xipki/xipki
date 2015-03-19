@@ -60,30 +60,30 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 @Command(scope = "xipki-qa", name = "check-cert", description="check the certificate")
 public class CheckCertCommand extends XipkiOsgiCommandSupport
 {
-    @Option(name = "-cert",
+    @Option(name = "--cert", aliases = "-c",
             required = true,
             description = "certificate file\n"
                     + "(required)")
     private String certFile;
 
-    @Option(name = "-issuer",
+    @Option(name = "--issuer",
             description = "issuer name\n"
                     + "required if multiple issuers are configured")
     private String issuerName;
 
-    @Option(name = "-p10",
+    @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request file\n"
                     + "(required)")
     private String p10File;
 
-    @Option(name = "-profile",
+    @Option(name = "--profile", aliases = "-p",
             required = true,
             description = "certificate profile\n"
                     + "(required)")
     private String profileName;
 
-    @Option(name = "-v", aliases="--verbose",
+    @Option(name = "--verbose", aliases="-v",
             description = "show status verbosely")
     private Boolean verbose = Boolean.FALSE;
 
