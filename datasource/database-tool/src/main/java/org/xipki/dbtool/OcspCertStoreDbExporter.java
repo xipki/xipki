@@ -107,7 +107,7 @@ class OcspCertStoreDbExporter extends DbPorter
             File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
             if(processLogFile.exists() == false)
             {
-                throw new Exception("could not process with '-resume' option");
+                throw new Exception("could not process with '--resume' option");
             }
         }
         this.resume = resume;

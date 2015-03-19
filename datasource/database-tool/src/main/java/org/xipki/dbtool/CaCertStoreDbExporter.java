@@ -576,7 +576,7 @@ class CaCertStoreDbExporter extends DbPorter
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-certs-");
             System.err.println("\nexporting table CERT and RAWCERT has been cancelled due to error,\n"
-                    + "please continue with the option '-resume'");
+                    + "please continue with the option '--resume'");
             LOG.error("Exception", e);
             return e;
         }

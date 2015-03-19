@@ -141,7 +141,7 @@ public class CaDbExporter
         {
             if(processLogFile.exists() == false)
             {
-                throw new IOException("could not process with '-resume' option");
+                throw new IOException("could not process with '--resume' option");
             }
         }
         else
