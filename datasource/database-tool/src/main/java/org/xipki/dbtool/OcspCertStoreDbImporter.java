@@ -117,14 +117,14 @@ class OcspCertStoreDbImporter extends DbPorter
         {
             if(processLogFile.exists() == false)
             {
-                throw new Exception("could not process with '-resume' option");
+                throw new Exception("could not process with '--resume' option");
             }
         }
         else
         {
             if(processLogFile.exists())
             {
-                throw new Exception("please either specify '-resume' option or delete the file " +
+                throw new Exception("please either specify '--resume' option or delete the file " +
                         processLogFile.getPath() + " first");
             }
         }
@@ -299,7 +299,7 @@ class OcspCertStoreDbImporter extends DbPorter
                 }catch(Exception e)
                 {
                     System.err.println("\nerror while importing certificates from file " + certsFile +
-                            ".\nplease continue with the option '-resume'");
+                            ".\nplease continue with the option '--resume'");
                     LOG.error("Exception", e);
                     throw e;
                 }
