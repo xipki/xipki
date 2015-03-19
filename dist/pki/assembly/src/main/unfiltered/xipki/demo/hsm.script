@@ -6,52 +6,52 @@ sleep 1000
 #                          GENERATE RCA                         #
 #################################################################
 ## Add the profile RCA
-xipki-ca:profile-add -name  RCA -type XML -confFile xipki/demo/profile/Certprofile_RootCA.xml
+xipki-ca:profile-add --name RCA --type XML --conf-file xipki/demo/profile/Certprofile_RootCA.xml
 
 ## Create the PKCS#10 request for the command caqa:check-cert in QA
-xipki-tk:req -slot 1 -key-label $RCA_KEY_LABEL -out output/RCA1.p10 \
+xipki-tk:req --slot 1 --key-label $RCA_KEY_LABEL --out output/RCA1.p10 \
   -subject "CN=RCA1,O=xipki,C=DE"
 
 ## Generate selfsigned RCA
-xipki-ca:gen-rca -name RCA1 \
-  -p10 output/RCA1.p10 \
-  -profile RCA \
-  -out output/RCA1.der \
-  -permission all \
-  -nextSerial 1 \
-  -nextCrlNo 2 \
-  -maxValidity 10y \
-  -signerType PKCS11 \
-  -signerConf algo?$CA_SIGNER_ALGO%slot?1%key-label?$RCA_KEY_LABEL \
-  -ocspUri http://localhost:8080/ocsp/responder1 \
-  -cmpControl cmpcontrol1 \
-  --duplicateSubject permitted \
-  --duplicateKey permitted \
-  -validityMode CUTOFF
+xipki-ca:gen-rca --name RCA1 \
+  --p10 output/RCA1.p10 \
+  --profile RCA \
+  --out output/RCA1.der \
+  --permission all \
+  --next-serial 1 \
+  --next-crl-no 2 \
+  --max-validity 10y \
+  --signer-type PKCS11 \
+  --signer-conf algo?$CA_SIGNER_ALGO%slot?1%key-label?$RCA_KEY_LABEL \
+  --ocsp-uri http://localhost:8080/ocsp/responder1 \
+  --cmp-control cmpcontrol1 \
+  --duplicate-subject permitted \
+  --duplicate-key permitted \
+  --validity-mode CUTOFF
 
 ## Update the certificate in the device
-xipki-tk:update-cert -slot 1 -key-label $RCA_KEY_LABEL -cert output/RCA1.der
+xipki-tk:update-cert --slot 1 --key-label $RCA_KEY_LABEL --cert output/RCA1.der
 
-xipki-ca:caalias-add -ca RCA1 -alias RCA
+xipki-ca:caalias-add --ca RCA1 --alias RCA
 
 ## Remove the profile RCA
 xipki-ca:profile-rm RCA
 
 ## Add Profiles
-xipki-ca:caprofile-add -ca RCA1 -profile RCA-Cross
+xipki-ca:caprofile-add --ca RCA1 --profile RCA-Cross
 
-xipki-ca:caprofile-add -ca RCA1 -profile SubCA
+xipki-ca:caprofile-add --ca RCA1 --profile SubCA
 
-xipki-ca:caprofile-add -ca RCA1 -profile SubCA.Complex
+xipki-ca:caprofile-add --ca RCA1 --profile SubCA.Complex
 
 ## Add publisher
-xipki-ca:capub-add -ca RCA1 -publisher OCSP.PUBLISHER
+xipki-ca:capub-add --ca RCA1 --publisher OCSP.PUBLISHER
 
 # Add requestor to CA
-xipki-ca:careq-add -requestor requestor -permission all -ra yes -profile all -ca RCA1
+xipki-ca:careq-add --requestor requestor --permission all --ra yes --profile all --ca RCA1
 
 ## Publish the self-signed certificate
-xipki-ca:publish-self -profile RCA RCA1
+xipki-ca:publish-self --profile RCA RCA1
 
 feature:install xipki-caclient-shell
 
@@ -60,31 +60,31 @@ sleep 1000
 # Wait two seconds
 
 ## Generate keys and PKCS#10 request for SubCA1
-xipki-tk:req -slot 1 -key-label $SubCA_KEY_LABEL -out output/SubCA1.p10 \
-  -subject "CN=SubCA1,O=xipki,C=DE"
+xipki-tk:req --slot 1 --key-label $SubCA_KEY_LABEL --out output/SubCA1.p10 \
+  --subject "CN=SubCA1,O=xipki,C=DE"
 
-xipki-cli:ra-enroll -p10 output/SubCA1.p10 -out output/SubCA1.der -profile SubCA
+xipki-cli:ra-enroll --p10 output/SubCA1.p10 --out output/SubCA1.der --profile SubCA
 
-xipki-tk:update-cert -slot 1 -key-label $SubCA_KEY_LABEL -cert output/SubCA1.der \
-  -cacert output/RCA1.der
+xipki-tk:update-cert --slot 1 --key-label $SubCA_KEY_LABEL --cert output/SubCA1.der \
+  --cacert output/RCA1.der
 
 ## Generate keys and PKCS#10 request for SubCAwithCRL1
-xipki-tk:req -slot 1 -key-label $SubCAwithCRL_KEY_LABEL -out output/SubCAwithCRL1.p10 \
-  -subject "CN=SubCAwithCRL1, O=xipki, C=DE" \
-  -subjectAltName "[1]info@xipki.org" \
-  -subjectAltName "[2]xipki.org" \
-  -subjectAltName "[5]edi-nameAssigner-1=edi-partyName1" \
-  -subjectAltName "[6]http://xipki.org/abc" \
-  -subjectAltName "[7]192.168.0.1" \
-  -subjectAltName "[8]1.2.3.4" \
-  -subjectAltName "[0]2.5.4.10=long organization name" \
-  -subjectInfoAccess "1.3.6.1.5.5.7.48.5?[6]http://example.org/abc" \
-  -keyusage cRLSign
+xipki-tk:req --slot 1 --key-label $SubCAwithCRL_KEY_LABEL --out output/SubCAwithCRL1.p10 \
+  --subject "CN=SubCAwithCRL1, O=xipki, C=DE" \
+  --subject-alt-name "[1]info@xipki.org" \
+  --subject-alt-name "[2]xipki.org" \
+  --subject-alt-name "[5]edi-nameAssigner-1=edi-partyName1" \
+  --subject-alt-name "[6]http://xipki.org/abc" \
+  --subject-alt-name "[7]192.168.0.1" \
+  --subject-alt-name "[8]1.2.3.4" \
+  --subject-alt-name "[0]2.5.4.10=long organization name" \
+  --subject-info-access "1.3.6.1.5.5.7.48.5?[6]http://example.org/abc" \
+  --keyusage cRLSign
 
-xipki-cli:ra-enroll -p10 output/SubCAwithCRL1.p10 -out output/SubCAwithCRL1.der -profile SubCA.Complex
+xipki-cli:ra-enroll --p10 output/SubCAwithCRL1.p10 --out output/SubCAwithCRL1.der --profile SubCA.Complex
 
-xipki-tk:update-cert -slot 1 -key-label $SubCAwithCRL_KEY_LABEL -cert output/SubCAwithCRL1.der \
-  -cacert output/RCA1.der
+xipki-tk:update-cert --slot 1 --key-label $SubCAwithCRL_KEY_LABEL --cert output/SubCAwithCRL1.der \
+  --cacert output/RCA1.der
 
 feature:uninstall xipki-caclient-shell
 feature:uninstall xipki-caclient
@@ -93,28 +93,28 @@ feature:uninstall xipki-caclient
 #                        ADD SubCA with OCSP                    #
 #################################################################
 ## Add CA
-xipki-ca:ca-add -name SubCA1 \
-  -permission all \
-  -nextSerial 1 \
-  -nextCrlNo 2 \
-  -maxValidity 5y \
-  -signerType PKCS11 \
-  -signerConf algo?$CA_SIGNER_ALGO%slot?1%key-label?$SubCA_KEY_LABEL \
-  -ocspUri http://localhost:8080/ocsp/responder1 \
-  -cmpControl cmpcontrol1 \
-  --duplicateSubject permitted \
-  --duplicateKey permitted
+xipki-ca:ca-add --name SubCA1 \
+  --permission all \
+  --next-serial 1 \
+  --next-crl-no 2 \
+  --max-validity 5y \
+  --signer-type PKCS11 \
+  --signer-conf algo?$CA_SIGNER_ALGO%slot?1%key-label?$SubCA_KEY_LABEL \
+  --ocsp-uri http://localhost:8080/ocsp/responder1 \
+  --cmp-control cmpcontrol1 \
+  --duplicate-subject permitted \
+  --duplicate-key permitted
 
-xipki-ca:caalias-add -ca SubCA1 -alias SubCA
+xipki-ca:caalias-add --ca SubCA1 --alias SubCA
 
 ## Add cert profile to CA
-xipki-ca:caprofile-add -ca SubCA1 -profile TLS -profile TLS_C -profile TLSwithIncSN -profile gSMC_K
+xipki-ca:caprofile-add --ca SubCA1 --profile TLS --profile TLS_C --profile TLSwithIncSN --profile gSMC_K
 
 ## Add publisher
-xipki-ca:capub-add -ca SubCA1 -publisher OCSP.PUBLISHER
+xipki-ca:capub-add --ca SubCA1 --publisher OCSP.PUBLISHER
 
 # Add requestor to CA
-xipki-ca:careq-add -requestor requestor -permission all -ra yes -profile all -ca SubCA1
+xipki-ca:careq-add --requestor requestor --permission all --ra yes --profile all --ca SubCA1
 
 ## Restart the CA
 #xipki-ca:restart
@@ -123,28 +123,28 @@ xipki-ca:careq-add -requestor requestor -permission all -ra yes -profile all -ca
 #                       ADD SubCA with CRL                      #
 #################################################################
 ## Add CA
-xipki-ca:ca-add -name SubCAwithCRL1 \
-  -permission all \
-  -nextSerial 1 \
-  -nextCrlNo 2 \
-  -maxValidity 5y \
-  -signerType PKCS11 \
-  -signerConf algo?$CA_SIGNER_ALGO%slot?1%key-label?$SubCAwithCRL_KEY_LABEL \
-  -ocspUri http://localhost:8080/ocsp/responder2 \
-  -crlUri http://subcawithcrl.example.org/crl \
-  -deltaCrlUri http://subcawithcrl.example.org/deltacrl \
-  -crlSigner CASIGN.CRLSIGNER \
-  -cmpControl cmpcontrol1 \
-  --duplicateSubject permitted \
-  --duplicateKey permitted
+xipki-ca:ca-add --name SubCAwithCRL1 \
+  --permission all \
+  --next-serial 1 \
+  --next-crl-no 2 \
+  --max-validity 5y \
+  --signer-type PKCS11 \
+  --signer-conf algo?$CA_SIGNER_ALGO%slot?1%key-label?$SubCAwithCRL_KEY_LABEL \
+  --ocsp-uri http://localhost:8080/ocsp/responder2 \
+  --crl-uri http://subcawithcrl.example.org/crl \
+  --deltacrl-uri http://subcawithcrl.example.org/deltacrl \
+  --crl-signer CASIGN.CRLSIGNER \
+  --cmp-control cmpcontrol1 \
+  --duplicate-subject permitted \
+  --duplicate-key permitted
 
-xipki-ca:caalias-add -ca SubCAwithCRL1 -alias SubCAwithCRL
+xipki-ca:caalias-add --ca SubCAwithCRL1 --alias SubCAwithCRL
 
 ## Add cert profile to CA
-xipki-ca:caprofile-add -ca SubCAwithCRL1 -profile OCSP -profile DEMO -profile multipleOUs
+xipki-ca:caprofile-add --ca SubCAwithCRL1 --profile OCSP --profile DEMO --profile multipleOUs
 
 ## Add CMP requestor to CA
-xipki-ca:careq-add -requestor requestor -permission all -ra yes -profile all -ca SubCAwithCRL1
+xipki-ca:careq-add --requestor requestor --permission all --ra yes --profile all --ca SubCAwithCRL1
 
 ## Restart the CA
 xipki-ca:restart

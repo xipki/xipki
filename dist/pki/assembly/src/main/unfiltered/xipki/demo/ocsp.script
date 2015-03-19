@@ -12,156 +12,156 @@ sleep 1000
 
 ## POST
 echo "QA: Good (POST, DB)"
-xipki-qa:ocsp-status -issuer output/RCA1.der -cert output/SubCA1.der \
-  -expStatus good -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/RCA1.der --cert output/SubCA1.der \
+  --exp-status good --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Good (POST, DB)"
-xipki-qa:ocsp-status -issuer output/SubCA1.der -cert output/TLS1.der \
-  -expStatus good -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCA1.der --cert output/TLS1.der \
+  --exp-status good --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
   
 echo "QA: Revoked, reason = affiliationChanged (POST, DB)"
-xipki-qa:ocsp-status -issuer output/SubCA1.der -cert output/TLS2.der \
-  -expStatus affiliationChanged -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCA1.der --cert output/TLS2.der \
+  --exp-status affiliationChanged --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
   
 echo "QA: Good (POST, DB)"
-xipki-qa:ocsp-status -issuer output/SubCA1.der -cert output/TLS_C1.der \
-  -expStatus good -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCA1.der --cert output/TLS_C1.der \
+  --exp-status good --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Revoked, reason = affiliationChanged (POST, DB)"
-xipki-qa:ocsp-status -issuer output/SubCA1.der -cert output/TLS_C2.der \
-  -expStatus affiliationChanged -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCA1.der --cert output/TLS_C2.der \
+  --exp-status affiliationChanged --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Good (POST, CRL)"
-xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -cert output/OCSP1.der \
-  -expStatus good -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCAwithCRL1.der --cert output/OCSP1.der \
+  --exp-status good --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Revoked, reason = keyCompromise (POST, CRL)"
-xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -cert output/OCSP2.der \
-  -expStatus keyCompromise -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCAwithCRL1.der --cert output/OCSP2.der \
+  --exp-status keyCompromise --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Good (POST, CRL)"
-xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -serial 99999 \
-  -expStatus good -expCerthash forbidden -expSigAlg SHA256withRSA \
-  -url $URL_CRL -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCAwithCRL1.der --serial 99999 \
+  --exp-status good --exp-certhash forbidden --exp-sig-alg SHA256withRSA \
+  --url $URL_CRL --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Unknown (RFC6960) (POST, DB)"
-xipki-qa:ocsp-status -issuer output/SubCA1.der -serial 99999 \
-  -expStatus unknown -expSigAlg SHA256withRSA \
-  -url $URL -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCA1.der --serial 99999 \
+  --exp-status unknown --exp-sig-alg SHA256withRSA \
+  --url $URL --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Unknown (RFC2560) (POST, ISSUER UNKNOWN)"
-xipki-qa:ocsp-status -issuer output/TLS1.der -serial 2 \
-  -expStatus issuerUnknown -expSigAlg SHA256withRSA \
-  -url $URL -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/TLS1.der --serial 2 \
+  --exp-status issuerUnknown --exp-sig-alg SHA256withRSA \
+  --url $URL --resp-issuer output/SubCAwithCRL1.der
 
 ## GET
 echo "QA: Good (GET, DB)"
-xipki-qa:ocsp-status -issuer output/RCA1.der -cert output/SubCA1.der -httpget \
-  -expStatus good -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/RCA1.der --cert output/SubCA1.der --http-get \
+  --exp-status good --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Good (GET, DB)"
-xipki-qa:ocsp-status -issuer output/SubCA1.der -cert output/TLS1.der -httpget \
-  -expStatus good -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCA1.der --cert output/TLS1.der --http-get \
+  --exp-status good --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Revoked, reason = affiliationChanged (GET, DB)"
-xipki-qa:ocsp-status -issuer output/SubCA1.der -cert output/TLS2.der -httpget \
-  -expStatus affiliationChanged -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCA1.der --cert output/TLS2.der --http-get \
+  --exp-status affiliationChanged --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Good (GET,DB)"
-xipki-qa:ocsp-status -issuer output/SubCA1.der -cert output/TLS_C1.der -httpget \
-  -expStatus good -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCA1.der --cert output/TLS_C1.der --http-get \
+  --exp-status good --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Revoked, reason = affiliationChanged (GET, DB)"
-xipki-qa:ocsp-status -issuer output/SubCA1.der -cert output/TLS_C2.der -httpget \
-  -expStatus affiliationChanged -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCA1.der --cert output/TLS_C2.der --http-get \
+  --exp-status affiliationChanged --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Good (GET, CRL)"
-xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -cert output/OCSP1.der -httpget \
-  -expStatus good -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCAwithCRL1.der --cert output/OCSP1.der --http-get \
+  --exp-status good --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Revoked, reason = keyCompromise (GET, CRL)"
-xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -cert output/OCSP2.der -httpget \
-  -expStatus keyCompromise -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCAwithCRL1.der --cert output/OCSP2.der --http-get \
+  --exp-status keyCompromise --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Good (GET, CRL)"
-xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -serial 99999 -httpget \
-  -expStatus good -expCerthash forbidden -expSigAlg SHA256withRSA \
-  -url $URL_CRL -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCAwithCRL1.der --serial 99999 --http-get \
+  --exp-status good --exp-certhash forbidden --exp-sig-alg SHA256withRSA \
+  --url $URL_CRL --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Unknown (RFC6960) (GET, DB)"
-xipki-qa:ocsp-status -issuer output/SubCA1.der -serial 99999 -httpget \
-  -expStatus unknown -expSigAlg SHA256withRSA \
-  -url $URL -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCA1.der --serial 99999 --http-get \
+  --exp-status unknown --exp-sig-alg SHA256withRSA \
+  --url $URL --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Unknown (RFC2560) (GET, ISSUER UNKNOWN)"
-xipki-qa:ocsp-status -issuer output/TLS1.der -serial 2 -httpget \
-  -expStatus issuerUnknown -expSigAlg SHA256withRSA \
-  -url $URL -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/TLS1.der --serial 2 --http-get \
+  --exp-status issuerUnknown --exp-sig-alg SHA256withRSA \
+  --url $URL --resp-issuer output/SubCAwithCRL1.der
  
 ## POST, SIGNED
 echo "QA: Good (POST, SIGNED, DB)"
-xipki-qa:ocsp-status -issuer output/RCA1.der -cert output/SubCA1.der -sign \
--expStatus good -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/RCA1.der --cert output/SubCA1.der --sign \
+  --exp-status good --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Good (POST, SIGNED, DB)"
-xipki-qa:ocsp-status -issuer output/SubCA1.der -cert output/TLS1.der -sign \
-  -expStatus good -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCA1.der --cert output/TLS1.der --sign \
+  --exp-status good --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Revoked, reason = affiliationChanged (POST, SIGNED, DB)"
-xipki-qa:ocsp-status -issuer output/SubCA1.der -cert output/TLS2.der -sign \
-  -expStatus affiliationChanged -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCA1.der --cert output/TLS2.der --sign \
+  --exp-status affiliationChanged --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Good (POST, SIGNED, DB)"
-xipki-qa:ocsp-status -issuer output/SubCA1.der -cert output/TLS_C1.der -sign \
-  -expStatus good -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCA1.der --cert output/TLS_C1.der --sign \
+  --exp-status good --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Revoked, reason = affiliationChanged (POST, SIGNED, DB)"
-xipki-qa:ocsp-status -issuer output/SubCA1.der -cert output/TLS_C2.der -sign \
-  -expStatus affiliationChanged -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCA1.der --cert output/TLS_C2.der --sign \
+  --exp-status affiliationChanged --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Good (POST, SIGNED, CRL)"
-xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -cert output/OCSP1.der -sign \
-  -expStatus good -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCAwithCRL1.der --cert output/OCSP1.der --sign \
+  --exp-status good --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
  
 echo "QA: Revoked, reason = keyCompromise (POST, SIGNED, CRL)"
-xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -cert output/OCSP2.der -sign \
-  -expStatus keyCompromise -expCerthash required -expSigAlg SHA256withRSA \
-  -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCAwithCRL1.der --cert output/OCSP2.der --sign \
+  --exp-status keyCompromise --exp-certhash required --exp-sig-alg SHA256withRSA \
+  --resp-issuer output/SubCAwithCRL1.der
  
 echo "QA: Good (POST, SIGNED, CRL)"
-xipki-qa:ocsp-status -issuer output/SubCAwithCRL1.der -serial 99999 -sign \
-  -expStatus good -expCerthash forbidden -expSigAlg SHA256withRSA \
-  -url $URL_CRL -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCAwithCRL1.der --serial 99999 --sign \
+  --exp-status good --exp-certhash forbidden --exp-sig-alg SHA256withRSA \
+  --url $URL_CRL --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Unknown (RFC6960) (POST, SIGNED, DB)"
-xipki-qa:ocsp-status -issuer output/SubCA1.der -serial 99999 -sign \
-  -expStatus unknown -expSigAlg SHA256withRSA \
-  -url $URL -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/SubCA1.der --serial 99999 --sign \
+  --exp-status unknown --exp-sig-alg SHA256withRSA \
+  --url $URL --resp-issuer output/SubCAwithCRL1.der
 
 echo "QA: Unknown (RFC2560) (POST, SIGNED, ISSUER UNKNOWN)"
-xipki-qa:ocsp-status -issuer output/TLS1.der -serial 2 -sign \
-  -expStatus issuerUnknown -expSigAlg SHA256withRSA \
-  -url $URL -respIssuer output/SubCAwithCRL1.der
+xipki-qa:ocsp-status --issuer output/TLS1.der --serial 2 --sign \
+  --exp-status issuerUnknown --exp-sig-alg SHA256withRSA \
+  --url $URL --resp-issuer output/SubCAwithCRL1.der
 
 feature:uninstall xipki-ocspqa-shell
 feature:uninstall xipki-ocspclient-shell

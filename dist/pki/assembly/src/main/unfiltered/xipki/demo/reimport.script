@@ -11,11 +11,11 @@ xipki-file:rm -r -f output/DB
 
 ## Export CA
 
-xipki-db:export-ca -outdir output/DB/CA
+xipki-db:export-ca --out-dir output/DB/CA
 
 ## Export OCSP
 
-xipki-db:export-ocsp -outdir output/DB/OCSP
+xipki-db:export-ocsp --out-dir output/DB/OCSP
 
 # Reset the CA and OCSP database
 
@@ -23,11 +23,11 @@ xipki-db:initdb --quiet
 
 ## Import CA
 
-xipki-db:import-ca -indir output/DB/CA
+xipki-db:import-ca --in-dir output/DB/CA
 
 ## Import OCSP
 
-xipki-db:import-ocsp -indir output/DB/OCSP
+xipki-db:import-ocsp --in-dir output/DB/OCSP
 
 ## Restart the CA
 feature:install xipki-camgmt-shell

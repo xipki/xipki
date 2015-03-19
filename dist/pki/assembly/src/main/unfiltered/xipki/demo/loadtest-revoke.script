@@ -8,8 +8,8 @@ sleep 1000
 
 echo "Revoke load test"
 xipki-cli:loadtest-revoke \
- -cacert output/SubCA1.der -cadb xipki/ca-config/ca-db.properties \
- -excludeSerials 1 -duration 15 -thread 8
+ --issuer output/SubCA1.der --ca-db xipki/ca-config/ca-db.properties \
+ --duration 15 --thread 8
 
 #################################################################
 #              UNINSTALL UNNEEDED FEATURES                      #

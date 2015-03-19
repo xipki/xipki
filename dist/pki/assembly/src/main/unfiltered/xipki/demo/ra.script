@@ -1,9 +1,9 @@
-xipki-tk:rsa-p12 -pwd 1234 -out output/RCA2.p12 \
-  -subject "CN=RCA2,O=xipki,C=DE"
+xipki-tk:rsa-p12 --password 1234 --out output/RCA2.p12 \
+  --subject "CN=RCA2,O=xipki,C=DE"
 
-xipki-tk:req-p12 -p12 output/RCA2.p12 -pwd 1234 -out output/RCA2.p10
+xipki-tk:req-p12 --p12 output/RCA2.p12 --password 1234 --out output/RCA2.p10
 
-xipki-ca:enroll-cert -ca RCA1 -profile RCA-Cross -p10 output/RCA2.p10 -out output/RCA2-cross.der
+xipki-ca:enroll-cert --ca RCA1 --profile RCA-Cross --p10 output/RCA2.p10 --out output/RCA2-cross.der
 
 #################################################################
 #              MANAGE CERTIFICATE WITH RA CLIENT                #
@@ -15,179 +15,189 @@ sleep 2000
 
 ## Check the healthy status
 
-xipki-cli:health -ca RCA1
+xipki-cli:health --ca RCA1
 
-xipki-cli:health -ca SubCA1
+xipki-cli:health --ca SubCA1
 
-xipki-cli:health -ca SubCAwithCRL1
+xipki-cli:health --ca SubCAwithCRL1
 
 ## Enroll certificates
 # Certificate OCSP1
-xipki-tk:rsa-p12 -pwd 1234 -out output/OCSP1.p12 -subject "CN=OCSP1,O=xipki,C=DE"
+xipki-tk:rsa-p12 --password 1234 --out output/OCSP1.p12 --subject "CN=OCSP1,O=xipki,C=DE"
 
 ## Create the PKCS#10 request for the command caqa:check-cert in QA 
-xipki-tk:req-p12 -p12 output/OCSP1.p12 -pwd 1234 \
-  -out output/OCSP1.p10 \
-  -subject "CN=OCSP1,O=xipki,C=DE" \
-  -needExtension authorityInfoAccess
+xipki-tk:req-p12 --p12 output/OCSP1.p12 --password 1234 \
+  --out output/OCSP1.p10 \
+  --subject "CN=OCSP1,O=xipki,C=DE" \
+  --need-extension authorityInfoAccess
 
-xipki-cli:enroll-p12 -p12 output/OCSP1.p12 -pwd 1234 -out output/OCSP1.der -profile OCSP -user USER-O \
-  -needExtension authorityInfoAccess
+xipki-cli:enroll-p12 --p12 output/OCSP1.p12 --password 1234 --out output/OCSP1.der --profile OCSP --user USER-O \
+  --need-extension authorityInfoAccess
 
-xipki-tk:update-cert-p12 -p12 output/OCSP1.p12 -pwd 1234 -cert output/OCSP1.der \
-  -cacert output/SubCAwithCRL1.der -cacert output/RCA1.der
+xipki-tk:update-cert-p12 --p12 output/OCSP1.p12 --password 1234 --cert output/OCSP1.der \
+  --ca-cert output/SubCAwithCRL1.der --ca-cert output/RCA1.der
 
 # Certificate OCSP2
-xipki-tk:rsa-p12 -pwd 1234 -out output/OCSP2.p12 -subject "CN=OCSP2,O=xipki,C=DE"
+xipki-tk:rsa-p12 --password 1234 --out output/OCSP2.p12 --subject "CN=OCSP2,O=xipki,C=DE"
 
 ## Create the PKCS#10 request for the command caqa:check-cert in QA 
-xipki-tk:req-p12 -p12 output/OCSP2.p12 -pwd 1234 \
-  -out output/OCSP2.p10 \
-  -subject "CN=OCSP2,O=xipki,C=DE" \
-  -needExtension authorityInfoAccess
+xipki-tk:req-p12 --p12 output/OCSP2.p12 --password 1234 \
+  --out output/OCSP2.p10 \
+  --subject "CN=OCSP2,O=xipki,C=DE" \
+  --need-extension authorityInfoAccess
 
-xipki-cli:enroll-p12 -p12 output/OCSP2.p12 -pwd 1234 -out output/OCSP2.der -profile OCSP -user USER-O \
-  -needExtension authorityInfoAccess
+xipki-cli:enroll-p12 --p12 output/OCSP2.p12 --password 1234 --out output/OCSP2.der --profile OCSP --user USER-O \
+  --need-extension authorityInfoAccess
 
-xipki-tk:update-cert-p12 -p12 output/OCSP2.p12 -pwd 1234 -cert output/OCSP2.der \
-  -cacert output/SubCAwithCRL1.der -cacert output/RCA1.der
+xipki-tk:update-cert-p12 --p12 output/OCSP2.p12 --password 1234 --cert output/OCSP2.der \
+  --ca-cert output/SubCAwithCRL1.der --ca-cert output/RCA1.der
 
 ## Revocate certificates
-xipki-cli:revoke -cert output/OCSP2.der -reason keyCompromise
+xipki-cli:revoke --cert output/OCSP2.der --reason keyCompromise
 
 # Certificate multipleOUs
-xipki-tk:rsa-p12 -pwd 1234 -out output/multipleOUs1.p12 -subject "CN=multipleOUs1,OU=A12345,OU=54321,O=xipki,C=DE"
+xipki-tk:rsa-p12 --password 1234 --out output/multipleOUs1.p12 \
+  --subject "CN=multipleOUs1,OU=A12345,OU=54321,O=xipki,C=DE"
 
 ## Create the PKCS#10 request for the command caqa:check-cert in QA 
-xipki-tk:req-p12 -p12 output/multipleOUs1.p12 -pwd 1234 \
-  -out output/multipleOUs1.p10 \
-  -subject "CN=multipleOUs1,OU=A12345,OU=54321,O=xipki,C=DE"
+xipki-tk:req-p12 --p12 output/multipleOUs1.p12 --password 1234 \
+  --out output/multipleOUs1.p10 \
+  --subject "CN=multipleOUs1,OU=A12345,OU=54321,O=xipki,C=DE"
 
-xipki-cli:enroll-p12 -p12 output/multipleOUs1.p12 -pwd 1234 -out output/multipleOUs1.der -profile multipleOUs -user USER-O
+xipki-cli:enroll-p12 --p12 output/multipleOUs1.p12 --password 1234 --out output/multipleOUs1.der \
+  --profile multipleOUs --user USER-O
 
-xipki-tk:update-cert-p12 -p12 output/multipleOUs1.p12 -pwd 1234 -cert output/multipleOUs1.der \
-  -cacert output/SubCAwithCRL1.der -cacert output/RCA1.der
+xipki-tk:update-cert-p12 --p12 output/multipleOUs1.p12 --password 1234 --cert output/multipleOUs1.der \
+  --ca-cert output/SubCAwithCRL1.der --ca-cert output/RCA1.der
 
-xipki-tk:rsa-p12 -pwd 1234 -out output/multipleOUs2.p12 -subject "CN=multipleOUs2,OU=54321,OU=A12345,O=xipki,C=DE"
+xipki-tk:rsa-p12 --password 1234 --out output/multipleOUs2.p12 \
+  --subject "CN=multipleOUs2,OU=54321,OU=A12345,O=xipki,C=DE"
 
 ## Create the PKCS#10 request for the command caqa:check-cert in QA 
-xipki-tk:req-p12 -p12 output/multipleOUs2.p12 -pwd 1234 \
-  -out output/multipleOUs2.p10 \
-  -subject "CN=multipleOUs2,OU=54321,OU=A12345,O=xipki,C=DE"
+xipki-tk:req-p12 --p12 output/multipleOUs2.p12 --password 1234 \
+  --out output/multipleOUs2.p10 \
+  --subject "CN=multipleOUs2,OU=54321,OU=A12345,O=xipki,C=DE"
 
-xipki-cli:enroll-p12 -p12 output/multipleOUs2.p12 -pwd 1234 -out output/multipleOUs2.der -profile multipleOUs -user USER-O
+xipki-cli:enroll-p12 --p12 output/multipleOUs2.p12 --password 1234 --out output/multipleOUs2.der \
+  --profile multipleOUs --user USER-O
 
-xipki-tk:update-cert-p12 -p12 output/multipleOUs2.p12 -pwd 1234 -cert output/multipleOUs2.der \
-  -cacert output/SubCAwithCRL1.der -cacert output/RCA1.der
+xipki-tk:update-cert-p12 --p12 output/multipleOUs2.p12 --password 1234 --cert output/multipleOUs2.der \
+  --ca-cert output/SubCAwithCRL1.der --ca-cert output/RCA1.der
 
 # Certificate DEMO1
-xipki-tk:rsa-p12 -pwd 1234 -out output/DEMO1.p12 -subject "CN=DEMO1,O=xipki,C=DE"
+xipki-tk:rsa-p12 --password 1234 --out output/DEMO1.p12 --subject "CN=DEMO1,O=xipki,C=DE"
 
-xipki-cli:enroll-p12 -p12 output/DEMO1.p12 -pwd 1234 -out output/DEMO1.der -profile DEMO -user USER-O
+xipki-cli:enroll-p12 --p12 output/DEMO1.p12 --password 1234 --out output/DEMO1.der --profile DEMO --user USER-O
 
-xipki-tk:update-cert-p12 -p12 output/DEMO1.p12 -pwd 1234 -cert output/DEMO1.der \
-  -cacert output/SubCAwithCRL1.der -cacert output/RCA1.der
+xipki-tk:update-cert-p12 --p12 output/DEMO1.p12 --password 1234 --cert output/DEMO1.der \
+  --ca-cert output/SubCAwithCRL1.der --ca-cert output/RCA1.der
 
 # Certificate TLS1
-xipki-tk:rsa-p12 -pwd 1234 -out output/TLS1.p12 -subject "CN=TLS1.xipki.org,O=xipki,C=DE"
+xipki-tk:rsa-p12 --password 1234 --out output/TLS1.p12 --subject "CN=TLS1.xipki.org,O=xipki,C=DE"
 
-xipki-tk:req-p12 -p12 output/TLS1.p12 -pwd 1234 -out output/TLS1.p10
+xipki-tk:req-p12 --p12 output/TLS1.p12 --password 1234 --out output/TLS1.p10
 
-xipki-cli:ra-enroll -p10 output/TLS1.p10 -out output/TLS1.der -profile TLS -user USER-T
+xipki-cli:ra-enroll --p10 output/TLS1.p10 --out output/TLS1.der --profile TLS --user USER-T
 
-xipki-tk:update-cert-p12 -p12 output/TLS1.p12 -pwd 1234 -cert output/TLS1.der \
-  -cacert output/SubCA1.der -cacert output/RCA1.der
+xipki-tk:update-cert-p12 --p12 output/TLS1.p12 --password 1234 --cert output/TLS1.der \
+  --ca-cert output/SubCA1.der --ca-cert output/RCA1.der
  
 # Try to enroll with another profile
-xipki-cli:ra-enroll -p10 output/TLS1.p10 -out output/TLS1-TLS_C.der -profile TLS_C -user USER-T
+xipki-cli:ra-enroll --p10 output/TLS1.p10 --out output/TLS1-TLS_C.der --profile TLS_C --user USER-T
 
 # Certificate TLSwithIncSN1 (all with same subject and profile but different key) 
 # 1.
-xipki-tk:rsa-p12 -pwd 1234 -out output/TLSwithIncSN1.p12 -subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE"
+xipki-tk:rsa-p12 --password 1234 --out output/TLSwithIncSN1.p12 \
+  --subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE"
 
-xipki-tk:req-p12 -p12 output/TLSwithIncSN1.p12 -pwd 1234 -out output/TLSwithIncSN1.p10
+xipki-tk:req-p12 --p12 output/TLSwithIncSN1.p12 --password 1234 --out output/TLSwithIncSN1.p10
 
-xipki-cli:ra-enroll -p10 output/TLSwithIncSN1.p10 -out output/TLSwithIncSN1.der -profile TLSwithIncSN -user USER-T
+xipki-cli:ra-enroll --p10 output/TLSwithIncSN1.p10 --out output/TLSwithIncSN1.der \
+  --profile TLSwithIncSN --user USER-T
 
 # 2.
-xipki-tk:rsa-p12 -pwd 1234 -out output/TLSwithIncSN1-1.p12 -subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE"
+xipki-tk:rsa-p12 --password 1234 --out output/TLSwithIncSN1-1.p12 \
+  --subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE"
 
-xipki-tk:req-p12 -p12 output/TLSwithIncSN1-1.p12 -pwd 1234 -out output/TLSwithIncSN1-1.p10
+xipki-tk:req-p12 --p12 output/TLSwithIncSN1-1.p12 --password 1234 --out output/TLSwithIncSN1-1.p10
 
-xipki-cli:ra-enroll -p10 output/TLSwithIncSN1-1.p10 -out output/TLSwithIncSN1-1.der -profile TLSwithIncSN -user USER-T
+xipki-cli:ra-enroll --p10 output/TLSwithIncSN1-1.p10 --out output/TLSwithIncSN1-1.der \
+  --profile TLSwithIncSN --user USER-T
 
 # 3.
-xipki-tk:rsa-p12 -pwd 1234 -out output/TLSwithIncSN1-2.p12 -subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE"
+xipki-tk:rsa-p12 --password 1234 --out output/TLSwithIncSN1-2.p12 \
+  --subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE"
 
-xipki-tk:req-p12 -p12 output/TLSwithIncSN1-2.p12 -pwd 1234 -out output/TLSwithIncSN1-2.p10
+xipki-tk:req-p12 --p12 output/TLSwithIncSN1-2.p12 --password 1234 --out output/TLSwithIncSN1-2.p10
 
-xipki-cli:ra-enroll -p10 output/TLSwithIncSN1-2.p10 -out output/TLSwithIncSN1-2.der -profile TLSwithIncSN -user USER-T
+xipki-cli:ra-enroll --p10 output/TLSwithIncSN1-2.p10 --out output/TLSwithIncSN1-2.der \
+  --profile TLSwithIncSN --user USER-T
  
 # Certificate TLS2
-xipki-tk:rsa-p12 -pwd 1234 -out output/TLS2.p12 -subject "CN=TLS2.xipki.org,O=xipki,C=DE"
+xipki-tk:rsa-p12 --password 1234 --out output/TLS2.p12 --subject "CN=TLS2.xipki.org,O=xipki,C=DE"
 
-xipki-tk:req-p12 -p12 output/TLS2.p12 -pwd 1234 -out output/TLS2.p10
+xipki-tk:req-p12 --p12 output/TLS2.p12 --password 1234 --out output/TLS2.p10
 
-xipki-cli:ra-enroll -p10 output/TLS2.p10 -out output/TLS2.der -profile TLS -user USER-T
+xipki-cli:ra-enroll --p10 output/TLS2.p10 --out output/TLS2.der --profile TLS --user USER-T
 
-xipki-tk:update-cert-p12 -p12 output/TLS2.p12 -pwd 1234 -cert output/TLS2.der \
-  -cacert output/SubCA1.der -cacert output/RCA1.der
+xipki-tk:update-cert-p12 --p12 output/TLS2.p12 --password 1234 --cert output/TLS2.der \
+  --ca-cert output/SubCA1.der --ca-cert output/RCA1.der
 
 ## Revocate certificates
-xipki-cli:revoke -cert output/TLS2.der -reason affiliationChanged
+xipki-cli:revoke --cert output/TLS2.der --reason affiliationChanged
 
 ## Enroll certificates
 # Certificate TLS_C1
-xipki-tk:rsa-p12 -pwd 1234 -out output/TLS_C1.p12 -subject "CN=TLS_C1,O=xipki,C=DE"
+xipki-tk:rsa-p12 --password 1234 --out output/TLS_C1.p12 --subject "CN=TLS_C1,O=xipki,C=DE"
 
-xipki-tk:req-p12 -p12 output/TLS_C1.p12 -pwd 1234 -out output/TLS_C1.p10
+xipki-tk:req-p12 --p12 output/TLS_C1.p12 --password 1234 --out output/TLS_C1.p10
 
-xipki-cli:ra-enroll -p10 output/TLS_C1.p10 -out output/TLS_C1.der -profile TLS_C -user USER-T
+xipki-cli:ra-enroll --p10 output/TLS_C1.p10 --out output/TLS_C1.der --profile TLS_C --user USER-T
 
-xipki-tk:update-cert-p12 -p12 output/TLS_C1.p12 -pwd 1234 -cert output/TLS_C1.der \
-  -cacert output/SubCA1.der -cacert output/RCA1.der
+xipki-tk:update-cert-p12 --p12 output/TLS_C1.p12 --password 1234 --cert output/TLS_C1.der \
+  --ca-cert output/SubCA1.der --ca-cert output/RCA1.der
 
 # Certificate TLS_C2
-xipki-tk:rsa-p12 -pwd 1234 -out output/TLS_C2.p12 -subject "CN=TLS_C2,O=xipki,C=DE"
+xipki-tk:rsa-p12 --password 1234 --out output/TLS_C2.p12 --subject "CN=TLS_C2,O=xipki,C=DE"
 
-xipki-tk:req-p12 -p12 output/TLS_C2.p12 -pwd 1234 -out output/TLS_C2.p10
+xipki-tk:req-p12 --p12 output/TLS_C2.p12 --password 1234 --out output/TLS_C2.p10
 
-xipki-cli:ra-enroll -p10 output/TLS_C2.p10 -out output/TLS_C2.der -profile TLS_C -user USER-T
+xipki-cli:ra-enroll --p10 output/TLS_C2.p10 --out output/TLS_C2.der --profile TLS_C --user USER-T
 
-xipki-tk:update-cert-p12 -p12 output/TLS_C2.p12 -pwd 1234 -cert output/TLS_C2.der \
-  -cacert output/SubCA1.der -cacert output/RCA1.der
+xipki-tk:update-cert-p12 --p12 output/TLS_C2.p12 --password 1234 --cert output/TLS_C2.der \
+  --ca-cert output/SubCA1.der --ca-cert output/RCA1.der
 
 ## Revocate certificates
-xipki-cli:revoke -cert output/TLS_C2.der -reason affiliationChanged
+xipki-cli:revoke --cert output/TLS_C2.der --reason affiliationChanged
 
 ## Enroll certificates gSMC-K
-xipki-tk:rsa-p12 -pwd 1234 -out output/gSMC_K1.p12 -subject "CN=80276123451234512345,O=xipki,C=DE"
+xipki-tk:rsa-p12 --password 1234 --out output/gSMC_K1.p12 --subject "CN=80276123451234512345,O=xipki,C=DE"
 
-xipki-tk:req-p12 -p12 output/gSMC_K1.p12 -pwd 1234 -out output/gSMC_K1.p10
+xipki-tk:req-p12 --p12 output/gSMC_K1.p12 --password 1234 --out output/gSMC_K1.p10
 
-xipki-cli:ra-enroll -p10 output/gSMC_K1.p10 -out output/gSMC_K1.der -profile gSMC_K -user USER-T
+xipki-cli:ra-enroll --p10 output/gSMC_K1.p10 --out output/gSMC_K1.der --profile gSMC_K --user USER-T
 
-xipki-tk:update-cert-p12 -p12 output/gSMC_K1.p12 -pwd 1234 -cert output/gSMC_K1.der \
-  -cacert output/SubCA1.der -cacert output/RCA1.der
+xipki-tk:update-cert-p12 --p12 output/gSMC_K1.p12 --password 1234 --cert output/gSMC_K1.der \
+  --ca-cert output/SubCA1.der --ca-cert output/RCA1.der
 
 # sleep 1.2 seconds to ensure different notBefore in certificate
 sleep 1200
 
 # with the same CN
-xipki-tk:rsa-p12 -pwd 1234 -out output/gSMC_K2.p12 -subject "CN=80276123451234512345,O=xipki,C=DE"
+xipki-tk:rsa-p12 --password 1234 --out output/gSMC_K2.p12 --subject "CN=80276123451234512345,O=xipki,C=DE"
 
-xipki-tk:req-p12 -p12 output/gSMC_K2.p12 -pwd 1234 -out output/gSMC_K2.p10
+xipki-tk:req-p12 --p12 output/gSMC_K2.p12 --password 1234 --out output/gSMC_K2.p10
 
-xipki-cli:ra-enroll -p10 output/gSMC_K2.p10 -out output/gSMC_K2.der -profile gSMC_K -user USER-T
+xipki-cli:ra-enroll --p10 output/gSMC_K2.p10 --out output/gSMC_K2.der --profile gSMC_K --user USER-T
 
-xipki-tk:update-cert-p12 -p12 output/gSMC_K2.p12 -pwd 1234 -cert output/gSMC_K2.der \
-  -cacert output/SubCA1.der -cacert output/RCA1.der
+xipki-tk:update-cert-p12 --p12 output/gSMC_K2.p12 --password 1234 --cert output/gSMC_K2.der \
+  --ca-cert output/SubCA1.der --ca-cert output/RCA1.der
 
 ## Generate CRL
-xipki-cli:gencrl -ca SubCAwithCRL1 -out output/SubCAwithCRL1.crl
+xipki-cli:gencrl --ca SubCAwithCRL1 --out output/SubCAwithCRL1.crl
 
 ## Get CRL
-xipki-cli:getcrl -ca SubCAwithCRL1 -out output/SubCAwithCRL1-get.crl
+xipki-cli:getcrl --ca SubCAwithCRL1 --out output/SubCAwithCRL1-get.crl
 
 #################################################################
 #              UNINSTALL UNNEEDED FEATURES                      #
