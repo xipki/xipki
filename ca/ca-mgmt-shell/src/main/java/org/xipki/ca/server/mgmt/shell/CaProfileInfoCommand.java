@@ -51,7 +51,7 @@ import org.apache.karaf.shell.commands.Option;
         description="show information of certificate profiles in given CA")
 public class CaProfileInfoCommand extends CaCommand
 {
-    @Option(name = "-ca",
+    @Option(name = "--ca",
             required = true,
             description = "CA name\n"
                     + "(required)")

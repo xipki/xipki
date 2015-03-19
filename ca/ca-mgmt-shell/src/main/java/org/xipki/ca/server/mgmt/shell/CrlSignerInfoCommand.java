@@ -55,7 +55,7 @@ public class CrlSignerInfoCommand extends CaCommand
     @Argument(index = 0, name = "name", description = "CRL signer name")
     private String name;
 
-    @Option(name = "-v", aliases="--verbose",
+    @Option(name = "--verbose", aliases="-v",
             description = "show CRL signer information verbosely")
     private Boolean verbose = Boolean.FALSE;
 

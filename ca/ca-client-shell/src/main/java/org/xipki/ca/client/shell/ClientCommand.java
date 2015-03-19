@@ -50,11 +50,11 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 public abstract class ClientCommand extends XipkiOsgiCommandSupport
 {
-    @Option(name = "-reqout",
+    @Option(name = "--req-out",
             description = "where to save the request")
     private String reqout;
 
-    @Option(name = "-respout",
+    @Option(name = "--resp-out",
             description = "where to save the response")
     private String respout;
 

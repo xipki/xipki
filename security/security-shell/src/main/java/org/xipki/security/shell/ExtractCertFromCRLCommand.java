@@ -60,13 +60,13 @@ import org.xipki.common.util.SecurityUtil;
 public class ExtractCertFromCRLCommand extends SecurityCommand
 {
 
-    @Option(name = "-crl",
+    @Option(name = "--crl",
             required = true,
             description = "CRL file\n"
                     + "(required)")
     private String crlFile;
 
-    @Option(name = "-out",
+    @Option(name = "--out", aliases = "-o",
             required = true,
             description = "zip file to save the extracted certificates\n"
                     + "(required)")

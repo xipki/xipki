@@ -45,13 +45,13 @@ import org.apache.karaf.shell.commands.Option;
 @Command(scope = "xipki-ca", name = "caalias-add", description="add CA alias")
 public class CaAliasAddCommand extends CaCommand
 {
-    @Option(name = "-ca",
+    @Option(name = "--ca",
             required = true,
             description = "CA name\n"
                     + "(required)")
     private String caName;
 
-    @Option(name = "-alias",
+    @Option(name = "--alias",
             required = true,
             description = "CA alias\n"
                     + "(required)")

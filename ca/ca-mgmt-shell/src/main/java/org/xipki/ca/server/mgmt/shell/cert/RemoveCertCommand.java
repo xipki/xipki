@@ -46,13 +46,13 @@ import org.xipki.ca.server.mgmt.shell.CaCommand;
 @Command(scope = "xipki-ca", name = "remove-cert", description="remove certificate")
 public class RemoveCertCommand extends CaCommand
 {
-    @Option(name = "-ca",
+    @Option(name = "--ca",
             required = true,
             description = "CA name\n"
                     + "(required)")
     private String caName;
 
-    @Option(name = "-serial",
+    @Option(name = "--serial", aliases = "-s",
             required = true,
             description = "serial number\n"
                     + "(required)")

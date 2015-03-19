@@ -57,7 +57,7 @@ import org.xipki.security.api.ConcurrentContentSigner;
 @Command(scope = "xipki-ca", name = "ca-add", description="add CA")
 public class CaAddCommand extends CaAddOrGenCommand
 {
-    @Option(name = "-cert",
+    @Option(name = "--cert",
             description = "CA certificate file")
     private String certFile;
 

@@ -46,13 +46,13 @@ import org.apache.karaf.shell.commands.Option;
 public class EnvAddCommand extends CaCommand
 {
 
-    @Option(name = "-name",
+    @Option(name = "--name", aliases = "-n",
             required = true,
             description = "parameter Name\n"
                     + "(required)")
     private String name;
 
-    @Option(name = "-value",
+    @Option(name = "--value",
             required = true,
             description = "environment paremter value\n"
                     + "(required)")

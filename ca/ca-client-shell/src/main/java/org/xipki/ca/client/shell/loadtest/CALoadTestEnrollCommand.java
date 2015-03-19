@@ -52,39 +52,39 @@ import org.xipki.common.util.StringUtil;
 public class CALoadTestEnrollCommand extends CALoadTestCommand
 {
 
-    @Option(name = "-profile",
+    @Option(name = "--profile", aliases = "-p",
             required = true,
             description = "certificate profile\n"
                     + "(required)")
     private String certprofile;
 
-    @Option(name = "-subject",
+    @Option(name = "--subject", aliases = "-s",
             required = true,
             description = "subject template\n"
                     + "(required)")
     private String subjectTemplate;
 
-    @Option(name = "-randomDN",
+    @Option(name = "--random-dn",
             description = "DN name to be incremented")
     private String randomDNStr = "O";
 
-    @Option(name = "-duration",
+    @Option(name = "--duration",
             description = "duration in seconds")
     private Integer durationInSecond = 30;
 
-    @Option(name = "-thread",
+    @Option(name = "--thread",
             description = "number of threads")
     private Integer numThreads = 5;
 
-    @Option(name="-keyType",
+    @Option(name="--key-type",
             description = "key type to be requested")
     private String keyType = "RSA";
 
-    @Option(name="-keysize",
+    @Option(name="--key-size",
             description = "modulus length of RSA key or p length of DSA key")
     private Integer keysize = 2048;
 
-    @Option(name = "-curve",
+    @Option(name = "--curve",
             description = "EC curve name or OID of EC key")
     private String curveName;
 

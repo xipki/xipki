@@ -51,7 +51,7 @@ import org.xipki.security.api.SignerException;
 @Command(scope = "xipki-tk", name = "export-cert-p12", description="export certificate from PKCS#12 keystore")
 public class P12CertExportCommand extends P12SecurityCommand
 {
-    @Option(name = "-out",
+    @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")

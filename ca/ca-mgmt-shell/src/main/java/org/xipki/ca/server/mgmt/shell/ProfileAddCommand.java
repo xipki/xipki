@@ -48,23 +48,23 @@ import org.xipki.common.util.IoUtil;
 public class ProfileAddCommand extends CaCommand
 {
 
-    @Option(name = "-name",
+    @Option(name = "--name", aliases = "-n",
             required = true,
             description = "profile name\n"
                     + "(required)")
     private String name;
 
-    @Option(name = "-type",
+    @Option(name = "--type",
             required = true,
             description = "profile type\n"
                     + "(required)")
     private String type;
 
-    @Option(name = "-conf",
+    @Option(name = "--conf",
             description = "profile configuration")
     private String conf;
 
-    @Option(name = "-confFile",
+    @Option(name = "--conf-file",
             description = "profile configuration file")
     private String confFile;
 

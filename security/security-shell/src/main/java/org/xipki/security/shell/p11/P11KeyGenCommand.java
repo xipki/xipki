@@ -51,27 +51,27 @@ import org.xipki.security.shell.KeyGenCommand;
 public abstract class P11KeyGenCommand extends KeyGenCommand
 {
 
-    @Option(name = "-slot",
+    @Option(name = "--slot",
             required = true,
             description = "slot index\n"
                     + "(required)")
     protected Integer slotIndex;
 
-    @Option(name = "-key-label",
+    @Option(name = "--key-label",
             required = true,
             description = "label of the PKCS#11 objects\n"
                     + "(required)")
     protected String label;
 
-    @Option(name = "-subject",
+    @Option(name = "--subject", aliases = "-s",
             description = "subject in the self-signed certificate")
     protected String subject;
 
-    @Option(name = "-certout",
+    @Option(name = "--cert-out",
             description = "where to save the self-signed certificate")
     protected String outputFilename;
 
-    @Option(name = "-module",
+    @Option(name = "--module",
             description = "Name of the PKCS#11 module.")
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 

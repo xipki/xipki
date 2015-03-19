@@ -49,7 +49,7 @@ public class CaPublishRCACertCommand extends CaCommand
     @Argument(index = 0, name = "name", description = "CA name", required = true)
     private String caName;
 
-    @Option(name = "-profile",
+    @Option(name = "--profile",
             required = true,
             description = "certificate profile name\n"
                     + "(required)")

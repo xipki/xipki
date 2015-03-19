@@ -48,93 +48,93 @@ import org.xipki.security.api.SecurityFactory;
 
 public abstract class CaAddOrGenCommand extends CaCommand
 {
-    @Option(name = "-name",
+    @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CA name\n"
                     + "(required)")
     protected String caName;
 
-    @Option(name = "-status",
+    @Option(name = "--status",
             description = "CA status")
     protected String caStatus = "active";
 
-    @Option(name = "-ocspUri",
+    @Option(name = "--ocsp-uri",
             multiValued = true,
             description = "OCSP URI\n"
                     + "(multi-valued)")
     protected List<String> ocspUris;
 
-    @Option(name = "-crlUri",
+    @Option(name = "--crl-uri",
             multiValued = true,
             description = "CRL distribution point\n"
                     + "(multi-valued)")
     protected List<String> crlUris;
 
-    @Option(name = "-deltaCrlUri",
+    @Option(name = "--deltacrl-uri",
             multiValued = true,
             description = "CRL distribution point\n"
                     + "(multi-valued)")
     protected List<String> deltaCrlUris;
 
-    @Option(name = "-permission",
+    @Option(name = "--permission",
             required = true, multiValued = true,
             description = "permission\n"
                     + "(required, multi-valued)")
     protected Set<String> permissions;
 
-    @Option(name = "-nextSerial",
+    @Option(name = "--next-serial",
             required = true,
             description = "serial number for the next certificate, 0 for random serial number\n"
                     + "(required)")
     protected Long nextSerial;
 
-    @Option(name = "-nextCrlNo",
+    @Option(name = "--next-crl-no",
             required = true,
             description = "CRL number for the next CRL\n"
                     + "(required)")
     protected Integer nextCrlNumber ;
 
-    @Option(name = "-maxValidity",
+    @Option(name = "--max-validity",
             required = true,
             description = "maximal validity\n"
                     + "(required)")
     protected String maxValidity;
 
-    @Option(name = "-crlSigner",
+    @Option(name = "--crl-signer",
             description = "CRL signer name")
     protected String crlSignerName;
 
-    @Option(name = "-cmpControl",
+    @Option(name = "--cmp-control",
             description = "CMP control name")
     protected String cmpControlName;
 
-    @Option(name = "-numCrls",
+    @Option(name = "--num-crls",
             description = "number of CRLs to be kept in database")
     protected Integer numCrls = 30;
 
-    @Option(name = "-expirationPeriod",
+    @Option(name = "--expiration-period",
             description = "days before expiration time of CA to issue certificates")
     protected Integer expirationPeriod = 365;
 
-    @Option(name = "-signerType",
+    @Option(name = "--signer-type",
             required = true,
             description = "CA signer type\n"
                     + "(required)")
     protected String signerType;
 
-    @Option(name = "-signerConf",
+    @Option(name = "--signer-conf",
             description = "CA signer configuration")
     protected String signerConf;
 
-    @Option(name = "-dk", aliases = { "--duplicateKey" },
+    @Option(name = "--duplicate-key",
             description = "mode of duplicate key")
     protected String duplicateKeyS = "forbiddenWithinProfile";
 
-    @Option(name = "-ds", aliases = { "--duplicateSubject" },
+    @Option(name = "--duplicate-subject",
             description = "mode of duplicate subject")
     protected String duplicateSubjectS = "forbiddenWithinProfile";
 
-    @Option(name = "-validityMode",
+    @Option(name = "--validity-mode",
             description = "mode of valditity")
     protected String validityModeS = "STRICT";
 

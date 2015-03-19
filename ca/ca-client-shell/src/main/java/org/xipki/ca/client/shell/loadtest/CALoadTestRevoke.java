@@ -125,7 +125,7 @@ class CALoadTestRevoke extends AbstractLoadTest
         }
 
         String sha1Fp = SecurityUtil.sha1sum(caCert.getEncoded());
-        String sql = "SELECT ID FROM CAINFO WHERE SHA1_FP_CERT='" + sha1Fp + "'";
+        String sql = "SELECT ID FROM CAINFO WHERE SHA1_CERT='" + sha1Fp + "'";
         Statement stmt = caDataSource.getConnection().createStatement();
         try
         {

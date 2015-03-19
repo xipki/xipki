@@ -48,7 +48,7 @@ import org.xipki.common.util.IoUtil;
 public class CertRequestValidateCommand extends SecurityCommand
 {
 
-    @Option(name = "-p10",
+    @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request file\n"
                     + "(required)")

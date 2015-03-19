@@ -48,13 +48,13 @@ import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 @Command(scope = "xipki-ca", name = "profile-export", description="export profile configuration")
 public class ProfileExportCommand extends CaCommand
 {
-    @Option(name = "-name",
+    @Option(name = "--name", aliases = "-n",
             required = true,
             description = "profile name\n"
                     + "(required)")
     private String name;
 
-    @Option(name = "-out",
+    @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the profile configuration\n"
                     + "(required)")

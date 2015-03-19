@@ -56,19 +56,19 @@ import org.xipki.common.util.IoUtil;
 @Command(scope = "xipki-ca", name = "gen-rca", description="generate selfsigned CA")
 public class CaGenRootCACommand extends CaAddOrGenCommand
 {
-    @Option(name = "-p10",
+    @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request of the Root CA\n"
                     + "(required)")
     private String p10ReqFile;
 
-    @Option(name = "-profile",
+    @Option(name = "--profile",
             required = true,
             description = "profile of the Root CA\n"
                     + "(required)")
     private String rcaProfile;
 
-    @Option(name = "-out",
+    @Option(name = "--out", aliases = "-o",
             description = "where to save the generated CA certificate")
     private String rcaCertOutFile;
 

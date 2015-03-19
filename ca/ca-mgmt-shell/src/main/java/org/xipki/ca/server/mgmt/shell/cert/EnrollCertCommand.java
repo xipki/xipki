@@ -55,31 +55,31 @@ public class EnrollCertCommand extends CaCommand
 {
     private static final Logger LOG = LoggerFactory.getLogger(EnrollCertCommand.class);
 
-    @Option(name = "-ca",
+    @Option(name = "--ca",
             required = true,
             description = "CA name\n"
                     + "(required)")
     private String caName;
 
-    @Option(name = "-p10",
+    @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request file\n"
                     + "(required)")
     private String p10File;
 
-    @Option(name = "-out",
+    @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")
     private String outFile;
 
-    @Option(name = "-profile",
+    @Option(name = "--profile", aliases = "-p",
             required = true,
             description = "profile name\n"
                     + "(required)")
     private String profileName;
 
-    @Option(name = "-user",
+    @Option(name = "--user",
             description = "username")
     private String user;
 

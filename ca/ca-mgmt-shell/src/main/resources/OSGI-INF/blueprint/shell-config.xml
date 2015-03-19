@@ -87,15 +87,15 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-status" value-ref="caStatusCompleter"/>
-        <entry key="-permission" value-ref="permissionCompleter"/>
-        <entry key="-crlSigner" value-ref="crlSignerNameCompleter"/>
-        <entry key="-cmpControl" value-ref="cmpControlNameCompleter"/>
-        <entry key="-cert" value-ref="filePathCompleter"/>
-        <entry key="-signerType" value-ref="signerTypeCompleter"/>
-        <entry key="-ds" value-ref="duplicationModeCompleter"/>
-        <entry key="-dk" value-ref="duplicationModeCompleter"/>
-        <entry key="-validityMode" value-ref="validityModeCompleter"/>
+        <entry key="--status" value-ref="caStatusCompleter"/>
+        <entry key="--permission" value-ref="permissionCompleter"/>
+        <entry key="--crl-signer" value-ref="crlSignerNameCompleter"/>
+        <entry key="--cmp-control" value-ref="cmpControlNameCompleter"/>
+        <entry key="--cert" value-ref="filePathCompleter"/>
+        <entry key="--signer-type" value-ref="signerTypeCompleter"/>
+        <entry key="--duplicate-subject" value-ref="duplicationModeCompleter"/>
+        <entry key="--duplicate-key" value-ref="duplicationModeCompleter"/>
+        <entry key="--validity-mode" value-ref="validityModeCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -107,7 +107,7 @@
         <null/>
       </completers>
       <optional-completers>
-        <entry key="-reason" value-ref="caCrlReasonCompleter"/>
+        <entry key="--reason" value-ref="caCrlReasonCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -134,15 +134,15 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-status" value-ref="caStatusCompleter"/>
-        <entry key="-permission" value-ref="permissionCompleter"/>
-        <entry key="-crlSigner" value-ref="crlSignerNameCompleter"/>
-        <entry key="-cmpControl" value-ref="cmpControlNameCompleter"/>
-        <entry key="-out" value-ref="filePathCompleter"/>
-        <entry key="-signerType" value-ref="signerTypeCompleter"/>
-        <entry key="-ds" value-ref="duplicationModeCompleter"/>
-        <entry key="-dk" value-ref="duplicationModeCompleter"/>
-        <entry key="-validityMode" value-ref="validityModeCompleter"/>
+        <entry key="--out" value-ref="filePathCompleter"/>
+        <entry key="--status" value-ref="caStatusCompleter"/>
+        <entry key="--permission" value-ref="permissionCompleter"/>
+        <entry key="--crl-signer" value-ref="crlSignerNameCompleter"/>
+        <entry key="--cmp-control" value-ref="cmpControlNameCompleter"/>
+        <entry key="--signer-type" value-ref="signerTypeCompleter"/>
+        <entry key="--duplicate-subject" value-ref="duplicationModeCompleter"/>
+        <entry key="--duplicate-key" value-ref="duplicationModeCompleter"/>
+        <entry key="--validity-mode" value-ref="validityModeCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -169,16 +169,16 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-name" value-ref="caNameCompleter"/>
-        <entry key="-status" value-ref="caStatusCompleter"/>
-        <entry key="-permission" value-ref="permissionCompleter"/>
-        <entry key="-crlSigner" value-ref="crlSignerNamePlusNullCompleter"/>
-        <entry key="-cmpControl" value-ref="cmpControlNamePlusNullCompleter"/>
-        <entry key="-cert" value-ref="filePathCompleter"/>
-        <entry key="-signerType" value-ref="signerTypeCompleter"/>
-        <entry key="-ds" value-ref="duplicationModeCompleter"/>
-        <entry key="-dk" value-ref="duplicationModeCompleter"/>
-        <entry key="-validityMode" value-ref="validityModeCompleter"/>
+        <entry key="--name" value-ref="caNameCompleter"/>
+        <entry key="--status" value-ref="caStatusCompleter"/>
+        <entry key="--permission" value-ref="permissionCompleter"/>
+        <entry key="--crl-signer" value-ref="crlSignerNameCompleter"/>
+        <entry key="--cmp-control" value-ref="cmpControlNameCompleter"/>
+        <entry key="--cert" value-ref="filePathCompleter"/>
+        <entry key="--signer-type" value-ref="signerTypeCompleter"/>
+        <entry key="--duplicate-subject" value-ref="duplicationModeCompleter"/>
+        <entry key="--duplicate-key" value-ref="duplicationModeCompleter"/>
+        <entry key="--validity-mode" value-ref="validityModeCompleter"/>
       </optional-completers>
     </command>
     <!-- CA Alias -->
@@ -187,7 +187,7 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-ca" value-ref="caNameCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -214,8 +214,8 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-ca" value-ref="caNameCompleter"/>
-        <entry key="-profile" value-ref="profileNameCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
+        <entry key="--profile" value-ref="profileNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -223,7 +223,7 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-ca" value-ref="caNameCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -231,8 +231,8 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-ca" value-ref="caNameCompleter"/>
-        <entry key="-profile" value-ref="profileNameCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
+        <entry key="--profile" value-ref="profileNameCompleter"/>
       </optional-completers>
     </command>
     <!--  CA-Publisher -->
@@ -241,8 +241,8 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-ca" value-ref="caNameCompleter"/>
-        <entry key="-publisher" value-ref="publisherNameCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
+        <entry key="--publisher" value-ref="publisherNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -250,7 +250,7 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-ca" value-ref="caNameCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -258,7 +258,7 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-ca" value-ref="caNameCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
     <!--  CA-Requestor -->
@@ -267,11 +267,11 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-ca" value-ref="caNameCompleter"/>
-        <entry key="-requestor" value-ref="requestorNameCompleter"/>
-        <entry key="-permission" value-ref="permissionCompleter"/>
-        <entry key="-profile" value-ref="profileNameAndAllCompleter"/>
-        <entry key="-ra" value-ref="yesNoCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
+        <entry key="--requestor" value-ref="requestorNameCompleter"/>
+        <entry key="--permission" value-ref="permissionCompleter"/>
+        <entry key="--profile" value-ref="profileNameAndAllCompleter"/>
+        <entry key="--ra" value-ref="yesNoCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -279,7 +279,7 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-ca" value-ref="caNameCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -287,8 +287,8 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-ca" value-ref="caNameCompleter"/>
-        <entry key="-requestor" value-ref="requestorNameCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
+        <entry key="--requestor" value-ref="requestorNameCompleter"/>
       </optional-completers>
     </command>
     <!-- CMPControl -->
@@ -315,10 +315,10 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-cc" value-ref="yesNoCompleter"/>
-        <entry key="-scc" value-ref="yesNoCompleter"/>
-        <entry key="-src" value-ref="yesNoCompleter"/>
-        <entry key="-mt" value-ref="yesNoCompleter"/>
+        <entry key="--confirm-cert" value-ref="yesNoCompleter"/>
+        <entry key="--send-ca" value-ref="yesNoCompleter"/>
+        <entry key="--send-responder" value-ref="yesNoCompleter"/>
+        <entry key="--need-message-time" value-ref="yesNoCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -326,11 +326,11 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-name" value-ref="cmpControlNameCompleter"/>
-        <entry key="-cc" value-ref="yesNoCompleter"/>
-        <entry key="-scc" value-ref="yesNoCompleter"/>
-        <entry key="-src" value-ref="yesNoCompleter"/>
-        <entry key="-mt" value-ref="yesNoCompleter"/>
+        <entry key="--name" value-ref="cmpControlNameCompleter"/>
+        <entry key="--confirm-cert" value-ref="yesNoCompleter"/>
+        <entry key="--send-ca" value-ref="yesNoCompleter"/>
+        <entry key="--send-responder" value-ref="yesNoCompleter"/>
+        <entry key="--need-message-time" value-ref="yesNoCompleter"/>
       </optional-completers>
     </command>
     <!-- CRL signer -->
@@ -340,10 +340,8 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-cert" value-ref="filePathCompleter"/>
-        <entry key="-signerType" value-ref="crlSignerTypeCompleter"/>
-        <entry key="-wc" value-ref="yesNoCompleter"/>
-        <entry key="-wec" value-ref="yesNoCompleter"/>
+        <entry key="--cert" value-ref="filePathCompleter"/>
+        <entry key="--signer-type" value-ref="crlSignerTypeCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -369,11 +367,9 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-name" value-ref="crlSignerNameCompleter"/>
-        <entry key="-cert" value-ref="filePathCompleter"/>
-        <entry key="-signerType" value-ref="crlSignerTypeCompleter"/>
-        <entry key="-wc" value-ref="yesNoCompleter"/>
-        <entry key="-wec" value-ref="yesNoCompleter"/>
+        <entry key="--name" value-ref="crlSignerNameCompleter"/>
+        <entry key="--cert" value-ref="filePathCompleter"/>
+        <entry key="--signer-type" value-ref="crlSignerTypeCompleter"/>
       </optional-completers>
     </command>
     <!-- Environment -->
@@ -405,7 +401,7 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-name" value-ref="envNameCompleter"/>
+        <entry key="--name" value-ref="envNameCompleter"/>
       </optional-completers>
     </command>
     <!-- Profile -->
@@ -414,7 +410,7 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-confFile" value-ref="filePathCompleter"/>
+        <entry key="--conf-file" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -440,8 +436,8 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-name" value-ref="profileNameCompleter"/>
-        <entry key="-confFile" value-ref="filePathCompleter"/>
+        <entry key="--name" value-ref="profileNameCompleter"/>
+        <entry key="--conf-file" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -449,8 +445,8 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-name" value-ref="profileNameCompleter"/>
-        <entry key="-out" value-ref="filePathCompleter"/>
+        <entry key="--name" value-ref="profileNameCompleter"/>
+        <entry key="--out" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <!-- Publisher -->
@@ -459,7 +455,7 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-confFile" value-ref="filePathCompleter"/>
+        <entry key="--conf-file" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -485,8 +481,8 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-name" value-ref="publisherNameCompleter"/>
-        <entry key="-confFile" value-ref="filePathCompleter"/>
+        <entry key="--name" value-ref="publisherNameCompleter"/>
+        <entry key="--conf-file" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -494,8 +490,8 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-ca" value-ref="caNamePlusAllCompleter"/>
-        <entry key="-publisher" value-ref="publisherNamePlusAllCompleter"/>
+        <entry key="--ca" value-ref="caNamePlusAllCompleter"/>
+        <entry key="--publisher" value-ref="publisherNamePlusAllCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -503,8 +499,8 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-ca" value-ref="caNamePlusAllCompleter"/>
-        <entry key="-publisher" value-ref="publisherNamePlusAllCompleter"/>
+        <entry key="--ca" value-ref="caNamePlusAllCompleter"/>
+        <entry key="--publisher" value-ref="publisherNamePlusAllCompleter"/>
       </optional-completers>
     </command>
     <!-- Requestor -->
@@ -513,7 +509,7 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-cert" value-ref="filePathCompleter"/>
+        <entry key="--cert" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -539,8 +535,8 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-name" value-ref="requestorNameCompleter"/>
-        <entry key="-cert" value-ref="filePathCompleter"/>
+        <entry key="--name" value-ref="requestorNameCompleter"/>
+        <entry key="--cert" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <!-- Responder -->
@@ -560,8 +556,8 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-signerType" value-ref="signerTypeCompleter"/>
-        <entry key="-cert" value-ref="filePathCompleter"/>
+        <entry key="--signer-type" value-ref="signerTypeCompleter"/>
+        <entry key="--cert" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -570,8 +566,8 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-signerType" value-ref="signerTypeCompleter"/>
-        <entry key="-cert" value-ref="filePathCompleter"/>
+        <entry key="--signer-type" value-ref="signerTypeCompleter"/>
+        <entry key="--cert" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <!-- Certificate management -->
@@ -581,10 +577,10 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-ca" value-ref="caNameCompleter"/>
-        <entry key="-profile" value-ref="profileNameCompleter"/>
-        <entry key="-p10" value-ref="filePathCompleter"/>
-        <entry key="-out" value-ref="filePathCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
+        <entry key="--profile" value-ref="profileNameCompleter"/>
+        <entry key="--p10" value-ref="filePathCompleter"/>
+        <entry key="--out" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <!-- Enroll Certificate -->
@@ -593,8 +589,8 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-ca" value-ref="caNameCompleter"/>
-        <entry key="-reason" value-ref="clientCrlReasonCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
+        <entry key="--reason" value-ref="clientCrlReasonCompleter"/>
       </optional-completers>
     </command>
     <!-- Enroll Certificate -->
@@ -603,7 +599,7 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-ca" value-ref="caNameCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
     <!-- Remove Certificate -->
@@ -612,7 +608,7 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="-ca" value-ref="caNameCompleter"/>
+        <entry key="--ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
   </command-bundle>

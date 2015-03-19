@@ -47,21 +47,21 @@ import org.xipki.common.util.IoUtil;
 public class PublisherUpdateCommand extends CaCommand
 {
 
-    @Option(name = "-name",
+    @Option(name = "--name", aliases = "-n",
             required = true,
             description = "publisher name\n"
                     + "(required)")
     private String name;
 
-    @Option(name = "-type",
+    @Option(name = "--type",
             description = "publisher type")
     private String type;
 
-    @Option(name = "-conf",
+    @Option(name = "--conf",
             description = "publisher configuration or 'NULL'")
     private String conf;
 
-    @Option(name = "-confFile",
+    @Option(name = "--conf-file",
             description = "profile configuration file")
     private String confFile;
 

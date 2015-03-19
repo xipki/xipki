@@ -51,7 +51,7 @@ import org.xipki.common.qa.UnexpectedResultException;
 public abstract class NegCRLCommand extends ClientCommand
 {
 
-    @Option(name = "-ca",
+    @Option(name = "--ca",
             description = "CA name\n"
                     + "required if multiple CAs are configured")
     private String caName;

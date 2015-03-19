@@ -47,13 +47,13 @@ import org.apache.karaf.shell.commands.Option;
 @Command(scope = "xipki-ca", name = "caprofile-add", description="add certificate profiles to CA")
 public class CaProfileAddCommand extends CaCommand
 {
-    @Option(name = "-ca",
+    @Option(name = "--ca",
             required = true,
             description = "CA name\n"
                     + "(required)")
     private String caName;
 
-    @Option(name = "-profile",
+    @Option(name = "--profile",
             required = true, multiValued = true,
             description = "profile profileNames\n"
                 + "(required, multi-valued)")

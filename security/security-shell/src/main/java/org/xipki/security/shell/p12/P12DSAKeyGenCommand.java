@@ -47,11 +47,11 @@ import org.xipki.security.api.P12KeypairGenerationResult;
 @Command(scope = "xipki-tk", name = "dsa-p12", description="generate RSA keypair in PKCS#12 keystore")
 public class P12DSAKeyGenCommand extends P12KeyGenCommand
 {
-    @Option(name = "-plen",
+    @Option(name = "--plen",
             description = "bit length of the prime")
     private Integer pLen = 2048;
 
-    @Option(name = "-qlen",
+    @Option(name = "--qlen",
             description = "bit length of the sub-prime")
     private Integer qLen;
 

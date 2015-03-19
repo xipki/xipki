@@ -47,7 +47,7 @@ import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 public class ResponderInfoCommand extends CaCommand
 {
 
-    @Option(name = "-v", aliases="--verbose",
+    @Option(name = "--verbose", aliases="-v",
             description = "show responder information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
