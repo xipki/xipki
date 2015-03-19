@@ -58,11 +58,11 @@ public class FileRmCommand extends XipkiOsgiCommandSupport
                     + "(required)")
     private String targetPath;
 
-    @Option(name = "-r", aliases="--recursive",
+    @Option(name = "--recursive", aliases="-r",
             description = "remove directories and their contents recursively")
     private Boolean recursive = Boolean.FALSE;
 
-    @Option(name = "-f", aliases="--force",
+    @Option(name = "--force", aliases="-f",
             description = "ignore nonexistent files, never prompt")
     private Boolean force = Boolean.FALSE;
 
