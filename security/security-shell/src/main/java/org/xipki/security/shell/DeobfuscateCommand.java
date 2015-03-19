@@ -47,7 +47,7 @@ import org.xipki.security.OBFPasswordResolver;
 @Command(scope = "xipki-tk", name = "deobfuscate", description="deobfuscate password")
 public class DeobfuscateCommand extends SecurityCommand
 {
-    @Option(name = "-pwd", aliases = { "--password" },
+    @Option(name = "--password",
             required = true,
             description = "obfuscated password, starts with OBF:\n"
                     + "(required)")

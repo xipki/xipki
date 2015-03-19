@@ -54,15 +54,15 @@ import org.xipki.common.util.SecurityUtil;
 
 public abstract class UnRevRemoveCertCommand extends ClientCommand
 {
-    @Option(name = "-cert",
+    @Option(name = "--cert", aliases = "-c",
             description = "certificate file")
     protected String certFile;
 
-    @Option(name = "-cacert",
-            description = "CA certificate file")
-    protected String caCertFile;
+    @Option(name = "--issuer", aliases = "-i",
+            description = "issuer certificate file")
+    protected String issuerCertFile;
 
-    @Option(name = "-serial",
+    @Option(name = "--serial", aliases = "-s",
             description = "serial number")
     private String serialNumberS;
 
@@ -85,7 +85,7 @@ public abstract class UnRevRemoveCertCommand extends ClientCommand
     {
         if(cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal()) == false)
         {
-            return "the given certificate is not issued by the given CA";
+            return "the given certificate is not issued by the given issuer";
         }
 
         byte[] caSki = SecurityUtil.extractSKI(caCert);
@@ -94,7 +94,7 @@ public abstract class UnRevRemoveCertCommand extends ClientCommand
         {
             if(Arrays.equals(aki, caSki) == false)
             {
-                return "the given certificate is not issued by the given CA";
+                return "the given certificate is not issued by the given issuer";
             }
         }
 
@@ -103,10 +103,10 @@ public abstract class UnRevRemoveCertCommand extends ClientCommand
             cert.verify(caCert.getPublicKey(), "BC");
         } catch(SignatureException e)
         {
-            return "could not verify the signaure of given certificate by the CA";
+            return "could not verify the signaure of given certificate by the issuer";
         } catch (InvalidKeyException | CertificateException | NoSuchAlgorithmException | NoSuchProviderException e)
         {
-            return "could not verify the signaure of given certificate by the CA: " + e.getMessage();
+            return "could not verify the signaure of given certificate by the issuer: " + e.getMessage();
         }
 
         return null;

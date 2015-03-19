@@ -50,13 +50,13 @@ import org.xipki.security.api.SignerException;
 @Command(scope = "xipki-cli", name = "enroll-p12", description="enroll certificate (PKCS#12 keystore)")
 public class P12EnrollCertCommand extends EnrollCertCommand
 {
-    @Option(name = "-p12",
+    @Option(name = "--p12",
             required = true,
             description = "PKCS#12 request file\n"
                     + "(required)")
     private String p12File;
 
-    @Option(name = "-pwd", aliases = { "--password" },
+    @Option(name = "--password",
             description = "password of the PKCS#12 file")
     private String password;
 

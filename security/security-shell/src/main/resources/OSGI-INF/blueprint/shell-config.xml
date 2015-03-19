@@ -15,7 +15,7 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-module" value-ref="p11ModuleNameCompleter"/>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -23,8 +23,8 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-certout" value-ref="filePathCompleter"/>
-        <entry key="-module" value-ref="p11ModuleNameCompleter"/>
+        <entry key="--cert-out" value-ref="filePathCompleter"/>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -32,8 +32,8 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-out" value-ref="filePathCompleter"/>
-        <entry key="-certout" value-ref="filePathCompleter"/>
+        <entry key="--out" value-ref="filePathCompleter"/>
+        <entry key="--cert-out" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -41,8 +41,8 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-certout" value-ref="filePathCompleter"/>
-        <entry key="-module" value-ref="p11ModuleNameCompleter"/>
+        <entry key="--cert-out" value-ref="filePathCompleter"/>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -50,8 +50,8 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-out" value-ref="filePathCompleter"/>
-        <entry key="-certout" value-ref="filePathCompleter"/>
+        <entry key="--out" value-ref="filePathCompleter"/>
+        <entry key="--cert-out" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -59,9 +59,9 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-curve" value-ref="ecCurveNameCompleter"/>
-        <entry key="-certout" value-ref="filePathCompleter"/>
-        <entry key="-module" value-ref="p11ModuleNameCompleter"/>
+        <entry key="--curve" value-ref="ecCurveNameCompleter"/>
+        <entry key="--cert-out" value-ref="filePathCompleter"/>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -69,9 +69,9 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-curve" value-ref="ecCurveNameCompleter"/>
-        <entry key="-out" value-ref="filePathCompleter"/>
-        <entry key="-certout" value-ref="filePathCompleter"/>
+        <entry key="--curve" value-ref="ecCurveNameCompleter"/>
+        <entry key="--out" value-ref="filePathCompleter"/>
+        <entry key="--cert-out" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -79,12 +79,12 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-out" value-ref="filePathCompleter"/>
-        <entry key="-module" value-ref="p11ModuleNameCompleter"/>
-        <entry key="-keyusage" value-ref="keyusageCompleter"/>
-        <entry key="-extKeyusage" value-ref="extKeyusageCompleter"/>
-        <entry key="-needExtension" value-ref="extNameCompleter"/>
-        <entry key="-wantExtension" value-ref="extNameCompleter"/>
+        <entry key="--out" value-ref="filePathCompleter"/>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+        <entry key="--keyusage" value-ref="keyusageCompleter"/>
+        <entry key="--ext-keyusage" value-ref="extKeyusageCompleter"/>
+        <entry key="--need-extension" value-ref="extNameCompleter"/>
+        <entry key="--want-extension" value-ref="extNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -92,12 +92,12 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-out" value-ref="filePathCompleter"/>
-        <entry key="-p12" value-ref="filePathCompleter"/>
-        <entry key="-keyusage" value-ref="keyusageCompleter"/>
-        <entry key="-extKeyusage" value-ref="extKeyusageCompleter"/>
-        <entry key="-needExtension" value-ref="extNameCompleter"/>
-        <entry key="-wantExtension" value-ref="extNameCompleter"/>        
+        <entry key="--out" value-ref="filePathCompleter"/>
+        <entry key="--p12" value-ref="filePathCompleter"/>
+        <entry key="--keyusage" value-ref="keyusageCompleter"/>
+        <entry key="--ext-keyusage" value-ref="extKeyusageCompleter"/>
+        <entry key="--need-extension" value-ref="extNameCompleter"/>
+        <entry key="--want-extension" value-ref="extNameCompleter"/>        
       </optional-completers>
     </command>
     <command>
@@ -105,16 +105,16 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-out" value-ref="filePathCompleter"/>
-        <entry key="-module" value-ref="p11ModuleNameCompleter"/>
+        <entry key="--out" value-ref="filePathCompleter"/>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
     <command>
       <action class="org.xipki.security.shell.p12.P12CertExportCommand">
             </action>
       <optional-completers>
-        <entry key="-out" value-ref="filePathCompleter"/>
-        <entry key="-p12" value-ref="filePathCompleter"/>
+        <entry key="--out" value-ref="filePathCompleter"/>
+        <entry key="--p12" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -122,9 +122,9 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-cert" value-ref="filePathCompleter"/>
-        <entry key="-cacert" value-ref="filePathCompleter"/>
-        <entry key="-module" value-ref="p11ModuleNameCompleter"/>
+        <entry key="--cert" value-ref="filePathCompleter"/>
+        <entry key="--ca-cert" value-ref="filePathCompleter"/>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -132,8 +132,8 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-cert" value-ref="filePathCompleter"/>
-        <entry key="-module" value-ref="p11ModuleNameCompleter"/>
+        <entry key="--cert" value-ref="filePathCompleter"/>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -141,7 +141,7 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-module" value-ref="p11ModuleNameCompleter"/>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -149,9 +149,9 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-cert" value-ref="filePathCompleter"/>
-        <entry key="-cacert" value-ref="filePathCompleter"/>
-        <entry key="-p12" value-ref="filePathCompleter"/>
+        <entry key="--cert" value-ref="filePathCompleter"/>
+        <entry key="--ca-cert" value-ref="filePathCompleter"/>
+        <entry key="--p12" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -159,7 +159,7 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-module" value-ref="p11ModuleNameCompleter"/>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -187,8 +187,8 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-crl" value-ref="filePathCompleter"/>
-        <entry key="-out" value-ref="filePathCompleter"/>
+        <entry key="--crl" value-ref="filePathCompleter"/>
+        <entry key="--out" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -196,7 +196,7 @@
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
-        <entry key="-p10" value-ref="filePathCompleter"/>
+        <entry key="--p10" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
   </command-bundle>

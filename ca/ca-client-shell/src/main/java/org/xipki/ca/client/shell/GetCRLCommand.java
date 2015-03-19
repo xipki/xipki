@@ -57,11 +57,11 @@ import org.xipki.common.qa.UnexpectedResultException;
 @Command(scope = "xipki-cli", name = "getcrl", description="download CRL")
 public class GetCRLCommand extends CRLCommand
 {
-    @Option(name = "-with-basecrl",
+    @Option(name = "--with-basecrl",
             description = "whether to retrieve the baseCRL if the current CRL is a delta CRL")
     private Boolean withBaseCRL = Boolean.FALSE;
 
-    @Option(name = "-basecrl-out",
+    @Option(name = "--basecrl-out",
             description = "where to save the baseCRL\n"
                     + "(defaults to <out>-baseCRL)")
     private String baseCRLOut;

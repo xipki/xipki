@@ -57,16 +57,16 @@ public class RemoveCertCommand extends UnRevRemoveCertCommand
     protected Object _doExecute()
     throws Exception
     {
-        if(certFile == null && (caCertFile == null || getSerialNumber() == null))
+        if(certFile == null && (issuerCertFile == null || getSerialNumber() == null))
         {
-            err("either cert or (cacert, serial) must be specified");
+            err("either cert or (issuer, serial) must be specified");
             return null;
         }
 
         X509Certificate caCert = null;
-        if(caCertFile != null)
+        if(issuerCertFile != null)
         {
-            caCert = SecurityUtil.parseCert(caCertFile);
+            caCert = SecurityUtil.parseCert(issuerCertFile);
         }
 
         CertIDOrError certIdOrError;

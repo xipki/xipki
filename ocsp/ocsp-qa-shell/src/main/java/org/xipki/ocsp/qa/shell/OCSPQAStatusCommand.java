@@ -62,33 +62,33 @@ import org.xipki.ocsp.qa.api.OcspResponseOption;
 @Command(scope = "xipki-qa", name = "ocsp-status", description="request certificate status (QA)")
 public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
 {
-    @Option(name = "-expError",
+    @Option(name = "--exp-error",
             description = "expected error")
     private String errorText;
 
-    @Option(name = "-expStatus",
+    @Option(name = "--exp-status",
             multiValued = true,
             description = "expected status\n"
                     + "(multi-valued)")
     private List<String> statusTexts;
 
-    @Option(name = "-expSigAlg",
+    @Option(name = "--exp-sig-alg",
             description = "expected signature algorithm")
     private String sigAlg;
 
-    @Option(name = "-expNextupdate",
+    @Option(name = "--exp-nextupdate",
             description = "occurence of nextUpdate")
     private String nextUpdateOccurrenceText = Occurrence.optional.name();
 
-    @Option(name = "-expCerthash",
+    @Option(name = "--exp-certhash",
             description = "occurence of certHash")
     private String certhashOccurrenceText = Occurrence.optional.name();
 
-    @Option(name = "-expCerthashAlg",
+    @Option(name = "--exp-certhash-alg",
             description = "occurence of certHash")
     private String certhashAlg;
 
-    @Option(name = "-expNonce",
+    @Option(name = "--exp-nonce",
             description = "occurence of nonce")
     private String nonceOccurrenceText = Occurrence.optional.name();
 

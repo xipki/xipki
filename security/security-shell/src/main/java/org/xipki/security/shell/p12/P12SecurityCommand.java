@@ -47,13 +47,13 @@ import org.xipki.security.shell.SecurityCommand;
 
 public abstract class P12SecurityCommand extends SecurityCommand
 {
-    @Option(name = "-p12",
+    @Option(name = "--p12",
             required = true,
             description = "PKCS#12 keystore file\n"
                     + "(required)")
     protected String p12File;
 
-    @Option(name = "-pwd", aliases = { "--password" },
+    @Option(name = "--password",
             description = "password of the PKCS#12 file")
     protected String password;
 

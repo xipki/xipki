@@ -54,27 +54,27 @@ import org.xipki.security.api.SecurityFactory;
 @Command(scope = "xipki-cli", name = "loadtest-revoke", description="CA Client Revoke Load test")
 public class CALoadTestRevokeCommand extends CALoadTestCommand
 {
-    @Option(name = "-cacert",
+    @Option(name = "--issuer",
             required = true,
-            description = "CA Certificate file\n"
+            description = "issuer certificate file\n"
                     + "(required)")
-    private String caCertFile;
+    private String issuerCertFile;
 
-    @Option(name = "-duration",
+    @Option(name = "--duration",
             description = "maximal duration in seconds")
     private Integer durationInSecond = 30;
 
-    @Option(name = "-thread",
+    @Option(name = "--thread",
             description = "number of threads")
     private Integer numThreads = 5;
 
-    @Option(name = "-cadb",
+    @Option(name = "--ca-db",
             required = true,
             description = "CA database configuration file\n"
                     + "(required)")
     private String caDbConfFile;
 
-    @Option(name = "-maxCerts",
+    @Option(name = "--max-certs",
             description = "maximal number of certificates to be revoked\n"
                     + "0 for unlimited")
     private Integer maxCerts = 0;
@@ -105,11 +105,11 @@ public class CALoadTestRevokeCommand extends CALoadTestCommand
         StringBuilder startMsg = new StringBuilder();
 
         startMsg.append("threads:         ").append(numThreads).append("\n");
-        startMsg.append("max. Duration:   ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
-        startMsg.append("cacert:          ").append(caCertFile).append("\n");
+        startMsg.append("max. duration:   ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
+        startMsg.append("issuer:          ").append(issuerCertFile).append("\n");
         startMsg.append("cadb:            ").append(caDbConfFile).append("\n");
         startMsg.append("maxCerts:        ").append(maxCerts).append("\n");
-        startMsg.append("#certs/Request:  ").append(n).append("\n");
+        startMsg.append("#certs/request:  ").append(n).append("\n");
         startMsg.append("unit:            ").append(n).append(" certificate");
         if(n > 1)
         {
@@ -118,7 +118,7 @@ public class CALoadTestRevokeCommand extends CALoadTestCommand
         startMsg.append("\n");
         out(startMsg.toString());
 
-        Certificate caCert = Certificate.getInstance(IoUtil.read(caCertFile));
+        Certificate caCert = Certificate.getInstance(IoUtil.read(issuerCertFile));
         Properties props = new Properties();
         props.load(new FileInputStream(IoUtil.expandFilepath(caDbConfFile)));
         props.setProperty("autoCommit", "false");

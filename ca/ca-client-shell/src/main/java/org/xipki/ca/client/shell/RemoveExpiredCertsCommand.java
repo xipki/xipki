@@ -49,23 +49,23 @@ import org.xipki.common.RequestResponseDebug;
 @Command(scope = "xipki-cli", name = "remove-expired-certs", description="remove expired certificates")
 public class RemoveExpiredCertsCommand extends ClientCommand
 {
-    @Option(name = "-ca",
+    @Option(name = "--ca",
             description = "CA name\n"
                     + "(required if multiple CAs are configured)")
     private String caName;
 
-    @Option(name = "-profile",
+    @Option(name = "--profile", aliases = "-p",
             required = true,
             description = "certificate profile\n"
                     + "(required)")
     private String profile;
 
-    @Option(name = "-user",
+    @Option(name = "--user",
             description = "username, wildcards '%' and '*' are allowed\n"
                     + "'all' for all users")
     private String userLike;
 
-    @Option(name = "-overlap",
+    @Option(name = "--overlap",
             description = "overlap in seconds")
     private Long overlapSeconds = 24L * 60 * 60;
 

@@ -76,67 +76,67 @@ import org.xipki.security.api.SignerException;
 
 public abstract class EnrollCertCommand extends ClientCommand
 {
-    @Option(name = "-subject",
+    @Option(name = "--subject", aliases = "-s",
             description = "subject to be requested\n"
                     + "(defaults to subject of self-signed certifite)")
     private String subject;
 
-    @Option(name = "-profile",
+    @Option(name = "--profile", aliases = "-p",
             required = true,
             description = "certificate profile\n"
                     + "(required)")
     private String profile;
 
-    @Option(name = "-out",
+    @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")
     private String outputFile;
 
-    @Option(name = "-user",
+    @Option(name = "--user",
             description = "username")
     private String user;
 
-    @Option(name = "-hash",
+    @Option(name = "--hash",
             description = "hash algorithm name for the POPO computation")
     protected String hashAlgo = "SHA256";
 
-    @Option(name = "-ca",
+    @Option(name = "--ca",
             description = "CA name\n"
                     + "(required if the profile is supported by more than one CA)")
     private String caName;
 
-    @Option(name = "-keyusage",
+    @Option(name = "--keyusage",
             multiValued = true,
             description = "keyusage\n"
                     + "(multi-valued)")
     private List<String> keyusages;
 
-    @Option(name = "-extKeyusage",
+    @Option(name = "--ext-keyusage",
             multiValued = true,
             description = "extended keyusage\n"
                     + "(multi-valued)")
     private List<String> extkeyusages;
 
-    @Option(name = "-subjectAltName",
+    @Option(name = "--subject-alt-name",
             multiValued = true,
             description = "subjectAltName\n"
                     + "(multi-valued)")
     private List<String> subjectAltNames;
 
-    @Option(name = "-subjectInfoAccess",
+    @Option(name = "--subject-info-access",
             multiValued = true,
             description = "subjectInfoAccess.\n"
                     + "(multi-valued)")
     private List<String> subjectInfoAccesses;
 
-    @Option(name = "-needExtension",
+    @Option(name = "--need-extension",
             multiValued = true,
             description = "type (OID or name) of extension that must be contaied in the certificate\n"
                     + "(multi-valued)")
     private List<String> needExtensionTypes;
 
-    @Option(name = "-wantExtension",
+    @Option(name = "--want-extension",
             multiValued = true,
             description = "type (OID or name) of extension that should be contaied in the certificate if possible\n"
                     + "(multi-valued)")

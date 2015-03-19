@@ -49,12 +49,12 @@ import org.xipki.common.HealthCheckResult;
 public class HealthCommand extends ClientCommand
 {
 
-    @Option(name = "-ca",
+    @Option(name = "--ca",
             description = "CA name\n"
                     + "(required if multiple CAs are configured)")
     private String caName;
 
-    @Option(name = "-v", aliases="--verbose",
+    @Option(name = "--verbose", aliases = "-v",
             description = "show status verbosely")
     private Boolean verbose = Boolean.FALSE;
 
