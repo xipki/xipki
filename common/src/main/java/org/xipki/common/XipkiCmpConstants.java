@@ -44,6 +44,8 @@ import org.bouncycastle.asn1.x509.GeneralName;
 
 public class XipkiCmpConstants
 {
+    public static final int CRL_REASON_REMOVE = -1;
+
     private static final ASN1ObjectIdentifier id_private_dummy = new ASN1ObjectIdentifier("1.2.3.4.5.6");
 
     private static final ASN1ObjectIdentifier id_ext                       = id_private_dummy.branch("1");

@@ -148,8 +148,6 @@ import org.xml.sax.SAXException;
 
 class X509CACmpResponder extends CmpResponder
 {
-    public static final int XiPKI_CRL_REASON_REMOVE = 101;
-
     private static final Set<String> knownGenMsgIds = new HashSet<>();
 
     private static final Logger LOG = LoggerFactory.getLogger(X509CACmpResponder.class);
@@ -1507,7 +1505,7 @@ class X509CACmpResponder extends CmpResponder
                 }
             }
 
-            if(reasonCode == XiPKI_CRL_REASON_REMOVE)
+            if(reasonCode == XipkiCmpConstants.CRL_REASON_REMOVE)
             {
                 if(requiredPermission == null)
                 {
@@ -1765,7 +1763,7 @@ class X509CACmpResponder extends CmpResponder
     {
         if(auditEvent != null)
         {
-            auditEvent.addEventData(new AuditEventData("eventType", "CERT_REQ"));
+            auditEvent.addEventData(new AuditEventData("eventType", eventType));
         }
     }
 
