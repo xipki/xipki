@@ -3,11 +3,11 @@
   <appInfo>
     <my:myDescription xmlns:my="http://example.org">
       <my:category>cat A</my:category>
-      <my:details>Certprofile RootCA Cross</my:details>
+      <my:details>Certprofile Cross</my:details>
     </my:myDescription>
   </appInfo>
   <version>3</version>
-  <ca>true</ca>
+  <ca>false</ca>
   <validity>10y</validity>
   <notBeforeTime>current</notBeforeTime>
   <duplicateKey>false</duplicateKey>

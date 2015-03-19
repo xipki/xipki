@@ -5,16 +5,17 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="xipki-${project.version}" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
   <repository>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</repository>
   <!-- Add the custom bundles for certprofiles here -->
-  <feature name="xipki-custom-certprofiles" version="${project.version}" resolver="(obr)">
+  <feature name="xipki-certprofiles" version="${project.version}" resolver="(obr)">
     <feature>xipki-ca-api</feature>
+    <bundle>mvn:org.xipki/ca-certprofile/${project.version}</bundle>
     <bundle>mvn:org.xipki/certprofile-demo/${project.version}</bundle>
   </feature>
   <!-- Add the custom bundles for cert publishers here -->
-  <feature name="xipki-custom-publishers" version="${project.version}" resolver="(obr)">
+  <feature name="xipki-publishers" version="${project.version}" resolver="(obr)">
     <feature>xipki-ca-api</feature>
   </feature>
   <!-- Add the custom bundles for signers here -->
-  <feature name="xipki-custom-signers" version="${project.version}" resolver="(obr)">
+  <feature name="xipki-signers" version="${project.version}" resolver="(obr)">
     <feature>xipki-security-base</feature>
   </feature>
   <!--
@@ -41,7 +42,7 @@
   </feature>
   <feature name="xipki-security" version="${project.version}" resolver="(obr)">
     <feature>xipki-security-base</feature>
-    <feature>xipki-custom-signers</feature>
+    <feature>xipki-signers</feature>
   </feature>
   <feature name="xipki-ca-api" version="${project.version}" resolver="(obr)">
     <bundle>mvn:org.xipki/common/${project.version}</bundle>
@@ -59,10 +60,9 @@
     <feature>xipki-datasource</feature>
     <feature>xipki-cabase</feature>
     <feature>xipki-audit</feature>
-    <feature>xipki-custom-certprofiles</feature>
-    <feature>xipki-custom-publishers</feature>
+    <feature>xipki-certprofiles</feature>
+    <feature>xipki-publishers</feature>
     <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-certprofile/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-server/${project.version}</bundle>
   </feature>
   <feature name="xipki-camgmt-shell" version="${project.version}" resolver="(obr)">
@@ -82,8 +82,8 @@
   </feature>
   <feature name="xipki-caqa-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-caclient-shell</feature>
+    <feature>xipki-certprofiles</feature>
     <bundle>mvn:org.xipki/ca-qa-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-certprofile/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-qa-impl/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-qa-shell/${project.version}</bundle>
   </feature>
