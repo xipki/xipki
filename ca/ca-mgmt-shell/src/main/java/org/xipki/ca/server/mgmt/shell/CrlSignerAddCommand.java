@@ -103,7 +103,7 @@ public class CrlSignerAddCommand extends CaCommand
             securityFactory.createSigner(signerType, signerConf, signerCert);
         }
 
-        CRLControl crlControl = CRLControl.getInstance(crlControlS);
+        CRLControl crlControl = new CRLControl(crlControlS);
         X509CrlSignerEntry entry = new X509CrlSignerEntry(name, signerType, signerConf, crlControl);
         if(signerCert != null)
         {
