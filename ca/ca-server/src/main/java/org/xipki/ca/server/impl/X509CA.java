@@ -925,6 +925,13 @@ class X509CA
                 auditEvent.addEventData(new AuditEventData("crlNumber", crlNumber.toString()));
             }
 
+            boolean onlyUserCerts = crlControl.isOnlyContainsUserCerts();
+            boolean onlyCACerts = crlControl.isOnlyContainsCACerts();
+            if(onlyUserCerts && onlyCACerts)
+            {
+                throw new RuntimeException("should not reach here, onlyUserCerts and onlyCACerts are both true");
+            }
+
             try
             {
                 // AuthorityKeyIdentifier
@@ -938,39 +945,19 @@ class X509CA
                 crlBuilder.addExtension(Extension.cRLNumber, false, new ASN1Integer(crlNumber));
 
                 // IssuingDistributionPoint
-                boolean onlyUserCerts = crlControl.isOnlyContainsUserCerts();
-                if(onlyUserCerts == false)
+                if(onlyUserCerts == true || onlyCACerts == true || directCRL == false)
                 {
-                    if(certstore.containsCACertificates(caCert) == false)
-                    {
-                        onlyUserCerts = true;
-                    }
+                    IssuingDistributionPoint idp = new IssuingDistributionPoint(
+                            (DistributionPointName) null, // distributionPoint,
+                            onlyUserCerts, // onlyContainsUserCerts,
+                            onlyCACerts, // onlyContainsCACerts,
+                            (ReasonFlags) null, // onlySomeReasons,
+                            directCRL == false, // indirectCRL,
+                            false // onlyContainsAttributeCerts
+                            );
+
+                    crlBuilder.addExtension(Extension.issuingDistributionPoint, true, idp);
                 }
-
-                boolean onlyCACerts = crlControl.isOnlyContainsCACerts();
-                if(onlyCACerts == false)
-                {
-                    if(certstore.containsUserCertificates(caCert) == false)
-                    {
-                        onlyCACerts = true;
-                    }
-                }
-
-                if(onlyUserCerts && onlyCACerts)
-                {
-                    throw new RuntimeException("should not reach here, onlyUserCerts and onlyCACerts are both true");
-                }
-
-                IssuingDistributionPoint idp = new IssuingDistributionPoint(
-                        (DistributionPointName) null, // distributionPoint,
-                        onlyUserCerts, // onlyContainsUserCerts,
-                        onlyCACerts, // onlyContainsCACerts,
-                        (ReasonFlags) null, // onlySomeReasons,
-                        directCRL == false, // indirectCRL,
-                        false // onlyContainsAttributeCerts
-                        );
-
-                crlBuilder.addExtension(Extension.issuingDistributionPoint, true, idp);
             } catch (CertIOException e)
             {
                 final String message = "crlBuilder.addExtension";
@@ -992,7 +979,7 @@ class X509CA
                 do
                 {
                     serials = certstore.getCertSerials(caCert, notExpireAt, startSerial, numEntries, false,
-                            control.isOnlyContainsCACerts(), control.isOnlyContainsUserCerts());
+                            onlyCACerts, onlyUserCerts);
 
                     BigInteger maxSerial = BigInteger.ONE;
                     for(BigInteger serial : serials)
