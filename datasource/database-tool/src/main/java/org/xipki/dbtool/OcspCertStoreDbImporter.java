@@ -87,14 +87,14 @@ class OcspCertStoreDbImporter extends DbPorter
             " SHA384_NAME, SHA384_KEY," +
             " SHA512_NAME, SHA512_KEY," +
             " SHA1_CERT, CERT," +
-            " REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME" +
+            " REVOKED, REV_REASON, REV_TIME, REV_INV_TIME" +
             " ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     static final String SQL_ADD_CERT =
             "INSERT INTO CERT (" +
             " ID, ISSUER_ID, SERIAL, " +
             " SUBJECT, LAST_UPDATE, NOTBEFORE, NOTAFTER," +
-            " REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE)" +
+            " REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, PROFILE)" +
             " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     static final String SQL_ADD_CERTHASH = "INSERT INTO CERTHASH (" +
@@ -225,7 +225,7 @@ class OcspCertStoreDbImporter extends DbPorter
                     setBoolean(ps, idx++, issuer.isRevoked());
                     setInt(ps, idx++, issuer.getRevReason());
                     setLong(ps, idx++, issuer.getRevTime());
-                    setLong(ps, idx++, issuer.getRevInvalidityTime());
+                    setLong(ps, idx++, issuer.getRevInvTime());
 
                     ps.execute();
                 }catch(SQLException e)
@@ -409,7 +409,7 @@ class OcspCertStoreDbImporter extends DbPorter
                     setBoolean(ps_cert, idx++, cert.isRevoked());
                     setInt(ps_cert, idx++, cert.getRevReason());
                     setLong(ps_cert, idx++, cert.getRevTime());
-                    setLong(ps_cert, idx++, cert.getRevInvalidityTime());
+                    setLong(ps_cert, idx++, cert.getRevInvTime());
                     ps_cert.setString(idx++, cert.getProfile());
                     ps_cert.addBatch();
                 }catch(SQLException e)

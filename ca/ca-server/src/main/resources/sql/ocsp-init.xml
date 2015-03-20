@@ -11,7 +11,7 @@
       </column>
     </createTable>
     <insert tableName="DBSCHEMAINFO">
-      <column name="VERSION" value="1"/>
+      <column name="VERSION" value="2"/>
     </insert>
     <!-- table ISSUER -->
     <createTable tableName="ISSUER">
@@ -63,7 +63,7 @@
       <column defaultValueNumeric="0" name="REVOKED" type="SMALLINT"/>
       <column name="REV_REASON" type="SMALLINT"/>
       <column name="REV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
-      <column name="REV_INVALIDITY_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
+      <column name="REV_INV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
       <column name="CERT" type="VARCHAR(3000)">
         <constraints nullable="false"/>
       </column>
@@ -96,7 +96,7 @@
       </column>
       <column name="REV_REASON" type="SMALLINT"/>
       <column name="REV_TIME" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
-      <column name="REV_INVALIDITY_TIME" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
+      <column name="REV_INV_TIME" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
       <column name="PROFILE" type="VARCHAR(45)"/>
     </createTable>
     <addUniqueConstraint tableName="CERT" columnNames="ISSUER_ID, SERIAL" constraintName="CONST_ISSUER_SERIAL"/>

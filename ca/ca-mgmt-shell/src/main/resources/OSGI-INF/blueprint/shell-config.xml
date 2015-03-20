@@ -172,8 +172,8 @@
         <entry key="--name" value-ref="caNameCompleter"/>
         <entry key="--status" value-ref="caStatusCompleter"/>
         <entry key="--permission" value-ref="permissionCompleter"/>
-        <entry key="--crl-signer" value-ref="crlSignerNameCompleter"/>
-        <entry key="--cmp-control" value-ref="cmpControlNameCompleter"/>
+        <entry key="--crl-signer" value-ref="crlSignerNamePlusNullCompleter"/>
+        <entry key="--cmp-control" value-ref="cmpControlNamePlusNullCompleter"/>
         <entry key="--cert" value-ref="filePathCompleter"/>
         <entry key="--signer-type" value-ref="signerTypeCompleter"/>
         <entry key="--duplicate-subject" value-ref="duplicationModeCompleter"/>
@@ -314,12 +314,6 @@
       <action class="org.xipki.ca.server.mgmt.shell.CmpControlAddCommand">
         <property name="caManager" ref="caManager"/>
       </action>
-      <optional-completers>
-        <entry key="--confirm-cert" value-ref="yesNoCompleter"/>
-        <entry key="--send-ca" value-ref="yesNoCompleter"/>
-        <entry key="--send-responder" value-ref="yesNoCompleter"/>
-        <entry key="--need-message-time" value-ref="yesNoCompleter"/>
-      </optional-completers>
     </command>
     <command>
       <action class="org.xipki.ca.server.mgmt.shell.CmpControlUpdateCommand">
@@ -327,10 +321,6 @@
       </action>
       <optional-completers>
         <entry key="--name" value-ref="cmpControlNameCompleter"/>
-        <entry key="--confirm-cert" value-ref="yesNoCompleter"/>
-        <entry key="--send-ca" value-ref="yesNoCompleter"/>
-        <entry key="--send-responder" value-ref="yesNoCompleter"/>
-        <entry key="--need-message-time" value-ref="yesNoCompleter"/>
       </optional-completers>
     </command>
     <!-- CRL signer -->

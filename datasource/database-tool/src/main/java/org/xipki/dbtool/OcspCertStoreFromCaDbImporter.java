@@ -72,12 +72,12 @@ import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType;
 import org.xipki.dbi.ca.jaxb.CaHasPublisherType;
 import org.xipki.dbi.ca.jaxb.CaType;
-import org.xipki.dbi.ca.jaxb.CainfoType;
 import org.xipki.dbi.ca.jaxb.CertStoreType;
-import org.xipki.dbi.ca.jaxb.CertStoreType.Cainfos;
+import org.xipki.dbi.ca.jaxb.CertStoreType.Cas;
 import org.xipki.dbi.ca.jaxb.CertStoreType.CertsFiles;
 import org.xipki.dbi.ca.jaxb.CertType;
 import org.xipki.dbi.ca.jaxb.CertsType;
+import org.xipki.dbi.ca.jaxb.CertstoreCaType;
 import org.xipki.dbi.ca.jaxb.NameIdType;
 import org.xipki.dbi.ca.jaxb.PublisherType;
 
@@ -214,7 +214,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
             }
 
             Map<Integer, String> profileMap = new HashMap<Integer, String>();
-            for(NameIdType ni : certstore.getCertprofileinfos().getCertprofileinfo())
+            for(NameIdType ni : certstore.getProfiles().getProfile())
             {
                 profileMap.put(ni.getId(), ni.getName());
             }
@@ -222,11 +222,11 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
             List<Integer> relatedCaIds;
             if(resume)
             {
-                relatedCaIds = getIssuerIds(certstore.getCainfos(), relatedCas);
+                relatedCaIds = getIssuerIds(certstore.getCas(), relatedCas);
             }
             else
             {
-                relatedCaIds = import_issuer(certstore.getCainfos(), relatedCas);
+                relatedCaIds = import_issuer(certstore.getCas(), relatedCas);
             }
 
             File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);
@@ -240,10 +240,10 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
         System.out.println(" imported OCSP certstore to database");
     }
 
-    private List<Integer> getIssuerIds(Cainfos issuers, List<CaType> cas)
+    private List<Integer> getIssuerIds(Cas issuers, List<CaType> cas)
     {
         List<Integer> relatedCaIds = new LinkedList<>();
-        for(CainfoType issuer : issuers.getCainfo())
+        for(CertstoreCaType issuer : issuers.getCa())
         {
             String b64Cert = issuer.getCert();
             byte[] encodedCert = Base64.decode(b64Cert);
@@ -268,7 +268,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
         return relatedCaIds;
     }
 
-    private List<Integer> import_issuer(Cainfos issuers, List<CaType> cas)
+    private List<Integer> import_issuer(Cas issuers, List<CaType> cas)
     throws DataAccessException, CertificateException
     {
         System.out.println("importing table ISSUER");
@@ -279,7 +279,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
 
         try
         {
-            for(CainfoType issuer : issuers.getCainfo())
+            for(CertstoreCaType issuer : issuers.getCa())
             {
                 try
                 {
@@ -346,7 +346,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                     setBoolean(ps, idx++, ca.isRevoked());
                     setInt(ps, idx++, ca.getRevReason());
                     setLong(ps, idx++, ca.getRevTime());
-                    setLong(ps, idx++, ca.getRevInvalidityTime());
+                    setLong(ps, idx++, ca.getRevInvTime());
 
                     ps.execute();
                 }catch(SQLException e)
@@ -544,9 +544,9 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                     setBoolean(ps_cert, idx++, cert.isRevoked());
                     setInt(ps_cert, idx++, cert.getRevReason());
                     setLong(ps_cert, idx++, cert.getRevTime());
-                    setLong(ps_cert, idx++, cert.getRevInvalidityTime());
+                    setLong(ps_cert, idx++, cert.getRevInvTime());
 
-                    int certprofileId = cert.getCertprofileId();
+                    int certprofileId = cert.getProfileId();
                     String certprofileName = profileMap.get(certprofileId);
                     ps_cert.setString(idx++, certprofileName);
                     ps_cert.addBatch();

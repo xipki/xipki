@@ -35,22 +35,7 @@
       <column name="NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="REQUIRE_CONFIRM_CERT" type="SMALLINT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="REQUIRE_MESSAGE_TIME" type="SMALLINT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="MESSAGE_TIME_BIAS" remarks="seconds" type="INT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="CONFIRM_WAIT_TIME" remarks="seconds" type="INT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="SEND_CA_CERT" type="SMALLINT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="SEND_RESPONDER_CERT" type="SMALLINT">
+      <column name="CONF" type="VARCHAR(4000)">
         <constraints nullable="false"/>
       </column>
     </createTable>
@@ -103,8 +88,8 @@
       </column>
       <column name="CONF" type="VARCHAR(4000)"/>
     </createTable>
-    <!-- table "CERTPROFILE" -->
-    <createTable tableName="CERTPROFILE">
+    <!-- table "PROFILE" -->
+    <createTable tableName="PROFILE">
       <column name="NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
@@ -133,7 +118,7 @@
         <constraints nullable="false"/>
       </column>
       <column name="CRL_URIS" type="VARCHAR(1000)"/>
-      <column name="DELTA_CRL_URIS" type="VARCHAR(1000)"/>
+      <column name="DELTACRL_URIS" type="VARCHAR(1000)"/>
       <column name="OCSP_URIS" type="VARCHAR(1000)"/>
       <column name="MAX_VALIDITY" type="VARCHAR(45)">
         <constraints nullable="false"/>
@@ -142,10 +127,10 @@
       <column name="CMPCONTROL_NAME" type="VARCHAR(45)">
         <constraints nullable="false"/>
       </column>
-      <column defaultValueNumeric="2" name="DUPLICATE_KEY_MODE" type="SMALLINT">
+      <column defaultValueNumeric="2" name="DUPLICATE_KEY" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
-      <column defaultValueNumeric="2" name="DUPLICATE_SUBJECT_MODE" type="SMALLINT">
+      <column defaultValueNumeric="2" name="DUPLICATE_SUBJECT" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
       <column name="VALIDITY_MODE" type="varchar(100)"/>
@@ -161,7 +146,7 @@
       </column>
       <column name="REV_REASON" type="SMALLINT"/>
       <column name="REV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
-      <column name="REV_INVALIDITY_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
+      <column name="REV_INV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
       <column name="SIGNER_TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
@@ -171,7 +156,7 @@
       <column name="CERT" type="VARCHAR(3000)">
         <constraints nullable="false"/>
       </column>
-      <column name="ADD_CONTROL" type="VARCHAR(4000)"/>
+      <column name="EXTRA_CONTROL" type="VARCHAR(4000)"/>
     </createTable>
     <!-- table CAALIAS -->
     <createTable tableName="CAALIAS">
@@ -205,20 +190,20 @@
         <constraints primaryKey="true" nullable="false"/>
       </column>
     </createTable>
-    <!-- table CA_HAS_CERTPROFILE -->
-    <createTable tableName="CA_HAS_CERTPROFILE">
+    <!-- table CA_HAS_PROFILE -->
+    <createTable tableName="CA_HAS_PROFILE">
       <column name="CA_NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="CERTPROFILE_NAME" type="VARCHAR(45)">
+      <column name="PROFILE_NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
     </createTable>
   </changeSet>
   <!-- CertStore :: create table -->
   <changeSet author="xipki" id="2">
-    <!-- table CAINFO -->
-    <createTable tableName="CAINFO">
+    <!-- table CS_CA -->
+    <createTable tableName="CS_CA">
       <column name="ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
@@ -228,12 +213,12 @@
       <column name="CERT" type="VARCHAR(3000)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA1_CERT" type="CHAR(40)">
+      <column name="FP_CERT" type="CHAR(40)">
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <!-- table REQUESTORINFO -->
-    <createTable tableName="REQUESTORINFO">
+    <!-- table CS_REQUESTOR -->
+    <createTable tableName="CS_REQUESTOR">
       <column name="ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
@@ -241,8 +226,8 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <!-- table PUBLISHERINFO -->
-    <createTable tableName="PUBLISHERINFO">
+    <!-- table CS_PUBLISHER -->
+    <createTable tableName="CS_PUBLISHER">
       <column name="ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
@@ -262,8 +247,8 @@
     <createIndex tableName="USERNAME" unique="false" indexName="IDX_USER_NAME">
       <column name="NAME"/>
     </createIndex>
-    <!-- table CERTPROFILEINFO -->
-    <createTable tableName="CERTPROFILEINFO">
+    <!-- table CS_PROFILE -->
+    <createTable tableName="CS_PROFILE">
       <column name="ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
@@ -279,7 +264,7 @@
       <column name="CA_ID" type="INT">
         <constraints nullable="false"/>
       </column>
-      <column name="CRL_NUMBER" type="INT">
+      <column name="CRL_NO" type="INT">
         <constraints nullable="false"/>
       </column>
       <column name="THISUPDATE" type="BIGINT">
@@ -289,12 +274,12 @@
       <column name="DELTACRL" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
-      <column name="BASECRL_NUMBER" type="INT"/>
+      <column name="BASECRL_NO" type="INT"/>
       <column name="CRL" type="${crl.data.type}">
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <addUniqueConstraint tableName="CRL" columnNames="CA_ID, CRL_NUMBER" constraintName="CONST_CA_CRLNUMBER"/>
+    <addUniqueConstraint tableName="CRL" columnNames="CA_ID, CRL_NO" constraintName="CONST_CA_CRLNO"/>
     <!-- table CERT -->
     <createTable tableName="CERT">
       <column name="ID" type="INT">
@@ -309,7 +294,7 @@
       <column name="SERIAL" type="BIGINT">
         <constraints nullable="false"/>
       </column>
-      <column name="CERTPROFILE_ID" type="INT">
+      <column name="PROFILE_ID" type="INT">
         <constraints nullable="false"/>
       </column>
       <column name="REQUESTOR_ID" type="INT"/>
@@ -330,31 +315,31 @@
       </column>
       <column name="REV_REASON" type="SMALLINT"/>
       <column name="REV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
-      <column name="REV_INVALIDITY_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
+      <column name="REV_INV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
       <column name="EE" type="SMALLINT" remarks="whether it is an end entity cert">
         <constraints nullable="false"/>
       </column>
       <column name="USER_ID" type="INT"/>
-      <column name="SHA1_PK" type="CHAR(40)">
+      <column name="FP_PK" type="CHAR(40)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA1_SUBJECT" type="CHAR(40)">
+      <column name="FP_SUBJECT" type="CHAR(40)">
         <constraints nullable="false"/>
       </column>
     </createTable>
     <addUniqueConstraint tableName="CERT" columnNames="CA_ID, SERIAL" constraintName="CONST_CA_SERIAL"/>
     <createIndex tableName="CERT" unique="false" indexName="IDX_FP_PK">
-      <column name="SHA1_PK"/>
+      <column name="FP_PK"/>
     </createIndex>
     <createIndex tableName="CERT" unique="false" indexName="IDX_FP_SUBJECT">
-      <column name="SHA1_SUBJECT"/>
+      <column name="FP_SUBJECT"/>
     </createIndex>
     <!-- table RAWCERT -->
     <createTable tableName="RAWCERT">
       <column name="CERT_ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="SHA1" type="VARCHAR(40)">
+      <column name="FP" type="VARCHAR(40)">
         <constraints nullable="false"/>
       </column>
       <column name="CERT" remarks="Base64 encoded certificate" type="VARCHAR(3000)">
@@ -386,10 +371,10 @@
       </column>
     </createTable>
     <createTable tableName="CERT_IN_PROCESS">
-      <column name="SHA1_PK" type="CHAR(40)">
+      <column name="FP_PK" type="CHAR(40)">
         <constraints primaryKey="true"/>
       </column>
-      <column name="SHA1_SUBJECT" type="CHAR(40)">
+      <column name="FP_SUBJECT" type="CHAR(40)">
         <constraints primaryKey="true"/>
       </column>
       <column name="TIME2" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT">
@@ -459,45 +444,45 @@
       onDelete="CASCADE" onUpdate="NO ACTION"
       baseColumnNames="CA_NAME" baseTableName="CA_HAS_PUBLISHER"
       referencedColumnNames="NAME" referencedTableName="CA"/>
-    <!-- ca_has_certprofile -->
+    <!-- CA_HAS_PROFILE -->
     <addForeignKeyConstraint constraintName="FK_CA_HAS_PROFILE_PROFILE1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="CERTPROFILE_NAME" baseTableName="CA_HAS_CERTPROFILE"
-      referencedColumnNames="NAME" referencedTableName="CERTPROFILE"/>
-    <addForeignKeyConstraint constraintName="FK_CA_HAS_CERTPROFILE_CA1"
+      baseColumnNames="PROFILE_NAME" baseTableName="CA_HAS_PROFILE"
+      referencedColumnNames="NAME" referencedTableName="PROFILE"/>
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_PROFILE_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="CA_NAME" baseTableName="CA_HAS_CERTPROFILE"
+      baseColumnNames="CA_NAME" baseTableName="CA_HAS_PROFILE"
       referencedColumnNames="NAME" referencedTableName="CA"/>
   </changeSet>
   <!-- CertStore :: foreigen key -->
   <changeSet author="xipki" id="6">
-    <addForeignKeyConstraint constraintName="FK_CRL_CAINFO1"
+    <addForeignKeyConstraint constraintName="FK_CRL_CS_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="CA_ID" baseTableName="CRL"
-      referencedColumnNames="ID" referencedTableName="CAINFO"/>
-    <addForeignKeyConstraint constraintName="FK_CERT_CAINFO1"
+      referencedColumnNames="ID" referencedTableName="CS_CA"/>
+    <addForeignKeyConstraint constraintName="FK_CERT_CS_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="CA_ID" baseTableName="CERT"
-      referencedColumnNames="ID" referencedTableName="CAINFO"/>
-    <addForeignKeyConstraint constraintName="FK_CERT_REQUESTORINFO1"
+      referencedColumnNames="ID" referencedTableName="CS_CA"/>
+    <addForeignKeyConstraint constraintName="FK_CERT_CS_REQUESTOR1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="REQUESTOR_ID" baseTableName="CERT"
-      referencedColumnNames="ID" referencedTableName="REQUESTORINFO"/>
+      referencedColumnNames="ID" referencedTableName="CS_REQUESTOR"/>
     <addForeignKeyConstraint constraintName="FK_CERT_USER1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="USER_ID" baseTableName="CERT"
       referencedColumnNames="ID" referencedTableName="USERNAME"/>
-    <addForeignKeyConstraint constraintName="FK_CERT_CERTPROFILEINFO1"
+    <addForeignKeyConstraint constraintName="FK_CERT_CS_PROFILE1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="CERTPROFILE_ID" baseTableName="CERT"
-      referencedColumnNames="ID" referencedTableName="CERTPROFILEINFO"/>
+      baseColumnNames="PROFILE_ID" baseTableName="CERT"
+      referencedColumnNames="ID" referencedTableName="CS_PROFILE"/>
     <addForeignKeyConstraint constraintName="FK_RAWCERT_CERT1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
@@ -507,7 +492,7 @@
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
       baseColumnNames="PUBLISHER_ID" baseTableName="PUBLISHQUEUE"
-      referencedColumnNames="ID" referencedTableName="PUBLISHERINFO"/>
+      referencedColumnNames="ID" referencedTableName="CS_PUBLISHER"/>
     <addForeignKeyConstraint constraintName="FK_PUBLISHQUEUE_CERT1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"

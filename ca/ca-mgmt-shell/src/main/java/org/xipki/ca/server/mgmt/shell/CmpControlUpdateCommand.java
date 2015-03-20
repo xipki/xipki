@@ -37,6 +37,7 @@ package org.xipki.ca.server.mgmt.shell;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.xipki.ca.server.mgmt.api.CmpControl;
 
 /**
  * @author Lijun Liao
@@ -51,42 +52,19 @@ public class CmpControlUpdateCommand extends CaCommand
                     + "(required)")
     private String name;
 
-    @Option(name = "--confirm-cert",
-            description = "whether confirm of certificate is required")
-    private String confirmCertS;
-
-    @Option(name = "--send-ca",
-            description = "whether CA certificate is included in response")
-    private String sendCaCertS;
-
-    @Option(name = "--send-responder",
-            description = "whether responder certificate is included in response")
-    private String sendResponderCertS;
-
-    @Option(name = "--need-message-time",
-            description = "whether message time is required in request")
-    private String requireMessageTimeS;
-
-    @Option(name = "--message-time-bias",
-            description = "message time bias in seconds")
-    private Integer messageTimeBias;
-
-    @Option(name = "--waittime-confirm",
-            description = "maximal confirmation time in seconds")
-    private Integer confirmWaitTime;
+    @Option(name = "--conf",
+            required = true,
+            description = "CMP control configuration\n"
+                    + "(required)")
+    private String conf;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        Boolean sendCaCert = isEnabled(sendCaCertS, "sendCaCert");
-        Boolean sendResponderCert = isEnabled(sendResponderCertS, "sendResponderCert");
-        Boolean requireMessageTime = isEnabled(requireMessageTimeS, "messageTime");
-        Boolean requireConfirmCert = isEnabled(confirmCertS, "confirmCert");
-
-        boolean b = caManager.changeCmpControl(name, requireConfirmCert, requireMessageTime, messageTimeBias, confirmWaitTime,
-                sendCaCert, sendResponderCert);
-        output(b, "updated", "could not update", "CMP control");
+        CmpControl entry = new CmpControl(name,conf);
+        boolean b = caManager.changeCmpControl(entry);
+        output(b, "updated", "could not update", "CMP control " + name);
         return null;
     }
 }

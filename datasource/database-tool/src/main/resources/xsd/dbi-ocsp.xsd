@@ -44,9 +44,9 @@
       <xs:element name="id" type="xs:int"/>
       <xs:element name="cert" type="xs:string"/>
       <xs:element name="revoked" type="xs:boolean"/>
-      <xs:element name="rev_reason" type="xs:int" minOccurs="0"/>
-      <xs:element name="rev_time" type="xs:long" minOccurs="0"/>
-      <xs:element name="rev_invalidity_time" type="xs:long" minOccurs="0"/>
+      <xs:element name="revReason" type="xs:int" minOccurs="0"/>
+      <xs:element name="revTime" type="xs:long" minOccurs="0"/>
+      <xs:element name="revInvTime" type="xs:long" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="certs" type="certsType"/>
@@ -59,12 +59,12 @@
   <xs:complexType name="certType">
     <xs:sequence>
       <xs:element name="id" type="xs:int"/>
-      <xs:element name="issuer_id" type="xs:int"/>
-      <xs:element name="last_update" type="xs:long"/>
+      <xs:element name="issuerId" type="xs:int"/>
+      <xs:element name="lastUpdate" type="xs:long"/>
       <xs:element name="revoked" type="xs:boolean"/>
-      <xs:element name="rev_reason" type="xs:int" minOccurs="0"/>
-      <xs:element name="rev_time" type="xs:long" minOccurs="0"/>
-      <xs:element name="rev_invalidity_time" type="xs:long" minOccurs="0"/>
+      <xs:element name="revReason" type="xs:int" minOccurs="0"/>
+      <xs:element name="revTime" type="xs:long" minOccurs="0"/>
+      <xs:element name="revInvTime" type="xs:long" minOccurs="0"/>
       <xs:element name="profile" type="xs:string"/>
       <xs:element name="certFile" type="xs:string"/>
     </xs:sequence>

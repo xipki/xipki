@@ -86,6 +86,8 @@ class OcspCertStoreDbExporter extends DbPorter
     private final ObjectFactory objFact = new ObjectFactory();
     private final int numCertsInBundle;
     private final boolean resume;
+    private final int dbSchemaVersion;
+    private final String col_revInvTime;
 
     OcspCertStoreDbExporter(DataSourceWrapper dataSource,
             Marshaller marshaller, Unmarshaller unmarshaller, String baseDir, int numCertsInBundle,
@@ -99,6 +101,7 @@ class OcspCertStoreDbExporter extends DbPorter
         {
             numCertsInBundle = 1;
         }
+        this.dbSchemaVersion = getDbSchemaVersion();
         this.numCertsInBundle = numCertsInBundle;
         this.marshaller = marshaller;
         this.unmarshaller = unmarshaller;
@@ -111,6 +114,8 @@ class OcspCertStoreDbExporter extends DbPorter
             }
         }
         this.resume = resume;
+
+        this.col_revInvTime = this.dbSchemaVersion > 1 ? "REV_INV_TIME" : "REV_INVALIDITY_TIME";
     }
 
     public void export()
@@ -176,7 +181,7 @@ class OcspCertStoreDbExporter extends DbPorter
         System.out.println("exporting table ISSUER");
         Issuers issuers = new Issuers();
         certstore.setIssuers(issuers);
-        final String sql = "SELECT ID, CERT, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME FROM ISSUER";
+        final String sql = "SELECT ID, CERT, REVOKED, REV_REASON, REV_TIME, " + col_revInvTime + " FROM ISSUER";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -201,12 +206,12 @@ class OcspCertStoreDbExporter extends DbPorter
                 {
                     int rev_reason = rs.getInt("REV_REASON");
                     long rev_time = rs.getLong("REV_TIME");
-                    long rev_invalidity_time = rs.getLong("REV_INVALIDITY_TIME");
+                    long rev_invalidity_time = rs.getLong(col_revInvTime);
                     issuer.setRevReason(rev_reason);
                     issuer.setRevTime(rev_time);
                     if(rev_invalidity_time != 0)
                     {
-                        issuer.setRevInvalidityTime(rev_invalidity_time);
+                        issuer.setRevInvTime(rev_invalidity_time);
                     }
                 }
 
@@ -234,7 +239,7 @@ class OcspCertStoreDbExporter extends DbPorter
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-certs-");
             System.err.println("\nexporting table CERT and RAWCERT has been cancelled due to error,\n"
-                    + "please continue with the option '-resume'");
+                    + "please continue with the option '--resume'");
             LOG.error("Exception", e);
             return e;
         }
@@ -273,8 +278,8 @@ class OcspCertStoreDbExporter extends DbPorter
 
         System.out.println("exporting tables CERT, CERTHASH and RAWCERT from ID " + minCertId);
 
-        String certSql = "SELECT ID, ISSUER_ID, LAST_UPDATE, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE " +
-                " FROM CERT WHERE ID >= ? AND ID < ?";
+        String certSql = "SELECT ID, ISSUER_ID, LAST_UPDATE, REVOKED, REV_REASON, REV_TIME, " + col_revInvTime +
+                ", PROFILE FROM CERT WHERE ID >= ? AND ID < ?";
 
         String rawCertSql = "SELECT CERT_ID, CERT FROM RAWCERT WHERE CERT_ID >= ? AND CERT_ID < ?";
 
@@ -389,16 +394,16 @@ class OcspCertStoreDbExporter extends DbPorter
                     {
                         int rev_reason = rs.getInt("REV_REASON");
                         long rev_time = rs.getLong("REV_TIME");
-                        long rev_invalidity_time = rs.getLong("REV_INVALIDITY_TIME");
+                        long rev_invalidity_time = rs.getLong(col_revInvTime);
                         cert.setRevReason(rev_reason);
                         cert.setRevTime(rev_time);
                         if(rev_invalidity_time != 0)
                         {
-                            cert.setRevInvalidityTime(rev_invalidity_time);
+                            cert.setRevInvTime(rev_invalidity_time);
                         }
                         cert.setRevReason(rev_reason);
                         cert.setRevTime(rev_time);
-                        cert.setRevInvalidityTime(rev_invalidity_time);
+                        cert.setRevInvTime(rev_invalidity_time);
                     }
                     cert.setCertFile(sha1_cert + ".der");
 

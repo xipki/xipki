@@ -1003,7 +1003,7 @@ implements CAManager, CmpResponderManager
         }
         certprofiles.clear();
 
-        List<String> names = queryExecutor.getNamesFromTable("CERTPROFILE");
+        List<String> names = queryExecutor.getNamesFromTable("PROFILE");
 
         if(CollectionUtil.isNotEmpty(names))
         {
@@ -1151,7 +1151,7 @@ implements CAManager, CmpResponderManager
         Set<CAHasRequestorEntry> caHasRequestors = queryExecutor.createCAhasRequestors(name);
         ca_has_requestors.put(name, caHasRequestors);
 
-        Set<String> profileNames = queryExecutor.createCAhasCertprofiles(name);
+        Set<String> profileNames = queryExecutor.createCAhasProfiles(name);
         ca_has_profiles.put(name, profileNames);
 
         Set<String> publisherNames = queryExecutor.createCAhasPublishers(name);
@@ -1494,7 +1494,7 @@ implements CAManager, CmpResponderManager
             removeCertprofileFromCA(profileName, caName);
         }
 
-        boolean b = queryExecutor.deleteRowWithName(profileName, "CERTPROFILE");
+        boolean b = queryExecutor.deleteRowWithName(profileName, "PROFILE");
         if(b == false)
         {
             return false;
@@ -1858,22 +1858,12 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean changeCmpControl(String name, Boolean requireConfirmCert,
-            Boolean requireMessageTime, Integer messageTimeBias,
-            Integer confirmWaitTime, Boolean sendCaCert, Boolean sendResponderCert)
+    public boolean changeCmpControl(CmpControl dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
-        if(requireConfirmCert == null && requireMessageTime == null && messageTimeBias == null
-                && confirmWaitTime == null && sendCaCert == null && sendResponderCert == null)
-        {
-            return false;
-        }
-
-        boolean changed = queryExecutor.changeCmpControl(name,
-                requireConfirmCert, requireMessageTime,
-                messageTimeBias, confirmWaitTime,
-                sendCaCert, sendResponderCert);
+        final String name = dbEntry.getName();
+        boolean changed = queryExecutor.changeCmpControl(name, dbEntry.getConf());
         if(changed == false)
         {
             return false;

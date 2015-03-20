@@ -166,7 +166,7 @@ class CAManagerQueryExecutor
             dsConnection = dataSource.getConnection();
         } catch (DataAccessException e)
         {
-            throw new CAMgmtException("could not get connection", e);
+            throw new CAMgmtException(e.getMessage(), e);
         }
 
         try
@@ -174,7 +174,7 @@ class CAManagerQueryExecutor
             return dataSource.prepareStatement(dsConnection, sql);
         }catch(DataAccessException e)
         {
-            throw new CAMgmtException("could not get connection", e);
+            throw new CAMgmtException(e.getMessage(), e);
         }
     }
 
@@ -374,7 +374,7 @@ class CAManagerQueryExecutor
     {
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        final String sql = "TYPE, CONF FROM CERTPROFILE WHERE NAME=?";
+        final String sql = "TYPE, CONF FROM PROFILE WHERE NAME=?";
         try
         {
             stmt = prepareFetchFirstStatement(sql);
@@ -585,9 +585,7 @@ class CAManagerQueryExecutor
     CmpControl createCmpControl(String name)
     throws CAMgmtException
     {
-        final String sql = "REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT" +
-                ", REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME" +
-                " FROM CMPCONTROL WHERE NAME=?";
+        final String sql = "CONF FROM CMPCONTROL WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
@@ -602,27 +600,8 @@ class CAManagerQueryExecutor
                 return null;
             }
 
-            boolean requireConfirmCert = rs.getBoolean("REQUIRE_CONFIRM_CERT");
-            boolean sendCaCert = rs.getBoolean("SEND_CA_CERT");
-            boolean sendResponderCert = rs.getBoolean("SEND_RESPONDER_CERT");
-            boolean requireMessageTime = rs.getBoolean("REQUIRE_MESSAGE_TIME");
-            int messageTimeBias = rs.getInt("MESSAGE_TIME_BIAS");
-            int confirmWaitTime = rs.getInt("CONFIRM_WAIT_TIME");
-
-            CmpControl cmpControl = new CmpControl(name);
-            cmpControl.setRequireConfirmCert(requireConfirmCert);
-            cmpControl.setSendCaCert(sendCaCert);
-            cmpControl.setSendResponderCert(sendResponderCert);
-            cmpControl.setMessageTimeRequired(requireMessageTime);
-            if(messageTimeBias != 0)
-            {
-                cmpControl.setMessageBias(messageTimeBias);
-            }
-            if(confirmWaitTime != 0)
-            {
-                cmpControl.setConfirmWaitTime(confirmWaitTime);
-            }
-            return cmpControl;
+            String conf = rs.getString("CONF");
+            return new CmpControl(name, conf);
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -712,9 +691,9 @@ class CAManagerQueryExecutor
     {
         final String sql = "NAME, ART, NEXT_SERIAL, NEXT_CRLNO, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY" +
                 ", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME" +
-                ", DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS" +
-                ", EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME" +
-                ", DELTA_CRL_URIS, VALIDITY_MODE" +
+                ", DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS" +
+                ", EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME" +
+                ", DELTACRL_URIS, VALIDITY_MODE" +
                 " FROM CA WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -736,7 +715,7 @@ class CAManagerQueryExecutor
                 int next_crlNo = rs.getInt("NEXT_CRLNO");
                 String status = rs.getString("STATUS");
                 String crl_uris = rs.getString("CRL_URIS");
-                String delta_crl_uris = rs.getString("DELTA_CRL_URIS");
+                String delta_crl_uris = rs.getString("DELTACRL_URIS");
                 String ocsp_uris = rs.getString("OCSP_URIS");
                 String max_validityS = rs.getString("MAX_VALIDITY");
                 CertValidity max_validity = CertValidity.getInstance(max_validityS);
@@ -745,8 +724,8 @@ class CAManagerQueryExecutor
                 String signer_conf = rs.getString("SIGNER_CONF");
                 String crlsigner_name = rs.getString("CRLSIGNER_NAME");
                 String cmpcontrol_name = rs.getString("CMPCONTROL_NAME");
-                int duplicateKeyI = rs.getInt("DUPLICATE_KEY_MODE");
-                int duplicateSubjectI = rs.getInt("DUPLICATE_SUBJECT_MODE");
+                int duplicateKeyI = rs.getInt("DUPLICATE_KEY");
+                int duplicateSubjectI = rs.getInt("DUPLICATE_SUBJECT");
                 int numCrls = rs.getInt("NUM_CRLS");
                 int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
 
@@ -756,7 +735,7 @@ class CAManagerQueryExecutor
                 {
                     int rev_reason = rs.getInt("REV_REASON");
                     long rev_time = rs.getInt("REV_TIME");
-                    long rev_invalidity_time = rs.getInt("REV_INVALIDITY_TIME");
+                    long rev_invalidity_time = rs.getInt("REV_INV_TIME");
                     revocationInfo = new CertRevocationInfo(rev_reason, new Date(rev_time * 1000),
                             rev_invalidity_time == 0 ? null : new Date(rev_invalidity_time * 1000));
                 }
@@ -893,10 +872,10 @@ class CAManagerQueryExecutor
         }
     }
 
-    Set<String> createCAhasCertprofiles(String caName)
+    Set<String> createCAhasProfiles(String caName)
     throws CAMgmtException
     {
-        return createCAhasNames(caName, "CERTPROFILE_NAME", "CA_HAS_CERTPROFILE");
+        return createCAhasNames(caName, "PROFILE_NAME", "CA_HAS_PROFILE");
     }
 
     Set<String> createCAhasPublishers(String caName)
@@ -985,8 +964,8 @@ class CAManagerQueryExecutor
         sqlBuilder.append("INSERT INTO CA (");
         sqlBuilder.append("NAME, ART, SUBJECT, NEXT_SERIAL, NEXT_CRLNO, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY");
         sqlBuilder.append(", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME");
-        sqlBuilder.append(", DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD");
-        sqlBuilder.append(", VALIDITY_MODE, DELTA_CRL_URIS");
+        sqlBuilder.append(", DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD");
+        sqlBuilder.append(", VALIDITY_MODE, DELTACRL_URIS");
         sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         final String sql = sqlBuilder.toString();
 
@@ -1077,7 +1056,7 @@ class CAManagerQueryExecutor
     void addCertprofile(CertprofileEntry dbEntry)
     throws CAMgmtException
     {
-        final String sql = "INSERT INTO CERTPROFILE (NAME, ART, TYPE, CONF) VALUES (?, ?, ?, ?)";
+        final String sql = "INSERT INTO PROFILE (NAME, ART, TYPE, CONF) VALUES (?, ?, ?, ?)";
         final String name = dbEntry.getName();
 
         PreparedStatement ps = null;
@@ -1106,7 +1085,7 @@ class CAManagerQueryExecutor
     void addCertprofileToCA(String profileName, String caName)
     throws CAMgmtException
     {
-        final String sql = "INSERT INTO CA_HAS_CERTPROFILE (CA_NAME, CERTPROFILE_NAME) VALUES (?, ?)";
+        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME) VALUES (?, ?)";
         PreparedStatement ps = null;
         try
         {
@@ -1130,8 +1109,7 @@ class CAManagerQueryExecutor
     {
         final String name = dbEntry.getName();
 
-        final String sql = "INSERT INTO CMPCONTROL (NAME, REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT," +
-                " REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        final String sql = "INSERT INTO CMPCONTROL (NAME, CONF) VALUES (?, ?)";
 
         PreparedStatement ps = null;
         try
@@ -1140,13 +1118,7 @@ class CAManagerQueryExecutor
 
             int idx = 1;
             ps.setString(idx++, name);
-            setBoolean(ps, idx++, dbEntry.isRequireConfirmCert());
-            setBoolean(ps, idx++, dbEntry.isSendCaCert());
-            setBoolean(ps, idx++, dbEntry.isSendResponderCert());
-            setBoolean(ps, idx++, dbEntry.isMessageTimeRequired());
-            ps.setInt(idx++, dbEntry.getMessageTimeBias());
-            ps.setInt(idx++, dbEntry.getConfirmWaitTime());
-
+            ps.setString(idx++, dbEntry.getConf());
             ps.executeUpdate();
             LOG.info("added CMP control: {}", dbEntry);
         }catch(SQLException e)
@@ -1354,15 +1326,15 @@ class CAManagerQueryExecutor
         Integer iSubject = addToSqlIfNotNull(sqlBuilder, index, cert, "SUBJECT");
         Integer iCert = addToSqlIfNotNull(sqlBuilder, index, cert, "CERT");
         Integer iCrl_uris = addToSqlIfNotNull(sqlBuilder, index, crl_uris, "CRL_URIS");
-        Integer iDelta_crl_uris = addToSqlIfNotNull(sqlBuilder, index, delta_crl_uris, "DELTA_CRL_URIS");
+        Integer iDelta_crl_uris = addToSqlIfNotNull(sqlBuilder, index, delta_crl_uris, "DELTACRL_URIS");
         Integer iOcsp_uris = addToSqlIfNotNull(sqlBuilder, index, ocsp_uris, "OCSP_URIS");
         Integer iMax_validity = addToSqlIfNotNull(sqlBuilder, index, max_validity, "MAX_VALIDITY");
         Integer iSigner_type = addToSqlIfNotNull(sqlBuilder, index, signer_type, "SIGNER_TYPE");
         Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signer_conf, "SIGNER_CONF");
         Integer iCrlsigner_name = addToSqlIfNotNull(sqlBuilder, index, crlsigner_name, "CRLSIGNER_NAME");
         Integer iCmpcontrol_name = addToSqlIfNotNull(sqlBuilder, index, cmpcontrol_name, "CMPCONTROL_NAME");
-        Integer iDuplicate_key = addToSqlIfNotNull(sqlBuilder, index, duplicate_key, "DUPLICATE_KEY_MODE");
-        Integer iDuplicate_subject = addToSqlIfNotNull(sqlBuilder, index, duplicate_subject, "DUPLICATE_SUBJECT_MODE");
+        Integer iDuplicate_key = addToSqlIfNotNull(sqlBuilder, index, duplicate_key, "DUPLICATE_KEY");
+        Integer iDuplicate_subject = addToSqlIfNotNull(sqlBuilder, index, duplicate_subject, "DUPLICATE_SUBJECT");
         Integer iPermissions = addToSqlIfNotNull(sqlBuilder, index, permissions, "PERMISSIONS");
         Integer iNum_crls = addToSqlIfNotNull(sqlBuilder, index, numCrls, "NUM_CRLS");
         Integer iExpiration_period = addToSqlIfNotNull(sqlBuilder, index, expirationPeriod, "EXPIRATION_PERIOD");
@@ -1524,7 +1496,7 @@ class CAManagerQueryExecutor
     throws CAMgmtException
     {
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("UPDATE CERTPROFILE SET ");
+        sqlBuilder.append("UPDATE PROFILE SET ");
 
         AtomicInteger index = new AtomicInteger(1);
 
@@ -1579,76 +1551,18 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean changeCmpControl(String name, Boolean requireConfirmCert,
-            Boolean requireMessageTime, Integer messageTimeBias,
-            Integer confirmWaitTime, Boolean sendCaCert, Boolean sendResponderCert)
+    boolean changeCmpControl(String name, String conf)
     throws CAMgmtException
     {
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("UPDATE CMPCONTROL SET ");
-
-        AtomicInteger index = new AtomicInteger(1);
-        Integer iConfirmCert = addToSqlIfNotNull(sqlBuilder, index, requireConfirmCert, "REQUIRE_CONFIRM_CERT");
-        Integer iRequireMessageTime = addToSqlIfNotNull(sqlBuilder, index, requireMessageTime, "REQUIRE_MESSAGE_TIME");
-        Integer iMessageTimeBias = addToSqlIfNotNull(sqlBuilder, index, messageTimeBias, "MESSAGE_TIME_BIAS");
-        Integer iConfirmWaitTime = addToSqlIfNotNull(sqlBuilder, index, confirmWaitTime, "CONFIRM_WAIT_TIME");
-        Integer iSendCaCert = addToSqlIfNotNull(sqlBuilder, index, sendCaCert, "SEND_CA_CERT");
-        Integer iSendResponderCert = addToSqlIfNotNull(sqlBuilder, index, sendResponderCert, "SEND_RESPONDER_CERT");
-        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(" WHERE NAME=?");
-        final String sql = sqlBuilder.toString();
-
+        final String sql = "UPDATE CMPCONTROL SET CONF=? WHERE NAME=?";
         PreparedStatement ps = null;
         try
         {
-            StringBuilder m = new StringBuilder();
-
             ps = prepareStatement(sql);
-            if(iConfirmCert != null)
-            {
-                m.append("requireConfirmCert: '").append(requireConfirmCert).append("'; ");
-                setBoolean(ps, iConfirmCert, requireConfirmCert);
-            }
+            ps.setString(1, conf);
+            ps.setString(2, name);
 
-            if(iRequireMessageTime != null)
-            {
-                m.append("requireMessageTime: '").append(requireMessageTime).append("'; ");
-                setBoolean(ps, iRequireMessageTime, requireMessageTime);
-            }
-
-            if(iMessageTimeBias != null)
-            {
-                m.append("messageTimeBias: '").append(messageTimeBias).append("'; ");
-                ps.setInt(iMessageTimeBias, messageTimeBias);
-            }
-
-            if(iConfirmWaitTime != null)
-            {
-                m.append("confirmWaitTime: '").append(confirmWaitTime).append("'; ");
-                ps.setInt(iConfirmWaitTime, confirmWaitTime);
-            }
-
-            if(iSendCaCert != null)
-            {
-                m.append("sendCaCert: '").append(sendCaCert).append("'; ");
-                setBoolean(ps, iSendCaCert, sendCaCert);
-            }
-
-            if(iSendResponderCert != null)
-            {
-                m.append("sendResponderCert: '").append(sendResponderCert).append("'; ");
-                setBoolean(ps, iSendResponderCert, sendResponderCert);
-            }
-
-            ps.setString(index.get(), name);
-            ps.executeUpdate();
-
-            if(m.length() > 0)
-            {
-                m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
-            }
-
-            LOG.info("changed CMP control: {}", m);
+            LOG.info("changed CMP control '{}': {}", name, conf);
             return true;
         }catch(SQLException e)
         {
@@ -1993,7 +1907,7 @@ class CAManagerQueryExecutor
     boolean removeCertprofileFromCA(String profileName, String caName)
     throws CAMgmtException
     {
-        final String sql = "DELETE FROM CA_HAS_CERTPROFILE WHERE CA_NAME=? AND CERTPROFILE_NAME=?";
+        final String sql = "DELETE FROM CA_HAS_PROFILE WHERE CA_NAME=? AND PROFILE_NAME=?";
         PreparedStatement ps = null;
         try
         {
@@ -2071,7 +1985,7 @@ class CAManagerQueryExecutor
     boolean revokeCa(String caName, CertRevocationInfo revocationInfo)
     throws CAMgmtException
     {
-        String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INVALIDITY_TIME=? WHERE NAME=?";
+        String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INV_TIME=? WHERE NAME=?";
         PreparedStatement ps = null;
         try
         {
@@ -2165,7 +2079,7 @@ class CAManagerQueryExecutor
     {
         LOG.info("Unrevoking of CA '{}'", caName);
 
-        final String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INVALIDITY_TIME=? WHERE NAME=?";
+        final String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INV_TIME=? WHERE NAME=?";
         PreparedStatement ps = null;
         try
         {

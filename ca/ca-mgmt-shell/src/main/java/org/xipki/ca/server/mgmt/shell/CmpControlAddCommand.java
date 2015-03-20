@@ -52,58 +52,17 @@ public class CmpControlAddCommand extends CaCommand
                     + "(required)")
     private String name;
 
-    @Option(name = "--confirm-cert",
-            description = "whether confirm of certificate is required")
-    private String confirmCertS = "no";
-
-    @Option(name = "--send-ca",
-            description = "whether CA certificate is included in response")
-    private String sendCaCertS = "no";
-
-    @Option(name = "--send-responder",
-            description = "whether responder certificate is included in response")
-    private String sendResponderCertS = "yes";
-
-    @Option(name = "--need-message-time",
-            description = "whether message time is required in request")
-    private String requireMessageTimeS = "yes";
-
-    @Option(name = "--message-time-bias",
-            description = "message time bias in seconds")
-    private Integer messageTimeBias;
-
-    @Option(name = "--waittime-confirm",
-            description = "maximal confirmation time in seconds")
-    private Integer confirmWaitTime;
+    @Option(name = "--conf",
+            required = true,
+            description = "CMP control configuration\n"
+                    + "(required)")
+    private String conf;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        CmpControl entry = new CmpControl(name);
-
-        boolean confirmCert = isEnabled(confirmCertS, false, "confirmCert");
-        entry.setRequireConfirmCert(confirmCert);
-
-        boolean sendCaCert = isEnabled(sendCaCertS, false, "sendCaCert");
-        entry.setSendCaCert(sendCaCert);
-
-        boolean sendResponderCert = isEnabled(sendResponderCertS, true, "sendResponderCert");
-        entry.setSendResponderCert(sendResponderCert);
-
-        boolean requireMessageTime = isEnabled(requireMessageTimeS, true, "messageTime");
-        entry.setMessageTimeRequired(requireMessageTime);
-
-        if(messageTimeBias != null)
-        {
-            entry.setMessageBias(messageTimeBias);
-        }
-
-        if(confirmWaitTime != null)
-        {
-            entry.setConfirmWaitTime(confirmWaitTime);
-        }
-
+        CmpControl entry = new CmpControl(name,conf);
         boolean b = caManager.addCmpControl(entry);
         output(b, "added", "could not add", "CMP control " + name);
         return null;

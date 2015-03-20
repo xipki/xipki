@@ -353,7 +353,7 @@ public class DbCertStatusStore extends CertStatusStore
                 return CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
             }
 
-            final String sql = "ID, NOTBEFORE, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE" +
+            final String sql = "ID, NOTBEFORE, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, PROFILE" +
                     " FROM CERT WHERE ISSUER_ID=? AND SERIAL=?";
 
             ResultSet rs = null;
@@ -393,7 +393,7 @@ public class DbCertStatusStore extends CertStatusStore
                         {
                             int reason = rs.getInt("REV_REASON");
                             long revocationTime = rs.getLong("REV_TIME");
-                            long invalidatityTime = rs.getLong("REV_INVALIDITY_TIME");
+                            long invalidatityTime = rs.getLong("REV_INV_TIME");
 
                             Date invTime = null;
                             if(invalidatityTime != 0 && invalidatityTime != revocationTime)

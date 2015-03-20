@@ -362,7 +362,7 @@ public class Rfc2560Servlet extends HttpServlet
                         {
                             auditLoggingService.logEvent(event);
                         }
-                    } 
+                    }
                 } // end if(auditEvent != null)
             } // end inner try
         } // end external try
