@@ -56,10 +56,10 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="certprofiles">
+      <xs:element name="profiles">
         <xs:complexType>
           <xs:sequence>
-            <xs:element ref="certprofile" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="profile" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -77,24 +77,24 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="ca_has_requestors">
+      <xs:element name="caHasRequestors">
         <xs:complexType>
           <xs:sequence>
-            <xs:element ref="ca_has_requestor" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="caHasRequestor" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="ca_has_publishers">
+      <xs:element name="caHasPublishers">
         <xs:complexType>
           <xs:sequence>
-            <xs:element ref="ca_has_publisher" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="caHasPublisher" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="ca_has_certprofiles">
+      <xs:element name="caHasProfiles">
         <xs:complexType>
           <xs:sequence>
-            <xs:element ref="ca_has_certprofile" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="caHasProfile" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -105,12 +105,7 @@
   <xs:complexType name="cmpcontrolType">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
-      <xs:element name="require_confirm_cert" type="xs:boolean"/>
-      <xs:element name="send_ca_cert" type="xs:boolean"/>
-      <xs:element name="send_responder_cert" type="xs:boolean"/>
-      <xs:element name="require_message_time" type="xs:boolean"/>
-      <xs:element name="message_time_bias" type="xs:int"/>
-      <xs:element name="confirm_wait_time" type="xs:int"/>
+      <xs:element name="conf" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="responder" type="responderType"/>
@@ -132,10 +127,10 @@
   <xs:complexType name="crlsignerType">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
-      <xs:element name="signer_type" type="xs:string"/>
-      <xs:element name="signer_conf" type="xs:string" minOccurs="0"/>
-      <xs:element name="signer_cert" type="xs:string" minOccurs="0"/>
-      <xs:element name="crl_control" type="xs:string"/>
+      <xs:element name="signerType" type="xs:string"/>
+      <xs:element name="signerConf" type="xs:string" minOccurs="0"/>
+      <xs:element name="signerCert" type="xs:string" minOccurs="0"/>
+      <xs:element name="crlControl" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="requestor" type="requestorType"/>
@@ -153,8 +148,8 @@
       <xs:element name="conf" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="certprofile" type="certprofileType"/>
-  <xs:complexType name="certprofileType">
+  <xs:element name="profile" type="profileType"/>
+  <xs:complexType name="profileType">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="art" type="xs:int" minOccurs="0"/>
@@ -170,91 +165,91 @@
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="art" type="xs:int" minOccurs="0"/>
-      <xs:element name="next_serial" type="xs:long"/>
-      <xs:element name="next_crlNo" type="xs:int"/>
+      <xs:element name="nextSerial" type="xs:long"/>
+      <xs:element name="nextCrlNo" type="xs:int"/>
       <xs:element name="status" type="xs:string"/>
-      <xs:element name="crl_uris" type="xs:string" minOccurs="0"/>
-      <xs:element name="delta_crl_uris" type="xs:string" minOccurs="0"/>
-      <xs:element name="ocsp_uris" type="xs:string" minOccurs="0"/>
-      <xs:element name="max_validity" type="xs:string"/>
+      <xs:element name="crlUris" type="xs:string" minOccurs="0"/>
+      <xs:element name="deltacrlUris" type="xs:string" minOccurs="0"/>
+      <xs:element name="ocspUris" type="xs:string" minOccurs="0"/>
+      <xs:element name="maxValidity" type="xs:string"/>
       <xs:element name="cert" type="xs:string"/>
-      <xs:element name="signer_type" type="xs:string"/>
-      <xs:element name="signer_conf" type="xs:string" minOccurs="0"/>
-      <xs:element name="crlsigner_name" type="xs:string" minOccurs="0"/>
-      <xs:element name="cmpcontrol_name" type="xs:string" minOccurs="0"/>
-      <xs:element name="duplicateKeyMode" type="xs:int"/>
-      <xs:element name="duplicateSubjectMode" type="xs:int"/>
+      <xs:element name="signerType" type="xs:string"/>
+      <xs:element name="signerConf" type="xs:string" minOccurs="0"/>
+      <xs:element name="crlsignerName" type="xs:string" minOccurs="0"/>
+      <xs:element name="cmpcontrolName" type="xs:string" minOccurs="0"/>
+      <xs:element name="duplicateKey" type="xs:int"/>
+      <xs:element name="duplicateSubject" type="xs:int"/>
       <xs:element name="permissions" type="xs:string" minOccurs="0"/>
       <xs:element name="numCrls" type="xs:int" minOccurs="0"/>
       <xs:element name="expirationPeriod" type="xs:int"/>
       <xs:element name="revoked" type="xs:boolean"/>
-      <xs:element name="rev_reason" type="xs:int" minOccurs="0"/>
-      <xs:element name="rev_time" type="xs:long" minOccurs="0"/>
-      <xs:element name="rev_invalidity_time" type="xs:long" minOccurs="0"/>
-      <xs:element name="validity_mode" type="xs:string" minOccurs="0"/>
-      <xs:element name="addControl" type="xs:string" minOccurs="0"/>
+      <xs:element name="revReason" type="xs:int" minOccurs="0"/>
+      <xs:element name="revTime" type="xs:long" minOccurs="0"/>
+      <xs:element name="revInvTime" type="xs:long" minOccurs="0"/>
+      <xs:element name="validityMode" type="xs:string" minOccurs="0"/>
+      <xs:element name="extraControl" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="caalias" type="caaliasType"/>
   <xs:complexType name="caaliasType">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
-      <xs:element name="ca_name" type="xs:string"/>
+      <xs:element name="caName" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="ca_has_requestor" type="ca_has_requestorType"/>
-  <xs:complexType name="ca_has_requestorType">
+  <xs:element name="caHasRequestor" type="caHasRequestorType"/>
+  <xs:complexType name="caHasRequestorType">
     <xs:sequence>
-      <xs:element name="ca_name" type="xs:string"/>
-      <xs:element name="requestor_name" type="xs:string"/>
+      <xs:element name="caName" type="xs:string"/>
+      <xs:element name="requestorName" type="xs:string"/>
       <xs:element name="ra" type="xs:boolean"/>
       <xs:element name="permissions" type="xs:string" minOccurs="0"/>
       <xs:element name="profiles" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="ca_has_publisher" type="ca_has_publisherType"/>
-  <xs:complexType name="ca_has_publisherType">
+  <xs:element name="caHasPublisher" type="caHasPublisherType"/>
+  <xs:complexType name="caHasPublisherType">
     <xs:sequence>
-      <xs:element name="ca_name" type="xs:string"/>
-      <xs:element name="publisher_name" type="xs:string"/>
+      <xs:element name="caName" type="xs:string"/>
+      <xs:element name="publisherName" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="ca_has_certprofile" type="ca_has_certprofileType"/>
-  <xs:complexType name="ca_has_certprofileType">
+  <xs:element name="caHasProfile" type="caHasProfileType"/>
+  <xs:complexType name="caHasProfileType">
     <xs:sequence>
-      <xs:element name="ca_name" type="xs:string"/>
-      <xs:element name="certprofile_name" type="xs:string"/>
+      <xs:element name="caName" type="xs:string"/>
+      <xs:element name="profileName" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
   <!-- CertStore -->
   <xs:element name="CertStore" type="CertStoreType"/>
   <xs:complexType name="CertStoreType">
     <xs:sequence>
-      <xs:element name="cainfos">
+      <xs:element name="cas">
         <xs:complexType>
           <xs:sequence>
-            <xs:element ref="cainfo" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="ca" type="certstoreCaType" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="requestorinfos">
+      <xs:element name="requestors">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="requestorinfo" type="nameIdType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="requestor" type="nameIdType" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="publisherinfos">
+      <xs:element name="publishers">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="publisherinfo" type="nameIdType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="publisher" type="nameIdType" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="certprofileinfos">
+      <xs:element name="profiles">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="certprofileinfo" type="nameIdType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="profile" type="nameIdType" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -310,8 +305,7 @@
       <xs:element name="caId" type="xs:int"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="cainfo" type="cainfoType"/>
-  <xs:complexType name="cainfoType">
+  <xs:complexType name="certstoreCaType">
     <xs:sequence>
       <xs:element name="id" type="xs:int"/>
       <xs:element name="cert" type="xs:string"/>
@@ -340,7 +334,7 @@
   <xs:complexType name="crlType">
     <xs:sequence>
       <xs:element name="id" type="xs:int"/>
-      <xs:element name="ca_id" type="xs:int"/>
+      <xs:element name="caId" type="xs:int"/>
       <xs:element name="crlFile" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
@@ -355,15 +349,15 @@
     <xs:sequence>
       <xs:element name="id" type="xs:int"/>
       <xs:element name="art" type="xs:int" minOccurs="0"/>
-      <xs:element name="ca_id" type="xs:int"/>
-      <xs:element name="certprofile_id" type="xs:int"/>
-      <xs:element name="requestor_id" type="xs:int" minOccurs="0"/>
+      <xs:element name="caId" type="xs:int"/>
+      <xs:element name="profileId" type="xs:int"/>
+      <xs:element name="requestorId" type="xs:int" minOccurs="0"/>
       <xs:element name="last_update" type="xs:long"/>
       <xs:element name="revoked" type="xs:boolean"/>
-      <xs:element name="rev_reason" type="xs:int" minOccurs="0"/>
-      <xs:element name="rev_time" type="xs:long" minOccurs="0"/>
-      <xs:element name="rev_invalidity_time" type="xs:long" minOccurs="0"/>
-      <xs:element name="user_id" type="xs:int" minOccurs="0"/>
+      <xs:element name="revReason" type="xs:int" minOccurs="0"/>
+      <xs:element name="revTime" type="xs:long" minOccurs="0"/>
+      <xs:element name="revInvTime" type="xs:long" minOccurs="0"/>
+      <xs:element name="userId" type="xs:int" minOccurs="0"/>
       <xs:element name="certFile" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>

@@ -668,16 +668,12 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean changeCmpControl(String name, Boolean requireConfirmCert,
-            Boolean requireMessageTime, Integer messageTimeBias,
-            Integer confirmWaitTime, Boolean sendCaCert,
-            Boolean sendResponderCert)
+    public boolean changeCmpControl(CmpControl dbEntry)
     throws HessianCAMgmtException
     {
         try
         {
-            return caManager.changeCmpControl(name, requireConfirmCert, requireMessageTime, messageTimeBias,
-                    confirmWaitTime, sendCaCert, sendResponderCert);
+            return caManager.changeCmpControl(dbEntry);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
