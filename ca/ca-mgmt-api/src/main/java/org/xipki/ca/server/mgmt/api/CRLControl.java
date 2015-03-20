@@ -36,14 +36,14 @@
 package org.xipki.ca.server.mgmt.api;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
+import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.StringUtil;
 
@@ -104,7 +104,6 @@ public class CRLControl implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(CRLControl.class);
     public static final String KEY_updateMode = "updateMode";
     public static final String KEY_extensions = "extensions";
     public static final String KEY_expiredCerts_included = "expiredCerts.included";
@@ -200,15 +199,12 @@ public class CRLControl implements Serializable
     private boolean onlyContainsUserCerts = false;
     private boolean onlyContainsCACerts = false;
 
-    private Set<String> extensionOIDs;
+    private final Set<String> extensionOIDs;
 
-    public CRLControl()
-    {
-    }
-
-    public static CRLControl getInstance(String conf)
+    public CRLControl(String conf)
     throws ConfigurationException
     {
+        ParamChecker.assertNotEmpty("conf", conf);
         CmpUtf8Pairs props;
         try
         {
@@ -218,32 +214,29 @@ public class CRLControl implements Serializable
             throw new ConfigurationException(e.getClass().getName() + ": " + e.getMessage(), e);
         }
 
-        CRLControl control = new CRLControl();
         String s = props.getValue(KEY_updateMode);
-        if(s != null)
+        if(s == null)
         {
-            UpdateMode mode = UpdateMode.getUpdateMode(s);
-            if(mode == null)
+            this.updateMode = UpdateMode.interval;
+        }
+        else
+        {
+            this.updateMode = UpdateMode.getUpdateMode(s);
+            if(this.updateMode == null)
             {
                 throw new ConfigurationException("invalid " + KEY_updateMode + ": " + s);
             }
-            control.setUpdateMode(mode);
         }
 
-        Boolean b = getBoolean(props, KEY_expiredCerts_included);
-        if(b != null)
-        {
-            control.setIncludeExpiredCerts(b.booleanValue());
-        }
-
-        b = getBoolean(props, KEY_certs_embedded);
-        if(b != null)
-        {
-            control.setEmbedsCerts(b.booleanValue());
-        }
+        this.includeExpiredCerts = getBoolean(props, KEY_expiredCerts_included, false);
+        this.embedsCerts = getBoolean(props, KEY_certs_embedded, false);
 
         s = props.getValue(KEY_extensions);
-        if(s != null)
+        if(s == null)
+        {
+            this.extensionOIDs = Collections.emptySet();
+        }
+        else
         {
             Set<String> extensionOIDs = StringUtil.splitAsSet(s, ", ");
             // check the OID
@@ -257,82 +250,44 @@ public class CRLControl implements Serializable
                     throw new ConfigurationException(extensionOID + " is not a valid OID");
                 }
             }
-            control.setExtensionOIDs(extensionOIDs);
+            this.extensionOIDs = extensionOIDs;
         }
 
-        b = getBoolean(props, KEY_onlyContainsCACerts);
-        if(b != null)
-        {
-            control.setOnlyContainsCACerts(b.booleanValue());
-        }
+        this.onlyContainsCACerts = getBoolean(props, KEY_onlyContainsCACerts, false);
+        this.onlyContainsUserCerts = getBoolean(props, KEY_onlyContainsUserCerts, false);
 
-        b = getBoolean(props, KEY_onlyContainsUserCerts);
-        if(b != null)
+        if(this.updateMode != UpdateMode.onDemand)
         {
-            control.setOnlyContainsUserCerts(b.booleanValue());
-        }
-
-        if(control.getUpdateMode() == UpdateMode.onDemand)
-        {
-            return control;
-        }
-
-        Integer i = getInteger(props, KEY_fullCRL_intervals);
-        if(i != null)
-        {
-            control.setFullCRLIntervals(i.intValue());
-        }
-
-        i = getInteger(props, KEY_deltaCRL_intervals);
-        if(i != null)
-        {
-            control.setDeltaCRLIntervals(i);
-        }
-
-        b = getBoolean(props, KEY_fullCRL_extendedNextUpdate);
-        if(b != null)
-        {
-            control.setExtendedNextUpdate(b);
-        }
-
-        i = getInteger(props, KEY_interval_minutes);
-        if(i != null)
-        {
-            control.setIntervalMinutes(i);
-        }
-
-        i = getInteger(props, KEY_overlap_minutes);
-        if(i != null)
-        {
-            control.setOverlapMinutes(i);
-        }
-
-        s = props.getValue(KEY_interval_time);
-        if(s != null)
-        {
-            List<String> tokens = StringUtil.split(s.trim(), ":");
-            if(tokens.size() != 2)
+            this.fullCRLIntervals = getInteger(props, KEY_fullCRL_intervals, 1);
+            this.deltaCRLIntervals = getInteger(props, KEY_deltaCRL_intervals, 0);
+            this.extendedNextUpdate = getBoolean(props, KEY_fullCRL_extendedNextUpdate, false);
+            this.intervalMinutes = getInteger(props, KEY_interval_minutes, 0);
+            this.overlapMinutes = getInteger(props, KEY_overlap_minutes, 60);
+            s = props.getValue(KEY_interval_time);
+            if(s != null)
             {
-                throw new ConfigurationException("invalid " + KEY_interval_time + ": '" + s + "'");
-            }
-            try
-            {
-                int hour = Integer.parseInt(tokens.get(0));
-                int minute = Integer.parseInt(tokens.get(1));
-                HourMinute hm = new HourMinute(hour, minute);
-                control.setIntervalDayTime(hm);
-            }catch(IllegalArgumentException e)
-            {
-                throw new ConfigurationException("invalid " + KEY_interval_time + ": '" + s + "'");
+                List<String> tokens = StringUtil.split(s.trim(), ":");
+                if(tokens.size() != 2)
+                {
+                    throw new ConfigurationException("invalid " + KEY_interval_time + ": '" + s + "'");
+                }
+
+                try
+                {
+                    int hour = Integer.parseInt(tokens.get(0));
+                    int minute = Integer.parseInt(tokens.get(1));
+                    this.intervalDayTime = new HourMinute(hour, minute);
+                }catch(IllegalArgumentException e)
+                {
+                    throw new ConfigurationException("invalid " + KEY_interval_time + ": '" + s + "'");
+                }
             }
         }
 
-        control.validate();
-
-        return control;
+        validate();
     }
 
-    private static Integer getInteger(CmpUtf8Pairs props, String propKey)
+    private static int getInteger(CmpUtf8Pairs props, String propKey, int dfltValue)
     throws ConfigurationException
     {
         String s = props.getValue(propKey);
@@ -346,10 +301,10 @@ public class CRLControl implements Serializable
                 throw new ConfigurationException(propKey + " does not have numeric value: " + s);
             }
         }
-        return null;
+        return dfltValue;
     }
 
-    private static Boolean getBoolean(CmpUtf8Pairs props, String propKey)
+    private static boolean getBoolean(CmpUtf8Pairs props, String propKey, boolean dfltValue)
     throws ConfigurationException
     {
         String s = props.getValue(propKey);
@@ -369,7 +324,7 @@ public class CRLControl implements Serializable
                 throw new ConfigurationException(propKey + " does not have boolean value: " + s);
             }
         }
-        return null;
+        return dfltValue;
     }
 
     public String getConf()
@@ -422,19 +377,9 @@ public class CRLControl implements Serializable
         return updateMode;
     }
 
-    public void setUpdateMode(UpdateMode updateMode)
-    {
-        this.updateMode = updateMode;
-    }
-
     public boolean isEmbedsCerts()
     {
         return embedsCerts;
-    }
-
-    public void setEmbedsCerts(boolean embedsCerts)
-    {
-        this.embedsCerts = embedsCerts;
     }
 
     public boolean isIncludeExpiredCerts()
@@ -442,19 +387,9 @@ public class CRLControl implements Serializable
         return includeExpiredCerts;
     }
 
-    public void setIncludeExpiredCerts(boolean includeExpiredCerts)
-    {
-        this.includeExpiredCerts = includeExpiredCerts;
-    }
-
     public int getFullCRLIntervals()
     {
         return fullCRLIntervals;
-    }
-
-    public void setFullCRLIntervals(int baseCRLIntervals)
-    {
-        this.fullCRLIntervals = baseCRLIntervals;
     }
 
     public int getDeltaCRLIntervals()
@@ -462,19 +397,9 @@ public class CRLControl implements Serializable
         return deltaCRLIntervals;
     }
 
-    public void setDeltaCRLIntervals(int deltaCRLIntervals)
-    {
-        this.deltaCRLIntervals = deltaCRLIntervals;
-    }
-
     public int getOverlapMinutes()
     {
         return overlapMinutes;
-    }
-
-    public void setOverlapMinutes(int overlapMinutes)
-    {
-        this.overlapMinutes = overlapMinutes;
     }
 
     public Integer getIntervalMinutes()
@@ -482,27 +407,9 @@ public class CRLControl implements Serializable
         return intervalMinutes;
     }
 
-    public void setIntervalMinutes(Integer intervalMinutes)
-    {
-        if(intervalMinutes != null && intervalMinutes < 60)
-        {
-            LOG.warn("corrected interval.minutes from {} to {}", intervalMinutes, 60);
-            this.intervalMinutes = 60;
-        }
-        else
-        {
-            this.intervalMinutes = intervalMinutes;
-        }
-    }
-
     public HourMinute getIntervalDayTime()
     {
         return intervalDayTime;
-    }
-
-    public void setIntervalDayTime(HourMinute intervalDayTime)
-    {
-        this.intervalDayTime = intervalDayTime;
     }
 
     public Set<String> getExtensionOIDs()
@@ -510,19 +417,9 @@ public class CRLControl implements Serializable
         return extensionOIDs;
     }
 
-    public void setExtensionOIDs(Set<String> extensionOIDs)
-    {
-        this.extensionOIDs = extensionOIDs;
-    }
-
     public boolean isExtendedNextUpdate()
     {
         return extendedNextUpdate;
-    }
-
-    public void setExtendedNextUpdate(boolean extendedNextUpdate)
-    {
-        this.extendedNextUpdate = extendedNextUpdate;
     }
 
     public boolean isOnlyContainsUserCerts()
@@ -530,19 +427,9 @@ public class CRLControl implements Serializable
         return onlyContainsUserCerts;
     }
 
-    public void setOnlyContainsUserCerts(boolean onlyContainsUserCerts)
-    {
-        this.onlyContainsUserCerts = onlyContainsUserCerts;
-    }
-
     public boolean isOnlyContainsCACerts()
     {
         return onlyContainsCACerts;
-    }
-
-    public void setOnlyContainsCACerts(boolean onlyContainsCACerts)
-    {
-        this.onlyContainsCACerts = onlyContainsCACerts;
     }
 
     public void validate()

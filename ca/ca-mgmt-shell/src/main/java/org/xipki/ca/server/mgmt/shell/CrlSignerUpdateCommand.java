@@ -93,7 +93,7 @@ public class CrlSignerUpdateCommand extends CaCommand
         CRLControl crlControl = null;
         if(crlControlS != null)
         {
-            crlControl = CRLControl.getInstance(crlControlS);
+            crlControl = new CRLControl(crlControlS);
         }
 
         boolean b = caManager.changeCrlSigner(name, signerType, signerConf, signerCertConf, crlControl);

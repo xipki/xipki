@@ -554,7 +554,7 @@ class CAManagerQueryExecutor
                 String signer_conf = rs.getString("SIGNER_CONF");
                 String signer_cert = rs.getString("SIGNER_CERT");
                 String crlControlConf = rs.getString("CRL_CONTROL");
-                CRLControl crlControl = CRLControl.getInstance(crlControlConf);
+                CRLControl crlControl = new CRLControl(crlControlConf);
 
                 X509CrlSignerEntry entry = new X509CrlSignerEntry(name, signer_type, signer_conf, crlControl);
                 if("CA".equalsIgnoreCase(signer_type) == false)
