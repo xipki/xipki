@@ -159,7 +159,7 @@ class OCSPStoreQueryExecutor
         if(certRegistered)
         {
             final String sql = "UPDATE CERT" +
-                    " SET LAST_UPDATE=?, REVOKED=?, REV_TIME=?, REV_INVALIDITY_TIME=?, REV_REASON=?" +
+                    " SET LAST_UPDATE=?, REVOKED=?, REV_TIME=?, REV_INV_TIME=?, REV_REASON=?" +
                     " WHERE ISSUER_ID=? AND SERIAL=?";
             PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -205,7 +205,7 @@ class OCSPStoreQueryExecutor
         sb.append(", NOTBEFORE, NOTAFTER, REVOKED, ISSUER_ID, PROFILE");
         if(revoked)
         {
-            sb.append(", REV_TIME, REV_INVALIDITY_TIME, REV_REASON");
+            sb.append(", REV_TIME, REV_INV_TIME, REV_REASON");
         }
         sb.append(")");
         sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?");
@@ -377,7 +377,7 @@ class OCSPStoreQueryExecutor
         if(publishGoodCerts)
         {
             final String sql = "UPDATE CERT" +
-                    " SET LAST_UPDATE=?, REVOKED=?, REV_TIME=?, REV_INVALIDITY_TIME=?, REV_REASON=?" +
+                    " SET LAST_UPDATE=?, REVOKED=?, REV_TIME=?, REV_INV_TIME=?, REV_REASON=?" +
                     " WHERE ISSUER_ID=? AND SERIAL=?";
             PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -461,7 +461,7 @@ class OCSPStoreQueryExecutor
         }
 
         int issuerId = getIssuerId(caCert);
-        final String sql = "UPDATE ISSUER SET REVOKED=?, REV_TIME=?, REV_INVALIDITY_TIME=?, REV_REASON=? WHERE ID=?";
+        final String sql = "UPDATE ISSUER SET REVOKED=?, REV_TIME=?, REV_INV_TIME=?, REV_REASON=? WHERE ID=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try
@@ -486,7 +486,7 @@ class OCSPStoreQueryExecutor
     throws DataAccessException, CertificateEncodingException
     {
         int issuerId = getIssuerId(caCert);
-        final String sql = "UPDATE ISSUER SET REVOKED=?, REV_TIME=?, REV_INVALIDITY_TIME=?, REV_REASON=? WHERE ID=?";
+        final String sql = "UPDATE ISSUER SET REVOKED=?, REV_TIME=?, REV_INV_TIME=?, REV_REASON=? WHERE ID=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try

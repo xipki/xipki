@@ -212,9 +212,7 @@ public interface HessianCAManager
     boolean removeCmpControl(String name)
     throws HessianCAMgmtException;
 
-    boolean changeCmpControl(String name, Boolean requireConfirmCert,
-            Boolean requireMessageTime, Integer messageTimeBias,
-            Integer confirmWaitTime, Boolean sendCaCert, Boolean sendResponderCert)
+    boolean changeCmpControl(CmpControl dbEntry)
     throws HessianCAMgmtException;
 
     Set<String> getEnvParamNames();

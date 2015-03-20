@@ -1458,7 +1458,7 @@ class X509CACmpResponder extends CmpResponder
         } // switch type
 
         InfoTypeAndValue tv = null;
-        if(cmpControl.isRequireConfirmCert() == false && CmpUtil.isImplictConfirm(reqHeader))
+        if(cmpControl.isConfirmCert() == false && CmpUtil.isImplictConfirm(reqHeader))
         {
             pendingCertPool.removeCertificates(tid.getOctets());
             tv = CmpUtil.getImplictConfirmGeneralInfo();

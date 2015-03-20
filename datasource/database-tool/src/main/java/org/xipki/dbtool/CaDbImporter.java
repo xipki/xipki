@@ -197,7 +197,7 @@ public class CaDbImporter
             }
 
             // get the CAINFO.ID
-            sql = "SELECT ID, CERT FROM CAINFO";
+            sql = "SELECT ID, CERT FROM CS_CA";
             rs = st.executeQuery(sql);
             while(rs.next())
             {

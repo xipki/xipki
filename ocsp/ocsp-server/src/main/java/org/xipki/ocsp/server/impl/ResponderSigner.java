@@ -137,7 +137,7 @@ class ResponderSigner
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
         if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid) == false)
         {
-        	return algOid.getId();
+            return algOid.getId();
         }
 
         ASN1Encodable asn1Encodable = sigAlgId.getParameters();
