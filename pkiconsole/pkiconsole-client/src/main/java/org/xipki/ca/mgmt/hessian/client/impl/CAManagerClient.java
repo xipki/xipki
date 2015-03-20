@@ -500,14 +500,10 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public boolean changeCmpControl(String name, Boolean requireConfirmCert,
-            Boolean requireMessageTime, Integer messageTimeBias,
-            Integer confirmWaitTime, Boolean sendCaCert,
-            Boolean sendResponderCert)
+    public boolean changeCmpControl(CmpControl dbEntry)
     throws CAMgmtException
     {
-        return client.changeCmpControl(name, requireConfirmCert, requireMessageTime, messageTimeBias,
-                confirmWaitTime, sendCaCert, sendResponderCert);
+        return client.changeCmpControl(dbEntry);
     }
 
     @Override
