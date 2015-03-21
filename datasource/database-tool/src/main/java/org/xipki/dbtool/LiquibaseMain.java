@@ -35,8 +35,6 @@
 
 package org.xipki.dbtool;
 
-import org.xipki.common.util.StringUtil;
-
 import liquibase.CatalogAndSchema;
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -51,6 +49,8 @@ import liquibase.lockservice.LockServiceFactory;
 import liquibase.logging.LogFactory;
 import liquibase.resource.CompositeResourceAccessor;
 import liquibase.resource.FileSystemResourceAccessor;
+
+import org.xipki.common.util.StringUtil;
 
 /**
  * Class for executing Liquibase via the command line.

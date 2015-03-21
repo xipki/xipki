@@ -38,7 +38,6 @@ package org.xipki.security.api;
 import java.security.KeyStore;
 
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.xipki.security.api.KeypairGenerationResult;
 
 /**
  * @author Lijun Liao

@@ -42,20 +42,20 @@ import java.util.List;
 import java.util.Set;
 
 import org.xipki.ca.api.profile.CertValidity;
+import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CRLControl;
-import org.xipki.ca.server.mgmt.api.CmpControl;
-import org.xipki.ca.server.mgmt.api.X509CAEntry;
-import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
+import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
+import org.xipki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
 
