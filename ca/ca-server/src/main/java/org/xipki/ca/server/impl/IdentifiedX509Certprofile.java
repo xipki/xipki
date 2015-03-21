@@ -287,7 +287,7 @@ class IdentifiedX509Certprofile
         Set<ASN1ObjectIdentifier> wantedExtensionTypes = new HashSet<>();
         if(requestExtensions != null)
         {
-            Extension reqExtension = requestExtensions.getExtension(ObjectIdentifiers.id_ext_cmp_request_extensions);
+            Extension reqExtension = requestExtensions.getExtension(ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions);
             if(reqExtension != null)
             {
                 ExtensionExistence ee = ExtensionExistence.getInstance(reqExtension.getParsedValue());

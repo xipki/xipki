@@ -55,13 +55,16 @@ import org.xipki.common.util.StringUtil;
 
 public class ObjectIdentifiers
 {
-    private static final ASN1ObjectIdentifier id_dummy = new ASN1ObjectIdentifier("1.2.3.4.5.6");
+    /**
+     * registered PEN for xipki.org: 45522
+     */
+    private static final ASN1ObjectIdentifier id_pen = new ASN1ObjectIdentifier("1.3.6.2.4.1");
+    private static final ASN1ObjectIdentifier id_xipki = id_pen.branch("45522");
 
-    private static final ASN1ObjectIdentifier id_ext                       = id_dummy.branch("1");
-    public static final ASN1ObjectIdentifier id_ext_crl_certset            = id_ext.branch("1");
-    public static final ASN1ObjectIdentifier id_ext_cmp_request_extensions = id_ext.branch("2");
+    public static final ASN1ObjectIdentifier id_xipki_ext_crlCertset           = id_xipki.branch("1.1");
+    public static final ASN1ObjectIdentifier id_xipki_ext_cmpRequestExtensions = id_xipki.branch("1.2");
 
-    public static final ASN1ObjectIdentifier id_xipki_cmp                  = id_dummy.branch("2");
+    public static final ASN1ObjectIdentifier id_xipki_cmp                  = id_xipki.branch("2");
 
     /**
      * country code - StringType(SIZE(2))
