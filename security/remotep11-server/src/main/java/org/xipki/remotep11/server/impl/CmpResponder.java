@@ -63,6 +63,7 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.XipkiCmpConstants;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -133,7 +134,7 @@ class CmpResponder
             for(InfoTypeAndValue m : itvs)
             {
                 ASN1ObjectIdentifier itvType = m.getInfoType();
-                if(XipkiCmpConstants.id_xipki_cmp.equals(itvType))
+                if(ObjectIdentifiers.id_xipki_cmp.equals(itvType))
                 {
                     itv = m;
                     break;
@@ -144,7 +145,7 @@ class CmpResponder
         if(itv == null)
         {
             final String statusMessage = String.format("PKIBody type %s is only supported with the sub-knownTypes",
-                    XipkiCmpConstants.id_xipki_cmp.getId());
+                    ObjectIdentifiers.id_xipki_cmp.getId());
             return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, statusMessage);
         }
 
@@ -165,7 +166,7 @@ class CmpResponder
             }catch(IllegalArgumentException e)
             {
                 final String statusMessage = "invalid value of the InfoTypeAndValue for " +
-                        XipkiCmpConstants.id_xipki_cmp.getId();
+                        ObjectIdentifiers.id_xipki_cmp.getId();
                 return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, statusMessage);
             }
 
@@ -303,7 +304,7 @@ class CmpResponder
             {
                 v.add(respItvInfoValue);
             }
-            InfoTypeAndValue respItv = new InfoTypeAndValue(XipkiCmpConstants.id_xipki_cmp,
+            InfoTypeAndValue respItv = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cmp,
                     new DERSequence(v));
             GenRepContent genRepContent = new GenRepContent(respItv);
             PKIBody respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);

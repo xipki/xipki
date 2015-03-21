@@ -133,6 +133,7 @@ import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.HealthCheckResult;
+import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.XipkiCmpConstants;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
@@ -162,7 +163,7 @@ class X509CACmpResponder extends CmpResponder
     static
     {
         knownGenMsgIds.add(CMPObjectIdentifiers.it_currentCRL.getId());
-        knownGenMsgIds.add(XipkiCmpConstants.id_xipki_cmp.getId());
+        knownGenMsgIds.add(ObjectIdentifiers.id_xipki_cmp.getId());
     }
 
     public X509CACmpResponder(CAManagerImpl caManager, String caName)
@@ -1626,7 +1627,7 @@ class X509CACmpResponder extends CmpResponder
 
                 itvResp = new InfoTypeAndValue(infoType, crl);
             }
-            else if(XipkiCmpConstants.id_xipki_cmp.equals(infoType))
+            else if(ObjectIdentifiers.id_xipki_cmp.equals(infoType))
             {
                 ASN1Encodable asn1 = itv.getInfoValue();
                 ASN1Integer asn1Code = null;
@@ -1643,7 +1644,7 @@ class X509CACmpResponder extends CmpResponder
                 }catch(IllegalArgumentException e)
                 {
                     String statusMessage = "invalid value of the InfoTypeAndValue for " +
-                            XipkiCmpConstants.id_xipki_cmp.getId();
+                            ObjectIdentifiers.id_xipki_cmp.getId();
                     return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badRequest, statusMessage);
                 }
 

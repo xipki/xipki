@@ -126,6 +126,7 @@ import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.common.cmp.PKIResponse;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.XipkiCmpConstants;
@@ -238,7 +239,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         }
 
         ASN1ObjectIdentifier expectedType = xipkiAction == null ?
-                CMPObjectIdentifiers.it_currentCRL : XipkiCmpConstants.id_xipki_cmp;
+                CMPObjectIdentifiers.it_currentCRL : ObjectIdentifiers.id_xipki_cmp;
 
         GenRepContent genRep = (GenRepContent) respBody.getContent();
 

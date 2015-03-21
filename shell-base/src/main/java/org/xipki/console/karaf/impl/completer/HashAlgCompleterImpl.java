@@ -35,8 +35,8 @@
 
 package org.xipki.console.karaf.impl.completer;
 
-import org.xipki.console.karaf.HashAlgCompleter;
 import org.xipki.console.karaf.EnumCompleter;
+import org.xipki.console.karaf.HashAlgCompleter;
 
 /**
  * @author Lijun Liao
