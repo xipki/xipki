@@ -815,7 +815,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         if(requestedExtensions != null)
         {
             Extension reqExtension = requestedExtensions.getExtension(
-                    ObjectIdentifiers.id_ext_cmp_request_extensions);
+                    ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions);
             if(reqExtension != null)
             {
                 ExtensionExistence ee = ExtensionExistence.getInstance(reqExtension.getParsedValue());
