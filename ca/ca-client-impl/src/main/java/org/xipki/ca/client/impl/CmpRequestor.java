@@ -77,10 +77,10 @@ import org.xipki.ca.common.cmp.PKIResponse;
 import org.xipki.ca.common.cmp.ProtectionResult;
 import org.xipki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
-import org.xipki.common.XipkiCmpConstants;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
@@ -296,7 +296,7 @@ public abstract class CmpRequestor
     protected ASN1Encodable extractXipkiActionRepContent(PKIResponse response, int action)
     throws CmpRequestorException, PKIErrorException
     {
-        ASN1Encodable itvValue = extractGeneralRepContent(response, XipkiCmpConstants.id_xipki_cmp.getId(), true);
+        ASN1Encodable itvValue = extractGeneralRepContent(response, ObjectIdentifiers.id_xipki_cmp.getId(), true);
         return extractXipkiActionContent(itvValue, action);
     }
 
@@ -511,7 +511,7 @@ public abstract class CmpRequestor
         {
             v.add(value);
         }
-        InfoTypeAndValue itv = new InfoTypeAndValue(XipkiCmpConstants.id_xipki_cmp, new DERSequence(v));
+        InfoTypeAndValue itv = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cmp, new DERSequence(v));
         GenMsgContent genMsgContent = new GenMsgContent(itv);
         PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
 

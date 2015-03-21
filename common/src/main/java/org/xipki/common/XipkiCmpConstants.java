@@ -35,7 +35,6 @@
 
 package org.xipki.common;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.GeneralName;
 
 /**
@@ -45,14 +44,6 @@ import org.bouncycastle.asn1.x509.GeneralName;
 public class XipkiCmpConstants
 {
     public static final int CRL_REASON_REMOVE = -1;
-
-    private static final ASN1ObjectIdentifier id_private_dummy = new ASN1ObjectIdentifier("1.2.3.4.5.6");
-
-    private static final ASN1ObjectIdentifier id_ext                       = id_private_dummy.branch("1");
-    public static final ASN1ObjectIdentifier id_ext_crl_certset            = id_ext.branch("1");
-    public static final ASN1ObjectIdentifier id_ext_cmp_request_extensions = id_ext.branch("2");
-
-    public static final ASN1ObjectIdentifier id_xipki_cmp                  = id_private_dummy.branch("2");
 
     public static final GeneralName remoteP11_cmp_server =
             new GeneralName(GeneralName.uniformResourceIdentifier, "http://xipki.org/remotep11/server");

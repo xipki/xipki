@@ -128,7 +128,6 @@ import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.XipkiCmpConstants;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.ObjectIdentifiers;
@@ -1020,7 +1019,7 @@ class X509CA
                 try
                 {
                     crlBuilder.addExtension(
-                            XipkiCmpConstants.id_ext_crl_certset, false, new DERSet(vector));
+                            ObjectIdentifiers.id_ext_crl_certset, false, new DERSet(vector));
                 } catch (CertIOException e)
                 {
                     throw new OperationException(ErrorCode.INVALID_EXTENSION,

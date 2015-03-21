@@ -93,7 +93,6 @@ import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.XipkiCmpConstants;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
@@ -288,7 +287,7 @@ class IdentifiedX509Certprofile
         Set<ASN1ObjectIdentifier> wantedExtensionTypes = new HashSet<>();
         if(requestExtensions != null)
         {
-            Extension reqExtension = requestExtensions.getExtension(XipkiCmpConstants.id_ext_cmp_request_extensions);
+            Extension reqExtension = requestExtensions.getExtension(ObjectIdentifiers.id_ext_cmp_request_extensions);
             if(reqExtension != null)
             {
                 ExtensionExistence ee = ExtensionExistence.getInstance(reqExtension.getParsedValue());
