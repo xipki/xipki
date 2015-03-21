@@ -76,8 +76,9 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.XipkiCmpConstants;
+import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.XipkiCmpConstants;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
@@ -268,7 +269,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
         {
             v.add(content);
         }
-        InfoTypeAndValue itvReq = new InfoTypeAndValue(XipkiCmpConstants.id_xipki_cmp, new DERSequence(v));
+        InfoTypeAndValue itvReq = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cmp, new DERSequence(v));
 
         GenMsgContent genMsgContent = new GenMsgContent(itvReq);
         PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
@@ -343,7 +344,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
         {
             for(InfoTypeAndValue m : itvs)
             {
-                if(XipkiCmpConstants.id_xipki_cmp.equals(m.getInfoType()))
+                if(ObjectIdentifiers.id_xipki_cmp.equals(m.getInfoType()))
                 {
                     itv = m;
                     break;
@@ -353,14 +354,14 @@ public abstract class RemoteP11CryptService implements P11CryptService
         if(itv == null)
         {
             throw new SignerException("the response does not contain InfoTypeAndValue '"
-                    + XipkiCmpConstants.id_xipki_cmp.getId() + "'");
+                    + ObjectIdentifiers.id_xipki_cmp.getId() + "'");
         }
 
         ASN1Encodable itvValue = itv.getInfoValue();
         if(itvValue == null)
         {
             throw new SignerException("value of InfoTypeAndValue '"
-                    + XipkiCmpConstants.id_xipki_cmp.getId() + "'  is incorrect");
+                    + ObjectIdentifiers.id_xipki_cmp.getId() + "'  is incorrect");
         }
         try
         {
@@ -375,7 +376,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
         }catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e)
         {
             throw new SignerException("value of response (type nfoTypeAndValue) '"
-                    + XipkiCmpConstants.id_xipki_cmp.getId() + "'  is incorrect");
+                    + ObjectIdentifiers.id_xipki_cmp.getId() + "'  is incorrect");
         }
     }
 

@@ -146,6 +146,7 @@ import org.xipki.ca.qa.api.X509CertprofileQA;
 import org.xipki.ca.qa.api.X509IssuerInfo;
 import org.xipki.ca.qa.impl.internal.QaAdmission;
 import org.xipki.ca.qa.impl.internal.QaCertificatePolicies;
+import org.xipki.ca.qa.impl.internal.QaCertificatePolicies.QaCertificatePolicyInformation;
 import org.xipki.ca.qa.impl.internal.QaExtensionValue;
 import org.xipki.ca.qa.impl.internal.QaGeneralSubtree;
 import org.xipki.ca.qa.impl.internal.QaInhibitAnyPolicy;
@@ -153,11 +154,9 @@ import org.xipki.ca.qa.impl.internal.QaNameConstraints;
 import org.xipki.ca.qa.impl.internal.QaPolicyConstraints;
 import org.xipki.ca.qa.impl.internal.QaPolicyMappingsOption;
 import org.xipki.ca.qa.impl.internal.QaPolicyQualifierInfo;
-import org.xipki.ca.qa.impl.internal.QaPolicyQualifiers;
-import org.xipki.ca.qa.impl.internal.QaCertificatePolicies.QaCertificatePolicyInformation;
 import org.xipki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
 import org.xipki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
-import org.xipki.common.XipkiCmpConstants;
+import org.xipki.ca.qa.impl.internal.QaPolicyQualifiers;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
 import org.xipki.common.KeyUsage;
@@ -816,7 +815,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         if(requestedExtensions != null)
         {
             Extension reqExtension = requestedExtensions.getExtension(
-                    XipkiCmpConstants.id_ext_cmp_request_extensions);
+                    ObjectIdentifiers.id_ext_cmp_request_extensions);
             if(reqExtension != null)
             {
                 ExtensionExistence ee = ExtensionExistence.getInstance(reqExtension.getParsedValue());

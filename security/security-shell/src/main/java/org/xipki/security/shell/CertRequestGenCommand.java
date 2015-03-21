@@ -50,8 +50,8 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.xipki.common.XipkiCmpConstants;
 import org.xipki.common.KeyUsage;
+import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.security.P10RequestGenerator;
 import org.xipki.security.api.ConcurrentContentSigner;
@@ -180,7 +180,7 @@ public abstract class CertRequestGenCommand extends SecurityCommand
                     SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
                     SecurityUtil.textToASN1ObjectIdentifers(wantExtensionTypes));
             extensions.add(new Extension(
-                    XipkiCmpConstants.id_ext_cmp_request_extensions, false, ee.toASN1Primitive().getEncoded()));
+                    ObjectIdentifiers.id_ext_cmp_request_extensions, false, ee.toASN1Primitive().getEncoded()));
         }
 
         ConcurrentContentSigner identifiedSigner = getSigner(hashAlgo);

@@ -39,8 +39,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.xipki.ca.certprofile.x509.jaxb.NameConstraints;
 import org.xipki.ca.certprofile.x509.jaxb.GeneralSubtreeBaseType;
+import org.xipki.ca.certprofile.x509.jaxb.NameConstraints;
 import org.xipki.common.util.CollectionUtil;
 
 /**
