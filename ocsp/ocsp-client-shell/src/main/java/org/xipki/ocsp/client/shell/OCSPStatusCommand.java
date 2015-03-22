@@ -68,7 +68,6 @@ import org.xipki.common.CRLReason;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.security.KeyUtil;
-import org.xipki.security.SignerUtil;
 
 /**
  * @author Lijun Liao
@@ -305,7 +304,7 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
                 }
                 else
                 {
-                    String sigAlgName = SignerUtil.getSignatureAlgoName(sigAlg);
+                    String sigAlgName = SecurityUtil.getSignatureAlgoName(sigAlg);
                     if(sigAlgName == null)
                     {
                         sigAlgName = "unknown";
