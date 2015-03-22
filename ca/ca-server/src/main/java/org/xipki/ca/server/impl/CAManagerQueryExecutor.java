@@ -457,7 +457,8 @@ class CAManagerQueryExecutor
 
     IdentifiedX509CertPublisher createPublisher(
             String name, Map<String, DataSourceWrapper> dataSources,
-            PasswordResolver pwdResolver, EnvironmentParameterResolver envParamResolver)
+            PasswordResolver pwdResolver, EnvironmentParameterResolver envParamResolver,
+            List<PublisherEntry> dbContainer)
     throws CAMgmtException
     {
         final String sql = "TYPE, CONF FROM PUBLISHER WHERE NAME=?";
@@ -475,6 +476,10 @@ class CAManagerQueryExecutor
                 String conf = rs.getString("CONF");
 
                 PublisherEntry rawEntry = new PublisherEntry(name, type, conf);
+                if(dbContainer != null)
+                {
+                    dbContainer.add(rawEntry);
+                }
                 String realType = getRealPublisherType(type, envParamResolver);
                 IdentifiedX509CertPublisher ret;
                 try

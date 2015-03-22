@@ -80,6 +80,16 @@ public class CertprofileEntry implements Serializable
         return conf;
     }
 
+    public boolean isFaulty()
+    {
+        return faulty;
+    }
+
+    public void setFaulty(boolean faulty)
+    {
+        this.faulty = faulty;
+    }
+
     @Override
     public String toString()
     {
@@ -101,16 +111,6 @@ public class CertprofileEntry implements Serializable
             sb.append(conf.substring(0, 297)).append("...");
         }
         return sb.toString();
-    }
-
-    public boolean isFaulty()
-    {
-        return faulty;
-    }
-
-    public void setFaulty(boolean faulty)
-    {
-        this.faulty = faulty;
     }
 
 }

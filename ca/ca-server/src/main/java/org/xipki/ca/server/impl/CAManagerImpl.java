@@ -259,6 +259,8 @@ implements CAManager, CmpResponderManager
     private final Map<String, CertprofileEntry> certprofileDbEntries = new ConcurrentHashMap<>();
 
     private final Map<String, IdentifiedX509CertPublisher> publishers = new ConcurrentHashMap<>();
+    private final Map<String, PublisherEntry> publisherDbEntries = new ConcurrentHashMap<>();
+
     private final Map<String, CmpRequestorEntryWrapper> requestors = new ConcurrentHashMap<>();
     private final Map<String, X509CrlSignerEntryWrapper> crlSigners = new ConcurrentHashMap<>();
     private final Map<String, Set<String>> ca_has_profiles = new ConcurrentHashMap<>();
@@ -891,7 +893,7 @@ implements CAManager, CmpResponderManager
     @Override
     public Set<String> getPublisherNames()
     {
-        return publishers.keySet();
+        return publisherDbEntries.keySet();
     }
 
     @Override
@@ -1051,6 +1053,7 @@ implements CAManager, CmpResponderManager
             queryExecutor.shutdownPublisher(publishers.get(name));
         }
         publishers.clear();
+        publisherDbEntries.clear();
 
         List<String> names = queryExecutor.getNamesFromTable("PUBLISHER");
 
@@ -1058,11 +1061,25 @@ implements CAManager, CmpResponderManager
         {
             for(String name : names)
             {
-                IdentifiedX509CertPublisher publisher = queryExecutor.createPublisher(name, dataSources,
-                        securityFactory.getPasswordResolver(), envParameterResolver);
-                if(publisher != null)
+                List<PublisherEntry> dbContainer = new ArrayList<>(1);
+                boolean faulty = true;
+                try
                 {
-                    publishers.put(name, publisher);
+                    IdentifiedX509CertPublisher publisher = queryExecutor.createPublisher(name, dataSources,
+                            securityFactory.getPasswordResolver(), envParameterResolver, dbContainer);
+                    if(publisher != null)
+                    {
+                        faulty = false;
+                        publishers.put(name, publisher);
+                    }
+                }finally
+                {
+                    if(CollectionUtil.isNotEmpty(dbContainer))
+                    {
+                        PublisherEntry dbEntry = dbContainer.get(0);
+                        dbEntry.setFaulty(faulty);
+                        publisherDbEntries.put(name, dbEntry);
+                    }
                 }
             }
         }
@@ -1289,6 +1306,11 @@ implements CAManager, CmpResponderManager
         }
         profileNames.add(profileName);
 
+        if(certprofiles.containsKey(profileName) == false)
+        {
+            throw new CAMgmtException("cerptofile '" + profileName + "' is faulty");
+        }
+
         queryExecutor.addCertprofileToCA(profileName, caName);
         ca_has_profiles.get(caName).add(profileName);
         return true;
@@ -1334,10 +1356,17 @@ implements CAManager, CmpResponderManager
             }
         }
 
+        IdentifiedX509CertPublisher publisher = publishers.get(publisherName);
+        if(publisher == null)
+        {
+            throw new CAMgmtException("publisher '" + publisherName + "' is faulty");
+        }
+
         queryExecutor.addPublisherToCA(publisherName, caName);
         publisherNames.add(publisherName);
         ca_has_publishers.get(caName).add(publisherName);
-        publishers.get(publisherName).issuerAdded(caInfos.get(caName).getCertificate());
+
+        publisher.issuerAdded(caInfos.get(caName).getCertificate());
         return true;
     }
 
@@ -1542,7 +1571,10 @@ implements CAManager, CmpResponderManager
 
         certprofileDbEntries.remove(name);
         IdentifiedX509Certprofile profile = certprofiles.remove(name);
-        queryExecutor.shutdownCertprofile(profile);
+        if(profile != null)
+        {
+            queryExecutor.shutdownCertprofile(profile);
+        }
 
         List<CertprofileEntry> dbContainer = new ArrayList<>(1);
         boolean faulty = true;
@@ -1750,13 +1782,15 @@ implements CAManager, CmpResponderManager
         {
             throw new CAMgmtException("publisher named " + name + " exists");
         }
-
         queryExecutor.addPublisher(dbEntry);
 
+        publisherDbEntries.put(name, dbEntry);
+        dbEntry.setFaulty(true);
         IdentifiedX509CertPublisher publisher = queryExecutor.createPublisher(name, dataSources,
-                securityFactory.getPasswordResolver(), envParameterResolver);
+                securityFactory.getPasswordResolver(), envParameterResolver, null);
         if(publisher != null)
         {
+            dbEntry.setFaulty(false);
             publishers.put(name, publisher);
         }
 
@@ -1790,7 +1824,7 @@ implements CAManager, CmpResponderManager
         List<PublisherEntry> ret = new ArrayList<>(publisherNames.size());
         for(String publisherName : publisherNames)
         {
-            ret.add(publishers.get(publisherName).getEntry());
+            ret.add(publisherDbEntries.get(publisherName));
         }
 
         return ret;
@@ -1799,8 +1833,7 @@ implements CAManager, CmpResponderManager
     @Override
     public PublisherEntry getPublisher(String publisherName)
     {
-        IdentifiedX509CertPublisher entry = publishers.get(publisherName);
-        return entry == null ? null : entry.getEntry();
+        return publisherDbEntries.get(publisherName);
     }
 
     @Override
@@ -1820,6 +1853,7 @@ implements CAManager, CmpResponderManager
         }
 
         LOG.info("removed publisher '{}'", publisherName);
+        publisherDbEntries.remove(publisherName);
         IdentifiedX509CertPublisher publisher = publishers.remove(publisherName);
         queryExecutor.shutdownPublisher(publisher);
         return true;
@@ -1837,13 +1871,32 @@ implements CAManager, CmpResponderManager
         }
 
         IdentifiedX509CertPublisher publisher = publishers.remove(name);
-        queryExecutor.shutdownPublisher(publisher);
-        publisher = queryExecutor.createPublisher(name, dataSources,
-                securityFactory.getPasswordResolver(), envParameterResolver);
         if(publisher != null)
         {
-            publishers.put(name, publisher);
+            queryExecutor.shutdownPublisher(publisher);
         }
+
+        List<PublisherEntry> dbContainer = new ArrayList<>(1);
+        boolean faulty = true;
+        try
+        {
+            publisher = queryExecutor.createPublisher(name, dataSources,
+                    securityFactory.getPasswordResolver(), envParameterResolver, dbContainer);
+            if(publisher != null)
+            {
+                faulty = false;
+                publishers.put(name, publisher);
+            }
+        }finally
+        {
+            if(CollectionUtil.isNotEmpty(dbContainer))
+            {
+                PublisherEntry dbEntry = dbContainer.get(0);
+                dbEntry.setFaulty(faulty);
+                publisherDbEntries.put(name, dbEntry);
+            }
+        }
+
         return true;
     }
 
@@ -2231,7 +2284,7 @@ implements CAManager, CmpResponderManager
 
         LOG.info("unrevoking of CA '{}'", caName);
 
-        boolean b =queryExecutor.unrevokeCa(caName);
+        boolean b = queryExecutor.unrevokeCa(caName);
         if(b == false)
         {
             return false;
