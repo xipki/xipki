@@ -53,7 +53,6 @@ import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
-import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
@@ -434,7 +433,7 @@ public class CAManagerClient implements CAManager
 
     @Override
     public boolean changeCrlSigner(String name, String signer_type,
-            String signer_conf, String signer_cert, CRLControl crlControl)
+            String signer_conf, String signer_cert, String crlControl)
     throws CAMgmtException
     {
         return client.changeCrlSigner(name, signer_type, signer_conf, signer_cert, crlControl);
