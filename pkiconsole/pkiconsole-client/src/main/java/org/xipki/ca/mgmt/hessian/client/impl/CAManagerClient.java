@@ -344,10 +344,10 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public boolean changeCmpRequestor(String name, String cert)
+    public boolean changeCmpRequestor(String name, String base64Cert)
     throws CAMgmtException
     {
-        return client.changeCmpRequestor(name, cert);
+        return client.changeCmpRequestor(name, base64Cert);
     }
 
     @Override
@@ -406,10 +406,10 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public boolean changeCmpResponder(String type, String conf, String cert)
+    public boolean changeCmpResponder(String type, String conf, String base64Cert)
     throws CAMgmtException
     {
-        return client.changeCmpResponder(type, conf, cert);
+        return client.changeCmpResponder(type, conf, base64Cert);
     }
 
     @Override
