@@ -37,7 +37,6 @@ package org.xipki.ca.server.mgmt.shell;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 
 /**
@@ -63,7 +62,7 @@ public class CmpControlAddCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        CmpControl entry = new CmpControl(new CmpControlEntry(name, conf));
+        CmpControlEntry entry = new CmpControlEntry(name, conf);
         boolean b = caManager.addCmpControl(entry);
         output(b, "added", "could not add", "CMP control " + name);
         return null;
