@@ -90,7 +90,6 @@ import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
-import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
@@ -266,6 +265,7 @@ implements CAManager, CmpResponderManager
     private final Map<String, CmpControlEntry> cmpControlDbEntries = new ConcurrentHashMap<>();
 
     private final Map<String, CmpRequestorEntryWrapper> requestors = new ConcurrentHashMap<>();
+    private final Map<String, CmpRequestorEntry> requestorDbEntries = new ConcurrentHashMap<>();
 
     private final Map<String, X509CrlSignerEntryWrapper> crlSigners = new ConcurrentHashMap<>();
 
@@ -903,7 +903,7 @@ implements CAManager, CmpResponderManager
     @Override
     public Set<String> getCmpRequestorNames()
     {
-        return requestors.keySet();
+        return requestorDbEntries.keySet();
     }
 
     @Override
@@ -932,6 +932,7 @@ implements CAManager, CmpResponderManager
             return;
         }
 
+        requestorDbEntries.clear();
         requestors.clear();
         List<String> names = queryExecutor.getNamesFromTable("REQUESTOR");
 
@@ -939,11 +940,16 @@ implements CAManager, CmpResponderManager
         {
             for(String name : names)
             {
-                CmpRequestorEntryWrapper requestor = queryExecutor.createRequestor(name);
-                if(requestor != null)
+                CmpRequestorEntry requestorDbEntry = queryExecutor.createRequestor(name);
+                if(requestorDbEntry == null)
                 {
-                    requestors.put(name, requestor);
+                    continue;
                 }
+
+                requestorDbEntries.put(name, requestorDbEntry);
+                CmpRequestorEntryWrapper requestor = new CmpRequestorEntryWrapper();
+                requestor.setDbEntry(requestorDbEntry);
+                requestors.put(name, requestor);
             }
         }
 
@@ -1397,7 +1403,7 @@ implements CAManager, CmpResponderManager
     @Override
     public CmpRequestorEntry getCmpRequestor(String name)
     {
-        return requestors.containsKey(name) ? requestors.get(name).getDbEntry() : null;
+        return requestorDbEntries.get(name);
     }
 
     public CmpRequestorEntryWrapper getCmpRequestorWrapper(String name)
@@ -1411,13 +1417,18 @@ implements CAManager, CmpResponderManager
     {
         asssertMasterMode();
         String name = dbEntry.getName();
-        if(requestors.containsKey(name))
+        if(requestorDbEntries.containsKey(name))
         {
             return false;
         }
 
+        CmpRequestorEntryWrapper requestor = new CmpRequestorEntryWrapper();
+        requestor.setDbEntry(dbEntry);
+
         queryExecutor.addCmpRequestor(dbEntry);
-        requestors.put(name, queryExecutor.createRequestor(name));
+
+        requestorDbEntries.put(name, dbEntry);
+        requestors.put(name, requestor);
 
         try
         {
@@ -1452,31 +1463,37 @@ implements CAManager, CmpResponderManager
             return false;
         }
 
+        requestorDbEntries.remove(requestorName);
         requestors.remove(requestorName);
         LOG.info("removed requestor '{}'", requestorName);
         return true;
     }
 
     @Override
-    public boolean changeCmpRequestor(String name, String cert)
+    public boolean changeCmpRequestor(String name, String base64Cert)
     throws CAMgmtException
     {
         asssertMasterMode();
-        if(cert == null)
+        if(base64Cert == null)
         {
             return false;
         }
 
-        boolean changed = queryExecutor.changeCmpRequestor(name, cert);
+        boolean changed = queryExecutor.changeCmpRequestor(name, base64Cert);
         if(changed == false)
         {
             return false;
         }
 
+        requestorDbEntries.remove(name);
         requestors.remove(name);
-        CmpRequestorEntryWrapper requestor = queryExecutor.createRequestor(name);
-        if(requestor != null)
+        CmpRequestorEntry requestorDbEntry = queryExecutor.createRequestor(name);
+        if(requestorDbEntry != null)
         {
+            requestorDbEntries.put(name, requestorDbEntry);
+
+            CmpRequestorEntryWrapper requestor = new CmpRequestorEntryWrapper();
+            requestor.setDbEntry(requestorDbEntry);
             requestors.put(name, requestor);
         }
         return true;
@@ -1678,16 +1695,16 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean changeCmpResponder(String type, String conf, String cert)
+    public boolean changeCmpResponder(String type, String conf, String base64Cert)
     throws CAMgmtException
     {
         asssertMasterMode();
-        if(type == null && conf == null && cert == null)
+        if(type == null && conf == null && base64Cert == null)
         {
             return false;
         }
 
-        boolean changed = queryExecutor.changeCmpResponder(type, conf, cert);
+        boolean changed = queryExecutor.changeCmpResponder(type, conf, base64Cert);
         if(changed == false)
         {
             LOG.info("no change of CMP responder is processed");

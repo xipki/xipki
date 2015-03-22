@@ -33,12 +33,13 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.mgmt.api;
+package org.xipki.ca.server.impl;
 
 import java.util.Collections;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
@@ -49,7 +50,7 @@ import org.xipki.common.util.StringUtil;
  * @author Lijun Liao
  */
 
-public class CmpControl
+class CmpControl
 {
     public static final String KEY_CONFIRM_CERT = "confirm.cert";
     public static final String KEY_SEND_CA = "send.ca";

@@ -509,7 +509,7 @@ class CAManagerQueryExecutor
         return null;
     }
 
-    CmpRequestorEntryWrapper createRequestor(String name)
+    CmpRequestorEntry createRequestor(String name)
     throws CAMgmtException
     {
         final String sql = "CERT FROM REQUESTOR WHERE NAME=?";
@@ -525,13 +525,7 @@ class CAManagerQueryExecutor
             if(rs.next())
             {
                 String b64Cert = rs.getString("CERT");
-                X509Certificate cert = generateCert(b64Cert);
-                CmpRequestorEntry entry = new CmpRequestorEntry(name);
-                entry.setCert(cert);
-
-                CmpRequestorEntryWrapper ret = new CmpRequestorEntryWrapper();
-                ret.setDbEntry(entry);
-                return ret;
+                return new CmpRequestorEntry(name, b64Cert);
             }
         }catch(SQLException e)
         {
@@ -1584,7 +1578,7 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean changeCmpRequestor(String name, String cert)
+    boolean changeCmpRequestor(String name, String base64Cert)
     throws CAMgmtException
     {
         final String sql = "UPDATE REQUESTOR SET CERT=? WHERE NAME=?";
@@ -1592,7 +1586,7 @@ class CAManagerQueryExecutor
         try
         {
             ps = prepareStatement(sql);
-            String b64Cert = getRealString(cert);
+            String b64Cert = getRealString(base64Cert);
             ps.setString(1, b64Cert);
             ps.setString(2, name);
             ps.executeUpdate();

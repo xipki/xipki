@@ -38,7 +38,7 @@ package org.xipki.ca.server.mgmt.shell;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.IoUtil;
 
 /**
  * @author Lijun Liao
@@ -63,9 +63,18 @@ public class RequestorAddCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        CmpRequestorEntry entry = new CmpRequestorEntry(name);
-        entry.setCert(SecurityUtil.parseCert(certFile));
-        boolean b = caManager.addCmpRequestor(entry);
+        String base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
+        CmpRequestorEntry entry = new CmpRequestorEntry(name, base64Cert);
+
+        boolean b;
+        if(entry.getCert() == null)
+        {
+            b = false;
+        }
+        else
+        {
+            b = caManager.addCmpRequestor(entry);
+        }
         output(b, "added", "could not add", "CMP requestor " + name);
         return null;
     }

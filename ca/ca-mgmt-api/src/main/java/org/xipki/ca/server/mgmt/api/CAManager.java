@@ -135,7 +135,7 @@ public interface CAManager
     boolean removeCmpRequestor(String requestorName)
     throws CAMgmtException;
 
-    boolean changeCmpRequestor(String name, String cert)
+    boolean changeCmpRequestor(String name, String base64Cert)
     throws CAMgmtException;
 
     boolean removeCmpRequestorFromCA(String requestorName, String caName)
@@ -161,7 +161,7 @@ public interface CAManager
     boolean removeCmpResponder()
     throws CAMgmtException;
 
-    boolean changeCmpResponder(String type, String conf, String cert)
+    boolean changeCmpResponder(String type, String conf, String base64Cert)
     throws CAMgmtException;
 
     CmpResponderEntry getCmpResponder();
