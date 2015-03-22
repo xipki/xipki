@@ -128,7 +128,6 @@ import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
-import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CmpUtf8Pairs;

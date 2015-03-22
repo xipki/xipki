@@ -148,7 +148,7 @@ public interface HessianCAManager
     boolean removeCmpRequestor(String requestorName)
     throws HessianCAMgmtException;
 
-    boolean changeCmpRequestor(String name, String cert)
+    boolean changeCmpRequestor(String name, String base64Cert)
     throws HessianCAMgmtException;
 
     boolean removeCmpRequestorFromCA(String requestorName, String caName)
@@ -174,7 +174,7 @@ public interface HessianCAManager
     boolean removeCmpResponder()
     throws HessianCAMgmtException;
 
-    boolean changeCmpResponder(String type, String conf, String cert)
+    boolean changeCmpResponder(String type, String conf, String base64Cert)
     throws HessianCAMgmtException;
 
     CmpResponderEntry getCmpResponder();

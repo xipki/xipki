@@ -72,7 +72,6 @@ import org.xipki.ca.api.RequestorInfo;
 import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.common.cmp.ProtectionResult;
 import org.xipki.ca.common.cmp.ProtectionVerificationResult;
-import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.LogUtil;
