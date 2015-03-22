@@ -191,15 +191,15 @@ public interface CAManager
     boolean changePublisher(String name, String type, String conf)
     throws CAMgmtException;
 
-    CmpControl getCmpControl(String name);
+    CmpControlEntry getCmpControl(String name);
 
-    boolean addCmpControl(CmpControl dbEntry)
+    boolean addCmpControl(CmpControlEntry dbEntry)
     throws CAMgmtException;
 
     boolean removeCmpControl(String name)
     throws CAMgmtException;
 
-    boolean changeCmpControl(CmpControl control)
+    boolean changeCmpControl(String name, String conf)
     throws CAMgmtException;
 
     Set<String> getEnvParamNames();

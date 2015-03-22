@@ -35,7 +35,6 @@
 
 package org.xipki.ca.server.mgmt.api;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.Set;
 
@@ -50,10 +49,8 @@ import org.xipki.common.util.StringUtil;
  * @author Lijun Liao
  */
 
-public class CmpControl implements Serializable
+public class CmpControl
 {
-    private static final long serialVersionUID = 1L;
-
     public static final String KEY_CONFIRM_CERT = "confirm.cert";
     public static final String KEY_SEND_CA = "send.ca";
     public static final String KEY_SEND_RESPONDER = "send.responder";
@@ -83,13 +80,12 @@ public class CmpControl implements Serializable
         return messageTimeRequired;
     }
 
-    public CmpControl(String name, String conf)
+    public CmpControl(CmpControlEntry dbEntry)
     {
-        ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotEmpty("conf", conf);
-        this.name = name;
+        ParamChecker.assertNotNull("dbEntry", dbEntry);
+        this.name = dbEntry.getName();
 
-        CmpUtf8Pairs pairs = new CmpUtf8Pairs(conf);
+        CmpUtf8Pairs pairs = new CmpUtf8Pairs(dbEntry.getConf());
         this.confirmCert = getBoolean(pairs, KEY_CONFIRM_CERT, false);
         this.sendCaCert = getBoolean(pairs, KEY_SEND_CA, false);
         this.sendResponderCert = getBoolean(pairs, KEY_SEND_RESPONDER, true);
