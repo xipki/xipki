@@ -225,7 +225,7 @@ public class SoftTokenContentSignerBuilder
                 algOid.equals(PKCSObjectIdentifiers.id_RSASSA_PSS) == false &&
                 key instanceof ECPrivateKey == false)
         {
-            String algoName = SignerUtil.getSignatureAlgoName(signatureAlgId);
+            String algoName = SecurityUtil.getSignatureAlgoName(signatureAlgId);
             if(algoName == null)
             {
                 throw new OperatorCreationException("unsupported signature algorithm " + algOid.getId());
@@ -338,7 +338,7 @@ public class SoftTokenContentSignerBuilder
         private RSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId)
         throws NoSuchAlgorithmException, NoSuchPaddingException
         {
-            super(signatureAlgId, SignerUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
+            super(signatureAlgId, SecurityUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
         }
 
         protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
@@ -383,7 +383,7 @@ public class SoftTokenContentSignerBuilder
         private DSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId)
         throws NoSuchAlgorithmException
         {
-            super(signatureAlgId, SignerUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
+            super(signatureAlgId, SecurityUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
         }
 
         protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
@@ -399,7 +399,7 @@ public class SoftTokenContentSignerBuilder
         private ECDSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId)
         throws NoSuchAlgorithmException
         {
-            super(signatureAlgId, SignerUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
+            super(signatureAlgId, SecurityUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
         }
 
         protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
