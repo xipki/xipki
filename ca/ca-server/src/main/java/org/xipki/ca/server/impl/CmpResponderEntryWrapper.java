@@ -90,9 +90,11 @@ class CmpResponderEntryWrapper
         }
 
         X509Certificate responderCert = dbEntry.getCertificate();
+        dbEntry.setConfFaulty(true);
         signer = securityFactory.createSigner(
                 dbEntry.getType(), dbEntry.getConf(), responderCert);
-        if(responderCert == null)
+        dbEntry.setConfFaulty(false);
+        if(dbEntry.getBase64Cert() == null)
         {
             dbEntry.setCertificate(signer.getCertificate());
             subjectAsX500Name = X500Name.getInstance(

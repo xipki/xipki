@@ -92,8 +92,6 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.SignerException;
 
 /**
  * @author Lijun Liao
@@ -616,7 +614,7 @@ class CAManagerQueryExecutor
         }
     }
 
-    CmpResponderEntryWrapper createResponder(SecurityFactory securityFactory)
+    CmpResponderEntry createResponder()
     throws CAMgmtException
     {
         final String sql = "SELECT TYPE, CONF, CERT FROM RESPONDER";
@@ -635,6 +633,7 @@ class CAManagerQueryExecutor
                 if(dbEntry != null)
                 {
                     errorMsg = "more than one CMPResponder is configured, but maximal one is allowed";
+                    break;
                 }
 
                 dbEntry = new CmpResponderEntry();
@@ -648,8 +647,7 @@ class CAManagerQueryExecutor
                 String b64Cert = rs.getString("CERT");
                 if(b64Cert != null)
                 {
-                    X509Certificate cert = generateCert(b64Cert);
-                    dbEntry.setCertificate(cert);
+                    dbEntry.setBase64Cert(b64Cert);
                 }
             }
 
@@ -658,28 +656,7 @@ class CAManagerQueryExecutor
                 throw new CAMgmtException(errorMsg);
             }
 
-            if(dbEntry == null)
-            {
-                return null;
-            }
-
-            CmpResponderEntryWrapper ret = new CmpResponderEntryWrapper();
-            ret.setDbEntry(dbEntry);
-
-            try
-            {
-                ret.initSigner(securityFactory);
-            } catch (SignerException e)
-            {
-                final String message = "CmpResponderEntryWrapper.initSigner()";
-                if(LOG.isErrorEnabled())
-                {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                }
-                LOG.debug(message, e);
-            }
-
-            return ret;
+            return dbEntry;
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);

@@ -36,10 +36,8 @@
 package org.xipki.ca.server.mgmt.api;
 
 import java.io.Serializable;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.util.SecurityUtil;
 
 /**
@@ -52,6 +50,9 @@ public class CmpResponderEntry implements Serializable
     public static final String name = "default";
     private String type;
     private String conf;
+    private boolean certFaulty;
+    private boolean confFaulty;
+    private String base64Cert;
     private X509Certificate cert;
 
     public CmpResponderEntry()
@@ -85,7 +86,39 @@ public class CmpResponderEntry implements Serializable
 
     public void setCertificate(X509Certificate cert)
     {
+        if(base64Cert != null)
+        {
+            throw new IllegalStateException("certificate is already specified by base64Cert");
+        }
         this.cert = cert;
+    }
+
+    public String getBase64Cert()
+    {
+        return base64Cert;
+    }
+
+    public void setBase64Cert(String base64Cert)
+    {
+        this.certFaulty = false;
+        this.base64Cert = base64Cert;
+        try
+        {
+            this.cert = SecurityUtil.parseBase64EncodedCert(base64Cert);
+        }catch(Throwable t)
+        {
+            this.certFaulty = true;
+        }
+    }
+
+    public boolean isFaulty()
+    {
+        return confFaulty || certFaulty;
+    }
+
+    public void setConfFaulty(boolean confFaulty)
+    {
+        this.confFaulty = confFaulty;
     }
 
     @Override
@@ -103,6 +136,7 @@ public class CmpResponderEntry implements Serializable
     {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
+        sb.append("faulty: ").append(isFaulty()).append('\n');
         sb.append("type: ").append(type).append('\n');
         sb.append("conf: ");
         if(conf == null)
@@ -123,14 +157,7 @@ public class CmpResponderEntry implements Serializable
                     SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
             if(verbose)
             {
-                sb.append("\tencoded: ");
-                try
-                {
-                    sb.append(Base64.toBase64String(cert.getEncoded()));
-                } catch (CertificateEncodingException e)
-                {
-                    sb.append("ERROR");
-                }
+                sb.append("\tencoded: ").append(base64Cert);
             }
         }
         else

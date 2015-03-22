@@ -246,6 +246,7 @@ implements CAManager, CmpResponderManager
 
     private final String lockInstanceId;
 
+    private CmpResponderEntry responderDbEntry;
     private CmpResponderEntryWrapper responder;
 
     private boolean caLockedByMe = false;
@@ -964,7 +965,17 @@ implements CAManager, CmpResponderManager
             return;
         }
 
-        responder = queryExecutor.createResponder(securityFactory);
+        responderDbEntry = null;
+        responder = null;
+
+        responderDbEntry = queryExecutor.createResponder();
+        if(responderDbEntry != null)
+        {
+            responderDbEntry.setConfFaulty(true);
+            responder = CAManagerUtil.createCmpResponder(responderDbEntry, securityFactory);
+            responderDbEntry.setConfFaulty(false);
+        }
+
         responderInitialized = true;
     }
 
@@ -1667,14 +1678,17 @@ implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
-        if(responder != null)
+
+        CmpResponderEntryWrapper _responder = CAManagerUtil.createCmpResponder(dbEntry, securityFactory);
+
+        if(this.responder != null)
         {
             removeCmpResponder();
         }
 
-        queryExecutor.setCmpResponder(dbEntry);
-        responder = queryExecutor.createResponder(securityFactory);
-
+        this.queryExecutor.setCmpResponder(dbEntry);
+        this.responder = _responder;
+        this.responderDbEntry = dbEntry;
         return true;
     }
 
@@ -1691,6 +1705,7 @@ implements CAManager, CmpResponderManager
 
         LOG.info("removed responder");
         responder = null;
+        responderDbEntry = null;
         return true;
     }
 
@@ -1711,16 +1726,20 @@ implements CAManager, CmpResponderManager
             return false;
         }
 
+        responderDbEntry = null;
         responder = null;
-        responder = queryExecutor.createResponder(securityFactory);
 
+        responderDbEntry = queryExecutor.createResponder();
+        responderDbEntry.setConfFaulty(true);
+        responder = CAManagerUtil.createCmpResponder(responderDbEntry, securityFactory);
+        responderDbEntry.setConfFaulty(false);
         return true;
     }
 
     @Override
     public CmpResponderEntry getCmpResponder()
     {
-        return responder == null ? null : responder.getDbEntry();
+        return responderDbEntry;
     }
 
     public CmpResponderEntryWrapper getCmpResponderWrapper()
