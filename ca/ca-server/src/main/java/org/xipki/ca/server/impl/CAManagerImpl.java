@@ -1916,6 +1916,11 @@ implements CAManager, CmpResponderManager
         return cmpControlDbEntries.get(name);
     }
 
+    public CmpControl getCmpControlObject(String name)
+    {
+        return cmpControls.get(name);
+    }
+
     @Override
     public boolean addCmpControl(CmpControlEntry dbEntry)
     throws CAMgmtException

@@ -1119,7 +1119,7 @@ class X509CACmpResponder extends CmpResponder
             String name = ca.getCAInfo().getCmpControlName();
             if(name != null)
             {
-                return caManager.getCmpControl(name);
+                return caManager.getCmpControlObject(name);
             }
         }
 

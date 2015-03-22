@@ -47,7 +47,7 @@ import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
-import org.xipki.ca.server.mgmt.api.CmpControl;
+import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
@@ -204,15 +204,15 @@ public interface HessianCAManager
     boolean changePublisher(String name, String type, String conf)
     throws HessianCAMgmtException;
 
-    CmpControl getCmpControl(String name);
+    CmpControlEntry getCmpControl(String name);
 
-    boolean addCmpControl(CmpControl dbEntry)
+    boolean addCmpControl(CmpControlEntry dbEntry)
     throws HessianCAMgmtException;
 
     boolean removeCmpControl(String name)
     throws HessianCAMgmtException;
 
-    boolean changeCmpControl(CmpControl dbEntry)
+    boolean changeCmpControl(String name, String conf)
     throws HessianCAMgmtException;
 
     Set<String> getEnvParamNames();

@@ -64,7 +64,7 @@ import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
-import org.xipki.ca.server.mgmt.api.CmpControl;
+import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
@@ -636,13 +636,13 @@ implements HessianCAManager
     }
 
     @Override
-    public CmpControl getCmpControl(String name)
+    public CmpControlEntry getCmpControl(String name)
     {
         return caManager.getCmpControl(name);
     }
 
     @Override
-    public boolean addCmpControl(CmpControl dbEntry)
+    public boolean addCmpControl(CmpControlEntry dbEntry)
     throws HessianCAMgmtException
     {
         try
@@ -668,12 +668,12 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean changeCmpControl(CmpControl dbEntry)
+    public boolean changeCmpControl(String name, String conf)
     throws HessianCAMgmtException
     {
         try
         {
-            return caManager.changeCmpControl(dbEntry);
+            return caManager.changeCmpControl(name, conf);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
