@@ -44,7 +44,6 @@ import org.bouncycastle.util.Arrays;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.KeyUsage;
@@ -60,6 +59,7 @@ import org.xipki.security.api.SignerException;
 class X509CrlSignerEntryWrapper
 {
     private X509CrlSignerEntry dbEntry;
+    private CRLControl crlControl;
     private ConcurrentContentSigner signer;
     private byte[] subjectKeyIdentifier;
 
@@ -68,13 +68,15 @@ class X509CrlSignerEntryWrapper
     }
 
     public void setDbEntry(X509CrlSignerEntry dbEntry)
+    throws ConfigurationException
     {
         this.dbEntry = dbEntry;
+        this.crlControl = new CRLControl(dbEntry.getCRLControl());
     }
 
     public CRLControl getCRLControl()
     {
-        return dbEntry.getCRLControl();
+        return crlControl;
     }
 
     public void initSigner(SecurityFactory securityFactory)
@@ -98,7 +100,7 @@ class X509CrlSignerEntryWrapper
         X509Certificate responderCert = dbEntry.getCertificate();
         signer = securityFactory.createSigner(
                 dbEntry.getType(), dbEntry.getConf(), responderCert);
-        if(responderCert == null)
+        if(dbEntry.getBase64Cert() == null)
         {
             dbEntry.setCertificate(signer.getCertificate());
         }

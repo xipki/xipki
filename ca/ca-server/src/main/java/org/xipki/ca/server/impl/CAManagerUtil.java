@@ -39,6 +39,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
+import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
+import org.xipki.common.ConfigurationException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 
@@ -67,6 +69,20 @@ public class CAManagerUtil
             throw new CAMgmtException(e.getMessage());
         }
         return ret;
+    }
+
+    public static X509CrlSignerEntryWrapper createX509CrlSigner(X509CrlSignerEntry dbEntry)
+    throws CAMgmtException
+    {
+        X509CrlSignerEntryWrapper signer = new X509CrlSignerEntryWrapper();
+        try
+        {
+            signer.setDbEntry(dbEntry);
+        } catch (ConfigurationException e)
+        {
+            throw new CAMgmtException("ConfigurationException: " + e.getMessage());
+        }
+        return signer;
     }
 
 }

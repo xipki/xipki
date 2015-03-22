@@ -36,8 +36,10 @@
 package org.xipki.ca.server.mgmt.api;
 
 import java.io.Serializable;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
+import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.util.SecurityUtil;
 
 /**
@@ -148,16 +150,26 @@ public class CmpResponderEntry implements Serializable
         }
         sb.append('\n');
         sb.append("cert: ").append("\n");
-        if(cert != null)
+        if(cert != null || base64Cert != null)
         {
-            sb.append("\tissuer: ").append(
-                    SecurityUtil.getRFC4519Name(cert.getIssuerX500Principal())).append('\n');
-            sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append('\n');
-            sb.append("\tsubject: ").append(
-                    SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
+            if(cert != null)
+            {
+                sb.append("\tissuer: ").append(
+                        SecurityUtil.getRFC4519Name(cert.getIssuerX500Principal())).append('\n');
+                sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append('\n');
+                sb.append("\tsubject: ").append(
+                        SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
+            }
             if(verbose)
             {
-                sb.append("\tencoded: ").append(base64Cert);
+                sb.append("\tencoded: ");
+                try
+                {
+                    sb.append(Base64.toBase64String(cert.getEncoded()));
+                } catch (CertificateEncodingException e)
+                {
+                    sb.append("ERROR");
+                }
             }
         }
         else

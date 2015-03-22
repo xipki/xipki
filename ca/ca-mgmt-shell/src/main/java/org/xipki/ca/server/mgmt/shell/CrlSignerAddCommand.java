@@ -39,8 +39,8 @@ import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
+import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.security.api.SecurityFactory;
 
@@ -75,7 +75,7 @@ public class CrlSignerAddCommand extends CaCommand
             required = true,
             description = "CRL control\n"
                     + "(required)")
-    private String crlControlS;
+    private String crlControl;
 
     private SecurityFactory securityFactory;
 
@@ -83,12 +83,15 @@ public class CrlSignerAddCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        X509Certificate signerCert = null;
+        String base64Cert = null;
         if("CA".equalsIgnoreCase(signerType) == false)
         {
+            X509Certificate signerCert = null;
             if(signerCertFile != null)
             {
-                signerCert = SecurityUtil.parseCert(signerCertFile);
+                byte[] encodedCert = IoUtil.read(signerCertFile);
+                base64Cert = IoUtil.base64Encode(encodedCert, false);
+                signerCert = SecurityUtil.parseCert(encodedCert);
             }
 
             if(signerConf != null)
@@ -103,12 +106,7 @@ public class CrlSignerAddCommand extends CaCommand
             securityFactory.createSigner(signerType, signerConf, signerCert);
         }
 
-        CRLControl crlControl = new CRLControl(crlControlS);
-        X509CrlSignerEntry entry = new X509CrlSignerEntry(name, signerType, signerConf, crlControl);
-        if(signerCert != null)
-        {
-            entry.setCertificate(signerCert);
-        }
+        X509CrlSignerEntry entry = new X509CrlSignerEntry(name, signerType, signerConf, base64Cert, crlControl);
         boolean b = caManager.addCrlSigner(entry);
         output(b, "added", "could not add", "CRL signer " + name);
         return null;

@@ -40,6 +40,8 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.SecurityUtil;
@@ -50,30 +52,67 @@ import org.xipki.common.util.SecurityUtil;
 
 public class X509CrlSignerEntry implements Serializable
 {
+    private static final Logger LOG = LoggerFactory.getLogger(X509CrlSignerEntry.class);
+
     private static final long serialVersionUID = 1L;
     private final String name;
     private final String signerType;
     private final String signerConf;
+    private final String base64Cert;
+
     private X509Certificate cert;
+    private boolean certFaulty;
+    private boolean confFaulty;
 
-    private CRLControl crlControl;
+    private String crlControl;
 
-    public X509CrlSignerEntry(String name, String signerType, String signerConf, CRLControl crlControl)
+    public X509CrlSignerEntry(String name, String signerType, String signerConf, String base64Cert, String crlControl)
     throws ConfigurationException
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("type", signerType);
         ParamChecker.assertNotNull("crlControl", crlControl);
 
+        if("CA".equalsIgnoreCase(name))
+        {
+            this.base64Cert = null;
+        }
+        else
+        {
+            this.base64Cert = base64Cert;
+        }
+
         this.name = name;
         this.signerType = signerType;
         this.signerConf = signerConf;
         this.crlControl = crlControl;
+
+        if(this.base64Cert != null)
+        {
+            try
+            {
+                this.cert = SecurityUtil.parseBase64EncodedCert(base64Cert);
+            }catch(Throwable t)
+            {
+                LOG.debug("could not parse the certificate of CRL signer '" + name + "'");
+                certFaulty = true;
+            }
+        }
     }
 
     public String getName()
     {
         return name;
+    }
+
+    public void setConfFaulty(boolean faulty)
+    {
+        this.confFaulty = faulty;
+    }
+
+    public boolean isFaulty()
+    {
+        return certFaulty || confFaulty;
     }
 
     public String getType()
@@ -86,6 +125,11 @@ public class X509CrlSignerEntry implements Serializable
         return signerConf;
     }
 
+    public String getBase64Cert()
+    {
+        return base64Cert;
+    }
+
     public X509Certificate getCertificate()
     {
         return cert;
@@ -93,10 +137,14 @@ public class X509CrlSignerEntry implements Serializable
 
     public void setCertificate(X509Certificate cert)
     {
+        if(base64Cert != null)
+        {
+            throw new IllegalStateException("certificate is already by specified by base64Cert");
+        }
         this.cert = cert;
     }
 
-    public CRLControl getCRLControl()
+    public String getCRLControl()
     {
         return crlControl;
     }
@@ -116,6 +164,7 @@ public class X509CrlSignerEntry implements Serializable
     {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
+        sb.append("faulty: ").append(isFaulty()).append('\n');
         sb.append("signerType: ").append(signerType).append('\n');
         sb.append("signerConf: ");
         if(signerConf == null)
@@ -126,7 +175,7 @@ public class X509CrlSignerEntry implements Serializable
             sb.append(SecurityUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo));
         }
         sb.append('\n');
-        sb.append("crlControl: ").append(crlControl.getConf()).append("\n");
+        sb.append("crlControl: ").append(crlControl).append("\n");
         if(cert != null)
         {
             sb.append("cert: ").append("\n");

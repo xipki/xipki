@@ -173,7 +173,7 @@ public interface CAManager
     throws CAMgmtException;
 
     boolean changeCrlSigner(String name, String signer_type, String signer_conf, String signer_cert,
-            CRLControl crlControl)
+            String crlControl)
     throws CAMgmtException;
 
     X509CrlSignerEntry getCrlSigner(String name);

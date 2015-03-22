@@ -69,7 +69,6 @@ import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
-import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CertArt;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
@@ -537,7 +536,7 @@ class CAManagerQueryExecutor
         return null;
     }
 
-    X509CrlSignerEntryWrapper createCrlSigner(String name)
+    X509CrlSignerEntry createCrlSigner(String name)
     throws CAMgmtException
     {
         final String sql = "SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL FROM CRLSIGNER WHERE NAME=?";
@@ -556,19 +555,7 @@ class CAManagerQueryExecutor
                 String signer_conf = rs.getString("SIGNER_CONF");
                 String signer_cert = rs.getString("SIGNER_CERT");
                 String crlControlConf = rs.getString("CRL_CONTROL");
-                CRLControl crlControl = new CRLControl(crlControlConf);
-
-                X509CrlSignerEntry entry = new X509CrlSignerEntry(name, signer_type, signer_conf, crlControl);
-                if("CA".equalsIgnoreCase(signer_type) == false)
-                {
-                    if(signer_cert != null)
-                    {
-                        entry.setCertificate(generateCert(signer_cert));
-                    }
-                }
-                X509CrlSignerEntryWrapper signer = new X509CrlSignerEntryWrapper();
-                signer.setDbEntry(entry);
-                return signer;
+                return new X509CrlSignerEntry(name, signer_type, signer_conf, signer_cert, crlControlConf);
             }
         }catch(SQLException e)
         {
@@ -1200,7 +1187,7 @@ class CAManagerQueryExecutor
             ps.setString(idx++, dbEntry.getCertificate() == null ? null :
                     Base64.toBase64String(dbEntry.getCertificate().getEncoded()));
 
-            String crlControl = dbEntry.getCRLControl().getConf();
+            String crlControl = dbEntry.getCRLControl();
             ps.setString(idx++, crlControl);
 
             ps.executeUpdate();
@@ -1671,7 +1658,7 @@ class CAManagerQueryExecutor
     }
 
     boolean changeCrlSigner(String name, String signer_type, String signer_conf, String signer_cert,
-            CRLControl crlControl)
+            String crlControl)
     throws CAMgmtException
     {
         StringBuilder sqlBuilder = new StringBuilder();
@@ -1736,7 +1723,7 @@ class CAManagerQueryExecutor
             if(iCrlControl != null)
             {
                 m.append("crlControl: '").append(crlControl).append("'; ");
-                ps.setString(iCrlControl, crlControl.getConf());
+                ps.setString(iCrlControl, crlControl);
             }
 
             ps.setString(index.get(), name);
