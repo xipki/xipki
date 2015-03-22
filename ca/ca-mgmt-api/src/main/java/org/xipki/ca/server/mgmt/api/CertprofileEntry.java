@@ -49,6 +49,7 @@ public class CertprofileEntry implements Serializable
     private final String name;
     private final String type;
     private final String conf;
+    private boolean faulty;
 
     public CertprofileEntry(String name, String type, String conf)
     {
@@ -89,6 +90,7 @@ public class CertprofileEntry implements Serializable
     {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
+        sb.append("faulty: ").append(faulty).append('\n');
         sb.append("type: ").append(type).append('\n');
         sb.append("conf: ");
         if(verbose || conf == null || conf.length() < 301)
@@ -99,6 +101,16 @@ public class CertprofileEntry implements Serializable
             sb.append(conf.substring(0, 297)).append("...");
         }
         return sb.toString();
+    }
+
+    public boolean isFaulty()
+    {
+        return faulty;
+    }
+
+    public void setFaulty(boolean faulty)
+    {
+        this.faulty = faulty;
     }
 
 }
