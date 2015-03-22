@@ -1251,6 +1251,11 @@ class X509CACmpResponder extends CmpResponder
                 for(String name : supportedProfileNames)
                 {
                     CertprofileEntry entry = ca.getCAManager().getCertprofile(name);
+                    if(entry.isFaulty())
+                    {
+                        continue;
+                    }
+
                     sb.append("<certprofile>");
                     sb.append("<name>").append(name).append("</name>");
                     sb.append("<type>").append(entry.getType()).append("</type>");

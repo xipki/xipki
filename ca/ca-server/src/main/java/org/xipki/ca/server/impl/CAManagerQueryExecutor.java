@@ -369,7 +369,8 @@ class CAManagerQueryExecutor
         return map;
     }
 
-    IdentifiedX509Certprofile createCertprofile(String name, EnvironmentParameterResolver envParamResolver)
+    IdentifiedX509Certprofile createCertprofile(String name, EnvironmentParameterResolver envParamResolver,
+            List<CertprofileEntry> dbContainer)
     throws CAMgmtException
     {
         PreparedStatement stmt = null;
@@ -389,6 +390,10 @@ class CAManagerQueryExecutor
                 try
                 {
                     CertprofileEntry rawEntry = new CertprofileEntry(name, type, conf);
+                    if(dbContainer != null)
+                    {
+                        dbContainer.add(rawEntry);
+                    }
                     String realType = getRealCertprofileType(type, envParamResolver);
                     IdentifiedX509Certprofile ret = new IdentifiedX509Certprofile(rawEntry, realType);
                     ret.setEnvironmentParameterResolver(envParamResolver);

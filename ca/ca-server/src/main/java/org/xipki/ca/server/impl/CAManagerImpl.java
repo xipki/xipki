@@ -254,7 +254,10 @@ implements CAManager, CmpResponderManager
     private Map<String, DataSourceWrapper> dataSources = null;
 
     private final Map<String, X509CAInfo> caInfos = new ConcurrentHashMap<>();
+
     private final Map<String, IdentifiedX509Certprofile> certprofiles = new ConcurrentHashMap<>();
+    private final Map<String, CertprofileEntry> certprofileDbEntries = new ConcurrentHashMap<>();
+
     private final Map<String, IdentifiedX509CertPublisher> publishers = new ConcurrentHashMap<>();
     private final Map<String, CmpRequestorEntryWrapper> requestors = new ConcurrentHashMap<>();
     private final Map<String, X509CrlSignerEntryWrapper> crlSigners = new ConcurrentHashMap<>();
@@ -882,7 +885,7 @@ implements CAManager, CmpResponderManager
     @Override
     public Set<String> getCertprofileNames()
     {
-        return certprofiles.keySet();
+        return certprofileDbEntries.keySet();
     }
 
     @Override
@@ -1001,6 +1004,7 @@ implements CAManager, CmpResponderManager
         {
             queryExecutor.shutdownCertprofile(certprofiles.get(name));
         }
+        certprofileDbEntries.clear();
         certprofiles.clear();
 
         List<String> names = queryExecutor.getNamesFromTable("PROFILE");
@@ -1009,10 +1013,24 @@ implements CAManager, CmpResponderManager
         {
             for(String name : names)
             {
-                IdentifiedX509Certprofile profile = queryExecutor.createCertprofile(name, envParameterResolver);
-                if(profile != null)
+                boolean faulty = true;
+                List<CertprofileEntry> dbContainer = new ArrayList<>(1);
+                try
                 {
-                    certprofiles.put(name, profile);
+                    IdentifiedX509Certprofile profile = queryExecutor.createCertprofile(name, envParameterResolver,dbContainer);
+                    if(profile != null)
+                    {
+                        faulty = false;
+                        certprofiles.put(name, profile);
+                    }
+                }finally
+                {
+                    if(CollectionUtil.isNotEmpty(dbContainer))
+                    {
+                        CertprofileEntry dbEntry = dbContainer.get(0);
+                        dbEntry.setFaulty(faulty);
+                        certprofileDbEntries.put(name, dbEntry);
+                    }
                 }
             }
         }
@@ -1480,8 +1498,7 @@ implements CAManager, CmpResponderManager
     @Override
     public CertprofileEntry getCertprofile(String profileName)
     {
-        IdentifiedX509Certprofile entry = certprofiles.get(profileName);
-        return entry == null ? null : entry.getEntry();
+        return certprofileDbEntries.get(profileName);
     }
 
     @Override
@@ -1501,6 +1518,7 @@ implements CAManager, CmpResponderManager
         }
 
         LOG.info("removed profile '{}'", profileName);
+        certprofileDbEntries.remove(profileName);
         IdentifiedX509Certprofile profile = certprofiles.remove(profileName);
         queryExecutor.shutdownCertprofile(profile);
         return true;
@@ -1522,12 +1540,28 @@ implements CAManager, CmpResponderManager
             return false;
         }
 
+        certprofileDbEntries.remove(name);
         IdentifiedX509Certprofile profile = certprofiles.remove(name);
         queryExecutor.shutdownCertprofile(profile);
-        profile = queryExecutor.createCertprofile(name, envParameterResolver);
-        if(profile != null)
+
+        List<CertprofileEntry> dbContainer = new ArrayList<>(1);
+        boolean faulty = true;
+        try
         {
-            certprofiles.put(name, profile);
+            profile = queryExecutor.createCertprofile(name, envParameterResolver, dbContainer);
+            if(profile != null)
+            {
+                faulty = false;
+                certprofiles.put(name, profile);
+            }
+        }finally
+        {
+            if(CollectionUtil.isNotEmpty(dbContainer))
+            {
+                CertprofileEntry dbEntry = dbContainer.get(0);
+                dbEntry.setFaulty(faulty);
+                certprofileDbEntries.put(name, dbEntry);
+            }
         }
         return true;
     }
@@ -1544,10 +1578,13 @@ implements CAManager, CmpResponderManager
         }
         queryExecutor.addCertprofile(dbEntry);
 
-        IdentifiedX509Certprofile profile = queryExecutor.createCertprofile(name, envParameterResolver);
+        certprofileDbEntries.put(name, dbEntry);
+        dbEntry.setFaulty(true);
+        IdentifiedX509Certprofile profile = queryExecutor.createCertprofile(name, envParameterResolver, null);
         if(profile != null)
         {
             certprofiles.put(name, profile);
+            dbEntry.setFaulty(false);
         }
 
         try

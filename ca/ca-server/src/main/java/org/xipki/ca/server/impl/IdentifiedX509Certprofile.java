@@ -144,7 +144,7 @@ class IdentifiedX509Certprofile
         noneRequestExtensionTypes.add(Extension.inhibitAnyPolicy);
     }
 
-    private final CertprofileEntry entry;
+    private final String name;
     private final X509Certprofile certprofile;
     private EnvironmentParameterResolver parameterResolver;
 
@@ -152,7 +152,7 @@ class IdentifiedX509Certprofile
     throws CertprofileException
     {
         ParamChecker.assertNotNull("entry", entry);
-        this.entry = entry;
+        this.name = entry.getName();
         X509Certprofile tmpCertprofile = null;
 
         final String type = realType == null ?  entry.getType() : realType;
@@ -215,12 +215,7 @@ class IdentifiedX509Certprofile
 
     public String getName()
     {
-        return entry.getName();
-    }
-
-    public CertprofileEntry getEntry()
-    {
-        return entry;
+        return name;
     }
 
     public X509CertVersion getVersion()
