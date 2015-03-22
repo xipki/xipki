@@ -36,9 +36,14 @@
 package org.xipki.ca.server.mgmt.api;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.Set;
 
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
@@ -55,6 +60,7 @@ public class CmpControl implements Serializable
     public static final String KEY_MESSAGETIME_REQUIRED = "messageTime.required";
     public static final String KEY_MESSAGETIME_BIAS = "messageTime.bias";
     public static final String KEY_CONFIRM_WAITTIME = "confirm.waittime";
+    public static final String KEY_PROTECTION_SIGALGO = "protection.sigalgo";
 
     private static final int DFLT_messageTimeBias = 300; // 300 seconds
     private static final int DFLT_confirmWaitTime = 300; // 300 seconds
@@ -68,6 +74,8 @@ public class CmpControl implements Serializable
 
     private final int messageTimeBias;
     private final int confirmWaitTime;
+    private final Set<String> sigAlgos;
+
     private final String conf;
 
     public boolean isMessageTimeRequired()
@@ -88,12 +96,29 @@ public class CmpControl implements Serializable
         this.messageTimeRequired = getBoolean(pairs, KEY_MESSAGETIME_REQUIRED, true);
         this.messageTimeBias = getInt(pairs, KEY_MESSAGETIME_BIAS, DFLT_messageTimeBias);
         this.confirmWaitTime = getInt(pairs, KEY_CONFIRM_WAITTIME, DFLT_confirmWaitTime);
+        String s = pairs.getValue(KEY_PROTECTION_SIGALGO);
+        Set<String> set = null;
+        if(s != null)
+        {
+            set = StringUtil.splitAsSet(s, ", ");
+        }
+
+        if(CollectionUtil.isEmpty(set))
+        {
+            this.sigAlgos = null;
+        }
+        else
+        {
+            this.sigAlgos = set;
+            pairs.putUtf8Pair(KEY_PROTECTION_SIGALGO, StringUtil.collectionAsString(this.sigAlgos, ","));
+        }
+
         this.conf = pairs.getEncoded();
     }
 
     public CmpControl(String name, Boolean confirmCert, Boolean sendCaCert,
             Boolean messageTimeRequired, Boolean sendResponderCert,
-            Integer messageTimeBias, Integer confirmWaitTime)
+            Integer messageTimeBias, Integer confirmWaitTime, Set<String> sigAlgos)
     {
         ParamChecker.assertNotEmpty("name", name);
         CmpUtf8Pairs pairs = new CmpUtf8Pairs();
@@ -117,6 +142,16 @@ public class CmpControl implements Serializable
 
         this.confirmWaitTime = confirmWaitTime == null ? DFLT_confirmWaitTime : confirmWaitTime;
         pairs.putUtf8Pair(KEY_CONFIRM_WAITTIME, Integer.toString(this.confirmWaitTime));
+
+        if(CollectionUtil.isEmpty(sigAlgos))
+        {
+            this.sigAlgos = null;
+        }
+        else
+        {
+            this.sigAlgos = sigAlgos;
+            pairs.putUtf8Pair(KEY_PROTECTION_SIGALGO, StringUtil.collectionAsString(this.sigAlgos, ","));
+        }
 
         this.conf = pairs.getEncoded();
     }
@@ -167,6 +202,34 @@ public class CmpControl implements Serializable
         return sendResponderCert;
     }
 
+    public Set<String> getSigAlgos()
+    {
+        return sigAlgos == null ? null : Collections.unmodifiableSet(sigAlgos);
+    }
+
+    public boolean isSigAlgoPermitted(AlgorithmIdentifier algId)
+    {
+        if(sigAlgos == null)
+        {
+            return true;
+        }
+
+        String name = SecurityUtil.getSignatureAlgoName(algId);
+        if(sigAlgos.contains(name))
+        {
+            return true;
+        }
+
+        for(String m : sigAlgos)
+        {
+            if(SecurityUtil.equalsAlgoName(m, name))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String getConf()
     {
         return conf;
@@ -183,6 +246,7 @@ public class CmpControl implements Serializable
         sb.append("messageTimeRequired: ").append(messageTimeRequired ? "yes" : "no").append("\n");
         sb.append("    messageTimeBias: ").append(messageTimeBias).append(" s").append('\n');
         sb.append("    confirmWaitTime: ").append(confirmWaitTime).append(" s").append('\n');
+        sb.append("    signature algos: ").append(StringUtil.collectionAsString(sigAlgos, ",")).append('\n');
         sb.append("               conf: ").append(conf);
 
         return sb.toString();

@@ -24,7 +24,8 @@ xipki-ca:env-add --name certprofileType.map --value \
  "DemoEE1?java:org.xipki.certprofile.demo.x509.DemoEE1X509Certprofile%DemoEE2?java:org.xipki.certprofile.demo.x509.DemoEE2X509Certprofile%"
 
 ## CMP control: messageTimeBias is set to 300 seconds.
-xipki-ca:cmpcontrol-add --name cmpcontrol1 --conf send.ca?true%messageTime.bias?300%
+xipki-ca:cmpcontrol-add --name cmpcontrol1 \
+  --conf send.ca?true%messageTime.bias?300%protection.sigalgo?SHA256withRSA,SHA256withRSAandMGF1,SHA256withDSA,SHA256withECDSA%
 
 ## Certificate Profiles
 xipki-ca:profile-add --name Cross --type XML --conf-file xipki/demo/profile/Certprofile_Cross.xml

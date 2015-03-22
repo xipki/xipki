@@ -54,6 +54,7 @@ import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.bouncycastle.asn1.cmp.PKIStatus;
 import org.bouncycastle.asn1.cmp.PKIStatusInfo;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
@@ -213,7 +214,7 @@ abstract class CmpResponder
         {
             try
             {
-                ProtectionVerificationResult verificationResult = verifyProtection(tidStr, message);
+                ProtectionVerificationResult verificationResult = verifyProtection(tidStr, message, cmpControl);
                 ProtectionResult pr = verificationResult.getProtectionResult();
                 switch(pr)
                 {
@@ -228,6 +229,9 @@ abstract class CmpResponder
                     break;
                 case SENDER_NOT_AUTHORIZED:
                     errorStatus = "request is protected by signature but the requestor is not authorized";
+                    break;
+                case SIGALGO_FORBIDDEN:
+                    errorStatus = "request is protected by signature but the protection algorithm is forbidden";
                     break;
                 default:
                     throw new RuntimeException("should not reach here, unknown ProtectionResult " + pr);
@@ -316,7 +320,8 @@ abstract class CmpResponder
         return  b;
     }
 
-    private ProtectionVerificationResult verifyProtection(String tid, GeneralPKIMessage pkiMessage)
+    private ProtectionVerificationResult verifyProtection(String tid, GeneralPKIMessage pkiMessage,
+            CmpControl cmpControl)
     throws CMPException, InvalidKeyException, OperatorCreationException
     {
         ProtectedPKIMessage pMsg = new ProtectedPKIMessage(pkiMessage);
@@ -328,6 +333,13 @@ abstract class CmpResponder
         }
 
         PKIHeader h = pMsg.getHeader();
+        AlgorithmIdentifier protectionAlg = h.getProtectionAlg();
+        if(cmpControl.isSigAlgoPermitted(protectionAlg) == false)
+        {
+            LOG.warn("SIG_ALGO_FORBIDDEN: " + pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
+            return new ProtectionVerificationResult(null, ProtectionResult.SIGALGO_FORBIDDEN);
+        }
+
         CmpRequestorInfo requestor = getRequestor(h);
         if(requestor == null)
         {
