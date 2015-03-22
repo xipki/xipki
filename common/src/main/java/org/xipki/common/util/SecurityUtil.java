@@ -45,6 +45,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.cert.CRLException;
@@ -80,6 +81,7 @@ import org.bouncycastle.asn1.cmp.PKIStatus;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x500.RDN;
@@ -97,6 +99,7 @@ import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.CmpUtf8Pairs;
@@ -1042,6 +1045,236 @@ public class SecurityUtil
         else
         {
             throw new RuntimeException("Unsupported hash algorithm " + hashAlgName);
+        }
+    }
+
+    static public String getSignatureAlgoName(AlgorithmIdentifier sigAlgId)
+    {
+        ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
+
+        if(X9ObjectIdentifiers.ecdsa_with_SHA1.equals(algOid))
+        {
+            return "SHA1withECDSA";
+        }
+        else if(X9ObjectIdentifiers.ecdsa_with_SHA224.equals(algOid))
+        {
+            return "SHA224withECDSA";
+        }
+        else if(X9ObjectIdentifiers.ecdsa_with_SHA256.equals(algOid))
+        {
+            return "SHA256withECDSA";
+        }
+        else if(X9ObjectIdentifiers.ecdsa_with_SHA384.equals(algOid))
+        {
+            return "SHA384withECDSA";
+        }
+        else if(X9ObjectIdentifiers.ecdsa_with_SHA512.equals(algOid))
+        {
+            return "SHA512withECDSA";
+        }
+        else if(X9ObjectIdentifiers.id_dsa_with_sha1.equals(algOid))
+        {
+            return "SHA1withDSA";
+        }
+        else if(NISTObjectIdentifiers.dsa_with_sha224.equals(algOid))
+        {
+            return "SHA224withDSA";
+        }
+        else if(NISTObjectIdentifiers.dsa_with_sha256.equals(algOid))
+        {
+            return "SHA256withDSA";
+        }
+        else if(NISTObjectIdentifiers.dsa_with_sha384.equals(algOid))
+        {
+            return "SHA384withDSA";
+        }
+        else if(NISTObjectIdentifiers.dsa_with_sha512.equals(algOid))
+        {
+            return "SHA512withDSA";
+        }
+        else if(PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(algOid))
+        {
+            return "SHA1withRSA";
+        }
+        else if(PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(algOid))
+        {
+            return "SHA224withRSA";
+        }
+        else if(PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(algOid))
+        {
+            return "SHA256withRSA";
+        }
+        else if(PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(algOid))
+        {
+            return "SHA384withRSA";
+        }
+        else if(PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid))
+        {
+            return "SHA512withRSA";
+        }
+        else if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid))
+        {
+            RSASSAPSSparams param = RSASSAPSSparams.getInstance(sigAlgId.getParameters());
+            ASN1ObjectIdentifier digestAlgOid = param.getHashAlgorithm().getAlgorithm();
+            if(X509ObjectIdentifiers.id_SHA1.equals(digestAlgOid))
+            {
+                return "SHA1withRSAandMGF1";
+            }
+            else if(NISTObjectIdentifiers.id_sha256.equals(digestAlgOid))
+            {
+                return "SHA256withRSAandMGF1";
+            }
+            else if(NISTObjectIdentifiers.id_sha384.equals(digestAlgOid))
+            {
+                return "SHA384withRSAandMGF1";
+            }
+            else if(NISTObjectIdentifiers.id_sha512.equals(digestAlgOid))
+            {
+                return "SHA512withRSAandMGF1";
+            }
+            else
+            {
+                return null;
+            }
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    static public AlgorithmIdentifier extractDigesetAlgorithmIdentifier(AlgorithmIdentifier sigAlgId)
+    throws NoSuchAlgorithmException
+    {
+        ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
+
+        ASN1ObjectIdentifier digestAlgOid;
+        if(X9ObjectIdentifiers.ecdsa_with_SHA1.equals(algOid))
+        {
+            digestAlgOid = X509ObjectIdentifiers.id_SHA1;
+        }
+        else if(X9ObjectIdentifiers.ecdsa_with_SHA224.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha224;
+        }
+        else if(X9ObjectIdentifiers.ecdsa_with_SHA256.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha256;
+        }
+        else if(X9ObjectIdentifiers.ecdsa_with_SHA384.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha384;
+        }
+        else if(X9ObjectIdentifiers.ecdsa_with_SHA512.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha512;
+        }
+        else if(X9ObjectIdentifiers.id_dsa_with_sha1.equals(algOid))
+        {
+            digestAlgOid = X509ObjectIdentifiers.id_SHA1;
+        }
+        else if(NISTObjectIdentifiers.dsa_with_sha224.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha224;
+        }
+        else if(NISTObjectIdentifiers.dsa_with_sha256.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha256;
+        }
+        else if(NISTObjectIdentifiers.dsa_with_sha384.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha384;
+        }
+        else if(NISTObjectIdentifiers.dsa_with_sha512.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha512;
+        }
+        else if(PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(algOid))
+        {
+            digestAlgOid = X509ObjectIdentifiers.id_SHA1;
+        }
+        else if(PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha224;
+        }
+        else if(PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha256;
+        }
+        else if(PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha384;
+        }
+        else if(PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha512;
+        }
+        else if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid))
+        {
+            ASN1Encodable asn1Encodable = sigAlgId.getParameters();
+            RSASSAPSSparams param = RSASSAPSSparams.getInstance(asn1Encodable);
+            digestAlgOid = param.getHashAlgorithm().getAlgorithm();
+        }
+        else
+        {
+            throw new NoSuchAlgorithmException("unknown signature algorithm" + algOid.getId());
+        }
+
+        return new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);
+    }
+
+    public static boolean equalsAlgoName(String a, String b)
+    {
+        if(a.equalsIgnoreCase(b))
+        {
+            return true;
+        }
+
+        a = a.replace("-", "");
+        b = b.replace("-", "");
+        boolean equals = a.equalsIgnoreCase(b);
+        if(equals)
+        {
+            return true;
+        }
+
+        return splitAlgoNameTokens(a).equals(splitAlgoNameTokens(b));
+    }
+
+    private static Set<String> splitAlgoNameTokens(String algoName)
+    {
+        algoName = algoName.toUpperCase();
+        int idx = algoName.indexOf("AND");
+        Set<String> l = new HashSet<>();
+
+        if(idx == -1)
+        {
+            l.add(algoName);
+            return l;
+        }
+
+        final int len = algoName.length();
+
+        int beginIndex = 0;
+        int endIndex = idx;
+        while(true)
+        {
+            String token = algoName.substring(beginIndex, endIndex);
+            if(StringUtil.isNotBlank(token))
+            {
+                l.add(token);
+            }
+
+            if(endIndex >= len)
+            {
+                return l;
+            }
+            beginIndex = endIndex + 3; // 3 = "AND".length()
+            endIndex = algoName.indexOf("AND", beginIndex);
+            if(endIndex == -1)
+            {
+                endIndex = len;
+            }
         }
     }
 
