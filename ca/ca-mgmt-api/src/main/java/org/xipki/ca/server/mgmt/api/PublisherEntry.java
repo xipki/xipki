@@ -49,6 +49,7 @@ public class PublisherEntry implements Serializable
     private final String name;
     private final String type;
     private final String conf;
+    private boolean faulty;
 
     public PublisherEntry(String name, String type, String conf)
     {
@@ -74,11 +75,22 @@ public class PublisherEntry implements Serializable
         return conf;
     }
 
+    public boolean isFaulty()
+    {
+        return faulty;
+    }
+
+    public void setFaulty(boolean faulty)
+    {
+        this.faulty = faulty;
+    }
+
     @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
+        sb.append("faulty: ").append(faulty).append('\n');
         sb.append("type: ").append(type).append('\n');
         sb.append("conf: ").append(conf);
         return sb.toString();
