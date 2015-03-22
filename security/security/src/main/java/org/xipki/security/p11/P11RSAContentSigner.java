@@ -53,7 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.LogUtil;
-import org.xipki.security.SignerUtil;
+import org.xipki.common.util.SecurityUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -96,7 +96,7 @@ public class P11RSAContentSigner implements ContentSigner
         this.algorithmIdentifier = signatureAlgId;
         this.keyId = keyId;
 
-        this.digAlgId = SignerUtil.extractDigesetAlgorithmIdentifier(signatureAlgId);
+        this.digAlgId = SecurityUtil.extractDigesetAlgorithmIdentifier(signatureAlgId);
         Digest digest = BcDefaultDigestProvider.INSTANCE.get(digAlgId);
 
         this.cryptService = cryptService;

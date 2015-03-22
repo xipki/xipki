@@ -202,7 +202,7 @@ public class SecurityFactoryImpl implements SecurityFactory
             return;
         }
 
-        String signatureAlgoName = SignerUtil.getSignatureAlgoName(signer.getAlgorithmIdentifier());
+        String signatureAlgoName = SecurityUtil.getSignatureAlgoName(signer.getAlgorithmIdentifier());
         ContentSigner csigner;
         try
         {

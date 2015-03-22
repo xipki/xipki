@@ -48,7 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.LogUtil;
-import org.xipki.security.SignerUtil;
+import org.xipki.common.util.SecurityUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -89,7 +89,7 @@ abstract class AbstractP11DSAContentSigner implements ContentSigner
         this.keyId = keyId;
         this.cryptService = cryptService;
 
-        AlgorithmIdentifier digAlgId = SignerUtil.extractDigesetAlgorithmIdentifier(signatureAlgId);
+        AlgorithmIdentifier digAlgId = SecurityUtil.extractDigesetAlgorithmIdentifier(signatureAlgId);
 
         Digest digest = BcDefaultDigestProvider.INSTANCE.get(digAlgId);
 

@@ -75,7 +75,6 @@ import org.xipki.ocsp.qa.api.OcspError;
 import org.xipki.ocsp.qa.api.OcspQA;
 import org.xipki.ocsp.qa.api.OcspResponseOption;
 import org.xipki.security.KeyUtil;
-import org.xipki.security.SignerUtil;
 
 /**
  * @author Lijun Liao
@@ -201,8 +200,8 @@ public class OcspQAImpl implements OcspQA
                     if(expectedSigalgo != null)
                     {
                         AlgorithmIdentifier sigAlg = basicResp.getSignatureAlgorithmID();
-                        String sigAlgName = SignerUtil.getSignatureAlgoName(sigAlg);
-                        if(equalsAlgName(sigAlgName, expectedSigalgo) == false)
+                        String sigAlgName = SecurityUtil.getSignatureAlgoName(sigAlg);
+                        if(SecurityUtil.equalsAlgoName(sigAlgName, expectedSigalgo) == false)
                         {
                             issue.setFailureMessage("is '" + sigAlgName +"', but expected '" + expectedSigalgo + "'");
                         }
@@ -476,18 +475,6 @@ public class OcspQAImpl implements OcspQA
             }
         }
         return issue;
-    }
-
-    private static boolean equalsAlgName(String a, String b)
-    {
-        if(a.equalsIgnoreCase(b))
-        {
-            return true;
-        }
-
-        a = a.replace("-", "");
-        b = b.replace("-", "");
-        return a.equalsIgnoreCase(b);
     }
 
 }
