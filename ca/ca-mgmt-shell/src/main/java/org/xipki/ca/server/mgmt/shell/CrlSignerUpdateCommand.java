@@ -41,7 +41,6 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.api.CAManager;
-import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.SecurityUtil;
 
@@ -72,7 +71,7 @@ public class CrlSignerUpdateCommand extends CaCommand
 
     @Option(name = "--crl-control",
             description = "CRL control")
-    private String crlControlS;
+    private String crlControl;
 
     @Override
     protected Object _doExecute()
@@ -88,12 +87,6 @@ public class CrlSignerUpdateCommand extends CaCommand
             byte[] certBytes = IoUtil.read(signerCert);
             SecurityUtil.parseCert(new ByteArrayInputStream(certBytes));
             signerCertConf = Base64.toBase64String(certBytes);
-        }
-
-        CRLControl crlControl = null;
-        if(crlControlS != null)
-        {
-            crlControl = new CRLControl(crlControlS);
         }
 
         boolean b = caManager.changeCrlSigner(name, signerType, signerConf, signerCertConf, crlControl);

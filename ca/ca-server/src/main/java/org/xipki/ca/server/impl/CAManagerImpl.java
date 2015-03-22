@@ -88,7 +88,6 @@ import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
-import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
@@ -269,6 +268,7 @@ implements CAManager, CmpResponderManager
     private final Map<String, CmpRequestorEntry> requestorDbEntries = new ConcurrentHashMap<>();
 
     private final Map<String, X509CrlSignerEntryWrapper> crlSigners = new ConcurrentHashMap<>();
+    private final Map<String, X509CrlSignerEntry> crlSignerDbEntries = new ConcurrentHashMap<>();
 
     private final Map<String, Set<String>> ca_has_profiles = new ConcurrentHashMap<>();
     private final Map<String, Set<String>> ca_has_publishers = new ConcurrentHashMap<>();
@@ -774,7 +774,9 @@ implements CAManager, CmpResponderManager
             crlSignerEntry = crlSigners.get(crlSignerName);
             try
             {
+                crlSignerEntry.getDbEntry().setConfFaulty(true);
                 crlSignerEntry.initSigner(securityFactory);
+                crlSignerEntry.getDbEntry().setConfFaulty(false);
             } catch (SignerException | OperationException | ConfigurationException e)
             {
                 final String message = "X09CrlSignerEntryWrapper.initSigner (name=" + crlSignerName + ")";
@@ -1116,6 +1118,7 @@ implements CAManager, CmpResponderManager
             return;
         }
         crlSigners.clear();
+        crlSignerDbEntries.clear();
 
         List<String> names = queryExecutor.getNamesFromTable("CRLSIGNER");
 
@@ -1123,11 +1126,15 @@ implements CAManager, CmpResponderManager
         {
             for(String name : names)
             {
-                X509CrlSignerEntryWrapper crlSigner = queryExecutor.createCrlSigner(name);
-                if(crlSigner != null)
+                X509CrlSignerEntry dbEntry = queryExecutor.createCrlSigner(name);
+                if(dbEntry == null)
                 {
-                    crlSigners.put(name, crlSigner);
+                    continue;
                 }
+
+                crlSignerDbEntries.put(name, dbEntry);
+                X509CrlSignerEntryWrapper crlSigner = CAManagerUtil.createX509CrlSigner(dbEntry);
+                crlSigners.put(name, crlSigner);
             }
         }
 
@@ -1757,8 +1764,11 @@ implements CAManager, CmpResponderManager
         {
             return false;
         }
+
+        X509CrlSignerEntryWrapper crlSigner = CAManagerUtil.createX509CrlSigner(dbEntry);
         queryExecutor.addCrlSigner(dbEntry);
-        crlSigners.put(name, queryExecutor.createCrlSigner(name));
+        crlSigners.put(name, crlSigner);
+        crlSignerDbEntries.put(name, dbEntry);
         return true;
     }
 
@@ -1782,13 +1792,14 @@ implements CAManager, CmpResponderManager
         }
 
         crlSigners.remove(crlSignerName);
+        crlSignerDbEntries.remove(crlSignerName);
         LOG.info("removed CRLSigner '{}'", crlSignerName);
         return true;
     }
 
     @Override
     public boolean changeCrlSigner(String name, String signer_type, String signer_conf, String signer_cert,
-            CRLControl crlControl)
+            String crlControl)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1798,10 +1809,14 @@ implements CAManager, CmpResponderManager
             return false;
         }
 
-        X509CrlSignerEntryWrapper crlSigner = crlSigners.remove(name);
-        crlSigner = queryExecutor.createCrlSigner(name);
-        if(crlSigner != null)
+        crlSigners.remove(name);
+        crlSignerDbEntries.remove(name);
+
+        X509CrlSignerEntry dbEntry = queryExecutor.createCrlSigner(name);
+        if(dbEntry != null)
         {
+            crlSignerDbEntries.put(name, dbEntry);
+            X509CrlSignerEntryWrapper crlSigner = CAManagerUtil.createX509CrlSigner(dbEntry);
             crlSigners.put(name, crlSigner);
         }
         return true;
@@ -1810,7 +1825,7 @@ implements CAManager, CmpResponderManager
     @Override
     public X509CrlSignerEntry getCrlSigner(String name)
     {
-        return crlSigners.containsKey(name) ? crlSigners.get(name).getDbEntry() : null;
+        return crlSignerDbEntries.get(name);
     }
 
     public X509CrlSignerEntryWrapper getCrlSignerWrapper(String name)

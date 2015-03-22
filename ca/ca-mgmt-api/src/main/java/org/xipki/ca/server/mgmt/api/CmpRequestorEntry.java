@@ -36,8 +36,10 @@
 package org.xipki.ca.server.mgmt.api;
 
 import java.io.Serializable;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
+import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ParamChecker;
@@ -82,6 +84,11 @@ public class CmpRequestorEntry implements Serializable
         return name;
     }
 
+    public String getBase64Cert()
+    {
+        return base64Cert;
+    }
+
     public X509Certificate getCert()
     {
         return cert;
@@ -107,10 +114,23 @@ public class CmpRequestorEntry implements Serializable
             sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
             sb.append("\tsubject: ").append(
                     SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
+
+            if(verbose)
+            {
+                sb.deleteCharAt(sb.length() - 1);
+                sb.append("\tencoded: ");
+                try
+                {
+                    sb.append(Base64.toBase64String(cert.getEncoded()));
+                } catch (CertificateEncodingException e)
+                {
+                    sb.append("ERROR");
+                }
+            }
         }
-        if(verbose)
+        else
         {
-            sb.append("encoded cert: ").append(base64Cert);
+            sb.append("cert: null");
         }
 
         return sb.toString();
