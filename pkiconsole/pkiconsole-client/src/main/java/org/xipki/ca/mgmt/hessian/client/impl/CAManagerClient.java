@@ -55,7 +55,7 @@ import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
-import org.xipki.ca.server.mgmt.api.CmpControl;
+import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
@@ -480,13 +480,13 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public CmpControl getCmpControl(String name)
+    public CmpControlEntry getCmpControl(String name)
     {
         return client.getCmpControl(name);
     }
 
     @Override
-    public boolean addCmpControl(CmpControl dbEntry)
+    public boolean addCmpControl(CmpControlEntry dbEntry)
     throws CAMgmtException
     {
         return client.addCmpControl(dbEntry);
@@ -500,10 +500,10 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public boolean changeCmpControl(CmpControl dbEntry)
+    public boolean changeCmpControl(String name, String conf)
     throws CAMgmtException
     {
-        return client.changeCmpControl(dbEntry);
+        return client.changeCmpControl(name, conf);
     }
 
     @Override
