@@ -36,6 +36,7 @@
 package org.xipki.common.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -102,6 +103,21 @@ public class StringUtil
         }
 
         return ret;
+    }
+
+    public static String collectionAsString(Collection<String> set, String delim)
+    {
+        StringBuilder sb = new StringBuilder();
+        for(String m : set)
+        {
+            sb.append(m).append(delim);
+        }
+        int n = sb.length();
+        if(n > 0)
+        {
+            sb.delete(n - delim.length(), n);
+        }
+        return sb.toString();
     }
 
     public static boolean startsWithIgnoreCase(String s, String prefix)
