@@ -73,6 +73,7 @@ import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CertArt;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
+import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
@@ -592,7 +593,7 @@ class CAManagerQueryExecutor
         return null;
     }
 
-    CmpControl createCmpControl(String name)
+    CmpControlEntry createCmpControl(String name)
     throws CAMgmtException
     {
         final String sql = "CONF FROM CMPCONTROL WHERE NAME=?";
@@ -611,7 +612,7 @@ class CAManagerQueryExecutor
             }
 
             String conf = rs.getString("CONF");
-            return new CmpControl(name, conf);
+            return new CmpControlEntry(name, conf);
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -1114,7 +1115,7 @@ class CAManagerQueryExecutor
         }
     }
 
-    void addCmpControl(CmpControl dbEntry)
+    void addCmpControl(CmpControlEntry dbEntry)
     throws CAMgmtException
     {
         final String name = dbEntry.getName();

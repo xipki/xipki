@@ -33,66 +33,60 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.mgmt.shell;
+package org.xipki.ca.server.mgmt.api;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.io.Serializable;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
-import org.xipki.ca.server.mgmt.api.CmpControl;
-import org.xipki.ca.server.mgmt.api.CmpControlEntry;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "cmpcontrol-info", description="show information of CMP control")
-public class CmpControlInfoCommand extends CaCommand
+public class CmpControlEntry implements Serializable
 {
-    @Argument(index = 0, name = "name", description = "CMP control name")
-    private String name;
+    private static final long serialVersionUID = 1L;
+
+    private final String name;
+    private final String conf;
+    private boolean faulty;
+
+    public CmpControlEntry(String name, String conf)
+    {
+        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotEmpty("conf", conf);
+        this.name = name;
+        this.conf = conf;
+    }
+
+    public boolean isFaulty()
+    {
+        return faulty;
+    }
+
+    public void setFaulty(boolean faulty)
+    {
+        this.faulty = faulty;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public String getConf()
+    {
+        return conf;
+    }
 
     @Override
-    protected Object _doExecute()
-    throws Exception
+    public String toString()
     {
         StringBuilder sb = new StringBuilder();
+        sb.append(" name: ").append(name).append('\n');
+        sb.append("faulty: ").append(faulty).append('\n');
+        sb.append(" conf: ").append(conf);
 
-        if(name == null)
-        {
-            Set<String> names = caManager.getCmpControlNames();
-            int n = names.size();
-
-            if(n == 0 || n == 1)
-            {
-                sb.append(((n == 0) ? "no" : "1") + " CMP control is configured\n");
-            }
-            else
-            {
-                sb.append(n + " CMP controls are configured:\n");
-            }
-
-            List<String> sorted = new ArrayList<>(names);
-            Collections.sort(sorted);
-
-            for(String name : sorted)
-            {
-                sb.append("\t").append(name).append("\n");
-            }
-        }
-        else
-        {
-            CmpControlEntry entry = caManager.getCmpControl(name);
-            if(entry != null)
-            {
-                sb.append(entry.toString());
-            }
-        }
-
-        out(sb.toString());
-        return null;
+        return sb.toString();
     }
 }

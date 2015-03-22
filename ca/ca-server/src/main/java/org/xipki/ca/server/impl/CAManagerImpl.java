@@ -91,6 +91,7 @@ import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
+import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
@@ -261,16 +262,19 @@ implements CAManager, CmpResponderManager
     private final Map<String, IdentifiedX509CertPublisher> publishers = new ConcurrentHashMap<>();
     private final Map<String, PublisherEntry> publisherDbEntries = new ConcurrentHashMap<>();
 
+    private final Map<String, CmpControl> cmpControls = new ConcurrentHashMap<>();
+    private final Map<String, CmpControlEntry> cmpControlDbEntries = new ConcurrentHashMap<>();
+
     private final Map<String, CmpRequestorEntryWrapper> requestors = new ConcurrentHashMap<>();
+
     private final Map<String, X509CrlSignerEntryWrapper> crlSigners = new ConcurrentHashMap<>();
+
     private final Map<String, Set<String>> ca_has_profiles = new ConcurrentHashMap<>();
     private final Map<String, Set<String>> ca_has_publishers = new ConcurrentHashMap<>();
     private final Map<String, Set<CAHasRequestorEntry>> ca_has_requestors = new ConcurrentHashMap<>();
     private final Map<String, String> caAliases = new ConcurrentHashMap<>();
 
     private final DfltEnvironmentParameterResolver envParameterResolver = new DfltEnvironmentParameterResolver();
-
-    private final Map<String, CmpControl> cmpControls = new ConcurrentHashMap<>();
 
     private ScheduledThreadPoolExecutor persistentScheduledThreadPoolExecutor;
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
@@ -911,7 +915,7 @@ implements CAManager, CmpResponderManager
     @Override
     public Set<String> getCmpControlNames()
     {
-        return cmpControls.keySet();
+        return cmpControlDbEntries.keySet();
     }
 
     @Override
@@ -1122,6 +1126,7 @@ implements CAManager, CmpResponderManager
         }
 
         cmpControls.clear();
+        cmpControlDbEntries.clear();
 
         List<String> names = queryExecutor.getNamesFromTable("CMPCONTROL");
 
@@ -1129,9 +1134,14 @@ implements CAManager, CmpResponderManager
         {
             for(String name : names)
             {
-                CmpControl cmpControl = queryExecutor.createCmpControl(name);
-                if(cmpControl != null)
+                CmpControlEntry cmpControlDb = queryExecutor.createCmpControl(name);
+                if(cmpControlDb != null)
                 {
+                    cmpControlDb.setFaulty(true);
+                    cmpControlDbEntries.put(name, cmpControlDb);
+
+                    CmpControl cmpControl = new CmpControl(cmpControlDb);
+                    cmpControlDb.setFaulty(false);
                     cmpControls.put(name, cmpControl);
                 }
             }
@@ -1604,9 +1614,9 @@ implements CAManager, CmpResponderManager
     {
         asssertMasterMode();
         String name = dbEntry.getName();
-        if(certprofiles.containsKey(name))
+        if(certprofileDbEntries.containsKey(name))
         {
-            throw new CAMgmtException("certprofile named " + name + " exists");
+            return false;
         }
         queryExecutor.addCertprofile(dbEntry);
 
@@ -1778,9 +1788,9 @@ implements CAManager, CmpResponderManager
     {
         asssertMasterMode();
         String name = dbEntry.getName();
-        if(publishers.containsKey(name))
+        if(publisherDbEntries.containsKey(name))
         {
-            throw new CAMgmtException("publisher named " + name + " exists");
+            return false;
         }
         queryExecutor.addPublisher(dbEntry);
 
@@ -1901,24 +1911,27 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public CmpControl getCmpControl(String name)
+    public CmpControlEntry getCmpControl(String name)
     {
-        return cmpControls.get(name);
+        return cmpControlDbEntries.get(name);
     }
 
     @Override
-    public boolean addCmpControl(CmpControl dbEntry)
+    public boolean addCmpControl(CmpControlEntry dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
         final String name = dbEntry.getName();
-        if(cmpControls.containsKey(name))
+        if(cmpControlDbEntries.containsKey(name))
         {
             return false;
         }
 
+        CmpControl cmpControl = new CmpControl(dbEntry);
         queryExecutor.addCmpControl(dbEntry);
-        cmpControls.put(name, dbEntry);
+
+        cmpControls.put(name, cmpControl);
+        cmpControlDbEntries.put(name, dbEntry);
         return true;
     }
 
@@ -1942,24 +1955,32 @@ implements CAManager, CmpResponderManager
             }
         }
 
+        cmpControlDbEntries.remove(name);
         cmpControls.remove(name);
         LOG.info("removed CMPControl '{}'", name);
         return true;
     }
 
     @Override
-    public boolean changeCmpControl(CmpControl dbEntry)
+    public boolean changeCmpControl(String name, String conf)
     throws CAMgmtException
     {
+        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotEmpty("conf", conf);
         asssertMasterMode();
-        final String name = dbEntry.getName();
-        boolean changed = queryExecutor.changeCmpControl(name, dbEntry.getConf());
+
+        boolean changed = queryExecutor.changeCmpControl(name, conf);
         if(changed == false)
         {
             return false;
         }
 
-        CmpControl cmpControl = queryExecutor.createCmpControl(name);
+        CmpControlEntry dbEntry = queryExecutor.createCmpControl(name);
+        cmpControlDbEntries.put(name, dbEntry);
+        dbEntry.setFaulty(true);
+
+        CmpControl cmpControl = new CmpControl(dbEntry);
+        dbEntry.setFaulty(false);
         cmpControls.put(name, cmpControl);
         return true;
     }
