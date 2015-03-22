@@ -410,12 +410,12 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean changeCmpRequestor(String name, String cert)
+    public boolean changeCmpRequestor(String name, String base64Cert)
     throws HessianCAMgmtException
     {
         try
         {
-            return caManager.changeCmpRequestor(name, cert);
+            return caManager.changeCmpRequestor(name, base64Cert);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -520,12 +520,12 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean changeCmpResponder(String type, String conf, String cert)
+    public boolean changeCmpResponder(String type, String conf, String base64Cert)
     throws HessianCAMgmtException
     {
         try
         {
-            return caManager.changeCmpResponder(type, conf, cert);
+            return caManager.changeCmpResponder(type, conf, base64Cert);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
