@@ -1078,25 +1078,21 @@ implements CAManager, CmpResponderManager
         {
             for(String name : names)
             {
-                List<PublisherEntry> dbContainer = new ArrayList<>(1);
-                boolean faulty = true;
-                try
+                PublisherEntry dbEntry = queryExecutor.createPublisher(name);
+                if(dbEntry == null)
                 {
-                    IdentifiedX509CertPublisher publisher = queryExecutor.createPublisher(name, dataSources,
-                            securityFactory.getPasswordResolver(), envParameterResolver, dbContainer);
-                    if(publisher != null)
-                    {
-                        faulty = false;
-                        publishers.put(name, publisher);
-                    }
-                }finally
+                    continue;
+                }
+
+                dbEntry.setFaulty(true);
+                publisherDbEntries.put(name, dbEntry);
+
+                IdentifiedX509CertPublisher publisher = CAManagerUtil.createPublisher(dbEntry, dataSources,
+                        securityFactory.getPasswordResolver(), envParameterResolver);
+                if(publisher != null)
                 {
-                    if(CollectionUtil.isNotEmpty(dbContainer))
-                    {
-                        PublisherEntry dbEntry = dbContainer.get(0);
-                        dbEntry.setFaulty(faulty);
-                        publisherDbEntries.put(name, dbEntry);
-                    }
+                    dbEntry.setFaulty(false);
+                    publishers.put(name, publisher);
                 }
             }
         }
@@ -1650,8 +1646,8 @@ implements CAManager, CmpResponderManager
             return false;
         }
 
-        certprofiles.put(name, profile);
         dbEntry.setFaulty(false);
+        certprofiles.put(name, profile);
 
         queryExecutor.addCertprofile(dbEntry);
         certprofileDbEntries.put(name, dbEntry);
@@ -1835,17 +1831,20 @@ implements CAManager, CmpResponderManager
         {
             return false;
         }
-        queryExecutor.addPublisher(dbEntry);
 
-        publisherDbEntries.put(name, dbEntry);
         dbEntry.setFaulty(true);
-        IdentifiedX509CertPublisher publisher = queryExecutor.createPublisher(name, dataSources,
-                securityFactory.getPasswordResolver(), envParameterResolver, null);
-        if(publisher != null)
+        IdentifiedX509CertPublisher publisher = CAManagerUtil.createPublisher(dbEntry, dataSources,
+                securityFactory.getPasswordResolver(), envParameterResolver);
+        if(publisher == null)
         {
-            dbEntry.setFaulty(false);
-            publishers.put(name, publisher);
+            return false;
         }
+
+        dbEntry.setFaulty(false);
+
+        queryExecutor.addPublisher(dbEntry);
+        publisherDbEntries.put(name, dbEntry);
+        publishers.put(name, publisher);
 
         try
         {
@@ -1929,25 +1928,20 @@ implements CAManager, CmpResponderManager
             queryExecutor.shutdownPublisher(publisher);
         }
 
-        List<PublisherEntry> dbContainer = new ArrayList<>(1);
-        boolean faulty = true;
-        try
+        PublisherEntry dbEntry = queryExecutor.createPublisher(name);
+        if(dbEntry == null)
         {
-            publisher = queryExecutor.createPublisher(name, dataSources,
-                    securityFactory.getPasswordResolver(), envParameterResolver, dbContainer);
-            if(publisher != null)
-            {
-                faulty = false;
-                publishers.put(name, publisher);
-            }
-        }finally
+            return false;
+        }
+
+        dbEntry.setFaulty(true);
+        publisherDbEntries.put(name, dbEntry);
+        publisher = CAManagerUtil.createPublisher(dbEntry, dataSources,
+                securityFactory.getPasswordResolver(), envParameterResolver);
+        if(publisher != null)
         {
-            if(CollectionUtil.isNotEmpty(dbContainer))
-            {
-                PublisherEntry dbEntry = dbContainer.get(0);
-                dbEntry.setFaulty(faulty);
-                publisherDbEntries.put(name, dbEntry);
-            }
+            dbEntry.setFaulty(false);
+            publishers.put(name, publisher);
         }
 
         return true;

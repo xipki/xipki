@@ -35,18 +35,24 @@
 
 package org.xipki.ca.server.impl;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.CertPublisherException;
 import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
+import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 
@@ -104,6 +110,33 @@ public class CAManagerUtil
         }catch(CertprofileException e)
         {
             final String message = "could not initialize Certprofile " + dbEntry.getName() + ", ignore it";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
+            return null;
+        }
+    }
+
+    public static IdentifiedX509CertPublisher createPublisher(
+            PublisherEntry dbEntry, Map<String, DataSourceWrapper> dataSources,
+            PasswordResolver pwdResolver, EnvironmentParameterResolver envParamResolver)
+    throws CAMgmtException
+    {
+        String name = dbEntry.getName();
+        String type = dbEntry.getType();
+
+        String realType = getRealPublisherType(type, envParamResolver);
+        IdentifiedX509CertPublisher ret;
+        try
+        {
+            ret = new IdentifiedX509CertPublisher(dbEntry, realType);
+            ret.initialize(pwdResolver, dataSources);
+            return ret;
+        } catch(CertPublisherException | RuntimeException e)
+        {
+            final String message = "invalid configuration for the certPublisher " + name;
             if(LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
