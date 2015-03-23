@@ -767,7 +767,51 @@ class X509CACmpResponder extends CmpResponder
 
         RevRepContentBuilder repContentBuilder = new RevRepContentBuilder();
 
-        int n = revContent.length;
+        final int n = revContent.length;
+        // test the reques
+        for (int i = 0; i < n; i++)
+        {
+            RevDetails revDetails = revContent[i];
+
+            CertTemplate certDetails = revDetails.getCertDetails();
+            X500Name issuer = certDetails.getIssuer();
+            ASN1Integer serialNumber = certDetails.getSerialNumber();
+
+            try
+            {
+                X500Name caSubject = getCA().getCAInfo().getCertificate().getSubjectAsX500Name();
+
+                if(issuer == null)
+                {
+                    return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
+                            "issuer is not present");
+                }
+                else if(issuer.equals(caSubject) == false)
+                {
+                    return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
+                            "issuer not targets at the CA");
+                }
+                else if(serialNumber == null)
+                {
+                    return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
+                            "serialNumber is not present");
+                }
+                else if(certDetails.getSigningAlg() != null || certDetails.getValidity() != null ||
+                        certDetails.getSubject() != null || certDetails.getPublicKey() != null ||
+                        certDetails.getIssuerUID() != null || certDetails.getSubjectUID() != null ||
+                        certDetails.getExtensions() != null)
+                {
+                    return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
+                            "only version, issuer and serialNumber in RevDetails.certDetails are allowed, "
+                            + "but more is specified");
+                }
+            }catch(IllegalArgumentException e)
+            {
+                return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
+                        "the request is not invalid");
+            }
+        }
+
         for (int i = 0; i < n; i++)
         {
             AuditChildEvent childAuditEvent = null;
@@ -780,62 +824,38 @@ class X509CACmpResponder extends CmpResponder
             RevDetails revDetails = revContent[i];
 
             CertTemplate certDetails = revDetails.getCertDetails();
-            X500Name issuer = certDetails.getIssuer();
             ASN1Integer serialNumber = certDetails.getSerialNumber();
+            // serialNumber is not null due to the check in the previous for-block.
+
+            X500Name caSubject = getCA().getCAInfo().getCertificate().getSubjectAsX500Name();
+            BigInteger snBigInt = serialNumber.getPositiveValue();
+            CertId certId = new CertId(new GeneralName(caSubject), serialNumber);
 
             if(childAuditEvent != null)
             {
-                AuditEventData eventData;
-                if(serialNumber == null)
-                {
-                    eventData = new AuditEventData("serialNumber", "NULL");
-                }
-                else
-                {
-                    eventData = new AuditEventData("serialNumber", serialNumber.getPositiveValue().toString());
-                }
+                AuditEventData eventData = new AuditEventData("serialNumber", snBigInt.toString());
                 childAuditEvent.addEventData(eventData);
             }
 
+            PKIStatusInfo status;
+
             try
             {
-                X500Name caSubject = getCA().getCAInfo().getCertificate().getSubjectAsX500Name();
-
-                if(issuer == null)
-                {
-                    throw new OperationException(ErrorCode.UNKNOWN_CERT, "issuer is not present");
-                }
-                else if(issuer.equals(caSubject) == false)
-                {
-                    throw new OperationException(ErrorCode.UNKNOWN_CERT, "issuer not targets at the CA");
-                }
-                else if(serialNumber == null)
-                {
-                    throw new OperationException(ErrorCode.UNKNOWN_CERT, "serialNumber is not present");
-                }
-                else if(certDetails.getSigningAlg() != null || certDetails.getValidity() != null ||
-                        certDetails.getSubject() != null || certDetails.getPublicKey() != null ||
-                        certDetails.getIssuerUID() != null || certDetails.getSubjectUID() != null ||
-                        certDetails.getExtensions() != null)
-                {
-                    throw new OperationException(ErrorCode.UNKNOWN_CERT,
-                            "only version, issuer and serialNumber in RevDetails.certDetails are allowed, "
-                            + "but more is specified");
-                }
-
-                BigInteger snBigInt = serialNumber.getPositiveValue();
                 Object returnedObj = null;
                 X509CA ca = getCA();
                 if(Permission.UNREVOKE_CERT == permission)
                 {
+                	// unrevoke
                     returnedObj = ca.unrevokeCertificate(snBigInt);
                 }
                 else if(Permission.REMOVE_CERT == permission)
                 {
+                	// remove
                     returnedObj = ca.removeCertificate(snBigInt);
                 }
                 else
                 {
+                	// revoke
                     Date invalidityDate = null;
                     CRLReason reason = null;
 
@@ -891,9 +911,7 @@ class X509CACmpResponder extends CmpResponder
                     throw new OperationException(ErrorCode.UNKNOWN_CERT, "cert not exists");
                 }
 
-                PKIStatusInfo status = new PKIStatusInfo(PKIStatus.granted);
-                CertId certId = new CertId(new GeneralName(caSubject), serialNumber);
-                repContentBuilder.add(status, certId);
+                status = new PKIStatusInfo(PKIStatus.granted);
                 if(childAuditEvent != null)
                 {
                     childAuditEvent.setStatus(AuditStatus.SUCCESSFUL);
@@ -973,9 +991,10 @@ class X509CACmpResponder extends CmpResponder
                     break;
                 } // end switch(code)
 
-                PKIStatusInfo status = generateCmpRejectionStatus(failureInfo, errorMessage);
-                repContentBuilder.add(status);
+                status = generateCmpRejectionStatus(failureInfo, errorMessage);
             } // end try
+
+            repContentBuilder.add(status, certId);
         } // end for
 
         return new PKIBody(PKIBody.TYPE_REVOCATION_REP, repContentBuilder.build());
