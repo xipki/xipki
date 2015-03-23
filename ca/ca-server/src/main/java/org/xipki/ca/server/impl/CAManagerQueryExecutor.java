@@ -58,8 +58,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.CertPublisherException;
-import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.profile.CertValidity;
@@ -80,7 +78,6 @@ import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
@@ -89,7 +86,6 @@ import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.security.api.PasswordResolver;
 
 /**
  * @author Lijun Liao
@@ -430,10 +426,8 @@ class CAManagerQueryExecutor
         }
     }
 
-    IdentifiedX509CertPublisher createPublisher(
-            String name, Map<String, DataSourceWrapper> dataSources,
-            PasswordResolver pwdResolver, EnvironmentParameterResolver envParamResolver,
-            List<PublisherEntry> dbContainer)
+    PublisherEntry createPublisher(
+            String name)
     throws CAMgmtException
     {
         final String sql = "TYPE, CONF FROM PUBLISHER WHERE NAME=?";
@@ -450,27 +444,7 @@ class CAManagerQueryExecutor
                 String type = rs.getString("TYPE");
                 String conf = rs.getString("CONF");
 
-                PublisherEntry rawEntry = new PublisherEntry(name, type, conf);
-                if(dbContainer != null)
-                {
-                    dbContainer.add(rawEntry);
-                }
-                String realType = getRealPublisherType(type, envParamResolver);
-                IdentifiedX509CertPublisher ret;
-                try
-                {
-                    ret = new IdentifiedX509CertPublisher(rawEntry, realType);
-                    ret.initialize(pwdResolver, dataSources);
-                    return ret;
-                } catch(CertPublisherException | RuntimeException e)
-                {
-                    final String message = "invalid configuration for the certPublisher " + name;
-                    if(LOG.isErrorEnabled())
-                    {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                    }
-                    LOG.debug(message, e);
-                }
+                return new PublisherEntry(name, type, conf);
             }
         }catch(SQLException e)
         {
@@ -2045,36 +2019,6 @@ class CAManagerQueryExecutor
         {
             dataSource.releaseResources(ps, null);
         }
-    }
-
-    private String getRealPublisherType(String publisherType, EnvironmentParameterResolver envParameterResolver)
-    {
-        return getRealType(envParameterResolver.getParameterValue("publisherType.map"), publisherType);
-    }
-
-    private String getRealType(String typeMap, String type)
-    {
-        if(typeMap == null)
-        {
-            return null;
-        }
-
-        typeMap = typeMap.trim();
-        if(StringUtil.isBlank(typeMap))
-        {
-            return null;
-        }
-
-        CmpUtf8Pairs pairs;
-        try
-        {
-            pairs = new CmpUtf8Pairs(typeMap);
-        }catch(IllegalArgumentException e)
-        {
-            LOG.error("CA environment {}: '{}' is not valid CMP UTF-8 pairs",typeMap, type);
-            return null;
-        }
-        return pairs.getValue(type);
     }
 
     private static void setBoolean(PreparedStatement ps, int index, boolean b)
