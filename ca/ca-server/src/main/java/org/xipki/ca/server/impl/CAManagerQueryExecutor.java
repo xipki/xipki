@@ -59,7 +59,6 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertPublisherException;
-import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.X509CertWithDBCertId;
@@ -366,8 +365,7 @@ class CAManagerQueryExecutor
         return map;
     }
 
-    IdentifiedX509Certprofile createCertprofile(String name, EnvironmentParameterResolver envParamResolver,
-            List<CertprofileEntry> dbContainer)
+    CertprofileEntry createCertprofile(String name)
     throws CAMgmtException
     {
         PreparedStatement stmt = null;
@@ -384,27 +382,7 @@ class CAManagerQueryExecutor
                 String type = rs.getString("TYPE");
                 String conf = rs.getString("CONF");
 
-                try
-                {
-                    CertprofileEntry rawEntry = new CertprofileEntry(name, type, conf);
-                    if(dbContainer != null)
-                    {
-                        dbContainer.add(rawEntry);
-                    }
-                    String realType = getRealCertprofileType(type, envParamResolver);
-                    IdentifiedX509Certprofile ret = new IdentifiedX509Certprofile(rawEntry, realType);
-                    ret.setEnvironmentParameterResolver(envParamResolver);
-                    ret.validate();
-                    return ret;
-                }catch(CertprofileException e)
-                {
-                    final String message = "could not initialize Certprofile " + name + ", ignore it";
-                    if(LOG.isErrorEnabled())
-                    {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                    }
-                    LOG.debug(message, e);
-                }
+                return new CertprofileEntry(name, type, conf);
             }
         }catch(SQLException e)
         {
@@ -2067,11 +2045,6 @@ class CAManagerQueryExecutor
         {
             dataSource.releaseResources(ps, null);
         }
-    }
-
-    private String getRealCertprofileType(String certprofileType, EnvironmentParameterResolver envParameterResolver)
-    {
-        return getRealType(envParameterResolver.getParameterValue("certprofileType.map"), certprofileType);
     }
 
     private String getRealPublisherType(String publisherType, EnvironmentParameterResolver envParameterResolver)

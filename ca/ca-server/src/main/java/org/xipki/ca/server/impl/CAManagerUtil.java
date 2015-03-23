@@ -37,10 +37,16 @@ package org.xipki.ca.server.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.CertprofileException;
+import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
+import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
+import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 
@@ -83,6 +89,63 @@ public class CAManagerUtil
             throw new CAMgmtException("ConfigurationException: " + e.getMessage());
         }
         return signer;
+    }
+
+    public static IdentifiedX509Certprofile createCertprofile(CertprofileEntry dbEntry,
+            EnvironmentParameterResolver envParamResolver)
+    {
+        try
+        {
+            String realType = getRealCertprofileType(dbEntry.getType(), envParamResolver);
+            IdentifiedX509Certprofile ret = new IdentifiedX509Certprofile(dbEntry, realType);
+            ret.setEnvironmentParameterResolver(envParamResolver);
+            ret.validate();
+            return ret;
+        }catch(CertprofileException e)
+        {
+            final String message = "could not initialize Certprofile " + dbEntry.getName() + ", ignore it";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
+            return null;
+        }
+    }
+
+    private static String getRealCertprofileType(String certprofileType, EnvironmentParameterResolver envParameterResolver)
+    {
+        return getRealType(envParameterResolver.getParameterValue("certprofileType.map"), certprofileType);
+    }
+
+    private static String getRealPublisherType(String publisherType, EnvironmentParameterResolver envParameterResolver)
+    {
+        return getRealType(envParameterResolver.getParameterValue("publisherType.map"), publisherType);
+    }
+
+    private static String getRealType(String typeMap, String type)
+    {
+        if(typeMap == null)
+        {
+            return null;
+        }
+
+        typeMap = typeMap.trim();
+        if(StringUtil.isBlank(typeMap))
+        {
+            return null;
+        }
+
+        CmpUtf8Pairs pairs;
+        try
+        {
+            pairs = new CmpUtf8Pairs(typeMap);
+        }catch(IllegalArgumentException e)
+        {
+            LOG.error("CA environment {}: '{}' is not valid CMP UTF-8 pairs",typeMap, type);
+            return null;
+        }
+        return pairs.getValue(type);
     }
 
 }
