@@ -1770,22 +1770,17 @@ implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
-        boolean changed = queryExecutor.changeCrlSigner(name, signer_type, signer_conf, signer_cert, crlControl);
-        if(changed == false)
+        X509CrlSignerEntryWrapper crlSigner = queryExecutor.changeCrlSigner(
+                name, signer_type, signer_conf, signer_cert, crlControl);
+        if(crlSigner == null)
         {
             return false;
         }
 
         crlSigners.remove(name);
         crlSignerDbEntries.remove(name);
-
-        X509CrlSignerEntry dbEntry = queryExecutor.createCrlSigner(name);
-        if(dbEntry != null)
-        {
-            crlSignerDbEntries.put(name, dbEntry);
-            X509CrlSignerEntryWrapper crlSigner = CAManagerUtil.createX509CrlSigner(dbEntry);
-            crlSigners.put(name, crlSigner);
-        }
+        crlSignerDbEntries.put(name, crlSigner.getDbEntry());
+        crlSigners.put(name, crlSigner);
         return true;
     }
 
