@@ -86,6 +86,7 @@ import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SecurityFactory;
 
 /**
@@ -1770,7 +1771,9 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean changePublisher(String name, String type, String conf)
+    IdentifiedX509CertPublisher changePublisher(String name, String type, String conf,
+            Map<String, DataSourceWrapper> dataSources,
+            PasswordResolver pwdResolver, EnvironmentParameterResolver envParamResolver)
     throws CAMgmtException
     {
         StringBuilder sqlBuilder = new StringBuilder();
@@ -1784,8 +1787,28 @@ class CAManagerQueryExecutor
 
         if(index.get() == 1)
         {
-            return false;
+            return null;
         }
+
+        PublisherEntry currentDbEntry = createPublisher(name);
+        if(type == null)
+        {
+            type = currentDbEntry.getType();
+        }
+
+        if(conf == null)
+        {
+            conf = currentDbEntry.getConf();
+        }
+
+        PublisherEntry dbEntry = new PublisherEntry(name, type, conf);
+        IdentifiedX509CertPublisher publisher = CAManagerUtil.createPublisher(
+                dbEntry, dataSources, pwdResolver, envParamResolver);
+        if(publisher == null)
+        {
+            return null;
+        }
+
         final String sql = sqlBuilder.toString();
 
         PreparedStatement ps = null;
@@ -1814,7 +1837,7 @@ class CAManagerQueryExecutor
                 m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
             }
             LOG.info("changed publisher '{}': {}", name, m);
-            return true;
+            return publisher;
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
