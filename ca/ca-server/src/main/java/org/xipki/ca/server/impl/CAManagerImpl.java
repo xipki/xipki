@@ -1487,23 +1487,17 @@ implements CAManager, CmpResponderManager
             return false;
         }
 
-        boolean changed = queryExecutor.changeCmpRequestor(name, base64Cert);
-        if(changed == false)
+        CmpRequestorEntryWrapper requestor = queryExecutor.changeCmpRequestor(name, base64Cert);
+        if(requestor == null)
         {
             return false;
         }
 
         requestorDbEntries.remove(name);
         requestors.remove(name);
-        CmpRequestorEntry requestorDbEntry = queryExecutor.createRequestor(name);
-        if(requestorDbEntry != null)
-        {
-            requestorDbEntries.put(name, requestorDbEntry);
 
-            CmpRequestorEntryWrapper requestor = new CmpRequestorEntryWrapper();
-            requestor.setDbEntry(requestorDbEntry);
-            requestors.put(name, requestor);
-        }
+        requestorDbEntries.put(name, requestor.getDbEntry());
+        requestors.put(name, requestor);
         return true;
     }
 

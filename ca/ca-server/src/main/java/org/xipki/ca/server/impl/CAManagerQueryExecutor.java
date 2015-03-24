@@ -1481,9 +1481,13 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean changeCmpRequestor(String name, String base64Cert)
+    CmpRequestorEntryWrapper changeCmpRequestor(String name, String base64Cert)
     throws CAMgmtException
     {
+        CmpRequestorEntry newDbEntry = new CmpRequestorEntry(name, base64Cert);
+        CmpRequestorEntryWrapper requestor = new CmpRequestorEntryWrapper();
+        requestor.setDbEntry(newDbEntry);
+
         final String sql = "UPDATE REQUESTOR SET CERT=? WHERE NAME=?";
         PreparedStatement ps = null;
         try
@@ -1507,7 +1511,7 @@ class CAManagerQueryExecutor
                 }
             }
             LOG.info("changed CMP requestor '{}': {}", name, subject);
-            return true;
+            return requestor;
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
