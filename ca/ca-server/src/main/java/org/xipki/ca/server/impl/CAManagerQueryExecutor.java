@@ -1619,18 +1619,56 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean changeCrlSigner(String name, String signer_type, String signer_conf, String signer_cert,
+    X509CrlSignerEntryWrapper changeCrlSigner(String name, String signerType, String signerConf, String base64Cert,
             String crlControl)
     throws CAMgmtException
     {
+        X509CrlSignerEntry dbEntry = createCrlSigner(name);
+        if(signerType == null)
+        {
+            signerType = dbEntry.getType();
+        }
+
+        if("CA".equalsIgnoreCase(signerType))
+        {
+            signerConf = null;
+            base64Cert = null;
+        }
+        else
+        {
+            if(signerConf == null)
+            {
+                signerConf = dbEntry.getConf();
+            }
+
+            if(base64Cert == null)
+            {
+                base64Cert = dbEntry.getBase64Cert();
+            }
+        }
+
+        if(crlControl == null)
+        {
+            crlControl = dbEntry.getCRLControl();
+        }
+
+        try
+        {
+            dbEntry = new X509CrlSignerEntry(name, signerType, signerConf, base64Cert, crlControl);
+        } catch (ConfigurationException e)
+        {
+            throw new CAMgmtException(e.getMessage(), e);
+        }
+        X509CrlSignerEntryWrapper crlSigner = CAManagerUtil.createX509CrlSigner(dbEntry);
+
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE CRLSIGNER SET ");
 
         AtomicInteger index = new AtomicInteger(1);
 
-        Integer iSigner_type = addToSqlIfNotNull(sqlBuilder, index, signer_type, "SIGNER_TYPE");
-        Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signer_conf, "SIGNER_CONF");
-        Integer iSigner_cert = addToSqlIfNotNull(sqlBuilder, index, signer_cert, "SIGNER_CERT");
+        Integer iSigner_type = addToSqlIfNotNull(sqlBuilder, index, signerType, "SIGNER_TYPE");
+        Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signerConf, "SIGNER_CONF");
+        Integer iSigner_cert = addToSqlIfNotNull(sqlBuilder, index, base64Cert, "SIGNER_CERT");
         Integer iCrlControl = addToSqlIfNotNull(sqlBuilder, index, crlControl, "CRL_CONTROL");
 
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
@@ -1638,7 +1676,7 @@ class CAManagerQueryExecutor
 
         if(index.get() == 1)
         {
-            return false;
+            return null;
         }
         final String sql = sqlBuilder.toString();
 
@@ -1651,20 +1689,20 @@ class CAManagerQueryExecutor
 
             if(iSigner_type != null)
             {
-                m.append("signerType: '").append(signer_type).append("'; ");
-                ps.setString(iSigner_type, signer_type);
+                m.append("signerType: '").append(signerType).append("'; ");
+                ps.setString(iSigner_type, signerType);
             }
 
             if(iSigner_conf != null)
             {
-                String txt = getRealString(signer_conf);
+                String txt = getRealString(signerConf);
                 m.append("signerConf: '").append(SecurityUtil.signerConfToString(txt, false, true)).append("'; ");
                 ps.setString(iSigner_conf, txt);
             }
 
             if(iSigner_cert != null)
             {
-                String txt = getRealString(signer_cert);
+                String txt = getRealString(base64Cert);
                 String subject = null;
                 if(txt != null)
                 {
@@ -1697,7 +1735,7 @@ class CAManagerQueryExecutor
                 m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
             }
             LOG.info("changed CRL signer '{}': {}", name, m);
-            return true;
+            return crlSigner;
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
