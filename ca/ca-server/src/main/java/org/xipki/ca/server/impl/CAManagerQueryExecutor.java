@@ -1455,9 +1455,12 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean changeCmpControl(String name, String conf)
+    CmpControl changeCmpControl(String name, String conf)
     throws CAMgmtException
     {
+        CmpControlEntry newDbEntry = new CmpControlEntry(name, conf);
+        CmpControl cmpControl = new CmpControl(newDbEntry);
+
         final String sql = "UPDATE CMPCONTROL SET CONF=? WHERE NAME=?";
         PreparedStatement ps = null;
         try
@@ -1467,7 +1470,7 @@ class CAManagerQueryExecutor
             ps.setString(2, name);
 
             LOG.info("changed CMP control '{}': {}", name, conf);
-            return true;
+            return cmpControl;
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);

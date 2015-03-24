@@ -2000,19 +2000,14 @@ implements CAManager, CmpResponderManager
         ParamChecker.assertNotEmpty("conf", conf);
         asssertMasterMode();
 
-        boolean changed = queryExecutor.changeCmpControl(name, conf);
-        if(changed == false)
+        CmpControl newCmpControl = queryExecutor.changeCmpControl(name, conf);
+        if(newCmpControl == null)
         {
             return false;
         }
 
-        CmpControlEntry dbEntry = queryExecutor.createCmpControl(name);
-        cmpControlDbEntries.put(name, dbEntry);
-        dbEntry.setFaulty(true);
-
-        CmpControl cmpControl = new CmpControl(dbEntry);
-        dbEntry.setFaulty(false);
-        cmpControls.put(name, cmpControl);
+        cmpControlDbEntries.put(name, newCmpControl.getDbEntry());
+        cmpControls.put(name, newCmpControl);
         return true;
     }
 

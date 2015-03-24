@@ -63,7 +63,7 @@ class CmpControl
     private static final int DFLT_messageTimeBias = 300; // 300 seconds
     private static final int DFLT_confirmWaitTime = 300; // 300 seconds
 
-    private final String name;
+    private final CmpControlEntry dbEntry;
     private final boolean confirmCert;
     private final boolean sendCaCert;
 
@@ -74,8 +74,6 @@ class CmpControl
     private final int confirmWaitTime;
     private final Set<String> sigAlgos;
 
-    private final String conf;
-
     public boolean isMessageTimeRequired()
     {
         return messageTimeRequired;
@@ -84,7 +82,7 @@ class CmpControl
     public CmpControl(CmpControlEntry dbEntry)
     {
         ParamChecker.assertNotNull("dbEntry", dbEntry);
-        this.name = dbEntry.getName();
+        this.dbEntry = dbEntry;
 
         CmpUtf8Pairs pairs = new CmpUtf8Pairs(dbEntry.getConf());
         this.confirmCert = getBoolean(pairs, KEY_CONFIRM_CERT, false);
@@ -109,8 +107,6 @@ class CmpControl
             this.sigAlgos = set;
             pairs.putUtf8Pair(KEY_PROTECTION_SIGALGO, StringUtil.collectionAsString(this.sigAlgos, ","));
         }
-
-        this.conf = pairs.getEncoded();
     }
 
     public CmpControl(String name, Boolean confirmCert, Boolean sendCaCert,
@@ -119,8 +115,6 @@ class CmpControl
     {
         ParamChecker.assertNotEmpty("name", name);
         CmpUtf8Pairs pairs = new CmpUtf8Pairs();
-
-        this.name = name;
 
         this.confirmCert = confirmCert == null ? false: confirmCert;
         pairs.putUtf8Pair(KEY_CONFIRM_CERT, Boolean.toString(this.confirmCert));
@@ -150,7 +144,7 @@ class CmpControl
             pairs.putUtf8Pair(KEY_PROTECTION_SIGALGO, StringUtil.collectionAsString(this.sigAlgos, ","));
         }
 
-        this.conf = pairs.getEncoded();
+        this.dbEntry = new CmpControlEntry(name, pairs.getEncoded());
     }
 
     private static boolean getBoolean(CmpUtf8Pairs pairs, String key, boolean defaultValue)
@@ -167,11 +161,6 @@ class CmpControl
         int ret = StringUtil.isBlank(s) ? defaultValue : Integer.parseInt(s);
         pairs.putUtf8Pair(key, Integer.toString(ret));
         return ret;
-    }
-
-    public String getName()
-    {
-        return name;
     }
 
     public boolean isConfirmCert()
@@ -227,16 +216,16 @@ class CmpControl
         return false;
     }
 
-    public String getConf()
+    public CmpControlEntry getDbEntry()
     {
-        return conf;
+        return dbEntry;
     }
 
     @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("               name: ").append(name).append('\n');
+        sb.append("               name: ").append(dbEntry.getName()).append('\n');
         sb.append("        confirmCert: ").append(confirmCert ? "yes" : "no").append('\n');
         sb.append("         sendCaCert: ").append(sendCaCert ? "yes" : "no").append("\n");
         sb.append("  sendResponderCert: ").append(sendResponderCert ? "yes" : "no").append("\n");
@@ -244,7 +233,7 @@ class CmpControl
         sb.append("    messageTimeBias: ").append(messageTimeBias).append(" s").append('\n');
         sb.append("    confirmWaitTime: ").append(confirmWaitTime).append(" s").append('\n');
         sb.append("    signature algos: ").append(StringUtil.collectionAsString(sigAlgos, ",")).append('\n');
-        sb.append("               conf: ").append(conf);
+        sb.append("               conf: ").append(dbEntry.getConf());
 
         return sb.toString();
     }
