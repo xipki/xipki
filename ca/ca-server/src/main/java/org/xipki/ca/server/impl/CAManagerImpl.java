@@ -1027,7 +1027,7 @@ implements CAManager, CmpResponderManager
 
         for(String name : certprofiles.keySet())
         {
-            queryExecutor.shutdownCertprofile(certprofiles.get(name));
+            shutdownCertprofile(certprofiles.get(name));
         }
         certprofileDbEntries.clear();
         certprofiles.clear();
@@ -1067,7 +1067,7 @@ implements CAManager, CmpResponderManager
 
         for(String name : publishers.keySet())
         {
-            queryExecutor.shutdownPublisher(publishers.get(name));
+            shutdownPublisher(publishers.get(name));
         }
         publishers.clear();
         publisherDbEntries.clear();
@@ -1584,7 +1584,7 @@ implements CAManager, CmpResponderManager
         LOG.info("removed profile '{}'", profileName);
         certprofileDbEntries.remove(profileName);
         IdentifiedX509Certprofile profile = certprofiles.remove(profileName);
-        queryExecutor.shutdownCertprofile(profile);
+        shutdownCertprofile(profile);
         return true;
     }
 
@@ -1598,33 +1598,22 @@ implements CAManager, CmpResponderManager
             throw new IllegalArgumentException("at least one of type and conf should not be null");
         }
 
-        boolean changed = queryExecutor.changeCertprofile(name, type, conf);
-        if(changed == false)
-        {
-            return false;
-        }
-
-        CertprofileEntry dbEntry = queryExecutor.createCertprofile(name);
-        if(dbEntry == null)
+        IdentifiedX509Certprofile profile = queryExecutor.changeCertprofile(name, type, conf, envParameterResolver);
+        if(profile == null)
         {
             return false;
         }
 
         certprofileDbEntries.remove(name);
-        IdentifiedX509Certprofile profile = certprofiles.remove(name);
-        if(profile != null)
+        IdentifiedX509Certprofile oldProfile = certprofiles.remove(name);
+        certprofileDbEntries.put(name, profile.getDbEntry());
+        certprofiles.put(name, profile);
+
+        if(oldProfile != null)
         {
-            queryExecutor.shutdownCertprofile(profile);
+            shutdownCertprofile(oldProfile);
         }
 
-        dbEntry.setFaulty(true);
-        certprofileDbEntries.put(name, dbEntry);
-        profile = CAManagerUtil.createCertprofile(dbEntry, envParameterResolver);
-        if(profile != null)
-        {
-            dbEntry.setFaulty(false);
-            certprofiles.put(name, profile);
-        }
         return true;
     }
 
@@ -1907,7 +1896,7 @@ implements CAManager, CmpResponderManager
         LOG.info("removed publisher '{}'", publisherName);
         publisherDbEntries.remove(publisherName);
         IdentifiedX509CertPublisher publisher = publishers.remove(publisherName);
-        queryExecutor.shutdownPublisher(publisher);
+        shutdownPublisher(publisher);
         return true;
     }
 
@@ -1925,7 +1914,7 @@ implements CAManager, CmpResponderManager
         IdentifiedX509CertPublisher publisher = publishers.remove(name);
         if(publisher != null)
         {
-            queryExecutor.shutdownPublisher(publisher);
+            shutdownPublisher(publisher);
         }
 
         PublisherEntry dbEntry = queryExecutor.createPublisher(name);
@@ -2752,6 +2741,48 @@ implements CAManager, CmpResponderManager
 
         utf8Pairs.putUtf8Pair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
         return utf8Pairs.getEncoded();
+    }
+
+    void shutdownCertprofile(IdentifiedX509Certprofile profile)
+    {
+        if(profile == null)
+        {
+            return;
+        }
+
+        try
+        {
+            profile.shutdown();
+        } catch(Exception e)
+        {
+            final String message = "could not shutdown Certprofile " + profile.getName();
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
+        }
+    }
+
+    void shutdownPublisher(IdentifiedX509CertPublisher publisher)
+    {
+        if(publisher == null)
+        {
+            return;
+        }
+
+        try
+        {
+            publisher.shutdown();
+        } catch(Exception e)
+        {
+            final String message = "could not shutdown CertPublisher " + publisher.getName();
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
+        }
     }
 
 }
