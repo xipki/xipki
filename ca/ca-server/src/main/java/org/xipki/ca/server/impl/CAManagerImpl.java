@@ -1697,20 +1697,16 @@ implements CAManager, CmpResponderManager
             return false;
         }
 
-        boolean changed = queryExecutor.changeCmpResponder(type, conf, base64Cert);
-        if(changed == false)
+        CmpResponderEntryWrapper newResponder = queryExecutor.changeCmpResponder(type, conf, base64Cert,
+                securityFactory);
+        if(newResponder == null)
         {
             LOG.info("no change of CMP responder is processed");
             return false;
         }
 
-        responderDbEntry = null;
-        responder = null;
-
-        responderDbEntry = queryExecutor.createResponder();
-        responderDbEntry.setConfFaulty(true);
-        responder = CAManagerUtil.createCmpResponder(responderDbEntry, securityFactory);
-        responderDbEntry.setConfFaulty(false);
+        responderDbEntry = newResponder.getDbEntry();
+        responder = newResponder;
         return true;
     }
 
