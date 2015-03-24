@@ -127,7 +127,7 @@ class IdentifiedX509CertPublisher
         return certPublisher.crlAdded(caCert, crl);
     }
 
-    public PublisherEntry getEntry()
+    public PublisherEntry getDbEntry()
     {
         return entry;
     }
