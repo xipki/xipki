@@ -1890,33 +1890,21 @@ implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
-        boolean changed = queryExecutor.changePublisher(name, type, conf);
-        if(changed == false)
+        IdentifiedX509CertPublisher publisher = queryExecutor.changePublisher(name, type, conf,
+                dataSources, securityFactory.getPasswordResolver(), envParameterResolver);
+        if(publisher == null)
         {
             return false;
         }
 
-        IdentifiedX509CertPublisher publisher = publishers.remove(name);
+        IdentifiedX509CertPublisher oldPublisher = publishers.remove(name);
         if(publisher != null)
         {
-            shutdownPublisher(publisher);
+            shutdownPublisher(oldPublisher);
         }
 
-        PublisherEntry dbEntry = queryExecutor.createPublisher(name);
-        if(dbEntry == null)
-        {
-            return false;
-        }
-
-        dbEntry.setFaulty(true);
-        publisherDbEntries.put(name, dbEntry);
-        publisher = CAManagerUtil.createPublisher(dbEntry, dataSources,
-                securityFactory.getPasswordResolver(), envParameterResolver);
-        if(publisher != null)
-        {
-            dbEntry.setFaulty(false);
-            publishers.put(name, publisher);
-        }
+        publisherDbEntries.put(name, publisher.getDbEntry());
+        publishers.put(name, publisher);
 
         return true;
     }
