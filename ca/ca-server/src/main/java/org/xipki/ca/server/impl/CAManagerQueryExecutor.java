@@ -86,6 +86,7 @@ import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
@@ -1522,9 +1523,27 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean changeCmpResponder(String type, String conf, String cert)
+    CmpResponderEntryWrapper changeCmpResponder(String type, String conf, String base64Cert, SecurityFactory securityFactory)
     throws CAMgmtException
     {
+        CmpResponderEntry dbEntry = createResponder();
+        if(type != null)
+        {
+            dbEntry.setType(type);
+        }
+
+        if(conf != null)
+        {
+            dbEntry.setConf(getRealString(conf));
+        }
+
+        if(base64Cert != null)
+        {
+            dbEntry.setBase64Cert(getRealString(base64Cert));
+        }
+
+        CmpResponderEntryWrapper responder = CAManagerUtil.createCmpResponder(dbEntry, securityFactory);
+
         StringBuilder m = new StringBuilder();
         StringBuilder sqlBuilder = new StringBuilder();
 
@@ -1533,7 +1552,7 @@ class CAManagerQueryExecutor
         AtomicInteger index = new AtomicInteger(1);
         Integer iType = addToSqlIfNotNull(sqlBuilder, index, type, "TYPE");
         Integer iConf = addToSqlIfNotNull(sqlBuilder, index, conf, "CONF");
-        Integer iCert = addToSqlIfNotNull(sqlBuilder, index, cert, "CERT");
+        Integer iCert = addToSqlIfNotNull(sqlBuilder, index, base64Cert, "CERT");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
         final String sql = sqlBuilder.toString();
@@ -1558,7 +1577,7 @@ class CAManagerQueryExecutor
 
             if(iCert != null)
             {
-                String txt = getRealString(cert);
+                String txt = getRealString(base64Cert);
                 m.append("cert: '");
                 if(txt == null)
                 {
@@ -1589,7 +1608,7 @@ class CAManagerQueryExecutor
                 m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
             }
             LOG.info("changed CMP responder: {}", m);
-            return true;
+            return responder;
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
