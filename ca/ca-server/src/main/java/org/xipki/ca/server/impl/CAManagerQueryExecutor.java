@@ -58,6 +58,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.profile.CertValidity;
@@ -81,7 +82,6 @@ import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -167,48 +167,6 @@ class CAManagerQueryExecutor
         }catch(DataAccessException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
-        }
-    }
-
-    void shutdownCertprofile(IdentifiedX509Certprofile profile)
-    {
-        if(profile == null)
-        {
-            return;
-        }
-
-        try
-        {
-            profile.shutdown();
-        } catch(Exception e)
-        {
-            final String message = "could not shutdown Certprofile " + profile.getName();
-            if(LOG.isWarnEnabled())
-            {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-            }
-            LOG.debug(message, e);
-        }
-    }
-
-    void shutdownPublisher(IdentifiedX509CertPublisher publisher)
-    {
-        if(publisher == null)
-        {
-            return;
-        }
-
-        try
-        {
-            publisher.shutdown();
-        } catch(Exception e)
-        {
-            final String message = "could not shutdown CertPublisher " + publisher.getName();
-            if(LOG.isWarnEnabled())
-            {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-            }
-            LOG.debug(message, e);
         }
     }
 
@@ -730,8 +688,7 @@ class CAManagerQueryExecutor
                         certstore.addCa(cm);
                     }
 
-                    X509CAInfo caInfo = new X509CAInfo(entry, certstore);
-                    return caInfo;
+                    return new X509CAInfo(entry, certstore);
                 } catch (OperationException e)
                 {
                     throw new CAMgmtException(e.getMessage(), e);
@@ -1412,9 +1369,30 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean changeCertprofile(String name, String type, String conf)
+    IdentifiedX509Certprofile changeCertprofile(String name, String type, String conf,
+            EnvironmentParameterResolver envParamResolver)
     throws CAMgmtException
     {
+        CertprofileEntry currentDbEntry = createCertprofile(name);
+        if(type == null)
+        {
+            type = currentDbEntry.getName();
+        }
+        if(conf == null)
+        {
+            conf = currentDbEntry.getConf();
+        }
+
+        type = getRealString(type);
+        conf = getRealString(conf);
+
+        CertprofileEntry newDbEntry = new CertprofileEntry(name, type, conf);
+        IdentifiedX509Certprofile profile = CAManagerUtil.createCertprofile(newDbEntry, envParamResolver);
+        if(profile == null)
+        {
+            return null;
+        }
+
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE PROFILE SET ");
 
@@ -1437,6 +1415,7 @@ class CAManagerQueryExecutor
         sqlBuilder.append(" WHERE NAME=?");
         final String sql = sqlBuilder.toString();
 
+        boolean failed = true;
         PreparedStatement ps = null;
         try
         {
@@ -1460,7 +1439,8 @@ class CAManagerQueryExecutor
             }
 
             LOG.info("changed profile '{}': {}", name, m);
-            return true;
+            failed = false;
+            return profile;
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -1468,6 +1448,10 @@ class CAManagerQueryExecutor
         }finally
         {
             dataSource.releaseResources(ps, null);
+            if(failed)
+            {
+                profile.shutdown();
+            }
         }
     }
 

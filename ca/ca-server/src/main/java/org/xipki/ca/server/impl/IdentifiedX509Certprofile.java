@@ -145,17 +145,19 @@ class IdentifiedX509Certprofile
     }
 
     private final String name;
+    private final CertprofileEntry dbEntry;
     private final X509Certprofile certprofile;
     private EnvironmentParameterResolver parameterResolver;
 
-    public IdentifiedX509Certprofile(CertprofileEntry entry, String realType)
+    public IdentifiedX509Certprofile(CertprofileEntry dbEntry, String realType)
     throws CertprofileException
     {
-        ParamChecker.assertNotNull("entry", entry);
-        this.name = entry.getName();
+        ParamChecker.assertNotNull("entry", dbEntry);
+        this.dbEntry = dbEntry;
+        this.name = dbEntry.getName();
         X509Certprofile tmpCertprofile = null;
 
-        final String type = realType == null ?  entry.getType() : realType;
+        final String type = realType == null ?  dbEntry.getType() : realType;
         String className;
         if(type.equalsIgnoreCase("xml"))
         {
@@ -179,7 +181,7 @@ class IdentifiedX509Certprofile
             throw new CertprofileException("invalid type " + type);
         }
 
-        tmpCertprofile.initialize(entry.getConf());
+        tmpCertprofile.initialize(dbEntry.getConf());
 
         if(parameterResolver != null)
         {
@@ -216,6 +218,11 @@ class IdentifiedX509Certprofile
     public String getName()
     {
         return name;
+    }
+
+    public CertprofileEntry getDbEntry()
+    {
+        return dbEntry;
     }
 
     public X509CertVersion getVersion()
