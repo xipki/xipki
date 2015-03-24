@@ -1375,26 +1375,6 @@ class CAManagerQueryExecutor
             EnvironmentParameterResolver envParamResolver)
     throws CAMgmtException
     {
-        CertprofileEntry currentDbEntry = createCertprofile(name);
-        if(type == null)
-        {
-            type = currentDbEntry.getName();
-        }
-        if(conf == null)
-        {
-            conf = currentDbEntry.getConf();
-        }
-
-        type = getRealString(type);
-        conf = getRealString(conf);
-
-        CertprofileEntry newDbEntry = new CertprofileEntry(name, type, conf);
-        IdentifiedX509Certprofile profile = CAManagerUtil.createCertprofile(newDbEntry, envParamResolver);
-        if(profile == null)
-        {
-            return null;
-        }
-
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE PROFILE SET ");
 
@@ -1415,6 +1395,31 @@ class CAManagerQueryExecutor
         Integer iConf = addToSqlIfNotNull(sqlBuilder, index, conf, "CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
+        if(index.get() == 1)
+        {
+            return null;
+        }
+
+        CertprofileEntry currentDbEntry = createCertprofile(name);
+        if(type == null)
+        {
+            type = currentDbEntry.getName();
+        }
+        if(conf == null)
+        {
+            conf = currentDbEntry.getConf();
+        }
+
+        type = getRealString(type);
+        conf = getRealString(conf);
+
+        CertprofileEntry newDbEntry = new CertprofileEntry(name, type, conf);
+        IdentifiedX509Certprofile profile = CAManagerUtil.createCertprofile(newDbEntry, envParamResolver);
+        if(profile == null)
+        {
+            return null;
+        }
+
         final String sql = sqlBuilder.toString();
 
         boolean failed = true;
@@ -1460,6 +1465,11 @@ class CAManagerQueryExecutor
     CmpControl changeCmpControl(String name, String conf)
     throws CAMgmtException
     {
+        if(conf == null)
+        {
+            return null;
+        }
+
         CmpControlEntry newDbEntry = new CmpControlEntry(name, conf);
         CmpControl cmpControl = new CmpControl(newDbEntry);
 
@@ -1527,6 +1537,21 @@ class CAManagerQueryExecutor
     CmpResponderEntryWrapper changeCmpResponder(String type, String conf, String base64Cert, SecurityFactory securityFactory)
     throws CAMgmtException
     {
+        StringBuilder m = new StringBuilder();
+        StringBuilder sqlBuilder = new StringBuilder();
+
+        AtomicInteger index = new AtomicInteger(1);
+        Integer iType = addToSqlIfNotNull(sqlBuilder, index, type, "TYPE");
+        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, conf, "CONF");
+        Integer iCert = addToSqlIfNotNull(sqlBuilder, index, base64Cert, "CERT");
+        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
+        sqlBuilder.append(" WHERE NAME=?");
+
+        if(index.get() == 1)
+        {
+            return null;
+        }
+
         CmpResponderEntry dbEntry = createResponder();
         if(type != null)
         {
@@ -1545,17 +1570,8 @@ class CAManagerQueryExecutor
 
         CmpResponderEntryWrapper responder = CAManagerUtil.createCmpResponder(dbEntry, securityFactory);
 
-        StringBuilder m = new StringBuilder();
-        StringBuilder sqlBuilder = new StringBuilder();
-
         sqlBuilder.append("UPDATE RESPONDER SET ");
 
-        AtomicInteger index = new AtomicInteger(1);
-        Integer iType = addToSqlIfNotNull(sqlBuilder, index, type, "TYPE");
-        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, conf, "CONF");
-        Integer iCert = addToSqlIfNotNull(sqlBuilder, index, base64Cert, "CERT");
-        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(" WHERE NAME=?");
         final String sql = sqlBuilder.toString();
 
         PreparedStatement ps = null;
@@ -1624,6 +1640,24 @@ class CAManagerQueryExecutor
             String crlControl)
     throws CAMgmtException
     {
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("UPDATE CRLSIGNER SET ");
+
+        AtomicInteger index = new AtomicInteger(1);
+
+        Integer iSigner_type = addToSqlIfNotNull(sqlBuilder, index, signerType, "SIGNER_TYPE");
+        Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signerConf, "SIGNER_CONF");
+        Integer iSigner_cert = addToSqlIfNotNull(sqlBuilder, index, base64Cert, "SIGNER_CERT");
+        Integer iCrlControl = addToSqlIfNotNull(sqlBuilder, index, crlControl, "CRL_CONTROL");
+
+        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
+        sqlBuilder.append(" WHERE NAME=?");
+
+        if(index.get() == 1)
+        {
+            return null;
+        }
+
         X509CrlSignerEntry dbEntry = createCrlSigner(name);
         if(signerType == null)
         {
@@ -1662,23 +1696,6 @@ class CAManagerQueryExecutor
         }
         X509CrlSignerEntryWrapper crlSigner = CAManagerUtil.createX509CrlSigner(dbEntry);
 
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("UPDATE CRLSIGNER SET ");
-
-        AtomicInteger index = new AtomicInteger(1);
-
-        Integer iSigner_type = addToSqlIfNotNull(sqlBuilder, index, signerType, "SIGNER_TYPE");
-        Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signerConf, "SIGNER_CONF");
-        Integer iSigner_cert = addToSqlIfNotNull(sqlBuilder, index, base64Cert, "SIGNER_CERT");
-        Integer iCrlControl = addToSqlIfNotNull(sqlBuilder, index, crlControl, "CRL_CONTROL");
-
-        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(" WHERE NAME=?");
-
-        if(index.get() == 1)
-        {
-            return null;
-        }
         final String sql = sqlBuilder.toString();
 
         PreparedStatement ps = null;
@@ -1750,6 +1767,11 @@ class CAManagerQueryExecutor
     boolean changeEnvParam(String name, String value)
     throws CAMgmtException
     {
+        if(value == null)
+        {
+            return false;
+        }
+
         final String sql = "UPDATE ENVIRONMENT SET VALUE2=? WHERE NAME=?";
 
         PreparedStatement ps = null;
