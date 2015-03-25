@@ -82,7 +82,6 @@ class CmpControl
     public CmpControl(CmpControlEntry dbEntry)
     {
         ParamChecker.assertNotNull("dbEntry", dbEntry);
-        this.dbEntry = dbEntry;
 
         CmpUtf8Pairs pairs = new CmpUtf8Pairs(dbEntry.getConf());
         this.confirmCert = getBoolean(pairs, KEY_CONFIRM_CERT, false);
@@ -107,6 +106,7 @@ class CmpControl
             this.sigAlgos = set;
             pairs.putUtf8Pair(KEY_PROTECTION_SIGALGO, StringUtil.collectionAsString(this.sigAlgos, ","));
         }
+        this.dbEntry = new CmpControlEntry(dbEntry.getName(), pairs.getEncoded());
     }
 
     public CmpControl(String name, Boolean confirmCert, Boolean sendCaCert,

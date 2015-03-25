@@ -35,11 +35,18 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.api.profile.CertValidity;
+import org.xipki.ca.server.mgmt.api.CAStatus;
+import org.xipki.ca.server.mgmt.api.DuplicationMode;
+import org.xipki.ca.server.mgmt.api.Permission;
+import org.xipki.ca.server.mgmt.api.ValidityMode;
+import org.xipki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.common.ConfigurationException;
 import org.xipki.security.api.SecurityFactory;
 
 /**
@@ -52,91 +59,91 @@ public abstract class CaAddOrGenCommand extends CaCommand
             required = true,
             description = "CA name\n"
                     + "(required)")
-    protected String caName;
+    private String caName;
 
     @Option(name = "--status",
             description = "CA status")
-    protected String caStatus = "active";
+    private String caStatus = "active";
 
     @Option(name = "--ocsp-uri",
             multiValued = true,
             description = "OCSP URI\n"
                     + "(multi-valued)")
-    protected List<String> ocspUris;
+    private List<String> ocspUris;
 
     @Option(name = "--crl-uri",
             multiValued = true,
             description = "CRL distribution point\n"
                     + "(multi-valued)")
-    protected List<String> crlUris;
+    private List<String> crlUris;
 
     @Option(name = "--deltacrl-uri",
             multiValued = true,
             description = "CRL distribution point\n"
                     + "(multi-valued)")
-    protected List<String> deltaCrlUris;
+    private List<String> deltaCrlUris;
 
     @Option(name = "--permission",
             required = true, multiValued = true,
             description = "permission\n"
                     + "(required, multi-valued)")
-    protected Set<String> permissions;
+    private Set<String> permissions;
 
     @Option(name = "--next-serial",
             required = true,
             description = "serial number for the next certificate, 0 for random serial number\n"
                     + "(required)")
-    protected Long nextSerial;
+    private Long nextSerial;
 
     @Option(name = "--next-crl-no",
             required = true,
             description = "CRL number for the next CRL\n"
                     + "(required)")
-    protected Integer nextCrlNumber ;
+    private Integer nextCrlNumber ;
 
     @Option(name = "--max-validity",
             required = true,
             description = "maximal validity\n"
                     + "(required)")
-    protected String maxValidity;
+    private String maxValidity;
 
     @Option(name = "--crl-signer",
             description = "CRL signer name")
-    protected String crlSignerName;
+    private String crlSignerName;
 
     @Option(name = "--cmp-control",
             description = "CMP control name")
-    protected String cmpControlName;
+    private String cmpControlName;
 
     @Option(name = "--num-crls",
             description = "number of CRLs to be kept in database")
-    protected Integer numCrls = 30;
+    private Integer numCrls = 30;
 
     @Option(name = "--expiration-period",
             description = "days before expiration time of CA to issue certificates")
-    protected Integer expirationPeriod = 365;
+    private Integer expirationPeriod = 365;
 
     @Option(name = "--signer-type",
             required = true,
             description = "CA signer type\n"
                     + "(required)")
-    protected String signerType;
+    private String signerType;
 
     @Option(name = "--signer-conf",
             description = "CA signer configuration")
-    protected String signerConf;
+    private String signerConf;
 
     @Option(name = "--duplicate-key",
             description = "mode of duplicate key")
-    protected String duplicateKeyS = "forbiddenWithinProfile";
+    private String duplicateKeyS = "forbiddenWithinProfile";
 
     @Option(name = "--duplicate-subject",
             description = "mode of duplicate subject")
-    protected String duplicateSubjectS = "forbiddenWithinProfile";
+    private String duplicateSubjectS = "forbiddenWithinProfile";
 
     @Option(name = "--validity-mode",
             description = "mode of valditity")
-    protected String validityModeS = "STRICT";
+    private String validityModeS = "STRICT";
 
     protected SecurityFactory securityFactory;
 
@@ -145,7 +152,93 @@ public abstract class CaAddOrGenCommand extends CaCommand
         this.securityFactory = securityFactory;
     }
 
-    protected CertValidity getMaxValidity()
+    protected X509CAEntry getCAEntry()
+    throws Exception
+    {
+        if(nextSerial < 0)
+        {
+            throw new ConfigurationException("invalid serial number: " + nextSerial);
+        }
+
+        if(nextCrlNumber < 1)
+        {
+            throw new ConfigurationException("invalid CRL number: " + nextCrlNumber);
+        }
+
+        if(numCrls < 0)
+        {
+            throw new ConfigurationException("invalid numCrls: " + numCrls);
+        }
+
+        if(expirationPeriod < 0)
+        {
+            throw new ConfigurationException("invalid expirationPeriod: " + expirationPeriod);
+        }
+
+        CAStatus status = CAStatus.getCAStatus(caStatus);
+        if(status == null)
+        {
+            throw new ConfigurationException("invalid status: " + caStatus);
+        }
+
+        if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
+        {
+            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf,
+                    securityFactory.getPasswordResolver());
+        }
+
+        X509CAEntry entry = new X509CAEntry(caName, nextSerial, nextCrlNumber, signerType, signerConf,
+                ocspUris, crlUris, deltaCrlUris, null, numCrls.intValue(), expirationPeriod.intValue());
+
+        DuplicationMode duplicateKey = DuplicationMode.getInstance(duplicateKeyS);
+        if(duplicateKey == null)
+        {
+            throw new ConfigurationException("invalid duplication mode: " + duplicateKeyS);
+        }
+        entry.setDuplicateKeyMode(duplicateKey);
+
+        DuplicationMode duplicateSubject = DuplicationMode.getInstance(duplicateSubjectS);
+        if(duplicateSubject == null)
+        {
+            throw new ConfigurationException("invalid duplication mode: " + duplicateSubjectS);
+        }
+        entry.setDuplicateSubjectMode(duplicateSubject);
+
+        ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
+        if(validityMode == null)
+        {
+            throw new ConfigurationException("invalid validity: " + validityModeS);
+        }
+        entry.setValidityMode(validityMode);
+
+        entry.setStatus(status);
+        if(crlSignerName != null)
+        {
+            entry.setCrlSignerName(crlSignerName);
+        }
+        entry.setMaxValidity(getMaxValidity());
+
+        if(cmpControlName != null)
+        {
+            entry.setCmpControlName(cmpControlName);
+        }
+
+        Set<Permission> _permissions = new HashSet<>();
+        for(String permission : permissions)
+        {
+            Permission _permission = Permission.getPermission(permission);
+            if(_permission == null)
+            {
+                throw new ConfigurationException("invalid permission: " + permission);
+            }
+            _permissions.add(_permission);
+        }
+
+        entry.setPermissions(_permissions);
+        return entry;
+    }
+
+    private CertValidity getMaxValidity()
     {
         CertValidity _maxValidity = null;
         if(maxValidity != null)

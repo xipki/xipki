@@ -40,6 +40,7 @@ import java.io.File;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -71,7 +72,14 @@ public class ProfileExportCommand extends CaCommand
             return null;
         }
 
-        saveVerbose("saved cert profile configuration to", new File(confFile), entry.getConf().getBytes("uTF-8"));
+        if(StringUtil.isBlank(entry.getConf()))
+        {
+            out("cert profile does not have conf");
+        }
+        else
+        {
+            saveVerbose("saved cert profile configuration to", new File(confFile), entry.getConf().getBytes("uTF-8"));
+        }
         return null;
     }
 }

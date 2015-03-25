@@ -75,7 +75,7 @@ import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestorInfo;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
-import org.xipki.ca.server.impl.CertRevocationInfoWithSerial;
+import org.xipki.ca.server.impl.CertRevInfoWithSerial;
 import org.xipki.ca.server.impl.CertStatus;
 import org.xipki.ca.server.impl.SubjectKeyProfileBundle;
 import org.xipki.ca.server.mgmt.api.CertArt;
@@ -1613,7 +1613,7 @@ class CertStoreQueryExecutor
         return null;
     }
 
-    List<CertRevocationInfoWithSerial> getRevokedCertificates(X509CertWithDBCertId caCert,
+    List<CertRevInfoWithSerial> getRevokedCertificates(X509CertWithDBCertId caCert,
             Date notExpiredAt, BigInteger startSerial, int numEntries,
             boolean onlyCACerts, boolean onlyUserCerts)
     throws DataAccessException, OperationException
@@ -1657,7 +1657,7 @@ class CertStoreQueryExecutor
             ps.setLong(idx++, notExpiredAt.getTime() / 1000 + 1);
             rs = ps.executeQuery();
 
-            List<CertRevocationInfoWithSerial> ret = new ArrayList<>();
+            List<CertRevInfoWithSerial> ret = new ArrayList<>();
             while(rs.next())
             {
                 long serial = rs.getLong("SERIAL");
@@ -1666,7 +1666,7 @@ class CertStoreQueryExecutor
                 long rev_invalidity_time = rs.getLong("REV_INV_TIME");
 
                 Date invalidityTime = rev_invalidity_time == 0 ? null :  new Date(1000 * rev_invalidity_time);
-                CertRevocationInfoWithSerial revInfo = new CertRevocationInfoWithSerial(
+                CertRevInfoWithSerial revInfo = new CertRevInfoWithSerial(
                         BigInteger.valueOf(serial),
                         rev_reason, new Date(1000 * rev_time), invalidityTime);
                 ret.add(revInfo);
@@ -1682,7 +1682,7 @@ class CertStoreQueryExecutor
         }
     }
 
-    List<CertRevocationInfoWithSerial> getCertificatesForDeltaCRL(
+    List<CertRevInfoWithSerial> getCertificatesForDeltaCRL(
             X509CertWithDBCertId caCert, BigInteger startSerial, int numEntries,
             boolean onlyCACerts, boolean onlyUserCerts)
     throws DataAccessException, OperationException
@@ -1741,7 +1741,7 @@ class CertStoreQueryExecutor
         sql = dataSource.createFetchFirstSelectSQL(sqlBuilder.toString(), 1);
         ps = borrowPreparedStatement(sql);
 
-        List<CertRevocationInfoWithSerial> ret = new ArrayList<>();
+        List<CertRevInfoWithSerial> ret = new ArrayList<>();
         for(Long serial : serials)
         {
             try
@@ -1754,7 +1754,7 @@ class CertStoreQueryExecutor
                 {
                     continue;
                 }
-                CertRevocationInfoWithSerial revInfo;
+                CertRevInfoWithSerial revInfo;
 
                 boolean revoked = rs.getBoolean("REVOEKD");
                 if(revoked)
@@ -1764,14 +1764,14 @@ class CertStoreQueryExecutor
                     long rev_invalidity_time = rs.getLong("REV_INV_TIME");
 
                     Date invalidityTime = rev_invalidity_time == 0 ? null :  new Date(1000 * rev_invalidity_time);
-                    revInfo = new CertRevocationInfoWithSerial(
+                    revInfo = new CertRevInfoWithSerial(
                             BigInteger.valueOf(serial),
                             rev_reason, new Date(1000 * rev_time), invalidityTime);
                 }
                 else
                 {
                     long lastUpdate = rs.getLong("LAST_UPDATE");
-                    revInfo = new CertRevocationInfoWithSerial(BigInteger.valueOf(serial),
+                    revInfo = new CertRevInfoWithSerial(BigInteger.valueOf(serial),
                             CRLReason.REMOVE_FROM_CRL.getCode(), new Date(1000 * lastUpdate), null);
                 }
                 ret.add(revInfo);

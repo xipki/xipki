@@ -100,7 +100,7 @@ import org.xipki.common.util.StringUtil;
  * @author Lijun Liao
  */
 
-public class CRLControl implements Serializable
+class CRLControl implements Serializable
 {
     private static final long serialVersionUID = 1L;
 

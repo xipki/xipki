@@ -832,7 +832,7 @@ class X509CA
             final int numEntries = 100;
 
             X509CertWithDBCertId caCert = caInfo.getCertificate();
-            List<CertRevocationInfoWithSerial> revInfos;
+            List<CertRevInfoWithSerial> revInfos;
             boolean isFirstCRLEntry = true;
 
             Date notExpireAt;
@@ -861,7 +861,7 @@ class X509CA
 
                 BigInteger maxSerial = BigInteger.ONE;
 
-                for(CertRevocationInfoWithSerial revInfo : revInfos)
+                for(CertRevInfoWithSerial revInfo : revInfos)
                 {
                     BigInteger serial = revInfo.getSerial();
                     if(serial.compareTo(maxSerial) > 0)

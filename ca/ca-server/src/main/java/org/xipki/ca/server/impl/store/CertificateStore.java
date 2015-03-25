@@ -51,7 +51,7 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
-import org.xipki.ca.server.impl.CertRevocationInfoWithSerial;
+import org.xipki.ca.server.impl.CertRevInfoWithSerial;
 import org.xipki.ca.server.impl.CertStatus;
 import org.xipki.ca.server.impl.SubjectKeyProfileBundle;
 import org.xipki.common.CertRevocationInfo;
@@ -423,7 +423,7 @@ public class CertificateStore
      * @return
      * @throws DataAccessException
      */
-    public List<CertRevocationInfoWithSerial> getRevokedCertificates(X509CertWithDBCertId caCert,
+    public List<CertRevInfoWithSerial> getRevokedCertificates(X509CertWithDBCertId caCert,
             Date notExpiredAt, BigInteger startSerial, int numEntries,
             boolean onlyCACerts, boolean onlyUserCerts)
     throws OperationException
@@ -442,7 +442,7 @@ public class CertificateStore
         }
     }
 
-    public List<CertRevocationInfoWithSerial> getCertificatesForDeltaCRL(
+    public List<CertRevInfoWithSerial> getCertificatesForDeltaCRL(
             X509CertWithDBCertId caCert, BigInteger startSerial, int numEntries,
             boolean onlyCACerts, boolean onlyUserCerts)
     throws OperationException

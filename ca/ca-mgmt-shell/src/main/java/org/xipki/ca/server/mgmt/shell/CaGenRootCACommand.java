@@ -37,16 +37,10 @@ package org.xipki.ca.server.mgmt.shell;
 
 import java.io.File;
 import java.security.cert.X509Certificate;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.CAStatus;
-import org.xipki.ca.server.mgmt.api.DuplicationMode;
-import org.xipki.ca.server.mgmt.api.Permission;
-import org.xipki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.common.ConfigurationException;
+import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.common.util.IoUtil;
 
 /**
@@ -76,88 +70,14 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
     protected Object _doExecute()
     throws Exception
     {
-        if(nextSerial < 0)
-        {
-            err("invalid serial number: " + nextSerial);
-            return null;
-        }
-
-        if(numCrls < 0)
-        {
-            err("invalid numCrls: " + numCrls);
-            return null;
-        }
-
-        if(expirationPeriod < 0)
-        {
-            err("invalid expirationPeriod: " + expirationPeriod);
-            return null;
-        }
-
-        CAStatus status = CAStatus.getCAStatus(caStatus);
-        if(status == null)
-        {
-            err("invalid status: " + caStatus);
-            return null;
-        }
-
-        DuplicationMode duplicateKey = DuplicationMode.getInstance(duplicateKeyS);
-        if(duplicateKey == null)
-        {
-            err("invalid duplication mode: " + duplicateKeyS);
-        }
-        DuplicationMode duplicateSubject = DuplicationMode.getInstance(duplicateSubjectS);
-        if(duplicateSubject == null)
-        {
-            err("invalid duplication mode: " + duplicateSubjectS);
-        }
-
-        ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
-        if(validityMode == null)
-        {
-            err("invalid validityMode: " + validityModeS);
-            return null;
-        }
-
-        Set<Permission> _permissions = new HashSet<>();
-        for(String permission : permissions)
-        {
-            Permission _permission = Permission.getPermission(permission);
-            if(_permission == null)
-            {
-                throw new ConfigurationException("invalid permission: " + permission);
-            }
-            _permissions.add(_permission);
-        }
-
+        X509CAEntry caEntry = getCAEntry();
         byte[] p10Req = IoUtil.read(p10ReqFile);
-        X509Certificate rcaCert = caManager.generateSelfSignedCA(caName,
-                rcaProfile,
-                p10Req,
-                status,
-                nextSerial,
-                nextCrlNumber,
-                crlUris,
-                deltaCrlUris,
-                ocspUris,
-                getMaxValidity(),
-                signerType,
-                signerConf,
-                crlSignerName,
-                cmpControlName,
-                duplicateKey,
-                duplicateSubject,
-                _permissions,
-                numCrls,
-                expirationPeriod,
-                validityMode);
-
+        X509Certificate rcaCert = caManager.generateSelfSignedCA(caEntry, rcaProfile, p10Req);
         if(rcaCertOutFile != null)
         {
             saveVerbose("saved root certificate to file", new File(rcaCertOutFile), rcaCert.getEncoded());
         }
-
-        out("generated root CA " + caName);
+        out("generated root CA " + caEntry.getName());
         return null;
     }
 
