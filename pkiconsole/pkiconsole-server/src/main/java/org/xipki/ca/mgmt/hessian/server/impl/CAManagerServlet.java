@@ -815,24 +815,12 @@ implements HessianCAManager
     }
 
     @Override
-    public X509Certificate generateSelfSignedCA(String name, String certprofileName,
-            byte[] p10Req, CAStatus status, long nextSerial, int nextCrlNo,
-            List<String> crl_uris, List<String> delta_crl_uris,
-            List<String> ocsp_uris, CertValidity max_validity, String signer_type,
-            String signer_conf, String crlsigner_name, String cmpcontrol_name,
-            DuplicationMode duplicate_key, DuplicationMode duplicate_subject,
-            Set<Permission> permissions, int numCrls, int expirationPeriod,
-            ValidityMode validityMode)
+    public X509Certificate generateSelfSignedCA(X509CAEntry caEntry, String certprofileName, byte[] p10Req)
     throws HessianCAMgmtException
     {
         try
         {
-            return caManager.generateSelfSignedCA(name, certprofileName, p10Req, status,
-                    nextSerial, nextCrlNo,
-                    crl_uris, delta_crl_uris, ocsp_uris, max_validity, signer_type, signer_conf,
-                    crlsigner_name, cmpcontrol_name,
-                    duplicate_key, duplicate_subject, permissions, numCrls,
-                    expirationPeriod, validityMode);
+            return caManager.generateSelfSignedCA(caEntry, certprofileName, p10Req);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());

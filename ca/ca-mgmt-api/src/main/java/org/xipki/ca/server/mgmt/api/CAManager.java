@@ -233,13 +233,6 @@ public interface CAManager
     X509Certificate generateCertificate(String caName, String profileName, String user, byte[] encodedPkcs10Request)
     throws CAMgmtException;
 
-    X509Certificate generateSelfSignedCA(
-            String name, String certprofileName, byte[] p10Req,
-            CAStatus status, long nextSerial, int nextCrlNumber,
-            List<String> crl_uris, List<String> delta_crl_uris, List<String> ocsp_uris,
-            CertValidity max_validity, String signer_type, String signer_conf,
-            String crlsigner_name, String cmpcontrol_name, DuplicationMode duplicate_key,
-            DuplicationMode duplicate_subject, Set<Permission> permissions,
-            int numCrls, int expirationPeriod, ValidityMode validityMode)
+    X509Certificate generateSelfSignedCA(X509CAEntry caEntry, String certprofileName, byte[] p10Req)
     throws CAMgmtException;
 }

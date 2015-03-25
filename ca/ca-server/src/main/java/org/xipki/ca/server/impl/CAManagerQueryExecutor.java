@@ -58,7 +58,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.profile.CertValidity;
@@ -86,8 +85,6 @@ import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
@@ -641,10 +638,10 @@ class CAManagerQueryExecutor
                     lOcspUris = StringUtil.split(ocsp_uris, " \t");
                 }
 
-                X509Certificate cert = generateCert(b64cert);
-
-                X509CAEntry entry = new X509CAEntry(name, next_serial, next_crlNo, signer_type, signer_conf, cert,
+                X509CAEntry entry = new X509CAEntry(name, next_serial, next_crlNo, signer_type, signer_conf,
                         lOcspUris, lCrlUris, lDeltaCrlUris, null, numCrls, expirationPeriod);
+                X509Certificate cert = generateCert(b64cert);
+                entry.setCertificate(cert);
 
                 CAStatus caStatus = CAStatus.getCAStatus(status);
                 if(caStatus == null)
@@ -1372,7 +1369,7 @@ class CAManagerQueryExecutor
     }
 
     IdentifiedX509Certprofile changeCertprofile(String name, String type, String conf,
-            EnvironmentParameterResolver envParamResolver)
+            CAManagerImpl caManager)
     throws CAMgmtException
     {
         StringBuilder sqlBuilder = new StringBuilder();
@@ -1414,7 +1411,7 @@ class CAManagerQueryExecutor
         conf = getRealString(conf);
 
         CertprofileEntry newDbEntry = new CertprofileEntry(name, type, conf);
-        IdentifiedX509Certprofile profile = CAManagerUtil.createCertprofile(newDbEntry, envParamResolver);
+        IdentifiedX509Certprofile profile = caManager.createCertprofile(newDbEntry);
         if(profile == null)
         {
             return null;
@@ -1480,6 +1477,7 @@ class CAManagerQueryExecutor
             ps = prepareStatement(sql);
             ps.setString(1, conf);
             ps.setString(2, name);
+            ps.executeUpdate();
 
             LOG.info("changed CMP control '{}': {}", name, conf);
             return cmpControl;
@@ -1534,7 +1532,7 @@ class CAManagerQueryExecutor
         }
     }
 
-    CmpResponderEntryWrapper changeCmpResponder(String type, String conf, String base64Cert, SecurityFactory securityFactory)
+    CmpResponderEntryWrapper changeCmpResponder(String type, String conf, String base64Cert, CAManagerImpl caManager)
     throws CAMgmtException
     {
         StringBuilder m = new StringBuilder();
@@ -1568,7 +1566,7 @@ class CAManagerQueryExecutor
             dbEntry.setBase64Cert(getRealString(base64Cert));
         }
 
-        CmpResponderEntryWrapper responder = CAManagerUtil.createCmpResponder(dbEntry, securityFactory);
+        CmpResponderEntryWrapper responder = caManager.createCmpResponder(dbEntry);
 
         sqlBuilder.append("UPDATE RESPONDER SET ");
 
@@ -1637,7 +1635,7 @@ class CAManagerQueryExecutor
     }
 
     X509CrlSignerEntryWrapper changeCrlSigner(String name, String signerType, String signerConf, String base64Cert,
-            String crlControl)
+            String crlControl, CAManagerImpl caManager)
     throws CAMgmtException
     {
         StringBuilder sqlBuilder = new StringBuilder();
@@ -1694,7 +1692,7 @@ class CAManagerQueryExecutor
         {
             throw new CAMgmtException(e.getMessage(), e);
         }
-        X509CrlSignerEntryWrapper crlSigner = CAManagerUtil.createX509CrlSigner(dbEntry);
+        X509CrlSignerEntryWrapper crlSigner = caManager.createX509CrlSigner(dbEntry);
 
         final String sql = sqlBuilder.toString();
 
@@ -1794,8 +1792,7 @@ class CAManagerQueryExecutor
     }
 
     IdentifiedX509CertPublisher changePublisher(String name, String type, String conf,
-            Map<String, DataSourceWrapper> dataSources,
-            PasswordResolver pwdResolver, EnvironmentParameterResolver envParamResolver)
+            CAManagerImpl caManager)
     throws CAMgmtException
     {
         StringBuilder sqlBuilder = new StringBuilder();
@@ -1824,8 +1821,7 @@ class CAManagerQueryExecutor
         }
 
         PublisherEntry dbEntry = new PublisherEntry(name, type, conf);
-        IdentifiedX509CertPublisher publisher = CAManagerUtil.createPublisher(
-                dbEntry, dataSources, pwdResolver, envParamResolver);
+        IdentifiedX509CertPublisher publisher = caManager.createPublisher(dbEntry);
         if(publisher == null)
         {
             return null;

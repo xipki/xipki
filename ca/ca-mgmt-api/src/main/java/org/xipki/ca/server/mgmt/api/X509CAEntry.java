@@ -86,18 +86,18 @@ public class X509CAEntry implements Serializable
     private String serialSeqName;
 
     public X509CAEntry(String name, long nextSerial, int nextCRLNumber,
-            String signerType, String signerConf, X509Certificate cert,
+            String signerType, String signerConf,
             List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
             List<String> issuerLocations, int numCrls,
             int expirationPeriod)
     throws CAMgmtException
     {
-        init(name, nextSerial, nextCRLNumber, signerType, signerConf, cert, ocspUris,
+        init(name, nextSerial, nextCRLNumber, signerType, signerConf, ocspUris,
                 crlUris, deltaCrlUris, issuerLocations, numCrls, expirationPeriod);
     }
 
     private void init(String name, long nextSerial, int nextCRLNumber,
-            String signerType, String signerConf, X509Certificate cert,
+            String signerType, String signerConf,
             List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
             List<String> issuerLocations, int numCrls,
             int expirationPeriod)
@@ -105,12 +105,6 @@ public class X509CAEntry implements Serializable
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("signerType", signerType);
-        ParamChecker.assertNotNull("cert", cert);
-
-        if(SecurityUtil.hasKeyusage(cert, KeyUsage.keyCertSign) == false)
-        {
-            throw new CAMgmtException("CA certificate does not have keyusage keyCertSign");
-        }
 
         if(nextSerial < 0)
         {
@@ -138,8 +132,6 @@ public class X509CAEntry implements Serializable
         this.serialSeqName = IoUtil.convertSequenceName("SERIAL_" + this.name);
         this.nextSerial = nextSerial;
         this.nextCRLNumber = nextCRLNumber;
-        this.cert = cert;
-        this.subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
 
         this.signerType = signerType;
         this.signerConf = signerConf;
@@ -152,6 +144,19 @@ public class X509CAEntry implements Serializable
                 null : Collections.unmodifiableList(new ArrayList<>(deltaCrlUris));
         this.issuerLocations = (issuerLocations == null) ?
                 null : Collections.unmodifiableList(new ArrayList<>(issuerLocations));
+    }
+
+    public void setCertificate(X509Certificate cert)
+    throws CAMgmtException
+    {
+        ParamChecker.assertNotNull("cert", cert);
+
+        if(SecurityUtil.hasKeyusage(cert, KeyUsage.keyCertSign) == false)
+        {
+            throw new CAMgmtException("CA certificate does not have keyusage keyCertSign");
+        }
+        this.cert = cert;
+        this.subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
     }
 
     public String getName()
@@ -307,23 +312,30 @@ public class X509CAEntry implements Serializable
         }
         sb.append('\n');
         sb.append("cert: ").append("\n");
-        sb.append("\tissuer: ").append(
-                SecurityUtil.getRFC4519Name(cert.getIssuerX500Principal())).append("\n");
-        sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
-        sb.append("\tsubject: ").append(subject).append("\n");
-        sb.append("\tnotBefore: ").append(cert.getNotBefore()).append("\n");
-        sb.append("\tnotAfter: ").append(cert.getNotAfter()).append("\n");
-        if(verbose)
+        if(cert == null)
         {
-            String b64EncodedCert = null;
-            try
+            sb.append("\tnull").append("\n");
+        }
+        else
+        {
+            sb.append("\tissuer: ").append(
+                    SecurityUtil.getRFC4519Name(cert.getIssuerX500Principal())).append("\n");
+            sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
+            sb.append("\tsubject: ").append(subject).append("\n");
+            sb.append("\tnotBefore: ").append(cert.getNotBefore()).append("\n");
+            sb.append("\tnotAfter: ").append(cert.getNotAfter()).append("\n");
+            if(verbose)
             {
-                b64EncodedCert = Base64.toBase64String(cert.getEncoded());
-            } catch (CertificateEncodingException e)
-            {
-                b64EncodedCert = "ERROR, could not encode the certificate";
+                String b64EncodedCert = null;
+                try
+                {
+                    b64EncodedCert = Base64.toBase64String(cert.getEncoded());
+                } catch (CertificateEncodingException e)
+                {
+                    b64EncodedCert = "ERROR, could not encode the certificate";
+                }
+                sb.append("\tEncoded: ").append(b64EncodedCert).append("\n");
             }
-            sb.append("\tEncoded: ").append(b64EncodedCert).append("\n");
         }
 
         sb.append("crlsigner_name: ").append(crlSignerName).append('\n');
