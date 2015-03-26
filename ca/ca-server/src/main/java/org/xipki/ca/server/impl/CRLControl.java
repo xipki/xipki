@@ -122,7 +122,8 @@ class CRLControl implements Serializable
         interval,
         onDemand;
 
-        public static UpdateMode getUpdateMode(String mode)
+        public static UpdateMode getUpdateMode(
+                final String mode)
         {
             for(UpdateMode v : values())
             {
@@ -141,7 +142,9 @@ class CRLControl implements Serializable
         private final int hour;
         private final int minute;
 
-        public HourMinute(int hour, int minute)
+        public HourMinute(
+                final int hour,
+                final int minute)
         throws IllegalArgumentException
         {
             if(hour < 0 | hour > 23)

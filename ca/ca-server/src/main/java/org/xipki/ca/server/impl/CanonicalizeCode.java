@@ -387,7 +387,13 @@ public class CanonicalizeCode
                         if(lastLine != null)
                         {
                             String trimmedLastLine = lastLine.trim();
-                            if(lastLine.indexOf(trimmedLastLine) == 2 * THROWS_PREFIX.length())
+                            int idx2 = lastLine.indexOf(trimmedLastLine);
+                            if(idx2 == 2 * THROWS_PREFIX.length())
+                            {
+                                continue;
+                            }
+
+                            if(idx2 == 4 * THROWS_PREFIX.length() && trimmedLastLine.startsWith("final "))
                             {
                                 continue;
                             }

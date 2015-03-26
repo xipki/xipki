@@ -271,7 +271,8 @@ class X509CA
          * @return whether there this method should still be called.
          * @throws OperationException
          */
-        private boolean removeExpirtedCerts(final RemoveExpiredCertsInfo task)
+        private boolean removeExpirtedCerts(
+                final RemoveExpiredCertsInfo task)
         throws OperationException
         {
             final String caName = caInfo.getName();

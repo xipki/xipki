@@ -73,7 +73,8 @@ class PendingCertificatePool
         }
 
         @Override
-        public boolean equals(final Object b)
+        public boolean equals(
+                final Object b)
         {
             if(b instanceof MyEntry == false)
             {

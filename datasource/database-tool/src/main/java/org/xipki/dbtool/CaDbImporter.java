@@ -80,7 +80,10 @@ public class CaDbImporter
         private long should_CA_nextSerial;
         private Integer CA_id;
 
-        public CAInfoBundle(String CA_name, long CA_nextSerial, byte[] cert)
+        public CAInfoBundle(
+                final String CA_name,
+                final long CA_nextSerial,
+                final byte[] cert)
         {
             this.CA_name = CA_name;
             this.CA_nextSerial = CA_nextSerial;
