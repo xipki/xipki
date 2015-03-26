@@ -93,8 +93,12 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
     private final String publisherName;
     private final boolean resume;
 
-    OcspCertStoreFromCaDbImporter(DataSourceWrapper dataSource, Unmarshaller unmarshaller,
-            String srcDir, String publisherName, boolean resume)
+    OcspCertStoreFromCaDbImporter(
+            final DataSourceWrapper dataSource,
+            final Unmarshaller unmarshaller,
+            final String srcDir,
+            final String publisherName,
+            final boolean resume)
     throws DataAccessException, InvalidInputException
     {
         super(dataSource, srcDir);
@@ -240,7 +244,9 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
         System.out.println(" imported OCSP certstore to database");
     }
 
-    private List<Integer> getIssuerIds(Cas issuers, List<CaType> cas)
+    private List<Integer> getIssuerIds(
+            final Cas issuers,
+            final List<CaType> cas)
     {
         List<Integer> relatedCaIds = new LinkedList<>();
         for(CertstoreCaType issuer : issuers.getCa())
@@ -268,7 +274,9 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
         return relatedCaIds;
     }
 
-    private List<Integer> import_issuer(Cas issuers, List<CaType> cas)
+    private List<Integer> import_issuer(
+            final Cas issuers,
+            final List<CaType> cas)
     throws DataAccessException, CertificateException
     {
         System.out.println("importing table ISSUER");
@@ -368,8 +376,12 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
         return relatedCaIds;
     }
 
-    private void import_cert(CertsFiles certsfiles, Map<Integer, String> profileMap,
-            boolean revokedOnly, List<Integer> caIds, File processLogFile)
+    private void import_cert(
+            final CertsFiles certsfiles,
+            final Map<Integer, String> profileMap,
+            final boolean revokedOnly,
+            final List<Integer> caIds,
+            final File processLogFile)
     throws Exception
     {
         int numProcessedBefore = 0;
@@ -440,11 +452,17 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
         System.out.println("processed " + sum + " certificates");
     }
 
-    private int[] do_import_cert(PreparedStatement ps_cert,
-            PreparedStatement ps_certhash, PreparedStatement ps_rawcert,
-            String certsZipFile, Map<Integer, String> profileMap,
-            boolean revokedOnly, List<Integer> caIds, int minId,
-            File processLogFile, int totalProcessedSum)
+    private int[] do_import_cert(
+            final PreparedStatement ps_cert,
+            final PreparedStatement ps_certhash,
+            final PreparedStatement ps_rawcert,
+            final String certsZipFile,
+            final Map<Integer, String> profileMap,
+            final boolean revokedOnly,
+            final List<Integer> caIds,
+            final int minId,
+            final File processLogFile,
+            final int totalProcessedSum)
     throws IOException, JAXBException, DataAccessException, CertificateException
     {
         ZipFile zipFile = new ZipFile(new File(baseDir, certsZipFile));
@@ -507,7 +525,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 // rawcert
                 ZipEntry certZipEnty = zipFile.getEntry(filename);
                 // rawcert
-                byte[] encodedCert = DbiUtil.read(zipFile.getInputStream(certZipEnty));
+                byte[] encodedCert = IoUtil.read(zipFile.getInputStream(certZipEnty));
 
                 X509Certificate c;
                 try

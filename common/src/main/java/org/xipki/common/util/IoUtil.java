@@ -58,19 +58,22 @@ import org.bouncycastle.util.encoders.Base64;
 
 public class IoUtil
 {
-    public static byte[] read(String fileName)
+    public static byte[] read(
+            final String fileName)
     throws IOException
     {
         return read(new File(expandFilepath(fileName)));
     }
 
-    public static byte[] read(File file)
+    public static byte[] read(
+            final File file)
     throws IOException
     {
         return read(new FileInputStream(expandFilepath(file)));
     }
 
-    public static byte[] read(InputStream in)
+    public static byte[] read(
+            final InputStream in)
     throws IOException
     {
         try
@@ -98,13 +101,17 @@ public class IoUtil
         }
     }
 
-    public static void save(String fileName, byte[] encoded)
+    public static void save(
+            final String fileName,
+            final byte[] encoded)
     throws IOException
     {
         save(new File(expandFilepath(fileName)), encoded);
     }
 
-    public static void save(File file, byte[] encoded)
+    public static void save(
+            File file,
+            final byte[] encoded)
     throws IOException
     {
         file = expandFilepath(file);
@@ -125,7 +132,9 @@ public class IoUtil
         }
     }
 
-    public static byte[] leftmost(byte[] bytes, int bitCount)
+    public static byte[] leftmost(
+            final byte[] bytes,
+            final int bitCount)
     {
         int byteLenKey = (bitCount + 7) / 8;
 
@@ -153,7 +162,8 @@ public class IoUtil
         return truncatedBytes;
     }
 
-    private static int byte2int(byte b)
+    private static int byte2int(
+            final byte b)
     {
         return b >= 0 ? b : 256 + b;
     }
@@ -210,7 +220,8 @@ public class IoUtil
         }
     }
 
-    public static String expandFilepath(String path)
+    public static String expandFilepath(
+            final String path)
     {
         if (path.startsWith("~" + File.separator))
         {
@@ -222,19 +233,23 @@ public class IoUtil
         }
     }
 
-    public static File expandFilepath(File file)
+    public static File expandFilepath(
+            final File file)
     {
         String path = file.getPath();
         String expandedPath = expandFilepath(path);
-        if(path.equals(expandedPath) == false)
+        if(path.equals(expandedPath))
         {
-            file = new File(expandedPath);
+            return file;
         }
-
-        return file;
+        else
+        {
+            return new File(expandedPath);
+        }
     }
 
-    public static String convertSequenceName(String sequenceName)
+    public static String convertSequenceName(
+            final String sequenceName)
     {
         StringBuilder sb = new StringBuilder();
         int n = sequenceName.length();
@@ -253,7 +268,9 @@ public class IoUtil
         return sb.toString();
     }
 
-    public static String base64Encode(byte[] data, boolean withLineBreak)
+    public static String base64Encode(
+            final byte[] data,
+            final boolean withLineBreak)
     {
 
         String b64Str = Base64.toBase64String(data);

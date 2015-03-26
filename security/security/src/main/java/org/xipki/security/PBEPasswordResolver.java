@@ -85,19 +85,23 @@ public class PBEPasswordResolver implements SinglePasswordResolver
     }
 
     @Override
-    public boolean canResolveProtocol(String protocol)
+    public boolean canResolveProtocol(
+            final String protocol)
     {
         return "PBE".equalsIgnoreCase(protocol);
     }
 
     @Override
-    public char[] resolvePassword(String passwordHint)
+    public char[] resolvePassword(
+            final String passwordHint)
     throws PasswordResolverException
     {
         return resolvePassword(getMasterPassword(), passwordHint);
     }
 
-    public static char[] resolvePassword(char[] masterPassword, String passwordHint)
+    public static char[] resolvePassword(
+            final char[] masterPassword,
+            final String passwordHint)
     throws PasswordResolverException
     {
         byte[] bytes = Base64.decode(passwordHint.substring("PBE:".length()));
@@ -128,7 +132,9 @@ public class PBEPasswordResolver implements SinglePasswordResolver
         return ret;
     }
 
-    public static String encryptPassword(char[] masterPassword, char[] password)
+    public static String encryptPassword(
+            final char[] masterPassword,
+            final char[] password)
     throws PasswordResolverException
     {
         SecureRandom random = new SecureRandom();
@@ -151,7 +157,8 @@ public class PBEPasswordResolver implements SinglePasswordResolver
         return pbeText;
     }
 
-    public void setMasterPasswordCallback(String masterPasswordCallback)
+    public void setMasterPasswordCallback(
+            String masterPasswordCallback)
     {
         if(masterPasswordCallback == null)
         {

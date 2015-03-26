@@ -50,19 +50,22 @@ public class OBFPasswordResolver  implements SinglePasswordResolver
     public static final String __OBFUSCATE = "OBF:";
 
     @Override
-    public boolean canResolveProtocol(String protocol)
+    public boolean canResolveProtocol(
+            final String protocol)
     {
         return "OBF".equalsIgnoreCase(protocol);
     }
 
     @Override
-    public char[] resolvePassword(String passwordHint)
+    public char[] resolvePassword(
+            final String passwordHint)
     throws PasswordResolverException
     {
         return deobfuscate(passwordHint).toCharArray();
     }
 
-    public static String obfuscate(String s)
+    public static String obfuscate(
+            final String s)
     {
         StringBuilder buf = new StringBuilder();
         byte[] b = s.getBytes(StandardCharsets.UTF_8);
@@ -96,7 +99,8 @@ public class OBFPasswordResolver  implements SinglePasswordResolver
     }
 
     /* ------------------------------------------------------------ */
-    public static String deobfuscate(String s)
+    public static String deobfuscate(
+            String s)
     {
         if (StringUtil.startsWithIgnoreCase(s, __OBFUSCATE))
         {

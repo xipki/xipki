@@ -101,12 +101,18 @@ public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
         extensionOidNameMap.put(OCSPRequestor.id_pkix_ocsp_extendedRevoke, "ExtendedRevoke");
     }
 
-    protected abstract void checkParameters(X509Certificate respIssuer,
-            List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+    protected abstract void checkParameters(
+            X509Certificate respIssuer,
+            List<BigInteger> serialNumbers,
+            Map<BigInteger, byte[]> encodedCerts)
     throws Exception;
 
-    protected abstract Object processResponse(OCSPResp response, X509Certificate respIssuer,
-            X509Certificate issuer, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+    protected abstract Object processResponse(
+            OCSPResp response,
+            X509Certificate respIssuer,
+            X509Certificate issuer,
+            List<BigInteger> serialNumbers,
+            Map<BigInteger, byte[]> encodedCerts)
     throws Exception;
 
     @Override

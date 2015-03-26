@@ -54,17 +54,21 @@ abstract class AbstractP11DSASigner implements Signer
     private final Digest digest;
     protected P11KeyParameter param;
 
-    protected abstract byte[] sign(byte[] hashValue)
+    protected abstract byte[] sign(
+            final byte[] hashValue)
     throws SignerException;
 
-    public AbstractP11DSASigner(Digest digest)
+    public AbstractP11DSASigner(
+            final Digest digest)
     {
         ParamChecker.assertNotNull("digest", digest);
         this.digest = digest;
     }
 
     @Override
-    public void init(boolean forSigning, CipherParameters param)
+    public void init(
+            final boolean forSigning,
+            final CipherParameters param)
     {
         if(forSigning == false)
         {
@@ -80,13 +84,17 @@ abstract class AbstractP11DSASigner implements Signer
     }
 
     @Override
-    public void update(byte b)
+    public void update(
+            final byte b)
     {
         digest.update(b);
     }
 
     @Override
-    public void update(byte[] in, int off, int len)
+    public void update(
+            final byte[] in,
+            final int off,
+            final int len)
     {
         digest.update(in, off, len);
     }
@@ -108,7 +116,8 @@ abstract class AbstractP11DSASigner implements Signer
     }
 
     @Override
-    public boolean verifySignature(byte[] signature)
+    public boolean verifySignature(
+            final byte[] signature)
     {
         throw new UnsupportedOperationException("verifySignature not supported");
     }

@@ -49,13 +49,22 @@ import org.xipki.security.api.PasswordResolverException;
 
 public interface DataSourceFactory
 {
-    DataSourceWrapper createDataSource(String name, InputStream conf, PasswordResolver passwordResolver)
+    DataSourceWrapper createDataSource(
+            String name,
+            InputStream conf,
+            PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException, IOException;
 
-    DataSourceWrapper createDataSourceForFile(String name, String confFile, PasswordResolver passwordResolver)
+    DataSourceWrapper createDataSourceForFile(
+            String name,
+            String confFile,
+            PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException, IOException;
 
-    DataSourceWrapper createDataSource(String name, Properties conf, PasswordResolver passwordResolver)
+    DataSourceWrapper createDataSource(
+            String name,
+            Properties conf,
+            PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException, IOException;
 
 }

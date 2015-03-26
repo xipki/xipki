@@ -57,7 +57,8 @@ public class PasswordResolverImpl implements PasswordResolver
     {
     }
 
-    public void bindService(SinglePasswordResolver service)
+    public void bindService(
+            SinglePasswordResolver service)
     {
         //might be null if dependency is optional
         if (service == null)
@@ -71,7 +72,8 @@ public class PasswordResolverImpl implements PasswordResolver
         LOG.debug("{} SinglePasswordResolver binding for {}", (replaced ? "replaced" : "added"), service);
     }
 
-    public void unbindService(SinglePasswordResolver service)
+    public void unbindService(
+            final SinglePasswordResolver service)
     {
         //might be null if dependency is optional
         if (service == null)
@@ -96,7 +98,8 @@ public class PasswordResolverImpl implements PasswordResolver
         }
     }
 
-    public char[] resolvePassword(String passwordHint)
+    public char[] resolvePassword(
+            final String passwordHint)
     throws PasswordResolverException
     {
         int index = passwordHint.indexOf(':');

@@ -63,7 +63,8 @@ public class SQLErrorCodes
     protected Set<String> deadlockLoserCodes;
     protected Set<String> cannotSerializeTransactionCodes;
 
-    public static SQLErrorCodes newInstance(DatabaseType dbType)
+    public static SQLErrorCodes newInstance(
+            final DatabaseType dbType)
     {
         ParamChecker.assertNotNull("dbType", dbType);
         switch(dbType)
@@ -242,7 +243,8 @@ public class SQLErrorCodes
         }
     }
 
-    private static Set<String> toSet(String... strs)
+    private static Set<String> toSet(
+            final String... strs)
     {
         if(strs == null || strs.length == 0)
         {
@@ -257,7 +259,8 @@ public class SQLErrorCodes
         return Collections.unmodifiableSet(set);
     }
 
-    private static Set<String> toSet(int... ints)
+    private static Set<String> toSet(
+            final int... ints)
     {
         if(ints == null || ints.length == 0)
         {

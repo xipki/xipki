@@ -155,7 +155,7 @@ public class IaikP11Slot implements P11WritableSlot
         private final PrivateKey privateKey;
         private final SubjectPublicKeyInfo publicKeyInfo;
 
-        public PrivateKeyAndPKInfo(PrivateKey privateKey, SubjectPublicKeyInfo publicKeyInfo)
+        public PrivateKeyAndPKInfo(final PrivateKey privateKey, final SubjectPublicKeyInfo publicKeyInfo)
         throws InvalidKeySpecException
         {
             super();
@@ -196,7 +196,10 @@ public class IaikP11Slot implements P11WritableSlot
     private Session writableSession;
     private final P11SlotIdentifier slotId;
 
-    IaikP11Slot(P11SlotIdentifier slotId, Slot slot, List<char[]> password)
+    IaikP11Slot(
+            final P11SlotIdentifier slotId,
+            final Slot slot,
+            final List<char[]> password)
     throws SignerException
     {
         ParamChecker.assertNotNull("slotId", slotId);
@@ -415,31 +418,42 @@ public class IaikP11Slot implements P11WritableSlot
         currentIdentifies.clear();
     }
 
-    public byte[] CKM_ECDSA(byte[] hash, P11KeyIdentifier keyId)
+    public byte[] CKM_ECDSA(
+            final byte[] hash,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         return CKM_SIGN(PKCS11Constants.CKM_ECDSA, hash, keyId);
     }
 
-    public byte[] CKM_DSA(byte[] hash, P11KeyIdentifier keyId)
+    public byte[] CKM_DSA(
+            final byte[] hash,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         return CKM_SIGN(PKCS11Constants.CKM_DSA, hash, keyId);
     }
 
-    public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo, P11KeyIdentifier keyId)
+    public byte[] CKM_RSA_PKCS(
+            final byte[] encodedDigestInfo,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         return CKM_SIGN(PKCS11Constants.CKM_RSA_PKCS, encodedDigestInfo, keyId);
     }
 
-    public byte[] CKM_RSA_X509(byte[] hash, P11KeyIdentifier keyId)
+    public byte[] CKM_RSA_X509(
+            final byte[] hash,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         return CKM_SIGN(PKCS11Constants.CKM_RSA_X_509, hash, keyId);
     }
 
-    private byte[] CKM_SIGN(long mech, byte[] hash, P11KeyIdentifier keyId)
+    private byte[] CKM_SIGN(
+            final long mech,
+            final byte[] hash,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         PrivateKey signingKey;
@@ -515,7 +529,8 @@ public class IaikP11Slot implements P11WritableSlot
         return openSession(false);
     }
 
-    private Session openSession(boolean rwSession)
+    private Session openSession(
+            final boolean rwSession)
     throws TokenException
     {
         Session session = slot.getToken().openSession(
@@ -524,7 +539,8 @@ public class IaikP11Slot implements P11WritableSlot
         return session;
     }
 
-    private void closeSession(Session session)
+    private void closeSession(
+            final Session session)
     throws TokenException
     {
         try
@@ -559,7 +575,8 @@ public class IaikP11Slot implements P11WritableSlot
         return writableSession;
     }
 
-    private synchronized void returnWritableSession(Session session)
+    private synchronized void returnWritableSession(
+            final Session session)
     throws SignerException
     {
         if(session != writableSession)
@@ -601,7 +618,8 @@ public class IaikP11Slot implements P11WritableSlot
         throw new SignerException("no idle session");
     }
 
-    public void returnIdleSession(Session session)
+    public void returnIdleSession(
+            final Session session)
     {
         if(session == null) return;
 
@@ -626,7 +644,9 @@ public class IaikP11Slot implements P11WritableSlot
         }
     }
 
-    private void firstLogin(Session session, List<char[]> password)
+    private void firstLogin(
+            final Session session,
+            final List<char[]> password)
     throws TokenException
     {
         boolean isProtectedAuthenticationPath = session.getToken().getTokenInfo().isProtectedAuthenticationPath();
@@ -673,7 +693,8 @@ public class IaikP11Slot implements P11WritableSlot
         }
     }
 
-    private void login(Session session)
+    private void login(
+            final Session session)
     throws SignerException
     {
         try
@@ -708,7 +729,8 @@ public class IaikP11Slot implements P11WritableSlot
         }
     }
 
-    private static boolean checkSessionLoggedIn(Session session)
+    private static boolean checkSessionLoggedIn(
+            final Session session)
     throws SignerException
     {
         SessionInfo info;
@@ -765,7 +787,8 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     public List<PrivateKey> getAllPrivateObjects(
-            Boolean forSigning, Boolean forDecrypting)
+            final Boolean forSigning,
+            final Boolean forDecrypting)
     throws SignerException
     {
         Session session = borrowIdleSession();
@@ -839,7 +862,8 @@ public class IaikP11Slot implements P11WritableSlot
         }
     }
 
-    private void cacheSigningKey(PrivateKey privateKey)
+    private void cacheSigningKey(
+            final PrivateKey privateKey)
     {
         Boolean b = privateKey.getSign().getBooleanValue();
         byte[] id = privateKey.getId().getByteArrayValue();
@@ -866,7 +890,10 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     private PrivateKey getPrivateObject(
-            Boolean forSigning, Boolean forDecrypting, byte[] keyId, char[] keyLabel)
+            final Boolean forSigning,
+            final Boolean forDecrypting,
+            final byte[] keyId,
+            final char[] keyLabel)
     throws SignerException
     {
         Session session = borrowIdleSession();
@@ -916,7 +943,10 @@ public class IaikP11Slot implements P11WritableSlot
         }
     }
 
-    private String listPrivateKeyObjects(Session session, Boolean forSigning, Boolean forDecrypting)
+    private String listPrivateKeyObjects(
+            final Session session,
+            final Boolean forSigning,
+            final Boolean forDecrypting)
     {
         try
         {
@@ -970,8 +1000,11 @@ public class IaikP11Slot implements P11WritableSlot
         }
     }
 
-    public PublicKey getPublicKeyObject(Boolean forSignature,
-            Boolean forCipher, byte[] keyId, char[] keyLabel)
+    public PublicKey getPublicKeyObject(
+            final Boolean forSignature,
+            final Boolean forCipher,
+            final byte[] keyId,
+            final char[] keyLabel)
     throws SignerException
     {
         Session session = borrowIdleSession();
@@ -1026,8 +1059,8 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     private static List<iaik.pkcs.pkcs11.objects.Object> getObjects(
-            Session session,
-            iaik.pkcs.pkcs11.objects.Object template)
+            final Session session,
+            final iaik.pkcs.pkcs11.objects.Object template)
     throws SignerException
     {
         List<iaik.pkcs.pkcs11.objects.Object> objList = new LinkedList<>();
@@ -1068,7 +1101,8 @@ public class IaikP11Slot implements P11WritableSlot
         return objList;
     }
 
-    private X509PublicKeyCertificate[] getCertificateObjects(X500Principal subject)
+    private X509PublicKeyCertificate[] getCertificateObjects(
+            final X500Principal subject)
     throws SignerException
     {
         Session session = borrowIdleSession();
@@ -1105,7 +1139,9 @@ public class IaikP11Slot implements P11WritableSlot
         }
     }
 
-    private X509PublicKeyCertificate getCertificateObject(byte[] keyId, char[] keyLabel)
+    private X509PublicKeyCertificate getCertificateObject(
+            final byte[] keyId,
+            final char[] keyLabel)
     throws SignerException
     {
         X509PublicKeyCertificate[] certs = getCertificateObjects(keyId, keyLabel);
@@ -1121,7 +1157,9 @@ public class IaikP11Slot implements P11WritableSlot
         return certs[0];
     }
 
-    private X509PublicKeyCertificate[] getCertificateObjects(byte[] keyId, char[] keyLabel)
+    private X509PublicKeyCertificate[] getCertificateObjects(
+            final byte[] keyId,
+            final char[] keyLabel)
     throws SignerException
     {
         Session session = borrowIdleSession();
@@ -1164,7 +1202,8 @@ public class IaikP11Slot implements P11WritableSlot
         }
     }
 
-    private String listCertificateObjects(Session session)
+    private String listCertificateObjects(
+            final Session session)
     {
         try
         {
@@ -1209,9 +1248,11 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     @Override
-    public void updateCertificate(P11KeyIdentifier keyIdentifier,
-            X509Certificate newCert, Set<X509Certificate> caCerts,
-            SecurityFactory securityFactory)
+    public void updateCertificate(
+            final P11KeyIdentifier keyIdentifier,
+            final X509Certificate newCert,
+            final Set<X509Certificate> caCerts,
+            final SecurityFactory securityFactory)
     throws Exception
     {
         ParamChecker.assertNotNull("keyIdentifier", keyIdentifier);
@@ -1293,7 +1334,8 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     @Override
-    public boolean removeKeyAndCerts(P11KeyIdentifier keyIdentifier)
+    public boolean removeKeyAndCerts(
+            final P11KeyIdentifier keyIdentifier)
     throws Exception
     {
         ParamChecker.assertNotNull("keyIdentifier", keyIdentifier);
@@ -1363,7 +1405,8 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     @Override
-    public void removeCerts(P11KeyIdentifier keyIdentifier)
+    public void removeCerts(
+            final P11KeyIdentifier keyIdentifier)
     throws Exception
     {
         ParamChecker.assertNotNull("keyIdentifier", keyIdentifier);
@@ -1393,7 +1436,10 @@ public class IaikP11Slot implements P11WritableSlot
         }
     }
 
-    private String listPublicKeyObjects(Session session, Boolean forSignature, Boolean forCipher)
+    private String listPublicKeyObjects(
+            final Session session,
+            final Boolean forSignature,
+            final Boolean forCipher)
     {
         try
         {
@@ -1447,7 +1493,9 @@ public class IaikP11Slot implements P11WritableSlot
         }
     }
 
-    private static String getDescription(byte[] keyId, char[] keyLabel)
+    private static String getDescription(
+            final byte[] keyId,
+            final char[] keyLabel)
     {
         StringBuilder sb = new StringBuilder();
         sb.append("id ");
@@ -1458,8 +1506,10 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     private static X509PublicKeyCertificate createPkcs11Template(
-            X509Certificate cert, byte[] encodedCert,
-            byte[] keyId, char[] label)
+            final X509Certificate cert,
+            byte[] encodedCert,
+            final byte[] keyId,
+            char[] label)
     throws Exception
     {
         if(encodedCert == null)
@@ -1490,7 +1540,10 @@ public class IaikP11Slot implements P11WritableSlot
         return newCertTemp;
     }
 
-    private void assertMatch(X509Certificate cert, P11KeyIdentifier keyId, SecurityFactory securityFactory)
+    private void assertMatch(
+            final X509Certificate cert,
+            final P11KeyIdentifier keyId,
+            final SecurityFactory securityFactory)
     throws SignerException, PasswordResolverException
     {
         CmpUtf8Pairs pairs = new CmpUtf8Pairs("slot-id", Long.toString(slot.getSlotID()));
@@ -1507,7 +1560,8 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     @Override
-    public P11KeyIdentifier addCert(X509Certificate cert)
+    public P11KeyIdentifier addCert(
+            final X509Certificate cert)
     throws Exception
     {
         Session session = borrowWritableSession();
@@ -1544,9 +1598,13 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     @Override
-    public P11KeypairGenerationResult generateRSAKeypairAndCert(int keySize,
-            BigInteger publicExponent, String label, String subject,
-            Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyusage)
+    public P11KeypairGenerationResult generateRSAKeypairAndCert(
+            final int keySize,
+            final BigInteger publicExponent,
+            final String label,
+            final String subject,
+            final Integer keyUsage,
+            final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception
     {
         ParamChecker.assertNotEmpty("label", label);
@@ -1591,9 +1649,13 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     @Override
-    public P11KeypairGenerationResult generateDSAKeypairAndCert(int pLength,
-            int qLength, String label, String subject, Integer keyUsage,
-            List<ASN1ObjectIdentifier> extendedKeyusage)
+    public P11KeypairGenerationResult generateDSAKeypairAndCert(
+            final int pLength,
+            final int qLength,
+            final String label,
+            final String subject,
+            final Integer keyUsage,
+            final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception
     {
         ParamChecker.assertNotEmpty("label", label);
@@ -1635,8 +1697,11 @@ public class IaikP11Slot implements P11WritableSlot
 
     @Override
     public P11KeypairGenerationResult generateECDSAKeypairAndCert(
-            String curveNameOrOid, String label, String subject,
-            Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyusage)
+            final String curveNameOrOid,
+            final String label,
+            final String subject,
+            final Integer keyUsage,
+            final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception
     {
         ParamChecker.assertNotEmpty("curveNameOrOid", curveNameOrOid);
@@ -1706,7 +1771,11 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     private PrivateKeyAndPKInfo generateDSAKeyPair(
-            Session session, int pLength, int qLength, byte[] id, String label)
+            final Session session,
+            final int pLength,
+            final int qLength,
+            final byte[] id,
+            final String label)
     throws Exception
     {
         DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());
@@ -1744,9 +1813,14 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     private X509CertificateHolder generateCertificate(
-            Session session, byte[] id, String label, String subject,
-            AlgorithmIdentifier signatureAlgId, PrivateKeyAndPKInfo privateKeyAndPkInfo,
-            Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyUsage)
+            final Session session,
+            final byte[] id,
+            final String label,
+            final String subject,
+            final AlgorithmIdentifier signatureAlgId,
+            final PrivateKeyAndPKInfo privateKeyAndPkInfo,
+            Integer keyUsage,
+            List<ASN1ObjectIdentifier> extendedKeyUsage)
     throws Exception
     {
         BigInteger serialNumber = BigInteger.ONE;
@@ -1870,7 +1944,8 @@ public class IaikP11Slot implements P11WritableSlot
         return new X509CertificateHolder(Certificate.getInstance(cert));
     }
 
-    private static byte[] convertToX962Signature(byte[] signature)
+    private static byte[] convertToX962Signature(
+            final byte[] signature)
     throws IOException
     {
         int n = signature.length / 2;
@@ -1913,9 +1988,11 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     private PrivateKeyAndPKInfo generateRSAKeyPair(
-            Session session,
-            int keySize, BigInteger publicExponent,
-            byte[] id, String label)
+            final Session session,
+            final int keySize,
+            BigInteger publicExponent,
+            final byte[] id,
+            final String label)
     throws Exception
     {
         if(publicExponent == null)
@@ -1944,7 +2021,8 @@ public class IaikP11Slot implements P11WritableSlot
         return new PrivateKeyAndPKInfo((RSAPrivateKey) kp.getPrivateKey(), pkInfo);
     }
 
-    private static ASN1ObjectIdentifier getCurveId(String curveNameOrOid)
+    private static ASN1ObjectIdentifier getCurveId(
+            final String curveNameOrOid)
     {
         ASN1ObjectIdentifier curveId;
 
@@ -1977,9 +2055,11 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     private PrivateKeyAndPKInfo generateECDSAKeyPair(
-            Session session,
-            ASN1ObjectIdentifier curveId, X9ECParameters ecParams,
-            byte[] id, String label)
+            final Session session,
+            final ASN1ObjectIdentifier curveId,
+            final X9ECParameters ecParams,
+            final byte[] id,
+            final String label)
     throws Exception
     {
         KeyPair kp = null;
@@ -2004,7 +2084,10 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     private KeyPair generateNamedECDSAKeyPair(
-            Session session, ASN1ObjectIdentifier curveId, byte[] id, String label)
+            final Session session,
+            final ASN1ObjectIdentifier curveId,
+            final byte[] id,
+            final String label)
     throws TokenException, IOException
     {
         ECDSAPrivateKey privateKeyTemplate = new ECDSAPrivateKey();
@@ -2019,7 +2102,11 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     private KeyPair generateSpecifiedECDSAKeyPair(
-            Session session, ASN1ObjectIdentifier curveId, X9ECParameters ecParams, byte[] id, String label)
+            final Session session,
+            final ASN1ObjectIdentifier curveId,
+            final X9ECParameters ecParams,
+            final byte[] id,
+            String label)
     throws TokenException, IOException
     {
         ECDSAPrivateKey privateKeyTemplate = new ECDSAPrivateKey();
@@ -2033,12 +2120,14 @@ public class IaikP11Slot implements P11WritableSlot
                 publicKeyTemplate, privateKeyTemplate);
     }
 
-    private static String hex(byte[] bytes)
+    private static String hex(
+            final byte[] bytes)
     {
         return Hex.toHexString(bytes).toUpperCase();
     }
 
-    private static java.security.PublicKey generatePublicKey(PublicKey p11Key)
+    private static java.security.PublicKey generatePublicKey(
+            final PublicKey p11Key)
     throws SignerException
     {
         if(p11Key instanceof RSAPublicKey)
@@ -2101,7 +2190,8 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     @Override
-    public X509Certificate exportCert(P11KeyIdentifier keyIdentifier)
+    public X509Certificate exportCert(
+            final P11KeyIdentifier keyIdentifier)
     throws Exception
     {
         String keyLabel = keyIdentifier.getKeyLabel();

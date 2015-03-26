@@ -417,13 +417,15 @@ public class ObjectIdentifiers
         oidNameMap.put(Extension.targetInformation, "targetInformation");
     }
 
-    public static String oidToDisplayName(ASN1ObjectIdentifier type)
+    public static String oidToDisplayName(
+            final ASN1ObjectIdentifier type)
     {
         String name = getName(type);
         return type.getId() + (name == null ? "" : " (" + name + ")");
     }
 
-    public static String getName(ASN1ObjectIdentifier type)
+    public static String getName(
+            final ASN1ObjectIdentifier type)
     {
         String name = oidNameMap.get(type);
 
@@ -439,7 +441,8 @@ public class ObjectIdentifiers
         return name;
     }
 
-    public static ASN1ObjectIdentifier nameToOID(String name)
+    public static ASN1ObjectIdentifier nameToOID(
+            final String name)
     {
         for(ASN1ObjectIdentifier oid : oidNameMap.keySet())
         {

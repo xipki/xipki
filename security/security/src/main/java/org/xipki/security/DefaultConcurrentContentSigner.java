@@ -99,7 +99,9 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
         this(signers, null);
     }
 
-    public DefaultConcurrentContentSigner(List<ContentSigner> signers, PrivateKey privateKey)
+    public DefaultConcurrentContentSigner(
+            final List<ContentSigner> signers,
+            final PrivateKey privateKey)
     {
         ParamChecker.assertNotEmpty("signers", signers);
 
@@ -119,7 +121,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     }
 
     @Override
-    public ContentSigner borrowContentSigner(int soTimeout)
+    public ContentSigner borrowContentSigner(
+            final int soTimeout)
     throws NoIdleSignerException
     {
         ContentSigner signer = null;
@@ -148,7 +151,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     }
 
     @Override
-    public void returnContentSigner(ContentSigner signer)
+    public void returnContentSigner(
+            final ContentSigner signer)
     {
         ParamChecker.assertNotNull("signer", signer);
 
@@ -166,7 +170,9 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     }
 
     @Override
-    public void initialize(String conf, PasswordResolver passwordResolver)
+    public void initialize(
+            final String conf,
+            final PasswordResolver passwordResolver)
     throws SignerException
     {
     }
@@ -178,7 +184,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     }
 
     @Override
-    public void setCertificateChain(X509Certificate[] certificateChain)
+    public void setCertificateChain(
+            final X509Certificate[] certificateChain)
     {
         this.certificateChain = certificateChain;
         if(this.certificateChain == null)

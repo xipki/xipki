@@ -66,12 +66,15 @@ public class LiquibaseMain
     private Database database;
     private Liquibase liquibase;
 
-    public static boolean loglevelIsSevereOrOff(String logLevel)
+    public static boolean loglevelIsSevereOrOff(
+            final String logLevel)
     {
         return "off".equalsIgnoreCase(logLevel) || "severe".equalsIgnoreCase(logLevel);
     }
 
-    public LiquibaseMain(LiquibaseDatabaseConf dbConf, String changeLogFile)
+    public LiquibaseMain(
+            final LiquibaseDatabaseConf dbConf,
+            final String changeLogFile)
     {
         if(dbConf == null)
         {
@@ -87,7 +90,8 @@ public class LiquibaseMain
         this.changeLogFile = changeLogFile;
     }
 
-    public void changeLogLevel(String logLevel)
+    public void changeLogLevel(
+            final String logLevel)
     throws CommandLineParsingException
     {
         try
@@ -99,7 +103,8 @@ public class LiquibaseMain
         }
     }
 
-    public void init(String logLevel)
+    public void init(
+            final String logLevel)
     throws Exception
     {
         changeLogLevel(logLevel);

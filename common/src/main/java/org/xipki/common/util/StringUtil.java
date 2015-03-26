@@ -49,7 +49,9 @@ import java.util.StringTokenizer;
 
 public class StringUtil
 {
-    public static List<String> split(String str, String delim)
+    public static List<String> split(
+            final String str,
+            final String delim)
     {
         if(str == null)
         {
@@ -72,17 +74,21 @@ public class StringUtil
         return ret;
     }
 
-    public static boolean isBlank(String s)
+    public static boolean isBlank(
+            final String s)
     {
         return s == null || s.isEmpty();
     }
 
-    public static boolean isNotBlank(String s)
+    public static boolean isNotBlank(
+            final String s)
     {
         return s != null && s.isEmpty() == false;
     }
 
-    public static Set<String> splitAsSet(String str, String delim)
+    public static Set<String> splitAsSet(
+            final String str,
+            final String delim)
     {
         if(str == null)
         {
@@ -105,7 +111,9 @@ public class StringUtil
         return ret;
     }
 
-    public static String collectionAsString(Collection<String> set, String delim)
+    public static String collectionAsString(
+            final Collection<String> set,
+            final String delim)
     {
         if(set == null)
         {
@@ -125,7 +133,9 @@ public class StringUtil
         return sb.toString();
     }
 
-    public static boolean startsWithIgnoreCase(String s, String prefix)
+    public static boolean startsWithIgnoreCase(
+            final String s,
+            final String prefix)
     {
         if(s.length() < prefix.length())
         {

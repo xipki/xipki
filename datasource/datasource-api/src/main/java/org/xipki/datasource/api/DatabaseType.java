@@ -49,17 +49,20 @@ public enum DatabaseType
     POSTGRES,
     UNKNOWN;
 
-    public static DatabaseType getDataSourceForDriver(String driverClass)
+    public static DatabaseType getDataSourceForDriver(
+            final String driverClass)
     {
         return getDatabaseType(driverClass);
     }
 
-    public static DatabaseType getDataSourceForDataSource(String dataSourceClass)
+    public static DatabaseType getDataSourceForDataSource(
+            final String dataSourceClass)
     {
         return getDatabaseType(dataSourceClass);
     }
 
-    private static DatabaseType getDatabaseType(String className)
+    private static DatabaseType getDatabaseType(
+            final String className)
     {
         if(className.contains("db2."))
         {

@@ -94,7 +94,10 @@ class CaConfigurationDbExporter extends DbPorter
     private final String table_profile;
     private final String table_caHasProfile;
 
-    CaConfigurationDbExporter(DataSourceWrapper dataSource, Marshaller marshaller, String destDir)
+    CaConfigurationDbExporter(
+            final DataSourceWrapper dataSource,
+            final Marshaller marshaller,
+            final String destDir)
     throws DataAccessException, PasswordResolverException, IOException
     {
         super(dataSource, destDir);
@@ -156,7 +159,8 @@ class CaConfigurationDbExporter extends DbPorter
         System.out.println(" exported CA configuration from database");
     }
 
-    private void export_cmpcontrol(CAConfigurationType caconf)
+    private void export_cmpcontrol(
+            final CAConfigurationType caconf)
     throws DataAccessException
     {
         Cmpcontrols cmpcontrols = new Cmpcontrols();
@@ -220,7 +224,8 @@ class CaConfigurationDbExporter extends DbPorter
         System.out.println(" exported table CMPCONTROL");
     }
 
-    private void export_environment(CAConfigurationType caconf)
+    private void export_environment(
+            final CAConfigurationType caconf)
     throws DataAccessException
     {
         System.out.println("exporting table ENVIRONMENT");
@@ -257,7 +262,8 @@ class CaConfigurationDbExporter extends DbPorter
         System.out.println(" exported table ENVIRONMENT");
     }
 
-    private void export_crlsigner(CAConfigurationType caconf)
+    private void export_crlsigner(
+            final CAConfigurationType caconf)
     throws DataAccessException
     {
         System.out.println("exporting table CRLSIGNER");
@@ -303,7 +309,8 @@ class CaConfigurationDbExporter extends DbPorter
         System.out.println(" exported table CRLSIGNER");
     }
 
-    private void export_caalias(CAConfigurationType caconf)
+    private void export_caalias(
+            final CAConfigurationType caconf)
     throws DataAccessException
     {
         System.out.println("exporting table CAALIAS");
@@ -340,7 +347,8 @@ class CaConfigurationDbExporter extends DbPorter
         System.out.println(" exported table CAALIAS");
     }
 
-    private void export_requestor(CAConfigurationType caconf)
+    private void export_requestor(
+            final CAConfigurationType caconf)
     throws DataAccessException
     {
         System.out.println("exporting table REQUESTOR");
@@ -377,7 +385,8 @@ class CaConfigurationDbExporter extends DbPorter
         System.out.println(" exported table REQUESTOR");
     }
 
-    private void export_responder(CAConfigurationType caconf)
+    private void export_responder(
+            final CAConfigurationType caconf)
     throws DataAccessException
     {
         System.out.println("exporting table RESPONDER");
@@ -414,7 +423,8 @@ class CaConfigurationDbExporter extends DbPorter
         System.out.println(" exported table RESPONDER");
     }
 
-    private void export_publisher(CAConfigurationType caconf)
+    private void export_publisher(
+            final CAConfigurationType caconf)
     throws DataAccessException
     {
         System.out.println("exporting table PUBLISHER");
@@ -453,7 +463,8 @@ class CaConfigurationDbExporter extends DbPorter
         System.out.println(" exported table PUBLISHER");
     }
 
-    private void export_profile(CAConfigurationType caconf)
+    private void export_profile(
+            final CAConfigurationType caconf)
     throws DataAccessException, IOException
     {
         System.out.println("exporting table " + table_profile);
@@ -520,7 +531,8 @@ class CaConfigurationDbExporter extends DbPorter
         System.out.println(" exported table " + table_profile);
     }
 
-    private void export_ca(CAConfigurationType caconf)
+    private void export_ca(
+            final CAConfigurationType caconf)
     throws DataAccessException
     {
         System.out.println("exporting table CA");
@@ -643,7 +655,8 @@ class CaConfigurationDbExporter extends DbPorter
         System.out.println(" exported table CA");
     }
 
-    private void export_ca_has_requestor(CAConfigurationType caconf)
+    private void export_ca_has_requestor(
+            final CAConfigurationType caconf)
     throws DataAccessException
     {
         System.out.println("exporting table CA_HAS_REQUESTOR");
@@ -686,7 +699,8 @@ class CaConfigurationDbExporter extends DbPorter
         System.out.println(" exported table CA_HAS_REQUESTOR");
     }
 
-    private void export_ca_has_publisher(CAConfigurationType caconf)
+    private void export_ca_has_publisher(
+            final CAConfigurationType caconf)
     throws DataAccessException
     {
         System.out.println("exporting table CA_HAS_PUBLISHER");
@@ -723,7 +737,8 @@ class CaConfigurationDbExporter extends DbPorter
         System.out.println(" exported table CA_HAS_PUBLISHER");
     }
 
-    private void export_ca_has_profile(CAConfigurationType caconf)
+    private void export_ca_has_profile(
+            final CAConfigurationType caconf)
     throws DataAccessException
     {
         System.out.println("exporting table " + table_caHasProfile);
@@ -761,9 +776,12 @@ class CaConfigurationDbExporter extends DbPorter
     }
 
     private static String convertCmpControlConf(
-            boolean confirmCert, boolean sendCaCert,
-            boolean messageTimeRequired, boolean sendResponderCert,
-            int messageTimeBias, int confirmWaitTime)
+            final boolean confirmCert,
+            final boolean sendCaCert,
+            final boolean messageTimeRequired,
+            final boolean sendResponderCert,
+            final int messageTimeBias,
+            final int confirmWaitTime)
     {
         final String KEY_CONFIRM_CERT = "confirm.cert";
         final String KEY_SEND_CA = "send.ca";

@@ -102,13 +102,13 @@ public class OcspQAImpl implements OcspQA
 
     @Override
     public ValidationResult checkOCSP(
-            OCSPResp response,
-            X509Certificate issuer,
-            List<BigInteger> serialNumbers,
-            Map<BigInteger, byte[]> encodedCerts,
-            OcspError expectedOcspError,
-            Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
-            OcspResponseOption responseOption)
+            final OCSPResp response,
+            final X509Certificate issuer,
+            final List<BigInteger> serialNumbers,
+            final Map<BigInteger, byte[]> encodedCerts,
+            final OcspError expectedOcspError,
+            final Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
+            final OcspResponseOption responseOption)
     {
         List<ValidationIssue> resultIssues = new LinkedList<ValidationIssue>();
 
@@ -313,10 +313,14 @@ public class OcspQAImpl implements OcspQA
     }
 
     private List<ValidationIssue> checkSingleCert(
-            int index, SingleResp singleResp,
-            OcspCertStatus expectedStatus, byte[] encodedCert,
-            boolean extendedRevoke, Occurrence nextupdateOccurrence,
-            Occurrence certhashOccurrence, ASN1ObjectIdentifier certhashAlg)
+            final int index,
+            final SingleResp singleResp,
+            final OcspCertStatus expectedStatus,
+            final byte[] encodedCert,
+            final boolean extendedRevoke,
+            final Occurrence nextupdateOccurrence,
+            final Occurrence certhashOccurrence,
+            final ASN1ObjectIdentifier certhashAlg)
     {
         List<ValidationIssue> issues = new LinkedList<>();
         {
@@ -457,7 +461,10 @@ public class OcspQAImpl implements OcspQA
         return issues;
     }
 
-    private static ValidationIssue checkOccurrence(String targetName, Object target, Occurrence occurrence)
+    private static ValidationIssue checkOccurrence(
+            final String targetName,
+            final Object target,
+            final Occurrence occurrence)
     {
         ValidationIssue issue = new ValidationIssue("OCSP." + targetName, targetName);
         if(occurrence == Occurrence.forbidden)

@@ -141,7 +141,8 @@ public class SecurityUtil
         statusTextMap.put(PKIStatus.KEY_UPDATE_WARNING, "keyUpdateWarning");
     }
 
-    public static String getCommonName(X500Name name)
+    public static String getCommonName(
+            final X500Name name)
     {
         RDN[] rdns = name.getRDNs(ObjectIdentifiers.DN_CN);
         if(rdns != null && rdns.length > 0)
@@ -151,7 +152,8 @@ public class SecurityUtil
         return null;
     }
 
-    public static X500Name reverse(X500Name name)
+    public static X500Name reverse(
+            final X500Name name)
     {
         RDN[] orig = name.getRDNs();
         int n = orig.length;
@@ -163,17 +165,21 @@ public class SecurityUtil
         return new X500Name(_new);
     }
 
-    public static X500Name sortX509Name(X500Name name)
+    public static X500Name sortX509Name(
+            final X500Name name)
     {
         return sortX500Name(name, false);
     }
 
-    public static X500Name backwardSortX509Name(X500Name name)
+    public static X500Name backwardSortX509Name(
+            final X500Name name)
     {
         return sortX500Name(name, true);
     }
 
-    private static X500Name sortX500Name(X500Name name, boolean backwards)
+    private static X500Name sortX500Name(
+            final X500Name name,
+            final boolean backwards)
     {
         RDN[] requstedRDNs = name.getRDNs();
 
@@ -201,7 +207,9 @@ public class SecurityUtil
         return new X500Name(rdns.toArray(new RDN[0]));
     }
 
-    private static RDN[] getRDNs(RDN[] rdns, ASN1ObjectIdentifier type)
+    private static RDN[] getRDNs(
+            final RDN[] rdns,
+            final ASN1ObjectIdentifier type)
     {
         List<RDN> ret = new ArrayList<>(1);
         for(int i = 0; i < rdns.length; i++)
@@ -226,13 +234,15 @@ public class SecurityUtil
     private static CertificateFactory certFact;
     private static Object certFactLock = new Object();
 
-    public static X509Certificate parseCert(String fileName)
+    public static X509Certificate parseCert(
+            final String fileName)
     throws IOException, CertificateException
     {
         return parseCert(new File(IoUtil.expandFilepath(fileName)));
     }
 
-    public static X509Certificate parseCert(File file)
+    public static X509Certificate parseCert(
+            final File file)
     throws IOException, CertificateException
     {
         FileInputStream in = new FileInputStream(IoUtil.expandFilepath(file));
@@ -245,19 +255,22 @@ public class SecurityUtil
         }
     }
 
-    public static X509Certificate parseCert(byte[] certBytes)
+    public static X509Certificate parseCert(
+            final byte[] certBytes)
     throws IOException, CertificateException
     {
         return parseCert(new ByteArrayInputStream(certBytes));
     }
 
-    public static X509Certificate parseBase64EncodedCert(String base64EncodedCert)
+    public static X509Certificate parseBase64EncodedCert(
+            final String base64EncodedCert)
     throws IOException, CertificateException
     {
         return parseCert(Base64.decode(base64EncodedCert));
     }
 
-    public static X509Certificate parseCert(InputStream certStream)
+    public static X509Certificate parseCert(
+            final InputStream certStream)
     throws IOException, CertificateException
     {
         synchronized (certFactLock)
@@ -277,13 +290,15 @@ public class SecurityUtil
         return (X509Certificate) certFact.generateCertificate(certStream);
     }
 
-    public static X509CRL parseCRL(String f)
+    public static X509CRL parseCRL(
+            final String f)
     throws IOException, CertificateException, CRLException
     {
         return parseCRL(new FileInputStream(IoUtil.expandFilepath(f)));
     }
 
-    public static X509CRL parseCRL(InputStream crlStream)
+    public static X509CRL parseCRL(
+            final InputStream crlStream)
     throws IOException, CertificateException, CRLException
     {
         try
@@ -299,12 +314,14 @@ public class SecurityUtil
         }
     }
 
-    public static String getRFC4519Name(X500Principal name)
+    public static String getRFC4519Name(
+            final X500Principal name)
     {
         return getRFC4519Name(X500Name.getInstance(name.getEncoded()));
     }
 
-    public static String getRFC4519Name(X500Name name)
+    public static String getRFC4519Name(
+            final X500Name name)
     {
         return RFC4519Style.INSTANCE.toString(name);
     }
@@ -313,13 +330,15 @@ public class SecurityUtil
      * First canonicalized the name, and then compute the SHA-1 finger-print over the
      * canonicalized subject string.
      */
-    public static String sha1sum_canonicalized_name(X500Principal prin)
+    public static String sha1sum_canonicalized_name(
+            final X500Principal prin)
     {
         X500Name x500Name = X500Name.getInstance(prin.getEncoded());
         return sha1sum_canonicalized_name(x500Name);
     }
 
-    public static String sha1sum_canonicalized_name(X500Name name)
+    public static String sha1sum_canonicalized_name(
+            final X500Name name)
     {
         String canonicalizedName = canonicalizName(name);
         byte[] encoded;
@@ -333,13 +352,15 @@ public class SecurityUtil
         return sha1sum(encoded);
     }
 
-    public static String canonicalizName(X500Principal prin)
+    public static String canonicalizName(
+            final X500Principal prin)
     {
         X500Name x500Name = X500Name.getInstance(prin.getEncoded());
         return canonicalizName(x500Name);
     }
 
-    public static String canonicalizName(X500Name name)
+    public static String canonicalizName(
+            final X500Name name)
     {
         ASN1ObjectIdentifier[] _types = name.getAttributeTypes();
         int n = _types.length;
@@ -377,13 +398,17 @@ public class SecurityUtil
         return sb.toString();
     }
 
-    public static String sha1sum(byte[] data)
+    public static String sha1sum(
+            final byte[] data)
     {
         return HashCalculator.hexHash(HashAlgoType.SHA1, data);
     }
 
-    public static byte[] extractMinimalKeyStore(String keystoreType, byte[] keystoreBytes,
-            String keyname, char[] password)
+    public static byte[] extractMinimalKeyStore(
+            final String keystoreType,
+            final byte[] keystoreBytes,
+            String keyname,
+            final char[] password)
     throws Exception
     {
         KeyStore ks;
@@ -455,7 +480,9 @@ public class SecurityUtil
     /**
      * Cross certificate will not be considered
      */
-    public static X509Certificate[] buildCertPath(X509Certificate cert, Set<? extends Certificate> certs)
+    public static X509Certificate[] buildCertPath(
+            final X509Certificate cert,
+            final Set<? extends Certificate> certs)
     {
         List<X509Certificate> certChain = new LinkedList<>();
         certChain.add(cert);
@@ -512,7 +539,9 @@ public class SecurityUtil
         }
     }
 
-    public static X509Certificate[] buildCertPath(X509Certificate cert, Certificate[] certs)
+    public static X509Certificate[] buildCertPath(
+            final X509Certificate cert,
+            final Certificate[] certs)
     {
         Set<Certificate> setOfCerts = new HashSet<>();
         for(Certificate m : certs)
@@ -523,8 +552,9 @@ public class SecurityUtil
         return buildCertPath(cert, setOfCerts);
     }
 
-    public static X509Certificate getCaCertOf(X509Certificate cert,
-            Set<? extends Certificate> caCerts)
+    public static X509Certificate getCaCertOf(
+            final X509Certificate cert,
+            final Set<? extends Certificate> caCerts)
     throws CertificateEncodingException
     {
         if(isSelfSigned(cert))
@@ -557,7 +587,8 @@ public class SecurityUtil
         return null;
     }
 
-    public static String formatPKIStatusInfo(org.bouncycastle.asn1.cmp.PKIStatusInfo pkiStatusInfo)
+    public static String formatPKIStatusInfo(
+            final org.bouncycastle.asn1.cmp.PKIStatusInfo pkiStatusInfo)
     {
         int status = pkiStatusInfo.getStatus().intValue();
         int failureInfo = pkiStatusInfo.getFailInfo().intValue();
@@ -567,7 +598,10 @@ public class SecurityUtil
         return SecurityUtil.formatPKIStatusInfo(status, failureInfo, statusMessage);
     }
 
-    public static String formatPKIStatusInfo(int status, int failureInfo, String statusMessage)
+    public static String formatPKIStatusInfo(
+            final int status,
+            final int failureInfo,
+            final String statusMessage)
     {
         StringBuilder sb = new StringBuilder("PKIStatusInfo {");
         sb.append("status = ");
@@ -580,7 +614,8 @@ public class SecurityUtil
         return sb.toString();
     }
 
-    public static String getFailureInfoText(int failureInfo)
+    public static String getFailureInfoText(
+            final int failureInfo)
     {
         BigInteger b = BigInteger.valueOf(failureInfo);
         final int n = Math.min(b.bitLength(), failureInfoTexts.length);
@@ -597,7 +632,8 @@ public class SecurityUtil
         return sb.length() < 3 ? "" : sb.substring(2);
     }
 
-    public static boolean isSelfSigned(X509Certificate cert)
+    public static boolean isSelfSigned(
+            final X509Certificate cert)
     throws CertificateEncodingException
     {
         boolean equals = cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
@@ -613,7 +649,9 @@ public class SecurityUtil
         return equals;
     }
 
-    public static boolean issues(X509Certificate issuerCert, X509Certificate cert)
+    public static boolean issues(
+            final X509Certificate issuerCert,
+            final X509Certificate cert)
     throws CertificateEncodingException
     {
         boolean isCA = issuerCert.getBasicConstraints() >= 0;
@@ -644,7 +682,9 @@ public class SecurityUtil
         return issues;
     }
 
-    public static byte[] leftmost(byte[] bytes, int bitCount)
+    public static byte[] leftmost(
+            final byte[] bytes,
+            final int bitCount)
     {
         int byteLenKey = (bitCount + 7)/8;
 
@@ -672,12 +712,14 @@ public class SecurityUtil
         return truncatedBytes;
     }
 
-    private static int byte2int(byte b)
+    private static int byte2int(
+            final byte b)
     {
         return b >= 0 ? b : 256 + b;
     }
 
-    public static SubjectPublicKeyInfo toRfc3279Style(SubjectPublicKeyInfo publicKeyInfo)
+    public static SubjectPublicKeyInfo toRfc3279Style(
+            final SubjectPublicKeyInfo publicKeyInfo)
     throws InvalidKeySpecException
     {
         // TODO: add support of other algorithms
@@ -701,7 +743,8 @@ public class SecurityUtil
         }
     }
 
-    public static String getCurveName(ASN1ObjectIdentifier curveId)
+    public static String getCurveName(
+            final ASN1ObjectIdentifier curveId)
     {
         String curveName = X962NamedCurves.getName(curveId);
 
@@ -723,7 +766,8 @@ public class SecurityUtil
         return curveName;
     }
 
-    public static byte[] extractSKI(X509Certificate cert)
+    public static byte[] extractSKI(
+            final X509Certificate cert)
     throws CertificateEncodingException
     {
         byte[] extValue = getCoreExtValue(cert, Extension.subjectKeyIdentifier);
@@ -741,7 +785,8 @@ public class SecurityUtil
         }
     }
 
-    public static byte[] extractSKI(org.bouncycastle.asn1.x509.Certificate cert)
+    public static byte[] extractSKI(
+            final org.bouncycastle.asn1.x509.Certificate cert)
     throws CertificateEncodingException
     {
         Extension encodedSkiValue = cert.getTBSCertificate().getExtensions().getExtension(Extension.subjectKeyIdentifier);
@@ -759,7 +804,8 @@ public class SecurityUtil
         }
     }
 
-    public static byte[] extractAKI(X509Certificate cert)
+    public static byte[] extractAKI(
+            final X509Certificate cert)
     throws CertificateEncodingException
     {
         byte[] extValue = getCoreExtValue(cert, Extension.authorityKeyIdentifier);
@@ -778,7 +824,8 @@ public class SecurityUtil
         }
     }
 
-    public static List<String> extractOCSPUrls(X509Certificate cert)
+    public static List<String> extractOCSPUrls(
+            final X509Certificate cert)
     throws CertificateEncodingException
     {
         byte[] extValue = getCoreExtValue(cert, Extension.authorityInfoAccess);
@@ -814,7 +861,8 @@ public class SecurityUtil
         return OCSPUris;
     }
 
-    public static byte[] extractAKI(org.bouncycastle.asn1.x509.Certificate cert)
+    public static byte[] extractAKI(
+            final org.bouncycastle.asn1.x509.Certificate cert)
     throws CertificateEncodingException
     {
         try
@@ -828,7 +876,8 @@ public class SecurityUtil
         }
     }
 
-    public static String rdnValueToString(ASN1Encodable value)
+    public static String rdnValueToString(
+            final ASN1Encodable value)
     {
         if (value instanceof ASN1String && !(value instanceof DERUniversalString))
         {
@@ -847,7 +896,8 @@ public class SecurityUtil
         }
     }
 
-    private static String bytesToString(byte[] data)
+    private static String bytesToString(
+            final byte[] data)
     {
         char[]  cs = new char[data.length];
 
@@ -859,7 +909,8 @@ public class SecurityUtil
         return new String(cs);
     }
 
-    public static List<ASN1ObjectIdentifier> textToASN1ObjectIdentifers(List<String> oidTexts)
+    public static List<ASN1ObjectIdentifier> textToASN1ObjectIdentifers(
+            final List<String> oidTexts)
     throws InvalidOIDorNameException
     {
         if(oidTexts == null)
@@ -884,7 +935,8 @@ public class SecurityUtil
         return ret;
     }
 
-    private static ASN1ObjectIdentifier toOID(String s)
+    private static ASN1ObjectIdentifier toOID(
+            final String s)
     throws InvalidOIDorNameException
     {
         final int n = s.length();
@@ -916,7 +968,8 @@ public class SecurityUtil
         return oid;
     }
 
-    public static org.bouncycastle.asn1.x509.KeyUsage createKeyUsage(Set<KeyUsage> usages)
+    public static org.bouncycastle.asn1.x509.KeyUsage createKeyUsage(
+            final Set<KeyUsage> usages)
     {
         if(CollectionUtil.isEmpty(usages))
         {
@@ -932,7 +985,8 @@ public class SecurityUtil
         return new org.bouncycastle.asn1.x509.KeyUsage(usage);
     }
 
-    public static ExtendedKeyUsage createExtendedUsage(Set<ASN1ObjectIdentifier> usages)
+    public static ExtendedKeyUsage createExtendedUsage(
+            final Set<ASN1ObjectIdentifier> usages)
     {
         if(CollectionUtil.isEmpty(usages))
         {
@@ -950,7 +1004,9 @@ public class SecurityUtil
         return new ExtendedKeyUsage(kps);
     }
 
-    public static boolean hasKeyusage(X509Certificate cert, KeyUsage usage)
+    public static boolean hasKeyusage(
+            final X509Certificate cert,
+            final KeyUsage usage)
     {
         boolean[] keyusage = cert.getKeyUsage();
         if(keyusage != null && keyusage.length > usage.getBit())
@@ -960,7 +1016,10 @@ public class SecurityUtil
         return false;
     }
 
-    public static String signerConfToString(String signerConf, boolean verbose, boolean ignoreSensitiveInfo)
+    public static String signerConfToString(
+            String signerConf,
+            final boolean verbose,
+            final boolean ignoreSensitiveInfo)
     {
         if(ignoreSensitiveInfo)
         {
@@ -977,7 +1036,8 @@ public class SecurityUtil
         }
     }
 
-    private static String eraseSensitiveData(String conf)
+    private static String eraseSensitiveData(
+            final String conf)
     {
         if(conf == null || conf.contains("password?") == false)
         {
@@ -999,7 +1059,9 @@ public class SecurityUtil
         }
     }
 
-    private static byte[] getCoreExtValue(X509Certificate cert, ASN1ObjectIdentifier type)
+    private static byte[] getCoreExtValue(
+            final X509Certificate cert,
+            final ASN1ObjectIdentifier type)
     throws CertificateEncodingException
     {
         byte[] fullExtValue = cert.getExtensionValue(type.getId());
@@ -1016,7 +1078,8 @@ public class SecurityUtil
         }
     }
 
-    public static ASN1ObjectIdentifier getHashAlg(String hashAlgName)
+    public static ASN1ObjectIdentifier getHashAlg(
+            String hashAlgName)
     {
         hashAlgName = hashAlgName.trim();
         ParamChecker.assertNotEmpty("hashAlgName", hashAlgName);
@@ -1048,7 +1111,8 @@ public class SecurityUtil
         }
     }
 
-    static public String getSignatureAlgoName(AlgorithmIdentifier sigAlgId)
+    static public String getSignatureAlgoName(
+            final AlgorithmIdentifier sigAlgId)
     {
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
 
@@ -1143,7 +1207,8 @@ public class SecurityUtil
         }
     }
 
-    static public AlgorithmIdentifier extractDigesetAlgorithmIdentifier(AlgorithmIdentifier sigAlgId)
+    static public AlgorithmIdentifier extractDigesetAlgorithmIdentifier(
+            final AlgorithmIdentifier sigAlgId)
     throws NoSuchAlgorithmException
     {
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
@@ -1223,7 +1288,9 @@ public class SecurityUtil
         return new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);
     }
 
-    public static boolean equalsAlgoName(String a, String b)
+    public static boolean equalsAlgoName(
+            String a,
+            String b)
     {
         if(a.equalsIgnoreCase(b))
         {
@@ -1241,7 +1308,8 @@ public class SecurityUtil
         return splitAlgoNameTokens(a).equals(splitAlgoNameTokens(b));
     }
 
-    private static Set<String> splitAlgoNameTokens(String algoName)
+    private static Set<String> splitAlgoNameTokens(
+            String algoName)
     {
         algoName = algoName.toUpperCase();
         int idx = algoName.indexOf("AND");

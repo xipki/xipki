@@ -48,7 +48,8 @@ import java.security.SecureRandom;
 public class IaikP11Util
 {
 
-    public static byte[] generateKeyID(Session session)
+    public static byte[] generateKeyID(
+            final Session session)
     throws Exception
     {
         SecureRandom random = new SecureRandom();
@@ -62,7 +63,8 @@ public class IaikP11Util
         return keyID;
     }
 
-    public static boolean idExists(Session session, byte[] keyID)
+    public static boolean idExists(
+            final Session session, final byte[] keyID)
     throws Exception
     {
         Key k = new Key();
@@ -86,7 +88,9 @@ public class IaikP11Util
         return objects.length > 0;
     }
 
-    public static boolean labelExists(Session session, String keyLabel)
+    public static boolean labelExists(
+            final Session session,
+            final String keyLabel)
     throws Exception
     {
         Key k = new Key();
@@ -110,7 +114,8 @@ public class IaikP11Util
         return objects.length > 0;
     }
 
-    static String eraseSensitiveInfo(String data)
+    static String eraseSensitiveInfo(
+            final String data)
     {
         int index = data.indexOf("password");
         if(index == -1)

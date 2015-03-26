@@ -57,7 +57,9 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever
         private final Set<P11SlotIdentifier> slots;
         private final List<String> singlePasswords;
 
-        private SingleRetriever(Set<P11SlotIdentifier> slots, List<String> singlePasswords)
+        private SingleRetriever(
+                final Set<P11SlotIdentifier> slots,
+                final List<String> singlePasswords)
         {
             this.slots = slots;
             if(CollectionUtil.isEmpty(singlePasswords))
@@ -70,7 +72,8 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever
             }
         }
 
-        public boolean match(P11SlotIdentifier pSlot)
+        public boolean match(
+                final P11SlotIdentifier pSlot)
         {
             if(slots == null)
             {
@@ -87,7 +90,7 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever
             return false;
         }
 
-        public List<char[]> getPasswords(PasswordResolver passwordResolver)
+        public List<char[]> getPasswords(final PasswordResolver passwordResolver)
         throws PasswordResolverException
         {
             if(singlePasswords == null)
@@ -121,13 +124,16 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever
         singleRetrievers = new LinkedList<>();
     }
 
-    public void addPasswordEntry(Set<P11SlotIdentifier> slots, List<String> singlePasswords)
+    public void addPasswordEntry(
+            final Set<P11SlotIdentifier> slots,
+            final List<String> singlePasswords)
     {
         singleRetrievers.add(new SingleRetriever(slots, singlePasswords));
     }
 
     @Override
-    public List<char[]> getPassword(P11SlotIdentifier slotId)
+    public List<char[]> getPassword(
+            final P11SlotIdentifier slotId)
     throws PasswordResolverException
     {
         if(CollectionUtil.isEmpty(singleRetrievers))
@@ -151,7 +157,8 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever
         return passwordResolver;
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver)
+    public void setPasswordResolver(
+            final PasswordResolver passwordResolver)
     {
         this.passwordResolver = passwordResolver;
     }

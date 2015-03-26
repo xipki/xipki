@@ -44,12 +44,16 @@ import org.bouncycastle.util.encoders.Hex;
 @SuppressWarnings("serial")
 public class OCSPNonceUnmatchedException extends OCSPResponseException
 {
-    public OCSPNonceUnmatchedException(byte[] expected, byte[] is)
+    public OCSPNonceUnmatchedException(
+            final byte[] expected,
+            final byte[] is)
     {
         super(buildMessage(expected, is));
     }
 
-    private static String buildMessage(byte[] expected, byte[] is)
+    private static String buildMessage(
+            final byte[] expected,
+            final byte[] is)
     {
         StringBuilder sb = new StringBuilder(100);
         sb.append("nonce unmatch (received ");

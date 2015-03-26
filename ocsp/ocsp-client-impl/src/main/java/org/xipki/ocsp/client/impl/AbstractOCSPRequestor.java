@@ -100,7 +100,10 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
 
     private SecureRandom random = new SecureRandom();
 
-    protected abstract byte[] send(byte[] request, URL responderUrl, RequestOptions requestOptions)
+    protected abstract byte[] send(
+            byte[] request,
+            URL responderUrl,
+            RequestOptions requestOptions)
     throws IOException;
 
     protected AbstractOCSPRequestor()
@@ -108,8 +111,12 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
     }
 
     @Override
-    public OCSPResp ask(X509Certificate issuerCert, X509Certificate cert, URL responderUrl,
-            RequestOptions requestOptions, RequestResponseDebug debug)
+    public OCSPResp ask(
+            final X509Certificate issuerCert,
+            final X509Certificate cert,
+            final URL responderUrl,
+            final RequestOptions requestOptions,
+            final RequestResponseDebug debug)
     throws OCSPResponseException, OCSPRequestorException
     {
         try
@@ -127,8 +134,12 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
     }
 
     @Override
-    public OCSPResp ask(X509Certificate issuerCert, X509Certificate[] certs, URL responderUrl,
-            RequestOptions requestOptions, RequestResponseDebug debug)
+    public OCSPResp ask(
+            final X509Certificate issuerCert,
+            final X509Certificate[] certs,
+            final URL responderUrl,
+            final RequestOptions requestOptions,
+            final RequestResponseDebug debug)
     throws OCSPResponseException, OCSPRequestorException
     {
         BigInteger[] serialNumbers = new BigInteger[certs.length];
@@ -152,16 +163,24 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
     }
 
     @Override
-    public OCSPResp ask(X509Certificate issuerCert, BigInteger serialNumber, URL responderUrl,
-            RequestOptions requestOptions, RequestResponseDebug debug)
+    public OCSPResp ask(
+            final X509Certificate issuerCert,
+            final BigInteger serialNumber,
+            final URL responderUrl,
+            final RequestOptions requestOptions,
+            final RequestResponseDebug debug)
     throws OCSPResponseException, OCSPRequestorException
     {
         return ask(issuerCert, new BigInteger[]{serialNumber}, responderUrl, requestOptions, debug);
     }
 
     @Override
-    public OCSPResp ask(X509Certificate issuerCert, BigInteger[] serialNumbers, URL responderUrl,
-            RequestOptions requestOptions, RequestResponseDebug debug)
+    public OCSPResp ask(
+            final X509Certificate issuerCert,
+            final BigInteger[] serialNumbers,
+            final URL responderUrl,
+            final RequestOptions requestOptions,
+            final RequestResponseDebug debug)
     throws OCSPResponseException, OCSPRequestorException
     {
         if(requestOptions == null)
@@ -328,8 +347,11 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         return ocspResp;
     }
 
-    private OCSPReq buildRequest(X509Certificate caCert, BigInteger[] serialNumbers, byte[] nonce,
-            RequestOptions requestOptions)
+    private OCSPReq buildRequest(
+            final X509Certificate caCert,
+            final BigInteger[] serialNumbers,
+            final byte[] nonce,
+            final RequestOptions requestOptions)
     throws OCSPRequestorException
     {
         ASN1ObjectIdentifier hashAlgId = requestOptions.getHashAlgorithmId();
@@ -472,7 +494,8 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         }
     }
 
-    private byte[] nextNonce(int nonceLen)
+    private byte[] nextNonce(
+            final int nonceLen)
     {
         byte[] nonce = new byte[nonceLen];
         random.nextBytes(nonce);
@@ -484,7 +507,8 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         return signerConf;
     }
 
-    public void setSignerConf(String signerConf)
+    public void setSignerConf(
+            final String signerConf)
     {
         this.signer = null;
         this.signerConf = signerConf;
@@ -495,7 +519,8 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         return signerCertFile;
     }
 
-    public void setSignerCertFile(String signerCertFile)
+    public void setSignerCertFile(
+            final String signerCertFile)
     {
         this.signer = null;
         this.signerCertFile = signerCertFile;
@@ -506,7 +531,8 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         return signerType;
     }
 
-    public void setSignerType(String signerType)
+    public void setSignerType(
+            final String signerType)
     {
         this.signer = null;
         this.signerType = signerType;
@@ -517,7 +543,8 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         return securityFactory;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory)
+    public void setSecurityFactory(
+            final SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;
     }
