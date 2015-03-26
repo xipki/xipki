@@ -116,7 +116,9 @@ public class CrlCertStatusStore extends CertStatusStore
         private Certificate cert;
         private String profileName;
 
-        public CertWithInfo(Certificate cert, String profileName)
+        public CertWithInfo(
+                final Certificate cert,
+                final String profileName)
         {
             ParamChecker.assertNotNull("cert", cert);
             ParamChecker.assertNotEmpty("profileName", profileName);
@@ -166,24 +168,24 @@ public class CrlCertStatusStore extends CertStatusStore
     private boolean initializationFailed = false;
 
     public CrlCertStatusStore(
-            String name,
-            String crlFile,
-            String deltaCrlFile,
-            X509Certificate caCert,
-            String crlUrl,
-            String certsDirname)
+            final String name,
+            final String crlFile,
+            final String deltaCrlFile,
+            final X509Certificate caCert,
+            final String crlUrl,
+            final String certsDirname)
     {
         this(name, crlFile, (String) null, caCert, (X509Certificate) null, crlUrl, certsDirname);
     }
 
     public CrlCertStatusStore(
-            String name,
-            String crlFilename,
-            String deltaCrlFilename,
-            X509Certificate caCert,
-            X509Certificate issuerCert,
-            String crlUrl,
-            String certsDirname)
+            final String name,
+            final String crlFilename,
+            final String deltaCrlFilename,
+            final X509Certificate caCert,
+            final X509Certificate issuerCert,
+            final String crlUrl,
+            final String certsDirname)
     {
         super(name);
         ParamChecker.assertNotEmpty("crlFile", crlFilename);
@@ -200,7 +202,8 @@ public class CrlCertStatusStore extends CertStatusStore
         this.sha1 = new SHA1Digest();
     }
 
-    private synchronized void initializeStore(boolean force)
+    private synchronized void initializeStore(
+            final boolean force)
     {
         Boolean updateCRLSuccessfull = null;
 
@@ -701,7 +704,8 @@ public class CrlCertStatusStore extends CertStatusStore
         }
     }
 
-    private static Map<HashAlgoType, byte[]> getCertHashes(Certificate cert)
+    private static Map<HashAlgoType, byte[]> getCertHashes(
+            final Certificate cert)
     throws CertStatusStoreException
     {
         byte[] encodedCert;
@@ -725,9 +729,13 @@ public class CrlCertStatusStore extends CertStatusStore
 
     @Override
     public CertStatusInfo getCertStatus(
-            HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash,
-            BigInteger serialNumber, boolean includeCertHash, HashAlgoType certHashAlg,
-            CertprofileOption certprofileOption)
+            final HashAlgoType hashAlgo,
+            final byte[] issuerNameHash,
+            final byte[] issuerKeyHash,
+            final BigInteger serialNumber,
+            final boolean includeCertHash,
+            final HashAlgoType certHashAlg,
+            final CertprofileOption certprofileOption)
     throws CertStatusStoreException
     {
         // wait for max. 0.5 second
@@ -848,7 +856,8 @@ public class CrlCertStatusStore extends CertStatusStore
         return certStatusInfo;
     }
 
-    private static byte[] removeTagAndLenFromExtensionValue(byte[] encodedExtensionValue)
+    private static byte[] removeTagAndLenFromExtensionValue(
+            final byte[] encodedExtensionValue)
     {
         return ASN1OctetString.getInstance(encodedExtensionValue).getOctets();
     }
@@ -864,7 +873,10 @@ public class CrlCertStatusStore extends CertStatusStore
         return true;
     }
 
-    private void auditLogPCIEvent(AuditLevel auditLevel, String eventType, String auditStatus)
+    private void auditLogPCIEvent(
+            final AuditLevel auditLevel,
+            final String eventType,
+            final String auditStatus)
     {
         AuditLoggingService auditLoggingService = getAuditLoggingService();
         if(auditLoggingService == null)
@@ -882,7 +894,9 @@ public class CrlCertStatusStore extends CertStatusStore
     }
 
     @Override
-    public void init(String conf, DataSourceWrapper datasource)
+    public void init(
+            final String conf,
+            final DataSourceWrapper datasource)
     throws CertStatusStoreException
     {
         initializeStore(true);
@@ -911,12 +925,15 @@ public class CrlCertStatusStore extends CertStatusStore
         return useUpdateDatesFromCRL;
     }
 
-    public void setUseUpdateDatesFromCRL(boolean useUpdateDatesFromCRL)
+    public void setUseUpdateDatesFromCRL(
+            final boolean useUpdateDatesFromCRL)
     {
         this.useUpdateDatesFromCRL = useUpdateDatesFromCRL;
     }
 
-    private Set<CertWithInfo> readCertWithInfosFromDir(X509Certificate caCert, String certsDirname)
+    private Set<CertWithInfo> readCertWithInfosFromDir(
+            final X509Certificate caCert,
+            final String certsDirname)
     throws CertificateEncodingException
     {
         File certsDir = new File(certsDirname);
@@ -1007,7 +1024,8 @@ public class CrlCertStatusStore extends CertStatusStore
         return certs;
     }
 
-    private final byte[] sha1Fp(File file)
+    private final byte[] sha1Fp(
+            final File file)
     throws IOException
     {
         synchronized (sha1)
@@ -1043,7 +1061,10 @@ public class CrlCertStatusStore extends CertStatusStore
     }
 
     @Override
-    public boolean canResolveIssuer(HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash)
+    public boolean canResolveIssuer(
+            final HashAlgoType hashAlgo,
+            final byte[] issuerNameHash,
+            final byte[] issuerKeyHash)
     {
         IssuerHashNameAndKey hashes = issuerHashMap.get(hashAlgo);
         if(hashes == null)
@@ -1062,15 +1083,18 @@ public class CrlCertStatusStore extends CertStatusStore
         return ret;
     }
 
-    public void setCARevocationInfo(Date revocationTime)
+    public void setCARevocationInfo(
+            final Date revocationTime)
     {
         ParamChecker.assertNotNull("revocationTime", revocationTime);
         this.caRevInfo = new CertRevocationInfo(CRLReason.CA_COMPROMISE, revocationTime, null);
     }
 
     @Override
-    public CertRevocationInfo getCARevocationInfo(HashAlgoType hashAlgo,
-            byte[] issuerNameHash, byte[] issuerKeyHash)
+    public CertRevocationInfo getCARevocationInfo(
+            final HashAlgoType hashAlgo,
+            final byte[] issuerNameHash,
+            final byte[] issuerKeyHash)
     {
         if(canResolveIssuer(hashAlgo, issuerNameHash, issuerKeyHash) == false)
         {

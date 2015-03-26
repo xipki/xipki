@@ -45,7 +45,8 @@ import org.xipki.ocsp.client.api.OCSPResponseException;
 public class OCSPResponseUnsuccessfulException extends OCSPResponseException
 {
     private int status;
-    public OCSPResponseUnsuccessfulException(int status)
+    public OCSPResponseUnsuccessfulException(
+            final int status)
     {
         super(getOCSPResponseStatus(status));
         this.status = status;
@@ -61,7 +62,8 @@ public class OCSPResponseUnsuccessfulException extends OCSPResponseException
         return getOCSPResponseStatus(status);
     }
 
-    private static String getOCSPResponseStatus(int statusCode)
+    private static String getOCSPResponseStatus(
+            final int statusCode)
     {
         switch(statusCode)
         {

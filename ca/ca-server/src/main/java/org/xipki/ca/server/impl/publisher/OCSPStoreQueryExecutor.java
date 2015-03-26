@@ -77,7 +77,9 @@ class OCSPStoreQueryExecutor
 
     private final boolean publishGoodCerts;
 
-    OCSPStoreQueryExecutor(DataSourceWrapper dataSource, boolean publishGoodCerts)
+    OCSPStoreQueryExecutor(
+            final DataSourceWrapper dataSource,
+            final boolean publishGoodCerts)
     throws DataAccessException, NoSuchAlgorithmException
     {
         this.dataSource = dataSource;
@@ -122,27 +124,30 @@ class OCSPStoreQueryExecutor
      * @throws NoSuchAlgorithmException
      * @throws CertificateEncodingException
      */
-    void addCert(X509CertWithDBCertId issuer,
-            X509CertWithDBCertId certificate,
-            String certprofile)
+    void addCert(
+            final X509CertWithDBCertId issuer,
+            final X509CertWithDBCertId certificate,
+            final String certprofile)
     throws DataAccessException, CertificateEncodingException
     {
         addCert(issuer, certificate, certprofile, null);
     }
 
-    void addCert(X509CertWithDBCertId issuer,
-            X509CertWithDBCertId certificate,
-            String certprofile,
-            CertRevocationInfo revInfo)
+    void addCert(
+            final X509CertWithDBCertId issuer,
+            final X509CertWithDBCertId certificate,
+            final String certprofile,
+            final CertRevocationInfo revInfo)
     throws DataAccessException, CertificateEncodingException
     {
         addOrUpdateCert(issuer, certificate, certprofile, revInfo);
     }
 
-    private void addOrUpdateCert(X509CertWithDBCertId issuer,
-            X509CertWithDBCertId certificate,
-            String certprofile,
-            CertRevocationInfo revInfo)
+    private void addOrUpdateCert(
+            final X509CertWithDBCertId issuer,
+            final X509CertWithDBCertId certificate,
+            final String certprofile,
+            final CertRevocationInfo revInfo)
     throws DataAccessException, CertificateEncodingException
     {
         boolean revoked = revInfo != null;
@@ -347,17 +352,19 @@ class OCSPStoreQueryExecutor
         }
     }
 
-    void revokeCert(X509CertWithDBCertId caCert,
-            X509CertWithDBCertId cert,
-            String certprofile,
-            CertRevocationInfo revInfo)
+    void revokeCert(
+            final X509CertWithDBCertId caCert,
+            final X509CertWithDBCertId cert,
+            final String certprofile,
+            final CertRevocationInfo revInfo)
     throws DataAccessException, CertificateEncodingException
     {
         addOrUpdateCert(caCert, cert, certprofile, revInfo);
     }
 
-    void unrevokeCert(X509CertWithDBCertId issuer,
-            X509CertWithDBCertId cert)
+    void unrevokeCert(
+            final X509CertWithDBCertId issuer,
+            final X509CertWithDBCertId cert)
     throws DataAccessException
     {
         Integer issuerId =  issuerStore.getIdForCert(issuer.getEncodedCert());
@@ -422,8 +429,9 @@ class OCSPStoreQueryExecutor
 
     }
 
-    void removeCert(X509CertWithDBCertId issuer,
-            X509CertWithDBCertId cert)
+    void removeCert(
+            final X509CertWithDBCertId issuer,
+            final X509CertWithDBCertId cert)
     throws DataAccessException
     {
         Integer issuerId =  issuerStore.getIdForCert(issuer.getEncodedCert());
@@ -450,7 +458,9 @@ class OCSPStoreQueryExecutor
         }
     }
 
-    void revokeCa(X509CertWithDBCertId caCert, CertRevocationInfo revocationInfo)
+    void revokeCa(
+            final X509CertWithDBCertId caCert,
+            final CertRevocationInfo revocationInfo)
     throws DataAccessException, CertificateEncodingException
     {
         Date revocationTime = revocationInfo.getRevocationTime();
@@ -482,7 +492,8 @@ class OCSPStoreQueryExecutor
         }
     }
 
-    void unrevokeCa(X509CertWithDBCertId caCert)
+    void unrevokeCa(
+            final X509CertWithDBCertId caCert)
     throws DataAccessException, CertificateEncodingException
     {
         int issuerId = getIssuerId(caCert);
@@ -507,7 +518,8 @@ class OCSPStoreQueryExecutor
         }
     }
 
-    private int getIssuerId(X509CertWithDBCertId issuerCert)
+    private int getIssuerId(
+            final X509CertWithDBCertId issuerCert)
     throws DataAccessException, CertificateEncodingException
     {
         Integer id = issuerStore.getIdForCert(issuerCert.getEncodedCert());
@@ -519,7 +531,8 @@ class OCSPStoreQueryExecutor
         return id.intValue();
     }
 
-    void addIssuer(X509CertWithDBCertId issuerCert)
+    void addIssuer(
+            final X509CertWithDBCertId issuerCert)
     throws CertificateEncodingException, DataAccessException
     {
         if(issuerStore.getIdForCert(issuerCert.getEncodedCert()) != null)
@@ -591,7 +604,8 @@ class OCSPStoreQueryExecutor
      *         if no PreparedStament can be created within 5 seconds
      * @throws DataAccessException
      */
-    private PreparedStatement borrowPreparedStatement(String sqlQuery)
+    private PreparedStatement borrowPreparedStatement(
+            final String sqlQuery)
     throws DataAccessException
     {
         PreparedStatement ps = null;
@@ -607,7 +621,8 @@ class OCSPStoreQueryExecutor
         return ps;
     }
 
-    private PreparedStatement[] borrowPreparedStatements(String... sqlQueries)
+    private PreparedStatement[] borrowPreparedStatements(
+            final String... sqlQueries)
     throws DataAccessException
     {
         PreparedStatement[] pss = new PreparedStatement[sqlQueries.length];
@@ -650,7 +665,9 @@ class OCSPStoreQueryExecutor
         return pss;
     }
 
-    private boolean certRegistered(int issuerId, BigInteger serialNumber)
+    private boolean certRegistered(
+            final int issuerId,
+            final BigInteger serialNumber)
     throws DataAccessException
     {
         final String sql = dataSource.createFetchFirstSelectSQL(
@@ -709,7 +726,9 @@ class OCSPStoreQueryExecutor
         }
     }
 
-    private void releaseDbResources(Statement ps, ResultSet rs)
+    private void releaseDbResources(
+            final Statement ps,
+            final ResultSet rs)
     {
         dataSource.releaseResources(ps, rs);
     }
@@ -734,7 +753,10 @@ class OCSPStoreQueryExecutor
         }
     }
 
-    private static void setBoolean(PreparedStatement ps, int index, boolean b)
+    private static void setBoolean(
+            final PreparedStatement ps,
+            final int index,
+            final boolean b)
     throws SQLException
     {
         ps.setInt(index, b ? 1 : 0);

@@ -56,7 +56,9 @@ public class CmpUtf8Pairs
 
     private final Map<String, String> pairs = new HashMap<>();
 
-    public CmpUtf8Pairs(String name, String value)
+    public CmpUtf8Pairs(
+            final String name,
+            final String value)
     {
         putUtf8Pair(name, value);
     }
@@ -65,7 +67,8 @@ public class CmpUtf8Pairs
     {
     }
 
-    public CmpUtf8Pairs(String string)
+    public CmpUtf8Pairs(
+            String string)
     {
         if(string == null || string.length() < 2)
         {
@@ -119,7 +122,8 @@ public class CmpUtf8Pairs
         }
     }
 
-    private static String encodeNameOrValue(String s)
+    private static String encodeNameOrValue(
+            String s)
     {
         if(s.indexOf("%") != -1)
         {
@@ -134,7 +138,8 @@ public class CmpUtf8Pairs
         return s;
     }
 
-    private static String decodeNameOrValue(String s)
+    private static String decodeNameOrValue(
+            final String s)
     {
         int idx = s.indexOf(TOKEN_TERM);
         if(idx == -1)
@@ -172,7 +177,9 @@ public class CmpUtf8Pairs
         return newS.toString();
     }
 
-    public void putUtf8Pair(String name, String value)
+    public void putUtf8Pair(
+            final String name,
+            final String value)
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotNull("value", value);
@@ -183,12 +190,14 @@ public class CmpUtf8Pairs
         pairs.put(name, value);
     }
 
-    public void removeUtf8Pair(String name)
+    public void removeUtf8Pair(
+            final String name)
     {
         pairs.remove(name);
     }
 
-    public String getValue(String name)
+    public String getValue(
+            final String name)
     {
         return pairs.get(name);
     }

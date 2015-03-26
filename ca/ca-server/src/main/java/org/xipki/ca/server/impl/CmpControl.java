@@ -79,7 +79,8 @@ class CmpControl
         return messageTimeRequired;
     }
 
-    public CmpControl(CmpControlEntry dbEntry)
+    public CmpControl(
+            final CmpControlEntry dbEntry)
     {
         ParamChecker.assertNotNull("dbEntry", dbEntry);
 
@@ -109,9 +110,15 @@ class CmpControl
         this.dbEntry = new CmpControlEntry(dbEntry.getName(), pairs.getEncoded());
     }
 
-    public CmpControl(String name, Boolean confirmCert, Boolean sendCaCert,
-            Boolean messageTimeRequired, Boolean sendResponderCert,
-            Integer messageTimeBias, Integer confirmWaitTime, Set<String> sigAlgos)
+    public CmpControl(
+            final String name,
+            final Boolean confirmCert,
+            final Boolean sendCaCert,
+            final Boolean messageTimeRequired,
+            final Boolean sendResponderCert,
+            final Integer messageTimeBias,
+            final Integer confirmWaitTime,
+            final Set<String> sigAlgos)
     {
         ParamChecker.assertNotEmpty("name", name);
         CmpUtf8Pairs pairs = new CmpUtf8Pairs();
@@ -147,7 +154,10 @@ class CmpControl
         this.dbEntry = new CmpControlEntry(name, pairs.getEncoded());
     }
 
-    private static boolean getBoolean(CmpUtf8Pairs pairs, String key, boolean defaultValue)
+    private static boolean getBoolean(
+            final CmpUtf8Pairs pairs,
+            final String key,
+            final boolean defaultValue)
     {
         String s = pairs.getValue(key);
         boolean ret = StringUtil.isBlank(s) ? defaultValue : Boolean.parseBoolean(s);
@@ -155,7 +165,10 @@ class CmpControl
         return ret;
     }
 
-    private static int getInt(CmpUtf8Pairs pairs, String key, int defaultValue)
+    private static int getInt(
+            final CmpUtf8Pairs pairs,
+            final String key,
+            final int defaultValue)
     {
         String s = pairs.getValue(key);
         int ret = StringUtil.isBlank(s) ? defaultValue : Integer.parseInt(s);
@@ -193,7 +206,8 @@ class CmpControl
         return sigAlgos == null ? null : Collections.unmodifiableSet(sigAlgos);
     }
 
-    public boolean isSigAlgoPermitted(AlgorithmIdentifier algId)
+    public boolean isSigAlgoPermitted(
+            final AlgorithmIdentifier algId)
     {
         if(sigAlgos == null)
         {

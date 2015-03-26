@@ -53,23 +53,35 @@ public interface OCSPRequestor
     public static final ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs = OCSPObjectIdentifiers.id_pkix_ocsp.branch("8");
     public static final ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke = OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
 
-    OCSPResp ask(X509Certificate issuerCert, X509Certificate cert,
-            URL responderUrl, RequestOptions requestOptions,
+    OCSPResp ask(
+            X509Certificate issuerCert,
+            X509Certificate cert,
+            URL responderUrl,
+            RequestOptions requestOptions,
             RequestResponseDebug debug)
     throws OCSPResponseException, OCSPRequestorException;
 
-    OCSPResp ask(X509Certificate issuerCert, X509Certificate[] certs,
-            URL responderUrl, RequestOptions requestOptions,
+    OCSPResp ask(
+            X509Certificate issuerCert,
+            X509Certificate[] certs,
+            URL responderUrl,
+            RequestOptions requestOptions,
             RequestResponseDebug debug)
     throws OCSPResponseException, OCSPRequestorException;
 
-    OCSPResp ask(X509Certificate issuerCert, BigInteger serialNumber,
-            URL responderUrl, RequestOptions requestOptions,
+    OCSPResp ask(
+            X509Certificate issuerCert,
+            BigInteger serialNumber,
+            URL responderUrl,
+            RequestOptions requestOptions,
             RequestResponseDebug debug)
     throws OCSPResponseException, OCSPRequestorException;
 
-    OCSPResp ask(X509Certificate issuerCert, BigInteger[] serialNumbers,
-            URL responderUrl, RequestOptions requestOptions,
+    OCSPResp ask(
+            X509Certificate issuerCert,
+            BigInteger[] serialNumbers,
+            URL responderUrl,
+            RequestOptions requestOptions,
             RequestResponseDebug debug)
     throws OCSPResponseException, OCSPRequestorException;
 

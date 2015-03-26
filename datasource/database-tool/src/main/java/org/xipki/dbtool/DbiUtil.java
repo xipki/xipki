@@ -35,18 +35,18 @@
 
 package org.xipki.dbtool;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 /**
  * @author Lijun Liao
  */
 
 public class DbiUtil
 {
-    public static String buildFilename(String prefix, String suffix,
-            int minCertIdOfCurrentFile, int maxCertIdOfCurrentFile, int maxCertId)
+    public static String buildFilename(
+            final String prefix,
+            final String suffix,
+            final int minCertIdOfCurrentFile,
+            final int maxCertIdOfCurrentFile,
+            final int maxCertId)
     {
         StringBuilder sb = new StringBuilder();
         sb.append(prefix);
@@ -71,28 +71,4 @@ public class DbiUtil
         return sb.toString();
     }
 
-    public static byte[] read(InputStream in)
-    throws IOException
-    {
-        try
-        {
-            ByteArrayOutputStream bout = new ByteArrayOutputStream();
-            int readed = 0;
-            byte[] buffer = new byte[1024];
-            while ((readed = in.read(buffer)) != -1)
-            {
-                bout.write(buffer, 0, readed);
-            }
-
-            return bout.toByteArray();
-        } finally
-        {
-            try
-            {
-                in.close();
-            } catch (IOException e)
-            {
-            }
-        }
-    }
 }

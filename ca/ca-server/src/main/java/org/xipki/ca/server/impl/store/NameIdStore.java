@@ -49,7 +49,9 @@ class NameIdStore
     private final String table;
     private final Map<String, Integer> entries;
 
-    NameIdStore(String table, Map<String, Integer> entries)
+    NameIdStore(
+            final String table,
+            final Map<String, Integer> entries)
     {
         this.table = table;
         this.entries = new HashMap<>();
@@ -60,7 +62,9 @@ class NameIdStore
         }
     }
 
-    void addEntry(String name, Integer id)
+    void addEntry(
+            final String name,
+            final Integer id)
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotNull("id", id);
@@ -78,7 +82,8 @@ class NameIdStore
         entries.put(name, id);
     }
 
-    String getName(Integer id)
+    String getName(
+            final Integer id)
     {
         for(String name : entries.keySet())
         {
@@ -91,7 +96,8 @@ class NameIdStore
         return null;
     }
 
-    Integer getId(String name)
+    Integer getId(
+            final String name)
     {
         return entries.get(name);
     }

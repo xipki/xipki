@@ -67,14 +67,16 @@ public class HealthCheckServlet extends HttpServlet
     {
     }
 
-    public void setServer(OcspServer server)
+    public void setServer(
+            final OcspServer server)
     {
         this.server = server;
     }
 
     @Override
-    protected void doGet(HttpServletRequest request,
-            HttpServletResponse response)
+    protected void doGet(
+            final HttpServletRequest request,
+            final HttpServletResponse response)
     throws ServletException, IOException
     {
         response.setHeader("Access-Control-Allow-Origin", "*");

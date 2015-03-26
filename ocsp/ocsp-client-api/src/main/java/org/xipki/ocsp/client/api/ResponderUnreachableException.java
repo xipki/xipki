@@ -48,17 +48,21 @@ public class ResponderUnreachableException extends OCSPResponseException
         super();
     }
 
-    public ResponderUnreachableException(String message, Throwable cause)
+    public ResponderUnreachableException(
+            final String message,
+            final Throwable cause)
     {
         super(message, cause);
     }
 
-    public ResponderUnreachableException(String message)
+    public ResponderUnreachableException(
+            final String message)
     {
         super(message);
     }
 
-    public ResponderUnreachableException(Throwable cause)
+    public ResponderUnreachableException(
+            final Throwable cause)
     {
         super(cause);
     }

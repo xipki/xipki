@@ -48,7 +48,9 @@ public class ValidationIssue
     private boolean failed;
     private String message;
 
-    public ValidationIssue(String code, String description)
+    public ValidationIssue(
+            final String code,
+            final String description)
     {
         ParamChecker.assertNotEmpty("code", code);
         ParamChecker.assertNotEmpty("description", description);
@@ -67,7 +69,8 @@ public class ValidationIssue
         return message;
     }
 
-    public void setFailureMessage(String message)
+    public void setFailureMessage(
+            final String message)
     {
         this.failed = true;
         this.message = message;

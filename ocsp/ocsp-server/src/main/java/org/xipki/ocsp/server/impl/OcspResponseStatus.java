@@ -49,12 +49,14 @@ public enum OcspResponseStatus
     unauthorized(6);
 
     private final int status;
-    private OcspResponseStatus(int status)
+    private OcspResponseStatus(
+            final int status)
     {
         this.status = status;
     }
 
-    public static OcspResponseStatus getOCSPResponseStatus(int status)
+    public static OcspResponseStatus getOCSPResponseStatus(
+            final int status)
     {
         for(OcspResponseStatus entry : values())
         {

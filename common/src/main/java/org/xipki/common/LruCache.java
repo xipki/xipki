@@ -102,7 +102,8 @@ public class LruCache<K, V>
      * head of the queue. This returns null if a value is not cached and could not
      * be created.
      */
-    public final V get(K key)
+    public final V get(
+            final K key)
     {
         if (key == null)
         {
@@ -166,7 +167,9 @@ public class LruCache<K, V>
      *
      * @return the previous value mapped by {@code key}.
      */
-    public final V put(K key, V value)
+    public final V put(
+            final K key,
+            final V value)
     {
         if (key == null || value == null)
         {
@@ -201,7 +204,8 @@ public class LruCache<K, V>
      * @param maxSize the maximum size of the cache before returning. May be -1
      *            to evict even 0-sized elements.
      */
-    public void trimToSize(int maxSize)
+    public void trimToSize(
+            final int maxSize)
     {
         while (true)
         {
@@ -237,7 +241,8 @@ public class LruCache<K, V>
      *
      * @return the previous value mapped by {@code key}.
      */
-    public final V remove(K key)
+    public final V remove(
+            final K key)
     {
         if (key == null)
         {
@@ -277,7 +282,13 @@ public class LruCache<K, V>
      *     this removal was caused by a {@link #put}. Otherwise it was caused by
      *     an eviction or a {@link #remove}.
      */
-    protected void entryRemoved(boolean evicted, K key, V oldValue, V newValue) {}
+    protected void entryRemoved(
+            final boolean evicted,
+            final K key,
+            final V oldValue,
+            final V newValue)
+    {
+    }
 
     /**
      * Called after a cache miss to compute a value for the corresponding key.
@@ -294,12 +305,15 @@ public class LruCache<K, V>
      * thread calls {@link #put} while another is creating a value for the same
      * key.
      */
-    protected V create(K key)
+    protected V create(
+            final K key)
     {
         return null;
     }
 
-    private int safeSizeOf(K key, V value)
+    private int safeSizeOf(
+            final K key,
+            final V value)
     {
         int result = sizeOf(key, value);
         if (result < 0)
@@ -316,7 +330,9 @@ public class LruCache<K, V>
      *
      * <p>An entry's size must not change while it is in the cache.
      */
-    protected int sizeOf(K key, V value)
+    protected int sizeOf(
+            final K key,
+            final V value)
     {
         return 1;
     }

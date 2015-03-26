@@ -108,16 +108,21 @@ public class SoftTokenContentSignerBuilder
     private final PrivateKey key;
     private final X509Certificate[] certificateChain;
 
-    public SoftTokenContentSignerBuilder(PrivateKey privateKey)
+    public SoftTokenContentSignerBuilder(
+            final PrivateKey privateKey)
     throws SignerException
     {
         this.key = privateKey;
         this.certificateChain = null;
     }
 
-    public SoftTokenContentSignerBuilder(String keystoreType, InputStream keystoreStream,
-            char[] keystorePassword, String keyname, char[] keyPassword,
-            X509Certificate[] certificateChain)
+    public SoftTokenContentSignerBuilder(
+            final String keystoreType,
+            final InputStream keystoreStream,
+            final char[] keystorePassword,
+            String keyname,
+            final char[] keyPassword,
+            final X509Certificate[] certificateChain)
     throws SignerException
     {
         if(("PKCS12".equalsIgnoreCase(keystoreType) || "JKS".equalsIgnoreCase(keystoreType)) == false)
@@ -208,8 +213,8 @@ public class SoftTokenContentSignerBuilder
     }
 
     public ConcurrentContentSigner createSigner(
-            AlgorithmIdentifier signatureAlgId,
-            int parallelism)
+            final AlgorithmIdentifier signatureAlgId,
+            final int parallelism)
     throws OperatorCreationException, NoSuchPaddingException
     {
         if(parallelism < 1)
@@ -335,13 +340,16 @@ public class SoftTokenContentSignerBuilder
 
     private static class RSAContentSignerBuilder extends BcContentSignerBuilder
     {
-        private RSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId)
+        private RSAContentSignerBuilder(
+                AlgorithmIdentifier signatureAlgId)
         throws NoSuchAlgorithmException, NoSuchPaddingException
         {
             super(signatureAlgId, SecurityUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
         }
 
-        protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
+        protected Signer createSigner(
+                final AlgorithmIdentifier sigAlgId,
+                final AlgorithmIdentifier digAlgId)
         throws OperatorCreationException
         {
             if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()))
@@ -380,13 +388,16 @@ public class SoftTokenContentSignerBuilder
 
     private static class DSAContentSignerBuilder extends BcContentSignerBuilder
     {
-        private DSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId)
+        private DSAContentSignerBuilder(
+                final AlgorithmIdentifier signatureAlgId)
         throws NoSuchAlgorithmException
         {
             super(signatureAlgId, SecurityUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
         }
 
-        protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
+        protected Signer createSigner(
+                final AlgorithmIdentifier sigAlgId,
+                final AlgorithmIdentifier digAlgId)
         throws OperatorCreationException
         {
             Digest dig = digestProvider.get(digAlgId);
@@ -423,7 +434,9 @@ public class SoftTokenContentSignerBuilder
         }
 
         @Override
-        public void init(boolean forEncryption, CipherParameters param)
+        public void init(
+                final boolean forEncryption,
+                final CipherParameters param)
         {
             if(forEncryption == false)
             {
@@ -474,7 +487,10 @@ public class SoftTokenContentSignerBuilder
         }
 
         @Override
-        public byte[] processBlock(byte[] in, int inOff, int len)
+        public byte[] processBlock(
+                final byte[] in,
+                final int inOff,
+                final int len)
         throws InvalidCipherTextException
         {
             try

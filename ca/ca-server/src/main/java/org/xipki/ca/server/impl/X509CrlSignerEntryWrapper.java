@@ -67,7 +67,8 @@ class X509CrlSignerEntryWrapper
     {
     }
 
-    public void setDbEntry(X509CrlSignerEntry dbEntry)
+    public void setDbEntry(
+            final X509CrlSignerEntry dbEntry)
     throws ConfigurationException
     {
         this.dbEntry = dbEntry;
@@ -79,7 +80,8 @@ class X509CrlSignerEntryWrapper
         return crlControl;
     }
 
-    public void initSigner(SecurityFactory securityFactory)
+    public void initSigner(
+            final SecurityFactory securityFactory)
     throws SignerException, OperationException, ConfigurationException
     {
         if(signer != null)

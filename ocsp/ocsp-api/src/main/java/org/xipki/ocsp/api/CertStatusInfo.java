@@ -60,7 +60,11 @@ public class CertStatusInfo
     private CrlID crlID;
     private Date archiveCutOff;
 
-    private CertStatusInfo(CertStatus certStatus, Date thisUpdate, Date nextUpdate, String certprofile)
+    private CertStatusInfo(
+            final CertStatus certStatus,
+            final Date thisUpdate,
+            final Date nextUpdate,
+            final String certprofile)
     {
         this.certStatus = certStatus;
         this.thisUpdate = thisUpdate;
@@ -68,24 +72,33 @@ public class CertStatusInfo
         this.certprofile = certprofile;
     }
 
-    public static CertStatusInfo getUnknownCertStatusInfo(Date thisUpdate, Date nextUpdate)
+    public static CertStatusInfo getUnknownCertStatusInfo(
+            final Date thisUpdate,
+            final Date nextUpdate)
     {
         return new CertStatusInfo(CertStatus.UNKNOWN, thisUpdate, nextUpdate, null);
     }
 
-    public static CertStatusInfo getIgnoreCertStatusInfo(Date thisUpdate, Date nextUpdate)
+    public static CertStatusInfo getIgnoreCertStatusInfo(
+            final Date thisUpdate,
+            final Date nextUpdate)
     {
         return new CertStatusInfo(CertStatus.IGNORE, thisUpdate, nextUpdate, null);
     }
 
-    public static CertStatusInfo getIssuerUnknownCertStatusInfo(Date thisUpdate, Date nextUpdate)
+    public static CertStatusInfo getIssuerUnknownCertStatusInfo(
+            final Date thisUpdate,
+            final Date nextUpdate)
     {
         return new CertStatusInfo(CertStatus.ISSUER_UNKNOWN, thisUpdate, nextUpdate, null);
     }
 
     public static CertStatusInfo getGoodCertStatusInfo(
-            HashAlgoType certHashAlgo, byte[] certHash,
-            Date thisUpdate, Date nextUpdate, String certprofile)
+            final HashAlgoType certHashAlgo,
+            final byte[] certHash,
+            final Date thisUpdate,
+            final Date nextUpdate,
+            final String certprofile)
     {
         CertStatusInfo ret = new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate, certprofile);
         ret.certHashAlgo = certHashAlgo;
@@ -93,9 +106,13 @@ public class CertStatusInfo
         return ret;
     }
 
-    public static CertStatusInfo getRevokedCertStatusInfo(CertRevocationInfo revocationInfo,
-            HashAlgoType certHashAlgo, byte[] certHash,
-            Date thisUpdate, Date nextUpdate, String certprofile)
+    public static CertStatusInfo getRevokedCertStatusInfo(
+            final CertRevocationInfo revocationInfo,
+            final HashAlgoType certHashAlgo,
+            final byte[] certHash,
+            final Date thisUpdate,
+            final Date nextUpdate,
+            final String certprofile)
     {
         if(revocationInfo == null)
         {
@@ -148,7 +165,8 @@ public class CertStatusInfo
         return crlID;
     }
 
-    public void setCrlID(CrlID crlID)
+    public void setCrlID(
+            final CrlID crlID)
     {
         this.crlID = crlID;
     }
@@ -158,7 +176,8 @@ public class CertStatusInfo
         return archiveCutOff;
     }
 
-    public void setArchiveCutOff(Date archiveCutOff)
+    public void setArchiveCutOff(
+            final Date archiveCutOff)
     {
         this.archiveCutOff = archiveCutOff;
     }

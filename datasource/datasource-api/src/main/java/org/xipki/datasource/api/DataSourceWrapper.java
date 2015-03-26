@@ -54,56 +54,95 @@ public interface DataSourceWrapper
     Connection getConnection()
     throws DataAccessException;
 
-    void returnConnection(Connection conn);
+    void returnConnection(
+            Connection conn);
 
     void shutdown();
 
     DatabaseType getDatabaseType();
 
-    Statement createStatement(Connection conn)
+    Statement createStatement(
+            Connection conn)
     throws DataAccessException;
 
-    PreparedStatement prepareStatement(Connection conn, String sqlQuery)
+    PreparedStatement prepareStatement(
+            Connection conn,
+            String sqlQuery)
     throws DataAccessException;
 
-    void releaseResources(Statement ps, ResultSet rs);
+    void releaseResources(
+            Statement ps,
+            ResultSet rs);
 
-    String createFetchFirstSelectSQL(String coreSql, int rows);
+    String createFetchFirstSelectSQL(
+            String coreSql,
+            int rows);
 
-    String createFetchFirstSelectSQL(String coreSql, int rows, String orderBy);
+    String createFetchFirstSelectSQL(
+            String coreSql,
+            int rows,
+            String orderBy);
 
-    long getMin(Connection conn, String table, String column)
+    long getMin(
+            Connection conn,
+            String table,
+            String column)
     throws DataAccessException;
 
-    long getMax(Connection conn, String table, String column)
+    long getMax(
+            Connection conn,
+            String table,
+            String column)
     throws DataAccessException;
 
-    int getCount(Connection conn, String table)
+    int getCount(
+            Connection conn,
+            String table)
     throws DataAccessException;
 
-    boolean columnExists(Connection conn, String table, String column, Object value)
+    boolean columnExists(
+            Connection conn,
+            String table,
+            String column,
+            Object value)
     throws DataAccessException;
 
-    boolean tableHasColumn(Connection conn, String table, String column)
+    boolean tableHasColumn(
+            Connection conn,
+            String table,
+            String column)
     throws DataAccessException;
 
-    boolean tableExists(Connection conn, String table)
+    boolean tableExists(
+            Connection conn,
+            String table)
     throws DataAccessException;
 
-    void dropAndCreateSequence(String sequenceName, long startValue)
+    void dropAndCreateSequence(
+            String sequenceName,
+            long startValue)
     throws DataAccessException;
 
-    void createSequence(String sequenceName, long startValue)
+    void createSequence(
+            String sequenceName,
+            long startValue)
     throws DataAccessException;
 
-    void dropSequence(String sequenceName)
+    void dropSequence(
+            String sequenceName)
     throws DataAccessException;
 
-    void setLastUsedSeqValue(String sequenceName, long sequenceValue);
+    void setLastUsedSeqValue(
+            String sequenceName,
+            long sequenceValue);
 
-    long nextSeqValue(Connection conn, String sequenceName)
+    long nextSeqValue(
+            Connection conn,
+            String sequenceName)
     throws DataAccessException;
 
-    DataAccessException translate(String sql, SQLException ex);
+    DataAccessException translate(
+            String sql,
+            SQLException ex);
 
 }

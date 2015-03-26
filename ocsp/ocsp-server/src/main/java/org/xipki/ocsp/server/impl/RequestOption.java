@@ -94,7 +94,8 @@ class RequestOption
     private final Set<X509Certificate> certs;
     private final CertpathValidationModel certpathValidationModel;
 
-    public RequestOption(RequestOptionType conf)
+    public RequestOption(
+            final RequestOptionType conf)
     throws ConfigurationException
     {
         NonceType nonceConf = conf.getNonce();
@@ -270,7 +271,8 @@ class RequestOption
         return nonceMaxLen;
     }
 
-    public boolean allows(HashAlgoType hashAlgo)
+    public boolean allows(
+            final HashAlgoType hashAlgo)
     {
         return hashAlgos.contains(hashAlgo);
     }
@@ -290,12 +292,14 @@ class RequestOption
         return certs;
     }
 
-    public boolean isVersionAllowed(Integer version)
+    public boolean isVersionAllowed(
+            final Integer version)
     {
         return versions == null || versions.contains(version);
     }
 
-    private Set<X509Certificate> getCerts(CertCollectionType conf)
+    private Set<X509Certificate> getCerts(
+            final CertCollectionType conf)
     throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException
     {
         Set<X509Certificate> certs = new HashSet<>();

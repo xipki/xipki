@@ -69,7 +69,8 @@ class ResponderSigner
 
     private final X500Name responderId;
 
-    public ResponderSigner(List<ConcurrentContentSigner> signers)
+    public ResponderSigner(
+            final List<ConcurrentContentSigner> signers)
     throws CertificateEncodingException, IOException
     {
         ParamChecker.assertNotEmpty("signers", signers);
@@ -111,7 +112,8 @@ class ResponderSigner
         return signers.get(0);
     }
 
-    public ConcurrentContentSigner getSignerForPreferredSigAlgs(ASN1Sequence preferredSigAlgs)
+    public ConcurrentContentSigner getSignerForPreferredSigAlgs(
+            final ASN1Sequence preferredSigAlgs)
     {
         if(preferredSigAlgs == null)
         {
@@ -132,7 +134,8 @@ class ResponderSigner
         return null;
     }
 
-    private static String getSignatureAlgorithmName(AlgorithmIdentifier sigAlgId)
+    private static String getSignatureAlgorithmName(
+            final AlgorithmIdentifier sigAlgId)
     {
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
         if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid) == false)

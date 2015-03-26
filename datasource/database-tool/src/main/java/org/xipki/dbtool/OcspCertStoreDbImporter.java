@@ -106,7 +106,11 @@ class OcspCertStoreDbImporter extends DbPorter
     private final Unmarshaller unmarshaller;
     private final boolean resume;
 
-    OcspCertStoreDbImporter(DataSourceWrapper dataSource, Unmarshaller unmarshaller, String srcDir, boolean resume)
+    OcspCertStoreDbImporter(
+            final DataSourceWrapper dataSource,
+            final Unmarshaller unmarshaller,
+            final String srcDir,
+            final boolean resume)
     throws Exception
     {
         super(dataSource, srcDir);
@@ -169,7 +173,8 @@ class OcspCertStoreDbImporter extends DbPorter
         System.out.println(" imported OCSP certstore to database");
     }
 
-    private void import_issuer(Issuers issuers)
+    private void import_issuer(
+            final Issuers issuers)
     throws DataAccessException, CertificateException
     {
         System.out.println("importing table ISSUER");
@@ -245,7 +250,9 @@ class OcspCertStoreDbImporter extends DbPorter
         System.out.println(" imported table ISSUER");
     }
 
-    private void import_cert(CertsFiles certsfiles, File processLogFile)
+    private void import_cert(
+            final CertsFiles certsfiles,
+            final File processLogFile)
     throws Exception
     {
         int numProcessedBefore = 0;
@@ -320,10 +327,14 @@ class OcspCertStoreDbImporter extends DbPorter
         System.out.println("processed " + sum + " certificates");
     }
 
-    private int[] do_import_cert(PreparedStatement ps_cert,
-            PreparedStatement ps_certhash, PreparedStatement ps_rawcert,
-            String certsZipFile, int minId,
-            File processLogFile, int totalProcessedSum)
+    private int[] do_import_cert(
+            final PreparedStatement ps_cert,
+            final PreparedStatement ps_certhash,
+            final PreparedStatement ps_rawcert,
+            final String certsZipFile,
+            final int minId,
+            final File processLogFile,
+            final int totalProcessedSum)
     throws IOException, JAXBException, DataAccessException, CertificateException
     {
         ZipFile zipFile = new ZipFile(new File(baseDir, certsZipFile));
@@ -375,7 +386,7 @@ class OcspCertStoreDbImporter extends DbPorter
                 // rawcert
                 ZipEntry certZipEnty = zipFile.getEntry(filename);
                 // rawcert
-                byte[] encodedCert = DbiUtil.read(zipFile.getInputStream(certZipEnty));
+                byte[] encodedCert = IoUtil.read(zipFile.getInputStream(certZipEnty));
 
                 X509Certificate c;
                 try

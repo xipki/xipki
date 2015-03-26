@@ -43,7 +43,8 @@ package org.xipki.common;
 public class InvalidOIDorNameException extends Exception
 {
 
-    public InvalidOIDorNameException(String declaredOidOrName)
+    public InvalidOIDorNameException(
+            final String declaredOidOrName)
     {
         super("invalid ObjectIdentifer or name '" + declaredOidOrName + "'");
     }

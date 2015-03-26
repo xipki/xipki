@@ -105,7 +105,8 @@ class RdnUpperBounds
         ubs.put(ObjectIdentifiers.DN_EmailAddress, ub_emailaddress_length);
     }
 
-    public static void checkUpperBounds(X500Name name)
+    public static void checkUpperBounds(
+            final X500Name name)
     throws BadCertTemplateException
     {
         RDN[] rdns = name.getRDNs();

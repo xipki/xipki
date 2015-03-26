@@ -52,12 +52,14 @@ public class ValidationResult
     private final List<ValidationIssue> failedValidationIssues;
     private final List<ValidationIssue> successfulValidationIssues;
 
-    public ValidationResult(ValidationIssue validationIssues)
+    public ValidationResult(
+            final ValidationIssue validationIssues)
     {
         this(Arrays.asList(validationIssues));
     }
 
-    public ValidationResult(List<ValidationIssue> validationIssues)
+    public ValidationResult(
+            final List<ValidationIssue> validationIssues)
     {
         ParamChecker.assertNotEmpty("validationIssues", validationIssues);
 

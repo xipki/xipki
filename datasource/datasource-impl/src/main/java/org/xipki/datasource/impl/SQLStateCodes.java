@@ -201,7 +201,8 @@ public class SQLStateCodes
         }
     }
 
-    private static Set<String> toSet(String... strs)
+    private static Set<String> toSet(
+            final String... strs)
     {
         if(strs == null || strs.length == 0)
         {
@@ -216,7 +217,9 @@ public class SQLStateCodes
         return Collections.unmodifiableSet(set);
     }
 
-    private static Set<String> addToSet(Set<String> baseSet, String... strs)
+    private static Set<String> addToSet(
+            final Set<String> baseSet,
+            final String... strs)
     {
         if(strs == null || strs.length == 0)
         {

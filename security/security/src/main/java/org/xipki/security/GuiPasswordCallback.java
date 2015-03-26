@@ -48,7 +48,8 @@ public class GuiPasswordCallback implements PasswordCallback
 {
 
     @Override
-    public char[] getPassword(String prompt)
+    public char[] getPassword(
+            String prompt)
     throws PasswordResolverException
     {
         if(StringUtil.isBlank(prompt))
@@ -64,7 +65,8 @@ public class GuiPasswordCallback implements PasswordCallback
     }
 
     @Override
-    public void init(String conf)
+    public void init(
+            final String conf)
     throws PasswordResolverException
     {
     }

@@ -55,14 +55,18 @@ public enum KeyUsage
     private int bcUsage;
     private String[] names;
 
-    private KeyUsage(int bit, int bcUsage, String... names)
+    private KeyUsage(
+            final int bit,
+            final int bcUsage,
+            final String... names)
     {
         this.bit = bit;
         this.bcUsage = bcUsage;
         this.names = names;
     }
 
-    public static KeyUsage getKeyUsage(String usage)
+    public static KeyUsage getKeyUsage(
+            final String usage)
     {
         if(usage == null)
         {
@@ -83,7 +87,8 @@ public enum KeyUsage
         return null;
     }
 
-    public static KeyUsage getKeyUsage(int bit)
+    public static KeyUsage getKeyUsage(
+            final int bit)
     {
         for(KeyUsage ku : KeyUsage.values())
         {
@@ -96,7 +101,8 @@ public enum KeyUsage
         return null;
     }
 
-    public static KeyUsage getKeyUsageFromBcUsage(int bcUsage)
+    public static KeyUsage getKeyUsageFromBcUsage(
+            final int bcUsage)
     {
         for(KeyUsage ku : KeyUsage.values())
         {

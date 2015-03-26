@@ -107,7 +107,7 @@ public class KeyUtil
     private static final Map<String, KeyFactory> keyFactories = new HashMap<>();
 
     public static ContentVerifierProvider getContentVerifierProvider(
-            X509Certificate verifierCert)
+            final X509Certificate verifierCert)
     throws InvalidKeyException, OperatorCreationException
     {
         PublicKey publicKey = verifierCert.getPublicKey();
@@ -144,7 +144,7 @@ public class KeyUtil
     }
 
     public static ContentVerifierProvider getContentVerifierProvider(
-            PublicKey publicKey)
+            final PublicKey publicKey)
     throws OperatorCreationException, InvalidKeyException
     {
         String keyAlg = publicKey.getAlgorithm().toUpperCase();
@@ -179,13 +179,16 @@ public class KeyUtil
         return builder.build(keyParam);
     }
 
-    public static KeyPair generateRSAKeypair(int keysize)
+    public static KeyPair generateRSAKeypair(
+            final int keysize)
     throws Exception
     {
         return generateRSAKeypair(keysize, null);
     }
 
-    public static KeyPair generateRSAKeypair(int keysize, BigInteger publicExponent)
+    public static KeyPair generateRSAKeypair(
+            final int keysize,
+            BigInteger publicExponent)
     throws Exception
     {
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
@@ -199,13 +202,18 @@ public class KeyUtil
         return kpGen.generateKeyPair();
     }
 
-    public static KeyPair generateDSAKeypair(int pLength, int qLength)
+    public static KeyPair generateDSAKeypair(
+            final int pLength,
+            final int qLength)
     throws Exception
     {
         return generateDSAKeypair(pLength, qLength, 80);
     }
 
-    public static KeyPair generateDSAKeypair(int pLength, int qLength, int certainty)
+    public static KeyPair generateDSAKeypair(
+            final int pLength,
+            final int qLength,
+            final int certainty)
     throws Exception
     {
         DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());
@@ -220,7 +228,8 @@ public class KeyUtil
         return kpGen.generateKeyPair();
     }
 
-    public static KeyPair generateECKeypair(ASN1ObjectIdentifier curveId)
+    public static KeyPair generateECKeypair(
+            final ASN1ObjectIdentifier curveId)
     throws Exception
     {
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("ECDSA", "BC");
@@ -229,7 +238,8 @@ public class KeyUtil
         return kpGen.generateKeyPair();
     }
 
-    private static KeyFactory getKeyFactory(String algorithm)
+    private static KeyFactory getKeyFactory(
+            String algorithm)
     throws InvalidKeySpecException
     {
         synchronized (keyFactories)
@@ -251,7 +261,8 @@ public class KeyUtil
         }
     }
 
-    public static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)
+    public static PublicKey generatePublicKey(
+            SubjectPublicKeyInfo pkInfo)
     throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         X509EncodedKeySpec keyspec;
@@ -285,7 +296,9 @@ public class KeyUtil
         return kf.generatePublic(keyspec);
     }
 
-    public static RSAPublicKey generateRSAPublicKey(BigInteger modulus, BigInteger publicExponent)
+    public static RSAPublicKey generateRSAPublicKey(
+            final BigInteger modulus,
+            final BigInteger publicExponent)
     throws InvalidKeySpecException
     {
         RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulus, publicExponent);
@@ -293,7 +306,9 @@ public class KeyUtil
         return (RSAPublicKey) kf.generatePublic(keySpec);
     }
 
-    public static ECPublicKey generateECPublicKey(String curveOid, byte[] encodedQ)
+    public static ECPublicKey generateECPublicKey(
+            final String curveOid,
+            final byte[] encodedQ)
     throws InvalidKeySpecException
     {
         ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveOid);
@@ -337,7 +352,7 @@ public class KeyUtil
     }
 
     public static AsymmetricKeyParameter generatePublicKeyParameter(
-            PublicKey key)
+            final PublicKey key)
     throws InvalidKeyException
     {
         if (key instanceof RSAPublicKey)

@@ -108,7 +108,11 @@ public abstract class P12KeypairGenerator
 
     protected abstract String getKeyAlgorithm();
 
-    public P12KeypairGenerator(char[] password, String subject, Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyUsage)
+    public P12KeypairGenerator(
+            final char[] password,
+            final String subject,
+            final Integer keyUsage,
+            final List<ASN1ObjectIdentifier> extendedKeyUsage)
     throws Exception
     {
         if(Security.getProvider("BC") == null)
@@ -189,7 +193,8 @@ public abstract class P12KeypairGenerator
         return result;
     }
 
-    private ContentSigner getContentSigner(PrivateKey key)
+    private ContentSigner getContentSigner(
+            final PrivateKey key)
     throws Exception
     {
         BcContentSignerBuilder builder;
@@ -254,7 +259,8 @@ public abstract class P12KeypairGenerator
         return builder.build(KeyUtil.generatePrivateKeyParameter(key));
     }
 
-    private static AlgorithmIdentifier buildAlgId(ASN1ObjectIdentifier identifier)
+    private static AlgorithmIdentifier buildAlgId(
+            final ASN1ObjectIdentifier identifier)
     {
         return new AlgorithmIdentifier(identifier, DERNull.INSTANCE);
     }
@@ -318,8 +324,12 @@ public abstract class P12KeypairGenerator
         private final String curveName;
         private final ASN1ObjectIdentifier curveOid;
 
-        public ECDSAIdentityGenerator(String curveNameOrOid, char[] password, String subject,
-        Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyUsage)
+        public ECDSAIdentityGenerator(
+        		final String curveNameOrOid,
+                final char[] password,
+                final String subject,
+                final Integer keyUsage,
+                final List<ASN1ObjectIdentifier> extendedKeyUsage)
         throws Exception
         {
             super(password, subject, keyUsage, extendedKeyUsage);
@@ -370,7 +380,8 @@ public abstract class P12KeypairGenerator
             return "ECDSA";
         }
 
-        public static ASN1ObjectIdentifier getCurveOID(String curveName)
+        public static ASN1ObjectIdentifier getCurveOID(
+                final String curveName)
         {
             ASN1ObjectIdentifier curveOID = X962NamedCurves.getOID(curveName);
             if(curveOID == null)
@@ -389,7 +400,8 @@ public abstract class P12KeypairGenerator
             return curveOID;
         }
 
-        public static String getCurveName(ASN1ObjectIdentifier curveOID)
+        public static String getCurveName(
+                final ASN1ObjectIdentifier curveOID)
         {
             String curveName = X962NamedCurves.getName(curveOID);
             if(curveName == null)

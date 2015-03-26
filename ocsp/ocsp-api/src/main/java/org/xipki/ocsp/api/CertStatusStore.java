@@ -53,19 +53,29 @@ public abstract class CertStatusStore
 {
     public abstract Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys();
 
-    public abstract boolean canResolveIssuer(HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash);
+    public abstract boolean canResolveIssuer(
+            HashAlgoType hashAlgo,
+            byte[] issuerNameHash,
+            byte[] issuerKeyHash);
 
     public abstract CertStatusInfo getCertStatus(
-            HashAlgoType hashAlgo, byte[] issuerNameHash,
-            byte[] issuerKeyHash, BigInteger serialNumber,
-            boolean includeCertHash, HashAlgoType certHashAlg,
+            HashAlgoType hashAlgo,
+            byte[] issuerNameHash,
+            byte[] issuerKeyHash,
+            BigInteger serialNumber,
+            boolean includeCertHash,
+            HashAlgoType certHashAlg,
             CertprofileOption certprofileOption)
     throws CertStatusStoreException;
 
-    public abstract void init(String conf, DataSourceWrapper datasource)
+    public abstract void init(
+            String conf,
+            DataSourceWrapper datasource)
     throws CertStatusStoreException;
 
-    public abstract CertRevocationInfo getCARevocationInfo(HashAlgoType hashAlgo, byte[] issuerNameHash,
+    public abstract CertRevocationInfo getCARevocationInfo(
+            HashAlgoType hashAlgo,
+            byte[] issuerNameHash,
             byte[] issuerKeyHash);
 
     public abstract void shutdown()
@@ -83,7 +93,8 @@ public abstract class CertStatusStore
 
     protected AuditLoggingServiceRegister auditServiceRegister;
 
-    protected CertStatusStore(String name)
+    protected CertStatusStore(
+            final String name)
     {
         ParamChecker.assertNotEmpty("name", name);
         this.name = name;
@@ -94,7 +105,8 @@ public abstract class CertStatusStore
         return name;
     }
 
-    public void setAuditServiceRegister(AuditLoggingServiceRegister auditServiceRegister)
+    public void setAuditServiceRegister(
+            final AuditLoggingServiceRegister auditServiceRegister)
     {
         this.auditServiceRegister = auditServiceRegister;
     }
@@ -109,7 +121,8 @@ public abstract class CertStatusStore
         return unknownSerialAsGood;
     }
 
-    public void setUnknownSerialAsGood(boolean unknownSerialAsGood)
+    public void setUnknownSerialAsGood(
+            final boolean unknownSerialAsGood)
     {
         this.unknownSerialAsGood = unknownSerialAsGood;
     }
@@ -119,7 +132,8 @@ public abstract class CertStatusStore
         return includeArchiveCutoff;
     }
 
-    public void setIncludeArchiveCutoff(boolean includeArchiveCutoff)
+    public void setIncludeArchiveCutoff(
+            final boolean includeArchiveCutoff)
     {
         this.includeArchiveCutoff = includeArchiveCutoff;
     }
@@ -129,7 +143,8 @@ public abstract class CertStatusStore
         return retentionInterval;
     }
 
-    public void setRetentionInterval(int retentionInterval)
+    public void setRetentionInterval(
+            final int retentionInterval)
     {
         this.retentionInterval = retentionInterval;
     }
@@ -139,7 +154,8 @@ public abstract class CertStatusStore
         return includeCrlID;
     }
 
-    public void setIncludeCrlID(boolean includeCrlID)
+    public void setIncludeCrlID(
+            final boolean includeCrlID)
     {
         this.includeCrlID = includeCrlID;
     }

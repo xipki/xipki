@@ -79,14 +79,14 @@ import org.xipki.security.api.SignerException;
 public class SignerUtil
 {
     static public RSAKeyParameters generateRSAPublicKeyParameter(
-        RSAPublicKey key)
+            final RSAPublicKey key)
     {
         return new RSAKeyParameters(false, key.getModulus(), key.getPublicExponent());
 
     }
 
     static public RSAKeyParameters generateRSAPrivateKeyParameter(
-        RSAPrivateKey key)
+            final RSAPrivateKey key)
     {
         if (key instanceof RSAPrivateCrtKey)
         {
@@ -103,13 +103,16 @@ public class SignerUtil
         }
     }
 
-    static public PSSSigner createPSSRSASigner(AlgorithmIdentifier sigAlgId)
+    static public PSSSigner createPSSRSASigner(
+            final AlgorithmIdentifier sigAlgId)
     throws OperatorCreationException
     {
         return createPSSRSASigner(sigAlgId, null);
     }
 
-    static public PSSSigner createPSSRSASigner(AlgorithmIdentifier sigAlgId, AsymmetricBlockCipher cipher)
+    static public PSSSigner createPSSRSASigner(
+            final AlgorithmIdentifier sigAlgId,
+            AsymmetricBlockCipher cipher)
     throws OperatorCreationException
     {
         if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()) == false)
@@ -155,7 +158,8 @@ public class SignerUtil
         throw new IllegalArgumentException("unknown trailer field");
     }
 
-    static public RSASSAPSSparams createPSSRSAParams(ASN1ObjectIdentifier digestAlgOID)
+    static public RSASSAPSSparams createPSSRSAParams(
+            ASN1ObjectIdentifier digestAlgOID)
     throws NoSuchAlgorithmException
     {
         int saltSize;
@@ -194,14 +198,15 @@ public class SignerUtil
     }
 
     static public AlgorithmIdentifier buildRSAPSSAlgorithmIdentifier(
-            ASN1ObjectIdentifier digAlgOid)
+            final ASN1ObjectIdentifier digAlgOid)
     throws NoSuchAlgorithmException
     {
         RSASSAPSSparams params = createPSSRSAParams(digAlgOid);
         return new AlgorithmIdentifier(PKCSObjectIdentifiers.id_RSASSA_PSS, params);
     }
 
-    static public AlgorithmIdentifier buildDSASigAlgorithmIdentifier(AlgorithmIdentifier digAlgId)
+    static public AlgorithmIdentifier buildDSASigAlgorithmIdentifier(
+            final AlgorithmIdentifier digAlgId)
     throws NoSuchAlgorithmException
     {
         ASN1ObjectIdentifier digAlgOid = digAlgId.getAlgorithm();
@@ -233,7 +238,8 @@ public class SignerUtil
         return new AlgorithmIdentifier(sid);
     }
 
-    public static  boolean verifyPOP(CertificationRequest p10Request)
+    public static  boolean verifyPOP(
+            final CertificationRequest p10Request)
     {
         PKCS10CertificationRequest p10Req = new PKCS10CertificationRequest(p10Request);
         return verifyPOP(p10Req);
@@ -255,7 +261,8 @@ public class SignerUtil
         }
     }
 
-    public static byte[] pkcs1padding(byte[] in, int blockSize)
+    public static byte[] pkcs1padding(
+            final byte[] in, final int blockSize)
     throws SignerException
     {
         int inLen = in.length;

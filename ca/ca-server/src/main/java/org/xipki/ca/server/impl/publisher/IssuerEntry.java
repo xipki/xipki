@@ -51,7 +51,11 @@ class IssuerEntry
     private final byte[] sha1Fp;
     private final byte[] cert;
 
-    IssuerEntry(int id, String subject, String hexSha1Fp, String b64Cert)
+    IssuerEntry(
+            final int id,
+            final String subject,
+            final String hexSha1Fp,
+            final String b64Cert)
     {
         super();
         this.id = id;
@@ -70,12 +74,14 @@ class IssuerEntry
         return subject;
     }
 
-    boolean matchSha1Fp(byte[] sha1Fp)
+    boolean matchSha1Fp(
+            final byte[] sha1Fp)
     {
         return Arrays.equals(this.sha1Fp, sha1Fp);
     }
 
-    boolean matchCert(byte[] encodedCert)
+    boolean matchCert(
+            final byte[] encodedCert)
     {
         return Arrays.equals(this.cert, encodedCert);
     }

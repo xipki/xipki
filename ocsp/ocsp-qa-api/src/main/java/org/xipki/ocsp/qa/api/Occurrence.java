@@ -45,7 +45,8 @@ public enum Occurrence
     optional,
     forbidden;
 
-    public static Occurrence getInstance(String name)
+    public static Occurrence getInstance(
+            final String name)
     {
         for(Occurrence entry : values())
         {

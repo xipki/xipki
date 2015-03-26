@@ -176,12 +176,14 @@ class RandomSerialNumberGenerator
         return noOctets;
     }
 
-    public void setSeed(final long seed)
+    public void setSeed(
+            final long seed)
     {
         random.setSeed(seed);
     }
 
-    public void setAlgorithm(final String algo)
+    public void setAlgorithm(
+            final String algo)
     throws NoSuchAlgorithmException
     {
         this.algorithm = algo;
@@ -189,7 +191,8 @@ class RandomSerialNumberGenerator
         init();
     }
 
-    public void setSernoOctetSize(final int noOctets)
+    public void setSernoOctetSize(
+            final int noOctets)
     {
         if (noOctets == 4)
         {

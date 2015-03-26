@@ -86,12 +86,14 @@ public class ExportCaCommand extends XipkiOsgiCommandSupport
         return null;
     }
 
-    public void setDataSourceFactory(DataSourceFactory dataSourceFactory)
+    public void setDataSourceFactory(
+            final DataSourceFactory dataSourceFactory)
     {
         this.dataSourceFactory = dataSourceFactory;
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver)
+    public void setPasswordResolver(
+            final PasswordResolver passwordResolver)
     {
         this.passwordResolver = passwordResolver;
     }

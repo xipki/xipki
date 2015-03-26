@@ -81,13 +81,16 @@ public class DbCertStatusStore extends CertStatusStore
         private final int id;
         private final Long revocationTimeMs;
 
-        public SimpleIssuerEntry(int id, Long revocationTimeMs)
+        public SimpleIssuerEntry(
+                final int id,
+                final Long revocationTimeMs)
         {
             this.id = id;
             this.revocationTimeMs = revocationTimeMs;
         }
 
-        public boolean match(IssuerEntry issuer)
+        public boolean match(
+                final IssuerEntry issuer)
         {
             if(id != issuer.getId())
             {
@@ -127,7 +130,9 @@ public class DbCertStatusStore extends CertStatusStore
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-    public DbCertStatusStore(String name, IssuerFilter issuerFilter)
+    public DbCertStatusStore(
+            final String name,
+            final IssuerFilter issuerFilter)
     {
         super(name);
         ParamChecker.assertNotNull("issuerFilter", issuerFilter);
@@ -303,9 +308,13 @@ public class DbCertStatusStore extends CertStatusStore
 
     @Override
     public CertStatusInfo getCertStatus(
-            HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash,
-            BigInteger serialNumber, boolean includeCertHash, HashAlgoType certHashAlg,
-            CertprofileOption certprofileOption)
+            final HashAlgoType hashAlgo,
+            final byte[] issuerNameHash,
+            final byte[] issuerKeyHash,
+            final BigInteger serialNumber,
+            final boolean includeCertHash,
+            final HashAlgoType certHashAlg,
+            final CertprofileOption certprofileOption)
     throws CertStatusStoreException
     {
         // wait for max. 0.5 second
@@ -459,7 +468,9 @@ public class DbCertStatusStore extends CertStatusStore
         }
     }
 
-    private byte[] getCertHash(int certId, HashAlgoType hashAlgo)
+    private byte[] getCertHash(
+            final int certId,
+            final HashAlgoType hashAlgo)
     throws DataAccessException
     {
         final String sql = hashAlgo.name().toUpperCase() + " FROM CERTHASH WHERE CERT_ID=?";
@@ -495,7 +506,8 @@ public class DbCertStatusStore extends CertStatusStore
      *         if no PreparedStament can be created within 5 seconds
      * @throws DataAccessException
      */
-    private PreparedStatement borrowPreparedStatement(String sqlQuery)
+    private PreparedStatement borrowPreparedStatement(
+            final String sqlQuery)
     throws DataAccessException
     {
         PreparedStatement ps = null;
@@ -540,13 +552,17 @@ public class DbCertStatusStore extends CertStatusStore
         }
     }
 
-    private void releaseDbResources(Statement ps, ResultSet rs)
+    private void releaseDbResources(
+            final Statement ps,
+            final ResultSet rs)
     {
         dataSource.releaseResources(ps, rs);
     }
 
     @Override
-    public void init(String conf, DataSourceWrapper datasource)
+    public void init(
+            final String conf,
+            final DataSourceWrapper datasource)
     throws CertStatusStoreException
     {
         ParamChecker.assertNotNull("datasource", datasource);
@@ -571,7 +587,10 @@ public class DbCertStatusStore extends CertStatusStore
     }
 
     @Override
-    public boolean canResolveIssuer(HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash)
+    public boolean canResolveIssuer(
+            final HashAlgoType hashAlgo,
+            final byte[] issuerNameHash,
+            final byte[] issuerKeyHash)
     {
         IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
         return issuer != null;
@@ -584,8 +603,10 @@ public class DbCertStatusStore extends CertStatusStore
     }
 
     @Override
-    public CertRevocationInfo getCARevocationInfo(HashAlgoType hashAlgo,
-            byte[] issuerNameHash, byte[] issuerKeyHash)
+    public CertRevocationInfo getCARevocationInfo(
+            final HashAlgoType hashAlgo,
+            final byte[] issuerNameHash,
+            final byte[] issuerKeyHash)
     {
         IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
         return issuer == null ? null : issuer.getRevocationInfo();

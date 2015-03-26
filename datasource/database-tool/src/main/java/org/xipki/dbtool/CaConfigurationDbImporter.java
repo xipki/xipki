@@ -88,7 +88,10 @@ class CaConfigurationDbImporter extends DbPorter
 {
     private final Unmarshaller unmarshaller;
 
-    CaConfigurationDbImporter(DataSourceWrapper dataSource, Unmarshaller unmarshaller, String srcDir)
+    CaConfigurationDbImporter(
+            final DataSourceWrapper dataSource,
+            final Unmarshaller unmarshaller,
+            final String srcDir)
     throws DataAccessException, PasswordResolverException, IOException
     {
         super(dataSource, srcDir);
@@ -141,7 +144,8 @@ class CaConfigurationDbImporter extends DbPorter
     }
 
     @SuppressWarnings("resource")
-    private void import_cmpcontrol(Cmpcontrols controls)
+    private void import_cmpcontrol(
+            final Cmpcontrols controls)
     throws DataAccessException
     {
         System.out.println("importing table CMPCONTROL");
@@ -177,7 +181,8 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" imported table CMPCONTROL");
     }
 
-    private void import_responder(ResponderType responder)
+    private void import_responder(
+            final ResponderType responder)
     throws DataAccessException
     {
         System.out.println("importing table RESPONDER");
@@ -215,7 +220,8 @@ class CaConfigurationDbImporter extends DbPorter
     }
 
     @SuppressWarnings("resource")
-    private void import_environment(Environments environments)
+    private void import_environment(
+            final Environments environments)
     throws DataAccessException
     {
         System.out.println("importing table ENVIRONMENT");
@@ -246,7 +252,8 @@ class CaConfigurationDbImporter extends DbPorter
     }
 
     @SuppressWarnings("resource")
-    private void import_crlsigner(Crlsigners crlsigners)
+    private void import_crlsigner(
+            final Crlsigners crlsigners)
     throws DataAccessException
     {
         System.out.println("importing table CRLSIGNER");
@@ -315,7 +322,8 @@ class CaConfigurationDbImporter extends DbPorter
     }
 
     @SuppressWarnings("resource")
-    private void import_publisher(Publishers publishers)
+    private void import_publisher(
+            final Publishers publishers)
     throws DataAccessException
     {
         System.out.println("importing table PUBLISHER");
@@ -348,7 +356,8 @@ class CaConfigurationDbImporter extends DbPorter
     }
 
     @SuppressWarnings("resource")
-    private void import_profile(Profiles profiles)
+    private void import_profile(
+            final Profiles profiles)
     throws DataAccessException, IOException
     {
         System.out.println("importing table PROFILE");
@@ -397,7 +406,8 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" imported table PROFILE");
     }
 
-    private void import_ca(Cas cas)
+    private void import_ca(
+            final Cas cas)
     throws DataAccessException, CertificateException, IOException
     {
         System.out.println("importing table CA");
@@ -473,7 +483,8 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" imported table CA");
     }
 
-    private void import_caalias(Caaliases caaliases)
+    private void import_caalias(
+            final Caaliases caaliases)
     throws DataAccessException
     {
         System.out.println("importing table CAALIAS");
@@ -502,7 +513,8 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" imported table CAALIAS");
     }
 
-    private void import_ca_has_requestor(CaHasRequestors ca_has_requestors)
+    private void import_ca_has_requestor(
+            final CaHasRequestors ca_has_requestors)
     throws DataAccessException
     {
         System.out.println("importing table CA_HAS_REQUESTOR");
@@ -537,7 +549,8 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" imported table CA_HAS_REQUESTOR");
     }
 
-    private void import_ca_has_publisher(CaHasPublishers ca_has_publishers)
+    private void import_ca_has_publisher(
+            final CaHasPublishers ca_has_publishers)
     throws Exception
     {
         System.out.println("importing table CA_HAS_PUBLISHER");
@@ -567,7 +580,8 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" imported table CA_HAS_PUBLISHER");
     }
 
-    private void import_ca_has_certprofile(CaHasProfiles ca_has_certprofiles)
+    private void import_ca_has_certprofile(
+            final CaHasProfiles ca_has_certprofiles)
     throws DataAccessException
     {
         System.out.println("importing table CA_HAS_PROFILE");

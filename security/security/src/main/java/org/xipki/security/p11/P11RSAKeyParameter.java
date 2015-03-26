@@ -59,10 +59,12 @@ public class P11RSAKeyParameter extends RSAKeyParameters
 
     private final int keysize;
 
-    private P11RSAKeyParameter(P11CryptService p11CryptService,
-            P11SlotIdentifier slot,
-            P11KeyIdentifier keyId,
-            BigInteger modulus, BigInteger publicExponent)
+    private P11RSAKeyParameter(
+            final P11CryptService p11CryptService,
+            final P11SlotIdentifier slot,
+            final P11KeyIdentifier keyId,
+            final BigInteger modulus,
+            final BigInteger publicExponent)
     {
         super(true, modulus, publicExponent);
 
@@ -73,9 +75,9 @@ public class P11RSAKeyParameter extends RSAKeyParameters
     }
 
     public static P11RSAKeyParameter getInstance(
-            P11CryptService p11CryptService,
-            P11SlotIdentifier slot,
-            P11KeyIdentifier keyId)
+            final P11CryptService p11CryptService,
+            final P11SlotIdentifier slot,
+            final P11KeyIdentifier keyId)
     throws InvalidKeyException
     {
         ParamChecker.assertNotNull("p11CryptService", p11CryptService);

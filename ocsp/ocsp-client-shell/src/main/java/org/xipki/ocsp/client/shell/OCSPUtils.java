@@ -47,7 +47,8 @@ import org.xipki.ocsp.client.api.OCSPResponseException;
 
 public class OCSPUtils
 {
-    public static BasicOCSPResp extractBasicOCSPResp(OCSPResp response)
+    public static BasicOCSPResp extractBasicOCSPResp(
+            final OCSPResp response)
     throws OCSPResponseException
     {
         int status = response.getStatus();

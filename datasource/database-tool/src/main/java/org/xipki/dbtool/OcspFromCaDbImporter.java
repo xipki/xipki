@@ -66,8 +66,12 @@ public class OcspFromCaDbImporter
     private final String publisherName;
     private final boolean resume;
 
-    public OcspFromCaDbImporter(DataSourceFactory dataSourceFactory,
-            PasswordResolver passwordResolver, String dbConfFile, String publisherName, boolean resume)
+    public OcspFromCaDbImporter(
+            final DataSourceFactory dataSourceFactory,
+            final PasswordResolver passwordResolver,
+            final String dbConfFile,
+            final String publisherName,
+            final boolean resume)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
@@ -80,7 +84,8 @@ public class OcspFromCaDbImporter
         this.resume = resume;
     }
 
-    public void importDatabase(String srcFolder)
+    public void importDatabase(
+            final String srcFolder)
     throws Exception
     {
         long start = System.currentTimeMillis();

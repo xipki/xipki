@@ -61,7 +61,8 @@ public enum OcspCertStatus
     sigRequired,
     unauthorized;
 
-    public static OcspCertStatus getInstance(String name)
+    public static OcspCertStatus getInstance(
+            final String name)
     {
         for(OcspCertStatus entry : values())
         {

@@ -63,7 +63,9 @@ public class SimpleXPath
      *        namespace will not be evaluated.
      * @throws XPathExpressionException
      */
-    public SimpleXPath(String relativeXPath, Map<String, String> nsPrefixURIMap)
+    public SimpleXPath(
+            final String relativeXPath,
+            final Map<String, String> nsPrefixURIMap)
     throws XPathExpressionException
     {
         if(relativeXPath.startsWith("/"))
@@ -105,14 +107,16 @@ public class SimpleXPath
         }
     }
 
-    public List<Node> select(Element context)
+    public List<Node> select(
+            final Element context)
     {
         List<Node> rv = new LinkedList<Node>();
         select(rv, context, this.steps, 0, false);
         return rv;
     }
 
-    public Node selectFirstMatch(Element context)
+    public Node selectFirstMatch(
+            final Element context)
     {
         List<Node> rv = new LinkedList<Node>();
         select(rv, context, this.steps, 0, true);
@@ -120,7 +124,11 @@ public class SimpleXPath
     }
 
     private static void select(
-            List<Node> results, Element context, List<SimpleXPathStep> steps, int stepIndex, boolean onlyFirst)
+            final List<Node> results,
+            final Element context,
+            final List<SimpleXPathStep> steps,
+            final int stepIndex,
+            final boolean onlyFirst)
     {
         if(onlyFirst && CollectionUtil.isNotEmpty(results))
         {
@@ -169,7 +177,7 @@ public class SimpleXPath
          * @param nsPrefixURIMap Prefix and URI map of namespace. Set it to null if
          *        namespace will not be evaluated.
          */
-        SimpleXPathStep(String step, Map<String, String> nsPrefixURIMap)
+        SimpleXPathStep(String step, final Map<String, String> nsPrefixURIMap)
         throws XPathExpressionException
         {
             if(step.charAt(0) == '@')

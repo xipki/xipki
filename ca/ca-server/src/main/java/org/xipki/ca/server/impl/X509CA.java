@@ -271,7 +271,7 @@ class X509CA
          * @return whether there this method should still be called.
          * @throws OperationException
          */
-        private boolean removeExpirtedCerts(RemoveExpiredCertsInfo task)
+        private boolean removeExpirtedCerts(final RemoveExpiredCertsInfo task)
         throws OperationException
         {
             final String caName = caInfo.getName();
@@ -547,11 +547,11 @@ class X509CA
     private AuditLoggingServiceRegister serviceRegister;
 
     public X509CA(
-            CAManagerImpl caManager,
-            X509CAInfo caInfo,
-            CertificateStore certstore,
-            SecurityFactory securityFactory,
-            boolean masterMode)
+            final CAManagerImpl caManager,
+            final X509CAInfo caInfo,
+            final CertificateStore certstore,
+            final SecurityFactory securityFactory,
+            final boolean masterMode)
     throws OperationException
     {
         ParamChecker.assertNotNull("caManager", caManager);
@@ -644,7 +644,8 @@ class X509CA
      * @return
      * @throws OperationException
      */
-    public CertificateList getCRL(BigInteger crlNumber)
+    public CertificateList getCRL(
+            final BigInteger crlNumber)
     throws OperationException
     {
         LOG.info("     START getCurrentCRL: ca={}, crlNumber={}", caInfo.getName(), crlNumber);
@@ -717,7 +718,8 @@ class X509CA
         }
     }
 
-    public X509CRL generateCRLonDemand(AuditEvent auditEvent)
+    public X509CRL generateCRLonDemand(
+            final AuditEvent auditEvent)
     throws OperationException
     {
         X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
@@ -769,7 +771,11 @@ class X509CA
         }
     }
 
-    private X509CRL generateCRL(boolean deltaCRL, Date thisUpdate, Date nextUpdate, AuditEvent auditEvent)
+    private X509CRL generateCRL(
+            final boolean deltaCRL,
+            final Date thisUpdate,
+            final Date nextUpdate,
+            final AuditEvent auditEvent)
     throws OperationException
     {
         X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
@@ -1081,7 +1087,8 @@ class X509CA
         }
     }
 
-    private static Extension createReasonExtension(int reasonCode)
+    private static Extension createReasonExtension(
+            final int reasonCode)
     {
         org.bouncycastle.asn1.x509.CRLReason crlReason =
                 org.bouncycastle.asn1.x509.CRLReason.lookup(reasonCode);
@@ -1096,7 +1103,8 @@ class X509CA
         }
     }
 
-    private static Extension createInvalidityDateExtension(Date invalidityDate)
+    private static Extension createInvalidityDateExtension(
+            final Date invalidityDate)
     {
         try
         {
@@ -1114,7 +1122,8 @@ class X509CA
      * @param certificateIssuer
      * @return
      */
-    private static Extension createCertificateIssuerExtension(X500Name certificateIssuer)
+    private static Extension createCertificateIssuerExtension(
+            final X500Name certificateIssuer)
     {
         try
         {
@@ -1129,15 +1138,15 @@ class X509CA
     }
 
     public X509CertificateInfo generateCertificate(
-            boolean requestedByRA,
-            RequestorInfo requestor,
-            String certprofileName,
-            String user,
-            X500Name subject,
-            SubjectPublicKeyInfo publicKeyInfo,
-            Date notBefore,
-            Date notAfter,
-            Extensions extensions)
+            final boolean requestedByRA,
+            final RequestorInfo requestor,
+            final String certprofileName,
+            final String user,
+            final X500Name subject,
+            final SubjectPublicKeyInfo publicKeyInfo,
+            final Date notBefore,
+            final Date notAfter,
+            final Extensions extensions)
     throws OperationException
     {
         final String subjectText = SecurityUtil.getRFC4519Name(subject);
@@ -1180,15 +1189,15 @@ class X509CA
     }
 
     public X509CertificateInfo regenerateCertificate(
-            boolean requestedByRA,
-            RequestorInfo requestor,
-            String certprofileName,
-            String user,
-            X500Name subject,
-            SubjectPublicKeyInfo publicKeyInfo,
-            Date notBefore,
-            Date notAfter,
-            Extensions extensions)
+            final boolean requestedByRA,
+            final RequestorInfo requestor,
+            final String certprofileName,
+            final String user,
+            final X500Name subject,
+            final SubjectPublicKeyInfo publicKeyInfo,
+            final Date notBefore,
+            final Date notAfter,
+            final Extensions extensions)
     throws OperationException
     {
         final String subjectText = SecurityUtil.getRFC4519Name(subject);
@@ -1229,7 +1238,8 @@ class X509CA
         }
     }
 
-    public boolean publishCertificate(X509CertificateInfo certInfo)
+    public boolean publishCertificate(
+            final X509CertificateInfo certInfo)
     {
         return intern_publishCertificate(certInfo) == 0;
     }
@@ -1240,7 +1250,8 @@ class X509CA
      * @return 0 for published successfully, 1 if could not be published to CA certstore and any publishers,
      *  2 if could be published to CA certstore but not to all publishers.
      */
-    private int intern_publishCertificate(X509CertificateInfo certInfo)
+    private int intern_publishCertificate(
+            final X509CertificateInfo certInfo)
     {
         if(certInfo.isAlreadyIssued())
         {
@@ -1297,7 +1308,8 @@ class X509CA
         return 0;
     }
 
-    public boolean republishCertificates(List<String> publisherNames)
+    public boolean republishCertificates(
+            final List<String> publisherNames)
     {
         List<IdentifiedX509CertPublisher> publishers;
         if(publisherNames == null)
@@ -1461,7 +1473,8 @@ class X509CA
         }
     }
 
-    public boolean clearPublishQueue(List<String> publisherNames)
+    public boolean clearPublishQueue(
+            final List<String> publisherNames)
     throws CAMgmtException
     {
         if(publisherNames == null)
@@ -1504,7 +1517,8 @@ class X509CA
         return allSuccessfull;
     }
 
-    private boolean publishCertsInQueue(IdentifiedX509CertPublisher publisher)
+    private boolean publishCertsInQueue(
+            final IdentifiedX509CertPublisher publisher)
     {
         X509CertWithDBCertId caCert = caInfo.getCertificate();
 
@@ -1577,7 +1591,8 @@ class X509CA
         return true;
     }
 
-    private boolean publishCRL(X509CRL crl)
+    private boolean publishCRL(
+            final X509CRL crl)
     {
         X509CertWithDBCertId caCert = caInfo.getCertificate();
         if(certstore.addCRL(caCert, crl) == false)
@@ -1605,8 +1620,10 @@ class X509CA
         return true;
     }
 
-    public X509CertWithRevocationInfo revokeCertificate(BigInteger serialNumber,
-            CRLReason reason, Date invalidityTime)
+    public X509CertWithRevocationInfo revokeCertificate(
+            final BigInteger serialNumber,
+            CRLReason reason,
+            final Date invalidityTime)
     throws OperationException
     {
         if(caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber))
@@ -1640,7 +1657,8 @@ class X509CA
         return do_revokeCertificate(serialNumber, reason, invalidityTime, false);
     }
 
-    public X509CertWithDBCertId unrevokeCertificate(BigInteger serialNumber)
+    public X509CertWithDBCertId unrevokeCertificate(
+            final BigInteger serialNumber)
     throws OperationException
     {
         if(caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber))
@@ -1652,7 +1670,8 @@ class X509CA
         return do_unrevokeCertificate(serialNumber, false);
     }
 
-    public X509CertWithDBCertId removeCertificate(BigInteger serialNumber)
+    public X509CertWithDBCertId removeCertificate(
+            final BigInteger serialNumber)
     throws OperationException
     {
         if(caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber))
@@ -1664,7 +1683,8 @@ class X509CA
         return do_removeCertificate(serialNumber);
     }
 
-    private X509CertWithDBCertId do_removeCertificate(BigInteger serialNumber)
+    private X509CertWithDBCertId do_removeCertificate(
+            final BigInteger serialNumber)
     throws OperationException
     {
         X509CertWithRevocationInfo certWithRevInfo =
@@ -1719,8 +1739,11 @@ class X509CA
         return certToRemove;
     }
 
-    private X509CertWithRevocationInfo do_revokeCertificate(BigInteger serialNumber,
-            CRLReason reason, Date invalidityTime, boolean force)
+    private X509CertWithRevocationInfo do_revokeCertificate(
+            final BigInteger serialNumber,
+            final CRLReason reason,
+            final Date invalidityTime,
+            final boolean force)
     throws OperationException
     {
         LOG.info("     START revokeCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}",
@@ -1789,7 +1812,9 @@ class X509CA
         return revokedCert;
     }
 
-    private X509CertWithDBCertId do_unrevokeCertificate(BigInteger serialNumber, boolean force)
+    private X509CertWithDBCertId do_unrevokeCertificate(
+            final BigInteger serialNumber,
+            final boolean force)
     throws OperationException
     {
         LOG.info("     START unrevokeCertificate: ca={}, serialNumber={}", caInfo.getName(), serialNumber);
@@ -1875,7 +1900,8 @@ class X509CA
         return true;
     }
 
-    public void revoke(CertRevocationInfo revocationInfo)
+    public void revoke(
+            final CertRevocationInfo revocationInfo)
     throws OperationException
     {
         ParamChecker.assertNotNull("revocationInfo", revocationInfo);
@@ -1948,16 +1974,16 @@ class X509CA
     }
 
     private X509CertificateInfo intern_generateCertificate(
-            boolean requestedByRA,
-            RequestorInfo requestor,
-            String certprofileName,
-            String user,
+            final boolean requestedByRA,
+            final RequestorInfo requestor,
+            final String certprofileName,
+            final String user,
             X500Name requestedSubject,
             SubjectPublicKeyInfo publicKeyInfo,
             Date notBefore,
             Date notAfter,
-            org.bouncycastle.asn1.x509.Extensions extensions,
-            boolean keyUpdate)
+            final org.bouncycastle.asn1.x509.Extensions extensions,
+            final boolean keyUpdate)
     throws OperationException
     {
         ConcurrentContentSigner signer = caInfo.getSigner();
@@ -2478,7 +2504,8 @@ class X509CA
     }
 
     // remove the RDNs with empty content
-    private static X500Name removeEmptyRDNs(X500Name name)
+    private static X500Name removeEmptyRDNs(
+            final X500Name name)
     {
         RDN[] rdns = name.getRDNs();
         List<RDN> l = new ArrayList<RDN>(rdns.length);
@@ -2506,7 +2533,8 @@ class X509CA
         }
     }
 
-    public IdentifiedX509Certprofile getX509Certprofile(String certprofileName)
+    public IdentifiedX509Certprofile getX509Certprofile(
+            final String certprofileName)
     {
         if(certprofileName == null)
         {
@@ -2522,7 +2550,8 @@ class X509CA
         return caManager.getIdentifiedCertprofile(certprofileName);
     }
 
-    public CmpRequestorInfo getRequestor(X500Name requestorSender)
+    public CmpRequestorInfo getRequestor(
+            final X500Name requestorSender)
     {
         if(requestorSender == null)
         {
@@ -2552,7 +2581,10 @@ class X509CA
         return caManager;
     }
 
-    public RemoveExpiredCertsInfo removeExpiredCerts(String certprofile, String userLike, Long overlapSeconds)
+    public RemoveExpiredCertsInfo removeExpiredCerts(
+            final String certprofile,
+            String userLike,
+            Long overlapSeconds)
     throws OperationException
     {
         if(masterMode == false)
@@ -2604,7 +2636,8 @@ class X509CA
         return info;
     }
 
-    private Date getCRLNextUpdate(Date thisUpdate)
+    private Date getCRLNextUpdate(
+            final Date thisUpdate)
     {
         CRLControl control = getCrlSigner().getCRLControl();
         if(control.getUpdateMode() != UpdateMode.interval)
@@ -2703,7 +2736,8 @@ class X509CA
         return result;
     }
 
-    public void setAuditServiceRegister(AuditLoggingServiceRegister serviceRegister)
+    public void setAuditServiceRegister(
+            final AuditLoggingServiceRegister serviceRegister)
     {
         this.serviceRegister = serviceRegister;
     }
@@ -2721,7 +2755,10 @@ class X509CA
         return ae;
     }
 
-    private static Object[] incSerialNumber(IdentifiedX509Certprofile profile, X500Name origName, String latestSN)
+    private static Object[] incSerialNumber(
+            final IdentifiedX509Certprofile profile,
+            final X500Name origName,
+            final String latestSN)
     throws BadFormatException
     {
         RDN[] rdns = origName.getRDNs();
@@ -2775,7 +2812,8 @@ class X509CA
         return new Object[]{newName, newSerialNumber};
     }
 
-    private boolean verifySignature(X509Certificate cert)
+    private boolean verifySignature(
+            final X509Certificate cert)
     {
         PublicKey caPublicKey = caInfo.getCertificate().getCert().getPublicKey();
         try
@@ -2840,7 +2878,9 @@ class X509CA
         }
     }
 
-    private static Date setToMidnight(Date date, TimeZone timezone)
+    private static Date setToMidnight(
+            final Date date,
+            final TimeZone timezone)
     {
         Calendar c = Calendar.getInstance(timezone);
         c.setTime(date);

@@ -70,7 +70,9 @@ public class IaikP11Module implements P11Module
     private Map<P11SlotIdentifier, Slot> availableSlots = new HashMap<>();
     private List<P11SlotIdentifier> slotIds;
 
-    public IaikP11Module(Module module, P11ModuleConf moduleConf)
+    public IaikP11Module(
+            final Module module,
+            final P11ModuleConf moduleConf)
     throws SignerException
     {
         ParamChecker.assertNotNull("module", module);
@@ -142,7 +144,8 @@ public class IaikP11Module implements P11Module
     }
 
     @Override
-    public IaikP11Slot getSlot(P11SlotIdentifier slotId)
+    public IaikP11Slot getSlot(
+            final P11SlotIdentifier slotId)
     throws SignerException
     {
         IaikP11Slot extSlot = slots.get(slotId);
@@ -183,7 +186,8 @@ public class IaikP11Module implements P11Module
         return extSlot;
     }
 
-    public void destroySlot(long slotId)
+    public void destroySlot(
+            final long slotId)
     {
         slots.remove(slotId);
     }

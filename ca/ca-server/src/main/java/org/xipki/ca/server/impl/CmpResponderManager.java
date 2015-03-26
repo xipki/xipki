@@ -41,7 +41,9 @@ package org.xipki.ca.server.impl;
 
 public interface CmpResponderManager
 {
-    String getCaName(String caAlias);
+    String getCaName(
+            String caAlias);
 
-    X509CACmpResponder getX509CACmpResponder(String caName);
+    X509CACmpResponder getX509CACmpResponder(
+            String caName);
 }

@@ -52,17 +52,18 @@ public class P11ECDSAContentSigner extends AbstractP11DSAContentSigner
 {
 
     public P11ECDSAContentSigner(
-            P11CryptService cryptService,
-            P11SlotIdentifier slot,
-            P11KeyIdentifier keyId,
-            AlgorithmIdentifier signatureAlgId)
+            final P11CryptService cryptService,
+            final P11SlotIdentifier slot,
+            final P11KeyIdentifier keyId,
+            final AlgorithmIdentifier signatureAlgId)
     throws NoSuchAlgorithmException, OperatorCreationException
     {
         super(cryptService, slot, keyId, signatureAlgId);
     }
 
     @Override
-    protected byte[] CKM_SIGN(byte[] hashValue)
+    protected byte[] CKM_SIGN(
+            final byte[] hashValue)
     throws SignerException
     {
         return cryptService.CKM_ECDSA(hashValue, slot, keyId);

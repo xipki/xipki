@@ -51,7 +51,11 @@ class CertBasedIdentityEntry
     private final byte[] sha1Fp;
     private final byte[] cert;
 
-    CertBasedIdentityEntry(int id, String subject, String hexSha1Fp, String b64Cert)
+    CertBasedIdentityEntry(
+            final int id,
+            final String subject,
+            final String hexSha1Fp,
+            final String b64Cert)
     {
         super();
         this.id = id;

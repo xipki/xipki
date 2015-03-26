@@ -54,7 +54,9 @@ public class P11PlainRSASigner implements AsymmetricBlockCipher
     }
 
     @Override
-    public void init(boolean forEncryption, CipherParameters param)
+    public void init(
+            final boolean forEncryption,
+            final CipherParameters param)
     {
         if(forEncryption == false)
         {
@@ -81,7 +83,10 @@ public class P11PlainRSASigner implements AsymmetricBlockCipher
     }
 
     @Override
-    public byte[] processBlock(byte[] in, int inOff, int len)
+    public byte[] processBlock(
+            final byte[] in,
+            final int inOff,
+            final int len)
     throws InvalidCipherTextException
     {
         byte[] content = new byte[getInputBlockSize()];

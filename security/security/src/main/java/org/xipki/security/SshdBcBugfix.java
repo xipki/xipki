@@ -83,9 +83,9 @@ public class SshdBcBugfix
     }
 
     private static final Method getMethod(
-            Class<?> clz,
-            String methodName,
-            Class<?>[] params)
+            final Class<?> clz,
+            final String methodName,
+            final Class<?>[] params)
     {
         Method serviceMethod = null;
         final String desc = "method " + clz.getName() + "." + methodName;

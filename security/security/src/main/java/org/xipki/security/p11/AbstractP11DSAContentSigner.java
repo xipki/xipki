@@ -69,14 +69,15 @@ abstract class AbstractP11DSAContentSigner implements ContentSigner
     protected final P11SlotIdentifier slot;
     protected final P11KeyIdentifier keyId;
 
-    protected abstract byte[] CKM_SIGN(byte[] hashValue)
+    protected abstract byte[] CKM_SIGN(
+            final byte[] hashValue)
     throws SignerException;
 
     protected AbstractP11DSAContentSigner(
-            P11CryptService cryptService,
-            P11SlotIdentifier slot,
-            P11KeyIdentifier keyId,
-            AlgorithmIdentifier signatureAlgId)
+            final P11CryptService cryptService,
+            final P11SlotIdentifier slot,
+            final P11KeyIdentifier keyId,
+            final AlgorithmIdentifier signatureAlgId)
     throws NoSuchAlgorithmException, OperatorCreationException
     {
         ParamChecker.assertNotNull("slot", slot);

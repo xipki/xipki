@@ -55,9 +55,11 @@ class CrlCertStatusInfo
     private final String certprofile;
     private final Map<HashAlgoType, byte[]> certHashes;
 
-    private CrlCertStatusInfo(CertStatus certStatus, CertRevocationInfo revocationInfo,
-            String certprofile,
-            Map<HashAlgoType, byte[]> certHashes)
+    private CrlCertStatusInfo(
+            final CertStatus certStatus,
+            final CertRevocationInfo revocationInfo,
+            final String certprofile,
+            final Map<HashAlgoType, byte[]> certHashes)
     {
         this.certStatus = certStatus;
         this.revocationInfo = revocationInfo;
@@ -71,16 +73,17 @@ class CrlCertStatusInfo
     }
 
     static CrlCertStatusInfo getGoodCertStatusInfo(
-            String certprofile, Map<HashAlgoType, byte[]> certHashes)
+            final String certprofile,
+            final Map<HashAlgoType, byte[]> certHashes)
     {
         ParamChecker.assertNotEmpty("certprofile", certprofile);
         return new CrlCertStatusInfo(CertStatus.GOOD, null, certprofile, certHashes);
     }
 
     static CrlCertStatusInfo getRevokedCertStatusInfo(
-            CertRevocationInfo revocationInfo,
-            String certprofile,
-            Map<HashAlgoType, byte[]> certHashes)
+            final CertRevocationInfo revocationInfo,
+            final String certprofile,
+            final Map<HashAlgoType, byte[]> certHashes)
     {
         ParamChecker.assertNotNull("revocationInfo", revocationInfo);
         return new CrlCertStatusInfo(CertStatus.REVOKED, revocationInfo, certprofile, certHashes);
@@ -101,7 +104,10 @@ class CrlCertStatusInfo
         return certprofile;
     }
 
-    CertStatusInfo getCertStatusInfo(HashAlgoType hashAlgo, Date thisUpdate, Date nextUpdate)
+    CertStatusInfo getCertStatusInfo(
+            final HashAlgoType hashAlgo,
+            final Date thisUpdate,
+            final Date nextUpdate)
     {
         switch(certStatus)
         {

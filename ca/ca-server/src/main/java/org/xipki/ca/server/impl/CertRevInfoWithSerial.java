@@ -50,15 +50,21 @@ public class CertRevInfoWithSerial extends CertRevocationInfo
     private static final long serialVersionUID = 1L;
     private BigInteger serial;
 
-    public CertRevInfoWithSerial(BigInteger serial, CRLReason reason,
-            Date revocationTime, Date invalidityTime)
+    public CertRevInfoWithSerial(
+            final BigInteger serial,
+            final CRLReason reason,
+            final Date revocationTime,
+            final Date invalidityTime)
     {
         super(reason, revocationTime, invalidityTime);
         this.serial = serial;
     }
 
-    public CertRevInfoWithSerial(BigInteger serial, int reasonCode,
-            Date revocationTime, Date invalidityTime)
+    public CertRevInfoWithSerial(
+            final BigInteger serial,
+            final int reasonCode,
+            final Date revocationTime,
+            final Date invalidityTime)
     {
         super(reasonCode, revocationTime, invalidityTime);
         this.serial = serial;

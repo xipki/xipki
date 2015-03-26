@@ -58,7 +58,10 @@ public class SignatureSigner implements ContentSigner
     private final SignatureStream stream = new SignatureStream();
     private final PrivateKey key;
 
-    public SignatureSigner(AlgorithmIdentifier sigAlgId, Signature signer, PrivateKey key)
+    public SignatureSigner(
+            final AlgorithmIdentifier sigAlgId,
+            final Signature signer,
+            final PrivateKey key)
     {
         ParamChecker.assertNotNull("sigAlgId", sigAlgId);
         ParamChecker.assertNotNull("signer", signer);
@@ -110,7 +113,8 @@ public class SignatureSigner implements ContentSigner
         }
 
         @Override
-        public void write(int b)
+        public void write(
+                final int b)
         throws IOException
         {
             try
@@ -123,7 +127,8 @@ public class SignatureSigner implements ContentSigner
         }
 
         @Override
-        public void write(byte[] b)
+        public void write(
+                final byte[] b)
         throws IOException
         {
             try
@@ -136,7 +141,10 @@ public class SignatureSigner implements ContentSigner
         }
 
         @Override
-        public void write(byte[] b, int off, int len)
+        public void write(
+                final byte[] b,
+                final int off,
+                final int len)
         throws IOException
         {
             try

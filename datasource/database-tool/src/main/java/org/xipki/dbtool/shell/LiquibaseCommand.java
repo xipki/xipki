@@ -85,7 +85,9 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
             description = "CA configuration file")
     private String caconfFile = DFLT_CACONF_FILE;
 
-    protected void resetAndInit(LiquibaseDatabaseConf dbConf, String schemaFile)
+    protected void resetAndInit(
+            final LiquibaseDatabaseConf dbConf,
+            final String schemaFile)
     throws Exception
     {
         printDatabaseInfo(dbConf, schemaFile);
@@ -122,7 +124,8 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
 
     }
 
-    private static Properties getDbConfPoperties(String dbconfFile)
+    private static Properties getDbConfPoperties(
+            final String dbconfFile)
     throws FileNotFoundException, IOException
     {
         Properties props = new Properties();
@@ -151,7 +154,8 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
         return ret;
     }
 
-    private static Properties getPropertiesFromFile(String propFile)
+    private static Properties getPropertiesFromFile(
+            final String propFile)
     throws FileNotFoundException, IOException
     {
         Properties props = new Properties();
@@ -159,7 +163,9 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
         return props;
     }
 
-    private void printDatabaseInfo(LiquibaseDatabaseConf dbParams, String schemaFile)
+    private void printDatabaseInfo(
+            final LiquibaseDatabaseConf dbParams,
+            final String schemaFile)
     {
         StringBuilder msg = new StringBuilder();
         msg.append("\n--------------------------------------------\n");
@@ -175,14 +181,17 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
         System.out.println(msg);
     }
 
-    private boolean confirm(String command)
+    private boolean confirm(
+            final String command)
     throws IOException
     {
         String text = read("\nDo you wish to " + command + " the database", yesNo);
         return "yes".equalsIgnoreCase(text);
     }
 
-    private String read(String prompt, Set<String> validValues)
+    private String read(
+            String prompt,
+            Set<String> validValues)
     throws IOException
     {
         if(validValues == null)
@@ -238,7 +247,8 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
         }
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver)
+    public void setPasswordResolver(
+            final PasswordResolver passwordResolver)
     {
         this.passwordResolver = passwordResolver;
     }

@@ -76,21 +76,21 @@ public class BCRSAPrivateKey
     }
 
     public BCRSAPrivateKey(
-        RSAKeyParameters key)
+            final RSAKeyParameters key)
     {
         this.modulus = key.getModulus();
         this.privateExponent = key.getExponent();
     }
 
     public BCRSAPrivateKey(
-        RSAPrivateKeySpec spec)
+            final RSAPrivateKeySpec spec)
     {
         this.modulus = spec.getModulus();
         this.privateExponent = spec.getPrivateExponent();
     }
 
     public BCRSAPrivateKey(
-        RSAPrivateKey key)
+            final RSAPrivateKey key)
     {
         this.modulus = key.getModulus();
         this.privateExponent = key.getPrivateExponent();
@@ -125,7 +125,8 @@ public class BCRSAPrivateKey
                         ZERO, getPrivateExponent(), ZERO, ZERO, ZERO, ZERO, ZERO));
     }
 
-    public boolean equals(Object o)
+    public boolean equals(
+            final Object o)
     {
         if (!(o instanceof RSAPrivateKey))
         {
@@ -149,14 +150,14 @@ public class BCRSAPrivateKey
     }
 
     public void setBagAttribute(
-        ASN1ObjectIdentifier oid,
-        ASN1Encodable attribute)
+            final ASN1ObjectIdentifier oid,
+            final ASN1Encodable attribute)
     {
         attrCarrier.setBagAttribute(oid, attribute);
     }
 
     public ASN1Encodable getBagAttribute(
-        ASN1ObjectIdentifier oid)
+            final ASN1ObjectIdentifier oid)
     {
         return attrCarrier.getBagAttribute(oid);
     }
@@ -167,7 +168,7 @@ public class BCRSAPrivateKey
     }
 
     private void readObject(
-        ObjectInputStream   in)
+            final ObjectInputStream in)
         throws IOException, ClassNotFoundException
     {
         in.defaultReadObject();
@@ -176,7 +177,7 @@ public class BCRSAPrivateKey
     }
 
     private void writeObject(
-        ObjectOutputStream  out)
+            final ObjectOutputStream out)
         throws IOException
     {
         out.defaultWriteObject();

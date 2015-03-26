@@ -100,13 +100,15 @@ class CAManagerQueryExecutor
 
     private DataSourceWrapper dataSource;
 
-    CAManagerQueryExecutor(DataSourceWrapper dataSource)
+    CAManagerQueryExecutor(
+            final DataSourceWrapper dataSource)
     {
         ParamChecker.assertNotNull("dataSource", dataSource);
         this.dataSource = dataSource;
     }
 
-    private X509Certificate generateCert(String b64Cert)
+    private X509Certificate generateCert(
+            final String b64Cert)
     throws CAMgmtException
     {
         if(b64Cert == null)
@@ -145,13 +147,15 @@ class CAManagerQueryExecutor
         }
     }
 
-    private PreparedStatement prepareFetchFirstStatement(String sql)
+    private PreparedStatement prepareFetchFirstStatement(
+            final String sql)
     throws CAMgmtException
     {
         return prepareStatement(dataSource.createFetchFirstSelectSQL(sql, 1));
     }
 
-    private PreparedStatement prepareStatement(String sql)
+    private PreparedStatement prepareStatement(
+            final String sql)
     throws CAMgmtException
     {
         Connection dsConnection;
@@ -172,7 +176,8 @@ class CAManagerQueryExecutor
         }
     }
 
-    SystemEvent getSystemEvent(String eventName)
+    SystemEvent getSystemEvent(
+            final String eventName)
     throws CAMgmtException
     {
         final String sql = "SELECT EVENT_TIME, EVENT_OWNER FROM SYSTEM_EVENT WHERE NAME=?";
@@ -204,7 +209,8 @@ class CAManagerQueryExecutor
         }
     }
 
-    void deleteSystemEvent(String eventName)
+    void deleteSystemEvent(
+            final String eventName)
     throws CAMgmtException
     {
         final String sql = "DELETE FROM SYSTEM_EVENT WHERE NAME=?";
@@ -225,7 +231,8 @@ class CAManagerQueryExecutor
         }
     }
 
-    void addSystemEvent(SystemEvent systemEvent)
+    void addSystemEvent(
+            final SystemEvent systemEvent)
     throws CAMgmtException
     {
         final String sql = "INSERT INTO SYSTEM_EVENT (NAME, EVENT_TIME, EVENT_TIME2, EVENT_OWNER)"
@@ -250,7 +257,8 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean changeSystemEvent(SystemEvent systemEvent)
+    boolean changeSystemEvent(
+            final SystemEvent systemEvent)
     throws CAMgmtException
     {
         deleteSystemEvent(systemEvent.getName());
@@ -321,7 +329,8 @@ class CAManagerQueryExecutor
         return map;
     }
 
-    CertprofileEntry createCertprofile(String name)
+    CertprofileEntry createCertprofile(
+            final String name)
     throws CAMgmtException
     {
         PreparedStatement stmt = null;
@@ -352,7 +361,8 @@ class CAManagerQueryExecutor
         return null;
     }
 
-    List<String> getNamesFromTable(String table)
+    List<String> getNamesFromTable(
+            final String table)
     throws CAMgmtException
     {
         final String sql = new StringBuilder("SELECT NAME FROM ").append(table).toString();
@@ -387,7 +397,7 @@ class CAManagerQueryExecutor
     }
 
     PublisherEntry createPublisher(
-            String name)
+            final String name)
     throws CAMgmtException
     {
         final String sql = "TYPE, CONF FROM PUBLISHER WHERE NAME=?";
@@ -418,7 +428,8 @@ class CAManagerQueryExecutor
         return null;
     }
 
-    CmpRequestorEntry createRequestor(String name)
+    CmpRequestorEntry createRequestor(
+            final String name)
     throws CAMgmtException
     {
         final String sql = "CERT FROM REQUESTOR WHERE NAME=?";
@@ -448,7 +459,8 @@ class CAManagerQueryExecutor
         return null;
     }
 
-    X509CrlSignerEntry createCrlSigner(String name)
+    X509CrlSignerEntry createCrlSigner(
+            final String name)
     throws CAMgmtException
     {
         final String sql = "SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL FROM CRLSIGNER WHERE NAME=?";
@@ -483,7 +495,8 @@ class CAManagerQueryExecutor
         return null;
     }
 
-    CmpControlEntry createCmpControl(String name)
+    CmpControlEntry createCmpControl(
+            final String name)
     throws CAMgmtException
     {
         final String sql = "CONF FROM CMPCONTROL WHERE NAME=?";
@@ -566,7 +579,10 @@ class CAManagerQueryExecutor
         }
     }
 
-    X509CAInfo createCAInfo(String name, boolean masterMode, CertificateStore certstore)
+    X509CAInfo createCAInfo(
+            final String name,
+            final boolean masterMode,
+            final CertificateStore certstore)
     throws CAMgmtException
     {
         final String sql = "NAME, ART, NEXT_SERIAL, NEXT_CRLNO, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY" +
@@ -708,7 +724,8 @@ class CAManagerQueryExecutor
         return null;
     }
 
-    Set<CAHasRequestorEntry> createCAhasRequestors(String caName)
+    Set<CAHasRequestorEntry> createCAhasRequestors(
+            final String caName)
     throws CAMgmtException
     {
         final String sql = "SELECT REQUESTOR_NAME, RA, PERMISSIONS, PROFILES FROM CA_HAS_REQUESTOR" +
@@ -751,19 +768,24 @@ class CAManagerQueryExecutor
         }
     }
 
-    Set<String> createCAhasProfiles(String caName)
+    Set<String> createCAhasProfiles(
+            final String caName)
     throws CAMgmtException
     {
         return createCAhasNames(caName, "PROFILE_NAME", "CA_HAS_PROFILE");
     }
 
-    Set<String> createCAhasPublishers(String caName)
+    Set<String> createCAhasPublishers(
+            final String caName)
     throws CAMgmtException
     {
         return createCAhasNames(caName, "PUBLISHER_NAME", "CA_HAS_PUBLISHER");
     }
 
-    Set<String> createCAhasNames(String caName, String columnName, String table)
+    Set<String> createCAhasNames(
+            final String caName,
+            final String columnName,
+            final String table)
     throws CAMgmtException
     {
         final String sql = new StringBuilder("SELECT ").append(columnName).append(" FROM ")
@@ -794,7 +816,9 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean deleteRowWithName(String name, String table)
+    boolean deleteRowWithName(
+            final String name,
+            final String table)
     throws CAMgmtException
     {
         final String sql = new StringBuilder("DELETE FROM ").append(table).append(" WHERE NAME=?").toString();
@@ -814,7 +838,8 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean deleteRows(String table)
+    boolean deleteRows(
+            final String table)
     throws CAMgmtException
     {
         final String sql = "DELETE FROM " + table;
@@ -834,7 +859,8 @@ class CAManagerQueryExecutor
         }
     }
 
-    void addCA(CAEntry caEntry)
+    void addCA(
+            final CAEntry caEntry)
     throws CAMgmtException
     {
         if(caEntry instanceof X509CAEntry == false)
@@ -916,7 +942,9 @@ class CAManagerQueryExecutor
         }
     }
 
-    void addCaAlias(String aliasName, String caName)
+    void addCaAlias(
+            final String aliasName,
+            final String caName)
     throws CAMgmtException
     {
         final String sql = "INSERT INTO CAALIAS (NAME, CA_NAME) VALUES (?, ?)";
@@ -939,7 +967,8 @@ class CAManagerQueryExecutor
         }
     }
 
-    void addCertprofile(CertprofileEntry dbEntry)
+    void addCertprofile(
+            final CertprofileEntry dbEntry)
     throws CAMgmtException
     {
         final String sql = "INSERT INTO PROFILE (NAME, ART, TYPE, CONF) VALUES (?, ?, ?, ?)";
@@ -968,7 +997,9 @@ class CAManagerQueryExecutor
         }
     }
 
-    void addCertprofileToCA(String profileName, String caName)
+    void addCertprofileToCA(
+            final String profileName,
+            final String caName)
     throws CAMgmtException
     {
         final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME) VALUES (?, ?)";
@@ -990,7 +1021,8 @@ class CAManagerQueryExecutor
         }
     }
 
-    void addCmpControl(CmpControlEntry dbEntry)
+    void addCmpControl(
+            final CmpControlEntry dbEntry)
     throws CAMgmtException
     {
         final String name = dbEntry.getName();
@@ -1017,7 +1049,8 @@ class CAManagerQueryExecutor
         }
     }
 
-    void addCmpRequestor(CmpRequestorEntry dbEntry)
+    void addCmpRequestor(
+            final CmpRequestorEntry dbEntry)
     throws CAMgmtException
     {
         String name = dbEntry.getName();
@@ -1048,7 +1081,9 @@ class CAManagerQueryExecutor
         }
     }
 
-    void addCmpRequestorToCA(CAHasRequestorEntry requestor, String caName)
+    void addCmpRequestorToCA(
+            final CAHasRequestorEntry requestor,
+            final String caName)
     throws CAMgmtException
     {
         final String requestorName = requestor.getRequestorName();
@@ -1085,7 +1120,8 @@ class CAManagerQueryExecutor
         }
     }
 
-    void addCrlSigner(X509CrlSignerEntry dbEntry)
+    void addCrlSigner(
+            final X509CrlSignerEntry dbEntry)
     throws CAMgmtException
     {
         String name = dbEntry.getName();
@@ -1123,7 +1159,9 @@ class CAManagerQueryExecutor
         }
     }
 
-    void addEnvParam(String name, String value)
+    void addEnvParam(
+            final String name,
+            final String value)
     throws CAMgmtException
     {
         final String sql = "INSERT INTO ENVIRONMENT (NAME, VALUE2) VALUES (?, ?)";
@@ -1146,7 +1184,8 @@ class CAManagerQueryExecutor
         }
     }
 
-    void addPublisher(PublisherEntry dbEntry)
+    void addPublisher(
+            final PublisherEntry dbEntry)
     throws CAMgmtException
     {
         String name = dbEntry.getName();
@@ -1173,7 +1212,9 @@ class CAManagerQueryExecutor
         }
     }
 
-    void addPublisherToCA(String publisherName, String caName)
+    void addPublisherToCA(
+            final String publisherName,
+            final String caName)
     throws CAMgmtException
     {
         final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_NAME, PUBLISHER_NAME) VALUES (?, ?)";
@@ -1195,7 +1236,8 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean changeCA(ChangeCAEntry changeCAEntry)
+    boolean changeCA(
+            final ChangeCAEntry changeCAEntry)
     throws CAMgmtException
     {
         if(changeCAEntry instanceof X509ChangeCAEntry == false)
@@ -1405,8 +1447,11 @@ class CAManagerQueryExecutor
         }
     }
 
-    IdentifiedX509Certprofile changeCertprofile(String name, String type, String conf,
-            CAManagerImpl caManager)
+    IdentifiedX509Certprofile changeCertprofile(
+            final String name,
+            String type,
+            String conf,
+            final CAManagerImpl caManager)
     throws CAMgmtException
     {
         StringBuilder sqlBuilder = new StringBuilder();
@@ -1496,7 +1541,9 @@ class CAManagerQueryExecutor
         }
     }
 
-    CmpControl changeCmpControl(String name, String conf)
+    CmpControl changeCmpControl(
+            final String name,
+            final String conf)
     throws CAMgmtException
     {
         if(conf == null)
@@ -1528,7 +1575,9 @@ class CAManagerQueryExecutor
         }
     }
 
-    CmpRequestorEntryWrapper changeCmpRequestor(String name, String base64Cert)
+    CmpRequestorEntryWrapper changeCmpRequestor(
+            final String name,
+            final String base64Cert)
     throws CAMgmtException
     {
         CmpRequestorEntry newDbEntry = new CmpRequestorEntry(name, base64Cert);
@@ -1569,7 +1618,11 @@ class CAManagerQueryExecutor
         }
     }
 
-    CmpResponderEntryWrapper changeCmpResponder(String type, String conf, String base64Cert, CAManagerImpl caManager)
+    CmpResponderEntryWrapper changeCmpResponder(
+            final String type,
+            final String conf,
+            final String base64Cert,
+            final CAManagerImpl caManager)
     throws CAMgmtException
     {
         StringBuilder m = new StringBuilder();
@@ -1671,8 +1724,13 @@ class CAManagerQueryExecutor
         }
     }
 
-    X509CrlSignerEntryWrapper changeCrlSigner(String name, String signerType, String signerConf, String base64Cert,
-            String crlControl, CAManagerImpl caManager)
+    X509CrlSignerEntryWrapper changeCrlSigner(
+            final String name,
+            String signerType,
+            String signerConf,
+            String base64Cert,
+            String crlControl,
+            CAManagerImpl caManager)
     throws CAMgmtException
     {
         StringBuilder sqlBuilder = new StringBuilder();
@@ -1799,7 +1857,9 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean changeEnvParam(String name, String value)
+    boolean changeEnvParam(
+            final String name,
+            final String value)
     throws CAMgmtException
     {
         if(value == null)
@@ -1828,8 +1888,11 @@ class CAManagerQueryExecutor
         }
     }
 
-    IdentifiedX509CertPublisher changePublisher(String name, String type, String conf,
-            CAManagerImpl caManager)
+    IdentifiedX509CertPublisher changePublisher(
+            final String name,
+            String type,
+            String conf,
+            final CAManagerImpl caManager)
     throws CAMgmtException
     {
         StringBuilder sqlBuilder = new StringBuilder();
@@ -1903,7 +1966,8 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean removeCA(String caName)
+    boolean removeCA(
+            final String caName)
     throws CAMgmtException
     {
         final String sql = "DELETE FROM CA WHERE NAME=?";
@@ -1924,7 +1988,8 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean removeCaAlias(String aliasName)
+    boolean removeCaAlias(
+            final String aliasName)
     throws CAMgmtException
     {
         final String sql = "DELETE FROM CAALIAS WHERE NAME=?";
@@ -1950,7 +2015,9 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean removeCertprofileFromCA(String profileName, String caName)
+    boolean removeCertprofileFromCA(
+            final String profileName,
+            final String caName)
     throws CAMgmtException
     {
         final String sql = "DELETE FROM CA_HAS_PROFILE WHERE CA_NAME=? AND PROFILE_NAME=?";
@@ -1976,7 +2043,9 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean removeCmpRequestorFromCA(String requestorName, String caName)
+    boolean removeCmpRequestorFromCA(
+            final String requestorName,
+            final String caName)
     throws CAMgmtException
     {
         final String sql = "DELETE FROM CA_HAS_REQUESTOR WHERE CA_NAME=? AND REQUESTOR_NAME=?";
@@ -2002,7 +2071,9 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean removePublisherFromCA(String publisherName, String caName)
+    boolean removePublisherFromCA(
+            final String publisherName,
+            final String caName)
     throws CAMgmtException
     {
         final String sql = "DELETE FROM CA_HAS_PUBLISHER WHERE CA_NAME=? AND PUBLISHER_NAME=?";
@@ -2028,7 +2099,9 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean revokeCa(String caName, CertRevocationInfo revocationInfo)
+    boolean revokeCa(
+            final String caName,
+            final CertRevocationInfo revocationInfo)
     throws CAMgmtException
     {
         String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INV_TIME=? WHERE NAME=?";
@@ -2063,7 +2136,8 @@ class CAManagerQueryExecutor
         }
     }
 
-    void setCmpResponder(CmpResponderEntry dbEntry)
+    void setCmpResponder(
+            final CmpResponderEntry dbEntry)
     throws CAMgmtException
     {
         final String sql = "INSERT INTO RESPONDER (NAME, TYPE, CONF, CERT) VALUES (?, ?, ?, ?)";
@@ -2120,7 +2194,8 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean unrevokeCa(String caName)
+    boolean unrevokeCa(
+            final String caName)
     throws CAMgmtException
     {
         LOG.info("Unrevoking of CA '{}'", caName);
@@ -2147,14 +2222,20 @@ class CAManagerQueryExecutor
         }
     }
 
-    private static void setBoolean(PreparedStatement ps, int index, boolean b)
+    private static void setBoolean(
+            final PreparedStatement ps,
+            final int index,
+            final boolean b)
     throws SQLException
     {
         ps.setInt(index, b ? 1 : 0);
     }
 
-    private static Integer addToSqlIfNotNull(StringBuilder sqlBuilder, AtomicInteger index,
-            Object columnObj, String columnName)
+    private static Integer addToSqlIfNotNull(
+            final StringBuilder sqlBuilder,
+            final AtomicInteger index,
+            final Object columnObj,
+            final String columnName)
     {
         if(columnObj == null)
         {
@@ -2165,7 +2246,8 @@ class CAManagerQueryExecutor
         return index.getAndIncrement();
     }
 
-    private static Set<Permission> getPermissions(String permissionsText)
+    private static Set<Permission> getPermissions(
+            final String permissionsText)
     throws CAMgmtException
     {
         ParamChecker.assertNotEmpty("permissionsText", permissionsText);
@@ -2194,12 +2276,15 @@ class CAManagerQueryExecutor
         return permissions;
     }
 
-    private static String toString(Collection<String> tokens, String seperator)
+    private static String toString(
+            final Collection<String> tokens,
+            final String seperator)
     {
         return StringUtil.collectionAsString(tokens, seperator);
     }
 
-    private static String getRealString(String s)
+    private static String getRealString(
+            final String s)
     {
         return CAManager.NULL.equalsIgnoreCase(s) ? null : s;
     }

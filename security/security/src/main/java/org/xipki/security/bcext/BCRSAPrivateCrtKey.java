@@ -74,7 +74,7 @@ public class BCRSAPrivateCrtKey
      * @param key the parameters object representing the private key.
      */
     public BCRSAPrivateCrtKey(
-        RSAPrivateCrtKeyParameters key)
+            final RSAPrivateCrtKeyParameters key)
     {
         super(key);
 
@@ -92,7 +92,7 @@ public class BCRSAPrivateCrtKey
      * @param spec the spec to be used in construction.
      */
     public BCRSAPrivateCrtKey(
-        RSAPrivateCrtKeySpec spec)
+            final RSAPrivateCrtKeySpec spec)
     {
         this.modulus = spec.getModulus();
         this.publicExponent = spec.getPublicExponent();
@@ -110,7 +110,7 @@ public class BCRSAPrivateCrtKey
      * @param key the object implementing the RSAPrivateCrtKey interface.
      */
     public BCRSAPrivateCrtKey(
-        RSAPrivateCrtKey key)
+            final RSAPrivateCrtKey key)
     {
         this.modulus = key.getModulus();
         this.publicExponent = key.getPublicExponent();
@@ -126,7 +126,7 @@ public class BCRSAPrivateCrtKey
      * construct an RSA key from a private key info object.
      */
     public BCRSAPrivateCrtKey(
-        PrivateKeyInfo info)
+            final PrivateKeyInfo info)
         throws IOException
     {
         this(RSAPrivateKey.getInstance(info.parsePrivateKey()));
@@ -136,7 +136,7 @@ public class BCRSAPrivateCrtKey
      * construct an RSA key from a ASN.1 RSA private key object.
      */
     public BCRSAPrivateCrtKey(
-        RSAPrivateKey key)
+            final RSAPrivateKey key)
     {
         this.modulus = key.getModulus();
         this.publicExponent = key.getPublicExponent();

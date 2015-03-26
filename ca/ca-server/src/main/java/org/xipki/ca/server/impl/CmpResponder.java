@@ -88,9 +88,13 @@ abstract class CmpResponder
     private static final Logger LOG = LoggerFactory.getLogger(CmpResponder.class);
 
     private final SecureRandom random = new SecureRandom();
+
     protected abstract ConcurrentContentSigner getSigner();
+
     protected abstract GeneralName getSender();
-    protected abstract boolean intendsMe(GeneralName requestRecipient);
+
+    protected abstract boolean intendsMe(
+            GeneralName requestRecipient);
 
     protected final SecurityFactory securityFactory;
 
@@ -101,19 +105,28 @@ abstract class CmpResponder
      */
     protected abstract CmpControl getCmpControl();
 
-    protected abstract CmpRequestorInfo getRequestor(X500Name requestorSender);
+    protected abstract CmpRequestorInfo getRequestor(
+            X500Name requestorSender);
 
-    protected abstract PKIMessage intern_processPKIMessage(RequestorInfo requestor, String user,
-            ASN1OctetString transactionId, GeneralPKIMessage pkiMessage, AuditEvent auditEvent);
+    protected abstract PKIMessage intern_processPKIMessage(
+            RequestorInfo requestor,
+            String user,
+            ASN1OctetString transactionId,
+            GeneralPKIMessage pkiMessage,
+            AuditEvent auditEvent);
 
-    protected CmpResponder(SecurityFactory securityFactory)
+    protected CmpResponder(
+            final SecurityFactory securityFactory)
     {
         ParamChecker.assertNotNull("securityFactory", securityFactory);
 
         this.securityFactory = securityFactory;
     }
 
-    public PKIMessage processPKIMessage(PKIMessage pkiMessage, X509Certificate tlsClientCert, AuditEvent auditEvent)
+    public PKIMessage processPKIMessage(
+            final PKIMessage pkiMessage,
+            final X509Certificate tlsClientCert,
+            final AuditEvent auditEvent)
     {
         GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
 
@@ -319,8 +332,10 @@ abstract class CmpResponder
         return  b;
     }
 
-    private ProtectionVerificationResult verifyProtection(String tid, GeneralPKIMessage pkiMessage,
-            CmpControl cmpControl)
+    private ProtectionVerificationResult verifyProtection(
+            final String tid,
+            final GeneralPKIMessage pkiMessage,
+            final CmpControl cmpControl)
     throws CMPException, InvalidKeyException, OperatorCreationException
     {
         ProtectedPKIMessage pMsg = new ProtectedPKIMessage(pkiMessage);
@@ -359,7 +374,9 @@ abstract class CmpResponder
                 signatureValid ? ProtectionResult.VALID : ProtectionResult.INVALID);
     }
 
-    private PKIMessage addProtection(PKIMessage pkiMessage, AuditEvent auditEvent)
+    private PKIMessage addProtection(
+            final PKIMessage pkiMessage,
+            final AuditEvent auditEvent)
     {
         try
         {
@@ -387,10 +404,11 @@ abstract class CmpResponder
         }
     }
 
-    protected PKIMessage buildErrorPkiMessage(ASN1OctetString tid,
-            PKIHeader requestHeader,
-            int failureCode,
-            String statusText)
+    protected PKIMessage buildErrorPkiMessage(
+            final ASN1OctetString tid,
+            final PKIHeader requestHeader,
+            final int failureCode,
+            final String statusText)
     {
         GeneralName respRecipient = requestHeader.getSender();
 
@@ -409,7 +427,8 @@ abstract class CmpResponder
         return new PKIMessage(respHeader.build(), body);
     }
 
-    private CmpRequestorInfo getRequestor(PKIHeader reqHeader)
+    private CmpRequestorInfo getRequestor(
+            final PKIHeader reqHeader)
     {
         GeneralName requestSender = reqHeader.getSender();
         if(requestSender.getTagNo() != GeneralName.directoryName)
@@ -420,7 +439,9 @@ abstract class CmpResponder
         return getRequestor((X500Name) requestSender.getName());
     }
 
-    protected PKIStatusInfo generateCmpRejectionStatus(Integer info, String errorMessage)
+    protected PKIStatusInfo generateCmpRejectionStatus(
+            final Integer info,
+            final String errorMessage)
     {
         PKIFreeText statusMessage = (errorMessage == null) ? null : new PKIFreeText(errorMessage);
         PKIFailureInfo failureInfo = (info == null) ? null : new PKIFailureInfo(info);

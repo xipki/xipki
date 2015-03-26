@@ -47,7 +47,12 @@ public class SubjectKeyProfileBundle
     private final String profile;
     private final boolean revoked;
 
-    public SubjectKeyProfileBundle(int certId, String subjectFp, String keyFp, String profile, boolean revoked)
+    public SubjectKeyProfileBundle(
+            final int certId,
+            final String subjectFp,
+            final String keyFp,
+            final String profile,
+            final boolean revoked)
     {
         super();
         this.certId = certId;

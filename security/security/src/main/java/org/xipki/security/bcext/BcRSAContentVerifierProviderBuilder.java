@@ -61,12 +61,14 @@ public class BcRSAContentVerifierProviderBuilder
 {
     private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
 
-    public BcRSAContentVerifierProviderBuilder(DigestAlgorithmIdentifierFinder digestAlgorithmFinder)
+    public BcRSAContentVerifierProviderBuilder(
+            final DigestAlgorithmIdentifierFinder digestAlgorithmFinder)
     {
         this.digestAlgorithmFinder = digestAlgorithmFinder;
     }
 
-    protected Signer createSigner(AlgorithmIdentifier sigAlgId)
+    protected Signer createSigner(
+            final AlgorithmIdentifier sigAlgId)
     throws OperatorCreationException
     {
         AlgorithmIdentifier digAlgId = digestAlgorithmFinder.find(sigAlgId);
@@ -82,7 +84,8 @@ public class BcRSAContentVerifierProviderBuilder
         }
     }
 
-    protected AsymmetricKeyParameter extractKeyParameters(SubjectPublicKeyInfo publicKeyInfo)
+    protected AsymmetricKeyParameter extractKeyParameters(
+            final SubjectPublicKeyInfo publicKeyInfo)
     throws IOException
     {
         return PublicKeyFactory.createKey(publicKeyInfo);
