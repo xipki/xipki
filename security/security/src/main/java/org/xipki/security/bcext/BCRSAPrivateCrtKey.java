@@ -127,7 +127,7 @@ public class BCRSAPrivateCrtKey
      */
     public BCRSAPrivateCrtKey(
             final PrivateKeyInfo info)
-        throws IOException
+    throws IOException
     {
         this(RSAPrivateKey.getInstance(info.parsePrivateKey()));
     }
@@ -166,11 +166,10 @@ public class BCRSAPrivateCrtKey
      */
     public byte[] getEncoded()
     {
-        return KeyUtil.getEncodedPrivateKeyInfo(
-                new AlgorithmIdentifier(
-                        PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE),
-                        new RSAPrivateKey(getModulus(), getPublicExponent(), getPrivateExponent(),
-                        getPrimeP(), getPrimeQ(), getPrimeExponentP(), getPrimeExponentQ(), getCrtCoefficient()));
+        AlgorithmIdentifier algId = new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
+        RSAPrivateKey key = new RSAPrivateKey(getModulus(), getPublicExponent(), getPrivateExponent(),
+                getPrimeP(), getPrimeQ(), getPrimeExponentP(), getPrimeExponentQ(), getCrtCoefficient());
+        return KeyUtil.getEncodedPrivateKeyInfo(algId, key);
     }
 
     /**

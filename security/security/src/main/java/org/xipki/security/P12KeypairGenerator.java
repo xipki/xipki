@@ -270,7 +270,9 @@ public abstract class P12KeypairGenerator
         private KeyPair keypair;
         private SubjectPublicKeyInfo subjectPublicKeyInfo;
 
-        public KeyPairWithSubjectPublicKeyInfo(KeyPair keypair, SubjectPublicKeyInfo subjectPublicKeyInfo)
+        public KeyPairWithSubjectPublicKeyInfo(
+                final KeyPair keypair,
+                final SubjectPublicKeyInfo subjectPublicKeyInfo)
         throws InvalidKeySpecException
         {
             super();
@@ -295,7 +297,9 @@ public abstract class P12KeypairGenerator
         private final X509Certificate jceCert;
         private final PrivateKey key;
 
-        KeyAndCertPair(X509CertificateHolder cert, PrivateKey key)
+        KeyAndCertPair(
+                final X509CertificateHolder cert,
+                final PrivateKey key)
         throws CertificateParsingException
         {
             this.cert = cert;
@@ -427,8 +431,13 @@ public abstract class P12KeypairGenerator
         private final int keysize;
         private final BigInteger publicExponent;
 
-        public RSAIdentityGenerator(int keysize, BigInteger publicExponent, char[] password,
-        String subject, Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyUsage)
+        public RSAIdentityGenerator(
+                final int keysize,
+                final BigInteger publicExponent,
+                final char[] password,
+                final String subject,
+                final Integer keyUsage,
+                final List<ASN1ObjectIdentifier> extendedKeyUsage)
         throws Exception
         {
             super(password, subject, keyUsage, extendedKeyUsage);
@@ -462,8 +471,13 @@ public abstract class P12KeypairGenerator
         private final int pLength;
         private final int qLength;
 
-        public DSAIdentityGenerator(int pLength, int qLength, char[] password,
-        String subject, Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyUsage)
+        public DSAIdentityGenerator(
+                final int pLength,
+                final int qLength,
+                final char[] password,
+                final String subject,
+                final Integer keyUsage,
+                final List<ASN1ObjectIdentifier> extendedKeyUsage)
         throws Exception
         {
             super(password, subject, keyUsage, extendedKeyUsage);

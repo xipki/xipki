@@ -90,7 +90,8 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever
             return false;
         }
 
-        public List<char[]> getPasswords(final PasswordResolver passwordResolver)
+        public List<char[]> getPasswords(
+                final PasswordResolver passwordResolver)
         throws PasswordResolverException
         {
             if(singlePasswords == null)

@@ -134,7 +134,7 @@ public class ProfileConfCreatorDemo
     private static class ExampleDescription extends AnyType
     {
         public ExampleDescription(
-                Element appInfo)
+                final Element appInfo)
         {
             setAny(appInfo);
         }
