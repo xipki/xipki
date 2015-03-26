@@ -60,7 +60,8 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
     private P11Control p11Control;
 
     @Override
-    public void init(P11Control p11Control)
+    public void init(
+            final P11Control p11Control)
     {
         ParamChecker.assertNotNull("p11Control", p11Control);
         this.p11Control = p11Control;
@@ -69,7 +70,8 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
     private final Map<String, RemoteP11CryptService> services = new HashMap<>();
 
     @Override
-    public P11CryptService createP11CryptService(String moduleName)
+    public P11CryptService createP11CryptService(
+            String moduleName)
     throws SignerException
     {
         ParamChecker.assertNotNull("moduleName", moduleName);
@@ -112,7 +114,9 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
         }
     }
 
-    private static void logServiceInfo(String url, RemoteP11CryptService service)
+    private static void logServiceInfo(
+            final String url,
+            final RemoteP11CryptService service)
     {
         StringBuilder sb = new StringBuilder();
         sb.append("initialized RemoteP11CryptService (url=").append(url).append(")\n");

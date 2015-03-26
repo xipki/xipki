@@ -68,7 +68,8 @@ public abstract class P12KeyGenCommand extends KeyGenCommand
             description = "password of the PKCS#12 file")
     protected String password;
 
-    protected void saveKeyAndCert(P12KeypairGenerationResult keyAndCert)
+    protected void saveKeyAndCert(
+            final P12KeypairGenerationResult keyAndCert)
     throws IOException
     {
         File p12File = new File(keyOutFile);

@@ -61,13 +61,16 @@ public interface ConcurrentContentSigner
 
     X509CertificateHolder getCertificateAsBCObject();
 
-    void setCertificateChain(X509Certificate[] certchain);
+    void setCertificateChain(
+            X509Certificate[] certchain);
 
     X509Certificate[] getCertificateChain();
 
     X509CertificateHolder[] getCertificateChainAsBCObjects();
 
-    void initialize(String conf, PasswordResolver passwordResolver)
+    void initialize(
+            String conf,
+            PasswordResolver passwordResolver)
     throws SignerException;
 
     public ContentSigner borrowContentSigner()
@@ -79,10 +82,12 @@ public interface ConcurrentContentSigner
      * @return
      * @throws InterruptedException
      */
-    public ContentSigner borrowContentSigner(int timeout)
+    public ContentSigner borrowContentSigner(
+            int timeout)
     throws NoIdleSignerException;
 
-    public void returnContentSigner(ContentSigner signer);
+    public void returnContentSigner(
+            ContentSigner signer);
 
     public boolean isHealthy();
 }

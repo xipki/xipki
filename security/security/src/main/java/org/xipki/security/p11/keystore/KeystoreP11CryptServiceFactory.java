@@ -52,7 +52,8 @@ public class KeystoreP11CryptServiceFactory implements P11CryptServiceFactory
     private P11Control p11Control;
 
     @Override
-    public void init(P11Control p11Control)
+    public void init(
+            final P11Control p11Control)
     {
         ParamChecker.assertNotNull("p11Control", p11Control);
         this.p11Control = p11Control;
@@ -60,7 +61,8 @@ public class KeystoreP11CryptServiceFactory implements P11CryptServiceFactory
     }
 
     @Override
-    public P11CryptService createP11CryptService(String moduleName)
+    public P11CryptService createP11CryptService(
+            String moduleName)
     throws SignerException
     {
         ParamChecker.assertNotNull("moduleName", moduleName);

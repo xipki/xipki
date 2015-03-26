@@ -107,7 +107,8 @@ extends Provider
         });
     }
 
-    private static boolean support(Descriptor d)
+    private static boolean support(
+            final Descriptor d)
     {
         try
         {
@@ -169,7 +170,12 @@ extends Provider
         regist(Service.Signature, "RawECDSA", "RawECDSA", OID_DSAENC, "NONEWithECDSA");
     }
 
-    private static void regist(Service service, String algorithm, String className, String oid, String... aliases)
+    private static void regist(
+            final Service service,
+            final String algorithm,
+            final String className,
+            final String oid,
+            final String... aliases)
     {
         Descriptor d = new Descriptor(service, algorithm, className, oid, aliases);
         if(support(d))
@@ -186,9 +192,12 @@ extends Provider
         private final String oid;
         private final String[] aliases;
 
-        private Descriptor(Service service, String algorithm,
-            String classNameWithoutPackage, String oid,
-            String... aliases)
+        private Descriptor(
+                final Service service,
+                final String algorithm,
+                final String classNameWithoutPackage,
+                final String oid,
+                final String... aliases)
         {
             this.service = service;
             this.algorithm = algorithm;

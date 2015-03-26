@@ -44,7 +44,9 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier>
     private final Integer slotIndex;
     private final Long slotId;
 
-    public P11SlotIdentifier(Integer slotIndex, Long slotId)
+    public P11SlotIdentifier(
+            final Integer slotIndex,
+            final Long slotId)
     {
         if(slotIndex == null && slotId == null)
         {
@@ -106,7 +108,8 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier>
     }
 
     @Override
-    public int compareTo(P11SlotIdentifier o)
+    public int compareTo(
+            final P11SlotIdentifier o)
     {
         if(this == o)
         {

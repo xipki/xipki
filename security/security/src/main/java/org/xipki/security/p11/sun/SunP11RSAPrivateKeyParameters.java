@@ -47,7 +47,8 @@ public class SunP11RSAPrivateKeyParameters extends AsymmetricKeyParameter
 {
     private PrivateKey privateKey;
 
-    public SunP11RSAPrivateKeyParameters(PrivateKey privateKey)
+    public SunP11RSAPrivateKeyParameters(
+            final PrivateKey privateKey)
     {
         super(true);
         this.privateKey = privateKey;

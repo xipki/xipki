@@ -57,10 +57,10 @@ public class P11Identity implements Comparable<P11Identity>
     protected final int signatureKeyBitLength;
 
     public P11Identity(
-            P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId,
-            X509Certificate[] certificateChain,
-            PublicKey publicKey)
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId,
+            final X509Certificate[] certificateChain,
+            final PublicKey publicKey)
     {
         ParamChecker.assertNotNull("slotId", slotId);
         ParamChecker.assertNotNull("keyId", keyId);
@@ -122,7 +122,9 @@ public class P11Identity implements Comparable<P11Identity>
         return slotId;
     }
 
-    public boolean match(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    public boolean match(
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     {
         if(this.slotId.equals(slotId) == false)
         {
@@ -132,7 +134,9 @@ public class P11Identity implements Comparable<P11Identity>
         return this.keyId.equals(keyId);
     }
 
-    public boolean match(P11SlotIdentifier slotId, String keyLabel)
+    public boolean match(
+            final P11SlotIdentifier slotId,
+            final String keyLabel)
     {
         if(keyLabel == null)
         {

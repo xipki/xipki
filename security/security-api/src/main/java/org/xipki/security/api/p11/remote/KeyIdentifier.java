@@ -62,7 +62,8 @@ public class KeyIdentifier extends ASN1Object
 {
     private P11KeyIdentifier keyId;
 
-    public KeyIdentifier(P11KeyIdentifier keyId)
+    public KeyIdentifier(
+            final P11KeyIdentifier keyId)
     {
         if(keyId == null)
         {
@@ -73,7 +74,7 @@ public class KeyIdentifier extends ASN1Object
     }
 
     public static KeyIdentifier getInstance(
-            Object obj)
+            final Object obj)
     {
         if (obj == null || obj instanceof KeyIdentifier)
         {

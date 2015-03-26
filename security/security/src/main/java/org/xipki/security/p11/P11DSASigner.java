@@ -44,13 +44,15 @@ import org.xipki.security.api.SignerException;
 
 public class P11DSASigner extends AbstractP11DSASigner
 {
-    public P11DSASigner(Digest digest)
+    public P11DSASigner(
+            final Digest digest)
     {
         super(digest);
     }
 
     @Override
-    protected byte[] sign(byte[] hashValue)
+    protected byte[] sign(
+            final byte[] hashValue)
     throws SignerException
     {
         return param.getP11CryptService().CKM_DSA(hashValue, param.getSlot(), param.getKeyId());

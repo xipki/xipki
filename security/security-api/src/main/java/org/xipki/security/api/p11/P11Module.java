@@ -47,6 +47,7 @@ public interface P11Module
 {
     List<P11SlotIdentifier> getSlotIdentifiers();
 
-    P11WritableSlot getSlot(P11SlotIdentifier slotId)
+    P11WritableSlot getSlot(
+            P11SlotIdentifier slotId)
     throws SignerException;
 }

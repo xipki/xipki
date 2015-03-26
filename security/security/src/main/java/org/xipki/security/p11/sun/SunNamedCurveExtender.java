@@ -153,7 +153,8 @@ public class SunNamedCurveExtender
         }
     }
 
-    public static void main(String[] args)
+    public static void main(
+            final String[] args)
     {
         addNamedCurves();
     }
@@ -418,7 +419,8 @@ public class SunNamedCurveExtender
         logAddedCurves(addedCurves);
     }
 
-    private static ASN1ObjectIdentifier getCurveId(String curveName)
+    private static ASN1ObjectIdentifier getCurveId(
+            final String curveName)
     {
         ASN1ObjectIdentifier curveId = X962NamedCurves.getOID(curveName);
 
@@ -441,8 +443,8 @@ public class SunNamedCurveExtender
     }
 
     private static boolean curve_isRegistered(
-            Method method_lookup,
-            ASN1ObjectIdentifier curveId)
+            final Method method_lookup,
+            final ASN1ObjectIdentifier curveId)
     {
         try
         {
@@ -457,9 +459,17 @@ public class SunNamedCurveExtender
     }
 
     private static boolean CurveDB_add(
-            Method method_add,
-            String name, String soid, int type, String sfield,
-            String a, String b, String x, String y, String n, int h)
+            final Method method_add,
+            final String name,
+            final String soid,
+            final int type,
+            final String sfield,
+            final String a,
+            final String b,
+            final String x,
+            final String y,
+            final String n,
+            final int h)
     {
         try
         {
@@ -474,9 +484,17 @@ public class SunNamedCurveExtender
     }
 
     private static boolean NamedCurve_add(
-            Method method_add,
-            String name, String soid, int type, String sfield,
-            String a, String b, String x, String y, String n, int h)
+            final Method method_add,
+            final String name,
+            final String soid,
+            final int type,
+            final String sfield,
+            final String a,
+            final String b,
+            final String x,
+            final String y,
+            final String n,
+            final int h)
     {
         try
         {
@@ -491,9 +509,9 @@ public class SunNamedCurveExtender
     }
 
     private static final Method getMethod(
-            Class<?> clz,
-            String methodName,
-            Class<?>[] params)
+            final Class<?> clz,
+            final String methodName,
+            final Class<?>[] params)
     {
         Method serviceMethod = null;
         final String desc = "method " + clz.getName() + "." + methodName;
@@ -524,8 +542,8 @@ public class SunNamedCurveExtender
     }
 
     private static final Field getField(
-            Class<?> clazz,
-            String fieldName)
+            final Class<?> clazz,
+            final String fieldName)
     {
         String desc = "Field " + fieldName;
         try
@@ -557,7 +575,8 @@ public class SunNamedCurveExtender
         final String n;
         final int h;
 
-        CurveData(X9ECParameters params)
+        CurveData(
+                final X9ECParameters params)
         {
             ECCurve curve = params.getCurve();
 
@@ -602,7 +621,8 @@ public class SunNamedCurveExtender
         }
     }
 
-    private static void logAddedCurves(Map<String, String> addedCurves)
+    private static void logAddedCurves(
+            final Map<String, String> addedCurves)
     {
         StringBuilder sb = new StringBuilder("the following named curves are added to the SUN's list of named curves:\n");
 
@@ -623,7 +643,8 @@ public class SunNamedCurveExtender
         LOG.info("{}", sb);
     }
 
-    static byte[] getNamedCurveEncoded(ECParameterSpec namedCurve)
+    static byte[] getNamedCurveEncoded(
+            final ECParameterSpec namedCurve)
     {
         try
         {
@@ -635,7 +656,8 @@ public class SunNamedCurveExtender
         }
     }
 
-    static String getNamedCurveObjectId(ECParameterSpec namedCurve)
+    static String getNamedCurveObjectId(
+            final ECParameterSpec namedCurve)
     {
         try
         {
@@ -647,7 +669,8 @@ public class SunNamedCurveExtender
         }
     }
 
-    static ECParameterSpec lookupCurve(String name)
+    static ECParameterSpec lookupCurve(
+            final String name)
     {
         try
         {
@@ -659,7 +682,8 @@ public class SunNamedCurveExtender
         }
     }
 
-    static ECParameterSpec lookupCurve(ECParameterSpec paramSpec)
+    static ECParameterSpec lookupCurve(
+            final ECParameterSpec paramSpec)
     {
         try
         {
