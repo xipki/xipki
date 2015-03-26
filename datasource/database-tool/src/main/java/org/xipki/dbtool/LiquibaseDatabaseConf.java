@@ -53,7 +53,9 @@ public class LiquibaseDatabaseConf
     private final String url;
     private final String schema;
 
-    public static LiquibaseDatabaseConf getInstance(Properties dbProps, PasswordResolver passwordResolver)
+    public static LiquibaseDatabaseConf getInstance(
+            final Properties dbProps,
+            final PasswordResolver passwordResolver)
     throws PasswordResolverException
     {
         String driverClassName;
@@ -195,7 +197,12 @@ public class LiquibaseDatabaseConf
         return new LiquibaseDatabaseConf(driverClassName, user, password, url, schema);
     }
 
-    public LiquibaseDatabaseConf(String driver, String username, String password, String url, String schema)
+    public LiquibaseDatabaseConf(
+            final String driver,
+            final String username,
+            final String password,
+            final String url,
+            final String schema)
     {
         this.driver = driver;
         this.username = username;

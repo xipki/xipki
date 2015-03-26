@@ -51,7 +51,11 @@ public class PasswordBasedEncryption
 {
     private static final String CIPHER_ALGO = "PBEWITHSHA256AND256BITAES-CBC-BC";
 
-    public static byte[] encrypt(byte[] plaintext, char[] password, int iterationCount, byte[] salt)
+    public static byte[] encrypt(
+            final byte[] plaintext,
+            final char[] password,
+            final int iterationCount,
+            final byte[] salt)
     throws GeneralSecurityException
     {
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CIPHER_ALGO, "BC");
@@ -67,7 +71,11 @@ public class PasswordBasedEncryption
         return cipher.doFinal(plaintext);
     }
 
-    public static byte[] decrypt(byte[] cipherText, char[] password, int iterationCount, byte[] salt)
+    public static byte[] decrypt(
+            final byte[] cipherText,
+            final char[] password,
+            final int iterationCount,
+            byte[] salt)
     throws GeneralSecurityException
     {
         PBEKeySpec pbeKeySpec = new PBEKeySpec(password);

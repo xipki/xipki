@@ -60,12 +60,14 @@ public class ECDSAContentVerifierProviderBuilder
 {
     private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
 
-    public ECDSAContentVerifierProviderBuilder(DigestAlgorithmIdentifierFinder digestAlgorithmFinder)
+    public ECDSAContentVerifierProviderBuilder(
+            final DigestAlgorithmIdentifierFinder digestAlgorithmFinder)
     {
         this.digestAlgorithmFinder = digestAlgorithmFinder;
     }
 
-    protected Signer createSigner(AlgorithmIdentifier sigAlgId)
+    protected Signer createSigner(
+            final AlgorithmIdentifier sigAlgId)
     throws OperatorCreationException
     {
         AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
@@ -79,7 +81,8 @@ public class ECDSAContentVerifierProviderBuilder
         return new DSADigestSigner(new ECDSASigner(), dig);
     }
 
-    protected AsymmetricKeyParameter extractKeyParameters(SubjectPublicKeyInfo publicKeyInfo)
+    protected AsymmetricKeyParameter extractKeyParameters(
+            final SubjectPublicKeyInfo publicKeyInfo)
     throws IOException
     {
         return PublicKeyFactory.createKey(publicKeyInfo);

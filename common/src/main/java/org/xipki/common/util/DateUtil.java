@@ -54,7 +54,8 @@ public class DateUtil
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    public static Date parseUTCTimeyyyyMMddhhmmss(String utcTime)
+    public static Date parseUTCTimeyyyyMMddhhmmss(
+            final String utcTime)
     {
         if(utcTime == null || utcTime.length() != 14)
         {
@@ -69,7 +70,8 @@ public class DateUtil
         }
     }
 
-    public static void main(String[] args)
+    public static void main(
+            final String[] args)
     {
         System.out.println(parseUTCTimeyyyyMMddhhmmss("20150223134459"));
     }

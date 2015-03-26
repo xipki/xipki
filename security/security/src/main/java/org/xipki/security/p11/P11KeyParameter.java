@@ -54,9 +54,10 @@ public class P11KeyParameter extends AsymmetricKeyParameter
     private final P11SlotIdentifier slot;
     private final P11KeyIdentifier keyId;
 
-    private P11KeyParameter(P11CryptService p11CryptService,
-            P11SlotIdentifier slot,
-            P11KeyIdentifier keyId)
+    private P11KeyParameter(
+            final P11CryptService p11CryptService,
+            final P11SlotIdentifier slot,
+            final P11KeyIdentifier keyId)
     {
         super(true);
 
@@ -66,9 +67,9 @@ public class P11KeyParameter extends AsymmetricKeyParameter
     }
 
     public static P11KeyParameter getInstance(
-            P11CryptService p11CryptService,
-            P11SlotIdentifier slot,
-            P11KeyIdentifier keyId)
+            final P11CryptService p11CryptService,
+            final P11SlotIdentifier slot,
+            final P11KeyIdentifier keyId)
     throws InvalidKeyException
     {
         ParamChecker.assertNotNull("p11CryptService", p11CryptService);

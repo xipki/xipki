@@ -139,7 +139,9 @@ public abstract class AbstractLoadTest
         return errorAccount.get();
     }
 
-    protected void account(int all, int failed)
+    protected void account(
+            final int all,
+            final int failed)
     {
         account.addAndGet(all);
         errorAccount.addAndGet(failed);
@@ -212,7 +214,8 @@ public abstract class AbstractLoadTest
     }
 
     private String unit = "";
-    public void setUnit(String unit)
+    public void setUnit(
+            final String unit)
     {
         if(unit != null)
         {
@@ -244,7 +247,8 @@ public abstract class AbstractLoadTest
         System.out.println(sb.toString());
     }
 
-    public static String formatTime(long seconds)
+    public static String formatTime(
+            final long seconds)
     {
         long h = seconds / 3600;
         long m = (seconds - h * 3600) / 60;
@@ -293,7 +297,9 @@ public abstract class AbstractLoadTest
         private long measureTime;
         private long measureAccount;
 
-        public MeasurePoint(long measureTime, long measureAccount)
+        public MeasurePoint(
+                final long measureTime,
+                final long measureAccount)
         {
             this.measureTime = measureTime;
             this.measureAccount = measureAccount;

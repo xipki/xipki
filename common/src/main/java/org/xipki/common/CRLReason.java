@@ -123,7 +123,9 @@ public enum CRLReason
     private final int code;
     private final String desription;
 
-    private CRLReason(int code, String description)
+    private CRLReason(
+            final int code,
+            final String description)
     {
         this.code = code;
         this.desription = description;
@@ -148,12 +150,14 @@ public enum CRLReason
         }
     }
 
-    public static CRLReason forReasonCode(int reasonCode)
+    public static CRLReason forReasonCode(
+            final int reasonCode)
     {
         return reasons.get(reasonCode);
     }
 
-    public static CRLReason getInstance(String text)
+    public static CRLReason getInstance(
+            final String text)
     {
         for(CRLReason value : values())
         {

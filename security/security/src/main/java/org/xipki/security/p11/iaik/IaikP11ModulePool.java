@@ -70,7 +70,8 @@ public class IaikP11ModulePool
         return INSTANCE;
     }
 
-    public synchronized void removeModule(String moduleName)
+    public synchronized void removeModule(
+            final String moduleName)
     {
         IaikP11Module module = modules.remove(moduleName);
         if(module == null && defaultModuleName != null &&
@@ -100,7 +101,8 @@ public class IaikP11ModulePool
         }
     }
 
-    public IaikP11Module getModule(String moduleName)
+    public IaikP11Module getModule(
+            final String moduleName)
     throws SignerException
     {
         IaikP11Module module = modules.get(moduleName);
@@ -112,7 +114,8 @@ public class IaikP11ModulePool
         return module;
     }
 
-    public synchronized IaikP11Module getModule(P11ModuleConf moduleConf)
+    public synchronized IaikP11Module getModule(
+            final P11ModuleConf moduleConf)
     throws SignerException
     {
         IaikP11Module extModule = modules.get(moduleConf.getName());
@@ -204,7 +207,8 @@ public class IaikP11ModulePool
         modules.clear();
     }
 
-    private static void close(Module module)
+    private static void close(
+            final Module module)
     {
         if (module != null)
         {
@@ -230,7 +234,8 @@ public class IaikP11ModulePool
         return defaultModuleName;
     }
 
-    public void setDefaultModuleName(String defaultModuleName)
+    public void setDefaultModuleName(
+            final String defaultModuleName)
     {
         this.defaultModuleName = defaultModuleName;
     }

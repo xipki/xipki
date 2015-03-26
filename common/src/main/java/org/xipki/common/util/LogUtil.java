@@ -42,7 +42,8 @@ package org.xipki.common.util;
 public class LogUtil
 {
 
-    public static String buildExceptionLogFormat(String message)
+    public static String buildExceptionLogFormat(
+            final String message)
     {
         return StringUtil.isBlank(message) ? "{}: {}" : message + ", {}: {}";
     }

@@ -74,7 +74,8 @@ public final class IaikP11CryptService implements P11CryptService
 
     private static final Map<String, IaikP11CryptService> instances = new HashMap<>();
 
-    public synchronized static IaikP11CryptService getInstance(P11ModuleConf moduleConf)
+    public synchronized static IaikP11CryptService getInstance(
+            final P11ModuleConf moduleConf)
     throws SignerException
     {
         synchronized (instances)
@@ -91,7 +92,8 @@ public final class IaikP11CryptService implements P11CryptService
         }
     }
 
-    private IaikP11CryptService(P11ModuleConf moduleConf)
+    private IaikP11CryptService(
+            final P11ModuleConf moduleConf)
     throws SignerException
     {
         this.moduleConf = moduleConf;
@@ -202,8 +204,10 @@ public final class IaikP11CryptService implements P11CryptService
     }
 
     @Override
-    public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo, P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
+    public byte[] CKM_RSA_PKCS(
+            final byte[] encodedDigestInfo,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         checkState();
@@ -230,16 +234,20 @@ public final class IaikP11CryptService implements P11CryptService
         }
     }
 
-    private byte[] CKM_RSA_PKCS_noReconnect(byte[] encodedDigestInfo, P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
+    private byte[] CKM_RSA_PKCS_noReconnect(
+            final byte[] encodedDigestInfo,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         return getIdentity(slotId, keyId).CKM_RSA_PKCS(extModule, encodedDigestInfo);
     }
 
     @Override
-    public byte[] CKM_RSA_X509(byte[] hash, P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
+    public byte[] CKM_RSA_X509(
+            final byte[] hash,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         checkState();
@@ -266,15 +274,20 @@ public final class IaikP11CryptService implements P11CryptService
         }
     }
 
-    private byte[] CKM_RSA_X509_noReconnect(byte[] hash, P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
+    private byte[] CKM_RSA_X509_noReconnect(
+            final byte[] hash,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         return getIdentity(slotId, keyId).CKM_RSA_X509(extModule, hash);
     }
 
     @Override
-    public byte[] CKM_ECDSA(byte[] hash, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    public byte[] CKM_ECDSA(
+            final byte[] hash,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         checkState();
@@ -301,14 +314,20 @@ public final class IaikP11CryptService implements P11CryptService
         }
     }
 
-    private byte[] CKM_ECDSA_noReconnect(byte[] hash, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    private byte[] CKM_ECDSA_noReconnect(
+            final byte[] hash,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         return getIdentity(slotId, keyId).CKM_ECDSA(extModule, hash);
     }
 
     @Override
-    public byte[] CKM_DSA(byte[] hash, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    public byte[] CKM_DSA(
+            final byte[] hash,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         checkState();
@@ -335,14 +354,19 @@ public final class IaikP11CryptService implements P11CryptService
         }
     }
 
-    private byte[] CKM_DSA_noReconnect(byte[] hash, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    private byte[] CKM_DSA_noReconnect(
+            final byte[] hash,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         return getIdentity(slotId, keyId).CKM_DSA(extModule, hash);
     }
 
     @Override
-    public PublicKey getPublicKey(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    public PublicKey getPublicKey(
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         IaikP11Identity identity = getIdentity2(slotId, keyId);
@@ -350,15 +374,18 @@ public final class IaikP11CryptService implements P11CryptService
     }
 
     @Override
-    public X509Certificate getCertificate(P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
+    public X509Certificate getCertificate(
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         IaikP11Identity identity = getIdentity2(slotId, keyId);
         return identity == null ? null : identity.getCertificate();
     }
 
-    private IaikP11Identity getIdentity(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    private IaikP11Identity getIdentity(
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         IaikP11Identity identity = getIdentity2(slotId, keyId);
@@ -369,7 +396,9 @@ public final class IaikP11CryptService implements P11CryptService
         return identity;
     }
 
-    private IaikP11Identity getIdentity2(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    private IaikP11Identity getIdentity2(
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     {
         for(IaikP11Identity identity : identities)
         {
@@ -406,8 +435,9 @@ public final class IaikP11CryptService implements P11CryptService
     }
 
     @Override
-    public X509Certificate[] getCertificates(P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
+    public X509Certificate[] getCertificates(
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         IaikP11Identity identity = getIdentity2(slotId, keyId);
@@ -432,7 +462,8 @@ public final class IaikP11CryptService implements P11CryptService
     }
 
     @Override
-    public String[] getKeyLabels(P11SlotIdentifier slotId)
+    public String[] getKeyLabels(
+            final P11SlotIdentifier slotId)
     throws SignerException
     {
         List<String> keyLabels = new LinkedList<>();

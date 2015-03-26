@@ -48,23 +48,30 @@ public class UnexpectedResultException extends Exception
     {
     }
 
-    public UnexpectedResultException(String message)
+    public UnexpectedResultException(
+            final String message)
     {
         super(message);
     }
 
-    public UnexpectedResultException(Throwable cause)
+    public UnexpectedResultException(
+            final Throwable cause)
     {
         super(cause);
     }
 
-    public UnexpectedResultException(String message, Throwable cause)
+    public UnexpectedResultException(
+            final String message,
+            final Throwable cause)
     {
         super(message, cause);
     }
 
-    public UnexpectedResultException(String message, Throwable cause,
-            boolean enableSuppression, boolean writableStackTrace)
+    public UnexpectedResultException(
+            final String message,
+            final Throwable cause,
+            final boolean enableSuppression,
+            final boolean writableStackTrace)
     {
         super(message, cause, enableSuppression, writableStackTrace);
     }

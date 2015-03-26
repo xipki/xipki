@@ -147,7 +147,8 @@ public class SecurePasswordInputPanel extends Panel
     public class MyActionListener implements ActionListener
     {
         @Override
-        public void actionPerformed(ActionEvent e)
+        public void actionPerformed(
+                final ActionEvent e)
         {
             JButton btn = (JButton) e.getSource();
             String pressedKey = (String) btn.getClientProperty("key");
@@ -183,7 +184,8 @@ public class SecurePasswordInputPanel extends Panel
         }
     }
 
-    public static void main(String[] args)
+    public static void main(
+            final String[] args)
     {
         char[] password = readPassword("Enter password");
         System.out.println("'" + new String(password) + "'");
@@ -191,7 +193,8 @@ public class SecurePasswordInputPanel extends Panel
         System.out.println("'" + new String(password2) + "'");
     }
 
-    public static char[] readPassword(String prompt)
+    public static char[] readPassword(
+            String prompt)
     {
         LookAndFeel currentLookAndFeel = UIManager.getLookAndFeel();
         try

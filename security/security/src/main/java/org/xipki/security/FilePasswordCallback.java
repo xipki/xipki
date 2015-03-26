@@ -53,7 +53,8 @@ public class FilePasswordCallback implements PasswordCallback
     private String passwordFile;
 
     @Override
-    public char[] getPassword(String prompt)
+    public char[] getPassword(
+            final String prompt)
     throws PasswordResolverException
     {
         if(passwordFile == null)

@@ -100,7 +100,8 @@ implements HessianCAManager
     {
     }
 
-    public  void setCaManager(CAManager caManager)
+    public  void setCaManager(
+            CAManager caManager)
     {
         this.caManager = caManager;
     }
@@ -118,7 +119,9 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean publishRootCA(String caName, String certprofile)
+    public boolean publishRootCA(
+            final String caName,
+            final String certprofile)
     throws HessianCAMgmtException
     {
         try
@@ -131,7 +134,9 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean republishCertificates(String caName, List<String> publisherNames)
+    public boolean republishCertificates(
+            final String caName,
+            final List<String> publisherNames)
     throws HessianCAMgmtException
     {
         try
@@ -144,7 +149,9 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean clearPublishQueue(String caName, List<String> publisherNames)
+    public boolean clearPublishQueue(
+            final String caName,
+            final List<String> publisherNames)
     throws HessianCAMgmtException
     {
         try
@@ -157,7 +164,8 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean removeCA(String caName)
+    public boolean removeCA(
+            final String caName)
     throws HessianCAMgmtException
     {
         try
@@ -189,7 +197,9 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean addCaAlias(String aliasName, String caName)
+    public boolean addCaAlias(
+            final String aliasName,
+            final String caName)
     throws HessianCAMgmtException
     {
         try
@@ -202,7 +212,8 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean removeCaAlias(String aliasName)
+    public boolean removeCaAlias(
+            final String aliasName)
     throws HessianCAMgmtException
     {
         try
@@ -215,13 +226,15 @@ implements HessianCAManager
     }
 
     @Override
-    public String getAliasName(String caName)
+    public String getAliasName(
+            final String caName)
     {
         return caManager.getAliasName(caName);
     }
 
     @Override
-    public String getCaName(String aliasName)
+    public String getCaName(
+            final String aliasName)
     {
         return caManager.getCaName(aliasName);
     }
@@ -269,7 +282,8 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean addCA(CAEntry newCaDbEntry)
+    public boolean addCA(
+            final CAEntry newCaDbEntry)
     throws HessianCAMgmtException
     {
         try
@@ -282,13 +296,15 @@ implements HessianCAManager
     }
 
     @Override
-    public X509CAEntry getCA(String caName)
+    public X509CAEntry getCA(
+            final String caName)
     {
         return caManager.getCA(caName);
     }
 
     @Override
-    public boolean changeCA(ChangeCAEntry changeCAentry)
+    public boolean changeCA(
+            final ChangeCAEntry changeCAentry)
     throws HessianCAMgmtException
     {
         try
@@ -301,7 +317,9 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean removeCertprofileFromCA(String profileName, String caName)
+    public boolean removeCertprofileFromCA(
+            final String profileName,
+            final String caName)
     throws HessianCAMgmtException
     {
         try
@@ -314,7 +332,9 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean addCertprofileToCA(String profileName, String caName)
+    public boolean addCertprofileToCA(
+            final String profileName,
+            final String caName)
     throws HessianCAMgmtException
     {
         try
@@ -327,7 +347,9 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean removePublisherFromCA(String publisherName, String caName)
+    public boolean removePublisherFromCA(
+            final String publisherName,
+            final String caName)
     throws HessianCAMgmtException
     {
         try
@@ -340,7 +362,9 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean addPublisherToCA(String publisherName, String caName)
+    public boolean addPublisherToCA(
+            final String publisherName,
+            final String caName)
     throws HessianCAMgmtException
     {
         try
@@ -353,25 +377,29 @@ implements HessianCAManager
     }
 
     @Override
-    public Set<String> getCertprofilesForCA(String caName)
+    public Set<String> getCertprofilesForCA(
+            final String caName)
     {
         return caManager.getCertprofilesForCA(caName);
     }
 
     @Override
-    public Set<CAHasRequestorEntry> getCmpRequestorsForCA(String caName)
+    public Set<CAHasRequestorEntry> getCmpRequestorsForCA(
+            final String caName)
     {
         return caManager.getCmpRequestorsForCA(caName);
     }
 
     @Override
-    public CmpRequestorEntry getCmpRequestor(String name)
+    public CmpRequestorEntry getCmpRequestor(
+            final String name)
     {
         return caManager.getCmpRequestor(name);
     }
 
     @Override
-    public boolean addCmpRequestor(CmpRequestorEntry dbEntry)
+    public boolean addCmpRequestor(
+            final CmpRequestorEntry dbEntry)
     throws HessianCAMgmtException
     {
         try
@@ -384,7 +412,8 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean removeCmpRequestor(String requestorName)
+    public boolean removeCmpRequestor(
+            final String requestorName)
     throws HessianCAMgmtException
     {
         try
@@ -397,7 +426,9 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean changeCmpRequestor(String name, String base64Cert)
+    public boolean changeCmpRequestor(
+            final String name,
+            final String base64Cert)
     throws HessianCAMgmtException
     {
         try
@@ -410,7 +441,9 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean removeCmpRequestorFromCA(String requestorName, String caName)
+    public boolean removeCmpRequestorFromCA(
+            final String requestorName,
+            final String caName)
     throws HessianCAMgmtException
     {
         try
@@ -423,7 +456,9 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean addCmpRequestorToCA(CAHasRequestorEntry requestor, String caName)
+    public boolean addCmpRequestorToCA(
+            final CAHasRequestorEntry requestor,
+            final String caName)
     throws HessianCAMgmtException
     {
         try
@@ -436,13 +471,15 @@ implements HessianCAManager
     }
 
     @Override
-    public CertprofileEntry getCertprofile(String profileName)
+    public CertprofileEntry getCertprofile(
+            final String profileName)
     {
         return caManager.getCertprofile(profileName);
     }
 
     @Override
-    public boolean removeCertprofile(String profileName)
+    public boolean removeCertprofile(
+            final String profileName)
     throws HessianCAMgmtException
     {
         try
@@ -455,7 +492,10 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean changeCertprofile(String name, String type, String conf)
+    public boolean changeCertprofile(
+            final String name,
+            final String type,
+            final String conf)
     throws HessianCAMgmtException
     {
         try
@@ -468,7 +508,8 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean addCertprofile(CertprofileEntry dbEntry)
+    public boolean addCertprofile(
+            final CertprofileEntry dbEntry)
     throws HessianCAMgmtException
     {
         try
@@ -481,7 +522,8 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean setCmpResponder(CmpResponderEntry dbEntry)
+    public boolean setCmpResponder(
+            final CmpResponderEntry dbEntry)
     throws HessianCAMgmtException
     {
         try
@@ -507,7 +549,10 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean changeCmpResponder(String type, String conf, String base64Cert)
+    public boolean changeCmpResponder(
+            final String type,
+            final String conf,
+            final String base64Cert)
     throws HessianCAMgmtException
     {
         try
@@ -526,7 +571,8 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean addCrlSigner(X509CrlSignerEntry dbEntry)
+    public boolean addCrlSigner(
+            final X509CrlSignerEntry dbEntry)
     throws HessianCAMgmtException
     {
         try
@@ -539,7 +585,8 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean removeCrlSigner(String crlSignerName)
+    public boolean removeCrlSigner(
+            final String crlSignerName)
     throws HessianCAMgmtException
     {
         try
@@ -552,8 +599,12 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean changeCrlSigner(String name, String signer_type,
-            String signer_conf, String signer_cert, String crlControl)
+    public boolean changeCrlSigner(
+            final String name,
+            final String signer_type,
+            final String signer_conf,
+            final String signer_cert,
+            final String crlControl)
     throws HessianCAMgmtException
     {
         try
@@ -566,13 +617,15 @@ implements HessianCAManager
     }
 
     @Override
-    public X509CrlSignerEntry getCrlSigner(String name)
+    public X509CrlSignerEntry getCrlSigner(
+            final String name)
     {
         return caManager.getCrlSigner(name);
     }
 
     @Override
-    public boolean addPublisher(PublisherEntry dbEntry)
+    public boolean addPublisher(
+            final PublisherEntry dbEntry)
     throws HessianCAMgmtException
     {
         try
@@ -585,19 +638,22 @@ implements HessianCAManager
     }
 
     @Override
-    public List<PublisherEntry> getPublishersForCA(String caName)
+    public List<PublisherEntry> getPublishersForCA(
+            final String caName)
     {
         return caManager.getPublishersForCA(caName);
     }
 
     @Override
-    public PublisherEntry getPublisher(String publisherName)
+    public PublisherEntry getPublisher(
+            final String publisherName)
     {
         return caManager.getPublisher(publisherName);
     }
 
     @Override
-    public boolean removePublisher(String publisherName)
+    public boolean removePublisher(
+            final String publisherName)
     throws HessianCAMgmtException
     {
         try
@@ -610,7 +666,10 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean changePublisher(String name, String type, String conf)
+    public boolean changePublisher(
+            final String name,
+            final String type,
+            final String conf)
     throws HessianCAMgmtException
     {
         try
@@ -623,13 +682,15 @@ implements HessianCAManager
     }
 
     @Override
-    public CmpControlEntry getCmpControl(String name)
+    public CmpControlEntry getCmpControl(
+            final String name)
     {
         return caManager.getCmpControl(name);
     }
 
     @Override
-    public boolean addCmpControl(CmpControlEntry dbEntry)
+    public boolean addCmpControl(
+            final CmpControlEntry dbEntry)
     throws HessianCAMgmtException
     {
         try
@@ -642,7 +703,8 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean removeCmpControl(String name)
+    public boolean removeCmpControl(
+            final String name)
     throws HessianCAMgmtException
     {
         try
@@ -655,7 +717,9 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean changeCmpControl(String name, String conf)
+    public boolean changeCmpControl(
+            final String name,
+            final String conf)
     throws HessianCAMgmtException
     {
         try
@@ -674,13 +738,16 @@ implements HessianCAManager
     }
 
     @Override
-    public String getEnvParam(String name)
+    public String getEnvParam(
+            final String name)
     {
         return caManager.getEnvParam(name);
     }
 
     @Override
-    public boolean addEnvParam(String name, String value)
+    public boolean addEnvParam(
+            final String name,
+            final String value)
     throws HessianCAMgmtException
     {
         try
@@ -693,7 +760,8 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean removeEnvParam(String envParamName)
+    public boolean removeEnvParam(
+            final String envParamName)
     throws HessianCAMgmtException
     {
         try
@@ -706,7 +774,9 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean changeEnvParam(String name, String value)
+    public boolean changeEnvParam(
+            final String name,
+            final String value)
     throws HessianCAMgmtException
     {
         try
@@ -719,7 +789,9 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean revokeCa(String caName, CertRevocationInfo revocationInfo)
+    public boolean revokeCa(
+            final String caName,
+            final CertRevocationInfo revocationInfo)
     throws HessianCAMgmtException
     {
         try
@@ -732,7 +804,7 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean unrevokeCa(String caName)
+    public boolean unrevokeCa(final String caName)
     throws HessianCAMgmtException
     {
         try
@@ -745,8 +817,11 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean revokeCertificate(String caName, BigInteger serialNumber,
-            CRLReason reason, Date invalidityTime)
+    public boolean revokeCertificate(
+            final String caName,
+            final BigInteger serialNumber,
+            final CRLReason reason,
+            final Date invalidityTime)
     throws HessianCAMgmtException
     {
         try
@@ -759,7 +834,9 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean unrevokeCertificate(String caName, BigInteger serialNumber)
+    public boolean unrevokeCertificate(
+            String caName,
+            BigInteger serialNumber)
     throws HessianCAMgmtException
     {
         try
@@ -772,7 +849,9 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean removeCertificate(String caName, BigInteger serialNumber)
+    public boolean removeCertificate(
+            String caName,
+            BigInteger serialNumber)
     throws HessianCAMgmtException
     {
         try
@@ -785,8 +864,11 @@ implements HessianCAManager
     }
 
     @Override
-    public byte[] generateCertificate(String caName, String profileName,
-            String user, byte[] encodedPkcs10Request)
+    public byte[] generateCertificate(
+            final String caName,
+            final String profileName,
+            final String user,
+            final byte[] encodedPkcs10Request)
     throws HessianCAMgmtException
     {
         try
@@ -803,7 +885,10 @@ implements HessianCAManager
     }
 
     @Override
-    public X509Certificate generateSelfSignedCA(X509CAEntry caEntry, String certprofileName, byte[] p10Req)
+    public X509Certificate generateSelfSignedCA(
+            final X509CAEntry caEntry,
+            final String certprofileName,
+            final byte[] p10Req)
     throws HessianCAMgmtException
     {
         try
@@ -816,7 +901,8 @@ implements HessianCAManager
     }
 
     @Override
-    public String getAttribute(String attributeKey)
+    public String getAttribute(
+            String attributeKey)
     {
         if("version".equalsIgnoreCase(attributeKey))
         {
@@ -826,7 +912,9 @@ implements HessianCAManager
     }
 
     @Override
-    public void service(ServletRequest request, ServletResponse response)
+    public void service(
+            ServletRequest request,
+            ServletResponse response)
     throws IOException, ServletException
     {
         X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
@@ -928,27 +1016,32 @@ implements HessianCAManager
         trustedUserCerts.clear();
     }
 
-    public  void setTruststoreFile(String truststoreFile)
+    public  void setTruststoreFile(
+            final String truststoreFile)
     {
         this.truststoreFile = truststoreFile;
     }
 
-    public  void setTruststoreType(String truststoreType)
+    public  void setTruststoreType(
+            final String truststoreType)
     {
         this.truststoreType = truststoreType;
     }
 
-    public  void setTruststoreProvider(String truststoreProvider)
+    public  void setTruststoreProvider(
+            final String truststoreProvider)
     {
         this.truststoreProvider = truststoreProvider;
     }
 
-    public  void setTruststorePassword(String truststorePassword)
+    public  void setTruststorePassword(
+            final String truststorePassword)
     {
         this.truststorePassword = truststorePassword;
     }
 
-    public  void setSecurityFactory(SecurityFactory securityFactory)
+    public  void setSecurityFactory(
+            SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;
     }

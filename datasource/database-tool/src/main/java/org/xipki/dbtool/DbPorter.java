@@ -86,7 +86,9 @@ public class DbPorter
 
     protected final String baseDir;
 
-    public DbPorter(DataSourceWrapper dataSource, String baseDir)
+    public DbPorter(
+            final DataSourceWrapper dataSource,
+            final String baseDir)
     throws DataAccessException
     {
         super();
@@ -105,7 +107,10 @@ public class DbPorter
         this.baseDir = IoUtil.expandFilepath(baseDir);
     }
 
-    protected static void setLong(PreparedStatement ps, int index, Long i)
+    protected static void setLong(
+            final PreparedStatement ps,
+            final int index,
+            final Long i)
     throws SQLException
     {
         if(i != null)
@@ -118,7 +123,10 @@ public class DbPorter
         }
     }
 
-    protected static void setInt(PreparedStatement ps, int index, Integer i)
+    protected static void setInt(
+            final PreparedStatement ps,
+            final int index,
+            final Integer i)
     throws SQLException
     {
         if(i != null)
@@ -131,7 +139,10 @@ public class DbPorter
         }
     }
 
-    protected static void setBoolean(PreparedStatement ps, int index, boolean b)
+    protected static void setBoolean(
+            final PreparedStatement ps,
+            final int index,
+            final boolean b)
     throws SQLException
     {
         ps.setInt(index, b ? 1 : 0);
@@ -149,7 +160,8 @@ public class DbPorter
         }
     }
 
-    protected PreparedStatement prepareStatement(String sql)
+    protected PreparedStatement prepareStatement(
+            final String sql)
     throws DataAccessException
     {
         try
@@ -161,7 +173,9 @@ public class DbPorter
         }
     }
 
-    protected void releaseResources(Statement ps, ResultSet rs)
+    protected void releaseResources(
+            final Statement ps,
+            final ResultSet rs)
     {
         if(ps != null)
         {
@@ -190,37 +204,46 @@ public class DbPorter
         connection = null;
     }
 
-    public long getMin(String table, String column)
+    public long getMin(
+            final String table,
+            final String column)
     throws DataAccessException
     {
         return dataSource.getMin(connection, table, column);
     }
 
-    public long getMax(String table, String column)
+    public long getMax(
+            final String table,
+            final String column)
     throws DataAccessException
     {
         return dataSource.getMax(connection, table, column);
     }
 
-    public int getCount(String table)
+    public int getCount(
+            final String table)
     throws DataAccessException
     {
         return dataSource.getCount(connection, table);
     }
 
-    public boolean tableHasColumn(String table, String column)
+    public boolean tableHasColumn(
+            final String table,
+            final String column)
     throws DataAccessException
     {
         return dataSource.tableHasColumn(connection, table, column);
     }
 
-    public boolean tableExists(String table)
+    public boolean tableExists(
+            final String table)
     throws DataAccessException
     {
         return dataSource.tableExists(connection, table);
     }
 
-    public static final Schema retrieveSchema(String schemaPath)
+    public static final Schema retrieveSchema(
+            final String schemaPath)
     throws JAXBException
     {
         URL schemaUrl = DbPorter.class.getResource(schemaPath);
@@ -258,7 +281,9 @@ public class DbPorter
         }
     }
 
-    protected DataAccessException translate(String sql, SQLException e)
+    protected DataAccessException translate(
+            final String sql,
+            final SQLException e)
     {
         return dataSource.translate(sql, e);
     }
@@ -287,7 +312,8 @@ public class DbPorter
         }
     }
 
-    protected void commit(String task)
+    protected void commit(
+            final String task)
     throws DataAccessException
     {
         try
@@ -299,7 +325,8 @@ public class DbPorter
         }
     }
 
-    public static Properties getDbConfProperties(InputStream is)
+    public static Properties getDbConfProperties(
+            final InputStream is)
     throws IOException
     {
         Properties props = new Properties();
@@ -341,7 +368,10 @@ public class DbPorter
         System.out.println("\n-----------------------------------------");
     }
 
-    public static void printStatus(long total, long currentAccount, long startTime)
+    public static void printStatus(
+            final long total,
+            final long currentAccount,
+            final long startTime)
     {
         long now = System.currentTimeMillis();
         String accountS = Long.toString(currentAccount);
@@ -378,7 +408,9 @@ public class DbPorter
         System.out.flush();
     }
 
-    public static void echoToFile(String content, File file)
+    public static void echoToFile(
+            final String content,
+            final File file)
     throws IOException
     {
         FileOutputStream out = null;
@@ -396,7 +428,9 @@ public class DbPorter
         }
     }
 
-    public static void deleteTmpFiles(String dirName, String prefix)
+    public static void deleteTmpFiles(
+            final String dirName,
+            final String prefix)
     {
         // delete the temporary files
         File dir = new File(dirName);

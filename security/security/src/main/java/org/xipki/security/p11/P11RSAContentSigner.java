@@ -76,10 +76,10 @@ public class P11RSAContentSigner implements ContentSigner
     private final AlgorithmIdentifier digAlgId;
 
     public P11RSAContentSigner(
-            P11CryptService cryptService,
-            P11SlotIdentifier slot,
-            P11KeyIdentifier keyId,
-            AlgorithmIdentifier signatureAlgId)
+            final P11CryptService cryptService,
+            final P11SlotIdentifier slot,
+            final P11KeyIdentifier keyId,
+            final AlgorithmIdentifier signatureAlgId)
     throws NoSuchAlgorithmException, NoSuchPaddingException, OperatorCreationException
     {
         ParamChecker.assertNotNull("slot", slot);

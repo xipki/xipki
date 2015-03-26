@@ -64,7 +64,8 @@ public class HashCalculator
         mdsMap.put(HashAlgoType.SHA512, getMessageDigests("SHA-512"));
     }
 
-    private static BlockingDeque<MessageDigest> getMessageDigests(String hashAlgo)
+    private static BlockingDeque<MessageDigest> getMessageDigests(
+            final String hashAlgo)
     {
         BlockingDeque<MessageDigest> mds = new LinkedBlockingDeque<>();
         for(int i = 0; i < parallelism; i++)
@@ -82,13 +83,17 @@ public class HashCalculator
         return mds;
     }
 
-    public static String hexHash(HashAlgoType hashAlgoType, byte[] data)
+    public static String hexHash(
+            final HashAlgoType hashAlgoType,
+            final byte[] data)
     {
         byte[] bytes = hash(hashAlgoType, data);
         return bytes == null ? null : Hex.toHexString(bytes).toUpperCase();
     }
 
-    public static byte[] hash(HashAlgoType hashAlgoType, byte[] data)
+    public static byte[] hash(
+            final HashAlgoType hashAlgoType,
+            final byte[] data)
     {
         ParamChecker.assertNotNull("hashAlgoType", hashAlgoType);
         ParamChecker.assertNotNull("data", data);

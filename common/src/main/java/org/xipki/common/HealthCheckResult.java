@@ -60,13 +60,15 @@ public class HealthCheckResult
      * Name of the check result
      * @param name
      */
-    public HealthCheckResult(String name)
+    public HealthCheckResult(
+            final String name)
     {
         ParamChecker.assertNotEmpty("name", name);
         this.name = name;
     }
 
-    public void setHealthy(boolean healthy)
+    public void setHealthy(
+            final boolean healthy)
     {
         this.healthy = healthy;
     }
@@ -76,7 +78,8 @@ public class HealthCheckResult
         this.statuses.clear();
     }
 
-    public Object getStatus(String statusName)
+    public Object getStatus(
+            final String statusName)
     {
         return statusName == null ? null : statuses.get(statusName);
     }
@@ -86,7 +89,8 @@ public class HealthCheckResult
         this.childChecks.clear();
     }
 
-    public void addChildCheck(HealthCheckResult childCheck)
+    public void addChildCheck(
+            final HealthCheckResult childCheck)
     {
         this.childChecks.add(childCheck);
     }
@@ -106,12 +110,15 @@ public class HealthCheckResult
         return Collections.unmodifiableMap(statuses);
     }
 
-    public String toJsonMessage(boolean pretty)
+    public String toJsonMessage(
+            final boolean pretty)
     {
         return toJsonMessage(0, pretty);
     }
 
-    private String toJsonMessage(int level, boolean pretty)
+    private String toJsonMessage(
+            final int level,
+            final boolean pretty)
     {
         // Non root check requires always a name
         StringBuilder sb = new StringBuilder();
@@ -192,7 +199,13 @@ public class HealthCheckResult
         return sb.toString();
     }
 
-    private static void append(StringBuilder sb, String name, Object value, int level, boolean pretty, boolean lastElement)
+    private static void append(
+            final StringBuilder sb,
+            final String name,
+            final Object value,
+            final int level,
+            final boolean pretty,
+            final boolean lastElement)
     {
         if(pretty)
         {
@@ -222,7 +235,8 @@ public class HealthCheckResult
         }
     }
 
-    private static String getIndent(int level)
+    private static String getIndent(
+            final int level)
     {
         if(level == 0)
         {
@@ -237,7 +251,9 @@ public class HealthCheckResult
         return sb.toString();
     }
 
-    public static HealthCheckResult getInstanceFromJsonMessage(String name, String jsonMessage)
+    public static HealthCheckResult getInstanceFromJsonMessage(
+            final String name,
+            final String jsonMessage)
     {
         // remove white spaces and line breaks
         String jsonMsg = jsonMessage.replaceAll(" |\t|\r|\n", "");
@@ -296,7 +312,8 @@ public class HealthCheckResult
         return result;
     }
 
-    private static Map<String, String> getChildBlocks(String block)
+    private static Map<String, String> getChildBlocks(
+            final String block)
     {
         Map<String, String> childBlocks = new HashMap<>();
 
@@ -318,7 +335,9 @@ public class HealthCheckResult
         return childBlocks;
     }
 
-    private static String getBlock(String text, int offset)
+    private static String getBlock(
+            final String text,
+            final int offset)
     {
         if(text.startsWith("{", offset) == false)
         {
@@ -359,7 +378,8 @@ public class HealthCheckResult
         throw new IllegalArgumentException("invalid text: '" + text + "'");
     }
 
-    public static void main(String[] args)
+    public static void main(
+            final String[] args)
     {
         String jm1 = "{\"healthy\":true}";
         String jm2 = "{\"healthy\":true,\"checks\":{\"childcheck\":{\"healthy\":false,"

@@ -65,8 +65,11 @@ public class OcspDbImporter
     private final Unmarshaller unmarshaller;
     private final boolean resume;
 
-    public OcspDbImporter(DataSourceFactory dataSourceFactory,
-            PasswordResolver passwordResolver, String dbConfFile, boolean resume)
+    public OcspDbImporter(
+            final DataSourceFactory dataSourceFactory,
+            final PasswordResolver passwordResolver,
+            final String dbConfFile,
+            final boolean resume)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
@@ -78,7 +81,8 @@ public class OcspDbImporter
         this.resume = resume;
     }
 
-    public void importDatabase(String srcFolder)
+    public void importDatabase(
+            final String srcFolder)
     throws Exception
     {
         long start = System.currentTimeMillis();
