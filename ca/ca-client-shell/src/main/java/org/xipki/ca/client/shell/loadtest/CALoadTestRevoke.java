@@ -278,7 +278,8 @@ class CALoadTestRevoke extends AbstractLoadTest
             }
         }
 
-        private boolean testNext(List<Long> serialNumbers)
+        private boolean testNext(
+                final List<Long> serialNumbers)
         {
             RevokeCertRequestType request = new RevokeCertRequestType();
             int id = 1;
