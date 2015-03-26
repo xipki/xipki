@@ -49,7 +49,9 @@ class CAInfo
     private final X509Certificate cert;
     private final Set<CertprofileInfo> certprofiles;
 
-    CAInfo(X509Certificate cert, Set<CertprofileInfo> certprofiles)
+    CAInfo(
+            final X509Certificate cert,
+            final Set<CertprofileInfo> certprofiles)
     {
         this.cert = cert;
         this.certprofiles = certprofiles;

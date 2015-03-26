@@ -82,7 +82,10 @@ class CALoadTestEnroll extends AbstractLoadTest
         return new Testor();
     }
 
-    public CALoadTestEnroll(RAWorker raWorker, LoadTestEntry loadtestEntry, int n)
+    public CALoadTestEnroll(
+            final RAWorker raWorker,
+            final LoadTestEntry loadtestEntry,
+            final int n)
     {
         ParamChecker.assertNotNull("raWorker", raWorker);
         ParamChecker.assertNotNull("loadtestEntry", loadtestEntry);
@@ -143,7 +146,8 @@ class CALoadTestEnroll extends AbstractLoadTest
             }
         }
 
-        private boolean testNext(Map<Integer, CertRequest> certRequests)
+        private boolean testNext(
+                final Map<Integer, CertRequest> certRequests)
         {
             EnrollCertResult result;
             try

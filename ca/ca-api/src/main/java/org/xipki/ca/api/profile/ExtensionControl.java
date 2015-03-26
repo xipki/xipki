@@ -45,7 +45,10 @@ public class ExtensionControl
     private final boolean required;
     private final boolean request;
 
-    public ExtensionControl(boolean critical, boolean required, boolean request)
+    public ExtensionControl(
+            final boolean critical,
+            final boolean required,
+            final boolean request)
     {
         this.critical = critical;
         this.required = required;

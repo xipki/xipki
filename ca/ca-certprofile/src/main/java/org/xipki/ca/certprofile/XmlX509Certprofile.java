@@ -191,7 +191,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     }
 
     @Override
-    public void initialize(String data)
+    public void initialize(
+            final String data)
     throws CertprofileException
     {
         ParamChecker.assertNotEmpty("data", data);
@@ -211,7 +212,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         }
     }
 
-    private void doInitialize(String data)
+    private void doInitialize(
+            final String data)
     throws CertprofileException
     {
         byte[] bytes;
@@ -529,13 +531,15 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     }
 
     @Override
-    public String getParameter(String paramName)
+    public String getParameter(
+            String paramName)
     {
         return parameters == null ? null : parameters.get(paramName);
     }
 
     @Override
-    public SubjectInfo getSubject(X500Name requestedSubject)
+    public SubjectInfo getSubject(
+            final X500Name requestedSubject)
     throws CertprofileException, BadCertTemplateException
     {
         verifySubjectDNOccurence(requestedSubject);
@@ -598,10 +602,14 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     }
 
     @Override
-    protected RDN createSubjectRDN(String text, ASN1ObjectIdentifier type, RDNControl rdnControl, int index)
+    protected RDN createSubjectRDN(
+            final String text,
+            final ASN1ObjectIdentifier type,
+            final RDNControl rdnControl,
+            final int index)
     throws BadCertTemplateException
     {
-        text = text.trim();
+        String ttext = text.trim();
 
         SubjectDNOption option = subjectDNOptions.get(type);
         if(option != null)
@@ -611,16 +619,16 @@ public class XmlX509Certprofile extends BaseX509Certprofile
 
             if(prefix != null || suffix != null)
             {
-                String _text = text.toLowerCase();
+                String _text = ttext.toLowerCase();
                 if(prefix != null &&_text.startsWith(prefix.toLowerCase()))
                 {
-                    text = text.substring(prefix.length());
-                    _text = text.toLowerCase();
+                    ttext = ttext.substring(prefix.length());
+                    _text = ttext.toLowerCase();
                 }
 
                 if(suffix != null && _text.endsWith(suffix.toLowerCase()))
                 {
-                    text = text.substring(0, text.length() - suffix.length());
+                    ttext = ttext.substring(0, ttext.length() - suffix.length());
                 }
             }
 
@@ -628,10 +636,10 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             if(patterns != null)
             {
                 Pattern p = patterns.get(index);
-                if(p.matcher(text).matches() == false)
+                if(p.matcher(ttext).matches() == false)
                 {
                     throw new BadCertTemplateException("invalid subject " + ObjectIdentifiers.oidToDisplayName(type) +
-                            " '" + text + "' against regex '" + p.pattern() + "'");
+                            " '" + ttext + "' against regex '" + p.pattern() + "'");
                 }
             }
 
@@ -640,34 +648,36 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             {
                 sb.append(prefix);
             }
-            sb.append(text);
+            sb.append(ttext);
             if(suffix != null)
             {
                 sb.append(suffix);
             }
-            text = sb.toString();
+            ttext = sb.toString();
 
-            int len = text.length();
+            int len = ttext.length();
             Integer minLen = option.getMinLen();
             if(minLen != null && len < minLen)
             {
                 throw new BadCertTemplateException("subject " + ObjectIdentifiers.oidToDisplayName(type) +
-                        " '" + text + "' is too short (length (" + len + ") < minLen (" + minLen + ")");
+                        " '" + ttext + "' is too short (length (" + len + ") < minLen (" + minLen + ")");
             }
 
             Integer maxLen = option.getMaxLen();
             if(maxLen != null && len > maxLen)
             {
                 throw new BadCertTemplateException("subject " + ObjectIdentifiers.oidToDisplayName(type) +
-                        " '" + text + "' is too long (length (" + len + ") > maxLen (" + maxLen + ")");
+                        " '" + ttext + "' is too long (length (" + len + ") > maxLen (" + maxLen + ")");
             }
         }
 
-        return super.createSubjectRDN(text, type, rdnControl, index);
+        return super.createSubjectRDN(ttext, type, rdnControl, index);
     }
 
     @Override
-    protected String[] sortRDNs(ASN1ObjectIdentifier type, String[] values)
+    protected String[] sortRDNs(
+            final ASN1ObjectIdentifier type,
+            final String[] values)
     {
         SubjectDNOption option = subjectDNOptions.get(type);
         if(option == null)
@@ -705,8 +715,9 @@ public class XmlX509Certprofile extends BaseX509Certprofile
 
     @Override
     public ExtensionValues getExtensions(
-            Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
-            X500Name requestedSubject, Extensions requestedExtensions)
+            final Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
+            final X500Name requestedSubject,
+            final Extensions requestedExtensions)
     throws CertprofileException, BadCertTemplateException
     {
         ExtensionValues values = new ExtensionValues();
@@ -898,11 +909,12 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         return specialBehavior;
     }
 
-    private ExtensionValue createAdmission(boolean critical,
-            List<ASN1ObjectIdentifier> professionOIDs,
-            List<String> professionItems,
-            String registrationNumber,
-            byte[] addProfessionInfo)
+    private ExtensionValue createAdmission(
+            final boolean critical,
+            final List<ASN1ObjectIdentifier> professionOIDs,
+            final List<String> professionItems,
+            final String registrationNumber,
+            final byte[] addProfessionInfo)
     throws CertprofileException
     {
         if(CollectionUtil.isEmpty(professionItems)
@@ -997,8 +1009,10 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         return signatureAlgorithms;
     }
 
-    private Object getExtensionValue(ASN1ObjectIdentifier type,
-            ExtensionsType extensionsType, Class<?> expectedClass)
+    private static Object getExtensionValue(
+            final ASN1ObjectIdentifier type,
+            final ExtensionsType extensionsType,
+            final Class<?> expectedClass)
     throws CertprofileException
     {
         for(ExtensionType m : extensionsType.getExtension())

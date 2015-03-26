@@ -52,7 +52,9 @@ public enum GeneralNameTag
     registeredID(8);
 
     private final int tag;
-    private GeneralNameTag(int tag)
+
+    private GeneralNameTag(
+            final int tag)
     {
         this.tag = tag;
     }

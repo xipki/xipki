@@ -67,7 +67,8 @@ public class AuditChildEvent
         return level;
     }
 
-    public void setLevel(AuditLevel level)
+    public void setLevel(
+            AuditLevel level)
     {
         this.level = level;
     }
@@ -77,7 +78,8 @@ public class AuditChildEvent
         return Collections.unmodifiableList(eventDatas);
     }
 
-    public AuditEventData removeEventData(String eventDataName)
+    public AuditEventData removeEventData(
+            final String eventDataName)
     {
         AuditEventData tbr = null;
         for(AuditEventData ed : eventDatas)
@@ -96,7 +98,8 @@ public class AuditChildEvent
         return tbr;
     }
 
-    public AuditEventData addEventData(AuditEventData eventData)
+    public AuditEventData addEventData(
+            final AuditEventData eventData)
     {
         int idx = -1;
         for(int i = 0; i < eventDatas.size(); i++)
@@ -123,7 +126,8 @@ public class AuditChildEvent
         return status;
     }
 
-    public void setStatus(AuditStatus status)
+    public void setStatus(
+            final AuditStatus status)
     {
         this.status = status;
     }

@@ -47,7 +47,8 @@ public class UnrevokeOrRemoveCertRequestType
 {
     private final List<IssuerSerialEntryType> requestEntries = new LinkedList<>();
 
-    public boolean addRequestEntry(IssuerSerialEntryType requestEntry)
+    public boolean addRequestEntry(
+            final IssuerSerialEntryType requestEntry)
     {
         for(IssuerSerialEntryType re : requestEntries)
         {

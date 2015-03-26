@@ -47,12 +47,17 @@ public class EnrollCertResultEntryType extends ResultEntryType
     private final CMPCertificate cert;
     private final int status;
 
-    public EnrollCertResultEntryType(String id, CMPCertificate cert)
+    public EnrollCertResultEntryType(
+            final String id,
+            final CMPCertificate cert)
     {
         this(id, cert, PKIStatus.GRANTED);
     }
 
-    public EnrollCertResultEntryType(String id, CMPCertificate cert, int status)
+    public EnrollCertResultEntryType(
+            final String id,
+            final CMPCertificate cert,
+            final int status)
     {
         super(id);
         this.cert = cert;

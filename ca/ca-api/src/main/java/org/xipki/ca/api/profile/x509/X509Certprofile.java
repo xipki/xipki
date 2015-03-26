@@ -98,7 +98,8 @@ public abstract class X509Certprofile
         return false;
     }
 
-    public String incSerialNumber(String currentSerialNumber)
+    public String incSerialNumber(
+            final String currentSerialNumber)
     throws BadFormatException
     {
         try
@@ -129,7 +130,8 @@ public abstract class X509Certprofile
         return true;
     }
 
-    public String getParameter(String paramName)
+    public String getParameter(
+            final String paramName)
     {
         return null;
     }
@@ -170,7 +172,8 @@ public abstract class X509Certprofile
 
     public abstract Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls();
 
-    public abstract void initialize(String data)
+    public abstract void initialize(
+            String data)
     throws CertprofileException;
 
     public abstract boolean isCA();
@@ -179,21 +182,25 @@ public abstract class X509Certprofile
 
     public abstract Integer getPathLenBasicConstraint();
 
-    public abstract void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver);
+    public abstract void setEnvironmentParameterResolver(
+            EnvironmentParameterResolver parameterResolver);
 
     public abstract Date getNotBefore(Date notBefore);
 
     public abstract CertValidity getValidity();
 
-    public abstract SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
+    public abstract SubjectPublicKeyInfo checkPublicKey(
+            SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException;
 
-    public abstract SubjectInfo getSubject(X500Name requestedSubject)
+    public abstract SubjectInfo getSubject(
+            X500Name requestedSubject)
     throws CertprofileException, BadCertTemplateException;
 
     public abstract ExtensionValues getExtensions(
             Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
-            X500Name requestedSubject, Extensions requestExtensions)
+            X500Name requestedSubject,
+            Extensions requestExtensions)
     throws CertprofileException, BadCertTemplateException;
 
     public abstract boolean incSerialNumberIfSubjectExists();

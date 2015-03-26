@@ -47,7 +47,9 @@ public class ExtKeyUsageControl
     private final ASN1ObjectIdentifier extKeyUsage;
     private final boolean required;
 
-    public ExtKeyUsageControl(ASN1ObjectIdentifier extKeyUsage, boolean required)
+    public ExtKeyUsageControl(
+            final ASN1ObjectIdentifier extKeyUsage,
+            final boolean required)
     {
         ParamChecker.assertNotNull("extKeyUsage", extKeyUsage);
         this.extKeyUsage = extKeyUsage;

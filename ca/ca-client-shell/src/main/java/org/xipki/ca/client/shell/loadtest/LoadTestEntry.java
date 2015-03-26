@@ -60,7 +60,8 @@ public class LoadTestEntry
         OU,
         CN;
 
-        static RandomDN getInstance(String text)
+        static RandomDN getInstance(
+                final String text)
         {
             ParamChecker.assertNotNull("text", text);
             for(RandomDN value : values())
@@ -79,7 +80,9 @@ public class LoadTestEntry
         private final X500Name subjectTemplate;
         private final ASN1ObjectIdentifier subjectRDNForIncrement;
 
-        private IncreasableSubject(String subjectTemplate, RandomDN randomDN)
+        private IncreasableSubject(
+                final String subjectTemplate,
+                final RandomDN randomDN)
         {
             this.subjectTemplate = SecurityUtil.sortX509Name(new X500Name(subjectTemplate));
 
@@ -118,7 +121,8 @@ public class LoadTestEntry
             }
         }
 
-        private X500Name getX500Name(long index)
+        private X500Name getX500Name(
+                final long index)
         {
             RDN[] baseRDNs = subjectTemplate.getRDNs();
 
@@ -149,7 +153,11 @@ public class LoadTestEntry
     private final KeyEntry keyEntry;
     private final IncreasableSubject subject;
 
-    public LoadTestEntry(String certprofile, KeyEntry keyEntry, String subjectTemplate, RandomDN randomDN)
+    public LoadTestEntry(
+            final String certprofile,
+            final KeyEntry keyEntry,
+            final String subjectTemplate,
+            final RandomDN randomDN)
     {
         ParamChecker.assertNotEmpty("certprofile", certprofile);
         ParamChecker.assertNotNull("keyEntry", keyEntry);
@@ -161,12 +169,14 @@ public class LoadTestEntry
         this.subject = new IncreasableSubject(subjectTemplate, randomDN);
     }
 
-    public SubjectPublicKeyInfo getSubjectPublicKeyInfo(long index)
+    public SubjectPublicKeyInfo getSubjectPublicKeyInfo(
+            final long index)
     {
         return keyEntry.getSubjectPublicKeyInfo(index);
     }
 
-    public X500Name getX500Name(long index)
+    public X500Name getX500Name(
+            final long index)
     {
         return subject.getX500Name(index);
     }

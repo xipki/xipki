@@ -59,10 +59,11 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor
 
     private final URL serverUrl;
 
-    DefaultHttpX509CmpRequestor(X509Certificate requestorCert,
-            X509Certificate responderCert,
-            String serverUrl,
-            SecurityFactory securityFactory)
+    DefaultHttpX509CmpRequestor(
+            final X509Certificate requestorCert,
+            final X509Certificate responderCert,
+            final String serverUrl,
+            final SecurityFactory securityFactory)
     {
         super(requestorCert, responderCert, securityFactory);
         ParamChecker.assertNotEmpty("serverUrl", serverUrl);
@@ -76,11 +77,12 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor
         }
     }
 
-    DefaultHttpX509CmpRequestor(ConcurrentContentSigner requestor,
-            X509Certificate responderCert,
-            String serverUrl,
-            SecurityFactory securityFactory,
-            boolean signRequest)
+    DefaultHttpX509CmpRequestor(
+            final ConcurrentContentSigner requestor,
+            final X509Certificate responderCert,
+            final String serverUrl,
+            final SecurityFactory securityFactory,
+            final boolean signRequest)
     {
         super(requestor, responderCert, securityFactory, signRequest);
         ParamChecker.assertNotEmpty("serverUrl", serverUrl);
@@ -95,7 +97,8 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor
     }
 
     @Override
-    public byte[] send(byte[] request)
+    public byte[] send(
+            final byte[] request)
     throws IOException
     {
         HttpURLConnection httpUrlConnection = (HttpURLConnection) serverUrl.openConnection();

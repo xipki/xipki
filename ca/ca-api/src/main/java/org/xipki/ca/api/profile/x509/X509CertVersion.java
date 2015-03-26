@@ -46,7 +46,9 @@ public enum X509CertVersion
     V3(3);
 
     private int version;
-    private X509CertVersion(int version)
+
+    private X509CertVersion(
+            final int version)
     {
         this.version = version;
     }
@@ -56,7 +58,8 @@ public enum X509CertVersion
         return version;
     }
 
-    public static X509CertVersion getInstance(int version)
+    public static X509CertVersion getInstance(
+            final int version)
     {
         for(X509CertVersion m : values())
         {

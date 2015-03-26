@@ -133,13 +133,15 @@ public class ProfileConfCreatorDemo
 
     private static class ExampleDescription extends AnyType
     {
-        public ExampleDescription(Element appInfo)
+        public ExampleDescription(
+                Element appInfo)
         {
             setAny(appInfo);
         }
     }
 
-    public static void main(String[] args)
+    public static void main(
+            final String[] args)
     {
         try
         {
@@ -196,7 +198,10 @@ public class ProfileConfCreatorDemo
         }
     }
 
-    private static void marshall(Marshaller m, X509ProfileType profile, String filename)
+    private static void marshall(
+            final Marshaller m,
+            final X509ProfileType profile,
+            final String filename)
     throws Exception
     {
         File file = new File("tmp", filename);
@@ -783,13 +788,21 @@ public class ProfileConfCreatorDemo
         return profile;
     }
 
-    private static RdnType createRDN(ASN1ObjectIdentifier type, int min, int max)
+    private static RdnType createRDN(
+            final ASN1ObjectIdentifier type,
+            final int min,
+            final int max)
     {
         return createRDN(type, min, max, null, null, null);
     }
 
-    private static RdnType createRDN(ASN1ObjectIdentifier type, int min, int max, String[] regexArrays,
-            String prefix, String suffix)
+    private static RdnType createRDN(
+            final ASN1ObjectIdentifier type,
+            final int min,
+            final int max,
+            final String[] regexArrays,
+            final String prefix,
+            final String suffix)
     {
         RdnType ret = new RdnType();
         ret.setType(createOidType(type));
@@ -821,15 +834,21 @@ public class ProfileConfCreatorDemo
         return ret;
     }
 
-    private static ExtensionType createExtension(ASN1ObjectIdentifier type,
-            boolean required, boolean critical,
-            ExtensionValueType extValue)
+    private static ExtensionType createExtension(
+            final ASN1ObjectIdentifier type,
+            final boolean required,
+            final boolean critical,
+            final ExtensionValueType extValue)
     {
         return createExtension(type, required, critical, extValue, null);
     }
 
-    private static ExtensionType createExtension(ASN1ObjectIdentifier type, boolean required, boolean critical,
-            ExtensionValueType extValue, String description)
+    private static ExtensionType createExtension(
+            final ASN1ObjectIdentifier type,
+            final boolean required,
+            final boolean critical,
+            final ExtensionValueType extValue,
+            final String description)
     {
         ExtensionType ret = new ExtensionType();
         // abbributes
@@ -842,7 +861,8 @@ public class ProfileConfCreatorDemo
         return ret;
     }
 
-    private static ExtensionValueType createAuthorityKeyIdentifier(boolean includeSerialAndSerial)
+    private static ExtensionValueType createAuthorityKeyIdentifier(
+            final boolean includeSerialAndSerial)
     {
 
         AuthorityKeyIdentifier akiType = new AuthorityKeyIdentifier();
@@ -850,7 +870,8 @@ public class ProfileConfCreatorDemo
         return createExtensionValueType(akiType);
 
     }
-    private static ExtensionValueType createBasicConstraints(int pathLen)
+    private static ExtensionValueType createBasicConstraints(
+            final int pathLen)
     {
         BasicConstraints extValue = new BasicConstraints();
         extValue.setPathLen(pathLen);
@@ -858,7 +879,8 @@ public class ProfileConfCreatorDemo
     }
 
     private static ExtensionValueType createKeyUsages(
-            KeyUsageEnum[] requiredUsages, KeyUsageEnum[] optionalUsages)
+            final KeyUsageEnum[] requiredUsages,
+            final KeyUsageEnum[] optionalUsages)
     {
         KeyUsage extValue = new KeyUsage();
         if(requiredUsages != null)
@@ -886,7 +908,8 @@ public class ProfileConfCreatorDemo
     }
 
     private static ExtensionValueType createExtendedKeyUsage(
-            ASN1ObjectIdentifier[] requiredUsages, ASN1ObjectIdentifier[] optionalUsages)
+            final ASN1ObjectIdentifier[] requiredUsages,
+            final ASN1ObjectIdentifier[] optionalUsages)
     {
         ExtendedKeyUsage extValue = new ExtendedKeyUsage();
         if(requiredUsages != null)
@@ -908,7 +931,9 @@ public class ProfileConfCreatorDemo
         return createExtensionValueType(extValue);
     }
 
-    private static Usage createSingleExtKeyUsage(ASN1ObjectIdentifier usage, boolean required)
+    private static Usage createSingleExtKeyUsage(
+            final ASN1ObjectIdentifier usage,
+            final boolean required)
     {
         Usage type = new Usage();
         type.setValue(usage.getId());
@@ -921,7 +946,9 @@ public class ProfileConfCreatorDemo
         return type;
     }
 
-    private static ExtensionValueType createAdmission(ASN1ObjectIdentifier oid, String item)
+    private static ExtensionValueType createAdmission(
+            final ASN1ObjectIdentifier oid,
+            final String item)
     {
         Admission extValue = new Admission();
         extValue.getProfessionItem().add(item);
@@ -930,7 +957,7 @@ public class ProfileConfCreatorDemo
     }
 
     private static ExtensionValueType createCertificatePolicies(
-            ASN1ObjectIdentifier... policyOids)
+            final ASN1ObjectIdentifier... policyOids)
     {
         if(policyOids == null || policyOids.length == 0)
         {
@@ -949,14 +976,15 @@ public class ProfileConfCreatorDemo
         return createExtensionValueType(extValue);
     }
 
-    private static String getDescription(ASN1ObjectIdentifier oid)
+    private static String getDescription(
+            final ASN1ObjectIdentifier oid)
     {
         return ObjectIdentifiers.getName(oid);
     }
 
     private static PolicyIdMappingType createPolicyIdMapping(
-        ASN1ObjectIdentifier issuerPolicyId,
-        ASN1ObjectIdentifier subjectPolicyId)
+            final ASN1ObjectIdentifier issuerPolicyId,
+            final ASN1ObjectIdentifier subjectPolicyId)
     {
         PolicyIdMappingType ret = new PolicyIdMappingType();
         ret.setIssuerDomainPolicy(createOidType(issuerPolicyId));
@@ -965,7 +993,8 @@ public class ProfileConfCreatorDemo
         return ret;
     }
 
-    private static PolicyConstraints createPolicyConstraints(Integer inhibitPolicyMapping,
+    private static PolicyConstraints createPolicyConstraints(
+            Integer inhibitPolicyMapping,
             Integer requireExplicitPolicy)
     {
         PolicyConstraints ret = new PolicyConstraints();
@@ -999,19 +1028,23 @@ public class ProfileConfCreatorDemo
         return ret;
     }
 
-    private static InhibitAnyPolicy createInhibitAnyPolicy(int skipCerts)
+    private static InhibitAnyPolicy createInhibitAnyPolicy(
+            final int skipCerts)
     {
         InhibitAnyPolicy ret = new InhibitAnyPolicy();
         ret.setSkipCerts(skipCerts);
         return ret;
     }
 
-    private static OidWithDescType createOidType(ASN1ObjectIdentifier oid)
+    private static OidWithDescType createOidType(
+            final ASN1ObjectIdentifier oid)
     {
         return createOidType(oid, null);
     }
 
-    private static OidWithDescType createOidType(ASN1ObjectIdentifier oid, String description)
+    private static OidWithDescType createOidType(
+            ASN1ObjectIdentifier oid,
+            String description)
     {
         OidWithDescType ret = new OidWithDescType();
         ret.setValue(oid.getId());
@@ -1026,22 +1059,30 @@ public class ProfileConfCreatorDemo
         return ret;
     }
 
-    private static ExtensionValueType createConstantExtValue(byte[] bytes)
+    private static ExtensionValueType createConstantExtValue(
+            final byte[] bytes)
     {
         ConstantExtValue extValue = new ConstantExtValue();
         extValue.setValue(bytes);
         return createExtensionValueType(extValue);
     }
 
-    private static X509ProfileType getBaseProfile(String description, boolean ca,
-            String validity, boolean useMidnightNotBefore)
+    private static X509ProfileType getBaseProfile(
+            final String description,
+            final boolean ca,
+            final String validity,
+            final boolean useMidnightNotBefore)
     {
         final boolean qa = false;
         return getBaseProfile(description, ca, qa, validity, useMidnightNotBefore);
     }
 
-    private static X509ProfileType getBaseProfile(String description, boolean ca, boolean qa,
-            String validity, boolean useMidnightNotBefore)
+    private static X509ProfileType getBaseProfile(
+            final String description,
+            final boolean ca,
+            final boolean qa,
+            final String validity,
+            final boolean useMidnightNotBefore)
     {
         X509ProfileType profile = new X509ProfileType();
 
@@ -1079,7 +1120,6 @@ public class ProfileConfCreatorDemo
     {
         KeyAlgorithms ret = new KeyAlgorithms();
         List<AlgorithmType> list = ret.getAlgorithm();
-
         // RSA
         {
             AlgorithmType algorithm = new AlgorithmType();
@@ -1152,13 +1192,21 @@ public class ProfileConfCreatorDemo
         return ret;
     }
 
-    private static RangeType createRange(Integer size)
+    private static RangeType createRange(
+            final int size)
     {
         return createRange(size, size);
     }
 
-    private static RangeType createRange(Integer min, Integer max)
+    private static RangeType createRange(
+            final Integer min,
+            final Integer max)
     {
+        if(min == null && max == null)
+        {
+            throw new IllegalArgumentException("min and max can not be both null");
+        }
+
         RangeType range = new RangeType();
         if(min != null)
         {
@@ -1171,7 +1219,8 @@ public class ProfileConfCreatorDemo
         return range;
     }
 
-    private static AnyType createDescription(String details)
+    private static AnyType createDescription(
+            final String details)
     {
         StringBuilder sb = new StringBuilder();
         sb.append("<my:myDescription xmlns:my=\"http://example.org\">\n");
@@ -1189,14 +1238,16 @@ public class ProfileConfCreatorDemo
         return new ExampleDescription(element);
     }
 
-    private static ExtensionValueType createExtensionValueType(Object object)
+    private static ExtensionValueType createExtensionValueType(
+            final Object object)
     {
         ExtensionValueType ret = new ExtensionValueType();
         ret.setAny(object);
         return ret;
     }
 
-    private static KeyParametersType createKeyParametersType(Object object)
+    private static KeyParametersType createKeyParametersType(
+            final Object object)
     {
         KeyParametersType ret = new KeyParametersType();
         ret.setAny(object);

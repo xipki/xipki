@@ -121,7 +121,8 @@ extends X509Certprofile
 
     protected abstract Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms();
 
-    protected void checkSubjectContent(X500Name requestedSubject)
+    protected void checkSubjectContent(
+            final X500Name requestedSubject)
     throws BadCertTemplateException
     {
         String c = getSubjectFieldFirstValue(requestedSubject, ObjectIdentifiers.DN_C, 0);
@@ -143,7 +144,9 @@ extends X509Certprofile
         return false;
     }
 
-    protected String[] sortRDNs(ASN1ObjectIdentifier type, String[] values)
+    protected String[] sortRDNs(
+            final ASN1ObjectIdentifier type,
+            final String[] values)
     {
         return values;
     }
@@ -154,7 +157,8 @@ extends X509Certprofile
     }
 
     @Override
-    public Date getNotBefore(Date notBefore)
+    public Date getNotBefore(
+            final Date notBefore)
     {
         Date now = new Date();
         if(notBefore != null && notBefore.after(now))
@@ -168,7 +172,8 @@ extends X509Certprofile
     }
 
     @Override
-    public SubjectInfo getSubject(X500Name requestedSubject)
+    public SubjectInfo getSubject(
+            final X500Name requestedSubject)
     throws CertprofileException, BadCertTemplateException
     {
         verifySubjectDNOccurence(requestedSubject);
@@ -225,7 +230,9 @@ extends X509Certprofile
         return new SubjectInfo(grantedSubject, null);
     }
 
-    protected static RDNControl getRDNControl(Set<RDNControl> controls, ASN1ObjectIdentifier type)
+    protected static RDNControl getRDNControl(
+            final Set<RDNControl> controls,
+            final ASN1ObjectIdentifier type)
     {
         for(RDNControl control : controls)
         {
@@ -237,7 +244,9 @@ extends X509Certprofile
         return null;
     }
 
-    protected static RDN[] getRDNs(RDN[] rdns, ASN1ObjectIdentifier type)
+    protected static RDN[] getRDNs(
+            RDN[] rdns,
+            ASN1ObjectIdentifier type)
     {
         List<RDN> ret = new ArrayList<>(1);
         for(int i = 0; i < rdns.length; i++)
@@ -254,13 +263,17 @@ extends X509Certprofile
 
     protected EnvironmentParameterResolver parameterResolver;
     @Override
-    public void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver)
+    public void setEnvironmentParameterResolver(
+            final EnvironmentParameterResolver parameterResolver)
     {
         this.parameterResolver = parameterResolver;
     }
 
-    protected static void checkAndAddExtension(ASN1ObjectIdentifier type, ExtensionControl occurence,
-            ExtensionValue value, ExtensionValues values)
+    protected static void checkAndAddExtension(
+            final ASN1ObjectIdentifier type,
+            final ExtensionControl occurence,
+            final ExtensionValue value,
+            final ExtensionValues values)
     throws CertprofileException
     {
         if(value != null)
@@ -280,7 +293,8 @@ extends X509Certprofile
     }
 
     @Override
-    public SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
+    public SubjectPublicKeyInfo checkPublicKey(
+            final SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException
     {
         Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = getKeyAlgorithms();
@@ -413,12 +427,14 @@ extends X509Certprofile
     }
 
     @Override
-    public void initialize(String data)
+    public void initialize(
+            final String data)
     throws CertprofileException
     {
     }
 
-    protected void verifySubjectDNOccurence(X500Name requestedSubject)
+    protected void verifySubjectDNOccurence(
+            final X500Name requestedSubject)
     throws BadCertTemplateException
     {
         Set<RDNControl> occurences = getSubjectDNControls();
@@ -478,7 +494,10 @@ extends X509Certprofile
         }
     }
 
-    protected static String getSubjectFieldFirstValue(X500Name subject, ASN1ObjectIdentifier type, int index)
+    protected static String getSubjectFieldFirstValue(
+            final X500Name subject,
+            final ASN1ObjectIdentifier type,
+            final int index)
     {
         RDN[] rdns = subject.getRDNs(type);
         if(index < 0 || rdns == null || rdns.length <= index)
@@ -490,7 +509,11 @@ extends X509Certprofile
         return SecurityUtil.rdnValueToString(rdn.getFirst().getValue());
     }
 
-    protected RDN createSubjectRDN(String text, ASN1ObjectIdentifier type, RDNControl rdnControl, int index)
+    protected RDN createSubjectRDN(
+            final String text,
+            final ASN1ObjectIdentifier type,
+            final RDNControl rdnControl,
+            final int index)
     throws BadCertTemplateException
     {
         DirectoryStringType dsEnum = rdnControl == null ? null : rdnControl.getDirectoryStringEnum();
@@ -507,22 +530,25 @@ extends X509Certprofile
             }
         }
 
-        text = text.trim();
-        ASN1Encodable dnValue = dsEnum.createDirectoryString(text);
+        ASN1Encodable dnValue = dsEnum.createDirectoryString(text.trim());
         return new RDN(type, dnValue);
     }
 
-    protected static String oidToDisplayName(ASN1ObjectIdentifier type)
+    protected static String oidToDisplayName(
+            final ASN1ObjectIdentifier type)
     {
         return ObjectIdentifiers.oidToDisplayName(type);
     }
 
-    public static boolean isCountryCodeValid(String countryCode)
+    public static boolean isCountryCodeValid(
+            final String countryCode)
     {
         return countryCodes.contains(countryCode);
     }
 
-    private static void checkECSubjectPublicKeyInfo(ASN1ObjectIdentifier curveOid, byte[] encoded)
+    private static void checkECSubjectPublicKeyInfo(
+            final ASN1ObjectIdentifier curveOid,
+            final byte[] encoded)
     throws BadCertTemplateException
     {
         Integer expectedLength = ecCurveFieldSizes.get(curveOid);

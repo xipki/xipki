@@ -49,7 +49,8 @@ public class CertOrError
     private final Certificate certificate;
     private final PKIStatusInfo error;
 
-    public CertOrError(Certificate certificate)
+    public CertOrError(
+            final Certificate certificate)
     {
         ParamChecker.assertNotNull("certificate", certificate);
 
@@ -57,7 +58,8 @@ public class CertOrError
         this.error = null;
     }
 
-    public CertOrError(PKIStatusInfo error)
+    public CertOrError(
+            final PKIStatusInfo error)
     {
         ParamChecker.assertNotNull("error", error);
 

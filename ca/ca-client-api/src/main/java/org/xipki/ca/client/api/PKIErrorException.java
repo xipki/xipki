@@ -50,17 +50,22 @@ public class PKIErrorException extends Exception
     private final int pkiFailureInfo;
     private final String statusMessage;
 
-    public PKIErrorException(PKIStatusInfo statusInfo)
+    public PKIErrorException(
+            final PKIStatusInfo statusInfo)
     {
         this(new org.xipki.ca.common.cmp.PKIStatusInfo(statusInfo));
     }
 
-    public PKIErrorException(org.xipki.ca.common.cmp.PKIStatusInfo statusInfo)
+    public PKIErrorException(
+            final org.xipki.ca.common.cmp.PKIStatusInfo statusInfo)
     {
         this(statusInfo.getStatus(), statusInfo.getPkiFailureInfo(), statusInfo.getStatusMessage());
     }
 
-    public PKIErrorException(int status, int pkiFailureInfo, String statusMessage)
+    public PKIErrorException(
+            final int status,
+            final int pkiFailureInfo,
+            final String statusMessage)
     {
         super(SecurityUtil.formatPKIStatusInfo(status, pkiFailureInfo, statusMessage));
         this.status = status;
@@ -68,7 +73,8 @@ public class PKIErrorException extends Exception
         this.statusMessage = statusMessage;
     }
 
-    public PKIErrorException(int status)
+    public PKIErrorException(
+            final int status)
     {
         this.status = status;
         this.pkiFailureInfo = 0;

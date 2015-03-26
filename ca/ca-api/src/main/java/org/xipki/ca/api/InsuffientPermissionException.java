@@ -44,7 +44,8 @@ public class InsuffientPermissionException extends Exception
 
     private static final long serialVersionUID = 1L;
 
-    public InsuffientPermissionException(String message)
+    public InsuffientPermissionException(
+            final String message)
     {
         super(message);
     }

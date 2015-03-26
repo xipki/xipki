@@ -46,7 +46,8 @@ public enum CAStatus
 
     private String status;
 
-    private CAStatus(String status)
+    private CAStatus(
+            final String status)
     {
         this.status = status;
     }
@@ -56,7 +57,8 @@ public enum CAStatus
         return status;
     }
 
-    public static CAStatus getCAStatus(String status)
+    public static CAStatus getCAStatus(
+            final String status)
     {
         for(CAStatus value : values())
         {

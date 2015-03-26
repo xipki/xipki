@@ -61,10 +61,11 @@ public class X509CertificateInfo
     private CertRevocationInfo revInfo;
     private boolean alreadyIssued;
 
-    public X509CertificateInfo(X509CertWithDBCertId cert,
-            X509CertWithDBCertId issuerCert,
-            byte[] subjectPublicKey,
-            String profileName)
+    public X509CertificateInfo(
+            final X509CertWithDBCertId cert,
+            final X509CertWithDBCertId issuerCert,
+            final byte[] subjectPublicKey,
+            final String profileName)
     throws CertificateEncodingException
     {
         ParamChecker.assertNotNull("cert", cert);
@@ -104,7 +105,8 @@ public class X509CertificateInfo
         return warningMessage;
     }
 
-    public void setWarningMessage(String warningMessage)
+    public void setWarningMessage(
+            final String warningMessage)
     {
         this.warningMessage = warningMessage;
     }
@@ -114,7 +116,8 @@ public class X509CertificateInfo
         return requestor;
     }
 
-    public void setRequestor(RequestorInfo requestor)
+    public void setRequestor(
+            final RequestorInfo requestor)
     {
         this.requestor = requestor;
     }
@@ -124,7 +127,8 @@ public class X509CertificateInfo
         return user;
     }
 
-    public void setUser(String user)
+    public void setUser(
+            final String user)
     {
         this.user = user;
     }
@@ -139,7 +143,8 @@ public class X509CertificateInfo
         return revInfo;
     }
 
-    public void setRevocationInfo(CertRevocationInfo revInfo)
+    public void setRevocationInfo(
+            final CertRevocationInfo revInfo)
     {
         this.revInfo = revInfo;
     }
@@ -149,7 +154,8 @@ public class X509CertificateInfo
         return alreadyIssued;
     }
 
-    public void setAlreadyIssued(boolean alreadyIssued)
+    public void setAlreadyIssued(
+            final boolean alreadyIssued)
     {
         this.alreadyIssued = alreadyIssued;
     }

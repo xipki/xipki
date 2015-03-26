@@ -46,20 +46,28 @@ public class ErrorResultEntryType extends ResultEntryType
 {
     private final PKIStatusInfo statusInfo;
 
-    public ErrorResultEntryType(String id, PKIStatusInfo statusInfo)
+    public ErrorResultEntryType(
+            final String id,
+            final PKIStatusInfo statusInfo)
     {
         super(id);
         ParamChecker.assertNotNull("statusInfo", statusInfo);
         this.statusInfo = statusInfo;
     }
 
-    public ErrorResultEntryType(String id, int status, int pkiFailureInfo, String statusMessage)
+    public ErrorResultEntryType(
+            final String id,
+            final int status,
+            final int pkiFailureInfo,
+            final String statusMessage)
     {
         super(id);
         this.statusInfo = new PKIStatusInfo(status, pkiFailureInfo, statusMessage);
     }
 
-    public ErrorResultEntryType(String id, int status)
+    public ErrorResultEntryType(
+            final String id,
+            final int status)
     {
         super(id);
         this.statusInfo = new PKIStatusInfo(status);

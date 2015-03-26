@@ -49,7 +49,8 @@ public class CaNameCompleter extends DynamicEnumCompleter
 
     protected RAWorker raWorker;
 
-    public final void setRaWorker(RAWorker raWorker)
+    public final void setRaWorker(
+            final RAWorker raWorker)
     {
         this.raWorker = raWorker;
     }

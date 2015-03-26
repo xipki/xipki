@@ -49,13 +49,18 @@ public class RDNControl
     private final ASN1ObjectIdentifier type;
     private final DirectoryStringType directoryStringEnum;
 
-    public RDNControl(ASN1ObjectIdentifier type, DirectoryStringType directoryStringEnum)
+    public RDNControl(
+            final ASN1ObjectIdentifier type,
+            final DirectoryStringType directoryStringEnum)
     {
         this(type, 1, 1, directoryStringEnum);
     }
 
-    public RDNControl(ASN1ObjectIdentifier type, int minOccurs, int maxOccurs,
-            DirectoryStringType directoryStringEnum)
+    public RDNControl(
+            final ASN1ObjectIdentifier type,
+            final int minOccurs,
+            final int maxOccurs,
+            final DirectoryStringType directoryStringEnum)
     {
         ParamChecker.assertNotNull("type", type);
         if(minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs)

@@ -61,71 +61,120 @@ public interface RAWorker
 {
     Set<String> getCaNames();
 
-    Set<CertprofileInfo> getCertprofiles(String caName);
+    Set<CertprofileInfo> getCertprofiles(
+            String caName);
 
-    EnrollCertResult requestCert(CertificationRequest p10Request, String profile, String caName,
-            String username, RequestResponseDebug debug)
-    throws RAWorkerException, PKIErrorException;
-
-    EnrollCertResult requestCerts(EnrollCertRequestType.Type type,
-            Map<String, P10EnrollCertEntryType> enrollCertEntries, String caName, String username,
+    EnrollCertResult requestCert(
+            CertificationRequest p10Request,
+            String profile,
+            String caName,
+            String username,
             RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException;
 
-    EnrollCertResult requestCerts(EnrollCertRequestType request, String caName, String username,
+    EnrollCertResult requestCerts(
+            EnrollCertRequestType.Type type,
+            Map<String, P10EnrollCertEntryType> enrollCertEntries,
+            String caName,
+            String username,
             RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException;
 
-    CertIDOrError revokeCert(X500Name issuer, BigInteger serial, int reason, Date invalidityTime,
+    EnrollCertResult requestCerts(
+            EnrollCertRequestType request,
+            String caName,
+            String username,
             RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException;
 
-    CertIDOrError revokeCert(X509Certificate cert, int reason, Date invalidityTime,
+    CertIdOrError revokeCert(
+            X500Name issuer,
+            BigInteger serial,
+            int reason,
+            Date invalidityTime,
             RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException;
 
-    Map<String, CertIDOrError> revokeCerts(RevokeCertRequestType request, RequestResponseDebug debug)
+    CertIdOrError revokeCert(
+            X509Certificate cert,
+            int reason,
+            Date invalidityTime,
+            RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException;
 
-    X509CRL downloadCRL(String caName, RequestResponseDebug debug)
+    Map<String, CertIdOrError> revokeCerts(
+            RevokeCertRequestType request,
+            RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException;
 
-    X509CRL downloadCRL(String caName, BigInteger crlNumber, RequestResponseDebug debug)
+    X509CRL downloadCRL(
+            String caName,
+            RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException;
 
-    X509CRL generateCRL(String caName, RequestResponseDebug debug)
+    X509CRL downloadCRL(
+            String caName,
+            BigInteger crlNumber,
+            RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException;
 
-    String getCaNameByIssuer(X500Name issuer)
+    X509CRL generateCRL(
+            String caName,
+            RequestResponseDebug debug)
+    throws RAWorkerException, PKIErrorException;
+
+    String getCaNameByIssuer(
+            X500Name issuer)
     throws RAWorkerException;
 
-    byte[] envelope(CertRequest certRequest, ProofOfPossession popo, String profileName,
-            String caName, String username)
+    byte[] envelope(
+            CertRequest certRequest,
+            ProofOfPossession popo,
+            String profileName,
+            String caName,
+            String username)
     throws RAWorkerException;
 
-    byte[] envelopeRevocation(X500Name issuer, BigInteger serial, int reason)
+    byte[] envelopeRevocation(
+            X500Name issuer,
+            BigInteger serial,
+            int reason)
     throws RAWorkerException;
 
-    byte[] envelopeRevocation(X509Certificate cert, int reason)
+    byte[] envelopeRevocation(
+            X509Certificate cert,
+            int reason)
     throws RAWorkerException;
 
-    CertIDOrError unrevokeCert(X500Name issuer, BigInteger serial, RequestResponseDebug debug)
-    throws RAWorkerException, PKIErrorException;
-
-    CertIDOrError unrevokeCert(X509Certificate cert, RequestResponseDebug debug)
-    throws RAWorkerException, PKIErrorException;
-
-    Map<String, CertIDOrError> unrevokeCerts(UnrevokeOrRemoveCertRequestType request,
+    CertIdOrError unrevokeCert(
+            X500Name issuer,
+            BigInteger serial,
             RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException;
 
-    CertIDOrError removeCert(X500Name issuer, BigInteger serial, RequestResponseDebug debug)
+    CertIdOrError unrevokeCert(
+            X509Certificate cert,
+            RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException;
 
-    CertIDOrError removeCert(X509Certificate cert, RequestResponseDebug debug)
+    Map<String, CertIdOrError> unrevokeCerts(
+            UnrevokeOrRemoveCertRequestType request,
+            RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException;
 
-    Map<String, CertIDOrError> removeCerts(UnrevokeOrRemoveCertRequestType request,
+    CertIdOrError removeCert(
+            X500Name issuer,
+            BigInteger serial,
+            RequestResponseDebug debug)
+    throws RAWorkerException, PKIErrorException;
+
+    CertIdOrError removeCert(
+            X509Certificate cert,
+            RequestResponseDebug debug)
+    throws RAWorkerException, PKIErrorException;
+
+    Map<String, CertIdOrError> removeCerts(
+            UnrevokeOrRemoveCertRequestType request,
             RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException;
 
@@ -136,11 +185,16 @@ public interface RAWorker
      * @param userLike user name pattern, or 'all' for all users, or {@code null} for those without user info
      * @param overlapSeconds
      */
-    RemoveExpiredCertsResult removeExpiredCerts(String caName, String certprofile, String userLike,
-            long overlapSeconds, RequestResponseDebug debug)
+    RemoveExpiredCertsResult removeExpiredCerts(
+            String caName,
+            String certprofile,
+            String userLike,
+            long overlapSeconds,
+            RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException;
 
-    HealthCheckResult getHealthCheckResult(String caName)
+    HealthCheckResult getHealthCheckResult(
+            String caName)
     throws RAWorkerException;
 
 }

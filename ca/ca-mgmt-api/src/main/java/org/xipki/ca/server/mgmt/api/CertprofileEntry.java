@@ -51,7 +51,10 @@ public class CertprofileEntry implements Serializable
     private final String conf;
     private boolean faulty;
 
-    public CertprofileEntry(String name, String type, String conf)
+    public CertprofileEntry(
+            final String name,
+            final String type,
+            final String conf)
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("type", type);
@@ -85,7 +88,8 @@ public class CertprofileEntry implements Serializable
         return faulty;
     }
 
-    public void setFaulty(boolean faulty)
+    public void setFaulty(
+            final boolean faulty)
     {
         this.faulty = faulty;
     }
@@ -96,7 +100,8 @@ public class CertprofileEntry implements Serializable
         return toString(false);
     }
 
-    public String toString(boolean verbose)
+    public String toString(
+            final boolean verbose)
     {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');

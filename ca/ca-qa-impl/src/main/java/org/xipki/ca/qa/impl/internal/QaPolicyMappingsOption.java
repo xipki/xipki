@@ -50,7 +50,8 @@ public class QaPolicyMappingsOption extends QaExtension
 {
     private final Map<String, String> policyMappings;
 
-    public QaPolicyMappingsOption(PolicyMappings jaxb)
+    public QaPolicyMappingsOption(
+            final PolicyMappings jaxb)
     {
         this.policyMappings = new HashMap<>();
         for(PolicyIdMappingType type : jaxb.getMapping())
@@ -61,7 +62,8 @@ public class QaPolicyMappingsOption extends QaExtension
         }
     }
 
-    public String getSubjectDomainPolicy(String issuerDomainPolicy)
+    public String getSubjectDomainPolicy(
+            final String issuerDomainPolicy)
     {
         return policyMappings.get(issuerDomainPolicy);
     }

@@ -48,17 +48,21 @@ public class RAWorkerException extends Exception
     {
     }
 
-    public RAWorkerException(String message)
+    public RAWorkerException(
+            final String message)
     {
         super(message);
     }
 
-    public RAWorkerException(Throwable cause)
+    public RAWorkerException(
+            final Throwable cause)
     {
         super(cause);
     }
 
-    public RAWorkerException(String message, Throwable cause)
+    public RAWorkerException(
+            final String message,
+            final Throwable cause)
     {
         super(message, cause);
     }

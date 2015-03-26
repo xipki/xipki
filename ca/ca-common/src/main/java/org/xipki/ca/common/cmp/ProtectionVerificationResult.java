@@ -46,7 +46,9 @@ public class ProtectionVerificationResult
     private final Object requestor;
     private final ProtectionResult protectionResult;
 
-    public ProtectionVerificationResult(Object requestor, ProtectionResult protectionResult)
+    public ProtectionVerificationResult(
+            final Object requestor,
+            final ProtectionResult protectionResult)
     {
         ParamChecker.assertNotNull("protectionResult", protectionResult);
 

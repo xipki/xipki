@@ -45,7 +45,8 @@ public enum SpecialX509CertprofileBehavior
 
     public static final String PARAMETER_MAXLIFTIME = "maxLifetime";
 
-    public static SpecialX509CertprofileBehavior getInstance(String behavior)
+    public static SpecialX509CertprofileBehavior getInstance(
+            final String behavior)
     {
         for(SpecialX509CertprofileBehavior b : values())
         {

@@ -123,7 +123,8 @@ public class XmlX509CertprofileUtil
     private final static Object jaxbUnmarshallerLock = new Object();
     private static Unmarshaller jaxbUnmarshaller;
 
-    public static X509ProfileType parse(InputStream xmlConfStream)
+    public static X509ProfileType parse(
+            final InputStream xmlConfStream)
     throws CertprofileException
     {
         synchronized (jaxbUnmarshallerLock)
@@ -170,7 +171,8 @@ public class XmlX509CertprofileUtil
         }
     }
 
-    public static List<CertificatePolicyInformation> buildCertificatePolicies(CertificatePolicies type)
+    public static List<CertificatePolicyInformation> buildCertificatePolicies(
+            final CertificatePolicies type)
     {
         List<CertificatePolicyInformationType> policyPairs = type.getCertificatePolicyInformation();
         if(CollectionUtil.isEmpty(policyPairs))
@@ -216,7 +218,7 @@ public class XmlX509CertprofileUtil
     }
 
     public static PolicyMappings buildPolicyMappings(
-            org.xipki.ca.certprofile.x509.jaxb.PolicyMappings type)
+            final org.xipki.ca.certprofile.x509.jaxb.PolicyMappings type)
     {
         List<PolicyIdMappingType> mappings = type.getMapping();
         final int n = mappings.size();
@@ -238,7 +240,7 @@ public class XmlX509CertprofileUtil
     }
 
     public static NameConstraints buildNameConstrains(
-            org.xipki.ca.certprofile.x509.jaxb.NameConstraints type)
+            final org.xipki.ca.certprofile.x509.jaxb.NameConstraints type)
     throws CertprofileException
     {
         GeneralSubtree[] permitted = buildGeneralSubtrees(type.getPermittedSubtrees());
@@ -250,7 +252,8 @@ public class XmlX509CertprofileUtil
         return new NameConstraints(permitted, excluded);
     }
 
-    private static GeneralSubtree[] buildGeneralSubtrees(GeneralSubtreesType subtrees)
+    private static GeneralSubtree[] buildGeneralSubtrees(
+            final GeneralSubtreesType subtrees)
     throws CertprofileException
     {
         if(subtrees == null || CollectionUtil.isEmpty(subtrees.getBase()))
@@ -269,7 +272,8 @@ public class XmlX509CertprofileUtil
         return ret;
     }
 
-    private static GeneralSubtree buildGeneralSubtree(GeneralSubtreeBaseType type)
+    private static GeneralSubtree buildGeneralSubtree(
+            final GeneralSubtreeBaseType type)
     throws CertprofileException
     {
         GeneralName base = null;
@@ -318,7 +322,8 @@ public class XmlX509CertprofileUtil
         return new GeneralSubtree(base, minimum, maximum);
     }
 
-    public static ASN1Sequence buildPolicyConstrains(PolicyConstraints type)
+    public static ASN1Sequence buildPolicyConstrains(
+            final PolicyConstraints type)
     throws CertprofileException
     {
         Integer requireExplicitPolicy = type.getRequireExplicitPolicy();
@@ -353,7 +358,8 @@ public class XmlX509CertprofileUtil
         return new DERSequence(vec);
     }
 
-    public static Set<GeneralNameMode> buildGeneralNameMode(GeneralNameType name)
+    public static Set<GeneralNameMode> buildGeneralNameMode(
+            final GeneralNameType name)
     {
         Set<GeneralNameMode> ret = new HashSet<>();
         if(name.getOtherName() != null)
@@ -405,7 +411,8 @@ public class XmlX509CertprofileUtil
         return ret;
     }
 
-    private static Set<Range> buildParametersMap(RangesType ranges)
+    private static Set<Range> buildParametersMap(
+            final RangesType ranges)
     {
         if(ranges == null)
         {
@@ -423,7 +430,8 @@ public class XmlX509CertprofileUtil
         return ret;
     }
 
-    public static Map<ASN1ObjectIdentifier, KeyParametersOption> buildKeyAlgorithms(KeyAlgorithms keyAlgos)
+    public static Map<ASN1ObjectIdentifier, KeyParametersOption> buildKeyAlgorithms(
+            final KeyAlgorithms keyAlgos)
     throws CertprofileException
     {
         Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = new HashMap<>();
@@ -451,7 +459,7 @@ public class XmlX509CertprofileUtil
     }
 
     public static Map<ASN1ObjectIdentifier, ExtensionControl> buildExtensionControls(
-            ExtensionsType extensionsType)
+            final ExtensionsType extensionsType)
     throws CertprofileException
     {
         // Extension controls
@@ -469,7 +477,8 @@ public class XmlX509CertprofileUtil
         return Collections.unmodifiableMap(controls);
     }
 
-    public static List<ASN1ObjectIdentifier> toOIDList(List<OidWithDescType> oidWithDescTypes)
+    public static List<ASN1ObjectIdentifier> toOIDList(
+            final List<OidWithDescType> oidWithDescTypes)
     {
         if(CollectionUtil.isEmpty(oidWithDescTypes))
         {
@@ -485,7 +494,7 @@ public class XmlX509CertprofileUtil
     }
 
     public static Set<KeyUsageControl> buildKeyUsageOptions(
-            org.xipki.ca.certprofile.x509.jaxb.KeyUsage extConf)
+            final org.xipki.ca.certprofile.x509.jaxb.KeyUsage extConf)
     {
         List<UsageType> usages = extConf.getUsage();
         Set<KeyUsageControl> controls = new HashSet<>();
@@ -530,7 +539,8 @@ public class XmlX509CertprofileUtil
         return Collections.unmodifiableSet(controls);
     }
 
-    public static Set<ExtKeyUsageControl> buildExtKeyUsageOptions(ExtendedKeyUsage extConf)
+    public static Set<ExtKeyUsageControl> buildExtKeyUsageOptions(
+            final ExtendedKeyUsage extConf)
     {
         List<Usage> usages = extConf.getUsage();
         Set<ExtKeyUsageControl> controls = new HashSet<>();
@@ -546,7 +556,7 @@ public class XmlX509CertprofileUtil
     }
 
     public static Map<ASN1ObjectIdentifier, ExtensionValue> buildConstantExtesions(
-            ExtensionsType extensionsType)
+            final ExtensionsType extensionsType)
     throws CertprofileException
     {
         if(extensionsType == null)
@@ -586,7 +596,8 @@ public class XmlX509CertprofileUtil
         return Collections.unmodifiableMap(map);
     }
 
-    public static Set<ASN1ObjectIdentifier> toOIDSet(List<OidWithDescType> oidWithDescTypes)
+    public static Set<ASN1ObjectIdentifier> toOIDSet(
+            final List<OidWithDescType> oidWithDescTypes)
     {
         if(CollectionUtil.isEmpty(oidWithDescTypes))
         {
@@ -601,7 +612,8 @@ public class XmlX509CertprofileUtil
         return Collections.unmodifiableSet(oids);
     }
 
-    private static final KeyParametersOption convertKeyParametersOption(AlgorithmType type)
+    private static final KeyParametersOption convertKeyParametersOption(
+            final AlgorithmType type)
     throws CertprofileException
     {
         if(type.getParameters() == null || type.getParameters().getAny() == null)
@@ -700,7 +712,7 @@ public class XmlX509CertprofileUtil
     }
 
     public static final DirectoryStringType convertDirectoryStringType(
-            org.xipki.ca.certprofile.x509.jaxb.DirectoryStringType jaxbType)
+            final org.xipki.ca.certprofile.x509.jaxb.DirectoryStringType jaxbType)
     {
         if(jaxbType == null)
         {

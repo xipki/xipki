@@ -66,7 +66,12 @@ public class X509CrlSignerEntry implements Serializable
 
     private String crlControl;
 
-    public X509CrlSignerEntry(String name, String signerType, String signerConf, String base64Cert, String crlControl)
+    public X509CrlSignerEntry(
+            final String name,
+            final String signerType,
+            final String signerConf,
+            final String base64Cert,
+            final String crlControl)
     throws ConfigurationException
     {
         ParamChecker.assertNotEmpty("name", name);
@@ -105,7 +110,8 @@ public class X509CrlSignerEntry implements Serializable
         return name;
     }
 
-    public void setConfFaulty(boolean faulty)
+    public void setConfFaulty(
+            boolean faulty)
     {
         this.confFaulty = faulty;
     }
@@ -135,7 +141,8 @@ public class X509CrlSignerEntry implements Serializable
         return cert;
     }
 
-    public void setCertificate(X509Certificate cert)
+    public void setCertificate(
+            final X509Certificate cert)
     {
         if(base64Cert != null)
         {
@@ -155,12 +162,15 @@ public class X509CrlSignerEntry implements Serializable
         return toString(false);
     }
 
-    public String toString(boolean verbose)
+    public String toString(
+            final boolean verbose)
     {
         return toString(verbose, true);
     }
 
-    public String toString(boolean verbose, boolean ignoreSensitiveInfo)
+    public String toString(
+            final boolean verbose,
+            final boolean ignoreSensitiveInfo)
     {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');

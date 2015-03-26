@@ -54,8 +54,18 @@ public class KeyParametersOption
         private final Integer min;
         private final Integer max;
 
-        public Range(Integer min, Integer max)
+        public Range(
+                final Integer min,
+                final Integer max)
         {
+            if(min == null && max == null)
+            {
+                throw new IllegalArgumentException("min and max cannot be both null");
+            }
+            if(min != null && max != null && min > max)
+            {
+                throw new IllegalArgumentException("min cannot be greater than max: " + min + " > " + max);
+            }
             this.min = min;
             this.max = max;
         }
@@ -70,7 +80,8 @@ public class KeyParametersOption
             return max;
         }
 
-        public boolean match(int i)
+        public boolean match(
+                final int i)
         {
             if(min != null && i < min)
             {
@@ -92,11 +103,13 @@ public class KeyParametersOption
     public static class RSAParametersOption extends KeyParametersOption
     {
         private Set<Range> modulusLengths;
+
         public RSAParametersOption()
         {
         }
 
-        public void setModulusLengths(Set<Range> modulusLengths)
+        public void setModulusLengths(
+                final Set<Range> modulusLengths)
         {
             if(CollectionUtil.isEmpty(modulusLengths))
             {
@@ -107,7 +120,8 @@ public class KeyParametersOption
             }
         }
 
-        public boolean allowsModulusLength(int modulusLength)
+        public boolean allowsModulusLength(
+                final int modulusLength)
         {
             if(modulusLengths == null)
             {
@@ -136,7 +150,8 @@ public class KeyParametersOption
         {
         }
 
-        public void setHashAlgs(Set<ASN1ObjectIdentifier> hashAlgs)
+        public void setHashAlgs(
+                final Set<ASN1ObjectIdentifier> hashAlgs)
         {
             if(CollectionUtil.isEmpty(hashAlgs))
             {
@@ -147,7 +162,8 @@ public class KeyParametersOption
             }
         }
 
-        public void setMaskGenAlgs(Set<ASN1ObjectIdentifier> maskGenAlgs)
+        public void setMaskGenAlgs(
+                final Set<ASN1ObjectIdentifier> maskGenAlgs)
         {
             if(CollectionUtil.isEmpty(maskGenAlgs))
             {
@@ -158,7 +174,8 @@ public class KeyParametersOption
             }
         }
 
-        public void setSaltLengths(Set<Integer> saltLengths)
+        public void setSaltLengths(
+                final Set<Integer> saltLengths)
         {
             if(CollectionUtil.isEmpty(saltLengths))
             {
@@ -169,7 +186,8 @@ public class KeyParametersOption
             }
         }
 
-        public void setTrailerFields(Set<Integer> trailerFields)
+        public void setTrailerFields(
+                final Set<Integer> trailerFields)
         {
             if(CollectionUtil.isEmpty(trailerFields))
             {
@@ -180,7 +198,8 @@ public class KeyParametersOption
             }
         }
 
-        public boolean allowsHashAlg(ASN1ObjectIdentifier hashAlg)
+        public boolean allowsHashAlg(
+                final ASN1ObjectIdentifier hashAlg)
         {
             if(hashAlgs == null)
             {
@@ -190,7 +209,8 @@ public class KeyParametersOption
             return hashAlgs.contains(hashAlg);
         }
 
-        public boolean allowsMaskGenAlg(ASN1ObjectIdentifier maskGenAlg)
+        public boolean allowsMaskGenAlg(
+                final ASN1ObjectIdentifier maskGenAlg)
         {
             if(maskGenAlgs == null)
             {
@@ -200,7 +220,8 @@ public class KeyParametersOption
             return maskGenAlgs.contains(maskGenAlg);
         }
 
-        public boolean allowsSaltLength(int saltLength)
+        public boolean allowsSaltLength(
+                final int saltLength)
         {
             if(saltLengths == null)
             {
@@ -210,7 +231,8 @@ public class KeyParametersOption
             return saltLengths.contains(saltLength);
         }
 
-        public boolean allowsTrailerField(int trailerField)
+        public boolean allowsTrailerField(
+                final int trailerField)
         {
             if(trailerFields == null)
             {
@@ -231,7 +253,8 @@ public class KeyParametersOption
         {
         }
 
-        public void setPLengths(Set<Range> pLengths)
+        public void setPLengths(
+                final Set<Range> pLengths)
         {
             if(CollectionUtil.isEmpty(pLengths))
             {
@@ -242,7 +265,8 @@ public class KeyParametersOption
             }
         }
 
-        public void setQLengths(Set<Range> qLengths)
+        public void setQLengths(
+                final Set<Range> qLengths)
         {
             if(CollectionUtil.isEmpty(qLengths))
             {
@@ -253,7 +277,8 @@ public class KeyParametersOption
             }
         }
 
-        public boolean allowsPLength(int pLength)
+        public boolean allowsPLength(
+                final int pLength)
         {
             if(pLengths == null)
             {
@@ -271,7 +296,8 @@ public class KeyParametersOption
             return false;
         }
 
-        public boolean allowsQLength(int qLength)
+        public boolean allowsQLength(
+                final int qLength)
         {
             if(qLengths == null)
             {
@@ -308,7 +334,8 @@ public class KeyParametersOption
             return curveOids;
         }
 
-        public void setCurveOids(Set<ASN1ObjectIdentifier> curveOids)
+        public void setCurveOids(
+                final Set<ASN1ObjectIdentifier> curveOids)
         {
             this.curveOids = curveOids;
         }
@@ -318,17 +345,20 @@ public class KeyParametersOption
             return pointEncodings;
         }
 
-        public void setPointEncodings(Set<Byte> pointEncodings)
+        public void setPointEncodings(
+                final Set<Byte> pointEncodings)
         {
             this.pointEncodings = pointEncodings;
         }
 
-        public boolean allowsCurve(ASN1ObjectIdentifier curveOid)
+        public boolean allowsCurve(
+                final ASN1ObjectIdentifier curveOid)
         {
             return curveOids.contains(curveOid);
         }
 
-        public boolean allowsPointEncoding(byte encoding)
+        public boolean allowsPointEncoding(
+                final byte encoding)
         {
             return pointEncodings.contains(encoding);
         }
@@ -344,7 +374,8 @@ public class KeyParametersOption
         {
         }
 
-        public void setPublicKeyParamSets(Set<ASN1ObjectIdentifier> publicKeyParamSets)
+        public void setPublicKeyParamSets(
+                final Set<ASN1ObjectIdentifier> publicKeyParamSets)
         {
             if(CollectionUtil.isEmpty(publicKeyParamSets))
             {
@@ -355,7 +386,8 @@ public class KeyParametersOption
             }
         }
 
-        public void setDigestParamSets(Set<ASN1ObjectIdentifier> digestParamSets)
+        public void setDigestParamSets(
+                final Set<ASN1ObjectIdentifier> digestParamSets)
         {
             if(CollectionUtil.isEmpty(digestParamSets))
             {
@@ -366,7 +398,8 @@ public class KeyParametersOption
             }
         }
 
-        public void setEncryptionParamSets(Set<ASN1ObjectIdentifier> encryptionParamSets)
+        public void setEncryptionParamSets(
+                final Set<ASN1ObjectIdentifier> encryptionParamSets)
         {
             if(CollectionUtil.isEmpty(encryptionParamSets))
             {
@@ -377,7 +410,8 @@ public class KeyParametersOption
             }
         }
 
-        public boolean allowsPublicKeyParamSet(ASN1ObjectIdentifier oid)
+        public boolean allowsPublicKeyParamSet(
+                final ASN1ObjectIdentifier oid)
         {
             if(publicKeyParamSets == null)
             {
@@ -386,7 +420,8 @@ public class KeyParametersOption
             return publicKeyParamSets.contains(oid);
         }
 
-        public boolean allowsDigestParamSet(ASN1ObjectIdentifier oid)
+        public boolean allowsDigestParamSet(
+                final ASN1ObjectIdentifier oid)
         {
             if(digestParamSets == null)
             {
@@ -395,7 +430,8 @@ public class KeyParametersOption
             return digestParamSets.contains(oid);
         }
 
-        public boolean allowsEncryptionParamSet(ASN1ObjectIdentifier oid)
+        public boolean allowsEncryptionParamSet(
+                final ASN1ObjectIdentifier oid)
         {
             if(encryptionParamSets == null)
             {

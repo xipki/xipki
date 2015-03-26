@@ -67,7 +67,9 @@ import org.xipki.common.util.CollectionUtil;
 public class X509Util
 {
 
-    public static BasicConstraints createBasicConstraints(boolean isCa, Integer pathLen)
+    public static BasicConstraints createBasicConstraints(
+            final boolean isCa,
+            final Integer pathLen)
     {
         BasicConstraints basicConstraints;
         if(isCa)
@@ -88,7 +90,8 @@ public class X509Util
         return basicConstraints;
     }
 
-    public static AuthorityInformationAccess createAuthorityInformationAccess(List<String> ocspUris)
+    public static AuthorityInformationAccess createAuthorityInformationAccess(
+            final List<String> ocspUris)
     {
         if(CollectionUtil.isEmpty(ocspUris))
         {
@@ -106,8 +109,10 @@ public class X509Util
         return AuthorityInformationAccess.getInstance(seq);
     }
 
-    public static CRLDistPoint createCRLDistributionPoints(List<String> crlUris,
-            X500Name caSubject, X500Name crlSignerSubject)
+    public static CRLDistPoint createCRLDistributionPoints(
+            final List<String> crlUris,
+            final X500Name caSubject,
+            final X500Name crlSignerSubject)
     throws IOException, CertprofileException
     {
         if(CollectionUtil.isEmpty(crlUris))
@@ -139,7 +144,8 @@ public class X509Util
         return new CRLDistPoint(points);
     }
 
-    public static CertificatePolicies createCertificatePolicies(List<CertificatePolicyInformation> policyInfos)
+    public static CertificatePolicies createCertificatePolicies(
+            final List<CertificatePolicyInformation> policyInfos)
     throws CertprofileException
     {
         if(CollectionUtil.isEmpty(policyInfos))
@@ -177,7 +183,8 @@ public class X509Util
         return new CertificatePolicies(pInfos);
     }
 
-    private static ASN1Sequence createPolicyQualifiers(List<CertificatePolicyQualifier> qualifiers)
+    private static ASN1Sequence createPolicyQualifiers(
+            final List<CertificatePolicyQualifier> qualifiers)
     {
         List<PolicyQualifierInfo> qualifierInfos = new ArrayList<>(qualifiers.size());
         for(CertificatePolicyQualifier qualifier : qualifiers)

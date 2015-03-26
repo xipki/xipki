@@ -49,7 +49,8 @@ public class X509IssuerNameCompleter extends DynamicEnumCompleter
 
     protected QASystemManager qaSystemManager;
 
-    public void setQaSystemManager(QASystemManager qaSystemManager)
+    public void setQaSystemManager(
+            final QASystemManager qaSystemManager)
     {
         this.qaSystemManager = qaSystemManager;
     }

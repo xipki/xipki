@@ -52,7 +52,8 @@ import org.xipki.security.api.PasswordResolver;
 
 public abstract class X509CertPublisher
 {
-    public abstract void initialize(String conf,
+    public abstract void initialize(
+            String conf,
             PasswordResolver passwordResolver,
             Map<String, DataSourceWrapper> dataSources)
     throws CertPublisherException;
@@ -65,30 +66,42 @@ public abstract class X509CertPublisher
 
     public abstract boolean isAsyn();
 
-    public abstract void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver);
+    public abstract void setEnvironmentParameterResolver(
+            EnvironmentParameterResolver parameterResolver);
 
-    public abstract boolean issuerAdded(X509CertWithDBCertId issuerCert);
+    public abstract boolean issuerAdded(
+            X509CertWithDBCertId issuerCert);
 
-    public abstract boolean certificateAdded(X509CertificateInfo certInfo);
+    public abstract boolean certificateAdded(
+            X509CertificateInfo certInfo);
 
-    public abstract boolean certificateRevoked(X509CertWithDBCertId issuerCert,
+    public abstract boolean certificateRevoked(
+            X509CertWithDBCertId issuerCert,
             X509CertWithDBCertId cert,
             String certprofile,
             CertRevocationInfo revInfo);
 
-    public abstract boolean certificateUnrevoked(X509CertWithDBCertId issuerCert,
+    public abstract boolean certificateUnrevoked(
+            X509CertWithDBCertId issuerCert,
             X509CertWithDBCertId cert);
 
-    public abstract boolean certificateRemoved(X509CertWithDBCertId issuerCert,
+    public abstract boolean certificateRemoved(
+            X509CertWithDBCertId issuerCert,
             X509CertWithDBCertId cert);
 
-    public abstract boolean crlAdded(X509CertWithDBCertId caCert, X509CRL crl);
+    public abstract boolean crlAdded(
+            X509CertWithDBCertId caCert,
+            X509CRL crl);
 
-    public abstract boolean caRevoked(X509CertWithDBCertId caCert, CertRevocationInfo revocationInfo);
+    public abstract boolean caRevoked(
+            X509CertWithDBCertId caCert,
+            CertRevocationInfo revocationInfo);
 
-    public abstract boolean caUnrevoked(X509CertWithDBCertId caCert);
+    public abstract boolean caUnrevoked(
+            X509CertWithDBCertId caCert);
 
     public abstract boolean isHealthy();
 
-    public abstract void setAuditServiceRegister(AuditLoggingServiceRegister auditServiceRegister);
+    public abstract void setAuditServiceRegister(
+            AuditLoggingServiceRegister auditServiceRegister);
 }

@@ -50,13 +50,16 @@ public class GeneralNameMode
     // not applied to all tags, currently only for tag otherName
     private final Set<ASN1ObjectIdentifier> allowedTypes;
 
-    public GeneralNameMode(GeneralNameTag tag)
+    public GeneralNameMode(
+            final GeneralNameTag tag)
     {
         this.tag = tag;
         this.allowedTypes = null;
     }
 
-    public GeneralNameMode(GeneralNameTag tag, Set<ASN1ObjectIdentifier> allowedTypes)
+    public GeneralNameMode(
+            final GeneralNameTag tag,
+            final Set<ASN1ObjectIdentifier> allowedTypes)
     {
         this.tag = tag;
         this.allowedTypes = allowedTypes == null ? null : Collections.unmodifiableSet(allowedTypes);

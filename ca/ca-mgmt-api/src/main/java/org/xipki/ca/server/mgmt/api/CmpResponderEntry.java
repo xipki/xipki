@@ -66,7 +66,8 @@ public class CmpResponderEntry implements Serializable
         return type;
     }
 
-    public void setType(String type)
+    public void setType(
+            final String type)
     {
         this.type = type;
     }
@@ -76,7 +77,8 @@ public class CmpResponderEntry implements Serializable
         return conf;
     }
 
-    public void setConf(String conf)
+    public void setConf(
+            final String conf)
     {
         this.conf = conf;
     }
@@ -86,7 +88,8 @@ public class CmpResponderEntry implements Serializable
         return cert;
     }
 
-    public void setCertificate(X509Certificate cert)
+    public void setCertificate(
+            final X509Certificate cert)
     {
         if(base64Cert != null)
         {
@@ -100,7 +103,8 @@ public class CmpResponderEntry implements Serializable
         return base64Cert;
     }
 
-    public void setBase64Cert(String base64Cert)
+    public void setBase64Cert(
+            final String base64Cert)
     {
         this.certFaulty = false;
         this.base64Cert = base64Cert;
@@ -118,7 +122,8 @@ public class CmpResponderEntry implements Serializable
         return confFaulty || certFaulty;
     }
 
-    public void setConfFaulty(boolean confFaulty)
+    public void setConfFaulty(
+            final boolean confFaulty)
     {
         this.confFaulty = confFaulty;
     }
@@ -129,12 +134,15 @@ public class CmpResponderEntry implements Serializable
         return toString(false);
     }
 
-    public String toString(boolean verbose)
+    public String toString(
+            final boolean verbose)
     {
         return toString(verbose, true);
     }
 
-    public String toString(boolean verbose, boolean ignoreSensitiveInfo)
+    public String toString(
+            final boolean verbose,
+            final boolean ignoreSensitiveInfo)
     {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');

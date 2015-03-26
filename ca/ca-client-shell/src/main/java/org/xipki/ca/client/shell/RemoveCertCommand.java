@@ -40,7 +40,7 @@ import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.commands.Command;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.ca.client.api.CertIDOrError;
+import org.xipki.ca.client.api.CertIdOrError;
 import org.xipki.ca.common.cmp.PKIStatusInfo;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.util.SecurityUtil;
@@ -69,7 +69,7 @@ public class RemoveCertCommand extends UnRevRemoveCertCommand
             caCert = SecurityUtil.parseCert(issuerCertFile);
         }
 
-        CertIDOrError certIdOrError;
+        CertIdOrError certIdOrError;
         if(certFile != null)
         {
             X509Certificate cert = SecurityUtil.parseCert(certFile);

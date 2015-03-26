@@ -51,7 +51,10 @@ public class PublisherEntry implements Serializable
     private final String conf;
     private boolean faulty;
 
-    public PublisherEntry(String name, String type, String conf)
+    public PublisherEntry(
+            final String name,
+            final String type,
+            final String conf)
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("type", type);
@@ -80,7 +83,8 @@ public class PublisherEntry implements Serializable
         return faulty;
     }
 
-    public void setFaulty(boolean faulty)
+    public void setFaulty(
+            final boolean faulty)
     {
         this.faulty = faulty;
     }

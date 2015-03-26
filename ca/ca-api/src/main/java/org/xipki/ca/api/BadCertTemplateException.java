@@ -48,17 +48,21 @@ public class BadCertTemplateException extends Exception
     {
     }
 
-    public BadCertTemplateException(String message)
+    public BadCertTemplateException(
+            final String message)
     {
         super(message);
     }
 
-    public BadCertTemplateException(Throwable cause)
+    public BadCertTemplateException(
+            final Throwable cause)
     {
         super(cause);
     }
 
-    public BadCertTemplateException(String message, Throwable cause)
+    public BadCertTemplateException(
+            final String message,
+            final Throwable cause)
     {
         super(message, cause);
     }

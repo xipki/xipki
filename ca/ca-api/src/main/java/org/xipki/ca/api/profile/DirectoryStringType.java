@@ -52,7 +52,8 @@ public enum DirectoryStringType
     utf8String,
     bmpString;
 
-    public ASN1Encodable createDirectoryString(String text)
+    public ASN1Encodable createDirectoryString(
+            final String text)
     {
         if(teletexString == this)
         {

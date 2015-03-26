@@ -47,7 +47,10 @@ public class P10EnrollCertRequestType extends IdentifiedObject
     private final String certprofile;
     private final CertificationRequest p10Req;
 
-    public P10EnrollCertRequestType(String id, String certprofile, CertificationRequest p10Req)
+    public P10EnrollCertRequestType(
+            final String id,
+            final String certprofile,
+            final CertificationRequest p10Req)
     {
         super(id);
         ParamChecker.assertNotNull("p10Req", p10Req);

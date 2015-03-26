@@ -48,17 +48,21 @@ public class BadFormatException extends Exception
     {
     }
 
-    public BadFormatException(String message)
+    public BadFormatException(
+            final String message)
     {
         super(message);
     }
 
-    public BadFormatException(Throwable cause)
+    public BadFormatException(
+            final Throwable cause)
     {
         super(cause);
     }
 
-    public BadFormatException(String message, Throwable cause)
+    public BadFormatException(
+            final String message,
+            final Throwable cause)
     {
         super(message, cause);
     }

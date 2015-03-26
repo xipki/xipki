@@ -58,12 +58,15 @@ public class X509CertWithDBCertId
     private final byte[] subjectKeyIdentifer;
     private final X500Name subjectAsX500Name;
 
-    public X509CertWithDBCertId(X509Certificate cert)
+    public X509CertWithDBCertId(
+            final X509Certificate cert)
     {
         this(cert, null);
     }
 
-    public X509CertWithDBCertId(X509Certificate cert, byte[] encodedCert)
+    public X509CertWithDBCertId(
+            final X509Certificate cert,
+            final byte[] encodedCert)
     {
         ParamChecker.assertNotNull("cert", cert);
 
@@ -126,7 +129,8 @@ public class X509CertWithDBCertId
         return certId;
     }
 
-    public void setCertId(Integer certId)
+    public void setCertId(
+            final Integer certId)
     {
         this.certId = certId;
     }

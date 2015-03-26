@@ -47,7 +47,9 @@ public class KeyUsageControl
     private final KeyUsage keyUsage;
     private final boolean required;
 
-    public KeyUsageControl(KeyUsage keyUsage, boolean required)
+    public KeyUsageControl(
+            final KeyUsage keyUsage,
+            final boolean required)
     {
         ParamChecker.assertNotNull("keyUsage", keyUsage);
         this.keyUsage = keyUsage;

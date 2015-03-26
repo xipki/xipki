@@ -45,7 +45,8 @@ public enum ValidityMode
     LAX,
     CUTOFF;
 
-    public static ValidityMode getInstance(String text)
+    public static ValidityMode getInstance(
+            final String text)
     {
         for(ValidityMode value : values())
         {

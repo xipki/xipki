@@ -51,7 +51,9 @@ public class CmpControlEntry implements Serializable
     private final String conf;
     private boolean faulty;
 
-    public CmpControlEntry(String name, String conf)
+    public CmpControlEntry(
+            final String name,
+            final String conf)
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("conf", conf);
@@ -64,7 +66,8 @@ public class CmpControlEntry implements Serializable
         return faulty;
     }
 
-    public void setFaulty(boolean faulty)
+    public void setFaulty(
+            final boolean faulty)
     {
         this.faulty = faulty;
     }
