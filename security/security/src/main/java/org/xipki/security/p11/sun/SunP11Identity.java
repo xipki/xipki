@@ -75,12 +75,12 @@ class SunP11Identity implements Comparable<SunP11Identity>
     private final int signatureKeyBitLength;
 
     public SunP11Identity(
-            Provider p11Provider,
-            P11SlotIdentifier slotId,
-            String keyLabel,
-            PrivateKey privateKey,
-            X509Certificate[] certificateChain,
-            PublicKey publicKey)
+            final Provider p11Provider,
+            final P11SlotIdentifier slotId,
+            final String keyLabel,
+            final PrivateKey privateKey,
+            final X509Certificate[] certificateChain,
+            final PublicKey publicKey)
     throws SignerException
     {
         super();
@@ -194,19 +194,23 @@ class SunP11Identity implements Comparable<SunP11Identity>
         return slotId;
     }
 
-    public boolean match(P11SlotIdentifier slotId, String keyLabel)
+    public boolean match(
+            final P11SlotIdentifier slotId,
+            final String keyLabel)
     {
         return this.slotId.equals(slotId) && this.keyLabel.equals(keyLabel);
     }
 
-    public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo)
+    public byte[] CKM_RSA_PKCS(
+            final byte[] encodedDigestInfo)
     throws SignerException
     {
         byte[] padded = SignerUtil.pkcs1padding(encodedDigestInfo, (signatureKeyBitLength + 7)/8);
         return CKM_RSA_X509(padded);
     }
 
-    public byte[] CKM_RSA_X509(byte[] hash)
+    public byte[] CKM_RSA_X509(
+            final byte[] hash)
     throws SignerException
     {
         if(publicKey instanceof RSAPublicKey == false)
@@ -227,7 +231,8 @@ class SunP11Identity implements Comparable<SunP11Identity>
         }
     }
 
-    public byte[] CKM_ECDSA(byte[] hash)
+    public byte[] CKM_ECDSA(
+            final byte[] hash)
     throws SignerException
     {
         if(publicKey instanceof ECPublicKey == false)
@@ -250,7 +255,8 @@ class SunP11Identity implements Comparable<SunP11Identity>
         }
     }
 
-    public byte[] CKM_DSA(byte[] hash)
+    public byte[] CKM_DSA(
+            final byte[] hash)
     throws SignerException
     {
         if(publicKey instanceof DSAPublicKey == false)
@@ -273,7 +279,8 @@ class SunP11Identity implements Comparable<SunP11Identity>
     }
 
     @Override
-    public int compareTo(SunP11Identity o)
+    public int compareTo(
+            final SunP11Identity o)
     {
         return this.keyLabel.compareTo(o.keyLabel);
     }

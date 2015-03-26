@@ -49,7 +49,10 @@ public abstract class DynamicEnumCompleter implements XipkiCompleter
     protected abstract Set<String> getEnums();
 
     @Override
-    public int complete(String buffer, int cursor, List<String> candidates)
+    public int complete(
+            final String buffer,
+            final int cursor,
+            final List<String> candidates)
     {
         StringsCompleter delegate = new StringsCompleter();
 

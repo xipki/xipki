@@ -81,7 +81,8 @@ public class NSSSignatureSpi extends SignatureSpi
 
     private static final String MSG_UNSUPPORTED_ALGO = "unsupported signature algorithm (digestAlgo: %s, encryptionAlgo: %s)";
 
-    private NSSSignatureSpi(String algorithm)
+    private NSSSignatureSpi(
+            final String algorithm)
     {
         this.service = getSignatureService(algorithm);
         this.md = null;
@@ -89,7 +90,9 @@ public class NSSSignatureSpi extends SignatureSpi
         this.hashAlgOid = null;
     }
 
-    private NSSSignatureSpi(String digestAlgorithmName, String encrAlgorithmName)
+    private NSSSignatureSpi(
+            final String digestAlgorithmName,
+            final String encrAlgorithmName)
     {
         String HASHALGO = digestAlgorithmName.toUpperCase();
         String ENCALGO = encrAlgorithmName.toUpperCase();
@@ -131,7 +134,8 @@ public class NSSSignatureSpi extends SignatureSpi
         }
     }
 
-    private static Signature getSignatureService(String algorithm)
+    private static Signature getSignatureService(
+            final String algorithm)
     {
         Signature service = null;
         if(XipkiNSSProvider.nssProvider != null)
@@ -160,7 +164,8 @@ public class NSSSignatureSpi extends SignatureSpi
         return service;
     }
 
-    private static Cipher getCipherService(String algorithm)
+    private static Cipher getCipherService(
+            final String algorithm)
     {
         Cipher service = null;
         if(XipkiNSSProvider.nssProvider != null)
@@ -185,7 +190,8 @@ public class NSSSignatureSpi extends SignatureSpi
         return service;
     }
 
-    private static MessageDigest getMessageDigestService(String algorithm)
+    private static MessageDigest getMessageDigestService(
+            final String algorithm)
     {
         MessageDigest service = null;
         if(XipkiNSSProvider.nssProvider != null)
@@ -215,7 +221,8 @@ public class NSSSignatureSpi extends SignatureSpi
 
     @Override
     @SuppressWarnings("deprecation")
-    protected Object engineGetParameter(String param)
+    protected Object engineGetParameter(
+            final String param)
     throws InvalidParameterException
     {
         if(service != null)
@@ -229,7 +236,8 @@ public class NSSSignatureSpi extends SignatureSpi
     }
 
     @Override
-    protected void engineInitSign(PrivateKey privateKey)
+    protected void engineInitSign(
+            final PrivateKey privateKey)
     throws InvalidKeyException
     {
         if(service != null)
@@ -247,7 +255,9 @@ public class NSSSignatureSpi extends SignatureSpi
     }
 
     @Override
-    protected void engineInitSign(PrivateKey privateKey, SecureRandom random)
+    protected void engineInitSign(
+            final PrivateKey privateKey,
+            final SecureRandom random)
     throws InvalidKeyException
     {
         if(service != null)
@@ -265,7 +275,8 @@ public class NSSSignatureSpi extends SignatureSpi
     }
 
     @Override
-    protected void engineInitVerify(PublicKey publicKey)
+    protected void engineInitVerify(
+            final PublicKey publicKey)
     throws InvalidKeyException
     {
         if(service != null)
@@ -284,7 +295,8 @@ public class NSSSignatureSpi extends SignatureSpi
     }
 
     @Override
-    protected void engineSetParameter(AlgorithmParameterSpec params)
+    protected void engineSetParameter(
+            final AlgorithmParameterSpec params)
     throws InvalidAlgorithmParameterException
     {
         if(service != null)
@@ -299,7 +311,9 @@ public class NSSSignatureSpi extends SignatureSpi
 
     @Override
     @SuppressWarnings("deprecation")
-    protected void engineSetParameter(String param, Object value)
+    protected void engineSetParameter(
+            final String param,
+            final Object value)
     throws InvalidParameterException
     {
         if(service != null)
@@ -333,7 +347,10 @@ public class NSSSignatureSpi extends SignatureSpi
     }
 
     @Override
-    protected int engineSign(byte[] outbuf, int offset, int len)
+    protected int engineSign(
+            final byte[] outbuf,
+            final int offset,
+            final int len)
     throws SignatureException
     {
         if(md != null && service != null)
@@ -363,7 +380,8 @@ public class NSSSignatureSpi extends SignatureSpi
         }
     }
 
-    private byte[] encryptHash(byte[] hash)
+    private byte[] encryptHash(
+            final byte[] hash)
     throws SignatureException
     {
         int blockSize =    cipher.getOutputSize(1) - 1;
@@ -389,7 +407,8 @@ public class NSSSignatureSpi extends SignatureSpi
     }
 
     @Override
-    protected void engineUpdate(byte b)
+    protected void engineUpdate(
+            final byte b)
     throws SignatureException
     {
         if(md != null)
@@ -403,7 +422,10 @@ public class NSSSignatureSpi extends SignatureSpi
     }
 
     @Override
-    protected void engineUpdate(byte[] b, int off, int len)
+    protected void engineUpdate(
+            final byte[] b,
+            final int off,
+            final int len)
     throws SignatureException
     {
         if(md != null)
@@ -417,7 +439,8 @@ public class NSSSignatureSpi extends SignatureSpi
     }
 
     @Override
-    protected boolean engineVerify(byte[] sigBytes)
+    protected boolean engineVerify(
+            final byte[] sigBytes)
     throws SignatureException
     {
         if(md != null && service != null)
@@ -480,7 +503,9 @@ public class NSSSignatureSpi extends SignatureSpi
         }
     }
 
-    private static byte[] pkcs1padding(byte[] in, int blockSize)
+    private static byte[] pkcs1padding(
+            final byte[] in,
+            final int blockSize)
     {
         int inLen = in.length;
         if (inLen > blockSize)
@@ -502,8 +527,8 @@ public class NSSSignatureSpi extends SignatureSpi
     }
 
     private static byte[] decodePkcs11Block(
-        byte[]    block,
-        int minLen)
+            final byte[] block,
+            final int minLen)
     throws InvalidCipherTextException
     {
         int offset = 0;
@@ -548,15 +573,15 @@ public class NSSSignatureSpi extends SignatureSpi
             throw new InvalidCipherTextException("no data in block");
         }
 
-        byte[]    result = new byte[block.length - start];
+        byte[] result = new byte[block.length - start];
         System.arraycopy(block, start, result, 0, result.length);
 
         return result;
     }
 
     private static byte[] derEncode(
-        AlgorithmIdentifier algId,
-        byte[]    hash)
+            final AlgorithmIdentifier algId,
+            final byte[] hash)
     throws IOException
     {
         if (algId == null)

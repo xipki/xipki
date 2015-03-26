@@ -114,7 +114,8 @@ public abstract class CertRequestGenCommand extends SecurityCommand
                     + "(multi-valued)")
     private List<String> wantExtensionTypes;
 
-    protected abstract ConcurrentContentSigner getSigner(String hashAlgo)
+    protected abstract ConcurrentContentSigner getSigner(
+            String hashAlgo)
     throws Exception;
 
     @Override

@@ -65,7 +65,8 @@ public class SlotIdentifier extends ASN1Object
 {
     private P11SlotIdentifier slotId;
 
-    public SlotIdentifier(P11SlotIdentifier slotId)
+    public SlotIdentifier(
+            final P11SlotIdentifier slotId)
     {
         if(slotId == null)
         {
@@ -75,7 +76,8 @@ public class SlotIdentifier extends ASN1Object
         this.slotId = slotId;
     }
 
-    private SlotIdentifier(ASN1Sequence seq)
+    private SlotIdentifier(
+            final ASN1Sequence seq)
     {
         int size = seq.size();
         if (size < 1)
@@ -122,7 +124,7 @@ public class SlotIdentifier extends ASN1Object
     }
 
     public static SlotIdentifier getInstance(
-            Object obj)
+            final Object obj)
     {
         if (obj == null || obj instanceof SlotIdentifier)
         {

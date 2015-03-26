@@ -49,7 +49,9 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
     private final String keyIdHex;
     private final String keyLabel;
 
-    public P11KeyIdentifier(byte[] keyId, String keyLabel)
+    public P11KeyIdentifier(
+            final byte[] keyId,
+            final String keyLabel)
     {
         if(keyId == null && keyLabel == null)
         {
@@ -60,7 +62,8 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
         this.keyLabel = keyLabel;
     }
 
-    public P11KeyIdentifier(byte[] keyId)
+    public P11KeyIdentifier(
+            final byte[] keyId)
     {
         if(keyId == null)
         {
@@ -71,7 +74,8 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
         this.keyLabel = null;
     }
 
-    public P11KeyIdentifier(String keyLabel)
+    public P11KeyIdentifier(
+            final String keyLabel)
     {
         if(keyLabel == null)
         {
@@ -117,7 +121,8 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
     }
 
     @Override
-    public boolean equals(Object o)
+    public boolean equals(
+            final Object o)
     {
         if(this == o)
         {
@@ -142,7 +147,8 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
     }
 
     @Override
-    public int compareTo(P11KeyIdentifier o)
+    public int compareTo(
+            final P11KeyIdentifier o)
     {
         if(this == o)
         {

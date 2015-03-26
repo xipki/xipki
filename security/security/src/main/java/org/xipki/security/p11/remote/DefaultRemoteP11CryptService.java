@@ -61,7 +61,8 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
     private URL _serverUrl;
     private final String serverUrl;
 
-    DefaultRemoteP11CryptService(P11ModuleConf moduleConf)
+    DefaultRemoteP11CryptService(
+            final P11ModuleConf moduleConf)
     {
         super(moduleConf);
 
@@ -84,7 +85,8 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
     }
 
     @Override
-    public byte[] send(byte[] request)
+    public byte[] send(
+            final byte[] request)
     throws IOException
     {
         HttpURLConnection httpUrlConnection = (HttpURLConnection) _serverUrl.openConnection();

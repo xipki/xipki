@@ -49,34 +49,47 @@ import org.xipki.security.api.SecurityFactory;
 
 public interface P11WritableSlot
 {
-    void updateCertificate(P11KeyIdentifier keyIdentifier,
-            X509Certificate newCert, Set<X509Certificate> caCerts,
+    void updateCertificate(
+            P11KeyIdentifier keyIdentifier,
+            X509Certificate newCert,
+            Set<X509Certificate> caCerts,
             SecurityFactory securityFactory)
     throws Exception;
 
-    boolean removeKeyAndCerts(P11KeyIdentifier keyIdentifier)
+    boolean removeKeyAndCerts(
+            P11KeyIdentifier keyIdentifier)
     throws Exception;
 
-    void removeCerts(P11KeyIdentifier keyIdentifier)
+    void removeCerts(
+            P11KeyIdentifier keyIdentifier)
     throws Exception;
 
-    P11KeyIdentifier addCert(X509Certificate cert)
+    P11KeyIdentifier addCert(
+            X509Certificate cert)
     throws Exception;
 
     P11KeypairGenerationResult generateRSAKeypairAndCert(
-            int keySize, BigInteger publicExponent,
-            String label, String subject,
+            int keySize,
+            BigInteger publicExponent,
+            String label,
+            String subject,
             Integer keyUsage,
             List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception;
 
     P11KeypairGenerationResult generateDSAKeypairAndCert(
-            int pLength, int qLength, String label, String subject, Integer keyUsage,
+            int pLength,
+            int qLength,
+            String label,
+            String subject,
+            Integer keyUsage,
             List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception;
 
     P11KeypairGenerationResult generateECDSAKeypairAndCert(
-            String curveNameOrOid, String label, String subject,
+            String curveNameOrOid,
+            String label,
+            String subject,
             Integer keyUsage,
             List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception;

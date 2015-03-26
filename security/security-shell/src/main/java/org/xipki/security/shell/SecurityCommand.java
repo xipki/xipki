@@ -61,12 +61,14 @@ public abstract class SecurityCommand extends XipkiOsgiCommandSupport
         return securityFactory;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory)
+    public void setSecurityFactory(
+            final SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;
     }
 
-    protected P11Module getP11Module(String moduleName)
+    protected P11Module getP11Module(
+            final String moduleName)
     throws Exception
     {
         // this call initialization method
@@ -94,7 +96,9 @@ public abstract class SecurityCommand extends XipkiOsgiCommandSupport
 
     }
 
-    protected P11WritableSlot getP11WritablSlot(String moduleName, int slotIndex)
+    protected P11WritableSlot getP11WritablSlot(
+            final String moduleName,
+            final int slotIndex)
     throws Exception
     {
         P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);

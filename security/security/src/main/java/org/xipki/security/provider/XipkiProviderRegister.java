@@ -61,7 +61,8 @@ public class XipkiProviderRegister
         }
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory)
+    public void setSecurityFactory(
+            final SecurityFactory securityFactory)
     {
         XipkiKeyStoreSpi.setSecurityFactory(securityFactory);
     }

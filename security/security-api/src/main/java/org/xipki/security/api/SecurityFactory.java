@@ -62,38 +62,60 @@ public interface SecurityFactory
 
     PasswordResolver getPasswordResolver();
 
-    ConcurrentContentSigner createSigner(String type, String conf, X509Certificate cert)
+    ConcurrentContentSigner createSigner(
+            String type,
+            String conf,
+            X509Certificate cert)
     throws SignerException;
 
-    ConcurrentContentSigner createSigner(String type, String conf, X509Certificate[] certs)
+    ConcurrentContentSigner createSigner(
+            String type,
+            String conf,
+            X509Certificate[] certs)
     throws SignerException;
 
-    ConcurrentContentSigner createSigner(String type, String confWithoutAlgo, String hashAlgo,
+    ConcurrentContentSigner createSigner(
+            String type,
+            String confWithoutAlgo,
+            String hashAlgo,
             boolean mgf1, X509Certificate cert)
     throws SignerException;
 
-    ConcurrentContentSigner createSigner(String type, String confWithoutAlgo, String hashAlgo,
-            boolean mgf1, X509Certificate[] certs)
+    ConcurrentContentSigner createSigner(
+            String type,
+            String confWithoutAlgo,
+            String hashAlgo,
+            boolean mgf1,
+            X509Certificate[] certs)
     throws SignerException;
 
-    ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
+    ContentVerifierProvider getContentVerifierProvider(
+            PublicKey publicKey)
     throws InvalidKeyException;
 
-    ContentVerifierProvider getContentVerifierProvider(X509Certificate cert)
+    ContentVerifierProvider getContentVerifierProvider(
+            X509Certificate cert)
     throws InvalidKeyException;
 
-    ContentVerifierProvider getContentVerifierProvider(X509CertificateHolder cert)
+    ContentVerifierProvider getContentVerifierProvider(
+            X509CertificateHolder cert)
     throws InvalidKeyException;
 
-    PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo)
+    PublicKey generatePublicKey(
+            SubjectPublicKeyInfo subjectPublicKeyInfo)
     throws InvalidKeyException;
 
-    boolean verifyPOPO(CertificationRequest p10Req);
+    boolean verifyPOPO(
+            CertificationRequest p10Req);
 
-    P11CryptService getP11CryptService(String moduleName)
+    P11CryptService getP11CryptService(
+            String moduleName)
     throws SignerException;
 
-    PublicKey getPkcs11PublicKey(String moduleName, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    PublicKey getPkcs11PublicKey(
+            String moduleName,
+            P11SlotIdentifier slotId,
+            P11KeyIdentifier keyId)
     throws InvalidKeyException;
 
     String getPkcs11Provider();

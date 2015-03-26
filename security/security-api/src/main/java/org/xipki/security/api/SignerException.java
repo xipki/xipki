@@ -49,17 +49,21 @@ public class SignerException extends Exception
         super();
     }
 
-    public SignerException(String message, Throwable cause)
+    public SignerException(
+            final String message,
+            final Throwable cause)
     {
         super(message, cause);
     }
 
-    public SignerException(String message)
+    public SignerException(
+            final String message)
     {
         super(message);
     }
 
-    public SignerException(Throwable cause)
+    public SignerException(
+            final Throwable cause)
     {
         super(cause);
     }
