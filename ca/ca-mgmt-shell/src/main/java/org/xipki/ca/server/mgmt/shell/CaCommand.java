@@ -48,17 +48,20 @@ public abstract class CaCommand extends XipkiOsgiCommandSupport
 {
     protected CAManager caManager;
 
-    public void setCaManager(CAManager caManager)
+    public void setCaManager(
+            final CAManager caManager)
     {
         this.caManager = caManager;
     }
 
-    protected static String getRealString(String s)
+    protected static String getRealString(
+            final String s)
     {
         return CAManager.NULL.equalsIgnoreCase(s) ? null : s;
     }
 
-    protected static String toString(List<? extends Object> list)
+    protected static String toString(
+            final List<? extends Object> list)
     {
         StringBuilder sb = new StringBuilder();
         if(list == null)
@@ -81,7 +84,11 @@ public abstract class CaCommand extends XipkiOsgiCommandSupport
         return sb.toString();
     }
 
-    protected void output(boolean successful, String posPrefix, String negPrefix, String message)
+    protected void output(
+            final boolean successful,
+            final String posPrefix,
+            final String negPrefix,
+            final String message)
     {
         if(successful)
         {

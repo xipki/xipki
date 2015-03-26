@@ -65,7 +65,8 @@ public class AuditLoggingServiceRegisterImpl implements AuditLoggingServiceRegis
         }
     }
 
-    public void bindService(AuditLoggingService service)
+    public void bindService(
+            final AuditLoggingService service)
     {
         //might be null if dependency is optional
         if (service == null)
@@ -79,7 +80,8 @@ public class AuditLoggingServiceRegisterImpl implements AuditLoggingServiceRegis
         LOG.debug("{} AuditLoggingService binding for {}", (replaced ? "replaced" : "added"), service);
     }
 
-    public void unbindService(AuditLoggingService service)
+    public void unbindService(
+            final AuditLoggingService service)
     {
         //might be null if dependency is optional
         if (service == null)
@@ -104,7 +106,8 @@ public class AuditLoggingServiceRegisterImpl implements AuditLoggingServiceRegis
         }
     }
 
-    public void setAuditEnabled(boolean auditEnabled)
+    public void setAuditEnabled(
+            final boolean auditEnabled)
     {
         this.auditEnabled = auditEnabled;
     }

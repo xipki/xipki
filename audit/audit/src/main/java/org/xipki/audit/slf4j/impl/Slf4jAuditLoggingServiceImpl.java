@@ -59,7 +59,8 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
     }
 
     @Override
-    public void logEvent(AuditEvent event)
+    public void logEvent(
+            final AuditEvent event)
     {
         if(event == null)
         {
@@ -86,7 +87,8 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
         }
     }
 
-    private static String createMessage(AuditEvent event)
+    private static String createMessage(
+            final AuditEvent event)
     {
         StringBuilder sb = new StringBuilder();
 
@@ -136,7 +138,8 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
         return sb.toString();
     }
 
-    public void logEvent(PCIAuditEvent event)
+    public void logEvent(
+            final PCIAuditEvent event)
     {
         if(event == null)
         {

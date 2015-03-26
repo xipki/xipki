@@ -49,7 +49,9 @@ public class CertificatePolicyInformation
     private final String certPolicyId;
     private final List<CertificatePolicyQualifier> qualifiers;
 
-    public CertificatePolicyInformation(String certPolicyId, List<CertificatePolicyQualifier> qualifiers)
+    public CertificatePolicyInformation(
+            final String certPolicyId,
+            final List<CertificatePolicyQualifier> qualifiers)
     {
         ParamChecker.assertNotEmpty("certPolicyId", certPolicyId);
         this.certPolicyId = certPolicyId;

@@ -60,7 +60,8 @@ public abstract class ClientCommand extends XipkiOsgiCommandSupport
 
     protected RAWorker raWorker;
 
-    public final void setRaWorker(RAWorker raWorker)
+    public final void setRaWorker(
+            final RAWorker raWorker)
     {
         this.raWorker = raWorker;
     }
@@ -76,7 +77,8 @@ public abstract class ClientCommand extends XipkiOsgiCommandSupport
         return null;
     }
 
-    protected void saveRequestResponse(RequestResponseDebug debug)
+    protected void saveRequestResponse(
+            final RequestResponseDebug debug)
     {
         boolean saveReq = isNotBlank(reqout);
         boolean saveResp = isNotBlank(respout);
@@ -128,7 +130,9 @@ public abstract class ClientCommand extends XipkiOsgiCommandSupport
         }
     }
 
-    private static String appendIndex(String filename, int index)
+    private static String appendIndex(
+            final String filename,
+            final int index)
     {
         int idx = filename.lastIndexOf('.');
         if(idx == -1 || idx == filename.length() - 1)

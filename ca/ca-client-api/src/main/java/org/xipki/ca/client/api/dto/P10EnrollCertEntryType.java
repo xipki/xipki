@@ -47,7 +47,9 @@ public class P10EnrollCertEntryType
     private final CertificationRequest p10Request;
     private final String profile;
 
-    public P10EnrollCertEntryType(CertificationRequest p10Request, String profile)
+    public P10EnrollCertEntryType(
+            final CertificationRequest p10Request,
+            final String profile)
     {
         ParamChecker.assertNotNull("p10Request", p10Request);
         ParamChecker.assertNotEmpty("profile", profile);

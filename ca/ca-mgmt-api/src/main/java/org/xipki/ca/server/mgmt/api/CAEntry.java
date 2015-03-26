@@ -63,8 +63,11 @@ public class CAEntry
     private int expirationPeriod;
     private String extraControl;
 
-    public CAEntry(String name, String signerType, String signerConf,
-            int expirationPeriod)
+    public CAEntry(
+            final String name,
+            final String signerType,
+            final String signerConf,
+            final int expirationPeriod)
     throws CAMgmtException
     {
         ParamChecker.assertNotEmpty("name", name);
@@ -91,7 +94,8 @@ public class CAEntry
         return maxValidity;
     }
 
-    public void setMaxValidity(CertValidity maxValidity)
+    public void setMaxValidity(
+            final CertValidity maxValidity)
     {
         this.maxValidity = maxValidity;
     }
@@ -105,7 +109,8 @@ public class CAEntry
     {
         return status;
     }
-    public void setStatus(CAStatus status)
+    public void setStatus(
+            final CAStatus status)
     {
         this.status = status;
     }
@@ -115,7 +120,8 @@ public class CAEntry
         return signerType;
     }
 
-    public void setCmpControlName(String name)
+    public void setCmpControlName(
+            final String name)
     {
         this.cmpControlName = name;
     }
@@ -130,7 +136,8 @@ public class CAEntry
         return duplicateKeyMode;
     }
 
-    public void setDuplicateKeyMode(DuplicationMode mode)
+    public void setDuplicateKeyMode(
+            final DuplicationMode mode)
     {
         ParamChecker.assertNotNull("mode", mode);
         this.duplicateKeyMode = mode;
@@ -141,7 +148,8 @@ public class CAEntry
         return duplicateSubjectMode;
     }
 
-    public void setDuplicateSubjectMode(DuplicationMode mode)
+    public void setDuplicateSubjectMode(
+            final DuplicationMode mode)
     {
         ParamChecker.assertNotNull("mode", mode);
         this.duplicateSubjectMode = mode;
@@ -152,7 +160,8 @@ public class CAEntry
         return validityMode;
     }
 
-    public void setValidityMode(ValidityMode mode)
+    public void setValidityMode(
+            final ValidityMode mode)
     {
         ParamChecker.assertNotNull("mode", mode);
         this.validityMode = mode;
@@ -163,7 +172,8 @@ public class CAEntry
         return permissions;
     }
 
-    public void setPermissions(Set<Permission> permissions)
+    public void setPermissions(
+            final Set<Permission> permissions)
     {
         this.permissions = (permissions == null) ? null : Collections.unmodifiableSet(permissions);
     }
@@ -178,7 +188,8 @@ public class CAEntry
         return extraControl;
     }
 
-    public void setExtraControl(String extraControl)
+    public void setExtraControl(
+            final String extraControl)
     {
         this.extraControl = extraControl;
     }
@@ -189,12 +200,15 @@ public class CAEntry
         return toString(false);
     }
 
-    public String toString(boolean verbose)
+    public String toString(
+            final boolean verbose)
     {
         return toString(verbose, true);
     }
 
-    public String toString(boolean verbose, boolean ignoreSensitiveInfo)
+    public String toString(
+            final boolean verbose,
+            final boolean ignoreSensitiveInfo)
     {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
@@ -221,7 +235,8 @@ public class CAEntry
         return sb.toString();
     }
 
-    protected static String toString(Collection<String> tokens)
+    protected static String toString(
+            final Collection<String> tokens)
     {
         if(CollectionUtil.isEmpty(tokens))
         {

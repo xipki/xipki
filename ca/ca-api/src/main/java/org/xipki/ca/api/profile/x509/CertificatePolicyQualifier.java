@@ -46,19 +46,23 @@ public class CertificatePolicyQualifier
     private final String cpsUri;
     private final String userNotice;
 
-    private CertificatePolicyQualifier(String cpsUri, String userNotice)
+    private CertificatePolicyQualifier(
+            final String cpsUri,
+            final String userNotice)
     {
         this.cpsUri = cpsUri;
         this.userNotice = userNotice;
     }
 
-    public static CertificatePolicyQualifier getInstanceForUserNotice(String userNotice)
+    public static CertificatePolicyQualifier getInstanceForUserNotice(
+            final String userNotice)
     {
         ParamChecker.assertNotEmpty("userNotice", userNotice);
         return new CertificatePolicyQualifier(null, userNotice);
     }
 
-    public static CertificatePolicyQualifier getInstanceForCpsUri(String cpsUri)
+    public static CertificatePolicyQualifier getInstanceForCpsUri(
+            final String cpsUri)
     {
         ParamChecker.assertNotEmpty("cpsUri", cpsUri);
         return new CertificatePolicyQualifier(cpsUri, null);

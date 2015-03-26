@@ -42,5 +42,6 @@ package org.xipki.ca.api;
 public interface RequestorInfo
 {
     String getName();
+
     boolean isRA();
 }

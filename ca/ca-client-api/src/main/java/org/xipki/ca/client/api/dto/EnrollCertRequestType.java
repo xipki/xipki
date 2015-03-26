@@ -58,7 +58,8 @@ public class EnrollCertRequestType
     private final Type type;
     private final List<EnrollCertRequestEntryType> requestEntries = new LinkedList<>();
 
-    public EnrollCertRequestType(Type type)
+    public EnrollCertRequestType(
+            final Type type)
     {
         ParamChecker.assertNotNull("type", type);
         this.type = type;
@@ -69,7 +70,8 @@ public class EnrollCertRequestType
         return type;
     }
 
-    public boolean addRequestEntry(EnrollCertRequestEntryType requestEntry)
+    public boolean addRequestEntry(
+            final EnrollCertRequestEntryType requestEntry)
     {
         String id = requestEntry.getId();
         ASN1Integer certReqId = requestEntry.getCertReq().getCertReqId();

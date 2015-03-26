@@ -45,9 +45,11 @@ public interface QASystemManager
 {
     Set<String> getIssuerNames();
 
-    X509IssuerInfo getIssuer(String issuerName);
+    X509IssuerInfo getIssuer(
+            String issuerName);
 
     Set<String> getCertprofileNames();
 
-    X509CertprofileQA getCertprofile(String certprofileName);
+    X509CertprofileQA getCertprofile(
+            String certprofileName);
 }

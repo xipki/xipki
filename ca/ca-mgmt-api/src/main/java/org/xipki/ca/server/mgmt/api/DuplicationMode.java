@@ -48,7 +48,9 @@ public enum DuplicationMode
     private final int mode;
     private final String description;
 
-    private DuplicationMode(int mode, String description)
+    private DuplicationMode(
+            final int mode,
+            final String description)
     {
         this.mode = mode;
         this.description = description;
@@ -64,7 +66,8 @@ public enum DuplicationMode
         return description;
     }
 
-    public static DuplicationMode getInstance(String text)
+    public static DuplicationMode getInstance(
+            final String text)
     {
         for(DuplicationMode value : values())
         {
@@ -79,7 +82,8 @@ public enum DuplicationMode
         return null;
     }
 
-    public static DuplicationMode getInstance(int mode)
+    public static DuplicationMode getInstance(
+            final int mode)
     {
         for(DuplicationMode value : values())
         {

@@ -58,7 +58,8 @@ public class ChangeCAEntry
     private Set<Permission> permissions;
     private Integer expirationPeriod;
 
-    public ChangeCAEntry(String name)
+    public ChangeCAEntry(
+            final String name)
     throws CAMgmtException
     {
         ParamChecker.assertNotEmpty("name", name);
@@ -75,7 +76,8 @@ public class ChangeCAEntry
         return status;
     }
 
-    public void setStatus(CAStatus status)
+    public void setStatus(
+            final CAStatus status)
     {
         this.status = status;
     }
@@ -85,7 +87,8 @@ public class ChangeCAEntry
         return maxValidity;
     }
 
-    public void setMaxValidity(CertValidity maxValidity)
+    public void setMaxValidity(
+            final CertValidity maxValidity)
     {
         this.maxValidity = maxValidity;
     }
@@ -95,7 +98,8 @@ public class ChangeCAEntry
         return signerType;
     }
 
-    public void setSignerType(String signerType)
+    public void setSignerType(
+            final String signerType)
     {
         this.signerType = signerType;
     }
@@ -105,7 +109,8 @@ public class ChangeCAEntry
         return signerConf;
     }
 
-    public void setSignerConf(String signerConf)
+    public void setSignerConf(
+            final String signerConf)
     {
         this.signerConf = signerConf;
     }
@@ -115,7 +120,8 @@ public class ChangeCAEntry
         return cmpControlName;
     }
 
-    public void setCmpControlName(String cmpControlName)
+    public void setCmpControlName(
+            final String cmpControlName)
     {
         this.cmpControlName = cmpControlName;
     }
@@ -125,7 +131,8 @@ public class ChangeCAEntry
         return duplicateKeyMode;
     }
 
-    public void setDuplicateKeyMode(DuplicationMode duplicateKeyMode)
+    public void setDuplicateKeyMode(
+            final DuplicationMode duplicateKeyMode)
     {
         this.duplicateKeyMode = duplicateKeyMode;
     }
@@ -135,7 +142,8 @@ public class ChangeCAEntry
         return duplicateSubjectMode;
     }
 
-    public void setDuplicateSubjectMode(DuplicationMode duplicateSubjectMode)
+    public void setDuplicateSubjectMode(
+            final DuplicationMode duplicateSubjectMode)
     {
         this.duplicateSubjectMode = duplicateSubjectMode;
     }
@@ -145,7 +153,8 @@ public class ChangeCAEntry
         return validityMode;
     }
 
-    public void setValidityMode(ValidityMode validityMode)
+    public void setValidityMode(
+            final ValidityMode validityMode)
     {
         this.validityMode = validityMode;
     }
@@ -155,7 +164,8 @@ public class ChangeCAEntry
         return permissions;
     }
 
-    public void setPermissions(Set<Permission> permissions)
+    public void setPermissions(
+            final Set<Permission> permissions)
     {
         this.permissions = permissions;
     }
@@ -165,7 +175,8 @@ public class ChangeCAEntry
         return expirationPeriod;
     }
 
-    public void setExpirationPeriod(Integer expirationPeriod)
+    public void setExpirationPeriod(
+            final Integer expirationPeriod)
     {
         this.expirationPeriod = expirationPeriod;
     }

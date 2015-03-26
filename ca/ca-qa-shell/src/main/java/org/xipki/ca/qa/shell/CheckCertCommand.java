@@ -168,7 +168,10 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
         this.qaSystemManager = qaSystemManager;
     }
 
-    private static void format(ValidationIssue issue, String prefix, StringBuilder sb)
+    private static void format(
+            final ValidationIssue issue,
+            final String prefix,
+            final StringBuilder sb)
     {
         sb.append(prefix);
         sb.append(issue.getCode());

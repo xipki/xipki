@@ -60,7 +60,8 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
         HOUR("h");
 
         private String suffix;
-        private Unit(String suffix)
+        private Unit(
+                String suffix)
         {
             this.suffix = suffix;
         }
@@ -74,7 +75,8 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
     private final int validity;
     private final Unit unit;
 
-    public static CertValidity getInstance(String validityS)
+    public static CertValidity getInstance(
+            final String validityS)
     {
         ParamChecker.assertNotEmpty("validityS", validityS);
         final int len = validityS.length();
@@ -117,7 +119,9 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
         return new CertValidity(validity, unit);
     }
 
-    public CertValidity(int validity, Unit unit)
+    public CertValidity(
+            final int validity,
+            final Unit unit)
     {
         if(validity < 1)
         {
@@ -138,7 +142,8 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
         return unit;
     }
 
-    public Date add(Date referenceDate)
+    public Date add(
+            final Date referenceDate)
     {
         switch (unit)
         {
@@ -177,7 +182,8 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
         }
     }
 
-    private static boolean isLeapYear(int year)
+    private static boolean isLeapYear(
+            final int year)
     {
         if(year % 4 != 0)
         {
@@ -209,7 +215,8 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
     }
 
     @Override
-    public int compareTo(CertValidity o)
+    public int compareTo(
+            final CertValidity o)
     {
         if(unit == o.unit)
         {

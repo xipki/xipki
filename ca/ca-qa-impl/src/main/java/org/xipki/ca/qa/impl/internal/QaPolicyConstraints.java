@@ -46,7 +46,8 @@ public class QaPolicyConstraints extends QaExtension
     private final Integer requireExplicitPolicy;
     private final Integer inhibitPolicyMapping;
 
-    public QaPolicyConstraints(PolicyConstraints jaxb)
+    public QaPolicyConstraints(
+            final PolicyConstraints jaxb)
     {
         if(jaxb.getRequireExplicitPolicy() == null && jaxb.getInhibitPolicyMapping() == null)
         {

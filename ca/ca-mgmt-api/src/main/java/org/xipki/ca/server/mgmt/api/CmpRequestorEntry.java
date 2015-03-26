@@ -59,7 +59,9 @@ public class CmpRequestorEntry implements Serializable
     private final String base64Cert;
     private X509Certificate cert;
 
-    public CmpRequestorEntry(String name, String base64Cert)
+    public CmpRequestorEntry(
+            final String name,
+            final String base64Cert)
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("base64Cert", base64Cert);
@@ -100,7 +102,8 @@ public class CmpRequestorEntry implements Serializable
         return toString(false);
     }
 
-    public String toString(boolean verbose)
+    public String toString(
+            final boolean verbose)
     {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');

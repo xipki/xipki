@@ -45,6 +45,8 @@ public interface EnvironmentParameterResolver
 {
 
     Set<String> getAllParameterNames();
-    String getParameterValue(String parameterName);
+
+    String getParameterValue(
+            String parameterName);
 
 }

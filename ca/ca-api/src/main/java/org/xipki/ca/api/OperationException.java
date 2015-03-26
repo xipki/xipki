@@ -64,14 +64,17 @@ public class OperationException extends Exception
     private final ErrorCode errorCode;
     private final String errorMessage;
 
-    public OperationException(ErrorCode errorCode)
+    public OperationException(
+            final ErrorCode errorCode)
     {
         super("error code: " + errorCode);
         this.errorCode = errorCode;
         this.errorMessage = null;
     }
 
-    public OperationException(ErrorCode errorCode, String errorMessage)
+    public OperationException(
+            final ErrorCode errorCode,
+            final String errorMessage)
     {
         super("error code: " + errorCode + ", error message: " + errorMessage);
         this.errorCode = errorCode;

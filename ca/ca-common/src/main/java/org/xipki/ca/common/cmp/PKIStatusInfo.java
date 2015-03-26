@@ -48,21 +48,26 @@ public class PKIStatusInfo
     private final int pkiFailureInfo;
     private final String statusMessage;
 
-    public PKIStatusInfo(int status, int pkiFailureInfo, String statusMessage)
+    public PKIStatusInfo(
+            final int status,
+            final int pkiFailureInfo,
+            final String statusMessage)
     {
         this.status = status;
         this.pkiFailureInfo = pkiFailureInfo;
         this.statusMessage = statusMessage;
     }
 
-    public PKIStatusInfo(int status)
+    public PKIStatusInfo(
+            final int status)
     {
         this.status = status;
         this.pkiFailureInfo = 0;
         this.statusMessage = null;
     }
 
-    public PKIStatusInfo(org.bouncycastle.asn1.cmp.PKIStatusInfo bcPKIStatusInfo)
+    public PKIStatusInfo(
+            final org.bouncycastle.asn1.cmp.PKIStatusInfo bcPKIStatusInfo)
     {
         this.status = bcPKIStatusInfo.getStatus().intValue();
         if(bcPKIStatusInfo.getFailInfo() != null)

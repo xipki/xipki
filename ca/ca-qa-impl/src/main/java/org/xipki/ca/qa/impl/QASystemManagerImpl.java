@@ -84,7 +84,8 @@ public class QASystemManagerImpl implements QASystemManager
         return confFile;
     }
 
-    public void setConfFile(String confFile)
+    public void setConfFile(
+            final String confFile)
     {
         this.confFile = confFile;
     }
@@ -206,7 +207,8 @@ public class QASystemManagerImpl implements QASystemManager
     }
 
     @Override
-    public X509IssuerInfo getIssuer(String issuerName)
+    public X509IssuerInfo getIssuer(
+            final String issuerName)
     {
         return x509IssuerInfoMap.get(issuerName);
     }
@@ -218,12 +220,14 @@ public class QASystemManagerImpl implements QASystemManager
     }
 
     @Override
-    public X509CertprofileQA getCertprofile(String certprofileName)
+    public X509CertprofileQA getCertprofile(
+            final String certprofileName)
     {
         return x509ProfileMap.get(certprofileName);
     }
 
-    private static QAConfType parseQAConf(InputStream confStream)
+    private static QAConfType parseQAConf(
+            final InputStream confStream)
     throws IOException, JAXBException, SAXException
     {
         JAXBElement<?> rootElement;

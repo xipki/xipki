@@ -112,7 +112,8 @@ public class CrlSignerAddCommand extends CaCommand
         return null;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory)
+    public void setSecurityFactory(
+            final SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;
     }

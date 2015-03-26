@@ -53,7 +53,8 @@ public class DfltEnvironmentParameterResolver implements
     }
 
     @Override
-    public String getParameterValue(String parameterName)
+    public String getParameterValue(
+            final String parameterName)
     {
         return envParameters.get(parameterName);
     }
@@ -64,12 +65,15 @@ public class DfltEnvironmentParameterResolver implements
         return envParameters.keySet();
     }
 
-    public String getEnvParam(String name)
+    public String getEnvParam(
+            final String name)
     {
         return envParameters.get(name);
     }
 
-    public void addEnvParam(String name, String value)
+    public void addEnvParam(
+            final String name,
+            final String value)
     {
         envParameters.put(name, value);
     }
@@ -79,7 +83,8 @@ public class DfltEnvironmentParameterResolver implements
         envParameters.clear();
     }
 
-    public String removeEnvParam(String name)
+    public String removeEnvParam(
+            final String name)
     {
         return envParameters.remove(name);
     }

@@ -64,15 +64,20 @@ import org.xipki.security.api.NoIdleSignerException;
 
 public class CmpUtil
 {
-    public static PKIMessage addProtection(PKIMessage pkiMessage,
-            ConcurrentContentSigner signer, GeneralName signerName)
+    public static PKIMessage addProtection(
+            final PKIMessage pkiMessage,
+            final ConcurrentContentSigner signer,
+            final GeneralName signerName)
     throws CMPException, NoIdleSignerException
     {
         return addProtection(pkiMessage, signer, signerName, true);
     }
 
-    public static PKIMessage addProtection(PKIMessage pkiMessage,
-            ConcurrentContentSigner signer, GeneralName signerName, boolean addSignerCert)
+    public static PKIMessage addProtection(
+            final PKIMessage pkiMessage,
+            final ConcurrentContentSigner signer,
+            GeneralName signerName,
+            final boolean addSignerCert)
     throws CMPException, NoIdleSignerException
     {
         if(signerName == null)
@@ -151,7 +156,8 @@ public class CmpUtil
         }
     }
 
-    public static boolean isImplictConfirm(PKIHeader header)
+    public static boolean isImplictConfirm(
+            final PKIHeader header)
     {
         InfoTypeAndValue[] regInfos = header.getGeneralInfo();
         if(regInfos != null)
@@ -172,7 +178,8 @@ public class CmpUtil
         return new InfoTypeAndValue(CMPObjectIdentifiers.it_implicitConfirm, DERNull.INSTANCE);
     }
 
-    public static CmpUtf8Pairs extract(InfoTypeAndValue[] regInfos)
+    public static CmpUtf8Pairs extract(
+            final InfoTypeAndValue[] regInfos)
     {
         if(regInfos != null)
         {
@@ -189,7 +196,8 @@ public class CmpUtil
         return null;
     }
 
-    public static CmpUtf8Pairs extract(AttributeTypeAndValue[] atvs)
+    public static CmpUtf8Pairs extract(
+            final AttributeTypeAndValue[] atvs)
     {
         if(atvs == null)
         {
@@ -208,13 +216,15 @@ public class CmpUtil
         return null;
     }
 
-    public static InfoTypeAndValue buildInfoTypeAndValue(CmpUtf8Pairs utf8Pairs)
+    public static InfoTypeAndValue buildInfoTypeAndValue(
+            final CmpUtf8Pairs utf8Pairs)
     {
         return new InfoTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
                 new DERUTF8String(utf8Pairs.getEncoded()));
     }
 
-    public static AttributeTypeAndValue buildAttributeTypeAndValue(CmpUtf8Pairs utf8Pairs)
+    public static AttributeTypeAndValue buildAttributeTypeAndValue(
+            final CmpUtf8Pairs utf8Pairs)
     {
         return new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
                 new DERUTF8String(utf8Pairs.getEncoded()));

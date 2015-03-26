@@ -51,8 +51,12 @@ public class SubjectDNOption
     private final Integer minLen;
     private final Integer maxLen;
 
-    public SubjectDNOption(String prefix, String suffix, List<Pattern> patterns,
-            Integer minLen, Integer maxLen)
+    public SubjectDNOption(
+            final String prefix,
+            final String suffix,
+            final List<Pattern> patterns,
+            final Integer minLen,
+            final Integer maxLen)
     {
         this.prefix = prefix;
         this.suffix = suffix;

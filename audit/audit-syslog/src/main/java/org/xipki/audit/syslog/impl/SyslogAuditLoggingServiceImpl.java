@@ -121,7 +121,8 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
     }
 
     @Override
-    public void logEvent(final AuditEvent event)
+    public void logEvent(
+            final AuditEvent event)
     {
         if(event == null)
         {
@@ -173,7 +174,8 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
         syslog.log(SyslogLevel.forValue(event.getLevel().getValue()), msg);
     }
 
-    public void logEvent(final PCIAuditEvent event)
+    public void logEvent(
+            final PCIAuditEvent event)
     {
         if(event == null)
         {
@@ -349,81 +351,96 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
         }
     }
 
-    public void setFacility(String facility)
+    public void setFacility(
+            final String facility)
     {
         this.facility = facility;
     }
 
-    public void setCharSet(String charSet)
+    public void setCharSet(
+            final String charSet)
     {
         this.charSet = charSet;
     }
 
-    public void setHost(String host)
+    public void setHost(
+            final String host)
     {
         this.host = host;
     }
 
-    public void setPort(int port)
+    public void setPort(
+            final int port)
     {
         this.port = port;
     }
 
-    public void setProtocol(String protocol)
+    public void setProtocol(
+            final String protocol)
     {
         this.protocol = protocol;
     }
 
-    public void setIdent(String ident)
+    public void setIdent(
+            final String ident)
     {
         this.ident = ident;
     }
 
-    public void setUseThreading(boolean useThreading)
+    public void setUseThreading(
+            final boolean useThreading)
     {
         this.useThreading = useThreading;
     }
 
-    public void setThreadLoopInterval(int threadLoopInterval)
+    public void setThreadLoopInterval(
+            final int threadLoopInterval)
     {
         this.threadLoopInterval = threadLoopInterval;
     }
 
-    public void setWriteRetries(int writeRetries)
+    public void setWriteRetries(
+            final int writeRetries)
     {
         this.writeRetries = writeRetries;
     }
 
-    public void setUseStructuredData(boolean useStructuredData)
+    public void setUseStructuredData(
+            final boolean useStructuredData)
     {
         this.useStructuredData = useStructuredData;
     }
 
-    public void setUseSequenceNumbers(boolean useSequenceNumbers)
+    public void setUseSequenceNumbers(
+            final boolean useSequenceNumbers)
     {
         this.useSequenceNumbers = useSequenceNumbers;
     }
 
-    public void setLocalName(String localName)
+    public void setLocalName(
+            final String localName)
     {
         this.localName = localName;
     }
 
-    public void setSplitMessageBeginText(String splitMessageBeginText)
+    public void setSplitMessageBeginText(
+            final String splitMessageBeginText)
     {
         this.splitMessageBeginText = splitMessageBeginText;
     }
 
-    public void setSplitMessageEndText(String splitMessageEndText)
+    public void setSplitMessageEndText(
+            final String splitMessageEndText)
     {
         this.splitMessageEndText = splitMessageEndText;
     }
 
-    public void setMaxMessageLength(int maxMessageLength)
+    public void setMaxMessageLength(
+            final int maxMessageLength)
     {
         if ( maxMessageLength <= 0)
         {
-            maxMessageLength = 1023;
+            this.maxMessageLength = 1023;
         }
         else
         {
@@ -431,17 +448,20 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
         }
     }
 
-    public void setMaxShutdownWait(int maxShutdownWait)
+    public void setMaxShutdownWait(
+            final int maxShutdownWait)
     {
         this.maxShutdownWait = maxShutdownWait;
     }
 
-    public void setTruncateMessage(boolean truncateMessage)
+    public void setTruncateMessage(
+            final boolean truncateMessage)
     {
         this.truncateMessage = truncateMessage;
     }
 
-    private static boolean notEmpty(String text)
+    private static boolean notEmpty(
+            final String text)
     {
         return text != null && text.isEmpty() == false;
     }

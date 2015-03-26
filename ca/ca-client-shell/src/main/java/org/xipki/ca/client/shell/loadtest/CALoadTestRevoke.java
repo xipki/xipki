@@ -52,7 +52,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.client.api.CertIDOrError;
+import org.xipki.ca.client.api.CertIdOrError;
 import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.RAWorker;
 import org.xipki.ca.client.api.RAWorkerException;
@@ -102,8 +102,12 @@ class CALoadTestRevoke extends AbstractLoadTest
         return new Testor();
     }
 
-    public CALoadTestRevoke(RAWorker raWorker, Certificate caCert,
-            DataSourceWrapper caDataSource, int maxCerts, int n)
+    public CALoadTestRevoke(
+            final RAWorker raWorker,
+            final Certificate caCert,
+            final DataSourceWrapper caDataSource,
+            final int maxCerts,
+            final int n)
     throws Exception
     {
         ParamChecker.assertNotNull("raWorker", raWorker);
@@ -287,7 +291,7 @@ class CALoadTestRevoke extends AbstractLoadTest
                 request.addRequestEntry(entry);
             }
 
-            Map<String, CertIDOrError> result;
+            Map<String, CertIdOrError> result;
             try
             {
                 result = raWorker.revokeCerts(request, null);
@@ -307,7 +311,7 @@ class CALoadTestRevoke extends AbstractLoadTest
             }
 
             int nSuccess = 0;
-            for(CertIDOrError entry : result.values())
+            for(CertIdOrError entry : result.values())
             {
                 if(entry.getCertId() != null)
                 {

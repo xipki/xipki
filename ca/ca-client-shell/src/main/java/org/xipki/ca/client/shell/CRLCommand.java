@@ -62,7 +62,8 @@ public abstract class CRLCommand extends ClientCommand
                     + "(required)")
     protected String outFile;
 
-    protected abstract X509CRL retrieveCRL(String caName)
+    protected abstract X509CRL retrieveCRL(
+            String caName)
     throws RAWorkerException, PKIErrorException;
 
     @Override

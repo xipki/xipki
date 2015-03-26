@@ -47,7 +47,8 @@ public class RevokeCertRequestType
 {
     private final List<RevokeCertRequestEntryType> requestEntries = new LinkedList<>();
 
-    public boolean addRequestEntry(RevokeCertRequestEntryType requestEntry)
+    public boolean addRequestEntry(
+            final RevokeCertRequestEntryType requestEntry)
     {
         for(RevokeCertRequestEntryType re : requestEntries)
         {

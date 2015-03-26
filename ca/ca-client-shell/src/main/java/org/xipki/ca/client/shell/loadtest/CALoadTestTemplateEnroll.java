@@ -92,7 +92,9 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
     {
         private final String certprofile;
         private final CertRequest certRequest;
-        public CertRequestWithProfile(String certprofile, CertRequest certRequest)
+        public CertRequestWithProfile(
+                final String certprofile,
+                final CertRequest certRequest)
         {
             this.certprofile = certprofile;
             this.certRequest = certRequest;
@@ -120,7 +122,8 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
             }
         }
 
-        private boolean testNext(Map<Integer, CertRequestWithProfile> certRequests)
+        private boolean testNext(
+                final Map<Integer, CertRequestWithProfile> certRequests)
         {
             EnrollCertResult result;
             try
@@ -185,7 +188,9 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
 
     private final AtomicLong index;
 
-    public CALoadTestTemplateEnroll(RAWorker raWorker, String templateFile)
+    public CALoadTestTemplateEnroll(
+            final RAWorker raWorker,
+            final String templateFile)
     throws Exception
     {
         ParamChecker.assertNotNull("raWorker", raWorker);
@@ -280,7 +285,8 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
         return certRequests;
     }
 
-    private static EnrollTemplateType parse(InputStream configStream)
+    private static EnrollTemplateType parse(
+            InputStream configStream)
     throws ConfigurationException
     {
         synchronized (jaxbUnmarshallerLock)

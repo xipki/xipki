@@ -46,7 +46,8 @@ public class QaGeneralSubtree
 {
     private final GeneralSubtreeBaseType jaxb;
 
-    public QaGeneralSubtree(GeneralSubtreeBaseType jaxb)
+    public QaGeneralSubtree(
+            final GeneralSubtreeBaseType jaxb)
     {
         ParamChecker.assertNotNull("jaxb", jaxb);
         Integer i = jaxb.getMinimum();

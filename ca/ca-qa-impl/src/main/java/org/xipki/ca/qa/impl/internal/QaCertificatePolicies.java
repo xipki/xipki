@@ -51,7 +51,8 @@ public class QaCertificatePolicies extends QaExtension
 {
     private final List<QaCertificatePolicyInformation> policyInformations;
 
-    public QaCertificatePolicies(CertificatePolicies jaxb)
+    public QaCertificatePolicies(
+            final CertificatePolicies jaxb)
     {
         List<CertificatePolicyInformationType> types = jaxb.getCertificatePolicyInformation();
         List<QaCertificatePolicyInformation> list = new LinkedList<>();
@@ -68,7 +69,8 @@ public class QaCertificatePolicies extends QaExtension
         return policyInformations;
     }
 
-    public QaCertificatePolicyInformation getPolicyInformation(String policyId)
+    public QaCertificatePolicyInformation getPolicyInformation(
+            final String policyId)
     {
         for(QaCertificatePolicyInformation entry : policyInformations)
         {

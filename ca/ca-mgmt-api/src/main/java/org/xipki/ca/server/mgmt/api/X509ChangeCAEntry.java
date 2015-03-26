@@ -59,7 +59,8 @@ implements Serializable
     private Integer numCrls;
     private String extraControl;
 
-    public X509ChangeCAEntry(String name)
+    public X509ChangeCAEntry(
+            final String name)
     throws CAMgmtException
     {
         super(name);
@@ -70,7 +71,8 @@ implements Serializable
         return crlUris;
     }
 
-    public void setCrlUris(List<String> crlUris)
+    public void setCrlUris(
+            final List<String> crlUris)
     {
         this.crlUris = crlUris;
     }
@@ -80,7 +82,8 @@ implements Serializable
         return deltaCrlUris;
     }
 
-    public void setDeltaCrlUris(List<String> deltaCrlUris)
+    public void setDeltaCrlUris(
+            final List<String> deltaCrlUris)
     {
         this.deltaCrlUris = deltaCrlUris;
     }
@@ -90,7 +93,8 @@ implements Serializable
         return ocspUris;
     }
 
-    public void setOcspUris(List<String> ocspUris)
+    public void setOcspUris(
+            final List<String> ocspUris)
     {
         this.ocspUris = ocspUris;
     }
@@ -100,7 +104,8 @@ implements Serializable
         return issuerLocations;
     }
 
-    public void setIssuerLocations(List<String> issuerLocations)
+    public void setIssuerLocations(
+            final List<String> issuerLocations)
     {
         this.issuerLocations = issuerLocations;
     }
@@ -110,7 +115,8 @@ implements Serializable
         return cert;
     }
 
-    public void setCert(X509Certificate cert)
+    public void setCert(
+            final X509Certificate cert)
     {
         this.cert = cert;
     }
@@ -120,7 +126,8 @@ implements Serializable
         return crlSignerName;
     }
 
-    public void setCrlSignerName(String crlSignerName)
+    public void setCrlSignerName(
+            final String crlSignerName)
     {
         this.crlSignerName = crlSignerName;
     }
@@ -130,7 +137,8 @@ implements Serializable
         return cmpControlName;
     }
 
-    public void setCmpControlName(String cmpControlName)
+    public void setCmpControlName(
+            final String cmpControlName)
     {
         this.cmpControlName = cmpControlName;
     }
@@ -140,7 +148,8 @@ implements Serializable
         return numCrls;
     }
 
-    public void setNumCrls(Integer numCrls)
+    public void setNumCrls(
+            final Integer numCrls)
     {
         this.numCrls = numCrls;
     }
@@ -150,7 +159,8 @@ implements Serializable
         return extraControl;
     }
 
-    public void setExtraControl(String extraControl)
+    public void setExtraControl(
+            final String extraControl)
     {
         this.extraControl = extraControl;
     }

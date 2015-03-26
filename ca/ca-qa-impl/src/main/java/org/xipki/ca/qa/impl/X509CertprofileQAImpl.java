@@ -224,13 +224,15 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
     private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
 
-    public X509CertprofileQAImpl(String data)
+    public X509CertprofileQAImpl(
+            final String data)
     throws CertprofileException
     {
         this(data.getBytes());
     }
 
-    public X509CertprofileQAImpl(byte[] dataBytes)
+    public X509CertprofileQAImpl(
+            final byte[] dataBytes)
     throws CertprofileException
     {
         try
@@ -468,9 +470,12 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
     }
 
     @Override
-    public ValidationResult checkCert(byte[] certBytes, X509IssuerInfo issuerInfo,
-            X500Name requestedSubject, SubjectPublicKeyInfo requestedPublicKey,
-            Extensions requestedExtensions)
+    public ValidationResult checkCert(
+            final byte[] certBytes,
+            final X509IssuerInfo issuerInfo,
+            final X500Name requestedSubject,
+            final SubjectPublicKeyInfo requestedPublicKey,
+            final Extensions requestedExtensions)
     {
         ParamChecker.assertNotNull("certBytes", certBytes);
         ParamChecker.assertNotNull("issuerInfo", issuerInfo);
@@ -623,8 +628,11 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         return new ValidationResult(resultIssues);
     }
 
-    private List<ValidationIssue> checkExtensions(Certificate bcCert, X509Certificate cert,
-            X509IssuerInfo issuerInfo, Extensions requestExtensions)
+    private List<ValidationIssue> checkExtensions(
+            final Certificate bcCert,
+            final X509Certificate cert,
+            final X509IssuerInfo issuerInfo,
+            final Extensions requestExtensions)
     {
         List<ValidationIssue> result = new LinkedList<>();
 
@@ -751,7 +759,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 } else if(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck.equals(oid))
                 {
                     // ocsp-nocheck
-                    checkExtensionOcspNocheck(extensionValue, failureMsg);
+                    checkExtensionOcspNocheck(failureMsg, extensionValue);
                 } else
                 {
                     byte[] expected = getExpectedExtValue(oid, requestExtensions, extControl);
@@ -778,8 +786,10 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         return result;
     }
 
-    private byte[] getExpectedExtValue(ASN1ObjectIdentifier type, Extensions requestExtensions,
-            ExtensionControl extControl)
+    private byte[] getExpectedExtValue(
+            final ASN1ObjectIdentifier type,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
     {
         if(extControl.isRequest() && requestExtensions != null)
         {
@@ -797,8 +807,10 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         return null;
     }
 
-    private Set<ASN1ObjectIdentifier> getExensionTypes(Certificate cert,
-            X509IssuerInfo issuerInfo, Extensions requestedExtensions)
+    private Set<ASN1ObjectIdentifier> getExensionTypes(
+            final Certificate cert,
+            final X509IssuerInfo issuerInfo,
+            final Extensions requestedExtensions)
     {
         Set<ASN1ObjectIdentifier> types = new HashSet<>();
         // profile required extension types
@@ -1044,7 +1056,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         return types;
     }
 
-    private void checkPublicKey(SubjectPublicKeyInfo publicKey)
+    private void checkPublicKey(
+            final SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException
     {
         if(CollectionUtil.isEmpty(keyAlgorithms))
@@ -1172,7 +1185,9 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         throw new BadCertTemplateException("the given publicKey is not permitted");
     }
 
-    private static void checkECSubjectPublicKeyInfo(ASN1ObjectIdentifier curveOid, byte[] encoded)
+    private static void checkECSubjectPublicKeyInfo(
+            final ASN1ObjectIdentifier curveOid,
+            final byte[] encoded)
     throws BadCertTemplateException
     {
         Integer expectedLength = ecCurveFieldSizes.get(curveOid);
@@ -1210,7 +1225,9 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }// end switch
     }
 
-    private List<ValidationIssue> checkSubject(X500Name subject, X500Name requestedSubject)
+    private List<ValidationIssue> checkSubject(
+            final X500Name subject,
+            final X500Name requestedSubject)
     {
         // collect subject attribute types to check
         Set<ASN1ObjectIdentifier> oids = new HashSet<>();
@@ -1235,8 +1252,10 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         return result;
     }
 
-    private ValidationIssue checkSubjectAttribute(ASN1ObjectIdentifier type,
-            X500Name subject, X500Name requestedSubject)
+    private ValidationIssue checkSubjectAttribute(
+            final ASN1ObjectIdentifier type,
+            final X500Name subject,
+            final X500Name requestedSubject)
     {
         ValidationIssue issue = createSubjectIssue(type);
 
@@ -1443,12 +1462,15 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         return issue;
     }
 
-    private static int getInt(Integer i, int dfltValue)
+    private static int getInt(
+            final Integer i,
+            final int dfltValue)
     {
         return i == null ? dfltValue : i.intValue();
     }
 
-    private ValidationIssue createSubjectIssue(ASN1ObjectIdentifier subjectAttrType)
+    private ValidationIssue createSubjectIssue(
+            final ASN1ObjectIdentifier subjectAttrType)
     {
         ValidationIssue issue;
         String attrName = ObjectIdentifiers.getName(subjectAttrType);
@@ -1481,7 +1503,9 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         return issue;
     }
 
-    private void checkExtensionBasicConstraints(StringBuilder failureMsg, byte[] extensionValue)
+    private void checkExtensionBasicConstraints(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue)
     {
         BasicConstraints bc =  BasicConstraints.getInstance(extensionValue);
         if(ca != bc.isCA())
@@ -1517,8 +1541,10 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private void checkExtensionSubjectKeyIdentifier(StringBuilder failureMsg,
-            byte[] extensionValue, SubjectPublicKeyInfo subjectPublicKeyInfo)
+    private void checkExtensionSubjectKeyIdentifier(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final SubjectPublicKeyInfo subjectPublicKeyInfo)
     {
         // subjectKeyIdentifier
         SubjectKeyIdentifier asn1 = SubjectKeyIdentifier.getInstance(extensionValue);
@@ -1532,8 +1558,10 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private void checkExtensionIssuerKeyIdentifier(StringBuilder failureMsg,
-            byte[] extensionValue, X509IssuerInfo issuerInfo)
+    private void checkExtensionIssuerKeyIdentifier(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final X509IssuerInfo issuerInfo)
     {
         AuthorityKeyIdentifier asn1 = AuthorityKeyIdentifier.getInstance(extensionValue);
         byte[] keyIdentifier = asn1.getKeyIdentifier();
@@ -1631,8 +1659,11 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private void checkExtensionNameConstraints(StringBuilder failureMsg,
-            byte[] extensionValue, Extensions requestExtensions, ExtensionControl extControl)
+    private void checkExtensionNameConstraints(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
     {
         QaNameConstraints conf = nameConstraints;
 
@@ -1657,8 +1688,10 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 conf.getExcludedSubtrees());
     }
 
-    private void checkExtensionNameConstraintsSubtrees(StringBuilder failureMsg,
-            String description, GeneralSubtree[] subtrees, List<QaGeneralSubtree> expectedSubtrees)
+    private void checkExtensionNameConstraintsSubtrees(final StringBuilder failureMsg,
+            final String description,
+            final GeneralSubtree[] subtrees,
+            final List<QaGeneralSubtree> expectedSubtrees)
     {
         int iSize = subtrees == null ? 0 : subtrees.length;
         int eSize = expectedSubtrees == null ? 0 : expectedSubtrees.size();
@@ -1730,8 +1763,11 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private void checkExtensionPolicyConstraints(StringBuilder failureMsg,
-            byte[] extensionValue, Extensions requestExtensions, ExtensionControl extControl)
+    private void checkExtensionPolicyConstraints(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
     {
         QaPolicyConstraints conf = policyConstraints;
         if(conf == null)
@@ -1795,8 +1831,12 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private void checkExtensionKeyUsage(StringBuilder failureMsg,
-            byte[] extensionValue, boolean[] usages, Extensions requestExtensions, ExtensionControl extControl)
+    private void checkExtensionKeyUsage(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final boolean[] usages,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
     {
         int n = usages.length;
 
@@ -1865,8 +1905,11 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private void checkExtensionExtendedKeyUsage(StringBuilder failureMsg,
-            byte[] extensionValue, Extensions requestExtensions, ExtensionControl extControl)
+    private void checkExtensionExtendedKeyUsage(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
     {
         Set<String> isUsages = new HashSet<>();
         {
@@ -1935,8 +1978,11 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private void checkExtensionCertificatePolicies(StringBuilder failureMsg,
-            byte[] extensionValue, Extensions requestExtensions, ExtensionControl extControl)
+    private void checkExtensionCertificatePolicies(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
     {
         QaCertificatePolicies conf = certificatePolicies;
         if(conf == null)
@@ -2045,8 +2091,11 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private void checkExtensionPolicyMappings(StringBuilder failureMsg, byte[] extensionValue,
-            Extensions requestExtensions, ExtensionControl extControl)
+    private void checkExtensionPolicyMappings(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
     {
         QaPolicyMappingsOption conf = policyMappings;
         if(conf == null)
@@ -2098,8 +2147,11 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private void checkExtensionInhibitAnyPolicy(StringBuilder failureMsg,
-            byte[] extensionValue, Extensions requestExtensions, ExtensionControl extControl)
+    private void checkExtensionInhibitAnyPolicy(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
     {
         QaInhibitAnyPolicy conf = inhibitAnyPolicy;
         if(conf == null)
@@ -2124,8 +2176,11 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private void checkExtensionSubjectAltName(StringBuilder failureMsg,
-            byte[] extensionValue, Extensions requestExtensions, ExtensionControl extControl)
+    private void checkExtensionSubjectAltName(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
     {
         if(allowedSubjectAltNameModes == null)
         {
@@ -2188,8 +2243,11 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private void checkExtensionSubjectInfoAccess(StringBuilder failureMsg,
-            byte[] extensionValue, Extensions requestExtensions, ExtensionControl extControl)
+    private void checkExtensionSubjectInfoAccess(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
     {
         if(allowedSubjectInfoAccessModes == null)
         {
@@ -2291,8 +2349,10 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private void checkExtensionIssuerAltNames(StringBuilder failureMsg,
-            byte[] extensionValue, X509IssuerInfo issuerInfo)
+    private void checkExtensionIssuerAltNames(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final X509IssuerInfo issuerInfo)
     {
         Extension caSubjectAltExtension = issuerInfo.getBcCert().getTBSCertificate().getExtensions().getExtension(
                 Extension.subjectAlternativeName);
@@ -2312,8 +2372,10 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private void checkExtensionAuthorityInfoAccess(StringBuilder failureMsg,
-            byte[] extensionValue, X509IssuerInfo issuerInfo)
+    private void checkExtensionAuthorityInfoAccess(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final X509IssuerInfo issuerInfo)
     {
         Set<String> eOCSPUris = issuerInfo.getOcspURLs();
         if(eOCSPUris == null)
@@ -2375,8 +2437,10 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private void checkExtensionCrlDistributionPoints(StringBuilder failureMsg,
-            byte[] extensionValue, X509IssuerInfo issuerInfo)
+    private void checkExtensionCrlDistributionPoints(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final X509IssuerInfo issuerInfo)
     {
         CRLDistPoint iCRLDistPoints = CRLDistPoint.getInstance(extensionValue);
         DistributionPoint[] iDistributionPoints = iCRLDistPoints.getDistributionPoints();
@@ -2436,8 +2500,10 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private void checkExtensionDeltaCrlDistributionPoints(StringBuilder failureMsg,
-            byte[] extensionValue, X509IssuerInfo issuerInfo)
+    private void checkExtensionDeltaCrlDistributionPoints(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final X509IssuerInfo issuerInfo)
     {
         CRLDistPoint iCRLDistPoints = CRLDistPoint.getInstance(extensionValue);
         DistributionPoint[] iDistributionPoints = iCRLDistPoints.getDistributionPoints();
@@ -2497,8 +2563,11 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private void checkExtensionAdmission(StringBuilder failureMsg,
-            byte[] extensionValue, Extensions requestExtensions, ExtensionControl extControl)
+    private void checkExtensionAdmission(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
     {
         QaAdmission conf = admission;
         if(conf == null)
@@ -2632,7 +2701,9 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private boolean checkExtensionOcspNocheck(byte[] extensionValue, StringBuilder failureMsg)
+    private boolean checkExtensionOcspNocheck(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue)
     {
         if(Arrays.equals(DERNull, extensionValue) == false)
         {
@@ -2642,12 +2713,15 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         return true;
     }
 
-    private static String hex(byte[] bytes)
+    private static String hex(
+            final byte[] bytes)
     {
         return Hex.toHexString(bytes);
     }
 
-    private static Set<String> str_in_b_not_in_a(Collection<String> a, Collection<String> b)
+    private static Set<String> str_in_b_not_in_a(
+            final Collection<String> a,
+            final Collection<String> b)
     {
         if(b == null)
         {
@@ -2665,7 +2739,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         return result;
     }
 
-    static Set<Range> buildParametersMap(RangesType ranges)
+    static Set<Range> buildParametersMap(
+            final RangesType ranges)
     {
         if(ranges == null)
         {
@@ -2683,7 +2758,9 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         return ret;
     }
 
-    private static GeneralName createGeneralName(GeneralName reqName, Set<GeneralNameMode> modes)
+    private static GeneralName createGeneralName(
+            final GeneralName reqName,
+            final Set<GeneralNameMode> modes)
     throws BadCertTemplateException
     {
         int tag = reqName.getTagNo();
@@ -2773,7 +2850,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         } // end switch
     }
 
-    private static Set<String> getKeyUsage(byte[] extensionValue)
+    private static Set<String> getKeyUsage(
+            final byte[] extensionValue)
     {
         Set<String> usages = new HashSet<>();
         org.bouncycastle.asn1.x509.KeyUsage reqKeyUsage =
@@ -2789,7 +2867,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         return usages;
     }
 
-    private static Set<String> getExtKeyUsage(byte[] extensionValue)
+    private static Set<String> getExtKeyUsage(
+            final byte[] extensionValue)
     {
         Set<String> usages = new HashSet<>();
         org.bouncycastle.asn1.x509.ExtendedKeyUsage reqKeyUsage =
@@ -2801,7 +2880,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         return usages;
     }
 
-    private Set<KeyUsageControl> getKeyusage(boolean required)
+    private Set<KeyUsageControl> getKeyusage(
+            final boolean required)
     {
         Set<KeyUsageControl> ret = new HashSet<>();
 
@@ -2819,7 +2899,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         return ret;
     }
 
-    private Set<ExtKeyUsageControl> getExtKeyusage(boolean required)
+    private Set<ExtKeyUsageControl> getExtKeyusage(
+            final boolean required)
     {
         Set<ExtKeyUsageControl> ret = new HashSet<>();
 
@@ -2837,7 +2918,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         return ret;
     }
 
-    private RDNControl getSubjectDNControl(ASN1ObjectIdentifier type)
+    private RDNControl getSubjectDNControl(final ASN1ObjectIdentifier type)
     {
         for(RDNControl control : subjectDNControls)
         {
@@ -2850,12 +2931,15 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         return null;
     }
 
-    private byte[] getConstantExtensionValue(ASN1ObjectIdentifier type)
+    private byte[] getConstantExtensionValue(
+            final ASN1ObjectIdentifier type)
     {
         return constantExtensions == null ? null : constantExtensions.get(type).getValue();
     }
 
-    private Object getExtensionValue(ASN1ObjectIdentifier type, ExtensionsType extensionsType)
+    private Object getExtensionValue(
+            final ASN1ObjectIdentifier type,
+            final ExtensionsType extensionsType)
     {
         for(ExtensionType m : extensionsType.getExtension())
         {
@@ -2873,7 +2957,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
     }
 
     public static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(
-            ExtensionsType extensionsType)
+            final ExtensionsType extensionsType)
     throws CertprofileException
     {
         if(extensionsType == null)
@@ -2912,7 +2996,9 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         return Collections.unmodifiableMap(map);
     }
 
-    private static List<String> sort(List<String> contentList, List<Pattern> patternList)
+    private static List<String> sort(
+            final List<String> contentList,
+            final List<Pattern> patternList)
     {
         List<String> sorted = new ArrayList<>(contentList.size());
         for(Pattern p : patternList)

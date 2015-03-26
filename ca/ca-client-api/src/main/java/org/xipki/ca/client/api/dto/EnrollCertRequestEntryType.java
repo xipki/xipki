@@ -50,8 +50,11 @@ public class EnrollCertRequestEntryType extends IdentifiedObject
     private final CertRequest certReq;
     private final ProofOfPossession popo;
 
-    public EnrollCertRequestEntryType(String id, String certprofile,
-            CertRequest certReq, ProofOfPossession popo)
+    public EnrollCertRequestEntryType(
+            final String id,
+            final String certprofile,
+            final CertRequest certReq,
+            final ProofOfPossession popo)
     {
         super(id);
         ParamChecker.assertNotNull("certReq", certReq);

@@ -53,7 +53,8 @@ public class RevokeCertResultType
         return resultEntries;
     }
 
-    public void addResultEntry(ResultEntryType resultEntry)
+    public void addResultEntry(
+            final ResultEntryType resultEntry)
     {
         ParamChecker.assertNotNull("resultEntry", resultEntry);
 

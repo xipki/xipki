@@ -46,7 +46,9 @@ public enum CertArt
     CVC(3);
 
     private final int code;
-    private CertArt(int code)
+
+    private CertArt(
+            final int code)
     {
         this.code = code;
     }
@@ -56,7 +58,8 @@ public enum CertArt
         return code;
     }
 
-    public static CertArt getInstance(int code)
+    public static CertArt getInstance(
+            final int code)
     {
         for(CertArt value : values())
         {

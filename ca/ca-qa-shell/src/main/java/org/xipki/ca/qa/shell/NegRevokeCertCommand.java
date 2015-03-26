@@ -41,7 +41,7 @@ import java.util.Date;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.ca.client.api.CertIDOrError;
+import org.xipki.ca.client.api.CertIdOrError;
 import org.xipki.ca.client.shell.UnRevRemoveCertCommand;
 import org.xipki.common.CRLReason;
 import org.xipki.common.RequestResponseDebug;
@@ -102,7 +102,7 @@ public class NegRevokeCertCommand extends UnRevRemoveCertCommand
             caCert = SecurityUtil.parseCert(issuerCertFile);
         }
 
-        CertIDOrError certIdOrError;
+        CertIdOrError certIdOrError;
         if(certFile != null)
         {
             X509Certificate cert = SecurityUtil.parseCert(certFile);

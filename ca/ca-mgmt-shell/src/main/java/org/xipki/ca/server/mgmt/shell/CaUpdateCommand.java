@@ -141,7 +141,8 @@ public class CaUpdateCommand extends CaCommand
 
     private SecurityFactory securityFactory;
 
-    public void setSecurityFactory(SecurityFactory securityFactory)
+    public void setSecurityFactory(
+            final SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;
     }

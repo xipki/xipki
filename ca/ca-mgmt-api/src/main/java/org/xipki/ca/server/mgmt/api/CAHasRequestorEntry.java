@@ -54,7 +54,8 @@ public class CAHasRequestorEntry implements Serializable
     private Set<Permission> permissions;
     private Set<String> profiles;
 
-    public CAHasRequestorEntry(String requestorName)
+    public CAHasRequestorEntry(
+            final String requestorName)
     {
         ParamChecker.assertNotEmpty("requestorName", requestorName);
         this.requestorName = requestorName;
@@ -65,7 +66,8 @@ public class CAHasRequestorEntry implements Serializable
         return ra;
     }
 
-    public void setRa(boolean ra)
+    public void setRa(
+            final boolean ra)
     {
         this.ra = ra;
     }
@@ -75,7 +77,8 @@ public class CAHasRequestorEntry implements Serializable
         return permissions;
     }
 
-    public void setPermissions(Set<Permission> permissions)
+    public void setPermissions(
+            final Set<Permission> permissions)
     {
         this.permissions = Collections.unmodifiableSet(permissions);
     }
@@ -85,7 +88,8 @@ public class CAHasRequestorEntry implements Serializable
         return requestorName;
     }
 
-    public void setProfiles(Set<String> profiles)
+    public void setProfiles(
+            final Set<String> profiles)
     {
         this.profiles = Collections.unmodifiableSet(profiles);
     }

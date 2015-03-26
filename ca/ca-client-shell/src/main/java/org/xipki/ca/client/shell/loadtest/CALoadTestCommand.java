@@ -46,7 +46,8 @@ public abstract class CALoadTestCommand extends XipkiOsgiCommandSupport
 {
     protected RAWorker raWorker;
 
-    public final void setRaWorker(RAWorker raWorker)
+    public final void setRaWorker(
+            final RAWorker raWorker)
     {
         this.raWorker = raWorker;
     }

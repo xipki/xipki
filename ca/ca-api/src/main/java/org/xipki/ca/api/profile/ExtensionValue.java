@@ -47,7 +47,9 @@ public class ExtensionValue
     private final boolean critical;
     private final ASN1Encodable value;
 
-    public ExtensionValue(boolean critical, ASN1Encodable value)
+    public ExtensionValue(
+            final boolean critical,
+            final ASN1Encodable value)
     {
         ParamChecker.assertNotNull("value", value);
 

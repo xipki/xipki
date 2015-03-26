@@ -51,7 +51,8 @@ public class NegGetCRLCommand extends NegCRLCommand
 {
 
     @Override
-    protected X509CRL retrieveCRL(String caName)
+    protected X509CRL retrieveCRL(
+            final String caName)
     throws RAWorkerException, PKIErrorException
     {
         RequestResponseDebug debug = getRequestResponseDebug();

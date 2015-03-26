@@ -71,18 +71,30 @@ implements Serializable
     private String subject;
     private String serialSeqName;
 
-    public X509CAEntry(String name, long nextSerial, int nextCRLNumber,
-            String signerType, String signerConf,
-            List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
-            int numCrls, int expirationPeriod)
+    public X509CAEntry(
+            final String name,
+            final long nextSerial,
+            final int nextCRLNumber,
+            final String signerType,
+            final String signerConf,
+            final List<String> ocspUris,
+            final List<String> crlUris,
+            final List<String> deltaCrlUris,
+            final int numCrls,
+            final int expirationPeriod)
     throws CAMgmtException
     {
         super(name, signerType, signerConf, expirationPeriod);
         init(nextSerial, nextCRLNumber, ocspUris, crlUris, deltaCrlUris, numCrls);
     }
 
-    private void init(long nextSerial, int nextCRLNumber,
-            List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris, int numCrls)
+    private void init(
+            final long nextSerial,
+            final int nextCRLNumber,
+            final List<String> ocspUris,
+            final List<String> crlUris,
+            final List<String> deltaCrlUris,
+            final int numCrls)
     throws CAMgmtException
     {
         if(nextSerial < 0)
@@ -113,7 +125,8 @@ implements Serializable
                 null : Collections.unmodifiableList(new ArrayList<>(deltaCrlUris));
     }
 
-    public void setCertificate(X509Certificate cert)
+    public void setCertificate(
+            final X509Certificate cert)
     throws CAMgmtException
     {
         ParamChecker.assertNotNull("cert", cert);
@@ -131,7 +144,8 @@ implements Serializable
         return nextSerial;
     }
 
-    public void setNextSerial(long nextSerial)
+    public void setNextSerial(
+            final long nextSerial)
     {
         this.nextSerial = nextSerial;
     }
@@ -141,7 +155,8 @@ implements Serializable
         return nextCRLNumber;
     }
 
-    public void setNextCRLNumber(int crlNumber)
+    public void setNextCRLNumber(
+            final int crlNumber)
     {
         this.nextCRLNumber = crlNumber;
     }
@@ -191,12 +206,15 @@ implements Serializable
         return numCrls;
     }
 
-    public void setCrlSignerName(String crlSignerName)
+    public void setCrlSignerName(
+            final String crlSignerName)
     {
         this.crlSignerName = crlSignerName;
     }
 
-    public String toString(boolean verbose, boolean ignoreSensitiveInfo)
+    public String toString(
+            final boolean verbose,
+            final boolean ignoreSensitiveInfo)
     {
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString(verbose, ignoreSensitiveInfo));
@@ -252,7 +270,8 @@ implements Serializable
         return revocationInfo;
     }
 
-    public void setRevocationInfo(CertRevocationInfo revocationInfo)
+    public void setRevocationInfo(
+            final CertRevocationInfo revocationInfo)
     {
         this.revocationInfo = revocationInfo;
     }

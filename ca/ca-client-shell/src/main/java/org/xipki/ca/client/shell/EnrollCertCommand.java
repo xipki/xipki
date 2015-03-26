@@ -144,7 +144,8 @@ public abstract class EnrollCertCommand extends ClientCommand
 
     protected SecurityFactory securityFactory;
 
-    public void setSecurityFactory(SecurityFactory securityFactory)
+    public void setSecurityFactory(
+            final SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;
     }
