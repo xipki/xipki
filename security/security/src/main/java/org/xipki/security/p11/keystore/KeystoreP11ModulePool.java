@@ -64,7 +64,8 @@ public class KeystoreP11ModulePool
         return INSTANCE;
     }
 
-    public synchronized void removeModule(String moduleName)
+    public synchronized void removeModule(
+            final String moduleName)
     {
         KeystoreP11Module module = modules.remove(moduleName);
         if(module == null && defaultModuleName != null &&
@@ -94,7 +95,8 @@ public class KeystoreP11ModulePool
         }
     }
 
-    public KeystoreP11Module getModule(String moduleName)
+    public KeystoreP11Module getModule(
+            final String moduleName)
     throws SignerException
     {
         KeystoreP11Module module = modules.get(moduleName);
@@ -106,7 +108,8 @@ public class KeystoreP11ModulePool
         return module;
     }
 
-    public synchronized KeystoreP11Module getModule(P11ModuleConf moduleConf)
+    public synchronized KeystoreP11Module getModule(
+            final P11ModuleConf moduleConf)
     throws SignerException
     {
         KeystoreP11Module extModule = modules.get(moduleConf.getName());
@@ -141,7 +144,8 @@ public class KeystoreP11ModulePool
         return defaultModuleName;
     }
 
-    public void setDefaultModuleName(String defaultModuleName)
+    public void setDefaultModuleName(
+            final String defaultModuleName)
     {
         this.defaultModuleName = defaultModuleName;
     }

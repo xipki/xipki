@@ -79,12 +79,12 @@ public class KeystoreP11Identity extends P11Identity
     private final BlockingDeque<Signature> dsaSignatures = new LinkedBlockingDeque<>();
 
     public KeystoreP11Identity(
-            String sha1sum,
-            P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId,
-            PrivateKey privateKey,
-            X509Certificate[] certificateChain,
-            int maxSessions)
+            final String sha1sum,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId,
+            final PrivateKey privateKey,
+            final X509Certificate[] certificateChain,
+            final int maxSessions)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException
     {
         super(slotId, keyId, certificateChain, getPublicKeyOfFirstCert(certificateChain));
@@ -164,7 +164,8 @@ public class KeystoreP11Identity extends P11Identity
         }
     }
 
-    private static PublicKey getPublicKeyOfFirstCert(X509Certificate[] certificateChain)
+    private static PublicKey getPublicKeyOfFirstCert(
+            final X509Certificate[] certificateChain)
     {
         if(certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
         {
@@ -173,7 +174,8 @@ public class KeystoreP11Identity extends P11Identity
         return certificateChain[0].getPublicKey();
     }
 
-    public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo)
+    public byte[] CKM_RSA_PKCS(
+            final byte[] encodedDigestInfo)
     throws SignerException
     {
         if(publicKey instanceof RSAPublicKey == false)
@@ -186,7 +188,8 @@ public class KeystoreP11Identity extends P11Identity
         return do_rsa_sign(padded);
     }
 
-    public byte[] CKM_RSA_X509(byte[] hash)
+    public byte[] CKM_RSA_X509(
+            final byte[] hash)
     throws SignerException
     {
         if(publicKey instanceof RSAPublicKey == false)
@@ -197,7 +200,8 @@ public class KeystoreP11Identity extends P11Identity
         return do_rsa_sign(hash);
     }
 
-    private byte[] do_rsa_sign(byte[] paddedHash)
+    private byte[] do_rsa_sign(
+            final byte[] paddedHash)
     throws SignerException
     {
         Cipher cipher;
@@ -221,7 +225,8 @@ public class KeystoreP11Identity extends P11Identity
         }
     }
 
-    public byte[] CKM_ECDSA(byte[] hash)
+    public byte[] CKM_ECDSA(
+            final byte[] hash)
     throws SignerException
     {
         if(publicKey instanceof ECPublicKey == false)
@@ -232,7 +237,8 @@ public class KeystoreP11Identity extends P11Identity
         return do_dsa_sign(hash);
     }
 
-    public byte[] CKM_DSA(byte[] hash)
+    public byte[] CKM_DSA(
+            final byte[] hash)
     throws SignerException
     {
         if(publicKey instanceof DSAPublicKey == false)
@@ -242,7 +248,8 @@ public class KeystoreP11Identity extends P11Identity
         return do_dsa_sign(hash);
     }
 
-    private byte[] do_dsa_sign(byte[] hash)
+    private byte[] do_dsa_sign(
+            final byte[] hash)
     throws SignerException
     {
         byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);

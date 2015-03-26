@@ -49,6 +49,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.SecurePasswordInputPanel;
 import org.xipki.common.util.StringUtil;
 
@@ -77,12 +78,16 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         }
     }
 
-    protected boolean isTrue(Boolean b)
+    protected boolean isTrue(
+            final Boolean b)
     {
         return b != null && b.booleanValue();
     }
 
-    protected void saveVerbose(String promptPrefix, File file, byte[] encoded)
+    protected void saveVerbose(
+            String promptPrefix,
+            final File file,
+            final byte[] encoded)
     throws IOException
     {
         ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
@@ -166,7 +171,9 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         out(promptPrefix + " " + saveTo.getPath());
     }
 
-    protected void save(File file, byte[] encoded)
+    protected void save(
+            File file,
+            final byte[] encoded)
     throws IOException
     {
         file = expandFilepath(file);
@@ -186,7 +193,8 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         }
     }
 
-    private static final String randomHex(int n)
+    private static final String randomHex(
+            final int n)
     {
         SecureRandom r = new SecureRandom();
         byte[] bytes = new byte[n];
@@ -194,7 +202,9 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         return new BigInteger(1, bytes).toString(16);
     }
 
-    protected static Boolean isEnabled(String enabledS, String optionName)
+    protected static Boolean isEnabled(
+            final String enabledS,
+            final String optionName)
     {
         if(enabledS == null)
         {
@@ -203,7 +213,10 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         return intern_isEnabled(enabledS, optionName);
     }
 
-    protected static boolean isEnabled(String enabledS, boolean defaultEnabled, String optionName)
+    protected static boolean isEnabled(
+            final String enabledS,
+            final boolean defaultEnabled,
+            final String optionName)
     {
         if(enabledS == null)
         {
@@ -213,7 +226,9 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         return intern_isEnabled(enabledS, optionName);
     }
 
-    private static boolean intern_isEnabled(String enabledS, String optionName)
+    private static boolean intern_isEnabled(
+            final String enabledS,
+            final String optionName)
     {
         if("yes".equalsIgnoreCase(enabledS) || "enabled".equalsIgnoreCase(enabledS) || "true".equalsIgnoreCase(enabledS))
         {
@@ -229,7 +244,8 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         }
     }
 
-    protected char[] readPasswordIfNotSet(String password)
+    protected char[] readPasswordIfNotSet(
+            final String password)
     {
         if(password != null)
         {
@@ -244,7 +260,8 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         return readPassword("Enter the password");
     }
 
-    protected char[] readPassword(String prompt)
+    protected char[] readPassword(
+            final String prompt)
     {
         String passwordUi = System.getProperty("org.xipki.console.passwordui");
         if("gui".equalsIgnoreCase(passwordUi))
@@ -266,66 +283,63 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         }
     }
 
-    protected static String expandFilepath(String path)
+    protected static String expandFilepath(
+            final String path)
     {
-        if (path.startsWith("~" + File.separator))
-        {
-            return System.getProperty("user.home") + path.substring(1);
-        }
-        else
-        {
-            return path;
-        }
+        return IoUtil.expandFilepath(path);
     }
 
-    protected static File expandFilepath(File file)
+    protected static File expandFilepath(
+            final File file)
     {
-        String path = file.getPath();
-        String expandedPath = expandFilepath(path);
-        if(path.equals(expandedPath) == false)
-        {
-            file = new File(expandedPath);
-        }
-
-        return file;
+        return IoUtil.expandFilepath(file);
     }
 
-    protected void err(String message)
+    protected void err(
+            final String message)
     {
         System.err.println(message);
     }
 
-    protected void out(String message)
+    protected void out(
+            final String message)
     {
         System.out.println(message);
     }
 
-    protected static boolean isBlank(String s)
+    protected static boolean isBlank(
+            final String s)
     {
         return StringUtil.isBlank(s);
     }
 
-    protected static boolean isNotBlank(String s)
+    protected static boolean isNotBlank(
+            final String s)
     {
         return StringUtil.isNotBlank(s);
     }
 
-    protected static boolean isEmpty(Collection<?> c)
+    protected static boolean isEmpty(
+            final Collection<?> c)
     {
         return CollectionUtil.isEmpty(c);
     }
 
-    protected static boolean isNotEmpty(Collection<?> c)
+    protected static boolean isNotEmpty(
+            final Collection<?> c)
     {
         return CollectionUtil.isNotEmpty(c);
     }
 
-    protected static List<String> split(String str, String delim)
+    protected static List<String> split(
+            final String str,
+            final String delim)
     {
         return StringUtil.split(str, delim);
     }
 
-    protected static BigInteger toBigInt(String s)
+    protected static BigInteger toBigInt(
+            String s)
     {
         s = s.trim();
         if(s.startsWith("0x") || s.startsWith("0X"))

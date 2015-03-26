@@ -49,17 +49,21 @@ public class CryptException extends Exception
         super();
     }
 
-    public CryptException(String message, Throwable cause)
+    public CryptException(
+            final String message,
+            final Throwable cause)
     {
         super(message, cause);
     }
 
-    public CryptException(String message)
+    public CryptException(
+            final String message)
     {
         super(message);
     }
 
-    public CryptException(Throwable cause)
+    public CryptException(
+            final Throwable cause)
     {
         super(cause);
     }

@@ -98,7 +98,8 @@ public final class ECParameters extends AlgorithmParametersSpi
 {
 
     // used by ECPublicKeyImpl and ECPrivateKeyImpl
-    static AlgorithmParameters getAlgorithmParameters(ECParameterSpec spec)
+    static AlgorithmParameters getAlgorithmParameters(
+            final ECParameterSpec spec)
     throws InvalidKeyException
     {
         try
@@ -126,7 +127,8 @@ public final class ECParameters extends AlgorithmParametersSpi
 
     // AlgorithmParameterSpi methods
 
-    protected void engineInit(AlgorithmParameterSpec paramSpec)
+    protected void engineInit(
+            final AlgorithmParameterSpec paramSpec)
     throws InvalidParameterSpecException
     {
         if (paramSpec == null)
@@ -158,7 +160,8 @@ public final class ECParameters extends AlgorithmParametersSpi
         }
     }
 
-    protected void engineInit(byte[] params)
+    protected void engineInit(
+            final byte[] params)
     throws IOException
     {
         if(params.length < 30)
@@ -201,14 +204,16 @@ public final class ECParameters extends AlgorithmParametersSpi
         }
     }
 
-    protected void engineInit(byte[] params, String decodingMethod)
+    protected void engineInit(
+            final byte[] params,
+            final String decodingMethod)
     throws IOException
     {
         engineInit(params);
     }
 
-    protected <T extends AlgorithmParameterSpec> T
-            engineGetParameterSpec(Class<T> spec)
+    protected <T extends AlgorithmParameterSpec> T engineGetParameterSpec(
+            final Class<T> spec)
     throws InvalidParameterSpecException
     {
 
@@ -233,7 +238,8 @@ public final class ECParameters extends AlgorithmParametersSpi
         return SunNamedCurveExtender.getNamedCurveEncoded(namedCurve);
     }
 
-    protected byte[] engineGetEncoded(String encodingMethod)
+    protected byte[] engineGetEncoded(
+            final String encodingMethod)
     throws IOException
     {
         return engineGetEncoded();

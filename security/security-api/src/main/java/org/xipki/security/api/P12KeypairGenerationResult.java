@@ -48,7 +48,9 @@ public class P12KeypairGenerationResult extends KeypairGenerationResult
     private final byte[] keystore;
     private KeyStore keystoreObject;
 
-    public P12KeypairGenerationResult(byte[] keystore, X509CertificateHolder certificate)
+    public P12KeypairGenerationResult(
+            final byte[] keystore,
+            final X509CertificateHolder certificate)
     {
         super(certificate);
         this.keystore = keystore;
@@ -64,7 +66,8 @@ public class P12KeypairGenerationResult extends KeypairGenerationResult
         return keystoreObject;
     }
 
-    public void setKeystoreObject(KeyStore keystoreObject)
+    public void setKeystoreObject(
+            final KeyStore keystoreObject)
     {
         this.keystoreObject = keystoreObject;
     }

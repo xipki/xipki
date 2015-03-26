@@ -51,7 +51,10 @@ abstract class PathCompleter
     private static final boolean OS_IS_WINDOWS = Configuration.isWindows();
     private static final FilenameFilter filenameFilter = new MyFilenameFilter();
 
-    public int complete(String buffer, final int cursor, final List<String> candidates)
+    public int complete(
+            String buffer,
+            final int cursor,
+            final List<String> candidates)
     {
         if(candidates == null)
         {

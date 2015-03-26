@@ -54,7 +54,9 @@ public class P11Control
     private final Map<String, P11ModuleConf> moduleConfs;
     private final Set<String> moduleNames;
 
-    public P11Control(String defaultModuleName, Set<P11ModuleConf> moduleConfs)
+    public P11Control(
+            final String defaultModuleName,
+            final Set<P11ModuleConf> moduleConfs)
     {
         ParamChecker.assertNotEmpty("defaultModuleName", defaultModuleName);
 
@@ -82,7 +84,8 @@ public class P11Control
         return defaultModuleName;
     }
 
-    public P11ModuleConf getModuleConf(String moduleName)
+    public P11ModuleConf getModuleConf(
+            final String moduleName)
     {
         return moduleConfs == null ? null : moduleConfs.get(moduleName);
     }

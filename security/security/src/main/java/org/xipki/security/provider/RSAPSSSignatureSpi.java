@@ -78,7 +78,7 @@ class RSAPSSSignatureSpi
     private org.bouncycastle.crypto.signers.PSSSigner pss;
 
     private byte getTrailer(
-        int trailerField)
+            final int trailerField)
     {
         if (trailerField == 1)
         {
@@ -101,14 +101,14 @@ class RSAPSSSignatureSpi
     }
 
     protected RSAPSSSignatureSpi(
-        PSSParameterSpec paramSpecArg)
+            final PSSParameterSpec paramSpecArg)
     {
         this(paramSpecArg, false);
     }
 
     protected RSAPSSSignatureSpi(
-        PSSParameterSpec baseParamSpec,
-        boolean isRaw)
+            final PSSParameterSpec baseParamSpec,
+            final boolean isRaw)
     {
         this.originalSpec = baseParamSpec;
 
@@ -130,15 +130,15 @@ class RSAPSSSignatureSpi
     }
 
     protected void engineInitVerify(
-        PublicKey publicKey)
+            final PublicKey publicKey)
     throws InvalidKeyException
     {
         throw new UnsupportedOperationException("engineInitVerify unsupported");
     }
 
     protected void engineInitSign(
-        PrivateKey privateKey,
-        SecureRandom random)
+            final PrivateKey privateKey,
+            final SecureRandom random)
     throws InvalidKeyException
     {
         if(privateKey instanceof P11PrivateKey == false)
@@ -163,23 +163,23 @@ class RSAPSSSignatureSpi
     }
 
     protected void engineInitSign(
-        PrivateKey privateKey)
+            final PrivateKey privateKey)
     throws InvalidKeyException
     {
         engineInitSign(privateKey, null);
     }
 
     protected void engineUpdate(
-        byte    b)
+            final byte b)
     throws SignatureException
     {
         pss.update(b);
     }
 
     protected void engineUpdate(
-        byte[]  b,
-        int     off,
-        int     len)
+            final byte[] b,
+            final int off,
+            final int len)
     throws SignatureException
     {
         pss.update(b, off, len);
@@ -199,14 +199,14 @@ class RSAPSSSignatureSpi
     }
 
     protected boolean engineVerify(
-        byte[]  sigBytes)
+            final byte[] sigBytes)
     throws SignatureException
     {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }
 
     protected void engineSetParameter(
-        AlgorithmParameterSpec params)
+            final AlgorithmParameterSpec params)
     throws InvalidParameterException
     {
         if (params instanceof PSSParameterSpec)
@@ -284,14 +284,14 @@ class RSAPSSSignatureSpi
      * @deprecated replaced with <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
      */
     protected void engineSetParameter(
-        String param,
-        Object value)
+            final String param,
+            final Object value)
     {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
 
     protected Object engineGetParameter(
-        String param)
+            final String param)
     {
         throw new UnsupportedOperationException("engineGetParameter unsupported");
     }
@@ -370,7 +370,8 @@ class RSAPSSSignatureSpi
         private Digest baseDigest;
         private boolean oddTime = true;
 
-        public NullPssDigest(Digest mgfDigest)
+        public NullPssDigest(
+                final Digest mgfDigest)
         {
             this.baseDigest = mgfDigest;
         }
@@ -385,17 +386,23 @@ class RSAPSSSignatureSpi
             return baseDigest.getDigestSize();
         }
 
-        public void update(byte in)
+        public void update(
+                final byte in)
         {
             bOut.write(in);
         }
 
-        public void update(byte[] in, int inOff, int len)
+        public void update(
+                final byte[] in,
+                final int inOff,
+                final int len)
         {
             bOut.write(in, inOff, len);
         }
 
-        public int doFinal(byte[] out, int outOff)
+        public int doFinal(
+                final byte[] out,
+                final int outOff)
         {
             byte[] res = bOut.toByteArray();
 

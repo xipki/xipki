@@ -126,7 +126,9 @@ public class P12CertUpdateCommand extends P12SecurityCommand
         }
     }
 
-    private void assertMatch(X509Certificate cert, String password)
+    private void assertMatch(
+            final X509Certificate cert,
+            final String password)
     throws SignerException, PasswordResolverException
     {
         CmpUtf8Pairs pairs = new CmpUtf8Pairs("keystore", "file:" + p12File);

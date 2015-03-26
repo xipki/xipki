@@ -75,7 +75,7 @@ class RSADigestSignatureSpi
 
     // care - this constructor is actually used by outside organisations
     protected RSADigestSignatureSpi(
-        Digest digest)
+            final Digest digest)
     {
         this.digest = digest;
         this.algId = null;
@@ -83,22 +83,22 @@ class RSADigestSignatureSpi
 
     // care - this constructor is actually used by outside organisations
     protected RSADigestSignatureSpi(
-        ASN1ObjectIdentifier objId,
-        Digest digest)
+            final ASN1ObjectIdentifier objId,
+            final Digest digest)
     {
         this.digest = digest;
         this.algId = new AlgorithmIdentifier(objId, DERNull.INSTANCE);
     }
 
     protected void engineInitVerify(
-        PublicKey publicKey)
+            final PublicKey publicKey)
     throws InvalidKeyException
     {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }
 
     protected void engineInitSign(
-        PrivateKey privateKey)
+            final PrivateKey privateKey)
     throws InvalidKeyException
     {
         if(privateKey instanceof P11PrivateKey == false)
@@ -117,16 +117,16 @@ class RSADigestSignatureSpi
     }
 
     protected void engineUpdate(
-        byte    b)
+            final byte b)
     throws SignatureException
     {
         digest.update(b);
     }
 
     protected void engineUpdate(
-        byte[]  b,
-        int     off,
-        int     len)
+            final byte[] b,
+            final int off,
+            final int len)
     throws SignatureException
     {
         digest.update(b, off, len);
@@ -156,14 +156,14 @@ class RSADigestSignatureSpi
     }
 
     protected boolean engineVerify(
-        byte[]  sigBytes)
+            final byte[] sigBytes)
     throws SignatureException
     {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }
 
     protected void engineSetParameter(
-        AlgorithmParameterSpec params)
+            final AlgorithmParameterSpec params)
     {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
@@ -172,8 +172,8 @@ class RSADigestSignatureSpi
      * @deprecated replaced with <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
      */
     protected void engineSetParameter(
-        String param,
-        Object value)
+            final String param,
+            final Object value)
     {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
@@ -182,7 +182,7 @@ class RSADigestSignatureSpi
      * @deprecated
      */
     protected Object engineGetParameter(
-        String param)
+            final String param)
     {
         return null;
     }
@@ -193,7 +193,7 @@ class RSADigestSignatureSpi
     }
 
     private byte[] derEncode(
-        byte[]  hash)
+            final byte[] hash)
     throws IOException
     {
         if (algId == null)

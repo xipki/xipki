@@ -89,7 +89,8 @@ public abstract class P11KeyGenCommand extends KeyGenCommand
         return new P11SlotIdentifier(slotIndex, null);
     }
 
-    protected void saveKeyAndCert(P11KeypairGenerationResult keyAndCert)
+    protected void saveKeyAndCert(
+            final P11KeypairGenerationResult keyAndCert)
     throws Exception
     {
         out("generate PKCS#11 key");
