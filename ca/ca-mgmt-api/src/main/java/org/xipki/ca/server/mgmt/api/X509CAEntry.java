@@ -39,18 +39,14 @@ import java.io.Serializable;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.SecurityUtil;
 
@@ -58,29 +54,19 @@ import org.xipki.common.util.SecurityUtil;
  * @author Lijun Liao
  */
 
-public class X509CAEntry implements Serializable
+public class X509CAEntry
+extends CAEntry
+implements Serializable
 {
     private static final long serialVersionUID = 1L;
-    private String name;
-    private CAStatus status;
     private List<String> crlUris;
     private List<String> deltaCrlUris;
     private List<String> ocspUris;
-    private List<String> issuerLocations;
-    private CertValidity maxValidity;
     private X509Certificate cert;
-    private String signerType;
-    private String signerConf;
     private String crlSignerName;
-    private String cmpControlName;
     private long nextSerial;
     private int nextCRLNumber;
-    private DuplicationMode duplicateKeyMode;
-    private DuplicationMode duplicateSubjectMode;
-    private ValidityMode validityMode = ValidityMode.STRICT;
-    private Set<Permission> permissions;
     private int numCrls;
-    private int expirationPeriod;
     private CertRevocationInfo revocationInfo;
     private String subject;
     private String serialSeqName;
@@ -88,24 +74,17 @@ public class X509CAEntry implements Serializable
     public X509CAEntry(String name, long nextSerial, int nextCRLNumber,
             String signerType, String signerConf,
             List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
-            List<String> issuerLocations, int numCrls,
-            int expirationPeriod)
+            int numCrls, int expirationPeriod)
     throws CAMgmtException
     {
-        init(name, nextSerial, nextCRLNumber, signerType, signerConf, ocspUris,
-                crlUris, deltaCrlUris, issuerLocations, numCrls, expirationPeriod);
+        super(name, signerType, signerConf, expirationPeriod);
+        init(nextSerial, nextCRLNumber, ocspUris, crlUris, deltaCrlUris, numCrls);
     }
 
-    private void init(String name, long nextSerial, int nextCRLNumber,
-            String signerType, String signerConf,
-            List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
-            List<String> issuerLocations, int numCrls,
-            int expirationPeriod)
+    private void init(long nextSerial, int nextCRLNumber,
+            List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris, int numCrls)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotEmpty("signerType", signerType);
-
         if(nextSerial < 0)
         {
             throw new IllegalArgumentException("nextSerial is negative (" + nextSerial + " < 0)");
@@ -116,25 +95,15 @@ public class X509CAEntry implements Serializable
             throw new IllegalArgumentException("nextCRLNumber is not positive (" + nextCRLNumber + " < 1)");
         }
 
-        if(expirationPeriod < 0)
-        {
-            throw new IllegalArgumentException("expirationPeriod is negative (" + expirationPeriod + " < 0)");
-        }
-        this.expirationPeriod = expirationPeriod;
-
         if(numCrls < 0)
         {
             throw new IllegalArgumentException("numCrls could not be negative");
         }
         this.numCrls = numCrls;
 
-        this.name = name.toUpperCase();
-        this.serialSeqName = IoUtil.convertSequenceName("SERIAL_" + this.name);
+        this.serialSeqName = IoUtil.convertSequenceName("SERIAL_" + getName());
         this.nextSerial = nextSerial;
         this.nextCRLNumber = nextCRLNumber;
-
-        this.signerType = signerType;
-        this.signerConf = signerConf;
 
         this.ocspUris = (ocspUris == null) ?
                 null : Collections.unmodifiableList(new ArrayList<>(ocspUris));
@@ -142,8 +111,6 @@ public class X509CAEntry implements Serializable
                 null : Collections.unmodifiableList(new ArrayList<>(crlUris));
         this.deltaCrlUris = (deltaCrlUris == null) ?
                 null : Collections.unmodifiableList(new ArrayList<>(deltaCrlUris));
-        this.issuerLocations = (issuerLocations == null) ?
-                null : Collections.unmodifiableList(new ArrayList<>(issuerLocations));
     }
 
     public void setCertificate(X509Certificate cert)
@@ -157,11 +124,6 @@ public class X509CAEntry implements Serializable
         }
         this.cert = cert;
         this.subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
-    }
-
-    public String getName()
-    {
-        return name;
     }
 
     public long getNextSerial()
@@ -214,24 +176,9 @@ public class X509CAEntry implements Serializable
         return toString(ocspUris);
     }
 
-    public CertValidity getMaxValidity()
-    {
-        return maxValidity;
-    }
-
-    public void setMaxValidity(CertValidity maxValidity)
-    {
-        this.maxValidity = maxValidity;
-    }
-
     public X509Certificate getCertificate()
     {
         return cert;
-    }
-
-    public String getSignerConf()
-    {
-        return signerConf;
     }
 
     public String getCrlSignerName()
@@ -249,68 +196,19 @@ public class X509CAEntry implements Serializable
         this.crlSignerName = crlSignerName;
     }
 
-    public CAStatus getStatus()
-    {
-        return status;
-    }
-    public void setStatus(CAStatus status)
-    {
-        this.status = status;
-    }
-
-    public String getSignerType()
-    {
-        return signerType;
-    }
-
-    public List<String> getCaIssuerLocations()
-    {
-        return issuerLocations;
-    }
-
-    public void setCmpControlName(String name)
-    {
-        this.cmpControlName = name;
-    }
-
-    public String getCmpControlName()
-    {
-        return cmpControlName;
-    }
-
-    @Override
-    public String toString()
-    {
-        return toString(false);
-    }
-
-    public String toString(boolean verbose)
-    {
-        return toString(verbose, true);
-    }
-
     public String toString(boolean verbose, boolean ignoreSensitiveInfo)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("name: ").append(name).append('\n');
-        sb.append("next_serial: ").append(nextSerial).append('\n');
-        sb.append("next_crlNumber: ").append(nextCRLNumber).append('\n');
-        sb.append("status: ").append(status.getStatus()).append('\n');
-        sb.append("deltaCrl_uris: ").append(getDeltaCrlUrisAsString()).append('\n');
-        sb.append("crl_uris: ").append(getCrlUrisAsString()).append('\n');
-        sb.append("ocsp_uris: ").append(getOcspUrisAsString()).append('\n');
-        sb.append("max_validity: ").append(maxValidity).append("\n");
-        sb.append("expirationPeriod: ").append(expirationPeriod).append(" days\n");
-        sb.append("signer_type: ").append(signerType).append('\n');
-        sb.append("signer_conf: ");
-        if(signerConf == null)
+        sb.append(super.toString(verbose, ignoreSensitiveInfo));
+        if(sb.charAt(sb.length() - 1) != '\n')
         {
-            sb.append("null");
-        } else
-        {
-            sb.append(SecurityUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo));
+            sb.append('\n');
         }
-        sb.append('\n');
+        sb.append("nextSerial: ").append(nextSerial).append('\n');
+        sb.append("nextCrlNumber: ").append(nextCRLNumber).append('\n');
+        sb.append("deltaCrlUris: ").append(getDeltaCrlUrisAsString()).append('\n');
+        sb.append("crlUris: ").append(getCrlUrisAsString()).append('\n');
+        sb.append("ocspUris: ").append(getOcspUrisAsString()).append('\n');
         sb.append("cert: ").append("\n");
         if(cert == null)
         {
@@ -338,12 +236,7 @@ public class X509CAEntry implements Serializable
             }
         }
 
-        sb.append("crlsigner_name: ").append(crlSignerName).append('\n');
-        sb.append("cmpcontrol_name: ").append(cmpControlName).append('\n');
-        sb.append("duplicateKey: ").append(duplicateKeyMode.getDescription()).append('\n');
-        sb.append("duplicateSubject: ").append(duplicateSubjectMode.getDescription()).append('\n');
-        sb.append("validityMode: ").append(validityMode).append('\n');
-        sb.append("permissions: ").append(Permission.toString(permissions)).append('\n');
+        sb.append("crlsignerName: ").append(crlSignerName).append('\n');
         sb.append("revocation: ").append(revocationInfo == null ? "not revoked" : "revoked").append("\n");
         if(revocationInfo != null)
         {
@@ -354,71 +247,6 @@ public class X509CAEntry implements Serializable
         return sb.toString();
     }
 
-    private static String toString(Collection<String> tokens)
-    {
-        if(CollectionUtil.isEmpty(tokens))
-        {
-            return null;
-        }
-
-        StringBuilder sb = new StringBuilder();
-
-        int size = tokens.size();
-        int idx = 0;
-        for(String token : tokens)
-        {
-            sb.append(token);
-            if(idx++ < size - 1)
-            {
-                sb.append("\t");
-            }
-        }
-        return sb.toString();
-    }
-
-    public DuplicationMode getDuplicateKeyMode()
-    {
-        return duplicateKeyMode;
-    }
-
-    public void setDuplicateKeyMode(DuplicationMode mode)
-    {
-        ParamChecker.assertNotNull("mode", mode);
-        this.duplicateKeyMode = mode;
-    }
-
-    public DuplicationMode getDuplicateSubjectMode()
-    {
-        return duplicateSubjectMode;
-    }
-
-    public void setDuplicateSubjectMode(DuplicationMode mode)
-    {
-        ParamChecker.assertNotNull("mode", mode);
-        this.duplicateSubjectMode = mode;
-    }
-
-    public ValidityMode getValidityMode()
-    {
-        return validityMode;
-    }
-
-    public void setValidityMode(ValidityMode mode)
-    {
-        ParamChecker.assertNotNull("mode", mode);
-        this.validityMode = mode;
-    }
-
-    public Set<Permission> getPermissions()
-    {
-        return permissions;
-    }
-
-    public void setPermissions(Set<Permission> permissions)
-    {
-        this.permissions = (permissions == null) ? null : Collections.unmodifiableSet(permissions);
-    }
-
     public CertRevocationInfo getRevocationInfo()
     {
         return revocationInfo;
@@ -427,11 +255,6 @@ public class X509CAEntry implements Serializable
     public void setRevocationInfo(CertRevocationInfo revocationInfo)
     {
         this.revocationInfo = revocationInfo;
-    }
-
-    public int getExpirationPeriod()
-    {
-        return expirationPeriod;
     }
 
     public Date getCrlBaseTime()

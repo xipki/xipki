@@ -45,22 +45,19 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.mgmt.hessian.common.HessianCAManager;
 import org.xipki.ca.mgmt.hessian.common.HessianCAMgmtException;
+import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
-import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
+import org.xipki.ca.server.mgmt.api.ChangeCAEntry;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.ca.server.mgmt.api.DuplicationMode;
-import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
-import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.CRLReason;
@@ -254,7 +251,7 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public boolean addCA(X509CAEntry newCaDbEntry)
+    public boolean addCA(CAEntry newCaDbEntry)
     throws CAMgmtException
     {
         return client.addCA(newCaDbEntry);
@@ -267,19 +264,10 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public boolean changeCA(String name, CAStatus status,
-            X509Certificate cert, Set<String> crl_uris,
-            Set<String> delta_crl_uris, Set<String> ocsp_uris,
-            CertValidity max_validity, String signer_type, String signer_conf,
-            String crlsigner_name, String cmpcontrol_name, DuplicationMode duplicate_key,
-            DuplicationMode duplicate_subject, Set<Permission> permissions,
-            Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
+    public boolean changeCA(ChangeCAEntry changeCAentry)
     throws CAMgmtException
     {
-        return client.changeCA(name, status, cert, crl_uris, delta_crl_uris, ocsp_uris,
-                max_validity, signer_type, signer_conf, crlsigner_name, cmpcontrol_name,
-                duplicate_key, duplicate_subject,
-                permissions, numCrls, expirationPeriod, validityMode);
+        return client.changeCA(changeCAentry);
     }
 
     @Override
@@ -590,7 +578,7 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public X509Certificate generateSelfSignedCA(X509CAEntry caEntry, String certprofileName, byte[] p10Req)
+    public X509Certificate generateRootCA(X509CAEntry caEntry, String certprofileName, byte[] p10Req)
     throws CAMgmtException
     {
         return client.generateSelfSignedCA(caEntry, certprofileName, p10Req);

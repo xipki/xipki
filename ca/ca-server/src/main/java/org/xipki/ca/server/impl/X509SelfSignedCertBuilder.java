@@ -241,7 +241,7 @@ class X509SelfSignedCertBuilder
                 publicKeyInfo);
 
         PublicCAInfo publicCaInfo = new PublicCAInfo(
-                grantedSubject, _serialNumber, null, null, ocspUris, crlUris, null, deltaCrlUris);
+                grantedSubject, _serialNumber, null, null, ocspUris, crlUris, deltaCrlUris);
 
         Extensions extensions = null;
         ASN1Set attrs = p10Request.getCertificationRequestInfo().getAttributes();

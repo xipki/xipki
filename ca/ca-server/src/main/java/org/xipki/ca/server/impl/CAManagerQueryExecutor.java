@@ -46,6 +46,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,12 +63,14 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.impl.store.CertificateStore;
+import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CertArt;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
+import org.xipki.ca.server.mgmt.api.ChangeCAEntry;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
@@ -76,11 +79,11 @@ import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.ca.server.mgmt.api.X509ChangeCAEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -639,7 +642,7 @@ class CAManagerQueryExecutor
                 }
 
                 X509CAEntry entry = new X509CAEntry(name, next_serial, next_crlNo, signer_type, signer_conf,
-                        lOcspUris, lCrlUris, lDeltaCrlUris, null, numCrls, expirationPeriod);
+                        lOcspUris, lCrlUris, lDeltaCrlUris, numCrls, expirationPeriod);
                 X509Certificate cert = generateCert(b64cert);
                 entry.setCertificate(cert);
 
@@ -831,18 +834,24 @@ class CAManagerQueryExecutor
         }
     }
 
-    void addCA(X509CAEntry newCaDbEntry)
+    void addCA(CAEntry caEntry)
     throws CAMgmtException
     {
-        String name = newCaDbEntry.getName();
+        if(caEntry instanceof X509CAEntry == false)
+        {
+            throw new CAMgmtException("unsupported CAEntry " + caEntry.getClass().getName());
+        }
+
+        X509CAEntry entry = (X509CAEntry) caEntry;
+        String name = entry.getName();
 
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("INSERT INTO CA (");
         sqlBuilder.append("NAME, ART, SUBJECT, NEXT_SERIAL, NEXT_CRLNO, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY");
         sqlBuilder.append(", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME");
         sqlBuilder.append(", DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD");
-        sqlBuilder.append(", VALIDITY_MODE, DELTACRL_URIS");
-        sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        sqlBuilder.append(", VALIDITY_MODE, DELTACRL_URIS, EXTRA_CONTROL");
+        sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         final String sql = sqlBuilder.toString();
 
         // insert to table ca
@@ -853,45 +862,46 @@ class CAManagerQueryExecutor
             int idx = 1;
             ps.setString(idx++, name);
             ps.setInt(idx++, CertArt.X509PKC.getCode());
-            ps.setString(idx++, newCaDbEntry.getSubject());
+            ps.setString(idx++, entry.getSubject());
 
-            long nextSerial = newCaDbEntry.getNextSerial();
+            long nextSerial = entry.getNextSerial();
             if(nextSerial < 0)
             {
                 nextSerial = 0;
             }
             ps.setLong(idx++, nextSerial);
 
-            ps.setInt(idx++, newCaDbEntry.getNextCRLNumber());
-            ps.setString(idx++, newCaDbEntry.getStatus().getStatus());
-            ps.setString(idx++, newCaDbEntry.getCrlUrisAsString());
-            ps.setString(idx++, newCaDbEntry.getOcspUrisAsString());
-            ps.setString(idx++, newCaDbEntry.getMaxValidity().toString());
-            byte[] encodedCert = newCaDbEntry.getCertificate().getEncoded();
+            ps.setInt(idx++, entry.getNextCRLNumber());
+            ps.setString(idx++, entry.getStatus().getStatus());
+            ps.setString(idx++, entry.getCrlUrisAsString());
+            ps.setString(idx++, entry.getOcspUrisAsString());
+            ps.setString(idx++, entry.getMaxValidity().toString());
+            byte[] encodedCert = entry.getCertificate().getEncoded();
             ps.setString(idx++, Base64.toBase64String(encodedCert));
-            ps.setString(idx++, newCaDbEntry.getSignerType());
-            ps.setString(idx++, newCaDbEntry.getSignerConf());
-            ps.setString(idx++, newCaDbEntry.getCrlSignerName());
-            ps.setString(idx++, newCaDbEntry.getCmpControlName());
-            ps.setInt(idx++, newCaDbEntry.getDuplicateKeyMode().getMode());
-            ps.setInt(idx++, newCaDbEntry.getDuplicateSubjectMode().getMode());
-            ps.setString(idx++, Permission.toString(newCaDbEntry.getPermissions()));
-            ps.setInt(idx++, newCaDbEntry.getNumCrls());
-            ps.setInt(idx++, newCaDbEntry.getExpirationPeriod());
-            ps.setString(idx++, newCaDbEntry.getValidityMode().name());
-            ps.setString(idx++, newCaDbEntry.getDeltaCrlUrisAsString());
+            ps.setString(idx++, entry.getSignerType());
+            ps.setString(idx++, entry.getSignerConf());
+            ps.setString(idx++, entry.getCrlSignerName());
+            ps.setString(idx++, entry.getCmpControlName());
+            ps.setInt(idx++, entry.getDuplicateKeyMode().getMode());
+            ps.setInt(idx++, entry.getDuplicateSubjectMode().getMode());
+            ps.setString(idx++, Permission.toString(entry.getPermissions()));
+            ps.setInt(idx++, entry.getNumCrls());
+            ps.setInt(idx++, entry.getExpirationPeriod());
+            ps.setString(idx++, entry.getValidityMode().name());
+            ps.setString(idx++, entry.getDeltaCrlUrisAsString());
+            ps.setString(idx++, entry.getExtraControl());
 
             ps.executeUpdate();
 
             // create serial sequence
             if(nextSerial > 0)
             {
-                dataSource.createSequence(newCaDbEntry.getSerialSeqName(), nextSerial);
+                dataSource.createSequence(entry.getSerialSeqName(), nextSerial);
             }
 
             if(LOG.isInfoEnabled())
             {
-                LOG.info("add CA '{}': {}", name, newCaDbEntry.toString(false, true));
+                LOG.info("add CA '{}': {}", name, entry.toString(false, true));
             }
         }catch(SQLException e)
         {
@@ -1185,14 +1195,34 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean changeCA(String name, CAStatus status, X509Certificate cert,
-            Set<String> crl_uris, Set<String> delta_crl_uris, Set<String> ocsp_uris,
-            CertValidity max_validity, String signer_type, String signer_conf,
-            String crlsigner_name, String cmpcontrol_name, DuplicationMode duplicate_key,
-            DuplicationMode duplicate_subject, Set<Permission> permissions,
-            Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
+    boolean changeCA(ChangeCAEntry changeCAEntry)
     throws CAMgmtException
     {
+        if(changeCAEntry instanceof X509ChangeCAEntry == false)
+        {
+            throw new CAMgmtException("unsupported ChangeCAEntry " + changeCAEntry.getClass().getName());
+        }
+
+        X509ChangeCAEntry entry = (X509ChangeCAEntry) changeCAEntry;
+        String name = entry.getName();
+        CAStatus status = entry.getStatus();
+        X509Certificate cert = entry.getCert();
+        List<String> crl_uris = entry.getCrlUris();
+        List<String> delta_crl_uris = entry.getDeltaCrlUris();
+        List<String> ocsp_uris = entry.getOcspUris();
+        CertValidity max_validity = entry.getMaxValidity();
+        String signer_type = entry.getSignerType();
+        String signer_conf = entry.getSignerConf();
+        String crlsigner_name = entry.getCrlSignerName();
+        String cmpcontrol_name = entry.getCmpControlName();
+        DuplicationMode duplicate_key = entry.getDuplicateKeyMode();
+        DuplicationMode duplicate_subject = entry.getDuplicateSubjectMode();
+        Set<Permission> permissions = entry.getPermissions();
+        Integer numCrls = entry.getNumCrls();
+        Integer expirationPeriod = entry.getExpirationPeriod();
+        ValidityMode validityMode = entry.getValidityMode();
+        String extraControl = entry.getExtraControl();
+
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE CA SET ");
 
@@ -1215,6 +1245,7 @@ class CAManagerQueryExecutor
         Integer iNum_crls = addToSqlIfNotNull(sqlBuilder, index, numCrls, "NUM_CRLS");
         Integer iExpiration_period = addToSqlIfNotNull(sqlBuilder, index, expirationPeriod, "EXPIRATION_PERIOD");
         Integer iValidity_mode = addToSqlIfNotNull(sqlBuilder, index, validityMode, "VALIDITY_MODE");
+        Integer iExtra_control = addToSqlIfNotNull(sqlBuilder, index, extraControl, "EXTRA_CONTROL");
 
         // delete the last ','
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
@@ -1343,6 +1374,12 @@ class CAManagerQueryExecutor
                 String txt = validityMode.name();
                 m.append("validityMode: '").append(txt).append("'; ");
                 ps.setString(iValidity_mode, txt);
+            }
+
+            if(iExtra_control != null)
+            {
+                m.append("extraControl: '").append(extraControl).append("'; ");
+                ps.setString(iExtra_control, extraControl);
             }
 
             ps.setString(iName, name);
@@ -2157,20 +2194,9 @@ class CAManagerQueryExecutor
         return permissions;
     }
 
-    private static String toString(Set<String> tokens, String seperator)
+    private static String toString(Collection<String> tokens, String seperator)
     {
-        if(CollectionUtil.isEmpty(tokens))
-        {
-            return null;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for(String token : tokens)
-        {
-            sb.append(seperator);
-            sb.append(token);
-        }
-        return sb.substring(seperator.length()); // remove the leading seperator
+        return StringUtil.collectionAsString(tokens, seperator);
     }
 
     private static String getRealString(String s)

@@ -35,7 +35,7 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -49,6 +49,7 @@ import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
+import org.xipki.ca.server.mgmt.api.X509ChangeCAEntry;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.security.api.SecurityFactory;
@@ -149,22 +150,23 @@ public class CaUpdateCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        CAStatus status = null;
+        X509ChangeCAEntry entry = new X509ChangeCAEntry(caName);
         if(caStatus != null)
         {
-            status = CAStatus.getCAStatus(caStatus);
+            entry.setStatus(CAStatus.getCAStatus(caStatus));
         }
 
         if(expirationPeriod != null && expirationPeriod < 0)
         {
-            err("invalid expirationPeriod: " + expirationPeriod);
-            return null;
+            throw new ConfigurationException("invalid expirationPeriod: " + expirationPeriod);
+        } else
+        {
+            entry.setExpirationPeriod(expirationPeriod);
         }
 
-        X509Certificate caCert = null;
         if(certFile != null)
         {
-            caCert = SecurityUtil.parseCert(certFile);
+            entry.setCert(SecurityUtil.parseCert(certFile));
         }
 
         if(signerConf != null)
@@ -173,32 +175,32 @@ public class CaUpdateCommand extends CaCommand
             {
                 signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, securityFactory.getPasswordResolver());
             }
+            entry.setSignerConf(signerConf);
         }
 
-        DuplicationMode duplicateKey = null;
         if(duplicateKeyS != null)
         {
-            duplicateKey = DuplicationMode.getInstance(duplicateKeyS);
-            if(duplicateKey == null)
+            DuplicationMode duplicateMode = DuplicationMode.getInstance(duplicateKeyS);
+            if(duplicateMode == null)
             {
-                err("invalid duplication mode " + duplicateKeyS);
+                throw new ConfigurationException("invalid duplication mode " + duplicateKeyS);
             }
+            entry.setDuplicateKeyMode(duplicateMode);
         }
 
-        DuplicationMode duplicateSubject = null;
         if(duplicateSubjectS != null)
         {
-            duplicateSubject = DuplicationMode.getInstance(duplicateSubjectS);
-            if(duplicateKey == null)
+            DuplicationMode duplicateMode = DuplicationMode.getInstance(duplicateSubjectS);
+            if(duplicateMode == null)
             {
-                err("invalid duplication mode " + duplicateSubjectS);
+                throw new ConfigurationException("invalid duplication mode " + duplicateSubjectS);
             }
+            entry.setDuplicateSubjectMode(duplicateMode);
         }
 
-        Set<Permission> _permissions = null;
         if (permissions != null && permissions.size() > 0)
         {
-            _permissions = new HashSet<>();
+            Set<Permission> _permissions = new HashSet<>();
             for(String permission : permissions)
             {
                 Permission _permission = Permission.getPermission(permission);
@@ -208,124 +210,115 @@ public class CaUpdateCommand extends CaCommand
                 }
                 _permissions.add(_permission);
             }
+            entry.setPermissions(_permissions);
         }
 
-        boolean clearCrlUris = false;
-        if(crlUris != null)
         {
-            for(String uri : crlUris)
+            boolean clearCrlUris = false;
+            if(crlUris != null)
             {
-                if(CAManager.NULL.equalsIgnoreCase(uri))
+                for(String uri : crlUris)
                 {
-                    clearCrlUris = true;
-                    break;
+                    if(CAManager.NULL.equalsIgnoreCase(uri))
+                    {
+                        clearCrlUris = true;
+                        break;
+                    }
                 }
             }
-        }
 
-        Set<String> _crlUris = null;
+            List<String> _crlUris = null;
 
-        if(clearCrlUris)
-        {
-            _crlUris = Collections.emptySet();
-        }
-        else
-        {
-            if(crlUris != null )
+            if(clearCrlUris)
             {
-                _crlUris = new HashSet<>(crlUris);
+                _crlUris = Collections.emptyList();
             }
-        }
-
-        boolean clearDeltaCrlUris = false;
-        if(deltaCrlUris != null)
-        {
-            for(String uri : deltaCrlUris)
+            else
             {
-                if(CAManager.NULL.equalsIgnoreCase(uri))
+                if(crlUris != null )
                 {
-                    clearDeltaCrlUris = true;
-                    break;
+                    _crlUris = new ArrayList<>(crlUris);
                 }
             }
+            entry.setCrlUris(_crlUris);
         }
 
-        Set<String> _deltaCrlUris = null;
-
-        if(clearDeltaCrlUris)
         {
-            _deltaCrlUris = Collections.emptySet();
-        }
-        else
-        {
-            if(deltaCrlUris != null )
+            boolean clearDeltaCrlUris = false;
+            if(deltaCrlUris != null)
             {
-                _deltaCrlUris = new HashSet<>(deltaCrlUris);
-            }
-        }
-
-        boolean clearOcspUris = false;
-        if(ocspUris != null)
-        {
-            for(String uri : ocspUris)
-            {
-                if(CAManager.NULL.equalsIgnoreCase(uri))
+                for(String uri : deltaCrlUris)
                 {
-                    clearOcspUris = true;
-                    break;
+                    if(CAManager.NULL.equalsIgnoreCase(uri))
+                    {
+                        clearDeltaCrlUris = true;
+                        break;
+                    }
                 }
             }
-        }
 
-        Set<String> _ocspUris = null;
-        if(clearOcspUris)
-        {
-            _ocspUris = Collections.emptySet();
-        }
-        else
-        {
-            if (ocspUris != null)
+            List<String> _deltaCrlUris = null;
+
+            if(clearDeltaCrlUris)
             {
-                _ocspUris = new HashSet<>(ocspUris);
+                _deltaCrlUris = Collections.emptyList();
             }
+            else
+            {
+                if(deltaCrlUris != null )
+                {
+                    _deltaCrlUris = new ArrayList<>(deltaCrlUris);
+                }
+            }
+            entry.setDeltaCrlUris(_deltaCrlUris);
         }
 
-        ValidityMode validityMode = null;
+        {
+            boolean clearOcspUris = false;
+            if(ocspUris != null)
+            {
+                for(String uri : ocspUris)
+                {
+                    if(CAManager.NULL.equalsIgnoreCase(uri))
+                    {
+                        clearOcspUris = true;
+                        break;
+                    }
+                }
+            }
+
+            List<String> _ocspUris = null;
+            if(clearOcspUris)
+            {
+                _ocspUris = Collections.emptyList();
+            }
+            else
+            {
+                if (ocspUris != null)
+                {
+                    _ocspUris = new ArrayList<>(ocspUris);
+                }
+            }
+            entry.setOcspUris(_ocspUris);
+        }
+
         if(validityModeS != null)
         {
-            validityMode = ValidityMode.getInstance(validityModeS);
+            ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
             if(validityMode == null)
             {
                 throw new ConfigurationException("invalid validity mode: " + validityModeS);
             }
+            entry.setValidityMode(validityMode);
         }
 
-        CertValidity _maxValidity = null;
         if(maxValidity != null)
         {
-            _maxValidity = CertValidity.getInstance(maxValidity);
+            entry.setMaxValidity(CertValidity.getInstance(maxValidity));
         }
 
-        boolean b = caManager.changeCA(
-                caName,
-                status,
-                caCert,
-                _crlUris,
-                _deltaCrlUris,
-                _ocspUris,
-                _maxValidity,
-                signerType,
-                signerConf,
-                crlSignerName,
-                cmpControlName,
-                duplicateKey,
-                duplicateSubject,
-                _permissions,
-                numCrls,
-                expirationPeriod,
-                validityMode);
-
-        output(b, "updated", "could not update", "CA " + caName);
+        boolean b = caManager.changeCA(entry);
+        output(b, "updated", "could not update", "CA " + entry.getName());
         return null;
     }
 }

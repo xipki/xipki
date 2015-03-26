@@ -70,12 +70,10 @@ class PublicCAInfo
     private X509Certificate crlSignerCertificate;
     private final List<String> ocspUris;
     private final List<String> crlUris;
-    private final List<String> caIssuerLocations;
     private final List<String> deltaCrlUris;
 
     public PublicCAInfo(X509Certificate caCertificate,
-            List<String> ocspUris, List<String> crlUris,
-            List<String> caIssuerLocations, List<String> deltaCrlUris)
+            List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris)
     throws OperationException
     {
         ParamChecker.assertNotNull("caCertificate", caCertificate);
@@ -92,7 +90,6 @@ class PublicCAInfo
         }
         this.ocspUris = ocspUris;
         this.crlUris = crlUris;
-        this.caIssuerLocations = caIssuerLocations;
         this.deltaCrlUris = deltaCrlUris;
 
         byte[] encodedSubjectAltName = caCertificate.getExtensionValue(Extension.subjectAlternativeName.getId());
@@ -114,8 +111,7 @@ class PublicCAInfo
 
     public PublicCAInfo(X500Name subject, BigInteger serialNumber,
             GeneralNames subjectAltName, byte[] subjectKeyIdentifier,
-            List<String> ocspUris, List<String> crlUris,
-            List<String> caIssuerLocations, List<String> deltaCrlUris)
+            List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris)
     throws OperationException
     {
         ParamChecker.assertNotNull("subject", subject);
@@ -143,7 +139,6 @@ class PublicCAInfo
         this.subjectAltName = subjectAltName;
         this.ocspUris = ocspUris;
         this.crlUris = crlUris;
-        this.caIssuerLocations = caIssuerLocations;
         this.deltaCrlUris = deltaCrlUris;
     }
 
@@ -155,11 +150,6 @@ class PublicCAInfo
     public List<String> getCrlUris()
     {
         return crlUris == null ? null : Collections.unmodifiableList(crlUris);
-    }
-
-    public List<String> getCaIssuerLocations()
-    {
-        return caIssuerLocations == null ? null : Collections.unmodifiableList(caIssuerLocations);
     }
 
     public List<String> getDeltaCrlUris()

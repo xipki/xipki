@@ -85,12 +85,14 @@ import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.server.impl.X509SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.ca.server.impl.store.CertificateStore;
+import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
+import org.xipki.ca.server.mgmt.api.ChangeCAEntry;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
@@ -1235,7 +1237,7 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean addCA(X509CAEntry newCaDbEntry)
+    public boolean addCA(CAEntry newCaDbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1261,24 +1263,13 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean changeCA(String name, CAStatus status, X509Certificate cert,
-            Set<String> crl_uris, Set<String> delta_crl_uris, Set<String> ocsp_uris,
-            CertValidity max_validity, String signer_type, String signer_conf,
-            String crlsigner_name, String cmpcontrol_name, DuplicationMode duplicate_key,
-            DuplicationMode duplicate_subject, Set<Permission> permissions,
-            Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
+    public boolean changeCA(ChangeCAEntry entry)
     throws CAMgmtException
     {
         asssertMasterMode();
-        name = name.toUpperCase();
+        String name = entry.getName();
 
-        boolean changed = queryExecutor.changeCA(name, status, cert,
-                crl_uris, delta_crl_uris, ocsp_uris,
-                max_validity, signer_type, signer_conf,
-                crlsigner_name, cmpcontrol_name,
-                duplicate_key, duplicate_subject,
-                permissions, numCrls,
-                expirationPeriod, validityMode);
+        boolean changed = queryExecutor.changeCA(entry);
         if(changed == false)
         {
             LOG.info("no change of CA '{}' is processed", name);
@@ -2542,7 +2533,7 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public X509Certificate generateSelfSignedCA(
+    public X509Certificate generateRootCA(
             X509CAEntry caEntry, String certprofileName, byte[] p10Req)
     throws CAMgmtException
     {
@@ -2643,7 +2634,7 @@ implements CAManager, CmpResponderManager
         }
 
         X509CAEntry entry = new X509CAEntry(name, nextSerial, nextCrlNumber, signer_type, signerConf,
-                ocsp_uris, crl_uris, delta_crl_uris, null, numCrls, expirationPeriod);
+                ocsp_uris, crl_uris, delta_crl_uris, numCrls, expirationPeriod);
         caEntry.setCertificate(caCert);
         entry.setDuplicateKeyMode(duplicate_key);
         entry.setDuplicateSubjectMode(duplicate_subject);
