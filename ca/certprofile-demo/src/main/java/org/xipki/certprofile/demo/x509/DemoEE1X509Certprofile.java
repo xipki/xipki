@@ -116,8 +116,9 @@ public class DemoEE1X509Certprofile extends AbstractEEX509Certprofile
 
     @Override
     public ExtensionValues getExtensions(
-            Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
-            X500Name requestedSubject, Extensions requestedExtensions)
+    		final Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
+    		final X500Name requestedSubject, 
+    		final Extensions requestedExtensions)
     throws CertprofileException, BadCertTemplateException
     {
         return null;

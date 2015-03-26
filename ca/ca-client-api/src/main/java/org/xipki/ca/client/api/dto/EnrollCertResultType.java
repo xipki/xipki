@@ -54,7 +54,8 @@ public class EnrollCertResultType
     {
     }
 
-    public void addCACertificate(CMPCertificate cACertificate)
+    public void addCACertificate(
+            final CMPCertificate cACertificate)
     {
         if(cACertificates == null)
         {
@@ -63,7 +64,8 @@ public class EnrollCertResultType
         cACertificates.add(cACertificate);
     }
 
-    public void addResultEntry(ResultEntryType resultEntry)
+    public void addResultEntry(
+            final ResultEntryType resultEntry)
     {
         ParamChecker.assertNotNull("resultEntry", resultEntry);
 

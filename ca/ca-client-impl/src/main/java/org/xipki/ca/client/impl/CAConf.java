@@ -66,7 +66,12 @@ class CAConf
     private X500Name subject;
     private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
 
-    CAConf(String name, String url, String healthUrl, String requestorName, X509Certificate responder)
+    CAConf(
+            final String name,
+            final String url,
+            final String healthUrl,
+            final String requestorName,
+            final X509Certificate responder)
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("url", url);
@@ -102,7 +107,8 @@ class CAConf
         return healthUrl;
     }
 
-    public void setCert(X509Certificate cert)
+    public void setCert(
+            final X509Certificate cert)
     {
         this.cert = cert;
         if(cert != null)
@@ -115,7 +121,8 @@ class CAConf
         }
     }
 
-    public void setCertprofiles(Set<CertprofileInfo> profiles)
+    public void setCertprofiles(
+            final Set<CertprofileInfo> profiles)
     {
         if(profiles == null)
         {
@@ -146,12 +153,14 @@ class CAConf
         return profiles.keySet();
     }
 
-    public boolean supportsProfile(String profileName)
+    public boolean supportsProfile(
+            final String profileName)
     {
         return profiles.containsKey(profileName);
     }
 
-    public CertprofileInfo getProfile(String profileName)
+    public CertprofileInfo getProfile(
+            final String profileName)
     {
         return profiles.get(profileName);
     }
@@ -171,7 +180,8 @@ class CAConf
         return certAutoconf;
     }
 
-    public void setCertAutoconf(boolean autoconf)
+    public void setCertAutoconf(
+            final boolean autoconf)
     {
         this.certAutoconf = autoconf;
     }
@@ -181,12 +191,14 @@ class CAConf
         return certprofilesAutoconf;
     }
 
-    public void setCertprofilesAutoconf(boolean autoconf)
+    public void setCertprofilesAutoconf(
+            final boolean autoconf)
     {
         this.certprofilesAutoconf = autoconf;
     }
 
-    public void setRequestor(X509CmpRequestor requestor)
+    public void setRequestor(
+            final X509CmpRequestor requestor)
     {
         this.requestor = requestor;
     }

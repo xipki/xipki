@@ -45,7 +45,8 @@ public enum AuditStatus
     FAILED,
     UNDEFINED;
 
-    public static final AuditStatus getAuditStatus(final String name)
+    public static final AuditStatus getAuditStatus(
+            final String name)
     {
         if(name == null)
         {

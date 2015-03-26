@@ -46,7 +46,8 @@ public class PKIResponse
     private final GeneralPKIMessage pkiMessage;
     private ProtectionVerificationResult protectionVerificationResult;
 
-    public PKIResponse(GeneralPKIMessage pkiMessage)
+    public PKIResponse(
+            final GeneralPKIMessage pkiMessage)
     {
         this.pkiMessage = pkiMessage;
     }
@@ -66,7 +67,8 @@ public class PKIResponse
         return protectionVerificationResult;
     }
 
-    public void setProtectionVerificationResult(ProtectionVerificationResult protectionVerificationResult)
+    public void setProtectionVerificationResult(
+            final ProtectionVerificationResult protectionVerificationResult)
     {
         this.protectionVerificationResult = protectionVerificationResult;
     }

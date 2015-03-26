@@ -48,7 +48,10 @@ public class CertprofileInfo
     private final String type;
     private final String conf;
 
-    public CertprofileInfo(String name, String type, String conf)
+    public CertprofileInfo(
+            final String name,
+            final String type,
+            final String conf)
     {
         ParamChecker.assertNotEmpty("name", name);
         this.name = name;

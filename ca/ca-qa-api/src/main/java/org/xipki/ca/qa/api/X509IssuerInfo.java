@@ -62,7 +62,11 @@ public class X509IssuerInfo
     private final Certificate bcCert;
     private final byte[] ski;
 
-    public X509IssuerInfo(List<String> ocspURLs, List<String> crlURLs, List<String> deltaCrlURLs, byte[] certBytes)
+    public X509IssuerInfo(
+            final List<String> ocspURLs,
+            final List<String> crlURLs,
+            final List<String> deltaCrlURLs,
+            final byte[] certBytes)
     throws CertificateException
     {
         ParamChecker.assertNotNull("certBytes", certBytes);

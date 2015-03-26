@@ -55,7 +55,8 @@ public class QaAdmission extends QaExtension
     private final List<String> professionOIDs;
     private final List<String> professionItems;
 
-    public QaAdmission(Admission jaxb)
+    public QaAdmission(
+            final Admission jaxb)
     {
         this.registrationNumber = jaxb.getRegistrationNumber();
         this.addProfessionInfo = jaxb.getAddProfessionInfo();

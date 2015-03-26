@@ -42,7 +42,8 @@ package org.xipki.ca.client.api.dto;
 public abstract class ResultEntryType extends IdentifiedObject
 {
 
-    public ResultEntryType(String id)
+    public ResultEntryType(
+            final String id)
     {
         super(id);
     }

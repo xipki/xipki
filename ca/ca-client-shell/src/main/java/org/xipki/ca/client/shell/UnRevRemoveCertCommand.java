@@ -80,7 +80,9 @@ public abstract class UnRevRemoveCertCommand extends ClientCommand
         return serialNumber;
     }
 
-    protected String checkCertificate(X509Certificate cert, X509Certificate caCert)
+    protected String checkCertificate(
+            final X509Certificate cert,
+            final X509Certificate caCert)
     throws CertificateEncodingException
     {
         if(cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal()) == false)

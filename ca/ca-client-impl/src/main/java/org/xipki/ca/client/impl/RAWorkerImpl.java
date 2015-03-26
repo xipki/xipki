@@ -94,7 +94,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.client.api.CertIDOrError;
+import org.xipki.ca.client.api.CertIdOrError;
 import org.xipki.ca.client.api.CertOrError;
 import org.xipki.ca.client.api.CertprofileInfo;
 import org.xipki.ca.client.api.EnrollCertResult;
@@ -199,7 +199,8 @@ public final class RAWorkerImpl implements RAWorker
     {
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory)
+    public void setSecurityFactory(
+            final SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;
     }
@@ -208,7 +209,8 @@ public final class RAWorkerImpl implements RAWorker
      *
      * @return names of CAs which could not been configured
      */
-    private Set<String> autoConfCAs(Set<String> caNamesToBeConfigured)
+    private Set<String> autoConfCAs(
+            final Set<String> caNamesToBeConfigured)
     {
         Set<String> caNamesWithError = new HashSet<>();
 
@@ -551,7 +553,8 @@ public final class RAWorkerImpl implements RAWorker
         }
     }
 
-    private static byte[] readData(FileOrValueType fileOrValue)
+    private static byte[] readData(
+            final FileOrValueType fileOrValue)
     throws IOException
     {
         byte[] data = fileOrValue.getValue();
@@ -563,8 +566,12 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public EnrollCertResult requestCert(CertificationRequest p10Request, String profile, String caName,
-            String username, RequestResponseDebug debug)
+    public EnrollCertResult requestCert(
+            final CertificationRequest p10Request,
+            final String profile,
+            final String caName,
+            final String username,
+            final RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         P10EnrollCertEntryType entry = new P10EnrollCertEntryType(p10Request, profile);
@@ -576,9 +583,12 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public EnrollCertResult requestCerts(EnrollCertRequestType.Type type,
-            Map<String, P10EnrollCertEntryType> enrollCertEntries,
-            String caName, String username, RequestResponseDebug debug)
+    public EnrollCertResult requestCerts(
+            final EnrollCertRequestType.Type type,
+            final Map<String, P10EnrollCertEntryType> enrollCertEntries,
+            final String caName,
+            final String username,
+            final RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("enrollCertEntries", enrollCertEntries);
@@ -629,8 +639,11 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public EnrollCertResult requestCerts(EnrollCertRequestType request, String caName, String username,
-            RequestResponseDebug debug)
+    public EnrollCertResult requestCerts(
+            final EnrollCertRequestType request,
+            String caName,
+            final String username,
+            final RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("request", request);
@@ -681,7 +694,9 @@ public final class RAWorkerImpl implements RAWorker
         return parseEnrollCertResult((EnrollCertResultType) result, caName);
     }
 
-    private void checkCertprofileSupportInCA(String certprofile, String caName)
+    private void checkCertprofileSupportInCA(
+            final String certprofile,
+            String caName)
     throws RAWorkerException
     {
         if(caName != null)
@@ -728,8 +743,11 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public CertIDOrError revokeCert(X509Certificate cert, int reason, Date invalidityDate,
-            RequestResponseDebug debug)
+    public CertIdOrError revokeCert(
+            final X509Certificate cert,
+            final int reason,
+            final Date invalidityDate,
+            final RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
@@ -737,8 +755,12 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public CertIDOrError revokeCert(X500Name issuer, BigInteger serial, int reason, Date invalidityDate,
-            RequestResponseDebug debug)
+    public CertIdOrError revokeCert(
+            final X500Name issuer,
+            final BigInteger serial,
+            final int reason,
+            final Date invalidityDate,
+            final RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         final String id = "cert-1";
@@ -746,13 +768,14 @@ public final class RAWorkerImpl implements RAWorker
                 new RevokeCertRequestEntryType(id, issuer, serial, reason, invalidityDate);
         RevokeCertRequestType request = new RevokeCertRequestType();
         request.addRequestEntry(entry);
-        Map<String, CertIDOrError> result = revokeCerts(request, debug);
+        Map<String, CertIdOrError> result = revokeCerts(request, debug);
         return result == null ? null : result.get(id);
     }
 
     @Override
-    public Map<String, CertIDOrError> revokeCerts(RevokeCertRequestType request,
-            RequestResponseDebug debug)
+    public Map<String, CertIdOrError> revokeCerts(
+            final RevokeCertRequestType request,
+            final RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("request", request);
@@ -788,24 +811,25 @@ public final class RAWorkerImpl implements RAWorker
         return parseRevokeCertResult(result);
     }
 
-    private Map<String, CertIDOrError> parseRevokeCertResult(RevokeCertResultType result)
+    private Map<String, CertIdOrError> parseRevokeCertResult(
+            final RevokeCertResultType result)
     throws RAWorkerException
     {
-        Map<String, CertIDOrError> ret = new HashMap<>();
+        Map<String, CertIdOrError> ret = new HashMap<>();
 
         RevokeCertResultType _result = (RevokeCertResultType) result;
         for(ResultEntryType _entry : _result.getResultEntries())
         {
-            CertIDOrError certIdOrError;
+            CertIdOrError certIdOrError;
             if(_entry instanceof RevokeCertResultEntryType)
             {
                 RevokeCertResultEntryType entry = (RevokeCertResultEntryType) _entry;
-                certIdOrError = new CertIDOrError(entry.getCertID());
+                certIdOrError = new CertIdOrError(entry.getCertId());
             }
             else if(_entry instanceof ErrorResultEntryType)
             {
                 ErrorResultEntryType entry = (ErrorResultEntryType) _entry;
-                certIdOrError = new CertIDOrError(entry.getStatusInfo());
+                certIdOrError = new CertIdOrError(entry.getStatusInfo());
             }
             else
             {
@@ -819,14 +843,19 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public X509CRL downloadCRL(String caName, RequestResponseDebug debug)
+    public X509CRL downloadCRL(
+            final String caName,
+            final RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         return downloadCRL(caName, (BigInteger) null, debug);
     }
 
     @Override
-    public X509CRL downloadCRL(String caName, BigInteger crlNumber, RequestResponseDebug debug)
+    public X509CRL downloadCRL(
+            final String caName,
+            final BigInteger crlNumber,
+            final RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("caName", caName);
@@ -857,7 +886,9 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public X509CRL generateCRL(String caName, RequestResponseDebug debug)
+    public X509CRL generateCRL(
+            final String caName,
+            final RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("caName", caName);
@@ -879,7 +910,8 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public String getCaNameByIssuer(final X500Name issuer)
+    public String getCaNameByIssuer(
+            final X500Name issuer)
     throws RAWorkerException
     {
 
@@ -905,7 +937,8 @@ public final class RAWorkerImpl implements RAWorker
         throw new RAWorkerException("unknown CA for issuer: " + issuer);
     }
 
-    private String getCANameForProfile(String certprofile)
+    private String getCANameForProfile(
+            final String certprofile)
     throws RAWorkerException
     {
         String caName = null;
@@ -933,7 +966,8 @@ public final class RAWorkerImpl implements RAWorker
         return caName;
     }
 
-    private java.security.cert.Certificate getCertificate(CMPCertificate cmpCert)
+    private java.security.cert.Certificate getCertificate(
+            final CMPCertificate cmpCert)
     throws CertificateException
     {
         Certificate bcCert = cmpCert.getX509v3PKCert();
@@ -957,8 +991,12 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public byte[] envelope(CertRequest certRequest, ProofOfPossession pop, String profileName,
-            String caName, String username)
+    public byte[] envelope(
+            final CertRequest certRequest,
+            final ProofOfPossession pop,
+            final String profileName,
+            String caName,
+            final String username)
     throws RAWorkerException
     {
         if(caName == null)
@@ -999,8 +1037,9 @@ public final class RAWorkerImpl implements RAWorker
         }
     }
 
-    private boolean verify(java.security.cert.Certificate caCert,
-            java.security.cert.Certificate cert)
+    private boolean verify(
+            final java.security.cert.Certificate caCert,
+            final java.security.cert.Certificate cert)
     {
         if(caCert instanceof X509Certificate == false)
         {
@@ -1086,7 +1125,10 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public byte[] envelopeRevocation(X500Name issuer, BigInteger serial, int reason)
+    public byte[] envelopeRevocation(
+            final X500Name issuer,
+            final BigInteger serial,
+            final int reason)
     throws RAWorkerException
     {
         final String id = "cert-1";
@@ -1109,7 +1151,9 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public byte[] envelopeRevocation(X509Certificate cert, int reason)
+    public byte[] envelopeRevocation(
+            final X509Certificate cert,
+            final int reason)
     throws RAWorkerException
     {
         X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
@@ -1117,7 +1161,10 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public CertIDOrError unrevokeCert(X500Name issuer, BigInteger serial, RequestResponseDebug debug)
+    public CertIdOrError unrevokeCert(
+            final X500Name issuer,
+            final BigInteger serial,
+            final RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         final String id = "cert-1";
@@ -1125,12 +1172,14 @@ public final class RAWorkerImpl implements RAWorker
                 new IssuerSerialEntryType(id, issuer, serial);
         UnrevokeOrRemoveCertRequestType request = new UnrevokeOrRemoveCertRequestType();
         request.addRequestEntry(entry);
-        Map<String, CertIDOrError> result = unrevokeCerts(request, debug);
+        Map<String, CertIdOrError> result = unrevokeCerts(request, debug);
         return result == null ? null : result.get(id);
     }
 
     @Override
-    public CertIDOrError unrevokeCert(X509Certificate cert, RequestResponseDebug debug)
+    public CertIdOrError unrevokeCert(
+            final X509Certificate cert,
+            final RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
@@ -1138,8 +1187,9 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public Map<String, CertIDOrError> unrevokeCerts(UnrevokeOrRemoveCertRequestType request,
-            RequestResponseDebug debug)
+    public Map<String, CertIdOrError> unrevokeCerts(
+            final UnrevokeOrRemoveCertRequestType request,
+            final RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("request", request);
@@ -1176,7 +1226,10 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public CertIDOrError removeCert(X500Name issuer, BigInteger serial, RequestResponseDebug debug)
+    public CertIdOrError removeCert(
+            final X500Name issuer,
+            final BigInteger serial,
+            final RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         final String id = "cert-1";
@@ -1184,12 +1237,14 @@ public final class RAWorkerImpl implements RAWorker
                 new IssuerSerialEntryType(id, issuer, serial);
         UnrevokeOrRemoveCertRequestType request = new UnrevokeOrRemoveCertRequestType();
         request.addRequestEntry(entry);
-        Map<String, CertIDOrError> result = removeCerts(request, debug);
+        Map<String, CertIdOrError> result = removeCerts(request, debug);
         return result == null ? null : result.get(id);
     }
 
     @Override
-    public CertIDOrError removeCert(X509Certificate cert, RequestResponseDebug debug)
+    public CertIdOrError removeCert(
+            final X509Certificate cert,
+            final RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
@@ -1197,8 +1252,9 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public Map<String, CertIDOrError> removeCerts(UnrevokeOrRemoveCertRequestType request,
-            RequestResponseDebug debug)
+    public Map<String, CertIdOrError> removeCerts(
+            final UnrevokeOrRemoveCertRequestType request,
+            final RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("request", request);
@@ -1235,7 +1291,8 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public Set<CertprofileInfo> getCertprofiles(String caName)
+    public Set<CertprofileInfo> getCertprofiles(
+            final String caName)
     {
         CAConf ca = casMap.get(caName);
         if(ca == null)
@@ -1258,8 +1315,12 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public RemoveExpiredCertsResult removeExpiredCerts(String caName, String certprofile,
-            String userLike, long overlapSeconds, RequestResponseDebug debug)
+    public RemoveExpiredCertsResult removeExpiredCerts(
+            final String caName,
+            final String certprofile,
+            final String userLike,
+            final long overlapSeconds,
+            final RequestResponseDebug debug)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("caName", caName);
@@ -1280,7 +1341,8 @@ public final class RAWorkerImpl implements RAWorker
     }
 
     @Override
-    public HealthCheckResult getHealthCheckResult(String caName)
+    public HealthCheckResult getHealthCheckResult(
+            final String caName)
     throws RAWorkerException
     {
         ParamChecker.assertNotNull("caName", caName);
@@ -1372,7 +1434,8 @@ public final class RAWorkerImpl implements RAWorker
         return healthCheckResult;
     }
 
-    private static CAClientType parse(InputStream configStream)
+    private static CAClientType parse(
+            final InputStream configStream)
     throws ConfigurationException
     {
         synchronized (jaxbUnmarshallerLock)
@@ -1412,7 +1475,9 @@ public final class RAWorkerImpl implements RAWorker
         }
     }
 
-    private EnrollCertResult parseEnrollCertResult(EnrollCertResultType result, String caName)
+    private EnrollCertResult parseEnrollCertResult(
+            final EnrollCertResultType result,
+            final String caName)
     throws RAWorkerException
     {
         Map<String, CertOrError> certOrErrors = new HashMap<>();

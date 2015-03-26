@@ -44,7 +44,9 @@ public class AuditEventData
     private final String name;
     private final String value;
 
-    public AuditEventData(final String name, final String value)
+    public AuditEventData(
+            final String name,
+            final String value)
     {
         assertNotEmpty("name", name);
         assertNotNull("value", value);
@@ -70,7 +72,9 @@ public class AuditEventData
         return sb.toString();
     }
 
-    private static void assertNotNull(String parameterName, Object parameter)
+    private static void assertNotNull(
+            final String parameterName,
+            final Object parameter)
     {
         if(parameter == null)
         {
@@ -78,7 +82,9 @@ public class AuditEventData
         }
     }
 
-    private static void assertNotEmpty(String parameterName, String parameter)
+    private static void assertNotEmpty(
+            final String parameterName,
+            final String parameter)
     {
         if(parameter == null)
         {

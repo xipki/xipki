@@ -47,7 +47,9 @@ public class QaExtensionValue
     private final boolean critical;
     private final byte[] value;
 
-    public QaExtensionValue(boolean critical, byte[] value)
+    public QaExtensionValue(
+            final boolean critical,
+            final byte[] value)
     {
         ParamChecker.assertNotNull("value", value);
 

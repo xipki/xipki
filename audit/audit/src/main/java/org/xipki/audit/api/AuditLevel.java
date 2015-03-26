@@ -49,7 +49,9 @@ public enum AuditLevel
     private final int value;
     private final String alignedText;
 
-    private AuditLevel(int value, String alignedText)
+    private AuditLevel(
+            final int value,
+            final String alignedText)
     {
         this.value = value;
         this.alignedText = alignedText;
@@ -60,7 +62,8 @@ public enum AuditLevel
         return value;
     }
 
-    public static final AuditLevel forName(String name)
+    public static final AuditLevel forName(
+            final String name)
     {
         if(name == null)
         {
@@ -77,7 +80,8 @@ public enum AuditLevel
         return null;
     }
 
-    public static final AuditLevel forValue(final int value)
+    public static final AuditLevel forValue(
+            final int value)
     {
         for (AuditLevel v : values())
         {

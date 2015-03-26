@@ -74,7 +74,7 @@ public abstract class KeyEntry
     {
         private final BigInteger baseN;
 
-        public RSAKeyEntry(int keysize)
+        public RSAKeyEntry(final int keysize)
         throws Exception
         {
             if(keysize % 1024 != 0)
@@ -92,7 +92,7 @@ public abstract class KeyEntry
         }
 
         @Override
-        public SubjectPublicKeyInfo getSubjectPublicKeyInfo(long index)
+        public SubjectPublicKeyInfo getSubjectPublicKeyInfo(final long index)
         {
             BigInteger modulus = baseN.add(BigInteger.valueOf(index));
 
@@ -197,7 +197,7 @@ public abstract class KeyEntry
         private AlgorithmIdentifier algId;
         private BigInteger baseY;
 
-        public DSAKeyEntry(int pLength)
+        public DSAKeyEntry(final int pLength)
         throws Exception
         {
             if(pLength == 1024)
@@ -233,17 +233,26 @@ public abstract class KeyEntry
             }
         }
 
-        private void init(String p, String q, String g, String y)
+        private void init(
+                final String p,
+                final String q,
+                final String g,
+                final String y)
         {
             init(base64ToInt(p), base64ToInt(q), base64ToInt(g), base64ToInt(y));
         }
 
-        private static BigInteger base64ToInt(String base64Str)
+        private static BigInteger base64ToInt(
+                final String base64Str)
         {
             return new BigInteger(1, Base64.decode(base64Str));
         }
 
-        private void init(BigInteger p, BigInteger q, BigInteger g, BigInteger y)
+        private void init(
+                final BigInteger p,
+                final BigInteger q,
+                final BigInteger g,
+                final BigInteger y)
         {
             ASN1EncodableVector v = new ASN1EncodableVector();
             v.add(new ASN1Integer(p));
@@ -255,7 +264,8 @@ public abstract class KeyEntry
         }
 
         @Override
-        public SubjectPublicKeyInfo getSubjectPublicKeyInfo(long index)
+        public SubjectPublicKeyInfo getSubjectPublicKeyInfo(
+                final long index)
         {
             BigInteger y = baseY.add(BigInteger.valueOf(index));
 
@@ -277,7 +287,7 @@ public abstract class KeyEntry
         private final AlgorithmIdentifier algId;
         private final BigInteger basePublicKey;
 
-        public ECKeyEntry(String curveNameOrOid)
+        public ECKeyEntry(final String curveNameOrOid)
         throws Exception
         {
             boolean isOid;
@@ -319,12 +329,14 @@ public abstract class KeyEntry
         }
 
         @Override
-        public SubjectPublicKeyInfo getSubjectPublicKeyInfo(long index)
+        public SubjectPublicKeyInfo getSubjectPublicKeyInfo(
+                final long index)
         {
             BigInteger publicKey = basePublicKey.add(BigInteger.valueOf(index));
             return new SubjectPublicKeyInfo(algId, publicKey.toByteArray());
         }
     }
 
-    public abstract SubjectPublicKeyInfo getSubjectPublicKeyInfo(long index);
+    public abstract SubjectPublicKeyInfo getSubjectPublicKeyInfo(
+            long index);
 }

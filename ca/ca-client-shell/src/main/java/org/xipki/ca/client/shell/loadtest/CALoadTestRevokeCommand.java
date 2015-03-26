@@ -143,12 +143,14 @@ public class CALoadTestRevokeCommand extends CALoadTestCommand
         return null;
     }
 
-    public void setDataSourceFactory(DataSourceFactory dataSourceFactory)
+    public void setDataSourceFactory(
+            final DataSourceFactory dataSourceFactory)
     {
         this.dataSourceFactory = dataSourceFactory;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory)
+    public void setSecurityFactory(
+            final SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;
     }

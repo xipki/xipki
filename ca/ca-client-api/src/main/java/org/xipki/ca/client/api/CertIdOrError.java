@@ -43,12 +43,13 @@ import org.xipki.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class CertIDOrError
+public class CertIdOrError
 {
     private final CertId certId;
     private final PKIStatusInfo error;
 
-    public CertIDOrError(CertId certId)
+    public CertIdOrError(
+            final CertId certId)
     {
         ParamChecker.assertNotNull("certId", certId);
 
@@ -56,7 +57,8 @@ public class CertIDOrError
         this.error = null;
     }
 
-    public CertIDOrError(PKIStatusInfo error)
+    public CertIdOrError(
+            final PKIStatusInfo error)
     {
         ParamChecker.assertNotNull("error", error);
 

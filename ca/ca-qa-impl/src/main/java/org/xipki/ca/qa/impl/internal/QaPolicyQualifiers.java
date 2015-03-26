@@ -53,7 +53,8 @@ import org.xipki.common.ParamChecker;
 public class QaPolicyQualifiers
 {
     private final List<QaPolicyQualifierInfo> policyQualifiers;
-    public QaPolicyQualifiers(PolicyQualifiers jaxb)
+    public QaPolicyQualifiers(
+            final PolicyQualifiers jaxb)
     {
         ParamChecker.assertNotNull("jaxb", jaxb);
 

@@ -50,15 +50,22 @@ public class RevokeCertRequestEntryType extends IssuerSerialEntryType
     private final int reason;
     private final Date invalidityDate;
 
-    public RevokeCertRequestEntryType(String id, X509Certificate cert,
-            int reason, Date invalidityDate)
+    public RevokeCertRequestEntryType(
+            final String id,
+            final X509Certificate cert,
+            final int reason,
+            final Date invalidityDate)
     {
         this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
                 cert.getSerialNumber(), reason, invalidityDate);
     }
 
-    public RevokeCertRequestEntryType(String id, X500Name issuer, BigInteger serialNumber,
-            int reason, Date invalidityDate)
+    public RevokeCertRequestEntryType(
+            final String id,
+            final X500Name issuer,
+            final BigInteger serialNumber,
+            final int reason,
+            final Date invalidityDate)
     {
         super(id, issuer, serialNumber);
 
