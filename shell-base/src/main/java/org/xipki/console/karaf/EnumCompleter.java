@@ -49,7 +49,8 @@ public class EnumCompleter implements XipkiCompleter
 {
     private final List<String> enums = new LinkedList<>();
 
-    public void setTokens(String tokens)
+    public void setTokens(
+            final String tokens)
     {
         enums.clear();
         StringTokenizer st = new StringTokenizer(tokens, ", ");
@@ -60,7 +61,10 @@ public class EnumCompleter implements XipkiCompleter
     }
 
     @Override
-    public int complete(String buffer, int cursor, List<String> candidates)
+    public int complete(
+            final String buffer,
+            final int cursor,
+            final List<String> candidates)
     {
         StringsCompleter delegate = new StringsCompleter();
         for(String entry : enums)

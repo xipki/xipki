@@ -229,8 +229,10 @@ public class P11ListSlotCommand extends SecurityCommand
         return null;
     }
 
-    private static X509PublicKeyCertificate removeCertificateObject(List<X509PublicKeyCertificate> certificateObjects,
-            byte[] keyId, char[] keyLabel)
+    private static X509PublicKeyCertificate removeCertificateObject(
+            final List<X509PublicKeyCertificate> certificateObjects,
+            final byte[] keyId,
+            final char[] keyLabel)
     {
         X509PublicKeyCertificate cert = null;
         for(X509PublicKeyCertificate certObj : certificateObjects)
@@ -259,7 +261,9 @@ public class P11ListSlotCommand extends SecurityCommand
         return cert;
     }
 
-    private void formatString(StringBuilder sb, X509PublicKeyCertificate cert)
+    private void formatString(
+            final StringBuilder sb,
+            final X509PublicKeyCertificate cert)
     {
         byte[] bytes = cert.getSubject().getByteArrayValue();
         String subject;
@@ -323,7 +327,9 @@ public class P11ListSlotCommand extends SecurityCommand
             .append("\n");
     }
 
-    private void formatString(StringBuilder sb, X509Certificate cert)
+    private void formatString(
+            final StringBuilder sb,
+            final X509Certificate cert)
     {
         String subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
 
@@ -363,7 +369,8 @@ public class P11ListSlotCommand extends SecurityCommand
         sb.append("\n");
     }
 
-    private static String getKeyAlgorithm(PublicKey key)
+    private static String getKeyAlgorithm(
+            final PublicKey key)
     {
         if(key instanceof RSAPublicKey)
         {
@@ -399,7 +406,8 @@ public class P11ListSlotCommand extends SecurityCommand
         }
     }
 
-    private static String getCurveName(ASN1ObjectIdentifier curveId)
+    private static String getCurveName(
+            final ASN1ObjectIdentifier curveId)
     {
         String curveName = X962NamedCurves.getName(curveId);
 
@@ -426,14 +434,17 @@ public class P11ListSlotCommand extends SecurityCommand
         private final byte[] keyId;
         private final char[] keyLabel;
 
-        public ComparableIaikPrivateKey(byte[] keyId, char[] keyLabel)
+        public ComparableIaikPrivateKey(
+                final byte[] keyId,
+                final char[] keyLabel)
         {
             this.keyId = keyId;
             this.keyLabel = keyLabel;
         }
 
         @Override
-        public int compareTo(ComparableIaikPrivateKey o)
+        public int compareTo(
+                final ComparableIaikPrivateKey o)
         {
             if(keyLabel == null)
             {
@@ -475,7 +486,8 @@ public class P11ListSlotCommand extends SecurityCommand
         }
     }
 
-    private void output(List<P11SlotIdentifier> slots)
+    private void output(
+            final List<P11SlotIdentifier> slots)
     {
         if(slotIndex == null)
         {

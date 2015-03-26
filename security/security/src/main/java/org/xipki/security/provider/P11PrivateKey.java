@@ -64,8 +64,10 @@ public class P11PrivateKey implements PrivateKey
     private final String algorithm;
     private final int keysize;
 
-    public P11PrivateKey(P11CryptService p11CryptService, P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
+    public P11PrivateKey(
+            final P11CryptService p11CryptService,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws InvalidKeyException
     {
         ParamChecker.assertNotNull("p11CryptService", p11CryptService);
@@ -128,7 +130,8 @@ public class P11PrivateKey implements PrivateKey
         return keysize;
     }
 
-    public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo)
+    public byte[] CKM_RSA_PKCS(
+            final byte[] encodedDigestInfo)
     throws SignatureException
     {
         if("RSA".equals(algorithm) == false)
@@ -145,7 +148,8 @@ public class P11PrivateKey implements PrivateKey
         }
     }
 
-    public byte[] CKM_RSA_X509(byte[] hash)
+    public byte[] CKM_RSA_X509(
+            final byte[] hash)
     throws SignatureException
     {
         if("RSA".equals(algorithm) == false)
@@ -162,7 +166,8 @@ public class P11PrivateKey implements PrivateKey
         }
     }
 
-    public byte[] CKM_ECDSA(byte[] hash)
+    public byte[] CKM_ECDSA(
+            final byte[] hash)
     throws SignatureException
     {
         if("EC".equals(algorithm) == false)
@@ -179,7 +184,8 @@ public class P11PrivateKey implements PrivateKey
         }
     }
 
-    public byte[] CKM_DSA(byte[] hash)
+    public byte[] CKM_DSA(
+            final byte[] hash)
     throws SignatureException
     {
         if("DSA".equals(algorithm) == false)

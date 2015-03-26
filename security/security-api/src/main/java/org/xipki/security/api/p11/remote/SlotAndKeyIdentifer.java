@@ -61,8 +61,9 @@ public class SlotAndKeyIdentifer extends ASN1Object
     private SlotIdentifier slotIdentifier;
     private KeyIdentifier keyIdentifier;
 
-    public SlotAndKeyIdentifer(SlotIdentifier slotIdentifier,
-            KeyIdentifier keyIdentifier)
+    public SlotAndKeyIdentifer(
+            final SlotIdentifier slotIdentifier,
+            final KeyIdentifier keyIdentifier)
     {
         if(slotIdentifier == null)
         {
@@ -78,7 +79,8 @@ public class SlotAndKeyIdentifer extends ASN1Object
         this.keyIdentifier = keyIdentifier;
     }
 
-    private SlotAndKeyIdentifer(ASN1Sequence seq)
+    private SlotAndKeyIdentifer(
+            final ASN1Sequence seq)
     {
         if (seq.size() != 2)
         {
@@ -90,7 +92,7 @@ public class SlotAndKeyIdentifer extends ASN1Object
     }
 
     public static SlotAndKeyIdentifer getInstance(
-            Object obj)
+            final Object obj)
     {
         if (obj == null || obj instanceof SlotAndKeyIdentifer)
         {

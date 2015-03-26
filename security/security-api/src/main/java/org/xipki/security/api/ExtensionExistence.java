@@ -70,7 +70,8 @@ public class ExtensionExistence extends ASN1Object
     private List<ASN1ObjectIdentifier> needExtensions;
     private List<ASN1ObjectIdentifier> wantExtensions;
 
-    public ExtensionExistence(List<ASN1ObjectIdentifier> needExtensions,
+    public ExtensionExistence(
+            final List<ASN1ObjectIdentifier> needExtensions,
             List<ASN1ObjectIdentifier> wantExtensions)
     {
         this.needExtensions = needExtensions;
@@ -90,7 +91,8 @@ public class ExtensionExistence extends ASN1Object
 
     }
 
-    private ExtensionExistence(ASN1Sequence seq)
+    private ExtensionExistence(
+            final ASN1Sequence seq)
     {
         int size = seq.size();
         if (size > 2)
@@ -140,7 +142,7 @@ public class ExtensionExistence extends ASN1Object
     }
 
     public static ExtensionExistence getInstance(
-            Object obj)
+            final Object obj)
     {
         if (obj == null || obj instanceof ExtensionExistence)
         {

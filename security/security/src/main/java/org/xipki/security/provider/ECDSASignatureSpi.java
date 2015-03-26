@@ -61,19 +61,21 @@ class ECDSASignatureSpi extends SignatureSpi
 
     private P11PrivateKey signingKey;
 
-    ECDSASignatureSpi(Digest digest)
+    ECDSASignatureSpi(
+            final Digest digest)
     {
         this.digest = digest;
     }
 
-    protected void engineInitVerify(PublicKey publicKey)
+    protected void engineInitVerify(
+            final PublicKey publicKey)
     throws InvalidKeyException
     {
         throw new UnsupportedOperationException("engineInitVerify unsupported");
     }
 
     protected void engineInitSign(
-        PrivateKey privateKey)
+            final PrivateKey privateKey)
     throws InvalidKeyException
     {
         if(privateKey instanceof P11PrivateKey == false)
@@ -155,16 +157,16 @@ class ECDSASignatureSpi extends SignatureSpi
     }
 
     protected void engineUpdate(
-        byte    b)
+            final byte b)
     throws SignatureException
     {
         digest.update(b);
     }
 
     protected void engineUpdate(
-        byte[]  b,
-        int     off,
-        int     len)
+            final byte[]  b,
+            final int off,
+            final int len)
     throws SignatureException
     {
         digest.update(b, off, len);
@@ -192,7 +194,7 @@ class ECDSASignatureSpi extends SignatureSpi
     }
 
     protected void engineSetParameter(
-        AlgorithmParameterSpec params)
+            final AlgorithmParameterSpec params)
     {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
@@ -201,8 +203,8 @@ class ECDSASignatureSpi extends SignatureSpi
      * @deprecated replaced with <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
      */
     protected void engineSetParameter(
-        String  param,
-        Object  value)
+            final String  param,
+            final Object  value)
     {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
@@ -211,13 +213,13 @@ class ECDSASignatureSpi extends SignatureSpi
      * @deprecated
      */
     protected Object engineGetParameter(
-        String      param)
+            final String param)
     {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
 
     protected boolean engineVerify(
-        byte[]  sigBytes)
+            final byte[] sigBytes)
     throws SignatureException
     {
         throw new UnsupportedOperationException("engineVerify unsupported");

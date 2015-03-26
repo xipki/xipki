@@ -95,7 +95,8 @@ public class Configuration
      * @param ctype The ctype to parse, may be null
      * @return The encoding, if one was present, otherwise null
      */
-    static String extractEncodingFromCtype(String ctype)
+    static String extractEncodingFromCtype(
+            final String ctype)
     {
         if (ctype != null && ctype.indexOf('.') > 0)
         {

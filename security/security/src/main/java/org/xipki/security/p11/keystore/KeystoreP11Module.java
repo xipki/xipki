@@ -67,7 +67,8 @@ public class KeystoreP11Module implements P11Module
     private Map<P11SlotIdentifier, KeystoreP11Slot> slots = new HashMap<>();
     private List<P11SlotIdentifier> slotIds;
 
-    public KeystoreP11Module(P11ModuleConf moduleConf)
+    public KeystoreP11Module(
+            final P11ModuleConf moduleConf)
     {
         ParamChecker.assertNotNull("moduleConf", moduleConf);
         this.moduleConf = moduleConf;
@@ -141,7 +142,8 @@ public class KeystoreP11Module implements P11Module
     }
 
     @Override
-    public KeystoreP11Slot getSlot(P11SlotIdentifier slotId)
+    public KeystoreP11Slot getSlot(
+            final P11SlotIdentifier slotId)
     throws SignerException
     {
         KeystoreP11Slot extSlot = slots.get(slotId);
@@ -183,7 +185,8 @@ public class KeystoreP11Module implements P11Module
         return extSlot;
     }
 
-    public void destroySlot(long slotId)
+    public void destroySlot(
+            final long slotId)
     {
         slots.remove(slotId);
     }

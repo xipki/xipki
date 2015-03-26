@@ -41,9 +41,11 @@ package org.xipki.security.api;
 
 public interface PasswordCallback
 {
-    void init(String conf)
+    void init(
+            String conf)
     throws PasswordResolverException;
 
-    char[] getPassword(String prompt)
+    char[] getPassword(
+            String prompt)
     throws PasswordResolverException;
 }

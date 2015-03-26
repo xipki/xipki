@@ -54,14 +54,20 @@ public class P11ModuleConf
     private final Set<P11SlotIdentifier> includeSlots;
     private final P11PasswordRetriever passwordRetriever;
 
-    public P11ModuleConf(String name, String nativeLibrary, P11PasswordRetriever passwordRetriever)
+    public P11ModuleConf(
+            final String name,
+            final String nativeLibrary,
+            final P11PasswordRetriever passwordRetriever)
     {
         this(name, nativeLibrary, passwordRetriever, null, null);
     }
 
     public P11ModuleConf(
-            String name, String nativeLibrary, P11PasswordRetriever passwordRetriever,
-            Set<P11SlotIdentifier> includeSlots, Set<P11SlotIdentifier> excludeSlots)
+            final String name,
+            final String nativeLibrary,
+            final P11PasswordRetriever passwordRetriever,
+            final Set<P11SlotIdentifier> includeSlots,
+            final Set<P11SlotIdentifier> excludeSlots)
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("nativeLibrary", nativeLibrary);
@@ -110,7 +116,8 @@ public class P11ModuleConf
         return passwordRetriever;
     }
 
-    public boolean isSlotIncluded(P11SlotIdentifier slot)
+    public boolean isSlotIncluded(
+            final P11SlotIdentifier slot)
     {
         boolean included;
         if(CollectionUtil.isEmpty(includeSlots))

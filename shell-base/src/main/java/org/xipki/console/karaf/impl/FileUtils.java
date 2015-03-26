@@ -55,7 +55,8 @@ public class FileUtils
      * @throws IOException in case deletion is unsuccessful
      * @throws IllegalArgumentException if {@code directory} does not exist or is not a directory
      */
-    public static void deleteDirectory(final File directory)
+    public static void deleteDirectory(
+            final File directory)
     throws IOException
     {
         if (directory.exists() == false)
@@ -91,7 +92,8 @@ public class FileUtils
      * @throws IOException if an IO error occurs while checking the file
      * @since 2.0
      */
-    public static boolean isSymlink(final File file)
+    public static boolean isSymlink(
+            final File file)
     throws IOException
     {
         if (file == null)
@@ -122,7 +124,8 @@ public class FileUtils
      * @throws IOException in case cleaning is unsuccessful
      * @throws IllegalArgumentException if {@code directory} does not exist or is not a directory
      */
-    public static void cleanDirectory(final File directory)
+    public static void cleanDirectory(
+            final File directory)
     throws IOException
     {
         if (directory.exists() == false)
@@ -174,7 +177,8 @@ public class FileUtils
      * @throws FileNotFoundException if the file was not found
      * @throws IOException in case deletion is unsuccessful
      */
-    public static void forceDelete(final File file)
+    public static void forceDelete(
+            final File file)
     throws IOException
     {
         if (file.isDirectory())

@@ -94,7 +94,8 @@ public class KeystoreP11Slot implements P11WritableSlot
     private final List<KeystoreP11Identity> identities = new LinkedList<>();
     private final char[] password;
 
-    public static byte[] deriveKeyIdFromLabel(String keyLabel)
+    public static byte[] deriveKeyIdFromLabel(
+            final String keyLabel)
     {
         byte[] keyLabelBytes;
         try
@@ -109,7 +110,10 @@ public class KeystoreP11Slot implements P11WritableSlot
         return Hex.decode(sha1Fp.substring(0, 16));
     }
 
-    public KeystoreP11Slot(File slotDir, P11SlotIdentifier slotId, List<char[]> password)
+    public KeystoreP11Slot(
+            final File slotDir,
+            final P11SlotIdentifier slotId,
+            final List<char[]> password)
     {
         ParamChecker.assertNotNull("slotDir", slotDir);
         ParamChecker.assertNotNull("slotId", slotId);
@@ -134,7 +138,9 @@ public class KeystoreP11Slot implements P11WritableSlot
         File[] keystoreFiles = slotDir.listFiles(new FilenameFilter()
         {
             @Override
-            public boolean accept(File dir, String name)
+            public boolean accept(
+                    final File dir,
+                    final String name)
             {
                 return name.endsWith(".p12");
             }
@@ -258,7 +264,8 @@ public class KeystoreP11Slot implements P11WritableSlot
     }
 
     @Override
-    public boolean removeKeyAndCerts(P11KeyIdentifier keyIdentifier)
+    public boolean removeKeyAndCerts(
+            final P11KeyIdentifier keyIdentifier)
     throws SignerException
     {
         ParamChecker.assertNotNull("keyIdentifier", keyIdentifier);
@@ -274,9 +281,11 @@ public class KeystoreP11Slot implements P11WritableSlot
     }
 
     @Override
-    public void updateCertificate(P11KeyIdentifier keyIdentifier,
-            X509Certificate newCert, Set<X509Certificate> caCerts,
-            SecurityFactory securityFactory)
+    public void updateCertificate(
+            final P11KeyIdentifier keyIdentifier,
+            final X509Certificate newCert,
+            final Set<X509Certificate> caCerts,
+            final SecurityFactory securityFactory)
     throws Exception
     {
         ParamChecker.assertNotNull("keyIdentifier", keyIdentifier);
@@ -344,23 +353,29 @@ public class KeystoreP11Slot implements P11WritableSlot
     }
 
     @Override
-    public void removeCerts(P11KeyIdentifier keyIdentifier)
+    public void removeCerts(
+            final P11KeyIdentifier keyIdentifier)
     throws Exception
     {
         throw new OperationNotSupportedException("removeCerts(P11KeyIdentifier) is unsupported");
     }
 
     @Override
-    public P11KeyIdentifier addCert(X509Certificate cert)
+    public P11KeyIdentifier addCert(
+            final X509Certificate cert)
     throws Exception
     {
         throw new OperationNotSupportedException("addCert(X509Certificate) is unsupported");
     }
 
     @Override
-    public P11KeypairGenerationResult generateRSAKeypairAndCert(int keySize,
-            BigInteger publicExponent, String label, String subject,
-            Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyusage)
+    public P11KeypairGenerationResult generateRSAKeypairAndCert(
+            final int keySize,
+            final BigInteger publicExponent,
+            final String label,
+            final String subject,
+            final Integer keyUsage,
+            final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception
     {
         ParamChecker.assertNotEmpty("label", label);
@@ -394,9 +409,13 @@ public class KeystoreP11Slot implements P11WritableSlot
     }
 
     @Override
-    public P11KeypairGenerationResult generateDSAKeypairAndCert(int pLength,
-            int qLength, String label, String subject, Integer keyUsage,
-            List<ASN1ObjectIdentifier> extendedKeyusage)
+    public P11KeypairGenerationResult generateDSAKeypairAndCert(
+            final int pLength,
+            final int qLength,
+            final String label,
+            final String subject,
+            final Integer keyUsage,
+            final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception
     {
         ParamChecker.assertNotEmpty("label", label);
@@ -431,8 +450,11 @@ public class KeystoreP11Slot implements P11WritableSlot
 
     @Override
     public P11KeypairGenerationResult generateECDSAKeypairAndCert(
-            String curveNameOrOid, String label, String subject,
-            Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyusage)
+            final String curveNameOrOid,
+            final String label,
+            final String subject,
+            final Integer keyUsage,
+            final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception
     {
         ParamChecker.assertNotEmpty("curveNameOrOid", curveNameOrOid);
@@ -454,7 +476,8 @@ public class KeystoreP11Slot implements P11WritableSlot
                 keyAndCert.getCertificate());
     }
 
-    private KeystoreP11Identity getIdentity(P11KeyIdentifier keyIdentifier)
+    private KeystoreP11Identity getIdentity(
+            final P11KeyIdentifier keyIdentifier)
     {
         byte[] keyId = keyIdentifier.getKeyId();
         String keyLabel = keyIdentifier.getKeyLabel();
@@ -495,7 +518,10 @@ public class KeystoreP11Slot implements P11WritableSlot
         return null;
     }
 
-    private void assertMatch(X509Certificate cert, P11KeyIdentifier keyId, SecurityFactory securityFactory)
+    private void assertMatch(
+            final X509Certificate cert,
+            final P11KeyIdentifier keyId,
+            final SecurityFactory securityFactory)
     throws SignerException, PasswordResolverException
     {
         CmpUtf8Pairs pairs = new CmpUtf8Pairs("slot", Integer.toString(slotId.getSlotIndex()));
@@ -512,7 +538,8 @@ public class KeystoreP11Slot implements P11WritableSlot
     }
 
     @Override
-    public X509Certificate exportCert(P11KeyIdentifier keyIdentifier)
+    public X509Certificate exportCert(
+            final P11KeyIdentifier keyIdentifier)
     throws Exception
     {
         KeystoreP11Identity identity = getIdentity(keyIdentifier);

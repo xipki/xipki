@@ -69,7 +69,8 @@ public class KeystoreP11CryptService implements P11CryptService
 
     private static final Map<String, KeystoreP11CryptService> instances = new HashMap<>();
 
-    public static KeystoreP11CryptService getInstance(P11ModuleConf moduleConf)
+    public static KeystoreP11CryptService getInstance(
+            final P11ModuleConf moduleConf)
     throws SignerException
     {
         synchronized (instances)
@@ -86,7 +87,8 @@ public class KeystoreP11CryptService implements P11CryptService
         }
     }
 
-    public KeystoreP11CryptService(P11ModuleConf moduleConf)
+    public KeystoreP11CryptService(
+            final P11ModuleConf moduleConf)
     throws SignerException
     {
         ParamChecker.assertNotNull("moduleConf", moduleConf);
@@ -183,7 +185,10 @@ public class KeystoreP11CryptService implements P11CryptService
     }
 
     @Override
-    public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    public byte[] CKM_RSA_PKCS(
+            final byte[] encodedDigestInfo,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         KeystoreP11Identity identity = getIdentity(slotId, keyId);
@@ -196,7 +201,10 @@ public class KeystoreP11CryptService implements P11CryptService
     }
 
     @Override
-    public byte[] CKM_RSA_X509(byte[] hash, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    public byte[] CKM_RSA_X509(
+            final byte[] hash,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         KeystoreP11Identity identity = getIdentity(slotId, keyId);
@@ -209,7 +217,10 @@ public class KeystoreP11CryptService implements P11CryptService
     }
 
     @Override
-    public byte[] CKM_ECDSA(byte[] hash, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    public byte[] CKM_ECDSA(
+            final byte[] hash,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         KeystoreP11Identity identity = getIdentity(slotId, keyId);
@@ -222,7 +233,10 @@ public class KeystoreP11CryptService implements P11CryptService
     }
 
     @Override
-    public byte[] CKM_DSA(byte[] hash, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    public byte[] CKM_DSA(
+            final byte[] hash,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         KeystoreP11Identity identity = getIdentity(slotId, keyId);
@@ -235,7 +249,9 @@ public class KeystoreP11CryptService implements P11CryptService
     }
 
     @Override
-    public PublicKey getPublicKey(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    public PublicKey getPublicKey(
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         KeystoreP11Identity identity = getIdentity(slotId, keyId);
@@ -243,7 +259,9 @@ public class KeystoreP11CryptService implements P11CryptService
     }
 
     @Override
-    public X509Certificate getCertificate(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    public X509Certificate getCertificate(
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         KeystoreP11Identity identity = getIdentity(slotId, keyId);
@@ -251,7 +269,9 @@ public class KeystoreP11CryptService implements P11CryptService
     }
 
     @Override
-    public X509Certificate[] getCertificates(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    public X509Certificate[] getCertificates(
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         KeystoreP11Identity identity = getIdentity(slotId, keyId);
@@ -276,7 +296,8 @@ public class KeystoreP11CryptService implements P11CryptService
     }
 
     @Override
-    public String[] getKeyLabels(P11SlotIdentifier slotId)
+    public String[] getKeyLabels(
+            final P11SlotIdentifier slotId)
     throws SignerException
     {
         List<String> keyLabels = new LinkedList<>();
@@ -291,7 +312,9 @@ public class KeystoreP11CryptService implements P11CryptService
         return keyLabels.toArray(new String[0]);
     }
 
-    private KeystoreP11Identity getIdentity(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    private KeystoreP11Identity getIdentity(
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         if(keyId.getKeyLabel() == null)

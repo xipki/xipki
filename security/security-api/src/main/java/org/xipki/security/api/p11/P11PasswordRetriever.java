@@ -45,7 +45,8 @@ import org.xipki.security.api.PasswordResolverException;
 
 public interface P11PasswordRetriever
 {
-    List<char[]> getPassword(P11SlotIdentifier slotId)
+    List<char[]> getPassword(
+            P11SlotIdentifier slotId)
     throws PasswordResolverException;
 
 }

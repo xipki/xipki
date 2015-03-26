@@ -104,7 +104,9 @@ public class FileRmCommand extends XipkiOsgiCommandSupport
         return null;
     }
 
-    private boolean confirm(ConsoleReader reader, String prompt)
+    private boolean confirm(
+            final ConsoleReader reader,
+            final String prompt)
     throws IOException
     {
         String answer = reader.readLine();

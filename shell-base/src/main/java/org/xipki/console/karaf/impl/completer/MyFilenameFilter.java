@@ -69,7 +69,9 @@ class MyFilenameFilter implements FilenameFilter
     }
 
     @Override
-    public boolean accept(File dir, String name)
+    public boolean accept(
+            final File dir,
+            final String name)
     {
         if(ignorePattern == null)
         {

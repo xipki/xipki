@@ -95,7 +95,8 @@ public class P12CertRequestGenCommand extends CertRequestGenCommand
     }
 
     @Override
-    protected ConcurrentContentSigner getSigner(String hashAlgo)
+    protected ConcurrentContentSigner getSigner(
+            final String hashAlgo)
     throws Exception
     {
         char[] pwd = getPassword();

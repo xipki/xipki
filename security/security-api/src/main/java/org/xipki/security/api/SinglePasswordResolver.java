@@ -41,8 +41,10 @@ package org.xipki.security.api;
 
 public interface SinglePasswordResolver
 {
-    boolean canResolveProtocol(String protocol);
+    boolean canResolveProtocol(
+            String protocol);
 
-    char[] resolvePassword(String passwordHint)
+    char[] resolvePassword(
+            String passwordHint)
     throws PasswordResolverException;
 }

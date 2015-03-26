@@ -124,7 +124,9 @@ class ResponseOption
         return certHashAlgo;
     }
 
-    private static boolean getBoolean(Boolean b, boolean dflt)
+    private static boolean getBoolean(
+            final Boolean b,
+            final boolean dflt)
     {
         return b == null ? dflt : b.booleanValue();
     }

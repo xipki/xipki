@@ -62,7 +62,7 @@ public class RSAUtil
     };
 
     public static boolean isRsaOid(
-        ASN1ObjectIdentifier algOid)
+            final ASN1ObjectIdentifier algOid)
     {
         for (int i = 0; i != rsaOids.length; i++)
         {
@@ -76,14 +76,14 @@ public class RSAUtil
     }
 
     static RSAKeyParameters generatePublicKeyParameter(
-        RSAPublicKey key)
+            final RSAPublicKey key)
     {
         return new RSAKeyParameters(false, key.getModulus(), key.getPublicExponent());
 
     }
 
     static RSAKeyParameters generatePrivateKeyParameter(
-        RSAPrivateKey key)
+            final RSAPrivateKey key)
     {
         if (key instanceof RSAPrivateCrtKey)
         {
