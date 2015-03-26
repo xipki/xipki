@@ -79,23 +79,23 @@ public class PCIAuditEvent
     public static final char DEFAULT_DELIMITER = ' ';
     public static final String DEFAULT_REPLACE_DELIMITER = "_";
 
-    public static final String USER_ID           = "userId";
-    public static final String EVENT_TYPE        = "eventType";
-    public static final String DATE              = "date";
-    public static final String TIME              = "time";
-    public static final String STATUS            = "status";
-    public static final String ORIGINATION       = "origination";
+    public static final String USER_ID = "userId";
+    public static final String EVENT_TYPE = "eventType";
+    public static final String DATE = "date";
+    public static final String TIME = "time";
+    public static final String STATUS = "status";
+    public static final String ORIGINATION = "origination";
     public static final String AFFECTED_RESOURCE = "affectedResource";
 
     /**
      * 10.3.1 "User Identification"
      */
-    private String userId           = UNDEFINED;
+    private String userId = UNDEFINED;
 
     /**
      * 10.3.2 "Type of event"
      */
-    private String eventType        = UNDEFINED;
+    private String eventType = UNDEFINED;
 
     /**
      * 10.3.3 "Date and time" (date)
@@ -110,12 +110,12 @@ public class PCIAuditEvent
     /**
      * 10.3.4 "Success or failure indication"
      */
-    private String status           = UNDEFINED;
+    private String status = UNDEFINED;
 
     /**
      * 10.3.5 "Origination of Event"
      */
-    private String origination      = null;
+    private String origination = null;
 
     /**
      * 10.3.6 "Identity or name of affected data, system component, or resource"
@@ -127,7 +127,8 @@ public class PCIAuditEvent
      */
     private AuditLevel level;
 
-    public PCIAuditEvent(Date date)
+    public PCIAuditEvent(
+            final Date date)
     {
         this.date = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(date);
         this.time = new SimpleDateFormat(DEFAULT_TIME_FORMAT).format(date);
@@ -139,7 +140,8 @@ public class PCIAuditEvent
         return level;
     }
 
-    public void setLevel(AuditLevel level)
+    public void setLevel(
+            final AuditLevel level)
     {
         this.level = level;
     }
@@ -154,7 +156,8 @@ public class PCIAuditEvent
         return this.userId;
     }
 
-    public void setUserId(String userId)
+    public void setUserId(
+            final String userId)
     {
         this.userId = userId;
     }
@@ -169,7 +172,8 @@ public class PCIAuditEvent
         return this.eventType;
     }
 
-    public void setEventType(String eventType)
+    public void setEventType(
+            final String eventType)
     {
         this.eventType = eventType;
     }
@@ -194,7 +198,8 @@ public class PCIAuditEvent
         return this.status;
     }
 
-    public void setStatus(String status)
+    public void setStatus(
+            final String status)
     {
         this.status = status;
     }
@@ -209,7 +214,8 @@ public class PCIAuditEvent
         return origination;
     }
 
-    public void setOrigination(String origination)
+    public void setOrigination(
+            final String origination)
     {
         this.origination = origination;
     }
@@ -224,7 +230,8 @@ public class PCIAuditEvent
         return this.affectedResource;
     }
 
-    public void setAffectedResource(String affectedResource)
+    public void setAffectedResource(
+            final String affectedResource)
     {
         this.affectedResource = affectedResource;
     }
@@ -253,7 +260,8 @@ public class PCIAuditEvent
         return buffer.toString();
     }
 
-    public static boolean isBlank(CharSequence cs)
+    public static boolean isBlank(
+            final CharSequence cs)
     {
         int strLen;
         if (cs == null || (strLen = cs.length()) == 0)
@@ -270,8 +278,10 @@ public class PCIAuditEvent
         return true;
     }
 
-    private String replaceDelimiter(String fieldValue,
-            char delimiter, String replaceDelimiter)
+    private String replaceDelimiter(
+            final String fieldValue,
+            final char delimiter,
+            final String replaceDelimiter)
     {
         if (replaceDelimiter == null || replaceDelimiter.length() < 1 ||
                 fieldValue == null || fieldValue.length() < 1)
