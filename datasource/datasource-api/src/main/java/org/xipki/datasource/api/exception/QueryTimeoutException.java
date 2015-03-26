@@ -55,7 +55,8 @@ public class QueryTimeoutException extends TransientDataAccessException
      * Constructor for QueryTimeoutException.
      * @param msg the detail message
      */
-    public QueryTimeoutException(String msg)
+    public QueryTimeoutException(
+            final String msg)
     {
         super(msg);
     }
@@ -65,7 +66,9 @@ public class QueryTimeoutException extends TransientDataAccessException
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public QueryTimeoutException(String msg, Throwable cause)
+    public QueryTimeoutException(
+            final String msg,
+            final Throwable cause)
     {
         super(msg, cause);
     }
