@@ -41,18 +41,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.xipki.ca.api.profile.CertValidity;
+import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
-import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
+import org.xipki.ca.server.mgmt.api.ChangeCAEntry;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.ca.server.mgmt.api.DuplicationMode;
-import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
-import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.CRLReason;
@@ -110,17 +107,12 @@ public interface HessianCAManager
 
     Set<String> getCaNames();
 
-    boolean addCA(X509CAEntry newCaDbEntry)
+    boolean addCA(CAEntry newCaDbEntry)
     throws HessianCAMgmtException;
 
     X509CAEntry getCA(String caName);
 
-    boolean changeCA(String name, CAStatus status, X509Certificate cert,
-            Set<String> crl_uris, Set<String> delta_crl_uris, Set<String> ocsp_uris,
-            CertValidity max_validity, String signer_type, String signer_conf,
-            String crlsigner_name, String cmpcontrol_name, DuplicationMode duplicate_key,
-            DuplicationMode duplicate_subject, Set<Permission> permissions,
-            Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
+    boolean changeCA(ChangeCAEntry changeCAEntry)
     throws HessianCAMgmtException;
 
     boolean removeCertprofileFromCA(String profileName, String caName)

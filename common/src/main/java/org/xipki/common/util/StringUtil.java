@@ -107,6 +107,11 @@ public class StringUtil
 
     public static String collectionAsString(Collection<String> set, String delim)
     {
+        if(set == null)
+        {
+            return null;
+        }
+
         StringBuilder sb = new StringBuilder();
         for(String m : set)
         {
