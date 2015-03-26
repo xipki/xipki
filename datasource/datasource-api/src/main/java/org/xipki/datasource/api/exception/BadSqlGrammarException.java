@@ -62,7 +62,9 @@ public class BadSqlGrammarException extends InvalidDataAccessResourceUsageExcept
      * @param sql the offending SQL statement
      * @param ex the root cause
      */
-    public BadSqlGrammarException( String sql, SQLException ex)
+    public BadSqlGrammarException(
+            final String sql,
+            final SQLException ex)
     {
         super("bad SQL grammar [" + sql + "]", ex);
         this.sql = sql;
