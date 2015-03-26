@@ -101,6 +101,7 @@ import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
@@ -1790,14 +1791,17 @@ implements CAManager, CmpResponderManager
 
     @Override
     public boolean changeCrlSigner(
-            final String name,
-            final String signer_type,
-            final String signer_conf,
-            final String signer_cert,
-            final String crlControl)
+            final X509ChangeCrlSignerEntry dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
+
+        String name = dbEntry.getName();
+        String signer_type = dbEntry.getSignerType();
+        String signer_conf = dbEntry.getSignerConf();
+        String signer_cert = dbEntry.getBase64Cert();
+        String crlControl = dbEntry.getCrlControl();
+
         X509CrlSignerEntryWrapper crlSigner = queryExecutor.changeCrlSigner(
                 name, signer_type, signer_conf, signer_cert, crlControl, this);
         if(crlSigner == null)

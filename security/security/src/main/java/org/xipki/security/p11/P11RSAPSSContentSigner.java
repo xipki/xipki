@@ -136,21 +136,26 @@ public class P11RSAPSSContentSigner implements ContentSigner
     {
 
         @Override
-        public void write(int b)
+        public void write(
+                final int b)
         throws IOException
         {
             pssSigner.update((byte) b);
         }
 
         @Override
-        public void write(byte[] b)
+        public void write(
+                final byte[] b)
         throws IOException
         {
             pssSigner.update(b, 0, b.length);
         }
 
         @Override
-        public void write(final byte[] b, final int off, final int len)
+        public void write(
+                final byte[] b,
+                final int off,
+                final int len)
         throws IOException
         {
             pssSigner.update(b, off, len);
