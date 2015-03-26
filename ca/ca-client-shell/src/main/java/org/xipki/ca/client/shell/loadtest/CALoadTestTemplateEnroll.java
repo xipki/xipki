@@ -92,6 +92,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
     {
         private final String certprofile;
         private final CertRequest certRequest;
+
         public CertRequestWithProfile(
                 final String certprofile,
                 final CertRequest certRequest)

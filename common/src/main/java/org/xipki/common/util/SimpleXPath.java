@@ -177,7 +177,9 @@ public class SimpleXPath
          * @param nsPrefixURIMap Prefix and URI map of namespace. Set it to null if
          *        namespace will not be evaluated.
          */
-        SimpleXPathStep(String step, final Map<String, String> nsPrefixURIMap)
+        SimpleXPathStep(
+                String step,
+                final Map<String, String> nsPrefixURIMap)
         throws XPathExpressionException
         {
             if(step.charAt(0) == '@')

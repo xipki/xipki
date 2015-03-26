@@ -74,7 +74,8 @@ public abstract class KeyEntry
     {
         private final BigInteger baseN;
 
-        public RSAKeyEntry(final int keysize)
+        public RSAKeyEntry(
+                final int keysize)
         throws Exception
         {
             if(keysize % 1024 != 0)
@@ -92,7 +93,8 @@ public abstract class KeyEntry
         }
 
         @Override
-        public SubjectPublicKeyInfo getSubjectPublicKeyInfo(final long index)
+        public SubjectPublicKeyInfo getSubjectPublicKeyInfo(
+                final long index)
         {
             BigInteger modulus = baseN.add(BigInteger.valueOf(index));
 
@@ -197,7 +199,8 @@ public abstract class KeyEntry
         private AlgorithmIdentifier algId;
         private BigInteger baseY;
 
-        public DSAKeyEntry(final int pLength)
+        public DSAKeyEntry(
+                final int pLength)
         throws Exception
         {
             if(pLength == 1024)
@@ -287,7 +290,8 @@ public abstract class KeyEntry
         private final AlgorithmIdentifier algId;
         private final BigInteger basePublicKey;
 
-        public ECKeyEntry(final String curveNameOrOid)
+        public ECKeyEntry(
+                final String curveNameOrOid)
         throws Exception
         {
             boolean isOid;
