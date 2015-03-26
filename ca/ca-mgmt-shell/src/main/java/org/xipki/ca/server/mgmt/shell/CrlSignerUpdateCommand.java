@@ -41,6 +41,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.api.CAManager;
+import org.xipki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.SecurityUtil;
 
@@ -89,7 +90,13 @@ public class CrlSignerUpdateCommand extends CaCommand
             signerCertConf = Base64.toBase64String(certBytes);
         }
 
-        boolean b = caManager.changeCrlSigner(name, signerType, signerConf, signerCertConf, crlControl);
+        X509ChangeCrlSignerEntry dbEntry = new X509ChangeCrlSignerEntry(name);
+        dbEntry.setSignerType(signerType);
+        dbEntry.setSignerConf(signerConf);
+        dbEntry.setCrlControl(crlControl);
+        dbEntry.setBase64Cert(signerCertConf);
+
+        boolean b = caManager.changeCrlSigner(dbEntry);
         output(b, "updated", "could not update", "CRL signer " + name);
         return null;
     }

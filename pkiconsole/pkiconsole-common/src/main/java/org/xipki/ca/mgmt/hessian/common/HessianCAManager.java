@@ -51,6 +51,7 @@ import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
@@ -221,11 +222,7 @@ public interface HessianCAManager
     throws HessianCAMgmtException;
 
     boolean changeCrlSigner(
-            String name,
-            String signer_type,
-            String signer_conf,
-            String signer_cert,
-            String crlControl)
+            X509ChangeCrlSignerEntry dbEntry)
     throws HessianCAMgmtException;
 
     X509CrlSignerEntry getCrlSigner(

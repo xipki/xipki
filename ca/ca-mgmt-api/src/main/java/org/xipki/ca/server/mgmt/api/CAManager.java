@@ -165,8 +165,7 @@ public interface CAManager
     boolean removeCrlSigner(String crlSignerName)
     throws CAMgmtException;
 
-    boolean changeCrlSigner(String name, String signer_type, String signer_conf, String signer_cert,
-            String crlControl)
+    boolean changeCrlSigner(X509ChangeCrlSignerEntry dbEntry)
     throws CAMgmtException;
 
     X509CrlSignerEntry getCrlSigner(String name);
