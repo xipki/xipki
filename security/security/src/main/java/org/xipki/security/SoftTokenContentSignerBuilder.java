@@ -341,7 +341,7 @@ public class SoftTokenContentSignerBuilder
     private static class RSAContentSignerBuilder extends BcContentSignerBuilder
     {
         private RSAContentSignerBuilder(
-                AlgorithmIdentifier signatureAlgId)
+                final AlgorithmIdentifier signatureAlgId)
         throws NoSuchAlgorithmException, NoSuchPaddingException
         {
             super(signatureAlgId, SecurityUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
@@ -407,13 +407,16 @@ public class SoftTokenContentSignerBuilder
 
     private static class ECDSAContentSignerBuilder extends BcContentSignerBuilder
     {
-        private ECDSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId)
+        private ECDSAContentSignerBuilder(
+                final AlgorithmIdentifier signatureAlgId)
         throws NoSuchAlgorithmException
         {
             super(signatureAlgId, SecurityUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
         }
 
-        protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
+        protected Signer createSigner(
+                final AlgorithmIdentifier sigAlgId,
+                final AlgorithmIdentifier digAlgId)
         throws OperatorCreationException
         {
             Digest dig = digestProvider.get(digAlgId);

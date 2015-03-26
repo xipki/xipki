@@ -169,7 +169,7 @@ public class BCRSAPrivateKey
 
     private void readObject(
             final ObjectInputStream in)
-        throws IOException, ClassNotFoundException
+    throws IOException, ClassNotFoundException
     {
         in.defaultReadObject();
 
@@ -178,7 +178,7 @@ public class BCRSAPrivateKey
 
     private void writeObject(
             final ObjectOutputStream out)
-        throws IOException
+    throws IOException
     {
         out.defaultWriteObject();
     }

@@ -76,7 +76,8 @@ public class XipkiProvider extends Provider
     private static class MyPrivilegedAction implements PrivilegedAction
     {
         private final XipkiProvider provider;
-        MyPrivilegedAction(XipkiProvider provider)
+        MyPrivilegedAction(
+                final XipkiProvider provider)
         {
             this.provider = provider;
         }
