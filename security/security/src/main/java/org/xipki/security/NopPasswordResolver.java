@@ -51,7 +51,8 @@ public class NopPasswordResolver implements PasswordResolver
     {
     }
 
-    public char[] resolvePassword(String passwordHint)
+    public char[] resolvePassword(
+            final String passwordHint)
     throws PasswordResolverException
     {
         return passwordHint.toCharArray();

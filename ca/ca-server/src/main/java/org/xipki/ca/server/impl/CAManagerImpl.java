@@ -355,7 +355,8 @@ implements CAManager, CmpResponderManager
         return securityFactory;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory)
+    public void setSecurityFactory(
+            final SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;
     }
@@ -365,7 +366,8 @@ implements CAManager, CmpResponderManager
         return dataSourceFactory;
     }
 
-    public void setDataSourceFactory(DataSourceFactory dataSourceFactory)
+    public void setDataSourceFactory(
+            final DataSourceFactory dataSourceFactory)
     {
         this.dataSourceFactory = dataSourceFactory;
     }
@@ -759,7 +761,8 @@ implements CAManager, CmpResponderManager
         return true;
     }
 
-    private boolean startCA(String caName)
+    private boolean startCA(
+            final String caName)
     {
         X509CAInfo caEntry = caInfos.get(caName);
         boolean signerRequired = caEntry.isSignerRequired();
@@ -878,10 +881,10 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public X509CACmpResponder getX509CACmpResponder(String caName)
+    public X509CACmpResponder getX509CACmpResponder(
+            final String caName)
     {
-        caName = caName.toUpperCase();
-        return responders.get(caName);
+        return responders.get(caName.toUpperCase());
     }
 
     public ScheduledThreadPoolExecutor getScheduledThreadPoolExecutor()
@@ -1188,7 +1191,8 @@ implements CAManager, CmpResponderManager
         cAsInitialized = true;
     }
 
-    private boolean createCA(String name)
+    private boolean createCA(
+            final String name)
     throws CAMgmtException
     {
         caInfos.remove(name);
@@ -1237,7 +1241,8 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean addCA(CAEntry newCaDbEntry)
+    public boolean addCA(
+            final CAEntry newCaDbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1255,15 +1260,16 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public X509CAEntry getCA(String caName)
+    public X509CAEntry getCA(
+            final String caName)
     {
-        caName = caName.toUpperCase();
-        X509CAInfo caInfo = caInfos.get(caName);
+        X509CAInfo caInfo = caInfos.get(caName.toUpperCase());
         return caInfo == null ? null : caInfo.getCaEntry();
     }
 
     @Override
-    public boolean changeCA(ChangeCAEntry entry)
+    public boolean changeCA(
+            final ChangeCAEntry entry)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1284,7 +1290,9 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean removeCertprofileFromCA(String profileName, String caName)
+    public boolean removeCertprofileFromCA(
+            final String profileName,
+            String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1298,7 +1306,9 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean addCertprofileToCA(String profileName, String caName)
+    public boolean addCertprofileToCA(
+            final String profileName,
+            String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1329,7 +1339,9 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean removePublisherFromCA(String publisherName, String caName)
+    public boolean removePublisherFromCA(
+            final String publisherName,
+            String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1349,7 +1361,9 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean addPublisherToCA(String publisherName, String caName)
+    public boolean addPublisherToCA(
+            final String publisherName,
+            String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1383,32 +1397,35 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public Set<String> getCertprofilesForCA(String caName)
+    public Set<String> getCertprofilesForCA(
+            final String caName)
     {
-        caName = caName.toUpperCase();
-        return ca_has_profiles.get(caName);
+        return ca_has_profiles.get(caName.toUpperCase());
     }
 
     @Override
-    public Set<CAHasRequestorEntry> getCmpRequestorsForCA(String caName)
+    public Set<CAHasRequestorEntry> getCmpRequestorsForCA(
+            final String caName)
     {
-        caName = caName.toUpperCase();
-        return ca_has_requestors.get(caName);
+        return ca_has_requestors.get(caName.toUpperCase());
     }
 
     @Override
-    public CmpRequestorEntry getCmpRequestor(String name)
+    public CmpRequestorEntry getCmpRequestor(
+            final String name)
     {
         return requestorDbEntries.get(name);
     }
 
-    public CmpRequestorEntryWrapper getCmpRequestorWrapper(String name)
+    public CmpRequestorEntryWrapper getCmpRequestorWrapper(
+            final String name)
     {
         return requestors.get(name);
     }
 
     @Override
-    public boolean addCmpRequestor(CmpRequestorEntry dbEntry)
+    public boolean addCmpRequestor(
+            final CmpRequestorEntry dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1444,7 +1461,8 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean removeCmpRequestor(String requestorName)
+    public boolean removeCmpRequestor(
+            final String requestorName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1466,7 +1484,9 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean changeCmpRequestor(String name, String base64Cert)
+    public boolean changeCmpRequestor(
+            final String name,
+            final String base64Cert)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1490,7 +1510,9 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean removeCmpRequestorFromCA(String requestorName, String caName)
+    public boolean removeCmpRequestorFromCA(
+            final String requestorName,
+            String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1504,7 +1526,9 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean addCmpRequestorToCA(CAHasRequestorEntry requestor, String caName)
+    public boolean addCmpRequestorToCA(
+            final CAHasRequestorEntry requestor,
+            String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1542,13 +1566,15 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public CertprofileEntry getCertprofile(String profileName)
+    public CertprofileEntry getCertprofile(
+            final String profileName)
     {
         return certprofileDbEntries.get(profileName);
     }
 
     @Override
-    public boolean removeCertprofile(String profileName)
+    public boolean removeCertprofile(
+            final String profileName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1571,7 +1597,10 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean changeCertprofile(String name, String type, String conf)
+    public boolean changeCertprofile(
+            final String name,
+            final String type,
+            final String conf)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1600,7 +1629,8 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean addCertprofile(CertprofileEntry dbEntry)
+    public boolean addCertprofile(
+            final CertprofileEntry dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1640,7 +1670,8 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean setCmpResponder(CmpResponderEntry dbEntry)
+    public boolean setCmpResponder(
+            final CmpResponderEntry dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1676,7 +1707,10 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean changeCmpResponder(String type, String conf, String base64Cert)
+    public boolean changeCmpResponder(
+            final String type,
+            final String conf,
+            final String base64Cert)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1710,7 +1744,8 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean addCrlSigner(X509CrlSignerEntry dbEntry)
+    public boolean addCrlSigner(
+            final X509CrlSignerEntry dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1728,7 +1763,8 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean removeCrlSigner(String crlSignerName)
+    public boolean removeCrlSigner(
+            final String crlSignerName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1753,8 +1789,12 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean changeCrlSigner(String name, String signer_type, String signer_conf, String signer_cert,
-            String crlControl)
+    public boolean changeCrlSigner(
+            final String name,
+            final String signer_type,
+            final String signer_conf,
+            final String signer_cert,
+            final String crlControl)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1773,18 +1813,21 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public X509CrlSignerEntry getCrlSigner(String name)
+    public X509CrlSignerEntry getCrlSigner(
+            final String name)
     {
         return crlSignerDbEntries.get(name);
     }
 
-    public X509CrlSignerEntryWrapper getCrlSignerWrapper(String name)
+    public X509CrlSignerEntryWrapper getCrlSignerWrapper(
+            final String name)
     {
         return crlSigners.get(name);
     }
 
     @Override
-    public boolean addPublisher(PublisherEntry dbEntry)
+    public boolean addPublisher(
+            final PublisherEntry dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1824,11 +1867,11 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public List<PublisherEntry> getPublishersForCA(String caName)
+    public List<PublisherEntry> getPublishersForCA(
+            final String caName)
     {
         ParamChecker.assertNotEmpty("caName", caName);
-        caName = caName.toUpperCase();
-        Set<String> publisherNames = ca_has_publishers.get(caName);
+        Set<String> publisherNames = ca_has_publishers.get(caName.toUpperCase());
         if(publisherNames == null)
         {
             return Collections.emptyList();
@@ -1844,13 +1887,15 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public PublisherEntry getPublisher(String publisherName)
+    public PublisherEntry getPublisher(
+            final String publisherName)
     {
         return publisherDbEntries.get(publisherName);
     }
 
     @Override
-    public boolean removePublisher(String publisherName)
+    public boolean removePublisher(
+            final String publisherName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1873,7 +1918,10 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean changePublisher(String name, String type, String conf)
+    public boolean changePublisher(
+            final String name,
+            final String type,
+            final String conf)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1896,18 +1944,21 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public CmpControlEntry getCmpControl(String name)
+    public CmpControlEntry getCmpControl(
+            final String name)
     {
         return cmpControlDbEntries.get(name);
     }
 
-    public CmpControl getCmpControlObject(String name)
+    public CmpControl getCmpControlObject(
+            final String name)
     {
         return cmpControls.get(name);
     }
 
     @Override
-    public boolean addCmpControl(CmpControlEntry dbEntry)
+    public boolean addCmpControl(
+            final CmpControlEntry dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1926,7 +1977,8 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean removeCmpControl(String name)
+    public boolean removeCmpControl(
+            final String name)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1952,7 +2004,9 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean changeCmpControl(String name, String conf)
+    public boolean changeCmpControl(
+            final String name,
+            final String conf)
     throws CAMgmtException
     {
         ParamChecker.assertNotEmpty("name", name);
@@ -1982,13 +2036,16 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public String getEnvParam(String name)
+    public String getEnvParam(
+            final String name)
     {
         return envParameterResolver.getEnvParam(name);
     }
 
     @Override
-    public boolean addEnvParam(String name, String value)
+    public boolean addEnvParam(
+            final String name,
+            final String value)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -2002,7 +2059,8 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean removeEnvParam(String envParamName)
+    public boolean removeEnvParam(
+            final String envParamName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -2018,7 +2076,9 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean changeEnvParam(String name, String value)
+    public boolean changeEnvParam(
+            final String name,
+            final String value)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -2045,13 +2105,16 @@ implements CAManager, CmpResponderManager
         return caConfFile;
     }
 
-    public void setCaConfFile(String caConfFile)
+    public void setCaConfFile(
+            final String caConfFile)
     {
         this.caConfFile = caConfFile;
     }
 
     @Override
-    public boolean addCaAlias(String aliasName, String caName)
+    public boolean addCaAlias(
+            final String aliasName,
+            String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -2067,7 +2130,8 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean removeCaAlias(String aliasName)
+    public boolean removeCaAlias(
+            final String aliasName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -2082,13 +2146,15 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public String getCaName(String aliasName)
+    public String getCaName(
+            final String aliasName)
     {
         return caAliases.get(aliasName);
     }
 
     @Override
-    public String getAliasName(String caName)
+    public String getAliasName(
+            String caName)
     {
         caName = caName.toUpperCase();
         for(String alias : caAliases.keySet())
@@ -2110,7 +2176,8 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean removeCA(String caName)
+    public boolean removeCA(
+            String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -2162,7 +2229,9 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean publishRootCA(String caName, String certprofile)
+    public boolean publishRootCA(
+            String caName,
+            final String certprofile)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -2196,7 +2265,9 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean republishCertificates(String caName, List<String> publisherNames)
+    public boolean republishCertificates(
+            String caName,
+            final List<String> publisherNames)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -2232,7 +2303,9 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean revokeCa(String caName, CertRevocationInfo revocationInfo)
+    public boolean revokeCa(
+            String caName,
+            final CertRevocationInfo revocationInfo)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -2277,7 +2350,8 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean unrevokeCa(String caName)
+    public boolean unrevokeCa(
+            String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -2310,7 +2384,8 @@ implements CAManager, CmpResponderManager
         return true;
     }
 
-    public void setAuditServiceRegister(AuditLoggingServiceRegister serviceRegister)
+    public void setAuditServiceRegister(
+            final AuditLoggingServiceRegister serviceRegister)
     {
         this.auditServiceRegister = serviceRegister;
 
@@ -2327,7 +2402,9 @@ implements CAManager, CmpResponderManager
         }
     }
 
-    private void auditLogPCIEvent(boolean successfull, String eventType)
+    private void auditLogPCIEvent(
+            final boolean successfull,
+            final String eventType)
     {
         AuditLoggingService auditLoggingService =
                 auditServiceRegister == null ? null : auditServiceRegister.getAuditLoggingService();
@@ -2354,7 +2431,9 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean clearPublishQueue(String caName, List<String> publisherNames)
+    public boolean clearPublishQueue(
+            String caName,
+            final List<String> publisherNames)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -2401,8 +2480,11 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean revokeCertificate(String caName, BigInteger serialNumber,
-            CRLReason reason, Date invalidityTime)
+    public boolean revokeCertificate(
+            final String caName,
+            final BigInteger serialNumber,
+            final CRLReason reason,
+            final Date invalidityTime)
     throws CAMgmtException
     {
         X509CA ca = getX509CA(caName);
@@ -2416,7 +2498,9 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean unrevokeCertificate(String caName, BigInteger serialNumber)
+    public boolean unrevokeCertificate(
+            final String caName,
+            final BigInteger serialNumber)
     throws CAMgmtException
     {
         X509CA ca = getX509CA(caName);
@@ -2430,7 +2514,9 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean removeCertificate(String caName, BigInteger serialNumber)
+    public boolean removeCertificate(
+            final String caName,
+            final BigInteger serialNumber)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -2450,8 +2536,11 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public X509Certificate generateCertificate(String caName,
-            String profileName, String user, byte[] encodedPkcs10Request)
+    public X509Certificate generateCertificate(
+            final String caName,
+            final String profileName,
+            final String user,
+            final byte[] encodedPkcs10Request)
     throws CAMgmtException
     {
         X509CA ca = getX509CA(caName);
@@ -2498,7 +2587,8 @@ implements CAManager, CmpResponderManager
         return certInfo.getCert().getCert();
     }
 
-    public X509CA getX509CA(String caName)
+    public X509CA getX509CA(
+            final String caName)
     throws CAMgmtException
     {
         X509CA ca = x509cas.get(caName.toUpperCase());
@@ -2509,12 +2599,14 @@ implements CAManager, CmpResponderManager
         return ca;
     }
 
-    public IdentifiedX509Certprofile getIdentifiedCertprofile(String profileName)
+    public IdentifiedX509Certprofile getIdentifiedCertprofile(
+            final String profileName)
     {
         return certprofiles.get(profileName);
     }
 
-    public List<IdentifiedX509CertPublisher> getIdentifiedPublishersForCa(String caName)
+    public List<IdentifiedX509CertPublisher> getIdentifiedPublishersForCa(
+            String caName)
     {
         caName = caName.toUpperCase();
         List<IdentifiedX509CertPublisher> ret = new LinkedList<>();
@@ -2534,7 +2626,9 @@ implements CAManager, CmpResponderManager
 
     @Override
     public X509Certificate generateRootCA(
-            X509CAEntry caEntry, String certprofileName, byte[] p10Req)
+            final X509CAEntry caEntry,
+            final String certprofileName,
+            final byte[] p10Req)
     throws CAMgmtException
     {
         String name = caEntry.getName();
@@ -2665,7 +2759,9 @@ implements CAManager, CmpResponderManager
         }
     }
 
-    private static void assertNotNULL(String parameterName, String parameterValue)
+    private static void assertNotNULL(
+            final String parameterName,
+            final String parameterValue)
     {
         if(CAManager.NULL.equalsIgnoreCase(parameterValue))
         {
@@ -2673,8 +2769,10 @@ implements CAManager, CmpResponderManager
         }
     }
 
-    private static String canonicalizeSignerConf(String keystoreType, String signerConf,
-            PasswordResolver passwordResolver)
+    private static String canonicalizeSignerConf(
+            final String keystoreType,
+            final String signerConf,
+            final PasswordResolver passwordResolver)
     throws Exception
     {
         if(signerConf.contains("file:") == false && signerConf.contains("base64:") == false )
@@ -2710,7 +2808,8 @@ implements CAManager, CmpResponderManager
         return utf8Pairs.getEncoded();
     }
 
-    void shutdownCertprofile(IdentifiedX509Certprofile profile)
+    void shutdownCertprofile(
+            final IdentifiedX509Certprofile profile)
     {
         if(profile == null)
         {
@@ -2731,7 +2830,8 @@ implements CAManager, CmpResponderManager
         }
     }
 
-    void shutdownPublisher(IdentifiedX509CertPublisher publisher)
+    void shutdownPublisher(
+            final IdentifiedX509CertPublisher publisher)
     {
         if(publisher == null)
         {
@@ -2752,7 +2852,8 @@ implements CAManager, CmpResponderManager
         }
     }
 
-    CmpResponderEntryWrapper createCmpResponder(CmpResponderEntry dbEntry)
+    CmpResponderEntryWrapper createCmpResponder(
+            final CmpResponderEntry dbEntry)
     throws CAMgmtException
     {
         CmpResponderEntryWrapper ret = new CmpResponderEntryWrapper();
@@ -2769,7 +2870,8 @@ implements CAManager, CmpResponderManager
         return ret;
     }
 
-    X509CrlSignerEntryWrapper createX509CrlSigner(X509CrlSignerEntry dbEntry)
+    X509CrlSignerEntryWrapper createX509CrlSigner(
+            final X509CrlSignerEntry dbEntry)
     throws CAMgmtException
     {
         X509CrlSignerEntryWrapper signer = new X509CrlSignerEntryWrapper();
@@ -2783,7 +2885,8 @@ implements CAManager, CmpResponderManager
         return signer;
     }
 
-    IdentifiedX509Certprofile createCertprofile(CertprofileEntry dbEntry)
+    IdentifiedX509Certprofile createCertprofile(
+            final CertprofileEntry dbEntry)
     {
         try
         {
@@ -2804,7 +2907,8 @@ implements CAManager, CmpResponderManager
         }
     }
 
-    IdentifiedX509CertPublisher createPublisher(PublisherEntry dbEntry)
+    IdentifiedX509CertPublisher createPublisher(
+            final PublisherEntry dbEntry)
     throws CAMgmtException
     {
         String name = dbEntry.getName();
@@ -2829,17 +2933,21 @@ implements CAManager, CmpResponderManager
         }
     }
 
-    private String getRealCertprofileType(String certprofileType)
+    private String getRealCertprofileType(
+            final String certprofileType)
     {
         return getRealType(envParameterResolver.getParameterValue("certprofileType.map"), certprofileType);
     }
 
-    private String getRealPublisherType(String publisherType)
+    private String getRealPublisherType(
+            final String publisherType)
     {
         return getRealType(envParameterResolver.getParameterValue("publisherType.map"), publisherType);
     }
 
-    private static String getRealType(String typeMap, String type)
+    private static String getRealType(
+            String typeMap,
+            final String type)
     {
         if(typeMap == null)
         {

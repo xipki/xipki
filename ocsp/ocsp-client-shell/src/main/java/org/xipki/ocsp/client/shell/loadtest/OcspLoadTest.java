@@ -81,8 +81,12 @@ public class OcspLoadTest extends AbstractLoadTest
         return new Testor();
     }
 
-    public OcspLoadTest(OCSPRequestor requestor, List<Long> serials,
-            X509Certificate caCert, URL serverUrl, RequestOptions options)
+    public OcspLoadTest(
+            final OCSPRequestor requestor,
+            final List<Long> serials,
+            final X509Certificate caCert,
+            final URL serverUrl,
+            final RequestOptions options)
     {
         ParamChecker.assertNotNull("requestor", requestor);
         ParamChecker.assertNotEmpty("serials", serials);
@@ -123,7 +127,8 @@ public class OcspLoadTest extends AbstractLoadTest
             }
         }
 
-        private boolean testNext(long sn)
+        private boolean testNext(
+                final long sn)
         {
             BasicOCSPResp basicResp;
             try

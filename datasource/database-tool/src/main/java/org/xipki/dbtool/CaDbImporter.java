@@ -94,8 +94,11 @@ public class CaDbImporter
     private final Unmarshaller unmarshaller;
     protected final boolean resume;
 
-    public CaDbImporter(DataSourceFactory dataSourceFactory,
-            PasswordResolver passwordResolver, String dbConfFile, boolean resume)
+    public CaDbImporter(
+            final DataSourceFactory dataSourceFactory,
+            final PasswordResolver passwordResolver,
+            final String dbConfFile,
+            final boolean resume)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
@@ -107,7 +110,8 @@ public class CaDbImporter
         this.resume = resume;
     }
 
-    public void importDatabase(String srcFolder)
+    public void importDatabase(
+            final String srcFolder)
     throws Exception
     {
         File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);

@@ -85,7 +85,9 @@ public class Rfc6712Servlet extends HttpServlet
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
+    public void doPost(
+            final HttpServletRequest request,
+            final HttpServletResponse response)
     throws ServletException, IOException
     {
         X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
@@ -246,7 +248,8 @@ public class Rfc6712Servlet extends HttpServlet
         }
     }
 
-    protected PKIMessage generatePKIMessage(InputStream is)
+    protected PKIMessage generatePKIMessage(
+            final InputStream is)
     throws IOException
     {
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
@@ -263,18 +266,24 @@ public class Rfc6712Servlet extends HttpServlet
         }
     }
 
-    public void setResponderManager(CmpResponderManager responderManager)
+    public void setResponderManager(
+            final CmpResponderManager responderManager)
     {
         this.responderManager = responderManager;
     }
 
-    public void setAuditServiceRegister(AuditLoggingServiceRegister auditServiceRegister)
+    public void setAuditServiceRegister(
+            final AuditLoggingServiceRegister auditServiceRegister)
     {
         this.auditServiceRegister = auditServiceRegister;
     }
 
-    private static void audit(AuditLoggingService auditLoggingService,
-            AuditEvent auditEvent, AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage)
+    private static void audit(
+            final AuditLoggingService auditLoggingService,
+            final AuditEvent auditEvent,
+            final AuditLevel auditLevel,
+            final AuditStatus auditStatus,
+            final String auditMessage)
     {
         if(auditLevel != null)
         {

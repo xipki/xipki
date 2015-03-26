@@ -149,7 +149,9 @@ class IdentifiedX509Certprofile
     private final X509Certprofile certprofile;
     private EnvironmentParameterResolver parameterResolver;
 
-    public IdentifiedX509Certprofile(CertprofileEntry dbEntry, String realType)
+    public IdentifiedX509Certprofile(
+            final CertprofileEntry dbEntry,
+            final String realType)
     throws CertprofileException
     {
         ParamChecker.assertNotNull("entry", dbEntry);
@@ -240,7 +242,8 @@ class IdentifiedX509Certprofile
         return certprofile.getSpecialCertprofileBehavior();
     }
 
-    public void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver)
+    public void setEnvironmentParameterResolver(
+            final EnvironmentParameterResolver parameterResolver)
     {
         this.parameterResolver = parameterResolver;
         if(certprofile != null)
@@ -249,7 +252,8 @@ class IdentifiedX509Certprofile
         }
     }
 
-    public Date getNotBefore(Date notBefore)
+    public Date getNotBefore(
+            final Date notBefore)
     {
         return certprofile.getNotBefore(notBefore);
     }
@@ -269,16 +273,19 @@ class IdentifiedX509Certprofile
         return certprofile.getTimezone();
     }
 
-    public SubjectInfo getSubject(X500Name requestedSubject)
+    public SubjectInfo getSubject(
+            final X500Name requestedSubject)
     throws CertprofileException, BadCertTemplateException
     {
         return certprofile.getSubject(requestedSubject);
     }
 
     public ExtensionValues getExtensions(
-            X500Name requestedSubject, Extensions requestExtensions,
-            SubjectPublicKeyInfo publicKeyInfo,
-            PublicCAInfo publicCaInfo, X509Certificate crlSignerCert)
+            final X500Name requestedSubject,
+            final Extensions requestExtensions,
+            final SubjectPublicKeyInfo publicKeyInfo,
+            final PublicCAInfo publicCaInfo,
+            final X509Certificate crlSignerCert)
     throws CertprofileException, BadCertTemplateException
     {
         ExtensionValues values = new ExtensionValues();
@@ -581,9 +588,13 @@ class IdentifiedX509Certprofile
         return values;
     }
 
-    private static void addExtension(ExtensionValues values, ASN1ObjectIdentifier extType,
-            ExtensionValue extValue, ExtensionControl extControl,
-            Set<ASN1ObjectIdentifier> neededExtensionTypes, Set<ASN1ObjectIdentifier> wantedExtensionTypes)
+    private static void addExtension(
+            final ExtensionValues values,
+            final ASN1ObjectIdentifier extType,
+            final ExtensionValue extValue,
+            final ExtensionControl extControl,
+            final Set<ASN1ObjectIdentifier> neededExtensionTypes,
+            final Set<ASN1ObjectIdentifier> wantedExtensionTypes)
     throws CertprofileException
     {
         if(extValue != null)
@@ -607,9 +618,13 @@ class IdentifiedX509Certprofile
         throw new CertprofileException("could not add required extension " + description);
     }
 
-    private static void addExtension(ExtensionValues values, ASN1ObjectIdentifier extType,
-            ASN1Encodable extValue, ExtensionControl extControl,
-            Set<ASN1ObjectIdentifier> neededExtensionTypes, Set<ASN1ObjectIdentifier> wantedExtensionTypes)
+    private static void addExtension(
+            final ExtensionValues values,
+            final ASN1ObjectIdentifier extType,
+            final ASN1Encodable extValue,
+            final ExtensionControl extControl,
+            final Set<ASN1ObjectIdentifier> neededExtensionTypes,
+            final Set<ASN1ObjectIdentifier> wantedExtensionTypes)
     throws CertprofileException
     {
         if(extValue != null)
@@ -648,7 +663,8 @@ class IdentifiedX509Certprofile
         return certprofile.isOnlyForQA();
     }
 
-    public SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
+    public SubjectPublicKeyInfo checkPublicKey(
+            final SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException
     {
         return certprofile.checkPublicKey(publicKey);
@@ -672,7 +688,8 @@ class IdentifiedX509Certprofile
         return certprofile.includeIssuerAndSerialInAKI();
     }
 
-    public String incSerialNumber(String currentSerialNumber)
+    public String incSerialNumber(
+            final String currentSerialNumber)
     throws BadFormatException
     {
         return certprofile.incSerialNumber(currentSerialNumber);
@@ -693,7 +710,8 @@ class IdentifiedX509Certprofile
         return certprofile.isSerialNumberInReqPermitted();
     }
 
-    public  String getParameter(String paramName)
+    public  String getParameter(
+            final String paramName)
     {
         return certprofile.getParameter(paramName);
     }
@@ -870,7 +888,8 @@ class IdentifiedX509Certprofile
         }
     }
 
-    private static String toString(Set<ASN1ObjectIdentifier> oids)
+    private static String toString(
+            final Set<ASN1ObjectIdentifier> oids)
     {
         if(oids == null)
         {
@@ -902,7 +921,9 @@ class IdentifiedX509Certprofile
         return sb.toString();
     }
 
-    private static boolean containsKeyusage(Set<KeyUsageControl> usageControls, KeyUsage usage)
+    private static boolean containsKeyusage(
+            final Set<KeyUsageControl> usageControls,
+            final KeyUsage usage)
     {
         for(KeyUsageControl entry : usageControls)
         {
@@ -914,7 +935,9 @@ class IdentifiedX509Certprofile
         return false;
     }
 
-    private static GeneralName createGeneralName(GeneralName reqName, Set<GeneralNameMode> modes)
+    private static GeneralName createGeneralName(
+            final GeneralName reqName,
+            final Set<GeneralNameMode> modes)
     throws BadCertTemplateException
     {
         int tag = reqName.getTagNo();
@@ -1004,9 +1027,11 @@ class IdentifiedX509Certprofile
         }// end switch(tag)
     }
 
-    private static boolean addMe(ASN1ObjectIdentifier extType, ExtensionControl extControl,
-            Set<ASN1ObjectIdentifier> neededExtensionTypes,
-            Set<ASN1ObjectIdentifier> wantedExtensionTypes)
+    private static boolean addMe(
+            final ASN1ObjectIdentifier extType,
+            final ExtensionControl extControl,
+            final Set<ASN1ObjectIdentifier> neededExtensionTypes,
+            final Set<ASN1ObjectIdentifier> wantedExtensionTypes)
     {
         boolean addMe = extControl.isRequired();
         if(addMe == false)
@@ -1019,8 +1044,10 @@ class IdentifiedX509Certprofile
         return addMe;
     }
 
-    private static void addRequestedKeyusage(Set<KeyUsage> usages,
-            Extensions requestExtensions, Set<KeyUsageControl> usageOccs)
+    private static void addRequestedKeyusage(
+            final Set<KeyUsage> usages,
+            final Extensions requestExtensions,
+            final Set<KeyUsageControl> usageOccs)
     {
         Extension extension = requestExtensions.getExtension(Extension.keyUsage);
         if(extension == null)
@@ -1044,8 +1071,10 @@ class IdentifiedX509Certprofile
         }
     }
 
-    private static void addRequestedExtKeyusage(Set<ASN1ObjectIdentifier> usages,
-            Extensions requestExtensions, Set<ExtKeyUsageControl> usageOccs)
+    private static void addRequestedExtKeyusage(
+            final Set<ASN1ObjectIdentifier> usages,
+            final Extensions requestExtensions,
+            final Set<ExtKeyUsageControl> usageOccs)
     {
         Extension extension = requestExtensions.getExtension(Extension.extendedKeyUsage);
         if(extension == null)
@@ -1069,7 +1098,9 @@ class IdentifiedX509Certprofile
         }
     }
 
-    private static GeneralNames createRequestedSubjectAltNames(Extensions requestExtensions, Set<GeneralNameMode> modes)
+    private static GeneralNames createRequestedSubjectAltNames(
+            final Extensions requestExtensions,
+            final Set<GeneralNameMode> modes)
     throws BadCertTemplateException
     {
         ASN1Encodable extValue = requestExtensions.getExtensionParsedValue(Extension.subjectAlternativeName);
@@ -1093,8 +1124,10 @@ class IdentifiedX509Certprofile
         return new GeneralNames(l);
     }
 
-    private static ASN1Sequence createSubjectInfoAccess(Extensions requestExtensions,
-            Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> modes)
+    private static ASN1Sequence createSubjectInfoAccess(
+            final Extensions requestExtensions,
+            final Map<ASN1ObjectIdentifier,
+            Set<GeneralNameMode>> modes)
     throws BadCertTemplateException
     {
         ASN1Encodable extValue = requestExtensions.getExtensionParsedValue(Extension.subjectInfoAccess);

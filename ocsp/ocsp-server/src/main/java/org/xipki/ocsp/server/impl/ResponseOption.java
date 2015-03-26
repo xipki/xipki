@@ -55,7 +55,8 @@ class ResponseOption
     private final HashAlgoType certHashAlgo;
     private final Long cacheMaxAge;
 
-    public ResponseOption(ResponseOptionType conf)
+    public ResponseOption(
+            final ResponseOptionType conf)
     throws ConfigurationException
     {
         this.includeInvalidityDate = getBoolean(conf.isIncludeInvalidityDate(), true);

@@ -58,7 +58,10 @@ public class IssuerEntry
 
     private CertRevocationInfo revocationInfo;
 
-    public IssuerEntry(int id, Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap, Date caNotBefore)
+    public IssuerEntry(
+            final int id,
+            final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap,
+            final Date caNotBefore)
     {
         ParamChecker.assertNotEmpty("issuerHashMap", issuerHashMap);
         ParamChecker.assertNotNull("caNotBefore", caNotBefore);
@@ -73,13 +76,17 @@ public class IssuerEntry
         return id;
     }
 
-    public boolean matchHash(HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash)
+    public boolean matchHash(
+            final HashAlgoType hashAlgo,
+            final byte[] issuerNameHash,
+            final byte[] issuerKeyHash)
     {
         IssuerHashNameAndKey issuerHash = issuerHashMap.get(hashAlgo);
         return issuerHash == null ? false : issuerHash.match(hashAlgo, issuerNameHash, issuerKeyHash);
     }
 
-    public void setRevocationInfo(Date revocationTime)
+    public void setRevocationInfo(
+            final Date revocationTime)
     {
         ParamChecker.assertNotNull("revocationTime", revocationTime);
         this.revocationInfo = new CertRevocationInfo(CRLReason.CA_COMPROMISE, revocationTime, null);

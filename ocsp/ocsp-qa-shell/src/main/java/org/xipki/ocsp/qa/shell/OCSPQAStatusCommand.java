@@ -99,14 +99,17 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
     private Occurrence expectedCerthashOccurrence;
     private Occurrence expectedNonceOccurrence;
 
-    public void setOcspQA(OcspQA ocspQA)
+    public void setOcspQA(
+            final OcspQA ocspQA)
     {
         this.ocspQA = ocspQA;
     }
 
     @Override
-    protected void checkParameters(X509Certificate respIssuer,
-            List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+    protected void checkParameters(
+            final X509Certificate respIssuer,
+            final List<BigInteger> serialNumbers,
+            final Map<BigInteger, byte[]> encodedCerts)
     throws Exception
     {
         if(isBlank(errorText) && isEmpty(statusTexts))
@@ -158,9 +161,12 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
     }
 
     @Override
-    protected Object processResponse(OCSPResp response, X509Certificate respIssuer,
-            X509Certificate issuer, List<BigInteger> serialNumbers,
-            Map<BigInteger, byte[]> encodedCerts)
+    protected Object processResponse(
+            final OCSPResp response,
+            final X509Certificate respIssuer,
+            final X509Certificate issuer,
+            final List<BigInteger> serialNumbers,
+            final Map<BigInteger, byte[]> encodedCerts)
     throws Exception
     {
         OcspResponseOption responseOption = new OcspResponseOption();
@@ -203,7 +209,10 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
         return null;
     }
 
-    private static void format(ValidationIssue issue, String prefix, StringBuilder sb)
+    private static void format(
+            final ValidationIssue issue,
+            final String prefix,
+            final StringBuilder sb)
     {
         sb.append(prefix);
         sb.append(issue.getCode());
@@ -215,7 +224,8 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
         }
     }
 
-    private static Occurrence getOccurrence(String text)
+    private static Occurrence getOccurrence(
+            final String text)
     throws Exception
     {
         Occurrence ret = Occurrence.getInstance(text);

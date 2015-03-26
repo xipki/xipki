@@ -59,16 +59,17 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
 class IaikP11Identity extends P11Identity
 {
     public IaikP11Identity(
-            P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId,
-            X509Certificate[] certificateChain,
-            PublicKey publicKey)
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId,
+            final X509Certificate[] certificateChain,
+            final PublicKey publicKey)
     {
         super(slotId, keyId, certificateChain, publicKey);
     }
 
-    public byte[] CKM_RSA_PKCS(IaikP11Module module,
-            byte[] encodedDigestInfo)
+    public byte[] CKM_RSA_PKCS(
+            final IaikP11Module module,
+            final byte[] encodedDigestInfo)
     throws SignerException
     {
         if(publicKey instanceof RSAPublicKey == false)
@@ -86,8 +87,9 @@ class IaikP11Identity extends P11Identity
         return slot.CKM_RSA_PKCS(encodedDigestInfo, keyId);
     }
 
-    public byte[] CKM_RSA_X509(IaikP11Module module,
-            byte[] hash)
+    public byte[] CKM_RSA_X509(
+            final IaikP11Module module,
+            final byte[] hash)
     throws SignerException
     {
         if(publicKey instanceof RSAPublicKey == false)
@@ -105,8 +107,9 @@ class IaikP11Identity extends P11Identity
         return slot.CKM_RSA_X509(hash, keyId);
     }
 
-    public byte[] CKM_ECDSA(IaikP11Module module,
-            byte[] hash)
+    public byte[] CKM_ECDSA(
+            final IaikP11Module module,
+            final byte[] hash)
     throws SignerException
     {
         if(publicKey instanceof ECPublicKey == false)
@@ -126,8 +129,9 @@ class IaikP11Identity extends P11Identity
         return convertToX962Signature(signature);
     }
 
-    public byte[] CKM_DSA(IaikP11Module module,
-            byte[] hash)
+    public byte[] CKM_DSA(
+            final IaikP11Module module,
+            final byte[] hash)
     throws SignerException
     {
         if(publicKey instanceof DSAPublicKey == false)
@@ -145,7 +149,8 @@ class IaikP11Identity extends P11Identity
         return convertToX962Signature(signature);
     }
 
-    private static byte[] convertToX962Signature(byte[] signature)
+    private static byte[] convertToX962Signature(
+            final byte[] signature)
     throws SignerException
     {
         byte[] ba = new byte[signature.length/2];

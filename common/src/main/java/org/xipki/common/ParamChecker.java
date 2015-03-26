@@ -45,7 +45,9 @@ import java.util.Map;
 public class ParamChecker
 {
 
-    public static void assertNotNull(String parameterName, Object parameter)
+    public static void assertNotNull(
+            final String parameterName,
+            final Object parameter)
     {
         if(parameter == null)
         {
@@ -53,20 +55,9 @@ public class ParamChecker
         }
     }
 
-    public static void assertNotEmpty(String parameterName, String parameter)
-    {
-        if(parameter == null)
-        {
-            throw new IllegalArgumentException(parameterName + " could not be null");
-        }
-
-        if(parameter.isEmpty())
-        {
-            throw new IllegalArgumentException(parameterName + " could not be empty");
-        }
-    }
-
-    public static void assertNotEmpty(String parameterName, Collection<?> parameter)
+    public static void assertNotEmpty(
+            final String parameterName,
+            final String parameter)
     {
         if(parameter == null)
         {
@@ -79,7 +70,24 @@ public class ParamChecker
         }
     }
 
-    public static void assertNotEmpty(String parameterName, Map<?, ?> parameter)
+    public static void assertNotEmpty(
+            final String parameterName,
+            final Collection<?> parameter)
+    {
+        if(parameter == null)
+        {
+            throw new IllegalArgumentException(parameterName + " could not be null");
+        }
+
+        if(parameter.isEmpty())
+        {
+            throw new IllegalArgumentException(parameterName + " could not be empty");
+        }
+    }
+
+    public static void assertNotEmpty(
+            final String parameterName,
+            final Map<?, ?> parameter)
     {
         if(parameter == null)
         {

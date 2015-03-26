@@ -51,7 +51,9 @@ public class CertprofileOption
     private final Set<String> includes;
     private final Set<String> excludes;
 
-    public CertprofileOption(Collection<String> includes, Collection<String> excludes)
+    public CertprofileOption(
+            final Collection<String> includes,
+            final Collection<String> excludes)
     {
         if(CollectionUtil.isEmpty(includes))
         {
@@ -82,7 +84,8 @@ public class CertprofileOption
         return excludes == null ? null : Collections.unmodifiableSet(excludes);
     }
 
-    public boolean include(String certprofile)
+    public boolean include(
+            final String certprofile)
     {
         if(includes == null)
         {

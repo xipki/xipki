@@ -58,9 +58,10 @@ class PendingCertificatePool
         private final long waitForConfirmTill;
         private final X509CertificateInfo certInfo;
 
-        public MyEntry(BigInteger certReqId,
-                long waitForConfirmTill,
-                X509CertificateInfo certInfo)
+        public MyEntry(
+                final BigInteger certReqId,
+                final long waitForConfirmTill,
+                final X509CertificateInfo certInfo)
         {
             super();
             ParamChecker.assertNotNull("certReqId", certReqId);
@@ -72,7 +73,7 @@ class PendingCertificatePool
         }
 
         @Override
-        public boolean equals(Object b)
+        public boolean equals(final Object b)
         {
             if(b instanceof MyEntry == false)
             {
@@ -92,7 +93,10 @@ class PendingCertificatePool
     }
 
     synchronized void addCertificate(
-            byte[] tid, BigInteger certReqId, X509CertificateInfo certInfo, long waitForConfirmTill)
+            final byte[] tid,
+            final BigInteger certReqId,
+            final X509CertificateInfo certInfo,
+            final long waitForConfirmTill)
     {
         if(certInfo.isAlreadyIssued())
         {
@@ -112,7 +116,9 @@ class PendingCertificatePool
     }
 
     synchronized X509CertificateInfo removeCertificate(
-            byte[] transactionId, BigInteger certReqId, byte[] certHash)
+            final byte[] transactionId,
+            final BigInteger certReqId,
+            final byte[] certHash)
     {
         String hexTid = Hex.toHexString(transactionId);
         Set<MyEntry> entries = map.get(hexTid);
@@ -144,7 +150,8 @@ class PendingCertificatePool
         return retEntry.certInfo;
     }
 
-    synchronized Set<X509CertificateInfo> removeCertificates(byte[] transactionId)
+    synchronized Set<X509CertificateInfo> removeCertificates(
+            final byte[] transactionId)
     {
         Set<MyEntry> entries = map.remove(Hex.toHexString(transactionId));
         if(entries == null)

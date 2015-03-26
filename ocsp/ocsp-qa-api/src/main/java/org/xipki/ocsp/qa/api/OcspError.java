@@ -59,7 +59,8 @@ public enum OcspError
         return status;
     }
 
-    public static OcspError getInstance(String name)
+    public static OcspError getInstance(
+            final String name)
     {
         for(OcspError entry : values())
         {
@@ -72,7 +73,8 @@ public enum OcspError
         throw new IllegalArgumentException("unknown OCSP error '" + name + "'");
     }
 
-    public static OcspError getInstanceForCode(int status)
+    public static OcspError getInstanceForCode(
+            final int status)
     {
         for(OcspError entry : values())
         {

@@ -52,6 +52,7 @@ public abstract class AbstractDigestCalculator implements DigestCalculator
     private ByteArrayOutputStream bOut = new ByteArrayOutputStream();
 
     protected abstract ASN1ObjectIdentifier getObjectIdentifier();
+
     protected abstract Digest getDigester();
 
     public AlgorithmIdentifier getAlgorithmIdentifier()

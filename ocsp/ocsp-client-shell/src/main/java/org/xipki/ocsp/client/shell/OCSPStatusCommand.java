@@ -77,15 +77,21 @@ import org.xipki.security.KeyUtil;
 public class OCSPStatusCommand extends BaseOCSPStatusCommand
 {
     @Override
-    protected void checkParameters(X509Certificate respIssuer,
-            List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+    protected void checkParameters(
+            final X509Certificate respIssuer,
+            final List<BigInteger> serialNumbers,
+            final Map<BigInteger, byte[]> encodedCerts)
     throws Exception
     {
     }
 
     @Override
-    protected Object processResponse(OCSPResp response, X509Certificate respIssuer,
-            X509Certificate issuer, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+    protected Object processResponse(
+            final OCSPResp response,
+            final X509Certificate respIssuer,
+            final X509Certificate issuer,
+            final List<BigInteger> serialNumbers,
+            final Map<BigInteger, byte[]> encodedCerts)
     throws Exception
     {
         BasicOCSPResp basicResp = OCSPUtils.extractBasicOCSPResp(response);

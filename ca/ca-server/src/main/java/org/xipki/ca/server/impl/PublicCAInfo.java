@@ -72,8 +72,11 @@ class PublicCAInfo
     private final List<String> crlUris;
     private final List<String> deltaCrlUris;
 
-    public PublicCAInfo(X509Certificate caCertificate,
-            List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris)
+    public PublicCAInfo(
+            final X509Certificate caCertificate,
+            final List<String> ocspUris,
+            final List<String> crlUris,
+            final List<String> deltaCrlUris)
     throws OperationException
     {
         ParamChecker.assertNotNull("caCertificate", caCertificate);
@@ -109,9 +112,14 @@ class PublicCAInfo
         }
     }
 
-    public PublicCAInfo(X500Name subject, BigInteger serialNumber,
-            GeneralNames subjectAltName, byte[] subjectKeyIdentifier,
-            List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris)
+    public PublicCAInfo(
+            final X500Name subject,
+            final BigInteger serialNumber,
+            final GeneralNames subjectAltName,
+            final byte[] subjectKeyIdentifier,
+            final List<String> ocspUris,
+            final List<String> crlUris,
+            final List<String> deltaCrlUris)
     throws OperationException
     {
         ParamChecker.assertNotNull("subject", subject);
@@ -162,7 +170,8 @@ class PublicCAInfo
         return crlSignerCertificate;
     }
 
-    public void setCrlSignerCertificate(X509Certificate crlSignerCert)
+    public void setCrlSignerCertificate(
+            final X509Certificate crlSignerCert)
     {
         if(caCertificate.equals(crlSignerCert))
         {

@@ -58,7 +58,8 @@ public class DummyPBEPasswordResolver extends PBEPasswordResolver
 
         return super.getMasterPassword();
     }
-    public void setMasterPassword(char[] masterPassword)
+    public void setMasterPassword(
+            final char[] masterPassword)
     {
         this.masterPassword = masterPassword;
     }

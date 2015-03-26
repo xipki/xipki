@@ -172,7 +172,9 @@ public class OcspServer
         private final String path;
         private final String responderName;
 
-        public ServletPathResponderName(String path, String responderName)
+        public ServletPathResponderName(
+                final String path,
+                final String responderName)
         {
             ParamChecker.assertNotNull("path", path);
             ParamChecker.assertNotEmpty("responderName", responderName);
@@ -192,7 +194,8 @@ public class OcspServer
         }
 
         @Override
-        public int compareTo(ServletPathResponderName o)
+        public int compareTo(
+                final ServletPathResponderName o)
         {
             int d = o.path.length() - path.length();
             if(d == 0)
@@ -227,22 +230,26 @@ public class OcspServer
     {
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory)
+    public void setSecurityFactory(
+            final SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;
     }
 
-    public void setDataSourceFactory(DataSourceFactory dataSourceFactory)
+    public void setDataSourceFactory(
+            final DataSourceFactory dataSourceFactory)
     {
         this.dataSourceFactory = dataSourceFactory;
     }
 
-    public void setConfFile(String confFile)
+    public void setConfFile(
+            final String confFile)
     {
         this.confFile = confFile;
     }
 
-    public ResponderAndRelativeUri getResponderAndRelativeUri(HttpServletRequest request)
+    public ResponderAndRelativeUri getResponderAndRelativeUri(
+            final HttpServletRequest request)
     throws UnsupportedEncodingException
     {
         String requestURI = request.getRequestURI();
@@ -286,7 +293,8 @@ public class OcspServer
                 relativeUri);
     }
 
-    public Responder getResponder(String name)
+    public Responder getResponder(
+            final String name)
     {
         return responders.get(name);
     }
@@ -642,8 +650,11 @@ public class OcspServer
         auditLogPCIEvent(true, "SHUTDOWN");
     }
 
-    public OcspRespWithCacheInfo answer(Responder responder, OCSPReq request,
-            AuditEvent auditEvent, boolean viaGet)
+    public OcspRespWithCacheInfo answer(
+            final Responder responder,
+            final OCSPReq request,
+            final AuditEvent auditEvent,
+            final boolean viaGet)
     {
         ResponderOption responderOption = responder.getResponderOption();
         RequestOption requestOption = responder.getRequestOption();
@@ -1168,14 +1179,16 @@ public class OcspServer
         }
     }
 
-    private static OcspRespWithCacheInfo createUnsuccessfullOCSPResp(OcspResponseStatus status)
+    private static OcspRespWithCacheInfo createUnsuccessfullOCSPResp(
+            final OcspResponseStatus status)
     {
         OCSPResp resp = new OCSPResp(new OCSPResponse(
                 new org.bouncycastle.asn1.ocsp.OCSPResponseStatus(status.getStatus()), null));
         return new OcspRespWithCacheInfo(resp, null);
     }
 
-    public HealthCheckResult healthCheck(Responder responder)
+    public HealthCheckResult healthCheck(
+            final Responder responder)
     {
         HealthCheckResult result = new HealthCheckResult("OCSPResponder");
         boolean healthy = true;
@@ -1201,7 +1214,11 @@ public class OcspServer
         return result;
     }
 
-    private static void fillAuditEvent(AuditEvent auditEvent, AuditLevel level, AuditStatus status, String message)
+    private static void fillAuditEvent(
+            final AuditEvent auditEvent,
+            final AuditLevel level,
+            final AuditStatus status,
+            final String message)
     {
         if(level != null)
         {
@@ -1219,7 +1236,11 @@ public class OcspServer
         }
     }
 
-    private static void fillAuditEvent(AuditChildEvent auditEvent, AuditLevel level, AuditStatus status, String message)
+    private static void fillAuditEvent(
+            final AuditChildEvent auditEvent,
+            final AuditLevel level,
+            final AuditStatus status,
+            final String message)
     {
         if(level != null)
         {
@@ -1237,7 +1258,8 @@ public class OcspServer
         }
     }
 
-    public void setAuditServiceRegister(AuditLoggingServiceRegister auditServiceRegister)
+    public void setAuditServiceRegister(
+            final AuditLoggingServiceRegister auditServiceRegister)
     {
         this.auditServiceRegister = auditServiceRegister;
         for(CertStatusStore store : stores.values())
@@ -1246,7 +1268,9 @@ public class OcspServer
         }
     }
 
-    private void auditLogPCIEvent(boolean successfull, String eventType)
+    private void auditLogPCIEvent(
+            final boolean successfull,
+            final String eventType)
     {
         AuditLoggingService auditLoggingService = auditServiceRegister == null ? null :
             auditServiceRegister.getAuditLoggingService();
@@ -1270,7 +1294,8 @@ public class OcspServer
         }
     }
 
-    private ResponderSigner initSigner(SignerType m)
+    private ResponderSigner initSigner(
+            final SignerType m)
     throws ConfigurationException
     {
         X509Certificate[] explicitCertificateChain = null;
@@ -1325,7 +1350,9 @@ public class OcspServer
         }
     }
 
-    private CertStatusStore initStore(StoreType conf, Map<String, DataSourceWrapper> datasources)
+    private CertStatusStore initStore(
+            final StoreType conf,
+            final Map<String, DataSourceWrapper> datasources)
     throws ConfigurationException
     {
         String name = conf.getName();
@@ -1463,8 +1490,10 @@ public class OcspServer
         return store;
     }
 
-    private OcspRespWithCacheInfo checkSignature(OCSPReq request, RequestOption requestOption,
-            AuditEvent auditEvent)
+    private OcspRespWithCacheInfo checkSignature(
+            final OCSPReq request,
+            final RequestOption requestOption,
+            final AuditEvent auditEvent)
     throws OCSPException, CertificateParsingException, InvalidAlgorithmParameterException, OcspResponderException
     {
         if(request.isSigned() == false)
@@ -1542,8 +1571,10 @@ public class OcspServer
         return createUnsuccessfullOCSPResp(OcspResponseStatus.unauthorized);
     }
 
-    private static boolean canBuildCertpath(X509CertificateHolder[] certsInReq,
-            RequestOption requestOption, Date referenceTime)
+    private static boolean canBuildCertpath(
+            final X509CertificateHolder[] certsInReq,
+            final RequestOption requestOption,
+            final Date referenceTime)
     {
         X509Certificate target;
         try
@@ -1616,12 +1647,15 @@ public class OcspServer
         return false;
     }
 
-    private static boolean getBoolean(Boolean b, boolean defaultValue)
+    private static boolean getBoolean(
+            final Boolean b,
+            final boolean defaultValue)
     {
         return (b == null) ? defaultValue : b.booleanValue();
     }
 
-    private static Set<X509Certificate> parseCerts(List<FileOrValueType> certConfs)
+    private static Set<X509Certificate> parseCerts(
+            final List<FileOrValueType> certConfs)
     throws ConfigurationException
     {
         Set<X509Certificate> certs = new HashSet<>(certConfs.size());
@@ -1632,7 +1666,8 @@ public class OcspServer
         return certs;
     }
 
-    private static InputStream getInputStream(FileOrValueType conf)
+    private static InputStream getInputStream(
+            final FileOrValueType conf)
     throws IOException
     {
         if(conf.getFile() != null)
@@ -1645,7 +1680,8 @@ public class OcspServer
         }
     }
 
-    private static InputStream getInputStream(FileOrPlainValueType conf)
+    private static InputStream getInputStream(
+            final FileOrPlainValueType conf)
     throws IOException
     {
         if(conf.getFile() != null)
@@ -1658,7 +1694,8 @@ public class OcspServer
         }
     }
 
-    private static void close(InputStream stream)
+    private static void close(
+            final InputStream stream)
     {
         if(stream != null)
         {
@@ -1671,7 +1708,8 @@ public class OcspServer
         }
     }
 
-    private static X509Certificate parseCert(FileOrValueType certConf)
+    private static X509Certificate parseCert(
+            final FileOrValueType certConf)
     throws ConfigurationException
     {
         InputStream is = null;
@@ -1693,7 +1731,8 @@ public class OcspServer
         }
     }
 
-    private static OCSPServer parseConf(String confFilename)
+    private static OCSPServer parseConf(
+            final String confFilename)
     throws ConfigurationException
     {
         try
@@ -1713,7 +1752,8 @@ public class OcspServer
         }
     }
 
-    public static void main(String[] args)
+    public static void main(
+            final String[] args)
     {
         String confFile = "../../dist/pki/assembly/src/main/unfiltered/xipki/ocsp-config/ocsp-responder.xml";
         try

@@ -48,17 +48,21 @@ public class OCSPTargetUnmatchedException extends OCSPResponseException
         super();
     }
 
-    public OCSPTargetUnmatchedException(String message, Throwable cause)
+    public OCSPTargetUnmatchedException(
+            final String message,
+            final Throwable cause)
     {
         super(message, cause);
     }
 
-    public OCSPTargetUnmatchedException(String message)
+    public OCSPTargetUnmatchedException(
+            final String message)
     {
         super(message);
     }
 
-    public OCSPTargetUnmatchedException(Throwable cause)
+    public OCSPTargetUnmatchedException(
+            final Throwable cause)
     {
         super(cause);
     }

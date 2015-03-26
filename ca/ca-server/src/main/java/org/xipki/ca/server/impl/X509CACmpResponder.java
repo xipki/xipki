@@ -165,7 +165,9 @@ class X509CACmpResponder extends CmpResponder
         knownGenMsgIds.add(ObjectIdentifiers.id_xipki_cmp.getId());
     }
 
-    public X509CACmpResponder(CAManagerImpl caManager, String caName)
+    public X509CACmpResponder(
+            final CAManagerImpl caManager,
+            final String caName)
     {
         super(caManager.getSecurityFactory());
 
@@ -223,8 +225,12 @@ class X509CACmpResponder extends CmpResponder
     }
 
     @Override
-    protected PKIMessage intern_processPKIMessage(RequestorInfo requestor, String user,
-            ASN1OctetString tid, GeneralPKIMessage message, AuditEvent auditEvent)
+    protected PKIMessage intern_processPKIMessage(
+            final RequestorInfo requestor,
+            final String user,
+            final ASN1OctetString tid,
+            final GeneralPKIMessage message,
+            final AuditEvent auditEvent)
     {
         if(requestor instanceof CmpRequestorInfo == false)
         {
@@ -346,8 +352,15 @@ class X509CACmpResponder extends CmpResponder
      * handle the PKI body with the choice {@code cr}
      *
      */
-    private PKIBody processCr(CmpRequestorInfo requestor, String user, ASN1OctetString tid, PKIHeader reqHeader,
-            CertReqMessages cr, long confirmWaitTime, boolean sendCaCert, AuditEvent auditEvent)
+    private PKIBody processCr(
+            final CmpRequestorInfo requestor,
+            final String user,
+            final ASN1OctetString tid,
+            final PKIHeader reqHeader,
+            final CertReqMessages cr,
+            final long confirmWaitTime,
+            final boolean sendCaCert,
+            final AuditEvent auditEvent)
     throws InsuffientPermissionException
     {
         CertRepMessage repMessage = processCertReqMessages(requestor, user, tid, reqHeader, cr,
@@ -355,8 +368,15 @@ class X509CACmpResponder extends CmpResponder
         return new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
     }
 
-    private PKIBody processKur(CmpRequestorInfo requestor, String user, ASN1OctetString tid, PKIHeader reqHeader,
-            CertReqMessages kur, long confirmWaitTime, boolean sendCaCert, AuditEvent auditEvent)
+    private PKIBody processKur(
+            final CmpRequestorInfo requestor,
+            final String user,
+            final ASN1OctetString tid,
+            final PKIHeader reqHeader,
+            final CertReqMessages kur,
+            final long confirmWaitTime,
+            final boolean sendCaCert,
+            final AuditEvent auditEvent)
     throws InsuffientPermissionException
     {
         CertRepMessage repMessage = processCertReqMessages(requestor, user, tid, reqHeader, kur,
@@ -368,10 +388,15 @@ class X509CACmpResponder extends CmpResponder
      * handle the PKI body with the choice {@code cr}
      *
      */
-    private PKIBody processCcp(CmpRequestorInfo requestor, String user,
-            ASN1OctetString tid, PKIHeader reqHeader,
-            CertReqMessages cr, long confirmWaitTime,
-            boolean sendCaCert, AuditEvent auditEvent)
+    private PKIBody processCcp(
+            final CmpRequestorInfo requestor,
+            final String user,
+            final ASN1OctetString tid,
+            final PKIHeader reqHeader,
+            final CertReqMessages cr,
+            final long confirmWaitTime,
+            final boolean sendCaCert,
+            final AuditEvent auditEvent)
     throws InsuffientPermissionException
     {
         CertRepMessage repMessage = processCertReqMessages(requestor, user, tid, reqHeader, cr,
@@ -380,15 +405,15 @@ class X509CACmpResponder extends CmpResponder
     }
 
     private CertRepMessage processCertReqMessages(
-            CmpRequestorInfo requestor,
-            String user,
-            ASN1OctetString tid,
-            PKIHeader reqHeader,
-            CertReqMessages kur,
-            boolean keyUpdate,
-            long confirmWaitTime,
-            boolean sendCaCert,
-            AuditEvent auditEvent)
+            final CmpRequestorInfo requestor,
+            final String user,
+            final ASN1OctetString tid,
+            final PKIHeader reqHeader,
+            final CertReqMessages kur,
+            final boolean keyUpdate,
+            final long confirmWaitTime,
+            final boolean sendCaCert,
+            final AuditEvent auditEvent)
     throws InsuffientPermissionException
     {
         CmpRequestorInfo _requestor = (CmpRequestorInfo) requestor;
@@ -495,8 +520,15 @@ class X509CACmpResponder extends CmpResponder
      * PKIHeader.generalInfo
      *
      */
-    private PKIBody processP10cr(CmpRequestorInfo requestor, String user, ASN1OctetString tid, PKIHeader reqHeader,
-            CertificationRequest p10cr, long confirmWaitTime, boolean sendCaCert, AuditEvent auditEvent)
+    private PKIBody processP10cr(
+            final CmpRequestorInfo requestor,
+            final String user,
+            final ASN1OctetString tid,
+            final PKIHeader reqHeader,
+            final CertificationRequest p10cr,
+            final long confirmWaitTime,
+            final boolean sendCaCert,
+            final AuditEvent auditEvent)
     throws InsuffientPermissionException
     {
         // verify the POP first
@@ -582,18 +614,18 @@ class X509CACmpResponder extends CmpResponder
     }
 
     private CertResponse generateCertificate(
-            CmpRequestorInfo requestor,
-            String user,
-            ASN1OctetString tid,
-            ASN1Integer certReqId,
-            X500Name subject,
-            SubjectPublicKeyInfo publicKeyInfo,
-            OptionalValidity validity,
-            Extensions extensions,
-            String certprofileName,
-            boolean keyUpdate,
-            long confirmWaitTime,
-            AuditChildEvent childAuditEvent)
+            final CmpRequestorInfo requestor,
+            final String user,
+            final ASN1OctetString tid,
+            final ASN1Integer certReqId,
+            final X500Name subject,
+            final SubjectPublicKeyInfo publicKeyInfo,
+            final OptionalValidity validity,
+            final Extensions extensions,
+            final String certprofileName,
+            final boolean keyUpdate,
+            final long confirmWaitTime,
+            final AuditChildEvent childAuditEvent)
     throws InsuffientPermissionException
     {
         checkPermission(requestor, certprofileName);
@@ -761,7 +793,10 @@ class X509CACmpResponder extends CmpResponder
         }
     }
 
-    private PKIBody revokeOrUnrevokeOrRemoveCertificates(RevReqContent rr, AuditEvent auditEvent, Permission permission)
+    private PKIBody revokeOrUnrevokeOrRemoveCertificates(
+            final RevReqContent rr,
+            final AuditEvent auditEvent,
+            final Permission permission)
     {
         RevDetails[] revContent = rr.toRevDetailsArray();
 
@@ -1000,7 +1035,9 @@ class X509CACmpResponder extends CmpResponder
         return new PKIBody(PKIBody.TYPE_REVOCATION_REP, repContentBuilder.build());
     }
 
-    private PKIBody confirmCertificates(ASN1OctetString transactionId, CertConfirmContent certConf)
+    private PKIBody confirmCertificates(
+            final ASN1OctetString transactionId,
+            final CertConfirmContent certConf)
     {
         CertStatus[] certStatuses = certConf.toCertStatusArray();
 
@@ -1070,7 +1107,8 @@ class X509CACmpResponder extends CmpResponder
         return new PKIBody(PKIBody.TYPE_ERROR, emc);
     }
 
-    private boolean revokePendingCertificates(ASN1OctetString transactionId)
+    private boolean revokePendingCertificates(
+            final ASN1OctetString transactionId)
     {
         Set<X509CertificateInfo> remainingCerts = pendingCertPool.removeCertificates(transactionId.getOctets());
 
@@ -1097,7 +1135,9 @@ class X509CACmpResponder extends CmpResponder
         return successfull;
     }
 
-    private boolean verifyPOP(CertificateRequestMessage certRequest, boolean allowRAPopo)
+    private boolean verifyPOP(
+            final CertificateRequestMessage certRequest,
+            final boolean allowRAPopo)
     {
         int popType = certRequest.getProofOfPossessionType();
         if(popType == CertificateRequestMessage.popRaVerified && allowRAPopo)
@@ -1171,7 +1211,9 @@ class X509CACmpResponder extends CmpResponder
         }
     }
 
-    private void checkPermission(CmpRequestorInfo requestor, String certprofile)
+    private void checkPermission(
+            final CmpRequestorInfo requestor,
+            final String certprofile)
     throws InsuffientPermissionException
     {
         Set<String> profiles = requestor.getCaHasRequestor().getProfiles();
@@ -1188,7 +1230,9 @@ class X509CACmpResponder extends CmpResponder
         throw new InsuffientPermissionException(msg);
     }
 
-    private void checkPermission(CmpRequestorInfo requestor, Permission requiredPermission)
+    private void checkPermission(
+            final CmpRequestorInfo requestor,
+            final Permission requiredPermission)
     throws InsuffientPermissionException
     {
         X509CA ca = getCA();
@@ -1213,7 +1257,9 @@ class X509CACmpResponder extends CmpResponder
         throw new InsuffientPermissionException(msg);
     }
 
-    private String getSystemInfo(CmpRequestorInfo requestor, Set<Integer> acceptVersions)
+    private String getSystemInfo(
+            final CmpRequestorInfo requestor,
+            final Set<Integer> acceptVersions)
     throws OperationException
     {
         X509CA ca = getCA();
@@ -1301,7 +1347,9 @@ class X509CACmpResponder extends CmpResponder
         return sb.toString();
     }
 
-    private String removeExpiredCerts(CmpRequestorInfo requestor, ASN1Encodable asn1RequestInfo)
+    private String removeExpiredCerts(
+            final CmpRequestorInfo requestor,
+            final ASN1Encodable asn1RequestInfo)
     throws OperationException, InsuffientPermissionException
     {
         String requestInfo = null;
@@ -1403,7 +1451,8 @@ class X509CACmpResponder extends CmpResponder
     }
 
     @Override
-    protected boolean intendsMe(GeneralName requestRecipient)
+    protected boolean intendsMe(
+            final GeneralName requestRecipient)
     {
         if(requestRecipient == null)
         {
@@ -1428,16 +1477,21 @@ class X509CACmpResponder extends CmpResponder
     }
 
     @Override
-    protected CmpRequestorInfo getRequestor(X500Name requestorSender)
+    protected CmpRequestorInfo getRequestor(
+            final X500Name requestorSender)
     {
         return getCA().getRequestor(requestorSender);
     }
 
     private PKIBody cmpEnrollCert(
-            PKIHeaderBuilder respHeader, CmpControl cmpControl,
-            PKIHeader reqHeader, PKIBody reqBody,
-            CmpRequestorInfo requestor, String user,
-            ASN1OctetString tid, AuditEvent auditEvent)
+            final PKIHeaderBuilder respHeader,
+            final CmpControl cmpControl,
+            final PKIHeader reqHeader,
+            final PKIBody reqBody,
+            final CmpRequestorInfo requestor,
+            final String user,
+            final ASN1OctetString tid,
+            final AuditEvent auditEvent)
     throws InsuffientPermissionException
     {
         long confirmWaitTime = cmpControl.getConfirmWaitTime();
@@ -1501,10 +1555,14 @@ class X509CACmpResponder extends CmpResponder
     }
 
     private PKIBody cmpRevokeOrUnrevokeOrRemoveCertificates(
-            PKIHeaderBuilder respHeader, CmpControl cmpControl,
-            PKIHeader reqHeader, PKIBody reqBody,
-            CmpRequestorInfo requestor, String user,
-            ASN1OctetString tid, AuditEvent auditEvent)
+            final PKIHeaderBuilder respHeader,
+            final CmpControl cmpControl,
+            final PKIHeader reqHeader,
+            final PKIBody reqBody,
+            final CmpRequestorInfo requestor,
+            final String user,
+            final ASN1OctetString tid,
+            final AuditEvent auditEvent)
     throws InsuffientPermissionException
     {
         Permission requiredPermission = null;
@@ -1587,10 +1645,14 @@ class X509CACmpResponder extends CmpResponder
     }
 
     private PKIBody cmpGeneralMsg(
-            PKIHeaderBuilder respHeader, CmpControl cmpControl,
-            PKIHeader reqHeader, PKIBody reqBody,
-            CmpRequestorInfo requestor, String user,
-            ASN1OctetString tid, AuditEvent auditEvent)
+            final PKIHeaderBuilder respHeader,
+            final CmpControl cmpControl,
+            final PKIHeader reqHeader,
+            final PKIBody reqBody,
+            final CmpRequestorInfo requestor,
+            final String user,
+            final ASN1OctetString tid,
+            final AuditEvent auditEvent)
     throws InsuffientPermissionException
     {
         GenMsgContent genMsgBody = (GenMsgContent) reqBody.getContent();
@@ -1774,7 +1836,10 @@ class X509CACmpResponder extends CmpResponder
         }
     }
 
-    private static PKIBody createErrorMsgPKIBody(PKIStatus pkiStatus, int failureInfo, String statusMessage)
+    private static PKIBody createErrorMsgPKIBody(
+            final PKIStatus pkiStatus,
+            final int failureInfo,
+            final String statusMessage)
     {
         ErrorMsgContent emc = new ErrorMsgContent(
                 new PKIStatusInfo(pkiStatus,
@@ -1783,7 +1848,9 @@ class X509CACmpResponder extends CmpResponder
         return new PKIBody(PKIBody.TYPE_ERROR, emc);
     }
 
-    private static void addAutitEventType(AuditEvent auditEvent, String eventType)
+    private static void addAutitEventType(
+            final AuditEvent auditEvent,
+            final String eventType)
     {
         if(auditEvent != null)
         {

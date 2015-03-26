@@ -70,9 +70,12 @@ public class OcspDbExporter
     protected final String destFolder;
     protected final boolean resume;
 
-    public OcspDbExporter(DataSourceFactory dataSourceFactory,
-            PasswordResolver passwordResolver, String dbConfFile,
-            String destFolder, boolean resume)
+    public OcspDbExporter(
+            final DataSourceFactory dataSourceFactory,
+            final PasswordResolver passwordResolver,
+            final String dbConfFile,
+            final String destFolder,
+            final boolean resume)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
@@ -119,7 +122,8 @@ public class OcspDbExporter
         this.destFolder = destFolder;
     }
 
-    public void exportDatabase(int numCertsInBundle)
+    public void exportDatabase(
+            final int numCertsInBundle)
     throws Exception
     {
         long start = System.currentTimeMillis();

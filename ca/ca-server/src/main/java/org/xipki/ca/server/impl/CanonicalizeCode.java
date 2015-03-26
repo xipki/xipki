@@ -90,7 +90,8 @@ public class CanonicalizeCode
 
     private final static String THROWS_PREFIX = "    ";
 
-    public static void main(String[] args)
+    public static void main(
+            final String[] args)
     {
         try
         {
@@ -106,7 +107,8 @@ public class CanonicalizeCode
         }
     }
 
-    private static void canonicalizeDir(File dir)
+    private static void canonicalizeDir(
+            final File dir)
     throws Exception
     {
         File[] files = dir.listFiles();
@@ -126,7 +128,8 @@ public class CanonicalizeCode
         }
     }
 
-    private static void canonicalizeFile(File file)
+    private static void canonicalizeFile(
+            final File file)
     throws Exception
     {
         BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -202,7 +205,8 @@ public class CanonicalizeCode
      * @param line
      * @return
      */
-    private static String canonicalizeLine(String line)
+    private static String canonicalizeLine(
+            final String line)
     {
         if(line.trim().startsWith("//"))
         {
@@ -289,7 +293,8 @@ public class CanonicalizeCode
         return sb.toString();
     }
 
-    private static void checkWarningsInDir(File dir)
+    private static void checkWarningsInDir(
+            final File dir)
     throws Exception
     {
         File[] files = dir.listFiles();
@@ -309,7 +314,8 @@ public class CanonicalizeCode
         }
     }
 
-    private static void checkWarningsInFile(File file)
+    private static void checkWarningsInFile(
+            final File file)
     throws Exception
     {
         BufferedReader reader = new BufferedReader(new FileReader(file));

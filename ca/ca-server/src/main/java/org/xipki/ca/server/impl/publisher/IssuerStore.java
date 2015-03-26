@@ -48,7 +48,8 @@ class IssuerStore
 {
     private final List<IssuerEntry> entries;
 
-    IssuerStore( List<IssuerEntry> entries)
+    IssuerStore(
+            final List<IssuerEntry> entries)
     {
         this.entries = new ArrayList<>(entries.size());
 
@@ -58,7 +59,8 @@ class IssuerStore
         }
     }
 
-    void addIdentityEntry(IssuerEntry entry)
+    void addIdentityEntry(
+            final IssuerEntry entry)
     {
         ParamChecker.assertNotNull("entry", entry);
 
@@ -73,7 +75,8 @@ class IssuerStore
         entries.add(entry);
     }
 
-    Integer getIdForSubject(String subject)
+    Integer getIdForSubject(
+            final String subject)
     {
         for(IssuerEntry entry : entries)
         {
@@ -86,7 +89,8 @@ class IssuerStore
         return null;
     }
 
-    Integer getIdForSha1Fp(byte[] sha1Fp_cert)
+    Integer getIdForSha1Fp(
+            final byte[] sha1Fp_cert)
     {
         for(IssuerEntry entry : entries)
         {
@@ -99,7 +103,8 @@ class IssuerStore
         return null;
     }
 
-    Integer getIdForCert(byte[] encodedCert)
+    Integer getIdForCert(
+            final byte[] encodedCert)
     {
         for(IssuerEntry entry : entries)
         {

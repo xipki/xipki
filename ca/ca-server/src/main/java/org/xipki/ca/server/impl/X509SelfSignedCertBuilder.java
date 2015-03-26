@@ -98,7 +98,9 @@ class X509SelfSignedCertBuilder
         private final String signerConf;
         private final X509Certificate cert;
 
-        GenerateSelfSignedResult(String signerConf, X509Certificate cert)
+        GenerateSelfSignedResult(
+                final String signerConf,
+                final X509Certificate cert)
         {
             this.signerConf = signerConf;
             this.cert = cert;
@@ -116,15 +118,15 @@ class X509SelfSignedCertBuilder
     }
 
     public static GenerateSelfSignedResult generateSelfSigned(
-            SecurityFactory securityFactory,
-            String signerType,
-            String signerConf,
-            IdentifiedX509Certprofile certprofile,
-            CertificationRequest p10Request,
-            long serialNumber,
-            List<String> ocspUris,
-            List<String> crlUris,
-            List<String> deltaCrlUris)
+            final SecurityFactory securityFactory,
+            final String signerType,
+            final String signerConf,
+            final IdentifiedX509Certprofile certprofile,
+            final CertificationRequest p10Request,
+            final long serialNumber,
+            final List<String> ocspUris,
+            final List<String> crlUris,
+            final List<String> deltaCrlUris)
     throws OperationException, ConfigurationException
     {
         if(securityFactory.verifyPOPO(p10Request) == false)
@@ -170,14 +172,14 @@ class X509SelfSignedCertBuilder
     }
 
     private static X509Certificate generateCertificate(
-            ConcurrentContentSigner signer,
-            IdentifiedX509Certprofile certprofile,
-            CertificationRequest p10Request,
-            long serialNumber,
+            final ConcurrentContentSigner signer,
+            final IdentifiedX509Certprofile certprofile,
+            final CertificationRequest p10Request,
+            final long serialNumber,
             SubjectPublicKeyInfo publicKeyInfo,
-            List<String> ocspUris,
-            List<String> crlUris,
-            List<String> deltaCrlUris)
+            final List<String> ocspUris,
+            final List<String> crlUris,
+            final List<String> deltaCrlUris)
     throws OperationException
     {
         try
@@ -290,12 +292,12 @@ class X509SelfSignedCertBuilder
     }
 
     private static void addExtensions(
-            X509v3CertificateBuilder certBuilder,
-            IdentifiedX509Certprofile profile,
-            X500Name requestedSubject,
-            Extensions extensions,
-            SubjectPublicKeyInfo requestedPublicKeyInfo,
-            PublicCAInfo publicCaInfo)
+            final X509v3CertificateBuilder certBuilder,
+            final IdentifiedX509Certprofile profile,
+            final X500Name requestedSubject,
+            final Extensions extensions,
+            final SubjectPublicKeyInfo requestedPublicKeyInfo,
+            final PublicCAInfo publicCaInfo)
     throws CertprofileException, IOException, BadCertTemplateException, NoSuchAlgorithmException
     {
         ExtensionValues extensionTuples = profile.getExtensions(requestedSubject, extensions, requestedPublicKeyInfo,
@@ -312,7 +314,8 @@ class X509SelfSignedCertBuilder
         }
     }
 
-    public static AsymmetricKeyParameter generatePublicKeyParameter(PublicKey key)
+    public static AsymmetricKeyParameter generatePublicKeyParameter(
+            final PublicKey key)
     throws InvalidKeyException
     {
         if (key instanceof RSAPublicKey)

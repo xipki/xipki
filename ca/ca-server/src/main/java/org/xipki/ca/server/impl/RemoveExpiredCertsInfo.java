@@ -52,7 +52,8 @@ class RemoveExpiredCertsInfo
         return numOfCerts;
     }
 
-    public void setNumOfCerts(int numOfCerts)
+    public void setNumOfCerts(
+            final int numOfCerts)
     {
         this.numOfCerts = numOfCerts;
     }
@@ -62,7 +63,8 @@ class RemoveExpiredCertsInfo
         return expiredAt;
     }
 
-    public void setExpiredAt(long expiredAt)
+    public void setExpiredAt(
+            final long expiredAt)
     {
         this.expiredAt = expiredAt;
     }
@@ -72,7 +74,8 @@ class RemoveExpiredCertsInfo
         return userLike;
     }
 
-    public void setUserLike(String userLike)
+    public void setUserLike(
+            final String userLike)
     {
         this.userLike = userLike;
     }
@@ -82,7 +85,8 @@ class RemoveExpiredCertsInfo
         return certprofile;
     }
 
-    public void setCertprofile(String certprofile)
+    public void setCertprofile(
+            final String certprofile)
     {
         this.certprofile = certprofile;
     }
@@ -92,7 +96,8 @@ class RemoveExpiredCertsInfo
         return overlap;
     }
 
-    public void setOverlap(long overlap)
+    public void setOverlap(
+            final long overlap)
     {
         this.overlap = overlap;
     }

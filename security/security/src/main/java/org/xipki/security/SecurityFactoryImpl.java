@@ -156,7 +156,10 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
 
     @Override
-    public ConcurrentContentSigner createSigner(String type, String conf, X509Certificate cert)
+    public ConcurrentContentSigner createSigner(
+            final String type,
+            final String conf,
+            final X509Certificate cert)
     throws SignerException
     {
         return createSigner(type, conf,
@@ -164,8 +167,12 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
 
     @Override
-    public ConcurrentContentSigner createSigner(String type, String confWithoutAlgo, String hashAlgo,
-            boolean mgf1, X509Certificate cert)
+    public ConcurrentContentSigner createSigner(
+            final String type,
+            final String confWithoutAlgo,
+            final String hashAlgo,
+            final boolean mgf1,
+            final X509Certificate cert)
     throws SignerException
     {
         return createSigner(type, confWithoutAlgo, hashAlgo, mgf1,
@@ -173,7 +180,10 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
 
     @Override
-    public ConcurrentContentSigner createSigner(String type, String confWithoutAlgo, String hashAlgo,
+    public ConcurrentContentSigner createSigner(
+            final String type,
+            final String confWithoutAlgo,
+            final String hashAlgo,
             boolean mgf1, X509Certificate[] certs)
     throws SignerException
     {
@@ -183,7 +193,10 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
 
     @Override
-    public ConcurrentContentSigner createSigner(String type, String conf, X509Certificate[] certificateChain)
+    public ConcurrentContentSigner createSigner(
+            final String type,
+            final String conf,
+            final X509Certificate[] certificateChain)
     throws SignerException
     {
         ConcurrentContentSigner signer = doCreateSigner(type, conf, null, false, certificateChain);
@@ -192,8 +205,9 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
 
     private static void validateSigner(
-            ConcurrentContentSigner signer, X509Certificate[] certificateChain,
-            String signerType, String signerConf)
+            final ConcurrentContentSigner signer,
+            final X509Certificate[] certificateChain,
+            final String signerType, String signerConf)
     throws SignerException
     {
         X509Certificate cert = signer.getCertificate();
@@ -259,8 +273,11 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
 
     private ConcurrentContentSigner doCreateSigner(
-            String type, String conf, String hashAlgo, boolean mgf1,
-            X509Certificate[] certificateChain)
+            String type,
+            final String conf,
+            final String hashAlgo,
+            final boolean mgf1,
+            final X509Certificate[] certificateChain)
     throws SignerException
     {
         if(signerTypeMapping.containsKey(type))
@@ -473,7 +490,8 @@ public class SecurityFactoryImpl implements SecurityFactory
         }
     }
 
-    private AlgorithmIdentifier getSignatureAlgoId(String signerConf)
+    private AlgorithmIdentifier getSignatureAlgoId(
+            final String signerConf)
     throws SignerException
     {
         CmpUtf8Pairs keyValues = new CmpUtf8Pairs(signerConf);
@@ -619,7 +637,10 @@ public class SecurityFactoryImpl implements SecurityFactory
         return signatureAlgId;
     }
 
-    private AlgorithmIdentifier getSignatureAlgoId(PublicKey pubKey, String hashAlgo, boolean mgf1)
+    private AlgorithmIdentifier getSignatureAlgoId(
+            final PublicKey pubKey,
+            final String hashAlgo,
+            final boolean mgf1)
     throws SignerException
     {
         AlgorithmIdentifier signatureAlgId;
@@ -736,7 +757,8 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
 
     @Override
-    public ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
+    public ContentVerifierProvider getContentVerifierProvider(
+            final PublicKey publicKey)
     throws InvalidKeyException
     {
         try
@@ -749,7 +771,8 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
 
     @Override
-    public ContentVerifierProvider getContentVerifierProvider(X509Certificate cert)
+    public ContentVerifierProvider getContentVerifierProvider(
+            final X509Certificate cert)
     throws InvalidKeyException
     {
         try
@@ -762,7 +785,8 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
 
     @Override
-    public ContentVerifierProvider getContentVerifierProvider(X509CertificateHolder cert)
+    public ContentVerifierProvider getContentVerifierProvider(
+            final X509CertificateHolder cert)
     throws InvalidKeyException
     {
         try
@@ -776,7 +800,8 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
 
     @Override
-    public PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo)
+    public PublicKey generatePublicKey(
+            final SubjectPublicKeyInfo subjectPublicKeyInfo)
     throws InvalidKeyException
     {
         try
@@ -789,12 +814,14 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
 
     @Override
-    public boolean verifyPOPO(CertificationRequest p10Req)
+    public boolean verifyPOPO(
+            final CertificationRequest p10Req)
     {
         return SignerUtil.verifyPOP(p10Req);
     }
 
-    public void setPkcs11Provider(String pkcs11Provider)
+    public void setPkcs11Provider(
+            final String pkcs11Provider)
     {
         this.pkcs11Provider = pkcs11Provider;
     }
@@ -805,7 +832,8 @@ public class SecurityFactoryImpl implements SecurityFactory
         return pkcs11Provider;
     }
 
-    public void setDefaultParallelism(int defaultParallelism)
+    public void setDefaultParallelism(
+            final int defaultParallelism)
     {
         if(defaultParallelism > 0)
         {
@@ -813,14 +841,19 @@ public class SecurityFactoryImpl implements SecurityFactory
         }
     }
 
-    public static String getKeystoreSignerConf(String keystoreFile, String password,
-            String signatureAlgorithm, int parallelism)
+    public static String getKeystoreSignerConf(
+            final String keystoreFile, final String password,
+            final String signatureAlgorithm, final int parallelism)
     {
         return getKeystoreSignerConf(keystoreFile, password, signatureAlgorithm, parallelism, null);
     }
 
-    public static String getKeystoreSignerConf(String keystoreFile, String password,
-            String signatureAlgorithm, int parallelism, String keyLabel)
+    public static String getKeystoreSignerConf(
+            final String keystoreFile,
+            final String password,
+            final String signatureAlgorithm,
+            final int parallelism,
+            final String keyLabel)
     {
         ParamChecker.assertNotEmpty("keystoreFile", keystoreFile);
         ParamChecker.assertNotEmpty("password", password);
@@ -838,13 +871,19 @@ public class SecurityFactoryImpl implements SecurityFactory
         return conf.getEncoded();
     }
 
-    public static String getKeystoreSignerConfWithoutAlgo(String keystoreFile, String password, int parallelism)
+    public static String getKeystoreSignerConfWithoutAlgo(
+            final String keystoreFile,
+            final String password,
+            final int parallelism)
     {
         return getKeystoreSignerConfWithoutAlgo(keystoreFile, password, parallelism, null);
     }
 
-    public static String getKeystoreSignerConfWithoutAlgo(String keystoreFile, String password,
-            int parallelism, String keyLabel)
+    public static String getKeystoreSignerConfWithoutAlgo(
+            final String keystoreFile,
+            final String password,
+            final int parallelism,
+            final String keyLabel)
     {
         ParamChecker.assertNotEmpty("keystoreFile", keystoreFile);
         ParamChecker.assertNotEmpty("password", password);
@@ -860,8 +899,11 @@ public class SecurityFactoryImpl implements SecurityFactory
         return conf.getEncoded();
     }
 
-    public static String getPkcs11SignerConf(String pkcs11ModuleName, P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId, String signatureAlgorithm, int parallelism)
+    public static String getPkcs11SignerConf(
+            final String pkcs11ModuleName,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId,
+            final String signatureAlgorithm, final int parallelism)
     {
         ParamChecker.assertNotNull("algo", signatureAlgorithm);
         ParamChecker.assertNotNull("keyId", keyId);
@@ -896,8 +938,11 @@ public class SecurityFactoryImpl implements SecurityFactory
         return conf.getEncoded();
     }
 
-    public static String getPkcs11SignerConfWithoutAlgo(String pkcs11ModuleName, P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId, int parallelism)
+    public static String getPkcs11SignerConfWithoutAlgo(
+            final String pkcs11ModuleName,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId,
+            int parallelism)
     {
         ParamChecker.assertNotNull("keyId", keyId);
 
@@ -931,7 +976,8 @@ public class SecurityFactoryImpl implements SecurityFactory
         return conf.getEncoded();
     }
     @Override
-    public P11CryptService getP11CryptService(String moduleName)
+    public P11CryptService getP11CryptService(
+            String moduleName)
     throws SignerException
     {
         initP11CryptServiceFactory();
@@ -1226,7 +1272,8 @@ public class SecurityFactoryImpl implements SecurityFactory
         }
     }
 
-    public void setSignerTypeMap(String signerTypeMap)
+    public void setSignerTypeMap(
+            String signerTypeMap)
     {
         if(signerTypeMap == null)
         {

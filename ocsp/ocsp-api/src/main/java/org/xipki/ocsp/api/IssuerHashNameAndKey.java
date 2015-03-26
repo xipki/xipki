@@ -50,7 +50,10 @@ public class IssuerHashNameAndKey
     private final byte[] issuerNameHash;
     private final byte[] issuerKeyHash;
 
-    public IssuerHashNameAndKey(HashAlgoType algo, byte[] issuerNameHash, byte[] issuerKeyHash)
+    public IssuerHashNameAndKey(
+            final HashAlgoType algo,
+            final byte[] issuerNameHash,
+            final byte[] issuerKeyHash)
     {
         ParamChecker.assertNotNull("algo", algo);
 
@@ -70,7 +73,10 @@ public class IssuerHashNameAndKey
         this.issuerKeyHash = Arrays.copyOf(issuerKeyHash, len);
     }
 
-    public boolean match(HashAlgoType algo, byte[] issuerNameHash, byte[] issuerKeyHash)
+    public boolean match(
+            final HashAlgoType algo,
+            final byte[] issuerNameHash,
+            final byte[] issuerKeyHash)
     {
         return this.algo == algo &&
                 Arrays.equals(this.issuerNameHash, issuerNameHash) &&

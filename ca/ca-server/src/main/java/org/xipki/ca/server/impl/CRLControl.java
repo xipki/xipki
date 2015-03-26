@@ -201,7 +201,8 @@ class CRLControl implements Serializable
 
     private final Set<String> extensionOIDs;
 
-    public CRLControl(String conf)
+    public CRLControl(
+            final String conf)
     throws ConfigurationException
     {
         ParamChecker.assertNotEmpty("conf", conf);
@@ -287,7 +288,10 @@ class CRLControl implements Serializable
         validate();
     }
 
-    private static int getInteger(CmpUtf8Pairs props, String propKey, int dfltValue)
+    private static int getInteger(
+            final CmpUtf8Pairs props,
+            final String propKey,
+            final int dfltValue)
     throws ConfigurationException
     {
         String s = props.getValue(propKey);
@@ -304,7 +308,10 @@ class CRLControl implements Serializable
         return dfltValue;
     }
 
-    private static boolean getBoolean(CmpUtf8Pairs props, String propKey, boolean dfltValue)
+    private static boolean getBoolean(
+            final CmpUtf8Pairs props,
+            final String propKey,
+            final boolean dfltValue)
     throws ConfigurationException
     {
         String s = props.getValue(propKey);

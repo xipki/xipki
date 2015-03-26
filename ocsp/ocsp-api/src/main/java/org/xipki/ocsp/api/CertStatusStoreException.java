@@ -48,17 +48,21 @@ public class CertStatusStoreException extends Exception
     {
     }
 
-    public CertStatusStoreException(String message)
+    public CertStatusStoreException(
+            final String message)
     {
         super(message);
     }
 
-    public CertStatusStoreException(Throwable cause)
+    public CertStatusStoreException(
+            final Throwable cause)
     {
         super(cause);
     }
 
-    public CertStatusStoreException(String message, Throwable cause)
+    public CertStatusStoreException(
+            final String message,
+            final Throwable cause)
     {
         super(message, cause);
     }

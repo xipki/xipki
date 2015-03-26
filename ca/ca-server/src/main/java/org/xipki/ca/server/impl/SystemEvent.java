@@ -45,7 +45,10 @@ class SystemEvent
     private final String owner;
     private final long eventTime;
 
-    public SystemEvent(String name, String owner, long eventTime)
+    public SystemEvent(
+            final String name,
+            final String owner,
+            final long eventTime)
     {
         super();
         this.name = name;

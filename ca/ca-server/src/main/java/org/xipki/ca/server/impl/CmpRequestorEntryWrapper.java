@@ -51,7 +51,8 @@ class CmpRequestorEntryWrapper
     {
     }
 
-    public void setDbEntry(CmpRequestorEntry dbEntry)
+    public void setDbEntry(
+            final CmpRequestorEntry dbEntry)
     {
         this.dbEntry = dbEntry;
         cert = null;

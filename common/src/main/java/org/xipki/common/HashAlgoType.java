@@ -51,7 +51,10 @@ public enum HashAlgoType
     private final String oid;
     private final String name;
 
-    private HashAlgoType(int length, String oid, String name)
+    private HashAlgoType(
+            final int length,
+            final String oid,
+            final String name)
     {
         this.length = length;
         this.oid = oid;
@@ -73,7 +76,8 @@ public enum HashAlgoType
         return name;
     }
 
-    public static HashAlgoType getHashAlgoType(String nameOrOid)
+    public static HashAlgoType getHashAlgoType(
+            String nameOrOid)
     {
         for(HashAlgoType hashAlgo : values())
         {

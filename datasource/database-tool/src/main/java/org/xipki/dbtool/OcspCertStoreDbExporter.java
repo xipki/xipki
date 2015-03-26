@@ -89,9 +89,13 @@ class OcspCertStoreDbExporter extends DbPorter
     private final int dbSchemaVersion;
     private final String col_revInvTime;
 
-    OcspCertStoreDbExporter(DataSourceWrapper dataSource,
-            Marshaller marshaller, Unmarshaller unmarshaller, String baseDir, int numCertsInBundle,
-            boolean resume)
+    OcspCertStoreDbExporter(
+            final DataSourceWrapper dataSource,
+            final Marshaller marshaller,
+            final Unmarshaller unmarshaller,
+            final String baseDir,
+            int numCertsInBundle,
+            final boolean resume)
     throws Exception
     {
         super(dataSource, baseDir);
@@ -175,7 +179,8 @@ class OcspCertStoreDbExporter extends DbPorter
         }
     }
 
-    private void export_issuer(CertStoreType certstore)
+    private void export_issuer(
+            final CertStoreType certstore)
     throws DataAccessException
     {
         System.out.println("exporting table ISSUER");
@@ -228,7 +233,9 @@ class OcspCertStoreDbExporter extends DbPorter
         System.out.println(" exported table ISSUER");
     }
 
-    private Exception export_cert(CertStoreType certstore, File processLogFile)
+    private Exception export_cert(
+            final CertStoreType certstore,
+            final File processLogFile)
     {
         try
         {
@@ -245,7 +252,9 @@ class OcspCertStoreDbExporter extends DbPorter
         }
     }
 
-    private void do_export_cert(CertStoreType certstore, File processLogFile)
+    private void do_export_cert(
+            final CertStoreType certstore,
+            final File processLogFile)
     throws DataAccessException, IOException, JAXBException
     {
         CertsFiles certsFiles = certstore.getCertsFiles();
@@ -478,7 +487,9 @@ class OcspCertStoreDbExporter extends DbPorter
         System.out.println(" exported " + sum + " certificates from tables cert, certhash and rawcert");
     }
 
-    private void finalizeZip(ZipOutputStream zipOutStream, CertsType certsType)
+    private void finalizeZip(
+            final ZipOutputStream zipOutStream,
+            final CertsType certsType)
     throws JAXBException, IOException
     {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();

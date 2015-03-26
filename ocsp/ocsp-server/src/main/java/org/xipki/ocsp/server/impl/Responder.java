@@ -55,10 +55,14 @@ class Responder
     private final ResponderSigner signer;
     private final List<CertStatusStore> stores;
 
-    Responder(ResponderOption responderOption,
-            RequestOption requestOption, ResponseOption responseOption,
-            AuditOption auditOption, CertprofileOption certprofileOption,
-            ResponderSigner signer, List<CertStatusStore> stores)
+    Responder(
+            final ResponderOption responderOption,
+            final RequestOption requestOption,
+            final ResponseOption responseOption,
+            final AuditOption auditOption,
+            final CertprofileOption certprofileOption,
+            final ResponderSigner signer,
+            final List<CertStatusStore> stores)
     {
         ParamChecker.assertNotNull("responderOption", responderOption);
         ParamChecker.assertNotNull("requestOption", requestOption);

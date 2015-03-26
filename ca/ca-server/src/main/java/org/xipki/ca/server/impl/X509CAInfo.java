@@ -87,7 +87,9 @@ class X509CAInfo
     private RandomSerialNumberGenerator randomSNGenerator;
     private ConcurrentContentSigner signer;
 
-    public X509CAInfo(X509CAEntry caEntry, CertificateStore certStore)
+    public X509CAInfo(
+            final X509CAEntry caEntry,
+            final CertificateStore certStore)
     throws OperationException
     {
         ParamChecker.assertNotNull("caEntry", caEntry);
@@ -252,7 +254,8 @@ class X509CAInfo
         return caEntry.getMaxValidity();
     }
 
-    public void setMaxValidity(CertValidity maxValidity)
+    public void setMaxValidity(
+            final CertValidity maxValidity)
     {
         caEntry.setMaxValidity(maxValidity);
     }
@@ -272,7 +275,8 @@ class X509CAInfo
         return caEntry.getCrlSignerName();
     }
 
-    public void setCrlSignerName(String crlSignerName)
+    public void setCrlSignerName(
+            final String crlSignerName)
     {
         caEntry.setCrlSignerName(crlSignerName);
     }
@@ -282,7 +286,8 @@ class X509CAInfo
         return caEntry.getCmpControlName();
     }
 
-    public void setCmpControlName(String name)
+    public void setCmpControlName(
+            final String name)
     {
         caEntry.setCmpControlName(name);
     }
@@ -297,7 +302,8 @@ class X509CAInfo
         return caEntry.getStatus();
     }
 
-    public void setStatus(CAStatus status)
+    public void setStatus(
+            final CAStatus status)
     {
         caEntry.setStatus(status);
     }
@@ -313,7 +319,8 @@ class X509CAInfo
         return caEntry.toString(false);
     }
 
-    public String toString(boolean verbose)
+    public String toString(
+            final boolean verbose)
     {
         return caEntry.toString(verbose);
     }
@@ -323,7 +330,8 @@ class X509CAInfo
         return caEntry.getDuplicateKeyMode();
     }
 
-    public void setDuplicateKeyMode(DuplicationMode mode)
+    public void setDuplicateKeyMode(
+            final DuplicationMode mode)
     {
         caEntry.setDuplicateKeyMode(mode);
     }
@@ -333,7 +341,8 @@ class X509CAInfo
         return caEntry.getDuplicateSubjectMode();
     }
 
-    public void setDuplicateSubjectMode(DuplicationMode mode)
+    public void setDuplicateSubjectMode(
+            final DuplicationMode mode)
     {
         caEntry.setDuplicateSubjectMode(mode);
     }
@@ -343,7 +352,8 @@ class X509CAInfo
         return caEntry.getValidityMode();
     }
 
-    public void setValidityMode(ValidityMode mode)
+    public void setValidityMode(
+            final ValidityMode mode)
     {
         caEntry.setValidityMode(mode);
     }
@@ -353,7 +363,8 @@ class X509CAInfo
         return caEntry.getPermissions();
     }
 
-    public void setPermissions(Set<Permission> permissions)
+    public void setPermissions(
+            final Set<Permission> permissions)
     {
         caEntry.setPermissions(permissions);
     }
@@ -363,7 +374,8 @@ class X509CAInfo
         return caEntry.getRevocationInfo();
     }
 
-    public void setRevocationInfo(CertRevocationInfo revocationInfo)
+    public void setRevocationInfo(
+            final CertRevocationInfo revocationInfo)
     {
         caEntry.setRevocationInfo(revocationInfo);
     }
@@ -423,7 +435,8 @@ class X509CAInfo
         return signer;
     }
 
-    public boolean initSigner(SecurityFactory securityFactory)
+    public boolean initSigner(
+            final SecurityFactory securityFactory)
     throws SignerException
     {
         if(signer != null)

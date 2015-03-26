@@ -59,7 +59,8 @@ class ResponderOption
     private final List<String> storeNames;
     private final List<String> servletPaths;
 
-    public ResponderOption(ResponderType conf)
+    public ResponderOption(
+            final ResponderType conf)
     throws ConfigurationException
     {
         String s = conf.getMode();

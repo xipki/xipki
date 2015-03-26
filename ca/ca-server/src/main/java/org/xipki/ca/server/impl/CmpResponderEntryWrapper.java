@@ -59,7 +59,8 @@ class CmpResponderEntryWrapper
     {
     }
 
-    public void setDbEntry(CmpResponderEntry dbEntry)
+    public void setDbEntry(
+            final CmpResponderEntry dbEntry)
     {
         this.dbEntry = dbEntry;
         signer = null;
@@ -76,7 +77,8 @@ class CmpResponderEntryWrapper
         return signer;
     }
 
-    public void initSigner(SecurityFactory securityFactory)
+    public void initSigner(
+            final SecurityFactory securityFactory)
     throws SignerException
     {
         if(signer != null)

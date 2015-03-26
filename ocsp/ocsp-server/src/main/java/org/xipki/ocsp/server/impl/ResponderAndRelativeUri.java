@@ -46,7 +46,9 @@ class ResponderAndRelativeUri
     private final Responder responder;
     private final String relativeUri;
 
-    public ResponderAndRelativeUri(Responder responder, String relativeUri)
+    public ResponderAndRelativeUri(
+            final Responder responder,
+            final String relativeUri)
     {
         ParamChecker.assertNotNull("responder", responder);
         ParamChecker.assertNotNull("relativeUri", relativeUri);

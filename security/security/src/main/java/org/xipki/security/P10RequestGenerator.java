@@ -75,10 +75,11 @@ public class P10RequestGenerator
 {
 
     public PKCS10CertificationRequest generateRequest(
-            SecurityFactory securityFactory,
-            String signerType, String signerConf,
-            SubjectPublicKeyInfo subjectPublicKeyInfo,
-            String subject,
+            final SecurityFactory securityFactory,
+            final String signerType,
+            final String signerConf,
+            final SubjectPublicKeyInfo subjectPublicKeyInfo,
+            final String subject,
             List<Extension> extensions)
     throws PasswordResolverException, SignerException
     {
@@ -87,11 +88,12 @@ public class P10RequestGenerator
     }
 
     public PKCS10CertificationRequest generateRequest(
-            SecurityFactory securityFactory,
-            String signerType, String signerConf,
-            SubjectPublicKeyInfo subjectPublicKeyInfo,
-            X500Name subjectDN,
-            List<Extension> extensions)
+            final SecurityFactory securityFactory,
+            final String signerType,
+            final String signerConf,
+            final SubjectPublicKeyInfo subjectPublicKeyInfo,
+            final X500Name subjectDN,
+            final List<Extension> extensions)
     throws PasswordResolverException, SignerException
     {
         ConcurrentContentSigner signer = securityFactory.createSigner(signerType, signerConf,
@@ -114,10 +116,10 @@ public class P10RequestGenerator
     }
 
     public PKCS10CertificationRequest generateRequest(
-            ContentSigner contentSigner,
-            SubjectPublicKeyInfo subjectPublicKeyInfo,
-            X500Name subjectDN,
-            List<Extension> extensions)
+            final ContentSigner contentSigner,
+            final SubjectPublicKeyInfo subjectPublicKeyInfo,
+            final X500Name subjectDN,
+            final List<Extension> extensions)
     {
         PKCS10CertificationRequestBuilder p10ReqBuilder =
                 new PKCS10CertificationRequestBuilder(subjectDN, subjectPublicKeyInfo);
@@ -130,7 +132,8 @@ public class P10RequestGenerator
     }
 
     public static Extension createExtensionSubjectAltName(
-            List<String> taggedValues, boolean critical)
+            final List<String> taggedValues,
+            final boolean critical)
     throws BadInputException
     {
         GeneralNames names = createGeneralNames(taggedValues);
@@ -148,7 +151,8 @@ public class P10RequestGenerator
         }
     }
 
-    public static GeneralNames createGeneralNames(List<String> taggedValues)
+    public static GeneralNames createGeneralNames(
+            final List<String> taggedValues)
     throws BadInputException
     {
         if(CollectionUtil.isEmpty(taggedValues))
@@ -166,7 +170,8 @@ public class P10RequestGenerator
     }
 
     public static Extension createExtensionSubjectInfoAccess(
-            List<String> accessMethodAndLocations, boolean critical)
+            final List<String> accessMethodAndLocations,
+            final boolean critical)
     throws BadInputException
     {
         if(CollectionUtil.isEmpty(accessMethodAndLocations))
@@ -189,7 +194,8 @@ public class P10RequestGenerator
         }
     }
 
-    public static AccessDescription createAccessDescription(String accessMethodAndLocation)
+    public static AccessDescription createAccessDescription(
+            final String accessMethodAndLocation)
     throws BadInputException
     {
         CmpUtf8Pairs pairs;
@@ -222,7 +228,8 @@ public class P10RequestGenerator
      * @return
      * @throws BadInputException
      */
-    public static GeneralName createGeneralName(String taggedValue)
+    public static GeneralName createGeneralName(
+            final String taggedValue)
     throws BadInputException
     {
         int tag = -1;

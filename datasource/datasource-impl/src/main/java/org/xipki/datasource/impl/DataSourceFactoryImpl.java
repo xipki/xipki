@@ -35,12 +35,12 @@
 
 package org.xipki.datasource.impl;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.xipki.common.util.IoUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.DatabaseType;
@@ -55,17 +55,23 @@ import org.xipki.security.api.PasswordResolverException;
 public class DataSourceFactoryImpl implements DataSourceFactory
 {
     @Override
-    public DataSourceWrapper createDataSourceForFile(String name, String confFile, PasswordResolver passwordResolver)
+    public DataSourceWrapper createDataSourceForFile(
+            final String name,
+            final String confFile,
+            final PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException, IOException
     {
         assertNotNull("confFile", confFile);
 
-        FileInputStream fIn = new FileInputStream(expandFilepath(confFile));
+        FileInputStream fIn = new FileInputStream(IoUtil.expandFilepath(confFile));
         return createDataSource(name, fIn, passwordResolver);
     }
 
     @Override
-    public DataSourceWrapper createDataSource(String name, InputStream conf, PasswordResolver passwordResolver)
+    public DataSourceWrapper createDataSource(
+            final String name,
+            final InputStream conf,
+            final PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException, IOException
     {
         assertNotNull("conf", conf);
@@ -88,7 +94,10 @@ public class DataSourceFactoryImpl implements DataSourceFactory
     }
 
     @Override
-    public DataSourceWrapper createDataSource(String name, Properties conf, PasswordResolver passwordResolver)
+    public DataSourceWrapper createDataSource(
+            final String name,
+            final Properties conf,
+            final PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException
     {
         assertNotNull("conf", conf);
@@ -129,23 +138,13 @@ public class DataSourceFactoryImpl implements DataSourceFactory
         return DataSourceWrapperImpl.createDataSource(name, conf, databaseType);
     }
 
-    private static void assertNotNull(String parameterName, Object parameter)
+    private static void assertNotNull(
+            final String parameterName,
+            final Object parameter)
     {
         if(parameter == null)
         {
             throw new IllegalArgumentException(parameterName + " could not be null");
-        }
-    }
-
-    private static String expandFilepath(String path)
-    {
-        if (path.startsWith("~" + File.separator))
-        {
-            return System.getProperty("user.home") + path.substring(1);
-        }
-        else
-        {
-            return path;
         }
     }
 

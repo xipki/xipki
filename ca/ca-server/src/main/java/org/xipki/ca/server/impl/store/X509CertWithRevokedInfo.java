@@ -46,7 +46,9 @@ public class X509CertWithRevokedInfo
     private final X509CertWithDBCertId cert;
     private final boolean revoked;
 
-    public X509CertWithRevokedInfo(X509CertWithDBCertId cert, boolean revoked)
+    public X509CertWithRevokedInfo(
+            final X509CertWithDBCertId cert,
+            final boolean revoked)
     {
         this.cert = cert;
         this.revoked = revoked;

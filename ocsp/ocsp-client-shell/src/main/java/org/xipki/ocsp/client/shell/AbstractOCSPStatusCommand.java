@@ -110,7 +110,8 @@ public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
         return requestor;
     }
 
-    public void setRequestor(OCSPRequestor requestor)
+    public void setRequestor(
+            final OCSPRequestor requestor)
     {
         this.requestor = requestor;
     }

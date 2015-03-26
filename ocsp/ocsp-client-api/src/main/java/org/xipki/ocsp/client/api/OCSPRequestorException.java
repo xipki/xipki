@@ -48,17 +48,21 @@ public class OCSPRequestorException extends Exception
     {
     }
 
-    public OCSPRequestorException(String message)
+    public OCSPRequestorException(
+            final String message)
     {
         super(message);
     }
 
-    public OCSPRequestorException(Throwable cause)
+    public OCSPRequestorException(
+            final Throwable cause)
     {
         super(cause);
     }
 
-    public OCSPRequestorException(String message, Throwable cause)
+    public OCSPRequestorException(
+            final String message,
+            final Throwable cause)
     {
         super(message, cause);
     }

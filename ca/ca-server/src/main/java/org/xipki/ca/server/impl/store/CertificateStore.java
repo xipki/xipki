@@ -69,7 +69,8 @@ public class CertificateStore
     private static final Logger LOG = LoggerFactory.getLogger(CertificateStore.class);
     private final CertStoreQueryExecutor queryExecutor;
 
-    public CertificateStore(DataSourceWrapper dataSource)
+    public CertificateStore(
+            final DataSourceWrapper dataSource)
     throws DataAccessException
     {
         ParamChecker.assertNotNull("dataSource", dataSource);
@@ -77,7 +78,8 @@ public class CertificateStore
         this.queryExecutor = new CertStoreQueryExecutor(dataSource);
     }
 
-    public boolean addCertificate(X509CertificateInfo certInfo)
+    public boolean addCertificate(
+            final X509CertificateInfo certInfo)
     {
         try
         {
@@ -100,7 +102,10 @@ public class CertificateStore
         return true;
     }
 
-    public void addToPublishQueue(String publisherName, int certId, X509CertWithDBCertId caCert)
+    public void addToPublishQueue(
+            final String publisherName,
+            final int certId,
+            final X509CertWithDBCertId caCert)
     throws OperationException
     {
         try
@@ -116,7 +121,9 @@ public class CertificateStore
         }
     }
 
-    public void removeFromPublishQueue(String publisherName, int certId)
+    public void removeFromPublishQueue(
+            final String publisherName,
+            final int certId)
     throws OperationException
     {
         try
@@ -132,7 +139,9 @@ public class CertificateStore
         }
     }
 
-    public void clearPublishQueue(X509CertWithDBCertId caCert, String publisherName)
+    public void clearPublishQueue(
+            final X509CertWithDBCertId caCert,
+            final String publisherName)
     throws OperationException
     {
         try
@@ -148,7 +157,8 @@ public class CertificateStore
         }
     }
 
-    public long getMaxIdOfDeltaCRLCache(X509CertWithDBCertId caCert)
+    public long getMaxIdOfDeltaCRLCache(
+            final X509CertWithDBCertId caCert)
     throws OperationException
     {
         try
@@ -164,7 +174,9 @@ public class CertificateStore
         }
     }
 
-    public void clearDeltaCRLCache(X509CertWithDBCertId caCert, long maxId)
+    public void clearDeltaCRLCache(
+            final X509CertWithDBCertId caCert,
+            final long maxId)
     throws OperationException
     {
         try
@@ -180,8 +192,12 @@ public class CertificateStore
         }
     }
 
-    public X509CertWithRevocationInfo revokeCertificate(X509CertWithDBCertId caCert,
-            BigInteger serialNumber, CertRevocationInfo revInfo, boolean force, boolean publishToDeltaCRLCache)
+    public X509CertWithRevocationInfo revokeCertificate(
+            final X509CertWithDBCertId caCert,
+            final BigInteger serialNumber,
+            final CertRevocationInfo revInfo,
+            final boolean force,
+            final boolean publishToDeltaCRLCache)
     throws OperationException
     {
         try
@@ -209,8 +225,11 @@ public class CertificateStore
         }
     }
 
-    public X509CertWithDBCertId unrevokeCertificate(X509CertWithDBCertId caCert,
-            BigInteger serialNumber, boolean force, boolean publishToDeltaCRLCache)
+    public X509CertWithDBCertId unrevokeCertificate(
+            final X509CertWithDBCertId caCert,
+            final BigInteger serialNumber,
+            final boolean force,
+            final boolean publishToDeltaCRLCache)
     throws OperationException
     {
         try
@@ -238,7 +257,9 @@ public class CertificateStore
         }
     }
 
-    X509CertWithDBCertId getCert(X509CertWithDBCertId caCert, BigInteger serialNumber)
+    X509CertWithDBCertId getCert(
+            final X509CertWithDBCertId caCert,
+            final BigInteger serialNumber)
     throws OperationException
     {
         try
@@ -254,8 +275,9 @@ public class CertificateStore
         }
     }
 
-    public void removeCertificate(X509CertWithDBCertId caCert,
-            BigInteger serialNumber)
+    public void removeCertificate(
+            final X509CertWithDBCertId caCert,
+            final BigInteger serialNumber)
     throws OperationException
     {
         try
@@ -271,7 +293,9 @@ public class CertificateStore
         }
     }
 
-    public boolean addCRL(X509CertWithDBCertId caCert, X509CRL crl)
+    public boolean addCRL(
+            final X509CertWithDBCertId caCert,
+            final X509CRL crl)
     {
         try
         {
@@ -287,7 +311,8 @@ public class CertificateStore
         }
     }
 
-    public boolean hasCRL(X509CertWithDBCertId caCert)
+    public boolean hasCRL(
+            final X509CertWithDBCertId caCert)
     throws OperationException
     {
         try
@@ -303,7 +328,8 @@ public class CertificateStore
         }
     }
 
-    public int getMaxCRLNumber(X509CertWithDBCertId caCert)
+    public int getMaxCRLNumber(
+            final X509CertWithDBCertId caCert)
     throws OperationException
     {
         try
@@ -319,7 +345,8 @@ public class CertificateStore
         }
     }
 
-    public long getThisUpdateOfCurrentCRL(X509CertWithDBCertId caCert)
+    public long getThisUpdateOfCurrentCRL(
+            final X509CertWithDBCertId caCert)
     throws OperationException
     {
         try
@@ -335,7 +362,9 @@ public class CertificateStore
         }
     }
 
-    public byte[] getEncodedCRL(X509CertWithDBCertId caCert, BigInteger crlNumber)
+    public byte[] getEncodedCRL(
+            final X509CertWithDBCertId caCert,
+            final BigInteger crlNumber)
     {
         try
         {
@@ -350,7 +379,9 @@ public class CertificateStore
         }
     }
 
-    public int cleanupCRLs(X509CertWithDBCertId caCert, int numCRLs)
+    public int cleanupCRLs(
+            final X509CertWithDBCertId caCert,
+            final int numCRLs)
     {
         try
         {
@@ -365,8 +396,9 @@ public class CertificateStore
         }
     }
 
-    public boolean certIssuedForSubject(X509CertWithDBCertId caCert,
-            String sha1FpSubject)
+    public boolean certIssuedForSubject(
+            final X509CertWithDBCertId caCert,
+            final String sha1FpSubject)
     throws OperationException
     {
         try
@@ -382,7 +414,9 @@ public class CertificateStore
         }
     }
 
-    public CertStatus getCertStatusForSubject(X509CertWithDBCertId caCert, X500Principal subject)
+    public CertStatus getCertStatusForSubject(
+            final X509CertWithDBCertId caCert,
+            final X500Principal subject)
     {
         try
         {
@@ -395,7 +429,9 @@ public class CertificateStore
         }
     }
 
-    public CertStatus getCertStatusForSubject(X509CertWithDBCertId caCert, X500Name subject)
+    public CertStatus getCertStatusForSubject(
+            final X509CertWithDBCertId caCert,
+            final X500Name subject)
     {
         try
         {
@@ -423,9 +459,13 @@ public class CertificateStore
      * @return
      * @throws DataAccessException
      */
-    public List<CertRevInfoWithSerial> getRevokedCertificates(X509CertWithDBCertId caCert,
-            Date notExpiredAt, BigInteger startSerial, int numEntries,
-            boolean onlyCACerts, boolean onlyUserCerts)
+    public List<CertRevInfoWithSerial> getRevokedCertificates(
+            final X509CertWithDBCertId caCert,
+            final Date notExpiredAt,
+            final BigInteger startSerial,
+            final int numEntries,
+            final boolean onlyCACerts,
+            final boolean onlyUserCerts)
     throws OperationException
     {
         try
@@ -443,8 +483,11 @@ public class CertificateStore
     }
 
     public List<CertRevInfoWithSerial> getCertificatesForDeltaCRL(
-            X509CertWithDBCertId caCert, BigInteger startSerial, int numEntries,
-            boolean onlyCACerts, boolean onlyUserCerts)
+            final X509CertWithDBCertId caCert,
+            final BigInteger startSerial,
+            final int numEntries,
+            final boolean onlyCACerts,
+            final boolean onlyUserCerts)
     throws OperationException
     {
         try
@@ -461,9 +504,14 @@ public class CertificateStore
         }
     }
 
-    public List<BigInteger> getCertSerials(X509CertWithDBCertId caCert,
-            Date notExpiredAt, BigInteger startSerial, int numEntries, boolean onlyRevoked,
-            boolean onlyCACerts, boolean onlyUserCerts)
+    public List<BigInteger> getCertSerials(
+            final X509CertWithDBCertId caCert,
+            final Date notExpiredAt,
+            final BigInteger startSerial,
+            final int numEntries,
+            final boolean onlyRevoked,
+            final boolean onlyCACerts,
+            final boolean onlyUserCerts)
     throws OperationException
     {
         try
@@ -480,8 +528,12 @@ public class CertificateStore
         }
     }
 
-    public List<BigInteger> getExpiredCertSerials(X509CertWithDBCertId caCert,
-            long expiredAt, int numEntries, String certprofile, String userLike)
+    public List<BigInteger> getExpiredCertSerials(
+            final X509CertWithDBCertId caCert,
+            final long expiredAt,
+            final int numEntries,
+            final String certprofile,
+            final String userLike)
     throws OperationException
     {
         try
@@ -497,8 +549,11 @@ public class CertificateStore
         }
     }
 
-    public int getNumOfExpiredCerts(X509CertWithDBCertId caCert, long expiredAt,
-            String certprofile, String userLike)
+    public int getNumOfExpiredCerts(
+            final X509CertWithDBCertId caCert,
+            final long expiredAt,
+            final String certprofile,
+            final String userLike)
     throws OperationException
     {
         try
@@ -514,8 +569,10 @@ public class CertificateStore
         }
     }
 
-    public List<Integer> getPublishQueueEntries(X509CertWithDBCertId caCert,
-            String publisherName, int numEntries)
+    public List<Integer> getPublishQueueEntries(
+            final X509CertWithDBCertId caCert,
+            final String publisherName,
+            final int numEntries)
     throws OperationException
     {
         try
@@ -531,8 +588,9 @@ public class CertificateStore
         }
     }
 
-    public X509CertWithRevocationInfo getCertWithRevocationInfo(X509CertWithDBCertId caCert,
-            BigInteger serial)
+    public X509CertWithRevocationInfo getCertWithRevocationInfo(
+            final X509CertWithDBCertId caCert,
+            final BigInteger serial)
     throws OperationException
     {
         try
@@ -548,7 +606,9 @@ public class CertificateStore
         }
     }
 
-    public X509CertificateInfo getCertificateInfoForSerial(X509CertWithDBCertId caCert, BigInteger serial)
+    public X509CertificateInfo getCertificateInfoForSerial(
+            final X509CertWithDBCertId caCert,
+            final BigInteger serial)
     throws OperationException, CertificateException
     {
         try
@@ -564,7 +624,8 @@ public class CertificateStore
         }
     }
 
-    public Long getGreatestSerialNumber(X509CertWithDBCertId caCert)
+    public Long getGreatestSerialNumber(
+            final X509CertWithDBCertId caCert)
     throws OperationException
     {
         try
@@ -585,8 +646,11 @@ public class CertificateStore
         return queryExecutor.isHealthy();
     }
 
-    public SubjectKeyProfileBundle getLatestCert(X509CertWithDBCertId caCert, String subjectFp,
-            String keyFp, String profile)
+    public SubjectKeyProfileBundle getLatestCert(
+            final X509CertWithDBCertId caCert,
+            final String subjectFp,
+            final String keyFp,
+            final String profile)
     throws OperationException
     {
         try
@@ -602,13 +666,18 @@ public class CertificateStore
         }
     }
 
-    public boolean isCertForSubjectIssued(X509CertWithDBCertId caCert, String subjectFp)
+    public boolean isCertForSubjectIssued(
+            final X509CertWithDBCertId caCert,
+            final String subjectFp)
     throws OperationException
     {
         return isCertForSubjectIssued(caCert, subjectFp, null);
     }
 
-    public boolean isCertForSubjectIssued(X509CertWithDBCertId caCert, String subjectFp, String profile)
+    public boolean isCertForSubjectIssued(
+            final X509CertWithDBCertId caCert,
+            final String subjectFp,
+            final String profile)
     throws OperationException
     {
         try
@@ -624,13 +693,18 @@ public class CertificateStore
         }
     }
 
-    public boolean isCertForKeyIssued(X509CertWithDBCertId caCert, String keyFp)
+    public boolean isCertForKeyIssued(
+            final X509CertWithDBCertId caCert,
+            final String keyFp)
     throws OperationException
     {
         return isCertForKeyIssued(caCert, keyFp, null);
     }
 
-    public boolean isCertForKeyIssued(X509CertWithDBCertId caCert, String keyFp, String profile)
+    public boolean isCertForKeyIssued(
+            final X509CertWithDBCertId caCert,
+            final String keyFp,
+            final String profile)
     throws OperationException
     {
         try
@@ -646,7 +720,9 @@ public class CertificateStore
         }
     }
 
-    public X509CertificateInfo getCertificateInfoForId(X509CertWithDBCertId caCert, int certId)
+    public X509CertificateInfo getCertificateInfoForId(
+            final X509CertWithDBCertId caCert,
+            final int certId)
     throws OperationException, CertificateException
     {
         try
@@ -662,7 +738,8 @@ public class CertificateStore
         }
     }
 
-    public X509CertWithDBCertId getCertForId(int certId)
+    public X509CertWithDBCertId getCertForId(
+            final int certId)
     throws OperationException
     {
         try
@@ -690,7 +767,9 @@ public class CertificateStore
         }
     }
 
-    public Long getNotBeforeOfFirstCertStartsWithCN(String commonName, String profileName)
+    public Long getNotBeforeOfFirstCertStartsWithCN(
+            final String commonName,
+            final String profileName)
     throws OperationException
     {
         try
@@ -706,7 +785,8 @@ public class CertificateStore
         }
     }
 
-    public boolean containsCACertificates(X509CertWithDBCertId caCert)
+    public boolean containsCACertificates(
+            final X509CertWithDBCertId caCert)
     throws OperationException
     {
         try
@@ -722,7 +802,8 @@ public class CertificateStore
         }
     }
 
-    public boolean containsUserCertificates(X509CertWithDBCertId caCert)
+    public boolean containsUserCertificates(
+            final X509CertWithDBCertId caCert)
     throws OperationException
     {
         try
@@ -738,7 +819,9 @@ public class CertificateStore
         }
     }
 
-    public long nextSerial(X509CertWithDBCertId caCert, String seqName)
+    public long nextSerial(
+            final X509CertWithDBCertId caCert,
+            final String seqName)
     throws OperationException
     {
         try
@@ -753,7 +836,9 @@ public class CertificateStore
         }
     }
 
-    public void commitNextSerialIfLess(String caName, long nextSerial)
+    public void commitNextSerialIfLess(
+            final String caName,
+            final long nextSerial)
     throws OperationException
     {
         try
@@ -768,7 +853,9 @@ public class CertificateStore
         }
     }
 
-    public void markMaxSerial(X509CertWithDBCertId caCert, String seqName)
+    public void markMaxSerial(
+            final X509CertWithDBCertId caCert,
+            final String seqName)
     throws OperationException
     {
         try
@@ -783,7 +870,9 @@ public class CertificateStore
         }
     }
 
-    public void commitNextCrlNo(String caName, int nextCrlNo)
+    public void commitNextCrlNo(
+            final String caName,
+            final int nextCrlNo)
     throws OperationException
     {
         try
@@ -798,7 +887,8 @@ public class CertificateStore
         }
     }
 
-    public void addCa(X509CertWithDBCertId caCert)
+    public void addCa(
+            final X509CertWithDBCertId caCert)
     throws OperationException
     {
         try
@@ -813,7 +903,8 @@ public class CertificateStore
         }
     }
 
-    public void addRequestorName(String name)
+    public void addRequestorName(
+            final String name)
     throws OperationException
     {
         try
@@ -828,7 +919,8 @@ public class CertificateStore
         }
     }
 
-    public void addPublisherName(String name)
+    public void addPublisherName(
+            final String name)
     throws OperationException
     {
         try
@@ -843,7 +935,8 @@ public class CertificateStore
         }
     }
 
-    public void addCertprofileName(String name)
+    public void addCertprofileName(
+            final String name)
     throws OperationException
     {
         try
@@ -858,7 +951,9 @@ public class CertificateStore
         }
     }
 
-    public boolean addCertInProcess(String fpKey, String fpSubject)
+    public boolean addCertInProcess(
+            final String fpKey,
+            final String fpSubject)
     throws OperationException
     {
         try
@@ -873,7 +968,9 @@ public class CertificateStore
         }
     }
 
-    public void delteCertInProcess(String fpKey, String fpSubject)
+    public void delteCertInProcess(
+            final String fpKey,
+            final String fpSubject)
     throws OperationException
     {
         try
@@ -888,7 +985,8 @@ public class CertificateStore
         }
     }
 
-    public void deleteCertsInProcessOlderThan(Date time)
+    public void deleteCertsInProcessOlderThan(
+            final Date time)
     throws OperationException
     {
         try

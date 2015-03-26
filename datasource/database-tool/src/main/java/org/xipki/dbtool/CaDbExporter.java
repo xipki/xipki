@@ -72,9 +72,12 @@ public class CaDbExporter
     protected final String destFolder;
     protected final boolean resume;
 
-    public CaDbExporter(DataSourceFactory dataSourceFactory,
-            PasswordResolver passwordResolver, InputStream dbConfStream,
-            String destFolder, boolean resume)
+    public CaDbExporter(
+            final DataSourceFactory dataSourceFactory,
+            final PasswordResolver passwordResolver,
+            final InputStream dbConfStream,
+            final String destFolder,
+            final boolean resume)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         ParamChecker.assertNotEmpty("destFolder", destFolder);
@@ -87,9 +90,12 @@ public class CaDbExporter
         checkDestFolder();
     }
 
-    public CaDbExporter(DataSourceFactory dataSourceFactory,
-            PasswordResolver passwordResolver, String dbConfFile, String destFolder,
-            boolean destFolderEmpty)
+    public CaDbExporter(
+            final DataSourceFactory dataSourceFactory,
+            final PasswordResolver passwordResolver,
+            final String dbConfFile,
+            final String destFolder,
+            final boolean destFolderEmpty)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         this(dataSourceFactory, passwordResolver,
@@ -154,7 +160,9 @@ public class CaDbExporter
         }
     }
 
-    public void exportDatabase(int numCertsInBundle, int numCrls)
+    public void exportDatabase(
+            final int numCertsInBundle,
+            final int numCrls)
     throws Exception
     {
         long start = System.currentTimeMillis();

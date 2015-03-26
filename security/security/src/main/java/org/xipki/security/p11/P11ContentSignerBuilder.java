@@ -78,10 +78,10 @@ public class P11ContentSignerBuilder
     private final P11KeyIdentifier keyId;
 
     public P11ContentSignerBuilder(
-            P11CryptService cryptService,
-            P11SlotIdentifier slot,
-            P11KeyIdentifier keyId,
-            X509Certificate[] certificateChain)
+            final P11CryptService cryptService,
+            final P11SlotIdentifier slot,
+            final P11KeyIdentifier keyId,
+            final X509Certificate[] certificateChain)
     throws SignerException
     {
         ParamChecker.assertNotNull("cryptService", cryptService);
@@ -137,8 +137,8 @@ public class P11ContentSignerBuilder
     }
 
     public ConcurrentContentSigner createSigner(
-            AlgorithmIdentifier signatureAlgId,
-            int parallelism)
+            final AlgorithmIdentifier signatureAlgId,
+            final int parallelism)
     throws OperatorCreationException, NoSuchPaddingException
     {
         if(parallelism < 1)

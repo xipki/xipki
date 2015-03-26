@@ -63,7 +63,10 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
     }
 
     @Override
-    protected byte[] send(byte[] request, URL responderURL, RequestOptions requestOptions)
+    protected byte[] send(
+            final byte[] request,
+            final URL responderURL,
+            final RequestOptions requestOptions)
     throws IOException
     {
         int size = request.length;

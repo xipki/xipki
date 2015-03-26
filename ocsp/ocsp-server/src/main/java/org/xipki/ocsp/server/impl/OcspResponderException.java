@@ -48,17 +48,21 @@ public class OcspResponderException extends Exception
     {
     }
 
-    public OcspResponderException(String message)
+    public OcspResponderException(
+            final String message)
     {
         super(message);
     }
 
-    public OcspResponderException(Throwable cause)
+    public OcspResponderException(
+            final Throwable cause)
     {
         super(cause);
     }
 
-    public OcspResponderException(String message, Throwable cause)
+    public OcspResponderException(
+            final String message,
+            final Throwable cause)
     {
         super(message, cause);
     }

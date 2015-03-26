@@ -86,13 +86,16 @@ public class Rfc2560Servlet extends HttpServlet
     {
     }
 
-    public void setServer(OcspServer server)
+    public void setServer(
+            final OcspServer server)
     {
         this.server = server;
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(
+            final HttpServletRequest request,
+            final HttpServletResponse response)
     throws ServletException, IOException
     {
         ResponderAndRelativeUri r = server.getResponderAndRelativeUri(request);
@@ -114,7 +117,9 @@ public class Rfc2560Servlet extends HttpServlet
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(
+            final HttpServletRequest request,
+            final HttpServletResponse response)
     throws ServletException, IOException
     {
         ResponderAndRelativeUri r = server.getResponderAndRelativeUri(request);
@@ -133,8 +138,11 @@ public class Rfc2560Servlet extends HttpServlet
         processRequest(request, response, r, false);
     }
 
-    private void processRequest(HttpServletRequest request, HttpServletResponse response,
-            ResponderAndRelativeUri r, boolean getMethod)
+    private void processRequest(
+            final HttpServletRequest request,
+            final HttpServletResponse response,
+            final ResponderAndRelativeUri r,
+            final boolean getMethod)
     throws ServletException, IOException
     {
         Responder responder = r.getResponder();
@@ -368,7 +376,8 @@ public class Rfc2560Servlet extends HttpServlet
         } // end external try
     }
 
-    public void setAuditServiceRegister(AuditLoggingServiceRegister auditServiceRegister)
+    public void setAuditServiceRegister(
+            final AuditLoggingServiceRegister auditServiceRegister)
     {
         this.auditServiceRegister = auditServiceRegister;
     }
