@@ -114,7 +114,7 @@ class X509CAInfo
 
         this.publicCAInfo = new PublicCAInfo(cert,
                 caEntry.getOcspUris(), caEntry.getCrlUris(),
-                caEntry.getCaIssuerLocations(), caEntry.getDeltaCrlUris());
+                caEntry.getDeltaCrlUris());
 
         this.noNewCertificateAfter = this.notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
 
@@ -305,11 +305,6 @@ class X509CAInfo
     public String getSignerType()
     {
         return caEntry.getSignerType();
-    }
-
-    public List<String> getCaIssuerLocations()
-    {
-        return caEntry.getCaIssuerLocations();
     }
 
     @Override

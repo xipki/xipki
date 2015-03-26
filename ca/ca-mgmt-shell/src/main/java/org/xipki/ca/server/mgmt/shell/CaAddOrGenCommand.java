@@ -188,7 +188,7 @@ public abstract class CaAddOrGenCommand extends CaCommand
         }
 
         X509CAEntry entry = new X509CAEntry(caName, nextSerial, nextCrlNumber, signerType, signerConf,
-                ocspUris, crlUris, deltaCrlUris, null, numCrls.intValue(), expirationPeriod.intValue());
+                ocspUris, crlUris, deltaCrlUris, numCrls.intValue(), expirationPeriod.intValue());
 
         DuplicationMode duplicateKey = DuplicationMode.getInstance(duplicateKeyS);
         if(duplicateKey == null)
@@ -216,7 +216,9 @@ public abstract class CaAddOrGenCommand extends CaCommand
         {
             entry.setCrlSignerName(crlSignerName);
         }
-        entry.setMaxValidity(getMaxValidity());
+
+        CertValidity _maxValidity = CertValidity.getInstance(maxValidity);
+        entry.setMaxValidity(_maxValidity);
 
         if(cmpControlName != null)
         {
@@ -238,13 +240,4 @@ public abstract class CaAddOrGenCommand extends CaCommand
         return entry;
     }
 
-    private CertValidity getMaxValidity()
-    {
-        CertValidity _maxValidity = null;
-        if(maxValidity != null)
-        {
-            _maxValidity = CertValidity.getInstance(maxValidity);
-        }
-        return _maxValidity;
-    }
 }

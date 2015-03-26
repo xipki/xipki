@@ -41,7 +41,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
 
@@ -97,18 +96,12 @@ public interface CAManager
 
     Set<String> getCaNames();
 
-    boolean addCA(X509CAEntry newCaDbEntry)
+    boolean addCA(CAEntry cEntry)
     throws CAMgmtException;
 
     X509CAEntry getCA(String caName);
 
-    boolean changeCA(String name, CAStatus status,
-            X509Certificate cert,
-            Set<String> crl_uris, Set<String> delta_crl_uris, Set<String> ocsp_uris,
-            CertValidity max_validity, String signer_type, String signer_conf,
-            String crlsigner_name, String cmpcontrol_name, DuplicationMode duplicate_key,
-            DuplicationMode duplicate_subject, Set<Permission> permissions,
-            Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
+    boolean changeCA(ChangeCAEntry changeCAentry)
     throws CAMgmtException;
 
     boolean removeCertprofileFromCA(String profileName, String caName)
@@ -233,6 +226,6 @@ public interface CAManager
     X509Certificate generateCertificate(String caName, String profileName, String user, byte[] encodedPkcs10Request)
     throws CAMgmtException;
 
-    X509Certificate generateSelfSignedCA(X509CAEntry caEntry, String certprofileName, byte[] p10Req)
+    X509Certificate generateRootCA(X509CAEntry caEntry, String certprofileName, byte[] p10Req)
     throws CAMgmtException;
 }
