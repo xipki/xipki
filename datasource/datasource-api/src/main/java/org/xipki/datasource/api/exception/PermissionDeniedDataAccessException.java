@@ -53,7 +53,9 @@ public class PermissionDeniedDataAccessException extends NonTransientDataAccessE
      * @param cause the root cause from the underlying data access API,
      * such as JDBC
      */
-    public PermissionDeniedDataAccessException(String msg, Throwable cause)
+    public PermissionDeniedDataAccessException(
+            final String msg,
+            final Throwable cause)
     {
         super(msg, cause);
     }
