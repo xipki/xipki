@@ -64,7 +64,8 @@ public class LocalP11CryptServicePool
     {
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory)
+    public void setSecurityFactory(
+            final SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;
     }
@@ -110,7 +111,8 @@ public class LocalP11CryptServicePool
         }
     }
 
-    public P11CryptService getP11CryptService(String moduleName)
+    public P11CryptService getP11CryptService(
+            String moduleName)
     {
         if(moduleName == null || SecurityFactory.DEFAULT_P11MODULE_NAME.equalsIgnoreCase(moduleName))
         {

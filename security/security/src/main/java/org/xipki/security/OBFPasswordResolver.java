@@ -75,7 +75,7 @@ public class OBFPasswordResolver  implements SinglePasswordResolver
         {
             byte b1 = b[i];
             byte b2 = b[b.length - (i + 1)];
-            if (b1<0 || b2<0)
+            if (b1 < 0 || b2 < 0)
             {
                 int i0 = (0xff&b1)*256 + (0xff&b2);
                 String x = Integer.toString(i0, 36).toLowerCase();
