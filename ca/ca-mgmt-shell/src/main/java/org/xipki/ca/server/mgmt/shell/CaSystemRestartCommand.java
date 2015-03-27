@@ -68,7 +68,7 @@ public class CaSystemRestartCommand extends CaCommand
             Set<String> caAliasNames = caManager.getCaAliasNames();
             for(String aliasName : caAliasNames)
             {
-                String name = caManager.getCaName(aliasName);
+                String name = caManager.getCaNameForAlias(aliasName);
                 names.remove(name);
 
                 sb.append(name).append(" (alias ").append(aliasName).append(")").append(", ");

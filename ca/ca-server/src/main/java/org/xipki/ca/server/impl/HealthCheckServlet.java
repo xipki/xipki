@@ -93,7 +93,7 @@ public class HealthCheckServlet extends HttpServlet
             if(requestURI.length() > n + 1)
             {
                 String caAlias = URLDecoder.decode(requestURI.substring(n + 1), "UTF-8");
-                caName = responderManager.getCaName(caAlias);
+                caName = responderManager.getCaNameForAlias(caAlias);
                 if(caName == null)
                 {
                     caName = caAlias;

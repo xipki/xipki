@@ -83,7 +83,7 @@ public class CaInfoCommand extends CaCommand
             for(String paramName : sorted)
             {
                 sb.append("\t").append(paramName);
-                String alias = caManager.getAliasName(paramName);
+                String alias = caManager.getAliasNameForCA(paramName);
                 if(alias != null)
                 {
                     sb.append(" (alias: ").append(alias).append(")");
