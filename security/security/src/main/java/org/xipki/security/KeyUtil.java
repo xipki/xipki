@@ -245,18 +245,19 @@ public class KeyUtil
         synchronized (keyFactories)
         {
             KeyFactory kf = keyFactories.get(algorithm);
-            if(kf == null)
+            if(kf != null)
             {
-                try
-                {
-                    kf = KeyFactory.getInstance(algorithm, "BC");
-                } catch (NoSuchAlgorithmException | NoSuchProviderException e)
-                {
-                    throw new InvalidKeySpecException("could not find KeyFactory for " + algorithm + ": " + e.getMessage());
-                }
-                keyFactories.put(algorithm, kf);
+                return kf;
             }
 
+            try
+            {
+                kf = KeyFactory.getInstance(algorithm, "BC");
+            } catch (NoSuchAlgorithmException | NoSuchProviderException e)
+            {
+                throw new InvalidKeySpecException("could not find KeyFactory for " + algorithm + ": " + e.getMessage());
+            }
+            keyFactories.put(algorithm, kf);
             return kf;
         }
     }
@@ -320,7 +321,7 @@ public class KeyUtil
     }
 
     public static AsymmetricKeyParameter generatePrivateKeyParameter(
-            PrivateKey key)
+            final PrivateKey key)
     throws InvalidKeyException
     {
         if (key instanceof RSAPrivateCrtKey)
@@ -381,7 +382,8 @@ public class KeyUtil
      * @return the appropriate key parameter
      * @throws java.io.IOException on an error encoding the key
      */
-    public static SubjectPublicKeyInfo creatDSASubjectPublicKeyInfo(DSAPublicKey publicKey)
+    public static SubjectPublicKeyInfo creatDSASubjectPublicKeyInfo(
+            final DSAPublicKey publicKey)
     throws IOException
     {
         ASN1EncodableVector v = new ASN1EncodableVector();
