@@ -88,7 +88,10 @@ class CmpResponder
     {
     }
 
-    PKIMessage processPKIMessage(LocalP11CryptServicePool localP11CryptServicePool, String moduleName, PKIMessage pkiMessage)
+    PKIMessage processPKIMessage(
+            final LocalP11CryptServicePool localP11CryptServicePool,
+            final String moduleName,
+            final PKIMessage pkiMessage)
     {
         GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
 
@@ -317,7 +320,10 @@ class CmpResponder
         }
     }
 
-    private PKIMessage createRejectionPKIMessage(PKIHeader header, int pkiFailureInfo, String statusMessage)
+    private PKIMessage createRejectionPKIMessage(
+            final PKIHeader header,
+            final int pkiFailureInfo,
+            final String statusMessage)
     {
         ErrorMsgContent emc = new ErrorMsgContent(
                 new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(statusMessage), new PKIFailureInfo(pkiFailureInfo)));

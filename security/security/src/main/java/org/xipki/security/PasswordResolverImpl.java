@@ -58,7 +58,7 @@ public class PasswordResolverImpl implements PasswordResolver
     }
 
     public void bindService(
-            SinglePasswordResolver service)
+            final SinglePasswordResolver service)
     {
         //might be null if dependency is optional
         if (service == null)
