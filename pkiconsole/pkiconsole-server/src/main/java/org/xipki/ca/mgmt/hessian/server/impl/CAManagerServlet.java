@@ -230,14 +230,14 @@ implements HessianCAManager
     public String getAliasName(
             final String caName)
     {
-        return caManager.getAliasName(caName);
+        return caManager.getAliasNameForCA(caName);
     }
 
     @Override
     public String getCaName(
             final String aliasName)
     {
-        return caManager.getCaName(aliasName);
+        return caManager.getCaNameForAlias(aliasName);
     }
 
     @Override
