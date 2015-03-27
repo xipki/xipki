@@ -73,7 +73,9 @@ public class Rfc6712Servlet extends HttpServlet
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
+    public void doPost(
+            final HttpServletRequest request,
+            final HttpServletResponse response)
     throws ServletException, IOException
     {
         try
@@ -168,7 +170,8 @@ public class Rfc6712Servlet extends HttpServlet
         response.flushBuffer();
     }
 
-    protected PKIMessage generatePKIMessage(InputStream is)
+    protected PKIMessage generatePKIMessage(
+            final InputStream is)
     throws IOException
     {
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
@@ -187,7 +190,8 @@ public class Rfc6712Servlet extends HttpServlet
         }
     }
 
-    public void setLocalP11CryptServicePool(LocalP11CryptServicePool localP11CryptServicePool)
+    public void setLocalP11CryptServicePool(
+            final LocalP11CryptServicePool localP11CryptServicePool)
     {
         this.localP11CryptServicePool = localP11CryptServicePool;
     }

@@ -70,66 +70,68 @@ public class FileListCommand extends XipkiOsgiCommandSupport
             return null;
         }
 
-        if(target.isDirectory())
-        {
-            List<String> l = new LinkedList<>();
-            File[] children = target.listFiles();
-            int maxLen = -1;
-            for(File child : children)
-            {
-                String name  = child.getName();
-                if(child.isDirectory())
-                {
-                    name += File.separator;
-                }
-                l.add(name);
-                maxLen = Math.max(maxLen, name.length());
-            }
-            if(isNotEmpty(l))
-            {
-                Collections.sort(l);
-                List<String> l2 = new LinkedList<>();
-
-                for(String s : l)
-                {
-                    int diffLen = maxLen - s.length();
-                    if(diffLen > 0)
-                    {
-                        for(int i = 0; i < diffLen; i++)
-                        {
-                            s += " ";
-                        }
-                    }
-                    l2.add(s);
-                }
-
-                ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
-                int width = reader.getTerminal().getWidth();
-
-                int n = width / (maxLen + 1);
-                if(n == 0)
-                {
-                    for(String s :l2)
-                    {
-                        out(s);
-                    }
-                } else
-                {
-                    for(int i = 0; i < l2.size(); i += n)
-                    {
-                        StringBuilder sb = new StringBuilder();
-                        for(int j = i; j < Math.min(l2.size(), i + n); j++)
-                        {
-                            sb.append(l2.get(j)).append(" ");
-                        }
-                        out(sb.toString());
-                    }
-                }
-            }
-        }
-        else
+        if(target.isDirectory() == false)
         {
             out(targetPath);
+            return null;
+        }
+
+        List<String> l = new LinkedList<>();
+        File[] children = target.listFiles();
+        int maxLen = -1;
+        for(File child : children)
+        {
+            String name  = child.getName();
+            if(child.isDirectory())
+            {
+                name += File.separator;
+            }
+            l.add(name);
+            maxLen = Math.max(maxLen, name.length());
+        }
+
+        if(isEmpty(l))
+        {
+            return null;
+        }
+
+        Collections.sort(l);
+        List<String> l2 = new LinkedList<>();
+
+        for(String s : l)
+        {
+            int diffLen = maxLen - s.length();
+            if(diffLen > 0)
+            {
+                for(int i = 0; i < diffLen; i++)
+                {
+                    s += " ";
+                }
+            }
+            l2.add(s);
+        }
+
+        ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
+        int width = reader.getTerminal().getWidth();
+
+        int n = width / (maxLen + 1);
+        if(n == 0)
+        {
+            for(String s :l2)
+            {
+                out(s);
+            }
+        } else
+        {
+            for(int i = 0; i < l2.size(); i += n)
+            {
+                StringBuilder sb = new StringBuilder();
+                for(int j = i; j < Math.min(l2.size(), i + n); j++)
+                {
+                    sb.append(l2.get(j)).append(" ");
+                }
+                out(sb.toString());
+            }
         }
 
         return null;
