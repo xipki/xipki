@@ -209,14 +209,14 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public String getAliasName(
+    public String getAliasNameForCA(
             final String caName)
     {
         return client.getAliasName(caName);
     }
 
     @Override
-    public String getCaName(
+    public String getCaNameForAlias(
             final String aliasName)
     {
         return client.getCaName(aliasName);

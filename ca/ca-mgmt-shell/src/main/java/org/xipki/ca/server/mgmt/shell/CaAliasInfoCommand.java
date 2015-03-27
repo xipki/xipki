@@ -86,7 +86,7 @@ public class CaAliasInfoCommand extends CaCommand
         {
             if(aliasNames.contains(caAlias))
             {
-                String paramValue = caManager.getCaName(caAlias);
+                String paramValue = caManager.getCaNameForAlias(caAlias);
                 sb.append(caAlias).append("\n\t").append(paramValue);
             }
             else

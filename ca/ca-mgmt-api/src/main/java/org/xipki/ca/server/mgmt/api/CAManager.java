@@ -79,8 +79,8 @@ public interface CAManager
     boolean removeCaAlias(String aliasName)
     throws CAMgmtException;
 
-    String getAliasName(String caName);
-    String getCaName(String aliasName);
+    String getAliasNameForCA(String caName);
+    String getCaNameForAlias(String aliasName);
 
     Set<String> getCaAliasNames();
 
