@@ -41,7 +41,6 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.common.util.SecurityUtil;
-import org.xipki.security.api.ConcurrentContentSigner;
 
 /**
  * @author Lijun Liao
@@ -59,23 +58,11 @@ public class CaAddCommand extends CaAddOrGenCommand
     throws Exception
     {
         X509CAEntry caEntry = getCAEntry();
-        X509Certificate caCert = null;
         if(certFile != null)
         {
-            caCert = SecurityUtil.parseCert(certFile);
+            X509Certificate caCert = SecurityUtil.parseCert(certFile);
+            caEntry.setCertificate(caCert);
         }
-
-        // check whether the signer and certificate match
-        ConcurrentContentSigner signer = securityFactory.createSigner(
-                caEntry.getSignerType(), caEntry.getSignerConf(), caCert);
-
-        // retrieve the certificate from the key token if not specified explicitly
-        if(caCert == null)
-        {
-            caCert = signer.getCertificate();
-        }
-
-        caEntry.setCertificate(caCert);
 
         boolean b = caManager.addCA(caEntry);
         output(b, "added", "could not add", "CA " + caEntry.getName());

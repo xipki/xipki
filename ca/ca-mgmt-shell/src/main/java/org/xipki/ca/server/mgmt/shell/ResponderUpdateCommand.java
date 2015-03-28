@@ -43,7 +43,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.SecurityUtil;
-import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.PasswordResolver;
 
 /**
  * @author Lijun Liao
@@ -66,12 +66,12 @@ public class ResponderUpdateCommand extends CaCommand
             description = "requestor certificate file or 'NULL'")
     private String certFile;
 
-    private SecurityFactory securityFactory;
+    private PasswordResolver passwordResolver;
 
-    public void setSecurityFactory(
-            final SecurityFactory securityFactory)
+    public void setPasswordResolver(
+            final PasswordResolver passwordResolver)
     {
-        this.securityFactory = securityFactory;
+        this.passwordResolver = passwordResolver;
     }
 
     @Override
@@ -90,9 +90,9 @@ public class ResponderUpdateCommand extends CaCommand
             cert = Base64.toBase64String(certBytes);
         }
 
-        if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
+        if(signerConf != null)
         {
-            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, securityFactory.getPasswordResolver());
+            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
         }
 
         boolean b = caManager.changeCmpResponder(signerType, signerConf, cert);

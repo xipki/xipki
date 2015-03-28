@@ -48,7 +48,7 @@ import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.util.StringUtil;
-import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.PasswordResolver;
 
 /**
  * @author Lijun Liao
@@ -150,12 +150,12 @@ public abstract class CaAddOrGenCommand extends CaCommand
             description = "extra control")
     private String extraControl;
 
-    protected SecurityFactory securityFactory;
+    private PasswordResolver passwordResolver;
 
-    public void setSecurityFactory(
-            final SecurityFactory securityFactory)
+    public void setPasswordResolver(
+            final PasswordResolver passwordResolver)
     {
-        this.securityFactory = securityFactory;
+        this.passwordResolver = passwordResolver;
     }
 
     protected X509CAEntry getCAEntry()
@@ -190,7 +190,7 @@ public abstract class CaAddOrGenCommand extends CaCommand
         if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
         {
             signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf,
-                    securityFactory.getPasswordResolver());
+                    passwordResolver);
         }
 
         X509CAEntry entry = new X509CAEntry(caName, nextSerial, nextCrlNumber, signerType, signerConf,

@@ -44,6 +44,7 @@ import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.SecurityUtil;
+import org.xipki.security.api.PasswordResolver;
 
 /**
  * @author Lijun Liao
@@ -74,6 +75,14 @@ public class CrlSignerUpdateCommand extends CaCommand
             description = "CRL control")
     private String crlControl;
 
+    private PasswordResolver passwordResolver;
+
+    public void setPasswordResolver(
+            final PasswordResolver passwordResolver)
+    {
+        this.passwordResolver = passwordResolver;
+    }
+
     @Override
     protected Object _doExecute()
     throws Exception
@@ -88,6 +97,12 @@ public class CrlSignerUpdateCommand extends CaCommand
             byte[] certBytes = IoUtil.read(signerCert);
             SecurityUtil.parseCert(new ByteArrayInputStream(certBytes));
             signerCertConf = Base64.toBase64String(certBytes);
+        }
+
+        if(signerConf !=null)
+        {
+            signerConf = ShellUtil.canonicalizeSignerConf(signerType,
+                    signerConf, passwordResolver);
         }
 
         X509ChangeCrlSignerEntry dbEntry = new X509ChangeCrlSignerEntry(name);

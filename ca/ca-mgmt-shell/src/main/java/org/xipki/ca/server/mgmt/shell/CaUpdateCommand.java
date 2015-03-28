@@ -52,7 +52,7 @@ import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509ChangeCAEntry;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.util.SecurityUtil;
-import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.PasswordResolver;
 
 /**
  * @author Lijun Liao
@@ -139,12 +139,11 @@ public class CaUpdateCommand extends CaCommand
             description = "mode of valditity")
     private String validityModeS;
 
-    private SecurityFactory securityFactory;
+    private PasswordResolver passwordResolver;
 
-    public void setSecurityFactory(
-            final SecurityFactory securityFactory)
+    public void setPasswordResolver(PasswordResolver passwordResolver)
     {
-        this.securityFactory = securityFactory;
+        this.passwordResolver = passwordResolver;
     }
 
     @Override
@@ -172,10 +171,7 @@ public class CaUpdateCommand extends CaCommand
 
         if(signerConf != null)
         {
-            if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
-            {
-                signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, securityFactory.getPasswordResolver());
-            }
+            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
             entry.setSignerConf(signerConf);
         }
 
