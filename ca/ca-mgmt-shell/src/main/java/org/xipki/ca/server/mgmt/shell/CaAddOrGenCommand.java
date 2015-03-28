@@ -47,6 +47,7 @@ import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.common.ConfigurationException;
+import org.xipki.common.util.StringUtil;
 import org.xipki.security.api.SecurityFactory;
 
 /**
@@ -145,6 +146,10 @@ public abstract class CaAddOrGenCommand extends CaCommand
             description = "mode of valditity")
     private String validityModeS = "STRICT";
 
+    @Option(name = "--extra-control",
+            description = "extra control")
+    private String extraControl;
+
     protected SecurityFactory securityFactory;
 
     public void setSecurityFactory(
@@ -238,6 +243,11 @@ public abstract class CaAddOrGenCommand extends CaCommand
         }
 
         entry.setPermissions(_permissions);
+
+        if(StringUtil.isNotBlank(extraControl))
+        {
+            entry.setExtraControl(extraControl.trim());
+        }
         return entry;
     }
 

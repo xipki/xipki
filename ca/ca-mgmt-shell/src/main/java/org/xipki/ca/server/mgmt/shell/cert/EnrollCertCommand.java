@@ -42,7 +42,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
 import org.xipki.common.util.IoUtil;
 
@@ -87,7 +87,7 @@ public class EnrollCertCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        X509CAEntry ca = caManager.getCA(caName);
+        CAEntry ca = caManager.getCA(caName);
         if(ca == null)
         {
             err("CA " + caName + " not available");

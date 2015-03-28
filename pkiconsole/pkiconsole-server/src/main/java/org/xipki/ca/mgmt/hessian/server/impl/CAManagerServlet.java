@@ -297,7 +297,7 @@ implements HessianCAManager
     }
 
     @Override
-    public X509CAEntry getCA(
+    public CAEntry getCA(
             final String caName)
     {
         return caManager.getCA(caName);

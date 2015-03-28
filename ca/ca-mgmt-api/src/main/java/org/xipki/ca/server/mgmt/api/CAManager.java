@@ -99,7 +99,7 @@ public interface CAManager
     boolean addCA(CAEntry cEntry)
     throws CAMgmtException;
 
-    X509CAEntry getCA(String caName);
+    CAEntry getCA(String caName);
 
     boolean changeCA(ChangeCAEntry changeCAentry)
     throws CAMgmtException;
