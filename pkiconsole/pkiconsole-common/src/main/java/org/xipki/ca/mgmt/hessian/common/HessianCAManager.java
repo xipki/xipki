@@ -123,7 +123,7 @@ public interface HessianCAManager
             CAEntry newCaDbEntry)
     throws HessianCAMgmtException;
 
-    X509CAEntry getCA(String caName);
+    CAEntry getCA(String caName);
 
     boolean changeCA(
             ChangeCAEntry changeCAEntry)
