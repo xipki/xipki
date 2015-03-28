@@ -273,7 +273,7 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public X509CAEntry getCA(
+    public CAEntry getCA(
             final String caName)
     {
         return client.getCA(caName);
@@ -678,7 +678,7 @@ public class CAManagerClient implements CAManager
             X509CrlSignerEntry crlSigner = c.getCrlSigner("CASIGN.CRLSIGNER");
             System.out.println(crlSigner);
 
-            X509CAEntry caEntry = c.getCA("RCA1");
+            CAEntry caEntry = c.getCA("RCA1");
             System.out.println(caEntry);
         }catch(Exception e)
         {
