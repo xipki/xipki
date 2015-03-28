@@ -58,8 +58,7 @@ import org.xipki.common.ConfigurationException;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.PasswordResolver;
 
 /**
  * @author Lijun Liao
@@ -80,16 +79,26 @@ public class CaAddFromFileCommand extends CaCommand
                     + "(required)")
     private String confFile;
 
-    private SecurityFactory securityFactory;
+    private PasswordResolver passwordResolver;
 
-    public void setSecurityFactory(
-            final SecurityFactory securityFactory)
+    public void setPasswordResolver(
+            final PasswordResolver passwordResolver)
     {
-        this.securityFactory = securityFactory;
+        this.passwordResolver = passwordResolver;
     }
 
     @Override
     protected Object _doExecute()
+    throws Exception
+    {
+        X509CAEntry caEntry = getCAEntry(false);
+
+        boolean b = caManager.addCA(caEntry);
+        output(b, "added", "could not add", "CA " + caEntry.getName());
+        return null;
+    }
+
+    protected X509CAEntry getCAEntry(boolean ignoreCert)
     throws Exception
     {
         Properties props = new Properties();
@@ -103,16 +112,6 @@ public class CaAddFromFileCommand extends CaCommand
             stream.close();
         }
 
-        X509CAEntry caEntry = getCAEntry(props);
-
-        boolean b = caManager.addCA(caEntry);
-        output(b, "added", "could not add", "CA " + caEntry.getName());
-        return null;
-    }
-
-    protected X509CAEntry getCAEntry(Properties props)
-    throws Exception
-    {
     	// ART
         String key = "ART";
         String s = getStrProp(props, key, true);
@@ -167,7 +166,7 @@ public class CaAddFromFileCommand extends CaCommand
         if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
         {
             signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf,
-                    securityFactory.getPasswordResolver());
+                    passwordResolver);
         }
 
         // CRL_URIS
@@ -315,36 +314,30 @@ public class CaAddFromFileCommand extends CaCommand
         }
 
         // CERT
-        key = "CERT";
-        s = getStrProp(props, key, false);
-        byte[] certBytes = null;
-        if(s != null)
+        if(ignoreCert == false)
         {
-            if(StringUtil.startsWithIgnoreCase(s, "file:"))
+            key = "CERT";
+            s = getStrProp(props, key, false);
+            byte[] certBytes = null;
+            if(s != null)
             {
-                certBytes = IoUtil.read(s.substring("file:".length()));
+                if(StringUtil.startsWithIgnoreCase(s, "file:"))
+                {
+                    certBytes = IoUtil.read(s.substring("file:".length()));
+                }
+                else
+                {
+                    certBytes = Base64.decode(s);
+                }
             }
-            else
+
+            X509Certificate caCert = null;
+            if(certBytes != null)
             {
-                certBytes = Base64.decode(s);
+                caCert = SecurityUtil.parseCert(certBytes);
             }
+            entry.setCertificate(caCert);
         }
-
-        X509Certificate caCert = null;
-        if(certBytes != null)
-        {
-            caCert = SecurityUtil.parseCert(certBytes);
-        }
-        // check whether the signer and certificate match
-        ConcurrentContentSigner signer = securityFactory.createSigner(
-                entry.getSignerType(), entry.getSignerConf(), caCert);
-
-        // retrieve the certificate from the key token if not specified explicitly
-        if(caCert == null)
-        {
-            caCert = signer.getCertificate();
-        }
-        entry.setCertificate(caCert);
 
         return entry;
     }

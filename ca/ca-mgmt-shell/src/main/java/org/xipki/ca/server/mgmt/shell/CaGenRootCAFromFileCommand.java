@@ -35,66 +35,50 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.io.File;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.common.util.SecurityUtil;
-import org.xipki.security.api.PasswordResolver;
+import org.xipki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.common.util.IoUtil;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "responder-set", description="set responder")
-public class ResponderSetCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "gen-rcaf",
+    description="generate selfsigned CA from configuration file")
+public class CaGenRootCAFromFileCommand extends CaAddFromFileCommand
 {
-    @Option(name = "--signer-type",
+    @Option(name = "--p10",
             required = true,
-            description = "type of the responder signer\n"
+            description = "PKCS#10 request of the Root CA\n"
                     + "(required)")
-    private String signerType;
+    private String p10ReqFile;
 
-    @Option(name = "--signer-conf",
-            description = "conf of the responder signer")
-    private String signerConf;
+    @Option(name = "--profile",
+            required = true,
+            description = "profile of the Root CA\n"
+                    + "(required)")
+    private String rcaProfile;
 
-    @Option(name = "--cert",
-            description = "requestor certificate")
-    private String certFile;
-
-    private PasswordResolver passwordResolver;
-
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver)
-    {
-        this.passwordResolver = passwordResolver;
-    }
+    @Option(name = "--out", aliases = "-o",
+            description = "where to save the generated CA certificate")
+    private String rcaCertOutFile;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        CmpResponderEntry entry = new CmpResponderEntry();
-        X509Certificate signerCert = null;
-        if(certFile != null)
+        X509CAEntry caEntry = getCAEntry(true);
+        byte[] p10Req = IoUtil.read(p10ReqFile);
+        X509Certificate rcaCert = caManager.generateRootCA(caEntry, rcaProfile, p10Req);
+        if(rcaCertOutFile != null)
         {
-            signerCert = SecurityUtil.parseCert(certFile);
-            entry.setCertificate(signerCert);
+            saveVerbose("saved root certificate to file", new File(rcaCertOutFile), rcaCert.getEncoded());
         }
-        entry.setType(signerType);
-
-        if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
-        {
-            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
-        }
-
-        entry.setConf(signerConf);
-
-        boolean b = caManager.setCmpResponder(entry);
-        output(b, "configured", "could not configure", "CMP responder");
+        out("generated root CA " + caEntry.getName());
         return null;
     }
-
 }

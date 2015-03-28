@@ -35,14 +35,12 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.security.cert.X509Certificate;
-
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.SecurityUtil;
-import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.PasswordResolver;
 
 /**
  * @author Lijun Liao
@@ -77,7 +75,13 @@ public class CrlSignerAddCommand extends CaCommand
                     + "(required)")
     private String crlControl;
 
-    private SecurityFactory securityFactory;
+    private PasswordResolver passwordResolver;
+
+    public void setPasswordResolver(
+            final PasswordResolver passwordResolver)
+    {
+        this.passwordResolver = passwordResolver;
+    }
 
     @Override
     protected Object _doExecute()
@@ -86,12 +90,11 @@ public class CrlSignerAddCommand extends CaCommand
         String base64Cert = null;
         if("CA".equalsIgnoreCase(signerType) == false)
         {
-            X509Certificate signerCert = null;
             if(signerCertFile != null)
             {
                 byte[] encodedCert = IoUtil.read(signerCertFile);
                 base64Cert = IoUtil.base64Encode(encodedCert, false);
-                signerCert = SecurityUtil.parseCert(encodedCert);
+                SecurityUtil.parseCert(encodedCert);
             }
 
             if(signerConf != null)
@@ -99,23 +102,15 @@ public class CrlSignerAddCommand extends CaCommand
                 if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
                 {
                     signerConf = ShellUtil.canonicalizeSignerConf(signerType,
-                            signerConf, securityFactory.getPasswordResolver());
+                            signerConf, passwordResolver);
                 }
             }
-            // check whether we can initialize the signer
-            securityFactory.createSigner(signerType, signerConf, signerCert);
         }
 
         X509CrlSignerEntry entry = new X509CrlSignerEntry(name, signerType, signerConf, base64Cert, crlControl);
         boolean b = caManager.addCrlSigner(entry);
         output(b, "added", "could not add", "CRL signer " + name);
         return null;
-    }
-
-    public void setSecurityFactory(
-            final SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
     }
 
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" default-activation="lazy">
   <reference id="caManager" interface="org.xipki.ca.server.mgmt.api.CAManager"/>
-  <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
+  <reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <reference id="yesNoCompleter" interface="org.xipki.console.karaf.YesNoCompleter"/>
   <reference id="clientCrlReasonCompleter" interface="org.xipki.console.karaf.ClientCRLReasonCompleter"/>  
@@ -84,7 +84,7 @@
     <command>
       <action class="org.xipki.ca.server.mgmt.shell.CaAddFromFileCommand">
         <property name="caManager" ref="caManager"/>
-        <property name="securityFactory" ref="securityFactory"/>
+        <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
         <entry key="--conf-file" value-ref="filePathCompleter"/>
@@ -93,7 +93,7 @@
     <command>
       <action class="org.xipki.ca.server.mgmt.shell.CaAddCommand">
         <property name="caManager" ref="caManager"/>
-        <property name="securityFactory" ref="securityFactory"/>
+        <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
         <entry key="--status" value-ref="caStatusCompleter"/>
@@ -138,9 +138,13 @@
       </completers>
     </command>
     <command>
+      <action class="org.xipki.ca.server.mgmt.shell.CaGenRootCAFromFileCommand">
+        <property name="caManager" ref="caManager"/>
+        <property name="passwordResolver" ref="passwordResolver"/>
+      </action>
       <action class="org.xipki.ca.server.mgmt.shell.CaGenRootCACommand">
         <property name="caManager" ref="caManager"/>
-        <property name="securityFactory" ref="securityFactory"/>
+        <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
         <entry key="--out" value-ref="filePathCompleter"/>
@@ -175,7 +179,7 @@
     <command>
       <action class="org.xipki.ca.server.mgmt.shell.CaUpdateCommand">
         <property name="caManager" ref="caManager"/>
-        <property name="securityFactory" ref="securityFactory"/>
+        <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
         <entry key="--name" value-ref="caNameCompleter"/>
@@ -336,7 +340,7 @@
     <command>
       <action class="org.xipki.ca.server.mgmt.shell.CrlSignerAddCommand">
         <property name="caManager" ref="caManager"/>
-        <property name="securityFactory" ref="securityFactory"/>
+        <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
         <entry key="--cert" value-ref="filePathCompleter"/>
@@ -364,6 +368,7 @@
     <command>
       <action class="org.xipki.ca.server.mgmt.shell.CrlSignerUpdateCommand">
         <property name="caManager" ref="caManager"/>
+        <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
         <entry key="--name" value-ref="crlSignerNameCompleter"/>
@@ -561,7 +566,7 @@
     <command>
       <action class="org.xipki.ca.server.mgmt.shell.ResponderSetCommand">
         <property name="caManager" ref="caManager"/>
-        <property name="securityFactory" ref="securityFactory"/>
+        <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
         <entry key="--signer-type" value-ref="signerTypeCompleter"/>
@@ -571,7 +576,7 @@
     <command>
       <action class="org.xipki.ca.server.mgmt.shell.ResponderUpdateCommand">
         <property name="caManager" ref="caManager"/>
-        <property name="securityFactory" ref="securityFactory"/>
+        <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
         <entry key="--signer-type" value-ref="signerTypeCompleter"/>
