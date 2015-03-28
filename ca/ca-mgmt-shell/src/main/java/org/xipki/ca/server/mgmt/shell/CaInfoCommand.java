@@ -43,7 +43,7 @@ import java.util.Set;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.ca.server.mgmt.api.CAEntry;
 
 /**
  * @author Lijun Liao
@@ -93,7 +93,7 @@ public class CaInfoCommand extends CaCommand
         }
         else
         {
-            X509CAEntry entry = caManager.getCA(caName);
+            CAEntry entry = caManager.getCA(caName);
             if(entry == null)
             {
                 sb.append("could not find CA '" + caName + "'");

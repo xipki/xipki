@@ -37,7 +37,7 @@ package org.xipki.ca.server.mgmt.shell.cert;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
 
 /**
@@ -63,7 +63,7 @@ public class UnrevokeCertCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        X509CAEntry ca = caManager.getCA(caName);
+        CAEntry ca = caManager.getCA(caName);
         if(ca == null)
         {
             err("CA " + caName + " not available");

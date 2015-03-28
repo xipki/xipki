@@ -82,6 +82,15 @@
     </command>
     <!-- CA -->
     <command>
+      <action class="org.xipki.ca.server.mgmt.shell.CaAddFromFileCommand">
+        <property name="caManager" ref="caManager"/>
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--conf-file" value-ref="filePathCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
       <action class="org.xipki.ca.server.mgmt.shell.CaAddCommand">
         <property name="caManager" ref="caManager"/>
         <property name="securityFactory" ref="securityFactory"/>
@@ -446,6 +455,15 @@
       </action>
       <optional-completers>
         <entry key="--conf-file" value-ref="filePathCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.ca.server.mgmt.shell.PublisherExportCommand">
+        <property name="caManager" ref="caManager"/>
+      </action>
+      <optional-completers>
+        <entry key="--name" value-ref="publisherNameCompleter"/>
+        <entry key="--out" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>

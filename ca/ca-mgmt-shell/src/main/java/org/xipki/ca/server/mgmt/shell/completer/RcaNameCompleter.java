@@ -39,6 +39,9 @@ import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.xipki.ca.server.mgmt.api.CAEntry;
+import org.xipki.ca.server.mgmt.api.X509CAEntry;
+
 /**
  * @author Lijun Liao
  */
@@ -52,7 +55,13 @@ public class RcaNameCompleter extends MgmtNameCompleter
         Set<String> ret = new HashSet<>();
         for(String name : caManager.getCaNames())
         {
-            X509Certificate cert = caManager.getCA(name).getCertificate();
+            CAEntry caEntry = caManager.getCA(name);
+            if(caEntry instanceof X509CAEntry == false)
+            {
+                continue;
+            }
+
+            X509Certificate cert = ((X509CAEntry) caEntry).getCertificate();
             if(cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal()))
             {
                 ret.add(name);

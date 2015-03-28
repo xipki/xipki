@@ -172,6 +172,11 @@ public class CAEntry
         return permissions;
     }
 
+    public String getPermissionsAsText()
+    {
+        return toString(permissions);
+    }
+
     public void setPermissions(
             final Set<Permission> permissions)
     {
@@ -236,7 +241,7 @@ public class CAEntry
     }
 
     protected static String toString(
-            final Collection<String> tokens)
+            final Collection<? extends Object> tokens)
     {
         if(CollectionUtil.isEmpty(tokens))
         {
@@ -247,12 +252,12 @@ public class CAEntry
 
         int size = tokens.size();
         int idx = 0;
-        for(String token : tokens)
+        for(Object token : tokens)
         {
             sb.append(token);
             if(idx++ < size - 1)
             {
-                sb.append("\t");
+                sb.append(", ");
             }
         }
         return sb.toString();

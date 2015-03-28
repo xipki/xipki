@@ -111,7 +111,7 @@
       </column>
       <column name="NEXT_SERIAL" type="BIGINT"/>
       <column name="NEXT_CRLNO" type="INT"/>
-      <column name="STATUS" remarks="valid values: pending, enabled, disabled" type="VARCHAR(10)">
+      <column name="STATUS" remarks="valid values: active, inactive" type="VARCHAR(10)">
         <constraints nullable="false"/>
       </column>
       <column name="SUBJECT" type="VARCHAR(300)">
