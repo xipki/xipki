@@ -46,7 +46,6 @@ import java.util.List;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.KeyUsage;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.SecurityUtil;
 
@@ -129,14 +128,20 @@ implements Serializable
             final X509Certificate cert)
     throws CAMgmtException
     {
-        ParamChecker.assertNotNull("cert", cert);
-
-        if(SecurityUtil.hasKeyusage(cert, KeyUsage.keyCertSign) == false)
-        {
-            throw new CAMgmtException("CA certificate does not have keyusage keyCertSign");
-        }
-        this.cert = cert;
-        this.subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
+    	if(cert == null)
+    	{
+    		this.cert = null;
+    		this.subject = null;
+    	}
+    	else
+    	{
+	        if(SecurityUtil.hasKeyusage(cert, KeyUsage.keyCertSign) == false)
+	        {
+	            throw new CAMgmtException("CA certificate does not have keyusage keyCertSign");
+	        }
+	        this.cert = cert;
+	        this.subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
+    	}
     }
 
     public long getNextSerial()

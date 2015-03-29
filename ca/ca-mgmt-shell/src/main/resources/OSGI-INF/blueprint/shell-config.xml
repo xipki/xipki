@@ -142,12 +142,20 @@
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
+      <optional-completers>
+        <entry key="--conf-file" value-ref="filePathCompleter"/>
+        <entry key="--out" value-ref="filePathCompleter"/>
+        <entry key="--p10" value-ref="filePathCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
       <action class="org.xipki.ca.server.mgmt.shell.CaGenRootCACommand">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
         <entry key="--out" value-ref="filePathCompleter"/>
+        <entry key="--p10" value-ref="filePathCompleter"/>
         <entry key="--status" value-ref="caStatusCompleter"/>
         <entry key="--permission" value-ref="permissionCompleter"/>
         <entry key="--crl-signer" value-ref="crlSignerNameCompleter"/>
@@ -192,6 +200,15 @@
         <entry key="--duplicate-subject" value-ref="duplicationModeCompleter"/>
         <entry key="--duplicate-key" value-ref="duplicationModeCompleter"/>
         <entry key="--validity-mode" value-ref="validityModeCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.ca.server.mgmt.shell.CaExportCommand">
+        <property name="caManager" ref="caManager"/>
+      </action>
+      <optional-completers>
+        <entry key="--name" value-ref="caNameCompleter"/>
+        <entry key="--out" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <!-- CA Alias -->
