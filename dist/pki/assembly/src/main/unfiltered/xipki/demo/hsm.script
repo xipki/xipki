@@ -10,7 +10,7 @@ xipki-ca:profile-add --name RCA --type XML --conf-file xipki/demo/profile/Certpr
 
 ## Create the PKCS#10 request for the command caqa:check-cert in QA
 xipki-tk:req --slot 1 --key-label $RCA_KEY_LABEL --out output/RCA1.p10 \
-  -subject "CN=RCA1,O=xipki,C=DE"
+  --subject "CN=RCA1,O=xipki,C=DE"
 
 ## Generate selfsigned RCA
 xipki-ca:gen-rca --name RCA1 \
@@ -66,7 +66,7 @@ xipki-tk:req --slot 1 --key-label $SubCA_KEY_LABEL --out output/SubCA1.p10 \
 xipki-cli:ra-enroll --p10 output/SubCA1.p10 --out output/SubCA1.der --profile SubCA
 
 xipki-tk:update-cert --slot 1 --key-label $SubCA_KEY_LABEL --cert output/SubCA1.der \
-  --cacert output/RCA1.der
+  --ca-cert output/RCA1.der
 
 ## Generate keys and PKCS#10 request for SubCAwithCRL1
 xipki-tk:req --slot 1 --key-label $SubCAwithCRL_KEY_LABEL --out output/SubCAwithCRL1.p10 \
@@ -84,7 +84,7 @@ xipki-tk:req --slot 1 --key-label $SubCAwithCRL_KEY_LABEL --out output/SubCAwith
 xipki-cli:ra-enroll --p10 output/SubCAwithCRL1.p10 --out output/SubCAwithCRL1.der --profile SubCA.Complex
 
 xipki-tk:update-cert --slot 1 --key-label $SubCAwithCRL_KEY_LABEL --cert output/SubCAwithCRL1.der \
-  --cacert output/RCA1.der
+  --ca-cert output/RCA1.der
 
 feature:uninstall xipki-caclient-shell
 feature:uninstall xipki-caclient
