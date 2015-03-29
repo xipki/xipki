@@ -886,7 +886,7 @@ implements CAManager, CmpResponderManager
     public X509CACmpResponder getX509CACmpResponder(
             final String name)
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         return responders.get(name.toUpperCase());
     }
 
@@ -1285,7 +1285,7 @@ implements CAManager, CmpResponderManager
     public X509CAEntry getCA(
             final String name)
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         X509CAInfo caInfo = caInfos.get(name.toUpperCase());
         return caInfo == null ? null : caInfo.getCaEntry();
     }
@@ -1319,8 +1319,8 @@ implements CAManager, CmpResponderManager
             String caName)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("profileName", profileName);
-        ParamChecker.assertNotEmpty("caName", caName);
+        ParamChecker.assertNotBlank("profileName", profileName);
+        ParamChecker.assertNotBlank("caName", caName);
         asssertMasterMode();
         caName = caName.toUpperCase();
         boolean b = queryExecutor.removeCertprofileFromCA(profileName, caName);
@@ -1337,8 +1337,8 @@ implements CAManager, CmpResponderManager
             String caName)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("profileName", profileName);
-        ParamChecker.assertNotEmpty("caName", caName);
+        ParamChecker.assertNotBlank("profileName", profileName);
+        ParamChecker.assertNotBlank("caName", caName);
         asssertMasterMode();
         caName = caName.toUpperCase();
         Set<String> profileNames = ca_has_profiles.get(caName);
@@ -1372,8 +1372,8 @@ implements CAManager, CmpResponderManager
             String caName)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("publisherName", publisherName);
-        ParamChecker.assertNotEmpty("caName", caName);
+        ParamChecker.assertNotBlank("publisherName", publisherName);
+        ParamChecker.assertNotBlank("caName", caName);
         asssertMasterMode();
         caName = caName.toUpperCase();
         boolean b = queryExecutor.removePublisherFromCA(publisherName, caName);
@@ -1396,8 +1396,8 @@ implements CAManager, CmpResponderManager
             String caName)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("publisherName", publisherName);
-        ParamChecker.assertNotEmpty("caName", caName);
+        ParamChecker.assertNotBlank("publisherName", publisherName);
+        ParamChecker.assertNotBlank("caName", caName);
         asssertMasterMode();
         caName = caName.toUpperCase();
         Set<String> publisherNames = ca_has_publishers.get(caName);
@@ -1432,7 +1432,7 @@ implements CAManager, CmpResponderManager
     public Set<String> getCertprofilesForCA(
             final String caName)
     {
-        ParamChecker.assertNotEmpty("caName", caName);
+        ParamChecker.assertNotBlank("caName", caName);
         return ca_has_profiles.get(caName.toUpperCase());
     }
 
@@ -1440,7 +1440,7 @@ implements CAManager, CmpResponderManager
     public Set<CAHasRequestorEntry> getCmpRequestorsForCA(
             final String caName)
     {
-        ParamChecker.assertNotEmpty("caName", caName);
+        ParamChecker.assertNotBlank("caName", caName);
         return ca_has_requestors.get(caName.toUpperCase());
     }
 
@@ -1448,14 +1448,14 @@ implements CAManager, CmpResponderManager
     public CmpRequestorEntry getCmpRequestor(
             final String name)
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         return requestorDbEntries.get(name);
     }
 
     public CmpRequestorEntryWrapper getCmpRequestorWrapper(
             final String name)
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         return requestors.get(name);
     }
 
@@ -1502,7 +1502,7 @@ implements CAManager, CmpResponderManager
             final String requestorName)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("requestorName", requestorName);
+        ParamChecker.assertNotBlank("requestorName", requestorName);
         asssertMasterMode();
         for(String caName : ca_has_requestors.keySet())
         {
@@ -1527,7 +1527,7 @@ implements CAManager, CmpResponderManager
             final String base64Cert)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         asssertMasterMode();
         if(base64Cert == null)
         {
@@ -1554,8 +1554,8 @@ implements CAManager, CmpResponderManager
             String caName)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("requestorName", requestorName);
-        ParamChecker.assertNotEmpty("caName", caName);
+        ParamChecker.assertNotBlank("requestorName", requestorName);
+        ParamChecker.assertNotBlank("caName", caName);
         asssertMasterMode();
         caName = caName.toUpperCase();
         boolean b = queryExecutor.removeCmpRequestorFromCA(requestorName, caName);
@@ -1573,7 +1573,7 @@ implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         ParamChecker.assertNotNull("requestor", requestor);
-        ParamChecker.assertNotEmpty("caName", caName);
+        ParamChecker.assertNotBlank("caName", caName);
         asssertMasterMode();
         caName = caName.toUpperCase();
         String requestorName = requestor.getRequestorName();
@@ -1620,7 +1620,7 @@ implements CAManager, CmpResponderManager
             final String profileName)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("profileName", profileName);
+        ParamChecker.assertNotBlank("profileName", profileName);
         asssertMasterMode();
         for(String caName : ca_has_profiles.keySet())
         {
@@ -1647,7 +1647,7 @@ implements CAManager, CmpResponderManager
             final String conf)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         if(type == null && conf == null)
         {
             return false;
@@ -1814,7 +1814,7 @@ implements CAManager, CmpResponderManager
             final String name)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         asssertMasterMode();
         boolean b = queryExecutor.deleteRowWithName(name, "CRLSIGNER");
         if(b == false)
@@ -1868,7 +1868,7 @@ implements CAManager, CmpResponderManager
     public X509CrlSignerEntry getCrlSigner(
             final String name)
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         return crlSignerDbEntries.get(name);
     }
 
@@ -1924,7 +1924,7 @@ implements CAManager, CmpResponderManager
     public List<PublisherEntry> getPublishersForCA(
             final String caName)
     {
-        ParamChecker.assertNotEmpty("caName", caName);
+        ParamChecker.assertNotBlank("caName", caName);
         Set<String> publisherNames = ca_has_publishers.get(caName.toUpperCase());
         if(publisherNames == null)
         {
@@ -1944,7 +1944,7 @@ implements CAManager, CmpResponderManager
     public PublisherEntry getPublisher(
             final String name)
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         return publisherDbEntries.get(name);
     }
 
@@ -1953,7 +1953,7 @@ implements CAManager, CmpResponderManager
             final String name)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         asssertMasterMode();
         for(String caName : ca_has_publishers.keySet())
         {
@@ -1980,7 +1980,7 @@ implements CAManager, CmpResponderManager
             final String conf)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         asssertMasterMode();
         if(type == null && conf == null)
         {
@@ -2009,14 +2009,14 @@ implements CAManager, CmpResponderManager
     public CmpControlEntry getCmpControl(
             final String name)
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         return cmpControlDbEntries.get(name);
     }
 
     public CmpControl getCmpControlObject(
             final String name)
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         return cmpControls.get(name);
     }
 
@@ -2046,7 +2046,7 @@ implements CAManager, CmpResponderManager
             final String name)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         asssertMasterMode();
         boolean b = queryExecutor.deleteRowWithName(name, "CMPCONTROL");
         if(b == false)
@@ -2075,8 +2075,8 @@ implements CAManager, CmpResponderManager
             final String conf)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotEmpty("conf", conf);
+        ParamChecker.assertNotBlank("name", name);
+        ParamChecker.assertNotBlank("conf", conf);
         asssertMasterMode();
 
         CmpControl newCmpControl = queryExecutor.changeCmpControl(name, conf);
@@ -2105,7 +2105,7 @@ implements CAManager, CmpResponderManager
     public String getEnvParam(
             final String name)
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         return envParameterResolver.getEnvParam(name);
     }
 
@@ -2115,8 +2115,8 @@ implements CAManager, CmpResponderManager
             final String value)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotEmpty("value", value);
+        ParamChecker.assertNotBlank("name", name);
+        ParamChecker.assertNotBlank("value", value);
         asssertMasterMode();
         if(envParameterResolver.getEnvParam(name) != null)
         {
@@ -2132,7 +2132,7 @@ implements CAManager, CmpResponderManager
             final String name)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         asssertMasterMode();
         boolean b = queryExecutor.deleteRowWithName(name, "ENVIRONMENT");
         if(b == false)
@@ -2151,7 +2151,7 @@ implements CAManager, CmpResponderManager
             final String value)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         ParamChecker.assertNotNull("value", value);
         asssertMasterMode();
         assertNotNULL("value", value);
@@ -2188,8 +2188,8 @@ implements CAManager, CmpResponderManager
             String caName)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("aliasName", aliasName);
-        ParamChecker.assertNotEmpty("caName", caName);
+        ParamChecker.assertNotBlank("aliasName", aliasName);
+        ParamChecker.assertNotBlank("caName", caName);
         asssertMasterMode();
         caName = caName.toUpperCase();
         if(caAliases.get(aliasName) != null)
@@ -2207,7 +2207,7 @@ implements CAManager, CmpResponderManager
             final String name)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         asssertMasterMode();
         boolean b = queryExecutor.removeCaAlias(name);
         if(b == false)
@@ -2223,7 +2223,7 @@ implements CAManager, CmpResponderManager
     public String getCaNameForAlias(
             final String aliasName)
     {
-        ParamChecker.assertNotEmpty("aliasName", aliasName);
+        ParamChecker.assertNotBlank("aliasName", aliasName);
         return caAliases.get(aliasName);
     }
 
@@ -2231,7 +2231,7 @@ implements CAManager, CmpResponderManager
     public String getAliasNameForCA(
             String caName)
     {
-        ParamChecker.assertNotEmpty("caName", caName);
+        ParamChecker.assertNotBlank("caName", caName);
         caName = caName.toUpperCase();
         for(String alias : caAliases.keySet())
         {
@@ -2256,7 +2256,7 @@ implements CAManager, CmpResponderManager
             String name)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         asssertMasterMode();
         name = name.toUpperCase();
         boolean b = queryExecutor.removeCA(name);
@@ -2311,8 +2311,8 @@ implements CAManager, CmpResponderManager
             final String certprofile)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("caName", caName);
-        ParamChecker.assertNotEmpty("certprofile", certprofile);
+        ParamChecker.assertNotBlank("caName", caName);
+        ParamChecker.assertNotBlank("certprofile", certprofile);
         asssertMasterMode();
         caName = caName.toUpperCase();
         X509CA ca = x509cas.get(caName);
@@ -2349,7 +2349,7 @@ implements CAManager, CmpResponderManager
             final List<String> publisherNames)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("caName", caName);
+        ParamChecker.assertNotBlank("caName", caName);
         ParamChecker.assertNotEmpty("publisherNames", publisherNames);
         asssertMasterMode();
 
@@ -2389,10 +2389,10 @@ implements CAManager, CmpResponderManager
             final CertRevocationInfo revocationInfo)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("caName", name);
+        ParamChecker.assertNotBlank("caName", name);
         ParamChecker.assertNotNull("revocationInfo", revocationInfo);
         asssertMasterMode();
-        ParamChecker.assertNotEmpty("caName", name);
+        ParamChecker.assertNotBlank("caName", name);
         ParamChecker.assertNotNull("revocationInfo", revocationInfo);
 
         name = name.toUpperCase();
@@ -2437,7 +2437,7 @@ implements CAManager, CmpResponderManager
             String name)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("caName", name);
+        ParamChecker.assertNotBlank("caName", name);
         asssertMasterMode();
         name = name.toUpperCase();
         if(x509cas.containsKey(name) == false)
@@ -2570,7 +2570,7 @@ implements CAManager, CmpResponderManager
             final Date invalidityTime)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("caName", caName);
+        ParamChecker.assertNotBlank("caName", caName);
         ParamChecker.assertNotNull("serialNumber", serialNumber);
         X509CA ca = getX509CA(caName);
         try
@@ -2588,7 +2588,7 @@ implements CAManager, CmpResponderManager
             final BigInteger serialNumber)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("caName", caName);
+        ParamChecker.assertNotBlank("caName", caName);
         ParamChecker.assertNotNull("serialNumber", serialNumber);
         X509CA ca = getX509CA(caName);
         try
@@ -2606,7 +2606,7 @@ implements CAManager, CmpResponderManager
             final BigInteger serialNumber)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("caName", caName);
+        ParamChecker.assertNotBlank("caName", caName);
         ParamChecker.assertNotNull("serialNumber", serialNumber);
         asssertMasterMode();
         X509CA ca = getX509CA(caName);
@@ -2632,8 +2632,8 @@ implements CAManager, CmpResponderManager
             final byte[] encodedPkcs10Request)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("caName", caName);
-        ParamChecker.assertNotEmpty("profileName", profileName);
+        ParamChecker.assertNotBlank("caName", caName);
+        ParamChecker.assertNotBlank("profileName", profileName);
         ParamChecker.assertNotNull("encodedPkcs10Request", encodedPkcs10Request);
 
         X509CA ca = getX509CA(caName);
@@ -2700,7 +2700,7 @@ implements CAManager, CmpResponderManager
     public List<IdentifiedX509CertPublisher> getIdentifiedPublishersForCa(
             String caName)
     {
-        ParamChecker.assertNotEmpty("caName", caName);
+        ParamChecker.assertNotBlank("caName", caName);
         caName = caName.toUpperCase();
         List<IdentifiedX509CertPublisher> ret = new LinkedList<>();
         Set<String> publisherNames = ca_has_publishers.get(caName);
@@ -2725,7 +2725,7 @@ implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         ParamChecker.assertNotNull("caEntry", caEntry);
-        ParamChecker.assertNotEmpty("certprofileName", certprofileName);
+        ParamChecker.assertNotBlank("certprofileName", certprofileName);
         ParamChecker.assertNotNull("p10Req", p10Req);
         String name = caEntry.getName();
         long nextSerial = caEntry.getNextSerial();

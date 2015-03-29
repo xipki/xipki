@@ -177,7 +177,7 @@ public class OcspServer
                 final String responderName)
         {
             ParamChecker.assertNotNull("path", path);
-            ParamChecker.assertNotEmpty("responderName", responderName);
+            ParamChecker.assertNotBlank("responderName", responderName);
 
             this.path = path;
             this.responderName = responderName;

@@ -52,8 +52,8 @@ public class ValidationIssue
             final String code,
             final String description)
     {
-        ParamChecker.assertNotEmpty("code", code);
-        ParamChecker.assertNotEmpty("description", description);
+        ParamChecker.assertNotBlank("code", code);
+        ParamChecker.assertNotBlank("description", description);
         this.code = code;
         this.description = description;
         this.failed = false;

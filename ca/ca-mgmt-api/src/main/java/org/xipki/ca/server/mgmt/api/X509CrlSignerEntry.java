@@ -74,8 +74,8 @@ public class X509CrlSignerEntry implements Serializable
             final String crlControl)
     throws ConfigurationException
     {
-        ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotEmpty("type", signerType);
+        ParamChecker.assertNotBlank("name", name);
+        ParamChecker.assertNotBlank("type", signerType);
         ParamChecker.assertNotNull("crlControl", crlControl);
 
         if("CA".equalsIgnoreCase(name))

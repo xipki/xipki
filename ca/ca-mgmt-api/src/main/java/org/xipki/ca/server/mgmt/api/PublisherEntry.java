@@ -56,8 +56,8 @@ public class PublisherEntry implements Serializable
             final String type,
             final String conf)
     {
-        ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotEmpty("type", type);
+        ParamChecker.assertNotBlank("name", name);
+        ParamChecker.assertNotBlank("type", type);
         this.name = name;
         this.type = type;
         this.conf = conf;

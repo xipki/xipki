@@ -48,7 +48,7 @@ public class IdentifiedObject
     public IdentifiedObject(
             final String id)
     {
-        ParamChecker.assertNotEmpty("id", id);
+        ParamChecker.assertNotBlank("id", id);
         this.id = id;
     }
 

@@ -120,7 +120,7 @@ class CmpControl
             final Integer confirmWaitTime,
             final Set<String> sigAlgos)
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         CmpUtf8Pairs pairs = new CmpUtf8Pairs();
 
         this.confirmCert = confirmCert == null ? false: confirmCert;

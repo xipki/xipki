@@ -56,8 +56,8 @@ public class CertprofileEntry implements Serializable
             final String type,
             final String conf)
     {
-        ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotEmpty("type", type);
+        ParamChecker.assertNotBlank("name", name);
+        ParamChecker.assertNotBlank("type", type);
 
         if("all".equalsIgnoreCase(name) || "null".equalsIgnoreCase(name))
         {

@@ -76,7 +76,7 @@ class CrlCertStatusInfo
             final String certprofile,
             final Map<HashAlgoType, byte[]> certHashes)
     {
-        ParamChecker.assertNotEmpty("certprofile", certprofile);
+        ParamChecker.assertNotBlank("certprofile", certprofile);
         return new CrlCertStatusInfo(CertStatus.GOOD, null, certprofile, certHashes);
     }
 

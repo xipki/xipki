@@ -66,7 +66,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor
             final SecurityFactory securityFactory)
     {
         super(requestorCert, responderCert, securityFactory);
-        ParamChecker.assertNotEmpty("serverUrl", serverUrl);
+        ParamChecker.assertNotBlank("serverUrl", serverUrl);
 
         try
         {
@@ -85,7 +85,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor
             final boolean signRequest)
     {
         super(requestor, responderCert, securityFactory, signRequest);
-        ParamChecker.assertNotEmpty("serverUrl", serverUrl);
+        ParamChecker.assertNotBlank("serverUrl", serverUrl);
 
         try
         {

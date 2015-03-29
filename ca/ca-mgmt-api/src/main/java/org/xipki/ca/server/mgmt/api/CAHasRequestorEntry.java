@@ -57,7 +57,7 @@ public class CAHasRequestorEntry implements Serializable
     public CAHasRequestorEntry(
             final String requestorName)
     {
-        ParamChecker.assertNotEmpty("requestorName", requestorName);
+        ParamChecker.assertNotBlank("requestorName", requestorName);
         this.requestorName = requestorName;
     }
 

@@ -96,7 +96,7 @@ public abstract class CertStatusStore
     protected CertStatusStore(
             final String name)
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         this.name = name;
     }
 

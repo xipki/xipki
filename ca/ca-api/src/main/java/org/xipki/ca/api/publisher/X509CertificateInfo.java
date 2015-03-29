@@ -70,7 +70,7 @@ public class X509CertificateInfo
     {
         ParamChecker.assertNotNull("cert", cert);
         ParamChecker.assertNotNull("issuerCert", issuerCert);
-        ParamChecker.assertNotEmpty("profileName", profileName);
+        ParamChecker.assertNotBlank("profileName", profileName);
         ParamChecker.assertNotNull("subjectPublicKey", subjectPublicKey);
 
         this.cert = cert;

@@ -103,7 +103,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
     {
         super(dataSource, srcDir);
         ParamChecker.assertNotNull("unmarshaller", unmarshaller);
-        ParamChecker.assertNotEmpty("publisherName", publisherName);
+        ParamChecker.assertNotBlank("publisherName", publisherName);
         this.unmarshaller = unmarshaller;
         this.publisherName = publisherName;
         File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);

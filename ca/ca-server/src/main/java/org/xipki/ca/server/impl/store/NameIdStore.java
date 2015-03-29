@@ -66,7 +66,7 @@ class NameIdStore
             final String name,
             final Integer id)
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         ParamChecker.assertNotNull("id", id);
 
         if(entries.containsKey(name))

@@ -63,8 +63,8 @@ public class CmpRequestorEntry implements Serializable
             final String name,
             final String base64Cert)
     {
-        ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotEmpty("base64Cert", base64Cert);
+        ParamChecker.assertNotBlank("name", name);
+        ParamChecker.assertNotBlank("base64Cert", base64Cert);
         this.name = name;
         this.base64Cert = base64Cert;
         try
