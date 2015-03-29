@@ -148,7 +148,7 @@ public class SignerUtil
     }
 
     static private byte getTrailer(
-            int trailerField)
+            final int trailerField)
     {
         if (trailerField == 1)
         {
@@ -159,7 +159,7 @@ public class SignerUtil
     }
 
     static public RSASSAPSSparams createPSSRSAParams(
-            ASN1ObjectIdentifier digestAlgOID)
+            final ASN1ObjectIdentifier digestAlgOID)
     throws NoSuchAlgorithmException
     {
         int saltSize;
@@ -245,7 +245,8 @@ public class SignerUtil
         return verifyPOP(p10Req);
     }
 
-    public static  boolean verifyPOP(PKCS10CertificationRequest p10Request)
+    public static  boolean verifyPOP(
+            final PKCS10CertificationRequest p10Request)
     {
         try
         {
@@ -262,7 +263,8 @@ public class SignerUtil
     }
 
     public static byte[] pkcs1padding(
-            final byte[] in, final int blockSize)
+            final byte[] in,
+            final int blockSize)
     throws SignerException
     {
         int inLen = in.length;

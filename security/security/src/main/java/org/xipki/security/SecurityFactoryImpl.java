@@ -184,7 +184,8 @@ public class SecurityFactoryImpl implements SecurityFactory
             final String type,
             final String confWithoutAlgo,
             final String hashAlgo,
-            boolean mgf1, X509Certificate[] certs)
+            final boolean mgf1,
+            final X509Certificate[] certs)
     throws SignerException
     {
         ConcurrentContentSigner signer = doCreateSigner(type, confWithoutAlgo, hashAlgo, mgf1, certs);
@@ -207,7 +208,8 @@ public class SecurityFactoryImpl implements SecurityFactory
     private static void validateSigner(
             final ConcurrentContentSigner signer,
             final X509Certificate[] certificateChain,
-            final String signerType, String signerConf)
+            final String signerType,
+            final String signerConf)
     throws SignerException
     {
         X509Certificate cert = signer.getCertificate();
@@ -842,8 +844,10 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
 
     public static String getKeystoreSignerConf(
-            final String keystoreFile, final String password,
-            final String signatureAlgorithm, final int parallelism)
+            final String keystoreFile,
+            final String password,
+            final String signatureAlgorithm,
+            final int parallelism)
     {
         return getKeystoreSignerConf(keystoreFile, password, signatureAlgorithm, parallelism, null);
     }
@@ -903,7 +907,8 @@ public class SecurityFactoryImpl implements SecurityFactory
             final String pkcs11ModuleName,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId,
-            final String signatureAlgorithm, final int parallelism)
+            final String signatureAlgorithm,
+            final int parallelism)
     {
         ParamChecker.assertNotNull("algo", signatureAlgorithm);
         ParamChecker.assertNotNull("keyId", keyId);
@@ -977,7 +982,7 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
     @Override
     public P11CryptService getP11CryptService(
-            String moduleName)
+            final String moduleName)
     throws SignerException
     {
         initP11CryptServiceFactory();
@@ -1178,7 +1183,8 @@ public class SecurityFactoryImpl implements SecurityFactory
         }
     }
 
-    public void setPkcs11ConfFile(String confFile)
+    public void setPkcs11ConfFile(
+            final String confFile)
     {
         if(StringUtil.isBlank(confFile))
         {
@@ -1190,7 +1196,8 @@ public class SecurityFactoryImpl implements SecurityFactory
         }
     }
 
-    private static Set<P11SlotIdentifier> getSlots(SlotsType type)
+    private static Set<P11SlotIdentifier> getSlots(
+            final SlotsType type)
     throws ConfigurationException
     {
         if(type == null || CollectionUtil.isEmpty(type.getSlot()))
@@ -1228,7 +1235,8 @@ public class SecurityFactoryImpl implements SecurityFactory
         return slots;
     }
 
-    private String getRealPkcs11ModuleName(String moduleName)
+    private String getRealPkcs11ModuleName(
+            final String moduleName)
     {
         if(moduleName == null || DEFAULT_P11MODULE_NAME.equals(moduleName))
         {
@@ -1240,7 +1248,8 @@ public class SecurityFactoryImpl implements SecurityFactory
         }
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver)
+    public void setPasswordResolver(
+            final PasswordResolver passwordResolver)
     {
         this.passwordResolver = passwordResolver;
     }
@@ -1259,7 +1268,10 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
 
     @Override
-    public PublicKey getPkcs11PublicKey(String moduleName, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    public PublicKey getPkcs11PublicKey(
+            final String moduleName,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
     throws InvalidKeyException
     {
         try
