@@ -69,8 +69,8 @@ public class P11ModuleConf
             final Set<P11SlotIdentifier> includeSlots,
             final Set<P11SlotIdentifier> excludeSlots)
     {
-        ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotEmpty("nativeLibrary", nativeLibrary);
+        ParamChecker.assertNotBlank("name", name);
+        ParamChecker.assertNotBlank("nativeLibrary", nativeLibrary);
 
         this.name = name.toLowerCase();
         this.nativeLibrary = nativeLibrary;

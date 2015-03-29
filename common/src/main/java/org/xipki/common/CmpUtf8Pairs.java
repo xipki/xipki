@@ -181,7 +181,7 @@ public class CmpUtf8Pairs
             final String name,
             final String value)
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         ParamChecker.assertNotNull("value", value);
 
         char c = name.charAt(0);

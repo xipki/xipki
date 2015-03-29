@@ -855,8 +855,8 @@ public class SecurityFactoryImpl implements SecurityFactory
             final int parallelism,
             final String keyLabel)
     {
-        ParamChecker.assertNotEmpty("keystoreFile", keystoreFile);
-        ParamChecker.assertNotEmpty("password", password);
+        ParamChecker.assertNotBlank("keystoreFile", keystoreFile);
+        ParamChecker.assertNotBlank("password", password);
         ParamChecker.assertNotNull("signatureAlgorithm", signatureAlgorithm);
 
         CmpUtf8Pairs conf = new CmpUtf8Pairs("password", password);
@@ -885,8 +885,8 @@ public class SecurityFactoryImpl implements SecurityFactory
             final int parallelism,
             final String keyLabel)
     {
-        ParamChecker.assertNotEmpty("keystoreFile", keystoreFile);
-        ParamChecker.assertNotEmpty("password", password);
+        ParamChecker.assertNotBlank("keystoreFile", keystoreFile);
+        ParamChecker.assertNotBlank("password", password);
 
         CmpUtf8Pairs conf = new CmpUtf8Pairs("password", password);
         conf.putUtf8Pair("parallelism", Integer.toString(parallelism));

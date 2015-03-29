@@ -80,7 +80,7 @@ public class CaDbExporter
             final boolean resume)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
-        ParamChecker.assertNotEmpty("destFolder", destFolder);
+        ParamChecker.assertNotBlank("destFolder", destFolder);
         Properties props = DbPorter.getDbConfProperties(dbConfStream);
         this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
         this.marshaller = getMarshaller();

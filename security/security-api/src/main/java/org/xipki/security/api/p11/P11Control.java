@@ -58,7 +58,7 @@ public class P11Control
             final String defaultModuleName,
             final Set<P11ModuleConf> moduleConfs)
     {
-        ParamChecker.assertNotEmpty("defaultModuleName", defaultModuleName);
+        ParamChecker.assertNotBlank("defaultModuleName", defaultModuleName);
 
         this.defaultModuleName = defaultModuleName;
         if(CollectionUtil.isEmpty(moduleConfs))

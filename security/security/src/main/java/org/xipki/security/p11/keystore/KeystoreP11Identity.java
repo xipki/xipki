@@ -89,7 +89,7 @@ public class KeystoreP11Identity extends P11Identity
     {
         super(slotId, keyId, certificateChain, getPublicKeyOfFirstCert(certificateChain));
         ParamChecker.assertNotNull("privateKey", privateKey);
-        ParamChecker.assertNotEmpty("sha1sum", sha1sum);
+        ParamChecker.assertNotBlank("sha1sum", sha1sum);
 
         if(certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
         {
