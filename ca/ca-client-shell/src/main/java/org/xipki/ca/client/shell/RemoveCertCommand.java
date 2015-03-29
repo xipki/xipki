@@ -85,7 +85,7 @@ public class RemoveCertCommand extends UnRevRemoveCertCommand
             RequestResponseDebug debug = getRequestResponseDebug();
             try
             {
-                certIdOrError = raWorker.removeCert(cert, debug);
+                certIdOrError = caClient.removeCert(cert, debug);
             }finally
             {
                 saveRequestResponse(debug);
@@ -97,7 +97,7 @@ public class RemoveCertCommand extends UnRevRemoveCertCommand
             RequestResponseDebug debug = getRequestResponseDebug();
             try
             {
-                certIdOrError = raWorker.removeCert(issuer, getSerialNumber(), debug);
+                certIdOrError = caClient.removeCert(issuer, getSerialNumber(), debug);
             }finally
             {
                 saveRequestResponse(debug);

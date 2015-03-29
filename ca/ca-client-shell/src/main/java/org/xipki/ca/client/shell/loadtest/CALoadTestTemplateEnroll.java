@@ -64,8 +64,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.client.api.CertOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.PKIErrorException;
-import org.xipki.ca.client.api.RAWorker;
-import org.xipki.ca.client.api.RAWorkerException;
+import org.xipki.ca.client.api.CAClient;
+import org.xipki.ca.client.api.CAClientException;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType.Type;
@@ -140,7 +140,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
                 }
 
                 result = raWorker.requestCerts(request, null, userPrefix + System.currentTimeMillis(), null);
-            } catch (RAWorkerException | PKIErrorException e)
+            } catch (CAClientException | PKIErrorException e)
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
                 return false;
@@ -183,14 +183,14 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
     private static Object jaxbUnmarshallerLock = new Object();
     private static Unmarshaller jaxbUnmarshaller;
 
-    private final RAWorker raWorker;
+    private final CAClient raWorker;
     private final String userPrefix = "LOADTEST-";
     private final List<LoadTestEntry> loadtestEntries;
 
     private final AtomicLong index;
 
     public CALoadTestTemplateEnroll(
-            final RAWorker raWorker,
+            final CAClient raWorker,
             final String templateFile)
     throws Exception
     {

@@ -41,7 +41,7 @@ import java.util.Set;
 
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.client.api.PKIErrorException;
-import org.xipki.ca.client.api.RAWorkerException;
+import org.xipki.ca.client.api.CAClientException;
 import org.xipki.common.qa.UnexpectedResultException;
 
 /**
@@ -64,13 +64,13 @@ public abstract class CRLCommand extends ClientCommand
 
     protected abstract X509CRL retrieveCRL(
             String caName)
-    throws RAWorkerException, PKIErrorException;
+    throws CAClientException, PKIErrorException;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        Set<String> caNames = raWorker.getCaNames();
+        Set<String> caNames = caClient.getCaNames();
         if(isEmpty(caNames))
         {
             err("no CA is configured");

@@ -7,11 +7,11 @@
       interpret it as a service-factory.
   -->
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
-  <reference id="raWorker" interface="org.xipki.ca.client.api.RAWorker"/>
+  <reference id="caClient" interface="org.xipki.ca.client.api.CAClient"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <reference id="clientCrlReasonCompleter" interface="org.xipki.console.karaf.ClientCRLReasonCompleter"/>
   <bean id="caNameCompleter" class="org.xipki.ca.client.shell.completer.CaNameCompleter">
-    <property name="raWorker" ref="raWorker"/>
+    <property name="caClient" ref="caClient"/>
   </bean>
   <reference id="qaSystemManager" interface="org.xipki.ca.qa.api.QASystemManager"/>
   <bean id="x509IssuerNameCompleter" class="org.xipki.ca.qa.shell.completer.X509IssuerNameCompleter">
@@ -33,8 +33,8 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.qa.shell.NegRAEnrollCertCommand">
-        <property name="raWorker" ref="raWorker"/>
+      <action class="org.xipki.ca.qa.shell.NegP10EnrollCertCommand">
+        <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
         <entry key="--out" value-ref="filePathCompleter"/>
@@ -46,7 +46,7 @@
     </command>
     <command>
       <action class="org.xipki.ca.qa.shell.NegP12EnrollCertCommand">
-        <property name="raWorker" ref="raWorker"/>
+        <property name="caClient" ref="caClient"/>
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -59,7 +59,7 @@
     </command>
     <command>
       <action class="org.xipki.ca.qa.shell.NegRevokeCertCommand">
-        <property name="raWorker" ref="raWorker"/>
+        <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
         <entry key="--cert" value-ref="filePathCompleter"/>
@@ -71,7 +71,7 @@
     </command>
     <command>
       <action class="org.xipki.ca.qa.shell.NegUnrevokeCertCommand">
-        <property name="raWorker" ref="raWorker"/>
+        <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
         <entry key="--cert" value-ref="filePathCompleter"/>
@@ -82,7 +82,7 @@
     </command>
     <command>
       <action class="org.xipki.ca.qa.shell.NegGenCRLCommand">
-        <property name="raWorker" ref="raWorker"/>
+        <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
         <entry key="--out" value-ref="filePathCompleter"/>
@@ -93,7 +93,7 @@
     </command>
     <command>
       <action class="org.xipki.ca.qa.shell.NegGetCRLCommand">
-        <property name="raWorker" ref="raWorker"/>
+        <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
         <entry key="--out" value-ref="filePathCompleter"/>

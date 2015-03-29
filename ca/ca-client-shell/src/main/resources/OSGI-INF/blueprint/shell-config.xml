@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" default-activation="lazy">
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
-  <reference id="raWorker" interface="org.xipki.ca.client.api.RAWorker"/>
+  <reference id="caClient" interface="org.xipki.ca.client.api.CAClient"/>
   <reference id="dataSourceFactory" interface="org.xipki.datasource.api.DataSourceFactory" availability="optional"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <reference id="clientCrlReasonCompleter" interface="org.xipki.console.karaf.ClientCRLReasonCompleter"/>
@@ -11,15 +11,15 @@
   <reference id="extNameCompleter" interface="org.xipki.console.karaf.ExtensionNameCompleter"/>
   <bean id="randomDNCompleter" class="org.xipki.ca.client.shell.completer.RandomDNCompleter"/>
   <bean id="caNameCompleter" class="org.xipki.ca.client.shell.completer.CaNameCompleter">
-    <property name="raWorker" ref="raWorker"/>
+    <property name="caClient" ref="caClient"/>
   </bean>
   <bean id="p11ModuleNameCompleter" class="org.xipki.ca.client.shell.completer.P11ModuleNameCompleter">
     <property name="securityFactory" ref="securityFactory"/>
   </bean>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
-      <action class="org.xipki.ca.client.shell.RAEnrollCertCommand">
-        <property name="raWorker" ref="raWorker"/>
+      <action class="org.xipki.ca.client.shell.P10EnrollCertCommand">
+        <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
         <entry key="--out" value-ref="filePathCompleter"/>
@@ -31,7 +31,7 @@
     </command>
     <command>
       <action class="org.xipki.ca.client.shell.P11EnrollCertCommand">
-        <property name="raWorker" ref="raWorker"/>
+        <property name="caClient" ref="caClient"/>
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -48,7 +48,7 @@
     </command>
     <command>
       <action class="org.xipki.ca.client.shell.P12EnrollCertCommand">
-        <property name="raWorker" ref="raWorker"/>
+        <property name="caClient" ref="caClient"/>
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -65,7 +65,7 @@
     </command>
     <command>
       <action class="org.xipki.ca.client.shell.RevokeCertCommand">
-        <property name="raWorker" ref="raWorker"/>
+        <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
         <entry key="--cert" value-ref="filePathCompleter"/>
@@ -77,7 +77,7 @@
     </command>
     <command>
       <action class="org.xipki.ca.client.shell.UnrevokeCertCommand">
-        <property name="raWorker" ref="raWorker"/>
+        <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
         <entry key="--cert" value-ref="filePathCompleter"/>
@@ -88,7 +88,7 @@
     </command>
     <command>
       <action class="org.xipki.ca.client.shell.RemoveCertCommand">
-        <property name="raWorker" ref="raWorker"/>
+        <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
         <entry key="--cert" value-ref="filePathCompleter"/>
@@ -99,7 +99,7 @@
     </command>
     <command>
       <action class="org.xipki.ca.client.shell.RemoveExpiredCertsCommand">
-        <property name="raWorker" ref="raWorker"/>
+        <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
         <entry key="--ca" value-ref="caNameCompleter"/>
@@ -109,7 +109,7 @@
     </command>
     <command>
       <action class="org.xipki.ca.client.shell.GenCRLCommand">
-        <property name="raWorker" ref="raWorker"/>
+        <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
         <entry key="--out" value-ref="filePathCompleter"/>
@@ -120,7 +120,7 @@
     </command>
     <command>
       <action class="org.xipki.ca.client.shell.GetCRLCommand">
-        <property name="raWorker" ref="raWorker"/>
+        <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
         <entry key="--out" value-ref="filePathCompleter"/>
@@ -132,7 +132,7 @@
     </command>
     <command>
       <action class="org.xipki.ca.client.shell.loadtest.CALoadTestEnrollCommand">
-        <property name="raWorker" ref="raWorker"/>
+        <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
         <entry key="--curve" value-ref="ecCurveNameCompleter"/>
@@ -141,7 +141,7 @@
     </command>
     <command>
       <action class="org.xipki.ca.client.shell.loadtest.CALoadTestTemplateEnrollCommand">
-        <property name="raWorker" ref="raWorker"/>
+        <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
         <entry key="--template" value-ref="filePathCompleter"/>
@@ -149,7 +149,7 @@
     </command>
     <command>
       <action class="org.xipki.ca.client.shell.loadtest.CALoadTestRevokeCommand">
-        <property name="raWorker" ref="raWorker"/>
+        <property name="caClient" ref="caClient"/>
         <property name="securityFactory" ref="securityFactory"/>
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
       </action>
@@ -160,7 +160,7 @@
     </command>
     <command>
       <action class="org.xipki.ca.client.shell.HealthCommand">
-        <property name="raWorker" ref="raWorker"/>
+        <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
         <entry key="--ca" value-ref="caNameCompleter"/>

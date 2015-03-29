@@ -33,8 +33,9 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell;
+package org.xipki.ca.client.shell;
 
+import java.io.File;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.commands.Command;
@@ -42,7 +43,6 @@ import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.ca.client.api.CertOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
-import org.xipki.ca.client.shell.ClientCommand;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.util.IoUtil;
@@ -51,8 +51,8 @@ import org.xipki.common.util.IoUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-qa", name = "neg-ra-enroll", description="enroll certificate as RA (negative, for QA)")
-public class NegRAEnrollCertCommand extends ClientCommand
+@Command(scope = "xipki-cli", name = "p10-enroll", description="enroll certificate via PKCS#10 request")
+public class P10EnrollCertCommand extends ClientCommand
 {
 
     @Option(name = "--p10",
@@ -67,6 +67,12 @@ public class NegRAEnrollCertCommand extends ClientCommand
                     + "(required)")
     private String profile;
 
+    @Option(name = "--out", aliases = "-o",
+            required = true,
+            description = "where to save the certificate\n"
+                    + "(required)")
+    private String outputFile;
+
     @Option(name = "--user",
             description = "username")
     private String user;
@@ -80,13 +86,14 @@ public class NegRAEnrollCertCommand extends ClientCommand
     protected Object _doExecute()
     throws Exception
     {
-        CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));
+        CertificationRequest p10Req = CertificationRequest.getInstance(
+                IoUtil.read(p10File));
 
         EnrollCertResult result;
         RequestResponseDebug debug = getRequestResponseDebug();
         try
         {
-            result = raWorker.requestCert(p10Req, profile, caName, user, debug);
+            result = caClient.requestCert(p10Req, profile, caName, user, debug);
         }finally
         {
             saveRequestResponse(debug);
@@ -100,10 +107,13 @@ public class NegRAEnrollCertCommand extends ClientCommand
             cert = (X509Certificate) certOrError.getCertificate();
         }
 
-        if(cert != null)
+        if(cert == null)
         {
-            throw new UnexpectedResultException("no certificate is excepted, but received one");
+            throw new UnexpectedResultException("no certificate received from the server");
         }
+
+        File certFile = new File(outputFile);
+        saveVerbose("certificate saved to file", certFile, cert.getEncoded());
 
         return null;
     }

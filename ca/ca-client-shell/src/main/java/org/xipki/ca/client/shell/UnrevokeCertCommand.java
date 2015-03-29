@@ -84,7 +84,7 @@ public class UnrevokeCertCommand extends UnRevRemoveCertCommand
             RequestResponseDebug debug = getRequestResponseDebug();
             try
             {
-                certIdOrError = raWorker.unrevokeCert(cert, debug);
+                certIdOrError = caClient.unrevokeCert(cert, debug);
             }finally
             {
                 saveRequestResponse(debug);
@@ -96,7 +96,7 @@ public class UnrevokeCertCommand extends UnRevRemoveCertCommand
             RequestResponseDebug debug = getRequestResponseDebug();
             try
             {
-                certIdOrError = raWorker.unrevokeCert(issuer, getSerialNumber(), debug);
+                certIdOrError = caClient.unrevokeCert(issuer, getSerialNumber(), debug);
             }finally
             {
                 saveRequestResponse(debug);

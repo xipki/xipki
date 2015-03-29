@@ -701,14 +701,13 @@ abstract class X509CmpRequestor extends CmpRequestor
             final P10EnrollCertRequestType p10Req,
             final String username)
     {
-        InfoTypeAndValue certprofileInfo = null;
-        if(p10Req.getCertprofile() != null)
+        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, p10Req.getCertprofile());
+        if(StringUtil.isNotBlank(username))
         {
-            CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, p10Req.getCertprofile());
-            certprofileInfo = CmpUtil.buildInfoTypeAndValue(utf8Pairs);
+            utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_USER, username);
         }
 
-        PKIHeader header = buildPKIHeader(implicitConfirm, null, username, certprofileInfo);
+        PKIHeader header = buildPKIHeader(implicitConfirm, null, utf8Pairs);
         PKIBody body = new PKIBody(PKIBody.TYPE_P10_CERT_REQ, p10Req.getP10Req());
 
         return new PKIMessage(header, body);
@@ -718,7 +717,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             final EnrollCertRequestType req,
             final String username)
     {
-        PKIHeader header = buildPKIHeader(implicitConfirm, null, username, (InfoTypeAndValue[]) null);
+        PKIHeader header = buildPKIHeader(implicitConfirm, null, username);
 
         List<EnrollCertRequestEntryType> reqEntries = req.getRequestEntries();
         CertReqMsg[] certReqMsgs = new CertReqMsg[reqEntries.size()];
@@ -759,7 +758,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             final String profileName,
             final String username)
     {
-        PKIHeader header = buildPKIHeader(implicitConfirm, null, username, (InfoTypeAndValue[]) null);
+        PKIHeader header = buildPKIHeader(implicitConfirm, null, username);
 
         CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, profileName);
         AttributeTypeAndValue certprofileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);

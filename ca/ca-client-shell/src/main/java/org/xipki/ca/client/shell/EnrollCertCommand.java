@@ -249,7 +249,7 @@ public abstract class EnrollCertCommand extends ClientCommand
         EnrollCertResult result;
         try
         {
-            result = raWorker.requestCerts(request, caName, user, debug);
+            result = caClient.requestCerts(request, caName, user, debug);
         }finally
         {
             saveRequestResponse(debug);
