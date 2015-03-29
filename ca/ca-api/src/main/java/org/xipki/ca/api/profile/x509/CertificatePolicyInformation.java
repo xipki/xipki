@@ -53,7 +53,7 @@ public class CertificatePolicyInformation
             final String certPolicyId,
             final List<CertificatePolicyQualifier> qualifiers)
     {
-        ParamChecker.assertNotEmpty("certPolicyId", certPolicyId);
+        ParamChecker.assertNotBlank("certPolicyId", certPolicyId);
         this.certPolicyId = certPolicyId;
         this.qualifiers = qualifiers == null ? null : Collections.unmodifiableList(qualifiers);
     }

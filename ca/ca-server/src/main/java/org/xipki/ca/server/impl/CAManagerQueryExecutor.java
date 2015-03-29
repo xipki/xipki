@@ -2316,7 +2316,7 @@ class CAManagerQueryExecutor
             final String permissionsText)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("permissionsText", permissionsText);
+        ParamChecker.assertNotBlank("permissionsText", permissionsText);
 
         List<String> l = StringUtil.split(permissionsText, ", ");
         Set<Permission> permissions = new HashSet<>();

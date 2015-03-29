@@ -1131,7 +1131,7 @@ class CertStoreQueryExecutor
     {
         ParamChecker.assertNotNull("caCert", caCert);
         ParamChecker.assertNotNull("expiredAt", expiredAt);
-        ParamChecker.assertNotEmpty("certprofile", certprofile);
+        ParamChecker.assertNotBlank("certprofile", certprofile);
 
         if(numEntries < 1)
         {
@@ -1211,7 +1211,7 @@ class CertStoreQueryExecutor
     {
         ParamChecker.assertNotNull("caCert", caCert);
         ParamChecker.assertNotNull("expiredAt", expiredAt);
-        ParamChecker.assertNotEmpty("certprofile", certprofile);
+        ParamChecker.assertNotBlank("certprofile", certprofile);
 
         int caId = getCaId(caCert);
 

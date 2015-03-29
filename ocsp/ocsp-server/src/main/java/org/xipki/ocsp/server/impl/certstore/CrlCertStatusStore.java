@@ -121,7 +121,7 @@ public class CrlCertStatusStore extends CertStatusStore
                 final String profileName)
         {
             ParamChecker.assertNotNull("cert", cert);
-            ParamChecker.assertNotEmpty("profileName", profileName);
+            ParamChecker.assertNotBlank("profileName", profileName);
             this.cert = cert;
             this.profileName = profileName;
         }
@@ -188,7 +188,7 @@ public class CrlCertStatusStore extends CertStatusStore
             final String certsDirname)
     {
         super(name);
-        ParamChecker.assertNotEmpty("crlFile", crlFilename);
+        ParamChecker.assertNotBlank("crlFile", crlFilename);
         ParamChecker.assertNotNull("caCert", caCert);
 
         this.crlFilename = IoUtil.expandFilepath(crlFilename);

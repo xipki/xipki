@@ -52,7 +52,7 @@ public class P10EnrollCertEntryType
             final String profile)
     {
         ParamChecker.assertNotNull("p10Request", p10Request);
-        ParamChecker.assertNotEmpty("profile", profile);
+        ParamChecker.assertNotBlank("profile", profile);
 
         this.p10Request = p10Request;
         this.profile = profile;

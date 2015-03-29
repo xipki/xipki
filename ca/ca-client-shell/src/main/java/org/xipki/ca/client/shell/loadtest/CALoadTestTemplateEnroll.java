@@ -195,7 +195,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
     throws Exception
     {
         ParamChecker.assertNotNull("raWorker", raWorker);
-        ParamChecker.assertNotEmpty("templateFile", templateFile);
+        ParamChecker.assertNotBlank("templateFile", templateFile);
 
         this.raWorker = raWorker;
 

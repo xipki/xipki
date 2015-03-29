@@ -93,7 +93,7 @@ public class DbPorter
     {
         super();
         ParamChecker.assertNotNull("dataSource", dataSource);
-        ParamChecker.assertNotEmpty("baseDir", baseDir);
+        ParamChecker.assertNotBlank("baseDir", baseDir);
 
         this.dataSource = dataSource;
         this.connection = this.dataSource.getConnection();

@@ -1082,7 +1082,7 @@ public class SecurityUtil
             String hashAlgName)
     {
         hashAlgName = hashAlgName.trim();
-        ParamChecker.assertNotEmpty("hashAlgName", hashAlgName);
+        ParamChecker.assertNotBlank("hashAlgName", hashAlgName);
         hashAlgName = hashAlgName.replace("-", "").toUpperCase();
 
         if("SHA1".equalsIgnoreCase(hashAlgName))

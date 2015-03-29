@@ -78,7 +78,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
     public static CertValidity getInstance(
             final String validityS)
     {
-        ParamChecker.assertNotEmpty("validityS", validityS);
+        ParamChecker.assertNotBlank("validityS", validityS);
         final int len = validityS.length();
         final char suffix = validityS.charAt(len - 1);
         Unit unit;

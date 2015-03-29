@@ -208,7 +208,7 @@ class CRLControl implements Serializable
             final String conf)
     throws ConfigurationException
     {
-        ParamChecker.assertNotEmpty("conf", conf);
+        ParamChecker.assertNotBlank("conf", conf);
         CmpUtf8Pairs props;
         try
         {

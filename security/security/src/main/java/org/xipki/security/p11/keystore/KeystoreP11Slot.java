@@ -378,7 +378,7 @@ public class KeystoreP11Slot implements P11WritableSlot
             final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception
     {
-        ParamChecker.assertNotEmpty("label", label);
+        ParamChecker.assertNotBlank("label", label);
 
         if (keySize < 1024)
         {
@@ -418,7 +418,7 @@ public class KeystoreP11Slot implements P11WritableSlot
             final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception
     {
-        ParamChecker.assertNotEmpty("label", label);
+        ParamChecker.assertNotBlank("label", label);
 
         if (pLength < 1024)
         {
@@ -457,8 +457,8 @@ public class KeystoreP11Slot implements P11WritableSlot
             final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception
     {
-        ParamChecker.assertNotEmpty("curveNameOrOid", curveNameOrOid);
-        ParamChecker.assertNotEmpty("label", label);
+        ParamChecker.assertNotBlank("curveNameOrOid", curveNameOrOid);
+        ParamChecker.assertNotBlank("label", label);
 
         if(labelExists(label))
         {

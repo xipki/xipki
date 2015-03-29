@@ -55,8 +55,8 @@ public class CmpControlEntry implements Serializable
             final String name,
             final String conf)
     {
-        ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotEmpty("conf", conf);
+        ParamChecker.assertNotBlank("name", name);
+        ParamChecker.assertNotBlank("conf", conf);
         this.name = name;
         this.conf = conf;
     }

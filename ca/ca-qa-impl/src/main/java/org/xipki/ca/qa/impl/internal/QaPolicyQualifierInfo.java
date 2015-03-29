@@ -51,7 +51,7 @@ public abstract class QaPolicyQualifierInfo
         public QaCPSUriPolicyQualifier(
                 final String cPSUri)
         {
-            ParamChecker.assertNotEmpty("cPSUri", cPSUri);
+            ParamChecker.assertNotBlank("cPSUri", cPSUri);
             this.cPSUri = cPSUri;
         }
 
@@ -68,7 +68,7 @@ public abstract class QaPolicyQualifierInfo
         public QaUserNoticePolicyQualifierInfo(
                 final String userNotice)
         {
-            ParamChecker.assertNotEmpty("userNotice", userNotice);
+            ParamChecker.assertNotBlank("userNotice", userNotice);
             this.userNotice = userNotice;
         }
 

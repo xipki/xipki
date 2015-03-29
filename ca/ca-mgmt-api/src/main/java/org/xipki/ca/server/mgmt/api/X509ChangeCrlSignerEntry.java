@@ -58,7 +58,7 @@ public class X509ChangeCrlSignerEntry implements Serializable
             final String name)
     throws ConfigurationException
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         this.name = name;
     }
 

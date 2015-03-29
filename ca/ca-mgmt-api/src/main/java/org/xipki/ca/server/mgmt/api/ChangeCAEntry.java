@@ -62,7 +62,7 @@ public class ChangeCAEntry
             final String name)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         this.name = name;
     }
 

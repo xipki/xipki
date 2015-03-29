@@ -70,8 +70,8 @@ public class CAEntry
             final int expirationPeriod)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotEmpty("signerType", signerType);
+        ParamChecker.assertNotBlank("name", name);
+        ParamChecker.assertNotBlank("signerType", signerType);
 
         if(expirationPeriod < 0)
         {
