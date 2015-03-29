@@ -116,6 +116,7 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SecurityFactory;
@@ -1256,6 +1257,24 @@ implements CAManager, CmpResponderManager
             throw new CAMgmtException("CA named " + name + " exists");
         }
 
+        if(caEntry instanceof X509CAEntry)
+        {
+            X509CAEntry xEntry = (X509CAEntry) caEntry;
+            X509Certificate cert = xEntry.getCertificate();
+            ConcurrentContentSigner signer;
+            try
+            {
+                signer = securityFactory.createSigner(xEntry.getSignerType(), xEntry.getSignerConf(), cert);
+            } catch (SignerException e)
+            {
+                throw new CAMgmtException("could not create signer for new CA " + name +": " + e.getMessage(), e);
+            }
+            if(cert == null)
+            {
+                xEntry.setCertificate(signer.getCertificate());
+            }
+        }
+
         queryExecutor.addCA(caEntry);
         createCA(name);
         startCA(name);
@@ -1280,7 +1299,7 @@ implements CAManager, CmpResponderManager
         asssertMasterMode();
         String name = entry.getName();
 
-        boolean changed = queryExecutor.changeCA(entry);
+        boolean changed = queryExecutor.changeCA(entry, securityFactory);
         if(changed == false)
         {
             LOG.info("no change of CA '{}' is processed", name);

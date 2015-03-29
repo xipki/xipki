@@ -88,6 +88,8 @@ import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.SignerException;
 
 /**
  * @author Lijun Liao
@@ -1237,7 +1239,8 @@ class CAManagerQueryExecutor
     }
 
     boolean changeCA(
-            final ChangeCAEntry changeCAEntry)
+            final ChangeCAEntry changeCAEntry,
+            final SecurityFactory securityFactory)
     throws CAMgmtException
     {
         if(changeCAEntry instanceof X509ChangeCAEntry == false)
@@ -1264,6 +1267,69 @@ class CAManagerQueryExecutor
         Integer expirationPeriod = entry.getExpirationPeriod();
         ValidityMode validityMode = entry.getValidityMode();
         String extraControl = entry.getExtraControl();
+
+        if(signer_type != null || signer_conf != null || cert != null)
+        {
+            final String sql = "SELECT SIGNE_TYPE, SIGNER_CONF, CERT FROM CA WHERE NAME=?";
+            PreparedStatement stmt = null;
+            ResultSet rs = null;
+
+            try
+            {
+                stmt = prepareStatement(sql);
+                stmt.setString(1, name);
+                rs = stmt.executeQuery(sql);
+                if(rs.next() == false)
+                {
+                    throw new CAMgmtException("no CA '" + name + "' is defined");
+                }
+
+                String _signerType = rs.getString("SIGNER_TYPE");
+                String _signerConf = rs.getString("SIGNER_CONF");
+                String _b64Cert = rs.getString("CERT");
+                if(signer_type != null)
+                {
+                    _signerType = signer_type;
+                }
+
+                if(signer_conf != null)
+                {
+                    _signerConf = getRealString(signer_conf);
+                }
+
+                X509Certificate _cert;
+                if(cert != null)
+                {
+                    _cert = cert;
+                }
+                else
+                {
+                    try
+                    {
+                        _cert = SecurityUtil.parseBase64EncodedCert(_b64Cert);
+                    } catch (CertificateException | IOException e)
+                    {
+                        throw new CAMgmtException(
+                                "could not parse the stored certificate for CA '" + name + "'" + e.getMessage(), e);
+                    }
+                }
+                try
+                {
+                    securityFactory.createSigner(_signerType, _signerConf, _cert);
+                } catch (SignerException e)
+                {
+                    throw new CAMgmtException(
+                            "could not create signer for  CA '" + name + "'" + e.getMessage(), e);
+                }
+            }catch(SQLException e)
+            {
+                DataAccessException tEx = dataSource.translate(sql, e);
+                throw new CAMgmtException(tEx.getMessage(), tEx);
+            }finally
+            {
+                dataSource.releaseResources(stmt, rs);
+            }
+        }
 
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE CA SET ");
