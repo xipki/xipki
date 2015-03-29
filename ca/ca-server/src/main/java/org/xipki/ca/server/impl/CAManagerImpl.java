@@ -2825,7 +2825,7 @@ implements CAManager, CmpResponderManager
 
         X509CAEntry entry = new X509CAEntry(name, nextSerial, nextCrlNumber, signer_type, signerConf,
                 ocsp_uris, crl_uris, delta_crl_uris, numCrls, expirationPeriod);
-        caEntry.setCertificate(caCert);
+        entry.setCertificate(caCert);
         entry.setDuplicateKeyMode(duplicate_key);
         entry.setDuplicateSubjectMode(duplicate_subject);
         entry.setValidityMode(validityMode);
