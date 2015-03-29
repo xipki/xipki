@@ -60,7 +60,7 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.PasswordResolverException;
@@ -279,7 +279,7 @@ public class P10RequestGenerator
             return new GeneralName(tag, value);
         case GeneralName.directoryName:
         {
-            X500Name x500Name = SecurityUtil.reverse(new X500Name(value));
+            X500Name x500Name = X509Util.reverse(new X500Name(value));
             return new GeneralName(GeneralName.directoryName, x500Name);
         }
         case GeneralName.ediPartyName:

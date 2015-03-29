@@ -41,7 +41,7 @@ import java.util.Set;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
 
@@ -71,13 +71,13 @@ public class P11CertUpdateCommand extends P11SecurityCommand
     {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
-        X509Certificate newCert = SecurityUtil.parseCert(certFile);
+        X509Certificate newCert = X509Util.parseCert(certFile);
         Set<X509Certificate> caCerts = new HashSet<>();
         if(isNotEmpty(caCertFiles))
         {
             for(String caCertFile : caCertFiles)
             {
-                caCerts.add(SecurityUtil.parseCert(caCertFile));
+                caCerts.add(X509Util.parseCert(caCertFile));
             }
         }
 

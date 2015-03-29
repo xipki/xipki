@@ -68,7 +68,7 @@ import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
@@ -207,12 +207,12 @@ class CaCertStoreDbImporter extends DbPorter
                 {
                     String b64Cert = m.getCert();
                     byte[] encodedCert = Base64.decode(b64Cert);
-                    X509Certificate c = SecurityUtil.parseCert(encodedCert);
+                    X509Certificate c = X509Util.parseCert(encodedCert);
                     String hexSha1FpCert = HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
 
                     int idx = 1;
                     ps.setInt(idx++, m.getId());
-                    ps.setString(idx++, SecurityUtil.getRFC4519Name(c.getSubjectX500Principal()));
+                    ps.setString(idx++, X509Util.getRFC4519Name(c.getSubjectX500Principal()));
                     ps.setString(idx++, hexSha1FpCert);
                     ps.setString(idx++, b64Cert);
 
@@ -517,7 +517,7 @@ class CaCertStoreDbImporter extends DbPorter
                     X509CRL c = null;
                     try
                     {
-                        c = SecurityUtil.parseCRL(new ByteArrayInputStream(encodedCrl));
+                        c = X509Util.parseCRL(new ByteArrayInputStream(encodedCrl));
                     } catch (CertificateException | CRLException e)
                     {
                         LOG.error("could not parse CRL in file {}", filename);
@@ -760,7 +760,7 @@ class CaCertStoreDbImporter extends DbPorter
                     ps_cert.setInt(idx++, certArt);
                     ps_cert.setLong(idx++, cert.getLastUpdate());
                     ps_cert.setLong(idx++, c.getSerialNumber().getPositiveValue().longValue());
-                    ps_cert.setString(idx++, SecurityUtil.getRFC4519Name(c.getSubject()));
+                    ps_cert.setString(idx++, X509Util.getRFC4519Name(c.getSubject()));
                     ps_cert.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
                     ps_cert.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
                     setBoolean(ps_cert, idx++, cert.isRevoked());
@@ -773,7 +773,7 @@ class CaCertStoreDbImporter extends DbPorter
                     setInt(ps_cert, idx++, cert.getUserId());
 
                     ps_cert.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
-                    String sha1FpSubject = SecurityUtil.sha1sum_canonicalized_name(c.getSubject());
+                    String sha1FpSubject = X509Util.sha1sum_canonicalized_name(c.getSubject());
                     ps_cert.setString(idx++, sha1FpSubject);
                     Extension extension = c.getTBSCertificate().getExtensions().getExtension(Extension.basicConstraints);
                     boolean ee = true;

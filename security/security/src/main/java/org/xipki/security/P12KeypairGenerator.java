@@ -81,6 +81,7 @@ import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.bcext.ECDSAContentSignerBuilder;
 
@@ -136,7 +137,7 @@ public abstract class P12KeypairGenerator
         Date notAfter = new Date(notBefore.getTime() + validity * DAY );
 
         X500Name subjectDN = new X500Name(subject);
-        subjectDN = SecurityUtil.sortX509Name(subjectDN);
+        subjectDN = X509Util.sortX509Name(subjectDN);
         SubjectPublicKeyInfo subjectPublicKeyInfo = kp.getSubjectPublicKeyInfo();
         ContentSigner contentSigner = getContentSigner(kp.getKeypair().getPrivate());
 

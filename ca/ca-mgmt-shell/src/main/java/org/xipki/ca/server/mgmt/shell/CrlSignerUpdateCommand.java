@@ -43,7 +43,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.PasswordResolver;
 
 /**
@@ -95,7 +95,7 @@ public class CrlSignerUpdateCommand extends CaCommand
         else if(signerCert != null)
         {
             byte[] certBytes = IoUtil.read(signerCert);
-            SecurityUtil.parseCert(new ByteArrayInputStream(certBytes));
+            X509Util.parseCert(new ByteArrayInputStream(certBytes));
             signerCertConf = Base64.toBase64String(certBytes);
         }
 

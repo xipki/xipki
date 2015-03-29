@@ -119,8 +119,8 @@ import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -1319,7 +1319,7 @@ public class OcspServer
                 }
             }
 
-            explicitCertificateChain = SecurityUtil.buildCertPath(explicitResponderCert, caCerts);
+            explicitCertificateChain = X509Util.buildCertPath(explicitResponderCert, caCerts);
         }
 
         String responderSignerType = m.getType();
@@ -1613,7 +1613,7 @@ public class OcspServer
             certstore.addAll(requestOption.getCerts());
         }
 
-        X509Certificate[] certpath = SecurityUtil.buildCertPath(target, certstore);
+        X509Certificate[] certpath = X509Util.buildCertPath(target, certstore);
         CertpathValidationModel model = requestOption.getCertpathValidationModel();
 
         Date now = new Date();
@@ -1716,7 +1716,7 @@ public class OcspServer
         try
         {
             is = getInputStream(certConf);
-            return SecurityUtil.parseCert(is);
+            return X509Util.parseCert(is);
         } catch (IOException | CertificateException e)
         {
             String msg = "could not parse certificate";

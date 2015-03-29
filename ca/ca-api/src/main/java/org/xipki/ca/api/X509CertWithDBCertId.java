@@ -43,7 +43,7 @@ import javax.security.auth.x500.X500Principal;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.util.Arrays;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -72,11 +72,11 @@ public class X509CertWithDBCertId
 
         this.cert = cert;
         X500Principal x500Subject = cert.getSubjectX500Principal();
-        this.subject = SecurityUtil.getRFC4519Name(x500Subject);
+        this.subject = X509Util.getRFC4519Name(x500Subject);
         this.subjectAsX500Name = X500Name.getInstance(x500Subject.getEncoded());
         try
         {
-            this.subjectKeyIdentifer = SecurityUtil.extractSKI(cert);
+            this.subjectKeyIdentifer = X509Util.extractSKI(cert);
         } catch(CertificateEncodingException e)
         {
             throw new RuntimeException("CertificateEncodingException: " + e.getMessage());

@@ -44,7 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -69,7 +69,7 @@ public class CmpRequestorEntry implements Serializable
         this.base64Cert = base64Cert;
         try
         {
-            this.cert = SecurityUtil.parseBase64EncodedCert(base64Cert);
+            this.cert = X509Util.parseBase64EncodedCert(base64Cert);
         }catch(Throwable t)
         {
             final String message = "could not parse the certificate for requestor '" + name + "'";
@@ -113,10 +113,10 @@ public class CmpRequestorEntry implements Serializable
         {
             sb.append("cert: ").append("\n");
             sb.append("\tissuer: ").append(
-                    SecurityUtil.getRFC4519Name(cert.getIssuerX500Principal())).append("\n");
+                    X509Util.getRFC4519Name(cert.getIssuerX500Principal())).append("\n");
             sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
             sb.append("\tsubject: ").append(
-                    SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
+                    X509Util.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
 
             if(verbose)
             {

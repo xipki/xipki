@@ -75,7 +75,7 @@ import org.xipki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 
@@ -280,7 +280,7 @@ abstract class CmpResponder
             else
             {
                 LOG.warn("tid={}: not authorized requestor (TLS client '{}')",
-                        tid, SecurityUtil.getRFC4519Name(tlsClientCert.getSubjectX500Principal()));
+                        tid, X509Util.getRFC4519Name(tlsClientCert.getSubjectX500Principal()));
                 errorStatus = "requestor (TLS client certificate) is not authorized";
             }
         }

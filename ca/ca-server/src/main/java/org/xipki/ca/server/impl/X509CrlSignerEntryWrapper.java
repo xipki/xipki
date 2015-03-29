@@ -47,7 +47,7 @@ import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.KeyUsage;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
@@ -125,7 +125,7 @@ class X509CrlSignerEntryWrapper
         }
         this.subjectKeyIdentifier = ski.getOctets();
 
-        if(SecurityUtil.hasKeyusage(signer.getCertificate(), KeyUsage.cRLSign) == false)
+        if(X509Util.hasKeyusage(signer.getCertificate(), KeyUsage.cRLSign) == false)
         {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "CRL signer does not have keyusage cRLSign");

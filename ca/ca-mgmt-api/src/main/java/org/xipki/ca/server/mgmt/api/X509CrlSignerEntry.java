@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -96,7 +97,7 @@ public class X509CrlSignerEntry implements Serializable
         {
             try
             {
-                this.cert = SecurityUtil.parseBase64EncodedCert(base64Cert);
+                this.cert = X509Util.parseBase64EncodedCert(base64Cert);
             }catch(Throwable t)
             {
                 LOG.debug("could not parse the certificate of CRL signer '" + name + "'");
@@ -190,10 +191,10 @@ public class X509CrlSignerEntry implements Serializable
         {
             sb.append("cert: ").append("\n");
             sb.append("\tissuer: ").append(
-                    SecurityUtil.getRFC4519Name(cert.getIssuerX500Principal())).append('\n');
+                    X509Util.getRFC4519Name(cert.getIssuerX500Principal())).append('\n');
             sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append('\n');
             sb.append("\tsubject: ").append(
-                    SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
+                    X509Util.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
 
             if(verbose)
             {

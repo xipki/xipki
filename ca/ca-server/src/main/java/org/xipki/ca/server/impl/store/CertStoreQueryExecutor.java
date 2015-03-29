@@ -86,6 +86,7 @@ import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.datasource.api.exception.DataIntegrityViolationException;
@@ -220,7 +221,7 @@ class CertStoreQueryExecutor
         Integer requestorId = (requestor == null) ? null : getRequestorId(requestor.getName());
 
         String fpPK = fp(encodedSubjectPublicKey);
-        String fpSubject = SecurityUtil.sha1sum_canonicalized_name(cert.getSubjectX500Principal());
+        String fpSubject = X509Util.sha1sum_canonicalized_name(cert.getSubjectX500Principal());
         String fpCert = fp(certificate.getEncodedCert());
         String b64Cert = Base64.toBase64String(certificate.getEncodedCert());
 
@@ -1427,7 +1428,7 @@ class CertStoreQueryExecutor
             {
                 String b64Cert = rs.getString("CERT");
                 byte[] encodedCert = Base64.decode(b64Cert);
-                X509Certificate cert = SecurityUtil.parseCert(encodedCert);
+                X509Certificate cert = X509Util.parseCert(encodedCert);
 
                 int certprofile_id = rs.getInt("PROFILE_ID");
                 String certprofileName = certprofileStore.getName(certprofile_id);
@@ -1494,7 +1495,7 @@ class CertStoreQueryExecutor
                 X509Certificate cert;
                 try
                 {
-                    cert = SecurityUtil.parseCert(encodedCert);
+                    cert = X509Util.parseCert(encodedCert);
                 } catch (CertificateException e)
                 {
                     throw new OperationException(ErrorCode.SYSTEM_FAILURE, "CertificateException: " + e.getMessage());
@@ -1553,7 +1554,7 @@ class CertStoreQueryExecutor
                 X509Certificate cert;
                 try
                 {
-                    cert = SecurityUtil.parseCert(certBytes);
+                    cert = X509Util.parseCert(certBytes);
                 } catch (CertificateException | IOException e)
                 {
                     throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getClass().getName() + ": " + e.getMessage());
@@ -1629,7 +1630,7 @@ class CertStoreQueryExecutor
             {
                 String b64Cert = rs.getString("CERT");
                 byte[] encodedCert = Base64.decode(b64Cert);
-                X509Certificate cert = SecurityUtil.parseCert(encodedCert);
+                X509Certificate cert = X509Util.parseCert(encodedCert);
 
                 int certprofile_id = rs.getInt("PROFILE_ID");
                 String certprofileName = certprofileStore.getName(certprofile_id);
@@ -1859,7 +1860,7 @@ class CertStoreQueryExecutor
             final X500Principal subject)
     throws DataAccessException
     {
-        String subjectFp = SecurityUtil.sha1sum_canonicalized_name(subject);
+        String subjectFp = X509Util.sha1sum_canonicalized_name(subject);
         return getCertStatusForSubjectFp(caCert, subjectFp);
     }
 
@@ -1868,7 +1869,7 @@ class CertStoreQueryExecutor
             final X500Name subject)
     throws DataAccessException
     {
-        String subjectFp = SecurityUtil.sha1sum_canonicalized_name(subject);
+        String subjectFp = X509Util.sha1sum_canonicalized_name(subject);
         return getCertStatusForSubjectFp(caCert, subjectFp);
     }
 
@@ -2457,7 +2458,7 @@ class CertStoreQueryExecutor
             }
         }
 
-        String namePattern = SecurityUtil.getRFC4519Name(new X500Name(rdns2));
+        String namePattern = X509Util.getRFC4519Name(new X500Name(rdns2));
 
         final String sql = dataSource.createFetchFirstSelectSQL(
                 "SUBJECT FROM CERT WHERE SUBJECT LIKE ?", 1, "NOTBEFORE DESC");
@@ -2486,7 +2487,7 @@ class CertStoreQueryExecutor
                 }
                 else
                 {
-                    return SecurityUtil.rdnValueToString(rdns[0].getFirst().getValue());
+                    return X509Util.rdnValueToString(rdns[0].getFirst().getValue());
                 }
             }
         }catch(SQLException e)

@@ -35,6 +35,7 @@
 
 package org.xipki.ca.server.impl;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.Set;
 
@@ -214,7 +215,15 @@ class CmpControl
             return true;
         }
 
-        String name = SecurityUtil.getSignatureAlgoName(algId);
+        String name;
+        try
+        {
+            name = SecurityUtil.getSignatureAlgoName(algId);
+        } catch (NoSuchAlgorithmException e)
+        {
+            return false;
+        }
+
         if(sigAlgos.contains(name))
         {
             return true;

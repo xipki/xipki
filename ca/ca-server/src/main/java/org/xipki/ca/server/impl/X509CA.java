@@ -135,6 +135,7 @@ import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.SecurityFactory;
@@ -590,7 +591,7 @@ class X509CA
             // CA signs the CRL
             if(caManager.getCrlSignerWrapper(caInfo.getCrlSignerName()) == null)
             {
-                if(SecurityUtil.hasKeyusage(caInfo.getCertificate().getCert(), KeyUsage.cRLSign) == false)
+                if(X509Util.hasKeyusage(caInfo.getCertificate().getCert(), KeyUsage.cRLSign) == false)
                 {
                     final String msg = "CRL signer does not have keyusage cRLSign";
                     LOG.error(msg);
@@ -1150,7 +1151,7 @@ class X509CA
             final Extensions extensions)
     throws OperationException
     {
-        final String subjectText = SecurityUtil.getRFC4519Name(subject);
+        final String subjectText = X509Util.getRFC4519Name(subject);
         LOG.info("     START generateCertificate: CA={}, profile={}, subject='{}'",
                 new Object[]{caInfo.getName(), certprofileName, subjectText});
 
@@ -1201,7 +1202,7 @@ class X509CA
             final Extensions extensions)
     throws OperationException
     {
-        final String subjectText = SecurityUtil.getRFC4519Name(subject);
+        final String subjectText = X509Util.getRFC4519Name(subject);
         LOG.info("     START regenerateCertificate: CA={}, profile={}, subject='{}'",
                 new Object[]{caInfo.getName(), certprofileName, subjectText});
 
@@ -1725,9 +1726,9 @@ class X509CA
             LOG.error("removing certificate issuer='{}', serial={}, subject='{}' from publisher {} failed.",
                     new Object[]
                     {
-                            SecurityUtil.getRFC4519Name(c.getIssuerX500Principal()),
+                            X509Util.getRFC4519Name(c.getIssuerX500Principal()),
                             c.getSerialNumber(),
-                            SecurityUtil.getRFC4519Name(c.getSubjectX500Principal()),
+                            X509Util.getRFC4519Name(c.getSubjectX500Principal()),
                             publisher.getName()});
         }
 
@@ -2092,7 +2093,7 @@ class X509CA
             RDN[] cnRDNs = requestedSubject.getRDNs(ObjectIdentifiers.DN_CN);
             if(cnRDNs != null && cnRDNs.length > 0)
             {
-                String requestedCN = SecurityUtil.rdnValueToString(cnRDNs[0].getFirst().getValue());
+                String requestedCN = X509Util.rdnValueToString(cnRDNs[0].getFirst().getValue());
                 Long gsmckFirstNotBeforeInSecond = certstore.getNotBeforeOfFirstCertStartsWithCN(
                         requestedCN, certprofileName);
                 if(gsmckFirstNotBeforeInSecond != null)
@@ -2153,8 +2154,8 @@ class X509CA
             subjectMode = DuplicationMode.FORBIDDEN_WITHIN_PROFILE;
         }
 
-        String sha1FpSubject = SecurityUtil.sha1sum_canonicalized_name(grantedSubject);
-        String grandtedSubjectText = SecurityUtil.getRFC4519Name(grantedSubject);
+        String sha1FpSubject = X509Util.sha1sum_canonicalized_name(grantedSubject);
+        String grandtedSubjectText = X509Util.getRFC4519Name(grantedSubject);
 
         byte[] subjectPublicKeyData =  publicKeyInfo.getPublicKeyData().getBytes();
         String sha1FpPublicKey = SecurityUtil.sha1sum(subjectPublicKeyData);
@@ -2293,7 +2294,7 @@ class X509CA
                         }
 
                         foundUniqueSubject = (certstore.certIssuedForSubject(caInfo.getCertificate(),
-                                    SecurityUtil.sha1sum_canonicalized_name(grantedSubject)) == false);
+                                X509Util.sha1sum_canonicalized_name(grantedSubject)) == false);
                         if(foundUniqueSubject)
                         {
                             break;
@@ -2513,7 +2514,7 @@ class X509CA
         boolean changed = false;
         for(RDN rdn : rdns)
         {
-            String textValue = SecurityUtil.rdnValueToString(rdn.getFirst().getValue());
+            String textValue = X509Util.rdnValueToString(rdn.getFirst().getValue());
             if(StringUtil.isBlank(textValue))
             {
                 changed = true;

@@ -86,6 +86,7 @@ import org.xipki.common.ConfigurationException;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.security.api.SecurityFactory;
@@ -121,7 +122,7 @@ class CAManagerQueryExecutor
         byte[] encodedCert = Base64.decode(b64Cert);
         try
         {
-            return SecurityUtil.parseCert(encodedCert);
+            return X509Util.parseCert(encodedCert);
         } catch (CertificateException | IOException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
@@ -1306,7 +1307,7 @@ class CAManagerQueryExecutor
                 {
                     try
                     {
-                        _cert = SecurityUtil.parseBase64EncodedCert(_b64Cert);
+                        _cert = X509Util.parseBase64EncodedCert(_b64Cert);
                     } catch (CertificateException | IOException e)
                     {
                         throw new CAMgmtException(
@@ -1381,7 +1382,7 @@ class CAManagerQueryExecutor
 
             if(iCert != null)
             {
-                String subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
+                String subject = X509Util.getRFC4519Name(cert.getSubjectX500Principal());
                 m.append("cert: '").append(subject).append("'; ");
                 ps.setString(iSubject, subject);
                 String base64Cert = Base64.toBase64String(cert.getEncoded());
@@ -1665,8 +1666,8 @@ class CAManagerQueryExecutor
             {
                 try
                 {
-                    subject = SecurityUtil.canonicalizName(
-                            SecurityUtil.parseBase64EncodedCert(b64Cert).getSubjectX500Principal());
+                    subject = X509Util.canonicalizName(
+                            X509Util.parseBase64EncodedCert(b64Cert).getSubjectX500Principal());
                 } catch (CertificateException | IOException e)
                 {
                     subject = "ERROR";
@@ -1758,8 +1759,8 @@ class CAManagerQueryExecutor
                 {
                     try
                     {
-                        String subject = SecurityUtil.canonicalizName(
-                                SecurityUtil.parseBase64EncodedCert(txt).getSubjectX500Principal());
+                        String subject = X509Util.canonicalizName(
+                                X509Util.parseBase64EncodedCert(txt).getSubjectX500Principal());
                         m.append(subject);
                     } catch (CertificateException | IOException e)
                     {
@@ -1885,8 +1886,8 @@ class CAManagerQueryExecutor
                 {
                     try
                     {
-                        subject = SecurityUtil.canonicalizName(
-                                SecurityUtil.parseBase64EncodedCert(txt).getSubjectX500Principal());
+                        subject = X509Util.canonicalizName(
+                                X509Util.parseBase64EncodedCert(txt).getSubjectX500Principal());
                     } catch (CertificateException | IOException e)
                     {
                         subject = "ERROR";

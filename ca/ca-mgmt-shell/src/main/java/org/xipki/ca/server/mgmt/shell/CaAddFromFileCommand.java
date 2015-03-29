@@ -56,8 +56,8 @@ import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.PasswordResolver;
 
 /**
@@ -334,7 +334,7 @@ public class CaAddFromFileCommand extends CaCommand
             X509Certificate caCert = null;
             if(certBytes != null)
             {
-                caCert = SecurityUtil.parseCert(certBytes);
+                caCert = X509Util.parseCert(certBytes);
             }
             entry.setCertificate(caCert);
         }

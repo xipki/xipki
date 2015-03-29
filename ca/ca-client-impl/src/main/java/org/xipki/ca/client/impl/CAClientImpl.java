@@ -124,7 +124,7 @@ import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
@@ -302,7 +302,7 @@ public final class CAClientImpl implements CAClient
             X509Certificate cert;
             try
             {
-                cert = SecurityUtil.parseCert(readData(m.getCert()));
+                cert = X509Util.parseCert(readData(m.getCert()));
             } catch (CertificateException e)
             {
                 final String message = "could not configure responder " + m.getName();
@@ -348,7 +348,7 @@ public final class CAClientImpl implements CAClient
                 else
                 {
                     ca.setCertAutoconf(true);
-                    ca.setCert(SecurityUtil.parseCert(readData(caType.getCaCert().getCert())));
+                    ca.setCert(X509Util.parseCert(readData(caType.getCaCert().getCert())));
                 }
 
                 // Certprofiles
@@ -413,7 +413,7 @@ public final class CAClientImpl implements CAClient
             {
                 try
                 {
-                    requestorCert = SecurityUtil.parseCert(readData(requestorConf.getCert()));
+                    requestorCert = X509Util.parseCert(readData(requestorConf.getCert()));
                     requestorCerts.put(name, requestorCert);
                 } catch (Exception e)
                 {

@@ -94,8 +94,8 @@ import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
@@ -285,7 +285,7 @@ public class CrlCertStatusStore extends CertStatusStore
             auditLogPCIEvent(AuditLevel.INFO, "UPDATE_CERTSTORE", "a newer version of CRL is available");
             updateCRLSuccessfull = false;
 
-            X509CRL crl = SecurityUtil.parseCRL(crlFilename);
+            X509CRL crl = X509Util.parseCRL(crlFilename);
             BigInteger crlNumber;
             {
                 byte[] octetString = crl.getExtensionValue(Extension.cRLNumber.getId());
@@ -337,7 +337,7 @@ public class CrlCertStatusStore extends CertStatusStore
                     throw new CertStatusStoreException("baseCRL does not contains CRLNumber");
                 }
 
-                deltaCrl = SecurityUtil.parseCRL(deltaCrlFilename);
+                deltaCrl = X509Util.parseCRL(deltaCrlFilename);
                 byte[] octetString = deltaCrl.getExtensionValue(Extension.deltaCRLIndicator.getId());
                 if(octetString == null)
                 {
@@ -626,7 +626,7 @@ public class CrlCertStatusStore extends CertStatusStore
                         if(cert == null)
                         {
                             LOG.info("could not find certificate (issuer = '{}', serialNumber = '{}'",
-                                    SecurityUtil.getRFC4519Name(caName), serialNumber);
+                                    X509Util.getRFC4519Name(caName), serialNumber);
                         }
                         else
                         {
@@ -971,7 +971,7 @@ public class CrlCertStatusStore extends CertStatusStore
         }
 
         X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-        byte[] issuerSKI = SecurityUtil.extractSKI(caCert);
+        byte[] issuerSKI = X509Util.extractSKI(caCert);
 
         Set<CertWithInfo> certs = new HashSet<>();
 
@@ -1001,7 +1001,7 @@ public class CrlCertStatusStore extends CertStatusStore
                 byte[] aki = null;
                 try
                 {
-                    aki = SecurityUtil.extractAKI(bcCert);
+                    aki = X509Util.extractAKI(bcCert);
                 }catch(CertificateEncodingException e)
                 {
                     final String message = "could not extract AuthorityKeyIdentifier";

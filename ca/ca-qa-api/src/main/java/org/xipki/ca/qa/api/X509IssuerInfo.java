@@ -47,7 +47,7 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.Arrays;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -102,13 +102,13 @@ public class X509IssuerInfo
 
         try
         {
-            this.cert = SecurityUtil.parseCert(certBytes);
+            this.cert = X509Util.parseCert(certBytes);
         } catch (IOException e)
         {
             throw new CertificateException(e.getMessage(), e);
         }
         this.bcCert = Certificate.getInstance(certBytes);
-        this.ski = SecurityUtil.extractSKI(cert);
+        this.ski = X509Util.extractSKI(cert);
     }
 
     public Set<String> getOcspURLs()

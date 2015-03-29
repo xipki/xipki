@@ -37,45 +37,29 @@ package org.xipki.common.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
-import java.security.cert.CRLException;
+import java.security.PublicKey;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
+import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.security.auth.x500.X500Principal;
-
 import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1Encoding;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DERUniversalString;
 import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.bouncycastle.asn1.cmp.PKIStatus;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
@@ -84,29 +68,15 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
-import org.bouncycastle.asn1.x500.RDN;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.IETFUtils;
-import org.bouncycastle.asn1.x500.style.RFC4519Style;
-import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
-import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
 import org.xipki.common.InvalidOIDorNameException;
-import org.xipki.common.KeyUsage;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 
@@ -139,263 +109,6 @@ public class SecurityUtil
         statusTextMap.put(PKIStatus.REVOCATION_WARNING, "revocationWarning");
         statusTextMap.put(PKIStatus.REVOCATION_NOTIFICATION, "revocationNotification");
         statusTextMap.put(PKIStatus.KEY_UPDATE_WARNING, "keyUpdateWarning");
-    }
-
-    public static String getCommonName(
-            final X500Name name)
-    {
-        RDN[] rdns = name.getRDNs(ObjectIdentifiers.DN_CN);
-        if(rdns != null && rdns.length > 0)
-        {
-            return rdnValueToString(rdns[0].getFirst().getValue());
-        }
-        return null;
-    }
-
-    public static X500Name reverse(
-            final X500Name name)
-    {
-        RDN[] orig = name.getRDNs();
-        int n = orig.length;
-        RDN[] _new = new RDN[n];
-        for(int i = 0; i < n; i++)
-        {
-            _new[i] = orig[n - 1 - i];
-        }
-        return new X500Name(_new);
-    }
-
-    public static X500Name sortX509Name(
-            final X500Name name)
-    {
-        return sortX500Name(name, false);
-    }
-
-    public static X500Name backwardSortX509Name(
-            final X500Name name)
-    {
-        return sortX500Name(name, true);
-    }
-
-    private static X500Name sortX500Name(
-            final X500Name name,
-            final boolean backwards)
-    {
-        RDN[] requstedRDNs = name.getRDNs();
-
-        List<RDN> rdns = new LinkedList<>();
-
-        List<ASN1ObjectIdentifier> sortedDNs = backwards ?
-                ObjectIdentifiers.getBackwardDNs() : ObjectIdentifiers.getForwardDNs();
-        int size = sortedDNs.size();
-        for(int i = 0; i < size; i++)
-        {
-            ASN1ObjectIdentifier type = sortedDNs.get(i);
-            RDN[] thisRDNs = getRDNs(requstedRDNs, type);
-            int n = thisRDNs == null ? 0 : thisRDNs.length;
-            if(n == 0)
-            {
-                continue;
-            }
-
-            for(RDN thisRDN : thisRDNs)
-            {
-                rdns.add(thisRDN);
-            }
-        }
-
-        return new X500Name(rdns.toArray(new RDN[0]));
-    }
-
-    private static RDN[] getRDNs(
-            final RDN[] rdns,
-            final ASN1ObjectIdentifier type)
-    {
-        List<RDN> ret = new ArrayList<>(1);
-        for(int i = 0; i < rdns.length; i++)
-        {
-            RDN rdn = rdns[i];
-            if(rdn.getFirst().getType().equals(type))
-            {
-                ret.add(rdn);
-            }
-        }
-
-        if(CollectionUtil.isEmpty(ret))
-        {
-            return null;
-        }
-        else
-        {
-            return ret.toArray(new RDN[0]);
-        }
-    }
-
-    private static CertificateFactory certFact;
-    private static Object certFactLock = new Object();
-
-    public static X509Certificate parseCert(
-            final String fileName)
-    throws IOException, CertificateException
-    {
-        return parseCert(new File(IoUtil.expandFilepath(fileName)));
-    }
-
-    public static X509Certificate parseCert(
-            final File file)
-    throws IOException, CertificateException
-    {
-        FileInputStream in = new FileInputStream(IoUtil.expandFilepath(file));
-        try
-        {
-            return parseCert(in);
-        }finally
-        {
-            in.close();
-        }
-    }
-
-    public static X509Certificate parseCert(
-            final byte[] certBytes)
-    throws IOException, CertificateException
-    {
-        return parseCert(new ByteArrayInputStream(certBytes));
-    }
-
-    public static X509Certificate parseBase64EncodedCert(
-            final String base64EncodedCert)
-    throws IOException, CertificateException
-    {
-        return parseCert(Base64.decode(base64EncodedCert));
-    }
-
-    public static X509Certificate parseCert(
-            final InputStream certStream)
-    throws IOException, CertificateException
-    {
-        synchronized (certFactLock)
-        {
-            if (certFact == null)
-            {
-                try
-                {
-                    certFact = CertificateFactory.getInstance("X.509", "BC");
-                } catch (NoSuchProviderException e)
-                {
-                    throw new IOException("NoSuchProviderException: " + e.getMessage());
-                }
-            }
-        }
-
-        return (X509Certificate) certFact.generateCertificate(certStream);
-    }
-
-    public static X509CRL parseCRL(
-            final String f)
-    throws IOException, CertificateException, CRLException
-    {
-        return parseCRL(new FileInputStream(IoUtil.expandFilepath(f)));
-    }
-
-    public static X509CRL parseCRL(
-            final InputStream crlStream)
-    throws IOException, CertificateException, CRLException
-    {
-        try
-        {
-            if(certFact == null)
-            {
-                certFact = CertificateFactory.getInstance("X.509", "BC");
-            }
-            return (X509CRL) certFact.generateCRL(crlStream);
-        } catch (NoSuchProviderException e)
-        {
-            throw new IOException("NoSuchProviderException: " + e.getMessage());
-        }
-    }
-
-    public static String getRFC4519Name(
-            final X500Principal name)
-    {
-        return getRFC4519Name(X500Name.getInstance(name.getEncoded()));
-    }
-
-    public static String getRFC4519Name(
-            final X500Name name)
-    {
-        return RFC4519Style.INSTANCE.toString(name);
-    }
-
-    /**
-     * First canonicalized the name, and then compute the SHA-1 finger-print over the
-     * canonicalized subject string.
-     */
-    public static String sha1sum_canonicalized_name(
-            final X500Principal prin)
-    {
-        X500Name x500Name = X500Name.getInstance(prin.getEncoded());
-        return sha1sum_canonicalized_name(x500Name);
-    }
-
-    public static String sha1sum_canonicalized_name(
-            final X500Name name)
-    {
-        String canonicalizedName = canonicalizName(name);
-        byte[] encoded;
-        try
-        {
-            encoded = canonicalizedName.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e)
-        {
-            encoded = canonicalizedName.getBytes();
-        }
-        return sha1sum(encoded);
-    }
-
-    public static String canonicalizName(
-            final X500Principal prin)
-    {
-        X500Name x500Name = X500Name.getInstance(prin.getEncoded());
-        return canonicalizName(x500Name);
-    }
-
-    public static String canonicalizName(
-            final X500Name name)
-    {
-        ASN1ObjectIdentifier[] _types = name.getAttributeTypes();
-        int n = _types.length;
-        List<String> types = new ArrayList<>(n);
-        for(ASN1ObjectIdentifier type : _types)
-        {
-            types.add(type.getId());
-        }
-
-        Collections.sort(types);
-
-        StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < n; i++)
-        {
-            String type = types.get(i);
-            if(i > 0)
-            {
-                sb.append(",");
-            }
-            sb.append(type).append("=");
-            RDN[] rdns = name.getRDNs(new ASN1ObjectIdentifier(type));
-
-            for(int j = 0; j < rdns.length; j++)
-            {
-                if(j > 0)
-                {
-                    sb.append(";");
-                }
-                RDN rdn = rdns[j];
-                String textValue = IETFUtils.valueToString(rdn.getFirst().getValue()).toLowerCase();
-                sb.append(textValue);
-            }
-        }
-
-        return sb.toString();
     }
 
     public static String sha1sum(
@@ -477,116 +190,6 @@ public class SecurityUtil
         return bytes;
     }
 
-    /**
-     * Cross certificate will not be considered
-     */
-    public static X509Certificate[] buildCertPath(
-            final X509Certificate cert,
-            final Set<? extends Certificate> certs)
-    {
-        List<X509Certificate> certChain = new LinkedList<>();
-        certChain.add(cert);
-        try
-        {
-            if(certs != null && isSelfSigned(cert) == false)
-            {
-                while(true)
-                {
-                    X509Certificate caCert = getCaCertOf(certChain.get(certChain.size() - 1), certs);
-                    if(caCert == null)
-                    {
-                        break;
-                    }
-                    certChain.add(caCert);
-                    if(isSelfSigned(caCert))
-                    {
-                        // reaches root self-signed certificate
-                        break;
-                    }
-                }
-            }
-        }catch(CertificateEncodingException e)
-        {
-        }
-
-        final int n = certChain.size();
-        int len = n;
-        if(n > 1)
-        {
-            for(int i = 1; i < n; i++)
-            {
-                int pathLen = certChain.get(i).getBasicConstraints();
-                if(pathLen < 0 || pathLen < i)
-                {
-                    len = i;
-                    break;
-                }
-            }
-        }
-
-        if(len == n)
-        {
-            return certChain.toArray(new X509Certificate[0]);
-        }
-        else
-        {
-            X509Certificate[] ret = new X509Certificate[len];
-            for(int i = 0; i < len; i++)
-            {
-                ret[i] = certChain.get(i);
-            }
-            return ret;
-        }
-    }
-
-    public static X509Certificate[] buildCertPath(
-            final X509Certificate cert,
-            final Certificate[] certs)
-    {
-        Set<Certificate> setOfCerts = new HashSet<>();
-        for(Certificate m : certs)
-        {
-            setOfCerts.add(m);
-        }
-
-        return buildCertPath(cert, setOfCerts);
-    }
-
-    public static X509Certificate getCaCertOf(
-            final X509Certificate cert,
-            final Set<? extends Certificate> caCerts)
-    throws CertificateEncodingException
-    {
-        if(isSelfSigned(cert))
-        {
-            return null;
-        }
-
-        for(Certificate caCert : caCerts)
-        {
-            if(caCert instanceof X509Certificate == false)
-            {
-                continue;
-            }
-
-            X509Certificate x509CaCert = (X509Certificate) caCert;
-            if(issues(x509CaCert, cert) == false)
-            {
-                continue;
-            }
-
-            try
-            {
-                cert.verify(x509CaCert.getPublicKey());
-                return x509CaCert;
-            } catch (Exception e)
-            {
-            }
-        }
-
-        return null;
-    }
-
     public static String formatPKIStatusInfo(
             final org.bouncycastle.asn1.cmp.PKIStatusInfo pkiStatusInfo)
     {
@@ -630,56 +233,6 @@ public class SecurityUtil
         }
 
         return sb.length() < 3 ? "" : sb.substring(2);
-    }
-
-    public static boolean isSelfSigned(
-            final X509Certificate cert)
-    throws CertificateEncodingException
-    {
-        boolean equals = cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
-        if(equals)
-        {
-            byte[] ski = extractSKI(cert);
-            byte[] aki = extractAKI(cert);
-            if(ski != null && aki != null)
-            {
-                equals = Arrays.equals(ski, aki);
-            }
-        }
-        return equals;
-    }
-
-    public static boolean issues(
-            final X509Certificate issuerCert,
-            final X509Certificate cert)
-    throws CertificateEncodingException
-    {
-        boolean isCA = issuerCert.getBasicConstraints() >= 0;
-        if(isCA == false)
-        {
-            return false;
-        }
-
-        boolean issues = issuerCert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
-        if(issues)
-        {
-            byte[] ski = extractSKI(issuerCert);
-            byte[] aki = extractAKI(cert);
-            if(ski != null)
-            {
-                issues = Arrays.equals(ski, aki);
-            }
-        }
-
-        if(issues)
-        {
-            long issuerNotBefore = issuerCert.getNotBefore().getTime();
-            long issuerNotAfter = issuerCert.getNotAfter().getTime();
-            long notBefore = cert.getNotBefore().getTime();
-            issues = notBefore <= issuerNotAfter && notBefore >= issuerNotBefore;
-        }
-
-        return issues;
     }
 
     public static byte[] leftmost(
@@ -766,149 +319,6 @@ public class SecurityUtil
         return curveName;
     }
 
-    public static byte[] extractSKI(
-            final X509Certificate cert)
-    throws CertificateEncodingException
-    {
-        byte[] extValue = getCoreExtValue(cert, Extension.subjectKeyIdentifier);
-        if(extValue == null)
-        {
-            return null;
-        }
-
-        try
-        {
-            return ASN1OctetString.getInstance(extValue).getOctets();
-        }catch(IllegalArgumentException e)
-        {
-            throw new CertificateEncodingException(e.getMessage());
-        }
-    }
-
-    public static byte[] extractSKI(
-            final org.bouncycastle.asn1.x509.Certificate cert)
-    throws CertificateEncodingException
-    {
-        Extension encodedSkiValue = cert.getTBSCertificate().getExtensions().getExtension(Extension.subjectKeyIdentifier);
-        if(encodedSkiValue == null)
-        {
-            return null;
-        }
-
-        try
-        {
-            return ASN1OctetString.getInstance(encodedSkiValue.getParsedValue()).getOctets();
-        } catch (IllegalArgumentException e)
-        {
-            throw new CertificateEncodingException("invalid extension SubjectKeyIdentifier: " + e.getMessage());
-        }
-    }
-
-    public static byte[] extractAKI(
-            final X509Certificate cert)
-    throws CertificateEncodingException
-    {
-        byte[] extValue = getCoreExtValue(cert, Extension.authorityKeyIdentifier);
-        if(extValue == null)
-        {
-            return null;
-        }
-
-        try
-        {
-            AuthorityKeyIdentifier aki = AuthorityKeyIdentifier.getInstance(extValue);
-            return aki.getKeyIdentifier();
-        } catch (IllegalArgumentException e)
-        {
-            throw new CertificateEncodingException("invalid extension AuthorityKeyIdentifier: " + e.getMessage());
-        }
-    }
-
-    public static List<String> extractOCSPUrls(
-            final X509Certificate cert)
-    throws CertificateEncodingException
-    {
-        byte[] extValue = getCoreExtValue(cert, Extension.authorityInfoAccess);
-        if(extValue == null)
-        {
-            return Collections.emptyList();
-        }
-
-        AuthorityInformationAccess iAIA = AuthorityInformationAccess.getInstance(extValue);
-
-        AccessDescription[] iAccessDescriptions = iAIA.getAccessDescriptions();
-        List<AccessDescription> iOCSPAccessDescriptions = new LinkedList<>();
-        for(AccessDescription iAccessDescription : iAccessDescriptions)
-        {
-            if(iAccessDescription.getAccessMethod().equals(X509ObjectIdentifiers.id_ad_ocsp))
-            {
-                iOCSPAccessDescriptions.add(iAccessDescription);
-            }
-        }
-
-        int n = iOCSPAccessDescriptions.size();
-        List<String> OCSPUris = new ArrayList<>(n);
-        for(int i = 0; i < n; i++)
-        {
-            GeneralName iAccessLocation = iOCSPAccessDescriptions.get(i).getAccessLocation();
-            if(iAccessLocation.getTagNo() == GeneralName.uniformResourceIdentifier)
-            {
-                String iOCSPUri = ((ASN1String) iAccessLocation.getName()).getString();
-                OCSPUris.add(iOCSPUri);
-            }
-        }
-
-        return OCSPUris;
-    }
-
-    public static byte[] extractAKI(
-            final org.bouncycastle.asn1.x509.Certificate cert)
-    throws CertificateEncodingException
-    {
-        try
-        {
-            AuthorityKeyIdentifier aki = AuthorityKeyIdentifier.fromExtensions(
-                    cert.getTBSCertificate().getExtensions());
-            return aki == null ? null : aki.getKeyIdentifier();
-        } catch (IllegalArgumentException e)
-        {
-            throw new CertificateEncodingException("invalid extension AuthorityKeyIdentifier: " + e.getMessage());
-        }
-    }
-
-    public static String rdnValueToString(
-            final ASN1Encodable value)
-    {
-        if (value instanceof ASN1String && !(value instanceof DERUniversalString))
-        {
-            return ((ASN1String)value).getString();
-        }
-        else
-        {
-            try
-            {
-                return "#" + bytesToString(Hex.encode(value.toASN1Primitive().getEncoded(ASN1Encoding.DER)));
-            }
-            catch (IOException e)
-            {
-                throw new IllegalArgumentException("other value has no encoded form");
-            }
-        }
-    }
-
-    private static String bytesToString(
-            final byte[] data)
-    {
-        char[]  cs = new char[data.length];
-
-        for (int i = 0; i != cs.length; i++)
-        {
-            cs[i] = (char)(data[i] & 0xff);
-        }
-
-        return new String(cs);
-    }
-
     public static List<ASN1ObjectIdentifier> textToASN1ObjectIdentifers(
             final List<String> oidTexts)
     throws InvalidOIDorNameException
@@ -968,54 +378,6 @@ public class SecurityUtil
         return oid;
     }
 
-    public static org.bouncycastle.asn1.x509.KeyUsage createKeyUsage(
-            final Set<KeyUsage> usages)
-    {
-        if(CollectionUtil.isEmpty(usages))
-        {
-            return null;
-        }
-
-        int usage = 0;
-        for (KeyUsage keyUsage : usages)
-        {
-            usage |= keyUsage.getBcUsage();
-        }
-
-        return new org.bouncycastle.asn1.x509.KeyUsage(usage);
-    }
-
-    public static ExtendedKeyUsage createExtendedUsage(
-            final Set<ASN1ObjectIdentifier> usages)
-    {
-        if(CollectionUtil.isEmpty(usages))
-        {
-            return null;
-        }
-
-        KeyPurposeId[] kps = new KeyPurposeId[usages.size()];
-
-        int i = 0;
-        for (ASN1ObjectIdentifier oid : usages)
-        {
-            kps[i++] = KeyPurposeId.getInstance(oid);
-        }
-
-        return new ExtendedKeyUsage(kps);
-    }
-
-    public static boolean hasKeyusage(
-            final X509Certificate cert,
-            final KeyUsage usage)
-    {
-        boolean[] keyusage = cert.getKeyUsage();
-        if(keyusage != null && keyusage.length > usage.getBit())
-        {
-            return keyusage[usage.getBit()];
-        }
-        return false;
-    }
-
     public static String signerConfToString(
             String signerConf,
             final boolean verbose,
@@ -1059,27 +421,9 @@ public class SecurityUtil
         }
     }
 
-    private static byte[] getCoreExtValue(
-            final X509Certificate cert,
-            final ASN1ObjectIdentifier type)
-    throws CertificateEncodingException
-    {
-        byte[] fullExtValue = cert.getExtensionValue(type.getId());
-        if(fullExtValue == null)
-        {
-            return null;
-        }
-        try
-        {
-            return ASN1OctetString.getInstance(fullExtValue).getOctets();
-        } catch (IllegalArgumentException e)
-        {
-            throw new CertificateEncodingException("invalid extension " + type.getId() + ": " + e.getMessage());
-        }
-    }
-
     public static ASN1ObjectIdentifier getHashAlg(
             String hashAlgName)
+    throws NoSuchAlgorithmException
     {
         hashAlgName = hashAlgName.trim();
         ParamChecker.assertNotBlank("hashAlgName", hashAlgName);
@@ -1107,12 +451,13 @@ public class SecurityUtil
         }
         else
         {
-            throw new RuntimeException("Unsupported hash algorithm " + hashAlgName);
+            throw new NoSuchAlgorithmException("Unsupported hash algorithm " + hashAlgName);
         }
     }
 
     static public String getSignatureAlgoName(
             final AlgorithmIdentifier sigAlgId)
+    throws NoSuchAlgorithmException
     {
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
 
@@ -1198,13 +543,263 @@ public class SecurityUtil
             }
             else
             {
-                return null;
+                throw new NoSuchAlgorithmException("unsupported digest algorithm " + digestAlgOid.getId());
             }
         }
         else
         {
-            return null;
+            throw new NoSuchAlgorithmException("unsupported signature algorithm " + algOid.getId());
         }
+    }
+
+    static public AlgorithmIdentifier getSignatureAlgoId(
+            final String signatureAlgoName)
+    throws NoSuchAlgorithmException
+    {
+        String algoS = signatureAlgoName.replaceAll("-", "");
+
+        AlgorithmIdentifier signatureAlgId;
+        if("SHA1withRSAandMGF1".equalsIgnoreCase(algoS) ||
+                "SHA224withRSAandMGF1".equalsIgnoreCase(algoS) ||
+                "SHA256withRSAandMGF1".equalsIgnoreCase(algoS) ||
+                "SHA384withRSAandMGF1".equalsIgnoreCase(algoS) ||
+                "SHA512withRSAandMGF1".equalsIgnoreCase(algoS))
+        {
+            ASN1ObjectIdentifier hashAlgo;
+            if("SHA1withRSAandMGF1".equalsIgnoreCase(algoS))
+            {
+                hashAlgo = X509ObjectIdentifiers.id_SHA1;
+            }
+            else if("SHA224withRSAandMGF1".equalsIgnoreCase(algoS))
+            {
+                hashAlgo = NISTObjectIdentifiers.id_sha224;
+            }
+            else if("SHA256withRSAandMGF1".equalsIgnoreCase(algoS))
+            {
+                hashAlgo = NISTObjectIdentifiers.id_sha256;
+            }
+            else if("SHA384withRSAandMGF1".equalsIgnoreCase(algoS))
+            {
+                hashAlgo = NISTObjectIdentifiers.id_sha384;
+            }
+            else if("SHA512withRSAandMGF1".equalsIgnoreCase(algoS))
+            {
+                hashAlgo = NISTObjectIdentifiers.id_sha512;
+            }
+            else
+            {
+                throw new NoSuchAlgorithmException("should not reach here, unknown algorithm " + algoS);
+            }
+
+            signatureAlgId = SecurityUtil.buildRSAPSSAlgorithmIdentifier(hashAlgo);
+        }
+        else
+        {
+            boolean withNullParam = false;
+            ASN1ObjectIdentifier algOid;
+            if("SHA1withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA1".equalsIgnoreCase(algoS) ||
+                    PKCSObjectIdentifiers.sha1WithRSAEncryption.getId().equals(algoS))
+            {
+                algOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
+                withNullParam = true;
+            }
+            else if("SHA224withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA224".equalsIgnoreCase(algoS) ||
+                    PKCSObjectIdentifiers.sha224WithRSAEncryption.getId().equals(algoS))
+            {
+                algOid = PKCSObjectIdentifiers.sha224WithRSAEncryption;
+                withNullParam = true;
+            }
+            else if("SHA256withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA256".equalsIgnoreCase(algoS) ||
+                    PKCSObjectIdentifiers.sha256WithRSAEncryption.getId().equals(algoS))
+            {
+                algOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
+                withNullParam = true;
+            }
+            else if("SHA384withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA384".equalsIgnoreCase(algoS) ||
+                    PKCSObjectIdentifiers.sha384WithRSAEncryption.getId().equals(algoS))
+            {
+                algOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
+                withNullParam = true;
+            }
+            else if("SHA512withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA512".equalsIgnoreCase(algoS) ||
+                    PKCSObjectIdentifiers.sha512WithRSAEncryption.getId().equals(algoS))
+            {
+                algOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
+                withNullParam = true;
+            }
+            else if("SHA1withECDSA".equalsIgnoreCase(algoS) || "ECDSAwithSHA1".equalsIgnoreCase(algoS) ||
+                    X9ObjectIdentifiers.ecdsa_with_SHA1.getId().equals(algoS))
+            {
+                algOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
+            }
+            else if("SHA224withECDSA".equalsIgnoreCase(algoS) || "ECDSAwithSHA224".equalsIgnoreCase(algoS) ||
+                    X9ObjectIdentifiers.ecdsa_with_SHA224.getId().equals(algoS))
+            {
+                algOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
+            }
+            else if("SHA256withECDSA".equalsIgnoreCase(algoS) || "ECDSAwithSHA256".equalsIgnoreCase(algoS) ||
+                    X9ObjectIdentifiers.ecdsa_with_SHA256.getId().equals(algoS))
+            {
+                algOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
+            }
+            else if("SHA384withECDSA".equalsIgnoreCase(algoS) || "ECDSAwithSHA384".equalsIgnoreCase(algoS) ||
+                    X9ObjectIdentifiers.ecdsa_with_SHA384.getId().equals(algoS))
+            {
+                algOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
+            }
+            else if("SHA512withECDSA".equalsIgnoreCase(algoS) || "ECDSAwithSHA512".equalsIgnoreCase(algoS) ||
+                    X9ObjectIdentifiers.ecdsa_with_SHA512.getId().equals(algoS))
+            {
+                algOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
+            }
+            else if("SHA1withDSA".equalsIgnoreCase(algoS) || "DSAwithSHA1".equalsIgnoreCase(algoS) ||
+                    X9ObjectIdentifiers.id_dsa_with_sha1.getId().equals(algoS))
+            {
+                algOid = X9ObjectIdentifiers.id_dsa_with_sha1;
+            }
+            else if("SHA224withDSA".equalsIgnoreCase(algoS) || "DSAwithSHA224".equalsIgnoreCase(algoS) ||
+                    NISTObjectIdentifiers.dsa_with_sha224.getId().equals(algoS))
+            {
+                algOid = NISTObjectIdentifiers.dsa_with_sha224;
+            }
+            else if("SHA256withDSA".equalsIgnoreCase(algoS) || "DSAwithSHA256".equalsIgnoreCase(algoS) ||
+                    NISTObjectIdentifiers.dsa_with_sha256.getId().equals(algoS))
+            {
+                algOid = NISTObjectIdentifiers.dsa_with_sha256;
+            }
+            else if("SHA384withDSA".equalsIgnoreCase(algoS) || "DSAwithSHA384".equalsIgnoreCase(algoS) ||
+                    NISTObjectIdentifiers.dsa_with_sha384.getId().equals(algoS))
+            {
+                algOid = NISTObjectIdentifiers.dsa_with_sha384;
+            }
+            else if("SHA512withDSA".equalsIgnoreCase(algoS) || "DSAwithSHA512".equalsIgnoreCase(algoS) ||
+                    NISTObjectIdentifiers.dsa_with_sha512.getId().equals(algoS))
+            {
+                algOid = NISTObjectIdentifiers.dsa_with_sha512;
+            }
+            else
+            {
+                throw new NoSuchAlgorithmException("unsupported signature algorithm " + algoS);
+            }
+
+            signatureAlgId = withNullParam ? new AlgorithmIdentifier(algOid, DERNull.INSTANCE) :
+                new AlgorithmIdentifier(algOid);
+        }
+
+        return signatureAlgId;
+    }
+
+    static public AlgorithmIdentifier getSignatureAlgoId(
+            final PublicKey pubKey,
+            final String hashAlgo,
+            final boolean mgf1)
+    throws NoSuchAlgorithmException
+    {
+        AlgorithmIdentifier signatureAlgId;
+        if(pubKey instanceof RSAPublicKey)
+        {
+            if(mgf1)
+            {
+                ASN1ObjectIdentifier hashAlgoOid = SecurityUtil.getHashAlg(hashAlgo);
+                signatureAlgId = SecurityUtil.buildRSAPSSAlgorithmIdentifier(hashAlgoOid);
+            }
+            else
+            {
+                ASN1ObjectIdentifier sigAlgoOid;
+                if("SHA1".equalsIgnoreCase(hashAlgo))
+                {
+                    sigAlgoOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
+                }
+                else if("SHA224".equalsIgnoreCase(hashAlgo))
+                {
+                    sigAlgoOid = PKCSObjectIdentifiers.sha224WithRSAEncryption;
+                }
+                else if("SHA256".equalsIgnoreCase(hashAlgo))
+                {
+                    sigAlgoOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
+                }
+                else if("SHA384".equalsIgnoreCase(hashAlgo))
+                {
+                    sigAlgoOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
+                }
+                else if("SHA512".equalsIgnoreCase(hashAlgo))
+                {
+                    sigAlgoOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
+                }
+                else
+                {
+                    throw new RuntimeException("unsupported hash algorithm " + hashAlgo);
+                }
+
+                signatureAlgId = new AlgorithmIdentifier(sigAlgoOid, DERNull.INSTANCE);
+            }
+        }
+        else if(pubKey instanceof ECPublicKey)
+        {
+            ASN1ObjectIdentifier sigAlgoOid;
+            if("SHA1".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgoOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
+            }
+            else if("SHA224".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgoOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
+            }
+            else if("SHA256".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgoOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
+            }
+            else if("SHA384".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgoOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
+            }
+            else if("SHA512".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgoOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
+            }
+            else
+            {
+                throw new NoSuchAlgorithmException("unsupported hash algorithm " + hashAlgo);
+            }
+
+            signatureAlgId = new AlgorithmIdentifier(sigAlgoOid);
+        }
+        else if(pubKey instanceof DSAPublicKey)
+        {
+            ASN1ObjectIdentifier sigAlgoOid;
+            if("SHA1".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgoOid = X9ObjectIdentifiers.id_dsa_with_sha1;
+            }
+            else if("SHA224".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgoOid = NISTObjectIdentifiers.dsa_with_sha224;
+            }
+            else if("SHA256".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgoOid = NISTObjectIdentifiers.dsa_with_sha256;
+            }
+            else if("SHA384".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgoOid = NISTObjectIdentifiers.dsa_with_sha384;
+            }
+            else if("SHA512".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgoOid = NISTObjectIdentifiers.dsa_with_sha512;
+            }
+            else
+            {
+                throw new NoSuchAlgorithmException("unsupported hash algorithm " + hashAlgo);
+            }
+
+            signatureAlgId = new AlgorithmIdentifier(sigAlgoOid);
+        }
+        else
+        {
+            throw new NoSuchAlgorithmException("unsupported key type " + pubKey.getClass().getName());
+        }
+
+        return signatureAlgId;
     }
 
     static public AlgorithmIdentifier extractDigesetAlgorithmIdentifier(
@@ -1344,6 +939,86 @@ public class SecurityUtil
                 endIndex = len;
             }
         }
+    }
+
+    static public AlgorithmIdentifier buildRSAPSSAlgorithmIdentifier(
+            final ASN1ObjectIdentifier digAlgOid)
+    throws NoSuchAlgorithmException
+    {
+        RSASSAPSSparams params = createPSSRSAParams(digAlgOid);
+        return new AlgorithmIdentifier(PKCSObjectIdentifiers.id_RSASSA_PSS, params);
+    }
+
+    static public AlgorithmIdentifier buildDSASigAlgorithmIdentifier(
+            final AlgorithmIdentifier digAlgId)
+    throws NoSuchAlgorithmException
+    {
+        ASN1ObjectIdentifier digAlgOid = digAlgId.getAlgorithm();
+        ASN1ObjectIdentifier sid;
+        if(X509ObjectIdentifiers.id_SHA1.equals(digAlgOid))
+        {
+            sid = X9ObjectIdentifiers.id_dsa_with_sha1;
+        }
+        else if(NISTObjectIdentifiers.id_sha224.equals(digAlgOid))
+        {
+            sid = NISTObjectIdentifiers.dsa_with_sha224;
+        }
+        else if(NISTObjectIdentifiers.id_sha256.equals(digAlgOid))
+        {
+            sid = NISTObjectIdentifiers.dsa_with_sha256;
+        }
+        else if(NISTObjectIdentifiers.id_sha384.equals(digAlgOid))
+        {
+            sid = NISTObjectIdentifiers.dsa_with_sha384;
+        }
+        else if(NISTObjectIdentifiers.id_sha512.equals(digAlgOid))
+        {
+            sid = NISTObjectIdentifiers.dsa_with_sha512;
+        }
+        else
+        {
+            throw new NoSuchAlgorithmException("no signature algorithm for DSA with digest algorithm " + digAlgOid.getId());
+        }
+        return new AlgorithmIdentifier(sid);
+    }
+
+    static public RSASSAPSSparams createPSSRSAParams(
+            final ASN1ObjectIdentifier digestAlgOID)
+    throws NoSuchAlgorithmException
+    {
+        int saltSize;
+        if(X509ObjectIdentifiers.id_SHA1.equals(digestAlgOID))
+        {
+            saltSize = 20;
+        }
+        else if(NISTObjectIdentifiers.id_sha224.equals(digestAlgOID))
+        {
+            saltSize = 28;
+        }
+        else if(NISTObjectIdentifiers.id_sha256.equals(digestAlgOID))
+        {
+            saltSize = 32;
+        }
+        else if(NISTObjectIdentifiers.id_sha384.equals(digestAlgOID))
+        {
+            saltSize = 48;
+        }
+        else if(NISTObjectIdentifiers.id_sha512.equals(digestAlgOID))
+        {
+            saltSize = 64;
+        }
+        else
+        {
+            throw new NoSuchAlgorithmException(
+                    "unknown digest algorithm " + digestAlgOID);
+        }
+
+        AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlgOID, DERNull.INSTANCE);
+        return new RSASSAPSSparams(
+            digAlgId,
+            new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),
+            new ASN1Integer(saltSize),
+            RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
     }
 
 }

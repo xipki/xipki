@@ -41,7 +41,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -68,7 +68,7 @@ public class RequestorUpdateCommand extends CaCommand
     {
         // check if the certificate is valid
         byte[] certBytes = IoUtil.read(certFile);
-        SecurityUtil.parseCert(new ByteArrayInputStream(certBytes));
+        X509Util.parseCert(new ByteArrayInputStream(certBytes));
         boolean b = caManager.changeCmpRequestor(name, Base64.toBase64String(certBytes));
         output(b, "updated", "could not update", "CMP requestor " + name);
         return null;

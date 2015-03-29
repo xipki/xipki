@@ -42,7 +42,7 @@ import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.PasswordResolver;
 
 /**
@@ -86,7 +86,7 @@ public class ResponderUpdateCommand extends CaCommand
         else if(certFile != null)
         {
             byte[] certBytes = IoUtil.read(certFile);
-            SecurityUtil.parseCert(new ByteArrayInputStream(certBytes));
+            X509Util.parseCert(new ByteArrayInputStream(certBytes));
             cert = Base64.toBase64String(certBytes);
         }
 

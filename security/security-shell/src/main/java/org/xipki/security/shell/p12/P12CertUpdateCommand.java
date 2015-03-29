@@ -46,7 +46,7 @@ import java.util.Set;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 
@@ -76,7 +76,7 @@ public class P12CertUpdateCommand extends P12SecurityCommand
         KeyStore ks = getKeyStore();
 
         char[] pwd = getPassword();
-        X509Certificate newCert = SecurityUtil.parseCert(certFile);
+        X509Certificate newCert = X509Util.parseCert(certFile);
 
         assertMatch(newCert, new String(pwd));
 
@@ -103,10 +103,10 @@ public class P12CertUpdateCommand extends P12SecurityCommand
         {
             for(String caCertFile : caCertFiles)
             {
-                caCerts.add(SecurityUtil.parseCert(caCertFile));
+                caCerts.add(X509Util.parseCert(caCertFile));
             }
         }
-        X509Certificate[] certChain = SecurityUtil.buildCertPath(newCert, caCerts);
+        X509Certificate[] certChain = X509Util.buildCertPath(newCert, caCerts);
 
         ks.setKeyEntry(keyname, key, pwd, certChain);
 

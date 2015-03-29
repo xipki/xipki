@@ -168,6 +168,7 @@ import org.xipki.common.qa.ValidationResult;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.ExtensionExistence;
 
 /**
@@ -494,7 +495,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             try
             {
                 bcCert = Certificate.getInstance(certBytes);
-                cert = SecurityUtil.parseCert(certBytes);
+                cert = X509Util.parseCert(certBytes);
             } catch (CertificateException | IOException e)
             {
                 issue.setFailureMessage("certificate is not corrected encoded");
@@ -1314,7 +1315,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         {
             for(RDN requestedRdn : requestedRdns)
             {
-                String textValue = SecurityUtil.rdnValueToString(requestedRdn.getFirst().getValue());
+                String textValue = X509Util.rdnValueToString(requestedRdn.getFirst().getValue());
                 requestedCoreAtvTextValues.add(textValue);
             }
 
@@ -1364,7 +1365,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 continue;
             }
 
-            String atvTextValue = SecurityUtil.rdnValueToString(atvValue);
+            String atvTextValue = X509Util.rdnValueToString(atvValue);
             String coreAtvTextValue = atvTextValue;
 
             if(rdnOption != null)
@@ -1731,7 +1732,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             GeneralName eBase;
             if(eSubtree.getDirectoryName() != null)
             {
-                eBase = new GeneralName(SecurityUtil.reverse(
+                eBase = new GeneralName(X509Util.reverse(
                         new X500Name(eSubtree.getDirectoryName())));
             }
             else if(eSubtree.getDNSName() != null)

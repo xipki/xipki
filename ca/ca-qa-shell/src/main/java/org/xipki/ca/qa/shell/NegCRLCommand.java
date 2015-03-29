@@ -39,8 +39,8 @@ import java.security.cert.X509CRL;
 import java.util.Set;
 
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.CAClientException;
+import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.shell.ClientCommand;
 import org.xipki.common.qa.UnexpectedResultException;
 

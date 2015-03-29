@@ -54,7 +54,7 @@ import org.xipki.common.CertpathValidationModel;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.ocsp.server.impl.jaxb.CertCollectionType;
 import org.xipki.ocsp.server.impl.jaxb.CertCollectionType.Keystore;
 import org.xipki.ocsp.server.impl.jaxb.NonceType;
@@ -342,7 +342,7 @@ class RequestOption
             {
                 if(file.exists() && file.isFile())
                 {
-                    certs.add(SecurityUtil.parseCert(file));
+                    certs.add(X509Util.parseCert(file));
                 }
             }
         }

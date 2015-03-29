@@ -56,7 +56,7 @@ import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.security.api.PasswordResolver;
@@ -272,7 +272,7 @@ public class OCSPCertPublisher extends X509CertPublisher
             return true;
         } catch (Exception e)
         {
-            String issuerText = SecurityUtil.getRFC4519Name(caCert.getCert().getIssuerX500Principal());
+            String issuerText = X509Util.getRFC4519Name(caCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, caCert, e, "could not publish revocation of CA");
             return false;
         }
@@ -288,7 +288,7 @@ public class OCSPCertPublisher extends X509CertPublisher
             return true;
         } catch (Exception e)
         {
-            String issuerText = SecurityUtil.getRFC4519Name(caCert.getCert().getIssuerX500Principal());
+            String issuerText = X509Util.getRFC4519Name(caCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, caCert, e, "could not publish unrevocation of CA");
             return false;
         }
@@ -305,7 +305,7 @@ public class OCSPCertPublisher extends X509CertPublisher
             return true;
         } catch (Exception e)
         {
-            String issuerText = SecurityUtil.getRFC4519Name(issuerCert.getCert().getIssuerX500Principal());
+            String issuerText = X509Util.getRFC4519Name(issuerCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, issuerCert, e, "could not publish removal of certificate");
             return false;
         }

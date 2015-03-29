@@ -39,7 +39,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.PasswordResolver;
 
 /**
@@ -94,7 +94,7 @@ public class CrlSignerAddCommand extends CaCommand
             {
                 byte[] encodedCert = IoUtil.read(signerCertFile);
                 base64Cert = IoUtil.base64Encode(encodedCert, false);
-                SecurityUtil.parseCert(encodedCert);
+                X509Util.parseCert(encodedCert);
             }
 
             if(signerConf != null)
