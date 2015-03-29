@@ -94,7 +94,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
         }
     }
 
-    public DefaultConcurrentContentSigner(List<ContentSigner> signers)
+    public DefaultConcurrentContentSigner(
+            final List<ContentSigner> signers)
     {
         this(signers, null);
     }

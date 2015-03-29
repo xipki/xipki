@@ -109,7 +109,8 @@ public class FilePasswordCallback implements PasswordCallback
     }
 
     @Override
-    public void init(String conf)
+    public void init(
+            final String conf)
     throws PasswordResolverException
     {
         if(StringUtil.isBlank(conf))
