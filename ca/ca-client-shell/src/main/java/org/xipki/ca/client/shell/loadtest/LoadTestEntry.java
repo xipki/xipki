@@ -159,7 +159,7 @@ public class LoadTestEntry
             final String subjectTemplate,
             final RandomDN randomDN)
     {
-        ParamChecker.assertNotEmpty("certprofile", certprofile);
+        ParamChecker.assertNotBlank("certprofile", certprofile);
         ParamChecker.assertNotNull("keyEntry", keyEntry);
         ParamChecker.assertNotNull("subjectTemplate", subjectTemplate);
         ParamChecker.assertNotNull("randomDN", randomDN);

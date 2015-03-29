@@ -63,7 +63,7 @@ public class HealthCheckResult
     public HealthCheckResult(
             final String name)
     {
-        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotBlank("name", name);
         this.name = name;
     }
 

@@ -195,7 +195,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             final String data)
     throws CertprofileException
     {
-        ParamChecker.assertNotEmpty("data", data);
+        ParamChecker.assertNotBlank("data", data);
         reset();
         try
         {

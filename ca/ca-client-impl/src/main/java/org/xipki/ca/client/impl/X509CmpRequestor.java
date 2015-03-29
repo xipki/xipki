@@ -880,7 +880,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             final RequestResponseDebug debug)
     throws CmpRequestorException, PKIErrorException
     {
-        ParamChecker.assertNotEmpty("certprofile", certprofile);
+        ParamChecker.assertNotBlank("certprofile", certprofile);
         if(overlapSeconds < 0)
         {
             throw new IllegalArgumentException("overlapSeconds could not be negative");

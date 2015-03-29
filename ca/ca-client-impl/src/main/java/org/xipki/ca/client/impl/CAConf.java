@@ -73,8 +73,8 @@ class CAConf
             final String requestorName,
             final X509Certificate responder)
     {
-        ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotEmpty("url", url);
+        ParamChecker.assertNotBlank("name", name);
+        ParamChecker.assertNotBlank("url", url);
         ParamChecker.assertNotNull("requestorName", requestorName);
         ParamChecker.assertNotNull("responder", responder);
 

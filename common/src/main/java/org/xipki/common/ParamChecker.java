@@ -55,7 +55,7 @@ public class ParamChecker
         }
     }
 
-    public static void assertNotEmpty(
+    public static void assertNotBlank(
             final String parameterName,
             final String parameter)
     {
@@ -66,7 +66,7 @@ public class ParamChecker
 
         if(parameter.isEmpty())
         {
-            throw new IllegalArgumentException(parameterName + " could not be empty");
+            throw new IllegalArgumentException(parameterName + " could not be blank");
         }
     }
 
