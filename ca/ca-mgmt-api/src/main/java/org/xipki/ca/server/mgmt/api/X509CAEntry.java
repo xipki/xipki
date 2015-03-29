@@ -128,20 +128,20 @@ implements Serializable
             final X509Certificate cert)
     throws CAMgmtException
     {
-    	if(cert == null)
-    	{
-    		this.cert = null;
-    		this.subject = null;
-    	}
-    	else
-    	{
-	        if(SecurityUtil.hasKeyusage(cert, KeyUsage.keyCertSign) == false)
-	        {
-	            throw new CAMgmtException("CA certificate does not have keyusage keyCertSign");
-	        }
-	        this.cert = cert;
-	        this.subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
-    	}
+        if(cert == null)
+        {
+            this.cert = null;
+            this.subject = null;
+        }
+        else
+        {
+            if(SecurityUtil.hasKeyusage(cert, KeyUsage.keyCertSign) == false)
+            {
+                throw new CAMgmtException("CA certificate does not have keyusage keyCertSign");
+            }
+            this.cert = cert;
+            this.subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
+        }
     }
 
     public long getNextSerial()

@@ -35,7 +35,7 @@
 
 package org.xipki.ca.client.shell.loadtest;
 
-import org.xipki.ca.client.api.RAWorker;
+import org.xipki.ca.client.api.CAClient;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 /**
@@ -44,10 +44,10 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 public abstract class CALoadTestCommand extends XipkiOsgiCommandSupport
 {
-    protected RAWorker raWorker;
+    protected CAClient raWorker;
 
     public final void setRaWorker(
-            final RAWorker raWorker)
+            final CAClient raWorker)
     {
         this.raWorker = raWorker;
     }

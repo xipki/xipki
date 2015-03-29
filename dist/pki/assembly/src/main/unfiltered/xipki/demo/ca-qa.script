@@ -20,7 +20,7 @@ xipki-tk:rsa-p12 --password 1234 --out output/neg/TLS101.p12 --subject "CN=TLS10
 
 xipki-tk:req-p12 --p12 output/neg/TLS101.p12 --password 1234 --out output/neg/TLS101.p10
 
-xipki-qa:neg-ra-enroll --p10 output/neg/TLS101.p10 --profile TLS --user USER-T
+xipki-qa:neg-p10-enroll --p10 output/neg/TLS101.p10 --profile TLS --user USER-T
 
 xipki-qa:neg-enroll-p12 --p12 output/neg/TLS101.p12 --password 1234 --profile TLS --user USER-T
 

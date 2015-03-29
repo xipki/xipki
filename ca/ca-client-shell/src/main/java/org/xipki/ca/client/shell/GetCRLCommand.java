@@ -46,7 +46,7 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.ca.client.api.PKIErrorException;
-import org.xipki.ca.client.api.RAWorkerException;
+import org.xipki.ca.client.api.CAClientException;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.qa.UnexpectedResultException;
 
@@ -69,12 +69,12 @@ public class GetCRLCommand extends CRLCommand
     @Override
     protected X509CRL retrieveCRL(
             final String caName)
-    throws RAWorkerException, PKIErrorException
+    throws CAClientException, PKIErrorException
     {
         RequestResponseDebug debug = getRequestResponseDebug();
         try
         {
-            return raWorker.downloadCRL(caName, debug);
+            return caClient.downloadCRL(caName, debug);
         }finally
         {
             saveRequestResponse(debug);
@@ -85,7 +85,7 @@ public class GetCRLCommand extends CRLCommand
     protected Object _doExecute()
     throws Exception
     {
-        Set<String> caNames = raWorker.getCaNames();
+        Set<String> caNames = caClient.getCaNames();
         if(isEmpty(caNames))
         {
             err("no CA is configured");
@@ -143,7 +143,7 @@ public class GetCRLCommand extends CRLCommand
                 RequestResponseDebug debug = getRequestResponseDebug();
                 try
                 {
-                    crl = raWorker.downloadCRL(caName, baseCrlNumber, debug);
+                    crl = caClient.downloadCRL(caName, baseCrlNumber, debug);
                 }catch(PKIErrorException e)
                 {
                     throw new UnexpectedResultException("received no baseCRL from server: " + e.getMessage());

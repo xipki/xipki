@@ -97,13 +97,13 @@ xipki-tk:rsa-p12 --password 1234 --out output/TLS1.p12 --subject "CN=TLS1.xipki.
 
 xipki-tk:req-p12 --p12 output/TLS1.p12 --password 1234 --out output/TLS1.p10
 
-xipki-cli:ra-enroll --p10 output/TLS1.p10 --out output/TLS1.der --profile TLS --user USER-T
+xipki-cli:p10-enroll --p10 output/TLS1.p10 --out output/TLS1.der --profile TLS --user USER-T
 
 xipki-tk:update-cert-p12 --p12 output/TLS1.p12 --password 1234 --cert output/TLS1.der \
   --ca-cert output/SubCA1.der --ca-cert output/RCA1.der
  
 # Try to enroll with another profile
-xipki-cli:ra-enroll --p10 output/TLS1.p10 --out output/TLS1-TLS_C.der --profile TLS_C --user USER-T
+xipki-cli:p10-enroll --p10 output/TLS1.p10 --out output/TLS1-TLS_C.der --profile TLS_C --user USER-T
 
 # Certificate TLSwithIncSN1 (all with same subject and profile but different key) 
 # 1.
@@ -112,7 +112,7 @@ xipki-tk:rsa-p12 --password 1234 --out output/TLSwithIncSN1.p12 \
 
 xipki-tk:req-p12 --p12 output/TLSwithIncSN1.p12 --password 1234 --out output/TLSwithIncSN1.p10
 
-xipki-cli:ra-enroll --p10 output/TLSwithIncSN1.p10 --out output/TLSwithIncSN1.der \
+xipki-cli:p10-enroll --p10 output/TLSwithIncSN1.p10 --out output/TLSwithIncSN1.der \
   --profile TLSwithIncSN --user USER-T
 
 # 2.
@@ -121,7 +121,7 @@ xipki-tk:rsa-p12 --password 1234 --out output/TLSwithIncSN1-1.p12 \
 
 xipki-tk:req-p12 --p12 output/TLSwithIncSN1-1.p12 --password 1234 --out output/TLSwithIncSN1-1.p10
 
-xipki-cli:ra-enroll --p10 output/TLSwithIncSN1-1.p10 --out output/TLSwithIncSN1-1.der \
+xipki-cli:p10-enroll --p10 output/TLSwithIncSN1-1.p10 --out output/TLSwithIncSN1-1.der \
   --profile TLSwithIncSN --user USER-T
 
 # 3.
@@ -130,7 +130,7 @@ xipki-tk:rsa-p12 --password 1234 --out output/TLSwithIncSN1-2.p12 \
 
 xipki-tk:req-p12 --p12 output/TLSwithIncSN1-2.p12 --password 1234 --out output/TLSwithIncSN1-2.p10
 
-xipki-cli:ra-enroll --p10 output/TLSwithIncSN1-2.p10 --out output/TLSwithIncSN1-2.der \
+xipki-cli:p10-enroll --p10 output/TLSwithIncSN1-2.p10 --out output/TLSwithIncSN1-2.der \
   --profile TLSwithIncSN --user USER-T
  
 # Certificate TLS2
@@ -138,7 +138,7 @@ xipki-tk:rsa-p12 --password 1234 --out output/TLS2.p12 --subject "CN=TLS2.xipki.
 
 xipki-tk:req-p12 --p12 output/TLS2.p12 --password 1234 --out output/TLS2.p10
 
-xipki-cli:ra-enroll --p10 output/TLS2.p10 --out output/TLS2.der --profile TLS --user USER-T
+xipki-cli:p10-enroll --p10 output/TLS2.p10 --out output/TLS2.der --profile TLS --user USER-T
 
 xipki-tk:update-cert-p12 --p12 output/TLS2.p12 --password 1234 --cert output/TLS2.der \
   --ca-cert output/SubCA1.der --ca-cert output/RCA1.der
@@ -152,7 +152,7 @@ xipki-tk:rsa-p12 --password 1234 --out output/TLS_C1.p12 --subject "CN=TLS_C1,O=
 
 xipki-tk:req-p12 --p12 output/TLS_C1.p12 --password 1234 --out output/TLS_C1.p10
 
-xipki-cli:ra-enroll --p10 output/TLS_C1.p10 --out output/TLS_C1.der --profile TLS_C --user USER-T
+xipki-cli:p10-enroll --p10 output/TLS_C1.p10 --out output/TLS_C1.der --profile TLS_C --user USER-T
 
 xipki-tk:update-cert-p12 --p12 output/TLS_C1.p12 --password 1234 --cert output/TLS_C1.der \
   --ca-cert output/SubCA1.der --ca-cert output/RCA1.der
@@ -162,7 +162,7 @@ xipki-tk:rsa-p12 --password 1234 --out output/TLS_C2.p12 --subject "CN=TLS_C2,O=
 
 xipki-tk:req-p12 --p12 output/TLS_C2.p12 --password 1234 --out output/TLS_C2.p10
 
-xipki-cli:ra-enroll --p10 output/TLS_C2.p10 --out output/TLS_C2.der --profile TLS_C --user USER-T
+xipki-cli:p10-enroll --p10 output/TLS_C2.p10 --out output/TLS_C2.der --profile TLS_C --user USER-T
 
 xipki-tk:update-cert-p12 --p12 output/TLS_C2.p12 --password 1234 --cert output/TLS_C2.der \
   --ca-cert output/SubCA1.der --ca-cert output/RCA1.der
@@ -175,7 +175,7 @@ xipki-tk:rsa-p12 --password 1234 --out output/gSMC_K1.p12 --subject "CN=80276123
 
 xipki-tk:req-p12 --p12 output/gSMC_K1.p12 --password 1234 --out output/gSMC_K1.p10
 
-xipki-cli:ra-enroll --p10 output/gSMC_K1.p10 --out output/gSMC_K1.der --profile gSMC_K --user USER-T
+xipki-cli:p10-enroll --p10 output/gSMC_K1.p10 --out output/gSMC_K1.der --profile gSMC_K --user USER-T
 
 xipki-tk:update-cert-p12 --p12 output/gSMC_K1.p12 --password 1234 --cert output/gSMC_K1.der \
   --ca-cert output/SubCA1.der --ca-cert output/RCA1.der
@@ -188,7 +188,7 @@ xipki-tk:rsa-p12 --password 1234 --out output/gSMC_K2.p12 --subject "CN=80276123
 
 xipki-tk:req-p12 --p12 output/gSMC_K2.p12 --password 1234 --out output/gSMC_K2.p10
 
-xipki-cli:ra-enroll --p10 output/gSMC_K2.p10 --out output/gSMC_K2.der --profile gSMC_K --user USER-T
+xipki-cli:p10-enroll --p10 output/gSMC_K2.p10 --out output/gSMC_K2.der --profile gSMC_K --user USER-T
 
 xipki-tk:update-cert-p12 --p12 output/gSMC_K2.p12 --password 1234 --cert output/gSMC_K2.der \
   --ca-cert output/SubCA1.der --ca-cert output/RCA1.der

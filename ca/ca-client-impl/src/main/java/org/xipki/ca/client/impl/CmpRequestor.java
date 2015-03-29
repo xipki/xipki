@@ -52,6 +52,7 @@ import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
 import org.bouncycastle.asn1.cmp.ErrorMsgContent;
 import org.bouncycastle.asn1.cmp.GenMsgContent;
 import org.bouncycastle.asn1.cmp.GenRepContent;
@@ -413,15 +414,47 @@ public abstract class CmpRequestor
             final ASN1OctetString tid,
             final String username)
     {
-        return buildPKIHeader(false, tid, username, (InfoTypeAndValue[]) null);
+        return buildPKIHeader(false, tid, username);
     }
 
     protected PKIHeader buildPKIHeader(
             final boolean addImplictConfirm,
             final ASN1OctetString tid,
-            final String username,
+            final String username)
+    {
+        CmpUtf8Pairs utf8Pairs = null;
+        if(StringUtil.isNotBlank(username))
+        {
+            utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_USER, username);
+        }
+        return buildPKIHeader(addImplictConfirm, tid, utf8Pairs, (InfoTypeAndValue[]) null);
+    }
+
+    protected PKIHeader buildPKIHeader(
+            final boolean addImplictConfirm,
+            final ASN1OctetString tid,
+            final CmpUtf8Pairs utf8Pairs,
             final InfoTypeAndValue... additionalGeneralInfos)
     {
+        if(additionalGeneralInfos != null)
+        {
+            for(InfoTypeAndValue itv : additionalGeneralInfos)
+            {
+                ASN1ObjectIdentifier type = itv.getInfoType();
+                if(CMPObjectIdentifiers.it_implicitConfirm.equals(type))
+                {
+                    throw new IllegalArgumentException(""
+                            + "additionGeneralInfos contains unpermitted ITV implicitConfirm");
+                }
+
+                if(CMPObjectIdentifiers.regInfo_utf8Pairs.equals(type))
+                {
+                    throw new IllegalArgumentException(""
+                            + "additionGeneralInfos contains unpermitted ITV utf8Pairs");
+                }
+            }
+        }
+
         PKIHeaderBuilder hBuilder = new PKIHeaderBuilder(
                 PKIHeader.CMP_2000,
                 sender,
@@ -445,9 +478,9 @@ public abstract class CmpRequestor
         {
             itvs.add(CmpUtil.getImplictConfirmGeneralInfo());
         }
-        if(StringUtil.isNotBlank(username))
+
+        if(utf8Pairs != null)
         {
-            CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_USER, username);
             itvs.add(CmpUtil.buildInfoTypeAndValue(utf8Pairs));
         }
 

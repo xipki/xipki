@@ -63,7 +63,7 @@ sleep 1000
 xipki-tk:req --slot 1 --key-label $SubCA_KEY_LABEL --out output/SubCA1.p10 \
   --subject "CN=SubCA1,O=xipki,C=DE"
 
-xipki-cli:ra-enroll --p10 output/SubCA1.p10 --out output/SubCA1.der --profile SubCA
+xipki-cli:p10-enroll --p10 output/SubCA1.p10 --out output/SubCA1.der --profile SubCA
 
 xipki-tk:update-cert --slot 1 --key-label $SubCA_KEY_LABEL --cert output/SubCA1.der \
   --ca-cert output/RCA1.der
@@ -81,7 +81,7 @@ xipki-tk:req --slot 1 --key-label $SubCAwithCRL_KEY_LABEL --out output/SubCAwith
   --subject-info-access "1.3.6.1.5.5.7.48.5?[6]http://example.org/abc" \
   --keyusage cRLSign
 
-xipki-cli:ra-enroll --p10 output/SubCAwithCRL1.p10 --out output/SubCAwithCRL1.der --profile SubCA.Complex
+xipki-cli:p10-enroll --p10 output/SubCAwithCRL1.p10 --out output/SubCAwithCRL1.der --profile SubCA.Complex
 
 xipki-tk:update-cert --slot 1 --key-label $SubCAwithCRL_KEY_LABEL --cert output/SubCAwithCRL1.der \
   --ca-cert output/RCA1.der

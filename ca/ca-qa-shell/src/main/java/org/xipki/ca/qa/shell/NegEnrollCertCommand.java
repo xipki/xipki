@@ -134,7 +134,7 @@ public abstract class NegEnrollCertCommand extends ClientCommand
         RequestResponseDebug debug = getRequestResponseDebug();
         try
         {
-            result = raWorker.requestCerts(request, caName, user, debug);
+            result = caClient.requestCerts(request, caName, user, debug);
         }finally
         {
             saveRequestResponse(debug);

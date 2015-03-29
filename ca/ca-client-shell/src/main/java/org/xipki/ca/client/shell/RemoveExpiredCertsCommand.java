@@ -73,7 +73,7 @@ public class RemoveExpiredCertsCommand extends ClientCommand
     protected Object _doExecute()
     throws Exception
     {
-        Set<String> caNames = raWorker.getCaNames();
+        Set<String> caNames = caClient.getCaNames();
         if(isEmpty(caNames))
         {
             err("no CA is configured");
@@ -103,7 +103,7 @@ public class RemoveExpiredCertsCommand extends ClientCommand
         RequestResponseDebug debug = getRequestResponseDebug();
         try
         {
-            result = raWorker.removeExpiredCerts(caName, profile, userLike, overlapSeconds, debug);
+            result = caClient.removeExpiredCerts(caName, profile, userLike, overlapSeconds, debug);
         }finally
         {
             saveRequestResponse(debug);
