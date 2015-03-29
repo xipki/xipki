@@ -69,6 +69,7 @@ import org.xipki.common.CRLReason;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
 import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.ocsp.qa.api.Occurrence;
 import org.xipki.ocsp.qa.api.OcspCertStatus;
 import org.xipki.ocsp.qa.api.OcspError;
@@ -200,10 +201,16 @@ public class OcspQAImpl implements OcspQA
                     if(expectedSigalgo != null)
                     {
                         AlgorithmIdentifier sigAlg = basicResp.getSignatureAlgorithmID();
-                        String sigAlgName = SecurityUtil.getSignatureAlgoName(sigAlg);
-                        if(SecurityUtil.equalsAlgoName(sigAlgName, expectedSigalgo) == false)
+                        try
                         {
-                            issue.setFailureMessage("is '" + sigAlgName +"', but expected '" + expectedSigalgo + "'");
+                            String sigAlgName = SecurityUtil.getSignatureAlgoName(sigAlg);
+                            if(SecurityUtil.equalsAlgoName(sigAlgName, expectedSigalgo) == false)
+                            {
+                                issue.setFailureMessage("is '" + sigAlgName +"', but expected '" + expectedSigalgo + "'");
+                            }
+                        } catch (NoSuchAlgorithmException e)
+                        {
+                            issue.setFailureMessage("could not extract the signature algorithm");
                         }
                     }
                 }
@@ -248,7 +255,7 @@ public class OcspQAImpl implements OcspQA
                             try
                             {
                                 jceRespSigner = new X509CertificateObject(respSigner.toASN1Structure());
-                                if(SecurityUtil.issues(respIssuer, jceRespSigner))
+                                if(X509Util.issues(respIssuer, jceRespSigner))
                                 {
                                     jceRespSigner.verify(respIssuer.getPublicKey());
                                 }

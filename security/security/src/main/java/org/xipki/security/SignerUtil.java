@@ -43,17 +43,11 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
-import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.engines.RSABlindedEngine;
@@ -156,86 +150,6 @@ public class SignerUtil
         }
 
         throw new IllegalArgumentException("unknown trailer field");
-    }
-
-    static public RSASSAPSSparams createPSSRSAParams(
-            final ASN1ObjectIdentifier digestAlgOID)
-    throws NoSuchAlgorithmException
-    {
-        int saltSize;
-        if(X509ObjectIdentifiers.id_SHA1.equals(digestAlgOID))
-        {
-            saltSize = 20;
-        }
-        else if(NISTObjectIdentifiers.id_sha224.equals(digestAlgOID))
-        {
-            saltSize = 28;
-        }
-        else if(NISTObjectIdentifiers.id_sha256.equals(digestAlgOID))
-        {
-            saltSize = 32;
-        }
-        else if(NISTObjectIdentifiers.id_sha384.equals(digestAlgOID))
-        {
-            saltSize = 48;
-        }
-        else if(NISTObjectIdentifiers.id_sha512.equals(digestAlgOID))
-        {
-            saltSize = 64;
-        }
-        else
-        {
-            throw new NoSuchAlgorithmException(
-                    "unknown digest algorithm " + digestAlgOID);
-        }
-
-        AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlgOID, DERNull.INSTANCE);
-        return new RSASSAPSSparams(
-            digAlgId,
-            new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),
-            new ASN1Integer(saltSize),
-            RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
-    }
-
-    static public AlgorithmIdentifier buildRSAPSSAlgorithmIdentifier(
-            final ASN1ObjectIdentifier digAlgOid)
-    throws NoSuchAlgorithmException
-    {
-        RSASSAPSSparams params = createPSSRSAParams(digAlgOid);
-        return new AlgorithmIdentifier(PKCSObjectIdentifiers.id_RSASSA_PSS, params);
-    }
-
-    static public AlgorithmIdentifier buildDSASigAlgorithmIdentifier(
-            final AlgorithmIdentifier digAlgId)
-    throws NoSuchAlgorithmException
-    {
-        ASN1ObjectIdentifier digAlgOid = digAlgId.getAlgorithm();
-        ASN1ObjectIdentifier sid;
-        if(X509ObjectIdentifiers.id_SHA1.equals(digAlgOid))
-        {
-            sid = X9ObjectIdentifiers.id_dsa_with_sha1;
-        }
-        else if(NISTObjectIdentifiers.id_sha224.equals(digAlgOid))
-        {
-            sid = NISTObjectIdentifiers.dsa_with_sha224;
-        }
-        else if(NISTObjectIdentifiers.id_sha256.equals(digAlgOid))
-        {
-            sid = NISTObjectIdentifiers.dsa_with_sha256;
-        }
-        else if(NISTObjectIdentifiers.id_sha384.equals(digAlgOid))
-        {
-            sid = NISTObjectIdentifiers.dsa_with_sha384;
-        }
-        else if(NISTObjectIdentifiers.id_sha512.equals(digAlgOid))
-        {
-            sid = NISTObjectIdentifiers.dsa_with_sha512;
-        }
-        else
-        {
-            throw new NoSuchAlgorithmException("no signature algorithm for DSA with digest algorithm " + digAlgOid.getId());
-        }
-        return new AlgorithmIdentifier(sid);
     }
 
     public static  boolean verifyPOP(

@@ -63,7 +63,7 @@ import org.xipki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 
 import com.caucho.hessian.client.HessianProxyFactory;
 
@@ -650,7 +650,7 @@ public class CAManagerClient implements CAManager
         byte[] encodedCert = client.generateCertificate(caName, profileName, user, encodedPkcs10Request);
         try
         {
-            return SecurityUtil.parseCert(encodedCert);
+            return X509Util.parseCert(encodedCert);
         } catch (CertificateException | IOException e)
         {
             throw new CAMgmtException("could not parse the certificate: " + e.getMessage(), e);

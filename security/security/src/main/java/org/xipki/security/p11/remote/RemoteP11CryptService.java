@@ -80,6 +80,7 @@ import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.XipkiCmpConstants;
 import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -207,7 +208,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
 
         try
         {
-            return SecurityUtil.parseCert(certBytes);
+            return X509Util.parseCert(certBytes);
         } catch (CertificateException | IOException e)
         {
             throw new SignerException(e.getClass().getName() + ": " + e.getMessage(), e);

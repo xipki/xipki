@@ -64,6 +64,7 @@ import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.P10RequestGenerator;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.ExtensionExistence;
@@ -196,7 +197,7 @@ public abstract class EnrollCertCommand extends ClientCommand
             {
                 usages.add(KeyUsage.getKeyUsage(usage));
             }
-            org.bouncycastle.asn1.x509.KeyUsage extValue = SecurityUtil.createKeyUsage(usages);
+            org.bouncycastle.asn1.x509.KeyUsage extValue = X509Util.createKeyUsage(usages);
             ASN1ObjectIdentifier extType = Extension.keyUsage;
             extensions.add(new Extension(extType, false, extValue.getEncoded()));
             needExtensionTypes.add(extType.getId());
@@ -207,7 +208,7 @@ public abstract class EnrollCertCommand extends ClientCommand
         {
             Set<ASN1ObjectIdentifier> oids = new HashSet<>(
                     SecurityUtil.textToASN1ObjectIdentifers(extkeyusages));
-            ExtendedKeyUsage extValue = SecurityUtil.createExtendedUsage(oids);
+            ExtendedKeyUsage extValue = X509Util.createExtendedUsage(oids);
             ASN1ObjectIdentifier extType = Extension.extendedKeyUsage;
             extensions.add(new Extension(extType, false, extValue.getEncoded()));
             needExtensionTypes.add(extType.getId());

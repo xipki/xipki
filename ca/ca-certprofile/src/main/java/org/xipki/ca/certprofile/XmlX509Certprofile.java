@@ -81,8 +81,8 @@ import org.xipki.ca.api.profile.x509.CertificatePolicyInformation;
 import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
+import org.xipki.ca.api.profile.x509.X509CertUtil;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
-import org.xipki.ca.api.profile.x509.X509Util;
 import org.xipki.ca.certprofile.x509.jaxb.Admission;
 import org.xipki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier;
 import org.xipki.ca.certprofile.x509.jaxb.BasicConstraints;
@@ -110,8 +110,8 @@ import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -396,7 +396,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             if(extConf != null)
             {
                 List<CertificatePolicyInformation> policyInfos = XmlX509CertprofileUtil.buildCertificatePolicies(extConf);
-                org.bouncycastle.asn1.x509.CertificatePolicies value = X509Util.createCertificatePolicies(policyInfos);
+                org.bouncycastle.asn1.x509.CertificatePolicies value = X509CertUtil.createCertificatePolicies(policyInfos);
                 this.certificatePolicies = new ExtensionValue(extensionControls.get(type).isCritical(), value);
             }
         }
@@ -577,7 +577,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
 
             if(n == 1)
             {
-                String value = SecurityUtil.rdnValueToString(thisRDNs[0].getFirst().getValue());
+                String value = X509Util.rdnValueToString(thisRDNs[0].getFirst().getValue());
                 rdns.add(createSubjectRDN(value, type, control, 0));
             }
             else
@@ -585,7 +585,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                 String[] values = new String[n];
                 for(int i = 0; i < n; i++)
                 {
-                    values[i] = SecurityUtil.rdnValueToString(thisRDNs[i].getFirst().getValue());
+                    values[i] = X509Util.rdnValueToString(thisRDNs[i].getFirst().getValue());
                 }
                 values = sortRDNs(type, values);
 

@@ -65,7 +65,7 @@ import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
@@ -335,7 +335,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
 
                     int idx = 1;
                     ps.setInt(idx++, issuer.getId());
-                    ps.setString(idx++, SecurityUtil.getRFC4519Name(c.getSubject()));
+                    ps.setString(idx++, X509Util.getRFC4519Name(c.getSubject()));
                     ps.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
                     ps.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
                     ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedName));
@@ -530,7 +530,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 X509Certificate c;
                 try
                 {
-                    c = SecurityUtil.parseCert(encodedCert);
+                    c = X509Util.parseCert(encodedCert);
                 } catch (Exception e)
                 {
                     LOG.error("could not parse certificate in file {}", filename);
@@ -555,7 +555,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                     ps_cert.setInt(idx++, currentId);
                     ps_cert.setInt(idx++, caId);
                     ps_cert.setLong(idx++, c.getSerialNumber().longValue());
-                    ps_cert.setString(idx++, SecurityUtil.getRFC4519Name(c.getSubjectX500Principal()));
+                    ps_cert.setString(idx++, X509Util.getRFC4519Name(c.getSubjectX500Principal()));
                     ps_cert.setLong(idx++, cert.getLastUpdate());
                     ps_cert.setLong(idx++, c.getNotBefore().getTime() / 1000);
                     ps_cert.setLong(idx++, c.getNotAfter().getTime() / 1000);

@@ -85,6 +85,7 @@ import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.SecurityFactory;
@@ -640,6 +641,6 @@ public abstract class CmpRequestor
     private static String getSortedRFC4519Name(
             final X500Name name)
     {
-        return SecurityUtil.getRFC4519Name(SecurityUtil.sortX509Name(name));
+        return X509Util.getRFC4519Name(X509Util.sortX509Name(name));
     }
 }

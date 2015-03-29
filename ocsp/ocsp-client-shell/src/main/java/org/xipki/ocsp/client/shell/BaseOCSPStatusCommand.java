@@ -50,7 +50,7 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
 
@@ -124,7 +124,7 @@ public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
             throw new Exception("Neither serialNumbers nor certFiles is set");
         }
 
-        X509Certificate issuerCert = SecurityUtil.parseCert(issuerCertFile);
+        X509Certificate issuerCert = X509Util.parseCert(issuerCertFile);
 
         Map<BigInteger, byte[]> encodedCerts = null;
         List<BigInteger> sns = new LinkedList<>();
@@ -136,16 +136,16 @@ public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
             for(String certFile : certFiles)
             {
                 byte[] encodedCert = IoUtil.read(certFile);
-                X509Certificate cert = SecurityUtil.parseCert(certFile);
+                X509Certificate cert = X509Util.parseCert(certFile);
 
-                if(SecurityUtil.issues(issuerCert, cert) == false)
+                if(X509Util.issues(issuerCert, cert) == false)
                 {
                     throw new Exception("certificate " + certFile + " is not issued by the given issuer");
                 }
 
                 if(isBlank(serverURL))
                 {
-                    List<String> ocspUrls = SecurityUtil.extractOCSPUrls(cert);
+                    List<String> ocspUrls = X509Util.extractOCSPUrls(cert);
                     if(ocspUrls.size() > 0)
                     {
                         String url = ocspUrls.get(0);
@@ -186,7 +186,7 @@ public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
         X509Certificate respIssuer  = null;
         if(respIssuerFile != null)
         {
-            respIssuer = SecurityUtil.parseCert(IoUtil.expandFilepath(respIssuerFile));
+            respIssuer = X509Util.parseCert(IoUtil.expandFilepath(respIssuerFile));
         }
 
         URL serverUrl = new URL(serverURL);

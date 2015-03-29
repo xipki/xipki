@@ -42,7 +42,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -84,7 +84,7 @@ public class LoadTestEntry
                 final String subjectTemplate,
                 final RandomDN randomDN)
         {
-            this.subjectTemplate = SecurityUtil.sortX509Name(new X500Name(subjectTemplate));
+            this.subjectTemplate = X509Util.sortX509Name(new X500Name(subjectTemplate));
 
             switch(randomDN)
             {
@@ -137,7 +137,7 @@ public class LoadTestEntry
                 {
                     if(rdn.getFirst().getType().equals(subjectRDNForIncrement))
                     {
-                        String text = SecurityUtil.rdnValueToString(rdn.getFirst().getValue());
+                        String text = X509Util.rdnValueToString(rdn.getFirst().getValue());
                         rdn = new RDN(subjectRDNForIncrement, new DERUTF8String(text + index));
                         incremented = true;
                     }

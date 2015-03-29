@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -264,7 +264,7 @@ public final class SunP11CryptService implements P11CryptService
                             if(pubKey instanceof ECPublicKey == false)
                             {
                                 // reparse the certificate due to bug in bcprov version 1.49
-                                signatureCert = SecurityUtil.parseCert(signatureCert.getEncoded());
+                                signatureCert = X509Util.parseCert(signatureCert.getEncoded());
                                 pubKey = signatureCert.getPublicKey();
                             }
                         }
