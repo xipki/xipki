@@ -50,7 +50,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
@@ -433,12 +433,12 @@ class CaConfigurationDbImporter extends DbPorter
                 try
                 {
                     String b64Cert = ca.getCert();
-                    X509Certificate c = SecurityUtil.parseCert(Base64.decode(b64Cert));
+                    X509Certificate c = X509Util.parseCert(Base64.decode(b64Cert));
 
                     int idx = 1;
                     ps.setString(idx++, ca.getName().toUpperCase());
                     ps.setInt(idx++, art);
-                    ps.setString(idx++, SecurityUtil.getRFC4519Name(c.getSubjectX500Principal()));
+                    ps.setString(idx++, X509Util.getRFC4519Name(c.getSubjectX500Principal()));
                     ps.setLong(idx++, ca.getNextSerial());
                     ps.setInt(idx++, ca.getNextCrlNo());
                     ps.setString(idx++, ca.getStatus());

@@ -90,6 +90,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.bcext.BCRSAPrivateCrtKey;
@@ -204,7 +205,7 @@ public class SoftTokenContentSignerBuilder
                 }
             }
 
-            this.certificateChain = SecurityUtil.buildCertPath(cert, caCerts);
+            this.certificateChain = X509Util.buildCertPath(cert, caCerts);
         }catch(KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException |
                 CertificateException | IOException | UnrecoverableKeyException | ClassCastException e)
         {
@@ -230,10 +231,13 @@ public class SoftTokenContentSignerBuilder
                 algOid.equals(PKCSObjectIdentifiers.id_RSASSA_PSS) == false &&
                 key instanceof ECPrivateKey == false)
         {
-            String algoName = SecurityUtil.getSignatureAlgoName(signatureAlgId);
-            if(algoName == null)
+            String algoName;
+            try
             {
-                throw new OperatorCreationException("unsupported signature algorithm " + algOid.getId());
+                algoName = SecurityUtil.getSignatureAlgoName(signatureAlgId);
+            } catch (NoSuchAlgorithmException e)
+            {
+                throw new OperatorCreationException(e.getMessage());
             }
 
             boolean useGivenProvider = true;

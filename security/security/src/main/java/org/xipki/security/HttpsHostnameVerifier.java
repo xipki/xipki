@@ -48,8 +48,8 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -116,7 +116,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier
             {
                 return false;
             }
-            commonName = SecurityUtil.getCommonName(new X500Name(peerPrincipal.getName()));
+            commonName = X509Util.getCommonName(new X500Name(peerPrincipal.getName()));
             LOG.info("commonName: {}", commonName);
         }catch(Exception e)
         {

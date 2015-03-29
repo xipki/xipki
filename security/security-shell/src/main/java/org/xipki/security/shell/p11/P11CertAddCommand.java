@@ -39,7 +39,7 @@ import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
@@ -73,7 +73,7 @@ public class P11CertAddCommand extends SecurityCommand
     protected Object _doExecute()
     throws Exception
     {
-        X509Certificate cert = SecurityUtil.parseCert(certFile);
+        X509Certificate cert = X509Util.parseCert(certFile);
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier p11KeyId = slot.addCert(cert);
         out("added certificate under " + p11KeyId);
