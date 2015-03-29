@@ -68,6 +68,7 @@ import org.xipki.common.ParamChecker;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.P12KeypairGenerator;
 import org.xipki.security.P12KeypairGenerator.ECDSAIdentityGenerator;
 import org.xipki.security.api.P12KeypairGenerationResult;
@@ -214,7 +215,7 @@ public class KeystoreP11Slot implements P11WritableSlot
                     }
                 }
 
-                X509Certificate[] certificateChain = SecurityUtil.buildCertPath(cert, caCerts);
+                X509Certificate[] certificateChain = X509Util.buildCertPath(cert, caCerts);
                 KeystoreP11Identity p11Identity = new KeystoreP11Identity(
                         sha1sum, slotId,
                         keyId, privKey, certificateChain, 20);
@@ -334,7 +335,7 @@ public class KeystoreP11Slot implements P11WritableSlot
         }
 
         Key key = ks.getKey(keyname, password);
-        X509Certificate[] certChain = SecurityUtil.buildCertPath(newCert, caCerts);
+        X509Certificate[] certChain = X509Util.buildCertPath(newCert, caCerts);
 
         ks.setKeyEntry(keyname, key, password, certChain);
 

@@ -131,8 +131,8 @@ import org.xipki.common.ParamChecker;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.XipkiCmpConstants;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
@@ -395,7 +395,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             if(certId == null)
             {
                 LOG.warn("certId is not present in response for (issuer='{}', serialNumber={})",
-                        SecurityUtil.getRFC4519Name(re.getIssuer()), re.getSerialNumber());
+                        X509Util.getRFC4519Name(re.getIssuer()), re.getSerialNumber());
                 certId = new CertId(new GeneralName(re.getIssuer()), re.getSerialNumber());
                 continue;
             }
@@ -832,7 +832,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             String b64CACert = XMLUtil.getValueOfFirstElementChild(root, namespace, "CACert");
             try
             {
-                caCert = SecurityUtil.parseBase64EncodedCert(b64CACert);
+                caCert = X509Util.parseBase64EncodedCert(b64CACert);
             } catch (CertificateException | IOException e)
             {
                 throw new CmpRequestorException("could no parse the CA certificate", e);

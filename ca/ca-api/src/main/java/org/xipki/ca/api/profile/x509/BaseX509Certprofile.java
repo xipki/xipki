@@ -74,6 +74,7 @@ import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -206,7 +207,7 @@ extends X509Certprofile
 
             if(n == 1)
             {
-                String value = SecurityUtil.rdnValueToString(thisRDNs[0].getFirst().getValue());
+                String value = X509Util.rdnValueToString(thisRDNs[0].getFirst().getValue());
                 rdns.add(createSubjectRDN(value, type, control, 0));
             }
             else
@@ -214,7 +215,7 @@ extends X509Certprofile
                 String[] values = new String[n];
                 for(int i = 0; i < n; i++)
                 {
-                    values[i] = SecurityUtil.rdnValueToString(thisRDNs[i].getFirst().getValue());
+                    values[i] = X509Util.rdnValueToString(thisRDNs[i].getFirst().getValue());
                 }
                 values = sortRDNs(type, values);
 
@@ -506,7 +507,7 @@ extends X509Certprofile
         }
 
         RDN rdn = rdns[index];
-        return SecurityUtil.rdnValueToString(rdn.getFirst().getValue());
+        return X509Util.rdnValueToString(rdn.getFirst().getValue());
     }
 
     protected RDN createSubjectRDN(

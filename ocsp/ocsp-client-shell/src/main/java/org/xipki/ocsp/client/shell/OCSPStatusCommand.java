@@ -66,6 +66,7 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.CRLReason;
 import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.security.KeyUtil;
 
@@ -161,7 +162,7 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
                         {
                             boolean certValid = true;
                             X509Certificate jceRespSigner = new X509CertificateObject(respSigner.toASN1Structure());
-                            if(SecurityUtil.issues(respIssuer, jceRespSigner))
+                            if(X509Util.issues(respIssuer, jceRespSigner))
                             {
                                 try
                                 {
@@ -186,7 +187,7 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
 
                 if(verbose.booleanValue())
                 {
-                    out("responder is " + SecurityUtil.getRFC4519Name(responderCerts[0].getSubject()));
+                    out("responder is " + X509Util.getRFC4519Name(responderCerts[0].getSubject()));
                 }
             }
         }

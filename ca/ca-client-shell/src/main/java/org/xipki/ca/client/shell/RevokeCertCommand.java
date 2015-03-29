@@ -47,7 +47,7 @@ import org.xipki.common.CRLReason;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.util.DateUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -93,7 +93,7 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
         X509Certificate caCert = null;
         if(issuerCertFile != null)
         {
-            caCert = SecurityUtil.parseCert(issuerCertFile);
+            caCert = X509Util.parseCert(issuerCertFile);
         }
 
         Date invalidityDate = null;
@@ -104,7 +104,7 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
 
         if(certFile != null)
         {
-            X509Certificate cert = SecurityUtil.parseCert(certFile);
+            X509Certificate cert = X509Util.parseCert(certFile);
             if(caCert != null)
             {
                 String errorMsg = checkCertificate(cert, caCert);

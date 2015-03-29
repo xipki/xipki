@@ -40,7 +40,7 @@ import java.security.cert.X509Certificate;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -60,7 +60,7 @@ public class CaAddCommand extends CaAddOrGenCommand
         X509CAEntry caEntry = getCAEntry();
         if(certFile != null)
         {
-            X509Certificate caCert = SecurityUtil.parseCert(certFile);
+            X509Certificate caCert = X509Util.parseCert(certFile);
             caEntry.setCertificate(caCert);
         }
 

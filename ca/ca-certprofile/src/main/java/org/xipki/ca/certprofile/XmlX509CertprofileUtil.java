@@ -110,7 +110,7 @@ import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xml.sax.SAXException;
 
@@ -279,7 +279,7 @@ public class XmlX509CertprofileUtil
         GeneralName base = null;
         if(type.getDirectoryName() != null)
         {
-            base = new GeneralName(SecurityUtil.reverse(
+            base = new GeneralName(X509Util.reverse(
                     new X500Name(type.getDirectoryName())));
         }
         else if(type.getDNSName() != null)

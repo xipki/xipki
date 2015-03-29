@@ -64,7 +64,7 @@ import org.xipki.common.util.CollectionUtil;
  * @author Lijun Liao
  */
 
-public class X509Util
+public class X509CertUtil
 {
 
     public static BasicConstraints createBasicConstraints(

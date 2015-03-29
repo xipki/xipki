@@ -46,7 +46,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -90,8 +90,8 @@ public abstract class UnRevRemoveCertCommand extends ClientCommand
             return "the given certificate is not issued by the given issuer";
         }
 
-        byte[] caSki = SecurityUtil.extractSKI(caCert);
-        byte[] aki = SecurityUtil.extractAKI(cert);
+        byte[] caSki = X509Util.extractSKI(caCert);
+        byte[] aki = X509Util.extractAKI(cert);
         if(caSki != null && aki != null)
         {
             if(Arrays.equals(aki, caSki) == false)

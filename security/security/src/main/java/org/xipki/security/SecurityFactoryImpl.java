@@ -50,9 +50,6 @@ import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,15 +67,9 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
-import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
@@ -96,6 +87,7 @@ import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
@@ -218,7 +210,15 @@ public class SecurityFactoryImpl implements SecurityFactory
             return;
         }
 
-        String signatureAlgoName = SecurityUtil.getSignatureAlgoName(signer.getAlgorithmIdentifier());
+        String signatureAlgoName;
+        try
+        {
+            signatureAlgoName = SecurityUtil.getSignatureAlgoName(signer.getAlgorithmIdentifier());
+        } catch (NoSuchAlgorithmException e)
+        {
+            throw new SignerException(e.getMessage(), e);
+        }
+
         ContentSigner csigner;
         try
         {
@@ -242,7 +242,7 @@ public class SecurityFactoryImpl implements SecurityFactory
             boolean valid = verifier.verify(signatureValue);
             if(valid == false)
             {
-                String subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
+                String subject = X509Util.getRFC4519Name(cert.getSubjectX500Principal());
 
                 StringBuilder sb = new StringBuilder();
                 sb.append("key and certificate not match. ");
@@ -374,10 +374,10 @@ public class SecurityFactoryImpl implements SecurityFactory
                             throw new SignerException("invalid key: " + e.getMessage(), e);
                         }
 
-                        signatureAlgId = getSignatureAlgoId(pubKey, hashAlgo, mgf1);
+                        signatureAlgId = SecurityUtil.getSignatureAlgoId(pubKey, hashAlgo, mgf1);
                     }
                     return signerBuilder.createSigner(signatureAlgId, parallelism);
-                } catch (OperatorCreationException | NoSuchPaddingException e)
+                } catch (OperatorCreationException | NoSuchPaddingException | NoSuchAlgorithmException e)
                 {
                     throw new SignerException(e.getMessage(), e);
                 }
@@ -447,12 +447,12 @@ public class SecurityFactoryImpl implements SecurityFactory
                     else
                     {
                         PublicKey pubKey = signerBuilder.getCert().getPublicKey();
-                        signatureAlgId = getSignatureAlgoId(pubKey, hashAlgo, mgf1);
+                        signatureAlgId = SecurityUtil.getSignatureAlgoId(pubKey, hashAlgo, mgf1);
                     }
 
                     return signerBuilder.createSigner(
                             signatureAlgId, parallelism);
-                } catch (OperatorCreationException | NoSuchPaddingException e)
+                } catch (OperatorCreationException | NoSuchPaddingException | NoSuchAlgorithmException e)
                 {
                     throw new SignerException(e.getMessage());
                 }
@@ -502,260 +502,13 @@ public class SecurityFactoryImpl implements SecurityFactory
         {
             throw new SignerException("algo is not specified");
         }
-        algoS = algoS.replaceAll("-", "");
-
-        AlgorithmIdentifier signatureAlgId;
-        if("SHA1withRSAandMGF1".equalsIgnoreCase(algoS) || "SHA224withRSAandMGF1".equalsIgnoreCase(algoS) ||
-                "SHA256withRSAandMGF1".equalsIgnoreCase(algoS) || "SHA384withRSAandMGF1".equalsIgnoreCase(algoS) ||
-                "SHA512withRSAandMGF1".equalsIgnoreCase(algoS))
+        try
         {
-            ASN1ObjectIdentifier hashAlgo;
-            if("SHA1withRSAandMGF1".equalsIgnoreCase(algoS))
-            {
-                hashAlgo = X509ObjectIdentifiers.id_SHA1;
-            }
-            else if("SHA224withRSAandMGF1".equalsIgnoreCase(algoS))
-            {
-                hashAlgo = NISTObjectIdentifiers.id_sha224;
-            }
-            else if("SHA256withRSAandMGF1".equalsIgnoreCase(algoS))
-            {
-                hashAlgo = NISTObjectIdentifiers.id_sha256;
-            }
-            else if("SHA384withRSAandMGF1".equalsIgnoreCase(algoS))
-            {
-                hashAlgo = NISTObjectIdentifiers.id_sha384;
-            }
-            else if("SHA512withRSAandMGF1".equalsIgnoreCase(algoS))
-            {
-                hashAlgo = NISTObjectIdentifiers.id_sha512;
-            }
-            else
-            {
-                throw new RuntimeException("should not reach here, unknown algorithm " + algoS);
-            }
-
-            try
-            {
-                signatureAlgId = SignerUtil.buildRSAPSSAlgorithmIdentifier(hashAlgo);
-            } catch (NoSuchAlgorithmException e)
-            {
-                throw new SignerException(e.getMessage(), e);
-            }
-        }
-        else
+            return SecurityUtil.getSignatureAlgoId(algoS);
+        } catch (NoSuchAlgorithmException e)
         {
-            boolean withNullParam = false;
-            ASN1ObjectIdentifier algOid;
-            if("SHA1withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA1".equalsIgnoreCase(algoS) ||
-                    PKCSObjectIdentifiers.sha1WithRSAEncryption.getId().equals(algoS))
-            {
-                algOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
-                withNullParam = true;
-            }
-            else if("SHA224withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA224".equalsIgnoreCase(algoS) ||
-                    PKCSObjectIdentifiers.sha224WithRSAEncryption.getId().equals(algoS))
-            {
-                algOid = PKCSObjectIdentifiers.sha224WithRSAEncryption;
-                withNullParam = true;
-            }
-            else if("SHA256withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA256".equalsIgnoreCase(algoS) ||
-                    PKCSObjectIdentifiers.sha256WithRSAEncryption.getId().equals(algoS))
-            {
-                algOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
-                withNullParam = true;
-            }
-            else if("SHA384withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA384".equalsIgnoreCase(algoS) ||
-                    PKCSObjectIdentifiers.sha384WithRSAEncryption.getId().equals(algoS))
-            {
-                algOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
-                withNullParam = true;
-            }
-            else if("SHA512withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA512".equalsIgnoreCase(algoS) ||
-                    PKCSObjectIdentifiers.sha512WithRSAEncryption.getId().equals(algoS))
-            {
-                algOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
-                withNullParam = true;
-            }
-            else if("SHA1withECDSA".equalsIgnoreCase(algoS) || "ECDSAwithSHA1".equalsIgnoreCase(algoS) ||
-                    X9ObjectIdentifiers.ecdsa_with_SHA1.getId().equals(algoS))
-            {
-                algOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
-            }
-            else if("SHA224withECDSA".equalsIgnoreCase(algoS) || "ECDSAwithSHA224".equalsIgnoreCase(algoS) ||
-                    X9ObjectIdentifiers.ecdsa_with_SHA224.getId().equals(algoS))
-            {
-                algOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
-            }
-            else if("SHA256withECDSA".equalsIgnoreCase(algoS) || "ECDSAwithSHA256".equalsIgnoreCase(algoS) ||
-                    X9ObjectIdentifiers.ecdsa_with_SHA256.getId().equals(algoS))
-            {
-                algOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
-            }
-            else if("SHA384withECDSA".equalsIgnoreCase(algoS) || "ECDSAwithSHA384".equalsIgnoreCase(algoS) ||
-                    X9ObjectIdentifiers.ecdsa_with_SHA384.getId().equals(algoS))
-            {
-                algOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
-            }
-            else if("SHA512withECDSA".equalsIgnoreCase(algoS) || "ECDSAwithSHA512".equalsIgnoreCase(algoS) ||
-                    X9ObjectIdentifiers.ecdsa_with_SHA512.getId().equals(algoS))
-            {
-                algOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
-            }
-            else if("SHA1withDSA".equalsIgnoreCase(algoS) || "DSAwithSHA1".equalsIgnoreCase(algoS) ||
-                    X9ObjectIdentifiers.id_dsa_with_sha1.getId().equals(algoS))
-            {
-                algOid = X9ObjectIdentifiers.id_dsa_with_sha1;
-            }
-            else if("SHA224withDSA".equalsIgnoreCase(algoS) || "DSAwithSHA224".equalsIgnoreCase(algoS) ||
-                    NISTObjectIdentifiers.dsa_with_sha224.getId().equals(algoS))
-            {
-                algOid = NISTObjectIdentifiers.dsa_with_sha224;
-            }
-            else if("SHA256withDSA".equalsIgnoreCase(algoS) || "DSAwithSHA256".equalsIgnoreCase(algoS) ||
-                    NISTObjectIdentifiers.dsa_with_sha256.getId().equals(algoS))
-            {
-                algOid = NISTObjectIdentifiers.dsa_with_sha256;
-            }
-            else if("SHA384withDSA".equalsIgnoreCase(algoS) || "DSAwithSHA384".equalsIgnoreCase(algoS) ||
-                    NISTObjectIdentifiers.dsa_with_sha384.getId().equals(algoS))
-            {
-                algOid = NISTObjectIdentifiers.dsa_with_sha384;
-            }
-            else if("SHA512withDSA".equalsIgnoreCase(algoS) || "DSAwithSHA512".equalsIgnoreCase(algoS) ||
-                    NISTObjectIdentifiers.dsa_with_sha512.getId().equals(algoS))
-            {
-                algOid = NISTObjectIdentifiers.dsa_with_sha512;
-            }
-            else
-            {
-                throw new SignerException("unsupported signature algorithm " + algoS);
-            }
-
-            signatureAlgId = withNullParam ? new AlgorithmIdentifier(algOid, DERNull.INSTANCE) :
-                new AlgorithmIdentifier(algOid);
+            throw new SignerException(e.getMessage(), e);
         }
-
-        return signatureAlgId;
-    }
-
-    private AlgorithmIdentifier getSignatureAlgoId(
-            final PublicKey pubKey,
-            final String hashAlgo,
-            final boolean mgf1)
-    throws SignerException
-    {
-        AlgorithmIdentifier signatureAlgId;
-        if(pubKey instanceof RSAPublicKey)
-        {
-            if(mgf1)
-            {
-                ASN1ObjectIdentifier hashAlgoOid = SecurityUtil.getHashAlg(hashAlgo);
-                try
-                {
-                    signatureAlgId = SignerUtil.buildRSAPSSAlgorithmIdentifier(hashAlgoOid);
-                } catch (NoSuchAlgorithmException e)
-                {
-                    throw new SignerException(e.getMessage(), e);
-                }
-            }
-            else
-            {
-                ASN1ObjectIdentifier sigAlgoOid;
-                if("SHA1".equalsIgnoreCase(hashAlgo))
-                {
-                    sigAlgoOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
-                }
-                else if("SHA224".equalsIgnoreCase(hashAlgo))
-                {
-                    sigAlgoOid = PKCSObjectIdentifiers.sha224WithRSAEncryption;
-                }
-                else if("SHA256".equalsIgnoreCase(hashAlgo))
-                {
-                    sigAlgoOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
-                }
-                else if("SHA384".equalsIgnoreCase(hashAlgo))
-                {
-                    sigAlgoOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
-                }
-                else if("SHA512".equalsIgnoreCase(hashAlgo))
-                {
-                    sigAlgoOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
-                }
-                else
-                {
-                    throw new RuntimeException("unsupported hash algorithm " + hashAlgo);
-                }
-
-                signatureAlgId = new AlgorithmIdentifier(sigAlgoOid, DERNull.INSTANCE);
-            }
-        }
-        else if(pubKey instanceof ECPublicKey)
-        {
-            ASN1ObjectIdentifier sigAlgoOid;
-            if("SHA1".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgoOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
-            }
-            else if("SHA224".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgoOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
-            }
-            else if("SHA256".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgoOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
-            }
-            else if("SHA384".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgoOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
-            }
-            else if("SHA512".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgoOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
-            }
-            else
-            {
-                throw new RuntimeException("unsupported hash algorithm " + hashAlgo);
-            }
-
-            signatureAlgId = new AlgorithmIdentifier(sigAlgoOid);
-        }
-        else if(pubKey instanceof DSAPublicKey)
-        {
-            ASN1ObjectIdentifier sigAlgoOid;
-            if("SHA1".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgoOid = X9ObjectIdentifiers.id_dsa_with_sha1;
-            }
-            else if("SHA224".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgoOid = NISTObjectIdentifiers.dsa_with_sha224;
-            }
-            else if("SHA256".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgoOid = NISTObjectIdentifiers.dsa_with_sha256;
-            }
-            else if("SHA384".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgoOid = NISTObjectIdentifiers.dsa_with_sha384;
-            }
-            else if("SHA512".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgoOid = NISTObjectIdentifiers.dsa_with_sha512;
-            }
-            else
-            {
-                throw new RuntimeException("unsupported hash algorithm " + hashAlgo);
-            }
-
-            signatureAlgId = new AlgorithmIdentifier(sigAlgoOid);
-        }
-        else
-        {
-            throw new SignerException("unsupported key type " + pubKey.getClass().getName());
-        }
-
-        return signatureAlgId;
     }
 
     @Override

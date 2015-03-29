@@ -38,8 +38,8 @@ package org.xipki.ca.qa.shell;
 import java.security.cert.X509CRL;
 
 import org.apache.karaf.shell.commands.Command;
-import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.CAClientException;
+import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.common.RequestResponseDebug;
 
 /**

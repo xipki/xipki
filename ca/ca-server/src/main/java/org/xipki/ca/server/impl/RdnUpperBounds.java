@@ -44,7 +44,7 @@ import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -120,7 +120,7 @@ class RdnUpperBounds
                     continue;
                 }
                 int ub = ubs.get(type);
-                String value = SecurityUtil.rdnValueToString(atv.getValue());
+                String value = X509Util.rdnValueToString(atv.getValue());
                 if(value.length() > ub)
                 {
                     throw new BadCertTemplateException("attribute " +

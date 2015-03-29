@@ -56,7 +56,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.DefaultConcurrentContentSigner;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
@@ -133,7 +133,7 @@ public class P11ContentSignerBuilder
             }
         }
 
-        this.certificateChain = SecurityUtil.buildCertPath(cert, caCerts);
+        this.certificateChain = X509Util.buildCertPath(cert, caCerts);
     }
 
     public ConcurrentContentSigner createSigner(

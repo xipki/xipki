@@ -47,7 +47,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -135,12 +135,12 @@ implements Serializable
         }
         else
         {
-            if(SecurityUtil.hasKeyusage(cert, KeyUsage.keyCertSign) == false)
+            if(X509Util.hasKeyusage(cert, KeyUsage.keyCertSign) == false)
             {
                 throw new CAMgmtException("CA certificate does not have keyusage keyCertSign");
             }
             this.cert = cert;
-            this.subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
+            this.subject = X509Util.getRFC4519Name(cert.getSubjectX500Principal());
         }
     }
 
@@ -240,7 +240,7 @@ implements Serializable
         else
         {
             sb.append("\tissuer: ").append(
-                    SecurityUtil.getRFC4519Name(cert.getIssuerX500Principal())).append("\n");
+                    X509Util.getRFC4519Name(cert.getIssuerX500Principal())).append("\n");
             sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
             sb.append("\tsubject: ").append(subject).append("\n");
             sb.append("\tnotBefore: ").append(cert.getNotBefore()).append("\n");

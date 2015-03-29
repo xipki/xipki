@@ -136,8 +136,8 @@ import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.XipkiCmpConstants;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xml.sax.SAXException;
@@ -570,7 +570,7 @@ class X509CACmpResponder extends CmpResponder
             X500Name subject = certTemp.getSubject();
             if(childAuditEvent != null)
             {
-                childAuditEvent.addEventData(new AuditEventData("subject", SecurityUtil.getRFC4519Name(subject)));
+                childAuditEvent.addEventData(new AuditEventData("subject", X509Util.getRFC4519Name(subject)));
             }
 
             SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();

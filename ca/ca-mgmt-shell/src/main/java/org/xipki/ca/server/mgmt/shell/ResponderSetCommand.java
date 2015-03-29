@@ -40,7 +40,7 @@ import java.security.cert.X509Certificate;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.PasswordResolver;
 
 /**
@@ -80,7 +80,7 @@ public class ResponderSetCommand extends CaCommand
         X509Certificate signerCert = null;
         if(certFile != null)
         {
-            signerCert = SecurityUtil.parseCert(certFile);
+            signerCert = X509Util.parseCert(certFile);
             entry.setCertificate(signerCert);
         }
         entry.setType(signerType);

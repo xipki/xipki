@@ -85,17 +85,17 @@ import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
+import org.xipki.ca.api.profile.x509.X509CertUtil;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.api.profile.x509.X509Certprofile;
-import org.xipki.ca.api.profile.x509.X509Util;
 import org.xipki.ca.certprofile.XmlX509Certprofile;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.ExtensionExistence;
 
 /**
@@ -377,7 +377,7 @@ class IdentifiedX509Certprofile
         extControl = controls.remove(extType);
         if(extControl != null && addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes))
         {
-            AuthorityInformationAccess value = X509Util.createAuthorityInformationAccess(publicCaInfo.getOcspUris());
+            AuthorityInformationAccess value = X509CertUtil.createAuthorityInformationAccess(publicCaInfo.getOcspUris());
             addExtension(values, extType, value, extControl,
                     neededExtensionTypes, wantedExtensionTypes);
         }
@@ -400,7 +400,7 @@ class IdentifiedX509Certprofile
                 CRLDistPoint value;
                 try
                 {
-                    value = X509Util.createCRLDistributionPoints(publicCaInfo.getCrlUris(),
+                    value = X509CertUtil.createCRLDistributionPoints(publicCaInfo.getCrlUris(),
                             x500CaPrincipal, crlSignerSubject);
                 } catch (IOException e)
                 {
@@ -418,7 +418,7 @@ class IdentifiedX509Certprofile
                 CRLDistPoint value;
                 try
                 {
-                    value = X509Util.createCRLDistributionPoints(publicCaInfo.getDeltaCrlUris(),
+                    value = X509CertUtil.createCRLDistributionPoints(publicCaInfo.getDeltaCrlUris(),
                             x500CaPrincipal, crlSignerSubject);
                 } catch (IOException e)
                 {
@@ -434,7 +434,7 @@ class IdentifiedX509Certprofile
         extControl = controls.remove(extType);
         if(extControl != null && addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes))
         {
-            BasicConstraints value = X509Util.createBasicConstraints(certprofile.isCA(),
+            BasicConstraints value = X509CertUtil.createBasicConstraints(certprofile.isCA(),
                     certprofile.getPathLenBasicConstraint());
             addExtension(values, extType, value, extControl,
                     neededExtensionTypes, wantedExtensionTypes);
@@ -461,7 +461,7 @@ class IdentifiedX509Certprofile
                 addRequestedKeyusage(usages, requestExtensions, usageOccs);
             }
 
-            org.bouncycastle.asn1.x509.KeyUsage value = SecurityUtil.createKeyUsage(usages);
+            org.bouncycastle.asn1.x509.KeyUsage value = X509Util.createKeyUsage(usages);
             addExtension(values, extType, value, extControl,
                     neededExtensionTypes, wantedExtensionTypes);
         }
@@ -492,7 +492,7 @@ class IdentifiedX509Certprofile
                 extControl = new ExtensionControl(false, extControl.isRequired(), extControl.isRequest());
             }
 
-            ExtendedKeyUsage value = SecurityUtil.createExtendedUsage(usages);
+            ExtendedKeyUsage value = X509Util.createExtendedUsage(usages);
             addExtension(values, extType, value, extControl,
                     neededExtensionTypes, wantedExtensionTypes);
         }

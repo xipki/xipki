@@ -70,8 +70,8 @@ import org.bouncycastle.operator.DigestCalculator;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.ocsp.client.api.InvalidOCSPResponseException;
 import org.xipki.ocsp.client.api.OCSPNonceUnmatchedException;
 import org.xipki.ocsp.client.api.OCSPRequestor;
@@ -121,7 +121,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
     {
         try
         {
-            if(SecurityUtil.issues(issuerCert, cert) == false)
+            if(X509Util.issues(issuerCert, cert) == false)
             {
                 throw new IllegalArgumentException("cert and issuerCert do not match");
             }
@@ -148,7 +148,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             X509Certificate cert = certs[i];
             try
             {
-                if(SecurityUtil.issues(issuerCert, cert) == false)
+                if(X509Util.issues(issuerCert, cert) == false)
                 {
                     throw new IllegalArgumentException("cert at index " + i + " and issuerCert do not match");
                 }
@@ -448,7 +448,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                         {
                             try
                             {
-                                cert = SecurityUtil.parseCert(signerCertFile);
+                                cert = X509Util.parseCert(signerCertFile);
                             } catch (CertificateException e)
                             {
                                 throw new OCSPRequestorException(

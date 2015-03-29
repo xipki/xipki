@@ -53,7 +53,7 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -86,7 +86,7 @@ class PublicCAInfo
         this.x500Subject = X500Name.getInstance(subject.getEncoded());
         try
         {
-            this.subjectKeyIdentifier = SecurityUtil.extractSKI(caCertificate);
+            this.subjectKeyIdentifier = X509Util.extractSKI(caCertificate);
         } catch (CertificateEncodingException e)
         {
             throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());

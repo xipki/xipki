@@ -60,6 +60,7 @@ import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11Identity;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -270,7 +271,7 @@ public class P11ListSlotCommand extends SecurityCommand
         try
         {
             X500Principal x500Prin = new X500Principal(bytes);
-            subject = SecurityUtil.getRFC4519Name(x500Prin);
+            subject = X509Util.getRFC4519Name(x500Prin);
         }catch(Exception e)
         {
             subject = new String(bytes);
@@ -292,7 +293,7 @@ public class P11ListSlotCommand extends SecurityCommand
         try
         {
             X500Principal x500Prin = new X500Principal(bytes);
-            issuer = SecurityUtil.getRFC4519Name(x500Prin);
+            issuer = X509Util.getRFC4519Name(x500Prin);
         }catch(Exception e)
         {
             issuer = new String(bytes);
@@ -306,7 +307,7 @@ public class P11ListSlotCommand extends SecurityCommand
         X509Certificate x509Cert = null;
         try
         {
-            x509Cert = SecurityUtil.parseCert(certBytes);
+            x509Cert = X509Util.parseCert(certBytes);
         } catch (Exception e)
         {
             sb.append("\t\t\tError: " + e.getMessage());
@@ -331,7 +332,7 @@ public class P11ListSlotCommand extends SecurityCommand
             final StringBuilder sb,
             final X509Certificate cert)
     {
-        String subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
+        String subject = X509Util.getRFC4519Name(cert.getSubjectX500Principal());
 
         if(verbose.booleanValue() == false)
         {
@@ -344,7 +345,7 @@ public class P11ListSlotCommand extends SecurityCommand
             .append(subject)
             .append("\n");
 
-        String issuer = SecurityUtil.getRFC4519Name(cert.getIssuerX500Principal());
+        String issuer = X509Util.getRFC4519Name(cert.getIssuerX500Principal());
         sb.append("\t\t\tIssuer:     ")
             .append(issuer)
             .append("\n");
