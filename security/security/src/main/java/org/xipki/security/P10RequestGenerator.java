@@ -80,7 +80,7 @@ public class P10RequestGenerator
             final String signerConf,
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
             final String subject,
-            List<Extension> extensions)
+            final List<Extension> extensions)
     throws PasswordResolverException, SignerException
     {
         X500Name subjectDN = new X500Name(subject);

@@ -239,7 +239,7 @@ public class KeyUtil
     }
 
     private static KeyFactory getKeyFactory(
-            String algorithm)
+            final String algorithm)
     throws InvalidKeySpecException
     {
         synchronized (keyFactories)
@@ -263,7 +263,7 @@ public class KeyUtil
     }
 
     public static PublicKey generatePublicKey(
-            SubjectPublicKeyInfo pkInfo)
+            final SubjectPublicKeyInfo pkInfo)
     throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         X509EncodedKeySpec keyspec;
