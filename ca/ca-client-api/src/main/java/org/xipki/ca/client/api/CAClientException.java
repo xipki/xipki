@@ -39,28 +39,28 @@ package org.xipki.ca.client.api;
  * @author Lijun Liao
  */
 
-public class RAWorkerException extends Exception
+public class CAClientException extends Exception
 {
 
     private static final long serialVersionUID = 1L;
 
-    public RAWorkerException()
+    public CAClientException()
     {
     }
 
-    public RAWorkerException(
+    public CAClientException(
             final String message)
     {
         super(message);
     }
 
-    public RAWorkerException(
+    public CAClientException(
             final Throwable cause)
     {
         super(cause);
     }
 
-    public RAWorkerException(
+    public CAClientException(
             final String message,
             final Throwable cause)
     {

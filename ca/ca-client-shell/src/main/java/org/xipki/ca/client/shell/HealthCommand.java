@@ -62,7 +62,7 @@ public class HealthCommand extends ClientCommand
     protected Object _doExecute()
     throws Exception
     {
-        Set<String> caNames = raWorker.getCaNames();
+        Set<String> caNames = caClient.getCaNames();
         if(isEmpty(caNames))
         {
             err("no CA is configured");
@@ -87,7 +87,7 @@ public class HealthCommand extends ClientCommand
             }
         }
 
-        HealthCheckResult healthResult = raWorker.getHealthCheckResult(caName);
+        HealthCheckResult healthResult = caClient.getHealthCheckResult(caName);
         StringBuilder sb = new StringBuilder();
         sb.append("healthy status for CA ");
         sb.append(caName);

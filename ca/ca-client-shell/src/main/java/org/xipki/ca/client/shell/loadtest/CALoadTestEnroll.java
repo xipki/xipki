@@ -51,8 +51,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.client.api.CertOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.PKIErrorException;
-import org.xipki.ca.client.api.RAWorker;
-import org.xipki.ca.client.api.RAWorkerException;
+import org.xipki.ca.client.api.CAClient;
+import org.xipki.ca.client.api.CAClientException;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType.Type;
@@ -69,7 +69,7 @@ class CALoadTestEnroll extends AbstractLoadTest
 
     private static final Logger LOG = LoggerFactory.getLogger(CALoadTestEnroll.class);
 
-    private final RAWorker raWorker;
+    private final CAClient raWorker;
     private final LoadTestEntry loadtestEntry;
     private final AtomicLong index;
     private final String userPrefix = "LOADTEST-";
@@ -83,7 +83,7 @@ class CALoadTestEnroll extends AbstractLoadTest
     }
 
     public CALoadTestEnroll(
-            final RAWorker raWorker,
+            final CAClient raWorker,
             final LoadTestEntry loadtestEntry,
             final int n)
     {
@@ -163,7 +163,7 @@ class CALoadTestEnroll extends AbstractLoadTest
                 }
 
                 result = raWorker.requestCerts(request, null, userPrefix + System.currentTimeMillis(), null);
-            } catch (RAWorkerException | PKIErrorException e)
+            } catch (CAClientException | PKIErrorException e)
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
                 return false;

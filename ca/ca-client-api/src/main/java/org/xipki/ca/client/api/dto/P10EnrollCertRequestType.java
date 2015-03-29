@@ -54,6 +54,7 @@ public class P10EnrollCertRequestType extends IdentifiedObject
     {
         super(id);
         ParamChecker.assertNotNull("p10Req", p10Req);
+        ParamChecker.assertNotEmpty("certprofile", certprofile);
 
         this.certprofile = certprofile;
         this.p10Req = p10Req;

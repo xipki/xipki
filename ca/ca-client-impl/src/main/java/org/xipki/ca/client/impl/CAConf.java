@@ -75,7 +75,7 @@ class CAConf
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("url", url);
-        ParamChecker.assertNotEmpty("requestorName", requestorName);
+        ParamChecker.assertNotNull("requestorName", requestorName);
         ParamChecker.assertNotNull("responder", responder);
 
         this.name = name;

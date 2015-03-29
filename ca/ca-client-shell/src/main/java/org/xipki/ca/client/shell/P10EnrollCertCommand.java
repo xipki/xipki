@@ -51,8 +51,8 @@ import org.xipki.common.util.IoUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-cli", name = "ra-enroll", description="enroll certificate as RA")
-public class RAEnrollCertCommand extends ClientCommand
+@Command(scope = "xipki-cli", name = "p10-enroll", description="enroll certificate via PKCS#10 request")
+public class P10EnrollCertCommand extends ClientCommand
 {
 
     @Option(name = "--p10",
@@ -93,7 +93,7 @@ public class RAEnrollCertCommand extends ClientCommand
         RequestResponseDebug debug = getRequestResponseDebug();
         try
         {
-            result = raWorker.requestCert(p10Req, profile, caName, user, debug);
+            result = caClient.requestCert(p10Req, profile, caName, user, debug);
         }finally
         {
             saveRequestResponse(debug);

@@ -54,8 +54,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.client.api.CertIdOrError;
 import org.xipki.ca.client.api.PKIErrorException;
-import org.xipki.ca.client.api.RAWorker;
-import org.xipki.ca.client.api.RAWorkerException;
+import org.xipki.ca.client.api.CAClient;
+import org.xipki.ca.client.api.CAClientException;
 import org.xipki.ca.client.api.dto.RevokeCertRequestEntryType;
 import org.xipki.ca.client.api.dto.RevokeCertRequestType;
 import org.xipki.common.AbstractLoadTest;
@@ -74,7 +74,7 @@ class CALoadTestRevoke extends AbstractLoadTest
 {
     private static final Logger LOG = LoggerFactory.getLogger(CALoadTestRevoke.class);
 
-    private final RAWorker raWorker;
+    private final CAClient raWorker;
     private final DataSourceWrapper caDataSource;
     private final X500Name caSubject;
     private final Set<Long> excludeSerials = new HashSet<>();
@@ -103,7 +103,7 @@ class CALoadTestRevoke extends AbstractLoadTest
     }
 
     public CALoadTestRevoke(
-            final RAWorker raWorker,
+            final CAClient raWorker,
             final Certificate caCert,
             final DataSourceWrapper caDataSource,
             final int maxCerts,
@@ -296,7 +296,7 @@ class CALoadTestRevoke extends AbstractLoadTest
             try
             {
                 result = raWorker.revokeCerts(request, null);
-            } catch (RAWorkerException | PKIErrorException e)
+            } catch (CAClientException | PKIErrorException e)
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
                 return false;

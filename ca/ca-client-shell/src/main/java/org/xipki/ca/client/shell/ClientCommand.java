@@ -38,7 +38,7 @@ package org.xipki.ca.client.shell;
 import java.io.IOException;
 
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.client.api.RAWorker;
+import org.xipki.ca.client.api.CAClient;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.IoUtil;
@@ -58,12 +58,12 @@ public abstract class ClientCommand extends XipkiOsgiCommandSupport
             description = "where to save the response")
     private String respout;
 
-    protected RAWorker raWorker;
+    protected CAClient caClient;
 
-    public final void setRaWorker(
-            final RAWorker raWorker)
+    public void setCaClient(
+            final CAClient caClient)
     {
-        this.raWorker = raWorker;
+        this.caClient = caClient;
     }
 
     protected RequestResponseDebug getRequestResponseDebug()
