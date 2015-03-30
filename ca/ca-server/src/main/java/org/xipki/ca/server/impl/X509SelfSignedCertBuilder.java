@@ -79,7 +79,7 @@ import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.SecurityFactory;
@@ -184,7 +184,7 @@ class X509SelfSignedCertBuilder
     {
         try
         {
-            publicKeyInfo = SecurityUtil.toRfc3279Style(publicKeyInfo);
+            publicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
         } catch (InvalidKeySpecException e)
         {
             LOG.warn("SecurityUtil.toRfc3279Style", e);

@@ -88,8 +88,8 @@ import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
@@ -234,7 +234,7 @@ public class SoftTokenContentSignerBuilder
             String algoName;
             try
             {
-                algoName = SecurityUtil.getSignatureAlgoName(signatureAlgId);
+                algoName = AlgorithmUtil.getSignatureAlgoName(signatureAlgId);
             } catch (NoSuchAlgorithmException e)
             {
                 throw new OperatorCreationException(e.getMessage());
@@ -348,7 +348,7 @@ public class SoftTokenContentSignerBuilder
                 final AlgorithmIdentifier signatureAlgId)
         throws NoSuchAlgorithmException, NoSuchPaddingException
         {
-            super(signatureAlgId, SecurityUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
+            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
         }
 
         protected Signer createSigner(
@@ -396,7 +396,7 @@ public class SoftTokenContentSignerBuilder
                 final AlgorithmIdentifier signatureAlgId)
         throws NoSuchAlgorithmException
         {
-            super(signatureAlgId, SecurityUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
+            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
         }
 
         protected Signer createSigner(
@@ -415,7 +415,7 @@ public class SoftTokenContentSignerBuilder
                 final AlgorithmIdentifier signatureAlgId)
         throws NoSuchAlgorithmException
         {
-            super(signatureAlgId, SecurityUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
+            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
         }
 
         protected Signer createSigner(

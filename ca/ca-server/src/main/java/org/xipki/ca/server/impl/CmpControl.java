@@ -43,8 +43,8 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
@@ -218,7 +218,7 @@ class CmpControl
         String name;
         try
         {
-            name = SecurityUtil.getSignatureAlgoName(algId);
+            name = AlgorithmUtil.getSignatureAlgoName(algId);
         } catch (NoSuchAlgorithmException e)
         {
             return false;
@@ -231,7 +231,7 @@ class CmpControl
 
         for(String m : sigAlgos)
         {
-            if(SecurityUtil.equalsAlgoName(m, name))
+            if(AlgorithmUtil.equalsAlgoName(m, name))
             {
                 return true;
             }
