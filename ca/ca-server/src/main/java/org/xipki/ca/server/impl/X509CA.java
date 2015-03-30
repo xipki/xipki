@@ -2069,7 +2069,7 @@ class X509CA
 
         try
         {
-            publicKeyInfo = SecurityUtil.toRfc3279Style(publicKeyInfo);
+            publicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
         } catch (InvalidKeySpecException e)
         {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,

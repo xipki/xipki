@@ -65,7 +65,7 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.CRLReason;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.security.KeyUtil;
@@ -311,7 +311,7 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
                 }
                 else
                 {
-                    String sigAlgName = SecurityUtil.getSignatureAlgoName(sigAlg);
+                    String sigAlgName = AlgorithmUtil.getSignatureAlgoName(sigAlg);
                     if(sigAlgName == null)
                     {
                         sigAlgName = "unknown";

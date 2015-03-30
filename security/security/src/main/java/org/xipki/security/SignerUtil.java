@@ -60,7 +60,7 @@ import org.bouncycastle.operator.bc.BcDefaultDigestProvider;
 import org.bouncycastle.operator.bc.BcDigestProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.security.api.SignerException;
 
 /**
@@ -118,7 +118,7 @@ public class SignerUtil
         AlgorithmIdentifier digAlgId;
         try
         {
-            digAlgId = SecurityUtil.extractDigesetAlgorithmIdentifier(sigAlgId);
+            digAlgId = AlgorithmUtil.extractDigesetAlgorithmIdentifier(sigAlgId);
         } catch (NoSuchAlgorithmException e)
         {
             throw new OperatorCreationException(e.getMessage(), e);

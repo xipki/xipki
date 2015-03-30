@@ -47,7 +47,7 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.ocsp.client.shell.BaseOCSPStatusCommand;
 import org.xipki.ocsp.qa.api.Occurrence;
 import org.xipki.ocsp.qa.api.OcspCertStatus;
@@ -177,7 +177,7 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
         responseOption.setSignatureAlgName(sigAlg);
         if(isNotBlank(certhashAlg))
         {
-            responseOption.setCerthashAlgId(SecurityUtil.getHashAlg(certhashAlg));
+            responseOption.setCerthashAlgId(AlgorithmUtil.getHashAlg(certhashAlg));
         }
 
         ValidationResult result = ocspQA.checkOCSP(response,

@@ -133,7 +133,6 @@ import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SecurityFactory;
@@ -163,7 +162,7 @@ public class IaikP11Slot implements P11WritableSlot
         {
             super();
             this.privateKey = privateKey;
-            this.publicKeyInfo = SecurityUtil.toRfc3279Style(publicKeyInfo);
+            this.publicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
         }
 
         public PrivateKey getPrivateKey()

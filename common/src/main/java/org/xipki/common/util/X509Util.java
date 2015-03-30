@@ -49,6 +49,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -64,18 +65,22 @@ import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1String;
+import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERUniversalString;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.AccessDescription;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
@@ -713,6 +718,31 @@ public class X509Util
         }
 
         return issues;
+    }
+
+    public static SubjectPublicKeyInfo toRfc3279Style(
+            final SubjectPublicKeyInfo publicKeyInfo)
+    throws InvalidKeySpecException
+    {
+        // TODO: add support of other algorithms
+        ASN1ObjectIdentifier algOid = publicKeyInfo.getAlgorithm().getAlgorithm();
+        ASN1Encodable keyParameters = publicKeyInfo.getAlgorithm().getParameters();
+
+        if(PKCSObjectIdentifiers.rsaEncryption.equals(algOid))
+        {
+            if(DERNull.INSTANCE.equals(keyParameters))
+            {
+                return publicKeyInfo;
+            }
+            else
+            {
+                AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(algOid, DERNull.INSTANCE);
+                return new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
+            }
+        } else
+        {
+            return publicKeyInfo;
+        }
     }
 
 }
