@@ -82,10 +82,10 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
@@ -213,7 +213,7 @@ public class SecurityFactoryImpl implements SecurityFactory
         String signatureAlgoName;
         try
         {
-            signatureAlgoName = SecurityUtil.getSignatureAlgoName(signer.getAlgorithmIdentifier());
+            signatureAlgoName = AlgorithmUtil.getSignatureAlgoName(signer.getAlgorithmIdentifier());
         } catch (NoSuchAlgorithmException e)
         {
             throw new SignerException(e.getMessage(), e);
@@ -374,7 +374,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                             throw new SignerException("invalid key: " + e.getMessage(), e);
                         }
 
-                        signatureAlgId = SecurityUtil.getSignatureAlgoId(pubKey, hashAlgo, mgf1);
+                        signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, hashAlgo, mgf1);
                     }
                     return signerBuilder.createSigner(signatureAlgId, parallelism);
                 } catch (OperatorCreationException | NoSuchPaddingException | NoSuchAlgorithmException e)
@@ -447,7 +447,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                     else
                     {
                         PublicKey pubKey = signerBuilder.getCert().getPublicKey();
-                        signatureAlgId = SecurityUtil.getSignatureAlgoId(pubKey, hashAlgo, mgf1);
+                        signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, hashAlgo, mgf1);
                     }
 
                     return signerBuilder.createSigner(
@@ -504,7 +504,7 @@ public class SecurityFactoryImpl implements SecurityFactory
         }
         try
         {
-            return SecurityUtil.getSignatureAlgoId(algoS);
+            return AlgorithmUtil.getSignatureAlgoId(algoS);
         } catch (NoSuchAlgorithmException e)
         {
             throw new SignerException(e.getMessage(), e);

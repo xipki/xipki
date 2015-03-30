@@ -585,7 +585,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             SubjectPublicKeyInfo c14nRequestedPublicKey;
             try
             {
-                c14nRequestedPublicKey = SecurityUtil.toRfc3279Style(requestedPublicKey);
+                c14nRequestedPublicKey = X509Util.toRfc3279Style(requestedPublicKey);
                 if(c14nRequestedPublicKey.equals(publicKey) == false)
                 {
                     issue.setFailureMessage("public key in the certificate does not equal the requested one");

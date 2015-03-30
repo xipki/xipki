@@ -68,7 +68,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.CRLReason;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.ocsp.qa.api.Occurrence;
 import org.xipki.ocsp.qa.api.OcspCertStatus;
@@ -203,8 +203,8 @@ public class OcspQAImpl implements OcspQA
                         AlgorithmIdentifier sigAlg = basicResp.getSignatureAlgorithmID();
                         try
                         {
-                            String sigAlgName = SecurityUtil.getSignatureAlgoName(sigAlg);
-                            if(SecurityUtil.equalsAlgoName(sigAlgName, expectedSigalgo) == false)
+                            String sigAlgName = AlgorithmUtil.getSignatureAlgoName(sigAlg);
+                            if(AlgorithmUtil.equalsAlgoName(sigAlgName, expectedSigalgo) == false)
                             {
                                 issue.setFailureMessage("is '" + sigAlgName +"', but expected '" + expectedSigalgo + "'");
                             }
