@@ -98,6 +98,11 @@ public abstract class X509Certprofile
         return false;
     }
 
+    public AuthorityInfoAccessControl getAIAControl()
+    {
+        return null;
+    }
+
     public String incSerialNumber(
             final String currentSerialNumber)
     throws BadFormatException

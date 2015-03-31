@@ -266,6 +266,14 @@
       </xs:all>
     </xs:complexType>
   </xs:element>
+  <xs:element name="authorityInfoAccess">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="includeCaIssuers" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="includeOcsp" type="xs:boolean" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="keyUsage">
     <xs:complexType>
       <xs:sequence>

@@ -43,6 +43,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
@@ -82,6 +83,7 @@ import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.SubjectInfo;
+import org.xipki.ca.api.profile.x509.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
@@ -377,7 +379,21 @@ class IdentifiedX509Certprofile
         extControl = controls.remove(extType);
         if(extControl != null && addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes))
         {
-            AuthorityInformationAccess value = X509CertUtil.createAuthorityInformationAccess(publicCaInfo.getOcspUris());
+            AuthorityInfoAccessControl aiaControl = certprofile.getAIAControl();
+
+            List<String> caIssuers = null;
+            if(aiaControl == null || aiaControl.includesCaIssuers())
+            {
+                caIssuers = publicCaInfo.getCaCertUris();
+            }
+
+            List<String> ocspUris = null;
+            if(aiaControl == null || aiaControl.includesOcsp())
+            {
+                ocspUris = publicCaInfo.getOcspUris();
+            }
+            AuthorityInformationAccess value = X509CertUtil.createAuthorityInformationAccess(
+                    caIssuers, ocspUris);
             addExtension(values, extType, value, extControl,
                     neededExtensionTypes, wantedExtensionTypes);
         }

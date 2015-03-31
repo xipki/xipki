@@ -52,6 +52,7 @@ implements Serializable
     private List<String> crlUris;
     private List<String> deltaCrlUris;
     private List<String> ocspUris;
+    private List<String> caCertUris;
     private List<String> issuerLocations;
     private X509Certificate cert;
     private String crlSignerName;
@@ -97,6 +98,17 @@ implements Serializable
             final List<String> ocspUris)
     {
         this.ocspUris = ocspUris;
+    }
+
+    public List<String> getCaCertUris()
+    {
+        return caCertUris;
+    }
+
+    public void setCacertUris(
+            final List<String> caCertUris)
+    {
+        this.caCertUris = caCertUris;
     }
 
     public List<String> getIssuerLocations()

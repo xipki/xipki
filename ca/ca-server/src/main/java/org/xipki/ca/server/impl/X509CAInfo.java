@@ -115,7 +115,9 @@ class X509CAInfo
         this.certInCMPFormat = new CMPCertificate(bcCert);
 
         this.publicCAInfo = new PublicCAInfo(cert,
-                caEntry.getOcspUris(), caEntry.getCrlUris(),
+                caEntry.getCacertUris(),
+                caEntry.getOcspUris(),
+                caEntry.getCrlUris(),
                 caEntry.getDeltaCrlUris());
 
         this.noNewCertificateAfter = this.notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();

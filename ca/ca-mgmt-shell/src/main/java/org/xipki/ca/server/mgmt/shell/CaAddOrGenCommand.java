@@ -66,6 +66,12 @@ public abstract class CaAddOrGenCommand extends CaCommand
             description = "CA status")
     private String caStatus = "active";
 
+    @Option(name = "--ca-cert-uri",
+            multiValued = true,
+            description = "CA certificate URI\n"
+                    + "(multi-valued)")
+    private List<String> caCertUris;
+
     @Option(name = "--ocsp-uri",
             multiValued = true,
             description = "OCSP URI\n"
@@ -194,7 +200,8 @@ public abstract class CaAddOrGenCommand extends CaCommand
         }
 
         X509CAEntry entry = new X509CAEntry(caName, nextSerial, nextCrlNumber, signerType, signerConf,
-                ocspUris, crlUris, deltaCrlUris, numCrls.intValue(), expirationPeriod.intValue());
+                caCertUris, ocspUris, crlUris, deltaCrlUris,
+                numCrls.intValue(), expirationPeriod.intValue());
 
         DuplicationMode duplicateKey = DuplicationMode.getInstance(duplicateKeyS);
         if(duplicateKey == null)

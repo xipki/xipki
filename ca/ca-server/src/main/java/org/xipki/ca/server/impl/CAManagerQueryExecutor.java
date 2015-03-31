@@ -588,11 +588,11 @@ class CAManagerQueryExecutor
             final CertificateStore certstore)
     throws CAMgmtException
     {
-        final String sql = "NAME, ART, NEXT_SERIAL, NEXT_CRLNO, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY" +
+        final String sql = "NAME, ART, NEXT_SERIAL, NEXT_CRLNO, STATUS, MAX_VALIDITY" +
                 ", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME" +
                 ", DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS" +
-                ", EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME" +
-                ", DELTACRL_URIS, VALIDITY_MODE" +
+                ", EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, VALIDITY_MODE" +
+                ", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS" +
                 " FROM CA WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -616,6 +616,7 @@ class CAManagerQueryExecutor
                 String crl_uris = rs.getString("CRL_URIS");
                 String delta_crl_uris = rs.getString("DELTACRL_URIS");
                 String ocsp_uris = rs.getString("OCSP_URIS");
+                String cacert_uris = rs.getString("CACERT_URIS");
                 String max_validityS = rs.getString("MAX_VALIDITY");
                 CertValidity max_validity = CertValidity.getInstance(max_validityS);
                 String b64cert = rs.getString("CERT");
@@ -660,8 +661,14 @@ class CAManagerQueryExecutor
                     lOcspUris = StringUtil.split(ocsp_uris, " \t");
                 }
 
+                List<String> lCacertUris = null;
+                if(StringUtil.isNotBlank(cacert_uris))
+                {
+                    lCacertUris = StringUtil.split(cacert_uris, " \t");
+                }
+
                 X509CAEntry entry = new X509CAEntry(name, next_serial, next_crlNo, signer_type, signer_conf,
-                        lOcspUris, lCrlUris, lDeltaCrlUris, numCrls, expirationPeriod);
+                        lCacertUris, lOcspUris, lCrlUris, lDeltaCrlUris, numCrls, expirationPeriod);
                 X509Certificate cert = generateCert(b64cert);
                 entry.setCertificate(cert);
 
@@ -876,11 +883,12 @@ class CAManagerQueryExecutor
 
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("INSERT INTO CA (");
-        sqlBuilder.append("NAME, ART, SUBJECT, NEXT_SERIAL, NEXT_CRLNO, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY");
-        sqlBuilder.append(", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME");
+        sqlBuilder.append("NAME, ART, SUBJECT, NEXT_SERIAL, NEXT_CRLNO, STATUS");
+        sqlBuilder.append(", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS");
+        sqlBuilder.append(", MAX_VALIDITY, CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME");
         sqlBuilder.append(", DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD");
-        sqlBuilder.append(", VALIDITY_MODE, DELTACRL_URIS, EXTRA_CONTROL");
-        sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        sqlBuilder.append(", VALIDITY_MODE, EXTRA_CONTROL");
+        sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         final String sql = sqlBuilder.toString();
 
         // insert to table ca
@@ -903,7 +911,9 @@ class CAManagerQueryExecutor
             ps.setInt(idx++, entry.getNextCRLNumber());
             ps.setString(idx++, entry.getStatus().getStatus());
             ps.setString(idx++, entry.getCrlUrisAsString());
+            ps.setString(idx++, entry.getDeltaCrlUrisAsString());
             ps.setString(idx++, entry.getOcspUrisAsString());
+            ps.setString(idx++, entry.getCacertUrisAsString());
             ps.setString(idx++, entry.getMaxValidity().toString());
             byte[] encodedCert = entry.getCertificate().getEncoded();
             ps.setString(idx++, Base64.toBase64String(encodedCert));
@@ -917,7 +927,6 @@ class CAManagerQueryExecutor
             ps.setInt(idx++, entry.getNumCrls());
             ps.setInt(idx++, entry.getExpirationPeriod());
             ps.setString(idx++, entry.getValidityMode().name());
-            ps.setString(idx++, entry.getDeltaCrlUrisAsString());
             ps.setString(idx++, entry.getExtraControl());
 
             ps.executeUpdate();
@@ -1256,6 +1265,7 @@ class CAManagerQueryExecutor
         List<String> crl_uris = entry.getCrlUris();
         List<String> delta_crl_uris = entry.getDeltaCrlUris();
         List<String> ocsp_uris = entry.getOcspUris();
+        List<String> cacert_uris = entry.getCaCertUris();
         CertValidity max_validity = entry.getMaxValidity();
         String signer_type = entry.getSignerType();
         String signer_conf = entry.getSignerConf();
@@ -1343,6 +1353,7 @@ class CAManagerQueryExecutor
         Integer iCrl_uris = addToSqlIfNotNull(sqlBuilder, index, crl_uris, "CRL_URIS");
         Integer iDelta_crl_uris = addToSqlIfNotNull(sqlBuilder, index, delta_crl_uris, "DELTACRL_URIS");
         Integer iOcsp_uris = addToSqlIfNotNull(sqlBuilder, index, ocsp_uris, "OCSP_URIS");
+        Integer iCacert_uris = addToSqlIfNotNull(sqlBuilder, index, cacert_uris, "CACERT_URIS");
         Integer iMax_validity = addToSqlIfNotNull(sqlBuilder, index, max_validity, "MAX_VALIDITY");
         Integer iSigner_type = addToSqlIfNotNull(sqlBuilder, index, signer_type, "SIGNER_TYPE");
         Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signer_conf, "SIGNER_CONF");
@@ -1391,23 +1402,30 @@ class CAManagerQueryExecutor
 
             if(iCrl_uris != null)
             {
-                String txt = toString(crl_uris, " ");
+                String txt = toString(crl_uris, ", ");
                 m.append("crlUri: '").append(txt).append("'; ");
                 ps.setString(iCrl_uris, txt);
             }
 
             if(iDelta_crl_uris != null)
             {
-                String txt = toString(delta_crl_uris, " ");
+                String txt = toString(delta_crl_uris, ", ");
                 m.append("deltaCrlUri: '").append(txt).append("'; ");
                 ps.setString(iDelta_crl_uris, txt);
             }
 
             if(iOcsp_uris != null)
             {
-                String txt = toString(ocsp_uris, " ");
+                String txt = toString(ocsp_uris, ", ");
                 m.append("ocspUri: '").append(txt).append("'; ");
                 ps.setString(iOcsp_uris, txt);
+            }
+
+            if(iCacert_uris != null)
+            {
+                String txt = toString(cacert_uris, ", ");
+                m.append("caCertUri: '").append(txt).append("'; ");
+                ps.setString(iCacert_uris, txt);
             }
 
             if(iMax_validity != null)

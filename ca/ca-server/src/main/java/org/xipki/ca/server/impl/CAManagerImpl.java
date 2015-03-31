@@ -2736,6 +2736,7 @@ implements CAManager, CmpResponderManager
         List<String> crl_uris = caEntry.getCrlUris();
         List<String> delta_crl_uris = caEntry.getDeltaCrlUris();
         List<String> ocsp_uris = caEntry.getOcspUris();
+        List<String> cacert_uris = caEntry.getCacertUris();
         CertValidity max_validity = caEntry.getMaxValidity();
         String signer_type = caEntry.getSignerType();
         String signer_conf = caEntry.getSignerConf();
@@ -2803,7 +2804,8 @@ implements CAManager, CmpResponderManager
         {
             result = X509SelfSignedCertBuilder.generateSelfSigned(securityFactory,
                     signer_type, signer_conf,
-                    certprofile, p10Request, serialOfThisCert, ocsp_uris, crl_uris, delta_crl_uris);
+                    certprofile, p10Request, serialOfThisCert,
+                    cacert_uris, ocsp_uris, crl_uris, delta_crl_uris);
         } catch (OperationException | ConfigurationException e)
         {
             throw new CAMgmtException(e.getClass().getName() + ": " + e.getMessage(), e);
@@ -2824,7 +2826,7 @@ implements CAManager, CmpResponderManager
         }
 
         X509CAEntry entry = new X509CAEntry(name, nextSerial, nextCrlNumber, signer_type, signerConf,
-                ocsp_uris, crl_uris, delta_crl_uris, numCrls, expirationPeriod);
+                cacert_uris, ocsp_uris, crl_uris, delta_crl_uris, numCrls, expirationPeriod);
         entry.setCertificate(caCert);
         entry.setDuplicateKeyMode(duplicate_key);
         entry.setDuplicateSubjectMode(duplicate_subject);

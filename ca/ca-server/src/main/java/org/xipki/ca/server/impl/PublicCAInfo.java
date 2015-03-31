@@ -68,12 +68,14 @@ class PublicCAInfo
     private final BigInteger serialNumber;
     private final X509CertWithDBCertId caCertificate;
     private X509Certificate crlSignerCertificate;
+    private final List<String> caCertUris;
     private final List<String> ocspUris;
     private final List<String> crlUris;
     private final List<String> deltaCrlUris;
 
     public PublicCAInfo(
             final X509Certificate caCertificate,
+            final List<String> caCertUris,
             final List<String> ocspUris,
             final List<String> crlUris,
             final List<String> deltaCrlUris)
@@ -91,6 +93,7 @@ class PublicCAInfo
         {
             throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
         }
+        this.caCertUris = caCertUris;
         this.ocspUris = ocspUris;
         this.crlUris = crlUris;
         this.deltaCrlUris = deltaCrlUris;
@@ -117,6 +120,7 @@ class PublicCAInfo
             final BigInteger serialNumber,
             final GeneralNames subjectAltName,
             final byte[] subjectKeyIdentifier,
+            final List<String> caCertUris,
             final List<String> ocspUris,
             final List<String> crlUris,
             final List<String> deltaCrlUris)
@@ -145,9 +149,15 @@ class PublicCAInfo
 
         this.serialNumber = serialNumber;
         this.subjectAltName = subjectAltName;
+        this.caCertUris = caCertUris;
         this.ocspUris = ocspUris;
         this.crlUris = crlUris;
         this.deltaCrlUris = deltaCrlUris;
+    }
+
+    public List<String> getCaCertUris()
+    {
+        return caCertUris == null ? null : Collections.unmodifiableList(caCertUris);
     }
 
     public List<String> getOcspUris()
@@ -220,3 +230,4 @@ class PublicCAInfo
     }
 
 }
+// TODO: remove unmodifiable
