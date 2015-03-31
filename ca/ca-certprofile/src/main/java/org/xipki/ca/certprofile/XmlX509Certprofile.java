@@ -494,14 +494,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                 List<String> professionItems;
 
                 List<String> items = type == null ? null : extConf.getProfessionItem();
-                if(CollectionUtil.isEmpty(items))
-                {
-                    professionItems = null;
-                }
-                else
-                {
-                    professionItems = Collections.unmodifiableList(new LinkedList<>(items));
-                }
+                professionItems = CollectionUtil.unmodifiableList(items, true, true);
 
                 List<OidWithDescType> oidWithDescs = (type == null) ? null : extConf.getProfessionOid();
                 professionOIDs = XmlX509CertprofileUtil.toOIDList(oidWithDescs);
