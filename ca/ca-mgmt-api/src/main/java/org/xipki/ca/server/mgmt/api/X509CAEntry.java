@@ -61,6 +61,7 @@ implements Serializable
     private List<String> crlUris;
     private List<String> deltaCrlUris;
     private List<String> ocspUris;
+    private List<String> cacertUris;
     private X509Certificate cert;
     private String crlSignerName;
     private long nextSerial;
@@ -76,6 +77,7 @@ implements Serializable
             final int nextCRLNumber,
             final String signerType,
             final String signerConf,
+            final List<String> cacertUris,
             final List<String> ocspUris,
             final List<String> crlUris,
             final List<String> deltaCrlUris,
@@ -84,12 +86,13 @@ implements Serializable
     throws CAMgmtException
     {
         super(name, signerType, signerConf, expirationPeriod);
-        init(nextSerial, nextCRLNumber, ocspUris, crlUris, deltaCrlUris, numCrls);
+        init(nextSerial, nextCRLNumber, cacertUris, ocspUris, crlUris, deltaCrlUris, numCrls);
     }
 
     private void init(
             final long nextSerial,
             final int nextCRLNumber,
+            final List<String> cacertUris,
             final List<String> ocspUris,
             final List<String> crlUris,
             final List<String> deltaCrlUris,
@@ -116,6 +119,8 @@ implements Serializable
         this.nextSerial = nextSerial;
         this.nextCRLNumber = nextCRLNumber;
 
+        this.cacertUris = (cacertUris == null) ?
+                null : Collections.unmodifiableList(new ArrayList<>(cacertUris));
         this.ocspUris = (ocspUris == null) ?
                 null : Collections.unmodifiableList(new ArrayList<>(ocspUris));
         this.crlUris = (crlUris == null) ?
@@ -196,6 +201,16 @@ implements Serializable
         return toString(ocspUris);
     }
 
+    public List<String> getCacertUris()
+    {
+        return cacertUris;
+    }
+
+    public String getCacertUrisAsString()
+    {
+        return toString(cacertUris);
+    }
+
     public X509Certificate getCertificate()
     {
         return cert;
@@ -232,6 +247,7 @@ implements Serializable
         sb.append("deltaCrlUris: ").append(getDeltaCrlUrisAsString()).append('\n');
         sb.append("crlUris: ").append(getCrlUrisAsString()).append('\n');
         sb.append("ocspUris: ").append(getOcspUrisAsString()).append('\n');
+        sb.append("caCertUris: ").append(getCacertUrisAsString()).append('\n');
         sb.append("cert: ").append("\n");
         if(cert == null)
         {

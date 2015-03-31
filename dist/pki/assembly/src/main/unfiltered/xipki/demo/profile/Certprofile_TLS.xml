@@ -83,10 +83,6 @@
       <type description="subjectKeyIdentifier">2.5.29.14</type>
       <critical>false</critical>
     </extension>
-    <extension required="true" permittedInRequest="false">
-      <type description="authorityInfoAccess">1.3.6.1.5.5.7.1.1</type>
-      <critical>false</critical>
-    </extension>
     <extension required="false" permittedInRequest="false">
       <type description="cRLDistributionPoints">2.5.29.31</type>
       <critical>false</critical>
@@ -98,6 +94,16 @@
     <extension required="true" permittedInRequest="false">
       <type description="basicConstraints">2.5.29.19</type>
       <critical>true</critical>
+    </extension>
+    <extension required="true" permittedInRequest="false">
+      <type description="authorityInfoAccess">1.3.6.1.5.5.7.1.1</type>
+      <critical>false</critical>
+      <value>
+        <authorityInfoAccess>
+          <includeCaIssuers>true</includeCaIssuers>
+          <includeOcsp>true</includeOcsp>
+        </authorityInfoAccess>
+      </value>
     </extension>
     <extension required="true" permittedInRequest="false">
       <type description="authorityKeyIdentifier">2.5.29.35</type>

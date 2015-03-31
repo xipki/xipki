@@ -124,6 +124,7 @@ class X509SelfSignedCertBuilder
             final IdentifiedX509Certprofile certprofile,
             final CertificationRequest p10Request,
             final long serialNumber,
+            final List<String> cacertUris,
             final List<String> ocspUris,
             final List<String> crlUris,
             final List<String> deltaCrlUris)
@@ -166,7 +167,7 @@ class X509SelfSignedCertBuilder
 
         X509Certificate newCert = generateCertificate(
                 signer, certprofile, p10Request, serialNumber, publicKeyInfo,
-                ocspUris, crlUris, deltaCrlUris);
+                cacertUris, ocspUris, crlUris, deltaCrlUris);
 
         return new GenerateSelfSignedResult(signerConf, newCert);
     }
@@ -177,6 +178,7 @@ class X509SelfSignedCertBuilder
             final CertificationRequest p10Request,
             final long serialNumber,
             SubjectPublicKeyInfo publicKeyInfo,
+            final List<String> cacertUris,
             final List<String> ocspUris,
             final List<String> crlUris,
             final List<String> deltaCrlUris)
@@ -243,7 +245,8 @@ class X509SelfSignedCertBuilder
                 publicKeyInfo);
 
         PublicCAInfo publicCaInfo = new PublicCAInfo(
-                grantedSubject, _serialNumber, null, null, ocspUris, crlUris, deltaCrlUris);
+                grantedSubject, _serialNumber, null, null,
+                cacertUris, ocspUris, crlUris, deltaCrlUris);
 
         Extensions extensions = null;
         ASN1Set attrs = p10Request.getCertificationRequestInfo().getAttributes();

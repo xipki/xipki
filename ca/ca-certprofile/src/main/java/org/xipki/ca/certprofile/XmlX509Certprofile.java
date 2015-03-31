@@ -76,6 +76,7 @@ import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.RDNControl;
 import org.xipki.ca.api.profile.SubjectInfo;
+import org.xipki.ca.api.profile.x509.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.x509.BaseX509Certprofile;
 import org.xipki.ca.api.profile.x509.CertificatePolicyInformation;
 import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
@@ -84,6 +85,7 @@ import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.ca.api.profile.x509.X509CertUtil;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.certprofile.x509.jaxb.Admission;
+import org.xipki.ca.certprofile.x509.jaxb.AuthorityInfoAccess;
 import org.xipki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier;
 import org.xipki.ca.certprofile.x509.jaxb.BasicConstraints;
 import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies;
@@ -144,6 +146,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     private boolean notBeforeMidnight;
     private boolean includeIssuerAndSerialInAKI;
     private Integer pathLen;
+    private AuthorityInfoAccessControl aIAControl;
     private Set<KeyUsageControl> keyusages;
     private Set<ExtKeyUsageControl> extendedKeyusages;
     private Set<GeneralNameMode> allowedSubjectAltNameModes;
@@ -178,6 +181,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         duplicateSubjectPermitted = true;
         serialNumberInReqPermitted = true;
         pathLen = null;
+        aIAControl = null;
         keyusages = null;
         extendedKeyusages = null;
         allowedSubjectAltNameModes = null;
@@ -348,6 +352,26 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             if(extConf != null)
             {
                 this.pathLen = extConf.getPathLen();
+            }
+        }
+
+        // AuthorityInfoAccess
+        type = Extension.authorityInfoAccess;
+        if(extensionControls.containsKey(type))
+        {
+            AuthorityInfoAccess extConf = (AuthorityInfoAccess) getExtensionValue(
+                    type, extensionsType, AuthorityInfoAccess.class);
+            if(extConf != null)
+            {
+                Boolean b = extConf.isIncludeCaIssuers();
+                boolean includesCaIssuers = b == null ?
+                        true : b.booleanValue();
+
+                b = extConf.isIncludeOcsp();
+                boolean includesOcsp = b == null ?
+                        true : b.booleanValue();
+
+                this.aIAControl = new AuthorityInfoAccessControl(includesCaIssuers, includesOcsp);
             }
         }
 
@@ -859,6 +883,12 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     public Integer getPathLenBasicConstraint()
     {
         return pathLen;
+    }
+
+    @Override
+    public AuthorityInfoAccessControl getAIAControl()
+    {
+        return aIAControl;
     }
 
     @Override

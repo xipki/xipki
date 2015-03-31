@@ -71,6 +71,12 @@ public class CaUpdateCommand extends CaCommand
             description = "CA status")
     private String caStatus;
 
+    @Option(name = "--ca-cert-uri",
+            multiValued = true,
+            description = "CA certificate URI\n"
+                    + "(multi-valued)")
+    private List<String> caCertUris;
+
     @Option(name = "--ocsp-uri",
             multiValued = true,
             description = "OCSP URI or 'NULL'\n"
@@ -210,94 +216,10 @@ public class CaUpdateCommand extends CaCommand
             entry.setPermissions(_permissions);
         }
 
-        {
-            boolean clearCrlUris = false;
-            if(crlUris != null)
-            {
-                for(String uri : crlUris)
-                {
-                    if(CAManager.NULL.equalsIgnoreCase(uri))
-                    {
-                        clearCrlUris = true;
-                        break;
-                    }
-                }
-            }
-
-            List<String> _crlUris = null;
-
-            if(clearCrlUris)
-            {
-                _crlUris = Collections.emptyList();
-            }
-            else
-            {
-                if(crlUris != null )
-                {
-                    _crlUris = new ArrayList<>(crlUris);
-                }
-            }
-            entry.setCrlUris(_crlUris);
-        }
-
-        {
-            boolean clearDeltaCrlUris = false;
-            if(deltaCrlUris != null)
-            {
-                for(String uri : deltaCrlUris)
-                {
-                    if(CAManager.NULL.equalsIgnoreCase(uri))
-                    {
-                        clearDeltaCrlUris = true;
-                        break;
-                    }
-                }
-            }
-
-            List<String> _deltaCrlUris = null;
-
-            if(clearDeltaCrlUris)
-            {
-                _deltaCrlUris = Collections.emptyList();
-            }
-            else
-            {
-                if(deltaCrlUris != null )
-                {
-                    _deltaCrlUris = new ArrayList<>(deltaCrlUris);
-                }
-            }
-            entry.setDeltaCrlUris(_deltaCrlUris);
-        }
-
-        {
-            boolean clearOcspUris = false;
-            if(ocspUris != null)
-            {
-                for(String uri : ocspUris)
-                {
-                    if(CAManager.NULL.equalsIgnoreCase(uri))
-                    {
-                        clearOcspUris = true;
-                        break;
-                    }
-                }
-            }
-
-            List<String> _ocspUris = null;
-            if(clearOcspUris)
-            {
-                _ocspUris = Collections.emptyList();
-            }
-            else
-            {
-                if (ocspUris != null)
-                {
-                    _ocspUris = new ArrayList<>(ocspUris);
-                }
-            }
-            entry.setOcspUris(_ocspUris);
-        }
+        entry.setCrlUris(getUris(crlUris));
+        entry.setDeltaCrlUris(getUris(deltaCrlUris));
+        entry.setOcspUris(getUris(ocspUris));
+        entry.setCacertUris(getUris(caCertUris));
 
         if(validityModeS != null)
         {
@@ -317,5 +239,35 @@ public class CaUpdateCommand extends CaCommand
         boolean b = caManager.changeCA(entry);
         output(b, "updated", "could not update", "CA " + entry.getName());
         return null;
+    }
+
+    private static List<String> getUris(List<String> uris)
+    {
+        if(uris == null)
+        {
+            return null;
+        }
+
+        boolean clearUris = false;
+        if(uris != null)
+        {
+            for(String uri : uris)
+            {
+                if(CAManager.NULL.equalsIgnoreCase(uri))
+                {
+                    clearUris = true;
+                    break;
+                }
+            }
+        }
+
+        if(clearUris)
+        {
+            return Collections.emptyList();
+        }
+        else
+        {
+            return new ArrayList<>(uris);
+        }
     }
 }

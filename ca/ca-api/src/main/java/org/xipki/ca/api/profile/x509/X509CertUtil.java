@@ -91,18 +91,32 @@ public class X509CertUtil
     }
 
     public static AuthorityInformationAccess createAuthorityInformationAccess(
+            final List<String> caIssuerUris,
             final List<String> ocspUris)
     {
-        if(CollectionUtil.isEmpty(ocspUris))
+        if(CollectionUtil.isEmpty(ocspUris) && CollectionUtil.isEmpty(ocspUris))
         {
             return null;
         }
 
         List<AccessDescription> accessDescriptions = new ArrayList<>(ocspUris.size());
-        for(String uri : ocspUris)
+
+        if(CollectionUtil.isNotEmpty(caIssuerUris))
         {
-            GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
-            accessDescriptions.add(new AccessDescription(X509ObjectIdentifiers.id_ad_ocsp, gn));
+            for(String uri : caIssuerUris)
+            {
+                GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
+                accessDescriptions.add(new AccessDescription(X509ObjectIdentifiers.id_ad_caIssuers, gn));
+            }
+        }
+
+        if(CollectionUtil.isNotEmpty(ocspUris))
+        {
+            for(String uri : ocspUris)
+            {
+                GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
+                accessDescriptions.add(new AccessDescription(X509ObjectIdentifiers.id_ad_ocsp, gn));
+            }
         }
 
         DERSequence seq = new DERSequence(accessDescriptions.toArray(new AccessDescription[0]));

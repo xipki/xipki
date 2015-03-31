@@ -196,8 +196,19 @@ public class CaAddFromFileCommand extends CaCommand
             ocspUris = StringUtil.split(s, ", ");
         }
 
-        X509CAEntry entry = new X509CAEntry(caName, nextSerial, nextCrlNumber, signerType, signerConf,
-                ocspUris, crlUris, deltaCrlUris, numCrls, expirationPeriod);
+        // CACERT_URIS
+        key = "CACERT_URIS";
+        s = getStrProp(props, key, false);
+        List<String> caCertUris = null;
+        if(s != null)
+        {
+            ocspUris = StringUtil.split(s, ", ");
+        }
+
+        X509CAEntry entry = new X509CAEntry(
+                caName, nextSerial, nextCrlNumber, signerType, signerConf,
+                caCertUris, ocspUris, crlUris, deltaCrlUris,
+                numCrls, expirationPeriod);
 
         // STATUS
         key = "STATUS";
