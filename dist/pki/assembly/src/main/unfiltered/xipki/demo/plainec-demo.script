@@ -1,7 +1,7 @@
 # Curve name or OID, e.g. secp256r1, brainpoolp256r1
 CURVE = secp256r1
 
-CA_SIGNER_ALGO = SHA256withPlainECDSA
+CA_SIGNER_ALGO = SHA256withPlainECDSA,SHA1withPlainECDSA
 
 echo "========================================================"
 echo "||            DEMO EC with PKCS#12 Key                ||"

@@ -7,6 +7,18 @@
     </my:myDescription>
   </appInfo>
   <version>3</version>
+  <signatureAlgorithms>
+    <algorithm>SHA256withRSA</algorithm>
+    <algorithm>SHA1withRSA</algorithm>
+    <algorithm>SHA256withDSA</algorithm>
+    <algorithm>SHA1withDSA</algorithm>
+    <algorithm>SHA256withECDSA</algorithm>
+    <algorithm>SHA1withECDSA</algorithm>
+    <algorithm>SHA256withPlainECDSA</algorithm>
+    <algorithm>SHA1withPlainECDSA</algorithm>
+    <algorithm>SHA256withRSAandMGF1</algorithm>
+    <algorithm>SHA1withRSAandMGF1</algorithm>
+  </signatureAlgorithms>
   <ca>true</ca>
   <validity>8y</validity>
   <notBeforeTime>current</notBeforeTime>

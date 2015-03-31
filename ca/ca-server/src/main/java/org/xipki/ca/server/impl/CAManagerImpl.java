@@ -1261,18 +1261,23 @@ implements CAManager, CmpResponderManager
         if(caEntry instanceof X509CAEntry)
         {
             X509CAEntry xEntry = (X509CAEntry) caEntry;
-            X509Certificate cert = xEntry.getCertificate();
+
             ConcurrentContentSigner signer;
             try
             {
-                signer = securityFactory.createSigner(xEntry.getSignerType(), xEntry.getSignerConf(), cert);
+                List<String> signerConfs = X509CAInfo.splitCASignerConfsAsList(xEntry.getSignerConf());
+                for(String signerConf : signerConfs)
+                {
+                    signer = securityFactory.createSigner(
+                            xEntry.getSignerType(), signerConf, xEntry.getCertificate());
+                    if(xEntry.getCertificate() == null)
+                    {
+                        xEntry.setCertificate(signer.getCertificate());
+                    }
+                }
             } catch (SignerException e)
             {
                 throw new CAMgmtException("could not create signer for new CA " + name +": " + e.getMessage(), e);
-            }
-            if(cert == null)
-            {
-                xEntry.setCertificate(signer.getCertificate());
             }
         }
 

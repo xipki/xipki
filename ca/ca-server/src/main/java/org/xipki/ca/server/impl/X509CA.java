@@ -1035,7 +1035,9 @@ class X509CA
                 }
             }
 
-            ConcurrentContentSigner concurrentSigner = (_crlSigner == null) ? caInfo.getSigner() : _crlSigner;
+            ConcurrentContentSigner concurrentSigner = (_crlSigner == null) ?
+                    caInfo.getSigner(null) : _crlSigner;
+
             ContentSigner contentSigner;
             try
             {
@@ -1989,12 +1991,6 @@ class X509CA
             final boolean keyUpdate)
     throws OperationException
     {
-        ConcurrentContentSigner signer = caInfo.getSigner();
-        if(signer == null)
-        {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "signer of the CA is not initialized");
-        }
-
         if(caInfo.getRevocationInfo() != null)
         {
             throw new OperationException(ErrorCode.NOT_PERMITTED, "CA is revoked");
@@ -2007,6 +2003,13 @@ class X509CA
             throw new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE, "unknown cert profile " + certprofileLocalName);
         }
 
+        ConcurrentContentSigner signer = caInfo.getSigner(certprofile.getSignatureAlgorithms());
+        if(signer == null)
+        {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                    "CA does not support any signature algorithm restricted by the cert profile");
+        }
+
         final String certprofileName = certprofile.getName();
         if(certprofile.getVersion() != X509CertVersion.V3)
         {
@@ -2017,17 +2020,6 @@ class X509CA
         {
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
                     "profile " + certprofileName + " not applied to non-RA");
-        }
-
-        Set<ASN1ObjectIdentifier> permittedSigAlgs = certprofile.getSignatureAlgorithms();
-        if(CollectionUtil.isNotEmpty(permittedSigAlgs))
-        {
-            ASN1ObjectIdentifier sigAlgId = signer.getAlgorithmIdentifier().getAlgorithm();
-            if(permittedSigAlgs.contains(sigAlgId) == false)
-            {
-                throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                        "signature algorithm  " + sigAlgId.getId() + " is not permitted");
-            }
         }
 
         requestedSubject = removeEmptyRDNs(requestedSubject);
@@ -2696,7 +2688,7 @@ class X509CA
 
         boolean healthy = true;
 
-        ConcurrentContentSigner signer = caInfo.getSigner();
+        ConcurrentContentSigner signer = caInfo.getSigner(null);
         if(signer != null)
         {
             boolean caSignerHealthy = signer.isHealthy();

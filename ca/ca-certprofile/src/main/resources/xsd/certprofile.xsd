@@ -29,7 +29,15 @@
       <xs:element name="signatureAlgorithms" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="algorithm" type="oidWithDescType" maxOccurs="unbounded"/>
+            <xs:element name="algorithm" type="xs:string" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>
+                  Signature algorithm name. Algorithms supported by the CA are
+                     SHA*withECDSA, SHA*withDSA, SHA*withRSA, SHA*withRSAandMGF1, SHA*withPlainECDSA"
+                   where * is for 1, 224, 256, 384 and 512.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
           </xs:sequence>
         </xs:complexType>
       </xs:element>

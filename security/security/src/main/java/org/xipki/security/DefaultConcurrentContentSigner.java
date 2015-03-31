@@ -285,4 +285,9 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
         return algorithmIdentifier;
     }
 
+    @Override
+    public void shutdown()
+    {
+    }
+
 }
