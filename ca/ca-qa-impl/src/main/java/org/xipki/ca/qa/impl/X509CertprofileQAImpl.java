@@ -38,6 +38,7 @@ package org.xipki.ca.qa.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
@@ -166,6 +167,7 @@ import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
+import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.SecurityUtil;
@@ -205,7 +207,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
     private CertValidity validity;
     private X509CertVersion version;
-    private Set<ASN1ObjectIdentifier> signatureAlgorithms;
+    private Set<String> signatureAlgorithms;
     private boolean ca;
     private boolean notBeforeMidnight;
     private Integer pathLen;
@@ -250,8 +252,18 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
             if(conf.getSignatureAlgorithms() != null)
             {
-                this.signatureAlgorithms = XmlX509CertprofileUtil.toOIDSet(
-                        conf.getSignatureAlgorithms().getAlgorithm());
+                for(String algo :conf.getSignatureAlgorithms().getAlgorithm())
+                {
+                    String c14nAlgo;
+                    try
+                    {
+                        c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(algo);
+                    } catch (NoSuchAlgorithmException e)
+                    {
+                        throw new CertprofileException(e.getMessage(), e);
+                    }
+                    this.signatureAlgorithms.add(c14nAlgo);
+                }
             }
 
             this.validity = CertValidity.getInstance(conf.getValidity());
@@ -529,10 +541,16 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 issue.setFailureMessage("Certificate.tbsCertificate.signature != Certificate.signatureAlgorithm");
             } else
             {
-                String sigAlgo = sigAlgId.getAlgorithm().getId();
-                if(signatureAlgorithms.contains(sigAlgo) == false)
+                try
                 {
-                    issue.setFailureMessage("signatureAlgorithm '" + sigAlgo + "' is not allowed");
+                    String sigAlgo = AlgorithmUtil.getSignatureAlgoName(sigAlgId);
+                    if(signatureAlgorithms.contains(sigAlgo) == false)
+                    {
+                        issue.setFailureMessage("signatureAlgorithm '" + sigAlgo + "' is not allowed");
+                    }
+                } catch (NoSuchAlgorithmException e)
+                {
+                    issue.setFailureMessage("unsupported signature algorithm " + sigAlgId.getAlgorithm().getId());
                 }
             }
         }
