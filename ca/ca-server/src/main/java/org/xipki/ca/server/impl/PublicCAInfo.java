@@ -53,6 +53,7 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.X509Util;
 
 /**
@@ -93,10 +94,10 @@ class PublicCAInfo
         {
             throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
         }
-        this.caCertUris = caCertUris;
-        this.ocspUris = ocspUris;
-        this.crlUris = crlUris;
-        this.deltaCrlUris = deltaCrlUris;
+        this.caCertUris = CollectionUtil.unmodifiableList(caCertUris, true, true);
+        this.ocspUris = CollectionUtil.unmodifiableList(ocspUris, true, true);
+        this.crlUris = CollectionUtil.unmodifiableList(crlUris, true, true);
+        this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris, true, true);
 
         byte[] encodedSubjectAltName = caCertificate.getExtensionValue(Extension.subjectAlternativeName.getId());
         if(encodedSubjectAltName == null)
@@ -149,30 +150,30 @@ class PublicCAInfo
 
         this.serialNumber = serialNumber;
         this.subjectAltName = subjectAltName;
-        this.caCertUris = caCertUris;
-        this.ocspUris = ocspUris;
-        this.crlUris = crlUris;
-        this.deltaCrlUris = deltaCrlUris;
+        this.caCertUris = CollectionUtil.unmodifiableList(caCertUris, true, true);
+        this.ocspUris = CollectionUtil.unmodifiableList(ocspUris, true, true);
+        this.crlUris = CollectionUtil.unmodifiableList(crlUris, true, true);
+        this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris, true, true);
     }
 
     public List<String> getCaCertUris()
     {
-        return caCertUris == null ? null : Collections.unmodifiableList(caCertUris);
+        return caCertUris;
     }
 
     public List<String> getOcspUris()
     {
-        return ocspUris == null ? null : Collections.unmodifiableList(ocspUris);
+        return ocspUris;
     }
 
     public List<String> getCrlUris()
     {
-        return crlUris == null ? null : Collections.unmodifiableList(crlUris);
+        return crlUris;
     }
 
     public List<String> getDeltaCrlUris()
     {
-        return deltaCrlUris == null ? null : Collections.unmodifiableList(deltaCrlUris);
+        return deltaCrlUris;
     }
 
     public X509Certificate getCrlSignerCertificate()
@@ -230,4 +231,3 @@ class PublicCAInfo
     }
 
 }
-// TODO: remove unmodifiable

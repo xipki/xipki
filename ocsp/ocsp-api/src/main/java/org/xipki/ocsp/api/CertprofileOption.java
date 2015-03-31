@@ -61,7 +61,8 @@ public class CertprofileOption
         }
         else
         {
-            this.includes = new HashSet<>(includes);
+            this.includes = Collections.unmodifiableSet(
+                    new HashSet<>(includes));
         }
 
         if(CollectionUtil.isEmpty(excludes))
@@ -70,18 +71,19 @@ public class CertprofileOption
         }
         else
         {
-            this.excludes = new HashSet<>(excludes);
+            this.excludes = Collections.unmodifiableSet(
+                    new HashSet<>(excludes));
         }
     }
 
     public Set<String> getIncludes()
     {
-        return includes == null ? null : Collections.unmodifiableSet(includes);
+        return includes;
     }
 
     public Set<String> getExcludes()
     {
-        return excludes == null ? null : Collections.unmodifiableSet(excludes);
+        return excludes;
     }
 
     public boolean include(
