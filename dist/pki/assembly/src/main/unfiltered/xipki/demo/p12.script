@@ -110,8 +110,11 @@ xipki-ca:caalias-add --ca SubCA1.complex-Name --alias SubCA
 
 ## Add cert profile to CA
 xipki-ca:caprofile-add --ca SubCA1.complex-Name --profile TLS_g --local-name TLS
+
 xipki-ca:caprofile-add --ca SubCA1.complex-Name --profile TLS_C
+
 xipki-ca:caprofile-add --ca SubCA1.complex-Name --profile TLSwithIncSN
+
 xipki-ca:caprofile-add --ca SubCA1.complex-Name --profile gSMC_K
 
 ## Add publisher
