@@ -62,6 +62,7 @@ import org.xipki.ca.certprofile.XmlX509Certprofile;
 import org.xipki.ca.certprofile.x509.jaxb.Admission;
 import org.xipki.ca.certprofile.x509.jaxb.AlgorithmType;
 import org.xipki.ca.certprofile.x509.jaxb.AnyType;
+import org.xipki.ca.certprofile.x509.jaxb.AuthorityInfoAccess;
 import org.xipki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier;
 import org.xipki.ca.certprofile.x509.jaxb.BasicConstraints;
 import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies;
@@ -243,13 +244,16 @@ public class ProfileConfCreatorDemo
 
         List<ExtensionType> list = extensions.getExtension();
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-        list.add(createExtension(Extension.authorityInfoAccess, true, false, null));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
         list.add(createExtension(Extension.freshestCRL, false, false, null));
 
         // Extensions - basicConstraints
         ExtensionValueType extensionValue = null;
         list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
 
         // Extensions - keyUsage
         extensionValue = createKeyUsages(
@@ -263,7 +267,7 @@ public class ProfileConfCreatorDemo
     private static X509ProfileType Certprofile_Cross()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("Certprofile Cross",  true, "10y", false);
+        X509ProfileType profile = getBaseProfile("Certprofile Cross",  false, "10y", false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -281,13 +285,16 @@ public class ProfileConfCreatorDemo
 
         List<ExtensionType> list = extensions.getExtension();
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-        list.add(createExtension(Extension.authorityInfoAccess, true, false, null));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
         list.add(createExtension(Extension.freshestCRL, false, false, null));
 
         // Extensions - basicConstraints
         ExtensionValueType extensionValue = null;
         list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
 
         // Extensions - AuthorityKeyIdentifier
         extensionValue = createAuthorityKeyIdentifier(false);
@@ -323,13 +330,16 @@ public class ProfileConfCreatorDemo
         // Extensions - controls
         List<ExtensionType> list = extensions.getExtension();
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-        list.add(createExtension(Extension.authorityInfoAccess, true, false, null));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
         list.add(createExtension(Extension.freshestCRL, false, false, null));
 
         // Extensions - basicConstraints
         ExtensionValueType extensionValue = createBasicConstraints(1);
         list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
 
         // Extensions - AuthorityKeyIdentifier
         extensionValue = createAuthorityKeyIdentifier(false);
@@ -365,13 +375,16 @@ public class ProfileConfCreatorDemo
 
         List<ExtensionType> list = extensions.getExtension();
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-        list.add(createExtension(Extension.authorityInfoAccess, true, false, null));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
         list.add(createExtension(Extension.freshestCRL, false, false, null));
 
         // Extensions - basicConstraints
         ExtensionValueType extensionValue = createBasicConstraints(1);
         list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
 
         // Extensions - AuthorityKeyIdentifier
         extensionValue = createAuthorityKeyIdentifier(false);
@@ -476,7 +489,6 @@ public class ProfileConfCreatorDemo
         List<ExtensionType> list = extensions.getExtension();
 
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-        list.add(createExtension(Extension.authorityInfoAccess, false, false, null));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
         list.add(createExtension(Extension.freshestCRL, false, false, null));
         list.add(createExtension(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck, false, false, null));
@@ -484,6 +496,10 @@ public class ProfileConfCreatorDemo
         // Extensions - basicConstraints
         ExtensionValueType extensionValue = null;
         list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
 
         // Extensions - AuthorityKeyIdentifier
         extensionValue = createAuthorityKeyIdentifier(true);
@@ -525,13 +541,16 @@ public class ProfileConfCreatorDemo
         // Extensions - controls
         List<ExtensionType> list = extensions.getExtension();
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-        list.add(createExtension(Extension.authorityInfoAccess, true, false, null));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
         list.add(createExtension(Extension.freshestCRL, false, false, null));
 
         // Extensions - basicConstraints
         ExtensionValueType extensionValue = null;
         list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
 
         // Extensions - AuthorityKeyIdentifier
         extensionValue = createAuthorityKeyIdentifier(true);
@@ -577,13 +596,16 @@ public class ProfileConfCreatorDemo
         List<ExtensionType> list = extensions.getExtension();
 
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-        list.add(createExtension(Extension.authorityInfoAccess, true, false, null));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
         list.add(createExtension(Extension.freshestCRL, false, false, null));
 
         // Extensions - basicConstraints
         ExtensionValueType extensionValue = null;
         list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
 
         // Extensions - AuthorityKeyIdentifier
         extensionValue = createAuthorityKeyIdentifier(true);
@@ -626,13 +648,16 @@ public class ProfileConfCreatorDemo
         // Extensions - controls
         List<ExtensionType> list = extensions.getExtension();
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-        list.add(createExtension(Extension.authorityInfoAccess, true, false, null));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
         list.add(createExtension(Extension.freshestCRL, false, false, null));
 
         // Extensions - basicConstraints
         ExtensionValueType extensionValue = null;
         list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
 
         // Extensions - AuthorityKeyIdentifier
         extensionValue = createAuthorityKeyIdentifier(true);
@@ -691,12 +716,15 @@ public class ProfileConfCreatorDemo
         List<ExtensionType> list = extensions.getExtension();
 
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-        list.add(createExtension(Extension.authorityInfoAccess, true, false, null));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
 
         // Extensions - basicConstraints
         ExtensionValueType extensionValue = null;
         list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
 
         // Extensions - AuthorityKeyIdentifier
         extensionValue = createAuthorityKeyIdentifier(true);
@@ -767,13 +795,16 @@ public class ProfileConfCreatorDemo
         List<ExtensionType> list = extensions.getExtension();
 
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-        list.add(createExtension(Extension.authorityInfoAccess, false, false, null));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
         list.add(createExtension(Extension.freshestCRL, false, false, null));
 
         // Extensions - basicConstraints
         ExtensionValueType extensionValue = null;
         list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
 
         // Extensions - AuthorityKeyIdentifier
         extensionValue = createAuthorityKeyIdentifier(true);
@@ -861,23 +892,6 @@ public class ProfileConfCreatorDemo
         return ret;
     }
 
-    private static ExtensionValueType createAuthorityKeyIdentifier(
-            final boolean includeSerialAndSerial)
-    {
-
-        AuthorityKeyIdentifier akiType = new AuthorityKeyIdentifier();
-        akiType.setIncludeIssuerAndSerial(includeSerialAndSerial);
-        return createExtensionValueType(akiType);
-
-    }
-    private static ExtensionValueType createBasicConstraints(
-            final int pathLen)
-    {
-        BasicConstraints extValue = new BasicConstraints();
-        extValue.setPathLen(pathLen);
-        return createExtensionValueType(extValue);
-    }
-
     private static ExtensionValueType createKeyUsages(
             final KeyUsageEnum[] requiredUsages,
             final KeyUsageEnum[] optionalUsages)
@@ -904,6 +918,32 @@ public class ProfileConfCreatorDemo
             }
         }
 
+        return createExtensionValueType(extValue);
+    }
+
+    private static ExtensionValueType createAuthorityKeyIdentifier(
+            final boolean includeSerialAndSerial)
+    {
+
+        AuthorityKeyIdentifier akiType = new AuthorityKeyIdentifier();
+        akiType.setIncludeIssuerAndSerial(includeSerialAndSerial);
+        return createExtensionValueType(akiType);
+
+    }
+
+    private static ExtensionValueType createAuthorityInfoAccess()
+    {
+        AuthorityInfoAccess extnValue = new AuthorityInfoAccess();
+        extnValue.setIncludeCaIssuers(true);
+        extnValue.setIncludeOcsp(true);
+        return createExtensionValueType(extnValue);
+    }
+
+    private static ExtensionValueType createBasicConstraints(
+            final int pathLen)
+    {
+        BasicConstraints extValue = new BasicConstraints();
+        extValue.setPathLen(pathLen);
         return createExtensionValueType(extValue);
     }
 
