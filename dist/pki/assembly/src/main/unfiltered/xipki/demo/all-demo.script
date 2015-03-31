@@ -6,6 +6,8 @@ source ./xipki/demo/dsa-demo.script
 
 source ./xipki/demo/ec-demo.script
 
+source ./xipki/demo/plainec-demo.script
+
 source ./xipki/demo/hsm-rsa-demo.script
 
 source ./xipki/demo/hsm-rsapss-demo.script
@@ -14,4 +16,5 @@ source ./xipki/demo/hsm-dsa-demo.script
 
 source ./xipki/demo/hsm-ec-demo.script
 
+source ./xipki/demo/hsm-plainec-demo.script
 

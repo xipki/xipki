@@ -33,49 +33,40 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell;
+package org.xipki.security.p11;
 
-import java.security.cert.X509Certificate;
+import java.security.NoSuchAlgorithmException;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.SignatureAlgoControl;
-import org.xipki.security.SecurityFactoryImpl;
-import org.xipki.security.api.ConcurrentContentSigner;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-qa", name = "neg-enroll-p12", description="enroll certificate (PKCS#12 keystore, negative, for QA)")
-public class NegP12EnrollCertCommand extends NegEnrollCertCommand
+public class P11ECDSAX962ContentSigner extends AbstractP11DSAContentSigner
 {
 
-    @Option(name = "--p12",
-            required = true,
-            description = "PKCS#12 request file\n"
-                    + "(required)")
-    private String p12File;
-
-    @Option(name = "--password",
-            description = "password of the PKCS#12 file")
-    private String password;
+    public P11ECDSAX962ContentSigner(
+            final P11CryptService cryptService,
+            final P11SlotIdentifier slot,
+            final P11KeyIdentifier keyId,
+            final AlgorithmIdentifier signatureAlgId)
+    throws NoSuchAlgorithmException, OperatorCreationException
+    {
+        super(cryptService, slot, keyId, signatureAlgId);
+    }
 
     @Override
-    protected ConcurrentContentSigner getSigner(
-            final String hashAlgo,
-            final SignatureAlgoControl signatureAlgoControl)
+    protected byte[] CKM_SIGN(
+            final byte[] hashValue)
     throws SignerException
     {
-        if(password == null)
-        {
-            password = new String(readPassword());
-        }
-
-        String signerConfWithoutAlgo = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(p12File, password, 1);
-        return securityFactory.createSigner("PKCS12", signerConfWithoutAlgo, hashAlgo,
-                signatureAlgoControl, (X509Certificate[]) null);
+        return cryptService.CKM_ECDSA_X962(hashValue, slot, keyId);
     }
 
 }

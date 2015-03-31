@@ -39,6 +39,7 @@ import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.xipki.common.SignatureAlgoControl;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
@@ -61,7 +62,9 @@ public class P12EnrollCertCommand extends EnrollCertCommand
     private String password;
 
     @Override
-    protected ConcurrentContentSigner getSigner()
+    protected ConcurrentContentSigner getSigner(
+            final String hashAlgo,
+            final SignatureAlgoControl signatureAlgoControl)
     throws SignerException
     {
         if(password == null)
@@ -70,7 +73,8 @@ public class P12EnrollCertCommand extends EnrollCertCommand
         }
 
         String signerConfWithoutAlgo = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(p12File, password, 1);
-        return securityFactory.createSigner("PKCS12", signerConfWithoutAlgo, hashAlgo, false, (X509Certificate[]) null);
+        return securityFactory.createSigner("PKCS12", signerConfWithoutAlgo, hashAlgo,
+                signatureAlgoControl, (X509Certificate[]) null);
     }
 
 }

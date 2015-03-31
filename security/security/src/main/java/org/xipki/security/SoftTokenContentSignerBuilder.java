@@ -95,6 +95,7 @@ import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.bcext.BCRSAPrivateCrtKey;
 import org.xipki.security.bcext.BCRSAPrivateKey;
+import org.xipki.security.bcext.DSAPlainDigestSigner;
 
 /**
  * @author Lijun Liao
@@ -286,12 +287,14 @@ public class SoftTokenContentSignerBuilder
                 else if(key instanceof DSAPrivateKey)
                 {
                     keyparam = DSAUtil.generatePrivateKeyParameter(key);
-                    signerBuilder = new DSAContentSignerBuilder(signatureAlgId);
+                    signerBuilder = new DSAContentSignerBuilder(signatureAlgId,
+                            AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
                 }
                 else if(key instanceof ECPrivateKey)
                 {
                     keyparam = ECUtil.generatePrivateKeyParameter(key);
-                    signerBuilder = new ECDSAContentSignerBuilder(signatureAlgId);
+                    signerBuilder = new ECDSAContentSignerBuilder(signatureAlgId,
+                            AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
                 }
                 else
                 {
@@ -392,11 +395,15 @@ public class SoftTokenContentSignerBuilder
 
     private static class DSAContentSignerBuilder extends BcContentSignerBuilder
     {
+        private final boolean plain;
+
         private DSAContentSignerBuilder(
-                final AlgorithmIdentifier signatureAlgId)
+                final AlgorithmIdentifier signatureAlgId,
+                final boolean plain)
         throws NoSuchAlgorithmException
         {
             super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
+            this.plain = plain;
         }
 
         protected Signer createSigner(
@@ -405,17 +412,29 @@ public class SoftTokenContentSignerBuilder
         throws OperatorCreationException
         {
             Digest dig = digestProvider.get(digAlgId);
-            return new DSADigestSigner(new DSASigner(), dig);
+            DSASigner dsaSigner = new DSASigner();
+            if(plain)
+            {
+                return new DSAPlainDigestSigner(dsaSigner, dig);
+            }
+            else
+            {
+                return new DSADigestSigner(dsaSigner, dig);
+            }
         }
     } // DSAContentSignerBuilder
 
     private static class ECDSAContentSignerBuilder extends BcContentSignerBuilder
     {
+        private final boolean plain;
+
         private ECDSAContentSignerBuilder(
-                final AlgorithmIdentifier signatureAlgId)
+                final AlgorithmIdentifier signatureAlgId,
+                final boolean plain)
         throws NoSuchAlgorithmException
         {
             super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
+            this.plain = plain;
         }
 
         protected Signer createSigner(
@@ -424,7 +443,16 @@ public class SoftTokenContentSignerBuilder
         throws OperatorCreationException
         {
             Digest dig = digestProvider.get(digAlgId);
-            return new DSADigestSigner(new ECDSASigner(), dig);
+            ECDSASigner dsaSigner = new ECDSASigner();
+
+            if(plain)
+            {
+                return new DSAPlainDigestSigner(dsaSigner, dig);
+            }
+            else
+            {
+                return new DSADigestSigner(dsaSigner, dig);
+            }
         }
     } // ECDSAContentSignerBuilder
 

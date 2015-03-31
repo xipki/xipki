@@ -46,7 +46,6 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPrivateKey;
@@ -105,43 +104,6 @@ public class KeyUtil
     private static final Map<String, BcContentVerifierProviderBuilder> verifierProviderBuilders = new HashMap<>();
 
     private static final Map<String, KeyFactory> keyFactories = new HashMap<>();
-
-    public static ContentVerifierProvider getContentVerifierProvider(
-            final X509Certificate verifierCert)
-    throws InvalidKeyException, OperatorCreationException
-    {
-        PublicKey publicKey = verifierCert.getPublicKey();
-        String keyAlg = publicKey.getAlgorithm().toUpperCase();
-        if(keyAlg.equals("EC"))
-        {
-            keyAlg = "ECDSA";
-        }
-
-        BcContentVerifierProviderBuilder builder = verifierProviderBuilders.get(keyAlg);
-        if(builder == null)
-        {
-            if("RSA".equals(keyAlg))
-            {
-                builder = new BcRSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
-            }
-            else if("DSA".equals(keyAlg))
-            {
-                builder = new BcDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
-            }
-            else if("ECDSA".equals(keyAlg))
-            {
-                builder = new ECDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
-            }
-            else
-            {
-                throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
-            }
-            verifierProviderBuilders.put(keyAlg, builder);
-        }
-
-        AsymmetricKeyParameter keyParam = KeyUtil.generatePublicKeyParameter(publicKey);
-        return builder.build(keyParam);
-    }
 
     public static ContentVerifierProvider getContentVerifierProvider(
             final PublicKey publicKey)

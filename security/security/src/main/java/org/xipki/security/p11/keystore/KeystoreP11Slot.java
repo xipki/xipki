@@ -535,7 +535,7 @@ public class KeystoreP11Slot implements P11WritableSlot
             pairs.putUtf8Pair("key-label", keyId.getKeyLabel());
         }
 
-        securityFactory.createSigner("PKCS11", pairs.getEncoded(), "SHA1", false, cert);
+        securityFactory.createSigner("PKCS11", pairs.getEncoded(), "SHA1", null, cert);
     }
 
     @Override

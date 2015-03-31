@@ -33,29 +33,62 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.p11;
+package org.xipki.security.api;
 
-import org.bouncycastle.crypto.Digest;
-import org.xipki.security.api.SignerException;
+import java.security.InvalidKeyException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.operator.ContentVerifierProvider;
+import org.xipki.common.SignatureAlgoControl;
 
 /**
  * @author Lijun Liao
  */
 
-public class P11DSASigner extends AbstractP11DSASigner
+public abstract class AbstractSecurityFactory implements SecurityFactory
 {
-    public P11DSASigner(
-            final Digest digest)
+
+    @Override
+    public ConcurrentContentSigner createSigner(
+            final String type,
+            final String conf,
+            final X509Certificate cert)
+    throws SignerException
     {
-        super(digest);
+        return createSigner(type, conf,
+                (cert == null ? null : new X509Certificate[]{cert}));
     }
 
     @Override
-    protected byte[] sign(
-            final byte[] hashValue)
+    public ConcurrentContentSigner createSigner(
+            final String type,
+            final String confWithoutAlgo,
+            final String hashAlgo,
+            final SignatureAlgoControl sigAlgoControl,
+            final X509Certificate cert)
     throws SignerException
     {
-        return param.getP11CryptService().CKM_DSA(hashValue, param.getSlot(), param.getKeyId());
+        return createSigner(type, confWithoutAlgo, hashAlgo, sigAlgoControl,
+                (cert == null ? null : new X509Certificate[]{cert}));
+    }
+
+    @Override
+    public ContentVerifierProvider getContentVerifierProvider(
+            final X509Certificate cert)
+    throws InvalidKeyException
+    {
+        return getContentVerifierProvider(cert.getPublicKey());
+    }
+
+    @Override
+    public ContentVerifierProvider getContentVerifierProvider(
+            final X509CertificateHolder cert)
+    throws InvalidKeyException
+    {
+        PublicKey publicKey = generatePublicKey(cert.getSubjectPublicKeyInfo());
+        return getContentVerifierProvider(publicKey);
     }
 
 }

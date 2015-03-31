@@ -35,6 +35,8 @@
 
 package org.xipki.security;
 
+import java.io.IOException;
+import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -43,6 +45,10 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
@@ -203,5 +209,60 @@ public class SignerUtil
         return block;
     }
 
-}
+    public static byte[] convertPlainDSASigX962(
+            final byte[] signature)
+    throws SignerException
+    {
+        byte[] ba = new byte[signature.length/2];
+        ASN1EncodableVector sigder = new ASN1EncodableVector();
 
+        System.arraycopy(signature, 0, ba, 0, ba.length);
+        sigder.add(new ASN1Integer(new BigInteger(1, ba)));
+
+        System.arraycopy(signature, ba.length, ba, 0, ba.length);
+        sigder.add(new ASN1Integer(new BigInteger(1, ba)));
+
+        DERSequence seq = new DERSequence(sigder);
+        try
+        {
+            return seq.getEncoded();
+        } catch (IOException e)
+        {
+            throw new SignerException("IOException, message: " + e.getMessage(), e);
+        }
+    }
+
+    public static byte[] convertX962DSASigToPlain(
+            final byte[] x962Signature,
+            final int keyBitLen)
+    throws SignerException
+    {
+        final int blockSize = (keyBitLen + 7) / 8;
+        ASN1Sequence seq = ASN1Sequence.getInstance(x962Signature);
+        if(seq.size() != 2)
+        {
+            throw new IllegalArgumentException("invalid X962Signature");
+        }
+        BigInteger r = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
+        BigInteger s = ASN1Integer.getInstance(seq.getObjectAt(1)).getPositiveValue();
+        int rBitLen = r.bitLength();
+        int sBitLen = s.bitLength();
+        int bitLen = Math.max(rBitLen, sBitLen);
+        if((bitLen + 7) / 8 > blockSize)
+        {
+            throw new SignerException("signature is too large");
+        }
+
+        byte[] plainSignature = new byte[2 * blockSize];
+
+        byte[] bytes = r.toByteArray();
+        int srcOffset = Math.max(0, bytes.length - blockSize);
+        System.arraycopy(bytes, srcOffset, plainSignature, 0, bytes.length - srcOffset);
+
+        bytes = s.toByteArray();
+        srcOffset = Math.max(0, bytes.length - blockSize);
+        System.arraycopy(bytes, srcOffset, plainSignature, blockSize, bytes.length - srcOffset);
+        return plainSignature;
+    }
+
+}

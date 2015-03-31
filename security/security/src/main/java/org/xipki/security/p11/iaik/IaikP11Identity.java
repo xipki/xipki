@@ -35,17 +35,12 @@
 
 package org.xipki.security.p11.iaik;
 
-import java.io.IOException;
-import java.math.BigInteger;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.DERSequence;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11Identity;
@@ -123,10 +118,9 @@ class IaikP11Identity extends P11Identity
             throw new SignerException("could not find slot " + slotId);
         }
 
-        byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);
+        byte[] truncatedDigest = SecurityUtil.leftmost(hash, getSignatureKeyBitLength());
 
-        byte[] signature = slot.CKM_ECDSA(truncatedDigest, keyId);
-        return convertToX962Signature(signature);
+        return slot.CKM_ECDSA(truncatedDigest, keyId);
     }
 
     public byte[] CKM_DSA(
@@ -144,32 +138,8 @@ class IaikP11Identity extends P11Identity
         {
             throw new SignerException("could not find slot " + slotId);
         }
-        byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);
-        byte[] signature = slot.CKM_DSA(truncatedDigest, keyId);
-        return convertToX962Signature(signature);
-    }
-
-    private static byte[] convertToX962Signature(
-            final byte[] signature)
-    throws SignerException
-    {
-        byte[] ba = new byte[signature.length/2];
-        ASN1EncodableVector sigder = new ASN1EncodableVector();
-
-        System.arraycopy(signature, 0, ba, 0, ba.length);
-        sigder.add(new ASN1Integer(new BigInteger(1, ba)));
-
-        System.arraycopy(signature, ba.length, ba, 0, ba.length);
-        sigder.add(new ASN1Integer(new BigInteger(1, ba)));
-
-        DERSequence seq = new DERSequence(sigder);
-        try
-        {
-            return seq.getEncoded();
-        } catch (IOException e)
-        {
-            throw new SignerException("IOException, message: " + e.getMessage(), e);
-        }
+        byte[] truncatedDigest = SecurityUtil.leftmost(hash, getSignatureKeyBitLength());
+        return slot.CKM_DSA(truncatedDigest, keyId);
     }
 
 }
