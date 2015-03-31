@@ -153,7 +153,7 @@ public class QASystemManagerImpl implements QASystemManager
                 X509IssuerInfo issuerInfo;
                 try
                 {
-                    issuerInfo = new X509IssuerInfo(issuerType.getOcspUrl(),
+                    issuerInfo = new X509IssuerInfo(issuerType.getCaIssuerUrl(), issuerType.getOcspUrl(),
                             issuerType.getCrlUrl(), issuerType.getDeltaCrlUrl(), certBytes);
                 } catch (CertificateException e)
                 {

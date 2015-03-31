@@ -31,6 +31,7 @@
   <xs:complexType name="X509IssuerType">
     <xs:sequence>
       <xs:element name="cert" type="fileOrValueType"/>
+      <xs:element name="caIssuerUrl" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="ocspUrl" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="crlUrl" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="deltaCrlUrl" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
