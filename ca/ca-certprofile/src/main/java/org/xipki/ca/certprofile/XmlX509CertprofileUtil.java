@@ -455,7 +455,7 @@ public class XmlX509CertprofileUtil
                 keyAlgorithms.put(oid, keyParamsOption);
             }
         }
-        return CollectionUtil.isEmpty(keyAlgorithms) ? null : Collections.unmodifiableMap(keyAlgorithms);
+        return CollectionUtil.unmodifiableMap(keyAlgorithms, false, true);
     }
 
     public static Map<ASN1ObjectIdentifier, ExtensionControl> buildExtensionControls(

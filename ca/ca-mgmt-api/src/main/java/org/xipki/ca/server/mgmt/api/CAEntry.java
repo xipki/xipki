@@ -36,7 +36,6 @@
 package org.xipki.ca.server.mgmt.api;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 
 import org.xipki.ca.api.profile.CertValidity;
@@ -180,7 +179,7 @@ public class CAEntry
     public void setPermissions(
             final Set<Permission> permissions)
     {
-        this.permissions = (permissions == null) ? null : Collections.unmodifiableSet(permissions);
+        this.permissions = CollectionUtil.unmodifiableSet(permissions);
     }
 
     public int getExpirationPeriod()

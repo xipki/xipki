@@ -38,14 +38,13 @@ package org.xipki.ca.server.mgmt.api;
 import java.io.Serializable;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.KeyUsage;
+import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.X509Util;
 
@@ -119,14 +118,10 @@ implements Serializable
         this.nextSerial = nextSerial;
         this.nextCRLNumber = nextCRLNumber;
 
-        this.cacertUris = (cacertUris == null) ?
-                null : Collections.unmodifiableList(new ArrayList<>(cacertUris));
-        this.ocspUris = (ocspUris == null) ?
-                null : Collections.unmodifiableList(new ArrayList<>(ocspUris));
-        this.crlUris = (crlUris == null) ?
-                null : Collections.unmodifiableList(new ArrayList<>(crlUris));
-        this.deltaCrlUris = (deltaCrlUris == null) ?
-                null : Collections.unmodifiableList(new ArrayList<>(deltaCrlUris));
+        this.cacertUris = CollectionUtil.unmodifiableList(cacertUris, true, true);
+        this.ocspUris = CollectionUtil.unmodifiableList(ocspUris, true, true);
+        this.crlUris = CollectionUtil.unmodifiableList(crlUris, true, true);
+        this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris, true, true);
     }
 
     public void setCertificate(

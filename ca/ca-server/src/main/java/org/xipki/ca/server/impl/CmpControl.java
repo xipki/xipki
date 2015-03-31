@@ -97,17 +97,13 @@ class CmpControl
         if(s != null)
         {
             set = StringUtil.splitAsSet(s, ", ");
+            if(CollectionUtil.isNotEmpty(set))
+            {
+                pairs.putUtf8Pair(KEY_PROTECTION_SIGALGO, StringUtil.collectionAsString(this.sigAlgos, ","));
+            }
         }
 
-        if(CollectionUtil.isEmpty(set))
-        {
-            this.sigAlgos = null;
-        }
-        else
-        {
-            this.sigAlgos = set;
-            pairs.putUtf8Pair(KEY_PROTECTION_SIGALGO, StringUtil.collectionAsString(this.sigAlgos, ","));
-        }
+        this.sigAlgos = CollectionUtil.unmodifiableSet(set, false, true);
         this.dbEntry = new CmpControlEntry(dbEntry.getName(), pairs.getEncoded());
     }
 
@@ -204,7 +200,7 @@ class CmpControl
 
     public Set<String> getSigAlgos()
     {
-        return sigAlgos == null ? null : Collections.unmodifiableSet(sigAlgos);
+        return sigAlgos;
     }
 
     public boolean isSigAlgoPermitted(
