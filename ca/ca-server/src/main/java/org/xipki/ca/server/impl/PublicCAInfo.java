@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.Collections;
 import java.util.List;
 
 import javax.security.auth.x500.X500Principal;

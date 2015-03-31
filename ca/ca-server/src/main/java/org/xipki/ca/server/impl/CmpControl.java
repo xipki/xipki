@@ -36,7 +36,6 @@
 package org.xipki.ca.server.impl;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Collections;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
