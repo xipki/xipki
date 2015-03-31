@@ -35,15 +35,12 @@
 
 package org.xipki.common;
 
-import java.security.Provider.Service;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * @author Lijun Liao
@@ -296,21 +293,6 @@ public class CmpUtf8Pairs
             {
                 System.out.println(name + ": " + pairs.getValue(name));
             }
-
-            BouncyCastleProvider bc = new BouncyCastleProvider();
-            Set<Service> services = bc.getServices();
-            for(Service m : services)
-            {
-                if("SIGNATURE".equalsIgnoreCase(m.getType()))
-                {
-                    String alg = m.getAlgorithm().toUpperCase();
-                    if(alg.contains("DSA"))
-                    {
-                        System.out.println(alg);
-                    }
-                }
-            }
-
         }catch(Exception e)
         {
             e.printStackTrace();

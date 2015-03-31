@@ -550,7 +550,7 @@ class CaConfigurationDbExporter extends DbPorter
         sqlBuilder.append("VALIDITY_MODE");
         if(dbSchemaVersion > 1)
         {
-            sqlBuilder.append(", ART, NEXT_CRLNO, CMPCONTROL_NAME, EXTRA_CONTROL");
+            sqlBuilder.append(", CACERT_URIS, ART, NEXT_CRLNO, CMPCONTROL_NAME, EXTRA_CONTROL");
         }
         sqlBuilder.append(" FROM CA");
 
@@ -571,11 +571,14 @@ class CaConfigurationDbExporter extends DbPorter
                 int next_crlNo;
                 String cmpcontrol_name;
                 String extraControl;
+                String caCertUris;
+
                 if(dbSchemaVersion == 1)
                 {
                     art = 1; // X.509
                     next_crlNo = 1;
                     cmpcontrol_name = "default";
+                    caCertUris = null;
                     extraControl = null;
                 }
                 else
@@ -583,6 +586,7 @@ class CaConfigurationDbExporter extends DbPorter
                     art = rs.getInt("ART");
                     next_crlNo = rs.getInt("NEXT_CRLNO");
                     cmpcontrol_name = rs.getString("CMPCONTROL_NAME");
+                    caCertUris = rs.getString("CACERT_URIS");
                     extraControl = rs.getString("EXTRA_CONTROL");
                 }
 
@@ -613,6 +617,7 @@ class CaConfigurationDbExporter extends DbPorter
                 ca.setCrlUris(crl_uris);
                 ca.setDeltacrlUris(delta_crl_uris);
                 ca.setOcspUris(ocsp_uris);
+                ca.setCacertUris(caCertUris);
                 ca.setMaxValidity(max_validity);
                 ca.setCert(cert);
                 ca.setSignerType(signer_type);

@@ -171,6 +171,7 @@
       <xs:element name="crlUris" type="xs:string" minOccurs="0"/>
       <xs:element name="deltacrlUris" type="xs:string" minOccurs="0"/>
       <xs:element name="ocspUris" type="xs:string" minOccurs="0"/>
+      <xs:element name="cacertUris" type="xs:string" minOccurs="0"/>
       <xs:element name="maxValidity" type="xs:string"/>
       <xs:element name="cert" type="xs:string"/>
       <xs:element name="signerType" type="xs:string"/>

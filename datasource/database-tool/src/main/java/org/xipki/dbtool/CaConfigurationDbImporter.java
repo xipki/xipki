@@ -413,12 +413,12 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println("importing table CA");
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("INSERT INTO CA (NAME, ART, SUBJECT, NEXT_SERIAL, NEXT_CRLNO, STATUS,");
-        sqlBuilder.append(" CRL_URIS, DELTACRL_URIS, OCSP_URIS, MAX_VALIDITY,");
+        sqlBuilder.append(" CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS, MAX_VALIDITY,");
         sqlBuilder.append(" CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME,");
         sqlBuilder.append(" DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS,");
         sqlBuilder.append(" EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, VALIDITY_MODE,");
         sqlBuilder.append(" EXTRA_CONTROL)");
-        sqlBuilder.append(" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        sqlBuilder.append(" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         final String sql = sqlBuilder.toString();
 
         PreparedStatement ps = null;
@@ -445,6 +445,7 @@ class CaConfigurationDbImporter extends DbPorter
                     ps.setString(idx++, ca.getCrlUris());
                     ps.setString(idx++, ca.getDeltacrlUris());
                     ps.setString(idx++, ca.getOcspUris());
+                    ps.setString(idx++, ca.getCacertUris());
                     ps.setString(idx++, ca.getMaxValidity());
                     ps.setString(idx++, b64Cert);
                     ps.setString(idx++, ca.getSignerType());
