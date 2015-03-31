@@ -52,6 +52,7 @@ import org.xipki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.ca.client.shell.ClientCommand;
 import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.SignatureAlgoControl;
 import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
@@ -80,7 +81,17 @@ public abstract class NegEnrollCertCommand extends ClientCommand
 
     @Option(name = "--hash",
             description = "hash algorithm name for the POPO computation")
-    protected String hashAlgo = "SHA256";
+    private String hashAlgo = "SHA256";
+
+    @Option(name = "--rsa-mgf1",
+            description = "whether to use the RSAPSS MGF1 for the POPO computation\n"
+                    + "(only applied to RSA key)")
+    private Boolean rsaMgf1 = Boolean.FALSE;
+
+    @Option(name = "--dsa-plain",
+            description = "whether to use the Plain DSA for the POPO computation\n"
+                    + "(only applied to DSA and ECDSA key)")
+    private Boolean dsaPlain = Boolean.FALSE;
 
     @Option(name = "--ca",
             description = "CA name\n"
@@ -95,7 +106,9 @@ public abstract class NegEnrollCertCommand extends ClientCommand
         this.securityFactory = securityFactory;
     }
 
-    protected abstract ConcurrentContentSigner getSigner()
+    protected abstract ConcurrentContentSigner getSigner(
+            String hashAlgo,
+            SignatureAlgoControl signatureAlgoControl)
     throws SignerException;
 
     @Override
@@ -105,8 +118,7 @@ public abstract class NegEnrollCertCommand extends ClientCommand
         EnrollCertRequestType request = new EnrollCertRequestType(EnrollCertRequestType.Type.CERT_REQ);
 
         CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
-
-        ConcurrentContentSigner signer = getSigner();
+        ConcurrentContentSigner signer = getSigner(hashAlgo, new SignatureAlgoControl(rsaMgf1, dsaPlain));
         X509CertificateHolder ssCert = signer.getCertificateAsBCObject();
 
         X500Name x500Subject = subject == null ? ssCert.getSubject() : new X500Name(subject);

@@ -412,7 +412,7 @@ public final class SunP11CryptService implements P11CryptService
     }
 
     @Override
-    public byte[] CKM_ECDSA(
+    public byte[] CKM_ECDSA_Plain(
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
@@ -430,7 +430,24 @@ public final class SunP11CryptService implements P11CryptService
     }
 
     @Override
-    public byte[] CKM_DSA(
+    public byte[] CKM_ECDSA_X962(
+            final byte[] hash,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
+    throws SignerException
+    {
+        ensureResource();
+
+        SunP11Identity identity = getIdentity(slotId, keyId);
+        if(identity == null)
+        {
+            throw new SignerException("found no key with " + keyId);
+        }
+        return identity.CKM_ECDSA_X962(hash);
+    }
+
+    @Override
+    public byte[] CKM_DSA_Plain(
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
@@ -445,6 +462,24 @@ public final class SunP11CryptService implements P11CryptService
         }
 
         return identity.CKM_DSA(hash);
+    }
+
+    @Override
+    public byte[] CKM_DSA_X962(
+            final byte[] hash,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
+    throws SignerException
+    {
+        ensureResource();
+
+        SunP11Identity identity = getIdentity(slotId, keyId);
+        if(identity == null)
+        {
+            throw new SignerException("found no key with " + keyId);
+        }
+
+        return identity.CKM_DSA_X962(hash);
     }
 
     @Override

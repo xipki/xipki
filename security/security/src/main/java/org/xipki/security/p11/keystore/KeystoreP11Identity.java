@@ -184,7 +184,7 @@ public class KeystoreP11Identity extends P11Identity
                     publicKey.getAlgorithm() + " public key");
         }
 
-        byte[] padded = SignerUtil.pkcs1padding(encodedDigestInfo, (signatureKeyBitLength + 7)/8);
+        byte[] padded = SignerUtil.pkcs1padding(encodedDigestInfo, (getSignatureKeyBitLength() + 7)/8);
         return do_rsa_sign(padded);
     }
 
@@ -225,7 +225,7 @@ public class KeystoreP11Identity extends P11Identity
         }
     }
 
-    public byte[] CKM_ECDSA(
+    public byte[] CKM_ECDSA_X962(
             final byte[] hash)
     throws SignerException
     {
@@ -234,10 +234,17 @@ public class KeystoreP11Identity extends P11Identity
             throw new SignerException("operation CKM_ECDSA is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
 
-        return do_dsa_sign(hash);
+        return do_dsa_x962_sign(hash);
+    }
+    public byte[] CKM_ECDSA(
+            final byte[] hash)
+    throws SignerException
+    {
+        byte[] x962Signature = CKM_ECDSA_X962(hash);
+        return SignerUtil.convertX962DSASigToPlain(x962Signature, getSignatureKeyBitLength());
     }
 
-    public byte[] CKM_DSA(
+    public byte[] CKM_DSA_X962(
             final byte[] hash)
     throws SignerException
     {
@@ -245,14 +252,22 @@ public class KeystoreP11Identity extends P11Identity
         {
             throw new SignerException("operation CKM_DSA is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
-        return do_dsa_sign(hash);
+        return do_dsa_x962_sign(hash);
     }
 
-    private byte[] do_dsa_sign(
+    public byte[] CKM_DSA(
             final byte[] hash)
     throws SignerException
     {
-        byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);
+        byte[] x962Signature = CKM_DSA_X962(hash);
+        return SignerUtil.convertX962DSASigToPlain(x962Signature, getSignatureKeyBitLength());
+    }
+
+    private byte[] do_dsa_x962_sign(
+            final byte[] hash)
+    throws SignerException
+    {
+        byte[] truncatedDigest = SecurityUtil.leftmost(hash, getSignatureKeyBitLength());
         Signature sig;
         try
         {

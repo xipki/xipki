@@ -33,49 +33,29 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell;
+package org.xipki.security.p11;
 
-import java.security.cert.X509Certificate;
-
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.SignatureAlgoControl;
-import org.xipki.security.SecurityFactoryImpl;
-import org.xipki.security.api.ConcurrentContentSigner;
+import org.bouncycastle.crypto.Digest;
 import org.xipki.security.api.SignerException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-qa", name = "neg-enroll-p12", description="enroll certificate (PKCS#12 keystore, negative, for QA)")
-public class NegP12EnrollCertCommand extends NegEnrollCertCommand
+public class P11ECDSAX962Signer extends AbstractP11DSASigner
 {
-
-    @Option(name = "--p12",
-            required = true,
-            description = "PKCS#12 request file\n"
-                    + "(required)")
-    private String p12File;
-
-    @Option(name = "--password",
-            description = "password of the PKCS#12 file")
-    private String password;
+    public P11ECDSAX962Signer(
+            final Digest digest)
+    {
+        super(digest);
+    }
 
     @Override
-    protected ConcurrentContentSigner getSigner(
-            final String hashAlgo,
-            final SignatureAlgoControl signatureAlgoControl)
+    protected byte[] sign(
+            final byte[] hashValue)
     throws SignerException
     {
-        if(password == null)
-        {
-            password = new String(readPassword());
-        }
-
-        String signerConfWithoutAlgo = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(p12File, password, 1);
-        return securityFactory.createSigner("PKCS12", signerConfWithoutAlgo, hashAlgo,
-                signatureAlgoControl, (X509Certificate[]) null);
+        return param.getP11CryptService().CKM_ECDSA_X962(hashValue, param.getSlot(), param.getKeyId());
     }
 
 }

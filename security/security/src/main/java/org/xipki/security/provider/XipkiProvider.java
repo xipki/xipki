@@ -104,6 +104,14 @@ public class XipkiProvider extends Provider
             provider.put("Signature.SHA512withECDSA", ECDSASignatureSpi.SHA512.class.getName());
             provider.put("Signature.RIPEMDwithECDSA", ECDSASignatureSpi.RIPEMD160.class.getName());
 
+            provider.put("Signature.NONEwithECDSAplain", ECDSAPlainSignatureSpi.NONE.class.getName());
+            provider.put("Signature.SHA1withECDSAplain", ECDSAPlainSignatureSpi.SHA1.class.getName());
+            provider.put("Signature.SHA224withECDSAplain", ECDSAPlainSignatureSpi.SHA224.class.getName());
+            provider.put("Signature.SHA256withECDSAplain", ECDSAPlainSignatureSpi.SHA256.class.getName());
+            provider.put("Signature.SHA384withECDSAplain", ECDSAPlainSignatureSpi.SHA384.class.getName());
+            provider.put("Signature.SHA512withECDSAplain", ECDSAPlainSignatureSpi.SHA512.class.getName());
+            provider.put("Signature.RIPEMDwithECDSAplain", ECDSAPlainSignatureSpi.RIPEMD160.class.getName());
+
             provider.put("Signature.SHA1withRSAandMGF1", RSAPSSSignatureSpi.SHA1withRSA.class.getName());
             provider.put("Signature.SHA224withRSAandMGF1", RSAPSSSignatureSpi.SHA224withRSA.class.getName());
             provider.put("Signature.SHA256withRSAandMGF1", RSAPSSSignatureSpi.SHA256withRSA.class.getName());

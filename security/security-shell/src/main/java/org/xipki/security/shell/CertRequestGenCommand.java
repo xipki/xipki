@@ -52,6 +52,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.ObjectIdentifiers;
+import org.xipki.common.SignatureAlgoControl;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.security.P10RequestGenerator;
@@ -72,6 +73,16 @@ public abstract class CertRequestGenCommand extends SecurityCommand
     @Option(name = "--hash",
             description = "hash algorithm name")
     private String hashAlgo = "SHA256";
+
+    @Option(name = "--rsa-mgf1",
+            description = "whether to use the RSAPSS MGF1 for the POPO computation\n"
+                    + "(only applied to RSA key)")
+    private Boolean rsaMgf1 = Boolean.FALSE;
+
+    @Option(name = "--dsa-plain",
+            description = "whether to use the Plain DSA for the POPO computation\n"
+                    + "(only applied to DSA and ECDSA key)")
+    private Boolean dsaPlain = Boolean.FALSE;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
@@ -116,7 +127,8 @@ public abstract class CertRequestGenCommand extends SecurityCommand
     private List<String> wantExtensionTypes;
 
     protected abstract ConcurrentContentSigner getSigner(
-            String hashAlgo)
+            String hashAlgo,
+            SignatureAlgoControl signatureAlgoControl)
     throws Exception;
 
     @Override
@@ -185,8 +197,7 @@ public abstract class CertRequestGenCommand extends SecurityCommand
                     ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions, false, ee.toASN1Primitive().getEncoded()));
         }
 
-        ConcurrentContentSigner identifiedSigner = getSigner(hashAlgo);
-
+        ConcurrentContentSigner identifiedSigner = getSigner(hashAlgo, new SignatureAlgoControl(rsaMgf1, dsaPlain));
         Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());
 
         X500Name subjectDN;

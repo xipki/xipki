@@ -35,27 +35,37 @@
 
 package org.xipki.security.p11;
 
-import org.bouncycastle.crypto.Digest;
+import java.security.NoSuchAlgorithmException;
+
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 
 /**
  * @author Lijun Liao
  */
 
-public class P11ECDSASigner extends AbstractP11DSASigner
+public class P11DSAPlainContentSigner extends AbstractP11DSAContentSigner
 {
-    public P11ECDSASigner(
-            final Digest digest)
+    public P11DSAPlainContentSigner(
+            final P11CryptService cryptService,
+            final P11SlotIdentifier slot,
+            final P11KeyIdentifier keyId,
+            final AlgorithmIdentifier signatureAlgId)
+    throws NoSuchAlgorithmException, OperatorCreationException
     {
-        super(digest);
+        super(cryptService, slot, keyId, signatureAlgId);
     }
 
     @Override
-    protected byte[] sign(
+    protected byte[] CKM_SIGN(
             final byte[] hashValue)
     throws SignerException
     {
-        return param.getP11CryptService().CKM_ECDSA(hashValue, param.getSlot(), param.getKeyId());
+        return cryptService.CKM_DSA_Plain(hashValue, slot, keyId);
     }
 
 }

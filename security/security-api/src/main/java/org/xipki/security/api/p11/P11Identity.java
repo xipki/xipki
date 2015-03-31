@@ -54,7 +54,7 @@ public class P11Identity implements Comparable<P11Identity>
 
     protected final X509Certificate[] certificateChain;
     protected final PublicKey publicKey;
-    protected final int signatureKeyBitLength;
+    private final int signatureKeyBitLength;
 
     public P11Identity(
             final P11SlotIdentifier slotId,
