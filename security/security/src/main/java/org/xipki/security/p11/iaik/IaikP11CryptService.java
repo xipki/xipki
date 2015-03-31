@@ -50,6 +50,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.LogUtil;
+import org.xipki.security.SignerUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11Identity;
@@ -284,7 +285,18 @@ public final class IaikP11CryptService implements P11CryptService
     }
 
     @Override
-    public byte[] CKM_ECDSA(
+    public byte[] CKM_ECDSA_X962(
+            final byte[] hash,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
+    throws SignerException
+    {
+        byte[] plainSignature = CKM_ECDSA_Plain(hash, slotId, keyId);
+        return SignerUtil.convertPlainDSASigX962(plainSignature);
+    }
+
+    @Override
+    public byte[] CKM_ECDSA_Plain(
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
@@ -305,7 +317,7 @@ public final class IaikP11CryptService implements P11CryptService
             LOG.debug(message, e);
             if(reconnect())
             {
-                return CKM_ECDSA_noReconnect(hash, slotId, keyId);
+                return CKM_ECDSAPlain_noReconnect(hash, slotId, keyId);
             }
             else
             {
@@ -314,7 +326,7 @@ public final class IaikP11CryptService implements P11CryptService
         }
     }
 
-    private byte[] CKM_ECDSA_noReconnect(
+    private byte[] CKM_ECDSAPlain_noReconnect(
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
@@ -324,7 +336,18 @@ public final class IaikP11CryptService implements P11CryptService
     }
 
     @Override
-    public byte[] CKM_DSA(
+    public byte[] CKM_DSA_X962(
+            final byte[] hash,
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
+    throws SignerException
+    {
+        byte[] plainSignature = CKM_DSA_Plain(hash, slotId, keyId);
+        return SignerUtil.convertPlainDSASigX962(plainSignature);
+    }
+
+    @Override
+    public byte[] CKM_DSA_Plain(
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)

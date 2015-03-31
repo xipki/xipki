@@ -33,38 +33,29 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common;
+package org.xipki.security.p11;
 
-import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.crypto.Digest;
+import org.xipki.security.api.SignerException;
 
 /**
  * @author Lijun Liao
  */
 
-public class XipkiCmpConstants
+public class P11ECDSAX962Signer extends AbstractP11DSASigner
 {
-    public static final int CRL_REASON_REMOVE = -1;
+    public P11ECDSAX962Signer(
+            final Digest digest)
+    {
+        super(digest);
+    }
 
-    public static final GeneralName remoteP11_cmp_server =
-            new GeneralName(GeneralName.uniformResourceIdentifier, "http://xipki.org/remotep11/server");
-    public static final GeneralName remotep11_cmp_client =
-            new GeneralName(GeneralName.uniformResourceIdentifier, "http://xipki.org/remotep11/client");
-
-    public static final int ACTION_GEN_CRL                    = 1;
-    public static final int ACTION_GET_CRL_WITH_SN            = 2;
-    public static final int ACTION_GET_CAINFO                 = 3;
-    public static final int ACTION_REMOVE_EXPIRED_CERTS       = 4;
-
-    public static final int ACTION_RP11_VERSION          = 80;
-    public static final int ACTION_RP11_GET_PUBLICKEY    = 81;
-    public static final int ACTION_RP11_GET_CERTIFICATE  = 82;
-    public static final int ACTION_RP11_LIST_SLOTS       = 83;
-    public static final int ACTION_RP11_LIST_KEYLABELS   = 84;
-    public static final int ACTION_RP11_PSO_RSA_X509     = 90;
-    public static final int ACTION_RP11_PSO_RSA_PKCS     = 91;
-    public static final int ACTION_RP11_PSO_ECDSA_PLAIN  = 92;
-    public static final int ACTION_RP11_PSO_ECDSA_X962   = 93;
-    public static final int ACTION_RP11_PSO_DSA_PLAIN    = 94;
-    public static final int ACTION_RP11_PSO_DSA_X962     = 95;
+    @Override
+    protected byte[] sign(
+            final byte[] hashValue)
+    throws SignerException
+    {
+        return param.getP11CryptService().CKM_ECDSA_X962(hashValue, param.getSlot(), param.getKeyId());
+    }
 
 }

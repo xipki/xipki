@@ -70,7 +70,6 @@ import javax.xml.validation.SchemaFactory;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifierProvider;
@@ -82,6 +81,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SignatureAlgoControl;
 import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
@@ -89,11 +89,11 @@ import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
+import org.xipki.security.api.AbstractSecurityFactory;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
-import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11Control;
 import org.xipki.security.api.p11.P11CryptService;
@@ -123,7 +123,7 @@ import org.xml.sax.SAXException;
  * @author Lijun Liao
  */
 
-public class SecurityFactoryImpl implements SecurityFactory
+public class SecurityFactoryImpl extends AbstractSecurityFactory
 {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityFactoryImpl.class);
 
@@ -150,37 +150,13 @@ public class SecurityFactoryImpl implements SecurityFactory
     @Override
     public ConcurrentContentSigner createSigner(
             final String type,
-            final String conf,
-            final X509Certificate cert)
-    throws SignerException
-    {
-        return createSigner(type, conf,
-                (cert == null ? null : new X509Certificate[]{cert}));
-    }
-
-    @Override
-    public ConcurrentContentSigner createSigner(
-            final String type,
             final String confWithoutAlgo,
             final String hashAlgo,
-            final boolean mgf1,
-            final X509Certificate cert)
-    throws SignerException
-    {
-        return createSigner(type, confWithoutAlgo, hashAlgo, mgf1,
-                (cert == null ? null : new X509Certificate[]{cert}));
-    }
-
-    @Override
-    public ConcurrentContentSigner createSigner(
-            final String type,
-            final String confWithoutAlgo,
-            final String hashAlgo,
-            final boolean mgf1,
+            final SignatureAlgoControl sigAlgoControl,
             final X509Certificate[] certs)
     throws SignerException
     {
-        ConcurrentContentSigner signer = doCreateSigner(type, confWithoutAlgo, hashAlgo, mgf1, certs);
+        ConcurrentContentSigner signer = doCreateSigner(type, confWithoutAlgo, hashAlgo, sigAlgoControl, certs);
         validateSigner(signer, certs, type, confWithoutAlgo);
         return signer;
     }
@@ -192,7 +168,7 @@ public class SecurityFactoryImpl implements SecurityFactory
             final X509Certificate[] certificateChain)
     throws SignerException
     {
-        ConcurrentContentSigner signer = doCreateSigner(type, conf, null, false, certificateChain);
+        ConcurrentContentSigner signer = doCreateSigner(type, conf, null, null, certificateChain);
         validateSigner(signer, certificateChain, type, conf);
         return signer;
     }
@@ -274,11 +250,15 @@ public class SecurityFactoryImpl implements SecurityFactory
         }
     }
 
+    /*
+     * sigAlgoControl will be considered only if hashAlgo is not set
+     *
+     */
     private ConcurrentContentSigner doCreateSigner(
             String type,
             final String conf,
             final String hashAlgo,
-            final boolean mgf1,
+            final SignatureAlgoControl sigAlgoControl,
             final X509Certificate[] certificateChain)
     throws SignerException
     {
@@ -374,7 +354,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                             throw new SignerException("invalid key: " + e.getMessage(), e);
                         }
 
-                        signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, hashAlgo, mgf1);
+                        signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, hashAlgo, sigAlgoControl);
                     }
                     return signerBuilder.createSigner(signatureAlgId, parallelism);
                 } catch (OperatorCreationException | NoSuchPaddingException | NoSuchAlgorithmException e)
@@ -447,7 +427,8 @@ public class SecurityFactoryImpl implements SecurityFactory
                     else
                     {
                         PublicKey pubKey = signerBuilder.getCert().getPublicKey();
-                        signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, hashAlgo, mgf1);
+                        signatureAlgId = AlgorithmUtil.getSignatureAlgoId(
+                                pubKey, hashAlgo, sigAlgoControl);
                     }
 
                     return signerBuilder.createSigner(
@@ -520,35 +501,6 @@ public class SecurityFactoryImpl implements SecurityFactory
         {
             return KeyUtil.getContentVerifierProvider(publicKey);
         } catch (OperatorCreationException e)
-        {
-            throw new InvalidKeyException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public ContentVerifierProvider getContentVerifierProvider(
-            final X509Certificate cert)
-    throws InvalidKeyException
-    {
-        try
-        {
-            return KeyUtil.getContentVerifierProvider(cert);
-        } catch (OperatorCreationException e)
-        {
-            throw new InvalidKeyException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public ContentVerifierProvider getContentVerifierProvider(
-            final X509CertificateHolder cert)
-    throws InvalidKeyException
-    {
-        try
-        {
-            PublicKey pk = KeyUtil.generatePublicKey(cert.getSubjectPublicKeyInfo());
-            return KeyUtil.getContentVerifierProvider(pk);
-        } catch (OperatorCreationException | NoSuchAlgorithmException | InvalidKeySpecException e)
         {
             throw new InvalidKeyException(e.getMessage(), e);
         }
@@ -700,7 +652,7 @@ public class SecurityFactoryImpl implements SecurityFactory
             final String pkcs11ModuleName,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId,
-            int parallelism)
+            final int parallelism)
     {
         ParamChecker.assertNotNull("keyId", keyId);
 

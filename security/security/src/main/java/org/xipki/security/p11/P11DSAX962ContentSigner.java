@@ -33,38 +33,39 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common;
+package org.xipki.security.p11;
 
-import org.bouncycastle.asn1.x509.GeneralName;
+import java.security.NoSuchAlgorithmException;
+
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 
 /**
  * @author Lijun Liao
  */
 
-public class XipkiCmpConstants
+public class P11DSAX962ContentSigner extends AbstractP11DSAContentSigner
 {
-    public static final int CRL_REASON_REMOVE = -1;
+    public P11DSAX962ContentSigner(
+            final P11CryptService cryptService,
+            final P11SlotIdentifier slot,
+            final P11KeyIdentifier keyId,
+            final AlgorithmIdentifier signatureAlgId)
+    throws NoSuchAlgorithmException, OperatorCreationException
+    {
+        super(cryptService, slot, keyId, signatureAlgId);
+    }
 
-    public static final GeneralName remoteP11_cmp_server =
-            new GeneralName(GeneralName.uniformResourceIdentifier, "http://xipki.org/remotep11/server");
-    public static final GeneralName remotep11_cmp_client =
-            new GeneralName(GeneralName.uniformResourceIdentifier, "http://xipki.org/remotep11/client");
-
-    public static final int ACTION_GEN_CRL                    = 1;
-    public static final int ACTION_GET_CRL_WITH_SN            = 2;
-    public static final int ACTION_GET_CAINFO                 = 3;
-    public static final int ACTION_REMOVE_EXPIRED_CERTS       = 4;
-
-    public static final int ACTION_RP11_VERSION          = 80;
-    public static final int ACTION_RP11_GET_PUBLICKEY    = 81;
-    public static final int ACTION_RP11_GET_CERTIFICATE  = 82;
-    public static final int ACTION_RP11_LIST_SLOTS       = 83;
-    public static final int ACTION_RP11_LIST_KEYLABELS   = 84;
-    public static final int ACTION_RP11_PSO_RSA_X509     = 90;
-    public static final int ACTION_RP11_PSO_RSA_PKCS     = 91;
-    public static final int ACTION_RP11_PSO_ECDSA_PLAIN  = 92;
-    public static final int ACTION_RP11_PSO_ECDSA_X962   = 93;
-    public static final int ACTION_RP11_PSO_DSA_PLAIN    = 94;
-    public static final int ACTION_RP11_PSO_DSA_X962     = 95;
+    @Override
+    protected byte[] CKM_SIGN(
+            final byte[] hashValue)
+    throws SignerException
+    {
+        return cryptService.CKM_DSA_X962(hashValue, slot, keyId);
+    }
 
 }

@@ -33,39 +33,37 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.p11;
-
-import java.security.NoSuchAlgorithmException;
-
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.xipki.security.api.SignerException;
-import org.xipki.security.api.p11.P11CryptService;
-import org.xipki.security.api.p11.P11KeyIdentifier;
-import org.xipki.security.api.p11.P11SlotIdentifier;
+package org.xipki.common;
 
 /**
  * @author Lijun Liao
  */
 
-public class P11DSAContentSigner extends AbstractP11DSAContentSigner
+public class SignatureAlgoControl
 {
-    public P11DSAContentSigner(
-            final P11CryptService cryptService,
-            final P11SlotIdentifier slot,
-            final P11KeyIdentifier keyId,
-            final AlgorithmIdentifier signatureAlgId)
-    throws NoSuchAlgorithmException, OperatorCreationException
+    private final boolean rsaMgf1;
+    private final boolean dsaPlain;
+
+    public SignatureAlgoControl()
     {
-        super(cryptService, slot, keyId, signatureAlgId);
+        this.rsaMgf1 = false;
+        this.dsaPlain = false;
     }
 
-    @Override
-    protected byte[] CKM_SIGN(
-            final byte[] hashValue)
-    throws SignerException
+    public SignatureAlgoControl(boolean rsaMgf1, boolean dsaPlain)
     {
-        return cryptService.CKM_DSA(hashValue, slot, keyId);
+        this.rsaMgf1 = rsaMgf1;
+        this.dsaPlain = dsaPlain;
+    }
+
+    public boolean isRsaMgf1()
+    {
+        return rsaMgf1;
+    }
+
+    public boolean isDsaPlain()
+    {
+        return dsaPlain;
     }
 
 }

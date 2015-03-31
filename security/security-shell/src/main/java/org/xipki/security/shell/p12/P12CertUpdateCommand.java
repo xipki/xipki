@@ -137,7 +137,7 @@ public class P12CertUpdateCommand extends P12SecurityCommand
             pairs.putUtf8Pair("password", new String(password));
         }
 
-        securityFactory.createSigner("PKCS12", pairs.getEncoded(), "SHA1", false, cert);
+        securityFactory.createSigner("PKCS12", pairs.getEncoded(), "SHA1", null, cert);
     }
 
 }
