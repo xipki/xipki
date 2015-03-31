@@ -148,7 +148,8 @@ class X509SelfSignedCertBuilder
         ConcurrentContentSigner signer;
         try
         {
-            signer = securityFactory.createSigner(signerType, signerConf, (X509Certificate[]) null);
+            String firstSignerConf = X509CAInfo.splitCASignerConfsAsList(signerConf).get(0);
+            signer = securityFactory.createSigner(signerType, firstSignerConf, (X509Certificate[]) null);
         } catch (SignerException e)
         {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getClass().getName() + ": " + e.getMessage());

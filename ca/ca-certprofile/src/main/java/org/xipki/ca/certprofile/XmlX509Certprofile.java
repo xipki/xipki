@@ -38,6 +38,7 @@ package org.xipki.ca.certprofile;
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -110,6 +111,7 @@ import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Parameters;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.StringUtil;
@@ -134,7 +136,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
 
     private CertValidity validity;
     private X509CertVersion version;
-    private Set<ASN1ObjectIdentifier> signatureAlgorithms;
+    private List<String> signatureAlgorithms;
     private boolean incSerialNoIfSubjectExists;
     private boolean raOnly;
     private boolean qaOnly;
@@ -247,8 +249,18 @@ public class XmlX509Certprofile extends BaseX509Certprofile
 
         if(conf.getSignatureAlgorithms() != null)
         {
-            this.signatureAlgorithms = XmlX509CertprofileUtil.toOIDSet(
-                    conf.getSignatureAlgorithms().getAlgorithm());
+            List<String> algoNames = conf.getSignatureAlgorithms().getAlgorithm();
+            this.signatureAlgorithms = new ArrayList<>(algoNames.size());
+            for(String algoName : algoNames)
+            {
+                try
+                {
+                    this.signatureAlgorithms.add(AlgorithmUtil.canonicalizeSignatureAlgo(algoName));
+                } catch (NoSuchAlgorithmException e)
+                {
+                    throw new CertprofileException(e.getMessage(), e);
+                }
+            }
         }
 
         this.raOnly = conf.isRaOnly();
@@ -1027,7 +1039,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     }
 
     @Override
-    public Set<ASN1ObjectIdentifier> getSignatureAlgorithms()
+    public List<String> getSignatureAlgorithms()
     {
         return signatureAlgorithms;
     }

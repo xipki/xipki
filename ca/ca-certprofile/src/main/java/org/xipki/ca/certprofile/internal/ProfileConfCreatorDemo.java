@@ -102,6 +102,7 @@ import org.xipki.ca.certprofile.x509.jaxb.UsageType;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Parameters;
+import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.SignatureAlgorithms;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.util.SecurityUtil;
@@ -226,7 +227,7 @@ public class ProfileConfCreatorDemo
     throws Exception
     {
         X509ProfileType profile = getBaseProfile("Certprofile RootCA",
-                true, "10y", false);
+                true, "10y", false, new String[]{"SHA256", "SHA1"});
 
         // Subject
         Subject subject = profile.getSubject();
@@ -267,7 +268,8 @@ public class ProfileConfCreatorDemo
     private static X509ProfileType Certprofile_Cross()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("Certprofile Cross",  false, "10y", false);
+        X509ProfileType profile = getBaseProfile("Certprofile Cross",  false, "10y", false,
+                new String[]{"SHA256", "SHA1"});
 
         // Subject
         Subject subject = profile.getSubject();
@@ -311,7 +313,8 @@ public class ProfileConfCreatorDemo
     private static X509ProfileType Certprofile_SubCA()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("Certprofile SubCA", true, "8y", false);
+        X509ProfileType profile = getBaseProfile("Certprofile SubCA", true, "8y", false,
+                new String[]{"SHA256", "SHA1"});
 
         // Subject
         Subject subject = profile.getSubject();
@@ -357,7 +360,8 @@ public class ProfileConfCreatorDemo
     private static X509ProfileType Certprofile_SubCA_Complex()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("Certprofile SubCA with most extensions", true, "8y", false);
+        X509ProfileType profile = getBaseProfile("Certprofile SubCA with most extensions", true, "8y", false,
+                new String[]{"SHA256", "SHA1"});
 
         // Subject
         Subject subject = profile.getSubject();
@@ -471,7 +475,8 @@ public class ProfileConfCreatorDemo
     private static X509ProfileType Certprofile_OCSP()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("Certprofile OCSP", false, "5y", false);
+        X509ProfileType profile = getBaseProfile("Certprofile OCSP", false, "5y", false,
+                new String[]{"SHA256"});
 
         // Subject
         Subject subject = profile.getSubject();
@@ -521,7 +526,8 @@ public class ProfileConfCreatorDemo
     private static X509ProfileType Certprofile_TLS()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("Certprofile TLS", false, "5y", true);
+        X509ProfileType profile = getBaseProfile("Certprofile TLS", false, "5y", true,
+                new String[]{"SHA1"});
 
         // Subject
         Subject subject = profile.getSubject();
@@ -578,7 +584,8 @@ public class ProfileConfCreatorDemo
     private static X509ProfileType Certprofile_TLS_C()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("Certprofile TLS_C", false, "5y", false);
+        X509ProfileType profile = getBaseProfile("Certprofile TLS_C", false, "5y", false,
+                new String[]{"SHA1"});
 
         // Subject
         Subject subject = profile.getSubject();
@@ -628,7 +635,8 @@ public class ProfileConfCreatorDemo
     private static X509ProfileType Certprofile_TLSwithIncSN()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("Certprofile TLSwithIncSN", false, "5y", false);
+        X509ProfileType profile = getBaseProfile("Certprofile TLSwithIncSN", false, "5y", false,
+                new String[]{"SHA1"});
 
         // Subject
         Subject subject = profile.getSubject();
@@ -681,7 +689,8 @@ public class ProfileConfCreatorDemo
     private static X509ProfileType Certprofile_gSMC_K()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("Certprofile gSMC_K", false, "5y", false);
+        X509ProfileType profile = getBaseProfile("Certprofile gSMC_K", false, "5y", false,
+                new String[]{"SHA256"});
         profile.setDuplicateSubject(true);
 
         // SpecialBehavior
@@ -773,7 +782,8 @@ public class ProfileConfCreatorDemo
     private static X509ProfileType Certprofile_MultipleOUs()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("Certprofile Multiple OUs DEMO", false, "5y", false);
+        X509ProfileType profile = getBaseProfile("Certprofile Multiple OUs DEMO", false, "5y", false,
+                new String[]{"SHA1"});
 
         // Subject
         Subject subject = profile.getSubject();
@@ -1111,10 +1121,11 @@ public class ProfileConfCreatorDemo
             final String description,
             final boolean ca,
             final String validity,
-            final boolean useMidnightNotBefore)
+            final boolean useMidnightNotBefore,
+            String[] sigHashAlgos)
     {
         final boolean qa = false;
-        return getBaseProfile(description, ca, qa, validity, useMidnightNotBefore);
+        return getBaseProfile(description, ca, qa, validity, useMidnightNotBefore, sigHashAlgos);
     }
 
     private static X509ProfileType getBaseProfile(
@@ -1122,7 +1133,8 @@ public class ProfileConfCreatorDemo
             final boolean ca,
             final boolean qa,
             final String validity,
-            final boolean useMidnightNotBefore)
+            final boolean useMidnightNotBefore,
+            String[] sigHashAlgos)
     {
         X509ProfileType profile = new X509ProfileType();
 
@@ -1139,6 +1151,23 @@ public class ProfileConfCreatorDemo
         profile.setDuplicateKey(false);
         profile.setDuplicateSubject(false);
         profile.setSerialNumberInReq(false);
+
+        // SignatureAlgorithms
+        if(sigHashAlgos != null && sigHashAlgos.length > 0)
+        {
+            SignatureAlgorithms sigAlgosType = new SignatureAlgorithms();
+            profile.setSignatureAlgorithms(sigAlgosType);
+
+            List<String> l = sigAlgosType.getAlgorithm();
+            String[] algoPart2s = new String[]{"withRSA", "withDSA", "withECDSA", "withPlainECDSA", "withRSAandMGF1"};
+            for(String part2 : algoPart2s)
+            {
+                for(String hashAlgo : sigHashAlgos)
+                {
+                    l.add(hashAlgo + part2);
+                }
+            }
+        }
 
         // Subject
         Subject subject = new Subject();

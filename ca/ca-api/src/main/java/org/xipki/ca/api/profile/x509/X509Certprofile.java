@@ -36,6 +36,7 @@
 package org.xipki.ca.api.profile.x509;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
@@ -78,7 +79,7 @@ public abstract class X509Certprofile
         return X509CertVersion.V3;
     }
 
-    public Set<ASN1ObjectIdentifier> getSignatureAlgorithms()
+    public List<String> getSignatureAlgorithms()
     {
         return null;
     }

@@ -234,7 +234,7 @@ class IdentifiedX509Certprofile
         return certprofile.getVersion();
     }
 
-    public Set<ASN1ObjectIdentifier> getSignatureAlgorithms()
+    public List<String> getSignatureAlgorithms()
     {
         return certprofile.getSignatureAlgorithms();
     }

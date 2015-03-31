@@ -1352,9 +1352,14 @@ class CAManagerQueryExecutor
                                 "could not parse the stored certificate for CA '" + name + "'" + e.getMessage(), e);
                     }
                 }
+
                 try
                 {
-                    securityFactory.createSigner(_signerType, _signerConf, _cert);
+                    List<String> signerConfs = X509CAInfo.splitCASignerConfsAsList(_signerConf);
+                    for(String signerConf : signerConfs)
+                    {
+                        securityFactory.createSigner(_signerType, signerConf, _cert);
+                    }
                 } catch (SignerException e)
                 {
                     throw new CAMgmtException(

@@ -1,6 +1,6 @@
 # Valid signer algos are SHA<n>withRSAandMGF1, where n is 1, 256, 384 and 512
 
-CA_SIGNER_ALGO = SHA256withRSAandMGF1
+CA_SIGNER_ALGO = SHA256withRSAandMGF1,SHA1withRSAandMGF1
 
 RCA_KEY_LABEL = RCA1
 SubCA_KEY_LABEL = SubCA1
