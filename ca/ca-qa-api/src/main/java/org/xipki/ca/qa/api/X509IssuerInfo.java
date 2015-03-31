@@ -55,6 +55,7 @@ import org.xipki.common.util.X509Util;
 
 public class X509IssuerInfo
 {
+    private final Set<String> caIssuerURLs;
     private final Set<String> ocspURLs;
     private final Set<String> crlURLs;
     private final Set<String> deltaCrlURLs;
@@ -63,6 +64,7 @@ public class X509IssuerInfo
     private final byte[] ski;
 
     public X509IssuerInfo(
+            final List<String> caIssuerURLs,
             final List<String> ocspURLs,
             final List<String> crlURLs,
             final List<String> deltaCrlURLs,
@@ -70,6 +72,17 @@ public class X509IssuerInfo
     throws CertificateException
     {
         ParamChecker.assertNotNull("certBytes", certBytes);
+
+        if(CollectionUtil.isEmpty(caIssuerURLs))
+        {
+            this.caIssuerURLs = null;
+        }else
+        {
+            Set<String> set = new HashSet<>();
+            set.addAll(caIssuerURLs);
+            this.caIssuerURLs = Collections.unmodifiableSet(set);
+        }
+
         if(CollectionUtil.isEmpty(ocspURLs))
         {
             this.ocspURLs = null;
@@ -109,6 +122,11 @@ public class X509IssuerInfo
         }
         this.bcCert = Certificate.getInstance(certBytes);
         this.ski = X509Util.extractSKI(cert);
+    }
+
+    public Set<String> getCaIssuerURLs()
+    {
+        return caIssuerURLs;
     }
 
     public Set<String> getOcspURLs()

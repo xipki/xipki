@@ -120,6 +120,7 @@ import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.Range;
 import org.xipki.ca.api.profile.RDNControl;
+import org.xipki.ca.api.profile.x509.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
@@ -208,6 +209,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
     private boolean ca;
     private boolean notBeforeMidnight;
     private Integer pathLen;
+    private AuthorityInfoAccessControl aiaControl;
     private Set<KeyUsageControl> keyusages;
     private Set<ExtKeyUsageControl> extendedKeyusages;
     private Set<GeneralNameMode> allowedSubjectAltNameModes;
@@ -2378,8 +2380,27 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             final byte[] extensionValue,
             final X509IssuerInfo issuerInfo)
     {
-        Set<String> eOCSPUris = issuerInfo.getOcspURLs();
-        if(eOCSPUris == null)
+        Set<String> eCaIssuerUris;
+        if(aiaControl == null || aiaControl.includesCaIssuers())
+        {
+            eCaIssuerUris = issuerInfo.getCaIssuerURLs();
+        }
+        else
+        {
+            eCaIssuerUris = Collections.emptySet();
+        }
+
+        Set<String> eOCSPUris;
+        if(aiaControl == null || aiaControl.includesOcsp())
+        {
+            eOCSPUris = issuerInfo.getOcspURLs();
+        }
+        else
+        {
+            eOCSPUris = Collections.emptySet();
+        }
+
+        if(CollectionUtil.isEmpty(eCaIssuerUris) && CollectionUtil.isEmpty(eOCSPUris))
         {
             failureMsg.append("AIA is present but expected is 'none'");
             failureMsg.append("; ");
@@ -2387,53 +2408,76 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
 
         AuthorityInformationAccess iAIA = AuthorityInformationAccess.getInstance(extensionValue);
-        AccessDescription[] iAccessDescriptions = iAIA.getAccessDescriptions();
-        List<AccessDescription> iOCSPAccessDescriptions = new LinkedList<>();
-        for(AccessDescription iAccessDescription : iAccessDescriptions)
+        checkAIA(failureMsg, iAIA, X509ObjectIdentifiers.id_ad_caIssuers, eCaIssuerUris);
+        checkAIA(failureMsg, iAIA, X509ObjectIdentifiers.id_ad_ocsp, eOCSPUris);
+    }
+
+    private static void checkAIA(
+            final StringBuilder failureMsg,
+            final AuthorityInformationAccess aia,
+            final ASN1ObjectIdentifier accessMethod,
+            final Set<String> expectedUris)
+    {
+        String typeDesc;
+        if(X509ObjectIdentifiers.id_ad_ocsp.equals(accessMethod))
         {
-            if(iAccessDescription.getAccessMethod().equals(X509ObjectIdentifiers.id_ad_ocsp))
+            typeDesc = "OCSP";
+        }
+        else if(X509ObjectIdentifiers.id_ad_caIssuers.equals(accessMethod))
+        {
+            typeDesc= "caIssuer";
+        }
+        else
+        {
+            typeDesc = accessMethod.getId();
+        }
+
+        List<AccessDescription> iAccessDescriptions = new LinkedList<>();
+        for(AccessDescription accessDescription : aia.getAccessDescriptions())
+        {
+            if(accessMethod.equals(accessDescription.getAccessMethod()))
             {
-                iOCSPAccessDescriptions.add(iAccessDescription);
+                iAccessDescriptions.add(accessDescription);
             }
         }
 
-        int n = iOCSPAccessDescriptions.size();
-        if(n != eOCSPUris.size())
+        int n = iAccessDescriptions.size();
+        if(n != expectedUris.size())
         {
-            failureMsg.append("number of AIA OCSP URIs is '").append(n);
-            failureMsg.append("' but expected is '").append(eOCSPUris.size()).append("'");
+            failureMsg.append("number of AIA " +  typeDesc + " URIs is '").append(n);
+            failureMsg.append("' but expected is '").append(expectedUris.size()).append("'");
             failureMsg.append("; ");
             return;
         }
 
-        Set<String> iOCSPUris = new HashSet<>();
+        Set<String> iUris = new HashSet<>();
         for(int i = 0; i < n; i++)
         {
-            GeneralName iAccessLocation = iOCSPAccessDescriptions.get(i).getAccessLocation();
+            GeneralName iAccessLocation = iAccessDescriptions.get(i).getAccessLocation();
             if(iAccessLocation.getTagNo() != GeneralName.uniformResourceIdentifier)
             {
-                failureMsg.append("tag of accessLocation of AIA OCSP is '").append(iAccessLocation.getTagNo());
+                failureMsg.append("tag of accessLocation of AIA " + typeDesc + " is '").append(iAccessLocation.getTagNo());
                 failureMsg.append("' but expected is '").append(GeneralName.uniformResourceIdentifier).append("'");
                 failureMsg.append("; ");
             }
             else
             {
                 String iOCSPUri = ((ASN1String) iAccessLocation.getName()).getString();
-                iOCSPUris.add(iOCSPUri);
+                iUris.add(iOCSPUri);
             }
         }
 
-        Set<String> diffs = str_in_b_not_in_a(eOCSPUris, iOCSPUris);
+        Set<String> diffs = str_in_b_not_in_a(expectedUris, iUris);
         if(CollectionUtil.isNotEmpty(diffs))
         {
-            failureMsg.append("OCSP URLs ").append(diffs.toString()).append(" are present but not expected");
+            failureMsg.append(typeDesc + " URIs ").append(diffs.toString()).append(" are present but not expected");
             failureMsg.append("; ");
         }
 
-        diffs = str_in_b_not_in_a(iOCSPUris, eOCSPUris);
+        diffs = str_in_b_not_in_a(iUris, expectedUris);
         if(CollectionUtil.isNotEmpty(diffs))
         {
-            failureMsg.append("OCSP URLs ").append(diffs.toString()).append(" are absent but are required");
+            failureMsg.append(typeDesc + " URIs ").append(diffs.toString()).append(" are absent but are required");
             failureMsg.append("; ");
         }
     }
