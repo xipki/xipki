@@ -35,10 +35,9 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.util.List;
-
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -54,20 +53,36 @@ public class CaProfileAddCommand extends CaCommand
     private String caName;
 
     @Option(name = "--profile",
-            required = true, multiValued = true,
-            description = "profile profileNames\n"
-                + "(required, multi-valued)")
-    private List<String> profileNames;
+            required = true,
+            description = "profile profileName\n"
+                + "(required)")
+    private String profileName;
+
+    @Option(name = "--local-name",
+            required = false,
+            description = "profile localname")
+    private String profileLocalname;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        for(String name : profileNames)
+        if(StringUtil.isBlank(profileLocalname))
         {
-            boolean b = caManager.addCertprofileToCA(name, caName);
-            output(b, "associated", "could not assiciate", "certificate profile " + name + " to CA " + caName);
+            profileLocalname = profileName;
         }
+
+        boolean b = caManager.addCertprofileToCA(profileName, profileLocalname, caName);
+        StringBuilder sb = new StringBuilder();
+        sb.append("certificate profile ").append(profileName);
+        if(profileLocalname != null)
+        {
+            sb.append(" (localname ").append(profileLocalname).append(")");
+        }
+        sb.append(" to CA ").append(caName);
+
+        output(b, "associated", "could not assiciate",
+                sb.toString());
         return null;
     }
 }

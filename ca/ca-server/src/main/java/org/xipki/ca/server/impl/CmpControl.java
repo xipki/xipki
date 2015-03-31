@@ -92,17 +92,21 @@ class CmpControl
         this.messageTimeBias = getInt(pairs, KEY_MESSAGETIME_BIAS, DFLT_messageTimeBias);
         this.confirmWaitTime = getInt(pairs, KEY_CONFIRM_WAITTIME, DFLT_confirmWaitTime);
         String s = pairs.getValue(KEY_PROTECTION_SIGALGO);
-        Set<String> set = null;
-        if(s != null)
+
+        if(s == null)
         {
-            set = StringUtil.splitAsSet(s, ", ");
-            if(CollectionUtil.isNotEmpty(set))
+            this.sigAlgos = null;
+        }
+        else
+        {
+            Set<String> set = StringUtil.splitAsSet(s, ", ");
+            this.sigAlgos = CollectionUtil.unmodifiableSet(set, false, true);
+            if(CollectionUtil.isNotEmpty(this.sigAlgos))
             {
                 pairs.putUtf8Pair(KEY_PROTECTION_SIGALGO, StringUtil.collectionAsString(this.sigAlgos, ","));
             }
         }
 
-        this.sigAlgos = CollectionUtil.unmodifiableSet(set, false, true);
         this.dbEntry = new CmpControlEntry(dbEntry.getName(), pairs.getEncoded());
     }
 

@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
@@ -1978,7 +1979,7 @@ class X509CA
     private X509CertificateInfo intern_generateCertificate(
             final boolean requestedByRA,
             final RequestorInfo requestor,
-            final String certprofileName,
+            final String certprofileLocalName,
             final String user,
             X500Name requestedSubject,
             SubjectPublicKeyInfo publicKeyInfo,
@@ -1999,13 +2000,14 @@ class X509CA
             throw new OperationException(ErrorCode.NOT_PERMITTED, "CA is revoked");
         }
 
-        IdentifiedX509Certprofile certprofile = getX509Certprofile(certprofileName);
+        IdentifiedX509Certprofile certprofile = getX509Certprofile(certprofileLocalName);
 
         if(certprofile == null)
         {
-            throw new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE, "unknown cert profile " + certprofileName);
+            throw new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE, "unknown cert profile " + certprofileLocalName);
         }
 
+        final String certprofileName = certprofile.getName();
         if(certprofile.getVersion() != X509CertVersion.V3)
         {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, "unknown cert version " + certprofile);
@@ -2536,20 +2538,20 @@ class X509CA
     }
 
     public IdentifiedX509Certprofile getX509Certprofile(
-            final String certprofileName)
+            final String certprofileLocalName)
     {
-        if(certprofileName == null)
+        if(certprofileLocalName == null)
         {
             return null;
         }
 
-        Set<String> profileNames = caManager.getCertprofilesForCA(caInfo.getName());
-        if(profileNames == null || profileNames.contains(certprofileName) == false)
+        Map<String, String> profileNames = caManager.getCertprofilesForCA(caInfo.getName());
+        if(profileNames == null || profileNames.containsKey(certprofileLocalName) == false)
         {
             return null;
         }
 
-        return caManager.getIdentifiedCertprofile(certprofileName);
+        return caManager.getIdentifiedCertprofile(profileNames.get(certprofileLocalName));
     }
 
     public CmpRequestorInfo getRequestor(

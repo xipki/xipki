@@ -41,6 +41,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -299,10 +300,11 @@ public class CAManagerClient implements CAManager
     @Override
     public boolean addCertprofileToCA(
             final String profileName,
+            final String profileLocalname,
             final String caName)
     throws CAMgmtException
     {
-        return client.addCertprofileToCA(profileName, caName);
+        return client.addCertprofileToCA(profileName, profileLocalname, caName);
     }
 
     @Override
@@ -324,7 +326,7 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public Set<String> getCertprofilesForCA(
+    public Map<String, String> getCertprofilesForCA(
             final String caName)
     {
         return client.getCertprofilesForCA(caName);

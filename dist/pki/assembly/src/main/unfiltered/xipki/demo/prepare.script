@@ -38,7 +38,7 @@ xipki-ca:profile-add --name OCSP --type XML --conf-file xipki/demo/profile/Certp
 
 xipki-ca:profile-add --name multipleOUs --type XML --conf-file xipki/demo/profile/Certprofile_multipleOUs.xml
 
-xipki-ca:profile-add --name TLS --type XML --conf-file xipki/demo/profile/Certprofile_TLS.xml
+xipki-ca:profile-add --name TLS_g --type XML --conf-file xipki/demo/profile/Certprofile_TLS.xml
 
 xipki-ca:profile-add --name TLS_C --type XML --conf-file xipki/demo/profile/Certprofile_TLS_C.xml
 
