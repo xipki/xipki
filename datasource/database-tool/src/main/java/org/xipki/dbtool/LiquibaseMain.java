@@ -180,14 +180,14 @@ public class LiquibaseMain
     throws Exception
     {
         liquibase.dropAll();
-        System.out.println("successfully dropped the database");
+        System.out.println("successfully  dropped the database");
     }
 
     public void update()
     throws Exception
     {
         liquibase.update((String) null);
-        System.out.println("successfully updated the database");
+        System.out.println("successfully  updated the database");
     }
 
     public void shutdown()
