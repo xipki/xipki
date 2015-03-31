@@ -39,6 +39,7 @@ import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.xipki.ca.server.mgmt.api.CAEntry;
@@ -136,6 +137,7 @@ public interface HessianCAManager
 
     boolean addCertprofileToCA(
             String profileName,
+            String profileLocalname,
             String caName)
     throws HessianCAMgmtException;
 
@@ -149,7 +151,7 @@ public interface HessianCAManager
             String caName)
     throws HessianCAMgmtException;
 
-    Set<String> getCertprofilesForCA(
+    Map<String, String> getCertprofilesForCA(
             String caName);
 
     Set<CAHasRequestorEntry> getCmpRequestorsForCA(
