@@ -261,6 +261,12 @@ public class AlgorithmUtil
         return false;
     }
 
+    static public String canonicalizeSignatureAlgo(String algoName)
+    throws NoSuchAlgorithmException
+    {
+        return getSignatureAlgoName(getSignatureAlgoId(algoName));
+    }
+
     static public AlgorithmIdentifier getSignatureAlgoId(
             final String signatureAlgoName)
     throws NoSuchAlgorithmException

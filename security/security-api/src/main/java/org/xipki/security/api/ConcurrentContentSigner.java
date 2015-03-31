@@ -73,7 +73,7 @@ public interface ConcurrentContentSigner
             PasswordResolver passwordResolver)
     throws SignerException;
 
-    public ContentSigner borrowContentSigner()
+    ContentSigner borrowContentSigner()
     throws NoIdleSignerException;
 
     /**
@@ -82,12 +82,15 @@ public interface ConcurrentContentSigner
      * @return
      * @throws InterruptedException
      */
-    public ContentSigner borrowContentSigner(
+    ContentSigner borrowContentSigner(
             int timeout)
     throws NoIdleSignerException;
 
-    public void returnContentSigner(
+    void returnContentSigner(
             ContentSigner signer);
 
-    public boolean isHealthy();
+    boolean isHealthy();
+
+    void shutdown();
+
 }
