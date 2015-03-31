@@ -166,7 +166,7 @@ public class P11PrivateKey implements PrivateKey
         }
     }
 
-    public byte[] CKM_ECDSA(
+    public byte[] CKM_ECDSA_X962(
             final byte[] hash)
     throws SignatureException
     {
@@ -177,14 +177,32 @@ public class P11PrivateKey implements PrivateKey
 
         try
         {
-            return p11CryptService.CKM_ECDSA(hash, slotId, keyId);
+            return p11CryptService.CKM_ECDSA_X962(hash, slotId, keyId);
         } catch (SignerException e)
         {
             throw new SignatureException("SignatureException: " + e.getMessage(), e);
         }
     }
 
-    public byte[] CKM_DSA(
+    public byte[] CKM_ECDSA_Plain(
+            final byte[] hash)
+    throws SignatureException
+    {
+        if("EC".equals(algorithm) == false)
+        {
+            throw new SignatureException("could not compute ECDSA signature with " + algorithm + " key");
+        }
+
+        try
+        {
+            return p11CryptService.CKM_ECDSA_Plain(hash, slotId, keyId);
+        } catch (SignerException e)
+        {
+            throw new SignatureException("SignatureException: " + e.getMessage(), e);
+        }
+    }
+
+    public byte[] CKM_DSA_X962(
             final byte[] hash)
     throws SignatureException
     {
@@ -195,7 +213,25 @@ public class P11PrivateKey implements PrivateKey
 
         try
         {
-            return p11CryptService.CKM_DSA(hash, slotId, keyId);
+            return p11CryptService.CKM_DSA_X962(hash, slotId, keyId);
+        } catch (SignerException e)
+        {
+            throw new SignatureException("SignatureException: " + e.getMessage(), e);
+        }
+    }
+
+    public byte[] CKM_DSA_Plain(
+            final byte[] hash)
+    throws SignatureException
+    {
+        if("DSA".equals(algorithm) == false)
+        {
+            throw new SignatureException("could not compute DSA signature with " + algorithm + " key");
+        }
+
+        try
+        {
+            return p11CryptService.CKM_DSA_Plain(hash, slotId, keyId);
         } catch (SignerException e)
         {
             throw new SignatureException("SignatureException: " + e.getMessage(), e);

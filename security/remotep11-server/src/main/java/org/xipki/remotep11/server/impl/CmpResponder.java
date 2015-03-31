@@ -180,15 +180,17 @@ class CmpResponder
 
             switch(action)
             {
-            case XipkiCmpConstants.ACTION_REMOTEP11_VERSION:
+            case XipkiCmpConstants.ACTION_RP11_VERSION:
             {
                 respItvInfoValue = new ASN1Integer(localP11CryptServicePool.getVersion());
                 break;
             }
-            case XipkiCmpConstants.ACTION_REMOTEP11_PSO_DSA:
-            case XipkiCmpConstants.ACTION_REMOTEP11_PSO_ECDSA:
-            case XipkiCmpConstants.ACTION_REMOTEP11_PSO_RSA_PKCS:
-            case XipkiCmpConstants.ACTION_REMOTEP11_PSO_RSA_X509:
+            case XipkiCmpConstants.ACTION_RP11_PSO_DSA_PLAIN:
+            case XipkiCmpConstants.ACTION_RP11_PSO_DSA_X962:
+            case XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_PLAIN:
+            case XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_X962:
+            case XipkiCmpConstants.ACTION_RP11_PSO_RSA_PKCS:
+            case XipkiCmpConstants.ACTION_RP11_PSO_RSA_X509:
             {
                 byte[] psoMessage = null;
                 P11SlotIdentifier slot = null;
@@ -211,19 +213,27 @@ class CmpResponder
 
                 byte[] signature;
 
-                if(XipkiCmpConstants.ACTION_REMOTEP11_PSO_ECDSA == action)
+                if(XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_PLAIN == action)
                 {
-                    signature = p11CryptService.CKM_ECDSA(psoMessage, slot, keyId);
+                    signature = p11CryptService.CKM_ECDSA_Plain(psoMessage, slot, keyId);
                 }
-                else if(XipkiCmpConstants.ACTION_REMOTEP11_PSO_DSA == action)
+                else if(XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_X962 == action)
                 {
-                    signature = p11CryptService.CKM_DSA(psoMessage, slot, keyId);
+                    signature = p11CryptService.CKM_ECDSA_X962(psoMessage, slot, keyId);
                 }
-                else if(XipkiCmpConstants.ACTION_REMOTEP11_PSO_RSA_X509 == action)
+                else if(XipkiCmpConstants.ACTION_RP11_PSO_DSA_PLAIN == action)
+                {
+                    signature = p11CryptService.CKM_DSA_Plain(psoMessage, slot, keyId);
+                }
+                else if(XipkiCmpConstants.ACTION_RP11_PSO_DSA_X962 == action)
+                {
+                    signature = p11CryptService.CKM_DSA_X962(psoMessage, slot, keyId);
+                }
+                else if(XipkiCmpConstants.ACTION_RP11_PSO_RSA_X509 == action)
                 {
                     signature = p11CryptService.CKM_RSA_X509(psoMessage, slot, keyId);
                 }
-                else if(XipkiCmpConstants.ACTION_REMOTEP11_PSO_RSA_PKCS == action)
+                else if(XipkiCmpConstants.ACTION_RP11_PSO_RSA_PKCS == action)
                 {
                     signature = p11CryptService.CKM_RSA_PKCS(psoMessage, slot, keyId);
                 }
@@ -235,8 +245,8 @@ class CmpResponder
                 respItvInfoValue = new DEROctetString(signature);
                 break;
             }
-            case XipkiCmpConstants.ACTION_REMOTEP11_GET_CERTIFICATE:
-            case XipkiCmpConstants.ACTION_REMOTEP11_GET_PUBLICKEY:
+            case XipkiCmpConstants.ACTION_RP11_GET_CERTIFICATE:
+            case XipkiCmpConstants.ACTION_RP11_GET_PUBLICKEY:
             {
                 P11SlotIdentifier slot = null;
                 P11KeyIdentifier keyId = null;
@@ -253,11 +263,11 @@ class CmpResponder
                 }
 
                 byte[] encodeCertOrKey;
-                if(XipkiCmpConstants.ACTION_REMOTEP11_GET_CERTIFICATE == action)
+                if(XipkiCmpConstants.ACTION_RP11_GET_CERTIFICATE == action)
                 {
                     encodeCertOrKey = p11CryptService.getCertificate(slot, keyId).getEncoded();
                 }
-                else if(XipkiCmpConstants.ACTION_REMOTEP11_GET_PUBLICKEY== action)
+                else if(XipkiCmpConstants.ACTION_RP11_GET_PUBLICKEY== action)
                 {
                     encodeCertOrKey = p11CryptService.getPublicKey(slot, keyId).getEncoded();
                 }
@@ -269,7 +279,7 @@ class CmpResponder
                 respItvInfoValue = new DEROctetString(encodeCertOrKey);
                 break;
             }
-            case XipkiCmpConstants.ACTION_REMOTEP11_LIST_SLOTS:
+            case XipkiCmpConstants.ACTION_RP11_LIST_SLOTS:
             {
                 P11SlotIdentifier[] slotIds = p11CryptService.getSlotIdentifiers();
 
@@ -281,7 +291,7 @@ class CmpResponder
                 respItvInfoValue = new DERSequence(vector);
                 break;
             }
-            case XipkiCmpConstants.ACTION_REMOTEP11_LIST_KEYLABELS:
+            case XipkiCmpConstants.ACTION_RP11_LIST_KEYLABELS:
             {
                 SlotIdentifier slotId = SlotIdentifier.getInstance(reqValue);
                 String[] keyLabels = p11CryptService.getKeyLabels(slotId.getSlotId());

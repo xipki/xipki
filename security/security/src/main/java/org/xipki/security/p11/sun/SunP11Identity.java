@@ -235,6 +235,14 @@ class SunP11Identity implements Comparable<SunP11Identity>
             final byte[] hash)
     throws SignerException
     {
+        byte[] x962Sig = CKM_ECDSA_X962(hash);
+        return SignerUtil.convertX962DSASigToPlain(x962Sig, signatureKeyBitLength);
+    }
+
+    public byte[] CKM_ECDSA_X962(
+            final byte[] hash)
+    throws SignerException
+    {
         if(publicKey instanceof ECPublicKey == false)
         {
             throw new SignerException("operation CKM_ECDSA is not allowed for " + publicKey.getAlgorithm() + " public key");
@@ -256,6 +264,14 @@ class SunP11Identity implements Comparable<SunP11Identity>
     }
 
     public byte[] CKM_DSA(
+            final byte[] hash)
+    throws SignerException
+    {
+        byte[] x962Sig = CKM_DSA_X962(hash);
+        return SignerUtil.convertX962DSASigToPlain(x962Sig, signatureKeyBitLength);
+    }
+
+    public byte[] CKM_DSA_X962(
             final byte[] hash)
     throws SignerException
     {

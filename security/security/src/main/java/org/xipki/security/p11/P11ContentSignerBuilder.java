@@ -56,6 +56,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.security.DefaultConcurrentContentSigner;
 import org.xipki.security.api.ConcurrentContentSigner;
@@ -167,11 +168,25 @@ public class P11ContentSignerBuilder
                 }
                 else if(publicKey instanceof ECPublicKey)
                 {
-                    signer = new P11ECDSAContentSigner(cryptService, slot, keyId, signatureAlgId);
+                    if(AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId))
+                    {
+                        signer = new P11ECDSAPlainContentSigner(cryptService, slot, keyId, signatureAlgId);
+                    }
+                    else
+                    {
+                        signer = new P11ECDSAX962ContentSigner(cryptService, slot, keyId, signatureAlgId);
+                    }
                 }
                 else if(publicKey instanceof DSAPublicKey)
                 {
-                    signer = new P11DSAContentSigner(cryptService, slot, keyId, signatureAlgId);
+                    if(AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId))
+                    {
+                        signer = new P11DSAPlainContentSigner(cryptService, slot, keyId, signatureAlgId);
+                    }
+                    else
+                    {
+                        signer = new P11DSAX962ContentSigner(cryptService, slot, keyId, signatureAlgId);
+                    }
                 }
                 else
                 {

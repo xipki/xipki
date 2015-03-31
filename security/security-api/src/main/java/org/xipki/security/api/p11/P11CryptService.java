@@ -61,13 +61,25 @@ public interface P11CryptService
             P11KeyIdentifier keyId)
     throws SignerException;
 
-    byte[] CKM_ECDSA(
+    byte[] CKM_ECDSA_Plain(
             byte[] hash,
             P11SlotIdentifier slotId,
             P11KeyIdentifier keyId)
     throws SignerException;
 
-    byte[] CKM_DSA(
+    byte[] CKM_ECDSA_X962(
+            byte[] hash,
+            P11SlotIdentifier slotId,
+            P11KeyIdentifier keyId)
+    throws SignerException;
+
+    byte[] CKM_DSA_Plain(
+            byte[] hash,
+            P11SlotIdentifier slotId,
+            P11KeyIdentifier keyId)
+    throws SignerException;
+
+    byte[] CKM_DSA_X962(
             byte[] hash,
             P11SlotIdentifier slotId,
             P11KeyIdentifier keyId)

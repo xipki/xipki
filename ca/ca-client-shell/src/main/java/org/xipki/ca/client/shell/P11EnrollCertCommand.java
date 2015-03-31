@@ -40,6 +40,7 @@ import java.security.cert.X509Certificate;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.common.SignatureAlgoControl;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
@@ -75,7 +76,9 @@ public class P11EnrollCertCommand extends EnrollCertCommand
     private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Override
-    protected ConcurrentContentSigner getSigner()
+    protected ConcurrentContentSigner getSigner(
+            final String hashAlgo,
+            final SignatureAlgoControl signatureAlgoControl)
     throws SignerException
     {
         P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, null);
@@ -83,7 +86,8 @@ public class P11EnrollCertCommand extends EnrollCertCommand
 
         String signerConfWithoutAlgo = SecurityFactoryImpl.getPkcs11SignerConfWithoutAlgo(
                 moduleName, slotIdentifier, keyIdentifier, 1);
-        return securityFactory.createSigner("PKCS11", signerConfWithoutAlgo, hashAlgo, false, (X509Certificate[]) null);
+        return securityFactory.createSigner("PKCS11", signerConfWithoutAlgo, hashAlgo,
+                signatureAlgoControl, (X509Certificate[]) null);
     }
 
     private P11KeyIdentifier getKeyIdentifier()
