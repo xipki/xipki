@@ -262,7 +262,6 @@
       </action>
       <optional-completers>
         <entry key="--ca" value-ref="caNameCompleter"/>
-        <entry key="--profile" value-ref="profileNameCompleter"/>
       </optional-completers>
     </command>
     <!--  CA-Publisher -->

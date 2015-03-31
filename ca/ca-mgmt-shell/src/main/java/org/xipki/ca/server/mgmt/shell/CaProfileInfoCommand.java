@@ -35,13 +35,11 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.xipki.common.util.CollectionUtil;
 
 /**
  * @author Lijun Liao
@@ -68,17 +66,16 @@ public class CaProfileInfoCommand extends CaCommand
         }
         else
         {
-            Set<String> entries = caManager.getCertprofilesForCA(caName);
-            if(isNotEmpty(entries))
+            Map<String, String> entries = caManager.getCertprofilesForCA(caName);
+            if(CollectionUtil.isNotEmpty(entries))
             {
                 sb.append("certificate Profiles supported by CA " + caName).append("\n");
 
-                List<String> sorted = new ArrayList<>(entries);
-                Collections.sort(sorted);
-
-                for(String entry  : sorted)
+                for(String localname  : entries.keySet())
                 {
-                    sb.append("\t").append(entry).append("\n");
+                    sb.append("\t");
+                    sb.append(entries.get(localname));
+                    sb.append(" (localname ").append(localname).append(")\n");
                 }
             }
             else

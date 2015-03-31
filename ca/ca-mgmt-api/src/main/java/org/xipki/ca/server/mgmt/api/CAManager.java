@@ -39,6 +39,7 @@ import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.xipki.common.CRLReason;
@@ -104,10 +105,10 @@ public interface CAManager
     boolean changeCA(ChangeCAEntry changeCAentry)
     throws CAMgmtException;
 
-    boolean removeCertprofileFromCA(String profileName, String caName)
+    boolean removeCertprofileFromCA(String profileLocalname, String caName)
     throws CAMgmtException;
 
-    boolean addCertprofileToCA(String profileName, String caName)
+    boolean addCertprofileToCA(String profileName, String profileLocalname, String caName)
     throws CAMgmtException;
 
     boolean removePublisherFromCA(String publisherName, String caName)
@@ -116,7 +117,7 @@ public interface CAManager
     boolean addPublisherToCA(String publisherName, String caName)
     throws CAMgmtException;
 
-    Set<String> getCertprofilesForCA(String caName);
+    Map<String, String> getCertprofilesForCA(String caName);
 
     Set<CAHasRequestorEntry> getCmpRequestorsForCA(String caName);
 

@@ -47,6 +47,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -276,7 +277,7 @@ implements CAManager, CmpResponderManager
     private final Map<String, X509CrlSignerEntryWrapper> crlSigners = new ConcurrentHashMap<>();
     private final Map<String, X509CrlSignerEntry> crlSignerDbEntries = new ConcurrentHashMap<>();
 
-    private final Map<String, Set<String>> ca_has_profiles = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, String>> ca_has_profiles = new ConcurrentHashMap<>();
     private final Map<String, Set<String>> ca_has_publishers = new ConcurrentHashMap<>();
     private final Map<String, Set<CAHasRequestorEntry>> ca_has_requestors = new ConcurrentHashMap<>();
     private final Map<String, String> caAliases = new ConcurrentHashMap<>();
@@ -1216,7 +1217,7 @@ implements CAManager, CmpResponderManager
         Set<CAHasRequestorEntry> caHasRequestors = queryExecutor.createCAhasRequestors(name);
         ca_has_requestors.put(name, caHasRequestors);
 
-        Set<String> profileNames = queryExecutor.createCAhasProfiles(name);
+        Map<String, String> profileNames = queryExecutor.createCAhasProfiles(name);
         ca_has_profiles.put(name, profileNames);
 
         Set<String> publisherNames = queryExecutor.createCAhasPublishers(name);
@@ -1315,54 +1316,68 @@ implements CAManager, CmpResponderManager
 
     @Override
     public boolean removeCertprofileFromCA(
-            final String profileName,
+            final String profileLocalname,
             String caName)
     throws CAMgmtException
     {
-        ParamChecker.assertNotBlank("profileName", profileName);
+        ParamChecker.assertNotBlank("profileLocalname", profileLocalname);
         ParamChecker.assertNotBlank("caName", caName);
         asssertMasterMode();
         caName = caName.toUpperCase();
-        boolean b = queryExecutor.removeCertprofileFromCA(profileName, caName);
-        if(b && ca_has_profiles.containsKey(caName))
+        boolean b = queryExecutor.removeCertprofileFromCA(profileLocalname, caName);
+        if(b == false)
         {
-            ca_has_profiles.get(caName).remove(profileName);
+            return false;
         }
-        return b;
+
+        if(ca_has_profiles.containsKey(caName))
+        {
+            Map<String, String> map = ca_has_profiles.get(caName);
+            if(map != null)
+            {
+                map.remove(profileLocalname);
+            }
+        }
+        return true;
     }
 
     @Override
     public boolean addCertprofileToCA(
             final String profileName,
+            String profileLocalname,
             String caName)
     throws CAMgmtException
     {
         ParamChecker.assertNotBlank("profileName", profileName);
         ParamChecker.assertNotBlank("caName", caName);
         asssertMasterMode();
-        caName = caName.toUpperCase();
-        Set<String> profileNames = ca_has_profiles.get(caName);
-        if(profileNames == null)
+        if(StringUtil.isBlank(profileLocalname))
         {
-            profileNames = new HashSet<>();
-            ca_has_profiles.put(caName, profileNames);
+            profileLocalname = profileName;
+        }
+        caName = caName.toUpperCase();
+
+        Map<String, String> map = ca_has_profiles.get(caName);
+        if(map == null)
+        {
+            map = new HashMap<>();
+            ca_has_profiles.put(caName, map);
         }
         else
         {
-            if(profileNames.contains(profileName))
+            if(map.containsKey(profileLocalname))
             {
                 return false;
             }
         }
-        profileNames.add(profileName);
 
         if(certprofiles.containsKey(profileName) == false)
         {
             throw new CAMgmtException("cerptofile '" + profileName + "' is faulty");
         }
 
-        queryExecutor.addCertprofileToCA(profileName, caName);
-        ca_has_profiles.get(caName).add(profileName);
+        queryExecutor.addCertprofileToCA(profileName, profileLocalname, caName);
+        map.put(profileLocalname, profileName);
         return true;
     }
 
@@ -1429,7 +1444,7 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public Set<String> getCertprofilesForCA(
+    public Map<String, String> getCertprofilesForCA(
             final String caName)
     {
         ParamChecker.assertNotBlank("caName", caName);

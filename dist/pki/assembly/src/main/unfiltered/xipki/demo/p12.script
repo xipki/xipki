@@ -109,7 +109,10 @@ xipki-ca:ca-add --name SubCA1.complex-Name \
 xipki-ca:caalias-add --ca SubCA1.complex-Name --alias SubCA
 
 ## Add cert profile to CA
-xipki-ca:caprofile-add --ca SubCA1.complex-Name --profile TLS --profile TLS_C --profile TLSwithIncSN --profile gSMC_K
+xipki-ca:caprofile-add --ca SubCA1.complex-Name --profile TLS_g --local-name TLS
+xipki-ca:caprofile-add --ca SubCA1.complex-Name --profile TLS_C
+xipki-ca:caprofile-add --ca SubCA1.complex-Name --profile TLSwithIncSN
+xipki-ca:caprofile-add --ca SubCA1.complex-Name --profile gSMC_K
 
 ## Add publisher
 xipki-ca:capub-add --ca SubCA1.complex-Name --publisher OCSP.PUBLISHER
@@ -143,7 +146,9 @@ xipki-ca:ca-add --name SubCAwithCRL1 \
 xipki-ca:caalias-add --ca SubCAwithCRL1 --alias SubCAwithCRL
 
 ## Add cert profile to CA
-xipki-ca:caprofile-add --ca SubCAwithCRL1 --profile OCSP --profile DEMO --profile multipleOUs
+xipki-ca:caprofile-add --ca SubCAwithCRL1 --profile OCSP
+xipki-ca:caprofile-add --ca SubCAwithCRL1 --profile DEMO
+xipki-ca:caprofile-add --ca SubCAwithCRL1 --profile multipleOUs
 
 ## Add CMP requestor to CA
 xipki-ca:careq-add --requestor  requestor --permission all --ra yes --profile all --ca SubCAwithCRL1

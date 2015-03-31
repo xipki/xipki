@@ -778,11 +778,37 @@ class CAManagerQueryExecutor
         }
     }
 
-    Set<String> createCAhasProfiles(
+    Map<String, String> createCAhasProfiles(
             final String caName)
     throws CAMgmtException
     {
-        return createCAhasNames(caName, "PROFILE_NAME", "CA_HAS_PROFILE");
+        final String sql = new StringBuilder("SELECT PROFILE_NAME, PROFILE_LOCALNAME FROM CA_HAS_PROFILE")
+                .append(" WHERE CA_NAME=?").toString();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try
+        {
+            stmt = prepareStatement(sql);
+            stmt.setString(1, caName);
+            rs = stmt.executeQuery();
+
+            Map<String, String> ret = new HashMap<>();
+            while(rs.next())
+            {
+                String profileName = rs.getString("PROFILE_NAME");
+                String profileLocalname = rs.getString("PROFILE_LOCALNAME");
+                ret.put(profileLocalname, profileName);
+            }
+
+            return ret;
+        }catch(SQLException e)
+        {
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
+        }finally
+        {
+            dataSource.releaseResources(stmt, rs);
+        }
     }
 
     Set<String> createCAhasPublishers(
@@ -811,8 +837,8 @@ class CAManagerQueryExecutor
             Set<String> ret = new HashSet<>();
             while(rs.next())
             {
-                String certprofileName = rs.getString(columnName);
-                ret.add(certprofileName);
+                String name = rs.getString(columnName);
+                ret.add(name);
             }
 
             return ret;
@@ -1011,18 +1037,20 @@ class CAManagerQueryExecutor
 
     void addCertprofileToCA(
             final String profileName,
+            final String profileLocalName,
             final String caName)
     throws CAMgmtException
     {
-        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME) VALUES (?, ?)";
+        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME, PROFILE_LOCALNAME) VALUES (?, ?, ?)";
         PreparedStatement ps = null;
         try
         {
             ps = prepareStatement(sql);
             ps.setString(1, caName);
             ps.setString(2, profileName);
+            ps.setString(3, profileLocalName);
             ps.executeUpdate();
-            LOG.info("added profile '{}' to CA '{}'", profileName, caName);
+            LOG.info("added profile '{} (localname {})' to CA '{}'", profileName, profileLocalName, caName);
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -2101,21 +2129,21 @@ class CAManagerQueryExecutor
     }
 
     boolean removeCertprofileFromCA(
-            final String profileName,
+            final String profileLocalName,
             final String caName)
     throws CAMgmtException
     {
-        final String sql = "DELETE FROM CA_HAS_PROFILE WHERE CA_NAME=? AND PROFILE_NAME=?";
+        final String sql = "DELETE FROM CA_HAS_PROFILE WHERE CA_NAME=? AND PROFILE_LOCALNAME=?";
         PreparedStatement ps = null;
         try
         {
             ps = prepareStatement(sql);
             ps.setString(1, caName);
-            ps.setString(2, profileName);
+            ps.setString(2, profileLocalName);
             boolean b = ps.executeUpdate() > 0;
             if(b)
             {
-                LOG.info("removed profile '{}' from CA '{}'", profileName, caName);
+                LOG.info("removed profile '{}' from CA '{}'", profileLocalName, caName);
             }
             return b;
         }catch(SQLException e)
