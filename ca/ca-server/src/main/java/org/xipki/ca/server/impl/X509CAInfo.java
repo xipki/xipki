@@ -36,10 +36,8 @@
 package org.xipki.ca.server.impl;
 
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -62,10 +60,8 @@ import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.util.AlgorithmUtil;
-import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.CollectionUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
@@ -94,6 +90,7 @@ class X509CAInfo
     private boolean useRandomSerialNumber;
     private RandomSerialNumberGenerator randomSNGenerator;
     private Map<String, ConcurrentContentSigner> signers;
+    private ConcurrentContentSigner dfltSigner;
 
     public X509CAInfo(
             final X509CAEntry caEntry,
@@ -442,6 +439,11 @@ class X509CAInfo
 
     public ConcurrentContentSigner getSigner(List<String> algoNames)
     {
+        if(CollectionUtil.isEmpty(algoNames))
+        {
+            return dfltSigner;
+        }
+
         for(String name : algoNames)
         {
             if(signers.containsKey(name))
@@ -461,18 +463,24 @@ class X509CAInfo
         {
             return true;
         }
+        dfltSigner = null;
 
-        Map<String, String> signerConfs = splitCASignerConfs(caEntry.getSignerConf());
+        List<String[]> signerConfs = CAManagerImpl.splitCASignerConfs(caEntry.getSignerConf());
 
         Map<String, ConcurrentContentSigner> tSigners = new HashMap<>();
-        for(String algo : signerConfs.keySet())
+        for(String[] m : signerConfs)
         {
-            String signerConf = signerConfs.get(algo);
+            String algo = m[0];
+            String signerConf = m[1];
             ConcurrentContentSigner signer;
             try
             {
                 signer = securityFactory.createSigner(
                     caEntry.getSignerType(), signerConf, caEntry.getCertificate());
+                if(dfltSigner == null)
+                {
+                    dfltSigner = signer;
+                }
                 tSigners.put(algo, signer);
             }catch(Throwable t)
             {
@@ -518,64 +526,6 @@ class X509CAInfo
         }
 
         return signerRequired;
-    }
-
-    static Map<String, String> splitCASignerConfs(String conf)
-    throws SignerException
-    {
-        CmpUtf8Pairs pairs = new CmpUtf8Pairs(conf);
-        String str = pairs.getValue("algo");
-        List<String> list = StringUtil.split(str, ", ");
-        if(list == null)
-        {
-            throw new SignerException("no algo is defined in CA signerConf");
-        }
-
-        Map<String, String> signerConfs = new HashMap<>(list.size());
-        for(String n : list)
-        {
-            String c14nAlgo;
-            try
-            {
-                c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(n);
-            } catch (NoSuchAlgorithmException e)
-            {
-                throw new SignerException(e.getMessage(), e);
-            }
-            pairs.putUtf8Pair("algo", c14nAlgo);
-            signerConfs.put(c14nAlgo, pairs.getEncoded());
-        }
-
-        return signerConfs;
-    }
-
-    static List<String> splitCASignerConfsAsList(String conf)
-    throws SignerException
-    {
-        CmpUtf8Pairs pairs = new CmpUtf8Pairs(conf);
-        String str = pairs.getValue("algo");
-        List<String> list = StringUtil.split(str, ", ");
-        if(list == null)
-        {
-            throw new SignerException("no algo is defined in CA signerConf");
-        }
-
-        List<String> signerConfs = new ArrayList<>(list.size());
-        for(String n : list)
-        {
-            String c14nAlgo;
-            try
-            {
-                c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(n);
-            } catch (NoSuchAlgorithmException e)
-            {
-                throw new SignerException(e.getMessage(), e);
-            }
-            pairs.putUtf8Pair("algo", c14nAlgo);
-            signerConfs.add(pairs.getEncoded());
-        }
-
-        return signerConfs;
     }
 
 }

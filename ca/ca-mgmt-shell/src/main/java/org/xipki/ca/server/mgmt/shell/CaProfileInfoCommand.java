@@ -73,9 +73,14 @@ public class CaProfileInfoCommand extends CaCommand
 
                 for(String localname  : entries.keySet())
                 {
+                    String name = entries.get(localname);
                     sb.append("\t");
-                    sb.append(entries.get(localname));
-                    sb.append(" (localname ").append(localname).append(")\n");
+                    sb.append(name);
+                    if(name.equals(localname) == false)
+                    {
+                        sb.append(" (localname ").append(localname).append(")");
+                    }
+                    sb.append("\n");
                 }
             }
             else

@@ -40,6 +40,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.SocketException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -109,6 +110,7 @@ import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
@@ -1265,9 +1267,10 @@ implements CAManager, CmpResponderManager
             ConcurrentContentSigner signer;
             try
             {
-                List<String> signerConfs = X509CAInfo.splitCASignerConfsAsList(xEntry.getSignerConf());
-                for(String signerConf : signerConfs)
+                List<String[]> signerConfs = splitCASignerConfs(xEntry.getSignerConf());
+                for(String[] m : signerConfs)
                 {
+                    String signerConf = m[1];
                     signer = securityFactory.createSigner(
                             xEntry.getSignerType(), signerConf, xEntry.getCertificate());
                     if(xEntry.getCertificate() == null)
@@ -3092,6 +3095,35 @@ implements CAManager, CmpResponderManager
             return null;
         }
         return pairs.getValue(type);
+    }
+
+    static List<String[]> splitCASignerConfs(String conf)
+    throws SignerException
+    {
+        CmpUtf8Pairs pairs = new CmpUtf8Pairs(conf);
+        String str = pairs.getValue("algo");
+        List<String> list = StringUtil.split(str, ", ");
+        if(list == null)
+        {
+            throw new SignerException("no algo is defined in CA signerConf");
+        }
+
+        List<String[]> signerConfs = new ArrayList<>(list.size());
+        for(String n : list)
+        {
+            String c14nAlgo;
+            try
+            {
+                c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(n);
+            } catch (NoSuchAlgorithmException e)
+            {
+                throw new SignerException(e.getMessage(), e);
+            }
+            pairs.putUtf8Pair("algo", c14nAlgo);
+            signerConfs.add(new String[]{c14nAlgo, pairs.getEncoded()});
+        }
+
+        return signerConfs;
     }
 
 }
