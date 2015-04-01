@@ -287,7 +287,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
         System.out.println("exporting tables CERT, CERTHASH and RAWCERT from ID " + minCertId);
 
-        String certSql = "SELECT ID, ISSUER_ID, LAST_UPDATE, REVOKED, REV_REASON, REV_TIME, " + col_revInvTime +
+        String certSql = "SELECT ID, SERIAL, ISSUER_ID, LAST_UPDATE, REVOKED, REV_REASON, REV_TIME, " + col_revInvTime +
                 ", PROFILE FROM CERT WHERE ID >= ? AND ID < ?";
 
         String rawCertSql = "SELECT CERT_ID, CERT FROM RAWCERT WHERE CERT_ID >= ? AND CERT_ID < ?";
@@ -392,6 +392,9 @@ class OcspCertStoreDbExporter extends DbPorter
 
                     int issuer_id = rs.getInt("ISSUER_ID");
                     cert.setIssuerId(issuer_id);
+
+                    long serial = rs.getLong("SERIAL");
+                    cert.setSerial(Long.toHexString(serial));
 
                     long last_update = rs.getLong("LAST_UPDATE");
                     cert.setLastUpdate(last_update);
