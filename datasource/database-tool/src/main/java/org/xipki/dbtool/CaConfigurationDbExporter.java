@@ -748,7 +748,15 @@ class CaConfigurationDbExporter extends DbPorter
     {
         System.out.println("exporting table " + table_caHasProfile);
         CaHasProfiles ca_has_profiles = new CaHasProfiles();
-        final String sql = "SELECT CA_NAME, " + col_profileName + " FROM " + table_caHasProfile;
+        StringBuilder sqlBuilder = new StringBuilder(100);
+        sqlBuilder.append("SELECT CA_NAME");
+        sqlBuilder.append(", ").append(col_profileName);
+        if(dbSchemaVersion > 1)
+        {
+            sqlBuilder.append(", PROFILE_LOCALNAME");
+        }
+        sqlBuilder.append(" FROM " + table_caHasProfile);
+        final String sql = sqlBuilder.toString();
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -761,10 +769,20 @@ class CaConfigurationDbExporter extends DbPorter
             {
                 String ca_name = rs.getString("CA_NAME");
                 String profile_name = rs.getString(col_profileName);
+                String profile_localname;
+                if(dbSchemaVersion > 1)
+                {
+                    profile_localname = rs.getString("PROFILE_LOCALNAME");
+                }
+                else
+                {
+                    profile_localname = profile_name;
+                }
 
                 CaHasProfileType ca_has_profile = new CaHasProfileType();
                 ca_has_profile.setCaName(ca_name);
                 ca_has_profile.setProfileName(profile_name);
+                ca_has_profile.setProfileLocalname(profile_localname);
 
                 ca_has_profiles.getCaHasProfile().add(ca_has_profile);
             }
