@@ -18,7 +18,7 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
     - SHA1withRSA, SHA224withRSA, SHA256withRSA, SHA384withRSA, SHA512withRSA
     - SHA1withRSAandMGF1, SHA224withRSAandMGF1, SHA256withRSAandMGF1, SHA384withRSAandMGF1, SHA512withRSAandMGF1
     - SHA1withECDSA, SHA224withECDSA, SHA256withECDSA, SHA384withECDSA, SHA512withECDSA
-    - SHA1withPlain-ECDSA, SHA224withPlain-ECDSA, SHA256withPlain-ECDSA, SHA384withPlain-ECDSA, SHA512withPlain-ECDSA
+    - SHA1withPlainECDSA, SHA224withPlainECDSA, SHA256withPlainECDSA, SHA384withPlainECDSA, SHA512withPlainECDSA
     - SHA1withDSA, SHA224withDSA, SHA256withDSA, SHA384withDSA, SHA512withDSA
  - Support of both random and sequential certificate serial number assignment
  - Management of multiple CAs in one software instance
