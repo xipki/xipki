@@ -586,7 +586,7 @@ class CaConfigurationDbImporter extends DbPorter
     throws DataAccessException
     {
         System.out.println("importing table CA_HAS_PROFILE");
-        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME) VALUES (?, ?)";
+        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME, PROFILE_LOCALNAME) VALUES (?, ?, ?)";
         PreparedStatement ps = prepareStatement(sql);
         try
         {
@@ -597,11 +597,13 @@ class CaConfigurationDbImporter extends DbPorter
                     int idx = 1;
                     ps.setString(idx++, entry.getCaName().toUpperCase());
                     ps.setString(idx++, entry.getProfileName());
+                    ps.setString(idx++, entry.getProfileLocalname());
                     ps.executeUpdate();
                 }catch(SQLException e)
                 {
                     System.err.println("error while importing CA_HAS_PROFILE with CA_NAME=" + entry.getCaName() +
-                            " and certprofile_name=" + entry.getProfileName());
+                            ", profile_name=" + entry.getProfileName() +
+                            " and profile_localname=" + entry.getProfileLocalname());
                     throw translate(sql, e);
                 }
             }
