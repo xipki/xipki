@@ -79,6 +79,7 @@ import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
+import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
@@ -148,8 +149,41 @@ class X509SelfSignedCertBuilder
         ConcurrentContentSigner signer;
         try
         {
-            String firstSignerConf = X509CAInfo.splitCASignerConfsAsList(signerConf).get(0);
-            signer = securityFactory.createSigner(signerType, firstSignerConf, (X509Certificate[]) null);
+            List<String[]> signerConfs = CAManagerImpl.splitCASignerConfs(signerConf);
+            List<String> restrictedSigAlgos = certprofile.getSignatureAlgorithms();
+
+            String thisSignerConf = null;
+            if(CollectionUtil.isEmpty(restrictedSigAlgos))
+            {
+                thisSignerConf = signerConfs.get(0)[1];
+            }
+            else
+            {
+                for(String algo : restrictedSigAlgos)
+                {
+                    for(String[] m : signerConfs)
+                    {
+                        if(m[0].equals(algo))
+                        {
+                            thisSignerConf = m[1];
+                            break;
+                        }
+                    }
+
+                    if(thisSignerConf != null)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if(thisSignerConf == null)
+            {
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                        "CA does not support any signature algorithm restricted by the cert profile");
+            }
+
+            signer = securityFactory.createSigner(signerType, thisSignerConf, (X509Certificate[]) null);
         } catch (SignerException e)
         {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getClass().getName() + ": " + e.getMessage());

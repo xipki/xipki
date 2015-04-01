@@ -1355,9 +1355,10 @@ class CAManagerQueryExecutor
 
                 try
                 {
-                    List<String> signerConfs = X509CAInfo.splitCASignerConfsAsList(_signerConf);
-                    for(String signerConf : signerConfs)
+                    List<String[]> signerConfs = CAManagerImpl.splitCASignerConfs(_signerConf);
+                    for(String[] m : signerConfs)
                     {
+                        String signerConf = m[1];
                         securityFactory.createSigner(_signerType, signerConf, _cert);
                     }
                 } catch (SignerException e)
