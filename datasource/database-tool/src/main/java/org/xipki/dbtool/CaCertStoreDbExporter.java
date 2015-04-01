@@ -661,7 +661,7 @@ class CaCertStoreDbExporter extends DbPorter
             total = 1; // to avoid exception
         }
 
-        StringBuilder certSql = new StringBuilder("SELECT ID, ");
+        StringBuilder certSql = new StringBuilder("SELECT ID, SERIAL, ");
         certSql.append(col_caId).append(", ");
         certSql.append(col_profileId).append(", ");
         certSql.append(col_profileId).append(", ");
@@ -780,6 +780,9 @@ class CaCertStoreDbExporter extends DbPorter
 
                     int cainfo_id = rs.getInt(col_caId);
                     cert.setCaId(cainfo_id);
+
+                    long serial = rs.getLong("SERIAL");
+                    cert.setSerial(Long.toHexString(serial));
 
                     int certprofile_id = rs.getInt(col_profileId);
                     cert.setProfileId(certprofile_id);
