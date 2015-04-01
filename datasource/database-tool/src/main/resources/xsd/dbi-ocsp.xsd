@@ -60,6 +60,7 @@
     <xs:sequence>
       <xs:element name="id" type="xs:int"/>
       <xs:element name="issuerId" type="xs:int"/>
+      <xs:element name="serial" type="xs:string"/>
       <xs:element name="lastUpdate" type="xs:long"/>
       <xs:element name="revoked" type="xs:boolean"/>
       <xs:element name="revReason" type="xs:int" minOccurs="0"/>
