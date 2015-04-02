@@ -44,12 +44,12 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 public abstract class CALoadTestCommand extends XipkiOsgiCommandSupport
 {
-    protected CAClient raWorker;
+    protected CAClient caClient;
 
-    public final void setRaWorker(
-            final CAClient raWorker)
+    public final void setCaClient(
+            final CAClient caClient)
     {
-        this.raWorker = raWorker;
+        this.caClient = caClient;
     }
 
 }

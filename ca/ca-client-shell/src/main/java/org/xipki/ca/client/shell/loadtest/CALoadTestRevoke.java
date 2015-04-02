@@ -74,7 +74,7 @@ class CALoadTestRevoke extends AbstractLoadTest
 {
     private static final Logger LOG = LoggerFactory.getLogger(CALoadTestRevoke.class);
 
-    private final CAClient raWorker;
+    private final CAClient caClient;
     private final DataSourceWrapper caDataSource;
     private final X500Name caSubject;
     private final Set<Long> excludeSerials = new HashSet<>();
@@ -103,14 +103,14 @@ class CALoadTestRevoke extends AbstractLoadTest
     }
 
     public CALoadTestRevoke(
-            final CAClient raWorker,
+            final CAClient caClient,
             final Certificate caCert,
             final DataSourceWrapper caDataSource,
             final int maxCerts,
             final int n)
     throws Exception
     {
-        ParamChecker.assertNotNull("raWorker", raWorker);
+        ParamChecker.assertNotNull("caClient", caClient);
         ParamChecker.assertNotNull("caCert", caCert);
         ParamChecker.assertNotNull("caDataSource", caDataSource);
         if(n < 1)
@@ -119,7 +119,7 @@ class CALoadTestRevoke extends AbstractLoadTest
         }
         this.n = n;
 
-        this.raWorker = raWorker;
+        this.caClient = caClient;
         this.caDataSource = caDataSource;
         this.caSubject = caCert.getSubject();
         this.maxCerts = maxCerts;
@@ -295,7 +295,7 @@ class CALoadTestRevoke extends AbstractLoadTest
             Map<String, CertIdOrError> result;
             try
             {
-                result = raWorker.revokeCerts(request, null);
+                result = caClient.revokeCerts(request, null);
             } catch (CAClientException | PKIErrorException e)
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());

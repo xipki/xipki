@@ -130,7 +130,7 @@ public class CALoadTestRevokeCommand extends CALoadTestCommand
                 null, props, securityFactory.getPasswordResolver());
         try
         {
-            CALoadTestRevoke loadTest = new CALoadTestRevoke(raWorker, caCert, caDataSource, maxCerts, n);
+            CALoadTestRevoke loadTest = new CALoadTestRevoke(caClient, caCert, caDataSource, maxCerts, n);
 
             loadTest.setDuration(durationInSecond);
             loadTest.setThreads(numThreads);
