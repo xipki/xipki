@@ -78,7 +78,7 @@ public class CALoadTestTemplateEnrollCommand extends CALoadTestCommand
         }
 
         StringBuilder startMsg = new StringBuilder();
-        CALoadTestTemplateEnroll loadTest = new CALoadTestTemplateEnroll(raWorker, templateFile);
+        CALoadTestTemplateEnroll loadTest = new CALoadTestTemplateEnroll(caClient, templateFile);
         int n = loadTest.getNumberOfCertsInOneRequest();
 
         startMsg.append("threads:         ").append(numThreads).append("\n");

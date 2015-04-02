@@ -161,7 +161,7 @@ public class CALoadTestEnrollCommand extends CALoadTestCommand
         }
 
         LoadTestEntry loadtestEntry = new LoadTestEntry(certprofile, keyEntry, subjectTemplate, randomDN);
-        CALoadTestEnroll loadTest = new CALoadTestEnroll(raWorker, loadtestEntry, n);
+        CALoadTestEnroll loadTest = new CALoadTestEnroll(caClient, loadtestEntry, n);
 
         loadTest.setDuration(durationInSecond);
         loadTest.setThreads(numThreads);

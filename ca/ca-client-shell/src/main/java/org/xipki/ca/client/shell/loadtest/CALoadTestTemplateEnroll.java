@@ -139,7 +139,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
                     request.addRequestEntry(requestEntry);
                 }
 
-                result = raWorker.requestCerts(request, null, userPrefix + System.currentTimeMillis(), null);
+                result = caClient.requestCerts(request, null, userPrefix + System.currentTimeMillis(), null);
             } catch (CAClientException | PKIErrorException e)
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
@@ -183,21 +183,21 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
     private static Object jaxbUnmarshallerLock = new Object();
     private static Unmarshaller jaxbUnmarshaller;
 
-    private final CAClient raWorker;
+    private final CAClient caClient;
     private final String userPrefix = "LOADTEST-";
     private final List<LoadTestEntry> loadtestEntries;
 
     private final AtomicLong index;
 
     public CALoadTestTemplateEnroll(
-            final CAClient raWorker,
+            final CAClient caClient,
             final String templateFile)
     throws Exception
     {
-        ParamChecker.assertNotNull("raWorker", raWorker);
+        ParamChecker.assertNotNull("caClient", caClient);
         ParamChecker.assertNotBlank("templateFile", templateFile);
 
-        this.raWorker = raWorker;
+        this.caClient = caClient;
 
         Calendar baseTime = Calendar.getInstance(Locale.UK);
         baseTime.set(Calendar.YEAR, 2014);
