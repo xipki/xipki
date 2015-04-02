@@ -69,7 +69,7 @@ class CALoadTestEnroll extends AbstractLoadTest
 
     private static final Logger LOG = LoggerFactory.getLogger(CALoadTestEnroll.class);
 
-    private final CAClient raWorker;
+    private final CAClient caClient;
     private final LoadTestEntry loadtestEntry;
     private final AtomicLong index;
     private final String userPrefix = "LOADTEST-";
@@ -83,11 +83,11 @@ class CALoadTestEnroll extends AbstractLoadTest
     }
 
     public CALoadTestEnroll(
-            final CAClient raWorker,
+            final CAClient caClient,
             final LoadTestEntry loadtestEntry,
             final int n)
     {
-        ParamChecker.assertNotNull("raWorker", raWorker);
+        ParamChecker.assertNotNull("caClient", caClient);
         ParamChecker.assertNotNull("loadtestEntry", loadtestEntry);
         if(n < 1)
         {
@@ -95,7 +95,7 @@ class CALoadTestEnroll extends AbstractLoadTest
         }
         this.n = n;
         this.loadtestEntry = loadtestEntry;
-        this.raWorker = raWorker;
+        this.caClient = caClient;
 
         this.index = new AtomicLong(getSecureIndex());
     }
@@ -162,7 +162,7 @@ class CALoadTestEnroll extends AbstractLoadTest
                     request.addRequestEntry(requestEntry);
                 }
 
-                result = raWorker.requestCerts(request, null, userPrefix + System.currentTimeMillis(), null);
+                result = caClient.requestCerts(request, null, userPrefix + System.currentTimeMillis(), null);
             } catch (CAClientException | PKIErrorException e)
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
