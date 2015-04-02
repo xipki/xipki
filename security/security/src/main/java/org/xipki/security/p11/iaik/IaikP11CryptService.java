@@ -103,6 +103,7 @@ public final class IaikP11CryptService implements P11CryptService
 
     private boolean lastRefreshSuccessfull;
     private long lastRefresh;
+
     private synchronized boolean reconnect()
     throws SignerException
     {

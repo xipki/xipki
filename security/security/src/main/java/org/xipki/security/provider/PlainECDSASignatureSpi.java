@@ -48,16 +48,16 @@ import org.bouncycastle.crypto.digests.SHA512Digest;
  * @author Lijun Liao
  */
 
-class ECDSAPlainSignatureSpi extends AbstractECDSASignatureSpi
+class PlainECDSASignatureSpi extends AbstractECDSASignatureSpi
 {
-    ECDSAPlainSignatureSpi(
+    PlainECDSASignatureSpi(
             final Digest digest)
     {
         super(digest, false);
     }
 
     static public class SHA1
-        extends ECDSAPlainSignatureSpi
+        extends PlainECDSASignatureSpi
     {
         public SHA1()
         {
@@ -66,7 +66,7 @@ class ECDSAPlainSignatureSpi extends AbstractECDSASignatureSpi
     }
 
     static public class NONE
-        extends ECDSAPlainSignatureSpi
+        extends PlainECDSASignatureSpi
     {
         public NONE()
         {
@@ -75,7 +75,7 @@ class ECDSAPlainSignatureSpi extends AbstractECDSASignatureSpi
     }
 
     static public class SHA224
-        extends ECDSAPlainSignatureSpi
+        extends PlainECDSASignatureSpi
     {
         public SHA224()
         {
@@ -84,7 +84,7 @@ class ECDSAPlainSignatureSpi extends AbstractECDSASignatureSpi
     }
 
     static public class SHA256
-        extends ECDSAPlainSignatureSpi
+        extends PlainECDSASignatureSpi
     {
         public SHA256()
         {
@@ -93,7 +93,7 @@ class ECDSAPlainSignatureSpi extends AbstractECDSASignatureSpi
     }
 
     static public class SHA384
-        extends ECDSAPlainSignatureSpi
+        extends PlainECDSASignatureSpi
     {
         public SHA384()
         {
@@ -102,7 +102,7 @@ class ECDSAPlainSignatureSpi extends AbstractECDSASignatureSpi
     }
 
     static public class SHA512
-        extends ECDSAPlainSignatureSpi
+        extends PlainECDSASignatureSpi
     {
         public SHA512()
         {
@@ -111,7 +111,7 @@ class ECDSAPlainSignatureSpi extends AbstractECDSASignatureSpi
     }
 
     static public class RIPEMD160
-        extends ECDSAPlainSignatureSpi
+        extends PlainECDSASignatureSpi
     {
         public RIPEMD160()
         {
