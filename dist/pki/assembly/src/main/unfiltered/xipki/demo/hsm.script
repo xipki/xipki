@@ -26,6 +26,7 @@ xipki-ca:gen-rca --name RCA1 \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
+  --responder responder1 \
   --duplicate-subject permitted \
   --duplicate-key permitted \
   --validity-mode CUTOFF
@@ -49,7 +50,7 @@ xipki-ca:caprofile-add --ca RCA1 --profile SubCA.Complex
 xipki-ca:capub-add --ca RCA1 --publisher OCSP.PUBLISHER
 
 # Add requestor to CA
-xipki-ca:careq-add --requestor requestor --permission all --ra yes --profile all --ca RCA1
+xipki-ca:careq-add --requestor requestor1 --permission all --ra yes --profile all --ca RCA1
 
 ## Publish the self-signed certificate
 xipki-ca:publish-self --profile RCA RCA1
@@ -104,6 +105,7 @@ xipki-ca:ca-add --name SubCA1 \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/SubCA1.der \
   --cmp-control cmpcontrol1 \
+  --responder responder1 \
   --duplicate-subject permitted \
   --duplicate-key permitted
 
@@ -122,7 +124,7 @@ xipki-ca:caprofile-add --ca SubCA1.complex-Name --profile gSMC_K
 xipki-ca:capub-add --ca SubCA1 --publisher OCSP.PUBLISHER
 
 # Add requestor to CA
-xipki-ca:careq-add --requestor requestor --permission all --ra yes --profile all --ca SubCA1
+xipki-ca:careq-add --requestor requestor1 --permission all --ra yes --profile all --ca SubCA1
 
 ## Restart the CA
 #xipki-ca:restart
@@ -144,6 +146,7 @@ xipki-ca:ca-add --name SubCAwithCRL1 \
   --deltacrl-uri http://subcawithcrl.example.org/deltacrl \
   --crl-signer CASIGN.CRLSIGNER \
   --cmp-control cmpcontrol1 \
+  --responder responder1 \
   --duplicate-subject permitted \
   --duplicate-key permitted
 
@@ -157,7 +160,7 @@ xipki-ca:caprofile-add --ca SubCAwithCRL1 --profile DEMO
 xipki-ca:caprofile-add --ca SubCAwithCRL1 --profile multipleOUs
 
 ## Add CMP requestor to CA
-xipki-ca:careq-add --requestor requestor --permission all --ra yes --profile all --ca SubCAwithCRL1
+xipki-ca:careq-add --requestor requestor1 --permission all --ra yes --profile all --ca SubCAwithCRL1
 
 ## Restart the CA
 xipki-ca:restart

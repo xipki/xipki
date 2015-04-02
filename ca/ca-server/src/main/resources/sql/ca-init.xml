@@ -128,6 +128,7 @@
       <column name="CMPCONTROL_NAME" type="VARCHAR(45)">
         <constraints nullable="false"/>
       </column>
+      <column name="RESPONDER_NAME" type="VARCHAR(45)"/>
       <column defaultValueNumeric="2" name="DUPLICATE_KEY" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
@@ -421,6 +422,11 @@
       onDelete="SET NULL" onUpdate="NO ACTION"
       baseColumnNames="CRLSIGNER_NAME" baseTableName="CA"
       referencedColumnNames="NAME" referencedTableName="CRLSIGNER"/>
+    <addForeignKeyConstraint constraintName="FK_CA_RESPONDER1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="SET NULL" onUpdate="NO ACTION"
+      baseColumnNames="RESPONDER_NAME" baseTableName="CA"
+      referencedColumnNames="NAME" referencedTableName="RESPONDER"/>
     <addForeignKeyConstraint constraintName="FK_CAALIAS_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"

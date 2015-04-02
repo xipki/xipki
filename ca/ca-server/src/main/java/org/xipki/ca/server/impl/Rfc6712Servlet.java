@@ -147,7 +147,7 @@ public class Rfc6712Servlet extends HttpServlet
                 responder = responderManager.getX509CACmpResponder(caName);
             }
 
-            if(caName == null || responder == null || responder.isCAInService() == false)
+            if(caName == null || responder == null || responder.isInService() == false)
             {
                 if(caName == null)
                 {

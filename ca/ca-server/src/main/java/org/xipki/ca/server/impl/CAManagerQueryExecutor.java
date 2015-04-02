@@ -529,49 +529,29 @@ class CAManagerQueryExecutor
         }
     }
 
-    CmpResponderEntry createResponder()
+    CmpResponderEntry createResponder(
+            final String name)
     throws CAMgmtException
     {
-        final String sql = "SELECT TYPE, CONF, CERT FROM RESPONDER";
-        Statement stmt = null;
+        final String sql = "TYPE, CONF, CERT FROM RESPONDER WHERE NAME=?";
+        PreparedStatement stmt = null;
         ResultSet rs = null;
 
         try
         {
-            stmt = createStatement();
-            rs = stmt.executeQuery(sql);
+            stmt = prepareFetchFirstStatement(sql);
+            stmt.setString(1, name);
+            rs = stmt.executeQuery();
 
-            CmpResponderEntry dbEntry = null;
-            String errorMsg = null;
-            while(rs.next())
+            if(rs.next() == false)
             {
-                if(dbEntry != null)
-                {
-                    errorMsg = "more than one CMPResponder is configured, but maximal one is allowed";
-                    break;
-                }
-
-                dbEntry = new CmpResponderEntry();
-
-                String type = rs.getString("TYPE");
-                dbEntry.setType(type);
-
-                String conf = rs.getString("CONF");
-                dbEntry.setConf(conf);
-
-                String b64Cert = rs.getString("CERT");
-                if(b64Cert != null)
-                {
-                    dbEntry.setBase64Cert(b64Cert);
-                }
+                return null;
             }
 
-            if(errorMsg != null)
-            {
-                throw new CAMgmtException(errorMsg);
-            }
-
-            return dbEntry;
+            String type = rs.getString("TYPE");
+            String conf = rs.getString("CONF");
+            String b64Cert = rs.getString("CERT");
+            return new CmpResponderEntry(name, type, conf, b64Cert);
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -589,10 +569,10 @@ class CAManagerQueryExecutor
     throws CAMgmtException
     {
         final String sql = "NAME, ART, NEXT_SERIAL, NEXT_CRLNO, STATUS, MAX_VALIDITY" +
-                ", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME" +
+                ", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME" +
                 ", DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS" +
                 ", EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, VALIDITY_MODE" +
-                ", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS" +
+                ", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS, EXTRA_CONTROL" +
                 " FROM CA WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -623,11 +603,13 @@ class CAManagerQueryExecutor
                 String signer_type = rs.getString("SIGNER_TYPE");
                 String signer_conf = rs.getString("SIGNER_CONF");
                 String crlsigner_name = rs.getString("CRLSIGNER_NAME");
+                String responder_name = rs.getString("RESPONDER_NAME");
                 String cmpcontrol_name = rs.getString("CMPCONTROL_NAME");
                 int duplicateKeyI = rs.getInt("DUPLICATE_KEY");
                 int duplicateSubjectI = rs.getInt("DUPLICATE_SUBJECT");
                 int numCrls = rs.getInt("NUM_CRLS");
                 int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
+                String extra_control = rs.getString("EXTRA_CONTROL");
 
                 CertRevocationInfo revocationInfo = null;
                 boolean revoked = rs.getBoolean("REVOKED");
@@ -684,6 +666,16 @@ class CAManagerQueryExecutor
                 if(crlsigner_name != null)
                 {
                     entry.setCrlSignerName(crlsigner_name);
+                }
+
+                if(responder_name != null)
+                {
+                    entry.setResponderName(responder_name);
+                }
+
+                if(extra_control != null)
+                {
+                    entry.setExtraControl(extra_control);
                 }
 
                 if(cmpcontrol_name != null)
@@ -911,10 +903,11 @@ class CAManagerQueryExecutor
         sqlBuilder.append("INSERT INTO CA (");
         sqlBuilder.append("NAME, ART, SUBJECT, NEXT_SERIAL, NEXT_CRLNO, STATUS");
         sqlBuilder.append(", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS");
-        sqlBuilder.append(", MAX_VALIDITY, CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME");
+        sqlBuilder.append(", MAX_VALIDITY, CERT, SIGNER_TYPE, SIGNER_CONF");
+        sqlBuilder.append(", CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME");
         sqlBuilder.append(", DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD");
         sqlBuilder.append(", VALIDITY_MODE, EXTRA_CONTROL");
-        sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         final String sql = sqlBuilder.toString();
 
         // insert to table ca
@@ -946,6 +939,7 @@ class CAManagerQueryExecutor
             ps.setString(idx++, entry.getSignerType());
             ps.setString(idx++, entry.getSignerConf());
             ps.setString(idx++, entry.getCrlSignerName());
+            ps.setString(idx++, entry.getResponderName());
             ps.setString(idx++, entry.getCmpControlName());
             ps.setInt(idx++, entry.getDuplicateKeyMode().getMode());
             ps.setInt(idx++, entry.getDuplicateSubjectMode().getMode());
@@ -1298,6 +1292,7 @@ class CAManagerQueryExecutor
         String signer_type = entry.getSignerType();
         String signer_conf = entry.getSignerConf();
         String crlsigner_name = entry.getCrlSignerName();
+        String responder_name = entry.getResponderName();
         String cmpcontrol_name = entry.getCmpControlName();
         DuplicationMode duplicate_key = entry.getDuplicateKeyMode();
         DuplicationMode duplicate_subject = entry.getDuplicateSubjectMode();
@@ -1392,6 +1387,7 @@ class CAManagerQueryExecutor
         Integer iSigner_type = addToSqlIfNotNull(sqlBuilder, index, signer_type, "SIGNER_TYPE");
         Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signer_conf, "SIGNER_CONF");
         Integer iCrlsigner_name = addToSqlIfNotNull(sqlBuilder, index, crlsigner_name, "CRLSIGNER_NAME");
+        Integer iResponder_name = addToSqlIfNotNull(sqlBuilder, index, responder_name, "RESPONDER_NAME");
         Integer iCmpcontrol_name = addToSqlIfNotNull(sqlBuilder, index, cmpcontrol_name, "CMPCONTROL_NAME");
         Integer iDuplicate_key = addToSqlIfNotNull(sqlBuilder, index, duplicate_key, "DUPLICATE_KEY");
         Integer iDuplicate_subject = addToSqlIfNotNull(sqlBuilder, index, duplicate_subject, "DUPLICATE_SUBJECT");
@@ -1488,6 +1484,13 @@ class CAManagerQueryExecutor
                 String txt = getRealString(crlsigner_name);
                 m.append("crlSigner: '").append(txt).append("'; ");
                 ps.setString(iCrlsigner_name, txt);
+            }
+
+            if(iResponder_name != null)
+            {
+                String txt = getRealString(responder_name);
+                m.append("responder: '").append(txt).append("'; ");
+                ps.setString(iResponder_name, txt);
             }
 
             if(iCmpcontrol_name != null)
@@ -1738,9 +1741,10 @@ class CAManagerQueryExecutor
     }
 
     CmpResponderEntryWrapper changeCmpResponder(
-            final String type,
-            final String conf,
-            final String base64Cert,
+            final String name,
+            String type,
+            String conf,
+            String base64Cert,
             final CAManagerImpl caManager)
     throws CAMgmtException
     {
@@ -1759,23 +1763,25 @@ class CAManagerQueryExecutor
             return null;
         }
 
-        CmpResponderEntry dbEntry = createResponder();
+        CmpResponderEntry dbEntry = createResponder(name);
+
         if(type != null)
         {
-            dbEntry.setType(type);
+            type = dbEntry.getType();
         }
 
         if(conf != null)
         {
-            dbEntry.setConf(getRealString(conf));
+            conf = dbEntry.getConf();
         }
 
         if(base64Cert != null)
         {
-            dbEntry.setBase64Cert(getRealString(base64Cert));
+            base64Cert = dbEntry.getBase64Cert();
         }
 
-        CmpResponderEntryWrapper responder = caManager.createCmpResponder(dbEntry);
+        CmpResponderEntry newDbEntry = new CmpResponderEntry(name, type, conf, base64Cert);
+        CmpResponderEntryWrapper responder = caManager.createCmpResponder(newDbEntry);
 
         sqlBuilder.append("UPDATE RESPONDER SET ");
 
@@ -1823,7 +1829,7 @@ class CAManagerQueryExecutor
                 ps.setString(iCert, txt);
             }
 
-            ps.setString(index.get(), CmpResponderEntry.name);
+            ps.setString(index.get(), name);
 
             ps.executeUpdate();
 
@@ -2255,7 +2261,7 @@ class CAManagerQueryExecutor
         }
     }
 
-    void setCmpResponder(
+    void addCmpResponder(
             final CmpResponderEntry dbEntry)
     throws CAMgmtException
     {
@@ -2266,7 +2272,7 @@ class CAManagerQueryExecutor
         {
             ps = prepareStatement(sql);
             int idx = 1;
-            ps.setString(idx++, CmpResponderEntry.name);
+            ps.setString(idx++, dbEntry.getName());
             ps.setString(idx++, dbEntry.getType());
             ps.setString(idx++, dbEntry.getConf());
 

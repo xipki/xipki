@@ -27,7 +27,13 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element ref="responder" minOccurs="0"/>
+      <xs:element name="responders">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="responder" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="environments">
         <xs:complexType>
           <xs:sequence>
@@ -111,6 +117,7 @@
   <xs:element name="responder" type="responderType"/>
   <xs:complexType name="responderType">
     <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
       <xs:element name="type" type="xs:string"/>
       <xs:element name="conf" type="xs:string" minOccurs="0"/>
       <xs:element name="cert" type="xs:string" minOccurs="0"/>
@@ -177,6 +184,7 @@
       <xs:element name="signerType" type="xs:string"/>
       <xs:element name="signerConf" type="xs:string" minOccurs="0"/>
       <xs:element name="crlsignerName" type="xs:string" minOccurs="0"/>
+      <xs:element name="responderName" type="xs:string" minOccurs="0"/>
       <xs:element name="cmpcontrolName" type="xs:string" minOccurs="0"/>
       <xs:element name="duplicateKey" type="xs:int"/>
       <xs:element name="duplicateSubject" type="xs:int"/>

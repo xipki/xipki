@@ -299,6 +299,17 @@ class X509CAInfo
         caEntry.setCmpControlName(name);
     }
 
+    public String getResponderName()
+    {
+        return caEntry.getResponderName();
+    }
+
+    public void setResponderName(
+            final String name)
+    {
+        caEntry.setResponderName(name);
+    }
+
     public int getNumCrls()
     {
         return caEntry.getNumCrls();

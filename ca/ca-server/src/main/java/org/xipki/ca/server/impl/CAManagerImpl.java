@@ -83,7 +83,6 @@ import org.xipki.ca.api.DfltEnvironmentParameterResolver;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.X509CertWithDBCertId;
-import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.server.impl.X509SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.ca.server.impl.store.CertificateStore;
@@ -98,10 +97,7 @@ import org.xipki.ca.server.mgmt.api.ChangeCAEntry;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.ca.server.mgmt.api.DuplicationMode;
-import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
-import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
@@ -254,8 +250,8 @@ implements CAManager, CmpResponderManager
 
     private final String lockInstanceId;
 
-    private CmpResponderEntry responderDbEntry;
-    private CmpResponderEntryWrapper responder;
+    private Map<String, CmpResponderEntry> responderDbEntries = new ConcurrentHashMap<>();
+    private Map<String, CmpResponderEntryWrapper> responders = new ConcurrentHashMap<>();
 
     private boolean caLockedByMe = false;
     private boolean masterMode = false;
@@ -288,7 +284,8 @@ implements CAManager, CmpResponderManager
 
     private ScheduledThreadPoolExecutor persistentScheduledThreadPoolExecutor;
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
-    private final Map<String, X509CACmpResponder> responders = new ConcurrentHashMap<>();
+
+    private final Map<String, X509CACmpResponder> x509Responders = new ConcurrentHashMap<>();
     private final Map<String, X509CA> x509cas = new ConcurrentHashMap<>();
 
     private String caConfFile;
@@ -705,7 +702,7 @@ implements CAManager, CmpResponderManager
             this.lastStartTime = new Date();
 
             x509cas.clear();
-            responders.clear();
+            x509Responders.clear();
 
             scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(10);
 
@@ -817,7 +814,7 @@ implements CAManager, CmpResponderManager
         x509cas.put(caName, ca);
 
         X509CACmpResponder caResponder = new X509CACmpResponder(this, caName);
-        responders.put(caName, caResponder);
+        x509Responders.put(caName, caResponder);
         return true;
     }
 
@@ -890,7 +887,7 @@ implements CAManager, CmpResponderManager
             final String name)
     {
         ParamChecker.assertNotBlank("name", name);
-        return responders.get(name.toUpperCase());
+        return x509Responders.get(name.toUpperCase());
     }
 
     public ScheduledThreadPoolExecutor getScheduledThreadPoolExecutor()
@@ -914,6 +911,12 @@ implements CAManager, CmpResponderManager
     public Set<String> getCmpRequestorNames()
     {
         return requestorDbEntries.keySet();
+    }
+
+    @Override
+    public Set<String> getCmpResponderNames()
+    {
+        return responderDbEntries.keySet();
     }
 
     @Override
@@ -974,15 +977,31 @@ implements CAManager, CmpResponderManager
             return;
         }
 
-        responderDbEntry = null;
-        responder = null;
+        responderDbEntries.clear();
+        responders.clear();
 
-        responderDbEntry = queryExecutor.createResponder();
-        if(responderDbEntry != null)
+        List<String> names = queryExecutor.getNamesFromTable("RESPONDER");
+
+        if(CollectionUtil.isNotEmpty(names))
         {
-            responderDbEntry.setConfFaulty(true);
-            responder = createCmpResponder(responderDbEntry);
-            responderDbEntry.setConfFaulty(false);
+            for(String name : names)
+            {
+                CmpResponderEntry dbEntry = queryExecutor.createResponder(name);
+                if(dbEntry == null)
+                {
+                    continue;
+                }
+
+                dbEntry.setConfFaulty(true);
+                responderDbEntries.put(name, dbEntry);
+
+                CmpResponderEntryWrapper responder = createCmpResponder(dbEntry);
+                if(responder != null)
+                {
+                    dbEntry.setConfFaulty(false);
+                    responders.put(name, responder);
+                }
+            }
         }
 
         responderInitialized = true;
@@ -1739,49 +1758,61 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public boolean setCmpResponder(
+    public boolean addCmpResponder(
             final CmpResponderEntry dbEntry)
     throws CAMgmtException
     {
         ParamChecker.assertNotNull("dbEntry", dbEntry);
         asssertMasterMode();
-        CmpResponderEntryWrapper _responder = createCmpResponder(dbEntry);
-
-        if(this.responder != null)
-        {
-            removeCmpResponder();
-        }
-
-        this.queryExecutor.setCmpResponder(dbEntry);
-        this.responder = _responder;
-        this.responderDbEntry = dbEntry;
-        return true;
-    }
-
-    @Override
-    public boolean removeCmpResponder()
-    throws CAMgmtException
-    {
-        asssertMasterMode();
-        boolean b = queryExecutor.deleteRows("RESPONDER");
-        if(b == false)
+        String name = dbEntry.getName();
+        if(crlSigners.containsKey(name))
         {
             return false;
         }
 
-        LOG.info("removed responder");
-        responder = null;
-        responderDbEntry = null;
+        CmpResponderEntryWrapper _responder = createCmpResponder(dbEntry);
+        queryExecutor.addCmpResponder(dbEntry);
+        responders.put(name, _responder);
+        responderDbEntries.put(name, dbEntry);
+        return true;
+    }
+
+    @Override
+    public boolean removeCmpResponder(
+            final String name)
+    throws CAMgmtException
+    {
+        ParamChecker.assertNotBlank("name", name);
+        asssertMasterMode();
+        boolean b = queryExecutor.deleteRowWithName(name, "RESPONDER");
+        if(b == false)
+        {
+            return false;
+        }
+        for(String caName : caInfos.keySet())
+        {
+            X509CAInfo caInfo = caInfos.get(caName);
+            if(name.equals(caInfo.getResponderName()))
+            {
+                caInfo.setResponderName(null);
+            }
+        }
+
+        responderDbEntries.remove(name);
+        responders.remove(name);
+        LOG.info("removed Responder '{}'", name);
         return true;
     }
 
     @Override
     public boolean changeCmpResponder(
+            final String name,
             final String type,
             final String conf,
             final String base64Cert)
     throws CAMgmtException
     {
+        ParamChecker.assertNotBlank("name", name);
         asssertMasterMode();
         if(type == null && conf == null && base64Cert == null)
         {
@@ -1789,27 +1820,30 @@ implements CAManager, CmpResponderManager
         }
 
         CmpResponderEntryWrapper newResponder = queryExecutor.changeCmpResponder(
-                type, conf, base64Cert, this);
+                name, type, conf, base64Cert, this);
         if(newResponder == null)
         {
-            LOG.info("no change of CMP responder is processed");
             return false;
         }
 
-        responderDbEntry = newResponder.getDbEntry();
-        responder = newResponder;
+        responders.remove(name);
+        responderDbEntries.remove(name);
+        responderDbEntries.put(name, newResponder.getDbEntry());
+        responders.put(name, newResponder);
         return true;
     }
 
     @Override
-    public CmpResponderEntry getCmpResponder()
+    public CmpResponderEntry getCmpResponder(
+            final String name)
     {
-        return responderDbEntry;
+        return responderDbEntries.get(name);
     }
 
-    public CmpResponderEntryWrapper getCmpResponderWrapper()
+    public CmpResponderEntryWrapper getCmpResponderWrapper(
+            final String name)
     {
-        return responder;
+        return responders.get(name);
     }
 
     @Override
@@ -2319,7 +2353,7 @@ implements CAManager, CmpResponderManager
         ca_has_publishers.remove(name);
         ca_has_requestors.remove(name);
         x509cas.remove(name);
-        responders.remove(name);
+        x509Responders.remove(name);
 
         if(exception != null)
         {
@@ -2760,15 +2794,8 @@ implements CAManager, CmpResponderManager
         List<String> delta_crl_uris = caEntry.getDeltaCrlUris();
         List<String> ocsp_uris = caEntry.getOcspUris();
         List<String> cacert_uris = caEntry.getCacertUris();
-        CertValidity max_validity = caEntry.getMaxValidity();
         String signer_type = caEntry.getSignerType();
         String signer_conf = caEntry.getSignerConf();
-        String crlsigner_name = caEntry.getCrlSignerName();
-        String cmpcontrol_name = caEntry.getCmpControlName();
-        DuplicationMode duplicate_key = caEntry.getDuplicateKeyMode();
-        DuplicationMode duplicate_subject = caEntry.getDuplicateSubjectMode();
-        Set<Permission> permissions = caEntry.getPermissions();
-        ValidityMode validityMode = caEntry.getValidityMode();
 
         asssertMasterMode();
         if(nextSerial < 0)
@@ -2851,23 +2878,18 @@ implements CAManager, CmpResponderManager
         X509CAEntry entry = new X509CAEntry(name, nextSerial, nextCrlNumber, signer_type, signerConf,
                 cacert_uris, ocsp_uris, crl_uris, delta_crl_uris, numCrls, expirationPeriod);
         entry.setCertificate(caCert);
-        entry.setDuplicateKeyMode(duplicate_key);
-        entry.setDuplicateSubjectMode(duplicate_subject);
-        entry.setValidityMode(validityMode);
+        entry.setCmpControlName(caEntry.getCmpControlName());
+        entry.setCrlSignerName(caEntry.getCrlSignerName());
+        entry.setDuplicateKeyMode(caEntry.getDuplicateKeyMode());
+        entry.setDuplicateSubjectMode(caEntry.getDuplicateSubjectMode());
+        entry.setExtraControl(caEntry.getExtraControl());
+        entry.setMaxValidity(caEntry.getMaxValidity());
+        entry.setPermissions(caEntry.getPermissions());
+        entry.setResponderName(caEntry.getResponderName());
         entry.setStatus(status);
-        if(crlsigner_name != null)
-        {
-            entry.setCrlSignerName(crlsigner_name);
-        }
-        if(cmpcontrol_name != null)
-        {
-            entry.setCmpControlName(cmpcontrol_name);
-        }
-        entry.setMaxValidity(max_validity);
-        entry.setPermissions(permissions);
+        entry.setValidityMode(caEntry.getValidityMode());
 
         addCA(entry);
-
         return caCert;
     }
 

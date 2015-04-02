@@ -113,6 +113,10 @@ public class CaUpdateCommand extends CaCommand
             description = "CRL signer name or 'NULL'")
     private String crlSignerName;
 
+    @Option(name = "--responder",
+            description = "Responder name or 'NULL'")
+    private String responderName;
+
     @Option(name = "--cmp-control",
             description = "CMP control name or 'NULL'")
     private String cmpControlName;
@@ -144,6 +148,10 @@ public class CaUpdateCommand extends CaCommand
     @Option(name = "--validity-mode",
             description = "mode of valditity")
     private String validityModeS;
+
+    @Option(name = "--extra-control",
+            description = "extra control")
+    private String extraControl;
 
     private PasswordResolver passwordResolver;
 
@@ -234,6 +242,31 @@ public class CaUpdateCommand extends CaCommand
         if(maxValidity != null)
         {
             entry.setMaxValidity(CertValidity.getInstance(maxValidity));
+        }
+
+        if(crlSignerName != null)
+        {
+            entry.setCrlSignerName(crlSignerName);
+        }
+
+        if(cmpControlName != null)
+        {
+            entry.setCmpControlName(cmpControlName);
+        }
+
+        if(responderName != null)
+        {
+            entry.setResponderName(responderName);
+        }
+
+        if(extraControl != null)
+        {
+            entry.setExtraControl(extraControl);
+        }
+
+        if(numCrls != null)
+        {
+            entry.setNumCrls(numCrls);
         }
 
         boolean b = caManager.changeCA(entry);

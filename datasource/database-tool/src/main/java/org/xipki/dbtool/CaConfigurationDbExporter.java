@@ -63,6 +63,7 @@ import org.xipki.dbi.ca.jaxb.CAConfigurationType.Environments;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Profiles;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Publishers;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Requestors;
+import org.xipki.dbi.ca.jaxb.CAConfigurationType.Responders;
 import org.xipki.dbi.ca.jaxb.CaHasProfileType;
 import org.xipki.dbi.ca.jaxb.CaHasPublisherType;
 import org.xipki.dbi.ca.jaxb.CaHasRequestorType;
@@ -390,8 +391,10 @@ class CaConfigurationDbExporter extends DbPorter
     throws DataAccessException
     {
         System.out.println("exporting table RESPONDER");
-        ResponderType responder = null;
-        final String sql = "SELECT TYPE, CERT, CONF FROM RESPONDER";
+
+        System.out.println("exporting table CRLSIGNER");
+        Responders responders = new Responders();
+        final String sql = "SELECT NAME, TYPE, CONF, CERT FROM RESPONDER";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -402,14 +405,17 @@ class CaConfigurationDbExporter extends DbPorter
 
             while(rs.next())
             {
+                String name = rs.getString("NAME");
                 String type = rs.getString("TYPE");
                 String conf = rs.getString("CONF");
                 String cert = rs.getString("CERT");
 
-                responder = new ResponderType();
+                ResponderType responder = new ResponderType();
+                responder.setName(name);
                 responder.setType(type);
                 responder.setConf(conf);
                 responder.setCert(cert);
+                responders.getResponder().add(responder);
             }
         }catch(SQLException e)
         {
@@ -419,7 +425,7 @@ class CaConfigurationDbExporter extends DbPorter
             releaseResources(stmt, rs);
         }
 
-        caconf.setResponder(responder);
+        caconf.setResponders(responders);
         System.out.println(" exported table RESPONDER");
     }
 
@@ -550,7 +556,7 @@ class CaConfigurationDbExporter extends DbPorter
         sqlBuilder.append("VALIDITY_MODE");
         if(dbSchemaVersion > 1)
         {
-            sqlBuilder.append(", CACERT_URIS, ART, NEXT_CRLNO, CMPCONTROL_NAME, EXTRA_CONTROL");
+            sqlBuilder.append(", CACERT_URIS, ART, NEXT_CRLNO, RESPONDER_NAME, CMPCONTROL_NAME, EXTRA_CONTROL");
         }
         sqlBuilder.append(" FROM CA");
 
@@ -570,6 +576,7 @@ class CaConfigurationDbExporter extends DbPorter
                 int art;
                 int next_crlNo;
                 String cmpcontrol_name;
+                String responder_name;
                 String extraControl;
                 String caCertUris;
 
@@ -577,6 +584,7 @@ class CaConfigurationDbExporter extends DbPorter
                 {
                     art = 1; // X.509
                     next_crlNo = 1;
+                    responder_name = "default";
                     cmpcontrol_name = "default";
                     caCertUris = null;
                     extraControl = null;
@@ -585,6 +593,7 @@ class CaConfigurationDbExporter extends DbPorter
                 {
                     art = rs.getInt("ART");
                     next_crlNo = rs.getInt("NEXT_CRLNO");
+                    responder_name = rs.getString("RESPONDER_NAME");
                     cmpcontrol_name = rs.getString("CMPCONTROL_NAME");
                     caCertUris = rs.getString("CACERT_URIS");
                     extraControl = rs.getString("EXTRA_CONTROL");
@@ -623,6 +632,7 @@ class CaConfigurationDbExporter extends DbPorter
                 ca.setSignerType(signer_type);
                 ca.setSignerConf(signer_conf);
                 ca.setCrlsignerName(crlsigner_name);
+                ca.setResponderName(responder_name);
                 ca.setCmpcontrolName(cmpcontrol_name);
                 ca.setDuplicateKey(duplicateKey);
                 ca.setDuplicateSubject(duplicateSubject);

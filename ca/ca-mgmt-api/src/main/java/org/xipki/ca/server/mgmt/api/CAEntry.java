@@ -55,6 +55,7 @@ public class CAEntry
     private String signerType;
     private String signerConf;
     private String cmpControlName;
+    private String responderName;
     private DuplicationMode duplicateKeyMode;
     private DuplicationMode duplicateSubjectMode;
     private ValidityMode validityMode = ValidityMode.STRICT;
@@ -128,6 +129,17 @@ public class CAEntry
     public String getCmpControlName()
     {
         return cmpControlName;
+    }
+
+    public String getResponderName()
+    {
+        return responderName;
+    }
+
+    public void setResponderName(
+            final String responderName)
+    {
+        this.responderName = responderName;
     }
 
     public DuplicationMode getDuplicateKeyMode()
@@ -230,6 +242,7 @@ public class CAEntry
         }
         sb.append('\n');
         sb.append("cmpcontrolName: ").append(cmpControlName).append('\n');
+        sb.append("responderName: ").append(responderName).append('\n');
         sb.append("duplicateKey: ").append(duplicateKeyMode.getDescription()).append('\n');
         sb.append("duplicateSubject: ").append(duplicateSubjectMode.getDescription()).append('\n');
         sb.append("validityMode: ").append(validityMode).append('\n');
