@@ -42,6 +42,12 @@
   <bean id="requestorNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.RequestorNameCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
+  <bean id="responderNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter">
+    <property name="caManager" ref="caManager"/>
+  </bean>
+  <bean id="responderNamePlusNullCompleter" class="org.xipki.ca.server.mgmt.shell.completer.ResponderNamePlusNullCompleter">
+    <property name="caManager" ref="caManager"/>
+  </bean>
   <bean id="crlSignerNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
@@ -99,6 +105,7 @@
         <entry key="--status" value-ref="caStatusCompleter"/>
         <entry key="--permission" value-ref="permissionCompleter"/>
         <entry key="--crl-signer" value-ref="crlSignerNameCompleter"/>
+        <entry key="--responder" value-ref="responderNameCompleter"/>
         <entry key="--cmp-control" value-ref="cmpControlNameCompleter"/>
         <entry key="--cert" value-ref="filePathCompleter"/>
         <entry key="--signer-type" value-ref="signerTypeCompleter"/>
@@ -159,6 +166,7 @@
         <entry key="--status" value-ref="caStatusCompleter"/>
         <entry key="--permission" value-ref="permissionCompleter"/>
         <entry key="--crl-signer" value-ref="crlSignerNameCompleter"/>
+        <entry key="--responder" value-ref="responderNameCompleter"/>
         <entry key="--cmp-control" value-ref="cmpControlNameCompleter"/>
         <entry key="--signer-type" value-ref="signerTypeCompleter"/>
         <entry key="--duplicate-subject" value-ref="duplicationModeCompleter"/>
@@ -194,6 +202,7 @@
         <entry key="--status" value-ref="caStatusCompleter"/>
         <entry key="--permission" value-ref="permissionCompleter"/>
         <entry key="--crl-signer" value-ref="crlSignerNamePlusNullCompleter"/>
+        <entry key="--responder" value-ref="responderNamePlusNullCompleter"/>
         <entry key="--cmp-control" value-ref="cmpControlNamePlusNullCompleter"/>
         <entry key="--cert" value-ref="filePathCompleter"/>
         <entry key="--signer-type" value-ref="signerTypeCompleter"/>
@@ -573,14 +582,20 @@
       <action class="org.xipki.ca.server.mgmt.shell.ResponderInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
+      <optional-completers>
+        <entry key="--name" value-ref="responderNameCompleter"/>
+      </optional-completers>
     </command>
     <command>
       <action class="org.xipki.ca.server.mgmt.shell.ResponderRemoveCommand">
         <property name="caManager" ref="caManager"/>
       </action>
+      <optional-completers>
+        <entry key="--name" value-ref="responderNameCompleter"/>
+      </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.ResponderSetCommand">
+      <action class="org.xipki.ca.server.mgmt.shell.ResponderAddCommand">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -595,6 +610,7 @@
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
+        <entry key="--name" value-ref="responderNameCompleter"/>
         <entry key="--signer-type" value-ref="signerTypeCompleter"/>
         <entry key="--cert" value-ref="filePathCompleter"/>
       </optional-completers>

@@ -35,6 +35,12 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
@@ -47,6 +53,9 @@ import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 public class ResponderInfoCommand extends CaCommand
 {
 
+    @Argument(index = 0, name = "name", description = "certificate profile name")
+    private String name;
+
     @Option(name = "--verbose", aliases="-v",
             description = "show responder information verbosely")
     private Boolean verbose = Boolean.FALSE;
@@ -55,8 +64,40 @@ public class ResponderInfoCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        CmpResponderEntry responder = caManager.getCmpResponder();
-        out(responder.toString(verbose.booleanValue()));
+        StringBuilder sb = new StringBuilder();
+
+        if(name == null)
+        {
+            Set<String> names = caManager.getCmpResponderNames();
+            int n = names.size();
+
+            if(n == 0 || n == 1)
+            {
+                sb.append(((n == 0) ? "no" : "1") + " responder is configured\n");
+            }
+            else
+            {
+                sb.append(n + " responders are configured:\n");
+            }
+
+            List<String> sorted = new ArrayList<>(names);
+            Collections.sort(sorted);
+
+            for(String name : sorted)
+            {
+                sb.append("\t").append(name).append("\n");
+            }
+        }
+        else
+        {
+            CmpResponderEntry entry = caManager.getCmpResponder(name);
+            if(entry != null)
+            {
+                sb.append(entry.toString());
+            }
+        }
+
+        out(sb.toString());
         return null;
     }
 }

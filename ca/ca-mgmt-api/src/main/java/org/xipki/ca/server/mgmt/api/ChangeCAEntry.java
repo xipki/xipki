@@ -52,6 +52,7 @@ public class ChangeCAEntry
     private String signerType;
     private String signerConf;
     private String cmpControlName;
+    private String responderName;
     private DuplicationMode duplicateKeyMode;
     private DuplicationMode duplicateSubjectMode;
     private ValidityMode validityMode = ValidityMode.STRICT;
@@ -124,6 +125,17 @@ public class ChangeCAEntry
             final String cmpControlName)
     {
         this.cmpControlName = cmpControlName;
+    }
+
+    public String getResponderName()
+    {
+        return responderName;
+    }
+
+    public void setResponderName(
+            final String responderName)
+    {
+        this.responderName = responderName;
     }
 
     public DuplicationMode getDuplicateKeyMode()

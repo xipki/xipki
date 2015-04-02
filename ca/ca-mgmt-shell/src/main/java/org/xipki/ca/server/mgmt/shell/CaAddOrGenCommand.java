@@ -118,6 +118,10 @@ public abstract class CaAddOrGenCommand extends CaCommand
             description = "CRL signer name")
     private String crlSignerName;
 
+    @Option(name = "--responder",
+            description = "Responder name")
+    private String responderName;
+
     @Option(name = "--cmp-control",
             description = "CMP control name")
     private String cmpControlName;
@@ -228,6 +232,11 @@ public abstract class CaAddOrGenCommand extends CaCommand
         if(crlSignerName != null)
         {
             entry.setCrlSignerName(crlSignerName);
+        }
+
+        if(responderName != null)
+        {
+            entry.setResponderName(responderName);
         }
 
         CertValidity _maxValidity = CertValidity.getInstance(maxValidity);

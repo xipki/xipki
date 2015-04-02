@@ -211,14 +211,14 @@ implements Serializable
         return cert;
     }
 
-    public String getCrlSignerName()
-    {
-        return crlSignerName;
-    }
-
     public int getNumCrls()
     {
         return numCrls;
+    }
+
+    public String getCrlSignerName()
+    {
+        return crlSignerName;
     }
 
     public void setCrlSignerName(

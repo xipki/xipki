@@ -73,6 +73,7 @@ import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.common.cmp.ProtectionResult;
 import org.xipki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.ConfigurationException;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.X509Util;
@@ -89,16 +90,35 @@ abstract class CmpResponder
 
     private final SecureRandom random = new SecureRandom();
 
-    protected abstract ConcurrentContentSigner getSigner();
+    protected abstract ConcurrentContentSigner getSigner()
+    throws ConfigurationException;
 
-    protected abstract GeneralName getSender();
+    protected abstract GeneralName getSender()
+    throws ConfigurationException;
 
     protected abstract boolean intendsMe(
-            GeneralName requestRecipient);
+            GeneralName requestRecipient)
+    throws ConfigurationException;
 
     protected final SecurityFactory securityFactory;
 
-    public abstract boolean isCAInService();
+    public boolean isInService()
+    {
+        try
+        {
+            return getSigner() != null;
+        }catch(Exception e)
+        {
+            final String msg = "error while getting responder signer";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(msg, e);
+
+            return false;
+        }
+    }
 
     /**
      * @return never returns {@code null}.
@@ -113,7 +133,8 @@ abstract class CmpResponder
             String user,
             ASN1OctetString transactionId,
             GeneralPKIMessage pkiMessage,
-            AuditEvent auditEvent);
+            AuditEvent auditEvent)
+    throws ConfigurationException;
 
     protected CmpResponder(
             final SecurityFactory securityFactory)
@@ -127,6 +148,7 @@ abstract class CmpResponder
             final PKIMessage pkiMessage,
             final X509Certificate tlsClientCert,
             final AuditEvent auditEvent)
+    throws ConfigurationException
     {
         GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
 
@@ -409,6 +431,7 @@ abstract class CmpResponder
             final PKIHeader requestHeader,
             final int failureCode,
             final String statusText)
+    throws ConfigurationException
     {
         GeneralName respRecipient = requestHeader.getSender();
 
@@ -448,13 +471,15 @@ abstract class CmpResponder
         return new PKIStatusInfo(PKIStatus.rejection, statusMessage, failureInfo);
     }
 
-    public X500Name getResponderName()
+    public X500Name getResponderSubject()
+    throws ConfigurationException
     {
         GeneralName sender = getSender();
         return sender == null ? null : (X500Name) sender.getName();
     }
 
     public X509Certificate getResponderCert()
+    throws ConfigurationException
     {
         ConcurrentContentSigner signer = getSigner();
         return signer == null ? null : signer.getCertificate();

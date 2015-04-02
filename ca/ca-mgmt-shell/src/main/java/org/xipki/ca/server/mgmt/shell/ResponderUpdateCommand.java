@@ -52,6 +52,12 @@ import org.xipki.security.api.PasswordResolver;
 @Command(scope = "xipki-ca", name = "responder-update", description="update responder")
 public class ResponderUpdateCommand extends CaCommand
 {
+    @Option(name = "--name", aliases = "-n",
+            required = true,
+            description = "responder name\n"
+                    + "(required)")
+    private String name;
+
     @Option(name = "--signer-type",
             required = true,
             description = "type of the responder signer\n"
@@ -95,8 +101,8 @@ public class ResponderUpdateCommand extends CaCommand
             signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
         }
 
-        boolean b = caManager.changeCmpResponder(signerType, signerConf, cert);
-        output(b, "updated", "could not update", "CMP responder");
+        boolean b = caManager.changeCmpResponder(name, signerType, signerConf, cert);
+        output(b, "updated", "could not update", "CMP responder " + name);
         return null;
     }
 

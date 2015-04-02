@@ -104,6 +104,8 @@ public interface CAManager
 
     Set<String> getCmpRequestorNames();
 
+    Set<String> getCmpResponderNames();
+
     Set<String> getCrlSignerNames();
 
     Set<String> getCmpControlNames();
@@ -191,20 +193,23 @@ public interface CAManager
             CertprofileEntry dbEntry)
     throws CAMgmtException;
 
-    boolean setCmpResponder(
+    boolean addCmpResponder(
             CmpResponderEntry dbEntry)
     throws CAMgmtException;
 
-    boolean removeCmpResponder()
+    boolean removeCmpResponder(
+            String name)
     throws CAMgmtException;
 
+    CmpResponderEntry getCmpResponder(
+            String name);
+
     boolean changeCmpResponder(
+            String name,
             String type,
             String conf,
             String base64Cert)
     throws CAMgmtException;
-
-    CmpResponderEntry getCmpResponder();
 
     boolean addCrlSigner(
             X509CrlSignerEntry dbEntry)

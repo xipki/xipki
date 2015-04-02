@@ -40,6 +40,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.xipki.common.ParamChecker;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.X509Util;
 
@@ -50,16 +51,45 @@ import org.xipki.common.util.X509Util;
 public class CmpResponderEntry implements Serializable
 {
     private static final long serialVersionUID = 1L;
-    public static final String name = "default";
-    private String type;
-    private String conf;
+    private final String name;
+    private final String type;
+    private final String conf;
     private boolean certFaulty;
     private boolean confFaulty;
-    private String base64Cert;
+    private final String base64Cert;
     private X509Certificate cert;
 
-    public CmpResponderEntry()
+    public CmpResponderEntry(
+            final String name,
+            final String type,
+            final String conf,
+            final String base64Cert)
     {
+        ParamChecker.assertNotBlank("name", name);
+        ParamChecker.assertNotBlank("type", type);
+
+        this.name = name;
+        this.type = type;
+        this.conf = conf;
+        this.base64Cert = base64Cert;
+
+        if(base64Cert == null)
+        {
+            return;
+        }
+
+        try
+        {
+            this.cert = X509Util.parseBase64EncodedCert(base64Cert);
+        }catch(Throwable t)
+        {
+            this.certFaulty = true;
+        }
+    }
+
+    public String getName()
+    {
+        return name;
     }
 
     public String getType()
@@ -67,21 +97,9 @@ public class CmpResponderEntry implements Serializable
         return type;
     }
 
-    public void setType(
-            final String type)
-    {
-        this.type = type;
-    }
-
     public String getConf()
     {
         return conf;
-    }
-
-    public void setConf(
-            final String conf)
-    {
-        this.conf = conf;
     }
 
     public X509Certificate getCertificate()
@@ -102,20 +120,6 @@ public class CmpResponderEntry implements Serializable
     public String getBase64Cert()
     {
         return base64Cert;
-    }
-
-    public void setBase64Cert(
-            final String base64Cert)
-    {
-        this.certFaulty = false;
-        this.base64Cert = base64Cert;
-        try
-        {
-            this.cert = X509Util.parseBase64EncodedCert(base64Cert);
-        }catch(Throwable t)
-        {
-            this.certFaulty = true;
-        }
     }
 
     public boolean isFaulty()

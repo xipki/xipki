@@ -40,6 +40,7 @@ import java.security.cert.X509Certificate;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
+import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.security.api.PasswordResolver;
 
@@ -47,9 +48,15 @@ import org.xipki.security.api.PasswordResolver;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "responder-set", description="set responder")
-public class ResponderSetCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "responder-add", description="add responder")
+public class ResponderAddCommand extends CaCommand
 {
+    @Option(name = "--name", aliases = "-n",
+            required = true,
+            description = "responder name\n"
+                    + "(required)")
+    private String name;
+
     @Option(name = "--signer-type",
             required = true,
             description = "type of the responder signer\n"
@@ -76,24 +83,23 @@ public class ResponderSetCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        CmpResponderEntry entry = new CmpResponderEntry();
+        String base64Cert = null;
         X509Certificate signerCert = null;
         if(certFile != null)
         {
             signerCert = X509Util.parseCert(certFile);
-            entry.setCertificate(signerCert);
+            base64Cert = IoUtil.base64Encode(signerCert.getEncoded(), false);
         }
-        entry.setType(signerType);
+
+        CmpResponderEntry entry = new CmpResponderEntry(name, signerType, signerConf, base64Cert);
 
         if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
         {
             signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
         }
 
-        entry.setConf(signerConf);
-
-        boolean b = caManager.setCmpResponder(entry);
-        output(b, "configured", "could not configure", "CMP responder");
+        boolean b = caManager.addCmpResponder(entry);
+        output(b, "added", "could not add", "CMP responder " + name);
         return null;
     }
 

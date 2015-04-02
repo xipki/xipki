@@ -132,6 +132,7 @@ import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.ConfigurationException;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.XipkiCmpConstants;
@@ -203,9 +204,19 @@ class X509CACmpResponder extends CmpResponder
     }
 
     @Override
-    public boolean isCAInService()
+    public boolean isInService()
     {
-        return CAStatus.ACTIVE == getCA().getCAInfo().getStatus();
+        if(super.isInService() == false)
+        {
+            return false;
+        }
+
+        if(CAStatus.ACTIVE != getCA().getCAInfo().getStatus())
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public HealthCheckResult healthCheck()
@@ -214,7 +225,15 @@ class X509CACmpResponder extends CmpResponder
 
         boolean healthy = result.isHealthy();
 
-        boolean responderHealthy = caManager.getCmpResponderWrapper().getSigner().isHealthy();
+        boolean responderHealthy;
+        try
+        {
+            responderHealthy = caManager.getCmpResponderWrapper(
+                    getResponderName()).getSigner().isHealthy();
+        }catch(ConfigurationException e)
+        {
+            responderHealthy = false;
+        }
         healthy &= responderHealthy;
 
         HealthCheckResult responderHealth = new HealthCheckResult("Responder");
@@ -225,6 +244,17 @@ class X509CACmpResponder extends CmpResponder
         return result;
     }
 
+    public String getResponderName()
+    throws ConfigurationException
+    {
+        String name = getCA().getCAInfo().getResponderName();
+        if(name == null)
+        {
+            throw new ConfigurationException("No responder is configured for CA " + caName);
+        }
+        return name;
+    }
+
     @Override
     protected PKIMessage intern_processPKIMessage(
             final RequestorInfo requestor,
@@ -232,6 +262,7 @@ class X509CACmpResponder extends CmpResponder
             final ASN1OctetString tid,
             final GeneralPKIMessage message,
             final AuditEvent auditEvent)
+    throws ConfigurationException
     {
         if(requestor instanceof CmpRequestorInfo == false)
         {
@@ -1442,19 +1473,23 @@ class X509CACmpResponder extends CmpResponder
 
     @Override
     protected ConcurrentContentSigner getSigner()
+    throws ConfigurationException
     {
-        return caManager.getCmpResponderWrapper().getSigner();
+        String name = getResponderName();
+        return caManager.getCmpResponderWrapper(name).getSigner();
     }
 
     @Override
     protected GeneralName getSender()
+    throws ConfigurationException
     {
-        return caManager.getCmpResponderWrapper().getSubjectAsGeneralName();
+        return caManager.getCmpResponderWrapper(getResponderName()).getSubjectAsGeneralName();
     }
 
     @Override
     protected boolean intendsMe(
             final GeneralName requestRecipient)
+    throws ConfigurationException
     {
         if(requestRecipient == null)
         {
@@ -1469,7 +1504,8 @@ class X509CACmpResponder extends CmpResponder
         if(requestRecipient.getTagNo() == GeneralName.directoryName)
         {
             X500Name x500Name = X500Name.getInstance(requestRecipient.getName());
-            if(x500Name.equals(caManager.getCmpResponderWrapper().getSubjectAsX500Name()))
+            if(x500Name.equals(
+                    caManager.getCmpResponderWrapper(getResponderName()).getSubjectAsX500Name()))
             {
                 return true;
             }

@@ -56,7 +56,6 @@ implements Serializable
     private List<String> issuerLocations;
     private X509Certificate cert;
     private String crlSignerName;
-    private String cmpControlName;
     private Integer numCrls;
     private String extraControl;
 
@@ -142,17 +141,6 @@ implements Serializable
             final String crlSignerName)
     {
         this.crlSignerName = crlSignerName;
-    }
-
-    public String getCmpControlName()
-    {
-        return cmpControlName;
-    }
-
-    public void setCmpControlName(
-            final String cmpControlName)
-    {
-        this.cmpControlName = cmpControlName;
     }
 
     public Integer getNumCrls()

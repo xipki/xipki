@@ -53,11 +53,11 @@ xipki-ca:publisher-add --name OCSP.PUBLISHER --type OCSP \
   --conf  datasource?ocsp%publish.goodcerts?true
 
 # CMP Responder
-xipki-ca:responder-set --signer-type  JKS \
+xipki-ca:responder-add --name responder1 --signer-type  JKS \
   --signer-conf  password?1234%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?SHA256withRSA
 
 # CMP Requestors
-xipki-ca:requestor-add --cert etc/tlskeys/tls-client.der --name requestor
+xipki-ca:requestor-add --cert etc/tlskeys/tls-client.der --name requestor1
 
 ## CRL Signer
 # Generate CRL every day at 02:00 UTC with 90 minutes overlap time
