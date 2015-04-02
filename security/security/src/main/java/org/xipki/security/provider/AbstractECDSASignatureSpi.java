@@ -55,7 +55,8 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi
     private boolean x962;
 
     AbstractECDSASignatureSpi(
-            final Digest digest, boolean x962)
+            final Digest digest,
+            final boolean x962)
     {
         this.digest = digest;
         this.x962 = x962;
