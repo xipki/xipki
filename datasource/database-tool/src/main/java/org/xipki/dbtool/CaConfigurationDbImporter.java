@@ -66,6 +66,7 @@ import org.xipki.dbi.ca.jaxb.CAConfigurationType.Environments;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Profiles;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Publishers;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Requestors;
+import org.xipki.dbi.ca.jaxb.CAConfigurationType.Responders;
 import org.xipki.dbi.ca.jaxb.CaHasProfileType;
 import org.xipki.dbi.ca.jaxb.CaHasPublisherType;
 import org.xipki.dbi.ca.jaxb.CaHasRequestorType;
@@ -124,7 +125,7 @@ class CaConfigurationDbImporter extends DbPorter
         try
         {
             import_cmpcontrol(caconf.getCmpcontrols());
-            import_responder(caconf.getResponder());
+            import_responder(caconf.getResponders());
             import_environment(caconf.getEnvironments());
             import_requestor(caconf.getRequestors());
             import_publisher(caconf.getPublishers());
@@ -181,12 +182,13 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" imported table CMPCONTROL");
     }
 
+    @SuppressWarnings("resource")
     private void import_responder(
-            final ResponderType responder)
+            final Responders responders)
     throws DataAccessException
     {
         System.out.println("importing table RESPONDER");
-        if(responder == null)
+        if(responders == null)
         {
             System.out.println(" imported table RESPONDER: nothing to import");
             return;
@@ -198,24 +200,28 @@ class CaConfigurationDbImporter extends DbPorter
         {
             ps = prepareStatement(sql);
 
-            try
+            for(ResponderType responder : responders.getResponder())
             {
-                int idx = 1;
-                ps.setString(idx++, "default");
-                ps.setString(idx++, responder.getType());
-                ps.setString(idx++, responder.getConf());
-                ps.setString(idx++, responder.getCert());
+                try
+                {
+                    int idx = 1;
+                    ps.setString(idx++, responder.getName());
+                    ps.setString(idx++, responder.getType());
+                    ps.setString(idx++, responder.getConf());
+                    ps.setString(idx++, responder.getCert());
 
-                ps.executeUpdate();
-            }catch(SQLException e)
-            {
-                System.err.println("error while importing RESPONDER");
-                throw translate(sql, e);
+                    ps.executeUpdate();
+                }catch(SQLException e)
+                {
+                    System.err.println("error while importing CRLSIGNER with NAME=" + responder.getName());
+                    throw translate(sql, e);
+                }
             }
         }finally
         {
             releaseResources(ps, null);
         }
+
         System.out.println(" imported table RESPONDER");
     }
 
@@ -414,11 +420,11 @@ class CaConfigurationDbImporter extends DbPorter
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("INSERT INTO CA (NAME, ART, SUBJECT, NEXT_SERIAL, NEXT_CRLNO, STATUS,");
         sqlBuilder.append(" CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS, MAX_VALIDITY,");
-        sqlBuilder.append(" CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME,");
+        sqlBuilder.append(" CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME,");
         sqlBuilder.append(" DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS,");
         sqlBuilder.append(" EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, VALIDITY_MODE,");
         sqlBuilder.append(" EXTRA_CONTROL)");
-        sqlBuilder.append(" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        sqlBuilder.append(" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         final String sql = sqlBuilder.toString();
 
         PreparedStatement ps = null;
@@ -451,6 +457,7 @@ class CaConfigurationDbImporter extends DbPorter
                     ps.setString(idx++, ca.getSignerType());
                     ps.setString(idx++, ca.getSignerConf());
                     ps.setString(idx++, ca.getCrlsignerName());
+                    ps.setString(idx++, ca.getResponderName());
                     ps.setString(idx++, ca.getCmpcontrolName());
                     ps.setInt(idx++, ca.getDuplicateKey());
                     ps.setInt(idx++, ca.getDuplicateSubject());
