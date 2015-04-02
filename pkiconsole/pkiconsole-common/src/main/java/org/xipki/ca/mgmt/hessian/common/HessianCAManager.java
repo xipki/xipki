@@ -114,6 +114,8 @@ public interface HessianCAManager
 
     Set<String> getCmpRequestorNames();
 
+    Set<String> getCmpResponderNames();
+
     Set<String> getCrlSignerNames();
 
     Set<String> getCmpControlNames();
@@ -200,20 +202,23 @@ public interface HessianCAManager
             CertprofileEntry dbEntry)
     throws HessianCAMgmtException;
 
-    boolean setCmpResponder(
+    boolean addCmpResponder(
             CmpResponderEntry dbEntry)
     throws HessianCAMgmtException;
 
-    boolean removeCmpResponder()
+    boolean removeCmpResponder(
+            String name)
     throws HessianCAMgmtException;
 
     boolean changeCmpResponder(
+            String name,
             String type,
             String conf,
             String base64Cert)
     throws HessianCAMgmtException;
 
-    CmpResponderEntry getCmpResponder();
+    CmpResponderEntry getCmpResponder(
+            String name);
 
     boolean addCrlSigner(
             X509CrlSignerEntry dbEntry)

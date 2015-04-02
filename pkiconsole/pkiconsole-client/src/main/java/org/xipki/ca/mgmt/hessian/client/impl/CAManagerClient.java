@@ -248,6 +248,12 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
+    public Set<String> getCmpResponderNames()
+    {
+        return client.getCmpResponderNames();
+    }
+
+    @Override
     public Set<String> getCrlSignerNames()
     {
         return client.getCrlSignerNames();
@@ -423,34 +429,37 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public boolean setCmpResponder(
+    public boolean addCmpResponder(
             final CmpResponderEntry dbEntry)
     throws CAMgmtException
     {
-        return client.setCmpResponder(dbEntry);
+        return client.addCmpResponder(dbEntry);
     }
 
     @Override
-    public boolean removeCmpResponder()
+    public boolean removeCmpResponder(
+            final String name)
     throws CAMgmtException
     {
-        return client.removeCmpResponder();
+        return client.removeCmpResponder(name);
     }
 
     @Override
     public boolean changeCmpResponder(
+            final String name,
             final String type,
             final String conf,
             final String base64Cert)
     throws CAMgmtException
     {
-        return client.changeCmpResponder(type, conf, base64Cert);
+        return client.changeCmpResponder(name, type, conf, base64Cert);
     }
 
     @Override
-    public CmpResponderEntry getCmpResponder()
+    public CmpResponderEntry getCmpResponder(
+            final String name)
     {
-        return client.getCmpResponder();
+        return client.getCmpResponder(name);
     }
 
     @Override

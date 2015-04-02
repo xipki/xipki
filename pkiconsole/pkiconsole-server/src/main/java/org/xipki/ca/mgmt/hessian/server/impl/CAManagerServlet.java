@@ -266,6 +266,12 @@ implements HessianCAManager
     }
 
     @Override
+    public Set<String> getCmpResponderNames()
+    {
+        return caManager.getCmpResponderNames();
+    }
+
+    @Override
     public Set<String> getCrlSignerNames()
     {
         return caManager.getCrlSignerNames();
@@ -525,13 +531,13 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean setCmpResponder(
+    public boolean addCmpResponder(
             final CmpResponderEntry dbEntry)
     throws HessianCAMgmtException
     {
         try
         {
-            return caManager.setCmpResponder(dbEntry);
+            return caManager.addCmpResponder(dbEntry);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -539,12 +545,13 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean removeCmpResponder()
+    public boolean removeCmpResponder(
+            final String name)
     throws HessianCAMgmtException
     {
         try
         {
-            return caManager.removeCmpResponder();
+            return caManager.removeCmpResponder(name);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -553,6 +560,7 @@ implements HessianCAManager
 
     @Override
     public boolean changeCmpResponder(
+            final String name,
             final String type,
             final String conf,
             final String base64Cert)
@@ -560,7 +568,7 @@ implements HessianCAManager
     {
         try
         {
-            return caManager.changeCmpResponder(type, conf, base64Cert);
+            return caManager.changeCmpResponder(name, type, conf, base64Cert);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -568,9 +576,9 @@ implements HessianCAManager
     }
 
     @Override
-    public CmpResponderEntry getCmpResponder()
+    public CmpResponderEntry getCmpResponder(String name)
     {
-        return caManager.getCmpResponder();
+        return caManager.getCmpResponder(name);
     }
 
     @Override
