@@ -43,7 +43,7 @@ import org.xipki.common.util.IoUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "publisher-update", description="update publisher")
+@Command(scope = "xipki-ca", name = "publisher-up", description="update publisher")
 public class PublisherUpdateCommand extends CaCommand
 {
 

@@ -58,7 +58,7 @@ import org.xipki.security.api.PasswordResolver;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "ca-update", description="update CA")
+@Command(scope = "xipki-ca", name = "ca-up", description="update CA")
 public class CaUpdateCommand extends CaCommand
 {
     @Option(name = "--name", aliases = "-n",
