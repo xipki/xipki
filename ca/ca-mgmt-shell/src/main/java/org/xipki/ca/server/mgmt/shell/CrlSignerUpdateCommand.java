@@ -50,7 +50,7 @@ import org.xipki.security.api.PasswordResolver;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "crlsigner-update", description="update CRL signer")
+@Command(scope = "xipki-ca", name = "crlsigner-up", description="update CRL signer")
 public class CrlSignerUpdateCommand extends CaCommand
 {
     @Option(name = "--name", aliases = "-n",
