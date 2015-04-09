@@ -182,45 +182,15 @@ Run Demo
 
     If you have changed the content within folder `$XIPKI_HOME/etc` or `$XIPKI_HOME/system`, please delete the folder `$XIPKI_HOME/data` before starting XiPKI.
 
-* Run the pre-configured OSGi-commands in karaf terminal
-  
-    ```sh
-    source <OSGi batch script file>
-    ```
-    The script file is
-     * For RSA key in PKCS#12 file
-     
-      ```sh
-      demo/rsa-demo.script
-      ```
-       
-     * For EC key in PKCS#12 file
-     
-      ```sh
-      demo/ec-demo.script
-      ```
-       
-     * For DSA key in PKCS#12 file
-     
-      ```sh
-      demo/dsa-demo.script
-      ```
-       
-     * For RSA key in PKCS#11 device (simulator)
-     
-      ```sh
-      demo/hsm-rsa-demo.script
-      ```
-       
-     * For EC key in PKCS#11 device (simulator)
-     
-      ```sh
-      demo/hsm-ec-demo.script
-      ```
-     * For DSA key in PKCS#11 device (simulator)
-     
-      ```sh
-      demo/hsm-dsa-demo.script
-      ```
-    The generated keys, certificates, CRLs are saved in folder `$XIPKI_HOME/output`
+* Run the pre-configured OSGi-commands in OSGi console
+
+In the OSGi console, call `source <OSGi batch script file>`, the demo script files are in folder `xipki/demo` and can be retrieved from the following table. The generated keys, certificates and CRLs are saved in folder `output`.
+
+|Signature Algorithm \ Key container |  PKCS#12  | PKCS#11 (HSM simulator)|
+|:----------------:|:------------------:|:-----------------------:|
+|RSA PKCS#1v1.5    | rsa-demo.script    | hsm-rsa-demo.script     |
+|RSA PSS           | rsapss-demo.script | hsm-rsapss-demo.script  |
+|DSA               | dsa-demo.script    | hsm-dsa-demo.script     |
+|ECDSA             | ec-demo.script     | hsm-ec-demo.script      |
+|PlainECDSA (BSI)  | plainec-demo.script| hsm-plainec-demo.script |
   
