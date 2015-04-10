@@ -268,7 +268,7 @@ public class ProfileConfCreatorDemo
     private static X509ProfileType Certprofile_Cross()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("Certprofile Cross",  false, "10y", false,
+        X509ProfileType profile = getBaseProfile("Certprofile Cross",  true, "10y", false,
                 new String[]{"SHA256", "SHA1"});
 
         // Subject
