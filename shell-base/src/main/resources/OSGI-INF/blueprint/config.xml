@@ -49,5 +49,8 @@
         <null/>
       </completers>
     </command>
+    <command>
+      <action class="org.xipki.console.karaf.impl.PromptCommand"/>
+    </command>
   </command-bundle>
 </blueprint>
