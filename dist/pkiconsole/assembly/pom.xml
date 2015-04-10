@@ -142,6 +142,7 @@
                 <!-- project-core features -->
                 <feature>xipki-pkiconsole</feature>
                 <feature>xipki-pkiconsole-shell</feature>
+                <feature>xipki-security-shell</feature>
               </features>
             </configuration>
           </execution>

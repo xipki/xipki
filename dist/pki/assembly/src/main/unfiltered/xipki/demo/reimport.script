@@ -7,7 +7,7 @@ feature:install xipki-database-tool
 # Wait two seconds
 sleep 1000
 
-xipki-file:rm -r -f output/DB
+xipki-cmd:rm -r -f output/DB
 
 ## Export CA
 

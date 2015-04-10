@@ -1,11 +1,11 @@
-PLEN = 1024
+KEYSIZE = 2048
 
-# Valid signer algos are SHA<n>withDSA, where n is 1, 256, 384 and 512
+# Valid signer algos are SHA<n>withRSAandMGF1, where n is 1, 256, 384 and 512
 #
-CA_SIGNER_ALGO = SHA256withDSA,SHA1withDSA
+CA_SIGNER_ALGO = SHA256withRSAandMGF1,SHA1withRSAandMGF1
 
 echo "========================================================"
-echo "||           DEMO DSA with PKCS#12 Key                ||"
+echo "||         DEMO RSA (PSS) with PKCS#12 Key            ||"
 echo "========================================================"
 
 feature:install xipki-security-shell
@@ -13,16 +13,18 @@ feature:install xipki-security-shell
 # Wait one second
 sleep 1000
 
-xipki-file:rm -r -f output
+xipki-cmd:rm -r -f output
 
-xipki-tk:dsa-p12 --password 1234 --plen $PLEN --out output/RCA1.p12 \
+xipki-tk:rsa-p12 --password 1234 --key-size $KEYSIZE --out output/RCA1.p12 \
   --subject "CN=RCA1"
 
-xipki-tk:dsa-p12 --password 1234 --plen $PLEN --out output/SubCA1.p12 \
+xipki-tk:rsa-p12 --password 1234 --key-size $KEYSIZE --out output/SubCA1.p12 \
   --subject "CN=SubCA1"
 
-xipki-tk:dsa-p12 --password 1234 --plen $PLEN --out output/SubCAwithCRL1.p12 \
+xipki-tk:rsa-p12 --password 1234 --key-size $KEYSIZE --out output/SubCAwithCRL1.p12 \
   --subject "CN=SubCAwithCRL1"
+
+source ./xipki/demo/initdb.script
 
 source ./xipki/demo/prepare.script
 

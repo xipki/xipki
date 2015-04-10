@@ -11,10 +11,6 @@
     <fileSet>
       <directory>${project.basedir}/../../demo-tlskeys</directory>
       <outputDirectory>/etc/tlskeys</outputDirectory>
-      <includes>
-        <include>tls-client-keystore.jks</include>
-        <include>tls-client-truststore.jks</include>
-      </includes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
@@ -79,6 +75,19 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
+    <!-- Copy demo resources -->
+    <fileSet>
+      <directory>${project.basedir}/../../pki/assembly/src/main/unfiltered/xipki/demo</directory>
+      <includes>
+        <include>prepare.script</include>
+        <include>p12.script</include>
+        <include>profile/**</include>
+      </includes>
+      <outputDirectory>xipki/demo</outputDirectory>
+      <filtered>false</filtered>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>    
     <!-- Copy over start scripts -->
     <fileSet>
       <!-- in case we replace them with updated scripts

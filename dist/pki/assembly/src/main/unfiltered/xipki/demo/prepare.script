@@ -1,22 +1,4 @@
 #################################################################
-#                      Initialize the database                  #
-#################################################################
-
-feature:install xipki-database-tool
-
-sleep 1000
-
-xipki-db:initdb --quiet
-
-feature:uninstall xipki-database-tool
-
-feature:install xipki-camgmt-shell
-
-sleep 1000
-
-xipki-ca:restart
-
-#################################################################
 #                       PREPARE ENVIRONMENET                    #
 #################################################################
 
