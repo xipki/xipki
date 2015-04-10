@@ -212,7 +212,7 @@ public class XMLUtil
         Node node = element.getFirstChild();
         if(node == null)
         {
-        	return null;
+            return null;
         }
 
         do
