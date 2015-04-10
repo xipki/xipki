@@ -8,10 +8,9 @@ sleep 1000
 ## Add the profile RCA
 xipki-ca:profile-add --name RCA --type XML --conf-file xipki/demo/profile/Certprofile_RootCA.xml
 
-## Create the PKCS#10 request for the command caqa:check-cert in QA 
-xipki-tk:req-p12 --p12 output/RCA1.p12 --password 1234 --out output/RCA1.p10 \
-  --subject "CN=RCA1,O=xipki,C=DE"
-  
+## Create the PKCS#10 request for the command caqa:check-cert in QA
+xipki-cmd:prompt "In CA shell call 'xipki-tk:req --slot 1 --key-label $RCA_KEY_LABEL --out output/RCA1.p10 --subject \"CN=RCA1,O=xipki,C=DE\"', then copy the output to output/RCA1.p10"
+
 ## Generate selfsigned RCA
 xipki-ca:gen-rca --name RCA1 \
   --p10 output/RCA1.p10 \
@@ -21,18 +20,15 @@ xipki-ca:gen-rca --name RCA1 \
   --next-serial 1 \
   --next-crl-no 2 \
   --max-validity 10y \
-  --signer-type PKCS12 \
-  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?$CA_SIGNER_ALGO \
+  --signer-type PKCS11 \
+  --signer-conf algo?$CA_SIGNER_ALGO%slot?1%key-label?$RCA_KEY_LABEL \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
   --responder responder1 \
-  --duplicate-subject  permitted \
+  --duplicate-subject permitted \
   --duplicate-key permitted \
   --validity-mode CUTOFF
-
-## Update the certificate in the device
-xipki-tk:update-cert-p12 --p12 output/RCA1.p12 --password 1234 --cert output/RCA1.der
 
 xipki-ca:caalias-add --ca RCA1 --alias RCA
 
@@ -50,7 +46,7 @@ xipki-ca:caprofile-add --ca RCA1 --profile SubCA.Complex
 xipki-ca:capub-add --ca RCA1 --publisher OCSP.PUBLISHER
 
 # Add requestor to CA
-xipki-ca:careq-add --requestor  requestor1 --permission all --ra yes --profile all --ca RCA1
+xipki-ca:careq-add --requestor requestor1 --permission all --ra yes --profile all --ca RCA1
 
 ## Publish the self-signed certificate
 xipki-ca:publish-self --profile RCA RCA1

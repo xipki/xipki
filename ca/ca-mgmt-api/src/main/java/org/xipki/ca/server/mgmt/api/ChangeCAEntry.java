@@ -35,6 +35,7 @@
 
 package org.xipki.ca.server.mgmt.api;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import org.xipki.ca.api.profile.CertValidity;
@@ -44,8 +45,9 @@ import org.xipki.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class ChangeCAEntry
+public class ChangeCAEntry implements Serializable
 {
+    private static final long serialVersionUID = 1L;
     private final String name;
     private CAStatus status;
     private CertValidity maxValidity;

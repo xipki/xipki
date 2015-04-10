@@ -1,12 +1,12 @@
-source ./xipki/demo/rsa-demo.script
+source ./xipki/demo/p12-rsa-demo.script
 
-source ./xipki/demo/rsapss-demo.script
+source ./xipki/demo/p12-rsapss-demo.script
 
-source ./xipki/demo/dsa-demo.script
+source ./xipki/demo/p12-dsa-demo.script
 
-source ./xipki/demo/ec-demo.script
+source ./xipki/demo/p12-ec-demo.script
 
-source ./xipki/demo/plainec-demo.script
+source ./xipki/demo/p12-plainec-demo.script
 
 source ./xipki/demo/hsm-rsa-demo.script
 

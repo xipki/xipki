@@ -14,7 +14,7 @@ feature:install xipki-security-shell
 
 sleep 1000
 
-xipki-file:rm -r -f output
+xipki-cmd:rm -r -f output
 
 xipki-tk:delete-key --slot 1 --key-label $RCA_KEY_LABEL
 
@@ -29,6 +29,8 @@ xipki-tk:rsa --slot 1 --key-label $SubCA_KEY_LABEL
 xipki-tk:rsa --slot 1 --key-label $SubCAwithCRL_KEY_LABEL
 
 feature:uninstall xipki-security-shell
+
+source ./xipki/demo/initdb.script
 
 source ./xipki/demo/prepare.script
 

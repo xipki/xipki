@@ -11,7 +11,7 @@ sleep 2000
 #                        NEGITIVE TESTS                         #
 #################################################################
 
-xipki-file:rm -r -f output/neg
+xipki-cmd:rm -r -f output/neg
 
 ## Subject does not satisfy the requirement
 

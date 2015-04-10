@@ -187,10 +187,10 @@ Run Demo
 In the OSGi console, call `source <OSGi batch script file>`, the demo script files are in folder `xipki/demo` and can be retrieved from the following table. The generated keys, certificates and CRLs are saved in folder `output`.
 
 |Signature Algorithm \ Key container |  PKCS#12  | PKCS#11 (HSM simulator)|
-|:----------------:|:------------------:|:-----------------------:|
-|RSA PKCS#1v1.5    | rsa-demo.script    | hsm-rsa-demo.script     |
-|RSA PSS           | rsapss-demo.script | hsm-rsapss-demo.script  |
-|DSA               | dsa-demo.script    | hsm-dsa-demo.script     |
-|ECDSA             | ec-demo.script     | hsm-ec-demo.script      |
-|PlainECDSA (BSI)  | plainec-demo.script| hsm-plainec-demo.script |
+|:----------------:|:----------------------:|:-----------------------:|
+|RSA PKCS#1v1.5    | p12-rsa-demo.script    | hsm-rsa-demo.script     |
+|RSA PSS           | p12-rsapss-demo.script | hsm-rsapss-demo.script  |
+|DSA               | p12-dsa-demo.script    | hsm-dsa-demo.script     |
+|ECDSA             | p12-ec-demo.script     | hsm-ec-demo.script      |
+|PlainECDSA (BSI)  | p12-plainec-demo.script| hsm-plainec-demo.script |
   
