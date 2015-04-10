@@ -49,7 +49,7 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-file", name = "rm", description="remove file or directory")
+@Command(scope = "xipki-cmd", name = "rm", description="remove file or directory")
 public class FileRmCommand extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "file",
@@ -86,7 +86,7 @@ public class FileRmCommand extends XipkiOsgiCommandSupport
                 return null;
             }
 
-            if(force || confirm(reader, "remove directory " + targetPath))
+            if(force || confirm(reader, "Do you want to remove directory " + targetPath + " [yes/no]?"))
             {
                 FileUtils.deleteDirectory(target);
                 out("removed directory " + targetPath);
@@ -94,7 +94,7 @@ public class FileRmCommand extends XipkiOsgiCommandSupport
         }
         else
         {
-            if(force || confirm(reader, "remove file " + targetPath))
+            if(force || confirm(reader, "Do you want o remove file " + targetPath + " [yes/no]?"))
             {
                 target.delete();
                 out("removed file " + targetPath);
@@ -109,6 +109,7 @@ public class FileRmCommand extends XipkiOsgiCommandSupport
             final String prompt)
     throws IOException
     {
+        out(prompt);
         String answer = reader.readLine();
         if(answer == null)
         {
