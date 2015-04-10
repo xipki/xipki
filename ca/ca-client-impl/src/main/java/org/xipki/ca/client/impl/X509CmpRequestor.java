@@ -812,7 +812,8 @@ abstract class X509CmpRequestor extends CmpRequestor
             doc = xmlDocBuilder.parse(new ByteArrayInputStream(systemInfoStr.getBytes("UTF-8")));
         } catch (SAXException | IOException e)
         {
-            throw new CmpRequestorException("could not parse the returned systemInfo for CA " + caName, e);
+            throw new CmpRequestorException("could not parse the returned systemInfo for CA " +
+            		caName + ": " + e.getMessage(), e);
         }
 
         final String namespace = null;
