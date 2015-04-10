@@ -180,7 +180,7 @@ public class XMLUtil
             final String localname)
     {
         Node node = getFirstElementChild(element, namespace, localname);
-        return (node==null) ? null : getNodeValue(node);
+        return (node == null) ? null : getNodeValue(node);
     }
 
     public static String getNodeValue(
@@ -210,16 +210,18 @@ public class XMLUtil
             final String localname)
     {
         Node node = element.getFirstChild();
-        if(node != null)
+        if(node == null)
         {
-            do
-            {
-                if(match(node, namespace, localname))
-                {
-                    return (Element) node;
-                }
-            } while((node = node.getNextSibling()) != null);
+        	return null;
         }
+
+        do
+        {
+            if(match(node, namespace, localname))
+            {
+                return (Element) node;
+            }
+        } while((node = node.getNextSibling()) != null);
         return null;
     }
 
