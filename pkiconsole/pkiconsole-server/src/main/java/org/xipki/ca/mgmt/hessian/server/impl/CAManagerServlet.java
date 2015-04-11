@@ -228,10 +228,10 @@ implements HessianCAManager
     }
 
     @Override
-    public String getAliasName(
+    public Set<String> getAliasesForCA(
             final String caName)
     {
-        return caManager.getAliasNameForCA(caName);
+        return caManager.getAliasesForCA(caName);
     }
 
     @Override
