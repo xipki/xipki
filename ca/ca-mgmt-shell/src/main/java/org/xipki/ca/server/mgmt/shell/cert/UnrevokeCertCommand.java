@@ -35,6 +35,8 @@
 
 package org.xipki.ca.server.mgmt.shell.cert;
 
+import java.rmi.UnexpectedException;
+
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.CAEntry;
@@ -66,20 +68,11 @@ public class UnrevokeCertCommand extends CaCommand
         CAEntry ca = caManager.getCA(caName);
         if(ca == null)
         {
-            err("CA " + caName + " not available");
-            return null;
+            throw new UnexpectedException("CA " + caName + " not available");
         }
 
         boolean successful = caManager.unrevokeCertificate(caName, toBigInt(serialNumberS));
-
-        if(successful)
-        {
-            out("unrevoked certificate");
-        }
-        else
-        {
-            err("could not unrevoke certificate");
-        }
+        output(successful, "unrevoked", "could not unrevoke", "certificate");
 
         return null;
     }

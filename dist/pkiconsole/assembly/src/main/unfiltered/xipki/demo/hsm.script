@@ -9,7 +9,7 @@ sleep 1000
 xipki-ca:profile-add --name RCA --type XML --conf-file xipki/demo/profile/Certprofile_RootCA.xml
 
 ## Create the PKCS#10 request for the command caqa:check-cert in QA
-xipki-cmd:prompt "In CA shell call 'xipki-tk:req --slot 1 --key-label $RCA_KEY_LABEL --out output/RCA1.p10 --subject \"CN=RCA1,O=xipki,C=DE\"', then copy the output to output/RCA1.p10"
+xipki-cmd:confirm "In CA shell call 'xipki-tk:req --slot 1 --key-label $RCA_KEY_LABEL --out output/RCA1.p10 --subject \"CN=RCA1,O=xipki,C=DE\"', then copy the output to output/RCA1.p10"
 
 ## Generate selfsigned RCA
 xipki-ca:gen-rca --name RCA1 \

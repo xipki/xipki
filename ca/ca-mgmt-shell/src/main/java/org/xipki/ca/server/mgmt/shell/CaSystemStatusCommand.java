@@ -35,6 +35,8 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.rmi.UnexpectedException;
+
 import org.apache.karaf.shell.commands.Command;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 
@@ -56,7 +58,7 @@ public class CaSystemStatusCommand extends CaCommand
         }
         else
         {
-            err("status is NULL");
+            throw new UnexpectedException("status is NULL");
         }
         return null;
     }

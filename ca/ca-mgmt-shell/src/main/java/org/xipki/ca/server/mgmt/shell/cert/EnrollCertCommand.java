@@ -36,12 +36,11 @@
 package org.xipki.ca.server.mgmt.shell.cert;
 
 import java.io.File;
+import java.rmi.UnexpectedException;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
 import org.xipki.common.util.IoUtil;
@@ -53,8 +52,6 @@ import org.xipki.common.util.IoUtil;
 @Command(scope = "xipki-ca", name = "enroll-cert", description="enroll certificate")
 public class EnrollCertCommand extends CaCommand
 {
-    private static final Logger LOG = LoggerFactory.getLogger(EnrollCertCommand.class);
-
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -90,23 +87,13 @@ public class EnrollCertCommand extends CaCommand
         CAEntry ca = caManager.getCA(caName);
         if(ca == null)
         {
-            err("CA " + caName + " not available");
-            return null;
+            throw new UnexpectedException("CA " + caName + " not available");
         }
 
         byte[] encodedP10Request = IoUtil.read(p10File);
 
-        try
-        {
-            X509Certificate cert = caManager.generateCertificate(caName, profileName, user, encodedP10Request);
-            saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
-        } catch (Exception e)
-        {
-            LOG.warn("exception: {}", e.getMessage());
-            LOG.debug("exception", e);
-            err("ERROR: " + e.getMessage());
-            return null;
-        }
+        X509Certificate cert = caManager.generateCertificate(caName, profileName, user, encodedP10Request);
+        saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
 
         return null;
     }

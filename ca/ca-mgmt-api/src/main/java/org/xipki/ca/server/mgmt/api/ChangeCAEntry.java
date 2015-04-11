@@ -184,7 +184,7 @@ public class ChangeCAEntry implements Serializable
         this.permissions = permissions;
     }
 
-    public int getExpirationPeriod()
+    public Integer getExpirationPeriod()
     {
         return expirationPeriod;
     }

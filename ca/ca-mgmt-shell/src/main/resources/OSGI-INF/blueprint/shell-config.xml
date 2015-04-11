@@ -297,6 +297,7 @@
       </action>
       <optional-completers>
         <entry key="--ca" value-ref="caNameCompleter"/>
+        <entry key="--publisher" value-ref="publisherNameCompleter"/>
       </optional-completers>
     </command>
     <!--  CA-Requestor -->

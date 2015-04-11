@@ -35,6 +35,7 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -84,7 +85,14 @@ public class EnvInfoCommand extends CaCommand
         else
         {
             String paramValue = caManager.getEnvParam(name);
-            sb.append(name).append("\n\t").append(paramValue);
+            if(paramValue == null)
+            {
+                throw new UnexpectedException("\tno environment named '" + name + " is configured");
+            }
+            else
+            {
+                sb.append(name).append("\n\t").append(paramValue);
+            }
         }
 
         out(sb.toString());

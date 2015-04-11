@@ -35,6 +35,7 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -92,7 +93,7 @@ public class RequestorInfoCommand extends CaCommand
             CmpRequestorEntry entry = caManager.getCmpRequestor(name);
             if(entry == null)
             {
-                sb.append("could not find CMP requestor '" + name + "'");
+                throw new UnexpectedException("could not find CMP requestor '" + name + "'");
             }
             else
             {

@@ -1,0 +1,180 @@
+##### caalias #####
+
+xipki-ca:caalias-info 
+
+xipki-ca:caalias-info RCA
+
+xipki-ca:caalias-rm RCA
+ 
+xipki-ca:caalias-add --alias RCA --ca RCA1
+
+xipki-ca:ca-export --name RCA1 --out output/RCA1.export
+
+##### caprofile #####
+
+xipki-ca:caprofile-info --ca RCA1
+
+xipki-ca:caprofile-rm --profile-local SubCA --ca RCA1
+
+xipki-ca:caprofile-add  --profile SubCA --ca RCA1
+
+##### capub #####
+
+xipki-ca:capub-info --ca RCA1
+
+xipki-ca:capub-rm --publisher OCSP.PUBLISHER --ca RCA1
+
+xipki-ca:capub-add --ca RCA1 --publisher OCSP.PUBLISHER
+
+##### careq #####
+
+xipki-ca:careq-info --ca RCA1
+
+xipki-ca:careq-rm --requestor requestor1 --ca RCA1
+
+xipki-ca:careq-add --requestor requestor1 --ca RCA1 --profile all --ra yes --permission all 
+
+##### clear-publishqueue #####
+
+xipki-ca:clear-publishqueue --ca RCA1 --publisher OCSP.PUBLISHER
+
+xipki-ca:clear-publishqueue --ca all --publisher all
+
+##### cmpcontrol #####
+
+xipki-ca:cmpcontrol-add --name cmpcontrol2 --conf send.ca?true%messageTime.bias?300%protection.sigalgo?SHA256withRSA,SHA256withRSAandMGF1,SHA256withDSA,SHA256withECDSA%
+
+xipki-ca:cmpcontrol-info
+
+xipki-ca:cmpcontrol-info cmpcontrol2
+
+xipki-ca:cmpcontrol-up --name cmpcontrol2 --conf send.ca?true%messageTime.bias?300%protection.sigalgo?SHA256withRSA
+
+xipki-ca:cmpcontrol-rm cmpcontrol2
+
+##### crlsigner #####
+
+xipki-ca:crlsigner-add --name CASIGN.CRLSIGNER2 --signer-type CA --crl-control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
+
+xipki-ca:crlsigner-info
+
+xipki-ca:crlsigner-info CASIGN.CRLSIGNER2
+
+xipki-ca:crlsigner-up --name CASIGN.CRLSIGNER2 --signer-type CA --crl-control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:30%
+
+xipki-ca:crlsigner-rm CASIGN.CRLSIGNER2
+
+##### env #####
+
+env-add --name ENV2 --value VALUE2
+
+xipki-ca:env-info
+
+xipki-ca:env-info ENV2
+
+xipki-ca:env-up --name ENV2 --value VALUE2-2
+
+xipki-ca:env-rm ENV2
+
+##### profile #####
+
+xipki-ca:profile-info
+
+xipki-ca:profile-info DEMO
+
+xipki-ca:profile-export --name SubCA --out output/Certprofile_SubCA.export
+
+xipki-ca:profile-up --name SubCA --conf-file output/Certprofile_SubCA.export
+
+xipki-ca:profile-rm DEMO
+
+##### publisher #####
+
+xipki-ca:publisher-info
+
+xipki-ca:publisher-info OCSP.PUBLISHER
+
+xipki-ca:publisher-export --name OCSP.PUBLISHER --out output/publisher.export
+
+xipki-ca:publisher-up --name OCSP.PUBLISHER --conf-file output/publisher.export
+
+xipki-ca:publisher-add --name OCSP.PUBLISHER2 --type OCSP --conf-file output/publisher.export
+
+xipki-ca:publisher-rm OCSP.PUBLISHER2
+
+##### requestor #####
+
+xipki-ca:requestor-add --cert etc/tlskeys/tls-client.der --name requestor2
+
+xipki-ca:requestor-info
+
+xipki-ca:requestor-info requestor2
+
+xipki-ca:requestor-up --cert etc/tlskeys/tls-client.der --name requestor2
+
+xipki-ca:requestor-rm requestor2
+
+##### responder #####
+
+xipki-ca:responder-add --name responder2 --signer-type  JKS \
+  --signer-conf  password?1234%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?SHA256withRSA
+
+xipki-ca:responder-info
+
+xipki-ca:responder-info responder2
+
+xipki-ca:responder-up --name responder2 \
+  --signer-conf password?1234%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?SHA1withRSA
+
+xipki-ca:responder-rm responder2
+
+##### cert #####
+
+xipki-ca:revoke-cert --ca RCA1 --reason certificateHold --serial 3
+
+xipki-ca:unrevoke-cert --ca RCA1 --serial 3
+
+xipki-ca:revoke-cert --ca RCA1 --reason keyCompromise --serial 3
+
+xipki-ca:remove-cert --ca RCA1 --serial  3
+
+##### CA #####
+
+xipki-ca:ca-revoke --reason keyCompromise RCA1
+
+xipki-ca:ca-unrevoke RCA1 
+
+xipki-ca:notify-change
+
+xipki-ca:system-status
+
+xipki-ca:unlock
+
+xipki-ca:ca-info
+
+xipki-ca:ca-info RCA1
+
+xipki-ca:ca-rm SUBCAWITHCRL1
+
+## TODO: NPE
+xipki-ca:ca-up --name RCA1 \
+  --permission enroll --permission revoke \
+  --max-validity 8y \
+  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?SHA256withRSA \
+  --ocsp-uri http://localhost:8080/ocsp/responder2 \
+  --ca-cert-uri http://example.org/RCA1-2.der \
+  --duplicate-subject forbidden \
+  --duplicate-key forbidden \
+  --validity-mode STRICT
+
+xipki-ca:ca-up --name RCA1 \
+  --permission all \
+  --max-validity 10y \
+  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?SHA256withRSA \
+  --ocsp-uri http://localhost:8080/ocsp/responder1 \
+  --ca-cert-uri http://example.org/RCA1.der \
+  --duplicate-subject permitted \
+  --duplicate-key permitted \
+  --validity-mode CUTOFF
+
+

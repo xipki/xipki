@@ -1304,7 +1304,7 @@ class CAManagerQueryExecutor
 
         if(signer_type != null || signer_conf != null || cert != null)
         {
-            final String sql = "SELECT SIGNE_TYPE, SIGNER_CONF, CERT FROM CA WHERE NAME=?";
+            final String sql = "SELECT SIGNER_TYPE, SIGNER_CONF, CERT FROM CA WHERE NAME=?";
             PreparedStatement stmt = null;
             ResultSet rs = null;
 
@@ -1312,7 +1312,7 @@ class CAManagerQueryExecutor
             {
                 stmt = prepareStatement(sql);
                 stmt.setString(1, name);
-                rs = stmt.executeQuery(sql);
+                rs = stmt.executeQuery();
                 if(rs.next() == false)
                 {
                     throw new CAMgmtException("no CA '" + name + "' is defined");
@@ -1604,7 +1604,7 @@ class CAManagerQueryExecutor
         CertprofileEntry currentDbEntry = createCertprofile(name);
         if(type == null)
         {
-            type = currentDbEntry.getName();
+            type = currentDbEntry.getType();
         }
         if(conf == null)
         {
@@ -1748,8 +1748,8 @@ class CAManagerQueryExecutor
             final CAManagerImpl caManager)
     throws CAMgmtException
     {
-        StringBuilder m = new StringBuilder();
         StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("UPDATE RESPONDER SET ");
 
         AtomicInteger index = new AtomicInteger(1);
         Integer iType = addToSqlIfNotNull(sqlBuilder, index, type, "TYPE");
@@ -1765,17 +1765,17 @@ class CAManagerQueryExecutor
 
         CmpResponderEntry dbEntry = createResponder(name);
 
-        if(type != null)
+        if(type == null)
         {
             type = dbEntry.getType();
         }
 
-        if(conf != null)
+        if(conf == null)
         {
             conf = dbEntry.getConf();
         }
 
-        if(base64Cert != null)
+        if(base64Cert == null)
         {
             base64Cert = dbEntry.getBase64Cert();
         }
@@ -1783,9 +1783,9 @@ class CAManagerQueryExecutor
         CmpResponderEntry newDbEntry = new CmpResponderEntry(name, type, conf, base64Cert);
         CmpResponderEntryWrapper responder = caManager.createCmpResponder(newDbEntry);
 
-        sqlBuilder.append("UPDATE RESPONDER SET ");
-
         final String sql = sqlBuilder.toString();
+
+        StringBuilder m = new StringBuilder();
 
         PreparedStatement ps = null;
         try

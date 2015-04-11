@@ -35,6 +35,7 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -91,7 +92,11 @@ public class ResponderInfoCommand extends CaCommand
         else
         {
             CmpResponderEntry entry = caManager.getCmpResponder(name);
-            if(entry != null)
+            if(entry == null)
+            {
+                throw new UnexpectedException("could not find CMP responder '" + name + "'");
+            }
+            else
             {
                 sb.append(entry.toString());
             }

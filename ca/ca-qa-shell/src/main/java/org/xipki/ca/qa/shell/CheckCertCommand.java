@@ -37,6 +37,8 @@ package org.xipki.ca.qa.shell;
 
 import java.util.Set;
 
+import javax.naming.ConfigurationException;
+
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.ASN1Set;
@@ -96,16 +98,14 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
         Set<String> issuerNames = qaSystemManager.getIssuerNames();
         if(isEmpty(issuerNames))
         {
-            err("no issuer is configured");
-            return  null;
+            throw new ConfigurationException("no issuer is configured");
         }
 
         if(issuerName == null)
         {
             if(issuerNames.size() != 1)
             {
-                err("no issuer is specified");
-                return null;
+                throw new ConfigurationException("no issuer is specified");
             }
 
             issuerName = issuerNames.iterator().next();
@@ -113,8 +113,7 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
 
         if(issuerNames.contains(issuerName) == false)
         {
-            err("issuer " + issuerName + " is not within the configured issuers " + issuerNames);
-            return null;
+            throw new ConfigurationException("issuer " + issuerName + " is not within the configured issuers " + issuerNames);
         }
 
         X509IssuerInfo issuerInfo = qaSystemManager.getIssuer(issuerName);
@@ -122,8 +121,7 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
         X509CertprofileQA qa = qaSystemManager.getCertprofile(profileName);
         if(qa == null)
         {
-            err("found no certificate profile named '" + profileName + "'");
-            return null;
+            throw new ConfigurationException("found no certificate profile named '" + profileName + "'");
         }
 
         CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));

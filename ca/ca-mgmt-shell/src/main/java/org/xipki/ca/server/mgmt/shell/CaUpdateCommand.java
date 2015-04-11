@@ -44,6 +44,7 @@ import java.util.Set;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.api.profile.CertValidity;
+import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
@@ -185,7 +186,18 @@ public class CaUpdateCommand extends CaCommand
 
         if(signerConf != null)
         {
-            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
+            String _signerType = signerType;
+            if(_signerType == null)
+            {
+                CAEntry caEntry = caManager.getCA(caName);
+                if(caEntry == null)
+                {
+                    throw new ConfigurationException("please specify the signerType");
+                }
+                _signerType = caEntry.getSignerType();
+            }
+
+            signerConf = ShellUtil.canonicalizeSignerConf(_signerType, signerConf, passwordResolver);
             entry.setSignerConf(signerConf);
         }
 

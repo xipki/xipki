@@ -41,6 +41,8 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.api.CAManager;
+import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
+import org.xipki.common.ConfigurationException;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.security.api.PasswordResolver;
@@ -59,9 +61,7 @@ public class ResponderUpdateCommand extends CaCommand
     private String name;
 
     @Option(name = "--signer-type",
-            required = true,
-            description = "type of the responder signer\n"
-                    + "(required)")
+            description = "type of the responder signer")
     private String signerType;
 
     @Option(name = "--signer-conf",
@@ -98,7 +98,18 @@ public class ResponderUpdateCommand extends CaCommand
 
         if(signerConf != null)
         {
-            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
+            String _signerType = signerType;
+            if(_signerType == null)
+            {
+                CmpResponderEntry entry = caManager.getCmpResponder(name);
+                if(entry == null)
+                {
+                    throw new ConfigurationException("please specify the signerType");
+                }
+                _signerType = entry.getType();
+            }
+
+            signerConf = ShellUtil.canonicalizeSignerConf(_signerType, signerConf, passwordResolver);
         }
 
         boolean b = caManager.changeCmpResponder(name, signerType, signerConf, cert);

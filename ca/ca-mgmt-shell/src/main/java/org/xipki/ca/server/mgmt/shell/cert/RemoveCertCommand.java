@@ -35,6 +35,8 @@
 
 package org.xipki.ca.server.mgmt.shell.cert;
 
+import java.rmi.UnexpectedException;
+
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
@@ -64,22 +66,12 @@ public class RemoveCertCommand extends CaCommand
     {
         if(caManager.getCA(caName) == null)
         {
-            err("CA " + caName + " not available");
-            return null;
+            throw new UnexpectedException("CA " + caName + " not available");
         }
 
         boolean successful =
                 caManager.removeCertificate(caName, toBigInt(serialNumberS));
-
-        if(successful)
-        {
-            out("removed certificate");
-        }
-        else
-        {
-            err("could not remove certificate");
-        }
-
+        output(successful, "removed", "could not remove", "certificate");
         return null;
     }
 

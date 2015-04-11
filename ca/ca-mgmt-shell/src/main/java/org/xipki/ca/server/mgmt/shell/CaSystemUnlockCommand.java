@@ -35,6 +35,8 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.rmi.UnexpectedException;
+
 import org.apache.karaf.shell.commands.Command;
 
 /**
@@ -56,7 +58,7 @@ public class CaSystemUnlockCommand extends CaCommand
         }
         else
         {
-            err("could not unlock CA system");
+            throw new UnexpectedException("could not unlock CA system");
         }
 
         return null;
