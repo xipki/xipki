@@ -37,6 +37,7 @@ package org.xipki.ca.server.mgmt.shell;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.rmi.UnexpectedException;
 import java.util.Properties;
 
 import org.apache.karaf.shell.commands.Command;
@@ -73,14 +74,12 @@ public class CaExportCommand extends CaCommand
         CAEntry _entry = caManager.getCA(name);
         if(_entry == null)
         {
-            err("no CA named " + name + " is defined");
-            return null;
+            throw new UnexpectedException("no CA named " + name + " is defined");
         }
 
         if(_entry instanceof X509CAEntry == false)
         {
-            err("unsupported CAEntry type " + _entry.getClass().getName());
-            return null;
+            throw new UnexpectedException("unsupported CAEntry type " + _entry.getClass().getName());
         }
 
         X509CAEntry entry = (X509CAEntry) _entry;

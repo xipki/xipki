@@ -1603,7 +1603,16 @@ implements CAManager, CmpResponderManager
         boolean b = queryExecutor.removeCmpRequestorFromCA(requestorName, caName);
         if(b && ca_has_requestors.containsKey(caName))
         {
-            ca_has_requestors.get(caName).remove(requestorName);
+            Set<CAHasRequestorEntry> entries = ca_has_requestors.get(caName);
+            CAHasRequestorEntry entry = null;
+            for(CAHasRequestorEntry m : entries)
+            {
+                if(m.getRequestorName().equals(requestorName))
+                {
+                    entry = m;
+                }
+            }
+            entries.remove(entry);
         }
         return b;
     }

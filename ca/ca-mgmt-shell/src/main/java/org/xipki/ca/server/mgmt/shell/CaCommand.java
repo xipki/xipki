@@ -38,6 +38,7 @@ package org.xipki.ca.server.mgmt.shell;
 import java.util.List;
 
 import org.xipki.ca.server.mgmt.api.CAManager;
+import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 /**
@@ -63,19 +64,19 @@ public abstract class CaCommand extends XipkiOsgiCommandSupport
     protected static String toString(
             final List<? extends Object> list)
     {
-        StringBuilder sb = new StringBuilder();
         if(list == null)
         {
-            sb.append("null");
+            return "null";
         }
 
+        StringBuilder sb = new StringBuilder();
         sb.append("{");
         int n = list.size();
         for(int i = 0; i < n; i++)
         {
             Object o = list.get(i);
             sb.append(o);
-            if(i == n - 1 && n != 0)
+            if(i < n - 1)
             {
                 sb.append(", ");
             }
@@ -89,6 +90,7 @@ public abstract class CaCommand extends XipkiOsgiCommandSupport
             final String posPrefix,
             final String negPrefix,
             final String message)
+    throws UnexpectedResultException
     {
         if(successful)
         {
@@ -96,7 +98,7 @@ public abstract class CaCommand extends XipkiOsgiCommandSupport
         }
         else
         {
-            err(negPrefix + " " + message);
+            throw new UnexpectedResultException(negPrefix + " " + message);
         }
     }
 }

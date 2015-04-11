@@ -79,6 +79,7 @@
     <fileSet>
       <directory>${project.basedir}/../../pki/assembly/src/main/unfiltered/xipki/demo</directory>
       <includes>
+        <include>camgmt-demo.script</include>
         <include>prepare.script</include>
         <include>p12.script</include>
         <include>profile/**</include>

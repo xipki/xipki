@@ -35,6 +35,7 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -91,7 +92,7 @@ public class CaAliasInfoCommand extends CaCommand
             }
             else
             {
-                sb.append("could not find CA alias '" + caAlias + "'");
+                throw new UnexpectedException("could not find CA alias '" + caAlias + "'");
             }
         }
 

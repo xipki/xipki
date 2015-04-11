@@ -35,6 +35,7 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.rmi.UnexpectedException;
 import java.util.Map;
 
 import org.apache.karaf.shell.commands.Command;
@@ -62,7 +63,7 @@ public class CaProfileInfoCommand extends CaCommand
         StringBuilder sb = new StringBuilder();
         if(caManager.getCA(caName) == null)
         {
-            sb.append("could not find CA '").append(caName).append("'");
+            throw new UnexpectedException("could not find CA '" + caName + "'");
         }
         else
         {

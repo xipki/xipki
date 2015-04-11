@@ -105,15 +105,7 @@ public class RevokeCertCommand extends CaCommand
 
         boolean successful = caManager.revokeCertificate(caName, toBigInt(serialNumberS),
                 crlReason, invalidityDate);
-
-        if(successful)
-        {
-            out("revoked certificate");
-        }
-        else
-        {
-            err("could not revoke certificate");
-        }
+        output(successful, "revoked", "could not revoke", "certificate");
 
         return null;
     }

@@ -35,6 +35,7 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -85,7 +86,11 @@ public class PublisherInfoCommand extends CaCommand
         else
         {
             PublisherEntry entry = caManager.getPublisher(name);
-            if(entry != null)
+            if(entry == null)
+            {
+                throw new UnexpectedException("\tno publisher named '" + name + " is configured");
+            }
+            else
             {
                 sb.append(entry.toString());
             }

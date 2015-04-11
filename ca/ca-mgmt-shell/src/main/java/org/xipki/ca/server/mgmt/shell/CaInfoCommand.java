@@ -35,6 +35,7 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -96,7 +97,7 @@ public class CaInfoCommand extends CaCommand
             CAEntry entry = caManager.getCA(caName);
             if(entry == null)
             {
-                sb.append("could not find CA '" + caName + "'");
+                throw new UnexpectedException("could not find CA '" + caName + "'");
             }
             else
             {

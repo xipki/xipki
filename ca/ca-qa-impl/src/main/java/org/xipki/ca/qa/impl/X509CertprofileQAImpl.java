@@ -252,6 +252,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
             if(conf.getSignatureAlgorithms() != null)
             {
+                this.signatureAlgorithms = new HashSet<>();
                 for(String algo :conf.getSignatureAlgorithms().getAlgorithm())
                 {
                     String c14nAlgo;

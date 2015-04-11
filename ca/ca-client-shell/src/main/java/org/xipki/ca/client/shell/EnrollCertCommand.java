@@ -283,7 +283,7 @@ public abstract class EnrollCertCommand extends ClientCommand
         }
 
         File certFile = new File(outputFile);
-        saveVerbose("certificate saved to file", certFile, cert.getEncoded());
+        saveVerbose("saved certificate to file", certFile, cert.getEncoded());
 
         return null;
     }

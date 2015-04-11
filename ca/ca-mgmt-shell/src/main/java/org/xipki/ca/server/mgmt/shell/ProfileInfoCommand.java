@@ -35,6 +35,7 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -90,7 +91,11 @@ public class ProfileInfoCommand extends CaCommand
         else
         {
             CertprofileEntry entry = caManager.getCertprofile(name);
-            if(entry != null)
+            if(entry == null)
+            {
+                throw new UnexpectedException("\tno certprofile named '" + name + " is configured");
+            }
+            else
             {
                 sb.append(entry.toString(verbose));
             }

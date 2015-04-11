@@ -35,6 +35,7 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -77,15 +78,19 @@ public class CmpControlInfoCommand extends CaCommand
             List<String> sorted = new ArrayList<>(names);
             Collections.sort(sorted);
 
-            for(String name : sorted)
+            for(String m : sorted)
             {
-                sb.append("\t").append(name).append("\n");
+                sb.append("\t").append(m).append("\n");
             }
         }
         else
         {
             CmpControlEntry entry = caManager.getCmpControl(name);
-            if(entry != null)
+            if(entry == null)
+            {
+                throw new UnexpectedException("\tno CMP control named '" + name + " is configured");
+            }
+            else
             {
                 sb.append(entry.toString());
             }
