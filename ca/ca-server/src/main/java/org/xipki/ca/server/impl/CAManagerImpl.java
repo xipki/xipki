@@ -1226,6 +1226,12 @@ implements CAManager, CmpResponderManager
         ca_has_profiles.remove(name);
         ca_has_publishers.remove(name);
         ca_has_requestors.remove(name);
+        X509CA oldCa = x509cas.remove(name);
+        x509Responders.remove(name);
+        if(oldCa != null)
+        {
+            oldCa.shutdown();
+        }
 
         X509CAInfo ca = queryExecutor.createCAInfo(name, masterMode, certstore);
         try
