@@ -63,6 +63,8 @@ import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -385,7 +387,7 @@ class X509CA
                 } else
                 {
                     throw new RuntimeException(
-                            "should not reach here, none of interval minutes nor dateTime is specified");
+                            "should not reach here, neither interval minutes nor dateTime is specified");
                 }
 
                 boolean deltaCrl;
@@ -551,6 +553,10 @@ class X509CA
     private final ConcurrentLinkedDeque<RemoveExpiredCertsInfo> removeExpiredCertsQueue =
             new ConcurrentLinkedDeque<>();
 
+    private ScheduledFuture<?> nextSerialCommitService;
+    private ScheduledFuture<?> crlGenerationService;
+    private ScheduledFuture<?> expiredCertsRemover;
+
     private AuditLoggingServiceRegister serviceRegister;
 
     public X509CA(
@@ -594,14 +600,12 @@ class X509CA
         if(crlSigner != null)
         {
             // CA signs the CRL
-            if(caManager.getCrlSignerWrapper(caInfo.getCrlSignerName()) == null)
+            if(caManager.getCrlSignerWrapper(caInfo.getCrlSignerName()) == null &&
+                X509Util.hasKeyusage(caInfo.getCertificate().getCert(), KeyUsage.cRLSign) == false)
             {
-                if(X509Util.hasKeyusage(caInfo.getCertificate().getCert(), KeyUsage.cRLSign) == false)
-                {
-                    final String msg = "CRL signer does not have keyusage cRLSign";
-                    LOG.error(msg);
-                    throw new OperationException(ErrorCode.SYSTEM_FAILURE, msg);
-                }
+                final String msg = "CRL signer does not have keyusage cRLSign";
+                LOG.error(msg);
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE, msg);
             }
         }
 
@@ -609,9 +613,9 @@ class X509CA
 
         if(caInfo.useRandomSerialNumber() == false)
         {
-            ScheduledNextSerialCommitService nextSerialCommitService = new ScheduledNextSerialCommitService();
-            caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
-                    nextSerialCommitService, 1, 1, TimeUnit.MINUTES); // commit the next_serial every 1 minute
+            nextSerialCommitService = caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
+                    new ScheduledNextSerialCommitService(),
+                    1, 1, TimeUnit.MINUTES); // commit the next_serial every 1 minute
         }
 
         if(masterMode == false)
@@ -625,12 +629,12 @@ class X509CA
         }
 
         // CRL generation services
-        ScheduledCRLGenerationService crlGenerationService = new ScheduledCRLGenerationService();
-        caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(crlGenerationService,
+        crlGenerationService = caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
+                new ScheduledCRLGenerationService(),
                 1, 1, TimeUnit.MINUTES);
 
-        ScheduledExpiredCertsRemover expiredCertsRemover = new ScheduledExpiredCertsRemover();
-        caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(expiredCertsRemover,
+        expiredCertsRemover = caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
+                new ScheduledExpiredCertsRemover(),
                 10, 10, TimeUnit.MINUTES);
     }
 
@@ -2897,5 +2901,35 @@ class X509CA
         X509CrlSignerEntryWrapper crlSigner = crlSignerName == null ?
                 null : caManager.getCrlSignerWrapper(crlSignerName);
         return crlSigner;
+    }
+
+    @Override
+    public void finalize()
+    {
+        shutdown();
+    }
+
+    void shutdown()
+    {
+        ScheduledThreadPoolExecutor s = caManager.getScheduledThreadPoolExecutor();
+        if(crlGenerationService != null)
+        {
+            crlGenerationService.cancel(false);
+            crlGenerationService = null;
+        }
+
+        if(nextSerialCommitService != null)
+        {
+            nextSerialCommitService.cancel(false);
+            nextSerialCommitService = null;
+        }
+
+        if(expiredCertsRemover != null)
+        {
+            expiredCertsRemover.cancel(false);
+            expiredCertsRemover = null;
+        }
+
+        s.purge();
     }
 }
