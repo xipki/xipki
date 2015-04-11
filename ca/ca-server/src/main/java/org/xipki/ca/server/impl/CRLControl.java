@@ -265,7 +265,6 @@ class CRLControl implements Serializable
             this.fullCRLIntervals = getInteger(props, KEY_fullCRL_intervals, 1);
             this.deltaCRLIntervals = getInteger(props, KEY_deltaCRL_intervals, 0);
             this.extendedNextUpdate = getBoolean(props, KEY_fullCRL_extendedNextUpdate, false);
-            this.intervalMinutes = getInteger(props, KEY_interval_minutes, 0);
             this.overlapMinutes = getInteger(props, KEY_overlap_minutes, 60);
             s = props.getValue(KEY_interval_time);
             if(s != null)
@@ -285,6 +284,16 @@ class CRLControl implements Serializable
                 {
                     throw new ConfigurationException("invalid " + KEY_interval_time + ": '" + s + "'");
                 }
+            }
+            else
+            {
+                int minutes = getInteger(props, KEY_interval_minutes, 0);
+                if(minutes < this.overlapMinutes + 30)
+                {
+                    throw new ConfigurationException("invalid " + KEY_interval_minutes + ": '" + minutes +
+                            " is less than than 30 + " + this.overlapMinutes);
+                }
+                this.intervalMinutes = minutes;
             }
         }
 

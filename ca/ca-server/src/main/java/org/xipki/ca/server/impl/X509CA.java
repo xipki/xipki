@@ -359,7 +359,7 @@ class X509CA
                 CRLControl control = getCrlSigner().getCRLControl();
                 int interval;
 
-                if(control.getIntervalMinutes() != null)
+                if(control.getIntervalMinutes() != null && control.getIntervalMinutes() > 0)
                 {
                     long intervalMin = control.getIntervalMinutes();
                     interval = (int) (minSinceCrlBaseTime / intervalMin);
@@ -370,7 +370,7 @@ class X509CA
                         // only generate CRL within the time window
                         return;
                     }
-                } else
+                } else if(control.getIntervalDayTime() != null)
                 {
                     HourMinute hm = control.getIntervalDayTime();
                     Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -382,6 +382,10 @@ class X509CA
                         return;
                     }
                     interval = (int) (minSinceCrlBaseTime % MIN_PER_DAY);
+                } else
+                {
+                    throw new RuntimeException(
+                            "should not reach here, none of interval minutes nor dateTime is specified");
                 }
 
                 boolean deltaCrl;
