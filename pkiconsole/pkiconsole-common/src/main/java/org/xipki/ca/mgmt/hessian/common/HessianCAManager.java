@@ -102,9 +102,11 @@ public interface HessianCAManager
             String aliasName)
     throws HessianCAMgmtException;
 
-    String getAliasName(
+    Set<String> getAliasesForCA(
             String caName);
-    String getCaName(String aliasName);
+
+    String getCaName(
+            String aliasName);
 
     Set<String> getCaAliasNames();
 

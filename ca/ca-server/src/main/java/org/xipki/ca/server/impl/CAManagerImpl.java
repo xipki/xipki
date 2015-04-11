@@ -2302,21 +2302,23 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public String getAliasNameForCA(
+    public Set<String> getAliasesForCA(
             String caName)
     {
         ParamChecker.assertNotBlank("caName", caName);
         caName = caName.toUpperCase();
+
+        Set<String> aliases = new HashSet<>();
         for(String alias : caAliases.keySet())
         {
             String thisCaName = caAliases.get(alias);
             if(thisCaName.equals(caName))
             {
-                return alias;
+                aliases.add(alias);
             }
         }
 
-        return null;
+        return aliases;
     }
 
     @Override
