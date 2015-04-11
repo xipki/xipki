@@ -50,7 +50,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.console.karaf.impl.PromptCommand"/>
+      <action class="org.xipki.console.karaf.impl.ConfirmCommand"/>
     </command>
   </command-bundle>
 </blueprint>

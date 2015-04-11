@@ -47,8 +47,8 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-cmd", name = "prompt", description="Prompt")
-public class PromptCommand extends XipkiOsgiCommandSupport
+@Command(scope = "xipki-cmd", name = "confirm", description="Prompt")
+public class ConfirmCommand extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "message",
             required = true,
