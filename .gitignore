@@ -69,4 +69,5 @@ nbactions.xml
 nb-configuration.xml
 .nb-gradle/
 
+*~
 hs_err*.log
