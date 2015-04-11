@@ -45,6 +45,7 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.CAEntry;
+import org.xipki.common.util.CollectionUtil;
 
 /**
  * @author Lijun Liao
@@ -84,10 +85,10 @@ public class CaInfoCommand extends CaCommand
             for(String paramName : sorted)
             {
                 sb.append("\t").append(paramName);
-                String alias = caManager.getAliasNameForCA(paramName);
-                if(alias != null)
+                Set<String> aliases = caManager.getAliasesForCA(paramName);
+                if(CollectionUtil.isNotEmpty(aliases))
                 {
-                    sb.append(" (alias: ").append(alias).append(")");
+                    sb.append(" (aliases: ").append(toString(aliases)).append(")");
                 }
                 sb.append("\n");
             }
@@ -101,6 +102,8 @@ public class CaInfoCommand extends CaCommand
             }
             else
             {
+                Set<String> aliases = caManager.getAliasesForCA(caName);
+                sb.append("aliases: ").append(toString(aliases)).append("\n");
                 sb.append(entry.toString(verbose.booleanValue()));
             }
         }

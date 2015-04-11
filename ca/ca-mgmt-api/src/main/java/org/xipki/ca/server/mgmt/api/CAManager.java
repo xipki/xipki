@@ -90,7 +90,7 @@ public interface CAManager
             String aliasName)
     throws CAMgmtException;
 
-    String getAliasNameForCA(
+    Set<String> getAliasesForCA(
             String caName);
 
     String getCaNameForAlias(

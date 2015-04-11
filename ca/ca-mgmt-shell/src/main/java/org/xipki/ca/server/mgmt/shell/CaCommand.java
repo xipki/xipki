@@ -35,7 +35,7 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.common.qa.UnexpectedResultException;
@@ -62,24 +62,26 @@ public abstract class CaCommand extends XipkiOsgiCommandSupport
     }
 
     protected static String toString(
-            final List<? extends Object> list)
+            final Collection<? extends Object> c)
     {
-        if(list == null)
+        if(c == null)
         {
             return "null";
         }
 
         StringBuilder sb = new StringBuilder();
         sb.append("{");
-        int n = list.size();
-        for(int i = 0; i < n; i++)
+        int n = c.size();
+
+        int i = 0;
+        for(Object o : c)
         {
-            Object o = list.get(i);
             sb.append(o);
             if(i < n - 1)
             {
                 sb.append(", ");
             }
+            i++;
         }
         sb.append("}");
         return sb.toString();
