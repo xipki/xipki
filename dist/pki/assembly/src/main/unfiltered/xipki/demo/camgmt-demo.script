@@ -156,7 +156,6 @@ xipki-ca:ca-info RCA1
 
 xipki-ca:ca-rm SUBCAWITHCRL1
 
-## TODO: NPE
 xipki-ca:ca-up --name RCA1 \
   --permission enroll --permission revoke \
   --max-validity 8y \

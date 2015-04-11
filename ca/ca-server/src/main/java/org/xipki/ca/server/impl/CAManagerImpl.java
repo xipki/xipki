@@ -705,6 +705,7 @@ implements CAManager, CmpResponderManager
             x509Responders.clear();
 
             scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(10);
+            scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
 
             // Add the CAs to the store
             for(String caName : caInfos.keySet())
@@ -755,6 +756,7 @@ implements CAManager, CmpResponderManager
             if(masterMode == false && persistentScheduledThreadPoolExecutor == null)
             {
                 persistentScheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+                persistentScheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
                 ScheduledCARestarter caRestarter = new ScheduledCARestarter();
                 persistentScheduledThreadPoolExecutor.scheduleAtFixedRate(caRestarter, 300, 300, TimeUnit.SECONDS);
             }
@@ -2361,8 +2363,12 @@ implements CAManager, CmpResponderManager
         ca_has_profiles.remove(name);
         ca_has_publishers.remove(name);
         ca_has_requestors.remove(name);
-        x509cas.remove(name);
+        X509CA ca = x509cas.remove(name);
         x509Responders.remove(name);
+        if(ca != null)
+        {
+            ca.shutdown();
+        }
 
         if(exception != null)
         {
