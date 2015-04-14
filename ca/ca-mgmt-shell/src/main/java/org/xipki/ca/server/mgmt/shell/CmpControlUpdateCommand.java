@@ -49,13 +49,13 @@ public class CmpControlUpdateCommand extends CaCommand
             required = true,
             description = "CMP control name\n"
                     + "(required)")
-    private String name;
+    protected String name;
 
     @Option(name = "--conf",
             required = true,
             description = "CMP control configuration\n"
                     + "(required)")
-    private String conf;
+    protected String conf;
 
     @Override
     protected Object _doExecute()

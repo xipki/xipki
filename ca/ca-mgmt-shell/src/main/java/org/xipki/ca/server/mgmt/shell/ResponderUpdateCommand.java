@@ -58,21 +58,21 @@ public class ResponderUpdateCommand extends CaCommand
             required = true,
             description = "responder name\n"
                     + "(required)")
-    private String name;
+    protected String name;
 
     @Option(name = "--signer-type",
             description = "type of the responder signer")
-    private String signerType;
+    protected String signerType;
 
     @Option(name = "--signer-conf",
             description = "conf of the responder signer or 'NULL'")
-    private String signerConf;
+    protected String signerConf;
 
     @Option(name = "--cert",
             description = "requestor certificate file or 'NULL'")
-    private String certFile;
+    protected String certFile;
 
-    private PasswordResolver passwordResolver;
+    protected PasswordResolver passwordResolver;
 
     public void setPasswordResolver(
             final PasswordResolver passwordResolver)

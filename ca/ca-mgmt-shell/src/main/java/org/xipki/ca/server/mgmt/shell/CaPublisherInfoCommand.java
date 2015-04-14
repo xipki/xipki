@@ -35,6 +35,7 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.rmi.UnexpectedException;
 import java.util.List;
 
 import org.apache.karaf.shell.commands.Command;
@@ -58,6 +59,11 @@ public class CaPublisherInfoCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
+        if(caManager.getCA(caName) == null)
+        {
+            throw new UnexpectedException("could not find CA '" + caName + "'");
+        }
+
         StringBuilder sb = new StringBuilder();
 
         List<PublisherEntry> entries = caManager.getPublishersForCA(caName);

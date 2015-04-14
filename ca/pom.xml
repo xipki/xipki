@@ -25,6 +25,7 @@
     <module>ca-mgmt-api</module>
     <module>ca-server</module>
     <module>ca-mgmt-shell</module>
+    <module>ca-mgmt-qa-shell</module>
     <module>certprofile-demo</module>
   </modules>
 </project>
