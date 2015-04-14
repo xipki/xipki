@@ -243,6 +243,18 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
     }
 
     @Override
+    public boolean equals(Object obj)
+    {
+        if(obj instanceof CertValidity == false)
+        {
+            return false;
+        }
+
+        CertValidity b = (CertValidity) obj;
+        return unit == b.unit && validity == b.validity;
+    }
+
+    @Override
     public String toString()
     {
         switch (unit)

@@ -72,7 +72,7 @@ class X509CrlSignerEntryWrapper
     throws ConfigurationException
     {
         this.dbEntry = dbEntry;
-        this.crlControl = new CRLControl(dbEntry.getCRLControl());
+        this.crlControl = new CRLControl(dbEntry.getCrlControl());
     }
 
     public CRLControl getCRLControl()

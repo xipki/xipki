@@ -66,7 +66,7 @@ public class ResponderUpdateCommand extends CaCommand
 
     @Option(name = "--signer-conf",
             description = "conf of the responder signer or 'NULL'")
-    protected String signerConf;
+    private String signerConf;
 
     @Option(name = "--cert",
             description = "requestor certificate file or 'NULL'")
@@ -78,6 +78,27 @@ public class ResponderUpdateCommand extends CaCommand
             final PasswordResolver passwordResolver)
     {
         this.passwordResolver = passwordResolver;
+    }
+
+    protected String getSignerConf()
+    throws Exception
+    {
+        if(signerConf == null)
+        {
+            return signerConf;
+        }
+        String _signerType = signerType;
+        if(_signerType == null)
+        {
+            CmpResponderEntry entry = caManager.getCmpResponder(name);
+            if(entry == null)
+            {
+                throw new ConfigurationException("please specify the signerType");
+            }
+            _signerType = entry.getType();
+        }
+
+        return ShellUtil.canonicalizeSignerConf(_signerType, signerConf, passwordResolver);
     }
 
     @Override
@@ -96,23 +117,7 @@ public class ResponderUpdateCommand extends CaCommand
             cert = Base64.toBase64String(certBytes);
         }
 
-        if(signerConf != null)
-        {
-            String _signerType = signerType;
-            if(_signerType == null)
-            {
-                CmpResponderEntry entry = caManager.getCmpResponder(name);
-                if(entry == null)
-                {
-                    throw new ConfigurationException("please specify the signerType");
-                }
-                _signerType = entry.getType();
-            }
-
-            signerConf = ShellUtil.canonicalizeSignerConf(_signerType, signerConf, passwordResolver);
-        }
-
-        boolean b = caManager.changeCmpResponder(name, signerType, signerConf, cert);
+        boolean b = caManager.changeCmpResponder(name, signerType, getSignerConf(), cert);
         output(b, "updated", "could not update", "CMP responder " + name);
         return null;
     }

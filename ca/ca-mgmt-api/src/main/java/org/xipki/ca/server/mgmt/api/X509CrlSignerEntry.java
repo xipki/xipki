@@ -152,7 +152,7 @@ public class X509CrlSignerEntry implements Serializable
         this.cert = cert;
     }
 
-    public String getCRLControl()
+    public String getCrlControl()
     {
         return crlControl;
     }

@@ -35,27 +35,59 @@
 
 package org.xipki.ca.server.mgmt.qa.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.xipki.ca.server.mgmt.shell.EnvUpdateCommand;
+import java.util.Collection;
+
+import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.common.qa.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "env-check", description="check information of CA environment parameters (QA)")
-public class EnvCheckCommand extends EnvUpdateCommand
+public class MgmtQAShellUtil
 {
-    @Override
-    protected Object _doExecute()
-    throws Exception
+
+    public static void assertEquals(String desc, String ex, String is)
+    throws UnexpectedResultException
     {
-        String is = caManager.getEnvParam(name);
-        if(value.equals(is) == false)
+        if(CAManager.NULL.equals(ex))
         {
-            throw new UnexpectedResultException("Environment parameter '" + name + "': is '" + is +
-                    "', but expected '" + value + "'");
+            ex = null;
         }
-        return null;
+
+        boolean b;
+        if(ex == null)
+        {
+            b = (is == null);
+        }
+        else
+        {
+            b = ex.equals(is);
+        }
+
+        if(b == false)
+        {
+            throw new UnexpectedResultException(desc + ": is '" + is + "', but expected '" + ex + "'");
+        }
     }
+
+    public static void assertEquals(String desc, Collection<?> ex, Collection<?> is)
+    throws UnexpectedResultException
+    {
+        boolean b;
+        if(ex == null)
+        {
+            b = (is == null);
+        }
+        else
+        {
+            b = ex.equals(is);
+        }
+
+        if(b == false)
+        {
+            throw new UnexpectedResultException(desc + ": is '" + is + "', but expected '" + ex + "'");
+        }
+    }
+
 }
