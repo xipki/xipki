@@ -312,12 +312,13 @@
                 <feature>xipki-caserver</feature>
                 <feature>xipki-camgmt-shell</feature>
                 <feature>xipki-caclient-shell</feature>
-                <feature>xipki-caqa-shell</feature>
                 <feature>xipki-security-shell</feature>
                 <feature>xipki-ocspserver</feature>
                 <feature>xipki-ocspclient-shell</feature>
-                <feature>xipki-ocspqa-shell</feature>
                 <!-- optional features -->
+                <feature>xipki-camgmt-qa-shell</feature>
+                <feature>xipki-caqa-shell</feature>
+                <feature>xipki-ocspqa-shell</feature>
                 <feature>xipki-database-tool</feature>
                 <feature>xipki-audit-syslog</feature>
                 <feature>xipki-pkiconsole-server</feature>

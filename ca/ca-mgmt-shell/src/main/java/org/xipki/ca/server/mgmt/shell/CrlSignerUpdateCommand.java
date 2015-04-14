@@ -85,8 +85,7 @@ public class CrlSignerUpdateCommand extends CaCommand
         this.passwordResolver = passwordResolver;
     }
 
-    @Override
-    protected Object _doExecute()
+    protected X509ChangeCrlSignerEntry getCrlSignerChangeEntry()
     throws Exception
     {
         String signerCertConf = null;
@@ -123,8 +122,14 @@ public class CrlSignerUpdateCommand extends CaCommand
         dbEntry.setSignerConf(signerConf);
         dbEntry.setCrlControl(crlControl);
         dbEntry.setBase64Cert(signerCertConf);
+        return dbEntry;
+    }
 
-        boolean b = caManager.changeCrlSigner(dbEntry);
+    @Override
+    protected Object _doExecute()
+    throws Exception
+    {
+        boolean b = caManager.changeCrlSigner(getCrlSignerChangeEntry());
         output(b, "updated", "could not update", "CRL signer " + name);
         return null;
     }

@@ -54,7 +54,7 @@ public class CaProfileAddCommand extends CaCommand
 
     @Option(name = "--profile",
             required = true,
-            description = "profile profileName\n"
+            description = "profile name\n"
                 + "(required)")
     private String profileName;
 

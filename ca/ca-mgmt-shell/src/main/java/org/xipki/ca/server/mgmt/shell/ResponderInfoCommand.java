@@ -98,7 +98,7 @@ public class ResponderInfoCommand extends CaCommand
             }
             else
             {
-                sb.append(entry.toString());
+                sb.append(entry.toString(verbose));
             }
         }
 

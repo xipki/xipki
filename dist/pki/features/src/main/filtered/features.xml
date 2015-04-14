@@ -70,6 +70,10 @@
     <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-mgmt-shell/${project.version}</bundle>
   </feature>
+  <feature name="xipki-camgmt-qa-shell" version="${project.version}" resolver="(obr)">
+    <feature>xipki-camgmt-shell</feature>
+    <bundle>mvn:org.xipki/ca-mgmt-qa-shell/${project.version}</bundle>
+  </feature>
   <feature name="xipki-caclient" version="${project.version}" resolver="(obr)">
     <feature>xipki-cabase</feature>
     <bundle>mvn:org.xipki/ca-client-api/${project.version}</bundle>

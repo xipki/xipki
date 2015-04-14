@@ -161,8 +161,7 @@ public class CaUpdateCommand extends CaCommand
         this.passwordResolver = passwordResolver;
     }
 
-    @Override
-    protected Object _doExecute()
+    protected X509ChangeCAEntry getChangeCAEntry()
     throws Exception
     {
         X509ChangeCAEntry entry = new X509ChangeCAEntry(caName);
@@ -281,8 +280,15 @@ public class CaUpdateCommand extends CaCommand
             entry.setNumCrls(numCrls);
         }
 
-        boolean b = caManager.changeCA(entry);
-        output(b, "updated", "could not update", "CA " + entry.getName());
+        return entry;
+    }
+
+    @Override
+    protected Object _doExecute()
+    throws Exception
+    {
+        boolean b = caManager.changeCA(getChangeCAEntry());
+        output(b, "updated", "could not update", "CA " + caName);
         return null;
     }
 

@@ -60,34 +60,32 @@ public class CaProfileInfoCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        StringBuilder sb = new StringBuilder();
         if(caManager.getCA(caName) == null)
         {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
+
+        StringBuilder sb = new StringBuilder();
+        Map<String, String> entries = caManager.getCertprofilesForCA(caName);
+        if(CollectionUtil.isNotEmpty(entries))
+        {
+            sb.append("certificate Profiles supported by CA " + caName).append("\n");
+
+            for(String localname  : entries.keySet())
+            {
+                String name = entries.get(localname);
+                sb.append("\t");
+                sb.append(name);
+                if(name.equals(localname) == false)
+                {
+                    sb.append(" (localname ").append(localname).append(")");
+                }
+                sb.append("\n");
+            }
+        }
         else
         {
-            Map<String, String> entries = caManager.getCertprofilesForCA(caName);
-            if(CollectionUtil.isNotEmpty(entries))
-            {
-                sb.append("certificate Profiles supported by CA " + caName).append("\n");
-
-                for(String localname  : entries.keySet())
-                {
-                    String name = entries.get(localname);
-                    sb.append("\t");
-                    sb.append(name);
-                    if(name.equals(localname) == false)
-                    {
-                        sb.append(" (localname ").append(localname).append(")");
-                    }
-                    sb.append("\n");
-                }
-            }
-            else
-            {
-                sb.append("\tno profile for CA " + caName + " is configured");
-            }
+            sb.append("\tno profile for CA " + caName + " is configured");
         }
 
         out(sb.toString());

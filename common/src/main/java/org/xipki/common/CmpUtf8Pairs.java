@@ -247,6 +247,24 @@ public class CmpUtf8Pairs
         return getEncoded();
     }
 
+    @Override
+    public int hashCode()
+    {
+        return getEncoded().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if(obj instanceof CmpUtf8Pairs == false)
+        {
+            return false;
+        }
+
+        CmpUtf8Pairs b = (CmpUtf8Pairs) obj;
+        return pairs.equals(b.pairs);
+    }
+
     public static void main(String[] args)
     {
         try
