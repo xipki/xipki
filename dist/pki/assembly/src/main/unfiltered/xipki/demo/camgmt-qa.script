@@ -1,0 +1,146 @@
+CA_SIGNER_ALGO = SHA256withRSA,SHA1withRSA
+
+#################################################################
+#                                   QA                          #
+#################################################################
+feature:install xipki-camgmt-qa-shell
+
+# Wait two seconds
+sleep 2000
+
+# change the CA configuration
+xipki-ca:ca-up --name RCA1 \
+  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?$CA_SIGNER_ALGO \
+
+##### CA
+# initial CA configuration
+xipki-caqa:ca-check --name RCA1 \
+  --permission all \
+  --max-validity 10y \
+  --signer-type PKCS12 \
+  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?$CA_SIGNER_ALGO \
+  --cert output/RCA1.der \
+  --ocsp-uri http://localhost:8080/ocsp/responder1 \
+  --ca-cert-uri http://example.org/RCA1.der \
+  --cmp-control cmpcontrol1 \
+  --responder responder1 \
+  --duplicate-subject  permitted \
+  --duplicate-key permitted \
+  --validity-mode CUTOFF
+
+# change the CA configuration
+xipki-ca:ca-up --name RCA1 \
+  --permission enroll \
+  --permission revoke \
+  --max-validity 8y \
+  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?$CA_SIGNER_ALGO \
+  --ocsp-uri http://localhost:8080/ocsp/responder2 \
+  --ca-cert-uri http://example.org/RCA1-2.der \
+  --duplicate-subject forbidden \
+  --duplicate-key forbidden \
+  --validity-mode STRICT
+
+xipki-caqa:ca-check --name RCA1 \
+  --permission enroll \
+  --permission revoke \
+  --max-validity 8y \
+  --signer-type PKCS12 \
+  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?$CA_SIGNER_ALGO \
+  --cert output/RCA1.der \
+  --ocsp-uri http://localhost:8080/ocsp/responder2 \
+  --ca-cert-uri http://example.org/RCA1-2.der \
+  --cmp-control cmpcontrol1 \
+  --responder responder1 \
+  --duplicate-subject forbidden \
+  --duplicate-key forbidden \
+  --validity-mode STRICT
+
+# for commands neg-gen-rca
+xipki-ca:profile-add --name RCA --type XML --conf-file xipki/demo/profile/Certprofile_RootCA.xml
+
+# The CA named RCA2 exists. No new CA with the same name is allowed
+xipki-caqa:neg-gen-rca \
+  --name RCA1 \
+  --p10 output/RCA1.p10 \
+  --profile RCA \
+  --out output/RCA1-2.der \
+  --permission all \
+  --next-serial 1 \
+  --next-crl-no 2 \
+  --max-validity 10y \
+  --signer-type PKCS12 \
+  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?$CA_SIGNER_ALGO \
+  --ocsp-uri http://localhost:8080/ocsp/responder1 \
+  --ca-cert-uri http://example.org/RCA1.der \
+  --cmp-control cmpcontrol1 \
+  --responder responder1 \
+  --duplicate-subject  permitted \
+  --duplicate-key permitted \
+  --validity-mode CUTOFF
+
+# invalid signer conf (password invalid)
+xipki-caqa:neg-gen-rca \
+  --name RCA1 \
+  --p10 output/RCA1.p10 \
+  --profile RCA \
+  --out output/RCA1-2.der \
+  --permission all \
+  --next-serial 1 \
+  --next-crl-no 2 \
+  --max-validity 10y \
+  --signer-type PKCS12 \
+  --signer-conf password?123456%keystore?file:output/RCA1.p12%algo?SHA256withRSA \
+  --ocsp-uri http://localhost:8080/ocsp/responder1 \
+  --ca-cert-uri http://example.org/RCA1.der \
+  --cmp-control cmpcontrol1 \
+  --responder responder1 \
+  --duplicate-subject  permitted \
+  --duplicate-key permitted \
+  --validity-mode CUTOFF
+
+# invalid signer conf (key and algo do not match)
+xipki-caqa:neg-gen-rca \
+  --name RCA1 \
+  --p10 output/RCA1.p10 \
+  --profile RCA \
+  --out output/RCA1-2.der \
+  --permission all \
+  --next-serial 1 \
+  --next-crl-no 2 \
+  --max-validity 10y \
+  --signer-type PKCS12 \
+  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?SHA256withDSA \
+  --ocsp-uri http://localhost:8080/ocsp/responder1 \
+  --ca-cert-uri http://example.org/RCA1.der \
+  --cmp-control cmpcontrol1 \
+  --responder responder1 \
+  --duplicate-subject  permitted \
+  --duplicate-key permitted \
+  --validity-mode CUTOFF
+
+xipki-ca:profile-rm RCA
+
+# certificate and key do not match
+xipki-caqa:neg-add-ca \
+  --name RCA2 \
+  --permission all \
+  --next-serial 1 \
+  --next-crl-no 2 \
+  --max-validity 10y \
+  --signer-type PKCS12 \
+  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?SHA256withRSA \
+  --cert output/SubCA1.der
+  --ocsp-uri http://localhost:8080/ocsp/responder1 \
+  --ca-cert-uri http://example.org/RCA1.der \
+  --cmp-control cmpcontrol1 \
+  --responder responder1 \
+  --duplicate-subject  permitted \
+  --duplicate-key permitted \
+  --validity-mode CUTOFF
+
+./xipki/demo/camgmt-demo.script
+
+#################################################################
+#              UNINSTALL UNNEEDED FEATURES                      #
+#################################################################
+feature:uninstall xipki-camgmt-qa-shell

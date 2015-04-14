@@ -1175,7 +1175,7 @@ class CAManagerQueryExecutor
             ps.setString(idx++, dbEntry.getCertificate() == null ? null :
                     Base64.toBase64String(dbEntry.getCertificate().getEncoded()));
 
-            String crlControl = dbEntry.getCRLControl();
+            String crlControl = dbEntry.getCrlControl();
             ps.setString(idx++, crlControl);
 
             ps.executeUpdate();
@@ -1902,7 +1902,7 @@ class CAManagerQueryExecutor
 
         if(crlControl == null)
         {
-            crlControl = dbEntry.getCRLControl();
+            crlControl = dbEntry.getCrlControl();
         }
 
         try

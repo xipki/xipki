@@ -36,7 +36,9 @@
 package org.xipki.ca.server.mgmt.qa.shell;
 
 import org.apache.karaf.shell.commands.Command;
+import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.shell.PublisherUpdateCommand;
+import org.xipki.common.qa.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
@@ -49,7 +51,26 @@ public class PublisherCheckCommand extends PublisherUpdateCommand
     protected Object _doExecute()
     throws Exception
     {
-    	// TODO
+        PublisherEntry cp = caManager.getPublisher(name);
+        if(cp == null)
+        {
+            throw new UnexpectedResultException("publisher named '" +name + "' is not configured");
+        }
+
+        if(cp.getType() != null)
+        {
+            String ex = type;
+            String is = cp.getType();
+            MgmtQAShellUtil.assertEquals("type", ex, is);
+        }
+
+        if(cp.getConf() != null)
+        {
+            String ex = conf;
+            String is = cp.getConf();
+            MgmtQAShellUtil.assertEquals("signer conf", ex, is);
+        }
+
         return null;
     }
 }

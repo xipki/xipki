@@ -176,4 +176,3 @@ xipki-ca:ca-up --name RCA1 \
   --duplicate-key permitted \
   --validity-mode CUTOFF
 
-

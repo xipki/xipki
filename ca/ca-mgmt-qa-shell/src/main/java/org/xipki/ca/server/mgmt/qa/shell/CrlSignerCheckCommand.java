@@ -36,7 +36,10 @@
 package org.xipki.ca.server.mgmt.qa.shell;
 
 import org.apache.karaf.shell.commands.Command;
+import org.xipki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
+import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.ca.server.mgmt.shell.CrlSignerUpdateCommand;
+import org.xipki.common.qa.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
@@ -49,7 +52,41 @@ public class CrlSignerCheckCommand extends CrlSignerUpdateCommand
     protected Object _doExecute()
     throws Exception
     {
-    	// TODO
+        X509ChangeCrlSignerEntry ey = getCrlSignerChangeEntry();
+        String name = ey.getName();
+        X509CrlSignerEntry cs = caManager.getCrlSigner(name);
+        if(cs == null)
+        {
+            throw new UnexpectedResultException("CRL signer named '" +name + "' is not configured");
+        }
+
+        if(ey.getSignerType() != null)
+        {
+            String ex = ey.getSignerType();
+            String is = cs.getType();
+            MgmtQAShellUtil.assertEquals("signer type", ex, is);
+        }
+
+        if(ey.getSignerConf() != null)
+        {
+            String ex = ey.getSignerConf();
+            String is = cs.getConf();
+            MgmtQAShellUtil.assertEquals("signer conf", ex, is);
+        }
+
+        if(ey.getCrlControl() != null)
+        {
+            String ex = ey.getCrlControl();
+            String is = cs.getCrlControl();
+            MgmtQAShellUtil.assertEquals("CRL control", ex, is);
+        }
+
+        if(ey.getBase64Cert() != null)
+        {
+            String ex = ey.getBase64Cert();
+            String is = cs.getBase64Cert();
+            MgmtQAShellUtil.assertEquals("certificate", ex, is);
+        }
 
         return null;
     }
