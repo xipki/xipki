@@ -57,7 +57,7 @@ public class ChangeCAEntry implements Serializable
     private String responderName;
     private DuplicationMode duplicateKeyMode;
     private DuplicationMode duplicateSubjectMode;
-    private ValidityMode validityMode = ValidityMode.STRICT;
+    private ValidityMode validityMode;
     private Set<Permission> permissions;
     private Integer expirationPeriod;
 

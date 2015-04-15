@@ -228,7 +228,7 @@ public class CAEntry
     {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
-        sb.append("status: ").append(status.getStatus()).append('\n');
+        sb.append("status: ").append(status == null ? "null" : status.getStatus()).append('\n');
         sb.append("maxValidity: ").append(maxValidity).append("\n");
         sb.append("expirationPeriod: ").append(expirationPeriod).append(" days\n");
         sb.append("signerType: ").append(signerType).append('\n');
@@ -243,8 +243,10 @@ public class CAEntry
         sb.append('\n');
         sb.append("cmpcontrolName: ").append(cmpControlName).append('\n');
         sb.append("responderName: ").append(responderName).append('\n');
-        sb.append("duplicateKey: ").append(duplicateKeyMode.getDescription()).append('\n');
-        sb.append("duplicateSubject: ").append(duplicateSubjectMode.getDescription()).append('\n');
+        sb.append("duplicateKey: ").append(
+                duplicateKeyMode == null ? "null" : duplicateKeyMode.getDescription()).append('\n');
+        sb.append("duplicateSubject: ").append(
+                duplicateSubjectMode == null ? "null" : duplicateSubjectMode.getDescription()).append('\n');
         sb.append("validityMode: ").append(validityMode).append('\n');
         sb.append("permissions: ").append(Permission.toString(permissions)).append('\n');
         sb.append("extraControl: ").append(extraControl).append('\n');
