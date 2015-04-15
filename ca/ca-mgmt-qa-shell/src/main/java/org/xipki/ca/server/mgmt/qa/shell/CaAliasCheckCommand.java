@@ -68,6 +68,7 @@ public class CaAliasCheckCommand extends CaCommand
         {
             throw new UnexpectedResultException("the given CA name and alias do not match");
         }
+        out("checked CA alias " + aliasName);
         return null;
     }
 }

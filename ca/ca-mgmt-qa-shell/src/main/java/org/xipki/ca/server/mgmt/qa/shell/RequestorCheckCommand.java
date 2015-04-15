@@ -73,6 +73,7 @@ public class RequestorCheckCommand extends RequestorUpdateCommand
             throw new UnexpectedResultException("Cert: the expected one and the actual one differ");
         }
 
+        out("checked requestor " + name);
         return null;
     }
 }

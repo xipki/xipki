@@ -67,6 +67,7 @@ public class CmpControlCheckCommand extends CmpControlUpdateCommand
             throw new UnexpectedException("conf: is '" + is.getEncoded() +
                     "', but expected '" + ex.getEncoded() + "'");
         }
+        out("checked CMP control " + name);
         return null;
     }
 }

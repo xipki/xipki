@@ -260,6 +260,7 @@ public class CaCheckCommand extends CaUpdateCommand
             }
         }
 
+        out("checked CA" + caName);
         return null;
     }
 }

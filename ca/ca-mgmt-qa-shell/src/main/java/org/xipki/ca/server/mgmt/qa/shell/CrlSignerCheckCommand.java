@@ -87,7 +87,7 @@ public class CrlSignerCheckCommand extends CrlSignerUpdateCommand
             String is = cs.getBase64Cert();
             MgmtQAShellUtil.assertEquals("certificate", ex, is);
         }
-
+        out("checked CRL signer " + name);
         return null;
     }
 }

@@ -92,6 +92,7 @@ public class CaProfileCheckCommand extends CaCommand
         {
             throw new UnexpectedResultException("Profile name is '" + name + "', but expected '" + profileName + "'");
         }
+        out("checked CA profile");
         return null;
     }
 }

@@ -78,10 +78,12 @@ public class CaPublisherCheckCommand extends CaCommand
         {
             if(m.getName().equals(publisherName))
             {
+                out("checked CA publisher");
                 return null;
             }
         }
 
         throw new UnexpectedResultException("CA is not associated with publisher '" + publisherName + "'");
     }
+
 }

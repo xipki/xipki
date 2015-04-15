@@ -139,6 +139,8 @@ public class CaRequestorCheckCommand extends CaCommand
             throw new UnexpectedException("profiles: is '" + entry.getProfiles() +
                     "', but expected '" + profiles + "'");
         }
+
+        out("checked CA requestor");
         return null;
     }
 }

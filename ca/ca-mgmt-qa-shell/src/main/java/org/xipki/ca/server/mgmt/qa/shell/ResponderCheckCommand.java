@@ -89,6 +89,7 @@ public class ResponderCheckCommand extends ResponderUpdateCommand
             MgmtQAShellUtil.assertEquals("conf", signerConf, cr.getConf());
         }
 
+        out("checked responder " + name);
         return null;
     }
 }
