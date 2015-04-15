@@ -71,6 +71,7 @@ public class PublisherCheckCommand extends PublisherUpdateCommand
             MgmtQAShellUtil.assertEquals("signer conf", ex, is);
         }
 
+        out("checked publisher " + name);
         return null;
     }
 }

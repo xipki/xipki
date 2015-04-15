@@ -71,6 +71,7 @@ public class ProfileCheckCommand extends ProfileUpdateCommand
             MgmtQAShellUtil.assertEquals("conf", ex, is);
         }
 
+        out("checked profile " + name);
         return null;
     }
 }

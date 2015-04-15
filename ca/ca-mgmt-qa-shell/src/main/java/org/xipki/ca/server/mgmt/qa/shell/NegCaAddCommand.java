@@ -43,7 +43,7 @@ import org.xipki.common.qa.UnexpectedResultException;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "neg-neg-ca-add", description="add CA (negative, QA)")
+@Command(scope = "xipki-caqa", name = "neg-ca-add", description="add CA (negative, QA)")
 public class NegCaAddCommand extends CaAddCommand
 {
     @Override

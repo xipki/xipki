@@ -56,6 +56,7 @@ public class EnvCheckCommand extends EnvUpdateCommand
             throw new UnexpectedResultException("Environment parameter '" + name + "': is '" + is +
                     "', but expected '" + value + "'");
         }
+        out("checked environment " + name);
         return null;
     }
 }
