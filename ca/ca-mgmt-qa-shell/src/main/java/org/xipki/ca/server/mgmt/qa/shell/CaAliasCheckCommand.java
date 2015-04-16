@@ -53,7 +53,7 @@ public class CaAliasCheckCommand extends CaCommand
                     + "(required)")
     private String caName;
 
-    @Option(name = "--requestor",
+    @Option(name = "--alias",
             required = true,
             description = "alias name\n"
                     + "(required)")
