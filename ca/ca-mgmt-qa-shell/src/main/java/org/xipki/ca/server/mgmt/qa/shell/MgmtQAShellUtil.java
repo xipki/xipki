@@ -38,7 +38,7 @@ package org.xipki.ca.server.mgmt.qa.shell;
 import java.util.Collection;
 
 import org.xipki.ca.server.mgmt.api.CAManager;
-import org.xipki.common.qa.UnexpectedResultException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -48,7 +48,7 @@ public class MgmtQAShellUtil
 {
 
     public static void assertEquals(String desc, String ex, String is)
-    throws UnexpectedResultException
+    throws CmdFailure
     {
         if(CAManager.NULL.equals(ex))
         {
@@ -67,12 +67,12 @@ public class MgmtQAShellUtil
 
         if(b == false)
         {
-            throw new UnexpectedResultException(desc + ": is '" + is + "', but expected '" + ex + "'");
+            throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
         }
     }
 
     public static void assertEquals(String desc, Collection<?> ex, Collection<?> is)
-    throws UnexpectedResultException
+    throws CmdFailure
     {
         boolean b;
         if(ex == null)
@@ -86,7 +86,7 @@ public class MgmtQAShellUtil
 
         if(b == false)
         {
-            throw new UnexpectedResultException(desc + ": is '" + is + "', but expected '" + ex + "'");
+            throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
         }
     }
 

@@ -37,6 +37,7 @@ package org.xipki.security.shell.p12;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.P12KeypairGenerator;
 import org.xipki.security.api.P12KeypairGenerationResult;
 
@@ -61,8 +62,7 @@ public class P12DSAKeyGenCommand extends P12KeyGenCommand
     {
         if(pLen % 1024 != 0)
         {
-            err("plen is not multiple of 1024: " + pLen);
-            return null;
+            throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
         }
 
         if(qLen == null)

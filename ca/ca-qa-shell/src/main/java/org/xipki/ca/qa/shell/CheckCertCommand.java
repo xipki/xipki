@@ -37,7 +37,7 @@ package org.xipki.ca.qa.shell;
 
 import java.util.Set;
 
-import javax.naming.ConfigurationException;
+import javax.naming.IllegalCmdParamException;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
@@ -49,10 +49,11 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.ca.qa.api.QASystemManager;
 import org.xipki.ca.qa.api.X509CertprofileQA;
 import org.xipki.ca.qa.api.X509IssuerInfo;
-import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 /**
@@ -98,14 +99,14 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
         Set<String> issuerNames = qaSystemManager.getIssuerNames();
         if(isEmpty(issuerNames))
         {
-            throw new ConfigurationException("no issuer is configured");
+            throw new IllegalCmdParamException("no issuer is configured");
         }
 
         if(issuerName == null)
         {
             if(issuerNames.size() != 1)
             {
-                throw new ConfigurationException("no issuer is specified");
+                throw new IllegalCmdParamException("no issuer is specified");
             }
 
             issuerName = issuerNames.iterator().next();
@@ -113,7 +114,7 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
 
         if(issuerNames.contains(issuerName) == false)
         {
-            throw new ConfigurationException("issuer " + issuerName + " is not within the configured issuers " + issuerNames);
+            throw new IllegalCmdParamException("issuer " + issuerName + " is not within the configured issuers " + issuerNames);
         }
 
         X509IssuerInfo issuerInfo = qaSystemManager.getIssuer(issuerName);
@@ -121,7 +122,7 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
         X509CertprofileQA qa = qaSystemManager.getCertprofile(profileName);
         if(qa == null)
         {
-            throw new ConfigurationException("found no certificate profile named '" + profileName + "'");
+            throw new IllegalCmdParamException("found no certificate profile named '" + profileName + "'");
         }
 
         CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));
@@ -156,7 +157,7 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
         out(sb.toString());
         if(result.isAllSuccessful() == false)
         {
-            throw new UnexpectedResultException("certificate is invalid");
+            throw new CmdFailure("certificate is invalid");
         }
         return null;
     }

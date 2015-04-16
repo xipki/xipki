@@ -41,6 +41,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.common.util.StringUtil;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
@@ -68,8 +69,7 @@ public class ProfileExportCommand extends CaCommand
         CertprofileEntry entry = caManager.getCertprofile(name);
         if(entry == null)
         {
-            err("no cert profile named " + name + " is defined");
-            return null;
+            throw new IllegalCmdParamException("no cert profile named " + name + " is defined");
         }
 
         if(StringUtil.isBlank(entry.getConf()))

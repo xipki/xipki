@@ -41,6 +41,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.client.api.RemoveExpiredCertsResult;
 import org.xipki.common.RequestResponseDebug;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
@@ -76,14 +77,12 @@ public class RemoveExpiredCertsCommand extends ClientCommand
         Set<String> caNames = caClient.getCaNames();
         if(isEmpty(caNames))
         {
-            err("no CA is configured");
-            return  null;
+            throw new IllegalCmdParamException("no CA is configured");
         }
 
         if(caName != null && ! caNames.contains(caName))
         {
-            err("CA " + caName + " is not within the configured CAs " + caNames);
-            return null;
+            throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs " + caNames);
         }
 
         if(caName == null)
@@ -94,8 +93,7 @@ public class RemoveExpiredCertsCommand extends ClientCommand
             }
             else
             {
-                err("no caname is specified, one of " + caNames + " is required");
-                return null;
+                throw new IllegalCmdParamException("no caname is specified, one of " + caNames + " is required");
             }
         }
 

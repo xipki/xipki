@@ -51,7 +51,7 @@ import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.X509ChangeCAEntry;
 import org.xipki.ca.server.mgmt.shell.CaUpdateCommand;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.qa.UnexpectedResultException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -94,7 +94,7 @@ public class CaCheckCommand extends CaUpdateCommand
             X509Certificate is = ca.getCertificate();
             if(ex.equals(is) == false)
             {
-                throw new UnexpectedResultException("CA cert is not as expected");
+                throw new CmdFailure("CA cert is not as expected");
             }
         }
 
@@ -137,7 +137,7 @@ public class CaCheckCommand extends CaUpdateCommand
             DuplicationMode is = ca.getDuplicateKeyMode();
             if(ex.equals(is) == false)
             {
-                throw new UnexpectedResultException("Duplicate key mode: is '" + is + "', but expected '" + ex + "'");
+                throw new CmdFailure("Duplicate key mode: is '" + is + "', but expected '" + ex + "'");
             }
         }
 
@@ -148,7 +148,7 @@ public class CaCheckCommand extends CaUpdateCommand
             DuplicationMode is = ca.getDuplicateSubjectMode();
             if(ex.equals(is) == false)
             {
-                throw new UnexpectedResultException("Duplicate subject mode: is '" + is + "', but expected '" + ex + "'");
+                throw new CmdFailure("Duplicate subject mode: is '" + is + "', but expected '" + ex + "'");
             }
         }
 
@@ -159,7 +159,7 @@ public class CaCheckCommand extends CaUpdateCommand
             Integer is = ca.getExpirationPeriod();
             if(ex.equals(is) == false)
             {
-                throw new UnexpectedResultException("Expiration period: is '" + is + "', but expected '" + ex + "'");
+                throw new CmdFailure("Expiration period: is '" + is + "', but expected '" + ex + "'");
             }
         }
 
@@ -170,7 +170,7 @@ public class CaCheckCommand extends CaUpdateCommand
             String is = ca.getExtraControl();
             if(ex.equals(is) == false)
             {
-                throw new UnexpectedResultException("Extra control: is '" + is + "', but expected '" + ex + "'");
+                throw new CmdFailure("Extra control: is '" + is + "', but expected '" + ex + "'");
             }
         }
 
@@ -181,7 +181,7 @@ public class CaCheckCommand extends CaUpdateCommand
             CertValidity is = ca.getMaxValidity();
             if(ex.equals(is) == false)
             {
-                throw new UnexpectedResultException("Max validity: is '" + is + "', but expected '" + ex + "'");
+                throw new CmdFailure("Max validity: is '" + is + "', but expected '" + ex + "'");
             }
         }
 
@@ -192,7 +192,7 @@ public class CaCheckCommand extends CaUpdateCommand
             int is = ca.getNumCrls();
             if(ex != is)
             {
-                throw new UnexpectedResultException("num CRLs: is '" + is + "', but expected '" + ex + "'");
+                throw new CmdFailure("num CRLs: is '" + is + "', but expected '" + ex + "'");
             }
         }
 
@@ -234,7 +234,7 @@ public class CaCheckCommand extends CaUpdateCommand
             CmpUtf8Pairs is = new CmpUtf8Pairs(ca.getSignerConf());
             if(ex.equals(is) == false)
             {
-                throw new UnexpectedResultException("signer conf: is '" + is + "', but expected '" + ex + "'");
+                throw new CmdFailure("signer conf: is '" + is + "', but expected '" + ex + "'");
             }
         }
 
@@ -245,7 +245,7 @@ public class CaCheckCommand extends CaUpdateCommand
             CAStatus is = ca.getStatus();
             if(ex.equals(is) == false)
             {
-                throw new UnexpectedResultException("status: is '" + is + "', but expected '" + ex + "'");
+                throw new CmdFailure("status: is '" + is + "', but expected '" + ex + "'");
             }
         }
 
@@ -256,7 +256,7 @@ public class CaCheckCommand extends CaUpdateCommand
             ValidityMode is = ca.getValidityMode();
             if(ex.equals(is) == false)
             {
-                throw new UnexpectedResultException("validity mode: is '" + is + "', but expected '" + ex + "'");
+                throw new CmdFailure("validity mode: is '" + is + "', but expected '" + ex + "'");
             }
         }
 

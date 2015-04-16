@@ -42,9 +42,9 @@ import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.common.ConfigurationException;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.X509Util;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.api.PasswordResolver;
 
 /**
@@ -93,7 +93,7 @@ public class ResponderUpdateCommand extends CaCommand
             CmpResponderEntry entry = caManager.getCmpResponder(name);
             if(entry == null)
             {
-                throw new ConfigurationException("please specify the signerType");
+                throw new IllegalCmdParamException("please specify the signerType");
             }
             _signerType = entry.getType();
         }

@@ -53,7 +53,7 @@ import org.xipki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.ca.client.shell.ClientCommand;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.SignatureAlgoControl;
-import org.xipki.common.qa.UnexpectedResultException;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
@@ -162,7 +162,7 @@ public abstract class NegEnrollCertCommand extends ClientCommand
 
         if(cert != null)
         {
-            throw new UnexpectedResultException("no certificate is excepted, but received one");
+            throw new CmdFailure("no certificate is excepted, but received one");
         }
 
         return null;

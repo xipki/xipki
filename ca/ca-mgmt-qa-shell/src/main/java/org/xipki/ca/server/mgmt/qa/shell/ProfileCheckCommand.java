@@ -38,7 +38,7 @@ package org.xipki.ca.server.mgmt.qa.shell;
 import org.apache.karaf.shell.commands.Command;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.shell.ProfileUpdateCommand;
-import org.xipki.common.qa.UnexpectedResultException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -54,7 +54,7 @@ public class ProfileCheckCommand extends ProfileUpdateCommand
         CertprofileEntry cp = caManager.getCertprofile(name);
         if(cp == null)
         {
-            throw new UnexpectedResultException("certificate profile named '" +name + "' is not configured");
+            throw new CmdFailure("certificate profile named '" +name + "' is not configured");
         }
 
         if(cp.getType() != null)

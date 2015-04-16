@@ -51,8 +51,8 @@ import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509ChangeCAEntry;
-import org.xipki.common.ConfigurationException;
 import org.xipki.common.util.X509Util;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.api.PasswordResolver;
 
 /**
@@ -172,7 +172,7 @@ public class CaUpdateCommand extends CaCommand
 
         if(expirationPeriod != null && expirationPeriod < 0)
         {
-            throw new ConfigurationException("invalid expirationPeriod: " + expirationPeriod);
+            throw new IllegalCmdParamException("invalid expirationPeriod: " + expirationPeriod);
         } else
         {
             entry.setExpirationPeriod(expirationPeriod);
@@ -191,7 +191,7 @@ public class CaUpdateCommand extends CaCommand
                 CAEntry caEntry = caManager.getCA(caName);
                 if(caEntry == null)
                 {
-                    throw new ConfigurationException("please specify the signerType");
+                    throw new IllegalCmdParamException("please specify the signerType");
                 }
                 _signerType = caEntry.getSignerType();
             }
@@ -205,7 +205,7 @@ public class CaUpdateCommand extends CaCommand
             DuplicationMode duplicateMode = DuplicationMode.getInstance(duplicateKeyS);
             if(duplicateMode == null)
             {
-                throw new ConfigurationException("invalid duplication mode " + duplicateKeyS);
+                throw new IllegalCmdParamException("invalid duplication mode " + duplicateKeyS);
             }
             entry.setDuplicateKeyMode(duplicateMode);
         }
@@ -215,7 +215,7 @@ public class CaUpdateCommand extends CaCommand
             DuplicationMode duplicateMode = DuplicationMode.getInstance(duplicateSubjectS);
             if(duplicateMode == null)
             {
-                throw new ConfigurationException("invalid duplication mode " + duplicateSubjectS);
+                throw new IllegalCmdParamException("invalid duplication mode " + duplicateSubjectS);
             }
             entry.setDuplicateSubjectMode(duplicateMode);
         }
@@ -228,7 +228,7 @@ public class CaUpdateCommand extends CaCommand
                 Permission _permission = Permission.getPermission(permission);
                 if(_permission == null)
                 {
-                    throw new ConfigurationException("invalid permission: " + permission);
+                    throw new IllegalCmdParamException("invalid permission: " + permission);
                 }
                 _permissions.add(_permission);
             }
@@ -245,7 +245,7 @@ public class CaUpdateCommand extends CaCommand
             ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
             if(validityMode == null)
             {
-                throw new ConfigurationException("invalid validity mode: " + validityModeS);
+                throw new IllegalCmdParamException("invalid validity mode: " + validityModeS);
             }
             entry.setValidityMode(validityMode);
         }

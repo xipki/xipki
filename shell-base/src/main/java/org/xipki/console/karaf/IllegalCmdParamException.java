@@ -33,32 +33,38 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.mgmt.qa.shell;
-
-import org.apache.karaf.shell.commands.Command;
-import org.xipki.ca.server.mgmt.shell.RequestorUpdateCommand;
-import org.xipki.console.karaf.CmdFailure;
+package org.xipki.console.karaf;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "neg-requestor-up", description="update requestor (negative, QA)")
-public class NegRequestorUpdateCommand extends RequestorUpdateCommand
+public class IllegalCmdParamException extends Exception
 {
 
-    @Override
-    protected Object _doExecute()
-    throws Exception
-    {
-        try
-        {
-            super._doExecute();
-        }catch(Exception e)
-        {
-            return null;
-        }
+    private static final long serialVersionUID = 1L;
 
-        throw new CmdFailure("Exception expected, but received none");
+    public IllegalCmdParamException()
+    {
     }
+
+    public IllegalCmdParamException(
+            final String message)
+    {
+        super(message);
+    }
+
+    public IllegalCmdParamException(
+            final Throwable cause)
+    {
+        super(cause);
+    }
+
+    public IllegalCmdParamException(
+            final String message,
+            final Throwable cause)
+    {
+        super(message, cause);
+    }
+
 }

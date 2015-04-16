@@ -41,7 +41,7 @@ import java.util.Map;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
-import org.xipki.common.qa.UnexpectedResultException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -84,13 +84,13 @@ public class CaProfileCheckCommand extends CaCommand
         Map<String, String> entries = caManager.getCertprofilesForCA(caName);
         if(entries.containsKey(profileLocalname) == false)
         {
-            throw new UnexpectedResultException("CA is not associated with profile '" + profileLocalname + "'");
+            throw new CmdFailure("CA is not associated with profile '" + profileLocalname + "'");
         }
 
         String name = entries.get(profileLocalname);
         if(profileName.equals(name) == false)
         {
-            throw new UnexpectedResultException("Profile name is '" + name + "', but expected '" + profileName + "'");
+            throw new CmdFailure("Profile name is '" + name + "', but expected '" + profileName + "'");
         }
         out("checked CA profile");
         return null;

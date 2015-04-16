@@ -42,7 +42,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.Permission;
-import org.xipki.common.ConfigurationException;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
@@ -94,7 +94,7 @@ public class CaRequestorAddCommand extends CaCommand
             Permission _permission = Permission.getPermission(permission);
             if(_permission == null)
             {
-                throw new ConfigurationException("invalid permission: " + permission);
+                throw new IllegalCmdParamException("invalid permission: " + permission);
             }
             _permissions.add(_permission);
         }

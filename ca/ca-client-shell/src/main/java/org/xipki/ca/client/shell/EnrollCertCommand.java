@@ -63,9 +63,9 @@ import org.xipki.common.KeyUsage;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.SignatureAlgoControl;
-import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.X509Util;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.security.P10RequestGenerator;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.ExtensionExistence;
@@ -279,7 +279,7 @@ public abstract class EnrollCertCommand extends ClientCommand
 
         if(cert == null)
         {
-            throw new UnexpectedResultException("no certificate received from the server");
+            throw new CmdFailure("no certificate received from the server");
         }
 
         File certFile = new File(outputFile);

@@ -38,6 +38,7 @@ package org.xipki.security.shell;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.common.util.StringUtil;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.PBEPasswordResolver;
 
 /**
@@ -59,19 +60,12 @@ public class PBEDecryptCommand extends SecurityCommand
     {
         if(StringUtil.startsWithIgnoreCase(passwordHint, "PBE:") == false)
         {
-            err("encrypted password '" + passwordHint + "' does not start with PBE:");
-            return null;
+            throw new IllegalCmdParamException("encrypted password '" + passwordHint + "' does not start with PBE:");
         }
 
         char[] masterPassword = readPassword("please enter the master password");
-        try
-        {
-            char[] password = PBEPasswordResolver.resolvePassword(masterPassword, passwordHint);
-            out("the decrypted password is: '" + new String(password) + "'");
-        }catch(Exception e)
-        {
-            err(e.getMessage());
-        }
+        char[] password = PBEPasswordResolver.resolvePassword(masterPassword, passwordHint);
+        out("the decrypted password is: '" + new String(password) + "'");
         return null;
     }
 

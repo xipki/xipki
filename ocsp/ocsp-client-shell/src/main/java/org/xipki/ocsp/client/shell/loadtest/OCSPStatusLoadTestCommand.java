@@ -45,6 +45,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.common.AbstractLoadTest;
 import org.xipki.common.util.X509Util;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.shell.AbstractOCSPStatusCommand;
 
@@ -98,8 +99,7 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
                     int endSerial = Integer.parseInt(subtokens.get(1).trim());
                     if(startSerial < 1 || endSerial < 1 || startSerial > endSerial)
                     {
-                        err("invalid serial number " + this.serialNumbers);
-                        return null;
+                        throw new IllegalCmdParamException("invalid serial number " + this.serialNumbers);
                     }
                     for(long i = startSerial; i <= endSerial; i++)
                     {
@@ -108,20 +108,17 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
                 }
                 else
                 {
-                    err("invalid serial number " + this.serialNumbers);
-                    return null;
+                    throw new IllegalCmdParamException("invalid serial number " + this.serialNumbers);
                 }
             }
         }catch(Exception e)
         {
-            err("invalid serial numbers " + this.serialNumbers);
-            return null;
+            throw new IllegalCmdParamException("invalid serial numbers " + this.serialNumbers);
         }
 
         if(numThreads < 1)
         {
-            err("invalid number of threads " + numThreads);
-            return null;
+            throw new IllegalCmdParamException("invalid number of threads " + numThreads);
         }
 
         URL serverUrl;

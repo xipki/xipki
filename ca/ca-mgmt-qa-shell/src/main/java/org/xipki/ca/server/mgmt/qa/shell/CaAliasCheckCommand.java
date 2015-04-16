@@ -38,7 +38,7 @@ package org.xipki.ca.server.mgmt.qa.shell;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
-import org.xipki.common.qa.UnexpectedResultException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -66,7 +66,7 @@ public class CaAliasCheckCommand extends CaCommand
         String _caName = caManager.getCaNameForAlias(aliasName);
         if(caName.equals(_caName) == false)
         {
-            throw new UnexpectedResultException("the given CA name and alias do not match");
+            throw new CmdFailure("the given CA name and alias do not match");
         }
         out("checked CA alias " + aliasName);
         return null;

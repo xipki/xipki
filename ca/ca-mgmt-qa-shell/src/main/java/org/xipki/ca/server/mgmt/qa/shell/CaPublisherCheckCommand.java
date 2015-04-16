@@ -42,7 +42,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
-import org.xipki.common.qa.UnexpectedResultException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -83,7 +83,7 @@ public class CaPublisherCheckCommand extends CaCommand
             }
         }
 
-        throw new UnexpectedResultException("CA is not associated with publisher '" + publisherName + "'");
+        throw new CmdFailure("CA is not associated with publisher '" + publisherName + "'");
     }
 
 }

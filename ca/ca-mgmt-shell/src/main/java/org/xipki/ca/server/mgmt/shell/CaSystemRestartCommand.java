@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.karaf.shell.commands.Command;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -55,8 +56,7 @@ public class CaSystemRestartCommand extends CaCommand
         boolean successfull = caManager.restartCaSystem();
         if(successfull == false)
         {
-            err("could not restart CA system");
-            return null;
+            throw new CmdFailure("could not restart CA system");
         }
 
         StringBuilder sb = new StringBuilder("restarted CA system");

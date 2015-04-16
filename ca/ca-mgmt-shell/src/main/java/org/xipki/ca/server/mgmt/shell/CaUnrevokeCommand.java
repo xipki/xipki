@@ -37,6 +37,7 @@ package org.xipki.ca.server.mgmt.shell;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
@@ -54,8 +55,7 @@ public class CaUnrevokeCommand extends CaCommand
     {
         if(caManager.getCaNames().contains(caName) == false)
         {
-            err("invalid CA name " + caName);
-            return null;
+            throw new IllegalCmdParamException("invalid CA name " + caName);
         }
 
         boolean b = caManager.unrevokeCa(caName);

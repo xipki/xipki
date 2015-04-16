@@ -44,8 +44,8 @@ import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
-import org.xipki.common.ConfigurationException;
-import org.xipki.common.qa.UnexpectedResultException;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
@@ -104,7 +104,7 @@ public class CaRequestorCheckCommand extends CaCommand
 
         if(entry == null)
         {
-            throw new UnexpectedResultException("CA is not associated with requestor '" + requestorName + "'");
+            throw new CmdFailure("CA is not associated with requestor '" + requestorName + "'");
         }
 
         boolean ra = isEnabled(raS, false, "ra");
@@ -122,7 +122,7 @@ public class CaRequestorCheckCommand extends CaCommand
                 Permission _permission = Permission.getPermission(permission);
                 if(_permission == null)
                 {
-                    throw new ConfigurationException("invalid permission: " + permission);
+                    throw new IllegalCmdParamException("invalid permission: " + permission);
                 }
                 _permissions.add(_permission);
             }

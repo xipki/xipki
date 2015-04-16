@@ -37,6 +37,7 @@ package org.xipki.security.shell.p12;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.P12KeypairGenerator;
 import org.xipki.security.api.P12KeypairGenerationResult;
 
@@ -61,8 +62,7 @@ public class P12RSAKeyGenCommand extends P12KeyGenCommand
     {
         if(keysize % 1024 != 0)
         {
-            err("keysize is not multiple of 1024: " + keysize);
-            return null;
+            throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
         }
 
         P12KeypairGenerator gen = new P12KeypairGenerator.RSAIdentityGenerator(
