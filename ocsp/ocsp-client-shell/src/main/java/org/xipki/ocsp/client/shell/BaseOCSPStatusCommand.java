@@ -51,6 +51,7 @@ import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.X509Util;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
 
@@ -121,7 +122,7 @@ public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
     {
         if(isEmpty(serialNumbers) && isEmpty(certFiles))
         {
-            throw new Exception("Neither serialNumbers nor certFiles is set");
+            throw new IllegalCmdParamException("Neither serialNumbers nor certFiles is set");
         }
 
         X509Certificate issuerCert = X509Util.parseCert(issuerCertFile);
@@ -140,7 +141,7 @@ public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
 
                 if(X509Util.issues(issuerCert, cert) == false)
                 {
-                    throw new Exception("certificate " + certFile + " is not issued by the given issuer");
+                    throw new IllegalCmdParamException("certificate " + certFile + " is not issued by the given issuer");
                 }
 
                 if(isBlank(serverURL))
@@ -151,7 +152,8 @@ public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
                         String url = ocspUrls.get(0);
                         if(ocspUrl != null && ocspUrl.equals(url) == false)
                         {
-                            throw new Exception("given certificates have different OCSP responder URL in certificate");
+                            throw new IllegalCmdParamException(
+                                    "given certificates have different OCSP responder URL in certificate");
                         } else
                         {
                             ocspUrl = url;
@@ -180,7 +182,7 @@ public abstract class BaseOCSPStatusCommand extends AbstractOCSPStatusCommand
 
         if(isBlank(serverURL))
         {
-            throw new Exception("could not get URL for the OCSP responder");
+            throw new IllegalCmdParamException("could not get URL for the OCSP responder");
         }
 
         X509Certificate respIssuer  = null;

@@ -33,47 +33,38 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common.qa;
+package org.xipki.console.karaf;
 
 /**
  * @author Lijun Liao
  */
 
-public class UnexpectedResultException extends Exception
+public class CmdFailure extends Exception
 {
 
-    private static final long serialVersionUID = 189176458485831187L;
+    private static final long serialVersionUID = 1L;
 
-    public UnexpectedResultException()
+    public CmdFailure()
     {
     }
 
-    public UnexpectedResultException(
+    public CmdFailure(
             final String message)
     {
         super(message);
     }
 
-    public UnexpectedResultException(
+    public CmdFailure(
             final Throwable cause)
     {
         super(cause);
     }
 
-    public UnexpectedResultException(
+    public CmdFailure(
             final String message,
             final Throwable cause)
     {
         super(message, cause);
-    }
-
-    public UnexpectedResultException(
-            final String message,
-            final Throwable cause,
-            final boolean enableSuppression,
-            final boolean writableStackTrace)
-    {
-        super(message, cause, enableSuppression, writableStackTrace);
     }
 
 }

@@ -33,44 +33,38 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell.p11;
-
-import java.io.File;
-import java.security.cert.X509Certificate;
-
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.security.api.p11.P11KeyIdentifier;
-import org.xipki.security.api.p11.P11WritableSlot;
+package org.xipki.console.karaf;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "export-cert", description="export certificate from PKCS#11 device")
-public class P11CertExportCommand extends P11SecurityCommand
+public class IllegalCmdParamException extends Exception
 {
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the certificate\n"
-                    + "(required)")
-    private String outFile;
+    private static final long serialVersionUID = 1L;
 
-    @Override
-    protected Object _doExecute()
-    throws Exception
+    public IllegalCmdParamException()
     {
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
-        X509Certificate cert = slot.exportCert(keyIdentifier);
-        if(cert == null)
-        {
-            throw new CmdFailure("could not export certificate " + keyIdentifier);
-        }
-        saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
-        return null;
+    }
+
+    public IllegalCmdParamException(
+            final String message)
+    {
+        super(message);
+    }
+
+    public IllegalCmdParamException(
+            final Throwable cause)
+    {
+        super(cause);
+    }
+
+    public IllegalCmdParamException(
+            final String message,
+            final Throwable cause)
+    {
+        super(message, cause);
     }
 
 }

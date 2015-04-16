@@ -38,6 +38,7 @@ package org.xipki.ca.client.shell.loadtest;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.common.AbstractLoadTest;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
@@ -67,14 +68,12 @@ public class CALoadTestTemplateEnrollCommand extends CALoadTestCommand
     {
         if(numThreads < 1)
         {
-            err("invalid number of threads " + numThreads);
-            return null;
+            throw new IllegalCmdParamException("invalid number of threads " + numThreads);
         }
 
         if(durationInSecond < 1)
         {
-            err("invalid duration " + durationInSecond);
-            return null;
+            throw new IllegalCmdParamException("invalid duration " + durationInSecond);
         }
 
         StringBuilder startMsg = new StringBuilder();

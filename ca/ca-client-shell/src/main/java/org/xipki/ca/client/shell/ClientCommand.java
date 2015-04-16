@@ -107,7 +107,7 @@ public abstract class ClientCommand extends XipkiOsgiCommandSupport
                         IoUtil.save(fn, bytes);
                     } catch (IOException e)
                     {
-                        err("IOException: " + e.getMessage());
+                        System.err.println("IOException: " + e.getMessage());
                     }
                 }
             }
@@ -123,7 +123,7 @@ public abstract class ClientCommand extends XipkiOsgiCommandSupport
                         IoUtil.save(fn, bytes);
                     }catch(IOException e)
                     {
-                        err("IOException: " + e.getMessage());
+                        System.err.println("IOException: " + e.getMessage());
                     }
                 }
             }

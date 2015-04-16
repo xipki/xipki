@@ -37,6 +37,7 @@ package org.xipki.security.shell.p11;
 
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.shell.SecurityCommand;
@@ -68,7 +69,7 @@ public abstract class P11SecurityCommand extends SecurityCommand
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     public P11KeyIdentifier getKeyIdentifier()
-    throws Exception
+    throws IllegalCmdParamException
     {
         P11KeyIdentifier keyIdentifier;
         if(keyId != null && keyLabel == null)
@@ -81,7 +82,7 @@ public abstract class P11SecurityCommand extends SecurityCommand
         }
         else
         {
-            throw new Exception("exactly one of keyId or keyLabel should be specified");
+            throw new IllegalCmdParamException("exactly one of keyId or keyLabel should be specified");
         }
         return keyIdentifier;
     }

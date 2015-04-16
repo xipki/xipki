@@ -45,9 +45,10 @@ import org.xipki.ca.client.api.CertIdOrError;
 import org.xipki.ca.common.cmp.PKIStatusInfo;
 import org.xipki.common.CRLReason;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.X509Util;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
@@ -72,21 +73,18 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
     {
         if(certFile == null && (issuerCertFile == null || getSerialNumber() == null))
         {
-            err("either cert or (issuer, serial) must be specified");
-            return null;
+            throw new IllegalCmdParamException("either cert or (issuer, serial) must be specified");
         }
 
         CRLReason crlReason = CRLReason.getInstance(reason);
         if(crlReason == null)
         {
-            err("invalid reason " + reason);
-            return null;
+            throw new IllegalCmdParamException("invalid reason " + reason);
         }
 
         if(CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason) == false)
         {
-            err("reason " + reason + " is not permitted");
-            return null;
+            throw new IllegalCmdParamException("reason " + reason + " is not permitted");
         }
 
         CertIdOrError certIdOrError;
@@ -110,8 +108,7 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
                 String errorMsg = checkCertificate(cert, caCert);
                 if(errorMsg != null)
                 {
-                    err(errorMsg);
-                    return null;
+                    throw new CmdFailure(errorMsg);
                 }
             }
             RequestResponseDebug debug = getRequestResponseDebug();
@@ -140,7 +137,7 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
         if(certIdOrError.getError() != null)
         {
             PKIStatusInfo error = certIdOrError.getError();
-            throw new UnexpectedResultException("revocation failed: " + error);
+            throw new CmdFailure("revocation failed: " + error);
         }
         else
         {

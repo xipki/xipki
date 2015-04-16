@@ -67,6 +67,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.CRLReason;
 import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.X509Util;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.security.KeyUtil;
 
@@ -104,12 +105,12 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
         int n = singleResponses == null ? 0 : singleResponses.length;
         if(n == 0)
         {
-            throw new Exception("received no status from server");
+            throw new CmdFailure("received no status from server");
         }
 
         if(n != serialNumbers.size())
         {
-            throw new Exception("received status with " + n +
+            throw new CmdFailure("received status with " + n +
                     " single responses from server, but " + serialNumbers.size() + " were requested");
         }
 
@@ -129,66 +130,62 @@ public class OCSPStatusCommand extends BaseOCSPStatusCommand
             X509CertificateHolder[] responderCerts = basicResp.getCerts();
             if(responderCerts == null || responderCerts.length < 1)
             {
-                err("no responder certificate is contained in the response");
+                throw new CmdFailure("no responder certificate is contained in the response");
             }
-            else
+
+            X509CertificateHolder respSigner = responderCerts[0];
+            boolean validOn = true;
+            for(Date thisUpdate : thisUpdates)
             {
-                X509CertificateHolder respSigner = responderCerts[0];
-                boolean validOn = true;
-                for(Date thisUpdate : thisUpdates)
+                validOn = respSigner.isValidOn(thisUpdate);
+                if(validOn == false)
                 {
-                    validOn = respSigner.isValidOn(thisUpdate);
-                    if(validOn == false)
-                    {
-                        err("responder certificate is not valid on " + thisUpdate);
-                        break;
-                    }
+                    throw new CmdFailure("responder certificate is not valid on " + thisUpdate);
+                }
+            }
+
+            if(validOn)
+            {
+                PublicKey responderPubKey = KeyUtil.generatePublicKey(respSigner.getSubjectPublicKeyInfo());
+                ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(responderPubKey);
+                boolean sigValid = basicResp.isSignatureValid(cvp);
+
+                if(sigValid == false)
+                {
+                    throw new CmdFailure("response is equipped with invalid signature");
                 }
 
-                if(validOn)
+                // verify the OCSPResponse signer
+                if(respIssuer != null)
                 {
-                    PublicKey responderPubKey = KeyUtil.generatePublicKey(respSigner.getSubjectPublicKeyInfo());
-                    ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(responderPubKey);
-                    boolean sigValid = basicResp.isSignatureValid(cvp);
-
-                    if(sigValid == false)
+                    boolean certValid = true;
+                    X509Certificate jceRespSigner = new X509CertificateObject(respSigner.toASN1Structure());
+                    if(X509Util.issues(respIssuer, jceRespSigner))
                     {
-                        err("response is equipped with invalid signature");
-                    }
-                    else
-                    {
-                        // verify the OCSPResponse signer
-                        if(respIssuer != null)
+                        try
                         {
-                            boolean certValid = true;
-                            X509Certificate jceRespSigner = new X509CertificateObject(respSigner.toASN1Structure());
-                            if(X509Util.issues(respIssuer, jceRespSigner))
-                            {
-                                try
-                                {
-                                    jceRespSigner.verify(respIssuer.getPublicKey());
-                                }catch(SignatureException e)
-                                {
-                                    certValid = false;
-                                }
-                            }
-
-                            if(certValid == false)
-                            {
-                                err("response is equipped with valid signature but the OCSP signer is not trusted");
-                            }
-                        }
-                        else
+                            jceRespSigner.verify(respIssuer.getPublicKey());
+                        }catch(SignatureException e)
                         {
-                            out("response is equipped with valid signature");
+                            certValid = false;
                         }
                     }
-                }
 
-                if(verbose.booleanValue())
-                {
-                    out("responder is " + X509Util.getRFC4519Name(responderCerts[0].getSubject()));
+                    if(certValid == false)
+                    {
+                        throw new CmdFailure(
+                                "response is equipped with valid signature but the OCSP signer is not trusted");
+                    }
                 }
+                else
+                {
+                    out("response is equipped with valid signature");
+                }
+            }
+
+            if(verbose.booleanValue())
+            {
+                out("responder is " + X509Util.getRFC4519Name(responderCerts[0].getSubject()));
             }
         }
 
