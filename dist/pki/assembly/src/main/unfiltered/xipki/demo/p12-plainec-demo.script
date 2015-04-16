@@ -14,13 +14,22 @@ sleep 1000
 
 xipki-cmd:rm -r -f output
 
-xipki-tk:ec-p12 --curve $CURVE --password 1234 --out output/RCA1.p12 \
+xipki-tk:ec-p12 \
+  --curve $CURVE \
+  --password 1234 \
+  --out output/RCA1.p12 \
   --subject "CN=RCA1,O=xipki,C=DE"
 
-xipki-tk:ec-p12 --curve $CURVE --password 1234 --out output/SubCA1.p12 \
+xipki-tk:ec-p12 \
+  --curve $CURVE \
+  --password 1234 \
+  --out output/SubCA1.p12 \
   --subject "CN=SubCA1,O=xipki,C=DE"
 
-xipki-tk:ec-p12 --curve $CURVE --password 1234 --out output/SubCAwithCRL1.p12 \
+xipki-tk:ec-p12 \
+  --curve $CURVE \
+  --password 1234 \
+  --out output/SubCAwithCRL1.p12 \
   --subject "CN=SubCAwithCRL1,O=xipki,C=DE"
 
 source ./xipki/demo/prepare.script

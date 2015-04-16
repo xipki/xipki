@@ -1,0 +1,11 @@
+xipki-tk:delete-key \
+  --slot 1 \
+  --key-label $RCA_KEY_LABEL
+
+xipki-tk:delete-key \
+  --slot 1 \
+  --key-label $SubCA_KEY_LABEL
+
+xipki-tk:delete-key \
+  --slot 1 \
+  --key-label $SubCAwithCRL_KEY_LABEL

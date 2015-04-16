@@ -6,7 +6,8 @@ feature:install xipki-database-tool
 
 sleep 1000
 
-xipki-db:initdb --quiet
+xipki-db:initdb \
+  --quiet
 
 feature:uninstall xipki-database-tool
 

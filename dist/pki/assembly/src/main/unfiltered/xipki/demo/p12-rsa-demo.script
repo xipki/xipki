@@ -15,13 +15,22 @@ sleep 1000
 
 xipki-cmd:rm -r -f output
 
-xipki-tk:rsa-p12 --password 1234 --key-size $KEYSIZE --out output/RCA1.p12 \
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --key-size $KEYSIZE \
+  --out output/RCA1.p12 \
   --subject "CN=RCA1,O=xipki,C=DE"
 
-xipki-tk:rsa-p12 --password 1234 --key-size $KEYSIZE --out output/SubCA1.p12 \
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --key-size $KEYSIZE \
+  --out output/SubCA1.p12 \
   --subject "CN=SubCA1"
 
-xipki-tk:rsa-p12 --password 1234 --key-size $KEYSIZE --out output/SubCAwithCRL1.p12 \
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --key-size $KEYSIZE \
+  --out output/SubCAwithCRL1.p12 \
   --subject "CN=SubCAwithCRL1"
 
 source ./xipki/demo/initdb.script
