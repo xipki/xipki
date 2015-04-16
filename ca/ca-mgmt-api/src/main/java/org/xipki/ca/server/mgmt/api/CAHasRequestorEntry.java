@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.CollectionUtil;
 
 /**
  * @author Lijun Liao
@@ -91,7 +92,14 @@ public class CAHasRequestorEntry implements Serializable
     public void setProfiles(
             final Set<String> profiles)
     {
-        this.profiles = Collections.unmodifiableSet(profiles);
+        if(profiles == null)
+        {
+            this.profiles = Collections.emptySet();
+        }
+        else
+        {
+            this.profiles = CollectionUtil.unmodifiableSet(profiles);
+        }
     }
 
     public Set<String> getProfiles()

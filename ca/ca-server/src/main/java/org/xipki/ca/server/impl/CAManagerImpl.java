@@ -94,6 +94,7 @@ import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCAEntry;
+import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
@@ -1184,9 +1185,21 @@ implements CAManager, CmpResponderManager
                 cmpControlDb.setFaulty(true);
                 cmpControlDbEntries.put(name, cmpControlDb);
 
-                CmpControl cmpControl = new CmpControl(cmpControlDb);
-                cmpControlDb.setFaulty(false);
-                cmpControls.put(name, cmpControl);
+                CmpControl cmpControl;
+                try
+                {
+                    cmpControl = new CmpControl(cmpControlDb);
+                    cmpControlDb.setFaulty(false);
+                    cmpControls.put(name, cmpControl);
+                }catch(ConfigurationException e)
+                {
+                    final String message = "could not initialize CMP control " + name + ", ignore it";
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
+                }
             }
         }
 
@@ -1877,9 +1890,10 @@ implements CAManager, CmpResponderManager
         }
 
         X509CrlSignerEntryWrapper crlSigner = createX509CrlSigner(dbEntry);
-        queryExecutor.addCrlSigner(dbEntry);
+        X509CrlSignerEntry _dbEntry = crlSigner.getDbEntry();
+        queryExecutor.addCrlSigner(_dbEntry);
         crlSigners.put(name, crlSigner);
-        crlSignerDbEntries.put(name, dbEntry);
+        crlSignerDbEntries.put(name, _dbEntry);
         return true;
     }
 
@@ -2107,11 +2121,27 @@ implements CAManager, CmpResponderManager
             return false;
         }
 
-        CmpControl cmpControl = new CmpControl(dbEntry);
-        queryExecutor.addCmpControl(dbEntry);
+        CmpControl cmpControl;
+        try
+        {
+            cmpControl = new CmpControl(dbEntry);
+        } catch (ConfigurationException e)
+        {
+            final String message = "exception while adding CMP requestor to certStore";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
+            return false;
+        }
+
+        CmpControlEntry _dbEntry = cmpControl.getDbEntry();
+
+        queryExecutor.addCmpControl(_dbEntry);
 
         cmpControls.put(name, cmpControl);
-        cmpControlDbEntries.put(name, dbEntry);
+        cmpControlDbEntries.put(name, _dbEntry);
         return true;
     }
 
@@ -2891,7 +2921,8 @@ implements CAManager, CmpResponderManager
         {
             try
             {
-                signerConf = canonicalizeSignerConf(signer_type, signerConf, securityFactory.getPasswordResolver());
+                signerConf = canonicalizeSignerConf(signer_type, signerConf, securityFactory.getPasswordResolver(),
+                        new X509Certificate[]{caCert});
             } catch (Exception e)
             {
                 throw new CAMgmtException(e.getClass().getName() + ": " + e.getMessage(), e);
@@ -2938,7 +2969,8 @@ implements CAManager, CmpResponderManager
     private static String canonicalizeSignerConf(
             final String keystoreType,
             final String signerConf,
-            final PasswordResolver passwordResolver)
+            final PasswordResolver passwordResolver,
+            final X509Certificate[] certChain)
     throws Exception
     {
         if(signerConf.contains("file:") == false && signerConf.contains("base64:") == false )
@@ -2968,7 +3000,7 @@ implements CAManager, CmpResponderManager
 
         keystoreBytes = SecurityUtil.extractMinimalKeyStore(keystoreType,
                 keystoreBytes, keyLabel,
-                passwordResolver.resolvePassword(passwordHint));
+                passwordResolver.resolvePassword(passwordHint), certChain);
 
         utf8Pairs.putUtf8Pair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
         return utf8Pairs.getEncoded();
@@ -3050,6 +3082,28 @@ implements CAManager, CmpResponderManager
         {
             throw new CAMgmtException("ConfigurationException: " + e.getMessage());
         }
+        try
+        {
+            signer.initSigner(securityFactory);
+        } catch (SignerException | OperationException | ConfigurationException e)
+        {
+            final String message = "exception while creating CRL signer " + dbEntry.getName();
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
+
+            if(e instanceof OperationException)
+            {
+                throw new CAMgmtException(message + ": " + ((OperationException) e).getErrorCode() + ", " + e.getMessage());
+            }
+            else
+            {
+                throw new CAMgmtException(message + ": " + e.getMessage());
+            }
+        }
+
         return signer;
     }
 
