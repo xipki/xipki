@@ -42,6 +42,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -105,6 +106,17 @@ public class SecurityUtil
             final char[] password)
     throws Exception
     {
+        return extractMinimalKeyStore(keystoreType, keystoreBytes, keyname, password, null);
+    }
+
+    public static byte[] extractMinimalKeyStore(
+            final String keystoreType,
+            final byte[] keystoreBytes,
+            String keyname,
+            final char[] password,
+            final X509Certificate[] newCertChain)
+    throws Exception
+    {
         KeyStore ks;
         if("JKS".equalsIgnoreCase(keystoreType))
         {
@@ -145,10 +157,18 @@ public class SecurityUtil
             numAliases++;
         }
 
-        Certificate[] certs = ks.getCertificateChain(keyname);
-        if(numAliases == 1)
+        Certificate[] certs;
+        if(newCertChain == null || newCertChain.length < 1)
         {
-            return keystoreBytes;
+            if(numAliases == 1)
+            {
+                return keystoreBytes;
+            }
+            certs = ks.getCertificateChain(keyname);
+        }
+        else
+        {
+            certs = newCertChain;
         }
 
         PrivateKey key = (PrivateKey) ks.getKey(keyname, password);
