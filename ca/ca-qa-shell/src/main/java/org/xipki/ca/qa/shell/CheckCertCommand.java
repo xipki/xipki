@@ -37,8 +37,6 @@ package org.xipki.ca.qa.shell;
 
 import java.util.Set;
 
-import javax.naming.IllegalCmdParamException;
-
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.ASN1Set;
