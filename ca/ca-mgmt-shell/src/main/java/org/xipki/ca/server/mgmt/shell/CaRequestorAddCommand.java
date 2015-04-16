@@ -74,7 +74,7 @@ public class CaRequestorAddCommand extends CaCommand
     private Set<String> permissions;
 
     @Option(name = "--profile",
-            required = true, multiValued = true,
+            multiValued = true,
             description = "profile name or 'all' for all profiles\n"
                     + "(required, multi-valued)")
     private Set<String> profiles;
