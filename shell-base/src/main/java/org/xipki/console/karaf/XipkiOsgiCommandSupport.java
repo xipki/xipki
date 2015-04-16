@@ -295,12 +295,6 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         return IoUtil.expandFilepath(file);
     }
 
-    protected void err(
-            final String message)
-    {
-        System.err.println(message);
-    }
-
     protected void out(
             final String message)
     {

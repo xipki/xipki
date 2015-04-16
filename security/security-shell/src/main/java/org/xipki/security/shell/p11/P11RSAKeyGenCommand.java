@@ -37,6 +37,7 @@ package org.xipki.security.shell.p11;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.api.p11.P11WritableSlot;
 
@@ -61,8 +62,7 @@ public class P11RSAKeyGenCommand extends P11KeyGenCommand
     {
         if(keysize % 1024 != 0)
         {
-            err("keysize is not multiple of 1024: " + keysize);
-            return null;
+            throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
         }
 
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);

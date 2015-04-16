@@ -82,7 +82,7 @@ public class FileRmCommand extends XipkiOsgiCommandSupport
         {
             if(recursive == false)
             {
-                err("Please use option --recursive to delete directory");
+                out("Please use option --recursive to delete directory");
                 return null;
             }
 
