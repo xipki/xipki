@@ -68,6 +68,8 @@ public class CaPublisherCheckCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("checking CA publisher CA='" + caName +  "', publisher='" + publisherName + "'");
+
         if(caManager.getCA(caName) == null)
         {
             throw new UnexpectedException("could not find CA '" + caName + "'");
@@ -78,7 +80,7 @@ public class CaPublisherCheckCommand extends CaCommand
         {
             if(m.getName().equals(publisherName))
             {
-                out("checked CA publisher");
+                out(" checked CA publisher CA='" + caName +  "', publisher='" + publisherName + "'");
                 return null;
             }
         }

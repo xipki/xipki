@@ -51,6 +51,8 @@ public class NegProfileRemoveCommand extends ProfileRemoveCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-profile-rm");
+
         try
         {
             super._doExecute();
@@ -59,6 +61,6 @@ public class NegProfileRemoveCommand extends ProfileRemoveCommand
             return null;
         }
 
-        throw new CmdFailure("Exception expected, but received none");
+        throw new CmdFailure("exception expected, but received none");
     }
 }

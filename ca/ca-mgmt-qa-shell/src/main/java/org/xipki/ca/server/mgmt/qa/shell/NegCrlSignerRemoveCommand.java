@@ -51,6 +51,8 @@ public class NegCrlSignerRemoveCommand extends CrlSignerRemoveCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-crlsigner-rm");
+
         try
         {
             super._doExecute();
@@ -59,6 +61,6 @@ public class NegCrlSignerRemoveCommand extends CrlSignerRemoveCommand
             return null;
         }
 
-        throw new CmdFailure("Exception expected, but received none");
+        throw new CmdFailure("exception expected, but received none");
     }
 }

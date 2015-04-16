@@ -38,6 +38,7 @@ package org.xipki.ca.server.mgmt.shell;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
@@ -71,8 +72,7 @@ public class ProfileUpdateCommand extends CaCommand
     {
         if(type == null && conf == null && confFile == null)
         {
-            System.out.println("nothing to update");
-            return null;
+            throw new IllegalCmdParamException("nothing to update");
         }
 
         if(conf == null && confFile != null)

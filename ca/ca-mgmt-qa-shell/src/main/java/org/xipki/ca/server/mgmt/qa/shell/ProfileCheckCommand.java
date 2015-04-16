@@ -38,6 +38,7 @@ package org.xipki.ca.server.mgmt.qa.shell;
 import org.apache.karaf.shell.commands.Command;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.shell.ProfileUpdateCommand;
+import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
@@ -51,6 +52,19 @@ public class ProfileCheckCommand extends ProfileUpdateCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("checking profile " + name);
+
+        if(type == null && conf == null && confFile == null)
+        {
+            System.out.println("nothing to update");
+            return null;
+        }
+
+        if(conf == null && confFile != null)
+        {
+            conf = new String(IoUtil.read(confFile));
+        }
+
         CertprofileEntry cp = caManager.getCertprofile(name);
         if(cp == null)
         {
@@ -64,14 +78,13 @@ public class ProfileCheckCommand extends ProfileUpdateCommand
             MgmtQAShellUtil.assertEquals("type", ex, is);
         }
 
-        if(cp.getConf() != null)
         {
             String ex = conf;
             String is = cp.getConf();
             MgmtQAShellUtil.assertEquals("conf", ex, is);
         }
 
-        out("checked profile " + name);
+        out(" checked profile " + name);
         return null;
     }
 }

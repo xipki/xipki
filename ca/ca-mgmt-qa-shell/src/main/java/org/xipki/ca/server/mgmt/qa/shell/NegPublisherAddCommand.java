@@ -51,6 +51,8 @@ public class NegPublisherAddCommand extends PublisherAddCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-publisher-add");
+
         try
         {
             super._doExecute();
@@ -59,6 +61,6 @@ public class NegPublisherAddCommand extends PublisherAddCommand
             return null;
         }
 
-        throw new CmdFailure("Exception expected, but received none");
+        throw new CmdFailure("exception expected, but received none");
     }
 }

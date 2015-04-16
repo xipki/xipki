@@ -51,6 +51,8 @@ public class NegRequestorUpdateCommand extends RequestorUpdateCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-requestor-up");
+
         try
         {
             super._doExecute();
@@ -59,6 +61,6 @@ public class NegRequestorUpdateCommand extends RequestorUpdateCommand
             return null;
         }
 
-        throw new CmdFailure("Exception expected, but received none");
+        throw new CmdFailure("exception expected, but received none");
     }
 }

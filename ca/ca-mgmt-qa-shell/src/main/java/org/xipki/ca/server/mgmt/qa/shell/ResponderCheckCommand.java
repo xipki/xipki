@@ -57,6 +57,8 @@ public class ResponderCheckCommand extends ResponderUpdateCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("checking responder " + name);
+
         CmpResponderEntry cr = caManager.getCmpResponder(name);
         if(cr == null)
         {
@@ -89,7 +91,7 @@ public class ResponderCheckCommand extends ResponderUpdateCommand
             MgmtQAShellUtil.assertEquals("conf", signerConf, cr.getConf());
         }
 
-        out("checked responder " + name);
+        out(" checked responder " + name);
         return null;
     }
 }

@@ -51,6 +51,8 @@ public class PublisherCheckCommand extends PublisherUpdateCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("checking publisher " + name);
+
         PublisherEntry cp = caManager.getPublisher(name);
         if(cp == null)
         {
@@ -71,7 +73,7 @@ public class PublisherCheckCommand extends PublisherUpdateCommand
             MgmtQAShellUtil.assertEquals("signer conf", ex, is);
         }
 
-        out("checked publisher " + name);
+        out(" checked publisher " + name);
         return null;
     }
 }

@@ -91,12 +91,11 @@ public class ResponderAddCommand extends CaCommand
             base64Cert = IoUtil.base64Encode(signerCert.getEncoded(), false);
         }
 
-        CmpResponderEntry entry = new CmpResponderEntry(name, signerType, signerConf, base64Cert);
-
         if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
         {
             signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
         }
+        CmpResponderEntry entry = new CmpResponderEntry(name, signerType, signerConf, base64Cert);
 
         boolean b = caManager.addCmpResponder(entry);
         output(b, "added", "could not add", "CMP responder " + name);

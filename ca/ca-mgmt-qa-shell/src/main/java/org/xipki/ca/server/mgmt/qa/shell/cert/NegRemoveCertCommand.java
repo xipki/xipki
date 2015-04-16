@@ -51,6 +51,8 @@ public class NegRemoveCertCommand extends RemoveCertCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-remove-cert");
+
         try
         {
             super._doExecute();
