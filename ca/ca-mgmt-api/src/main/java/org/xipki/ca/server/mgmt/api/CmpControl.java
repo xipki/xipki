@@ -33,14 +33,16 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl;
+package org.xipki.ca.server.mgmt.api;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.ConfigurationException;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
@@ -50,7 +52,7 @@ import org.xipki.common.util.StringUtil;
  * @author Lijun Liao
  */
 
-class CmpControl
+public class CmpControl
 {
     public static final String KEY_CONFIRM_CERT = "confirm.cert";
     public static final String KEY_SEND_CA = "send.ca";
@@ -81,6 +83,7 @@ class CmpControl
 
     public CmpControl(
             final CmpControlEntry dbEntry)
+    throws ConfigurationException
     {
         ParamChecker.assertNotNull("dbEntry", dbEntry);
 
@@ -100,7 +103,7 @@ class CmpControl
         else
         {
             Set<String> set = StringUtil.splitAsSet(s, ", ");
-            this.sigAlgos = CollectionUtil.unmodifiableSet(set, false, true);
+            this.sigAlgos = canonicalizeAlgos(set);
             if(CollectionUtil.isNotEmpty(this.sigAlgos))
             {
                 pairs.putUtf8Pair(KEY_PROTECTION_SIGALGO, StringUtil.collectionAsString(this.sigAlgos, ","));
@@ -119,6 +122,7 @@ class CmpControl
             final Integer messageTimeBias,
             final Integer confirmWaitTime,
             final Set<String> sigAlgos)
+    throws ConfigurationException
     {
         ParamChecker.assertNotBlank("name", name);
         CmpUtf8Pairs pairs = new CmpUtf8Pairs();
@@ -147,11 +151,29 @@ class CmpControl
         }
         else
         {
-            this.sigAlgos = sigAlgos;
+            this.sigAlgos = canonicalizeAlgos(sigAlgos);
             pairs.putUtf8Pair(KEY_PROTECTION_SIGALGO, StringUtil.collectionAsString(this.sigAlgos, ","));
         }
 
         this.dbEntry = new CmpControlEntry(name, pairs.getEncoded());
+    }
+
+    private static Set<String> canonicalizeAlgos(
+            final Set<String> algos)
+    throws ConfigurationException
+    {
+        Set<String> ret = new HashSet<String>();
+        for(String m : algos)
+        {
+            try
+            {
+                ret.add(AlgorithmUtil.canonicalizeSignatureAlgo(m));
+            } catch (NoSuchAlgorithmException e)
+            {
+                throw new ConfigurationException(e.getMessage(), e);
+            }
+        }
+        return Collections.unmodifiableSet(ret);
     }
 
     private static boolean getBoolean(
@@ -223,19 +245,7 @@ class CmpControl
             return false;
         }
 
-        if(sigAlgos.contains(name))
-        {
-            return true;
-        }
-
-        for(String m : sigAlgos)
-        {
-            if(AlgorithmUtil.equalsAlgoName(m, name))
-            {
-                return true;
-            }
-        }
-        return false;
+        return sigAlgos.contains(name);
     }
 
     public CmpControlEntry getDbEntry()

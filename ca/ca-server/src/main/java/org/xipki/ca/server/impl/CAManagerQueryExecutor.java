@@ -71,6 +71,7 @@ import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CertArt;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCAEntry;
+import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
@@ -1674,7 +1675,14 @@ class CAManagerQueryExecutor
         }
 
         CmpControlEntry newDbEntry = new CmpControlEntry(name, conf);
-        CmpControl cmpControl = new CmpControl(newDbEntry);
+        CmpControl cmpControl;
+        try
+        {
+            cmpControl = new CmpControl(newDbEntry);
+        } catch (ConfigurationException e)
+        {
+            throw new CAMgmtException(e.getMessage(), e);
+        }
 
         final String sql = "UPDATE CMPCONTROL SET CONF=? WHERE NAME=?";
         PreparedStatement ps = null;

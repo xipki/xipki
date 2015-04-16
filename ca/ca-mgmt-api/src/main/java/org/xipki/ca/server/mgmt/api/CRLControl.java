@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl;
+package org.xipki.ca.server.mgmt.api;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -100,7 +100,7 @@ import org.xipki.common.util.StringUtil;
  * @author Lijun Liao
  */
 
-class CRLControl implements Serializable
+public class CRLControl implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
@@ -187,6 +187,18 @@ class CRLControl implements Serializable
             }
             sb.append(minute);
             return sb.toString();
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if(obj instanceof HourMinute == false)
+            {
+                return false;
+            }
+
+            HourMinute b = (HourMinute) obj;
+            return hour == b.hour && minute == b.minute;
         }
     }
 
@@ -479,5 +491,76 @@ class CRLControl implements Serializable
         {
             throw new ConfigurationException("deltaCRLIntervals could not be less than 0: " + deltaCRLIntervals);
         }
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if(obj instanceof CRLControl == false)
+        {
+            return false;
+        }
+
+        CRLControl b = (CRLControl) obj;
+        if(deltaCRLIntervals != b.deltaCRLIntervals ||
+                embedsCerts != b.embedsCerts ||
+                extendedNextUpdate != b.extendedNextUpdate ||
+                fullCRLIntervals != b.fullCRLIntervals ||
+                includeExpiredCerts != b.includeExpiredCerts ||
+                onlyContainsCACerts != b.onlyContainsCACerts ||
+                onlyContainsUserCerts != b.onlyContainsUserCerts)
+        {
+            return false;
+        }
+
+        if(extensionOIDs == null)
+        {
+            if(b.extensionOIDs != null)
+            {
+                return false;
+            }
+        }
+        else if(extensionOIDs.equals(b.extensionOIDs) == false)
+        {
+            return false;
+        }
+
+        if(intervalMinutes == null)
+        {
+            if(b.intervalMinutes != null)
+            {
+                return false;
+            }
+        }
+        else if(intervalMinutes.equals(b.intervalMinutes) == false)
+        {
+            return false;
+        }
+
+        if(intervalDayTime == null)
+        {
+            if(b.intervalDayTime != null)
+            {
+                return false;
+            }
+        }
+        else if(intervalDayTime.equals(b.intervalDayTime) == false)
+        {
+            return false;
+        }
+
+        if(updateMode == null)
+        {
+            if(b.updateMode != null)
+            {
+                return false;
+            }
+        }
+        else if(updateMode.equals(b.updateMode) == false)
+        {
+            return false;
+        }
+
+        return true;
     }
 }
