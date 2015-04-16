@@ -50,6 +50,8 @@ public class NegCaAliasAddCommand extends CaAliasAddCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-caalias-add");
+
         try
         {
             super._doExecute();
@@ -58,6 +60,6 @@ public class NegCaAliasAddCommand extends CaAliasAddCommand
             return null;
         }
 
-        throw new CmdFailure("Exception expected, but received none");
+        throw new CmdFailure("exception expected, but received none");
     }
 }

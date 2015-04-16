@@ -36,6 +36,7 @@
 package org.xipki.ca.server.mgmt.qa.shell;
 
 import org.apache.karaf.shell.commands.Command;
+import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.ca.server.mgmt.shell.CrlSignerUpdateCommand;
@@ -54,6 +55,8 @@ public class CrlSignerCheckCommand extends CrlSignerUpdateCommand
     {
         X509ChangeCrlSignerEntry ey = getCrlSignerChangeEntry();
         String name = ey.getName();
+        out("checking CRL signer " + name);
+
         X509CrlSignerEntry cs = caManager.getCrlSigner(name);
         if(cs == null)
         {
@@ -76,9 +79,13 @@ public class CrlSignerCheckCommand extends CrlSignerUpdateCommand
 
         if(ey.getCrlControl() != null)
         {
-            String ex = ey.getCrlControl();
-            String is = cs.getCrlControl();
-            MgmtQAShellUtil.assertEquals("CRL control", ex, is);
+            CRLControl ex = new CRLControl(ey.getCrlControl());
+            CRLControl is = new CRLControl(cs.getCrlControl());
+
+            if(ex.equals(is) == false)
+            {
+                throw new CmdFailure("CRL control: is '" + is.getConf() + "', but expected '" + ex.getConf() + "'");
+            }
         }
 
         if(ey.getBase64Cert() != null)
@@ -87,7 +94,8 @@ public class CrlSignerCheckCommand extends CrlSignerUpdateCommand
             String is = cs.getBase64Cert();
             MgmtQAShellUtil.assertEquals("certificate", ex, is);
         }
-        out("checked CRL signer " + name);
+
+        out(" checked CRL signer " + name);
         return null;
     }
 }

@@ -51,6 +51,8 @@ public class NegCmpControlUpdateCommand extends CmpControlUpdateCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-cmpcontrol-up");
+
         try
         {
             super._doExecute();
@@ -59,6 +61,6 @@ public class NegCmpControlUpdateCommand extends CmpControlUpdateCommand
             return null;
         }
 
-        throw new CmdFailure("Exception expected, but received none");
+        throw new CmdFailure("exception expected, but received none");
     }
 }

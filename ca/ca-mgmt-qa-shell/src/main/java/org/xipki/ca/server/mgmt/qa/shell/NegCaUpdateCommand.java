@@ -50,6 +50,8 @@ public class NegCaUpdateCommand extends CaUpdateCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-ca-up");
+
         try
         {
             super._doExecute();
@@ -58,6 +60,6 @@ public class NegCaUpdateCommand extends CaUpdateCommand
             return null;
         }
 
-        throw new CmdFailure("Exception expected, but received none");
+        throw new CmdFailure("exception expected, but received none");
     }
 }

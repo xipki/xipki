@@ -51,6 +51,8 @@ public class NegProfileAddCommand extends ProfileAddCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-profile-add");
+
         try
         {
             super._doExecute();
@@ -59,6 +61,6 @@ public class NegProfileAddCommand extends ProfileAddCommand
             return null;
         }
 
-        throw new CmdFailure("Exception expected, but received none");
+        throw new CmdFailure("exception expected, but received none");
     }
 }

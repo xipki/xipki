@@ -51,6 +51,8 @@ public class NegCaPublisherRemoveCommand extends CaPublisherRemoveCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-capub-rm");
+
         try
         {
             super._doExecute();
@@ -59,6 +61,6 @@ public class NegCaPublisherRemoveCommand extends CaPublisherRemoveCommand
             return null;
         }
 
-        throw new CmdFailure("Exception expected, but received none");
+        throw new CmdFailure("exception expected, but received none");
     }
 }

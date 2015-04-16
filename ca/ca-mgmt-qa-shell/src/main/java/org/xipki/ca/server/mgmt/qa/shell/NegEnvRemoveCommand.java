@@ -51,6 +51,8 @@ public class NegEnvRemoveCommand extends EnvRemoveCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-env-rm");
+
         try
         {
             super._doExecute();
@@ -59,6 +61,6 @@ public class NegEnvRemoveCommand extends EnvRemoveCommand
             return null;
         }
 
-        throw new CmdFailure("Exception expected, but received none");
+        throw new CmdFailure("exception expected, but received none");
     }
 }

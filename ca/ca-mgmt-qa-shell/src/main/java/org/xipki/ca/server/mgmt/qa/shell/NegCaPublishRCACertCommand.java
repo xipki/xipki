@@ -51,6 +51,8 @@ public class NegCaPublishRCACertCommand extends CaPublishRCACertCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-publish-self");
+
         try
         {
             super._doExecute();
@@ -59,6 +61,6 @@ public class NegCaPublishRCACertCommand extends CaPublishRCACertCommand
             return null;
         }
 
-        throw new CmdFailure("Exception expected, but received none");
+        throw new CmdFailure("exception expected, but received none");
     }
 }

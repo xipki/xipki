@@ -50,6 +50,8 @@ public class NegCaAddCommand extends CaAddCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-ca-add");
+
         try
         {
             super._doExecute();
@@ -58,6 +60,6 @@ public class NegCaAddCommand extends CaAddCommand
             return null;
         }
 
-        throw new CmdFailure("Exception expected, but received none");
+        throw new CmdFailure("exception expected, but received none");
     }
 }

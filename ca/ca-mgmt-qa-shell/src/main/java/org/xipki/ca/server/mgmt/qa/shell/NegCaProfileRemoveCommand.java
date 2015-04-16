@@ -51,6 +51,8 @@ public class NegCaProfileRemoveCommand extends CaProfileRemoveCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-caprofile-rm");
+
         try
         {
             super._doExecute();
@@ -59,6 +61,6 @@ public class NegCaProfileRemoveCommand extends CaProfileRemoveCommand
             return null;
         }
 
-        throw new CmdFailure("Exception expected, but received none");
+        throw new CmdFailure("exception expected, but received none");
     }
 }

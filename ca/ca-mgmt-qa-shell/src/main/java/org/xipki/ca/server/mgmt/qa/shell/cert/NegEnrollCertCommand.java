@@ -50,6 +50,8 @@ public class NegEnrollCertCommand extends EnrollCertCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-enroll-cert");
+
         try
         {
             super._doExecute();
@@ -58,7 +60,7 @@ public class NegEnrollCertCommand extends EnrollCertCommand
             return null;
         }
 
-        throw new CmdFailure("Exception expected, but received none");
+        throw new CmdFailure("exception expected, but received none");
     }
 
 }

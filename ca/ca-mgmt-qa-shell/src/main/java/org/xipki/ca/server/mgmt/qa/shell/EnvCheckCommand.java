@@ -50,13 +50,16 @@ public class EnvCheckCommand extends EnvUpdateCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("checking environment " + name);
+
         String is = caManager.getEnvParam(name);
         if(value.equals(is) == false)
         {
             throw new CmdFailure("Environment parameter '" + name + "': is '" + is +
                     "', but expected '" + value + "'");
         }
-        out("checked environment " + name);
+
+        out(" checked environment " + name);
         return null;
     }
 }

@@ -50,6 +50,8 @@ public class NegRepublishCommand extends RepublishCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-republish");
+
         try
         {
             super._doExecute();
@@ -58,6 +60,6 @@ public class NegRepublishCommand extends RepublishCommand
             return null;
         }
 
-        throw new CmdFailure("Exception expected, but received none");
+        throw new CmdFailure("exception expected, but received none");
     }
 }

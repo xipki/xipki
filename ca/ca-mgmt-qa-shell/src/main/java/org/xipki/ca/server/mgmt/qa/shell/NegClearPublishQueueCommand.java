@@ -50,6 +50,8 @@ public class NegClearPublishQueueCommand extends ClearPublishQueueCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-clear-publishqueue");
+
         try
         {
             super._doExecute();
@@ -58,6 +60,6 @@ public class NegClearPublishQueueCommand extends ClearPublishQueueCommand
             return null;
         }
 
-        throw new CmdFailure("Exception expected, but received none");
+        throw new CmdFailure("exception expected, but received none");
     }
 }

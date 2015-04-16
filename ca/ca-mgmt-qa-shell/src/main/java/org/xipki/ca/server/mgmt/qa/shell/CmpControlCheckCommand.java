@@ -35,12 +35,10 @@
 
 package org.xipki.ca.server.mgmt.qa.shell;
 
-import java.rmi.UnexpectedException;
-
 import org.apache.karaf.shell.commands.Command;
+import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.shell.CmpControlUpdateCommand;
-import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
@@ -54,20 +52,19 @@ public class CmpControlCheckCommand extends CmpControlUpdateCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("checking CMP control " + name);
+
         CmpControlEntry c = caManager.getCmpControl(name);
         if(c == null)
         {
             throw new CmdFailure("no CMP control named '" + name + "' is configured");
         }
 
-        CmpUtf8Pairs is = new CmpUtf8Pairs(c.getConf());
-        CmpUtf8Pairs ex = new CmpUtf8Pairs(conf);
-        if(is.equals(ex) == false)
-        {
-            throw new UnexpectedException("conf: is '" + is.getEncoded() +
-                    "', but expected '" + ex.getEncoded() + "'");
-        }
-        out("checked CMP control " + name);
+        String is = c.getConf();
+        String ex = new CmpControl(new CmpControlEntry(name, conf)).getDbEntry().getConf();
+        MgmtQAShellUtil.assertEquals("CMP control", ex, is);
+
+        out(" checked CMP control " + name);
         return null;
     }
 }

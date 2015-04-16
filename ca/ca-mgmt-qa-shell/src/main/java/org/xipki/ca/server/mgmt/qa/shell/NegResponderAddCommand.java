@@ -51,6 +51,8 @@ public class NegResponderAddCommand extends ResponderAddCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-responder-add");
+
         try
         {
             super._doExecute();
@@ -59,7 +61,7 @@ public class NegResponderAddCommand extends ResponderAddCommand
             return null;
         }
 
-        throw new CmdFailure("Exception expected, but received none");
+        throw new CmdFailure("exception expected, but received none");
     }
 
 }

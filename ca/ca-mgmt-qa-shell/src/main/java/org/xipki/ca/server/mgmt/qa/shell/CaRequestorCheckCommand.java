@@ -36,12 +36,14 @@
 package org.xipki.ca.server.mgmt.qa.shell;
 
 import java.rmi.UnexpectedException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
+import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
 import org.xipki.console.karaf.CmdFailure;
@@ -86,6 +88,8 @@ public class CaRequestorCheckCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("checking CA requestor CA='" + caName +  "', requestor='" + requestorName + "'");
+
         if(caManager.getCA(caName) == null)
         {
             throw new UnexpectedException("could not find CA '" + caName + "'");
@@ -134,13 +138,24 @@ public class CaRequestorCheckCommand extends CaCommand
             }
         }
 
-        if(profiles.equals(entry.getProfiles()) == false)
+        if(profiles != null)
         {
-            throw new UnexpectedException("profiles: is '" + entry.getProfiles() +
-                    "', but expected '" + profiles + "'");
+            if(profiles.size() == 1)
+            {
+                if(CAManager.NULL.equalsIgnoreCase(profiles.iterator().next()))
+                {
+                    profiles = Collections.emptySet();
+                }
+            }
+
+            if(profiles.equals(entry.getProfiles()) == false)
+            {
+                throw new UnexpectedException("profiles: is '" + entry.getProfiles() +
+                        "', but expected '" + profiles + "'");
+            }
         }
 
-        out("checked CA requestor");
+        out("checking CA requestor CA='" + caName +  "', requestor='" + requestorName + "'");
         return null;
     }
 }

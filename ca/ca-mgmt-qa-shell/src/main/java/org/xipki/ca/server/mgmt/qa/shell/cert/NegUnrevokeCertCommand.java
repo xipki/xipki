@@ -51,6 +51,8 @@ public class NegUnrevokeCertCommand extends UnrevokeCertCommand
     protected Object _doExecute()
     throws Exception
     {
+        out("neg-unrevoke-cert");
+
         try
         {
             super._doExecute();

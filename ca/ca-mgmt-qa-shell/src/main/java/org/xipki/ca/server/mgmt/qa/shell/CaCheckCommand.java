@@ -66,6 +66,8 @@ public class CaCheckCommand extends CaUpdateCommand
     {
         X509ChangeCAEntry ey = getChangeCAEntry();
         String caName = ey.getName();
+        out("checking CA" + caName);
+
         CAEntry entry = caManager.getCA(caName);
         if(entry == null)
         {
@@ -231,7 +233,9 @@ public class CaCheckCommand extends CaUpdateCommand
         if(ey.getSignerConf() != null)
         {
             CmpUtf8Pairs ex = new CmpUtf8Pairs(ey.getSignerConf());
+            ex.removeUtf8Pair("keystore");
             CmpUtf8Pairs is = new CmpUtf8Pairs(ca.getSignerConf());
+            is.removeUtf8Pair("keystore");
             if(ex.equals(is) == false)
             {
                 throw new CmdFailure("signer conf: is '" + is + "', but expected '" + ex + "'");
@@ -260,7 +264,7 @@ public class CaCheckCommand extends CaUpdateCommand
             }
         }
 
-        out("checked CA" + caName);
+        out(" checked CA" + caName);
         return null;
     }
 }
