@@ -54,10 +54,10 @@ import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.ConfigurationException;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.X509Util;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.api.PasswordResolver;
 
 /**
@@ -120,7 +120,7 @@ public class CaAddFromFileCommand extends CaCommand
 
         if(art != CertArt.X509PKC)
         {
-            throw new ConfigurationException("unsupported " + key + ": '" + s + "'");
+            throw new IllegalCmdParamException("unsupported " + key + ": '" + s + "'");
         }
 
     	// NEXT_SERIAL
@@ -128,7 +128,7 @@ public class CaAddFromFileCommand extends CaCommand
         long nextSerial = getRequiredLongProp(props, key);
         if(nextSerial < 0)
         {
-            throw new ConfigurationException("invalid " + key + ": " + nextSerial);
+            throw new IllegalCmdParamException("invalid " + key + ": " + nextSerial);
         }
 
         // NEXT_CRLNO
@@ -136,7 +136,7 @@ public class CaAddFromFileCommand extends CaCommand
         int nextCrlNumber = getRequiredIntProp(props, key);
         if(nextCrlNumber < 1)
         {
-            throw new ConfigurationException("invalid " + key + ": " + nextCrlNumber);
+            throw new IllegalCmdParamException("invalid " + key + ": " + nextCrlNumber);
         }
 
         // NUM_CRLS
@@ -144,7 +144,7 @@ public class CaAddFromFileCommand extends CaCommand
         int numCrls = getRequiredIntProp(props, key);
         if(numCrls < 0)
         {
-            throw new ConfigurationException("invalid " + key + ": " + numCrls);
+            throw new IllegalCmdParamException("invalid " + key + ": " + numCrls);
         }
 
         // EXPIRATION_PERIOD
@@ -152,7 +152,7 @@ public class CaAddFromFileCommand extends CaCommand
         int expirationPeriod = getRequiredIntProp(props, key);
         if(expirationPeriod < 0)
         {
-            throw new ConfigurationException("invalid " + key + ": " + expirationPeriod);
+            throw new IllegalCmdParamException("invalid " + key + ": " + expirationPeriod);
         }
 
         // SIGNER_TYPE
@@ -278,7 +278,7 @@ public class CaAddFromFileCommand extends CaCommand
             Permission _permission = Permission.getPermission(permission);
             if(_permission == null)
             {
-                throw new ConfigurationException("invalid permission: " + permission);
+                throw new IllegalCmdParamException("invalid permission: " + permission);
             }
             _permissions.add(_permission);
         }
@@ -298,7 +298,7 @@ public class CaAddFromFileCommand extends CaCommand
         }
         else
         {
-            throw new ConfigurationException("invalid " + key + ": '" + s + "'");
+            throw new IllegalCmdParamException("invalid " + key + ": '" + s + "'");
         }
 
         if(revoked)
@@ -354,7 +354,7 @@ public class CaAddFromFileCommand extends CaCommand
     }
 
     private String getStrProp(Properties props, String propKey, boolean required)
-    throws ConfigurationException
+    throws IllegalCmdParamException
     {
         String s = props.getProperty(propKey);
         if(StringUtil.isBlank(s))
@@ -373,7 +373,7 @@ public class CaAddFromFileCommand extends CaCommand
 
         if(required)
         {
-            throw new ConfigurationException("Required property '" + propKey + "' is not defined");
+            throw new IllegalCmdParamException("Required property '" + propKey + "' is not defined");
         }
         else
         {
@@ -382,37 +382,37 @@ public class CaAddFromFileCommand extends CaCommand
     }
 
     private int getRequiredIntProp(Properties props, String propKey)
-    throws ConfigurationException
+    throws IllegalCmdParamException
     {
         return getIntProp(props, propKey, true).intValue();
     }
 
     private Integer getIntProp(Properties props, String propKey, boolean required)
-    throws ConfigurationException
+    throws IllegalCmdParamException
     {
         String s = getStrProp(props, propKey, required);
         return s == null ? null : Integer.parseInt(s);
     }
 
     private long getRequiredLongProp(Properties props, String propKey)
-    throws ConfigurationException
+    throws IllegalCmdParamException
     {
         return getLongProp(props, propKey, true).longValue();
     }
 
     private Long getLongProp(Properties props, String propKey, boolean required)
-    throws ConfigurationException
+    throws IllegalCmdParamException
     {
         String s = getStrProp(props, propKey, required);
         return s == null ? null : Long.parseLong(s);
     }
 
     private static void assertNotNull(Object obj, String key, String value)
-    throws ConfigurationException
+    throws IllegalCmdParamException
     {
         if(obj == null)
         {
-            throw new ConfigurationException("invalid " + key + ": '" + value + "'");
+            throw new IllegalCmdParamException("invalid " + key + ": '" + value + "'");
         }
     }
 }

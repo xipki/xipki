@@ -42,8 +42,8 @@ import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.shell.ResponderUpdateCommand;
-import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -60,14 +60,14 @@ public class ResponderCheckCommand extends ResponderUpdateCommand
         CmpResponderEntry cr = caManager.getCmpResponder(name);
         if(cr == null)
         {
-            throw new UnexpectedResultException("CMP responder named '" + name + "' is not configured");
+            throw new CmdFailure("CMP responder named '" + name + "' is not configured");
         }
 
         if(CAManager.NULL.equalsIgnoreCase(certFile))
         {
             if(cr.getBase64Cert() != null)
             {
-                throw new UnexpectedResultException("Cert: is configured but expected is none");
+                throw new CmdFailure("Cert: is configured but expected is none");
             }
         }
         else if(certFile != null)
@@ -75,11 +75,11 @@ public class ResponderCheckCommand extends ResponderUpdateCommand
             byte[] ex = IoUtil.read(certFile);
             if(cr.getBase64Cert() == null)
             {
-                throw new UnexpectedResultException("Cert: is not configured explicitly as expected");
+                throw new CmdFailure("Cert: is not configured explicitly as expected");
             }
             if(Arrays.equals(ex, Base64.decode(cr.getBase64Cert())) == false)
             {
-                throw new UnexpectedResultException("Cert: the expected one and the actual one differ");
+                throw new CmdFailure("Cert: the expected one and the actual one differ");
             }
         }
 

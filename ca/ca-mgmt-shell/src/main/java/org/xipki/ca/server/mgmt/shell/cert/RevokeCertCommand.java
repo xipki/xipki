@@ -42,6 +42,7 @@ import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
 import org.xipki.common.CRLReason;
+import org.xipki.common.ConfigurationException;
 import org.xipki.common.util.DateUtil;
 
 /**
@@ -80,21 +81,18 @@ public class RevokeCertCommand extends CaCommand
         CAEntry ca = caManager.getCA(caName);
         if(ca == null)
         {
-            err("CA " + caName + " not available");
-            return null;
+            throw new ConfigurationException("CA " + caName + " not available");
         }
 
         CRLReason crlReason = CRLReason.getInstance(reason);
         if(crlReason == null)
         {
-            err("invalid reason " + reason);
-            return null;
+            throw new ConfigurationException("invalid reason " + reason);
         }
 
         if(CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason) == false)
         {
-            err("reason " + reason + " is not permitted");
-            return null;
+            throw new ConfigurationException("reason " + reason + " is not permitted");
         }
 
         Date invalidityDate = null;

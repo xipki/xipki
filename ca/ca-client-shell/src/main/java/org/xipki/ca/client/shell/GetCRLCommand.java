@@ -48,7 +48,8 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.ca.client.api.CAClientException;
 import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.qa.UnexpectedResultException;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
@@ -88,14 +89,12 @@ public class GetCRLCommand extends CRLCommand
         Set<String> caNames = caClient.getCaNames();
         if(isEmpty(caNames))
         {
-            err("no CA is configured");
-            return  null;
+            throw new IllegalCmdParamException("no CA is configured");
         }
 
         if(caName != null && ! caNames.contains(caName))
         {
-            err("CA " + caName + " is not within the configured CAs " + caNames);
-            return null;
+            throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs " + caNames);
         }
 
         if(caName == null)
@@ -106,8 +105,7 @@ public class GetCRLCommand extends CRLCommand
             }
             else
             {
-                err("no caname is specified, one of " + caNames + " is required");
-                return null;
+                throw new IllegalCmdParamException("no caname is specified, one of " + caNames + " is required");
             }
         }
 
@@ -117,12 +115,12 @@ public class GetCRLCommand extends CRLCommand
             crl = retrieveCRL(caName);
         }catch(PKIErrorException e)
         {
-            throw new UnexpectedResultException("received no CRL from server: " + e.getMessage());
+            throw new CmdFailure("received no CRL from server: " + e.getMessage());
         }
 
         if(crl == null)
         {
-            throw new UnexpectedResultException("received no CRL from server");
+            throw new CmdFailure("received no CRL from server");
         }
 
         saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
@@ -146,7 +144,7 @@ public class GetCRLCommand extends CRLCommand
                     crl = caClient.downloadCRL(caName, baseCrlNumber, debug);
                 }catch(PKIErrorException e)
                 {
-                    throw new UnexpectedResultException("received no baseCRL from server: " + e.getMessage());
+                    throw new CmdFailure("received no baseCRL from server: " + e.getMessage());
                 } finally
                 {
                     saveRequestResponse(debug);
@@ -154,7 +152,7 @@ public class GetCRLCommand extends CRLCommand
 
                 if(crl == null)
                 {
-                    throw new UnexpectedResultException("received no baseCRL from server");
+                    throw new CmdFailure("received no baseCRL from server");
                 }
                 else
                 {

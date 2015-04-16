@@ -41,7 +41,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.shell.CmpControlUpdateCommand;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.qa.UnexpectedResultException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -57,7 +57,7 @@ public class CmpControlCheckCommand extends CmpControlUpdateCommand
         CmpControlEntry c = caManager.getCmpControl(name);
         if(c == null)
         {
-            throw new UnexpectedResultException("no CMP control named '" + name + "' is configured");
+            throw new CmdFailure("no CMP control named '" + name + "' is configured");
         }
 
         CmpUtf8Pairs is = new CmpUtf8Pairs(c.getConf());

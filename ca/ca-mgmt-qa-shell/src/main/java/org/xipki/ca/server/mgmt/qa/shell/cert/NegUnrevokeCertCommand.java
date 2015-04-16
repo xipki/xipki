@@ -37,7 +37,7 @@ package org.xipki.ca.server.mgmt.qa.shell.cert;
 
 import org.apache.karaf.shell.commands.Command;
 import org.xipki.ca.server.mgmt.shell.cert.UnrevokeCertCommand;
-import org.xipki.common.qa.UnexpectedResultException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -59,7 +59,7 @@ public class NegUnrevokeCertCommand extends UnrevokeCertCommand
             return null;
         }
 
-        throw new UnexpectedResultException("Exception expected, but received none");
+        throw new CmdFailure("Exception expected, but received none");
     }
 
 }

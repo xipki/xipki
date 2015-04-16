@@ -44,8 +44,8 @@ import org.xipki.ca.client.api.CertOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.shell.ClientCommand;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -102,7 +102,7 @@ public class NegP10EnrollCertCommand extends ClientCommand
 
         if(cert != null)
         {
-            throw new UnexpectedResultException("no certificate is excepted, but received one");
+            throw new CmdFailure("no certificate is excepted, but received one");
         }
 
         return null;

@@ -42,7 +42,8 @@ import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.client.api.CAClientException;
 import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.shell.ClientCommand;
-import org.xipki.common.qa.UnexpectedResultException;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
@@ -66,14 +67,12 @@ public abstract class NegCRLCommand extends ClientCommand
         Set<String> caNames = caClient.getCaNames();
         if(isEmpty(caNames))
         {
-            err("no CA is configured");
-            return  null;
+            throw new IllegalCmdParamException("no CA is configured");
         }
 
         if(caName != null && ! caNames.contains(caName))
         {
-            err("CA " + caName + " is not within the configured CAs " + caNames);
-            return null;
+            throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs " + caNames);
         }
 
         if(caName == null)
@@ -84,8 +83,7 @@ public abstract class NegCRLCommand extends ClientCommand
             }
             else
             {
-                err("no caname is specified, one of " + caNames + " is required");
-                return null;
+                throw new IllegalCmdParamException("no caname is specified, one of " + caNames + " is required");
             }
         }
 
@@ -99,7 +97,7 @@ public abstract class NegCRLCommand extends ClientCommand
 
         if(crl != null)
         {
-            throw new UnexpectedResultException("no CRL is expected, but received one");
+            throw new CmdFailure("no CRL is expected, but received one");
         }
 
         return null;

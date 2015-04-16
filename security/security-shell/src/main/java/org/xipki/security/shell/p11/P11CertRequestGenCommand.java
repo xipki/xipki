@@ -41,6 +41,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.SignatureAlgoControl;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
@@ -89,7 +90,7 @@ public class P11CertRequestGenCommand extends CertRequestGenCommand
         }
         else
         {
-            throw new Exception("exactly one of keyId or keyLabel should be specified");
+            throw new IllegalCmdParamException("exactly one of keyId or keyLabel should be specified");
         }
         return keyIdentifier;
     }

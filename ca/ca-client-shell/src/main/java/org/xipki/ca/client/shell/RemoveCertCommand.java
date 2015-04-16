@@ -44,6 +44,8 @@ import org.xipki.ca.client.api.CertIdOrError;
 import org.xipki.ca.common.cmp.PKIStatusInfo;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.util.X509Util;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
@@ -59,8 +61,7 @@ public class RemoveCertCommand extends UnRevRemoveCertCommand
     {
         if(certFile == null && (issuerCertFile == null || getSerialNumber() == null))
         {
-            err("either cert or (issuer, serial) must be specified");
-            return null;
+            throw new IllegalCmdParamException("either cert or (issuer, serial) must be specified");
         }
 
         X509Certificate caCert = null;
@@ -78,8 +79,7 @@ public class RemoveCertCommand extends UnRevRemoveCertCommand
                 String errorMsg = checkCertificate(cert, caCert);
                 if(errorMsg != null)
                 {
-                    err(errorMsg);
-                    return null;
+                    throw new CmdFailure(errorMsg);
                 }
             }
             RequestResponseDebug debug = getRequestResponseDebug();

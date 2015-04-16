@@ -41,6 +41,7 @@ import jline.console.ConsoleReader;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 /**
@@ -65,7 +66,7 @@ public class ConfirmCommand extends XipkiOsgiCommandSupport
         boolean toContinue = confirm(reader, prompt + "\nDo you want to contine [yes/no]?");
         if(toContinue == false)
         {
-            throw new Exception("User cancelled");
+            throw new CmdFailure("User cancelled");
         }
 
         return null;
@@ -74,13 +75,13 @@ public class ConfirmCommand extends XipkiOsgiCommandSupport
     private boolean confirm(
             final ConsoleReader reader,
             final String prompt)
-    throws IOException
+    throws CmdFailure, IOException
     {
         out(prompt);
         String answer = reader.readLine();
         if(answer == null)
         {
-            throw new IOException("interrupted");
+            throw new CmdFailure("interrupted");
         }
 
         int tries = 0;

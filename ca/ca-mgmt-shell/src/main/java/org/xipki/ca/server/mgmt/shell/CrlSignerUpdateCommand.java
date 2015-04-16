@@ -43,9 +43,9 @@ import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
-import org.xipki.common.ConfigurationException;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.X509Util;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.api.PasswordResolver;
 
 /**
@@ -108,7 +108,7 @@ public class CrlSignerUpdateCommand extends CaCommand
                 X509CrlSignerEntry entry = caManager.getCrlSigner(name);
                 if(entry == null)
                 {
-                    throw new ConfigurationException("please specify the signerType");
+                    throw new IllegalCmdParamException("please specify the signerType");
                 }
                 _signerType = entry.getType();
             }

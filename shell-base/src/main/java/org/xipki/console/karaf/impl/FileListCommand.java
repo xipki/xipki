@@ -44,6 +44,7 @@ import jline.console.ConsoleReader;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 /**
@@ -66,8 +67,7 @@ public class FileListCommand extends XipkiOsgiCommandSupport
         File target = new File(expandFilepath(targetPath));
         if(target.exists() == false)
         {
-            err("could not access " + targetPath + ": no such file or directory");
-            return null;
+            throw new IllegalCmdParamException("could not access " + targetPath + ": no such file or directory");
         }
 
         if(target.isDirectory() == false)

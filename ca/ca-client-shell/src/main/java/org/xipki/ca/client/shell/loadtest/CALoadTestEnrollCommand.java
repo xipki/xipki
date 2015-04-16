@@ -43,6 +43,7 @@ import org.xipki.ca.client.shell.loadtest.KeyEntry.RSAKeyEntry;
 import org.xipki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
 import org.xipki.common.AbstractLoadTest;
 import org.xipki.common.util.StringUtil;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
@@ -98,20 +99,17 @@ public class CALoadTestEnrollCommand extends CALoadTestCommand
     {
         if(numThreads < 1)
         {
-            err("invalid number of threads " + numThreads);
-            return null;
+            throw new IllegalCmdParamException("invalid number of threads " + numThreads);
         }
 
         if(durationInSecond < 1)
         {
-            err("invalid duration " + durationInSecond);
-            return null;
+            throw new IllegalCmdParamException("invalid duration " + durationInSecond);
         }
 
         if("EC".equalsIgnoreCase(keyType) && StringUtil.isBlank(curveName))
         {
-            err("curveName is not specified");
-            return null;
+            throw new IllegalCmdParamException("curveName is not specified");
         }
 
         StringBuilder startMsg = new StringBuilder();
@@ -136,8 +134,7 @@ public class CALoadTestEnrollCommand extends CALoadTestCommand
             randomDN = RandomDN.getInstance(randomDNStr);
             if(randomDN == null)
             {
-                err("invalid randomDN " + randomDNStr);
-                return null;
+                throw new IllegalCmdParamException("invalid randomDN " + randomDNStr);
             }
         }
 
@@ -156,8 +153,7 @@ public class CALoadTestEnrollCommand extends CALoadTestCommand
         }
         else
         {
-            err("invalid keyType " + keyType);
-            return null;
+            throw new IllegalCmdParamException("invalid keyType " + keyType);
         }
 
         LoadTestEntry loadtestEntry = new LoadTestEntry(certprofile, keyEntry, subjectTemplate, randomDN);

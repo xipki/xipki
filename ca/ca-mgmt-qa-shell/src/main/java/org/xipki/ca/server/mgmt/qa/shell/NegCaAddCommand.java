@@ -37,7 +37,7 @@ package org.xipki.ca.server.mgmt.qa.shell;
 
 import org.apache.karaf.shell.commands.Command;
 import org.xipki.ca.server.mgmt.shell.CaAddCommand;
-import org.xipki.common.qa.UnexpectedResultException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -58,6 +58,6 @@ public class NegCaAddCommand extends CaAddCommand
             return null;
         }
 
-        throw new UnexpectedResultException("Exception expected, but received none");
+        throw new CmdFailure("Exception expected, but received none");
     }
 }

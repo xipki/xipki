@@ -42,7 +42,8 @@ import java.util.Set;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.client.api.CAClientException;
 import org.xipki.ca.client.api.PKIErrorException;
-import org.xipki.common.qa.UnexpectedResultException;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
@@ -73,14 +74,12 @@ public abstract class CRLCommand extends ClientCommand
         Set<String> caNames = caClient.getCaNames();
         if(isEmpty(caNames))
         {
-            err("no CA is configured");
-            return  null;
+            throw new CmdFailure("no CA is configured");
         }
 
         if(caName != null && ! caNames.contains(caName))
         {
-            err("CA " + caName + " is not within the configured CAs " + caNames);
-            return null;
+            throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs " + caNames);
         }
 
         if(caName == null)
@@ -91,8 +90,7 @@ public abstract class CRLCommand extends ClientCommand
             }
             else
             {
-                err("no caname is specified, one of " + caNames + " is required");
-                return null;
+                throw new IllegalCmdParamException("no caname is specified, one of " + caNames + " is required");
             }
         }
 
@@ -102,12 +100,12 @@ public abstract class CRLCommand extends ClientCommand
             crl = retrieveCRL(caName);
         }catch(PKIErrorException e)
         {
-            throw new UnexpectedResultException("received no CRL from server: " + e.getMessage());
+            throw new CmdFailure("received no CRL from server: " + e.getMessage());
         }
 
         if(crl == null)
         {
-            throw new UnexpectedResultException("received no CRL from server");
+            throw new CmdFailure("received no CRL from server");
         }
 
         saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());

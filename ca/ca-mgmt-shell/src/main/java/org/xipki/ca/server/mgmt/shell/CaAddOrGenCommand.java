@@ -46,8 +46,8 @@ import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
-import org.xipki.common.ConfigurationException;
 import org.xipki.common.util.StringUtil;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.api.PasswordResolver;
 
 /**
@@ -173,28 +173,28 @@ public abstract class CaAddOrGenCommand extends CaCommand
     {
         if(nextSerial < 0)
         {
-            throw new ConfigurationException("invalid serial number: " + nextSerial);
+            throw new IllegalCmdParamException("invalid serial number: " + nextSerial);
         }
 
         if(nextCrlNumber < 1)
         {
-            throw new ConfigurationException("invalid CRL number: " + nextCrlNumber);
+            throw new IllegalCmdParamException("invalid CRL number: " + nextCrlNumber);
         }
 
         if(numCrls < 0)
         {
-            throw new ConfigurationException("invalid numCrls: " + numCrls);
+            throw new IllegalCmdParamException("invalid numCrls: " + numCrls);
         }
 
         if(expirationPeriod < 0)
         {
-            throw new ConfigurationException("invalid expirationPeriod: " + expirationPeriod);
+            throw new IllegalCmdParamException("invalid expirationPeriod: " + expirationPeriod);
         }
 
         CAStatus status = CAStatus.getCAStatus(caStatus);
         if(status == null)
         {
-            throw new ConfigurationException("invalid status: " + caStatus);
+            throw new IllegalCmdParamException("invalid status: " + caStatus);
         }
 
         if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
@@ -210,21 +210,21 @@ public abstract class CaAddOrGenCommand extends CaCommand
         DuplicationMode duplicateKey = DuplicationMode.getInstance(duplicateKeyS);
         if(duplicateKey == null)
         {
-            throw new ConfigurationException("invalid duplication mode: " + duplicateKeyS);
+            throw new IllegalCmdParamException("invalid duplication mode: " + duplicateKeyS);
         }
         entry.setDuplicateKeyMode(duplicateKey);
 
         DuplicationMode duplicateSubject = DuplicationMode.getInstance(duplicateSubjectS);
         if(duplicateSubject == null)
         {
-            throw new ConfigurationException("invalid duplication mode: " + duplicateSubjectS);
+            throw new IllegalCmdParamException("invalid duplication mode: " + duplicateSubjectS);
         }
         entry.setDuplicateSubjectMode(duplicateSubject);
 
         ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
         if(validityMode == null)
         {
-            throw new ConfigurationException("invalid validity: " + validityModeS);
+            throw new IllegalCmdParamException("invalid validity: " + validityModeS);
         }
         entry.setValidityMode(validityMode);
 
@@ -253,7 +253,7 @@ public abstract class CaAddOrGenCommand extends CaCommand
             Permission _permission = Permission.getPermission(permission);
             if(_permission == null)
             {
-                throw new ConfigurationException("invalid permission: " + permission);
+                throw new IllegalCmdParamException("invalid permission: " + permission);
             }
             _permissions.add(_permission);
         }

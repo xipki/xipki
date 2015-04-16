@@ -39,7 +39,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.xipki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.ca.server.mgmt.shell.CrlSignerUpdateCommand;
-import org.xipki.common.qa.UnexpectedResultException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -57,7 +57,7 @@ public class CrlSignerCheckCommand extends CrlSignerUpdateCommand
         X509CrlSignerEntry cs = caManager.getCrlSigner(name);
         if(cs == null)
         {
-            throw new UnexpectedResultException("CRL signer named '" +name + "' is not configured");
+            throw new CmdFailure("CRL signer named '" +name + "' is not configured");
         }
 
         if(ey.getSignerType() != null)

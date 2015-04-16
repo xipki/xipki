@@ -46,6 +46,7 @@ import org.apache.karaf.shell.commands.Option;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.util.DateUtil;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
@@ -83,24 +84,20 @@ public class CaRevokeCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-
         CRLReason crlReason = CRLReason.getInstance(reason);
         if(crlReason == null)
         {
-            err("invalid reason " + reason);
-            return null;
+            throw new IllegalCmdParamException("invalid reason " + reason);
         }
 
         if(permitted_reasons.contains(crlReason) == false)
         {
-            err("reason " + reason + " is not permitted");
-            return null;
+            throw new IllegalCmdParamException("reason " + reason + " is not permitted");
         }
 
         if(caManager.getCaNames().contains(caName) == false)
         {
-            err("invalid CA name " + caName);
-            return null;
+            throw new IllegalCmdParamException("invalid CA name " + caName);
         }
 
         Date revocationDate = null;

@@ -41,8 +41,8 @@ import org.apache.karaf.shell.commands.Command;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.shell.RequestorUpdateCommand;
-import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -59,18 +59,18 @@ public class RequestorCheckCommand extends RequestorUpdateCommand
         CmpRequestorEntry cr = caManager.getCmpRequestor(name);
         if(cr == null)
         {
-            throw new UnexpectedResultException("CMP requestor named '" + name + "' is not configured");
+            throw new CmdFailure("CMP requestor named '" + name + "' is not configured");
         }
 
         byte[] ex = IoUtil.read(certFile);
         if(cr.getBase64Cert() == null)
         {
-            throw new UnexpectedResultException("Cert: is not configured explicitly as expected");
+            throw new CmdFailure("Cert: is not configured explicitly as expected");
         }
 
         if(Arrays.equals(ex, Base64.decode(cr.getBase64Cert())) == false)
         {
-            throw new UnexpectedResultException("Cert: the expected one and the actual one differ");
+            throw new CmdFailure("Cert: the expected one and the actual one differ");
         }
 
         out("checked requestor " + name);

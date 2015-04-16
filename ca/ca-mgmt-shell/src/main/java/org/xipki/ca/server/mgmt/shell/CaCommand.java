@@ -38,7 +38,7 @@ package org.xipki.ca.server.mgmt.shell;
 import java.util.Collection;
 
 import org.xipki.ca.server.mgmt.api.CAManager;
-import org.xipki.common.qa.UnexpectedResultException;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 /**
@@ -92,7 +92,7 @@ public abstract class CaCommand extends XipkiOsgiCommandSupport
             final String posPrefix,
             final String negPrefix,
             final String message)
-    throws UnexpectedResultException
+    throws CmdFailure
     {
         if(successful)
         {
@@ -100,7 +100,7 @@ public abstract class CaCommand extends XipkiOsgiCommandSupport
         }
         else
         {
-            throw new UnexpectedResultException(negPrefix + " " + message);
+            throw new CmdFailure(negPrefix + " " + message);
         }
     }
 }

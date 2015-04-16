@@ -42,8 +42,9 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.client.api.CertIdOrError;
 import org.xipki.ca.common.cmp.PKIStatusInfo;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.util.X509Util;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
@@ -58,8 +59,7 @@ public class UnrevokeCertCommand extends UnRevRemoveCertCommand
     {
         if(certFile == null && (issuerCertFile == null || getSerialNumber() == null))
         {
-            err("either cert or (issuer, serial) must be specified");
-            return null;
+            throw new IllegalCmdParamException("either cert or (issuer, serial) must be specified");
         }
 
         X509Certificate caCert = null;
@@ -77,8 +77,7 @@ public class UnrevokeCertCommand extends UnRevRemoveCertCommand
                 String errorMsg = checkCertificate(cert, caCert);
                 if(errorMsg != null)
                 {
-                    err(errorMsg);
-                    return null;
+                    throw new CmdFailure(errorMsg);
                 }
             }
             RequestResponseDebug debug = getRequestResponseDebug();
@@ -106,7 +105,7 @@ public class UnrevokeCertCommand extends UnRevRemoveCertCommand
         if(certIdOrError.getError() != null)
         {
             PKIStatusInfo error = certIdOrError.getError();
-            throw new UnexpectedResultException("releasing revocation failed: " + error);
+            throw new CmdFailure("releasing revocation failed: " + error);
         }
         else
         {

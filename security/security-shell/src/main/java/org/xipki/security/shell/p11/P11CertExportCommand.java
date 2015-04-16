@@ -40,6 +40,7 @@ import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
 
@@ -66,7 +67,7 @@ public class P11CertExportCommand extends P11SecurityCommand
         X509Certificate cert = slot.exportCert(keyIdentifier);
         if(cert == null)
         {
-            err("could not export certificate " + keyIdentifier);
+            throw new CmdFailure("could not export certificate " + keyIdentifier);
         }
         saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
         return null;

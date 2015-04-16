@@ -61,6 +61,8 @@ import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.X509Util;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11Identity;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -97,8 +99,7 @@ public class P11ListSlotCommand extends SecurityCommand
         P11Module module = getP11Module(moduleName);
         if(module == null)
         {
-            err("undefined module " + moduleName);
-            return null;
+            throw new IllegalCmdParamException("undefined module " + moduleName);
         }
 
         out("module: " + moduleName);
@@ -113,8 +114,7 @@ public class P11ListSlotCommand extends SecurityCommand
         P11WritableSlot p11slot = module.getSlot(slotId);
         if(p11slot == null)
         {
-            err("slot with index " + slotIndex + " does not exist");
-            return null;
+            throw new IllegalCmdParamException("slot with index " + slotIndex + " does not exist");
         }
 
         if(p11slot instanceof IaikP11Slot)
@@ -223,7 +223,7 @@ public class P11ListSlotCommand extends SecurityCommand
             }
         } else
         {
-            err("should not reach here, unknown P11WritableSlot " +
+            throw new CmdFailure("should not reach here, unknown P11WritableSlot " +
                     (p11slot == null ? "null" : p11slot.getClass().getName()));
         }
 
@@ -490,24 +490,21 @@ public class P11ListSlotCommand extends SecurityCommand
     private void output(
             final List<P11SlotIdentifier> slots)
     {
-        if(slotIndex == null)
+        // list all slots
+        int n = slots.size();
+
+        if(n == 0 || n == 1)
         {
-            // list all slots
-            int n = slots.size();
+            out(((n == 0) ? "no" : "1") + " slot is configured");
+        }
+        else
+        {
+            out(n + " slots are configured");
+        }
 
-            if(n == 0 || n == 1)
-            {
-                out(((n == 0) ? "no" : "1") + " slot is configured");
-            }
-            else
-            {
-                out(n + " slots are configured");
-            }
-
-            for(P11SlotIdentifier slotId : slots)
-            {
-                out("\tslot[" + slotId.getSlotIndex() + "]: " + slotId.getSlotId());
-            }
+        for(P11SlotIdentifier slotId : slots)
+        {
+            out("\tslot[" + slotId.getSlotIndex() + "]: " + slotId.getSlotId());
         }
     }
 

@@ -44,10 +44,11 @@ import java.util.Map;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
 import org.xipki.common.util.AlgorithmUtil;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.ocsp.client.shell.BaseOCSPStatusCommand;
 import org.xipki.ocsp.qa.api.Occurrence;
 import org.xipki.ocsp.qa.api.OcspCertStatus;
@@ -114,12 +115,12 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
     {
         if(isBlank(errorText) && isEmpty(statusTexts))
         {
-            throw new Exception("neither expError nor expStatus is set, this is not permitted");
+            throw new IllegalArgumentException("neither expError nor expStatus is set, this is not permitted");
         }
 
         if(isNotBlank(errorText) && isNotEmpty(statusTexts))
         {
-            throw new Exception("both expError and expStatus are set, this is not permitted");
+            throw new IllegalArgumentException("both expError and expStatus are set, this is not permitted");
         }
 
         if(isNotBlank(errorText))
@@ -127,7 +128,7 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
             expectedOcspError = OcspError.getInstance(errorText);
             if(expectedOcspError == null)
             {
-                throw new Exception("invalid OCSP error status '" + errorText + "'");
+                throw new IllegalArgumentException("invalid OCSP error status '" + errorText + "'");
             }
         }
 
@@ -135,7 +136,7 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
         {
             if(statusTexts.size() != serialNumbers.size())
             {
-                throw new Exception("number of expStatus is invalid: " + (statusTexts.size()) +
+                throw new IllegalArgumentException("number of expStatus is invalid: " + (statusTexts.size()) +
                         ", it should be " + serialNumbers.size());
             }
 
@@ -148,7 +149,7 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
                 OcspCertStatus certStatus = OcspCertStatus.getInstance(expectedStatusText);
                 if(certStatus == null)
                 {
-                    throw new Exception("invalid cert status '" + expectedStatusText + "'");
+                    throw new IllegalArgumentException("invalid cert status '" + expectedStatusText + "'");
                 }
                 expectedStatuses.put(serialNumbers.get(i), certStatus);
             }
@@ -204,7 +205,7 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
         out(sb.toString());
         if(result.isAllSuccessful() == false)
         {
-            throw new UnexpectedResultException("OCSP response is invalid");
+            throw new CmdFailure("OCSP response is invalid");
         }
         return null;
     }
@@ -226,12 +227,12 @@ public class OCSPQAStatusCommand extends BaseOCSPStatusCommand
 
     private static Occurrence getOccurrence(
             final String text)
-    throws Exception
+    throws IllegalCmdParamException
     {
         Occurrence ret = Occurrence.getInstance(text);
         if(ret == null)
         {
-            throw new Exception("invalid occurrence '" + text + "'");
+            throw new IllegalCmdParamException("invalid occurrence '" + text + "'");
         }
         return ret;
     }

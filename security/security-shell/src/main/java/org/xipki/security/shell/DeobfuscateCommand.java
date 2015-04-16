@@ -38,6 +38,7 @@ package org.xipki.security.shell;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.common.util.StringUtil;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.OBFPasswordResolver;
 
 /**
@@ -59,18 +60,11 @@ public class DeobfuscateCommand extends SecurityCommand
     {
         if(StringUtil.startsWithIgnoreCase(passwordHint, "PBE:") == false)
         {
-            err("encrypted password '" + passwordHint + "' does not start with OBF:");
-            return null;
+            throw new IllegalCmdParamException("encrypted password '" + passwordHint + "' does not start with OBF:");
         }
 
-        try
-        {
-            String password = OBFPasswordResolver.deobfuscate(passwordHint);
-            out("the deobfuscated password is: '" + new String(password) + "'");
-        }catch(Exception e)
-        {
-            err(e.getMessage());
-        }
+        String password = OBFPasswordResolver.deobfuscate(passwordHint);
+        out("the deobfuscated password is: '" + new String(password) + "'");
         return null;
     }
 

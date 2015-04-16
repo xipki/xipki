@@ -42,7 +42,7 @@ import java.util.Enumeration;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.security.api.SignerException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -77,7 +77,7 @@ public class P12CertExportCommand extends P12SecurityCommand
 
         if(keyname == null)
         {
-            throw new SignerException("could not find private key");
+            throw new CmdFailure("could not find private key");
         }
 
         X509Certificate cert = (X509Certificate) ks.getCertificate(keyname);

@@ -44,8 +44,8 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.ca.client.api.CertOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.qa.UnexpectedResultException;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -109,7 +109,7 @@ public class P10EnrollCertCommand extends ClientCommand
 
         if(cert == null)
         {
-            throw new UnexpectedResultException("no certificate received from the server");
+            throw new CmdFailure("no certificate received from the server");
         }
 
         File certFile = new File(outputFile);

@@ -52,6 +52,8 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.X509Util;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
@@ -82,8 +84,7 @@ public class ExtractCertFromCRLCommand extends SecurityCommand
         byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
         if(extnValue == null)
         {
-            err("no certificate is contained in " + crlFile);
-            return null;
+            throw new IllegalCmdParamException("no certificate is contained in " + crlFile);
         }
 
         extnValue = removingTagAndLenFromExtensionValue(extnValue);
@@ -91,8 +92,7 @@ public class ExtractCertFromCRLCommand extends SecurityCommand
         int n = asn1Set.size();
         if(n == 0)
         {
-            err("no certificate is contained in " + crlFile);
-            return null;
+            throw new CmdFailure("no certificate is contained in " + crlFile);
         }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();

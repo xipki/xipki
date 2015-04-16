@@ -37,7 +37,7 @@ package org.xipki.ca.server.mgmt.qa.shell;
 
 import org.apache.karaf.shell.commands.Command;
 import org.xipki.ca.server.mgmt.shell.EnvUpdateCommand;
-import org.xipki.common.qa.UnexpectedResultException;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -53,7 +53,7 @@ public class EnvCheckCommand extends EnvUpdateCommand
         String is = caManager.getEnvParam(name);
         if(value.equals(is) == false)
         {
-            throw new UnexpectedResultException("Environment parameter '" + name + "': is '" + is +
+            throw new CmdFailure("Environment parameter '" + name + "': is '" + is +
                     "', but expected '" + value + "'");
         }
         out("checked environment " + name);
