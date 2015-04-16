@@ -6,14 +6,21 @@ sleep 1000
 #                          GENERATE RCA                         #
 #################################################################
 ## Add the profile RCA
-xipki-ca:profile-add --name RCA --type XML --conf-file xipki/demo/profile/Certprofile_RootCA.xml
+xipki-ca:profile-add \
+  --name RCA \
+  --type XML \
+  --conf-file xipki/demo/profile/Certprofile_RootCA.xml
 
 ## Create the PKCS#10 request for the command caqa:check-cert in QA
-xipki-tk:req --slot 1 --key-label $RCA_KEY_LABEL --out output/RCA1.p10 \
+xipki-tk:req \
+  --slot 1 \
+  --key-label $RCA_KEY_LABEL \
+  --out output/RCA1.p10 \
   --subject "CN=RCA1,O=xipki,C=DE"
 
 ## Generate selfsigned RCA
-xipki-ca:gen-rca --name RCA1 \
+xipki-ca:gen-rca \
+  --name RCA1 \
   --p10 output/RCA1.p10 \
   --profile RCA \
   --out output/RCA1.der \
@@ -32,40 +39,73 @@ xipki-ca:gen-rca --name RCA1 \
   --validity-mode CUTOFF
 
 ## Update the certificate in the device
-xipki-tk:update-cert --slot 1 --key-label $RCA_KEY_LABEL --cert output/RCA1.der
+xipki-tk:update-cert \
+  --slot 1 \
+  --key-label $RCA_KEY_LABEL \
+  --cert output/RCA1.der
 
-xipki-ca:caalias-add --ca RCA1 --alias RCA
+xipki-ca:caalias-add \
+  --ca RCA1 \
+  --alias RCA
 
 ## Remove the profile RCA
-xipki-ca:profile-rm RCA
+xipki-ca:profile-rm \
+  RCA
 
 ## Add Profiles
-xipki-ca:caprofile-add --ca RCA1 --profile Cross
+xipki-ca:caprofile-add \
+  --ca RCA1 \
+  --profile Cross
 
-xipki-ca:caprofile-add --ca RCA1 --profile SubCA
+xipki-ca:caprofile-add \
+  --ca RCA1 \
+  --profile SubCA
 
-xipki-ca:caprofile-add --ca RCA1 --profile SubCA.Complex
+xipki-ca:caprofile-add \
+  --ca RCA1 \
+  --profile SubCA.Complex
 
 ## Add publisher
-xipki-ca:capub-add --ca RCA1 --publisher OCSP.PUBLISHER
+xipki-ca:capub-add \
+  --ca RCA1 \
+  --publisher OCSP.PUBLISHER
 
 # Add requestor to CA
-xipki-ca:careq-add --requestor requestor1 --permission all --ra yes --profile all --ca RCA1
+xipki-ca:careq-add \
+  --requestor requestor1 \
+  --permission all \
+  --ra yes \
+  --profile all \
+  --ca RCA1
 
 ## Publish the self-signed certificate
-xipki-ca:publish-self --profile RCA RCA1
+xipki-ca:publish-self \
+  --profile RCA \
+  RCA1
 
 ## Generate keys and PKCS#10 request for SubCA1
-xipki-tk:req --slot 1 --key-label $SubCA_KEY_LABEL --out output/SubCA1.p10 \
+xipki-tk:req \
+  --slot 1 \
+  --key-label $SubCA_KEY_LABEL \
+  --out output/SubCA1.p10 \
   --subject "CN=SubCA1,O=xipki,C=DE"
 
-xipki-ca:enroll-cert --ca RCA1 --p10 output/SubCA1.p10 --out output/SubCA1.der --profile SubCA
+xipki-ca:enroll-cert \
+  --ca RCA1 \
+  --p10 output/SubCA1.p10 \
+  --out output/SubCA1.der \
+  --profile SubCA
 
-xipki-tk:update-cert --slot 1 --key-label $SubCA_KEY_LABEL --cert output/SubCA1.der \
+xipki-tk:update-cert \
+  --slot 1 \
+  --key-label $SubCA_KEY_LABEL \
+  --cert output/SubCA1.der \
   --ca-cert output/RCA1.der
 
 ## Generate keys and PKCS#10 request for SubCAwithCRL1
-xipki-tk:req --slot 1 --key-label $SubCAwithCRL_KEY_LABEL --out output/SubCAwithCRL1.p10 \
+xipki-tk:req \
+  --slot 1 \
+  --key-label $SubCAwithCRL_KEY_LABEL --out output/SubCAwithCRL1.p10 \
   --subject "CN=SubCAwithCRL1, O=xipki, C=DE" \
   --subject-alt-name "[1]info@xipki.org" \
   --subject-alt-name "[2]xipki.org" \
@@ -77,16 +117,24 @@ xipki-tk:req --slot 1 --key-label $SubCAwithCRL_KEY_LABEL --out output/SubCAwith
   --subject-info-access "1.3.6.1.5.5.7.48.5?[6]http://example.org/abc" \
   --keyusage cRLSign
 
-xipki-ca:enroll-cert --ca RCA1 --p10 output/SubCAwithCRL1.p10 --out output/SubCAwithCRL1.der --profile SubCA.Complex
+xipki-ca:enroll-cert \
+  --ca RCA1 \
+  --p10 output/SubCAwithCRL1.p10 \
+  --out output/SubCAwithCRL1.der \
+  --profile SubCA.Complex
 
-xipki-tk:update-cert --slot 1 --key-label $SubCAwithCRL_KEY_LABEL --cert output/SubCAwithCRL1.der \
+xipki-tk:update-cert \
+  --slot 1 \
+  --key-label $SubCAwithCRL_KEY_LABEL \
+  --cert output/SubCAwithCRL1.der \
   --ca-cert output/RCA1.der
 
 #################################################################
 #                        ADD SubCA with OCSP                    #
 #################################################################
 ## Add CA
-xipki-ca:ca-add --name SubCA1 \
+xipki-ca:ca-add \
+  --name SubCA1 \
   --permission all \
   --next-serial 1 \
   --next-crl-no 2 \
@@ -100,22 +148,40 @@ xipki-ca:ca-add --name SubCA1 \
   --duplicate-subject permitted \
   --duplicate-key permitted
 
-xipki-ca:caalias-add --ca SubCA1 --alias SubCA
+xipki-ca:caalias-add \
+  --ca SubCA1 \
+  --alias SubCA
 
 ## Add cert profile to CA
-xipki-ca:caprofile-add --ca SubCA1.complex-Name --profile TLS_g --local-name TLS
+xipki-ca:caprofile-add \
+  --ca SubCA1.complex-Name \
+  --profile TLS_g \
+  --local-name TLS
 
-xipki-ca:caprofile-add --ca SubCA1.complex-Name --profile TLS_C
+xipki-ca:caprofile-add \
+  --ca SubCA1.complex-Name \
+  --profile TLS_C
 
-xipki-ca:caprofile-add --ca SubCA1.complex-Name --profile TLSwithIncSN
+xipki-ca:caprofile-add \
+  --ca SubCA1.complex-Name \
+  --profile TLSwithIncSN
 
-xipki-ca:caprofile-add --ca SubCA1.complex-Name --profile gSMC_K
+xipki-ca:caprofile-add \
+  --ca SubCA1.complex-Name \
+  --profile gSMC_K
 
 ## Add publisher
-xipki-ca:capub-add --ca SubCA1 --publisher OCSP.PUBLISHER
+xipki-ca:capub-add \
+  --ca SubCA1 \
+  --publisher OCSP.PUBLISHER
 
 # Add requestor to CA
-xipki-ca:careq-add --requestor requestor1 --permission all --ra yes --profile all --ca SubCA1
+xipki-ca:careq-add \
+  --requestor requestor1 \
+  --permission all \
+  --ra yes \
+  --profile all \
+  --ca SubCA1
 
 ## Restart the CA
 #xipki-ca:restart
@@ -124,7 +190,8 @@ xipki-ca:careq-add --requestor requestor1 --permission all --ra yes --profile al
 #                       ADD SubCA with CRL                      #
 #################################################################
 ## Add CA
-xipki-ca:ca-add --name SubCAwithCRL1 \
+xipki-ca:ca-add \
+  --name SubCAwithCRL1 \
   --permission all \
   --next-serial 1 \
   --next-crl-no 2 \
@@ -141,17 +208,30 @@ xipki-ca:ca-add --name SubCAwithCRL1 \
   --duplicate-subject permitted \
   --duplicate-key permitted
 
-xipki-ca:caalias-add --ca SubCAwithCRL1 --alias SubCAwithCRL
+xipki-ca:caalias-add \
+  --ca SubCAwithCRL1 \
+  --alias SubCAwithCRL
 
 ## Add cert profile to CA
-xipki-ca:caprofile-add --ca SubCAwithCRL1 --profile OCSP
+xipki-ca:caprofile-add \
+  --ca SubCAwithCRL1 \
+  --profile OCSP
 
-xipki-ca:caprofile-add --ca SubCAwithCRL1 --profile DEMO
+xipki-ca:caprofile-add \
+  --ca SubCAwithCRL1 \
+  --profile DEMO
 
-xipki-ca:caprofile-add --ca SubCAwithCRL1 --profile multipleOUs
+xipki-ca:caprofile-add \
+  --ca SubCAwithCRL1 \
+  --profile multipleOUs
 
 ## Add CMP requestor to CA
-xipki-ca:careq-add --requestor requestor1 --permission all --ra yes --profile all --ca SubCAwithCRL1
+xipki-ca:careq-add \
+  --requestor requestor1 \
+  --permission all \
+  --ra yes \
+  --profile all \
+  --ca SubCAwithCRL1
 
 ## Restart the CA
 xipki-ca:restart
