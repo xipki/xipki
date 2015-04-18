@@ -35,43 +35,20 @@
 
 package org.xipki.ca.server.mgmt.shell.cert;
 
-import java.rmi.UnexpectedException;
-
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.CAEntry;
-import org.xipki.ca.server.mgmt.shell.CaCommand;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "xipki-ca", name = "unrevoke-cert", description="unrevoke certificate")
-public class UnrevokeCertCommand extends CaCommand
+public class UnrevokeCertCommand extends UnRevRemoveCertCommand
 {
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    private String caName;
-
-    @Option(name = "--serial", aliases = "-s",
-            required = true,
-            description = "serial number\n"
-                    + "(required)")
-    private String serialNumberS;
-
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        CAEntry ca = caManager.getCA(caName);
-        if(ca == null)
-        {
-            throw new UnexpectedException("CA " + caName + " not available");
-        }
-
-        boolean successful = caManager.unrevokeCertificate(caName, toBigInt(serialNumberS));
+        boolean successful = caManager.unrevokeCertificate(caName, getSerialNumber());
         output(successful, "unrevoked", "could not unrevoke", "certificate");
 
         return null;

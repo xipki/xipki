@@ -39,8 +39,6 @@ import java.util.Date;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.CAEntry;
-import org.xipki.ca.server.mgmt.shell.CaCommand;
 import org.xipki.common.CRLReason;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.util.DateUtil;
@@ -50,20 +48,8 @@ import org.xipki.common.util.DateUtil;
  */
 
 @Command(scope = "xipki-ca", name = "revoke-cert", description="revoke certificate")
-public class RevokeCertCommand extends CaCommand
+public class RevokeCertCommand extends UnRevRemoveCertCommand
 {
-    @Option(name = "--ca",
-            required = true,
-            description = " CA name\n"
-                    + "(required)")
-    private String caName;
-
-    @Option(name = "--serial", aliases = "-s",
-            required = true,
-            description = "serial number\n"
-                    + "(required)")
-    private String serialNumberS;
-
     @Option(name = "--reason", aliases = "-r",
             required = true,
             description = "CRL reason\n"
@@ -78,12 +64,6 @@ public class RevokeCertCommand extends CaCommand
     protected Object _doExecute()
     throws Exception
     {
-        CAEntry ca = caManager.getCA(caName);
-        if(ca == null)
-        {
-            throw new ConfigurationException("CA " + caName + " not available");
-        }
-
         CRLReason crlReason = CRLReason.getInstance(reason);
         if(crlReason == null)
         {
@@ -101,7 +81,7 @@ public class RevokeCertCommand extends CaCommand
             invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
         }
 
-        boolean successful = caManager.revokeCertificate(caName, toBigInt(serialNumberS),
+        boolean successful = caManager.revokeCertificate(caName, getSerialNumber(),
                 crlReason, invalidityDate);
         output(successful, "revoked", "could not revoke", "certificate");
 

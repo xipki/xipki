@@ -130,13 +130,24 @@ xipki-ca:responder-rm responder2
 
 ##### cert #####
 
+# Serial 2: SubCA1.der
+# Serial 3: SubCAwithCRL1.der
+
 xipki-ca:revoke-cert --ca RCA1 --reason certificateHold --serial 3
 
 xipki-ca:unrevoke-cert --ca RCA1 --serial 3
 
+xipki-ca:revoke-cert --ca RCA1 --reason certificateHold --cert output/SubCAwithCRL1.der
+
+xipki-ca:unrevoke-cert --ca RCA1 --cert output/SubCAwithCRL1.der
+
 xipki-ca:revoke-cert --ca RCA1 --reason keyCompromise --serial 3
 
+xipki-ca:revoke-cert --ca RCA1 --reason keyCompromise --cert output/SubCA1.der
+
 xipki-ca:remove-cert --ca RCA1 --serial  3
+
+xipki-ca:remove-cert --ca RCA1 --cert output/SubCA1.der
 
 ##### CA #####
 

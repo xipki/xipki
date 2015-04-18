@@ -35,42 +35,21 @@
 
 package org.xipki.ca.server.mgmt.shell.cert;
 
-import java.rmi.UnexpectedException;
-
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.shell.CaCommand;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "xipki-ca", name = "remove-cert", description="remove certificate")
-public class RemoveCertCommand extends CaCommand
+public class RemoveCertCommand extends UnRevRemoveCertCommand
 {
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    private String caName;
-
-    @Option(name = "--serial", aliases = "-s",
-            required = true,
-            description = "serial number\n"
-                    + "(required)")
-    private String serialNumberS;
-
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        if(caManager.getCA(caName) == null)
-        {
-            throw new UnexpectedException("CA " + caName + " not available");
-        }
-
         boolean successful =
-                caManager.removeCertificate(caName, toBigInt(serialNumberS));
+                caManager.removeCertificate(caName, getSerialNumber());
         output(successful, "removed", "could not remove", "certificate");
         return null;
     }
