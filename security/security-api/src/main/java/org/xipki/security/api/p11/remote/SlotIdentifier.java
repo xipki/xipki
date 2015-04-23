@@ -46,6 +46,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
+import org.xipki.common.BadASN1ObjectException;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 
 /**
@@ -67,10 +68,11 @@ public class SlotIdentifier extends ASN1Object
 
     public SlotIdentifier(
             final P11SlotIdentifier slotId)
+    throws BadASN1ObjectException
     {
         if(slotId == null)
         {
-            throw new IllegalArgumentException("slotId could not be null");
+            throw new BadASN1ObjectException("slotId could not be null");
         }
 
         this.slotId = slotId;
@@ -78,53 +80,61 @@ public class SlotIdentifier extends ASN1Object
 
     private SlotIdentifier(
             final ASN1Sequence seq)
+    throws BadASN1ObjectException
     {
         int size = seq.size();
         if (size < 1)
         {
-            throw new IllegalArgumentException("wrong number of elements in sequence");
+            throw new BadASN1ObjectException("wrong number of elements in sequence");
         }
 
-        Integer slotIndex = null;
-
-        ASN1Encodable slotIdASN1Obj = null;
-        ASN1Encodable obj = seq.getObjectAt(0);
-        if(obj instanceof ASN1Integer)
+        try
         {
-            slotIndex = ((ASN1Integer) obj).getPositiveValue().intValue();
-            if(size > 1)
+            Integer slotIndex = null;
+
+            ASN1Encodable slotIdASN1Obj = null;
+            ASN1Encodable obj = seq.getObjectAt(0);
+            if(obj instanceof ASN1Integer)
             {
-                slotIdASN1Obj = seq.getObjectAt(1);
-            }
-        }
-        else
-        {
-            slotIdASN1Obj = obj;
-        }
-
-        Long slotId = null;
-
-        if (slotIdASN1Obj instanceof ASN1TaggedObject)
-        {
-            ASN1TaggedObject tagObj = (ASN1TaggedObject) slotIdASN1Obj;
-
-            int tagNo = tagObj.getTagNo();
-            if(tagNo == 1)
-            {
-                ASN1Integer i = ASN1Integer.getInstance(tagObj.getObject());
-                slotId = i.getPositiveValue().longValue();
+                slotIndex = ((ASN1Integer) obj).getPositiveValue().intValue();
+                if(size > 1)
+                {
+                    slotIdASN1Obj = seq.getObjectAt(1);
+                }
             }
             else
             {
-                throw new IllegalArgumentException("unknown tag " + tagNo);
+                slotIdASN1Obj = obj;
             }
-        }
 
-        this.slotId = new P11SlotIdentifier(slotIndex, slotId);
+            Long slotId = null;
+
+            if (slotIdASN1Obj instanceof ASN1TaggedObject)
+            {
+                ASN1TaggedObject tagObj = (ASN1TaggedObject) slotIdASN1Obj;
+
+                int tagNo = tagObj.getTagNo();
+                if(tagNo == 1)
+                {
+                    ASN1Integer i = ASN1Integer.getInstance(tagObj.getObject());
+                    slotId = i.getPositiveValue().longValue();
+                }
+                else
+                {
+                    throw new BadASN1ObjectException("unknown tag " + tagNo);
+                }
+            }
+
+            this.slotId = new P11SlotIdentifier(slotIndex, slotId);
+        }catch(IllegalArgumentException e)
+        {
+            throw new BadASN1ObjectException(e.getMessage(), e);
+        }
     }
 
     public static SlotIdentifier getInstance(
             final Object obj)
+    throws BadASN1ObjectException
     {
         if (obj == null || obj instanceof SlotIdentifier)
         {
@@ -144,11 +154,11 @@ public class SlotIdentifier extends ASN1Object
             }
             catch (IOException e)
             {
-                throw new IllegalArgumentException("unable to parse encoded general name");
+                throw new BadASN1ObjectException("unable to parse encoded general name");
             }
         }
 
-        throw new IllegalArgumentException("unknown object in getInstance: " + obj.getClass().getName());
+        throw new BadASN1ObjectException("unknown object in getInstance: " + obj.getClass().getName());
     }
 
     @Override

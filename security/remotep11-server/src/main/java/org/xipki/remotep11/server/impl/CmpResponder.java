@@ -63,6 +63,7 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.BadASN1ObjectException;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.XipkiCmpConstants;
 import org.xipki.security.api.p11.P11CryptService;
@@ -322,6 +323,9 @@ class CmpResponder
             GenRepContent genRepContent = new GenRepContent(respItv);
             PKIBody respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
             return new PKIMessage(respHeader, respBody);
+        } catch (BadASN1ObjectException e)
+        {
+            return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, e.getMessage());
         } catch (Throwable t)
         {
             LOG.error("error while processing CMP message {}, message: {}", tidStr, t.getMessage());
