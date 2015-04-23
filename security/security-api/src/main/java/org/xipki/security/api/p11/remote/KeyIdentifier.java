@@ -65,11 +65,10 @@ public class KeyIdentifier extends ASN1Object
 
     public KeyIdentifier(
             final P11KeyIdentifier keyId)
-    throws BadASN1ObjectException
     {
         if(keyId == null)
         {
-            throw new BadASN1ObjectException("keyId could not be null");
+            throw new IllegalArgumentException("keyId could not be null");
         }
 
         this.keyId = keyId;
@@ -79,13 +78,13 @@ public class KeyIdentifier extends ASN1Object
             final Object obj)
     throws BadASN1ObjectException
     {
+        if (obj == null || obj instanceof KeyIdentifier)
+        {
+            return (KeyIdentifier)obj;
+        }
+
         try
         {
-            if (obj == null || obj instanceof KeyIdentifier)
-            {
-                return (KeyIdentifier)obj;
-            }
-
             if (obj instanceof ASN1OctetString)
             {
                 byte[] keyIdBytes = ((ASN1OctetString) obj).getOctets();
