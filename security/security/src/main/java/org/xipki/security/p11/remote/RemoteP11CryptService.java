@@ -76,6 +76,7 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.BadASN1ObjectException;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.XipkiCmpConstants;
@@ -260,8 +261,16 @@ public abstract class RemoteP11CryptService implements P11CryptService
             final P11KeyIdentifier keyId)
     throws SignerException
     {
-        SlotAndKeyIdentifer slotAndKeyIdentifier = buildSlotAndKeyIdentifier(slotId, keyId);
-        PSOTemplate psoTemplate = new PSOTemplate(slotAndKeyIdentifier, message);
+        PSOTemplate psoTemplate;
+        try
+        {
+            SlotAndKeyIdentifer slotAndKeyIdentifier = buildSlotAndKeyIdentifier(slotId, keyId);
+            psoTemplate = new PSOTemplate(slotAndKeyIdentifier, message);
+        }catch(BadASN1ObjectException e)
+        {
+            throw new SignerException("BadASN1ObjectException: " + e.getMessage(), e);
+        }
+
         ASN1Encodable result = send(action, psoTemplate);
 
         ASN1OctetString octetString;
@@ -282,7 +291,15 @@ public abstract class RemoteP11CryptService implements P11CryptService
             final P11KeyIdentifier keyId)
     throws SignerException
     {
-        SlotAndKeyIdentifer slotAndKeyIdentifier = buildSlotAndKeyIdentifier(slotId, keyId);
+        SlotAndKeyIdentifer slotAndKeyIdentifier;
+        try
+        {
+            slotAndKeyIdentifier = buildSlotAndKeyIdentifier(slotId, keyId);
+        }catch(BadASN1ObjectException e)
+        {
+            throw new SignerException("BadASN1ObjectException: " + e.getMessage(), e);
+        }
+
         ASN1Encodable result = send(action, slotAndKeyIdentifier);
 
         ASN1OctetString octetString;
@@ -300,6 +317,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     private SlotAndKeyIdentifer buildSlotAndKeyIdentifier(
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
+    throws BadASN1ObjectException
     {
         SlotIdentifier slotIdentifier = new SlotIdentifier(slotId);
         KeyIdentifier keyIdentifier = new KeyIdentifier(keyId);
@@ -543,8 +561,17 @@ public abstract class RemoteP11CryptService implements P11CryptService
     throws SignerException
     {
         checkSlotId(slotId);
+        SlotIdentifier _slotId;
+        try
+        {
+            _slotId = new SlotIdentifier(slotId);
+        }catch(BadASN1ObjectException e)
+        {
+            throw new SignerException("BadASN1ObjectException: " + e.getMessage(), e);
+        }
+
         ASN1Encodable resp = send(XipkiCmpConstants.ACTION_RP11_LIST_KEYLABELS,
-                new SlotIdentifier(slotId));
+                _slotId);
         if(resp instanceof ASN1Sequence == false)
         {
             throw new SignerException("response is not ASN1Sequence, but " + resp.getClass().getName());
