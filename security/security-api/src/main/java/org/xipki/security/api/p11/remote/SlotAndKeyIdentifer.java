@@ -43,6 +43,7 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
 import org.xipki.common.BadASN1ObjectException;
+import org.xipki.common.util.ASN1Util;
 
 /**
  *
@@ -65,16 +66,15 @@ public class SlotAndKeyIdentifer extends ASN1Object
     public SlotAndKeyIdentifer(
             final SlotIdentifier slotIdentifier,
             final KeyIdentifier keyIdentifier)
-    throws BadASN1ObjectException
     {
         if(slotIdentifier == null)
         {
-            throw new BadASN1ObjectException("slotIdentifier could not be null");
+            throw new IllegalArgumentException("slotIdentifier could not be null");
         }
 
         if(keyIdentifier == null)
         {
-            throw new BadASN1ObjectException("keyIdentifier could not be null");
+            throw new IllegalArgumentException("keyIdentifier could not be null");
         }
 
         this.slotIdentifier = slotIdentifier;
@@ -85,11 +85,7 @@ public class SlotAndKeyIdentifer extends ASN1Object
             final ASN1Sequence seq)
     throws BadASN1ObjectException
     {
-        if (seq.size() != 2)
-        {
-            throw new BadASN1ObjectException("wrong number of elements in sequence");
-        }
-
+        ASN1Util.assertSequenceLength(seq, 2, "SlotAndKeyIdentifier");
         this.slotIdentifier = SlotIdentifier.getInstance(seq.getObjectAt(0));
         this.keyIdentifier = KeyIdentifier.getInstance(seq.getObjectAt(1));
     }
@@ -98,13 +94,13 @@ public class SlotAndKeyIdentifer extends ASN1Object
             final Object obj)
     throws BadASN1ObjectException
     {
+        if (obj == null || obj instanceof SlotAndKeyIdentifer)
+        {
+            return (SlotAndKeyIdentifer)obj;
+        }
+
         try
         {
-            if (obj == null || obj instanceof SlotAndKeyIdentifer)
-            {
-                return (SlotAndKeyIdentifer)obj;
-            }
-
             if (obj instanceof ASN1Sequence)
             {
                 return new SlotAndKeyIdentifer((ASN1Sequence) obj);

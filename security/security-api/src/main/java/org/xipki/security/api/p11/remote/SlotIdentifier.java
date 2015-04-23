@@ -68,11 +68,10 @@ public class SlotIdentifier extends ASN1Object
 
     public SlotIdentifier(
             final P11SlotIdentifier slotId)
-    throws BadASN1ObjectException
     {
         if(slotId == null)
         {
-            throw new BadASN1ObjectException("slotId could not be null");
+            throw new IllegalArgumentException("slotId could not be null");
         }
 
         this.slotId = slotId;
@@ -141,24 +140,24 @@ public class SlotIdentifier extends ASN1Object
             return (SlotIdentifier)obj;
         }
 
-        if (obj instanceof ASN1Sequence)
+        try
         {
-            return new SlotIdentifier((ASN1Sequence) obj);
-        }
+            if (obj instanceof ASN1Sequence)
+            {
+                return new SlotIdentifier((ASN1Sequence) obj);
+            }
 
-        if (obj instanceof byte[])
-        {
-            try
+            if (obj instanceof byte[])
             {
                 return getInstance(ASN1Primitive.fromByteArray((byte[])obj));
             }
-            catch (IOException e)
-            {
-                throw new BadASN1ObjectException("unable to parse encoded general name");
-            }
+        }
+        catch (IOException | IllegalArgumentException e)
+        {
+            throw new BadASN1ObjectException("unable to parse encoded SlotIdentifier");
         }
 
-        throw new BadASN1ObjectException("unknown object in getInstance: " + obj.getClass().getName());
+        throw new BadASN1ObjectException("unknown object in SlotIdentifier.getInstance(): " + obj.getClass().getName());
     }
 
     @Override
