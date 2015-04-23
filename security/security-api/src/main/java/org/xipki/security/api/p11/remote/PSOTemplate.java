@@ -44,6 +44,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.xipki.common.BadASN1ObjectException;
+import org.xipki.common.util.ASN1Util;
 
 /**
  *
@@ -67,11 +68,7 @@ public class PSOTemplate extends ASN1Object
             final ASN1Sequence seq)
     throws BadASN1ObjectException
     {
-        if (seq.size() != 2)
-        {
-            throw new BadASN1ObjectException("wrong number of elements in sequence, is ");
-        }
-
+        ASN1Util.assertSequenceLength(seq, 2, "PSOTemplate");
         this.slotAndKeyIdentifier = SlotAndKeyIdentifer.getInstance(seq.getObjectAt(0));
         DEROctetString octetString = (DEROctetString) DEROctetString.getInstance(seq.getObjectAt(1));
         this.message = octetString.getOctets();
@@ -80,15 +77,14 @@ public class PSOTemplate extends ASN1Object
     public PSOTemplate(
             final SlotAndKeyIdentifer slotAndKeyIdentifier,
             final byte[] message)
-    throws BadASN1ObjectException
     {
         if(slotAndKeyIdentifier == null)
         {
-            throw new BadASN1ObjectException("slotAndKeyIdentifier could not be null");
+            throw new IllegalArgumentException("slotAndKeyIdentifier could not be null");
         }
         if(message == null)
         {
-            throw new BadASN1ObjectException("message could not be null");
+            throw new IllegalArgumentException("message could not be null");
         }
 
         this.slotAndKeyIdentifier = slotAndKeyIdentifier;
@@ -99,13 +95,13 @@ public class PSOTemplate extends ASN1Object
             final Object obj)
     throws BadASN1ObjectException
     {
+        if (obj == null || obj instanceof PSOTemplate)
+        {
+            return (PSOTemplate)obj;
+        }
+
         try
         {
-            if (obj == null || obj instanceof PSOTemplate)
-            {
-                return (PSOTemplate)obj;
-            }
-
             if (obj instanceof ASN1Sequence)
             {
                 return new PSOTemplate((ASN1Sequence) obj);

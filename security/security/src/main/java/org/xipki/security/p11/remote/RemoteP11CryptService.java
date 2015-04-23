@@ -561,14 +561,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     throws SignerException
     {
         checkSlotId(slotId);
-        SlotIdentifier _slotId;
-        try
-        {
-            _slotId = new SlotIdentifier(slotId);
-        }catch(BadASN1ObjectException e)
-        {
-            throw new SignerException("BadASN1ObjectException: " + e.getMessage(), e);
-        }
+        SlotIdentifier _slotId = new SlotIdentifier(slotId);
 
         ASN1Encodable resp = send(XipkiCmpConstants.ACTION_RP11_LIST_KEYLABELS,
                 _slotId);
