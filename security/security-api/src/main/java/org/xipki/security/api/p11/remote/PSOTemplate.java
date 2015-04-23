@@ -43,6 +43,7 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
+import org.xipki.common.BadASN1ObjectException;
 
 /**
  *
@@ -64,10 +65,11 @@ public class PSOTemplate extends ASN1Object
 
     private PSOTemplate(
             final ASN1Sequence seq)
+    throws BadASN1ObjectException
     {
         if (seq.size() != 2)
         {
-            throw new IllegalArgumentException("wrong number of elements in sequence");
+            throw new BadASN1ObjectException("wrong number of elements in sequence, is ");
         }
 
         this.slotAndKeyIdentifier = SlotAndKeyIdentifer.getInstance(seq.getObjectAt(0));
@@ -78,14 +80,15 @@ public class PSOTemplate extends ASN1Object
     public PSOTemplate(
             final SlotAndKeyIdentifer slotAndKeyIdentifier,
             final byte[] message)
+    throws BadASN1ObjectException
     {
         if(slotAndKeyIdentifier == null)
         {
-            throw new IllegalArgumentException("slotAndKeyIdentifier could not be null");
+            throw new BadASN1ObjectException("slotAndKeyIdentifier could not be null");
         }
         if(message == null)
         {
-            throw new IllegalArgumentException("message could not be null");
+            throw new BadASN1ObjectException("message could not be null");
         }
 
         this.slotAndKeyIdentifier = slotAndKeyIdentifier;
@@ -94,30 +97,31 @@ public class PSOTemplate extends ASN1Object
 
     public static PSOTemplate getInstance(
             final Object obj)
+    throws BadASN1ObjectException
     {
-        if (obj == null || obj instanceof PSOTemplate)
+        try
         {
-            return (PSOTemplate)obj;
-        }
+            if (obj == null || obj instanceof PSOTemplate)
+            {
+                return (PSOTemplate)obj;
+            }
 
-        if (obj instanceof ASN1Sequence)
-        {
-            return new PSOTemplate((ASN1Sequence) obj);
-        }
+            if (obj instanceof ASN1Sequence)
+            {
+                return new PSOTemplate((ASN1Sequence) obj);
+            }
 
-        if (obj instanceof byte[])
-        {
-            try
+            if (obj instanceof byte[])
             {
                 return getInstance(ASN1Primitive.fromByteArray((byte[])obj));
             }
-            catch (IOException e)
-            {
-                throw new IllegalArgumentException("unable to parse encoded general name");
-            }
+        }
+        catch (IOException | IllegalArgumentException e)
+        {
+            throw new BadASN1ObjectException("unable to parse encoded PSOTemplate");
         }
 
-        throw new IllegalArgumentException("unknown object in getInstance: " + obj.getClass().getName());
+        throw new BadASN1ObjectException("unknown object in PSOTemplate.getInstance(): " + obj.getClass().getName());
     }
 
     @Override

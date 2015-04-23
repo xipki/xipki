@@ -42,6 +42,7 @@ import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
+import org.xipki.common.BadASN1ObjectException;
 
 /**
  *
@@ -64,15 +65,16 @@ public class SlotAndKeyIdentifer extends ASN1Object
     public SlotAndKeyIdentifer(
             final SlotIdentifier slotIdentifier,
             final KeyIdentifier keyIdentifier)
+    throws BadASN1ObjectException
     {
         if(slotIdentifier == null)
         {
-            throw new IllegalArgumentException("slotIdentifier could not be null");
+            throw new BadASN1ObjectException("slotIdentifier could not be null");
         }
 
         if(keyIdentifier == null)
         {
-            throw new IllegalArgumentException("keyIdentifier could not be null");
+            throw new BadASN1ObjectException("keyIdentifier could not be null");
         }
 
         this.slotIdentifier = slotIdentifier;
@@ -81,10 +83,11 @@ public class SlotAndKeyIdentifer extends ASN1Object
 
     private SlotAndKeyIdentifer(
             final ASN1Sequence seq)
+    throws BadASN1ObjectException
     {
         if (seq.size() != 2)
         {
-            throw new IllegalArgumentException("wrong number of elements in sequence");
+            throw new BadASN1ObjectException("wrong number of elements in sequence");
         }
 
         this.slotIdentifier = SlotIdentifier.getInstance(seq.getObjectAt(0));
@@ -93,30 +96,31 @@ public class SlotAndKeyIdentifer extends ASN1Object
 
     public static SlotAndKeyIdentifer getInstance(
             final Object obj)
+    throws BadASN1ObjectException
     {
-        if (obj == null || obj instanceof SlotAndKeyIdentifer)
+        try
         {
-            return (SlotAndKeyIdentifer)obj;
-        }
+            if (obj == null || obj instanceof SlotAndKeyIdentifer)
+            {
+                return (SlotAndKeyIdentifer)obj;
+            }
 
-        if (obj instanceof ASN1Sequence)
-        {
-            return new SlotAndKeyIdentifer((ASN1Sequence) obj);
-        }
+            if (obj instanceof ASN1Sequence)
+            {
+                return new SlotAndKeyIdentifer((ASN1Sequence) obj);
+            }
 
-        if (obj instanceof byte[])
-        {
-            try
+            if (obj instanceof byte[])
             {
                 return getInstance(ASN1Primitive.fromByteArray((byte[])obj));
             }
-            catch (IOException e)
-            {
-                throw new IllegalArgumentException("unable to parse encoded general name");
-            }
+        }
+        catch (IOException | IllegalArgumentException e)
+        {
+            throw new BadASN1ObjectException("unable to parse encoded SlotAndKeyIdentifier");
         }
 
-        throw new IllegalArgumentException("unknown object in getInstance: " + obj.getClass().getName());
+        throw new BadASN1ObjectException("unknown object in SlotAndKeyIdentifier.getInstance(): " + obj.getClass().getName());
     }
 
     @Override
