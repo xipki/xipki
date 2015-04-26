@@ -258,11 +258,6 @@
               <!-- Define here the JDBC drivers -->
               <artifactItems>
                 <artifactItem>
-                  <groupId>mysql</groupId>
-                  <artifactId>mysql-connector-java</artifactId>
-                  <version>${mysql-jdbc.version}</version>
-                </artifactItem>
-                <artifactItem>
                   <groupId>com.h2database</groupId>
                   <artifactId>h2</artifactId>
                   <version>${h2-jdbc.version}</version>
