@@ -15,7 +15,6 @@
   <properties>
     <shared.dir>${project.basedir}/../../shared</shared.dir>
     <features.repo>${project.build.directory}/features-repo</features.repo>
-    <mysql-jdbc.version>5.1.31</mysql-jdbc.version>
     <postgresql.version>9.3-1100-jdbc41</postgresql.version>
     <h2-jdbc.version>1.4.185</h2-jdbc.version>
     <hsqldb.version>2.3.2</hsqldb.version>
