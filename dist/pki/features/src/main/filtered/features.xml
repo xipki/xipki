@@ -132,10 +132,8 @@
   </feature>
   <feature name="xipki-audit-syslog" version="${project.version}" resolver="(obr)">
     <feature>xipki-audit</feature>
-    <bundle>mvn:org.apache.commons/commons-lang3/${commons-lang3.version}</bundle>
-    <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
-    <bundle>mvn:joda-time/joda-time/${joda-time.version}</bundle>
-    <bundle>mvn:com.nesscomputing/ness-syslog4j/${syslog4j.version}</bundle>
+    <bundle><![CDATA[wrap:mvn:com.google.code.findbugs/jsr305/3.0.0/$Bundle-SymbolicName=jsr305&Bundle-Version=3.0.0]]></bundle>
+    <bundle><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
     <bundle>mvn:org.xipki/audit-syslog/${project.version}</bundle>
   </feature>
   <feature name="xipki-pkiconsole-server" version="${project.version}" resolver="(obr)">
