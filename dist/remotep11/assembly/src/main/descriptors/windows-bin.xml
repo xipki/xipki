@@ -10,7 +10,7 @@
     -->
     <fileSet>
       <directory>${project.basedir}/../../demo-tlskeys</directory>
-      <outputDirectory>/etc/tlskeys</outputDirectory>
+      <outputDirectory>etc/tlskeys</outputDirectory>
       <includes>
         <include>tls-server-keystore.jks</include>
         <include>tls-server-truststore.jks</include>
@@ -26,14 +26,14 @@
       <includes>
         <include>*-branding.jar</include>
       </includes>
-      <outputDirectory>/lib/</outputDirectory>
+      <outputDirectory>lib/</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
     <!-- Copy over everything that needs to get unix line endings -->
     <fileSet>
       <directory>${project.build.directory}/classes/etc</directory>
-      <outputDirectory>/etc/</outputDirectory>
+      <outputDirectory>etc/</outputDirectory>
       <lineEnding>dos</lineEnding>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -41,7 +41,7 @@
     <!-- Copy over everything unfiltered ressources -->
     <fileSet>
       <directory>${project.basedir}/src/main/unfiltered</directory>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory>.</outputDirectory>
       <excludes>
         <exclude>**/*.sh</exclude>
         <exclude>bin/setenv</exclude>
@@ -61,7 +61,7 @@
       <includes>
         <include>**/*.sh</include>
       </includes>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory>.</outputDirectory>
       <filtered>false</filtered>
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
@@ -72,7 +72,7 @@
         <exclude>**/*.sh</exclude>
         <exclude>**/*.bat</exclude>
       </excludes>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory>.</outputDirectory>
       <filtered>false</filtered>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -89,7 +89,7 @@
       <directory>${project.basedir}/src/main/bin/unix</directory>
       -->
       <directory>${project.build.directory}/windows-dependencies/apache-karaf-${karaf.version}/bin</directory>
-      <outputDirectory>/bin/</outputDirectory>
+      <outputDirectory>bin/</outputDirectory>
       <lineEnding>dos</lineEnding>
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
@@ -97,7 +97,7 @@
     <!-- Expanded Karaf -->
     <fileSet>
       <directory>${project.build.directory}/windows-dependencies/apache-karaf-${karaf.version}</directory>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory>.</outputDirectory>
       <excludes>
         <!--
             exclude files and directories without replacement

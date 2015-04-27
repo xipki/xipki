@@ -43,7 +43,7 @@
       <includes>
         <include>**/*.sh</include>
       </includes>
-      <outputDirectory></outputDirectory>
+      <outputDirectory>.</outputDirectory>
       <filtered>false</filtered>
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
