@@ -49,9 +49,7 @@
     <hikaricp.version>2.3.2</hikaricp.version>
     <javassist.version>3.19.0-GA</javassist.version>
     <syslog-java-client.version>1.0.6</syslog-java-client.version>
-    <commons-lang3.version>3.1</commons-lang3.version>
-    <guava.version>13.0</guava.version>
-    <joda-time.version>2.1</joda-time.version>
+    <jsr305.version>3.0.0</jsr305.version>
     <!-- plugins -->
     <plugin.comipler.version>3.2</plugin.comipler.version>
     <plugin.bundle.version>2.5.3</plugin.bundle.version>
