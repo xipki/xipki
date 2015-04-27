@@ -35,6 +35,7 @@
 
 package org.xipki.audit.api;
 
+import java.io.CharArrayWriter;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -47,45 +48,19 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * This file is copied from PCISyslogMessage from syslog4j.org (LGPL v2.1)
- *
- * PCISyslogMessage provides support for audit trails defined by section
- * 10.3 of the PCI Data Security Standard (PCI DSS) versions 1.1 and 1.2.
- *
- * <p>More information on the PCI DSS specification is available here:</p>
- *
- * <p>https://www.pcisecuritystandards.org/security_standards/pci_dss.shtml</p>
- *
- * <p>The PCI DSS specification is Copyright 2008 PCI Security Standards
- * Council LLC.</p>
- *
- * <p>Syslog4j is licensed under the Lesser GNU Public License v2.1.  A copy
- * of the LGPL license is available in the META-INF folder in all
- * distributions of Syslog4j and in the base directory of the "doc" ZIP.</p>
- *
- * @author &lt;syslog4j@productivity.org&gt;
- * @version $Id: PCISyslogMessage.java,v 1.3 2008/11/14 04:32:00 cvs Exp $
  *
  * @author Lijun Liao
  */
 
 public class PCIAuditEvent
 {
-    public static final String UNDEFINED = "undefined";
+    private static final String UNDEFINED = "undefined";
 
-    public static final String DEFAULT_DATE_FORMAT = "yyyy/MM/dd";
-    public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
+    private static final String DEFAULT_DATE_FORMAT = "yyyy/MM/dd";
+    private static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
 
-    public static final char DEFAULT_DELIMITER = ' ';
-    public static final String DEFAULT_REPLACE_DELIMITER = "_";
-
-    public static final String USER_ID = "userId";
-    public static final String EVENT_TYPE = "eventType";
-    public static final String DATE = "date";
-    public static final String TIME = "time";
-    public static final String STATUS = "status";
-    public static final String ORIGINATION = "origination";
-    public static final String AFFECTED_RESOURCE = "affectedResource";
+    private static final char DEFAULT_DELIMITER = ' ';
+    private static final String DEFAULT_REPLACE_DELIMITER = "_";
 
     /**
      * 10.3.1 "User Identification"
@@ -236,12 +211,17 @@ public class PCIAuditEvent
         this.affectedResource = affectedResource;
     }
 
-    public String createMessage()
+    public CharArrayWriter toCharArrayWriter(String prefix)
     {
-        StringBuilder buffer = new StringBuilder();
+        CharArrayWriter buffer = new CharArrayWriter();
 
-        char delimiter = DEFAULT_DELIMITER;
-        String replaceDelimiter = DEFAULT_REPLACE_DELIMITER;
+        final char delimiter = DEFAULT_DELIMITER;
+        final String replaceDelimiter = DEFAULT_REPLACE_DELIMITER;
+
+        if(prefix != null && prefix.isEmpty() == false)
+        {
+            buffer.append(prefix);
+        }
 
         buffer.append(replaceDelimiter(getUserId(), delimiter, replaceDelimiter));
         buffer.append(delimiter);
@@ -257,7 +237,7 @@ public class PCIAuditEvent
         buffer.append(delimiter);
         buffer.append(replaceDelimiter(getAffectedResource(), delimiter, replaceDelimiter));
 
-        return buffer.toString();
+        return buffer;
     }
 
     public static boolean isBlank(
