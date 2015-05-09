@@ -2139,7 +2139,8 @@ class X509CA
         X500Name grantedSubject = subjectInfo.getGrantedSubject();
 
         // make sure that the grantedSubject does not equal the CA's subject
-        if(grantedSubject.equals(caInfo.getPublicCAInfo().getX500Subject()))
+        if(X509Util.canonicalizName(grantedSubject).equals(
+                caInfo.getPublicCAInfo().getC14nSubject()))
         {
             throw new OperationException(ErrorCode.ALREADY_ISSUED,
                     "certificate with the same subject as CA is not allowed");

@@ -59,6 +59,7 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
 import org.bouncycastle.asn1.isismtt.x509.Admissions;
 import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
+import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -131,6 +132,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
 
     private Map<ASN1ObjectIdentifier, SubjectDNOption> subjectDNOptions;
     private Set<RDNControl> subjectDNControls;
+    private Map<ASN1ObjectIdentifier, String> subjectDNGroups;
     private Map<String, String> parameters;
     private Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
 
@@ -323,6 +325,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
 
             this.subjectDNControls = new HashSet<RDNControl>();
             this.subjectDNOptions = new HashMap<>();
+            this.subjectDNGroups = new HashMap<>();
 
             for(RdnType t : subject.getRdn())
             {
@@ -346,6 +349,11 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                 SubjectDNOption option = new SubjectDNOption(t.getPrefix(), t.getSuffix(), patterns,
                         t.getMinLen(), t.getMaxLen());
                 this.subjectDNOptions.put(type, option);
+                String g = t.getGroup();
+                if(StringUtil.isNotBlank(g))
+                {
+                    this.subjectDNGroups.put(type, g);
+                }
             }
         }
 
@@ -624,6 +632,44 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                     rdns.add(createSubjectRDN(value, type, control, i++));
                 }
             }
+        }
+
+        if(CollectionUtil.isNotEmpty(subjectDNGroups))
+        {
+            Set<String> consideredGroups = new HashSet<>();
+            final int n = rdns.size();
+
+            List<RDN> newRdns = new ArrayList<>(rdns.size());
+            for(int i = 0; i < n; i++)
+            {
+                RDN rdn = rdns.get(i);
+                ASN1ObjectIdentifier type = rdn.getFirst().getType();
+                String group = subjectDNGroups.get(type);
+                if(group == null)
+                {
+                    newRdns.add(rdn);
+                }
+                else if(consideredGroups.contains(group) == false)
+                {
+                    List<AttributeTypeAndValue> atvs = new LinkedList<>();
+                    atvs.add(rdn.getFirst());
+                    for(int j = i + 1; j < n; j++)
+                    {
+                        RDN rdn2 = rdns.get(j);
+                        ASN1ObjectIdentifier type2 = rdn2.getFirst().getType();
+                        String group2 = subjectDNGroups.get(type2);
+                        if(group.equals(group2))
+                        {
+                            atvs.add(rdn2.getFirst());
+                        }
+                    }
+
+                    newRdns.add(new RDN(atvs.toArray(new AttributeTypeAndValue[0])));
+                    consideredGroups.add(group);
+                }
+            }
+
+            rdns = newRdns;
         }
 
         X500Name grantedSubject = new X500Name(rdns.toArray(new RDN[0]));

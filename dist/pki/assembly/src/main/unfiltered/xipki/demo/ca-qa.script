@@ -144,6 +144,12 @@ xipki-qa:check-cert \
   --p10 output/multipleOUs2.p10 \
   --cert output/multipleOUs2.der
 
+xipki-qa:check-cert \
+  --issuer SubCAwithCRL \
+  --profile multiValuedRDN \
+  --p10 output/multiValuedRDN1.p10 \
+  --cert output/multiValuedRDN1.der
+
 ## SubCA
 xipki-qa:check-cert \
   --issuer SubCA \

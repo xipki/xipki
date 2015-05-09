@@ -223,6 +223,10 @@ xipki-ca:caprofile-add \
   --ca SubCAwithCRL1 \
   --profile multipleOUs
 
+xipki-ca:caprofile-add \
+  --ca SubCAwithCRL1 \
+  --profile multiValuedRDN
+
 ## Add CMP requestor to CA
 xipki-ca:careq-add \
   --requestor requestor1 \

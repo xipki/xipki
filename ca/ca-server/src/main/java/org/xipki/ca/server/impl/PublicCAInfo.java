@@ -63,6 +63,7 @@ class PublicCAInfo
 {
     private final X500Principal subject;
     private final X500Name x500Subject;
+    private final String c14nSubject;
     private final byte[] subjectKeyIdentifier;
     private final GeneralNames  subjectAltName;
     private final BigInteger serialNumber;
@@ -86,6 +87,7 @@ class PublicCAInfo
         this.serialNumber = caCertificate.getSerialNumber();
         this.subject = caCertificate.getSubjectX500Principal();
         this.x500Subject = X500Name.getInstance(subject.getEncoded());
+        this.c14nSubject = X509Util.canonicalizName(x500Subject);
         try
         {
             this.subjectKeyIdentifier = X509Util.extractSKI(caCertificate);
@@ -131,6 +133,7 @@ class PublicCAInfo
 
         this.caCertificate = null;
         this.x500Subject = subject;
+        this.c14nSubject = X509Util.canonicalizName(subject);
         try
         {
             this.subject = new X500Principal(subject.getEncoded());
@@ -201,6 +204,11 @@ class PublicCAInfo
     public X500Name getX500Subject()
     {
         return x500Subject;
+    }
+
+    public String getC14nSubject()
+    {
+        return c14nSubject;
     }
 
     public GeneralNames getSubjectAltName()

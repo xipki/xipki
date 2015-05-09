@@ -150,6 +150,33 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/SubCAwithCRL1.der \
   --ca-cert output/RCA1.der
 
+# Certificate multiValuedRDN
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out output/multiValuedRDN1.p12 \
+  --subject "CN=multiValuedRDN1,OU=A12345,O=xipki,C=DE"
+
+## Create the PKCS#10 request for the command caqa:check-cert in QA 
+xipki-tk:req-p12 \
+  --p12 output/multiValuedRDN1.p12 \
+  --password 1234 \
+  --out output/multiValuedRDN1.p10 \
+  --subject "CN=multiValuedRDN1,OU=A12345,O=xipki,C=DE"
+
+xipki-cli:enroll-p12 \
+  --p12 output/multiValuedRDN1.p12 \
+  --password 1234 \
+  --out output/multiValuedRDN1.der \
+  --profile multiValuedRDN \
+  --user USER-O
+
+xipki-tk:update-cert-p12 \
+  --p12 output/multiValuedRDN1.p12 \
+  --password 1234 \
+  --cert output/multiValuedRDN1.der \
+  --ca-cert output/SubCAwithCRL1.der \
+  --ca-cert output/RCA1.der
+
 # Certificate DEMO1
 xipki-tk:rsa-p12 \
   --password 1234 \
