@@ -194,6 +194,10 @@ public class ProfileConfCreatorDemo
             profile = Certprofile_MultipleOUs();
             marshall(m, profile, "Certprofile_multipleOUs.xml");
 
+            //multiple-valued RDN
+            profile = Certprofile_MultipleValuedRDN();
+            marshall(m, profile, "Certprofile_multiValuedRDN.xml");
+
         }catch(Exception e)
         {
             e.printStackTrace();
@@ -829,6 +833,56 @@ public class ProfileConfCreatorDemo
         return profile;
     }
 
+    /*
+     * O and OU in one RDN
+     */
+    private static X509ProfileType Certprofile_MultipleValuedRDN()
+    throws Exception
+    {
+        X509ProfileType profile = getBaseProfile("Certprofile Multiple Valued RDN", false, "5y", false,
+                new String[]{"SHA1"});
+
+        // Subject
+        Subject subject = profile.getSubject();
+        subject.setIncSerialNumber(false);
+
+        List<RdnType> rdnControls = subject.getRdn();
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null, null, null, "group1"));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 1, 1, null, null, null, "group1"));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+
+        // Extensions
+        // Extensions - general
+        ExtensionsType extensions = profile.getExtensions();
+        List<ExtensionType> list = extensions.getExtension();
+
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+        list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+        // Extensions - basicConstraints
+        ExtensionValueType extensionValue = null;
+        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
+
+        // Extensions - AuthorityKeyIdentifier
+        extensionValue = createAuthorityKeyIdentifier(true);
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
+
+        // Extensions - keyUsage
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.CONTENT_COMMITMENT},
+                null);
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
+
+        return profile;
+    }
+
     private static RdnType createRDN(
             final ASN1ObjectIdentifier type,
             final int min,
@@ -844,6 +898,18 @@ public class ProfileConfCreatorDemo
             final String[] regexArrays,
             final String prefix,
             final String suffix)
+    {
+        return createRDN(type, min, max, regexArrays, prefix, suffix, null);
+    }
+
+    private static RdnType createRDN(
+            final ASN1ObjectIdentifier type,
+            final int min,
+            final int max,
+            final String[] regexArrays,
+            final String prefix,
+            final String suffix,
+            String group)
     {
         RdnType ret = new RdnType();
         ret.setType(createOidType(type));
@@ -870,6 +936,11 @@ public class ProfileConfCreatorDemo
         if(StringUtil.isNotBlank(suffix))
         {
             ret.setSuffix(suffix);
+        }
+
+        if(StringUtil.isNotBlank(group))
+        {
+            ret.setGroup(group);
         }
 
         return ret;

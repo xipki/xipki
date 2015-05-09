@@ -171,6 +171,7 @@ import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.security.api.ExtensionExistence;
 
@@ -203,6 +204,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
     private Map<ASN1ObjectIdentifier, SubjectDNOption> subjectDNOptions;
     private Set<RDNControl> subjectDNControls;
+    private Map<ASN1ObjectIdentifier, String> subjectDNGroups;
     private Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
 
     private CertValidity validity;
@@ -289,6 +291,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
                 this.subjectDNControls = new HashSet<RDNControl>();
                 this.subjectDNOptions = new HashMap<>();
+                this.subjectDNGroups = new HashMap<>();
 
                 for(RdnType t : subject.getRdn())
                 {
@@ -313,6 +316,17 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                     SubjectDNOption option = new SubjectDNOption(t.getPrefix(), t.getSuffix(), patterns,
                             t.getMinLen(), t.getMaxLen());
                     this.subjectDNOptions.put(type, option);
+                    String g = t.getGroup();
+                    if(StringUtil.isNotBlank(g))
+                    {
+                        if(occ.getMaxOccurs() > 1)
+                        {
+                            throw new CertprofileException(
+                                    "maxOccurs greather than 1 is not not allowed if attribute group is set");
+                        }
+
+                        this.subjectDNGroups.put(type, g);
+                    }
                 }
             }
 
@@ -1265,6 +1279,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
 
         List<ValidationIssue> result = new LinkedList<>();
+
         for(ASN1ObjectIdentifier type : oids)
         {
             ValidationIssue issue = checkSubjectAttribute(type, subject, requestedSubject);
@@ -1275,6 +1290,22 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
     }
 
     private ValidationIssue checkSubjectAttribute(
+            final ASN1ObjectIdentifier type,
+            final X500Name subject,
+            final X500Name requestedSubject)
+    {
+        boolean multiValuedRdn = StringUtil.isNotBlank(subjectDNGroups.get(type));
+        if(multiValuedRdn)
+        {
+            return checkSubjectAttributeMultiValued(type, subject, requestedSubject);
+        }
+        else
+        {
+            return checkSubjectAttributeNotMultiValued(type, subject, requestedSubject);
+        }
+    }
+
+    private ValidationIssue checkSubjectAttributeNotMultiValued(
             final ASN1ObjectIdentifier type,
             final X500Name subject,
             final X500Name requestedSubject)
@@ -1431,6 +1462,229 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                     if(matches == false)
                     {
                         failureMsg.append("RDN + [" + i + "] '" + coreAtvTextValue+
+                                "' is not valid against regex '" + pattern.pattern() + "'");
+                        failureMsg.append("; ");
+                        continue;
+                    }
+                }
+            }
+
+            if(CollectionUtil.isEmpty(requestedCoreAtvTextValues))
+            {
+                if(type.equals(ObjectIdentifiers.DN_SERIALNUMBER) == false)
+                {
+                    failureMsg.append("is present but not contained in the request");
+                    failureMsg.append("; ");
+                }
+            } else
+            {
+                String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(i);
+                if(ObjectIdentifiers.DN_CN.equals(type) &&
+                        specialBehavior != null &&
+                        "gematik_gSMC_K".equals(specialBehavior))
+                {
+                    if(coreAtvTextValue.startsWith(requestedCoreAtvTextValue + "-") == false)
+                    {
+                        failureMsg.append("content '" + coreAtvTextValue + "' does not start with '" +
+                                requestedCoreAtvTextValue + "-'");
+                        failureMsg.append("; ");
+                    }
+                }
+                else if(type.equals(ObjectIdentifiers.DN_SERIALNUMBER))
+                {
+                }
+                else
+                {
+                    if(coreAtvTextValue.equals(requestedCoreAtvTextValue) == false)
+                    {
+                        failureMsg.append("content '" + coreAtvTextValue + "' but expected '" +
+                                requestedCoreAtvTextValue + "'");
+                        failureMsg.append("; ");
+                    }
+                }
+            }
+        }
+
+        int n = failureMsg.length();
+        if(n > 2)
+        {
+            failureMsg.delete(n - 2, n);
+            issue.setFailureMessage(failureMsg.toString());
+        }
+
+        return issue;
+    }
+
+    private ValidationIssue checkSubjectAttributeMultiValued(
+            final ASN1ObjectIdentifier type,
+            final X500Name subject,
+            final X500Name requestedSubject)
+    {
+        ValidationIssue issue = createSubjectIssue(type);
+
+        // control        
+        int minOccurs;
+        int maxOccurs;
+        RDNControl rdnControl = getSubjectDNControl(type);
+        if(rdnControl == null)
+        {
+            minOccurs = 0;
+            maxOccurs = 0;
+        } else
+        {
+            minOccurs = rdnControl.getMinOccurs();
+            maxOccurs = rdnControl.getMaxOccurs();
+        }
+
+        RDN[] rdns = subject.getRDNs(type);
+        int rdnsSize = rdns == null ? 0 : rdns.length;
+
+        RDN[] requestedRdns = requestedSubject.getRDNs(type);
+
+        if(rdnsSize != 1)
+        {
+            if(rdnsSize == 0)
+            {
+                // check optional attribute but is present in requestedSubject
+                if(requestedRdns != null && requestedRdns.length > 0)
+                {
+                    issue.setFailureMessage("is absent but expected present");
+                }
+            }
+            else
+            {
+                issue.setFailureMessage("number of RDNs '" + rdnsSize +
+                        "' is not 1");
+            }
+            return issue;
+        }
+
+        SubjectDNOption rdnOption = subjectDNOptions.get(type);
+
+        // check the encoding
+        DirectoryStringType stringType = rdnControl.getDirectoryStringEnum();
+        if(stringType == null)
+        {
+            if(ObjectIdentifiers.DN_C.equals(type) || ObjectIdentifiers.DN_SERIALNUMBER.equals(type))
+            {
+                stringType = DirectoryStringType.printableString;
+            } else
+            {
+                stringType = DirectoryStringType.utf8String;
+            }
+        }
+
+        List<String> requestedCoreAtvTextValues = new LinkedList<>();
+        if(requestedRdns != null)
+        {
+            for(RDN requestedRdn : requestedRdns)
+            {
+                String textValue = X509Util.rdnValueToString(requestedRdn.getFirst().getValue());
+                requestedCoreAtvTextValues.add(textValue);
+            }
+
+            if(rdnOption != null && rdnOption.getPatterns() != null)
+            {
+                // sort the requestedRDNs
+                requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues, rdnOption.getPatterns());
+            }
+        }
+
+        StringBuilder failureMsg = new StringBuilder();
+
+        AttributeTypeAndValue[] l = rdns[0].getTypesAndValues();
+        List<AttributeTypeAndValue> atvs = new LinkedList<>();
+        for(AttributeTypeAndValue m : l)
+        {
+            if(type.equals(m.getType()))
+            {
+                atvs.add(m);
+            }
+        }
+
+        final int atvsSize = atvs.size();
+        if(atvsSize < minOccurs || atvsSize > maxOccurs)
+        {
+            issue.setFailureMessage("number of AttributeTypeAndValuess '" + atvsSize +
+                    "' is not within [" + minOccurs + ", " + maxOccurs + "]");
+            return issue;
+        }
+
+        for(int i = 0; i < atvsSize; i++)
+        {
+            AttributeTypeAndValue atv = atvs.get(i);
+            ASN1Encodable atvValue = atv.getValue();
+            boolean correctStringType = true;
+            switch(stringType)
+            {
+            case bmpString:
+                correctStringType = (atvValue instanceof DERBMPString);
+                break;
+            case printableString:
+                correctStringType = (atvValue instanceof DERPrintableString);
+                break;
+            case teletexString:
+                correctStringType = (atvValue instanceof DERT61String);
+                break;
+            case utf8String:
+                correctStringType = (atvValue instanceof DERUTF8String);
+                break;
+            default:
+                throw new RuntimeException("should not reach here, unknown DirectoryStringType " + stringType);
+            } // end switch
+
+            if(correctStringType == false)
+            {
+                failureMsg.append("RDN + [" + i + "] is not of type DirectoryString." + stringType.name());
+                failureMsg.append("; ");
+                continue;
+            }
+
+            String atvTextValue = X509Util.rdnValueToString(atvValue);
+            String coreAtvTextValue = atvTextValue;
+
+            if(rdnOption != null)
+            {
+                String prefix = rdnOption.getPrefix();
+                if(prefix != null)
+                {
+                    if(coreAtvTextValue.startsWith(prefix) == false)
+                    {
+                        failureMsg.append("RDN + [" + i + "] '" + atvTextValue+
+                                "' does not start with prefix '" + prefix + "'");
+                        failureMsg.append("; ");
+                        continue;
+                    }
+                    else
+                    {
+                        coreAtvTextValue = coreAtvTextValue.substring(prefix.length());
+                    }
+                }
+
+                String suffix = rdnOption.getSufix();
+                if(suffix != null)
+                {
+                    if(coreAtvTextValue.endsWith(suffix) == false)
+                    {
+                        failureMsg.append("RDN + [" + i + "] '" + atvTextValue+
+                                "' does not end with suffx '" + suffix + "'");
+                        failureMsg.append("; ");
+                        continue;
+                    }
+                    else
+                    {
+                        coreAtvTextValue = coreAtvTextValue.substring(0, coreAtvTextValue.length() - suffix.length());
+                    }
+                }
+
+                List<Pattern> patterns = rdnOption.getPatterns();
+                if(patterns != null)
+                {
+                    Pattern pattern = patterns.get(i);
+                    boolean matches = pattern.matcher(coreAtvTextValue).matches();
+                    if(matches == false)
+                    {
+                        failureMsg.append("AttributeTypeAndValue + [" + i + "] '" + coreAtvTextValue+
                                 "' is not valid against regex '" + pattern.pattern() + "'");
                         failureMsg.append("; ");
                         continue;

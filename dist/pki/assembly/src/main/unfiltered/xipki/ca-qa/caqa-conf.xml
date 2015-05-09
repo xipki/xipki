@@ -44,6 +44,9 @@
     <X509Certprofile name="multipleOUs">
       <file>xipki/demo/profile/Certprofile_multipleOUs.xml</file>
     </X509Certprofile>
+    <X509Certprofile name="multiValuedRDN">
+      <file>xipki/demo/profile/Certprofile_multiValuedRDN.xml</file>
+    </X509Certprofile>
     <X509Certprofile name="TLS">
       <file>xipki/demo/profile/Certprofile_TLS.xml</file>
     </X509Certprofile>

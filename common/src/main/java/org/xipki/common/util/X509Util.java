@@ -68,6 +68,7 @@ import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERUniversalString;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
@@ -99,7 +100,24 @@ public class X509Util
         RDN[] rdns = name.getRDNs(ObjectIdentifiers.DN_CN);
         if(rdns != null && rdns.length > 0)
         {
-            return rdnValueToString(rdns[0].getFirst().getValue());
+            RDN rdn = rdns[0];
+            AttributeTypeAndValue atv = null;
+            if(rdn.isMultiValued())
+            {
+                for(AttributeTypeAndValue m : rdn.getTypesAndValues())
+                {
+                    if(m.getType().equals(ObjectIdentifiers.DN_CN))
+                    {
+                        atv = m;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                atv = rdn.getFirst();
+            }
+            return atv == null ? null : rdnValueToString(atv.getValue());
         }
         return null;
     }
@@ -335,15 +353,38 @@ public class X509Util
             sb.append(type).append("=");
             RDN[] rdns = name.getRDNs(new ASN1ObjectIdentifier(type));
 
+            List<String> values = new ArrayList<>(1);
             for(int j = 0; j < rdns.length; j++)
             {
-                if(j > 0)
-                {
-                    sb.append(";");
-                }
                 RDN rdn = rdns[j];
-                String textValue = IETFUtils.valueToString(rdn.getFirst().getValue()).toLowerCase();
-                sb.append(textValue);
+                if(rdn.isMultiValued())
+                {
+                    AttributeTypeAndValue[] atvs = rdn.getTypesAndValues();
+                    for(AttributeTypeAndValue atv : atvs)
+                    {
+                        if(type.equals(atv.getType().getId()))
+                        {
+                            String textValue = IETFUtils.valueToString(atv.getValue()).toLowerCase();
+                            values.add(textValue);
+                        }
+                    }
+                }
+                else
+                {
+                    String textValue = IETFUtils.valueToString(rdn.getFirst().getValue()).toLowerCase();
+                    values.add(textValue);
+                }
+            }
+
+            sb.append(values.get(0));
+
+            final int n2 = values.size();
+            if(n2 > 1)
+            {
+                for(int j = 1; j < n2; j++)
+                {
+                    sb.append(";").append(values.get(j));
+                }
             }
         }
 
