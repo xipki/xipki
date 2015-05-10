@@ -1280,10 +1280,57 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
         List<ValidationIssue> result = new LinkedList<>();
 
+        ValidationIssue issue = new ValidationIssue("X509.SUBJECT.group", "X509 subject RDN group");
+        result.add(issue);
+        if(CollectionUtil.isNotEmpty(subjectDNGroups))
+        {
+            Set<String> groups = new HashSet<>(subjectDNGroups.values());
+            for(String g : groups)
+            {
+                boolean toBreak = false;
+                RDN rdn = null;
+                for(ASN1ObjectIdentifier type : subjectDNGroups.keySet())
+                {
+                    if(subjectDNGroups.get(type).equals(g) == false)
+                    {
+                        continue;
+                    }
+
+                    RDN[] rdns = subject.getRDNs(type);
+                    if(rdns == null || rdns.length == 0)
+                    {
+                        continue;
+                    }
+
+                    if(rdns.length > 1)
+                    {
+                        issue.setFailureMessage("AttributeTypeAndValues of group " + g + " is not in one RDN");
+                        toBreak = true;
+                        break;
+                    }
+
+                    if(rdn == null)
+                    {
+                        rdn = rdns[0];
+                    }
+                    else if(rdn != rdns[0])
+                    {
+                        issue.setFailureMessage("AttributeTypeAndValues of group " + g + " is not in one RDN");
+                        toBreak = true;
+                        break;
+                    }
+                }
+
+                if(toBreak)
+                {
+                    break;
+                }
+            }
+        }
+
         for(ASN1ObjectIdentifier type : oids)
         {
-            ValidationIssue issue = checkSubjectAttribute(type, subject, requestedSubject);
-            result.add(issue);
+            result.add(checkSubjectAttribute(type, subject, requestedSubject));
         }
 
         return result;
