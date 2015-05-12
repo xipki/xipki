@@ -211,6 +211,12 @@ xipki-qa:check-cert \
   --p10 output/gSMC_K2.p10 \
   --cert output/gSMC_K2.der
 
+xipki-qa:check-cert \
+  --issuer SubCA \
+  --profile EE.Complex \
+  --p10 output/EE.Complex1.p10 \
+  --cert output/EE.Complex1.der
+
 #################################################################
 #              UNINSTALL UNNEEDED FEATURES                      #
 #################################################################

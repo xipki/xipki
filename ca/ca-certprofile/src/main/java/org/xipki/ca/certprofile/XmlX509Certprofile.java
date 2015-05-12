@@ -49,6 +49,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -86,6 +87,7 @@ import org.xipki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.ca.api.profile.x509.X509CertUtil;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
+import org.xipki.ca.certprofile.x509.jaxb.AdditionalInformation;
 import org.xipki.ca.certprofile.x509.jaxb.Admission;
 import org.xipki.ca.certprofile.x509.jaxb.AuthorityInfoAccess;
 import org.xipki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier;
@@ -103,9 +105,11 @@ import org.xipki.ca.certprofile.x509.jaxb.OidWithDescType;
 import org.xipki.ca.certprofile.x509.jaxb.PolicyConstraints;
 import org.xipki.ca.certprofile.x509.jaxb.PolicyMappings;
 import org.xipki.ca.certprofile.x509.jaxb.RdnType;
+import org.xipki.ca.certprofile.x509.jaxb.Restriction;
 import org.xipki.ca.certprofile.x509.jaxb.SubjectAltName;
 import org.xipki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
 import org.xipki.ca.certprofile.x509.jaxb.SubjectInfoAccess.Access;
+import org.xipki.ca.certprofile.x509.jaxb.ValidityModel;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Parameters;
@@ -162,6 +166,9 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     private ExtensionValue policyConstraints;
     private ExtensionValue inhibitAnyPolicy;
     private ExtensionValue admission;
+    private ExtensionValue restriction;
+    private ExtensionValue additionalInformation;
+    private ExtensionValue validityModel;
 
     private Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions;
 
@@ -557,6 +564,48 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             }
         }
 
+        // restriction
+        type = ObjectIdentifiers.id_extension_restriction;
+        if(extensionControls.containsKey(type))
+        {
+            Restriction extConf = (Restriction) getExtensionValue(
+                    type, extensionsType, Restriction.class);
+            if(extConf != null)
+            {
+                DirectoryStringType stringType = XmlX509CertprofileUtil.convertDirectoryStringType(extConf.getType());
+                ASN1Encodable extValue = stringType.createDirectoryString(extConf.getText());
+                restriction = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+            }
+        }
+
+        // additionalInformation
+        type = ObjectIdentifiers.id_extension_additionalInformation;
+        if(extensionControls.containsKey(type))
+        {
+            AdditionalInformation extConf = (AdditionalInformation) getExtensionValue(
+                    type, extensionsType, AdditionalInformation.class);
+            if(extConf != null)
+            {
+                DirectoryStringType stringType = XmlX509CertprofileUtil.convertDirectoryStringType(extConf.getType());
+                ASN1Encodable extValue = stringType.createDirectoryString(extConf.getText());
+                additionalInformation = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+            }
+        }
+
+        // validityModel
+        type = ObjectIdentifiers.id_extension_validityModel;
+        if(extensionControls.containsKey(type))
+        {
+            ValidityModel extConf = (ValidityModel) getExtensionValue(
+                    type, extensionsType, ValidityModel.class);
+            if(extConf != null)
+            {
+                ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(extConf.getModelId().getValue());
+                ASN1Encodable extValue = new DERSequence(oid);
+                validityModel = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+            }
+        }
+
         // constant extensions
         this.constantExtensions = XmlX509CertprofileUtil.buildConstantExtesions(extensionsType);
     }
@@ -884,6 +933,27 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         // OCSP Nocheck
         // processed by the CA
 
+        // restriction
+        type = ObjectIdentifiers.id_extension_restriction;
+        if(restriction != null && occurences.remove(type) != null)
+        {
+            values.addExtension(type, restriction);
+        }
+
+        // additionalInformation
+        type = ObjectIdentifiers.id_extension_additionalInformation;
+        if(additionalInformation != null && occurences.remove(type) != null)
+        {
+            values.addExtension(type, additionalInformation);
+        }
+
+        // validityModel
+        type = ObjectIdentifiers.id_extension_validityModel;
+        if(validityModel != null && occurences.remove(type) != null)
+        {
+            values.addExtension(type, validityModel);
+        }
+
         // constant extensions
         if(constantExtensions != null)
         {
@@ -1116,6 +1186,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             else if(ConstantExtValue.class.isAssignableFrom(o.getClass()))
             {
                 // will be processed later
+                return null;
             }
             else
             {

@@ -59,6 +59,7 @@ import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.w3c.dom.Element;
 import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.ca.certprofile.XmlX509Certprofile;
+import org.xipki.ca.certprofile.x509.jaxb.AdditionalInformation;
 import org.xipki.ca.certprofile.x509.jaxb.Admission;
 import org.xipki.ca.certprofile.x509.jaxb.AlgorithmType;
 import org.xipki.ca.certprofile.x509.jaxb.AnyType;
@@ -69,6 +70,7 @@ import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies;
 import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType;
 import org.xipki.ca.certprofile.x509.jaxb.ConstantExtValue;
 import org.xipki.ca.certprofile.x509.jaxb.DSAParameters;
+import org.xipki.ca.certprofile.x509.jaxb.DirectoryStringType;
 import org.xipki.ca.certprofile.x509.jaxb.ECParameters;
 import org.xipki.ca.certprofile.x509.jaxb.ECParameters.Curves;
 import org.xipki.ca.certprofile.x509.jaxb.ECParameters.PointEncodings;
@@ -96,9 +98,11 @@ import org.xipki.ca.certprofile.x509.jaxb.RSAParameters;
 import org.xipki.ca.certprofile.x509.jaxb.RangeType;
 import org.xipki.ca.certprofile.x509.jaxb.RangesType;
 import org.xipki.ca.certprofile.x509.jaxb.RdnType;
+import org.xipki.ca.certprofile.x509.jaxb.Restriction;
 import org.xipki.ca.certprofile.x509.jaxb.SubjectAltName;
 import org.xipki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
 import org.xipki.ca.certprofile.x509.jaxb.UsageType;
+import org.xipki.ca.certprofile.x509.jaxb.ValidityModel;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Parameters;
@@ -173,6 +177,10 @@ public class ProfileConfCreatorDemo
             // OCSP
             profile = Certprofile_OCSP();
             marshall(m, profile, "Certprofile_OCSP.xml");
+
+            // EE_Complex
+            profile = Certprofile_EE_complex();
+            marshall(m, profile, "Certprofile_EE_Complex.xml");
 
             // TLS
             profile = Certprofile_TLS();
@@ -470,7 +478,7 @@ public class ProfileConfCreatorDemo
 
         // Custom Extension
         ASN1ObjectIdentifier customExtensionOid = new ASN1ObjectIdentifier("1.2.3.4");
-        extensionValue = createConstantExtValue(DERNull.INSTANCE.getEncoded());
+        extensionValue = createConstantExtValue(DERNull.INSTANCE.getEncoded(), "DER Null");
         list.add(createExtension(customExtensionOid, true, false, extensionValue, "custom extension 1"));
 
         return profile;
@@ -1077,6 +1085,35 @@ public class ProfileConfCreatorDemo
         return createExtensionValueType(extValue);
     }
 
+    private static ExtensionValueType createRestriction(
+            final DirectoryStringType type,
+            final String text)
+    {
+        Restriction extValue = new Restriction();
+        extValue.setType(type);
+        extValue.setText(text);
+        return createExtensionValueType(extValue);
+    }
+
+    private static ExtensionValueType createAdditionalInformation(
+            final DirectoryStringType type,
+            final String text)
+    {
+        AdditionalInformation extValue = new AdditionalInformation();
+        extValue.setType(type);
+        extValue.setText(text);
+        return createExtensionValueType(extValue);
+    }
+
+    @SuppressWarnings("unused")
+    private static ExtensionValueType createValidityModel(
+            OidWithDescType modelId)
+    {
+        ValidityModel extValue = new ValidityModel();
+        extValue.setModelId(modelId);
+        return createExtensionValueType(extValue);
+    }
+
     private static ExtensionValueType createCertificatePolicies(
             final ASN1ObjectIdentifier... policyOids)
     {
@@ -1181,10 +1218,15 @@ public class ProfileConfCreatorDemo
     }
 
     private static ExtensionValueType createConstantExtValue(
-            final byte[] bytes)
+            final byte[] bytes,
+            final String desc)
     {
         ConstantExtValue extValue = new ConstantExtValue();
         extValue.setValue(bytes);
+        if(StringUtil.isNotBlank(desc))
+        {
+            extValue.setDescription(desc);
+        }
         return createExtensionValueType(extValue);
     }
 
@@ -1392,6 +1434,78 @@ public class ProfileConfCreatorDemo
         KeyParametersType ret = new KeyParametersType();
         ret.setAny(object);
         return ret;
+    }
+
+    private static X509ProfileType Certprofile_EE_complex()
+    throws Exception
+    {
+        X509ProfileType profile = getBaseProfile("Certprofile EE complex", false, "5y", true,
+                new String[]{"SHA1"});
+
+	    // Subject
+        Subject subject = profile.getSubject();
+        subject.setIncSerialNumber(false);
+
+        List<RdnType> rdnControls = subject.getRdn();
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+
+	    // Extensions
+	    // Extensions - general
+        ExtensionsType extensions = profile.getExtensions();
+
+	    // Extensions - controls
+        List<ExtensionType> list = extensions.getExtension();
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+        list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+	    // Extensions - basicConstraints
+        ExtensionValueType extensionValue = null;
+        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+	    // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
+
+	    // Extensions - AuthorityKeyIdentifier
+        extensionValue = createAuthorityKeyIdentifier(true);
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
+
+	    // Extensions - keyUsage
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.DATA_ENCIPHERMENT,
+                        KeyUsageEnum.KEY_ENCIPHERMENT},
+                null);
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
+
+	    // Extensions - extenedKeyUsage
+        extensionValue = createExtendedKeyUsage(new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_serverAuth},
+                new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth});
+        list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
+
+	    // Admission
+        extensionValue = createAdmission(new ASN1ObjectIdentifier("1.1.1.2"), "demo item");
+        list.add(createExtension(ObjectIdentifiers.id_extension_admission, true, false, extensionValue));
+
+	    // restriction
+        extensionValue = createRestriction(DirectoryStringType.UTF_8_STRING, "demo restriction");
+        list.add(createExtension(ObjectIdentifiers.id_extension_restriction, true, false, extensionValue));
+
+	    // additionalInformation
+        extensionValue = createAdditionalInformation(DirectoryStringType.UTF_8_STRING, "demo additional information");
+        list.add(createExtension(ObjectIdentifiers.id_extension_additionalInformation, true, false, extensionValue));
+
+	    // validationModel
+        extensionValue = createConstantExtValue(
+                new ASN1ObjectIdentifier("1.3.6.1.4.1.8301.3.5.1").getEncoded(), "chain");
+        list.add(createExtension(ObjectIdentifiers.id_extension_validityModel,
+                true, false, extensionValue));
+
+        return profile;
     }
 
 }

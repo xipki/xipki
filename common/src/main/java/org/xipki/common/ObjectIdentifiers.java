@@ -313,6 +313,9 @@ public class ObjectIdentifiers
 
     public static final ASN1ObjectIdentifier id_kp_ocsp              = id_pkix.branch("1.48.1");
     public static final ASN1ObjectIdentifier id_extension_pkix_ocsp_nocheck = id_pkix.branch("48.1.5");
+    public static final ASN1ObjectIdentifier id_extension_restriction = new ASN1ObjectIdentifier("1.3.36.8.3.8");
+    public static final ASN1ObjectIdentifier id_extension_additionalInformation = new ASN1ObjectIdentifier("1.3.36.8.3.15");
+    public static final ASN1ObjectIdentifier id_extension_validityModel = new ASN1ObjectIdentifier("1.3.6.1.4.1.8301.3.5");
 
     public static final ASN1ObjectIdentifier id_extension_admission = new ASN1ObjectIdentifier("1.3.36.8.3.3");
 
@@ -378,12 +381,15 @@ public class ObjectIdentifiers
         oidNameMap.put(id_pkix_ocsp_extendedRevoke, "id-pkix-ocsp-extendedRevoke");
         oidNameMap.put(id_pkix_ocsp_prefSigAlgs, "id-pkix-ocsp-prefSigAlgs");
         oidNameMap.put(id_tsl_kp_tslSigning, "id-tsl-kp-tslSigning");
-        oidNameMap.put(id_extension_pkix_ocsp_nocheck, "id-pkix-ocsp-nocheck");
+        oidNameMap.put(id_extension_pkix_ocsp_nocheck, "pkix-ocsp-nocheck");
+        oidNameMap.put(id_extension_restriction, "restriction");
+        oidNameMap.put(id_extension_additionalInformation, "additionalInformation");
+        oidNameMap.put(id_extension_admission, "admission");
+        oidNameMap.put(id_extension_validityModel, "validityModel");
+
         oidNameMap.put(anyExtendedKeyUsage, "anyExtendedKeyUsage");
         oidNameMap.put(id_ad_caRepository, "id-ad-caRepository");
         oidNameMap.put(id_ad_timeStamping, "id-ad-timeStamping");
-
-        oidNameMap.put(ObjectIdentifiers.id_extension_admission, "admission");
         oidNameMap.put(Extension.auditIdentity, "auditIdentity");
         oidNameMap.put(Extension.authorityInfoAccess, "authorityInfoAccess");
         oidNameMap.put(Extension.authorityKeyIdentifier, "authorityKeyIdentifier");
