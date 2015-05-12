@@ -61,6 +61,7 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.ASN1String;
@@ -128,6 +129,7 @@ import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.api.profile.x509.X509Certprofile;
 import org.xipki.ca.certprofile.SubjectDNOption;
 import org.xipki.ca.certprofile.XmlX509CertprofileUtil;
+import org.xipki.ca.certprofile.x509.jaxb.AdditionalInformation;
 import org.xipki.ca.certprofile.x509.jaxb.Admission;
 import org.xipki.ca.certprofile.x509.jaxb.ConstantExtValue;
 import org.xipki.ca.certprofile.x509.jaxb.ExtendedKeyUsage;
@@ -139,9 +141,11 @@ import org.xipki.ca.certprofile.x509.jaxb.PolicyMappings;
 import org.xipki.ca.certprofile.x509.jaxb.RangeType;
 import org.xipki.ca.certprofile.x509.jaxb.RangesType;
 import org.xipki.ca.certprofile.x509.jaxb.RdnType;
+import org.xipki.ca.certprofile.x509.jaxb.Restriction;
 import org.xipki.ca.certprofile.x509.jaxb.SubjectAltName;
 import org.xipki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
 import org.xipki.ca.certprofile.x509.jaxb.SubjectInfoAccess.Access;
+import org.xipki.ca.certprofile.x509.jaxb.ValidityModel;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
 import org.xipki.ca.qa.api.X509CertprofileQA;
@@ -149,6 +153,7 @@ import org.xipki.ca.qa.api.X509IssuerInfo;
 import org.xipki.ca.qa.impl.internal.QaAdmission;
 import org.xipki.ca.qa.impl.internal.QaCertificatePolicies;
 import org.xipki.ca.qa.impl.internal.QaCertificatePolicies.QaCertificatePolicyInformation;
+import org.xipki.ca.qa.impl.internal.QaDirectoryString;
 import org.xipki.ca.qa.impl.internal.QaExtensionValue;
 import org.xipki.ca.qa.impl.internal.QaGeneralSubtree;
 import org.xipki.ca.qa.impl.internal.QaInhibitAnyPolicy;
@@ -226,6 +231,9 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
     private QaPolicyConstraints policyConstraints;
     private QaInhibitAnyPolicy inhibitAnyPolicy;
     private QaAdmission admission;
+    private QaDirectoryString restriction;
+    private QaDirectoryString additionalInformation;
+    private ASN1ObjectIdentifier validityModelId;
 
     private Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
 
@@ -342,7 +350,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             {
                 org.xipki.ca.certprofile.x509.jaxb.BasicConstraints extConf =
                         (org.xipki.ca.certprofile.x509.jaxb.BasicConstraints)
-                            getExtensionValue(type, extensionsType);
+                            getExtensionValue(type, extensionsType,
+                                    org.xipki.ca.certprofile.x509.jaxb.BasicConstraints.class);
                 if(extConf != null)
                 {
                     this.pathLen = extConf.getPathLen();
@@ -355,7 +364,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             {
                 org.xipki.ca.certprofile.x509.jaxb.KeyUsage extConf =
                         (org.xipki.ca.certprofile.x509.jaxb.KeyUsage)
-                            getExtensionValue(type, extensionsType);
+                            getExtensionValue(type, extensionsType,
+                                    org.xipki.ca.certprofile.x509.jaxb.KeyUsage.class);
                 if(extConf != null)
                 {
                     this.keyusages = XmlX509CertprofileUtil.buildKeyUsageOptions(extConf);
@@ -366,7 +376,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             type = Extension.extendedKeyUsage;
             if(extensionControls.containsKey(type))
             {
-                ExtendedKeyUsage extConf = (ExtendedKeyUsage) getExtensionValue(type, extensionsType);
+                ExtendedKeyUsage extConf = (ExtendedKeyUsage) getExtensionValue(
+                        type, extensionsType, ExtendedKeyUsage.class);
                 if(extConf != null)
                 {
                     this.extendedKeyusages = XmlX509CertprofileUtil.buildExtKeyUsageOptions(extConf);
@@ -379,7 +390,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             {
                 org.xipki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier extConf =
                         (org.xipki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier)
-                                getExtensionValue(type, extensionsType);
+                                getExtensionValue(type, extensionsType,
+                                        org.xipki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier.class);
                 if(extConf != null)
                 {
                     this.includeIssuerAndSerialInAKI = extConf.isIncludeIssuerAndSerial();
@@ -392,7 +404,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             {
                 org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies extConf =
                         (org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies)
-                            getExtensionValue(type, extensionsType);
+                            getExtensionValue(type, extensionsType,
+                                    org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies.class);
                 if(extConf != null)
                 {
                     this.certificatePolicies = new QaCertificatePolicies(extConf);
@@ -403,7 +416,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             type = Extension.policyMappings;
             if(extensionControls.containsKey(type))
             {
-                PolicyMappings extConf = (PolicyMappings) getExtensionValue(type, extensionsType);
+                PolicyMappings extConf = (PolicyMappings) getExtensionValue(
+                        type, extensionsType, PolicyMappings.class);
                 if(extConf != null)
                 {
                     this.policyMappings = new QaPolicyMappingsOption(extConf);
@@ -416,7 +430,9 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             if(extensionControls.containsKey(type))
             {
                 org.xipki.ca.certprofile.x509.jaxb.NameConstraints extConf =
-                        (org.xipki.ca.certprofile.x509.jaxb.NameConstraints) getExtensionValue(type, extensionsType);
+                        (org.xipki.ca.certprofile.x509.jaxb.NameConstraints) getExtensionValue(
+                                type, extensionsType,
+                                org.xipki.ca.certprofile.x509.jaxb.NameConstraints.class);
                 if(extConf != null)
                 {
                     this.nameConstraints = new QaNameConstraints(extConf);
@@ -427,7 +443,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             type = Extension.policyConstraints;
             if(extensionControls.containsKey(type))
             {
-                PolicyConstraints extConf = (PolicyConstraints) getExtensionValue(type, extensionsType);
+                PolicyConstraints extConf = (PolicyConstraints) getExtensionValue(
+                        type, extensionsType, PolicyConstraints.class);
                 if(extConf != null)
                 {
                     this.policyConstraints = new QaPolicyConstraints(extConf);
@@ -438,7 +455,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             type = Extension.inhibitAnyPolicy;
             if(extensionControls.containsKey(type))
             {
-                InhibitAnyPolicy extConf = (InhibitAnyPolicy) getExtensionValue(type, extensionsType);
+                InhibitAnyPolicy extConf = (InhibitAnyPolicy) getExtensionValue(
+                        type, extensionsType, InhibitAnyPolicy.class);
                 if(extConf != null)
                 {
                     this.inhibitAnyPolicy = new QaInhibitAnyPolicy(extConf);
@@ -449,7 +467,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             type = ObjectIdentifiers.id_extension_admission;
             if(extensionControls.containsKey(type))
             {
-                Admission extConf = (Admission) getExtensionValue(type, extensionsType);
+                Admission extConf = (Admission) getExtensionValue(
+                        type, extensionsType, Admission.class);
                 if(extConf != null)
                 {
                     this.admission = new QaAdmission(extConf);
@@ -460,7 +479,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             type = Extension.subjectAlternativeName;
             if(extensionControls.containsKey(type))
             {
-                SubjectAltName extConf = (SubjectAltName) getExtensionValue(type, extensionsType);
+                SubjectAltName extConf = (SubjectAltName) getExtensionValue(
+                        type, extensionsType, SubjectAltName.class);
                 if(extConf != null)
                 {
                     this.allowedSubjectAltNameModes = XmlX509CertprofileUtil.buildGeneralNameMode(extConf);
@@ -471,7 +491,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             type = Extension.subjectInfoAccess;
             if(extensionControls.containsKey(type))
             {
-                SubjectInfoAccess extConf = (SubjectInfoAccess) getExtensionValue(type, extensionsType);
+                SubjectInfoAccess extConf = (SubjectInfoAccess) getExtensionValue(
+                        type, extensionsType, SubjectInfoAccess.class);
                 if(extConf != null)
                 {
                     List<Access> list = extConf.getAccess();
@@ -482,6 +503,44 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                                 new ASN1ObjectIdentifier(entry.getAccessMethod().getValue()),
                                 XmlX509CertprofileUtil.buildGeneralNameMode(entry.getAccessLocation()));
                     }
+                }
+            }
+
+            // restriction
+            type = ObjectIdentifiers.id_extension_restriction;
+            if(extensionControls.containsKey(type))
+            {
+                Restriction extConf = (Restriction) getExtensionValue(
+                        type, extensionsType, Restriction.class);
+                if(extConf != null)
+                {
+                    restriction = new QaDirectoryString(
+                            XmlX509CertprofileUtil.convertDirectoryStringType(extConf.getType()), extConf.getText());
+                }
+            }
+
+            // additionalInformation
+            type = ObjectIdentifiers.id_extension_additionalInformation;
+            if(extensionControls.containsKey(type))
+            {
+                AdditionalInformation extConf = (AdditionalInformation) getExtensionValue(
+                        type, extensionsType, AdditionalInformation.class);
+                if(extConf != null)
+                {
+                    additionalInformation = new QaDirectoryString(
+                            XmlX509CertprofileUtil.convertDirectoryStringType(extConf.getType()), extConf.getText());
+                }
+            }
+
+            // validityModel
+            type = ObjectIdentifiers.id_extension_validityModel;
+            if(extensionControls.containsKey(type))
+            {
+                ValidityModel extConf = (ValidityModel) getExtensionValue(
+                        type, extensionsType, ValidityModel.class);
+                if(extConf != null)
+                {
+                    validityModelId = new ASN1ObjectIdentifier(extConf.getModelId().getValue());
                 }
             }
 
@@ -720,7 +779,6 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             }
 
             byte[] extensionValue = ext.getExtnValue().getOctets();
-
             try
             {
                 if(Extension.authorityKeyIdentifier.equals(oid))
@@ -796,7 +854,20 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 {
                     // ocsp-nocheck
                     checkExtensionOcspNocheck(failureMsg, extensionValue);
-                } else
+                } else if(ObjectIdentifiers.id_extension_restriction.equals(oid))
+                {
+                	// restriction
+                    checkExtensionRestriction(failureMsg, extensionValue, requestExtensions, extControl);
+                } else if(ObjectIdentifiers.id_extension_additionalInformation.equals(oid))
+                {
+                	// additionalInformation
+                    checkExtensionAdditionalInformation(failureMsg, extensionValue, requestExtensions, extControl);
+                } else if(ObjectIdentifiers.id_extension_validityModel.equals(oid))
+                {
+                	// validityModel
+                    checkExtensionValidityModel(failureMsg, extensionValue, requestExtensions, extControl);
+                }
+                else
                 {
                     byte[] expected = getExpectedExtValue(oid, requestExtensions, extControl);
                     if(Arrays.equals(expected, extensionValue) == false)
@@ -2695,43 +2766,6 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
-    private void checkExtensionAuthorityInfoAccess(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final X509IssuerInfo issuerInfo)
-    {
-        Set<String> eCaIssuerUris;
-        if(aiaControl == null || aiaControl.includesCaIssuers())
-        {
-            eCaIssuerUris = issuerInfo.getCaIssuerURLs();
-        }
-        else
-        {
-            eCaIssuerUris = Collections.emptySet();
-        }
-
-        Set<String> eOCSPUris;
-        if(aiaControl == null || aiaControl.includesOcsp())
-        {
-            eOCSPUris = issuerInfo.getOcspURLs();
-        }
-        else
-        {
-            eOCSPUris = Collections.emptySet();
-        }
-
-        if(CollectionUtil.isEmpty(eCaIssuerUris) && CollectionUtil.isEmpty(eOCSPUris))
-        {
-            failureMsg.append("AIA is present but expected is 'none'");
-            failureMsg.append("; ");
-            return;
-        }
-
-        AuthorityInformationAccess iAIA = AuthorityInformationAccess.getInstance(extensionValue);
-        checkAIA(failureMsg, iAIA, X509ObjectIdentifiers.id_ad_caIssuers, eCaIssuerUris);
-        checkAIA(failureMsg, iAIA, X509ObjectIdentifiers.id_ad_ocsp, eOCSPUris);
-    }
-
     private static void checkAIA(
             final StringBuilder failureMsg,
             final AuthorityInformationAccess aia,
@@ -3066,6 +3100,43 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
     }
 
+    private void checkExtensionAuthorityInfoAccess(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final X509IssuerInfo issuerInfo)
+    {
+        Set<String> eCaIssuerUris;
+        if(aiaControl == null || aiaControl.includesCaIssuers())
+        {
+            eCaIssuerUris = issuerInfo.getCaIssuerURLs();
+        }
+        else
+        {
+            eCaIssuerUris = Collections.emptySet();
+        }
+
+        Set<String> eOCSPUris;
+        if(aiaControl == null || aiaControl.includesOcsp())
+        {
+            eOCSPUris = issuerInfo.getOcspURLs();
+        }
+        else
+        {
+            eOCSPUris = Collections.emptySet();
+        }
+
+        if(CollectionUtil.isEmpty(eCaIssuerUris) && CollectionUtil.isEmpty(eOCSPUris))
+        {
+            failureMsg.append("AIA is present but expected is 'none'");
+            failureMsg.append("; ");
+            return;
+        }
+
+        AuthorityInformationAccess iAIA = AuthorityInformationAccess.getInstance(extensionValue);
+        checkAIA(failureMsg, iAIA, X509ObjectIdentifiers.id_ad_caIssuers, eCaIssuerUris);
+        checkAIA(failureMsg, iAIA, X509ObjectIdentifiers.id_ad_ocsp, eOCSPUris);
+    }
+
     private boolean checkExtensionOcspNocheck(
             final StringBuilder failureMsg,
             final byte[] extensionValue)
@@ -3076,6 +3147,122 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             failureMsg.append("; ");
         }
         return true;
+    }
+
+    private void checkExtensionRestriction(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
+    {
+        checkDirectoryString(ObjectIdentifiers.id_extension_restriction, restriction,
+                failureMsg, extensionValue, requestExtensions, extControl);
+    }
+
+    private void checkExtensionAdditionalInformation(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
+    {
+        checkDirectoryString(ObjectIdentifiers.id_extension_additionalInformation, additionalInformation,
+                failureMsg, extensionValue, requestExtensions, extControl);
+    }
+
+    private void checkDirectoryString(
+            ASN1ObjectIdentifier extType,
+            QaDirectoryString conf,
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
+    {
+        if(conf == null)
+        {
+            byte[] expected = getExpectedExtValue(extType,
+                    requestExtensions, extControl);
+            if(Arrays.equals(expected, extensionValue) == false)
+            {
+                failureMsg.append("extension valus is '" + hex(extensionValue) +
+                        "' but expected '" + (expected == null ? "not present" : hex(expected)) + "'");
+                failureMsg.append("; ");
+            }
+            return;
+        }
+
+        ASN1Primitive asn1;
+        try
+        {
+            asn1 = ASN1Primitive.fromByteArray(extensionValue);
+        } catch (IOException e)
+        {
+            failureMsg.append("invalid syntax of extension value");
+            failureMsg.append("; ");
+            return;
+        }
+
+        boolean correctStringType;
+        switch(conf.getType())
+        {
+        case bmpString:
+            correctStringType = (asn1 instanceof DERBMPString);
+            break;
+        case printableString:
+            correctStringType = (asn1 instanceof DERPrintableString);
+            break;
+        case teletexString:
+            correctStringType = (asn1 instanceof DERT61String);
+            break;
+        case utf8String:
+            correctStringType = (asn1 instanceof DERUTF8String);
+            break;
+        default:
+            throw new RuntimeException("should not reach here, unknown DirectoryStringType " + conf.getType());
+        } // end switch
+
+        if(correctStringType == false)
+        {
+            failureMsg.append("extension value is not of type DirectoryString." + conf.getText());
+            failureMsg.append("; ");
+            return;
+        }
+
+        String extTextValue = ((ASN1String) asn1).getString();
+        if(conf.getText().equals(extTextValue) == false)
+        {
+            failureMsg.append("content '" + extTextValue + "' but expected '" +
+                    conf.getText() + "'");
+            failureMsg.append("; ");
+        }
+    }
+
+    private void checkExtensionValidityModel(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
+    {
+        ASN1ObjectIdentifier conf = validityModelId;
+        if(conf == null)
+        {
+            byte[] expected = getExpectedExtValue(ObjectIdentifiers.id_extension_validityModel,
+                    requestExtensions, extControl);
+            if(Arrays.equals(expected, extensionValue) == false)
+            {
+                failureMsg.append("extension valus is '" + hex(extensionValue) +
+                        "' but expected '" + (expected == null ? "not present" : hex(expected)) + "'");
+                failureMsg.append("; ");
+            }
+            return;
+        }
+
+        ASN1ObjectIdentifier extValue = ASN1ObjectIdentifier.getInstance(extensionValue);
+        if(conf.equals(extValue) == false)
+        {
+            failureMsg.append("content '" + extValue + "' but expected '" +
+                    conf + "'");
+            failureMsg.append("; ");
+        }
     }
 
     private static String hex(
@@ -3304,21 +3491,42 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
     private Object getExtensionValue(
             final ASN1ObjectIdentifier type,
-            final ExtensionsType extensionsType)
+            final ExtensionsType extensionsType,
+            final Class<?> expectedClass)
+    throws CertprofileException
     {
         for(ExtensionType m : extensionsType.getExtension())
         {
-            if(m.getType().getValue().equals(type.getId()))
+            if(m.getType().getValue().equals(type.getId()) == false)
             {
-                if(m.getValue() == null)
-                {
-                    return null;
-                }
-                return m.getValue().getAny();
+                continue;
+            }
+
+            if(m.getValue() == null || m.getValue().getAny() == null)
+            {
+                return null;
+            }
+
+            Object o = m.getValue().getAny();
+            if(expectedClass.isAssignableFrom(o.getClass()))
+            {
+                return o;
+            }
+            else if(ConstantExtValue.class.isAssignableFrom(o.getClass()))
+            {
+                // will be processed later
+                return null;
+            }
+            else
+            {
+                String displayName = ObjectIdentifiers.oidToDisplayName(type);
+                throw new CertprofileException("the extension configuration for " + displayName +
+                        " is not of the expected type " + expectedClass.getName());
             }
         }
 
-        throw new RuntimeException("should not reach here: undefined extension " + type.getId());
+        throw new RuntimeException("should not reach here: undefined extension " +
+                ObjectIdentifiers.oidToDisplayName(type));
     }
 
     public static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(

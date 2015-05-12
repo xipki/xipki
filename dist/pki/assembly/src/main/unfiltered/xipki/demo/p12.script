@@ -156,6 +156,10 @@ xipki-ca:caalias-add \
 ## Add cert profile to CA
 xipki-ca:caprofile-add \
   --ca SubCA1.complex-Name \
+  --profile EE.Complex \
+
+xipki-ca:caprofile-add \
+  --ca SubCA1.complex-Name \
   --profile TLS_g \
   --local-name TLS
 

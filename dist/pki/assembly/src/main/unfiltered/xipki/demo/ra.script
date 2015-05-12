@@ -197,6 +197,30 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/SubCAwithCRL1.der \
   --ca-cert output/RCA1.der
 
+# Certificate EE.Complex1
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out output/EE.Complex1.p12 \
+  --subject "CN=EE.Complex1,O=xipki,C=DE"
+
+xipki-tk:req-p12 \
+  --p12 output/EE.Complex1.p12 \
+  --password 1234 \
+  --out output/EE.Complex1.p10
+
+xipki-cli:p10-enroll \
+  --p10 output/EE.Complex1.p10 \
+  --out output/EE.Complex1.der \
+  --profile EE.Complex \
+  --user USER-T
+
+xipki-tk:update-cert-p12 \
+  --p12 output/EE.Complex1.p12 \
+  --password 1234 \
+  --cert output/EE.Complex1.der \
+  --ca-cert output/SubCA1.der \
+  --ca-cert output/RCA1.der
+ 
 # Certificate TLS1
 xipki-tk:rsa-p12 \
   --password 1234 \
