@@ -420,6 +420,13 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="privateKeyUsagePeriod">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="validity" type="xs:string"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="constantExtValue">
     <xs:complexType>
       <xs:simpleContent>

@@ -94,6 +94,7 @@ import org.xipki.ca.certprofile.x509.jaxb.OidWithDescType;
 import org.xipki.ca.certprofile.x509.jaxb.PolicyConstraints;
 import org.xipki.ca.certprofile.x509.jaxb.PolicyIdMappingType;
 import org.xipki.ca.certprofile.x509.jaxb.PolicyMappings;
+import org.xipki.ca.certprofile.x509.jaxb.PrivateKeyUsagePeriod;
 import org.xipki.ca.certprofile.x509.jaxb.RSAParameters;
 import org.xipki.ca.certprofile.x509.jaxb.RangeType;
 import org.xipki.ca.certprofile.x509.jaxb.RangesType;
@@ -1105,6 +1106,14 @@ public class ProfileConfCreatorDemo
         return createExtensionValueType(extValue);
     }
 
+    private static ExtensionValueType createPrivateKeyUsagePeriod(
+            final String validity)
+    {
+        PrivateKeyUsagePeriod extValue = new PrivateKeyUsagePeriod();
+        extValue.setValidity(validity);
+        return createExtensionValueType(extValue);
+    }
+
     @SuppressWarnings("unused")
     private static ExtensionValueType createValidityModel(
             OidWithDescType modelId)
@@ -1504,6 +1513,10 @@ public class ProfileConfCreatorDemo
                 new ASN1ObjectIdentifier("1.3.6.1.4.1.8301.3.5.1").getEncoded(), "chain");
         list.add(createExtension(ObjectIdentifiers.id_extension_validityModel,
                 true, false, extensionValue));
+
+        // privateKeyUsagePeriod
+        extensionValue = createPrivateKeyUsagePeriod("3y");
+        list.add(createExtension(Extension.privateKeyUsagePeriod, true, false, extensionValue));
 
         return profile;
     }

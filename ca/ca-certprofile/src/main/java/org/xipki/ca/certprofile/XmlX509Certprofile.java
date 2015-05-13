@@ -41,6 +41,7 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -55,8 +56,10 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
 import org.bouncycastle.asn1.isismtt.x509.Admissions;
 import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
@@ -104,6 +107,7 @@ import org.xipki.ca.certprofile.x509.jaxb.NameValueType;
 import org.xipki.ca.certprofile.x509.jaxb.OidWithDescType;
 import org.xipki.ca.certprofile.x509.jaxb.PolicyConstraints;
 import org.xipki.ca.certprofile.x509.jaxb.PolicyMappings;
+import org.xipki.ca.certprofile.x509.jaxb.PrivateKeyUsagePeriod;
 import org.xipki.ca.certprofile.x509.jaxb.RdnType;
 import org.xipki.ca.certprofile.x509.jaxb.Restriction;
 import org.xipki.ca.certprofile.x509.jaxb.SubjectAltName;
@@ -169,6 +173,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     private ExtensionValue restriction;
     private ExtensionValue additionalInformation;
     private ExtensionValue validityModel;
+    private CertValidity privateKeyUsagePeriod;
 
     private Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions;
 
@@ -606,6 +611,18 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             }
         }
 
+        // PrivateKeyUsagePeriod
+        type = Extension.privateKeyUsagePeriod;
+        if(extensionControls.containsKey(type))
+        {
+            PrivateKeyUsagePeriod extConf = (PrivateKeyUsagePeriod) getExtensionValue(
+                    type, extensionsType, PrivateKeyUsagePeriod.class);
+            if(extConf != null)
+            {
+                privateKeyUsagePeriod = CertValidity.getInstance(extConf.getValidity());
+            }
+        }
+
         // constant extensions
         this.constantExtensions = XmlX509CertprofileUtil.buildConstantExtesions(extensionsType);
     }
@@ -841,7 +858,9 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     public ExtensionValues getExtensions(
             final Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
             final X500Name requestedSubject,
-            final Extensions requestedExtensions)
+            final Extensions requestedExtensions,
+            final Date notBefore,
+            final Date notAfter)
     throws CertprofileException, BadCertTemplateException
     {
         ExtensionValues values = new ExtensionValues();
@@ -952,6 +971,32 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         if(validityModel != null && occurences.remove(type) != null)
         {
             values.addExtension(type, validityModel);
+        }
+
+        // PrivateKeyUsagePeriod
+        type = Extension.privateKeyUsagePeriod;
+        if(occurences.remove(type) != null)
+        {
+            Date _notAfter;
+            if(privateKeyUsagePeriod == null)
+            {
+                _notAfter = notAfter;
+            }
+            else
+            {
+                _notAfter = privateKeyUsagePeriod.add(notBefore);
+                if(_notAfter.after(notAfter))
+                {
+                    _notAfter = notAfter;
+                }
+            }
+
+            ASN1EncodableVector v = new ASN1EncodableVector();
+            v.add(new DERTaggedObject(false, 0, new DERGeneralizedTime(notBefore)));
+            v.add(new DERTaggedObject(false, 1, new DERGeneralizedTime(_notAfter)));
+            ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(),
+                    new DERSequence(v));
+            values.addExtension(type, extValue);
         }
 
         // constant extensions
