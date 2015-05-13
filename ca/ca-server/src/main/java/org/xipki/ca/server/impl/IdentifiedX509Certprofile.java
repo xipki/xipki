@@ -287,7 +287,9 @@ class IdentifiedX509Certprofile
             final Extensions requestExtensions,
             final SubjectPublicKeyInfo publicKeyInfo,
             final PublicCAInfo publicCaInfo,
-            final X509Certificate crlSignerCert)
+            final X509Certificate crlSignerCert,
+            final Date notBefore,
+            final Date notAfter)
     throws CertprofileException, BadCertTemplateException
     {
         ExtensionValues values = new ExtensionValues();
@@ -553,7 +555,8 @@ class IdentifiedX509Certprofile
         }
 
         ExtensionValues subvalues = certprofile.getExtensions(
-                Collections.unmodifiableMap(controls), requestedSubject, requestExtensions);
+                Collections.unmodifiableMap(controls), requestedSubject, requestExtensions,
+                notBefore, notAfter);
 
         Set<ASN1ObjectIdentifier> extTypes = new HashSet<>(controls.keySet());
         for(ASN1ObjectIdentifier type : extTypes)

@@ -2428,7 +2428,8 @@ class X509CA
                 X509Certificate crlSignerCert = crlSigner == null ? null : crlSigner.getCert();
 
                 ExtensionValues extensionTuples = certprofile.getExtensions(requestedSubject, extensions,
-                        publicKeyInfo, caInfo.getPublicCAInfo(), crlSignerCert);
+                        publicKeyInfo, caInfo.getPublicCAInfo(), crlSignerCert,
+                        notBefore, notAfter);
                 if(extensionTuples != null)
                 {
                     for(ASN1ObjectIdentifier extensionType : extensionTuples.getExtensionTypes())

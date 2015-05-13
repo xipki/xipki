@@ -206,7 +206,9 @@ public abstract class X509Certprofile
     public abstract ExtensionValues getExtensions(
             Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
             X500Name requestedSubject,
-            Extensions requestExtensions)
+            Extensions requestExtensions,
+            Date notBefore,
+            Date notAfter)
     throws CertprofileException, BadCertTemplateException;
 
     public abstract boolean incSerialNumberIfSubjectExists();

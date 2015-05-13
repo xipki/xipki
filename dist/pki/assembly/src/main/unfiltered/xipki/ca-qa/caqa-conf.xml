@@ -59,7 +59,7 @@
     <X509Certprofile name="gSMC_K">
       <file>xipki/demo/profile/Certprofile_gSMC_K.xml</file>
     </X509Certprofile>
-    <X509Certprofile name="EE_Complex">
+    <X509Certprofile name="EE.Complex">
       <file>xipki/demo/profile/Certprofile_EE_Complex.xml</file>
     </X509Certprofile>
   </X509Certprofiles>

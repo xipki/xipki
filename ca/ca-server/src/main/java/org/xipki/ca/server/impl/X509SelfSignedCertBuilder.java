@@ -302,7 +302,9 @@ class X509SelfSignedCertBuilder
                     requestedSubject,
                     extensions,
                     publicKeyInfo,
-                    publicCaInfo);
+                    publicCaInfo,
+                    notBefore,
+                    notAfter);
 
             ContentSigner contentSigner = signer.borrowContentSigner();
 
@@ -335,11 +337,14 @@ class X509SelfSignedCertBuilder
             final X500Name requestedSubject,
             final Extensions extensions,
             final SubjectPublicKeyInfo requestedPublicKeyInfo,
-            final PublicCAInfo publicCaInfo)
+            final PublicCAInfo publicCaInfo,
+            final Date notBefore,
+            final Date notAfter)
     throws CertprofileException, IOException, BadCertTemplateException, NoSuchAlgorithmException
     {
-        ExtensionValues extensionTuples = profile.getExtensions(requestedSubject, extensions, requestedPublicKeyInfo,
-                publicCaInfo, null);
+        ExtensionValues extensionTuples = profile.getExtensions(
+                requestedSubject, extensions, requestedPublicKeyInfo,
+                publicCaInfo, null, notBefore, notAfter);
         if(extensionTuples == null)
         {
             return;

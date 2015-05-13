@@ -36,6 +36,7 @@
 package org.xipki.certprofile.demo.x509;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -118,7 +119,9 @@ public class DemoEE1X509Certprofile extends AbstractEEX509Certprofile
     public ExtensionValues getExtensions(
             final Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
             final X500Name requestedSubject,
-            final Extensions requestedExtensions)
+            final Extensions requestedExtensions,
+            final Date notBefore,
+            final Date notAfter)
     throws CertprofileException, BadCertTemplateException
     {
         return null;

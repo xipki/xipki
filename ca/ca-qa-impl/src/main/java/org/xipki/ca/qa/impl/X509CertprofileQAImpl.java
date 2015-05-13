@@ -59,6 +59,7 @@ import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
@@ -138,6 +139,7 @@ import org.xipki.ca.certprofile.x509.jaxb.ExtensionsType;
 import org.xipki.ca.certprofile.x509.jaxb.InhibitAnyPolicy;
 import org.xipki.ca.certprofile.x509.jaxb.PolicyConstraints;
 import org.xipki.ca.certprofile.x509.jaxb.PolicyMappings;
+import org.xipki.ca.certprofile.x509.jaxb.PrivateKeyUsagePeriod;
 import org.xipki.ca.certprofile.x509.jaxb.RangeType;
 import org.xipki.ca.certprofile.x509.jaxb.RangesType;
 import org.xipki.ca.certprofile.x509.jaxb.RdnType;
@@ -234,6 +236,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
     private QaDirectoryString restriction;
     private QaDirectoryString additionalInformation;
     private ASN1ObjectIdentifier validityModelId;
+    private CertValidity privateKeyUsagePeriod;
 
     private Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
 
@@ -541,6 +544,18 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 if(extConf != null)
                 {
                     validityModelId = new ASN1ObjectIdentifier(extConf.getModelId().getValue());
+                }
+            }
+
+            // PrivateKeyUsagePeriod
+            type = Extension.privateKeyUsagePeriod;
+            if(extensionControls.containsKey(type))
+            {
+                PrivateKeyUsagePeriod extConf = (PrivateKeyUsagePeriod) getExtensionValue(
+                        type, extensionsType, PrivateKeyUsagePeriod.class);
+                if(extConf != null)
+                {
+                    privateKeyUsagePeriod = CertValidity.getInstance(extConf.getValidity());
                 }
             }
 
@@ -866,6 +881,10 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 {
                 	// validityModel
                     checkExtensionValidityModel(failureMsg, extensionValue, requestExtensions, extControl);
+                } else if(Extension.privateKeyUsagePeriod.equals(oid))
+                {
+                	// privateKeyUsagePeriod
+                    checkExtensionPrivateKeyUsagePeriod(failureMsg, extensionValue, cert.getNotBefore(), cert.getNotAfter());
                 }
                 else
                 {
@@ -3137,7 +3156,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         checkAIA(failureMsg, iAIA, X509ObjectIdentifiers.id_ad_ocsp, eOCSPUris);
     }
 
-    private boolean checkExtensionOcspNocheck(
+    private void checkExtensionOcspNocheck(
             final StringBuilder failureMsg,
             final byte[] extensionValue)
     {
@@ -3146,7 +3165,6 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             failureMsg.append("value is not DER NULL");
             failureMsg.append("; ");
         }
-        return true;
     }
 
     private void checkExtensionRestriction(
@@ -3259,8 +3277,58 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         ASN1ObjectIdentifier extValue = ASN1ObjectIdentifier.getInstance(extensionValue);
         if(conf.equals(extValue) == false)
         {
-            failureMsg.append("content '" + extValue + "' but expected '" +
+            failureMsg.append("content is '" + extValue + "' but expected '" +
                     conf + "'");
+            failureMsg.append("; ");
+        }
+    }
+
+    private void checkExtensionPrivateKeyUsagePeriod(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Date certNotBefore,
+            final Date certNotAfter)
+    {
+        ASN1GeneralizedTime notBefore = new ASN1GeneralizedTime(certNotBefore);
+        Date _notAfter;
+        if(privateKeyUsagePeriod == null)
+        {
+            _notAfter = certNotAfter;
+        }
+        else
+        {
+            _notAfter = privateKeyUsagePeriod.add(certNotBefore);
+            if(_notAfter.after(certNotAfter))
+            {
+                _notAfter = certNotAfter;
+            }
+        }
+        ASN1GeneralizedTime notAfter = new ASN1GeneralizedTime(_notAfter);
+
+        org.bouncycastle.asn1.x509.PrivateKeyUsagePeriod extValue =
+                org.bouncycastle.asn1.x509.PrivateKeyUsagePeriod.getInstance(extensionValue);
+
+        ASN1GeneralizedTime time = extValue.getNotBefore();
+        if(time == null)
+        {
+            failureMsg.append("notBefore is absent but expected present");
+            failureMsg.append("; ");
+        } else if(time.equals(notBefore) == false)
+        {
+            failureMsg.append("notBefore is '" + time.getTimeString() + "' but expected '" +
+                    notBefore.getTimeString() + "'");
+            failureMsg.append("; ");
+        }
+
+        time = extValue.getNotAfter();
+        if(time == null)
+        {
+            failureMsg.append("notAfter is absent but expected present");
+            failureMsg.append("; ");
+        } else if(time.equals(notAfter) == false)
+        {
+            failureMsg.append("notAfter is '" + time.getTimeString() + "' but expected '" +
+                    notAfter.getTimeString() + "'");
             failureMsg.append("; ");
         }
     }
