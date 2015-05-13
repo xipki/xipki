@@ -178,5 +178,14 @@
         <constantExtValue description="chain">BgorBgEEAcBtAwUB</constantExtValue>
       </value>
     </extension>
+    <extension required="true" permittedInRequest="false">
+      <type description="privateKeyUsagePeriod">2.5.29.16</type>
+      <critical>false</critical>
+      <value>
+        <privateKeyUsagePeriod>
+          <validity>3y</validity>
+        </privateKeyUsagePeriod>
+      </value>
+    </extension>
   </extensions>
 </X509Profile>
