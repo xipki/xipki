@@ -462,6 +462,21 @@
 	  </xs:sequence>
 	</xs:complexType>
   </xs:element>
+  <xs:element name="biometricInfo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="type" type="biometricTypeType" maxOccurs="unbounded"/>
+        <xs:element name="hashAlgorithm" type="oidWithDescType" maxOccurs="unbounded"/>
+        <xs:element name="includeSourceDataUri" type="tripleState"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="biometricTypeType">
+    <xs:choice>
+      <xs:element name="predefined" type="intWithDescType"/>
+      <xs:element name="oid" type="oidWithDescType"/>
+    </xs:choice>
+  </xs:complexType>
   <xs:element name="constantExtValue">
     <xs:complexType>
       <xs:simpleContent>
@@ -543,6 +558,20 @@
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>
+  <xs:complexType name="stringWithDescType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="description" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="intWithDescType">
+    <xs:simpleContent>
+      <xs:extension base="xs:int">
+        <xs:attribute name="description" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
   <xs:complexType name="UsageType">
     <xs:simpleContent>
       <xs:extension base="keyUsageEnum">
@@ -566,6 +595,13 @@
       <xs:enumeration value="cRLSign"/>
       <xs:enumeration value="encipherOnly"/>
       <xs:enumeration value="decipherOnly"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="tripleState">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="required"/>
+      <xs:enumeration value="optional"/>
+      <xs:enumeration value="forbidden"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

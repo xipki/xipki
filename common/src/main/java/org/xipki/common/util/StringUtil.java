@@ -144,4 +144,21 @@ public class StringUtil
 
         return prefix.equalsIgnoreCase(s.substring(0, prefix.length()));
     }
+
+    public static boolean isNumber(String s)
+    {
+        return isNumber(s, 10);
+    }
+
+    public static boolean isNumber(String s, int radix)
+    {
+        try
+        {
+            Integer.parseInt(s, radix);
+            return true;
+        }catch(NumberFormatException e)
+        {
+            return false;
+        }
+    }
 }

@@ -105,9 +105,11 @@ import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.UserNotice;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
+import org.bouncycastle.asn1.x509.qualified.BiometricData;
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
+import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.math.ec.ECCurve;
@@ -132,11 +134,13 @@ import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.api.profile.x509.X509Certprofile;
+import org.xipki.ca.certprofile.BiometricInfoOption;
 import org.xipki.ca.certprofile.SubjectDNOption;
 import org.xipki.ca.certprofile.XmlX509CertprofileUtil;
 import org.xipki.ca.certprofile.x509.jaxb.AdditionalInformation;
 import org.xipki.ca.certprofile.x509.jaxb.Admission;
 import org.xipki.ca.certprofile.x509.jaxb.AuthorizationTemplate;
+import org.xipki.ca.certprofile.x509.jaxb.BiometricInfo;
 import org.xipki.ca.certprofile.x509.jaxb.ConstantExtValue;
 import org.xipki.ca.certprofile.x509.jaxb.ExtendedKeyUsage;
 import org.xipki.ca.certprofile.x509.jaxb.ExtensionType;
@@ -157,6 +161,7 @@ import org.xipki.ca.certprofile.x509.jaxb.Restriction;
 import org.xipki.ca.certprofile.x509.jaxb.SubjectAltName;
 import org.xipki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
 import org.xipki.ca.certprofile.x509.jaxb.SubjectInfoAccess.Access;
+import org.xipki.ca.certprofile.x509.jaxb.TripleState;
 import org.xipki.ca.certprofile.x509.jaxb.ValidityModel;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
@@ -249,6 +254,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
     private ASN1ObjectIdentifier validityModelId;
     private CertValidity privateKeyUsagePeriod;
     private QCStatements qcStatements;
+    private BiometricInfoOption biometricInfo;
     private QaAuthorizationTemplate authorizationTemplate;
 
     private Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
@@ -581,6 +587,24 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 if(extConf != null)
                 {
                     qcStatements = extConf;
+                }
+            }
+
+            // biometricInfo
+            type = Extension.biometricInfo;
+            if(extensionControls.containsKey(type))
+            {
+                BiometricInfo extConf = (BiometricInfo) getExtensionValue(
+                        type, extensionsType, BiometricInfo.class);
+                if(extConf != null)
+                {
+                    try
+                    {
+                        biometricInfo = new BiometricInfoOption(extConf);
+                    } catch (NoSuchAlgorithmException e)
+                    {
+                        throw new CertprofileException("NoSuchAlgorithmException: " + e.getMessage());
+                    }
                 }
             }
 
@@ -926,7 +950,12 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 {
                 	// qCStatements
                     checkExtensionQCStatements(failureMsg, extensionValue, requestExtensions, extControl);
-                } else if(ObjectIdentifiers.id_xipki_ext_authorizationTemplate.equals(oid))
+                } else if (Extension.biometricInfo.equals(oid))
+                {
+                	// biometricInfo
+                    checkExtensionBiometricInfo(failureMsg, extensionValue, requestExtensions, extControl);
+                }
+                else if(ObjectIdentifiers.id_xipki_ext_authorizationTemplate.equals(oid))
                 {
                 	// authorizationTemplate
                     checkExtensionAuthorizationTemplate(failureMsg, extensionValue, requestExtensions, extControl);
@@ -2640,15 +2669,11 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             final Extensions requestExtensions,
             final ExtensionControl extControl)
     {
-        if(allowedSubjectAltNameModes == null)
+        Set<GeneralNameMode> conf = allowedSubjectAltNameModes;
+        if(conf == null)
         {
-            byte[] expected = getExpectedExtValue(Extension.subjectAlternativeName, requestExtensions, extControl);
-            if(Arrays.equals(expected, extensionValue) == false)
-            {
-                failureMsg.append("extension valus is '").append(hex(extensionValue));
-                failureMsg.append("' but expected '").append(expected == null ? "not present" : hex(expected)).append("'");
-                failureMsg.append("; ");
-            }
+            failureMsg.append("extension is present but not expected");
+            failureMsg.append("; ");
             return;
         }
 
@@ -2674,7 +2699,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         {
             try
             {
-                expected[i] = createGeneralName(is[i], allowedSubjectAltNameModes);
+                expected[i] = createGeneralName(is[i], conf);
             } catch (BadCertTemplateException e)
             {
                 failureMsg.append("error while processing ").append(i+1).append("-th name: ").append(e.getMessage());
@@ -2707,15 +2732,11 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             final Extensions requestExtensions,
             final ExtensionControl extControl)
     {
-        if(allowedSubjectInfoAccessModes == null)
+        Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> conf = allowedSubjectInfoAccessModes;
+        if(conf == null)
         {
-            byte[] expected = getExpectedExtValue(Extension.subjectAlternativeName, requestExtensions, extControl);
-            if(Arrays.equals(expected, extensionValue) == false)
-            {
-                failureMsg.append("extension valus is '").append(hex(extensionValue));
-                failureMsg.append("' but expected '").append(expected == null ? "not present" : hex(expected)).append("'");
-                failureMsg.append("; ");
-            }
+            failureMsg.append("extension is present but not expected");
+            failureMsg.append("; ");
             return;
         }
 
@@ -2752,10 +2773,10 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             Set<GeneralNameMode> generalNameModes;
             if(accessMethod == null)
             {
-                generalNameModes = allowedSubjectInfoAccessModes.get(X509Certprofile.OID_ZERO);
+                generalNameModes = conf.get(X509Certprofile.OID_ZERO);
             } else
             {
-                generalNameModes = allowedSubjectInfoAccessModes.get(accessMethod);
+                generalNameModes = conf.get(accessMethod);
             }
 
             if(generalNameModes == null)
@@ -3387,7 +3408,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         QCStatements conf = qcStatements;
         if(conf == null)
         {
-            byte[] expected = getExpectedExtValue(ObjectIdentifiers.id_extension_validityModel,
+            byte[] expected = getExpectedExtValue(Extension.qCStatements,
                     requestExtensions, extControl);
             if(Arrays.equals(expected, extensionValue) == false)
             {
@@ -3571,6 +3592,136 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             {
                 failureMsg.append("statementInfo[" + i + "] has incorrect syntax");
                 failureMsg.append("; ");
+            }
+        }
+    }
+
+    private void checkExtensionBiometricInfo(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
+    {
+        BiometricInfoOption conf = biometricInfo;
+
+        if(conf == null)
+        {
+            failureMsg.append("extension is present but not expected");
+            failureMsg.append("; ");
+            return;
+        }
+
+        ASN1Encodable extInRequest = null;
+        if(requestExtensions != null)
+        {
+            extInRequest = requestExtensions.getExtensionParsedValue(Extension.biometricInfo);
+        }
+
+        if(extInRequest == null)
+        {
+            failureMsg.append("extension is present but not expected");
+            failureMsg.append("; ");
+            return;
+        }
+
+        ASN1Sequence extValueInReq = ASN1Sequence.getInstance(extInRequest);
+        final int expSize = extValueInReq.size();
+
+        ASN1Sequence extValue = ASN1Sequence.getInstance(extensionValue);
+        final int isSize = extValue.size();
+        if(isSize != expSize)
+        {
+            failureMsg.append("number of biometricData is '" + isSize +
+                    "' but expected '" + expSize + "'");
+            failureMsg.append("; ");
+            return;
+        }
+
+        for(int i = 0; i < expSize; i++)
+        {
+            BiometricData isData = BiometricData.getInstance(extValue.getObjectAt(i));
+            BiometricData expData = BiometricData.getInstance(extValueInReq.getObjectAt(i));
+
+            {
+                TypeOfBiometricData isType = isData.getTypeOfBiometricData();
+                TypeOfBiometricData expType = expData.getTypeOfBiometricData();
+                if(isType.equals(expType) == false)
+                {
+                    String isStr = isType.isPredefined() ? Integer.toString(isType.getPredefinedBiometricType()) :
+                        isType.getBiometricDataOid().getId();
+                    String expStr = expType.isPredefined() ? Integer.toString(expType.getPredefinedBiometricType()) :
+                        expType.getBiometricDataOid().getId();
+
+                    failureMsg.append("biometricData[" + i + "].typeOfBiometricData is '" + isStr +
+                            "' but expected '" + expStr + "'");
+                    failureMsg.append("; ");
+                }
+            }
+
+            {
+                ASN1ObjectIdentifier is = isData.getHashAlgorithm().getAlgorithm();
+                ASN1ObjectIdentifier exp = expData.getHashAlgorithm().getAlgorithm();
+                if(is.equals(exp) == false)
+                {
+                    failureMsg.append("biometricData[" + i + "].hashAlgorithm is '" + is.getId() +
+                            "' but expected '" + exp.getId() + "'");
+                    failureMsg.append("; ");
+                }
+
+                if(isData.getHashAlgorithm().getParameters() != null)
+                {
+                    failureMsg.append("biometricData[" + i + "].hashAlgorithm.parameter is 'present'" +
+                            " but expected 'absent'");
+                    failureMsg.append("; ");
+                }
+            }
+
+            {
+                byte[] is = isData.getBiometricDataHash().getOctets();
+                byte[] exp = expData.getBiometricDataHash().getOctets();
+                if(Arrays.equals(is, exp) == false)
+                {
+                    failureMsg.append("biometricData[" + i + "].biometricDataHash is '" + hex(is) +
+                            "' but expected '" + hex(exp) + "'");
+                    failureMsg.append("; ");
+                }
+            }
+
+            {
+                DERIA5String str = isData.getSourceDataUri();
+                String isSourceDataUri = (str == null) ? null : str.getString();
+
+                String expSourceDataUri = null;
+                if(biometricInfo.getSourceDataUriOccurrence() != TripleState.FORBIDDEN)
+                {
+                    str = expData.getSourceDataUri();
+                    expSourceDataUri = (str == null) ? null : str.getString();
+                }
+
+                if(expSourceDataUri == null)
+                {
+                    if(isSourceDataUri != null)
+                    {
+                        failureMsg.append("biometricData[" + i + "].sourceDataUri is 'present'" +
+                                " but expected 'absent'");
+                        failureMsg.append("; ");
+                    }
+                }
+                else
+                {
+                    if(isSourceDataUri == null)
+                    {
+                        failureMsg.append("biometricData[" + i + "].sourceDataUri is 'absent'" +
+                                " but expected 'present'");
+                        failureMsg.append("; ");
+                    }
+                    else if(isSourceDataUri.equals(expSourceDataUri) == false)
+                    {
+                        failureMsg.append("biometricData[" + i + "].sourceDataUri is '" + isSourceDataUri +
+                                "' but expected '" + expSourceDataUri + "'");
+                        failureMsg.append("; ");
+                    }
+                }
             }
         }
     }
@@ -3897,6 +4048,14 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 continue;
             }
 
+            ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
+            if(Extension.subjectAlternativeName.equals(oid) ||
+                    Extension.subjectInfoAccess.equals(oid) ||
+                    Extension.biometricInfo.equals(oid))
+            {
+                continue;
+            }
+
             ConstantExtValue extConf = (ConstantExtValue) m.getValue().getAny();
             byte[] encodedValue = extConf.getValue();
             ASN1StreamParser parser = new ASN1StreamParser(encodedValue);
@@ -3908,7 +4067,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 throw new CertprofileException("could not parse the constant extension value", e);
             }
             QaExtensionValue extension = new QaExtensionValue(m.isCritical(), encodedValue);
-            map.put(new ASN1ObjectIdentifier(m.getType().getValue()), extension);
+            map.put(oid, extension);
         }
 
         if(CollectionUtil.isEmpty(map))
