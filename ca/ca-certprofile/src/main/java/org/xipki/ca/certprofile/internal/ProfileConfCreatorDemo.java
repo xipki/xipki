@@ -65,6 +65,7 @@ import org.xipki.ca.certprofile.x509.jaxb.AlgorithmType;
 import org.xipki.ca.certprofile.x509.jaxb.AnyType;
 import org.xipki.ca.certprofile.x509.jaxb.AuthorityInfoAccess;
 import org.xipki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier;
+import org.xipki.ca.certprofile.x509.jaxb.AuthorizationTemplate;
 import org.xipki.ca.certprofile.x509.jaxb.BasicConstraints;
 import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies;
 import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType;
@@ -1187,6 +1188,18 @@ public class ProfileConfCreatorDemo
         return createExtensionValueType(extValue);
     }
 
+    private static ExtensionValueType createAuthorizationTemplate()
+    {
+        AuthorizationTemplate extValue = new AuthorizationTemplate();
+        extValue.setType(createOidType(new ASN1ObjectIdentifier("1.2.3.4.5"), "dummy type"));
+        ConstantValueType accessRights = new ConstantValueType();
+        accessRights.setDescription("dummy access rights");
+        accessRights.setValue(new byte[]{1, 2, 3, 4});
+        extValue.setAccessRights(accessRights);
+
+        return createExtensionValueType(extValue);
+    }
+
     @SuppressWarnings("unused")
     private static ExtensionValueType createValidityModel(
             OidWithDescType modelId)
@@ -1594,6 +1607,10 @@ public class ProfileConfCreatorDemo
         // QcStatements
         extensionValue = createQcStatements();
         list.add(createExtension(Extension.qCStatements, true, false, extensionValue));
+
+        // authorizationTemplate
+        extensionValue = createAuthorizationTemplate();
+        list.add(createExtension(ObjectIdentifiers.id_xipki_ext_authorizationTemplate, true, false, extensionValue));
 
         return profile;
     }

@@ -454,10 +454,14 @@
       <xs:element name="exponent" type="range2Type"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="range2Type">
-    <xs:attribute name="min" type="xs:int" use="required"/>
-    <xs:attribute name="max" type="xs:int" use="required"/>
-  </xs:complexType>  
+  <xs:element name="authorizationTemplate">
+    <xs:complexType>
+	  <xs:sequence>
+	    <xs:element name="type" type="oidWithDescType"/>
+	    <xs:element name="accessRights" type="constantValueType"/>
+	  </xs:sequence>
+	</xs:complexType>
+  </xs:element>
   <xs:element name="constantExtValue">
     <xs:complexType>
       <xs:simpleContent>
@@ -467,6 +471,11 @@
       </xs:simpleContent>
     </xs:complexType>
   </xs:element>
+  <!-- general types -->
+  <xs:complexType name="range2Type">
+    <xs:attribute name="min" type="xs:int" use="required"/>
+    <xs:attribute name="max" type="xs:int" use="required"/>
+  </xs:complexType>  
   <xs:complexType name="constantValueType">
     <xs:simpleContent>
       <xs:extension base="xs:base64Binary">
@@ -474,7 +483,6 @@
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>
-  <!-- general types -->
   <xs:complexType name="generalNameType">
     <xs:all>
       <xs:element name="rfc822Name" type="xs:string" minOccurs="0"/>
