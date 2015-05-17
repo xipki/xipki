@@ -63,6 +63,7 @@ public class ObjectIdentifiers
 
     public static final ASN1ObjectIdentifier id_xipki_ext_crlCertset           = id_xipki.branch("1.1");
     public static final ASN1ObjectIdentifier id_xipki_ext_cmpRequestExtensions = id_xipki.branch("1.2");
+    public static final ASN1ObjectIdentifier id_xipki_ext_authorizationTemplate = id_xipki.branch("1.3");
 
     public static final ASN1ObjectIdentifier id_xipki_cmp                  = id_xipki.branch("2");
 
@@ -377,6 +378,11 @@ public class ObjectIdentifiers
         backwardDNs = Collections.unmodifiableList(_backwardDNs);
 
         oidNameMap = new HashMap<>();
+
+        oidNameMap.put(id_xipki_ext_crlCertset, "xipki-crlCertset");
+        oidNameMap.put(id_xipki_ext_cmpRequestExtensions, "xipki-cmpRequestExtensions");
+        oidNameMap.put(id_xipki_ext_authorizationTemplate, "xipki-authorizationTemplate");
+
         oidNameMap.put(id_kp_clientAuth, "id-kp-clientAuth");
         oidNameMap.put(id_kp_codeSigning, "id-kp-codeSigning");
         oidNameMap.put(id_kp_emailProtection, "id-kp-emailProtection");
