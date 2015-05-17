@@ -677,11 +677,6 @@ class IdentifiedX509Certprofile
         return certprofile.isOnlyForRA();
     }
 
-    public boolean isOnlyForQA()
-    {
-        return certprofile.isOnlyForQA();
-    }
-
     public SubjectPublicKeyInfo checkPublicKey(
             final SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException
@@ -758,11 +753,6 @@ class IdentifiedX509Certprofile
     public void validate()
     throws CertprofileException
     {
-        if(isOnlyForQA())
-        {
-            return;
-        }
-
         StringBuilder msg = new StringBuilder();
 
         Map<ASN1ObjectIdentifier, ExtensionControl> controls = getExtensionControls();

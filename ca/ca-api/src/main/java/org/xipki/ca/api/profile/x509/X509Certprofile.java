@@ -157,11 +157,6 @@ public abstract class X509Certprofile
         return null;
     }
 
-    public boolean isOnlyForQA()
-    {
-        return false;
-    }
-
     public Set<GeneralNameMode> getSubjectAltNameModes()
     {
         return null;

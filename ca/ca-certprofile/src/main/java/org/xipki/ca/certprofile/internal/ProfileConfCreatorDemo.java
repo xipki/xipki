@@ -1374,25 +1374,9 @@ public class ProfileConfCreatorDemo
             final boolean useMidnightNotBefore,
             String[] sigHashAlgos)
     {
-        final boolean qa = false;
-        return getBaseProfile(description, ca, qa, validity, useMidnightNotBefore, sigHashAlgos);
-    }
-
-    private static X509ProfileType getBaseProfile(
-            final String description,
-            final boolean ca,
-            final boolean qa,
-            final String validity,
-            final boolean useMidnightNotBefore,
-            String[] sigHashAlgos)
-    {
         X509ProfileType profile = new X509ProfileType();
 
         profile.setAppInfo(createDescription(description));
-        if(qa)
-        {
-            profile.setQaOnly(true);
-        }
         profile.setCa(ca);
         profile.setVersion(3);
         profile.setValidity(validity);

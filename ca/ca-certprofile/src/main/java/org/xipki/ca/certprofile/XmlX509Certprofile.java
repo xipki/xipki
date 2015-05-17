@@ -168,7 +168,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     private List<String> signatureAlgorithms;
     private boolean incSerialNoIfSubjectExists;
     private boolean raOnly;
-    private boolean qaOnly;
     private boolean backwardsSubject;
     private boolean ca;
     private boolean duplicateKeyPermitted;
@@ -213,7 +212,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         includeIssuerAndSerialInAKI = false;
         incSerialNoIfSubjectExists = false;
         raOnly = false;
-        qaOnly = false;
         backwardsSubject = false;
         ca = false;
         duplicateKeyPermitted = true;
@@ -309,7 +307,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         }
 
         this.raOnly = conf.isRaOnly();
-        this.qaOnly = conf.isQaOnly();
 
         this.validity = CertValidity.getInstance(conf.getValidity());
         this.ca = conf.isCa();
@@ -1425,12 +1422,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     public boolean isOnlyForRA()
     {
         return raOnly;
-    }
-
-    @Override
-    public boolean isOnlyForQA()
-    {
-        return qaOnly;
     }
 
     @Override
