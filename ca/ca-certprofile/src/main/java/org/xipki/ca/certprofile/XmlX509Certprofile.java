@@ -58,6 +58,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1StreamParser;
+import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
@@ -101,6 +102,7 @@ import org.xipki.ca.certprofile.x509.jaxb.AdditionalInformation;
 import org.xipki.ca.certprofile.x509.jaxb.Admission;
 import org.xipki.ca.certprofile.x509.jaxb.AuthorityInfoAccess;
 import org.xipki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier;
+import org.xipki.ca.certprofile.x509.jaxb.AuthorizationTemplate;
 import org.xipki.ca.certprofile.x509.jaxb.BasicConstraints;
 import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies;
 import org.xipki.ca.certprofile.x509.jaxb.ConstantExtValue;
@@ -188,6 +190,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     private CertValidity privateKeyUsagePeriod;
     private ExtensionValue qCStatments;
     private List<QcStatementOption> qcStatementsOption;
+    private ExtensionValue authorizationTemplate;
 
     private Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions;
 
@@ -221,6 +224,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         policyMappings = null;
         inhibitAnyPolicy = null;
         admission = null;
+        restriction = null;
+        additionalInformation = null;
+        validityModel = null;
+        privateKeyUsagePeriod = null;
+        qCStatments = null;
+        qcStatementsOption = null;
+        authorizationTemplate = null;
         constantExtensions = null;
     }
 
@@ -746,6 +756,22 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             }
         }
 
+        // authorizationTemplate
+        type = ObjectIdentifiers.id_xipki_ext_authorizationTemplate;
+        if(extensionControls.containsKey(type))
+        {
+            AuthorizationTemplate extConf = (AuthorizationTemplate) getExtensionValue(
+                    type, extensionsType, AuthorizationTemplate.class);
+            if(extConf != null)
+            {
+                ASN1EncodableVector v = new ASN1EncodableVector();
+                v.add(new ASN1ObjectIdentifier(extConf.getType().getValue()));
+                v.add(new DERBitString(extConf.getAccessRights().getValue()));
+                ASN1Encodable extValue = new DERSequence(v);
+                authorizationTemplate = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+            }
+        }
+
         // constant extensions
         this.constantExtensions = XmlX509CertprofileUtil.buildConstantExtesions(extensionsType);
     }
@@ -1206,6 +1232,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             {
                 throw new RuntimeException("should not reach here");
             }
+        }
+
+        // authorizationTemplate
+        type = ObjectIdentifiers.id_xipki_ext_authorizationTemplate;
+        if(authorizationTemplate != null && occurences.remove(type) != null)
+        {
+            values.addExtension(type, authorizationTemplate);
         }
 
         // constant extensions

@@ -214,7 +214,23 @@
               </qcEuLimitValue>
             </statementValue>
           </qCStatement>
+          <qCStatement>
+            <statementId description="dummy">1.2.3.4.5</statementId>
+            <statementValue>
+              <constant description="DER NULL">BQA=</constant>
+            </statementValue>
+          </qCStatement>
         </qCStatements>
+      </value>
+    </extension>
+    <extension required="true" permittedInRequest="false">
+      <type description="xipki-authorizationTemplate">1.3.6.2.4.1.45522.1.3</type>
+      <critical>false</critical>
+      <value>
+        <authorizationTemplate>
+          <type description="dummy type">1.2.3.4.5</type>
+          <accessRights description="dummy access rights">AQIDBA==</accessRights>
+        </authorizationTemplate>
       </value>
     </extension>
   </extensions>

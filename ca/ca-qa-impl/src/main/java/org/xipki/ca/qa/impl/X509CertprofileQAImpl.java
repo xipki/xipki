@@ -68,6 +68,7 @@ import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERBMPString;
+import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
@@ -135,6 +136,7 @@ import org.xipki.ca.certprofile.SubjectDNOption;
 import org.xipki.ca.certprofile.XmlX509CertprofileUtil;
 import org.xipki.ca.certprofile.x509.jaxb.AdditionalInformation;
 import org.xipki.ca.certprofile.x509.jaxb.Admission;
+import org.xipki.ca.certprofile.x509.jaxb.AuthorizationTemplate;
 import org.xipki.ca.certprofile.x509.jaxb.ConstantExtValue;
 import org.xipki.ca.certprofile.x509.jaxb.ExtendedKeyUsage;
 import org.xipki.ca.certprofile.x509.jaxb.ExtensionType;
@@ -161,6 +163,7 @@ import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
 import org.xipki.ca.qa.api.X509CertprofileQA;
 import org.xipki.ca.qa.api.X509IssuerInfo;
 import org.xipki.ca.qa.impl.internal.QaAdmission;
+import org.xipki.ca.qa.impl.internal.QaAuthorizationTemplate;
 import org.xipki.ca.qa.impl.internal.QaCertificatePolicies;
 import org.xipki.ca.qa.impl.internal.QaCertificatePolicies.QaCertificatePolicyInformation;
 import org.xipki.ca.qa.impl.internal.QaDirectoryString;
@@ -246,6 +249,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
     private ASN1ObjectIdentifier validityModelId;
     private CertValidity privateKeyUsagePeriod;
     private QCStatements qcStatements;
+    private QaAuthorizationTemplate authorizationTemplate;
 
     private Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
 
@@ -580,6 +584,18 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 }
             }
 
+            // AuthorizationTemplate
+            type = ObjectIdentifiers.id_xipki_ext_authorizationTemplate;
+            if(extensionControls.containsKey(type))
+            {
+                AuthorizationTemplate extConf = (AuthorizationTemplate) getExtensionValue(
+                        type, extensionsType, AuthorizationTemplate.class);
+                if(extConf != null)
+                {
+                    authorizationTemplate = new QaAuthorizationTemplate(extConf);
+                }
+            }
+
             // constant extensions
             this.constantExtensions = buildConstantExtesions(extensionsType);
         }catch(RuntimeException e)
@@ -910,6 +926,10 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 {
                 	// qCStatements
                     checkExtensionQCStatements(failureMsg, extensionValue, requestExtensions, extControl);
+                } else if(ObjectIdentifiers.id_xipki_ext_authorizationTemplate.equals(oid))
+                {
+                	// authorizationTemplate
+                    checkExtensionAuthorizationTemplate(failureMsg, extensionValue, requestExtensions, extControl);
                 }
                 else
                 {
@@ -3552,6 +3572,46 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 failureMsg.append("statementInfo[" + i + "] has incorrect syntax");
                 failureMsg.append("; ");
             }
+        }
+    }
+
+    private void checkExtensionAuthorizationTemplate(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
+    {
+        QaAuthorizationTemplate conf = authorizationTemplate;
+
+        if(conf == null)
+        {
+            byte[] expected = getExpectedExtValue(ObjectIdentifiers.id_xipki_ext_authorizationTemplate,
+                    requestExtensions, extControl);
+            if(Arrays.equals(expected, extensionValue) == false)
+            {
+                failureMsg.append("extension valus is '" + hex(extensionValue) +
+                        "' but expected '" + (expected == null ? "not present" : hex(expected)) + "'");
+                failureMsg.append("; ");
+            }
+            return;
+        }
+
+        ASN1Sequence seq = ASN1Sequence.getInstance(extensionValue);
+        ASN1ObjectIdentifier type = ASN1ObjectIdentifier.getInstance(seq.getObjectAt(0));
+        DERBitString accessRights = DERBitString.getInstance(seq.getObjectAt(1));
+        if(conf.getType().equals(type.getId()) == false)
+        {
+            failureMsg.append("type is '" + type.getId() +
+                    "' but expected '" + conf.getType() + "'");
+            failureMsg.append("; ");
+        }
+
+        byte[] isRights = accessRights.getBytes();
+        if(Arrays.equals(conf.getAccessRights(), isRights) == false)
+        {
+            failureMsg.append("accessRights is '" + hex(isRights) +
+                    "' but expected '" + hex(conf.getAccessRights()) + "'");
+            failureMsg.append("; ");
         }
     }
 
