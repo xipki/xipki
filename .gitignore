@@ -3,6 +3,7 @@
 /build/
 /bin/
 target/
+
 # OS Files #
 .DS_Store
 *.class
@@ -38,6 +39,7 @@ Desktop.ini
 .metadata
 bin/**
 tmp/**
+tmp/
 tmp/**/*
 *.tmp
 *.bak
