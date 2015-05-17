@@ -124,6 +124,36 @@ public class AlgorithmUtil
         }
     }
 
+    public static int getHashOutputSizeInOctets(
+            ASN1ObjectIdentifier hashAlgo)
+    throws NoSuchAlgorithmException
+    {
+        if(X509ObjectIdentifiers.id_SHA1.equals(hashAlgo))
+        {
+            return 20;
+        }
+        if(NISTObjectIdentifiers.id_sha224.equals(hashAlgo))
+        {
+            return 28;
+        }
+        if(NISTObjectIdentifiers.id_sha256.equals(hashAlgo))
+        {
+            return 32;
+        }
+        if(NISTObjectIdentifiers.id_sha384.equals(hashAlgo))
+        {
+            return 48;
+        }
+        if(NISTObjectIdentifiers.id_sha512.equals(hashAlgo))
+        {
+            return 64;
+        }
+        else
+        {
+            throw new NoSuchAlgorithmException("Unsupported hash algorithm " + hashAlgo.getId());
+        }
+    }
+
     static public String getSignatureAlgoName(
             final AlgorithmIdentifier sigAlgId)
     throws NoSuchAlgorithmException

@@ -36,6 +36,7 @@
 package org.xipki.security.shell;
 
 import java.io.File;
+import java.security.MessageDigest;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,21 +47,29 @@ import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERIA5String;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x509.qualified.BiometricData;
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
+import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.SignatureAlgoControl;
+import org.xipki.common.util.AlgorithmUtil;
+import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.security.P10RequestGenerator;
 import org.xipki.security.api.ConcurrentContentSigner;
@@ -126,6 +135,22 @@ public abstract class CertRequestGenCommand extends SecurityCommand
             description = "QC EuLimitValue of format <currency>:<amount>:<exponent>.\n"
                     + "(multi-valued)")
     private List<String> qcEuLimits;
+
+    @Option(name = "--biometric-type",
+            description = "Biometric type")
+    private String biometricType;
+
+    @Option(name = "--biometric-hash",
+            description = "Biometric hash algorithm")
+    private String biometricHashAlgo;
+
+    @Option(name = "--biometric-file",
+            description = "Biometric hash algorithm")
+    private String biometricFile;
+
+    @Option(name = "--biometric-uri",
+            description = "Biometric sourcedata URI")
+    private String biometricUri;
 
     @Option(name = "--need-extension",
             multiValued = true,
@@ -240,6 +265,53 @@ public abstract class CertRequestGenCommand extends SecurityCommand
             ASN1Sequence extValue = new DERSequence(v);
             extensions.add(new Extension(extType, false, extValue.getEncoded()));
             needExtensionTypes.add(extType.getId());
+        }
+
+        // biometricInfo
+        if(biometricType != null && biometricHashAlgo != null && biometricFile != null)
+        {
+            TypeOfBiometricData _biometricType;
+            if(StringUtil.isNumber(biometricType))
+            {
+                _biometricType = new TypeOfBiometricData(Integer.parseInt(biometricType));
+            }
+            else
+            {
+                _biometricType = new TypeOfBiometricData(new ASN1ObjectIdentifier(biometricType));
+            }
+
+            ASN1ObjectIdentifier _biometricHashAlgo = AlgorithmUtil.getHashAlg(biometricHashAlgo);
+            byte[] biometricBytes = IoUtil.read(biometricFile);
+            MessageDigest md = MessageDigest.getInstance(_biometricHashAlgo.getId());
+            md.reset();
+            byte[] _biometricDataHash = md.digest(biometricBytes);
+
+            DERIA5String _sourceDataUri = null;
+            if(biometricUri != null)
+            {
+                _sourceDataUri = new DERIA5String(biometricUri);
+            }
+            BiometricData biometricData = new BiometricData(_biometricType,
+                    new AlgorithmIdentifier(_biometricHashAlgo),
+                    new DEROctetString(_biometricDataHash),
+                    _sourceDataUri);
+
+            ASN1EncodableVector v = new ASN1EncodableVector();
+            v.add(biometricData);
+
+            ASN1ObjectIdentifier extType = Extension.biometricInfo;
+            ASN1Sequence extValue = new DERSequence(v);
+            extensions.add(new Extension(extType, false, extValue.getEncoded()));
+            needExtensionTypes.add(extType.getId());
+        }
+        else if(biometricType == null && biometricHashAlgo == null && biometricFile == null)
+        {
+        	// Do nothing
+        }
+        else
+        {
+            throw new Exception("either all of biometric triples (type, hash algo, file)"
+                    + " must be set or none of them should be set");
         }
 
         if(isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes))
