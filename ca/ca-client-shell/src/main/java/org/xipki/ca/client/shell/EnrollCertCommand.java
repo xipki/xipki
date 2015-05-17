@@ -41,9 +41,13 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.apache.karaf.shell.commands.Option;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
 import org.bouncycastle.asn1.crmf.POPOSigningKey;
@@ -52,6 +56,9 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
+import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
+import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
 import org.bouncycastle.operator.ContentSigner;
@@ -142,6 +149,12 @@ public abstract class EnrollCertCommand extends ClientCommand
                     + "(multi-valued)")
     private List<String> subjectInfoAccesses;
 
+    @Option(name = "--qc-eu-limit",
+            multiValued = true,
+            description = "QC EuLimitValue of format <currency>:<amount>:<exponent>.\n"
+                    + "(multi-valued)")
+    private List<String> qcEuLimits;
+
     @Option(name = "--need-extension",
             multiValued = true,
             description = "type (OID or name) of extension that must be contaied in the certificate\n"
@@ -223,6 +236,47 @@ public abstract class EnrollCertCommand extends ClientCommand
                     SecurityUtil.textToASN1ObjectIdentifers(extkeyusages));
             ExtendedKeyUsage extValue = X509Util.createExtendedUsage(oids);
             ASN1ObjectIdentifier extType = Extension.extendedKeyUsage;
+            extensions.add(new Extension(extType, false, extValue.getEncoded()));
+            needExtensionTypes.add(extType.getId());
+        }
+
+        // QcEuLimitValue
+        if(isNotEmpty(qcEuLimits))
+        {
+            ASN1EncodableVector v = new ASN1EncodableVector();
+            for(String m : qcEuLimits)
+            {
+                StringTokenizer st = new StringTokenizer(m, ":");
+                try
+                {
+                    String currencyS = st.nextToken();
+                    String amountS = st.nextToken();
+                    String exponentS = st.nextToken();
+
+                    Iso4217CurrencyCode currency;
+                    try
+                    {
+                        int intValue = Integer.parseInt(currencyS);
+                        currency = new Iso4217CurrencyCode(intValue);
+                    }catch(NumberFormatException e)
+                    {
+                        currency = new Iso4217CurrencyCode(currencyS);
+                    }
+
+                    int amount = Integer.parseInt(amountS);
+                    int exponent = Integer.parseInt(exponentS);
+
+                    MonetaryValue monterayValue = new MonetaryValue(currency, amount, exponent);
+                    QCStatement statment = new QCStatement(ObjectIdentifiers.id_etsi_qcs_QcLimitValue, monterayValue);
+                    v.add(statment);
+                }catch(Exception e)
+                {
+                    throw new Exception("invalid qc-eu-limit '" + m + "'");
+                }
+            }
+
+            ASN1ObjectIdentifier extType = Extension.qCStatements;
+            ASN1Sequence extValue = new DERSequence(v);
             extensions.add(new Extension(extType, false, extValue.getEncoded()));
             needExtensionTypes.add(extType.getId());
         }

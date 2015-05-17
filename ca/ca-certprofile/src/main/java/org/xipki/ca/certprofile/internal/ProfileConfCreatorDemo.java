@@ -69,6 +69,7 @@ import org.xipki.ca.certprofile.x509.jaxb.BasicConstraints;
 import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies;
 import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType;
 import org.xipki.ca.certprofile.x509.jaxb.ConstantExtValue;
+import org.xipki.ca.certprofile.x509.jaxb.ConstantValueType;
 import org.xipki.ca.certprofile.x509.jaxb.DSAParameters;
 import org.xipki.ca.certprofile.x509.jaxb.DirectoryStringType;
 import org.xipki.ca.certprofile.x509.jaxb.ECParameters;
@@ -95,7 +96,12 @@ import org.xipki.ca.certprofile.x509.jaxb.PolicyConstraints;
 import org.xipki.ca.certprofile.x509.jaxb.PolicyIdMappingType;
 import org.xipki.ca.certprofile.x509.jaxb.PolicyMappings;
 import org.xipki.ca.certprofile.x509.jaxb.PrivateKeyUsagePeriod;
+import org.xipki.ca.certprofile.x509.jaxb.QCStatementType;
+import org.xipki.ca.certprofile.x509.jaxb.QCStatementValueType;
+import org.xipki.ca.certprofile.x509.jaxb.QCStatements;
+import org.xipki.ca.certprofile.x509.jaxb.QcEuLimitValueType;
 import org.xipki.ca.certprofile.x509.jaxb.RSAParameters;
+import org.xipki.ca.certprofile.x509.jaxb.Range2Type;
 import org.xipki.ca.certprofile.x509.jaxb.RangeType;
 import org.xipki.ca.certprofile.x509.jaxb.RangesType;
 import org.xipki.ca.certprofile.x509.jaxb.RdnType;
@@ -1114,6 +1120,73 @@ public class ProfileConfCreatorDemo
         return createExtensionValueType(extValue);
     }
 
+    private static ExtensionValueType createQcStatements()
+    {
+        QCStatements extValue = new QCStatements();
+        {
+            QCStatementType statement = new QCStatementType();
+            statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcCompliance));
+            extValue.getQCStatement().add(statement);
+        }
+
+        {
+            QCStatementType statement = new QCStatementType();
+            statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcSSCD));
+            extValue.getQCStatement().add(statement);
+        }
+
+        {
+            QCStatementType statement = new QCStatementType();
+            statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcRetentionPeriod));
+            QCStatementValueType statementValue = new QCStatementValueType();
+            statementValue.setQcRetentionPeriod(10);
+            statement.setStatementValue(statementValue);
+            extValue.getQCStatement().add(statement);
+        }
+
+        {
+            QCStatementType statement = new QCStatementType();
+            statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcLimitValue));
+            QCStatementValueType statementValue = new QCStatementValueType();
+
+            QcEuLimitValueType euLimit = new QcEuLimitValueType();
+            euLimit.setCurrency("EUR");
+            Range2Type rAmount = new Range2Type();
+            rAmount.setMin(100);
+            rAmount.setMax(200);
+            euLimit.setAmount(rAmount);
+
+            Range2Type rExponent = new Range2Type();
+            rExponent.setMin(10);
+            rExponent.setMax(20);
+            euLimit.setExponent(rExponent);
+
+            statementValue.setQcEuLimitValue(euLimit);
+            statement.setStatementValue(statementValue);
+            extValue.getQCStatement().add(statement);
+        }
+
+        {
+            QCStatementType statement = new QCStatementType();
+            statement.setStatementId(createOidType(new ASN1ObjectIdentifier("1.2.3.4.5"), "dummy"));
+            QCStatementValueType statementValue = new QCStatementValueType();
+            ConstantValueType value = new ConstantValueType();
+            try
+            {
+                value.setValue(DERNull.INSTANCE.getEncoded());
+            } catch (IOException e)
+            {
+                throw new RuntimeException(e);
+            }
+            value.setDescription("DER NULL");
+            statementValue.setConstant(value);
+            statement.setStatementValue(statementValue);
+            extValue.getQCStatement().add(statement);
+        }
+
+        return createExtensionValueType(extValue);
+    }
+
     @SuppressWarnings("unused")
     private static ExtensionValueType createValidityModel(
             OidWithDescType modelId)
@@ -1517,6 +1590,10 @@ public class ProfileConfCreatorDemo
         // privateKeyUsagePeriod
         extensionValue = createPrivateKeyUsagePeriod("3y");
         list.add(createExtension(Extension.privateKeyUsagePeriod, true, false, extensionValue));
+
+        // QcStatements
+        extensionValue = createQcStatements();
+        list.add(createExtension(Extension.qCStatements, true, false, extensionValue));
 
         return profile;
     }
