@@ -208,9 +208,9 @@
             <statementId description="etsi-qcs-QcLimitValue">0.4.0.1862.1.2</statementId>
             <statementValue>
               <qcEuLimitValue>
-<currency>EUR</currency>
-<amount min="100" max="200"/>
-<exponent min="10" max="20"/>
+                <currency>EUR</currency>
+                <amount min="100" max="200"/>
+                <exponent min="10" max="20"/>
               </qcEuLimitValue>
             </statementValue>
           </qCStatement>
