@@ -104,6 +104,9 @@ import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.UserNotice;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
+import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
+import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
+import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.math.ec.ECCurve;
@@ -140,6 +143,11 @@ import org.xipki.ca.certprofile.x509.jaxb.InhibitAnyPolicy;
 import org.xipki.ca.certprofile.x509.jaxb.PolicyConstraints;
 import org.xipki.ca.certprofile.x509.jaxb.PolicyMappings;
 import org.xipki.ca.certprofile.x509.jaxb.PrivateKeyUsagePeriod;
+import org.xipki.ca.certprofile.x509.jaxb.QCStatementType;
+import org.xipki.ca.certprofile.x509.jaxb.QCStatementValueType;
+import org.xipki.ca.certprofile.x509.jaxb.QCStatements;
+import org.xipki.ca.certprofile.x509.jaxb.QcEuLimitValueType;
+import org.xipki.ca.certprofile.x509.jaxb.Range2Type;
 import org.xipki.ca.certprofile.x509.jaxb.RangeType;
 import org.xipki.ca.certprofile.x509.jaxb.RangesType;
 import org.xipki.ca.certprofile.x509.jaxb.RdnType;
@@ -237,6 +245,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
     private QaDirectoryString additionalInformation;
     private ASN1ObjectIdentifier validityModelId;
     private CertValidity privateKeyUsagePeriod;
+    private QCStatements qcStatements;
 
     private Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
 
@@ -556,6 +565,18 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 if(extConf != null)
                 {
                     privateKeyUsagePeriod = CertValidity.getInstance(extConf.getValidity());
+                }
+            }
+
+            // QCStatements
+            type = Extension.qCStatements;
+            if(extensionControls.containsKey(type))
+            {
+                QCStatements extConf = (QCStatements) getExtensionValue(
+                        type, extensionsType, QCStatements.class);
+                if(extConf != null)
+                {
+                    qcStatements = extConf;
                 }
             }
 
@@ -885,6 +906,10 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 {
                 	// privateKeyUsagePeriod
                     checkExtensionPrivateKeyUsagePeriod(failureMsg, extensionValue, cert.getNotBefore(), cert.getNotAfter());
+                } else if(Extension.qCStatements.equals(oid))
+                {
+                	// qCStatements
+                    checkExtensionQCStatements(failureMsg, extensionValue, requestExtensions, extControl);
                 }
                 else
                 {
@@ -3330,6 +3355,203 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             failureMsg.append("notAfter is '" + time.getTimeString() + "' but expected '" +
                     notAfter.getTimeString() + "'");
             failureMsg.append("; ");
+        }
+    }
+
+    private void checkExtensionQCStatements(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl)
+    {
+        QCStatements conf = qcStatements;
+        if(conf == null)
+        {
+            byte[] expected = getExpectedExtValue(ObjectIdentifiers.id_extension_validityModel,
+                    requestExtensions, extControl);
+            if(Arrays.equals(expected, extensionValue) == false)
+            {
+                failureMsg.append("extension valus is '" + hex(extensionValue) +
+                        "' but expected '" + (expected == null ? "not present" : hex(expected)) + "'");
+                failureMsg.append("; ");
+            }
+            return;
+        }
+
+        final int expSize = conf.getQCStatement().size();
+        ASN1Sequence extValue = ASN1Sequence.getInstance(extensionValue);
+        final int isSize = extValue.size();
+        if(isSize != expSize)
+        {
+            failureMsg.append("number of statements is '" + isSize +
+                    "' but expected '" + expSize + "'");
+            failureMsg.append("; ");
+            return;
+        }
+
+		// extract the euLimit data from request
+        Map<String, int[]> reqQcEuLimits = new HashMap<>();
+        Extension extension = requestExtensions.getExtension(Extension.qCStatements);
+        if(extension != null)
+        {
+            ASN1Sequence seq = ASN1Sequence.getInstance(extension.getParsedValue());
+
+            final int n = seq.size();
+            for(int j = 0; j < n; j++)
+            {
+                QCStatement stmt = QCStatement.getInstance(seq.getObjectAt(j));
+                if(ObjectIdentifiers.id_etsi_qcs_QcLimitValue.equals(stmt.getStatementId()) == false)
+                {
+                    continue;
+                }
+
+                MonetaryValue monetaryValue = MonetaryValue.getInstance(stmt.getStatementInfo());
+                int amount = monetaryValue.getAmount().intValue();
+                int exponent = monetaryValue.getExponent().intValue();
+                Iso4217CurrencyCode currency = monetaryValue.getCurrency();
+                String currencyS = currency.isAlphabetic() ? currency.getAlphabetic().toUpperCase() :
+                        Integer.toString(currency.getNumeric());
+                reqQcEuLimits.put(currencyS, new int[]{amount, exponent});
+            }
+        }
+
+        for(int i = 0; i < expSize; i++)
+        {
+            QCStatement is = QCStatement.getInstance(extValue.getObjectAt(i));
+            QCStatementType exp = conf.getQCStatement().get(i);
+            if(is.getStatementId().getId().equals(exp.getStatementId().getValue()) == false)
+            {
+                failureMsg.append("statmentId["+ i + "] is '" + is.getStatementId().getId() +
+                        "' but expected '" + exp.getStatementId().getValue() + "'");
+                failureMsg.append("; ");
+                continue;
+            }
+
+            if(exp.getStatementValue() == null)
+            {
+                if(is.getStatementInfo() != null)
+                {
+                    failureMsg.append("statmentInfo["+ i + "] is 'present' but expected 'absent'");
+                    failureMsg.append("; ");
+                }
+                continue;
+            }
+
+            if(is.getStatementInfo() == null)
+            {
+                failureMsg.append("statmentInfo["+ i + "] is 'absent' but expected 'present'");
+                failureMsg.append("; ");
+                continue;
+            }
+
+            QCStatementValueType expStatementValue = exp.getStatementValue();
+            try
+            {
+                if(expStatementValue.getConstant() != null)
+                {
+                    byte[] expValue = expStatementValue.getConstant().getValue();
+                    byte[] isValue = is.getStatementInfo().toASN1Primitive().getEncoded();
+                    if(Arrays.equals(isValue, expValue) == false)
+                    {
+                        failureMsg.append("statementInfo[" + i + "] is '" + hex(isValue) +
+                                "' but expected '" + hex(expValue) + "'");
+                        failureMsg.append("; ");
+                    }
+                }
+                else if(expStatementValue.getQcRetentionPeriod() != null)
+                {
+                    String isValue = ASN1Integer.getInstance(is.getStatementInfo()).toString();
+                    String expValue = expStatementValue.getQcRetentionPeriod().toString();
+                    if(isValue.equals(expValue) == false)
+                    {
+                        failureMsg.append("statementInfo[" + i + "] is '" + isValue +
+                                "' but expected '" + expValue + "'");
+                        failureMsg.append("; ");
+                    }
+                }
+                else if(expStatementValue.getQcEuLimitValue() != null)
+                {
+                    QcEuLimitValueType euLimitConf = expStatementValue.getQcEuLimitValue();
+                    String expCurrency = euLimitConf.getCurrency().toUpperCase();
+                    int[] expAmountExp = reqQcEuLimits.get(expCurrency);
+                    String expAmount;
+
+                    {
+                        Range2Type range = euLimitConf.getAmount();
+                        int value;
+                        if(range.getMin() == range.getMax())
+                        {
+                            value = range.getMin();
+                        }
+                        else if(expAmountExp != null)
+                        {
+                            value = expAmountExp[0];
+                        }
+                        else
+                        {
+                            failureMsg.append("found no QcEuLimit for currency '" + expCurrency + "'");
+                            failureMsg.append("; ");
+                            return;
+                        }
+                        expAmount = Integer.toString(value);
+                    }
+
+                    String expExponent;
+
+                    {
+                        Range2Type range = euLimitConf.getExponent();
+                        int value;
+                        if(range.getMin() == range.getMax())
+                        {
+                            value = range.getMin();
+                        }
+                        else if(expAmountExp != null)
+                        {
+                            value = expAmountExp[1];
+                        }
+                        else
+                        {
+                            failureMsg.append("found no QcEuLimit for currency '" + expCurrency + "'");
+                            failureMsg.append("; ");
+                            return;
+                        }
+                        expExponent = Integer.toString(value);
+                    }
+
+                    MonetaryValue monterayValue = MonetaryValue.getInstance(is.getStatementInfo());
+                    Iso4217CurrencyCode currency = monterayValue.getCurrency();
+                    String isCurrency = currency.isAlphabetic() ? currency.getAlphabetic() :
+                            Integer.toString(currency.getNumeric());
+                    String isAmount = monterayValue.getAmount().toString();
+                    String isExponent = monterayValue.getExponent().toString();
+                    if(isCurrency.equals(expCurrency) == false)
+                    {
+                        failureMsg.append("statementInfo[" + i + "].qcEuLimit.currency is '" + isCurrency +
+                                "' but expected '" + expCurrency + "'");
+                        failureMsg.append("; ");
+                    }
+                    if(isAmount.equals(expAmount) == false)
+                    {
+                        failureMsg.append("statementInfo[" + i + "].qcEuLimit.amount is '" + isAmount +
+                                "' but expected '" + expAmount + "'");
+                        failureMsg.append("; ");
+                    }
+                    if(isExponent.equals(expExponent) == false)
+                    {
+                        failureMsg.append("statementInfo[" + i + "].qcEuLimit.exponent is '" + isExponent +
+                                "' but expected '" + expExponent + "'");
+                        failureMsg.append("; ");
+                    }
+                }
+                else
+                {
+                    throw new RuntimeException("statementInfo[" + i + "]should not reach here");
+                }
+            } catch (IOException e)
+            {
+                failureMsg.append("statementInfo[" + i + "] has incorrect syntax");
+                failureMsg.append("; ");
+            }
         }
     }
 

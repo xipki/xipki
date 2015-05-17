@@ -206,8 +206,9 @@ xipki-tk:rsa-p12 \
 xipki-tk:req-p12 \
   --p12 output/EE.Complex1.p12 \
   --password 1234 \
-  --out output/EE.Complex1.p10
-
+  --out output/EE.Complex1.p10 \
+  --qc-eu-limit EUR:150:15
+  
 xipki-cli:p10-enroll \
   --p10 output/EE.Complex1.p10 \
   --out output/EE.Complex1.der \
