@@ -51,6 +51,7 @@ import javax.xml.validation.SchemaFactory;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
@@ -67,6 +68,8 @@ import org.xipki.ca.certprofile.x509.jaxb.AuthorityInfoAccess;
 import org.xipki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier;
 import org.xipki.ca.certprofile.x509.jaxb.AuthorizationTemplate;
 import org.xipki.ca.certprofile.x509.jaxb.BasicConstraints;
+import org.xipki.ca.certprofile.x509.jaxb.BiometricInfo;
+import org.xipki.ca.certprofile.x509.jaxb.BiometricTypeType;
 import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies;
 import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType;
 import org.xipki.ca.certprofile.x509.jaxb.ConstantExtValue;
@@ -86,6 +89,7 @@ import org.xipki.ca.certprofile.x509.jaxb.GeneralNameType.OtherName;
 import org.xipki.ca.certprofile.x509.jaxb.GeneralSubtreeBaseType;
 import org.xipki.ca.certprofile.x509.jaxb.GeneralSubtreesType;
 import org.xipki.ca.certprofile.x509.jaxb.InhibitAnyPolicy;
+import org.xipki.ca.certprofile.x509.jaxb.IntWithDescType;
 import org.xipki.ca.certprofile.x509.jaxb.KeyParametersType;
 import org.xipki.ca.certprofile.x509.jaxb.KeyUsage;
 import org.xipki.ca.certprofile.x509.jaxb.KeyUsageEnum;
@@ -109,6 +113,7 @@ import org.xipki.ca.certprofile.x509.jaxb.RdnType;
 import org.xipki.ca.certprofile.x509.jaxb.Restriction;
 import org.xipki.ca.certprofile.x509.jaxb.SubjectAltName;
 import org.xipki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
+import org.xipki.ca.certprofile.x509.jaxb.TripleState;
 import org.xipki.ca.certprofile.x509.jaxb.UsageType;
 import org.xipki.ca.certprofile.x509.jaxb.ValidityModel;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
@@ -1188,6 +1193,43 @@ public class ProfileConfCreatorDemo
         return createExtensionValueType(extValue);
     }
 
+    private static ExtensionValueType createBiometricInfo()
+    {
+        BiometricInfo extValue = new BiometricInfo();
+
+        // type
+        {
+        	// predefined image (0)
+            BiometricTypeType type = new BiometricTypeType();
+            IntWithDescType predefined = new IntWithDescType();
+            predefined.setValue(0);
+            predefined.setDescription("image");
+            type.setPredefined(predefined);
+            extValue.getType().add(type);
+
+        	// predefined handwritten-signature(1)
+            type = new BiometricTypeType();
+            predefined = new IntWithDescType();
+            predefined.setValue(1);
+            predefined.setDescription("handwritten-signature");
+            type.setPredefined(predefined);
+            extValue.getType().add(type);
+
+        	// OID
+            type = new BiometricTypeType();
+            type.setOid(createOidType(new ASN1ObjectIdentifier("1.2.3.4.5.6"), "dummy biometric type"));
+            extValue.getType().add(type);
+        }
+
+        // hash algorithm
+        {
+            extValue.getHashAlgorithm().add(createOidType(NISTObjectIdentifiers.id_sha256, "SHA256"));
+            extValue.getHashAlgorithm().add(createOidType(NISTObjectIdentifiers.id_sha384, "SHA384"));
+        }
+        extValue.setIncludeSourceDataUri(TripleState.REQUIRED);
+        return createExtensionValueType(extValue);
+    }
+
     private static ExtensionValueType createAuthorizationTemplate()
     {
         AuthorizationTemplate extValue = new AuthorizationTemplate();
@@ -1607,6 +1649,10 @@ public class ProfileConfCreatorDemo
         // QcStatements
         extensionValue = createQcStatements();
         list.add(createExtension(Extension.qCStatements, true, false, extensionValue));
+
+        // biometricInfo
+        extensionValue = createBiometricInfo();
+        list.add(createExtension(Extension.biometricInfo, true, false, extensionValue));
 
         // authorizationTemplate
         extensionValue = createAuthorizationTemplate();
