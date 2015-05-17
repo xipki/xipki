@@ -64,6 +64,7 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertPolicyId;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralSubtree;
 import org.bouncycastle.asn1.x509.NameConstraints;
@@ -573,6 +574,14 @@ public class XmlX509CertprofileUtil
                 continue;
             }
 
+            ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
+            if(Extension.subjectAlternativeName.equals(oid) ||
+                    Extension.subjectInfoAccess.equals(oid) ||
+                    Extension.biometricInfo.equals(oid))
+            {
+                continue;
+            }
+
             ConstantExtValue extConf = (ConstantExtValue) m.getValue().getAny();
             byte[] encodedValue = extConf.getValue();
             ASN1StreamParser parser = new ASN1StreamParser(encodedValue);
@@ -585,7 +594,7 @@ public class XmlX509CertprofileUtil
                 throw new CertprofileException("could not parse the constant extension value", e);
             }
             ExtensionValue extension = new ExtensionValue(m.isCritical(), value);
-            map.put(new ASN1ObjectIdentifier(m.getType().getValue()), extension);
+            map.put(oid, extension);
         }
 
         if(CollectionUtil.isEmpty(map))

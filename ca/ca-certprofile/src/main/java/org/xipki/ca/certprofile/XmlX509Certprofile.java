@@ -60,6 +60,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERGeneralizedTime;
+import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
@@ -70,11 +71,14 @@ import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.qualified.BiometricData;
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
+import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
@@ -104,6 +108,7 @@ import org.xipki.ca.certprofile.x509.jaxb.AuthorityInfoAccess;
 import org.xipki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier;
 import org.xipki.ca.certprofile.x509.jaxb.AuthorizationTemplate;
 import org.xipki.ca.certprofile.x509.jaxb.BasicConstraints;
+import org.xipki.ca.certprofile.x509.jaxb.BiometricInfo;
 import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies;
 import org.xipki.ca.certprofile.x509.jaxb.ConstantExtValue;
 import org.xipki.ca.certprofile.x509.jaxb.ExtendedKeyUsage;
@@ -191,6 +196,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     private ExtensionValue qCStatments;
     private List<QcStatementOption> qcStatementsOption;
     private ExtensionValue authorizationTemplate;
+    private BiometricInfoOption biometricDataOption;
 
     private Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions;
 
@@ -231,6 +237,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         qCStatments = null;
         qcStatementsOption = null;
         authorizationTemplate = null;
+        biometricDataOption = null;
         constantExtensions = null;
     }
 
@@ -705,11 +712,12 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                         }
 
                         Iso4217CurrencyCode currency;
-                        try
+                        if(StringUtil.isNumber(sCurrency))
                         {
                             int cCode = Integer.parseInt(sCurrency);
                             currency = new Iso4217CurrencyCode(cCode);
-                        }catch(NumberFormatException e)
+                        }
+                        else
                         {
                             currency = new Iso4217CurrencyCode(sCurrency);
                         }
@@ -752,6 +760,24 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                     ASN1Sequence seq = new DERSequence(v);
                     qCStatments = new ExtensionValue(extensionControls.get(type).isCritical(), seq);
                     qcStatementsOption = null;
+                }
+            }
+        }
+
+        // biometricInfo
+        type = Extension.biometricInfo;
+        if(extensionControls.containsKey(type))
+        {
+            BiometricInfo extConf = (BiometricInfo) getExtensionValue(
+                    type, extensionsType, BiometricInfo.class);
+            if(extConf != null)
+            {
+                try
+                {
+                    this.biometricDataOption = new BiometricInfoOption(extConf);
+                } catch (NoSuchAlgorithmException e)
+                {
+                    throw new CertprofileException("NoSuchAlgorithmException: " + e.getMessage());
                 }
             }
         }
@@ -1232,6 +1258,84 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             {
                 throw new RuntimeException("should not reach here");
             }
+        }
+
+        // biometricData
+        type = Extension.biometricInfo;
+        if(biometricDataOption != null && occurences.remove(type) != null)
+        {
+            Extension extension = requestedExtensions.getExtension(type);
+            if(extension == null)
+            {
+                throw new BadCertTemplateException("No biometricInfo extension is contained in the request");
+            }
+            ASN1Sequence seq = ASN1Sequence.getInstance(extension.getParsedValue());
+            final int n = seq.size();
+            if(n < 1)
+            {
+                throw new BadCertTemplateException("biometricInfo extension in request contains empty sequence");
+            }
+
+            ASN1EncodableVector v = new ASN1EncodableVector();
+
+            for(int i = 0; i < n; i++)
+            {
+                BiometricData m = BiometricData.getInstance(seq.getObjectAt(i));
+                TypeOfBiometricData t = m.getTypeOfBiometricData();
+                if(biometricDataOption.isTypePermitted(t) == false)
+                {
+                    throw new BadCertTemplateException("biometricInfo[" + i + "].typeOfBiometricData is not permitted");
+                }
+
+                ASN1ObjectIdentifier hashAlgo = m.getHashAlgorithm().getAlgorithm();
+                if(biometricDataOption.isHashAlgorithmPermitted(hashAlgo) == false)
+                {
+                    throw new BadCertTemplateException("biometricInfo[" + i + "].hashAlgorithm is not permitted");
+                }
+
+                int expHashValueSize;
+                try
+                {
+                    expHashValueSize = AlgorithmUtil.getHashOutputSizeInOctets(hashAlgo);
+                } catch (NoSuchAlgorithmException e)
+                {
+                    throw new CertprofileException("should not happen, unknown hash algorithm " + hashAlgo);
+                }
+
+                byte[] hashValue = m.getBiometricDataHash().getOctets();
+                if(hashValue.length != expHashValueSize)
+                {
+                    throw new BadCertTemplateException("biometricInfo[" + i + "].biometricDataHash has incorrect length");
+                }
+
+                DERIA5String sourceDataUri = m.getSourceDataUri();
+                switch(biometricDataOption.getSourceDataUriOccurrence())
+                {
+                case FORBIDDEN:
+                    sourceDataUri = null;
+                    break;
+                case REQUIRED:
+                    if(sourceDataUri == null)
+                    {
+                        throw new BadCertTemplateException("biometricInfo[" + i +
+                                "].sourceDataUri is not specified in request but is required");
+                    }
+                    break;
+                case OPTIONAL:
+                    break;
+                default:
+                    throw new BadCertTemplateException("could not reach here, unknown tripleState");
+                }
+
+                AlgorithmIdentifier newHashAlg = new AlgorithmIdentifier(hashAlgo);
+                BiometricData newBiometricData = new BiometricData(t, newHashAlg,
+                        new DEROctetString(hashValue), sourceDataUri);
+                v.add(newBiometricData);
+            }
+
+            ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(),
+                    new DERSequence(v));
+            values.addExtension(type, extValue);
         }
 
         // authorizationTemplate

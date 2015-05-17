@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" default-activation="lazy">
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
+  <reference id="hashAlgCompleter" interface="org.xipki.console.karaf.HashAlgCompleter"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <reference id="ecCurveNameCompleter" interface="org.xipki.console.karaf.ECCurveNameCompleter"/>
   <reference id="keyusageCompleter" interface="org.xipki.console.karaf.KeyusageCompleter"/>
@@ -80,9 +81,12 @@
       </action>
       <optional-completers>
         <entry key="--out" value-ref="filePathCompleter"/>
+        <entry key="--hash" value-ref="hashAlgCompleter"/>
         <entry key="--module" value-ref="p11ModuleNameCompleter"/>
         <entry key="--keyusage" value-ref="keyusageCompleter"/>
         <entry key="--ext-keyusage" value-ref="extKeyusageCompleter"/>
+        <entry key="--biometric-hash" value-ref="hashAlgCompleter"/>
+        <entry key="--biometric-file" value-ref="filePathCompleter"/>
         <entry key="--need-extension" value-ref="extNameCompleter"/>
         <entry key="--want-extension" value-ref="extNameCompleter"/>
       </optional-completers>
@@ -93,9 +97,12 @@
       </action>
       <optional-completers>
         <entry key="--out" value-ref="filePathCompleter"/>
+        <entry key="--hash" value-ref="hashAlgCompleter"/>
         <entry key="--p12" value-ref="filePathCompleter"/>
         <entry key="--keyusage" value-ref="keyusageCompleter"/>
         <entry key="--ext-keyusage" value-ref="extKeyusageCompleter"/>
+        <entry key="--biometric-hash" value-ref="hashAlgCompleter"/>
+        <entry key="--biometric-file" value-ref="filePathCompleter"/>
         <entry key="--need-extension" value-ref="extNameCompleter"/>
         <entry key="--want-extension" value-ref="extNameCompleter"/>        
       </optional-completers>
