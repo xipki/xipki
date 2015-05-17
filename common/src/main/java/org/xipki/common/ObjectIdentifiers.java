@@ -323,6 +323,15 @@ public class ObjectIdentifiers
     public static final ASN1ObjectIdentifier id_ad_timeStamping = id_ad.branch("3");
     public static final ASN1ObjectIdentifier id_ad_caRepository = id_ad.branch("5");
 
+    private static final ASN1ObjectIdentifier id_qcs = id_pkix.branch("11");
+    public static final ASN1ObjectIdentifier id_qcs_pkixQCSyntax_v1 = id_qcs.branch("1");
+    public static final ASN1ObjectIdentifier id_qcs_pkixQCSyntax_v2 = id_qcs.branch("2");
+    private static final ASN1ObjectIdentifier id_etsi_qcs = new ASN1ObjectIdentifier("0.4.0.1862.1");
+    public static final ASN1ObjectIdentifier id_etsi_qcs_QcCompliance = id_etsi_qcs.branch("1");
+    public static final ASN1ObjectIdentifier id_etsi_qcs_QcLimitValue = id_etsi_qcs.branch("2");
+    public static final ASN1ObjectIdentifier id_etsi_qcs_QcRetentionPeriod = id_etsi_qcs.branch("3");
+    public static final ASN1ObjectIdentifier id_etsi_qcs_QcSSCD = id_etsi_qcs.branch("4");
+
     private static final List<ASN1ObjectIdentifier> forwardDNs;
     private static final List<ASN1ObjectIdentifier> backwardDNs;
     private static final Map<ASN1ObjectIdentifier, String> oidNameMap;
@@ -421,6 +430,13 @@ public class ObjectIdentifiers
         oidNameMap.put(Extension.subjectInfoAccess, "subjectInfoAccess");
         oidNameMap.put(Extension.subjectKeyIdentifier, "subjectKeyIdentifier");
         oidNameMap.put(Extension.targetInformation, "targetInformation");
+
+        oidNameMap.put(id_qcs_pkixQCSyntax_v1, "qcs-pkixQCSyntax-v2");
+        oidNameMap.put(id_qcs_pkixQCSyntax_v2, "qcs-pkixQCSyntax-v2");
+        oidNameMap.put(id_etsi_qcs_QcCompliance, "etsi-qcs-QcCompliance");
+        oidNameMap.put(id_etsi_qcs_QcLimitValue, "etsi-qcs-QcLimitValue");
+        oidNameMap.put(id_etsi_qcs_QcRetentionPeriod, "etsi-qcs-QcRetentionPeriod");
+        oidNameMap.put(id_etsi_qcs_QcSSCD, "etsi-qcs-QcSSCD");
     }
 
     public static String oidToDisplayName(

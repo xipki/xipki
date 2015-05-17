@@ -427,15 +427,53 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="qCStatements">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="qCStatement" type="qCStatementType" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="qCStatementType">
+    <xs:sequence>
+      <xs:element name="statementId" type="oidWithDescType"/>
+      <xs:element name="statementValue" type="qCStatementValueType" minOccurs="0"/> 
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="qCStatementValueType">
+    <xs:choice>
+      <xs:element name="constant" type="constantValueType"/>
+      <xs:element name="qcRetentionPeriod" type="xs:int"/>
+      <xs:element name="qcEuLimitValue" type="qcEuLimitValueType"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="qcEuLimitValueType">
+    <xs:sequence>
+      <xs:element name="currency" type="xs:string"/>
+      <xs:element name="amount" type="range2Type"/>
+      <xs:element name="exponent" type="range2Type"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="range2Type">
+    <xs:attribute name="min" type="xs:int" use="required"/>
+    <xs:attribute name="max" type="xs:int" use="required"/>
+  </xs:complexType>  
   <xs:element name="constantExtValue">
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base="xs:base64Binary">
-	      <xs:attribute name="description" type="xs:string" use="optional"/>
+          <xs:attribute name="description" type="xs:string" use="optional"/>
         </xs:extension>
       </xs:simpleContent>
     </xs:complexType>
   </xs:element>
+  <xs:complexType name="constantValueType">
+    <xs:simpleContent>
+      <xs:extension base="xs:base64Binary">
+     <xs:attribute name="description" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
   <!-- general types -->
   <xs:complexType name="generalNameType">
     <xs:all>

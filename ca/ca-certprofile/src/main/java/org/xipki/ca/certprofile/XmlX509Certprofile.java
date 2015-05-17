@@ -36,6 +36,7 @@
 package org.xipki.ca.certprofile;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -56,6 +57,7 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
@@ -69,6 +71,9 @@ import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
+import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
+import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
@@ -90,6 +95,8 @@ import org.xipki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.ca.api.profile.x509.X509CertUtil;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
+import org.xipki.ca.certprofile.internal.MonetaryValueOption;
+import org.xipki.ca.certprofile.internal.QcStatementOption;
 import org.xipki.ca.certprofile.x509.jaxb.AdditionalInformation;
 import org.xipki.ca.certprofile.x509.jaxb.Admission;
 import org.xipki.ca.certprofile.x509.jaxb.AuthorityInfoAccess;
@@ -108,6 +115,11 @@ import org.xipki.ca.certprofile.x509.jaxb.OidWithDescType;
 import org.xipki.ca.certprofile.x509.jaxb.PolicyConstraints;
 import org.xipki.ca.certprofile.x509.jaxb.PolicyMappings;
 import org.xipki.ca.certprofile.x509.jaxb.PrivateKeyUsagePeriod;
+import org.xipki.ca.certprofile.x509.jaxb.QCStatementType;
+import org.xipki.ca.certprofile.x509.jaxb.QCStatementValueType;
+import org.xipki.ca.certprofile.x509.jaxb.QCStatements;
+import org.xipki.ca.certprofile.x509.jaxb.QcEuLimitValueType;
+import org.xipki.ca.certprofile.x509.jaxb.Range2Type;
 import org.xipki.ca.certprofile.x509.jaxb.RdnType;
 import org.xipki.ca.certprofile.x509.jaxb.Restriction;
 import org.xipki.ca.certprofile.x509.jaxb.SubjectAltName;
@@ -174,6 +186,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     private ExtensionValue additionalInformation;
     private ExtensionValue validityModel;
     private CertValidity privateKeyUsagePeriod;
+    private ExtensionValue qCStatments;
+    private List<QcStatementOption> qcStatementsOption;
 
     private Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions;
 
@@ -623,6 +637,115 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             }
         }
 
+        // QCStatements
+        type = Extension.qCStatements;
+        if(extensionControls.containsKey(type))
+        {
+            QCStatements extConf = (QCStatements) getExtensionValue(
+                    type, extensionsType, QCStatements.class);
+
+            if(extConf != null)
+            {
+                List<QCStatementType> qcStatementTypes = extConf.getQCStatement();
+
+                this.qcStatementsOption = new ArrayList<>(qcStatementTypes.size());
+                Set<String> currencyCodes = new HashSet<>();
+                boolean requireInfoFromReq = false;
+
+                for(QCStatementType m : qcStatementTypes)
+                {
+                    ASN1ObjectIdentifier qcStatementId = new ASN1ObjectIdentifier(m.getStatementId().getValue());
+                    QcStatementOption qcStatementOption;
+
+                    QCStatementValueType statementValue = m.getStatementValue();
+                    if(statementValue == null)
+                    {
+                        QCStatement qcStatment = new QCStatement(qcStatementId);
+                        qcStatementOption = new QcStatementOption(qcStatment);
+                    }
+                    else if(statementValue.getQcRetentionPeriod() != null)
+                    {
+                        QCStatement qcStatment = new QCStatement(qcStatementId,
+                                new ASN1Integer(statementValue.getQcRetentionPeriod()));
+                        qcStatementOption = new QcStatementOption(qcStatment);
+                    }
+                    else if(statementValue.getConstant() != null)
+                    {
+                        ASN1Encodable constantStatementValue;
+                        try
+                        {
+                            constantStatementValue = new ASN1StreamParser(
+                                    statementValue.getConstant().getValue()).readObject();
+                        } catch (IOException e)
+                        {
+                            throw new CertprofileException("cannot parse the constant value of QcStatement");
+                        }
+                        QCStatement qcStatment = new QCStatement(qcStatementId,
+                                constantStatementValue);
+                        qcStatementOption = new QcStatementOption(qcStatment);
+                    }
+                    else if(statementValue.getQcEuLimitValue() != null)
+                    {
+                        QcEuLimitValueType euLimitType = statementValue.getQcEuLimitValue();
+                        String sCurrency = euLimitType.getCurrency().toUpperCase();
+                        if(currencyCodes.contains(sCurrency))
+                        {
+                            throw new CertprofileException(
+                                    "Duplicated definition of qcStatments with QCEuLimitValue for the currency " + sCurrency);
+                        }
+
+                        Iso4217CurrencyCode currency;
+                        try
+                        {
+                            int cCode = Integer.parseInt(sCurrency);
+                            currency = new Iso4217CurrencyCode(cCode);
+                        }catch(NumberFormatException e)
+                        {
+                            currency = new Iso4217CurrencyCode(sCurrency);
+                        }
+
+                        Range2Type r1 = euLimitType.getAmount();
+                        Range2Type r2 = euLimitType.getExponent();
+                        if(r1.getMin() == r1.getMax() && r2.getMin() == r2.getMax())
+                        {
+                            MonetaryValue monetaryValue = new MonetaryValue(currency, r1.getMin(), r2.getMin());
+                            QCStatement qcStatment = new QCStatement(qcStatementId, monetaryValue);
+                            qcStatementOption = new QcStatementOption(qcStatment);
+                        }
+                        else
+                        {
+                            MonetaryValueOption monetaryValueOption = new MonetaryValueOption(currency, r1, r2);
+                            qcStatementOption = new QcStatementOption(qcStatementId, monetaryValueOption);
+                            requireInfoFromReq = true;
+                        }
+                        currencyCodes.add(sCurrency);
+                    }
+                    else
+                    {
+                        throw new RuntimeException("unknown value of qcStatment");
+                    }
+
+                    this.qcStatementsOption.add(qcStatementOption);
+                }
+
+                if(requireInfoFromReq == false)
+                {
+                    ASN1EncodableVector v = new ASN1EncodableVector();
+                    for(QcStatementOption m : qcStatementsOption)
+                    {
+                        if(m.getStatement() == null)
+                        {
+                            throw new RuntimeException("should not reach here");
+                        }
+                        v.add(m.getStatement());
+                    }
+                    ASN1Sequence seq = new DERSequence(v);
+                    qCStatments = new ExtensionValue(extensionControls.get(type).isCritical(), seq);
+                    qcStatementsOption = null;
+                }
+            }
+        }
+
         // constant extensions
         this.constantExtensions = XmlX509CertprofileUtil.buildConstantExtesions(extensionsType);
     }
@@ -997,6 +1120,92 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(),
                     new DERSequence(v));
             values.addExtension(type, extValue);
+        }
+
+        // QCStatements
+        type = Extension.qCStatements;
+        if((qCStatments != null || qcStatementsOption != null) && occurences.remove(type) != null)
+        {
+            if(qCStatments != null)
+            {
+                values.addExtension(type, qCStatments);
+            }
+            else if(qcStatementsOption != null)
+            {
+        		// extract the euLimit data from request
+                Extension extension = requestedExtensions.getExtension(type);
+                if(extension == null)
+                {
+                    throw new BadCertTemplateException("No QCStatement extension is contained in the request");
+                }
+                ASN1Sequence seq = ASN1Sequence.getInstance(extension.getParsedValue());
+
+                Map<String, int[]> qcEuLimits = new HashMap<>();
+                final int n = seq.size();
+                for(int i = 0; i < n; i++)
+                {
+                    QCStatement stmt = QCStatement.getInstance(seq.getObjectAt(i));
+                    if(ObjectIdentifiers.id_etsi_qcs_QcLimitValue.equals(stmt.getStatementId()) == false)
+                    {
+                        continue;
+                    }
+
+                    MonetaryValue monetaryValue = MonetaryValue.getInstance(stmt.getStatementInfo());
+                    int amount = monetaryValue.getAmount().intValue();
+                    int exponent = monetaryValue.getExponent().intValue();
+                    Iso4217CurrencyCode currency = monetaryValue.getCurrency();
+                    String currencyS = currency.isAlphabetic() ?
+                            currency.getAlphabetic().toUpperCase() : Integer.toString(currency.getNumeric());
+                    qcEuLimits.put(currencyS, new int[]{amount, exponent});
+                }
+
+                ASN1EncodableVector v = new ASN1EncodableVector();
+                for(QcStatementOption m : qcStatementsOption)
+                {
+                    if(m.getStatement() != null)
+                    {
+                        v.add(m.getStatement());
+                        continue;
+                    }
+
+                    MonetaryValueOption monetaryOption = m.getMonetaryValueOption();
+                    String currencyS = monetaryOption.getCurrencyString();
+                    int[] limit = qcEuLimits.get(currencyS);
+                    if(limit == null)
+                    {
+                        throw new BadCertTemplateException("no EuLimitValue is specified for currency '" + currencyS + "'");
+                    }
+
+                    int amount = limit[0];
+                    Range2Type range = monetaryOption.getAmountRange();
+                    if(amount < range.getMin() || amount > range.getMax())
+                    {
+                        throw new BadCertTemplateException("amount for currency '" + currencyS +
+                                "' is not within [" + range.getMin() + ", " + range.getMax() + "]");
+                    }
+
+                    int exponent = limit[1];
+                    range = monetaryOption.getExponentRange();
+                    if(exponent < range.getMin() || exponent > range.getMax())
+                    {
+                        throw new BadCertTemplateException("exponent for currency '" + currencyS +
+                                "' is not within [" + range.getMin() + ", " + range.getMax() + "]");
+                    }
+
+                    MonetaryValue monetaryVale = new MonetaryValue(
+                            monetaryOption.getCurrency(), amount, exponent);
+                    QCStatement qcStatment = new QCStatement(m.getStatementId(), monetaryVale);
+                    v.add(qcStatment);
+                }
+
+                ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(),
+                        new DERSequence(v));
+                values.addExtension(type, extValue);
+            }
+            else
+            {
+                throw new RuntimeException("should not reach here");
+            }
         }
 
         // constant extensions
