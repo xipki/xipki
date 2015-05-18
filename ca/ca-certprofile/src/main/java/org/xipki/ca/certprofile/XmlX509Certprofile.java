@@ -58,7 +58,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1StreamParser;
-import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERNull;
@@ -790,7 +789,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             {
                 ASN1EncodableVector v = new ASN1EncodableVector();
                 v.add(new ASN1ObjectIdentifier(extConf.getType().getValue()));
-                v.add(new DERBitString(extConf.getAccessRights().getValue()));
+                v.add(new DEROctetString(extConf.getAccessRights().getValue()));
                 ASN1Encodable extValue = new DERSequence(v);
                 authorizationTemplate = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
             }
