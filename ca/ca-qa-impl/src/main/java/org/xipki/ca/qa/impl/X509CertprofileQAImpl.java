@@ -3668,11 +3668,29 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                     failureMsg.append("; ");
                 }
 
-                if(isData.getHashAlgorithm().getParameters() != null)
+                ASN1Encodable isHashAlgoParam = isData.getHashAlgorithm().getParameters();
+                if(isHashAlgoParam == null)
                 {
-                    failureMsg.append("biometricData[" + i + "].hashAlgorithm.parameter is 'present'" +
+                    failureMsg.append("biometricData[" + i + "].hashAlgorithm.parameters is 'present'" +
                             " but expected 'absent'");
                     failureMsg.append("; ");
+                }
+                else
+                {
+                    try
+                    {
+                        byte[] isBytes = isHashAlgoParam.toASN1Primitive().getEncoded();
+                        if(Arrays.equals(isBytes, DERNull) == false)
+                        {
+                            failureMsg.append("biometricData[" + i + "].biometricDataHash.parameters is '" + hex(isBytes) +
+                                    "' but expected '" + hex(DERNull) + "'");
+                            failureMsg.append("; ");
+                        }
+                    } catch (IOException e)
+                    {
+                        failureMsg.append("biometricData[" + i + "].biometricDataHash.parameters has incorrect syntax");
+                        failureMsg.append("; ");
+                    }
                 }
             }
 

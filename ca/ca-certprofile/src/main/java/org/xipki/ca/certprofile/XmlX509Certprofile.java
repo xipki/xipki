@@ -61,6 +61,7 @@ import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERIA5String;
+import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
@@ -1324,7 +1325,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                     throw new BadCertTemplateException("could not reach here, unknown tripleState");
                 }
 
-                AlgorithmIdentifier newHashAlg = new AlgorithmIdentifier(hashAlgo);
+                AlgorithmIdentifier newHashAlg = new AlgorithmIdentifier(hashAlgo, DERNull.INSTANCE);
                 BiometricData newBiometricData = new BiometricData(t, newHashAlg,
                         new DEROctetString(hashValue), sourceDataUri);
                 v.add(newBiometricData);
