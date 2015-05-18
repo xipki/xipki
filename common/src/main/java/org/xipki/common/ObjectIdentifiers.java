@@ -383,19 +383,19 @@ public class ObjectIdentifiers
         oidNameMap.put(id_xipki_ext_cmpRequestExtensions, "xipki-cmpRequestExtensions");
         oidNameMap.put(id_xipki_ext_authorizationTemplate, "xipki-authorizationTemplate");
 
-        oidNameMap.put(id_kp_clientAuth, "id-kp-clientAuth");
-        oidNameMap.put(id_kp_codeSigning, "id-kp-codeSigning");
-        oidNameMap.put(id_kp_emailProtection, "id-kp-emailProtection");
-        oidNameMap.put(id_kp_ipsecEndSystem, "id-kp-ipsecEndSystem");
-        oidNameMap.put(id_kp_ipsecTunnel, "id-kp-ipsecTunnel");
-        oidNameMap.put(id_kp_ipsecUser, "id-kp-ipsecUser");
-        oidNameMap.put(id_kp_ocsp, "id-kp-ocsp");
-        oidNameMap.put(id_kp_OCSPSigning, "id-kp-OCSPSigning");
-        oidNameMap.put(id_kp_serverAuth, "id-kp-serverAuth");
-        oidNameMap.put(id_kp_timeStamping, "id-kp-timeStamping");
-        oidNameMap.put(id_pkix_ocsp_extendedRevoke, "id-pkix-ocsp-extendedRevoke");
-        oidNameMap.put(id_pkix_ocsp_prefSigAlgs, "id-pkix-ocsp-prefSigAlgs");
-        oidNameMap.put(id_tsl_kp_tslSigning, "id-tsl-kp-tslSigning");
+        oidNameMap.put(id_kp_clientAuth, "kp-clientAuth");
+        oidNameMap.put(id_kp_codeSigning, "kp-codeSigning");
+        oidNameMap.put(id_kp_emailProtection, "kp-emailProtection");
+        oidNameMap.put(id_kp_ipsecEndSystem, "kp-ipsecEndSystem");
+        oidNameMap.put(id_kp_ipsecTunnel, "kp-ipsecTunnel");
+        oidNameMap.put(id_kp_ipsecUser, "kp-ipsecUser");
+        oidNameMap.put(id_kp_ocsp, "kp-ocsp");
+        oidNameMap.put(id_kp_OCSPSigning, "kp-OCSPSigning");
+        oidNameMap.put(id_kp_serverAuth, "kp-serverAuth");
+        oidNameMap.put(id_kp_timeStamping, "kp-timeStamping");
+        oidNameMap.put(id_pkix_ocsp_extendedRevoke, "pkix-ocsp-extendedRevoke");
+        oidNameMap.put(id_pkix_ocsp_prefSigAlgs, "pkix-ocsp-prefSigAlgs");
+        oidNameMap.put(id_tsl_kp_tslSigning, "tsl-kp-tslSigning");
         oidNameMap.put(id_extension_pkix_ocsp_nocheck, "pkix-ocsp-nocheck");
         oidNameMap.put(id_extension_restriction, "restriction");
         oidNameMap.put(id_extension_additionalInformation, "additionalInformation");
@@ -403,8 +403,8 @@ public class ObjectIdentifiers
         oidNameMap.put(id_extension_validityModel, "validityModel");
 
         oidNameMap.put(anyExtendedKeyUsage, "anyExtendedKeyUsage");
-        oidNameMap.put(id_ad_caRepository, "id-ad-caRepository");
-        oidNameMap.put(id_ad_timeStamping, "id-ad-timeStamping");
+        oidNameMap.put(id_ad_caRepository, "ad-caRepository");
+        oidNameMap.put(id_ad_timeStamping, "ad-timeStamping");
         oidNameMap.put(Extension.auditIdentity, "auditIdentity");
         oidNameMap.put(Extension.authorityInfoAccess, "authorityInfoAccess");
         oidNameMap.put(Extension.authorityKeyIdentifier, "authorityKeyIdentifier");

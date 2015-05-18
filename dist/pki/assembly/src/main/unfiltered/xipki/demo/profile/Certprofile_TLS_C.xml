@@ -136,7 +136,7 @@
       <critical>false</critical>
       <value>
         <extendedKeyUsage>
-          <usage required="true" description="id-kp-clientAuth">1.3.6.1.5.5.7.3.2</usage>
+          <usage required="true" description="kp-clientAuth">1.3.6.1.5.5.7.3.2</usage>
         </extendedKeyUsage>
       </value>
     </extension>
