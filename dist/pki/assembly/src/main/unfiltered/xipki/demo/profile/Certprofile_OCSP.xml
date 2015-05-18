@@ -98,7 +98,7 @@
       <critical>false</critical>
     </extension>
     <extension required="false" permittedInRequest="false">
-      <type description="id-pkix-ocsp-nocheck">1.3.6.1.5.5.7.48.1.5</type>
+      <type description="pkix-ocsp-nocheck">1.3.6.1.5.5.7.48.1.5</type>
       <critical>false</critical>
     </extension>
     <extension required="true" permittedInRequest="false">
@@ -138,7 +138,7 @@
       <critical>false</critical>
       <value>
         <extendedKeyUsage>
-          <usage required="true" description="id-kp-OCSPSigning">1.3.6.1.5.5.7.3.9</usage>
+          <usage required="true" description="kp-OCSPSigning">1.3.6.1.5.5.7.3.9</usage>
         </extendedKeyUsage>
       </value>
     </extension>

@@ -233,7 +233,7 @@
       <value>
         <subjectInfoAccess>
           <access>
-            <accessMethod description="id-ad-caRepository">1.3.6.1.5.5.7.48.5</accessMethod>
+            <accessMethod description="ad-caRepository">1.3.6.1.5.5.7.48.5</accessMethod>
             <accessLocation>
               <directoryName/>
               <uniformResourceIdentifier/>
@@ -246,7 +246,7 @@
       <type description="custom extension 1">1.2.3.4</type>
       <critical>false</critical>
       <value>
-        <constantExtValue>BQA=</constantExtValue>
+        <constantExtValue description="DER Null">BQA=</constantExtValue>
       </value>
     </extension>
   </extensions>
