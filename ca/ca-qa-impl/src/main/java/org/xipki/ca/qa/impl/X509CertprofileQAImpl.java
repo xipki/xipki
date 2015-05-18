@@ -62,14 +62,15 @@ import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERBMPString;
-import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERIA5String;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERT61String;
@@ -3767,7 +3768,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
         ASN1Sequence seq = ASN1Sequence.getInstance(extensionValue);
         ASN1ObjectIdentifier type = ASN1ObjectIdentifier.getInstance(seq.getObjectAt(0));
-        DERBitString accessRights = DERBitString.getInstance(seq.getObjectAt(1));
+        ASN1OctetString accessRights = DEROctetString.getInstance(seq.getObjectAt(1));
         if(conf.getType().equals(type.getId()) == false)
         {
             failureMsg.append("type is '" + type.getId() +
@@ -3775,7 +3776,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             failureMsg.append("; ");
         }
 
-        byte[] isRights = accessRights.getBytes();
+        byte[] isRights = accessRights.getOctets();
         if(Arrays.equals(conf.getAccessRights(), isRights) == false)
         {
             failureMsg.append("accessRights is '" + hex(isRights) +
