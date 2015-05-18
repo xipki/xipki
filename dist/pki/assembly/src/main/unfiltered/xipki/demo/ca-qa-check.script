@@ -1,0 +1,185 @@
+#################################################################
+#                                   QA                          #
+#################################################################
+feature:install xipki-security-shell
+feature:install xipki-caqa-shell
+
+# Wait one second
+sleep 1000
+
+#################################################################
+#                       Check certificate                       #
+#################################################################
+
+## RCA
+
+echo "check cert output/RCA1.der"
+
+xipki-qa:check-cert \
+  --issuer RCA \
+  --profile RCA \
+  --p10 output/RCA1.p10 \
+  --cert output/RCA1.der
+
+echo "check cert output/Cross1.der"
+
+xipki-qa:check-cert \
+  --issuer RCA \
+  --profile Cross \
+  --p10 output/Cross1.p10 \
+  --cert output/Cross1.der
+
+echo "check cert output/SubCA1.der"
+
+xipki-qa:check-cert \
+  --issuer RCA \
+  --profile SubCA \
+  --p10 output/SubCA1.p10 \
+  --cert output/SubCA1.der
+
+echo "check cert output/SubCAwithCRL1.der"
+
+xipki-qa:check-cert \
+  --issuer RCA \
+  --profile SubCA.Complex \
+  --p10 output/SubCAwithCRL1.p10 \
+  --cert output/SubCAwithCRL1.der
+
+## SubCAwithCRL
+
+echo "check cert output/OCSP1.der"
+
+xipki-qa:check-cert \
+  --issuer SubCAwithCRL \
+  --profile OCSP \
+  --p10 output/OCSP1.p10 \
+  --cert output/OCSP1.der
+
+echo "check cert output/OCSP2.der"
+
+xipki-qa:check-cert \
+  --issuer SubCAwithCRL \
+  --profile OCSP \
+  --p10 output/OCSP2.p10 \
+  --cert output/OCSP2.der
+
+echo "check cert output/multipleOUs1.der"
+
+xipki-qa:check-cert \
+  --issuer SubCAwithCRL \
+  --profile multipleOUs \
+  --p10 output/multipleOUs1.p10 \
+  --cert output/multipleOUs1.der
+
+echo "check cert output/multipleOUs2.der"
+
+xipki-qa:check-cert \
+  --issuer SubCAwithCRL \
+  --profile multipleOUs \
+  --p10 output/multipleOUs2.p10 \
+  --cert output/multipleOUs2.der
+
+echo "check cert output/multiValuedRDN1.der"
+
+xipki-qa:check-cert \
+  --issuer SubCAwithCRL \
+  --profile multiValuedRDN \
+  --p10 output/multiValuedRDN1.p10 \
+  --cert output/multiValuedRDN1.der
+
+## SubCA
+echo "check cert output/TLS1.der"
+
+xipki-qa:check-cert \
+  --issuer SubCA \
+  --profile TLS \
+  --p10 output/TLS1.p10 \
+  --cert output/TLS1.der
+
+echo "check cert output/TLS1-TLS_C.der"
+
+xipki-qa:check-cert \
+  --issuer SubCA \
+  --profile TLS_C \
+  --p10 output/TLS1.p10 \
+  --cert output/TLS1-TLS_C.der
+
+echo "check cert output/TLSwithIncSN1.der"
+
+xipki-qa:check-cert \
+  --issuer SubCA \
+  --profile TLSwithIncSN \
+  --p10 output/TLSwithIncSN1.p10 \
+  --cert output/TLSwithIncSN1.der
+
+echo "check cert output/TLSwithIncSN1-1.der"
+
+xipki-qa:check-cert \
+  --issuer SubCA \
+  --profile TLSwithIncSN \
+  --p10 output/TLSwithIncSN1-1.p10 \
+  --cert output/TLSwithIncSN1-1.der
+
+echo "check cert output/TLSwithIncSN1-2.der"
+
+xipki-qa:check-cert \
+  --issuer SubCA \
+  --profile TLSwithIncSN \
+  --p10 output/TLSwithIncSN1-2.p10 \
+  --cert output/TLSwithIncSN1-2.der
+
+echo "check cert output/TLS2.der"
+
+xipki-qa:check-cert \
+  --issuer SubCA \
+  --profile TLS \
+  --p10 output/TLS2.p10 \
+  --cert output/TLS2.der
+
+echo "check cert output/TLS_C1.der"
+
+xipki-qa:check-cert \
+  --issuer SubCA \
+  --profile TLS_C \
+  --p10 output/TLS_C1.p10 \
+  --cert output/TLS_C1.der
+
+echo "check cert output/TLS_C2.der"
+
+xipki-qa:check-cert \
+  --issuer SubCA \
+  --profile TLS_C \
+  --p10 output/TLS_C2.p10 \
+  --cert output/TLS_C2.der
+
+echo "check cert output/gSMC_K1.der"
+
+xipki-qa:check-cert \
+  --issuer SubCA \
+  --profile gSMC_K \
+  --p10 output/gSMC_K1.p10 \
+  --cert output/gSMC_K1.der
+
+echo "check cert output/gSMC_K2.der"
+
+xipki-qa:check-cert \
+  --issuer SubCA \
+  --profile gSMC_K \
+  --p10 output/gSMC_K2.p10 \
+  --cert output/gSMC_K2.der
+
+echo "check cert output/EE.Complex1.der"
+
+xipki-qa:check-cert \
+  --issuer SubCA \
+  --profile EE.Complex \
+  --p10 output/EE.Complex1.p10 \
+  --cert output/EE.Complex1.der
+
+#################################################################
+#              UNINSTALL UNNEEDED FEATURES                      #
+#################################################################
+feature:uninstall xipki-caqa-shell
+feature:uninstall xipki-caclient-shell
+feature:uninstall xipki-caclient
+feature:uninstall xipki-security-shell
