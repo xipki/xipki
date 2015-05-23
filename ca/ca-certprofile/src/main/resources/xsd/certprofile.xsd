@@ -82,7 +82,7 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="subject" minOccurs="0">
+      <xs:element name="subject">
         <xs:complexType>
           <xs:sequence>
             <xs:element name="dnBackwards" type="xs:boolean" default="false" minOccurs="0"/>
@@ -127,7 +127,7 @@
       <xs:element name="type" type="oidWithDescType"/>
       <xs:element name="minLen" type="xs:int" minOccurs="0"/>
       <xs:element name="maxLen" type="xs:int" minOccurs="0"/>
-      <xs:element name="directoryStringType" type="DirectoryStringType" minOccurs="0"/>
+      <xs:element name="stringType" type="stringType" minOccurs="0"/>
       <xs:element name="regex" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="prefix" type="xs:string" minOccurs="0"/>
       <xs:element name="suffix" type="xs:string" minOccurs="0"/>
@@ -136,7 +136,7 @@
     <xs:attribute name="maxOccurs" type="xs:int" default="1" use="optional"/>
     <xs:attribute name="group" type="xs:string" use="optional"/>
   </xs:complexType>
-  <xs:simpleType name="DirectoryStringType">
+  <xs:simpleType name="directoryStringType">
     <xs:restriction base="xs:normalizedString">
       <xs:enumeration value="teletexString"/>
       <xs:enumeration value="printableString"/>
@@ -144,6 +144,15 @@
       <xs:enumeration value="bmpString"/>
     </xs:restriction>
   </xs:simpleType>
+  <xs:simpleType name="stringType">
+    <xs:restriction base="xs:normalizedString">
+      <xs:enumeration value="teletexString"/>
+      <xs:enumeration value="printableString"/>
+      <xs:enumeration value="utf8String"/>
+      <xs:enumeration value="bmpString"/>
+      <xs:enumeration value="ia5String"/>
+    </xs:restriction>
+  </xs:simpleType>  
   <xs:complexType name="extensionsType">
     <xs:sequence>
       <xs:element name="extension" type="extensionType" minOccurs="1" maxOccurs="unbounded"/>
@@ -406,7 +415,7 @@
   <xs:element name="additionalInformation">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="type" type="DirectoryStringType"/>
+        <xs:element name="type" type="directoryStringType"/>
         <xs:element name="text" type="xs:string"/>
       </xs:sequence>
     </xs:complexType>
@@ -414,7 +423,7 @@
   <xs:element name="restriction">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="type" type="DirectoryStringType"/>
+        <xs:element name="type" type="directoryStringType"/>
         <xs:element name="text" type="xs:string"/>
       </xs:sequence>
     </xs:complexType>

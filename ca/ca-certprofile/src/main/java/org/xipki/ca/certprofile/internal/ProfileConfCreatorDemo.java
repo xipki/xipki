@@ -1573,6 +1573,9 @@ public class ProfileConfCreatorDemo
         rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
         rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
         rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_DATE_OF_BIRTH, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_POSTAL_ADDRESS, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_UNIQUE_IDENTIFIER, 1, 1));
 
 	    // Extensions
 	    // Extensions - general

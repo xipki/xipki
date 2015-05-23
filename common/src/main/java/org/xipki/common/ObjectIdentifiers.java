@@ -235,7 +235,7 @@ public class ObjectIdentifiers
     /**
      * LDAP User id.
      */
-    public static final ASN1ObjectIdentifier DN_UID = new ASN1ObjectIdentifier("0.9.2342.19200300.100.1.1");
+    public static final ASN1ObjectIdentifier DN_LDAP_UID = new ASN1ObjectIdentifier("0.9.2342.19200300.100.1.1");
 
     /**
      * Extended key usages
@@ -354,7 +354,7 @@ public class ObjectIdentifiers
         _forwardDNs.add(DN_SERIALNUMBER);
         _forwardDNs.add(DN_NAME);
         _forwardDNs.add(DN_CN);
-        _forwardDNs.add(DN_UID);
+        _forwardDNs.add(DN_LDAP_UID);
         _forwardDNs.add(DN_DMD_NAME);
         _forwardDNs.add(DN_EmailAddress);
         _forwardDNs.add(DN_UnstructuredName);
@@ -378,6 +378,13 @@ public class ObjectIdentifiers
         backwardDNs = Collections.unmodifiableList(_backwardDNs);
 
         oidNameMap = new HashMap<>();
+
+        oidNameMap.put(DN_DATE_OF_BIRTH, "dateOfBirth");
+        oidNameMap.put(DN_PLACE_OF_BIRTH, "placeOfBirth");
+        oidNameMap.put(DN_GENDER, "gender");
+        oidNameMap.put(DN_COUNTRY_OF_CITIZENSHIP, "countryOfCitizenship");
+        oidNameMap.put(DN_COUNTRY_OF_RESIDENCE, "countryOfResidence");
+        oidNameMap.put(DN_NAME_AT_BIRTH, "nameAtBirth");
 
         oidNameMap.put(id_xipki_ext_crlCertset, "xipki-crlCertset");
         oidNameMap.put(id_xipki_ext_cmpRequestExtensions, "xipki-cmpRequestExtensions");
