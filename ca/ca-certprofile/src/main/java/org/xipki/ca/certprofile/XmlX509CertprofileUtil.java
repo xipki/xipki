@@ -76,7 +76,8 @@ import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.GeneralNameTag;
 import org.xipki.ca.api.profile.KeyParametersOption;
-import org.xipki.ca.api.profile.KeyParametersOption.Range;
+import org.xipki.ca.api.profile.Range;
+import org.xipki.ca.api.profile.StringType;
 import org.xipki.ca.api.profile.x509.CertificatePolicyInformation;
 import org.xipki.ca.api.profile.x509.CertificatePolicyQualifier;
 import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
@@ -741,4 +742,29 @@ public class XmlX509CertprofileUtil
             throw new RuntimeException("should not reach here, undefined DirectoryStringType " + jaxbType);
         }
     }
+
+    public static final StringType convertStringType(
+            final org.xipki.ca.certprofile.x509.jaxb.StringType jaxbType)
+    {
+        if(jaxbType == null)
+        {
+            return null;
+        }
+        switch(jaxbType)
+        {
+        case BMP_STRING:
+            return StringType.bmpString;
+        case PRINTABLE_STRING:
+            return StringType.printableString;
+        case TELETEX_STRING:
+            return StringType.teletexString;
+        case UTF_8_STRING:
+            return StringType.utf8String;
+        case IA_5_STRING:
+            return StringType.ia5String;
+        default:
+            throw new RuntimeException("should not reach here, undefined StringType " + jaxbType);
+        }
+    }
+
 }

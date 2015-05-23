@@ -203,7 +203,8 @@ xipki-tk:rsa-p12 \
   --out output/EE.Complex1.p12 \
   --subject "CN=EE.Complex1,O=xipki,C=DE"
 
-xipki-tk:req-p12 \
+xipki-tk:req-p12-complex \
+  --subject "CN=EE.Complex1,O=xipki,C=DE" \
   --p12 output/EE.Complex1.p12 \
   --password 1234 \
   --out output/EE.Complex1.p10 \

@@ -35,6 +35,9 @@
 
 package org.xipki.ca.api.profile;
 
+import java.util.List;
+import java.util.regex.Pattern;
+
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.common.ParamChecker;
 
@@ -47,20 +50,23 @@ public class RDNControl
     private final int minOccurs;
     private final int maxOccurs;
     private final ASN1ObjectIdentifier type;
-    private final DirectoryStringType directoryStringEnum;
+    private List<Pattern> patterns;
+    private StringType stringType;
+    private Range stringLengthRange;
+    private String prefix;
+    private String suffix;
+    private String group;
 
     public RDNControl(
-            final ASN1ObjectIdentifier type,
-            final DirectoryStringType directoryStringEnum)
+            final ASN1ObjectIdentifier type)
     {
-        this(type, 1, 1, directoryStringEnum);
+        this(type, 1, 1);
     }
 
     public RDNControl(
             final ASN1ObjectIdentifier type,
             final int minOccurs,
-            final int maxOccurs,
-            final DirectoryStringType directoryStringEnum)
+            final int maxOccurs)
     {
         ParamChecker.assertNotNull("type", type);
         if(minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs)
@@ -70,7 +76,6 @@ public class RDNControl
         this.type = type;
         this.minOccurs = minOccurs;
         this.maxOccurs = maxOccurs;
-        this.directoryStringEnum = directoryStringEnum;
     }
 
     public int getMinOccurs()
@@ -88,9 +93,64 @@ public class RDNControl
         return type;
     }
 
-    public DirectoryStringType getDirectoryStringEnum()
+    public StringType getStringType()
     {
-        return directoryStringEnum;
+        return stringType;
+    }
+
+    public List<Pattern> getPatterns()
+    {
+        return patterns;
+    }
+
+    public Range getStringLengthRange()
+    {
+        return stringLengthRange;
+    }
+
+    public void setStringType(StringType stringType)
+    {
+        this.stringType = stringType;
+    }
+
+    public void setStringLengthRange(Range stringLengthRange)
+    {
+        this.stringLengthRange = stringLengthRange;
+    }
+
+    public void setPatterns(List<Pattern> patterns)
+    {
+        this.patterns = patterns;
+    }
+
+    public String getPrefix()
+    {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix)
+    {
+        this.prefix = prefix;
+    }
+
+    public String getSuffix()
+    {
+        return suffix;
+    }
+
+    public void setSuffix(String suffix)
+    {
+        this.suffix = suffix;
+    }
+
+    public String getGroup()
+    {
+        return group;
+    }
+
+    public void setGroup(String group)
+    {
+        this.group = group;
     }
 
 }

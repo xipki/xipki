@@ -41,6 +41,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -67,9 +68,7 @@ import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
 import org.bouncycastle.asn1.isismtt.x509.Admissions;
 import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
-import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.DirectoryString;
-import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
@@ -91,13 +90,16 @@ import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.RDNControl;
-import org.xipki.ca.api.profile.SubjectInfo;
+import org.xipki.ca.api.profile.Range;
+import org.xipki.ca.api.profile.StringType;
+import org.xipki.ca.api.profile.SubjectControl;
 import org.xipki.ca.api.profile.x509.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.x509.BaseX509Certprofile;
 import org.xipki.ca.api.profile.x509.CertificatePolicyInformation;
 import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
+import org.xipki.ca.api.profile.x509.SubjectDNSpec;
 import org.xipki.ca.api.profile.x509.X509CertUtil;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.certprofile.internal.MonetaryValueOption;
@@ -143,7 +145,6 @@ import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -157,9 +158,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
 
     private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
 
-    private Map<ASN1ObjectIdentifier, SubjectDNOption> subjectDNOptions;
-    private Set<RDNControl> subjectDNControls;
-    private Map<ASN1ObjectIdentifier, String> subjectDNGroups;
+    private SubjectControl subjectControl;
     private Map<String, String> parameters;
     private Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
 
@@ -168,7 +167,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     private List<String> signatureAlgorithms;
     private boolean incSerialNoIfSubjectExists;
     private boolean raOnly;
-    private boolean backwardsSubject;
     private boolean ca;
     private boolean duplicateKeyPermitted;
     private boolean duplicateSubjectPermitted;
@@ -203,16 +201,14 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     {
         version = null;
         signatureAlgorithms = null;
+        incSerialNoIfSubjectExists = false;
         keyAlgorithms = null;
-        subjectDNOptions = null;
-        subjectDNControls = null;
+        subjectControl = null;
         extensionControls = null;
         validity = null;
         notBeforeMidnight = false;
         includeIssuerAndSerialInAKI = false;
-        incSerialNoIfSubjectExists = false;
         raOnly = false;
-        backwardsSubject = false;
         ca = false;
         duplicateKeyPermitted = true;
         duplicateSubjectPermitted = true;
@@ -358,44 +354,57 @@ public class XmlX509Certprofile extends BaseX509Certprofile
 
         // Subject
         Subject subject = conf.getSubject();
-        if(subject != null)
+
+        Map<ASN1ObjectIdentifier, RDNControl> subjectDNControls = new HashMap<>();
+
+        for(RdnType t : subject.getRdn())
         {
-            this.backwardsSubject = subject.isDnBackwards();
-            this.incSerialNoIfSubjectExists = subject.isIncSerialNumber();
+            StringType stringType = XmlX509CertprofileUtil.convertStringType(
+                    t.getStringType());
+            ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(t.getType().getValue());
 
-            this.subjectDNControls = new HashSet<RDNControl>();
-            this.subjectDNOptions = new HashMap<>();
-            this.subjectDNGroups = new HashMap<>();
-
-            for(RdnType t : subject.getRdn())
+            List<Pattern> patterns = null;
+            if(CollectionUtil.isNotEmpty(t.getRegex()))
             {
-                DirectoryStringType directoryStringEnum = XmlX509CertprofileUtil.convertDirectoryStringType(
-                        t.getDirectoryStringType());
-                ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(t.getType().getValue());
-                RDNControl occ = new RDNControl(type, t.getMinOccurs(), t.getMaxOccurs(), directoryStringEnum);
-                this.subjectDNControls.add(occ);
-
-                List<Pattern> patterns = null;
-                if(CollectionUtil.isNotEmpty(t.getRegex()))
+                patterns = new LinkedList<>();
+                for(String regex : t.getRegex())
                 {
-                    patterns = new LinkedList<>();
-                    for(String regex : t.getRegex())
-                    {
-                        Pattern pattern = Pattern.compile(regex);
-                        patterns.add(pattern);
-                    }
-                }
-
-                SubjectDNOption option = new SubjectDNOption(t.getPrefix(), t.getSuffix(), patterns,
-                        t.getMinLen(), t.getMaxLen());
-                this.subjectDNOptions.put(type, option);
-                String g = t.getGroup();
-                if(StringUtil.isNotBlank(g))
-                {
-                    this.subjectDNGroups.put(type, g);
+                    Pattern pattern = Pattern.compile(regex);
+                    patterns.add(pattern);
                 }
             }
+
+            if(patterns == null)
+            {
+                Pattern pattern = SubjectDNSpec.getPattern(type);
+                if(pattern != null)
+                {
+                    patterns = Arrays.asList(pattern);
+                }
+            }
+
+            Range range;
+            if(t.getMinLen() != null || t.getMaxLen() != null)
+            {
+                range = new Range(t.getMinLen(), t.getMaxLen());
+            }
+            else
+            {
+                range = null;
+            }
+            RDNControl rdnControl = new RDNControl(type, t.getMinOccurs(), t.getMaxOccurs());
+            rdnControl.setStringType(stringType);
+            rdnControl.setStringLengthRange(range);
+            rdnControl.setPatterns(patterns);
+            rdnControl.setPrefix(t.getPrefix());
+            rdnControl.setSuffix(t.getSuffix());
+            rdnControl.setGroup(t.getGroup());
+            SubjectDNSpec.fixRDNControl(rdnControl);
+
+            subjectDNControls.put(type, rdnControl);
         }
+        this.subjectControl = new SubjectControl(subject.isDnBackwards(), subjectDNControls);
+        this.incSerialNoIfSubjectExists = subject.isIncSerialNumber();
 
         // Extensions
         ExtensionsType extensionsType = conf.getExtensions();
@@ -813,220 +822,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     }
 
     @Override
-    public SubjectInfo getSubject(
-            final X500Name requestedSubject)
-    throws CertprofileException, BadCertTemplateException
-    {
-        verifySubjectDNOccurence(requestedSubject);
-        checkSubjectContent(requestedSubject);
-
-        RDN[] requstedRDNs = requestedSubject.getRDNs();
-        Set<RDNControl> occurences = getSubjectDNControls();
-        List<RDN> rdns = new LinkedList<>();
-        List<ASN1ObjectIdentifier> types = backwardsSubject() ?
-                ObjectIdentifiers.getBackwardDNs() : ObjectIdentifiers.getForwardDNs();
-
-        for(ASN1ObjectIdentifier type : types)
-        {
-            if(Extension.subjectAlternativeName.equals(type) || Extension.subjectInfoAccess.equals(type))
-            {
-                continue;
-            }
-
-            RDNControl control = null;
-            if(occurences != null)
-            {
-                control = getRDNControl(occurences, type);
-                if(control == null || control.getMaxOccurs() < 1)
-                {
-                    continue;
-                }
-            }
-
-            RDN[] thisRDNs = getRDNs(requstedRDNs, type);
-            int n = thisRDNs == null ? 0 : thisRDNs.length;
-            if(n == 0)
-            {
-                continue;
-            }
-
-            if(n == 1)
-            {
-                String value = X509Util.rdnValueToString(thisRDNs[0].getFirst().getValue());
-                rdns.add(createSubjectRDN(value, type, control, 0));
-            }
-            else
-            {
-                String[] values = new String[n];
-                for(int i = 0; i < n; i++)
-                {
-                    values[i] = X509Util.rdnValueToString(thisRDNs[i].getFirst().getValue());
-                }
-                values = sortRDNs(type, values);
-
-                int i = 0;
-                for(String value : values)
-                {
-                    rdns.add(createSubjectRDN(value, type, control, i++));
-                }
-            }
-        }
-
-        if(CollectionUtil.isNotEmpty(subjectDNGroups))
-        {
-            Set<String> consideredGroups = new HashSet<>();
-            final int n = rdns.size();
-
-            List<RDN> newRdns = new ArrayList<>(rdns.size());
-            for(int i = 0; i < n; i++)
-            {
-                RDN rdn = rdns.get(i);
-                ASN1ObjectIdentifier type = rdn.getFirst().getType();
-                String group = subjectDNGroups.get(type);
-                if(group == null)
-                {
-                    newRdns.add(rdn);
-                }
-                else if(consideredGroups.contains(group) == false)
-                {
-                    List<AttributeTypeAndValue> atvs = new LinkedList<>();
-                    atvs.add(rdn.getFirst());
-                    for(int j = i + 1; j < n; j++)
-                    {
-                        RDN rdn2 = rdns.get(j);
-                        ASN1ObjectIdentifier type2 = rdn2.getFirst().getType();
-                        String group2 = subjectDNGroups.get(type2);
-                        if(group.equals(group2))
-                        {
-                            atvs.add(rdn2.getFirst());
-                        }
-                    }
-
-                    newRdns.add(new RDN(atvs.toArray(new AttributeTypeAndValue[0])));
-                    consideredGroups.add(group);
-                }
-            }
-
-            rdns = newRdns;
-        }
-
-        X500Name grantedSubject = new X500Name(rdns.toArray(new RDN[0]));
-        return new SubjectInfo(grantedSubject, null);
-    }
-
-    @Override
-    protected RDN createSubjectRDN(
-            final String text,
-            final ASN1ObjectIdentifier type,
-            final RDNControl rdnControl,
-            final int index)
-    throws BadCertTemplateException
-    {
-        String ttext = text.trim();
-
-        SubjectDNOption option = subjectDNOptions.get(type);
-        if(option != null)
-        {
-            String prefix = option.getPrefix();
-            String suffix = option.getSufix();
-
-            if(prefix != null || suffix != null)
-            {
-                String _text = ttext.toLowerCase();
-                if(prefix != null &&_text.startsWith(prefix.toLowerCase()))
-                {
-                    ttext = ttext.substring(prefix.length());
-                    _text = ttext.toLowerCase();
-                }
-
-                if(suffix != null && _text.endsWith(suffix.toLowerCase()))
-                {
-                    ttext = ttext.substring(0, ttext.length() - suffix.length());
-                }
-            }
-
-            List<Pattern> patterns = option.getPatterns();
-            if(patterns != null)
-            {
-                Pattern p = patterns.get(index);
-                if(p.matcher(ttext).matches() == false)
-                {
-                    throw new BadCertTemplateException("invalid subject " + ObjectIdentifiers.oidToDisplayName(type) +
-                            " '" + ttext + "' against regex '" + p.pattern() + "'");
-                }
-            }
-
-            StringBuilder sb = new StringBuilder();
-            if(prefix != null)
-            {
-                sb.append(prefix);
-            }
-            sb.append(ttext);
-            if(suffix != null)
-            {
-                sb.append(suffix);
-            }
-            ttext = sb.toString();
-
-            int len = ttext.length();
-            Integer minLen = option.getMinLen();
-            if(minLen != null && len < minLen)
-            {
-                throw new BadCertTemplateException("subject " + ObjectIdentifiers.oidToDisplayName(type) +
-                        " '" + ttext + "' is too short (length (" + len + ") < minLen (" + minLen + ")");
-            }
-
-            Integer maxLen = option.getMaxLen();
-            if(maxLen != null && len > maxLen)
-            {
-                throw new BadCertTemplateException("subject " + ObjectIdentifiers.oidToDisplayName(type) +
-                        " '" + ttext + "' is too long (length (" + len + ") > maxLen (" + maxLen + ")");
-            }
-        }
-
-        return super.createSubjectRDN(ttext, type, rdnControl, index);
-    }
-
-    @Override
-    protected String[] sortRDNs(
-            final ASN1ObjectIdentifier type,
-            final String[] values)
-    {
-        SubjectDNOption option = subjectDNOptions.get(type);
-        if(option == null)
-        {
-            return values;
-        }
-
-        List<Pattern> patterns = option.getPatterns();
-        if(CollectionUtil.isEmpty(patterns))
-        {
-            return values;
-        }
-
-        List<String> result = new ArrayList<>(values.length);
-        for(Pattern p : patterns)
-        {
-            for(String value : values)
-            {
-                if(result.contains(value) == false && p.matcher(value).matches())
-                {
-                    result.add(value);
-                }
-            }
-        }
-        for(String value : values)
-        {
-            if(result.contains(value) == false)
-            {
-                result.add(value);
-            }
-        }
-
-        return result.toArray(new String[0]);
-    }
-
-    @Override
     public ExtensionValues getExtensions(
             final Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
             final X500Name requestedSubject,
@@ -1365,12 +1160,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     }
 
     @Override
-    public boolean incSerialNumberIfSubjectExists()
-    {
-        return incSerialNoIfSubjectExists;
-    }
-
-    @Override
     public Set<KeyUsageControl> getKeyUsage()
     {
         return keyusages;
@@ -1413,12 +1202,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     }
 
     @Override
-    public boolean backwardsSubject()
-    {
-        return backwardsSubject;
-    }
-
-    @Override
     public boolean isOnlyForRA()
     {
         return raOnly;
@@ -1431,9 +1214,9 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     }
 
     @Override
-    public Set<RDNControl> getSubjectDNControls()
+    public SubjectControl getSubjectControl()
     {
-        return subjectDNControls;
+        return subjectControl;
     }
 
     @Override
@@ -1580,6 +1363,12 @@ public class XmlX509Certprofile extends BaseX509Certprofile
 
         throw new RuntimeException("should not reach here: undefined extension " +
                 ObjectIdentifiers.oidToDisplayName(type));
+    }
+
+    @Override
+    public boolean incSerialNumberIfSubjectExists()
+    {
+        return incSerialNoIfSubjectExists;
     }
 
 }
