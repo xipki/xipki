@@ -33,67 +33,82 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.certprofile;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.Pattern;
+package org.xipki.ca.api.profile;
 
 /**
  * @author Lijun Liao
  */
 
-public class SubjectDNOption
+public class Range
 {
-    private final String prefix;
-    private final String suffix;
-    private final List<Pattern> patterns;
-    private final Integer minLen;
-    private final Integer maxLen;
+    private Integer min;
+    private Integer max;
 
-    public SubjectDNOption(
-            final String prefix,
-            final String suffix,
-            final List<Pattern> patterns,
-            final Integer minLen,
-            final Integer maxLen)
+    public Range(
+            final Integer min,
+            final Integer max)
     {
-        this.prefix = prefix;
-        this.suffix = suffix;
-        if(patterns == null)
+        setRange(min, max);
+    }
+
+    public Integer getMin()
+    {
+        return min;
+    }
+
+    public Integer getMax()
+    {
+        return max;
+    }
+
+    public void setRange(
+            final Integer min,
+            final Integer max)
+    {
+        if(min == null && max == null)
         {
-            this.patterns = null;
-        } else
-        {
-            this.patterns = Collections.unmodifiableList(patterns);
+            throw new IllegalArgumentException("min and max cannot be both null");
         }
-        this.minLen = minLen;
-        this.maxLen = maxLen;
+        if(min != null && max != null && min > max)
+        {
+            throw new IllegalArgumentException("min cannot be greater than max: " + min + " > " + max);
+        }
+        this.min = min;
+        this.max = max;
     }
 
-    public String getPrefix()
+    public boolean match(
+            final int i)
     {
-        return prefix;
+        if(min != null && i < min)
+        {
+            return false;
+        }
+        if(max != null && i > max)
+        {
+            return false;
+        }
+
+        return true;
     }
 
-    public String getSufix()
+    /**
+     * @Override
+     */
+    public String toString()
     {
-        return suffix;
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        if(min != null)
+        {
+            sb.append(min);
+        }
+        sb.append(", ");
+        if(max != null)
+        {
+            sb.append(max);
+        }
+        sb.append("]");
+        return sb.toString();
     }
-
-    public List<Pattern> getPatterns()
-    {
-        return patterns;
-    }
-
-    public Integer getMinLen()
-    {
-        return minLen;
-    }
-
-    public Integer getMaxLen()
-    {
-        return maxLen;
-    }
-
 }

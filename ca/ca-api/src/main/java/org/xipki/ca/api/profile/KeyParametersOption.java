@@ -49,53 +49,6 @@ public class KeyParametersOption
 {
     public static final AllowAllParametersOption allowAll = new AllowAllParametersOption();
 
-    public static class Range
-    {
-        private final Integer min;
-        private final Integer max;
-
-        public Range(
-                final Integer min,
-                final Integer max)
-        {
-            if(min == null && max == null)
-            {
-                throw new IllegalArgumentException("min and max cannot be both null");
-            }
-            if(min != null && max != null && min > max)
-            {
-                throw new IllegalArgumentException("min cannot be greater than max: " + min + " > " + max);
-            }
-            this.min = min;
-            this.max = max;
-        }
-
-        public Integer getMin()
-        {
-            return min;
-        }
-
-        public Integer getMax()
-        {
-            return max;
-        }
-
-        public boolean match(
-                final int i)
-        {
-            if(min != null && i < min)
-            {
-                return false;
-            }
-            if(max != null && i > max)
-            {
-                return false;
-            }
-
-            return true;
-        }
-    }
-
     public static class AllowAllParametersOption extends KeyParametersOption
     {
     }

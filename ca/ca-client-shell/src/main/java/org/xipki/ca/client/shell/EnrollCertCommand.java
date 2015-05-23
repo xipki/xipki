@@ -216,7 +216,7 @@ public abstract class EnrollCertCommand extends ClientCommand
         ConcurrentContentSigner signer = getSigner(hashAlgo, new SignatureAlgoControl(rsaMgf1, dsaPlain));
         X509CertificateHolder ssCert = signer.getCertificateAsBCObject();
 
-        X500Name x500Subject = subject == null ? ssCert.getSubject() : new X500Name(subject);
+        X500Name x500Subject = subject == null ? ssCert.getSubject() : getSubject(subject);
         certTemplateBuilder.setSubject(x500Subject);
         certTemplateBuilder.setPublicKey(ssCert.getSubjectPublicKeyInfo());
 
@@ -412,6 +412,11 @@ public abstract class EnrollCertCommand extends ClientCommand
         saveVerbose("saved certificate to file", certFile, cert.getEncoded());
 
         return null;
+    }
+
+    protected X500Name getSubject(String subject)
+    {
+        return new X500Name(subject);
     }
 
 }

@@ -2404,14 +2404,6 @@ class X509CA
                 notAfter = c.getTime();
             }
 
-            try
-            {
-                RdnUpperBounds.checkUpperBounds(grantedSubject);
-            } catch (BadCertTemplateException e)
-            {
-                throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
-            }
-
             X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
                     caInfo.getPublicCAInfo().getX500Subject(),
                     caInfo.nextSerial(),

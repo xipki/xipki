@@ -83,6 +83,15 @@
     <rdn minOccurs="1" maxOccurs="1">
       <type description="cn">2.5.4.3</type>
     </rdn>
+    <rdn minOccurs="1" maxOccurs="1">
+      <type description="dateOfBirth">1.3.6.1.5.5.7.9.1</type>
+    </rdn>
+    <rdn minOccurs="1" maxOccurs="1">
+      <type description="postalAddress">2.5.4.16</type>
+    </rdn>
+    <rdn minOccurs="1" maxOccurs="1">
+      <type description="x500UniqueIdentifier">2.5.4.45</type>
+    </rdn>
   </subject>
   <extensions>
     <extension required="true" permittedInRequest="false">
@@ -208,9 +217,9 @@
             <statementId description="etsi-qcs-QcLimitValue">0.4.0.1862.1.2</statementId>
             <statementValue>
               <qcEuLimitValue>
-                <currency>EUR</currency>
-                <amount min="100" max="200"/>
-                <exponent min="10" max="20"/>
+<currency>EUR</currency>
+<amount min="100" max="200"/>
+<exponent min="10" max="20"/>
               </qcEuLimitValue>
             </statementValue>
           </qCStatement>

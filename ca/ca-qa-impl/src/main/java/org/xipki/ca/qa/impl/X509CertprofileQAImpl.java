@@ -120,7 +120,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.ca.api.profile.DirectoryStringType;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.KeyParametersOption;
@@ -128,15 +127,17 @@ import org.xipki.ca.api.profile.KeyParametersOption.AllowAllParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
-import org.xipki.ca.api.profile.KeyParametersOption.Range;
 import org.xipki.ca.api.profile.RDNControl;
+import org.xipki.ca.api.profile.Range;
+import org.xipki.ca.api.profile.StringType;
+import org.xipki.ca.api.profile.SubjectControl;
 import org.xipki.ca.api.profile.x509.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.x509.KeyUsageControl;
+import org.xipki.ca.api.profile.x509.SubjectDNSpec;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.api.profile.x509.X509Certprofile;
 import org.xipki.ca.certprofile.BiometricInfoOption;
-import org.xipki.ca.certprofile.SubjectDNOption;
 import org.xipki.ca.certprofile.XmlX509CertprofileUtil;
 import org.xipki.ca.certprofile.x509.jaxb.AdditionalInformation;
 import org.xipki.ca.certprofile.x509.jaxb.Admission;
@@ -195,7 +196,6 @@ import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.SecurityUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.security.api.ExtensionExistence;
 
@@ -226,9 +226,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
     private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
 
-    private Map<ASN1ObjectIdentifier, SubjectDNOption> subjectDNOptions;
-    private Set<RDNControl> subjectDNControls;
-    private Map<ASN1ObjectIdentifier, String> subjectDNGroups;
+    private SubjectControl subjectControl;
     private Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
 
     private CertValidity validity;
@@ -316,50 +314,58 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             }
 
             // Subject
-            if(conf.getSubject() != null)
+            Subject subject = conf.getSubject();
+
+            Map<ASN1ObjectIdentifier, RDNControl> subjectDNControls = new HashMap<>();
+
+            for(RdnType t : subject.getRdn())
             {
-                Subject subject = conf.getSubject();
+                StringType stringType = XmlX509CertprofileUtil.convertStringType(
+                        t.getStringType());
+                ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(t.getType().getValue());
 
-                this.subjectDNControls = new HashSet<RDNControl>();
-                this.subjectDNOptions = new HashMap<>();
-                this.subjectDNGroups = new HashMap<>();
-
-                for(RdnType t : subject.getRdn())
+                List<Pattern> patterns = null;
+                if(CollectionUtil.isNotEmpty(t.getRegex()))
                 {
-                    DirectoryStringType directoryStringEnum =
-                            XmlX509CertprofileUtil.convertDirectoryStringType(t.getDirectoryStringType());
-                    ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(t.getType().getValue());
-                    RDNControl occ = new RDNControl(type,
-                            getInt(t.getMinOccurs(), 1), getInt(t.getMaxOccurs(), 1), directoryStringEnum);
-                    this.subjectDNControls.add(occ);
-
-                    List<Pattern> patterns = null;
-                    if(CollectionUtil.isNotEmpty(t.getRegex()))
+                    patterns = new LinkedList<>();
+                    for(String regex : t.getRegex())
                     {
-                        patterns = new LinkedList<>();
-                        for(String regex : t.getRegex())
-                        {
-                            Pattern pattern = Pattern.compile(regex);
-                            patterns.add(pattern);
-                        }
-                    }
-
-                    SubjectDNOption option = new SubjectDNOption(t.getPrefix(), t.getSuffix(), patterns,
-                            t.getMinLen(), t.getMaxLen());
-                    this.subjectDNOptions.put(type, option);
-                    String g = t.getGroup();
-                    if(StringUtil.isNotBlank(g))
-                    {
-                        if(occ.getMaxOccurs() > 1)
-                        {
-                            throw new CertprofileException(
-                                    "maxOccurs greather than 1 is not not allowed if attribute group is set");
-                        }
-
-                        this.subjectDNGroups.put(type, g);
+                        Pattern pattern = Pattern.compile(regex);
+                        patterns.add(pattern);
                     }
                 }
+
+                if(patterns == null)
+                {
+                    Pattern pattern = SubjectDNSpec.getPattern(type);
+                    if(pattern != null)
+                    {
+                        patterns = Arrays.asList(pattern);
+                    }
+                }
+
+                Range range;
+                if(t.getMinLen() != null || t.getMaxLen() != null)
+                {
+                    range = new Range(t.getMinLen(), t.getMaxLen());
+                }
+                else
+                {
+                    range = null;
+                }
+
+                RDNControl rdnControl = new RDNControl(type, t.getMinOccurs(), t.getMaxOccurs());
+                rdnControl.setStringType(stringType);
+                rdnControl.setStringLengthRange(range);
+                rdnControl.setPatterns(patterns);
+                rdnControl.setPrefix(t.getPrefix());
+                rdnControl.setSuffix(t.getSuffix());
+                rdnControl.setGroup(t.getGroup());
+                SubjectDNSpec.fixRDNControl(rdnControl);
+
+                subjectDNControls.put(type, rdnControl);
             }
+            this.subjectControl = new SubjectControl(subject.isDnBackwards(), subjectDNControls);
 
             // Extensions
             ExtensionsType extensionsType = conf.getExtensions();
@@ -1433,7 +1439,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         // collect subject attribute types to check
         Set<ASN1ObjectIdentifier> oids = new HashSet<>();
 
-        for(ASN1ObjectIdentifier oid : subjectDNOptions.keySet())
+        for(ASN1ObjectIdentifier oid : subjectControl.getTypes())
         {
             oids.add(oid);
         }
@@ -1447,20 +1453,15 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
         ValidationIssue issue = new ValidationIssue("X509.SUBJECT.group", "X509 subject RDN group");
         result.add(issue);
-        if(CollectionUtil.isNotEmpty(subjectDNGroups))
+        if(CollectionUtil.isNotEmpty(subjectControl.getGroups()))
         {
-            Set<String> groups = new HashSet<>(subjectDNGroups.values());
+            Set<String> groups = new HashSet<>(subjectControl.getGroups());
             for(String g : groups)
             {
                 boolean toBreak = false;
                 RDN rdn = null;
-                for(ASN1ObjectIdentifier type : subjectDNGroups.keySet())
+                for(ASN1ObjectIdentifier type : subjectControl.getTypesForGroup(g))
                 {
-                    if(subjectDNGroups.get(type).equals(g) == false)
-                    {
-                        continue;
-                    }
-
                     RDN[] rdns = subject.getRDNs(type);
                     if(rdns == null || rdns.length == 0)
                     {
@@ -1495,7 +1496,16 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
         for(ASN1ObjectIdentifier type : oids)
         {
-            result.add(checkSubjectAttribute(type, subject, requestedSubject));
+            ValidationIssue valIssue;
+            try
+            {
+                valIssue = checkSubjectAttribute(type, subject, requestedSubject);
+            } catch (BadCertTemplateException e)
+            {
+                valIssue = new ValidationIssue("X509.SUBJECT.REQUEST", "Subject in request");
+                valIssue.setFailureMessage(e.getMessage());
+            }
+            result.add(valIssue);
         }
 
         return result;
@@ -1505,8 +1515,9 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             final ASN1ObjectIdentifier type,
             final X500Name subject,
             final X500Name requestedSubject)
+    throws BadCertTemplateException
     {
-        boolean multiValuedRdn = StringUtil.isNotBlank(subjectDNGroups.get(type));
+        boolean multiValuedRdn = subjectControl.getGroup(type) != null;
         if(multiValuedRdn)
         {
             return checkSubjectAttributeMultiValued(type, subject, requestedSubject);
@@ -1521,13 +1532,14 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             final ASN1ObjectIdentifier type,
             final X500Name subject,
             final X500Name requestedSubject)
+    throws BadCertTemplateException
     {
         ValidationIssue issue = createSubjectIssue(type);
 
         // control
         int minOccurs;
         int maxOccurs;
-        RDNControl rdnControl = getSubjectDNControl(type);
+        RDNControl rdnControl = subjectControl.getControl(type);
         if(rdnControl == null)
         {
             minOccurs = 0;
@@ -1559,27 +1571,19 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             return issue;
         }
 
-        SubjectDNOption rdnOption = subjectDNOptions.get(type);
+        RDNControl rdnOption = subjectControl.getControl(type);
+
+        StringBuilder failureMsg = new StringBuilder();
 
         // check the encoding
-        DirectoryStringType stringType = rdnControl.getDirectoryStringEnum();
-        if(stringType == null)
-        {
-            if(ObjectIdentifiers.DN_C.equals(type) || ObjectIdentifiers.DN_SERIALNUMBER.equals(type))
-            {
-                stringType = DirectoryStringType.printableString;
-            } else
-            {
-                stringType = DirectoryStringType.utf8String;
-            }
-        }
+        StringType stringType = rdnControl.getStringType();
 
         List<String> requestedCoreAtvTextValues = new LinkedList<>();
         if(requestedRdns != null)
         {
             for(RDN requestedRdn : requestedRdns)
             {
-                String textValue = X509Util.rdnValueToString(requestedRdn.getFirst().getValue());
+                String textValue = getRdnTextValueOfRequest(requestedRdn);
                 requestedCoreAtvTextValues.add(textValue);
             }
 
@@ -1590,56 +1594,95 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             }
         }
 
-        StringBuilder failureMsg = new StringBuilder();
         for(int i = 0; i < rdns.length; i++)
         {
             RDN rdn = rdns[i];
             AttributeTypeAndValue[] atvs = rdn.getTypesAndValues();
             if(atvs.length > 1)
             {
-                failureMsg.append("size of RDN + [" + i + "] is '" + atvs.length + "' but expected '1'");
+                failureMsg.append("size of RDN[" + i + "] is '" + atvs.length + "' but expected '1'");
                 failureMsg.append("; ");
                 continue;
             }
 
             ASN1Encodable atvValue = atvs[0].getValue();
-            boolean correctStringType = true;
-            switch(stringType)
-            {
-            case bmpString:
-                correctStringType = (atvValue instanceof DERBMPString);
-                break;
-            case printableString:
-                correctStringType = (atvValue instanceof DERPrintableString);
-                break;
-            case teletexString:
-                correctStringType = (atvValue instanceof DERT61String);
-                break;
-            case utf8String:
-                correctStringType = (atvValue instanceof DERUTF8String);
-                break;
-            default:
-                throw new RuntimeException("should not reach here, unknown DirectoryStringType " + stringType);
-            } // end switch
 
-            if(correctStringType == false)
+            String atvTextValue;
+            if(ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type))
             {
-                failureMsg.append("RDN + [" + i + "] is not of type DirectoryString." + stringType.name());
-                failureMsg.append("; ");
-                continue;
+                if(atvValue instanceof ASN1GeneralizedTime == false)
+                {
+                    failureMsg.append("RDN[" + i + "] is not of type GeneralizedTime");
+                    failureMsg.append("; ");
+                    continue;
+                }
+                atvTextValue = ((ASN1GeneralizedTime) atvValue).getTimeString();
+            }
+            else if(ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type))
+            {
+                if(atvValue instanceof ASN1Sequence == false)
+                {
+                    failureMsg.append("RDN[" + i + "] is not of type Sequence");
+                    failureMsg.append("; ");
+                    continue;
+                }
+
+                ASN1Sequence seq = (ASN1Sequence) atvValue;
+                final int n = seq.size();
+
+                StringBuilder sb = new StringBuilder();
+                boolean validEncoding = true;
+                for(int j = 0; j < n; j++)
+                {
+                    ASN1Encodable o = seq.getObjectAt(j);
+                    if(matchStringType(o, stringType) == false)
+                    {
+                        failureMsg.append("RDN[" + i + "].[" + j + "] is not of type " + stringType.name());
+                        failureMsg.append("; ");
+                        validEncoding = false;
+                        break;
+                    }
+
+                    String textValue = X509Util.rdnValueToString(o);
+                    sb.append("[").append(j).append("]=").append(textValue).append(",");
+                }
+
+                if(validEncoding == false)
+                {
+                    continue;
+                }
+
+                atvTextValue = sb.toString();
+            }
+            else
+            {
+                if(matchStringType(atvValue, stringType) == false)
+                {
+                    failureMsg.append("RDN[" + i + "] is not of type " + stringType.name());
+                    failureMsg.append("; ");
+                    continue;
+                }
+
+                atvTextValue = X509Util.rdnValueToString(atvValue);
             }
 
-            String atvTextValue = X509Util.rdnValueToString(atvValue);
             String coreAtvTextValue = atvTextValue;
 
-            if(rdnOption != null)
+            if(ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type))
+            {
+                if(SubjectDNSpec.p_dateOfBirth.matcher(coreAtvTextValue).matches() == false)
+                {
+                    throw new BadCertTemplateException("Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
+                }
+            }
+            else if(rdnOption != null)
             {
                 String prefix = rdnOption.getPrefix();
                 if(prefix != null)
                 {
                     if(coreAtvTextValue.startsWith(prefix) == false)
                     {
-                        failureMsg.append("RDN + [" + i + "] '" + atvTextValue+
+                        failureMsg.append("RDN[" + i + "] '" + atvTextValue+
                                 "' does not start with prefix '" + prefix + "'");
                         failureMsg.append("; ");
                         continue;
@@ -1650,12 +1693,12 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                     }
                 }
 
-                String suffix = rdnOption.getSufix();
+                String suffix = rdnOption.getSuffix();
                 if(suffix != null)
                 {
                     if(coreAtvTextValue.endsWith(suffix) == false)
                     {
-                        failureMsg.append("RDN + [" + i + "] '" + atvTextValue+
+                        failureMsg.append("RDN[" + i + "] '" + atvTextValue+
                                 "' does not end with suffx '" + suffix + "'");
                         failureMsg.append("; ");
                         continue;
@@ -1673,7 +1716,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                     boolean matches = pattern.matcher(coreAtvTextValue).matches();
                     if(matches == false)
                     {
-                        failureMsg.append("RDN + [" + i + "] '" + coreAtvTextValue+
+                        failureMsg.append("RDN[" + i + "] '" + coreAtvTextValue+
                                 "' is not valid against regex '" + pattern.pattern() + "'");
                         failureMsg.append("; ");
                         continue;
@@ -1688,7 +1731,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                     failureMsg.append("is present but not contained in the request");
                     failureMsg.append("; ");
                 }
-            } else
+            }
+            else
             {
                 String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(i);
                 if(ObjectIdentifiers.DN_CN.equals(type) &&
@@ -1731,13 +1775,14 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             final ASN1ObjectIdentifier type,
             final X500Name subject,
             final X500Name requestedSubject)
+    throws BadCertTemplateException
     {
         ValidationIssue issue = createSubjectIssue(type);
 
         // control        
         int minOccurs;
         int maxOccurs;
-        RDNControl rdnControl = getSubjectDNControl(type);
+        RDNControl rdnControl = subjectControl.getControl(type);
         if(rdnControl == null)
         {
             minOccurs = 0;
@@ -1771,27 +1816,16 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             return issue;
         }
 
-        SubjectDNOption rdnOption = subjectDNOptions.get(type);
+        RDNControl rdnOption = subjectControl.getControl(type);
 
         // check the encoding
-        DirectoryStringType stringType = rdnControl.getDirectoryStringEnum();
-        if(stringType == null)
-        {
-            if(ObjectIdentifiers.DN_C.equals(type) || ObjectIdentifiers.DN_SERIALNUMBER.equals(type))
-            {
-                stringType = DirectoryStringType.printableString;
-            } else
-            {
-                stringType = DirectoryStringType.utf8String;
-            }
-        }
-
+        StringType stringType = rdnControl.getStringType();
         List<String> requestedCoreAtvTextValues = new LinkedList<>();
         if(requestedRdns != null)
         {
             for(RDN requestedRdn : requestedRdns)
             {
-                String textValue = X509Util.rdnValueToString(requestedRdn.getFirst().getValue());
+                String textValue = getRdnTextValueOfRequest(requestedRdn);
                 requestedCoreAtvTextValues.add(textValue);
             }
 
@@ -1826,43 +1860,83 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         {
             AttributeTypeAndValue atv = atvs.get(i);
             ASN1Encodable atvValue = atv.getValue();
-            boolean correctStringType = true;
-            switch(stringType)
-            {
-            case bmpString:
-                correctStringType = (atvValue instanceof DERBMPString);
-                break;
-            case printableString:
-                correctStringType = (atvValue instanceof DERPrintableString);
-                break;
-            case teletexString:
-                correctStringType = (atvValue instanceof DERT61String);
-                break;
-            case utf8String:
-                correctStringType = (atvValue instanceof DERUTF8String);
-                break;
-            default:
-                throw new RuntimeException("should not reach here, unknown DirectoryStringType " + stringType);
-            } // end switch
+            String atvTextValue;
 
-            if(correctStringType == false)
+            if(ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type))
             {
-                failureMsg.append("RDN + [" + i + "] is not of type DirectoryString." + stringType.name());
-                failureMsg.append("; ");
-                continue;
+                if(atvValue instanceof ASN1GeneralizedTime == false)
+                {
+                    failureMsg.append("AttributeTypeAndValue[" + i + "] is not of type GeneralizedTime");
+                    failureMsg.append("; ");
+                    continue;
+                }
+                atvTextValue = ((ASN1GeneralizedTime) atvValue).getTimeString();
+            }
+            else if(ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type))
+            {
+                if(atvValue instanceof ASN1Sequence == false)
+                {
+                    failureMsg.append("AttributeTypeAndValue[" + i + "] is not of type Sequence");
+                    failureMsg.append("; ");
+                    continue;
+                }
+
+                ASN1Sequence seq = (ASN1Sequence) atvValue;
+                final int n = seq.size();
+
+                StringBuilder sb = new StringBuilder();
+                boolean validEncoding = true;
+                for(int j = 0; j < n; j++)
+                {
+                    ASN1Encodable o = seq.getObjectAt(j);
+                    if(matchStringType(atvValue, stringType) == false)
+                    {
+                        failureMsg.append("AttributeTypeAndValue[" + i + "].[" + j + "] is not of type " + stringType.name());
+                        failureMsg.append("; ");
+                        validEncoding = false;
+                        break;
+                    }
+
+                    String textValue = X509Util.rdnValueToString(o);
+                    sb.append("[").append(j).append("]=").append(textValue).append(",");
+                }
+
+                if(validEncoding == false)
+                {
+                    continue;
+                }
+
+                atvTextValue = sb.toString();
+            }
+            else
+            {
+                if(matchStringType(atvValue, stringType) == false)
+                {
+                    failureMsg.append("AttributeTypeAndValue[" + i + "] is not of type " + stringType.name());
+                    failureMsg.append("; ");
+                    continue;
+                }
+
+                atvTextValue = X509Util.rdnValueToString(atvValue);
             }
 
-            String atvTextValue = X509Util.rdnValueToString(atvValue);
             String coreAtvTextValue = atvTextValue;
 
-            if(rdnOption != null)
+            if(ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type))
+            {
+                if(SubjectDNSpec.p_dateOfBirth.matcher(coreAtvTextValue).matches() == false)
+                {
+                    throw new BadCertTemplateException("Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
+                }
+            }
+            else if(rdnOption != null)
             {
                 String prefix = rdnOption.getPrefix();
                 if(prefix != null)
                 {
                     if(coreAtvTextValue.startsWith(prefix) == false)
                     {
-                        failureMsg.append("RDN + [" + i + "] '" + atvTextValue+
+                        failureMsg.append("AttributeTypeAndValue[" + i + "] '" + atvTextValue+
                                 "' does not start with prefix '" + prefix + "'");
                         failureMsg.append("; ");
                         continue;
@@ -1873,12 +1947,12 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                     }
                 }
 
-                String suffix = rdnOption.getSufix();
+                String suffix = rdnOption.getSuffix();
                 if(suffix != null)
                 {
                     if(coreAtvTextValue.endsWith(suffix) == false)
                     {
-                        failureMsg.append("RDN + [" + i + "] '" + atvTextValue+
+                        failureMsg.append("AttributeTypeAndValue[" + i + "] '" + atvTextValue+
                                 "' does not end with suffx '" + suffix + "'");
                         failureMsg.append("; ");
                         continue;
@@ -1896,7 +1970,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                     boolean matches = pattern.matcher(coreAtvTextValue).matches();
                     if(matches == false)
                     {
-                        failureMsg.append("AttributeTypeAndValue + [" + i + "] '" + coreAtvTextValue+
+                        failureMsg.append("AttributeTypeAndValue[" + i + "] '" + coreAtvTextValue+
                                 "' is not valid against regex '" + pattern.pattern() + "'");
                         failureMsg.append("; ");
                         continue;
@@ -1948,13 +2022,6 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
 
         return issue;
-    }
-
-    private static int getInt(
-            final Integer i,
-            final int dfltValue)
-    {
-        return i == null ? dfltValue : i.intValue();
     }
 
     private ValidationIssue createSubjectIssue(
@@ -3990,19 +4057,6 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         return ret;
     }
 
-    private RDNControl getSubjectDNControl(final ASN1ObjectIdentifier type)
-    {
-        for(RDNControl control : subjectDNControls)
-        {
-            if(control.getType().equals(type))
-            {
-                return control;
-            }
-        }
-
-        return null;
-    }
-
     private byte[] getConstantExtensionValue(
             final ASN1ObjectIdentifier type)
     {
@@ -4120,5 +4174,70 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             }
         }
         return sorted;
+    }
+
+    private static boolean matchStringType(ASN1Encodable atvValue, StringType stringType)
+    {
+        boolean correctStringType = true;
+        switch(stringType)
+        {
+        case bmpString:
+            correctStringType = (atvValue instanceof DERBMPString);
+            break;
+        case printableString:
+            correctStringType = (atvValue instanceof DERPrintableString);
+            break;
+        case teletexString:
+            correctStringType = (atvValue instanceof DERT61String);
+            break;
+        case utf8String:
+            correctStringType = (atvValue instanceof DERUTF8String);
+            break;
+        case ia5String:
+            correctStringType = (atvValue instanceof DERIA5String);
+            break;
+        default:
+            throw new RuntimeException("should not reach here, unknown StringType " + stringType);
+        } // end switch
+        return correctStringType;
+    }
+
+    private static String getRdnTextValueOfRequest(RDN requestedRdn)
+    throws BadCertTemplateException
+    {
+        ASN1ObjectIdentifier type = requestedRdn.getFirst().getType();
+        ASN1Encodable v = requestedRdn.getFirst().getValue();
+        if(ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type))
+        {
+            if(v instanceof ASN1GeneralizedTime == false)
+            {
+                throw new BadCertTemplateException("requested RDN is not of GeneralizedTime");
+            }
+            return ((ASN1GeneralizedTime) v).getTimeString();
+        }
+        else if(ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type))
+        {
+            if(v instanceof ASN1Sequence == false)
+            {
+                throw new BadCertTemplateException("requested RDN is not of Sequence");
+            }
+
+            ASN1Sequence seq = (ASN1Sequence) v;
+            final int n = seq.size();
+
+            StringBuilder sb = new StringBuilder();
+            for(int i = 0; i < n; i++)
+            {
+                ASN1Encodable o = seq.getObjectAt(i);
+                String textValue = X509Util.rdnValueToString(o);
+                sb.append("[").append(i).append("]=").append(textValue).append(",");
+            }
+
+            return sb.toString();
+        }
+        else
+        {
+            return X509Util.rdnValueToString(v);
+        }
     }
 }

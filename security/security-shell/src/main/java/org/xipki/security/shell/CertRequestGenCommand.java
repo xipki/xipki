@@ -329,7 +329,7 @@ public abstract class CertRequestGenCommand extends SecurityCommand
         X500Name subjectDN;
         if(subject != null)
         {
-            subjectDN = new X500Name(subject);
+            subjectDN = getSubject(subject);
         }
         else
         {
@@ -352,6 +352,11 @@ public abstract class CertRequestGenCommand extends SecurityCommand
         File file = new File(outputFilename);
         saveVerbose("saved PKCS#10 request to file", file, p10Req.getEncoded());
         return null;
+    }
+
+    protected X500Name getSubject(String subject)
+    {
+        return new X500Name(subject);
     }
 
 }
