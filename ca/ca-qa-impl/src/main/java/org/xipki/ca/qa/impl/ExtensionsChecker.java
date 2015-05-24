@@ -542,7 +542,6 @@ public class ExtensionsChecker
     {
         ParamChecker.assertNotNull("cert", cert);
         ParamChecker.assertNotNull("issuerInfo", issuerInfo);
-        ParamChecker.assertNotNull("requestExtensions", requestExtensions);
 
         X509Certificate jceCert;
         try
