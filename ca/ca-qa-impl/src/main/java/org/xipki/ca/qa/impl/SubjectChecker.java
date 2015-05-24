@@ -321,160 +321,14 @@ public class SubjectChecker
                 continue;
             }
 
-            ASN1Encodable atvValue = atvs[0].getValue();
-
-            String atvTextValue;
-            if(ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type))
+            String atvTextValue = getAtvValueString("RDN[" + i + "]", atvs[0], stringType, failureMsg);
+            if(atvTextValue == null)
             {
-                if(atvValue instanceof ASN1GeneralizedTime == false)
-                {
-                    failureMsg.append("RDN[" + i + "] is not of type GeneralizedTime");
-                    failureMsg.append("; ");
-                    continue;
-                }
-                atvTextValue = ((ASN1GeneralizedTime) atvValue).getTimeString();
-            }
-            else if(ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type))
-            {
-                if(atvValue instanceof ASN1Sequence == false)
-                {
-                    failureMsg.append("RDN[" + i + "] is not of type Sequence");
-                    failureMsg.append("; ");
-                    continue;
-                }
-
-                ASN1Sequence seq = (ASN1Sequence) atvValue;
-                final int n = seq.size();
-
-                StringBuilder sb = new StringBuilder();
-                boolean validEncoding = true;
-                for(int j = 0; j < n; j++)
-                {
-                    ASN1Encodable o = seq.getObjectAt(j);
-                    if(matchStringType(o, stringType) == false)
-                    {
-                        failureMsg.append("RDN[" + i + "].[" + j + "] is not of type " + stringType.name());
-                        failureMsg.append("; ");
-                        validEncoding = false;
-                        break;
-                    }
-
-                    String textValue = X509Util.rdnValueToString(o);
-                    sb.append("[").append(j).append("]=").append(textValue).append(",");
-                }
-
-                if(validEncoding == false)
-                {
-                    continue;
-                }
-
-                atvTextValue = sb.toString();
-            }
-            else
-            {
-                if(matchStringType(atvValue, stringType) == false)
-                {
-                    failureMsg.append("RDN[" + i + "] is not of type " + stringType.name());
-                    failureMsg.append("; ");
-                    continue;
-                }
-
-                atvTextValue = X509Util.rdnValueToString(atvValue);
+                continue;
             }
 
-            String coreAtvTextValue = atvTextValue;
-
-            if(ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type))
-            {
-                if(SubjectDNSpec.p_dateOfBirth.matcher(coreAtvTextValue).matches() == false)
-                {
-                    throw new BadCertTemplateException("Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
-                }
-            }
-            else if(rdnOption != null)
-            {
-                String prefix = rdnOption.getPrefix();
-                if(prefix != null)
-                {
-                    if(coreAtvTextValue.startsWith(prefix) == false)
-                    {
-                        failureMsg.append("RDN[" + i + "] '" + atvTextValue+
-                                "' does not start with prefix '" + prefix + "'");
-                        failureMsg.append("; ");
-                        continue;
-                    }
-                    else
-                    {
-                        coreAtvTextValue = coreAtvTextValue.substring(prefix.length());
-                    }
-                }
-
-                String suffix = rdnOption.getSuffix();
-                if(suffix != null)
-                {
-                    if(coreAtvTextValue.endsWith(suffix) == false)
-                    {
-                        failureMsg.append("RDN[" + i + "] '" + atvTextValue+
-                                "' does not end with suffx '" + suffix + "'");
-                        failureMsg.append("; ");
-                        continue;
-                    }
-                    else
-                    {
-                        coreAtvTextValue = coreAtvTextValue.substring(0, coreAtvTextValue.length() - suffix.length());
-                    }
-                }
-
-                List<Pattern> patterns = rdnOption.getPatterns();
-                if(patterns != null)
-                {
-                    Pattern pattern = patterns.get(i);
-                    boolean matches = pattern.matcher(coreAtvTextValue).matches();
-                    if(matches == false)
-                    {
-                        failureMsg.append("RDN[" + i + "] '" + coreAtvTextValue+
-                                "' is not valid against regex '" + pattern.pattern() + "'");
-                        failureMsg.append("; ");
-                        continue;
-                    }
-                }
-            }
-
-            if(CollectionUtil.isEmpty(requestedCoreAtvTextValues))
-            {
-                if(type.equals(ObjectIdentifiers.DN_SERIALNUMBER) == false)
-                {
-                    failureMsg.append("is present but not contained in the request");
-                    failureMsg.append("; ");
-                }
-            }
-            else
-            {
-                String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(i);
-                if(ObjectIdentifiers.DN_CN.equals(type) &&
-                        specialBehavior != null &&
-                        "gematik_gSMC_K".equals(specialBehavior))
-                {
-                    if(coreAtvTextValue.startsWith(requestedCoreAtvTextValue + "-") == false)
-                    {
-                        failureMsg.append("content '" + coreAtvTextValue + "' does not start with '" +
-                                requestedCoreAtvTextValue + "-'");
-                        failureMsg.append("; ");
-                    }
-                }
-                else if(type.equals(ObjectIdentifiers.DN_SERIALNUMBER))
-                {
-                }
-                else
-                {
-                    if(coreAtvTextValue.equals(requestedCoreAtvTextValue) == false)
-                    {
-                        failureMsg.append("content '" + coreAtvTextValue + "' but expected '" +
-                                requestedCoreAtvTextValue + "'");
-                        failureMsg.append("; ");
-                    }
-                }
-            }
+            checkAttributeTypeAndValue("RDN[" + i + "]", type,
+                    atvTextValue, rdnControl, requestedCoreAtvTextValues, i, failureMsg);
         }
 
         int n = failureMsg.length();
@@ -575,159 +429,14 @@ public class SubjectChecker
         for(int i = 0; i < atvsSize; i++)
         {
             AttributeTypeAndValue atv = atvs.get(i);
-            ASN1Encodable atvValue = atv.getValue();
-            String atvTextValue;
-
-            if(ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type))
+            String atvTextValue = getAtvValueString("AttributeTypeAndValue[" + i + "]", atv, stringType, failureMsg);
+            if(atvTextValue == null)
             {
-                if(atvValue instanceof ASN1GeneralizedTime == false)
-                {
-                    failureMsg.append("AttributeTypeAndValue[" + i + "] is not of type GeneralizedTime");
-                    failureMsg.append("; ");
-                    continue;
-                }
-                atvTextValue = ((ASN1GeneralizedTime) atvValue).getTimeString();
-            }
-            else if(ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type))
-            {
-                if(atvValue instanceof ASN1Sequence == false)
-                {
-                    failureMsg.append("AttributeTypeAndValue[" + i + "] is not of type Sequence");
-                    failureMsg.append("; ");
-                    continue;
-                }
-
-                ASN1Sequence seq = (ASN1Sequence) atvValue;
-                final int n = seq.size();
-
-                StringBuilder sb = new StringBuilder();
-                boolean validEncoding = true;
-                for(int j = 0; j < n; j++)
-                {
-                    ASN1Encodable o = seq.getObjectAt(j);
-                    if(matchStringType(atvValue, stringType) == false)
-                    {
-                        failureMsg.append("AttributeTypeAndValue[" + i + "].[" + j + "] is not of type " + stringType.name());
-                        failureMsg.append("; ");
-                        validEncoding = false;
-                        break;
-                    }
-
-                    String textValue = X509Util.rdnValueToString(o);
-                    sb.append("[").append(j).append("]=").append(textValue).append(",");
-                }
-
-                if(validEncoding == false)
-                {
-                    continue;
-                }
-
-                atvTextValue = sb.toString();
-            }
-            else
-            {
-                if(matchStringType(atvValue, stringType) == false)
-                {
-                    failureMsg.append("AttributeTypeAndValue[" + i + "] is not of type " + stringType.name());
-                    failureMsg.append("; ");
-                    continue;
-                }
-
-                atvTextValue = X509Util.rdnValueToString(atvValue);
+                continue;
             }
 
-            String coreAtvTextValue = atvTextValue;
-
-            if(ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type))
-            {
-                if(SubjectDNSpec.p_dateOfBirth.matcher(coreAtvTextValue).matches() == false)
-                {
-                    throw new BadCertTemplateException("Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
-                }
-            }
-            else if(rdnOption != null)
-            {
-                String prefix = rdnOption.getPrefix();
-                if(prefix != null)
-                {
-                    if(coreAtvTextValue.startsWith(prefix) == false)
-                    {
-                        failureMsg.append("AttributeTypeAndValue[" + i + "] '" + atvTextValue+
-                                "' does not start with prefix '" + prefix + "'");
-                        failureMsg.append("; ");
-                        continue;
-                    }
-                    else
-                    {
-                        coreAtvTextValue = coreAtvTextValue.substring(prefix.length());
-                    }
-                }
-
-                String suffix = rdnOption.getSuffix();
-                if(suffix != null)
-                {
-                    if(coreAtvTextValue.endsWith(suffix) == false)
-                    {
-                        failureMsg.append("AttributeTypeAndValue[" + i + "] '" + atvTextValue+
-                                "' does not end with suffx '" + suffix + "'");
-                        failureMsg.append("; ");
-                        continue;
-                    }
-                    else
-                    {
-                        coreAtvTextValue = coreAtvTextValue.substring(0, coreAtvTextValue.length() - suffix.length());
-                    }
-                }
-
-                List<Pattern> patterns = rdnOption.getPatterns();
-                if(patterns != null)
-                {
-                    Pattern pattern = patterns.get(i);
-                    boolean matches = pattern.matcher(coreAtvTextValue).matches();
-                    if(matches == false)
-                    {
-                        failureMsg.append("AttributeTypeAndValue[" + i + "] '" + coreAtvTextValue+
-                                "' is not valid against regex '" + pattern.pattern() + "'");
-                        failureMsg.append("; ");
-                        continue;
-                    }
-                }
-            }
-
-            if(CollectionUtil.isEmpty(requestedCoreAtvTextValues))
-            {
-                if(type.equals(ObjectIdentifiers.DN_SERIALNUMBER) == false)
-                {
-                    failureMsg.append("is present but not contained in the request");
-                    failureMsg.append("; ");
-                }
-            } else
-            {
-                String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(i);
-                if(ObjectIdentifiers.DN_CN.equals(type) &&
-                        specialBehavior != null &&
-                        "gematik_gSMC_K".equals(specialBehavior))
-                {
-                    if(coreAtvTextValue.startsWith(requestedCoreAtvTextValue + "-") == false)
-                    {
-                        failureMsg.append("content '" + coreAtvTextValue + "' does not start with '" +
-                                requestedCoreAtvTextValue + "-'");
-                        failureMsg.append("; ");
-                    }
-                }
-                else if(type.equals(ObjectIdentifiers.DN_SERIALNUMBER))
-                {
-                }
-                else
-                {
-                    if(coreAtvTextValue.equals(requestedCoreAtvTextValue) == false)
-                    {
-                        failureMsg.append("content '" + coreAtvTextValue + "' but expected '" +
-                                requestedCoreAtvTextValue + "'");
-                        failureMsg.append("; ");
-                    }
-                }
-            }
+            checkAttributeTypeAndValue("AttributeTypeAndValue[" + i + "]", type,
+                    atvTextValue, rdnControl, requestedCoreAtvTextValues, i, failureMsg);
         }
 
         int n = failureMsg.length();
@@ -846,5 +555,177 @@ public class SubjectChecker
                     " (" + subjectAttrType.getId() + ")");
         }
         return issue;
+    }
+
+    private static String getAtvValueString(
+            final String name,
+            final AttributeTypeAndValue atv,
+            final StringType stringType,
+            final StringBuilder failureMsg)
+    {
+        ASN1ObjectIdentifier type = atv.getType();
+        ASN1Encodable atvValue = atv.getValue();
+
+        if(ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type))
+        {
+            if(atvValue instanceof ASN1GeneralizedTime == false)
+            {
+                failureMsg.append(name).append(" is not of type GeneralizedTime");
+                failureMsg.append("; ");
+                return null;
+            }
+            return ((ASN1GeneralizedTime) atvValue).getTimeString();
+        }
+        else if(ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type))
+        {
+            if(atvValue instanceof ASN1Sequence == false)
+            {
+                failureMsg.append(name).append(" is not of type Sequence");
+                failureMsg.append("; ");
+                return null;
+            }
+
+            ASN1Sequence seq = (ASN1Sequence) atvValue;
+            final int n = seq.size();
+
+            StringBuilder sb = new StringBuilder();
+            boolean validEncoding = true;
+            for(int j = 0; j < n; j++)
+            {
+                ASN1Encodable o = seq.getObjectAt(j);
+                if(matchStringType(o, stringType) == false)
+                {
+                    failureMsg.append(name).append(".[" + j + "] is not of type " + stringType.name());
+                    failureMsg.append("; ");
+                    validEncoding = false;
+                    break;
+                }
+
+                String textValue = X509Util.rdnValueToString(o);
+                sb.append("[").append(j).append("]=").append(textValue).append(",");
+            }
+
+            if(validEncoding == false)
+            {
+                return null;
+            }
+
+            return sb.toString();
+        }
+        else
+        {
+            if(matchStringType(atvValue, stringType) == false)
+            {
+                failureMsg.append(name).append(" is not of type " + stringType.name());
+                failureMsg.append("; ");
+                return null;
+            }
+
+            return X509Util.rdnValueToString(atvValue);
+        }
+    }
+
+    private void checkAttributeTypeAndValue(
+            final String name,
+            final ASN1ObjectIdentifier type,
+            final String _atvTextValue,
+            final RDNControl rdnOption,
+            final List<String> requestedCoreAtvTextValues,
+            final int index,
+            final StringBuilder failureMsg)
+    throws BadCertTemplateException
+    {
+        String atvTextValue = _atvTextValue;
+        if(ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type))
+        {
+            if(SubjectDNSpec.p_dateOfBirth.matcher(atvTextValue).matches() == false)
+            {
+                throw new BadCertTemplateException("Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
+            }
+        }
+        else if(rdnOption != null)
+        {
+            String prefix = rdnOption.getPrefix();
+            if(prefix != null)
+            {
+                if(atvTextValue.startsWith(prefix) == false)
+                {
+                    failureMsg.append(name).append(" '").append(atvTextValue).
+                        append("' does not start with prefix '").append(prefix).append("'");
+                    failureMsg.append("; ");
+                    return;
+                }
+                else
+                {
+                    atvTextValue = atvTextValue.substring(prefix.length());
+                }
+            }
+
+            String suffix = rdnOption.getSuffix();
+            if(suffix != null)
+            {
+                if(atvTextValue.endsWith(suffix) == false)
+                {
+                    failureMsg.append(name).append(" '").append(atvTextValue)
+                            .append("' does not end with suffx '").append(suffix).append("'");
+                    failureMsg.append("; ");
+                    return;
+                }
+                else
+                {
+                    atvTextValue = atvTextValue.substring(0, atvTextValue.length() - suffix.length());
+                }
+            }
+
+            List<Pattern> patterns = rdnOption.getPatterns();
+            if(patterns != null)
+            {
+                Pattern pattern = patterns.get(index);
+                boolean matches = pattern.matcher(atvTextValue).matches();
+                if(matches == false)
+                {
+                    failureMsg.append(name).append(" '").append(atvTextValue)
+                            .append("' is not valid against regex '").append(pattern.pattern()).append("'");
+                    failureMsg.append("; ");
+                    return;
+                }
+            }
+        }
+
+        if(CollectionUtil.isEmpty(requestedCoreAtvTextValues))
+        {
+            if(type.equals(ObjectIdentifiers.DN_SERIALNUMBER) == false)
+            {
+                failureMsg.append("is present but not contained in the request");
+                failureMsg.append("; ");
+            }
+        }
+        else
+        {
+            String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(index);
+            if(ObjectIdentifiers.DN_CN.equals(type) &&
+                    specialBehavior != null &&
+                    "gematik_gSMC_K".equals(specialBehavior))
+            {
+                if(atvTextValue.startsWith(requestedCoreAtvTextValue + "-") == false)
+                {
+                    failureMsg.append("content '").append(atvTextValue).append("' does not start with '")
+                            .append(requestedCoreAtvTextValue).append("-'");
+                    failureMsg.append("; ");
+                }
+            }
+            else if(type.equals(ObjectIdentifiers.DN_SERIALNUMBER))
+            {
+            }
+            else
+            {
+                if(atvTextValue.equals(requestedCoreAtvTextValue) == false)
+                {
+                    failureMsg.append("content '").append(atvTextValue).append("' but expected '")
+                            .append(requestedCoreAtvTextValue).append("'");
+                    failureMsg.append("; ");
+                }
+            }
+        }
     }
 }
