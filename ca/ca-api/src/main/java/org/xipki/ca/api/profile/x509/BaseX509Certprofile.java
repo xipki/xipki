@@ -65,7 +65,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.CertprofileException;
-import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.AllowAllParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
@@ -74,8 +74,6 @@ import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
 import org.xipki.ca.api.profile.RDNControl;
 import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.api.profile.StringType;
-import org.xipki.ca.api.profile.SubjectControl;
-import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.common.LruCache;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.util.CollectionUtil;
@@ -386,10 +384,10 @@ extends X509Certprofile
         return CollectionUtil.isEmpty(ret) ? null : ret.toArray(new RDN[0]);
     }
 
-    protected EnvironmentParameterResolver parameterResolver;
+    protected EnvParameterResolver parameterResolver;
     @Override
-    public void setEnvironmentParameterResolver(
-            final EnvironmentParameterResolver parameterResolver)
+    public void setEnvParameterResolver(
+            final EnvParameterResolver parameterResolver)
     {
         this.parameterResolver = parameterResolver;
     }

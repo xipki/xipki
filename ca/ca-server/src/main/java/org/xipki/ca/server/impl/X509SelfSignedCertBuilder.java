@@ -76,7 +76,7 @@ import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
-import org.xipki.ca.api.profile.SubjectInfo;
+import org.xipki.ca.api.profile.x509.SubjectInfo;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.util.CollectionUtil;

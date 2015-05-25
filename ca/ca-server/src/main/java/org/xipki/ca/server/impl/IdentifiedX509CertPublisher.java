@@ -40,7 +40,7 @@ import java.util.Map;
 
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.ca.api.CertPublisherException;
-import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.publisher.X509CertPublisher;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
@@ -104,10 +104,10 @@ class IdentifiedX509CertPublisher
         certPublisher.initialize(entry.getConf(), passwordResolver, dataSources);
     }
 
-    public void setEnvironmentParameterResolver(
-            final EnvironmentParameterResolver parameterResolver)
+    public void setEnvParameterResolver(
+            final EnvParameterResolver parameterResolver)
     {
-        certPublisher.setEnvironmentParameterResolver(parameterResolver);
+        certPublisher.setEnvParameterResolver(parameterResolver);
     }
 
     public boolean issuerAdded(

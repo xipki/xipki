@@ -35,18 +35,57 @@
 
 package org.xipki.ca.api;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Lijun Liao
  */
 
-public interface EnvironmentParameterResolver
+public class DfltEnvParameterResolver implements EnvParameterResolver
 {
+    private final Map<String, String> envParameters = new ConcurrentHashMap<>();
 
-    Set<String> getAllParameterNames();
+    public DfltEnvParameterResolver()
+    {
+    }
 
-    String getParameterValue(
-            String parameterName);
+    @Override
+    public String getParameterValue(
+            final String parameterName)
+    {
+        return envParameters.get(parameterName);
+    }
+
+    @Override
+    public Set<String> getAllParameterNames()
+    {
+        return envParameters.keySet();
+    }
+
+    public String getEnvParam(
+            final String name)
+    {
+        return envParameters.get(name);
+    }
+
+    public void addEnvParam(
+            final String name,
+            final String value)
+    {
+        envParameters.put(name, value);
+    }
+
+    public void clear()
+    {
+        envParameters.clear();
+    }
+
+    public String removeEnvParam(
+            final String name)
+    {
+        return envParameters.remove(name);
+    }
 
 }

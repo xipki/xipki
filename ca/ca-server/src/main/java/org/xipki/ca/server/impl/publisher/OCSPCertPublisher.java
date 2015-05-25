@@ -49,7 +49,7 @@ import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.ca.api.CertPublisherException;
-import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.publisher.X509CertPublisher;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
@@ -70,7 +70,7 @@ public class OCSPCertPublisher extends X509CertPublisher
     private static final Logger LOG = LoggerFactory.getLogger(OCSPCertPublisher.class);
 
     @SuppressWarnings("unused")
-    private EnvironmentParameterResolver envParameterResolver;
+    private EnvParameterResolver envParameterResolver;
     private OCSPStoreQueryExecutor queryExecutor;
     private boolean asyn = false;
     private boolean publishsGoodCert = true;
@@ -129,8 +129,8 @@ public class OCSPCertPublisher extends X509CertPublisher
     }
 
     @Override
-    public void setEnvironmentParameterResolver(
-            final EnvironmentParameterResolver parameterResolver)
+    public void setEnvParameterResolver(
+            final EnvParameterResolver parameterResolver)
     {
         this.envParameterResolver = parameterResolver;
     }

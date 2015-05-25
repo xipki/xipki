@@ -40,7 +40,7 @@ import java.util.Map;
 
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.ca.api.CertPublisherException;
-import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -66,8 +66,8 @@ public abstract class X509CertPublisher
 
     public abstract boolean isAsyn();
 
-    public abstract void setEnvironmentParameterResolver(
-            EnvironmentParameterResolver parameterResolver);
+    public abstract void setEnvParameterResolver(
+            EnvParameterResolver parameterResolver);
 
     public abstract boolean issuerAdded(
             X509CertWithDBCertId issuerCert);
