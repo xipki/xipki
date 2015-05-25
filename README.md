@@ -20,6 +20,31 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
     - SHA1withECDSA, SHA224withECDSA, SHA256withECDSA, SHA384withECDSA, SHA512withECDSA
     - SHA1withPlainECDSA, SHA224withPlainECDSA, SHA256withPlainECDSA, SHA384withPlainECDSA, SHA512withPlainECDSA
     - SHA1withDSA, SHA224withDSA, SHA256withDSA, SHA384withDSA, SHA512withDSA
+ - Native support of X.509 extensions
+    - AuthorityKeyIdentifier
+    - SubjectKeyIdentifier
+    - KeyUsage
+    - CertificatePolicies
+    - PolicyMappings
+    - SubjectAltName
+    - IssuerAltName
+    - BasicConstraints
+    - NameConstraints
+    - PolicyConstrains
+    - ExtendedKeyUsage
+    - CRLDistributionPoints
+    - InhibitAnyPolicy
+    - FreshestCRL
+    - AuthorityInformationAccess
+    - SubjectInfoAccess
+    - Admission
+    - OcspNoCheck
+    - Restriction
+    - AdditionalInformation
+    - ValidityModel
+    - PrivateKeyUsagePeriod
+    - QCStatements
+    - BiometricInfo
  - Support of both random and sequential certificate serial number assignment
  - Management of multiple CAs in one software instance
  - Multiple software instances (all can be in active mode) for the same CA
