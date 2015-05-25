@@ -140,7 +140,8 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
                 p10Req.getCertificationRequestInfo().getSubjectPublicKeyInfo(), extensions);
         StringBuilder sb = new StringBuilder();
 
-        sb.append("certificate is ");
+        sb.append(certFile).append(" (certprofile ").append(profileName).append(")\n");
+        sb.append("\tcertificate is ");
         sb.append(result.isAllSuccessful()? "valid" : "invalid");
 
         if(verbose.booleanValue())
