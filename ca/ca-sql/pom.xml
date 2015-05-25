@@ -7,7 +7,7 @@
   <parent>
     <artifactId>ca-group</artifactId>
     <groupId>org.xipki</groupId>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
   </parent>
   <artifactId>ca-sql</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
