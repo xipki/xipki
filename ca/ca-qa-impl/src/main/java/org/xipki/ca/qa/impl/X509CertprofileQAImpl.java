@@ -89,18 +89,18 @@ import org.xipki.common.util.X509Util;
 
 public class X509CertprofileQAImpl implements X509CertprofileQA
 {
-    private final SubjectChecker subjectChecker;
-    private final PublicKeyChecker publicKeyChecker;
-    private final ExtensionsChecker extensionsChecker;
-
     private static final Logger LOG = LoggerFactory.getLogger(X509CertprofileQAImpl.class);
     private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     private static final long SECOND = 1000L;
 
-    private CertValidity validity;
-    private X509CertVersion version;
-    private Set<String> signatureAlgorithms;
-    private boolean notBeforeMidnight;
+    private final SubjectChecker subjectChecker;
+    private final PublicKeyChecker publicKeyChecker;
+    private final ExtensionsChecker extensionsChecker;
+
+    private final CertValidity validity;
+    private final X509CertVersion version;
+    private final Set<String> signatureAlgorithms;
+    private final boolean notBeforeMidnight;
 
     public X509CertprofileQAImpl(
             final String data)
@@ -123,7 +123,11 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 throw new CertprofileException("invalid version " + conf.getVersion());
             }
 
-            if(conf.getSignatureAlgorithms() != null)
+            if(conf.getSignatureAlgorithms() == null)
+            {
+                this.signatureAlgorithms = null;
+            }
+            else
             {
                 this.signatureAlgorithms = new HashSet<>();
                 for(String algo :conf.getSignatureAlgorithms().getAlgorithm())

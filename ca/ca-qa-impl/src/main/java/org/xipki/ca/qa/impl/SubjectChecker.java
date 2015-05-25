@@ -62,7 +62,7 @@ import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.profile.RDNControl;
 import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.api.profile.StringType;
-import org.xipki.ca.api.profile.SubjectControl;
+import org.xipki.ca.api.profile.x509.SubjectControl;
 import org.xipki.ca.api.profile.x509.SubjectDNSpec;
 import org.xipki.ca.certprofile.XmlX509CertprofileUtil;
 import org.xipki.ca.certprofile.x509.jaxb.RdnType;
@@ -287,8 +287,6 @@ public class SubjectChecker
             return issue;
         }
 
-        RDNControl rdnOption = subjectControl.getControl(type);
-
         StringBuilder failureMsg = new StringBuilder();
 
         // check the encoding
@@ -303,10 +301,10 @@ public class SubjectChecker
                 requestedCoreAtvTextValues.add(textValue);
             }
 
-            if(rdnOption != null && rdnOption.getPatterns() != null)
+            if(rdnControl != null && rdnControl.getPatterns() != null)
             {
                 // sort the requestedRDNs
-                requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues, rdnOption.getPatterns());
+                requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues, rdnControl.getPatterns());
             }
         }
 
@@ -386,8 +384,6 @@ public class SubjectChecker
             return issue;
         }
 
-        RDNControl rdnOption = subjectControl.getControl(type);
-
         // check the encoding
         StringType stringType = rdnControl.getStringType();
         List<String> requestedCoreAtvTextValues = new LinkedList<>();
@@ -399,10 +395,10 @@ public class SubjectChecker
                 requestedCoreAtvTextValues.add(textValue);
             }
 
-            if(rdnOption != null && rdnOption.getPatterns() != null)
+            if(rdnControl != null && rdnControl.getPatterns() != null)
             {
                 // sort the requestedRDNs
-                requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues, rdnOption.getPatterns());
+                requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues, rdnControl.getPatterns());
             }
         }
 
@@ -474,7 +470,9 @@ public class SubjectChecker
         return sorted;
     }
 
-    private static boolean matchStringType(ASN1Encodable atvValue, StringType stringType)
+    private static boolean matchStringType(
+            final ASN1Encodable atvValue,
+            final StringType stringType)
     {
         boolean correctStringType = true;
         switch(stringType)
@@ -500,7 +498,8 @@ public class SubjectChecker
         return correctStringType;
     }
 
-    private static String getRdnTextValueOfRequest(RDN requestedRdn)
+    private static String getRdnTextValueOfRequest(
+            final RDN requestedRdn)
     throws BadCertTemplateException
     {
         ASN1ObjectIdentifier type = requestedRdn.getFirst().getType();
@@ -590,19 +589,19 @@ public class SubjectChecker
 
             StringBuilder sb = new StringBuilder();
             boolean validEncoding = true;
-            for(int j = 0; j < n; j++)
+            for(int i = 0; i < n; i++)
             {
-                ASN1Encodable o = seq.getObjectAt(j);
+                ASN1Encodable o = seq.getObjectAt(i);
                 if(matchStringType(o, stringType) == false)
                 {
-                    failureMsg.append(name).append(".[" + j + "] is not of type " + stringType.name());
+                    failureMsg.append(name).append(".[" + i + "] is not of type " + stringType.name());
                     failureMsg.append("; ");
                     validEncoding = false;
                     break;
                 }
 
                 String textValue = X509Util.rdnValueToString(o);
-                sb.append("[").append(j).append("]=").append(textValue).append(",");
+                sb.append("[").append(i).append("]=").append(textValue).append(",");
             }
 
             if(validEncoding == false)
@@ -629,7 +628,7 @@ public class SubjectChecker
             final String name,
             final ASN1ObjectIdentifier type,
             final String _atvTextValue,
-            final RDNControl rdnOption,
+            final RDNControl rdnControl,
             final List<String> requestedCoreAtvTextValues,
             final int index,
             final StringBuilder failureMsg)
@@ -643,9 +642,9 @@ public class SubjectChecker
                 throw new BadCertTemplateException("Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
             }
         }
-        else if(rdnOption != null)
+        else if(rdnControl != null)
         {
-            String prefix = rdnOption.getPrefix();
+            String prefix = rdnControl.getPrefix();
             if(prefix != null)
             {
                 if(atvTextValue.startsWith(prefix) == false)
@@ -661,7 +660,7 @@ public class SubjectChecker
                 }
             }
 
-            String suffix = rdnOption.getSuffix();
+            String suffix = rdnControl.getSuffix();
             if(suffix != null)
             {
                 if(atvTextValue.endsWith(suffix) == false)
@@ -677,7 +676,7 @@ public class SubjectChecker
                 }
             }
 
-            List<Pattern> patterns = rdnOption.getPatterns();
+            List<Pattern> patterns = rdnControl.getPatterns();
             if(patterns != null)
             {
                 Pattern pattern = patterns.get(index);

@@ -652,7 +652,6 @@ public class ExtensionsChecker
                 {
                     // CRL Distribution Points
                     checkExtensionCrlDistributionPoints(failureMsg, extensionValue, issuerInfo);
-                    continue;
                 } else if(Extension.inhibitAnyPolicy.equals(oid))
                 {
                     // Inhibit anyPolicy
@@ -1004,7 +1003,8 @@ public class ExtensionsChecker
         return types;
     }
 
-    private ValidationIssue createExtensionIssue(ASN1ObjectIdentifier extId)
+    private ValidationIssue createExtensionIssue(
+            final ASN1ObjectIdentifier extId)
     {
         ValidationIssue issue;
         String extName = ObjectIdentifiers.getName(extId);
@@ -1205,7 +1205,8 @@ public class ExtensionsChecker
                 conf.getExcludedSubtrees());
     }
 
-    private void checkExtensionNameConstraintsSubtrees(final StringBuilder failureMsg,
+    private void checkExtensionNameConstraintsSubtrees(
+            final StringBuilder failureMsg,
             final String description,
             final GeneralSubtree[] subtrees,
             final List<QaGeneralSubtree> expectedSubtrees)
@@ -2284,8 +2285,8 @@ public class ExtensionsChecker
     }
 
     private void checkDirectoryString(
-            ASN1ObjectIdentifier extType,
-            QaDirectoryString conf,
+            final ASN1ObjectIdentifier extType,
+            final QaDirectoryString conf,
             final StringBuilder failureMsg,
             final byte[] extensionValue,
             final Extensions requestExtensions,
