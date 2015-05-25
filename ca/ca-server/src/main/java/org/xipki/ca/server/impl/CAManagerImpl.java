@@ -79,8 +79,8 @@ import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.ca.api.CertPublisherException;
 import org.xipki.ca.api.CertprofileException;
-import org.xipki.ca.api.DfltEnvironmentParameterResolver;
-import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.api.DfltEnvParameterResolver;
+import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
@@ -281,7 +281,7 @@ implements CAManager, CmpResponderManager
     private final Map<String, Set<CAHasRequestorEntry>> ca_has_requestors = new ConcurrentHashMap<>();
     private final Map<String, String> caAliases = new ConcurrentHashMap<>();
 
-    private final DfltEnvironmentParameterResolver envParameterResolver = new DfltEnvironmentParameterResolver();
+    private final DfltEnvParameterResolver envParameterResolver = new DfltEnvParameterResolver();
 
     private ScheduledThreadPoolExecutor persistentScheduledThreadPoolExecutor;
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
@@ -2194,7 +2194,7 @@ implements CAManager, CmpResponderManager
         return true;
     }
 
-    public EnvironmentParameterResolver getEnvParameterResolver()
+    public EnvParameterResolver getEnvParameterResolver()
     {
         return envParameterResolver;
     }
@@ -3115,7 +3115,7 @@ implements CAManager, CmpResponderManager
         {
             String realType = getRealCertprofileType(dbEntry.getType());
             IdentifiedX509Certprofile ret = new IdentifiedX509Certprofile(dbEntry, realType);
-            ret.setEnvironmentParameterResolver(envParameterResolver);
+            ret.setEnvParameterResolver(envParameterResolver);
             ret.validate();
             return ret;
         }catch(CertprofileException e)

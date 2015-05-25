@@ -33,60 +33,38 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api;
+package org.xipki.ca.api.profile.x509;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class DfltEnvironmentParameterResolver implements
-        EnvironmentParameterResolver
+public class SubjectInfo
 {
-    private final Map<String, String> envParameters = new ConcurrentHashMap<>();
+    private final X500Name grantedSubject;
+    private final String warning;
 
-    public DfltEnvironmentParameterResolver()
+    public SubjectInfo(
+            final X500Name grantedSubject,
+            final String warning)
     {
+        ParamChecker.assertNotNull("grantedSubject", grantedSubject);
+
+        this.grantedSubject = grantedSubject;
+        this.warning = warning;
     }
 
-    @Override
-    public String getParameterValue(
-            final String parameterName)
+    public X500Name getGrantedSubject()
     {
-        return envParameters.get(parameterName);
+        return grantedSubject;
     }
 
-    @Override
-    public Set<String> getAllParameterNames()
+    public String getWarning()
     {
-        return envParameters.keySet();
-    }
-
-    public String getEnvParam(
-            final String name)
-    {
-        return envParameters.get(name);
-    }
-
-    public void addEnvParam(
-            final String name,
-            final String value)
-    {
-        envParameters.put(name, value);
-    }
-
-    public void clear()
-    {
-        envParameters.clear();
-    }
-
-    public String removeEnvParam(
-            final String name)
-    {
-        return envParameters.remove(name);
+        return warning;
     }
 
 }

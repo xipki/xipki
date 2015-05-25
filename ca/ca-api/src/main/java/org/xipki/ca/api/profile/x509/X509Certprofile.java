@@ -48,12 +48,11 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.CertprofileException;
-import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.GeneralNameMode;
-import org.xipki.ca.api.profile.SubjectInfo;
 
 /**
  * @author Lijun Liao
@@ -183,8 +182,8 @@ public abstract class X509Certprofile
 
     public abstract Integer getPathLenBasicConstraint();
 
-    public abstract void setEnvironmentParameterResolver(
-            EnvironmentParameterResolver parameterResolver);
+    public abstract void setEnvParameterResolver(
+            EnvParameterResolver parameterResolver);
 
     public abstract Date getNotBefore(Date notBefore);
 

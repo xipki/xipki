@@ -33,38 +33,20 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api.profile;
+package org.xipki.ca.api;
 
-import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.common.ParamChecker;
+import java.util.Set;
 
 /**
  * @author Lijun Liao
  */
 
-public class SubjectInfo
+public interface EnvParameterResolver
 {
-    private final X500Name grantedSubject;
-    private final String warning;
 
-    public SubjectInfo(
-            final X500Name grantedSubject,
-            final String warning)
-    {
-        ParamChecker.assertNotNull("grantedSubject", grantedSubject);
+    Set<String> getAllParameterNames();
 
-        this.grantedSubject = grantedSubject;
-        this.warning = warning;
-    }
-
-    public X500Name getGrantedSubject()
-    {
-        return grantedSubject;
-    }
-
-    public String getWarning()
-    {
-        return warning;
-    }
+    String getParameterValue(
+            String parameterName);
 
 }

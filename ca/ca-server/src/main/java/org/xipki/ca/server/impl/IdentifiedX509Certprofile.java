@@ -76,17 +76,17 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.CertprofileException;
-import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.GeneralNameMode;
-import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.x509.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
+import org.xipki.ca.api.profile.x509.SubjectInfo;
 import org.xipki.ca.api.profile.x509.X509CertUtil;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.api.profile.x509.X509Certprofile;
@@ -149,7 +149,7 @@ class IdentifiedX509Certprofile
     private final String name;
     private final CertprofileEntry dbEntry;
     private final X509Certprofile certprofile;
-    private EnvironmentParameterResolver parameterResolver;
+    private EnvParameterResolver parameterResolver;
 
     public IdentifiedX509Certprofile(
             final CertprofileEntry dbEntry,
@@ -189,7 +189,7 @@ class IdentifiedX509Certprofile
 
         if(parameterResolver != null)
         {
-            tmpCertprofile.setEnvironmentParameterResolver(parameterResolver);
+            tmpCertprofile.setEnvParameterResolver(parameterResolver);
         }
 
         if(tmpCertprofile.getSpecialCertprofileBehavior() == SpecialX509CertprofileBehavior.gematik_gSMC_K)
@@ -244,13 +244,13 @@ class IdentifiedX509Certprofile
         return certprofile.getSpecialCertprofileBehavior();
     }
 
-    public void setEnvironmentParameterResolver(
-            final EnvironmentParameterResolver parameterResolver)
+    public void setEnvParameterResolver(
+            final EnvParameterResolver parameterResolver)
     {
         this.parameterResolver = parameterResolver;
         if(certprofile != null)
         {
-            certprofile.setEnvironmentParameterResolver(parameterResolver);
+            certprofile.setEnvParameterResolver(parameterResolver);
         }
     }
 
@@ -1135,8 +1135,7 @@ class IdentifiedX509Certprofile
 
     private static ASN1Sequence createSubjectInfoAccess(
             final Extensions requestExtensions,
-            final Map<ASN1ObjectIdentifier,
-            Set<GeneralNameMode>> modes)
+            final Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> modes)
     throws BadCertTemplateException
     {
         ASN1Encodable extValue = requestExtensions.getExtensionParsedValue(Extension.subjectInfoAccess);

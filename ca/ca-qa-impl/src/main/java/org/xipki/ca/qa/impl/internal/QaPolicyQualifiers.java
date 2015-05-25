@@ -53,6 +53,7 @@ import org.xipki.common.ParamChecker;
 public class QaPolicyQualifiers
 {
     private final List<QaPolicyQualifierInfo> policyQualifiers;
+
     public QaPolicyQualifiers(
             final PolicyQualifiers jaxb)
     {

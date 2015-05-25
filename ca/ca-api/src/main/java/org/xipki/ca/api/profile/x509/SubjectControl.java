@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api.profile;
+package org.xipki.ca.api.profile.x509;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.ca.api.profile.x509.SubjectDNSpec;
+import org.xipki.ca.api.profile.RDNControl;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.util.StringUtil;
 
