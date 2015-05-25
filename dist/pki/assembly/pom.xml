@@ -14,7 +14,6 @@
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
     <features.repo>${project.build.directory}/features-repo</features.repo>
-    <mysql-jdbc.version>5.1.31</mysql-jdbc.version>
     <postgresql.version>9.3-1100-jdbc41</postgresql.version>
     <h2-jdbc.version>1.4.179</h2-jdbc.version>
     <hsqldb.version>2.3.2</hsqldb.version>
@@ -227,11 +226,6 @@
               <outputDirectory>target/jdbc</outputDirectory>
               <!-- Define here the JDBC drivers -->
               <artifactItems>
-                <artifactItem>
-                  <groupId>mysql</groupId>
-                  <artifactId>mysql-connector-java</artifactId>
-                  <version>${mysql-jdbc.version}</version>
-                </artifactItem>
                 <artifactItem>
                   <groupId>com.h2database</groupId>
                   <artifactId>h2</artifactId>

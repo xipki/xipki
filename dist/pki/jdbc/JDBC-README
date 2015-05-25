@@ -1,4 +1,4 @@
-Due to the license restrictions I cannot provide the JDBC drivers of Oracle and DB2.
+Due to the license restrictions I cannot provide the JDBC drivers of MySQL, Oracle and DB2.
 Please copy them to this directory.
 
 1. Oracle
@@ -7,5 +7,9 @@ Please copy them to this directory.
 
 2. DB2
   Driver: db2jcc4.jar
+
+3. MySQL
+  Driver: mysql-connector-java.jar
+  Download URL: https://dev.mysql.com/downloads/connector/j
   
   
