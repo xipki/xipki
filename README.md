@@ -15,11 +15,31 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
   - API to specify customized publisher, e.g. for LDAP and OCSP responder
   - Embedded support of publisher for OCSP responder
   - Signature algorithms of certificates
-    - SHA1withRSA, SHA224withRSA, SHA256withRSA, SHA384withRSA, SHA512withRSA
-    - SHA1withRSAandMGF1, SHA224withRSAandMGF1, SHA256withRSAandMGF1, SHA384withRSAandMGF1, SHA512withRSAandMGF1
-    - SHA1withECDSA, SHA224withECDSA, SHA256withECDSA, SHA384withECDSA, SHA512withECDSA
-    - SHA1withPlainECDSA, SHA224withPlainECDSA, SHA256withPlainECDSA, SHA384withPlainECDSA, SHA512withPlainECDSA
-    - SHA1withDSA, SHA224withDSA, SHA256withDSA, SHA384withDSA, SHA512withDSA
+    - SHA1withRSA
+    - SHA224withRSA
+    - SHA256withRSA
+    - SHA384withRSA
+    - SHA512withRSA
+    - SHA1withRSAandMGF1
+    - SHA224withRSAandMGF1
+    - SHA256withRSAandMGF1
+    - SHA384withRSAandMGF1
+    - SHA512withRSAandMGF1
+    - SHA1withECDSA
+    - SHA224withECDSA
+    - SHA256withECDSA
+    - SHA384withECDSA
+    - SHA512withECDSA
+    - SHA1withPlainECDSA
+    - SHA224withPlainECDSA
+    - SHA256withPlainECDSA
+    - SHA384withPlainECDSA
+    - SHA512withPlainECDSA
+    - SHA1withDSA
+    - SHA224withDSA
+    - SHA256withDSA
+    - SHA384withDSA
+    - SHA512withDSA
  - Native support of X.509 extensions
     - AuthorityKeyIdentifier
     - SubjectKeyIdentifier
