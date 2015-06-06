@@ -36,9 +36,11 @@
 package org.xipki.ca.server.impl;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -53,6 +55,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -63,6 +66,7 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.impl.store.CertificateStore;
+import org.xipki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
@@ -78,6 +82,8 @@ import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
+import org.xipki.ca.server.mgmt.api.ScepEntry;
+import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.X509ChangeCAEntry;
@@ -85,11 +91,13 @@ import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.PasswordHash;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.datasource.api.exception.DuplicateKeyException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 
@@ -101,6 +109,7 @@ class CAManagerQueryExecutor
 {
 
     private static final Logger LOG = LoggerFactory.getLogger(CAManagerQueryExecutor.class);
+    private Random random;
 
     private DataSourceWrapper dataSource;
 
@@ -109,6 +118,7 @@ class CAManagerQueryExecutor
     {
         ParamChecker.assertNotNull("dataSource", dataSource);
         this.dataSource = dataSource;
+        this.random = new Random();
     }
 
     private X509Certificate generateCert(
@@ -2352,6 +2362,353 @@ class CAManagerQueryExecutor
         }finally
         {
             dataSource.releaseResources(ps, null);
+        }
+    }
+
+    boolean addUser(
+            final AddUserEntry userEntry)
+    throws CAMgmtException
+    {
+        final String name = userEntry.getName();
+        Integer existingId = executeGetUserIdSql(name);
+        if(existingId != null)
+        {
+            throw new CAMgmtException("user named '" + name + " ' already exists");
+        }
+
+        String hashedPassword;
+        try
+        {
+            hashedPassword = PasswordHash.createHash(userEntry.getPassword().toCharArray());
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e)
+        {
+            throw new CAMgmtException(e);
+        }
+        UserEntry _userEntry = new UserEntry(name, hashedPassword, userEntry.getCnRegex());
+        final int tries = 3;
+
+        for(int i = 0; i < tries; i++)
+        {
+            int tmpId = (i == 0) ? name.hashCode() : random.nextInt();
+            try
+            {
+                executeAddUserSql(tmpId, _userEntry);
+                break;
+            }catch(DataAccessException e)
+            {
+                if(e instanceof DuplicateKeyException && i < tries - 1)
+                {
+                    continue;
+                }
+                else
+                {
+                    throw new CAMgmtException(e);
+                }
+            }
+        }
+
+        LOG.info("added user '{}'", name);
+
+        return true;
+    }
+
+    private Integer executeGetUserIdSql(
+            final String user)
+    throws CAMgmtException
+    {
+        final String sql = dataSource.createFetchFirstSelectSQL("ID FROM USERNAME WHERE NAME=?", 1);
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        try
+        {
+            ps = prepareStatement(sql);
+
+            int idx = 1;
+            ps.setString(idx++, user);
+            rs = ps.executeQuery();
+            if(rs.next())
+            {
+                return rs.getInt("ID");
+            } else
+            {
+                return null;
+            }
+        }catch(SQLException e)
+        {
+            throw new CAMgmtException(dataSource.translate(sql, e));
+        } finally
+        {
+            dataSource.releaseResources(ps, rs);
+        }
+    }
+
+    private void executeAddUserSql(
+            final int id,
+            final UserEntry userEntry)
+    throws DataAccessException, CAMgmtException
+    {
+
+        final String sql = "INSERT INTO USERNAME (ID, NAME, PASSWORD, CN_REGEX) VALUES (?, ?, ?, ?)";
+
+        PreparedStatement ps = null;
+
+        try
+        {
+            ps = prepareStatement(sql);
+            int idx = 1;
+            ps.setInt(idx++, id);
+            ps.setString(idx++, userEntry.getName());
+            ps.setString(idx++, userEntry.getHashedPassword());
+            ps.setString(idx++, userEntry.getCnRegex());
+            ps.executeUpdate();
+        }catch(SQLException e)
+        {
+            throw dataSource.translate(sql, e);
+        } finally
+        {
+            dataSource.releaseResources(ps, null);
+        }
+    }
+
+    boolean changeUser(
+            final String username,
+            final String password,
+            final String cnRegex)
+    throws CAMgmtException
+    {
+        Integer existingId = executeGetUserIdSql(username);
+        if(existingId == null)
+        {
+            throw new CAMgmtException("user named '" + username + " ' does not exist");
+        }
+
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("UPDATE USERNAME SET ");
+
+        AtomicInteger index = new AtomicInteger(1);
+        Integer iPassword = addToSqlIfNotNull(sqlBuilder, index, password, "PASSWORD");
+        Integer iCnRegex = addToSqlIfNotNull(sqlBuilder, index, cnRegex, "CN_REGEX");
+        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
+        sqlBuilder.append(" WHERE NAME=?");
+
+        if(index.get() == 1)
+        {
+            return false;
+        }
+
+        final String sql = sqlBuilder.toString();
+
+        StringBuilder m = new StringBuilder();
+
+        PreparedStatement ps = null;
+        try
+        {
+            ps = prepareStatement(sql);
+            if(iPassword != null)
+            {
+                String txt = getRealString(password);
+                ps.setString(iPassword, txt);
+                m.append("password: ****; ");
+            }
+
+            if(iCnRegex != null)
+            {
+                m.append("CnRegex: '").append(cnRegex);
+                ps.setString(iCnRegex, cnRegex);
+            }
+
+            ps.setString(index.get(), username);
+
+            ps.executeUpdate();
+
+            if(m.length() > 0)
+            {
+                m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
+            }
+            LOG.info("changed user: {}", m);
+            return true;
+        }catch(SQLException e)
+        {
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
+        }finally
+        {
+            dataSource.releaseResources(ps, null);
+        }
+    }
+
+    UserEntry getUser(
+            final String username)
+    throws CAMgmtException
+    {
+        final String sql = dataSource.createFetchFirstSelectSQL("PASSWORD, CN_REGEX FROM USERNAME WHERE NAME=?", 1);
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        try
+        {
+            ps = prepareStatement(sql);
+
+            int idx = 1;
+            ps.setString(idx++, username);
+            rs = ps.executeQuery();
+            if(rs.next())
+            {
+                String hashedPassword = rs.getString("PASSWORD");
+                String cnRegex = rs.getString("CN_REGEX");
+                return new UserEntry(username, hashedPassword, cnRegex);
+            } else
+            {
+                return null;
+            }
+        }catch(SQLException e)
+        {
+            throw new CAMgmtException(dataSource.translate(sql, e));
+        } finally
+        {
+            dataSource.releaseResources(ps, rs);
+        }
+    }
+
+    boolean addScep(
+            final ScepEntry scepEntry)
+    throws CAMgmtException
+    {
+        String name = scepEntry.getName();
+        final String sql = "INSERT INTO SCEP (NAME, CA_NAME, PROFILE_NAME) VALUES (?, ?, ?)";
+
+        PreparedStatement ps = null;
+        try
+        {
+            ps = prepareStatement(sql);
+            ps.setString(1, name);
+            ps.setString(2, scepEntry.getCaName());
+            ps.setString(3, scepEntry.getProfileName());
+
+            ps.executeUpdate();
+            LOG.info("added SCEP '{}': {}", name, scepEntry);
+        }catch(SQLException e)
+        {
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
+        }finally
+        {
+            dataSource.releaseResources(ps, null);
+        }
+
+        return true;
+    }
+
+    boolean removeScep(
+            final String name)
+    throws CAMgmtException
+    {
+        final String sql = "DELETE FROM SCEP WHERE NAME=?";
+
+        PreparedStatement ps = null;
+        try
+        {
+            ps = prepareStatement(sql);
+            ps.setString(1, name);
+            return ps.executeUpdate() > 0;
+        }catch(SQLException e)
+        {
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
+        }finally
+        {
+            dataSource.releaseResources(ps, null);
+        }
+    }
+
+    boolean changeScep(
+            final String name,
+            final String caName,
+            final String profileName)
+    throws CAMgmtException
+    {
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("UPDATE SCEP SET ");
+
+        AtomicInteger index = new AtomicInteger(1);
+        Integer iCaName = addToSqlIfNotNull(sqlBuilder, index, caName, "CA_NAME");
+        Integer iProfileName = addToSqlIfNotNull(sqlBuilder, index, profileName, "Profile_Name");
+        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
+        sqlBuilder.append(" WHERE NAME=?");
+
+        if(index.get() == 1)
+        {
+            return false;
+        }
+
+        final String sql = sqlBuilder.toString();
+
+        StringBuilder m = new StringBuilder();
+
+        PreparedStatement ps = null;
+        try
+        {
+            ps = prepareStatement(sql);
+            if(iCaName != null)
+            {
+                ps.setString(iCaName, caName);
+                m.append("CA-Name: ").append("'").append(caName).append("'");
+            }
+
+            if(iProfileName != null)
+            {
+                ps.setString(iProfileName, profileName);
+                m.append("Profile-Name: ").append("'").append(profileName).append("'");
+            }
+
+            ps.setString(index.get(), name);
+
+            ps.executeUpdate();
+
+            if(m.length() > 0)
+            {
+                m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
+            }
+            LOG.info("changed SCEP: {}", m);
+            return true;
+        }catch(SQLException e)
+        {
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
+        }finally
+        {
+            dataSource.releaseResources(ps, null);
+        }
+    }
+
+    ScepEntry getScep(
+            final String name)
+    throws CAMgmtException
+    {
+        final String sql = dataSource.createFetchFirstSelectSQL("CA_NAME, PROFILE_NAME FROM SCEP WHERE NAME=?", 1);
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        try
+        {
+            ps = prepareStatement(sql);
+
+            int idx = 1;
+            ps.setString(idx++, name);
+            rs = ps.executeQuery();
+            if(rs.next())
+            {
+                String caName = rs.getString("CA_NAME");
+                String profileNmae = rs.getString("PROFILE_NAME");
+                return new ScepEntry(name, caName, profileNmae);
+            } else
+            {
+                return null;
+            }
+        }catch(SQLException e)
+        {
+            throw new CAMgmtException(dataSource.translate(sql, e));
+        } finally
+        {
+            dataSource.releaseResources(ps, rs);
         }
     }
 

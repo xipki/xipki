@@ -33,56 +33,61 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.mgmt.shell;
+package org.xipki.ca.server.impl;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.util.StringUtil;
+import org.xipki.common.ParamChecker;
 
 /**
+ *
  * @author Lijun Liao
+ *
  */
-
-@Command(scope = "xipki-ca", name = "caprofile-add", description="add certificate profiles to CA")
-public class CaProfileAddCommand extends CaCommand
+public class ScepInfo
 {
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
+    private final String name;
     private String caName;
-
-    @Option(name = "--profile",
-            required = true,
-            description = "profile name\n"
-                + "(required)")
     private String profileName;
 
-    @Option(name = "--local-name",
-            required = false,
-            description = "profile localname")
-    private String profileLocalname;
-
-    @Override
-    protected Object _doExecute()
-    throws Exception
+    public ScepInfo(
+            final String name,
+            final String caName,
+            final String profileName)
     {
-        if(StringUtil.isBlank(profileLocalname))
-        {
-            profileLocalname = profileName;
-        }
-
-        boolean b = caManager.addCertprofileToCA(profileName, profileLocalname, caName);
-        StringBuilder sb = new StringBuilder();
-        sb.append("certificate profile ").append(profileName);
-        if(profileLocalname.equals(profileName) == false)
-        {
-            sb.append(" (localname ").append(profileLocalname).append(")");
-        }
-        sb.append(" to CA ").append(caName);
-
-        output(b, "associated", "could not associate",
-                sb.toString());
-        return null;
+        ParamChecker.assertNotBlank("name", name);
+        ParamChecker.assertNotBlank("caName", caName);
+        ParamChecker.assertNotBlank("profileName", profileName);
+        this.name = name;
+        this.caName = caName;
+        this.profileName = profileName;
     }
+
+    public String getCaName()
+    {
+        return caName;
+    }
+
+    public void setCaName(
+            String caName)
+    {
+        ParamChecker.assertNotBlank("caName", caName);
+        this.caName = caName;
+    }
+
+    public String getProfileName()
+    {
+        return profileName;
+    }
+
+    public void setProfileName(
+            final String profileName)
+    {
+        ParamChecker.assertNotBlank("profileName", profileName);
+        this.profileName = profileName;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
 }

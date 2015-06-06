@@ -110,7 +110,7 @@ class CaCertStoreDbImporter extends DbPorter
 
     private static final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, FP, CERT) VALUES (?, ?, ?)";
 
-    private static final String SQL_ADD_USER = "INSERT INTO USERNAME (ID, NAME) VALUES (?, ?)";
+    private static final String SQL_ADD_USER = "INSERT INTO USERNAME (ID, NAME, PASSWORD,CN_REGEX) VALUES (?, ?, ?, ?)";
 
     private final Unmarshaller unmarshaller;
     private final boolean resume;
@@ -408,6 +408,8 @@ class CaCertStoreDbImporter extends DbPorter
                 int idx = 1;
                 ps_adduser.setInt(idx++, user.getId());
                 ps_adduser.setString(idx++, user.getName());
+                ps_adduser.setString(idx++, user.getPassword());
+                ps_adduser.setString(idx++, user.getCnRegex());
                 ps_adduser.execute();
                 sum ++;
             }catch(SQLException e)

@@ -204,6 +204,21 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
+    <!-- table SCEP -->
+    <createTable tableName="SCEP">
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="STATUS" remarks="valid values: active, inactive" type="VARCHAR(10)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CA_NAME" type="VARCHAR(45)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="PROFILE_NAME" type="VARCHAR(45)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
   </changeSet>
   <!-- CertStore :: create table -->
   <changeSet author="xipki" id="2">
@@ -247,6 +262,14 @@
       </column>
       <column name="NAME" type="VARCHAR(200)">
         <constraints nullable="false"/>
+      </column>
+      <column name="PASSWORD" type="VARCHAR(100)">
+        <!-- hex salted hashed password: first byte identifies hash algorithm,
+         second byte identifies length of salt, third and forth bytes specifies the iteration,
+         following by the salt and hash value-->
+      </column>
+      <column name="CN_REGEX" type="VARCHAR(300)">
+        <!-- regex for the permitted common names for this user -->
       </column>
     </createTable>
     <createIndex tableName="USERNAME" unique="false" indexName="IDX_USER_NAME">
@@ -331,6 +354,7 @@
       <column name="FP_SUBJECT" type="CHAR(40)">
         <constraints nullable="false"/>
       </column>
+      <column name="TID" remarks="heximal transactionId, maximal 160 bit" type="VARCHAR(40)"/>
     </createTable>
     <addUniqueConstraint tableName="CERT" columnNames="CA_ID, SERIAL" constraintName="CONST_CA_SERIAL"/>
     <createIndex tableName="CERT" unique="false" indexName="IDX_FP_PK">
@@ -464,6 +488,17 @@
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
       baseColumnNames="CA_NAME" baseTableName="CA_HAS_PROFILE"
+      referencedColumnNames="NAME" referencedTableName="CA"/>
+    <!-- SCEP -->
+    <addForeignKeyConstraint constraintName="FK_SCEP_PROFILE1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="PROFILE_NAME" baseTableName="SCEP"
+      referencedColumnNames="NAME" referencedTableName="PROFILE"/>
+    <addForeignKeyConstraint constraintName="FK_SCEP_CA1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CA_NAME" baseTableName="SCEP"
       referencedColumnNames="NAME" referencedTableName="CA"/>
   </changeSet>
   <!-- CertStore :: foreigen key -->

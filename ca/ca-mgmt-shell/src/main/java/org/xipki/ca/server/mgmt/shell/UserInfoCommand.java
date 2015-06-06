@@ -35,54 +35,39 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.rmi.UnexpectedException;
+
+import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.util.StringUtil;
+import org.xipki.ca.server.mgmt.api.UserEntry;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "caprofile-add", description="add certificate profiles to CA")
-public class CaProfileAddCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "user-info", description="show information of CA user")
+public class UserInfoCommand extends CaCommand
 {
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    private String caName;
-
-    @Option(name = "--profile",
-            required = true,
-            description = "profile name\n"
-                + "(required)")
-    private String profileName;
-
-    @Option(name = "--local-name",
-            required = false,
-            description = "profile localname")
-    private String profileLocalname;
+    @Argument(index = 0, name = "name", required = true, description = "user name")
+    private String name;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        if(StringUtil.isBlank(profileLocalname))
-        {
-            profileLocalname = profileName;
-        }
-
-        boolean b = caManager.addCertprofileToCA(profileName, profileLocalname, caName);
         StringBuilder sb = new StringBuilder();
-        sb.append("certificate profile ").append(profileName);
-        if(profileLocalname.equals(profileName) == false)
-        {
-            sb.append(" (localname ").append(profileLocalname).append(")");
-        }
-        sb.append(" to CA ").append(caName);
 
-        output(b, "associated", "could not associate",
-                sb.toString());
+        UserEntry userEntry = caManager.getUser(name);
+        if(userEntry == null)
+        {
+            throw new UnexpectedException("\tno user named '" + name + " is configured");
+        }
+        else
+        {
+            sb.append(name).append("\n\t").append(userEntry);
+        }
+
+        out(sb.toString());
         return null;
     }
 }

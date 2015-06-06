@@ -33,56 +33,61 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.mgmt.shell;
+package org.xipki.ca.server.mgmt.api;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.util.StringUtil;
+import java.io.Serializable;
+
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "caprofile-add", description="add certificate profiles to CA")
-public class CaProfileAddCommand extends CaCommand
+public class UserEntry
+implements Serializable
 {
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    private String caName;
+    private static final long serialVersionUID = 1L;
 
-    @Option(name = "--profile",
-            required = true,
-            description = "profile name\n"
-                + "(required)")
-    private String profileName;
+    private final String name;
+    private final String hashedPassword;
+    private final String cnRegex;
 
-    @Option(name = "--local-name",
-            required = false,
-            description = "profile localname")
-    private String profileLocalname;
+    public UserEntry(
+            final String name,
+            final String hashedPassword,
+            final String cnRegex)
+    throws CAMgmtException
+    {
+        ParamChecker.assertNotBlank("name", name);
+
+        this.name = name.toUpperCase();
+        this.hashedPassword = hashedPassword;
+        this.cnRegex = cnRegex;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public String getHashedPassword()
+    {
+        return hashedPassword;
+    }
+
+    public String getCnRegex()
+    {
+        return cnRegex;
+    }
 
     @Override
-    protected Object _doExecute()
-    throws Exception
+    public String toString()
     {
-        if(StringUtil.isBlank(profileLocalname))
-        {
-            profileLocalname = profileName;
-        }
-
-        boolean b = caManager.addCertprofileToCA(profileName, profileLocalname, caName);
         StringBuilder sb = new StringBuilder();
-        sb.append("certificate profile ").append(profileName);
-        if(profileLocalname.equals(profileName) == false)
-        {
-            sb.append(" (localname ").append(profileLocalname).append(")");
-        }
-        sb.append(" to CA ").append(caName);
-
-        output(b, "associated", "could not associate",
-                sb.toString());
-        return null;
+        sb.append("name: ").append(name).append('\n');
+        sb.append("hashed password: ").append(hashedPassword).append("\n");
+        sb.append("cnRegex: ").append(cnRegex);
+        return sb.toString();
     }
+
 }

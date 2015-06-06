@@ -48,6 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.mgmt.hessian.common.HessianCAManager;
 import org.xipki.ca.mgmt.hessian.common.HessianCAMgmtException;
+import org.xipki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
@@ -59,6 +60,8 @@ import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
+import org.xipki.ca.server.mgmt.api.ScepEntry;
+import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
@@ -676,6 +679,73 @@ public class CAManagerClient implements CAManager
     throws CAMgmtException
     {
         return client.generateSelfSignedCA(caEntry, certprofileName, p10Req);
+    }
+
+    @Override
+    public boolean addUser(
+            final AddUserEntry userEntry)
+    throws CAMgmtException
+    {
+        return client.addUser(userEntry);
+    }
+
+    @Override
+    public boolean changeUser(
+            final String username,
+            final String password,
+            final String cnRegex)
+    throws CAMgmtException
+    {
+		// TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public UserEntry getUser(
+            final String username)
+    throws CAMgmtException
+    {
+		// TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean addScep(
+            final ScepEntry scepEntry)
+    throws CAMgmtException
+    {
+        return client.addScep(scepEntry);
+    }
+
+    @Override
+    public boolean removeScep(
+            final String name)
+    throws CAMgmtException
+    {
+        return client.removeScep(name);
+    }
+
+    @Override
+    public boolean changeScep(
+            final String name,
+            final String caName,
+            final String profileName)
+    throws CAMgmtException
+    {
+        return client.changeScep(name, caName, profileName);
+    }
+
+    @Override
+    public Set<String> getScepNames()
+    {
+        return client.getScepNames();
+    }
+
+    @Override
+    public ScepEntry getScep(String name)
+    throws CAMgmtException
+    {
+        return client.getScep(name);
     }
 
     public static void main(

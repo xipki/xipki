@@ -35,54 +35,37 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.rmi.UnexpectedException;
+
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.util.StringUtil;
+import org.xipki.ca.server.mgmt.api.ScepEntry;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "caprofile-add", description="add certificate profiles to CA")
-public class CaProfileAddCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "scep-info",
+        description="show information of SCEP")
+public class ScepInfoCommand extends CaCommand
 {
-    @Option(name = "--ca",
+    @Option(name = "--name",
             required = true,
-            description = "CA name\n"
+            description = "SCEP name\n"
                     + "(required)")
-    private String caName;
-
-    @Option(name = "--profile",
-            required = true,
-            description = "profile name\n"
-                + "(required)")
-    private String profileName;
-
-    @Option(name = "--local-name",
-            required = false,
-            description = "profile localname")
-    private String profileLocalname;
+    private String name;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        if(StringUtil.isBlank(profileLocalname))
+        ScepEntry scep = caManager.getScep(name);
+        if(scep == null)
         {
-            profileLocalname = profileName;
+            throw new UnexpectedException("could not find SCEP '" + name + "'");
         }
 
-        boolean b = caManager.addCertprofileToCA(profileName, profileLocalname, caName);
-        StringBuilder sb = new StringBuilder();
-        sb.append("certificate profile ").append(profileName);
-        if(profileLocalname.equals(profileName) == false)
-        {
-            sb.append(" (localname ").append(profileLocalname).append(")");
-        }
-        sb.append(" to CA ").append(caName);
-
-        output(b, "associated", "could not associate",
-                sb.toString());
+        System.out.println(scep.toString());
         return null;
     }
 }
