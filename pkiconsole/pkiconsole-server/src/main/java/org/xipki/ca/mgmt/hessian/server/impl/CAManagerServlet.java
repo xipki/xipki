@@ -57,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.mgmt.hessian.common.HessianCAManager;
 import org.xipki.ca.mgmt.hessian.common.HessianCAMgmtException;
+import org.xipki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
@@ -68,6 +69,8 @@ import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
+import org.xipki.ca.server.mgmt.api.ScepEntry;
+import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
@@ -916,6 +919,113 @@ implements HessianCAManager
             return "1";
         }
         return null;
+    }
+
+    @Override
+    public boolean addUser(
+            AddUserEntry userEntry)
+    throws HessianCAMgmtException
+    {
+        try
+        {
+            return caManager.addUser(userEntry);
+        } catch (CAMgmtException e)
+        {
+            throw new HessianCAMgmtException(e.getMessage());
+        }
+    }
+
+    @Override
+    public UserEntry getUser(
+            final String username)
+    throws HessianCAMgmtException
+    {
+        try
+        {
+            return caManager.getUser(username);
+        } catch (CAMgmtException e)
+        {
+            throw new HessianCAMgmtException(e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean changeUser(
+            final String username,
+            final String password,
+            final String cnRegex)
+    throws HessianCAMgmtException
+    {
+        try
+        {
+            return caManager.changeUser(username, password, cnRegex);
+        } catch (CAMgmtException e)
+        {
+            throw new HessianCAMgmtException(e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean addScep(
+            final ScepEntry scepEntry)
+    throws HessianCAMgmtException
+    {
+        try
+        {
+            return caManager.addScep(scepEntry);
+        } catch (CAMgmtException e)
+        {
+            throw new HessianCAMgmtException(e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean removeScep(
+            final String name)
+    throws HessianCAMgmtException
+    {
+        try
+        {
+            return caManager.removeScep(name);
+        } catch (CAMgmtException e)
+        {
+            throw new HessianCAMgmtException(e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean changeScep(
+            final String name,
+            final String caName,
+            final String profileName)
+    throws HessianCAMgmtException
+    {
+        try
+        {
+            return caManager.changeScep(name, caName, profileName);
+        } catch (CAMgmtException e)
+        {
+            throw new HessianCAMgmtException(e.getMessage());
+        }
+    }
+
+    @Override
+    public Set<String> getScepNames()
+    {
+        return caManager.getScepNames();
+    }
+
+    @Override
+    public ScepEntry getScep(String name)
+    throws HessianCAMgmtException
+    {
+        try
+        {
+            return caManager.getScep(name);
+        } catch (CAMgmtException e)
+        {
+            throw new HessianCAMgmtException(e.getMessage());
+        }
     }
 
     @Override

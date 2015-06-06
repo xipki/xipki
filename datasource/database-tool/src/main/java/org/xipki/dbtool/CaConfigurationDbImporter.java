@@ -67,6 +67,7 @@ import org.xipki.dbi.ca.jaxb.CAConfigurationType.Profiles;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Publishers;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Requestors;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Responders;
+import org.xipki.dbi.ca.jaxb.CAConfigurationType.Sceps;
 import org.xipki.dbi.ca.jaxb.CaHasProfileType;
 import org.xipki.dbi.ca.jaxb.CaHasPublisherType;
 import org.xipki.dbi.ca.jaxb.CaHasRequestorType;
@@ -79,6 +80,7 @@ import org.xipki.dbi.ca.jaxb.ProfileType;
 import org.xipki.dbi.ca.jaxb.PublisherType;
 import org.xipki.dbi.ca.jaxb.RequestorType;
 import org.xipki.dbi.ca.jaxb.ResponderType;
+import org.xipki.dbi.ca.jaxb.ScepType;
 import org.xipki.security.api.PasswordResolverException;
 
 /**
@@ -136,6 +138,7 @@ class CaConfigurationDbImporter extends DbPorter
             import_ca_has_requestor(caconf.getCaHasRequestors());
             import_ca_has_publisher(caconf.getCaHasPublishers());
             import_ca_has_certprofile(caconf.getCaHasProfiles());
+            import_scep(caconf.getSceps());
         }catch(Exception e)
         {
             System.err.println("error while importing CA configuration to database. message: " + e.getMessage());
@@ -619,6 +622,37 @@ class CaConfigurationDbImporter extends DbPorter
             releaseResources(ps, null);
         }
         System.out.println(" imported table CA_HAS_PROFILE");
+    }
+
+    private void import_scep(
+            final Sceps sceps)
+    throws DataAccessException
+    {
+        System.out.println("importing table SCEP");
+        final String sql = "INSERT INTO SCEP (NAME, CA_NAME, PROFILE_NAME) VALUES (?, ?, ?)";
+        PreparedStatement ps = prepareStatement(sql);
+        try
+        {
+            for(ScepType entry : sceps.getScep())
+            {
+                try
+                {
+                    int idx = 1;
+                    ps.setString(idx++, entry.getName());
+                    ps.setString(idx++, entry.getCaName().toUpperCase());
+                    ps.setString(idx++, entry.getProfileName());
+                    ps.executeUpdate();
+                }catch(SQLException e)
+                {
+                    System.err.println("error while importing SCEP with NAME=" + entry.getName());
+                    throw translate(sql, e);
+                }
+            }
+        }finally
+        {
+            releaseResources(ps, null);
+        }
+        System.out.println(" imported table SCEP");
     }
 
 }
