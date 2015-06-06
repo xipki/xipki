@@ -37,52 +37,39 @@ package org.xipki.ca.server.mgmt.shell;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "caprofile-add", description="add certificate profiles to CA")
-public class CaProfileAddCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "user-up", description="update user")
+public class UserUpdateCommand extends CaCommand
 {
-    @Option(name = "--ca",
+
+    @Option(name = "--name", aliases = "-n",
             required = true,
-            description = "CA name\n"
+            description = "user Name\n"
                     + "(required)")
-    private String caName;
+    private String name;
 
-    @Option(name = "--profile",
-            required = true,
-            description = "profile name\n"
-                + "(required)")
-    private String profileName;
+    @Option(name = "--password",
+            description = "user password, 'NULL' for empty password, 'C' to read from console")
+    private String password;
 
-    @Option(name = "--local-name",
-            required = false,
-            description = "profile localname")
-    private String profileLocalname;
+    @Option(name = "--cn-regex",
+            description = "regex for the permitted common name, 'NULL' for empty password")
+    private String cnRegex;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        if(StringUtil.isBlank(profileLocalname))
+        if("CONSOLE".equalsIgnoreCase(password))
         {
-            profileLocalname = profileName;
+            password = new String(readPassword());
         }
-
-        boolean b = caManager.addCertprofileToCA(profileName, profileLocalname, caName);
-        StringBuilder sb = new StringBuilder();
-        sb.append("certificate profile ").append(profileName);
-        if(profileLocalname.equals(profileName) == false)
-        {
-            sb.append(" (localname ").append(profileLocalname).append(")");
-        }
-        sb.append(" to CA ").append(caName);
-
-        output(b, "associated", "could not associate",
-                sb.toString());
+        boolean b = caManager.changeUser(name, password, cnRegex);
+        output(b, "added", "could not add", "user " + name);
         return null;
     }
 }

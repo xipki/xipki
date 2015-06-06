@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.xipki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
@@ -51,6 +52,8 @@ import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
+import org.xipki.ca.server.mgmt.api.ScepEntry;
+import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
@@ -331,4 +334,37 @@ public interface HessianCAManager
             byte[] p10Req)
     throws HessianCAMgmtException;
 
+    boolean addUser(
+            AddUserEntry userEntry)
+    throws HessianCAMgmtException;
+
+    boolean changeUser(
+            String username,
+            String password,
+            String cnRegex)
+    throws HessianCAMgmtException;
+
+    UserEntry getUser(
+            String username)
+    throws HessianCAMgmtException;
+
+    boolean addScep(
+            ScepEntry scepEntry)
+    throws HessianCAMgmtException;
+
+    boolean removeScep(
+            String name)
+    throws HessianCAMgmtException;
+
+    boolean changeScep(
+            String name,
+            String caName,
+            String profileName)
+    throws HessianCAMgmtException;
+
+    Set<String> getScepNames();
+
+    ScepEntry getScep(
+            String name)
+    throws HessianCAMgmtException;
 }

@@ -447,7 +447,16 @@ class CaCertStoreDbExporter extends DbPorter
 
         final String tableName = "USERNAME";
         final int minId = (int) getMin(tableName, "ID");
-        String coreSql = "ID, NAME FROM " + tableName + " WHERE ID >= ?";
+        String coreSql;
+        if(dbSchemaVersion > 1)
+        {
+            coreSql = "ID, NAME, PASSWORD, CN_REGEX FROM " + tableName + " WHERE ID >= ?";
+        }
+        else
+        {
+            coreSql = "ID, NAME FROM " + tableName + " WHERE ID >= ?";
+        }
+
         final int rows = 100;
         final String sql = dataSource.createFetchFirstSelectSQL(coreSql, rows, "ID ASC");
 
@@ -496,10 +505,17 @@ class CaCertStoreDbExporter extends DbPorter
                     }
 
                     String name = rs.getString("NAME");
-
                     UserType user = new UserType();
                     user.setId(id);
                     user.setName(name);
+                    if(dbSchemaVersion > 1)
+                    {
+                        String password = rs.getString("PASSWORD");
+                        user.setPassword(password);
+
+                        String cnRegex = rs.getString("CN_REGEX");
+                        user.setCnRegex(cnRegex);
+                    }
                     usersInCurrentFile.getUser().add(user);
 
                     numUsersInCurrentFile ++;

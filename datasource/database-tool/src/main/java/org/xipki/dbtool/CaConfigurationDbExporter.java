@@ -64,6 +64,7 @@ import org.xipki.dbi.ca.jaxb.CAConfigurationType.Profiles;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Publishers;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Requestors;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Responders;
+import org.xipki.dbi.ca.jaxb.CAConfigurationType.Sceps;
 import org.xipki.dbi.ca.jaxb.CaHasProfileType;
 import org.xipki.dbi.ca.jaxb.CaHasPublisherType;
 import org.xipki.dbi.ca.jaxb.CaHasRequestorType;
@@ -77,6 +78,7 @@ import org.xipki.dbi.ca.jaxb.ProfileType;
 import org.xipki.dbi.ca.jaxb.PublisherType;
 import org.xipki.dbi.ca.jaxb.RequestorType;
 import org.xipki.dbi.ca.jaxb.ResponderType;
+import org.xipki.dbi.ca.jaxb.ScepType;
 import org.xipki.security.api.PasswordResolverException;
 
 /**
@@ -147,6 +149,7 @@ class CaConfigurationDbExporter extends DbPorter
         export_ca_has_requestor(caconf);
         export_ca_has_publisher(caconf);
         export_ca_has_profile(caconf);
+        export_scep(caconf);
 
         JAXBElement<CAConfigurationType> root = new ObjectFactory().createCAConfiguration(caconf);
         try
@@ -750,6 +753,51 @@ class CaConfigurationDbExporter extends DbPorter
 
         caconf.setCaHasPublishers(ca_has_publishers);
         System.out.println(" exported table CA_HAS_PUBLISHER");
+    }
+
+    private void export_scep(
+            final CAConfigurationType caconf)
+    throws DataAccessException
+    {
+        System.out.println("exporting table SCEP");
+        Sceps sceps = new Sceps();
+        caconf.setSceps(sceps);
+        if(dbSchemaVersion < 2)
+        {
+            System.out.println(" exported table SCEP");
+            return;
+        }
+
+        final String sql = "SELECT NAME, CA_NAME, PROFILE_NAME FROM SCEP";
+
+        Statement stmt = null;
+        ResultSet rs = null;
+        try
+        {
+            stmt = createStatement();
+            rs = stmt.executeQuery(sql);
+
+            while(rs.next())
+            {
+                String name = rs.getString("NAME");
+                String ca_name = rs.getString("CA_NAME");
+                String profile_name = rs.getString("PROFILE_NAME");
+
+                ScepType scep = new ScepType();
+                scep.setName(name);
+                scep.setCaName(ca_name);
+                scep.setProfileName(profile_name);
+                sceps.getScep().add(scep);
+            }
+        }catch(SQLException e)
+        {
+            throw translate(sql, e);
+        }finally
+        {
+            releaseResources(stmt, rs);
+        }
+
+        System.out.println(" exported table SCEP");
     }
 
     private void export_ca_has_profile(

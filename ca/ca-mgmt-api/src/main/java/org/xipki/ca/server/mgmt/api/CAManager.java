@@ -318,4 +318,39 @@ public interface CAManager
             String certprofileName,
             byte[] p10Req)
     throws CAMgmtException;
+
+    boolean addUser(
+            AddUserEntry userEntry)
+    throws CAMgmtException;
+
+    boolean changeUser(
+            String username,
+            String password,
+            String cnRegex)
+    throws CAMgmtException;
+
+    UserEntry getUser(
+            String username)
+    throws CAMgmtException;
+
+    boolean addScep(
+            ScepEntry scepEntry)
+    throws CAMgmtException;
+
+    boolean removeScep(
+            String name)
+    throws CAMgmtException;
+
+    boolean changeScep(
+            String name,
+            String caName,
+            String profileName)
+    throws CAMgmtException;
+
+    Set<String> getScepNames();
+
+    ScepEntry getScep(
+            String name)
+    throws CAMgmtException;
+
 }
