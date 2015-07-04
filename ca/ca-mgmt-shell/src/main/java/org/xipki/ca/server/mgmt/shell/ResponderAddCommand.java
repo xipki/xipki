@@ -68,7 +68,7 @@ public class ResponderAddCommand extends CaCommand
     private String signerConf;
 
     @Option(name = "--cert",
-            description = "requestor certificate")
+            description = "responder certificate file")
     private String certFile;
 
     private PasswordResolver passwordResolver;

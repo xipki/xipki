@@ -342,14 +342,12 @@ public interface CAManager
     throws CAMgmtException;
 
     boolean changeScep(
-            String name,
-            String caName,
-            String profileName)
+            ChangeScepEntry scepEntry)
     throws CAMgmtException;
 
     Set<String> getScepNames();
 
-    ScepEntry getScep(
+    ScepEntry getScepEntry(
             String name)
     throws CAMgmtException;
 

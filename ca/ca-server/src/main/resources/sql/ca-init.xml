@@ -206,18 +206,16 @@
     </createTable>
     <!-- table SCEP -->
     <createTable tableName="SCEP">
-      <column name="NAME" type="VARCHAR(45)">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="STATUS" remarks="valid values: active, inactive" type="VARCHAR(10)">
-        <constraints nullable="false"/>
-      </column>
       <column name="CA_NAME" type="VARCHAR(45)">
         <constraints nullable="false"/>
       </column>
-      <column name="PROFILE_NAME" type="VARCHAR(45)">
+      <!-- CONTROL is reserved for future, will currently not be used -->
+      <column name="CONTROL" type="VARCHAR(400)"/>
+      <column name="RESPONDER_TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
+      <column name="RESPONDER_CONF" type="CLOB"/>
+      <column name="RESPONDER_CERT" type="VARCHAR(3000)"/>
     </createTable>
   </changeSet>
   <!-- CertStore :: create table -->
@@ -329,6 +327,11 @@
       <column name="SUBJECT" type="VARCHAR(300)">
         <constraints nullable="false"/>
       </column>
+      <column name="FP_SUBJECT" type="CHAR(40)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="REQ_SUBJECT" type="VARCHAR(300)"/>
+      <column name="FP_REQ_SUBJECT" type="CHAR(40)"/>
       <column name="LAST_UPDATE" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT">
         <constraints nullable="false"/>
       </column>
@@ -351,10 +354,11 @@
       <column name="FP_PK" type="CHAR(40)">
         <constraints nullable="false"/>
       </column>
-      <column name="FP_SUBJECT" type="CHAR(40)">
+      <column name="TID" remarks="heximal transactionId, maximal 256 bit" type="VARCHAR(64)"/>
+      <column name="REQ_TYPE" type="SMALLINT"
+         remarks="how the certificate is requested, 1 for direct via CA command, 2 for CMP, 3 for SCEP">
         <constraints nullable="false"/>
       </column>
-      <column name="TID" remarks="heximal transactionId, maximal 160 bit" type="VARCHAR(40)"/>
     </createTable>
     <addUniqueConstraint tableName="CERT" columnNames="CA_ID, SERIAL" constraintName="CONST_CA_SERIAL"/>
     <createIndex tableName="CERT" unique="false" indexName="IDX_FP_PK">
@@ -490,11 +494,6 @@
       baseColumnNames="CA_NAME" baseTableName="CA_HAS_PROFILE"
       referencedColumnNames="NAME" referencedTableName="CA"/>
     <!-- SCEP -->
-    <addForeignKeyConstraint constraintName="FK_SCEP_PROFILE1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="PROFILE_NAME" baseTableName="SCEP"
-      referencedColumnNames="NAME" referencedTableName="PROFILE"/>
     <addForeignKeyConstraint constraintName="FK_SCEP_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"

@@ -65,6 +65,7 @@ import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCAEntry;
+import org.xipki.ca.server.mgmt.api.ChangeScepEntry;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
@@ -994,15 +995,12 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean changeScep(
-            final String name,
-            final String caName,
-            final String profileName)
+    public boolean changeScep(ChangeScepEntry scepEntry)
     throws HessianCAMgmtException
     {
         try
         {
-            return caManager.changeScep(name, caName, profileName);
+            return caManager.changeScep(scepEntry);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -1016,12 +1014,12 @@ implements HessianCAManager
     }
 
     @Override
-    public ScepEntry getScep(String name)
+    public ScepEntry getScepEntry(String name)
     throws HessianCAMgmtException
     {
         try
         {
-            return caManager.getScep(name);
+            return caManager.getScepEntry(name);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());

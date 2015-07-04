@@ -33,59 +33,31 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.mgmt.shell;
+package org.xipki.ca.server.impl.scep;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.ScepEntry;
-import org.xipki.common.ConfigurationException;
-import org.xipki.common.util.IoUtil;
+import org.xipki.common.ParamChecker;
+import org.xipki.scep4j.transaction.FailInfo;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "scep-add", description="add SCEP")
-public class ScepAddCommand extends CaCommand
+public class FailInfoException extends Exception
 {
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    private String caName;
 
-    @Option(name = "--resp-type",
-            required = true,
-            description = "type of the responder\n"
-                    + "(required)")
-    private String responderType;
+    private static final long serialVersionUID = 1L;
 
-    @Option(name = "--resp-conf",
-            description = "conf of the responder")
-    private String responderConf;
+    private FailInfo failInfo;
 
-    @Option(name = "--resp-cert",
-            description = "responder certificate file")
-    private String certFile;
-
-    @Override
-    protected Object _doExecute()
-    throws Exception
+    public FailInfoException(FailInfo failInfo)
     {
-        String base64Cert = null;
-        if(certFile != null)
-        {
-            base64Cert= IoUtil.base64Encode(IoUtil.read(certFile), false);
-        }
-
-        ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert, null);
-        if(entry.isFaulty())
-        {
-            throw new ConfigurationException("certificate is invalid");
-        }
-
-        boolean b = caManager.addScep(entry);
-        output(b, "added", "could not add", "SCEP responder " + caName);
-        return null;
+        ParamChecker.assertNotNull("failInfo", failInfo);
+        this.failInfo = failInfo;
     }
+
+    public FailInfo getFailInfo()
+    {
+        return failInfo;
+    }
+
 }

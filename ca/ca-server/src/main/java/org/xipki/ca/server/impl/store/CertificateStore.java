@@ -38,6 +38,7 @@ package org.xipki.ca.server.impl.store;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 
@@ -88,7 +89,10 @@ public class CertificateStore
                     certInfo.getSubjectPublicKey(),
                     certInfo.getProfileName(),
                     certInfo.getRequestor(),
-                    certInfo.getUser());
+                    certInfo.getUser(),
+                    certInfo.getReqType(),
+                    certInfo.getTransactionId(),
+                    certInfo.getRequestedSubject());
         } catch (Exception e)
         {
             LOG.error("could not save certificate {}: {}. Message: {}",
@@ -614,6 +618,74 @@ public class CertificateStore
         try
         {
             return queryExecutor.getCertificateInfo(caCert, serial);
+        } catch (DataAccessException e)
+        {
+            LOG.debug("DataAccessException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (RuntimeException e)
+        {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        }
+    }
+
+    public List<X509Certificate> getCertificate(
+            final X500Name subjectName,
+            final byte[] transactionId)
+    throws OperationException
+    {
+        try
+        {
+            return queryExecutor.getCertificate(subjectName, transactionId);
+        } catch (DataAccessException e)
+        {
+            LOG.debug("DataAccessException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (RuntimeException e)
+        {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        }
+    }
+
+    public boolean authenticateUser(String user, byte[] password)
+    throws OperationException
+    {
+        try
+        {
+            return queryExecutor.authenticateUser(user, password);
+        } catch (DataAccessException e)
+        {
+            LOG.debug("DataAccessException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (RuntimeException e)
+        {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        }
+    }
+
+    public String getCNRegexForUser(String user)
+    throws OperationException
+    {
+        try
+        {
+            return queryExecutor.getCNRegexForUser(user);
+        } catch (DataAccessException e)
+        {
+            LOG.debug("DataAccessException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (RuntimeException e)
+        {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        }
+    }
+
+    public boolean containsCertForSerial(
+            final X509CertWithDBCertId caCert,
+            final BigInteger serial)
+    throws OperationException
+    {
+        try
+        {
+            return queryExecutor.containsCertForSerial(caCert, serial);
         } catch (DataAccessException e)
         {
             LOG.debug("DataAccessException", e);

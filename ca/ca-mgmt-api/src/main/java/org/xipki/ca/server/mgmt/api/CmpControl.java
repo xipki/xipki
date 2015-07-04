@@ -136,7 +136,7 @@ public class CmpControl
         this.messageTimeRequired = messageTimeRequired == null ? true : messageTimeRequired;
         pairs.putUtf8Pair(KEY_MESSAGETIME_REQUIRED, Boolean.toString(this.messageTimeRequired));
 
-        this.sendResponderCert = sendResponderCert == null ? true : this.sendResponderCert;
+        this.sendResponderCert = sendResponderCert == null ? true : sendResponderCert.booleanValue();
         pairs.putUtf8Pair(KEY_SEND_RESPONDER, Boolean.toString(this.sendResponderCert));
 
         this.messageTimeBias = messageTimeBias == null ? DFLT_messageTimeBias : messageTimeBias;

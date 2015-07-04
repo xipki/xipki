@@ -70,7 +70,7 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-class X509CAInfo
+public class X509CAInfo
 {
     private final static Logger LOG = LoggerFactory.getLogger(X509CAInfo.class);
 

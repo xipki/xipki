@@ -82,9 +82,12 @@ import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.DfltEnvParameterResolver;
 import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.OperationException;
+import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.server.impl.X509SelfSignedCertBuilder.GenerateSelfSignedResult;
+import org.xipki.ca.server.impl.scep.Scep;
+import org.xipki.ca.server.impl.scep.ScepManager;
 import org.xipki.ca.server.impl.store.CertificateStore;
 import org.xipki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.ca.server.mgmt.api.CAEntry;
@@ -95,6 +98,7 @@ import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCAEntry;
+import org.xipki.ca.server.mgmt.api.ChangeScepEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
@@ -130,7 +134,7 @@ import org.xipki.security.api.SignerException;
  */
 
 public class CAManagerImpl
-implements CAManager, CmpResponderManager
+implements CAManager, CmpResponderManager, ScepManager
 {
 
     private class ScheduledPublishQueueCleaner implements Runnable
@@ -279,7 +283,7 @@ implements CAManager, CmpResponderManager
     private final Map<String, X509CrlSignerEntryWrapper> crlSigners = new ConcurrentHashMap<>();
     private final Map<String, X509CrlSignerEntry> crlSignerDbEntries = new ConcurrentHashMap<>();
 
-    private final Map<String, ScepInfo> sceps = new ConcurrentHashMap<>();
+    private final Map<String, Scep> sceps = new ConcurrentHashMap<>();
     private final Map<String, ScepEntry> scepDbEntries = new ConcurrentHashMap<>();
 
     private final Map<String, Map<String, String>> ca_has_profiles = new ConcurrentHashMap<>();
@@ -610,7 +614,7 @@ implements CAManager, CmpResponderManager
         initPublishers();
         initCmpControls();
         initRequestors();
-        initResponder();
+        initResponders();
         initCrlSigners();
         initCAs();
         initSceps();
@@ -981,7 +985,7 @@ implements CAManager, CmpResponderManager
         requestorsInitialized = true;
     }
 
-    private void initResponder()
+    private void initResponders()
     throws CAMgmtException
     {
         if(responderInitialized)
@@ -1238,12 +1242,12 @@ implements CAManager, CmpResponderManager
                     continue;
                 }
 
-                scepDb.setFaulty(true);
+                scepDb.setConfFaulty(true);
                 scepDbEntries.put(name, scepDb);
 
-                ScepInfo scepInfo = new ScepInfo(scepDb.getName(), scepDb.getCaName(), scepDb.getProfileName());
-                scepDb.setFaulty(false);
-                sceps.put(name, scepInfo);
+                Scep scep = new Scep(scepDb, this);
+                scepDb.setConfFaulty(false);
+                sceps.put(name, scep);
             }
         }
 
@@ -2824,7 +2828,7 @@ implements CAManager, CmpResponderManager
         try
         {
             certInfo = ca.generateCertificate(false, null, profileName, user, subject, publicKeyInfo,
-                        null, null, extensions);
+                        extensions, RequestType.CA, null);
         } catch (OperationException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
@@ -3306,10 +3310,10 @@ implements CAManager, CmpResponderManager
         boolean b = queryExecutor.addScep(dbEntry);
         if(b)
         {
-            final String name = dbEntry.getName();
-            ScepInfo scepInfo = new ScepInfo(name, dbEntry.getCaName(), dbEntry.getProfileName());
-            scepDbEntries.put(name, dbEntry);
-            sceps.put(name, scepInfo);
+            final String caName = dbEntry.getCaName();
+            Scep scep = new Scep(dbEntry, this);
+            scepDbEntries.put(caName, dbEntry);
+            sceps.put(caName, scep);
         }
         return b;
     }
@@ -3331,42 +3335,52 @@ implements CAManager, CmpResponderManager
         return b;
     }
 
-    @Override
-    public boolean changeScep(
-            final String name,
-            final String caName,
-            final String profileName)
+    public boolean changeScep(ChangeScepEntry scepEntry)
     throws CAMgmtException
     {
-        ParamChecker.assertNotBlank("name", name);
+        ParamChecker.assertNotNull("scepEntry", scepEntry);
         asssertMasterMode();
 
-        boolean b = queryExecutor.changeScep(name, caName, profileName);
-        if(b)
+        String caName = scepEntry.getCaName();
+        String type = scepEntry.getResponderType();
+        String conf = scepEntry.getResponderConf();
+        String base64Cert = scepEntry.getBase64Cert();
+        String control = scepEntry.getControl();
+        if(type == null && conf == null && base64Cert == null && control == null)
         {
-            ScepEntry origEntry = scepDbEntries.get(name);
-            String _caName = (caName == null) ? caName : origEntry.getCaName();
-            String _profileName = (profileName == null) ? profileName : origEntry.getProfileName();
-            ScepEntry newEntry = new ScepEntry(name, _caName, _profileName);
-            ScepInfo newScepInfo = new ScepInfo(name, _caName, _profileName);
-            scepDbEntries.put(name, newEntry);
-            sceps.put(name, newScepInfo);
+            return false;
         }
-        return b;
+
+        Scep scep = queryExecutor.changeScep(caName, type, conf, base64Cert, control, this);
+        if(scep == null)
+        {
+            return false;
+        }
+
+        sceps.remove(caName);
+        scepDbEntries.remove(caName);
+        scepDbEntries.put(caName, scep.getDbEntry());
+        sceps.put(caName, scep);
+        return true;
+    }
+
+    @Override
+    public ScepEntry getScepEntry(String caName)
+    {
+        return scepDbEntries == null ? null : scepDbEntries.get(caName);
+    }
+
+    @Override
+    public Scep getScep(String caName)
+    {
+        return sceps == null ? null : sceps.get(caName);
     }
 
     @Override
     public Set<String> getScepNames()
     {
-        return scepDbEntries.keySet();
-    }
-
-    @Override
-    public ScepEntry getScep(
-            final String name)
-    throws CAMgmtException
-    {
-        return scepDbEntries.get(name);
+        return scepDbEntries == null ? null :
+            Collections.unmodifiableSet(scepDbEntries.keySet());
     }
 
 }

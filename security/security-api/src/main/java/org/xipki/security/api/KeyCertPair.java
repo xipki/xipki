@@ -33,59 +33,39 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.mgmt.shell;
+package org.xipki.security.api;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.ScepEntry;
-import org.xipki.common.ConfigurationException;
-import org.xipki.common.util.IoUtil;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "scep-add", description="add SCEP")
-public class ScepAddCommand extends CaCommand
+public class KeyCertPair
 {
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    private String caName;
 
-    @Option(name = "--resp-type",
-            required = true,
-            description = "type of the responder\n"
-                    + "(required)")
-    private String responderType;
+    private final PrivateKey privateKey;
+    private final X509Certificate certificate;
 
-    @Option(name = "--resp-conf",
-            description = "conf of the responder")
-    private String responderConf;
-
-    @Option(name = "--resp-cert",
-            description = "responder certificate file")
-    private String certFile;
-
-    @Override
-    protected Object _doExecute()
-    throws Exception
+    public KeyCertPair(PrivateKey privateKey, X509Certificate certificate)
     {
-        String base64Cert = null;
-        if(certFile != null)
-        {
-            base64Cert= IoUtil.base64Encode(IoUtil.read(certFile), false);
-        }
-
-        ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert, null);
-        if(entry.isFaulty())
-        {
-            throw new ConfigurationException("certificate is invalid");
-        }
-
-        boolean b = caManager.addScep(entry);
-        output(b, "added", "could not add", "SCEP responder " + caName);
-        return null;
+        ParamChecker.assertNotNull("privateKey", privateKey);
+        ParamChecker.assertNotNull("certificate", certificate);
+        this.privateKey = privateKey;
+        this.certificate = certificate;
     }
+
+    public PrivateKey getPrivateKey()
+    {
+        return privateKey;
+    }
+
+    public X509Certificate getCertificate()
+    {
+        return certificate;
+    }
+
 }

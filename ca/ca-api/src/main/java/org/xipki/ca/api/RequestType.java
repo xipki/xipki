@@ -33,59 +33,40 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.mgmt.shell;
-
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.ScepEntry;
-import org.xipki.common.ConfigurationException;
-import org.xipki.common.util.IoUtil;
+package org.xipki.ca.api;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "scep-add", description="add SCEP")
-public class ScepAddCommand extends CaCommand
+public enum RequestType
 {
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    private String caName;
+    CA(1),
+    CMP(2),
+    SCEP(3);
 
-    @Option(name = "--resp-type",
-            required = true,
-            description = "type of the responder\n"
-                    + "(required)")
-    private String responderType;
-
-    @Option(name = "--resp-conf",
-            description = "conf of the responder")
-    private String responderConf;
-
-    @Option(name = "--resp-cert",
-            description = "responder certificate file")
-    private String certFile;
-
-    @Override
-    protected Object _doExecute()
-    throws Exception
+    private final int code;
+    private RequestType(
+            final int code)
     {
-        String base64Cert = null;
-        if(certFile != null)
+        this.code = code;
+    }
+
+    public int getCode()
+    {
+        return code;
+    }
+
+    public static RequestType getInstance(int code)
+    {
+        for(RequestType value : values())
         {
-            base64Cert= IoUtil.base64Encode(IoUtil.read(certFile), false);
+            if(code == value.code)
+            {
+                return value;
+            }
         }
 
-        ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert, null);
-        if(entry.isFaulty())
-        {
-            throw new ConfigurationException("certificate is invalid");
-        }
-
-        boolean b = caManager.addScep(entry);
-        output(b, "added", "could not add", "SCEP responder " + caName);
         return null;
     }
 }

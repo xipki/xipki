@@ -63,7 +63,6 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
@@ -95,10 +94,8 @@ import org.bouncycastle.asn1.crmf.CertReqMessages;
 import org.bouncycastle.asn1.crmf.CertReqMsg;
 import org.bouncycastle.asn1.crmf.CertTemplate;
 import org.bouncycastle.asn1.crmf.OptionalValidity;
-import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
@@ -123,6 +120,7 @@ import org.xipki.audit.api.AuditStatus;
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.RequestorInfo;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.common.cmp.CmpUtil;
@@ -589,16 +587,7 @@ class X509CACmpResponder extends CmpResponder
         else
         {
             CertificationRequestInfo certTemp = p10cr.getCertificationRequestInfo();
-            Extensions extensions = null;
-            ASN1Set attrs = certTemp.getAttributes();
-            for(int i = 0; i < attrs.size(); i++)
-            {
-                Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-                if(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
-                {
-                    extensions = Extensions.getInstance(attr.getAttributeValues()[0]);
-                }
-            }
+            Extensions extensions = X509Util.getExtensions(certTemp);
 
             X500Name subject = certTemp.getSubject();
             if(childAuditEvent != null)
@@ -687,13 +676,13 @@ class X509CACmpResponder extends CmpResponder
             {
                 certInfo = ca.regenerateCertificate(requestor.isRA(), requestor, certprofileName, user,
                         subject, publicKeyInfo,
-                        notBefore, notAfter, extensions);
+                        notBefore, notAfter, extensions, RequestType.CMP, tid.getOctets());
             }
             else
             {
                 certInfo = ca.generateCertificate(requestor.isRA(), requestor, certprofileName, user,
                         subject, publicKeyInfo,
-                        notBefore, notAfter, extensions);
+                        notBefore, notAfter, extensions, RequestType.CMP, tid.getOctets());
             }
             certInfo.setRequestor(requestor);
             certInfo.setUser(user);

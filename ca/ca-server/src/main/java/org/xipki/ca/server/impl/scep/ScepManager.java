@@ -33,61 +33,14 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl;
-
-import org.xipki.common.ParamChecker;
+package org.xipki.ca.server.impl.scep;
 
 /**
- *
  * @author Lijun Liao
- *
  */
-public class ScepInfo
+
+public interface ScepManager
 {
-    private final String name;
-    private String caName;
-    private String profileName;
-
-    public ScepInfo(
-            final String name,
-            final String caName,
-            final String profileName)
-    {
-        ParamChecker.assertNotBlank("name", name);
-        ParamChecker.assertNotBlank("caName", caName);
-        ParamChecker.assertNotBlank("profileName", profileName);
-        this.name = name;
-        this.caName = caName;
-        this.profileName = profileName;
-    }
-
-    public String getCaName()
-    {
-        return caName;
-    }
-
-    public void setCaName(
-            String caName)
-    {
-        ParamChecker.assertNotBlank("caName", caName);
-        this.caName = caName;
-    }
-
-    public String getProfileName()
-    {
-        return profileName;
-    }
-
-    public void setProfileName(
-            final String profileName)
-    {
-        ParamChecker.assertNotBlank("profileName", profileName);
-        this.profileName = profileName;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
+    Scep getScep(
+            String name);
 }
