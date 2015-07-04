@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl;
+package org.xipki.ca.server.impl.cmp;
 
 import java.security.cert.X509Certificate;
 
@@ -48,7 +48,7 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-class CmpResponderEntryWrapper
+public class CmpResponderEntryWrapper
 {
     private CmpResponderEntry dbEntry;
     private ConcurrentContentSigner signer;

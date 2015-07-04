@@ -65,6 +65,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.profile.CertValidity;
+import org.xipki.ca.server.impl.cmp.CmpRequestorEntryWrapper;
+import org.xipki.ca.server.impl.cmp.CmpResponderEntryWrapper;
 import org.xipki.ca.server.impl.scep.Scep;
 import org.xipki.ca.server.impl.store.CertificateStore;
 import org.xipki.ca.server.mgmt.api.AddUserEntry;

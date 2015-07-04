@@ -39,7 +39,7 @@ package org.xipki.ca.server.impl;
  * @author Lijun Liao
  */
 
-class RemoveExpiredCertsInfo
+public class RemoveExpiredCertsInfo
 {
     private int numOfCerts;
     private long expiredAt;

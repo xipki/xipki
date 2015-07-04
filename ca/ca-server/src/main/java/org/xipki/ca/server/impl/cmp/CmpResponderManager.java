@@ -33,40 +33,17 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl;
-
-import org.xipki.ca.api.X509CertWithDBCertId;
-import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
+package org.xipki.ca.server.impl.cmp;
 
 /**
  * @author Lijun Liao
  */
 
-class CmpRequestorEntryWrapper
+public interface CmpResponderManager
 {
-    private CmpRequestorEntry dbEntry;
-    private X509CertWithDBCertId cert;
+    String getCaNameForAlias(
+            String caAlias);
 
-    public CmpRequestorEntryWrapper()
-    {
-    }
-
-    public void setDbEntry(
-            final CmpRequestorEntry dbEntry)
-    {
-        this.dbEntry = dbEntry;
-        cert = null;
-        cert = new X509CertWithDBCertId(dbEntry.getCert());
-    }
-
-    public X509CertWithDBCertId getCert()
-    {
-        return cert;
-    }
-
-    public CmpRequestorEntry getDbEntry()
-    {
-        return dbEntry;
-    }
-
+    X509CACmpResponder getX509CACmpResponder(
+            String caName);
 }
