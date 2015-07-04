@@ -62,6 +62,7 @@ import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.HashAlgoType;
@@ -105,8 +106,8 @@ class CaCertStoreDbImporter extends DbPorter
             "(ID, ART, LAST_UPDATE, SERIAL, SUBJECT,"
             + " NOTBEFORE, NOTAFTER, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME,"
             + " PROFILE_ID, CA_ID,"
-            + " REQUESTOR_ID, USER_ID, FP_PK, FP_SUBJECT, EE)" +
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            + " REQUESTOR_ID, USER_ID, FP_PK, FP_SUBJECT, EE, REQ_TYPE, TID)" +
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, FP, CERT) VALUES (?, ?, ?)";
 
@@ -790,7 +791,13 @@ class CaCertStoreDbImporter extends DbPorter
                         }
                     }
                     ps_cert.setInt(idx++, ee ? 1 : 0);
-
+                    ps_cert.setInt(idx++, cert.getReqType());
+                    String tidS = null;
+                    if(cert.getTid() != null)
+                    {
+                        tidS = Hex.toHexString(cert.getTid());
+                    }
+                    ps_cert.setString(idx++, tidS);
                     ps_cert.addBatch();
                 }catch(SQLException e)
                 {

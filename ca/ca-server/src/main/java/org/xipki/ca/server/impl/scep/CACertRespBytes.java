@@ -33,59 +33,52 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.mgmt.shell;
+package org.xipki.ca.server.impl.scep;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.ScepEntry;
-import org.xipki.common.ConfigurationException;
-import org.xipki.common.util.IoUtil;
+import java.io.IOException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cms.CMSAbsentContent;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.bouncycastle.util.Arrays;
+import org.xipki.common.ParamChecker;
 
 /**
- * @author Lijun Liao
- */
+*
+* @author Lijun Liao
+*
+*/
 
-@Command(scope = "xipki-ca", name = "scep-add", description="add SCEP")
-public class ScepAddCommand extends CaCommand
+class CACertRespBytes
 {
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    private String caName;
+    private final byte[] bytes;
 
-    @Option(name = "--resp-type",
-            required = true,
-            description = "type of the responder\n"
-                    + "(required)")
-    private String responderType;
-
-    @Option(name = "--resp-conf",
-            description = "conf of the responder")
-    private String responderConf;
-
-    @Option(name = "--resp-cert",
-            description = "responder certificate file")
-    private String certFile;
-
-    @Override
-    protected Object _doExecute()
-    throws Exception
+    CACertRespBytes(X509Certificate cACert, X509Certificate responderCert)
+    throws CMSException, CertificateException
     {
-        String base64Cert = null;
-        if(certFile != null)
-        {
-            base64Cert= IoUtil.base64Encode(IoUtil.read(certFile), false);
-        }
+        ParamChecker.assertNotNull("cACert", cACert);
+        ParamChecker.assertNotNull("responderCert", responderCert);
 
-        ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert, null);
-        if(entry.isFaulty())
+        CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
+        try
         {
-            throw new ConfigurationException("certificate is invalid");
+            cmsSignedDataGen.addCertificate(new X509CertificateHolder(cACert.getEncoded()));
+            cmsSignedDataGen.addCertificate(new X509CertificateHolder(responderCert.getEncoded()));
+            CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
+            bytes = degenerateSignedData.getEncoded();
+        } catch (IOException e)
+        {
+            throw new CMSException("could not build CMS SignedDta");
         }
-
-        boolean b = caManager.addScep(entry);
-        output(b, "added", "could not add", "SCEP responder " + caName);
-        return null;
     }
+
+    byte[] getBytes()
+    {
+        return Arrays.clone(bytes);
+    }
+
 }

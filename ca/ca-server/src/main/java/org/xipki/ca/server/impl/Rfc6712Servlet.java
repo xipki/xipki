@@ -108,7 +108,7 @@ public class Rfc6712Servlet extends HttpServlet
         {
             if(responderManager == null)
             {
-                String message = "caManager in servlet not configured";
+                String message = "responderManager in servlet not configured";
                 LOG.error(message);
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.setContentLength(0);

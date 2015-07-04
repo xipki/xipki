@@ -303,7 +303,7 @@
         <entry key="--publisher" value-ref="publisherNameCompleter"/>
       </optional-completers>
     </command>
-    <!--  CA-Requestor -->
+    <!--  CA requestor -->
     <command>
       <action class="org.xipki.ca.server.mgmt.shell.CaRequestorAddCommand">
         <property name="caManager" ref="caManager"/>
@@ -642,7 +642,7 @@
       </action>
       <optional-completers>
         <entry key="--ca" value-ref="caNameCompleter"/>
-        <entry key="--profile" value-ref="profileNameCompleter"/>
+        <entry key="--resp-cert" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -650,7 +650,7 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="--name" value-ref="scepNameCompleter"/>
+        <entry key="--ca" value-ref="scepNameCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -658,7 +658,15 @@
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
-        <entry key="--name" value-ref="scepNameCompleter"/>
+        <entry key="--ca" value-ref="scepNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.ca.server.mgmt.shell.ScepUpdateCommand">
+        <property name="caManager" ref="caManager"/>
+      </action>
+      <optional-completers>
+        <entry key="--ca" value-ref="scepNameCompleter"/>
       </optional-completers>
     </command>
     <!-- Certificate management -->

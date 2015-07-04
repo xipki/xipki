@@ -111,7 +111,7 @@ public class PasswordHash
     public static String createHash(String password)
     throws NoSuchAlgorithmException, InvalidKeySpecException
     {
-        return createHash(password.toCharArray());
+        return createHash(password.getBytes());
     }
 
     /**
@@ -120,7 +120,7 @@ public class PasswordHash
      * @param   password    the password to hash
      * @return              a salted PBKDF2 hash of the password
      */
-    public static String createHash(char[] password)
+    public static String createHash(byte[] password)
     throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         return createHash(password, SALT_BYTE_SIZE, PBKDF2_ITERATIONS, DERIVED_KEY_SIZE);
@@ -132,7 +132,7 @@ public class PasswordHash
      * @param   password    the password to hash
      * @return              a salted PBKDF2 hash of the password
      */
-    public static String createHash(char[] password, int saltSize, int iterations, int dkSize)
+    public static String createHash(byte[] password, int saltSize, int iterations, int dkSize)
     throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         // Generate a random salt
@@ -156,7 +156,7 @@ public class PasswordHash
     public static boolean validatePassword(String password, String correctHash)
     throws NoSuchAlgorithmException, InvalidKeySpecException
     {
-        return validatePassword(password.toCharArray(), correctHash);
+        return validatePassword(password.getBytes(), correctHash);
     }
 
     /**
@@ -166,7 +166,7 @@ public class PasswordHash
      * @param   correctHash     the hash of the valid password
      * @return                  true if the password is correct, false if not
      */
-    public static boolean validatePassword(char[] password, String correctHash)
+    public static boolean validatePassword(byte[] password, String correctHash)
     throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         // Decode the hash into its parameters
@@ -210,7 +210,7 @@ public class PasswordHash
      * @param   bytes       the length of the hash to compute in bytes
      * @return              the PBDKF2 hash of the password
      */
-    public static byte[] pbkdf2(char[] password, byte[] salt, int iterations, int bytes)
+    public static byte[] pbkdf2(byte[] password, byte[] salt, int iterations, int bytes)
     throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         byte[] pwdBytes;

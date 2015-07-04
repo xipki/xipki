@@ -65,6 +65,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.profile.CertValidity;
+import org.xipki.ca.server.impl.scep.Scep;
 import org.xipki.ca.server.impl.store.CertificateStore;
 import org.xipki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.ca.server.mgmt.api.CAEntry;
@@ -2000,6 +2001,136 @@ class CAManagerQueryExecutor
         }
     }
 
+    Scep changeScep(
+            final String caName,
+            String responderType,
+            String responderConf,
+            String responderBase64Cert,
+            String control,
+            final CAManagerImpl caManager)
+    throws CAMgmtException
+    {
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("UPDATE SCEP SET ");
+
+        AtomicInteger index = new AtomicInteger(1);
+        Integer iType = addToSqlIfNotNull(sqlBuilder, index, responderType, "RESPONDER_TYPE");
+        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, responderConf, "RESPONDER_CONF");
+        Integer iCert = addToSqlIfNotNull(sqlBuilder, index, responderBase64Cert, "RESPONDER_CERT");
+        Integer iControl= addToSqlIfNotNull(sqlBuilder, index, control, "CONTROL");
+        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
+        sqlBuilder.append(" WHERE CA_NAME=?");
+
+        if(index.get() == 1)
+        {
+            return null;
+        }
+
+        ScepEntry dbEntry = getScep(caName);
+
+        if(responderType == null)
+        {
+            responderType = dbEntry.getResponderType();
+        }
+
+        if(responderConf == null)
+        {
+            responderConf = dbEntry.getResponderConf();
+        }
+
+        if(responderBase64Cert == null)
+        {
+            responderBase64Cert = dbEntry.getBase64Cert();
+        }
+
+        if(control == null)
+        {
+            control = dbEntry.getControl();
+        }
+
+        ScepEntry newDbEntry;
+        try
+        {
+            newDbEntry = new ScepEntry(caName, responderType, responderConf, responderBase64Cert, control);
+        } catch (ConfigurationException e)
+        {
+            throw new CAMgmtException(e);
+        }
+        Scep scep = new Scep(newDbEntry, caManager);
+
+        final String sql = sqlBuilder.toString();
+
+        StringBuilder m = new StringBuilder();
+
+        PreparedStatement ps = null;
+        try
+        {
+            ps = prepareStatement(sql);
+            if(iType != null)
+            {
+                String txt = responderType;
+                ps.setString(iType, txt);
+                m.append("responder type: '").append(txt).append("'; ");
+            }
+
+            if(iConf != null)
+            {
+                String txt = getRealString(responderConf);
+                m.append("responder conf: '").append(SecurityUtil.signerConfToString(txt, false, true));
+                ps.setString(iConf, txt);
+            }
+
+            if(iCert != null)
+            {
+                String txt = getRealString(responderBase64Cert);
+                m.append("responder cert: '");
+                if(txt == null)
+                {
+                    m.append("null");
+                }
+                else
+                {
+                    try
+                    {
+                        String subject = X509Util.canonicalizName(
+                                X509Util.parseBase64EncodedCert(txt).getSubjectX500Principal());
+                        m.append(subject);
+                    } catch (CertificateException | IOException e)
+                    {
+                        m.append("ERROR");
+                    }
+                }
+                m.append("'; ");
+                ps.setString(iCert, txt);
+            }
+
+            if(iControl != null)
+            {
+                String txt = getRealString(control);
+                m.append("control: '").append(control);
+                ps.setString(iControl, txt);
+            }
+
+            ps.setString(index.get(), caName);
+
+            ps.executeUpdate();
+
+            if(m.length() > 0)
+            {
+                m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
+            }
+            LOG.info("changed CMP responder: {}", m);
+            return scep;
+        }catch(SQLException e)
+        {
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
+        }finally
+        {
+            dataSource.releaseResources(ps, null);
+        }
+    }
+
     boolean changeEnvParam(
             final String name,
             final String value)
@@ -2379,7 +2510,7 @@ class CAManagerQueryExecutor
         String hashedPassword;
         try
         {
-            hashedPassword = PasswordHash.createHash(userEntry.getPassword().toCharArray());
+            hashedPassword = PasswordHash.createHash(userEntry.getPassword());
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e)
         {
             throw new CAMgmtException(e);
@@ -2573,19 +2704,22 @@ class CAManagerQueryExecutor
             final ScepEntry scepEntry)
     throws CAMgmtException
     {
-        String name = scepEntry.getName();
-        final String sql = "INSERT INTO SCEP (NAME, CA_NAME, PROFILE_NAME) VALUES (?, ?, ?)";
-
+        final String sql = "INSERT INTO SCEP (CA_NAME, CONTROL, RESPONDER_TYPE, "
+                + "RESPONDER_CONF, RESPONDER_CERT) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement ps = null;
         try
         {
+        	// TODO: validate the entries before writing to DB
             ps = prepareStatement(sql);
-            ps.setString(1, name);
-            ps.setString(2, scepEntry.getCaName());
-            ps.setString(3, scepEntry.getProfileName());
+            int idx = 1;
+            ps.setString(idx++, scepEntry.getCaName());
+            ps.setString(idx++, scepEntry.getControl());
+            ps.setString(idx++, scepEntry.getResponderType());
+            ps.setString(idx++, scepEntry.getResponderConf());
+            ps.setString(idx++, scepEntry.getBase64Cert());
 
             ps.executeUpdate();
-            LOG.info("added SCEP '{}': {}", name, scepEntry);
+            LOG.info("added SCEP '{}': {}", scepEntry.getCaName(), scepEntry);
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -2602,7 +2736,7 @@ class CAManagerQueryExecutor
             final String name)
     throws CAMgmtException
     {
-        final String sql = "DELETE FROM SCEP WHERE NAME=?";
+        final String sql = "DELETE FROM SCEP WHERE CA_NAME=?";
 
         PreparedStatement ps = null;
         try
@@ -2620,71 +2754,12 @@ class CAManagerQueryExecutor
         }
     }
 
-    boolean changeScep(
-            final String name,
-            final String caName,
-            final String profileName)
-    throws CAMgmtException
-    {
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("UPDATE SCEP SET ");
-
-        AtomicInteger index = new AtomicInteger(1);
-        Integer iCaName = addToSqlIfNotNull(sqlBuilder, index, caName, "CA_NAME");
-        Integer iProfileName = addToSqlIfNotNull(sqlBuilder, index, profileName, "Profile_Name");
-        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(" WHERE NAME=?");
-
-        if(index.get() == 1)
-        {
-            return false;
-        }
-
-        final String sql = sqlBuilder.toString();
-
-        StringBuilder m = new StringBuilder();
-
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(sql);
-            if(iCaName != null)
-            {
-                ps.setString(iCaName, caName);
-                m.append("CA-Name: ").append("'").append(caName).append("'");
-            }
-
-            if(iProfileName != null)
-            {
-                ps.setString(iProfileName, profileName);
-                m.append("Profile-Name: ").append("'").append(profileName).append("'");
-            }
-
-            ps.setString(index.get(), name);
-
-            ps.executeUpdate();
-
-            if(m.length() > 0)
-            {
-                m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
-            }
-            LOG.info("changed SCEP: {}", m);
-            return true;
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
-    }
-
     ScepEntry getScep(
-            final String name)
+            final String caName)
     throws CAMgmtException
     {
-        final String sql = dataSource.createFetchFirstSelectSQL("CA_NAME, PROFILE_NAME FROM SCEP WHERE NAME=?", 1);
+        final String sql = dataSource.createFetchFirstSelectSQL(
+                "CONTROL, RESPONDER_TYPE, RESPONDER_CONF, RESPONDER_CERT FROM SCEP WHERE CA_NAME=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = null;
         try
@@ -2692,13 +2767,21 @@ class CAManagerQueryExecutor
             ps = prepareStatement(sql);
 
             int idx = 1;
-            ps.setString(idx++, name);
+            ps.setString(idx++, caName);
             rs = ps.executeQuery();
             if(rs.next())
             {
-                String caName = rs.getString("CA_NAME");
-                String profileNmae = rs.getString("PROFILE_NAME");
-                return new ScepEntry(name, caName, profileNmae);
+                String control = rs.getString("CONTROL");
+                String type = rs.getString("RESPONDER_TYPE");
+                String conf = rs.getString("RESPONDER_CONF");
+                String cert = rs.getString("RESPONDER_CERT");
+                if(StringUtil.isBlank(cert))
+                {
+                    cert = null;
+                }
+
+                ScepEntry entry = new ScepEntry(caName, type, conf, cert, control);
+                return entry;
             } else
             {
                 return null;
@@ -2706,6 +2789,9 @@ class CAManagerQueryExecutor
         }catch(SQLException e)
         {
             throw new CAMgmtException(dataSource.translate(sql, e));
+        } catch (ConfigurationException e)
+        {
+            throw new CAMgmtException(e);
         } finally
         {
             dataSource.releaseResources(ps, rs);

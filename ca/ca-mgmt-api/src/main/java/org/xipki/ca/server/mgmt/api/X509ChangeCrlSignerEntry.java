@@ -74,7 +74,7 @@ public class X509ChangeCrlSignerEntry implements Serializable
 
     public void setSignerType(
             final String signerType)
-            {
+    {
         this.signerType = signerType;
     }
 
@@ -85,7 +85,7 @@ public class X509ChangeCrlSignerEntry implements Serializable
 
     public void setSignerConf(
             final String signerConf)
-            {
+    {
         this.signerConf = signerConf;
     }
 
@@ -96,7 +96,7 @@ public class X509ChangeCrlSignerEntry implements Serializable
 
     public void setBase64Cert(
             final String base64Cert)
-            {
+    {
         this.base64Cert = base64Cert;
     }
 
@@ -107,7 +107,7 @@ public class X509ChangeCrlSignerEntry implements Serializable
 
     public void setCrlControl(
             final String crlControl)
-            {
+    {
         this.crlControl = crlControl;
     }
 

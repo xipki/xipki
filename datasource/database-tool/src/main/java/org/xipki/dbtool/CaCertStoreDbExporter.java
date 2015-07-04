@@ -66,6 +66,7 @@ import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
@@ -685,7 +686,7 @@ class CaCertStoreDbExporter extends DbPorter
         certSql.append(col_revInvTime).append(", ");
         if(dbSchemaVersion > 1)
         {
-            certSql.append("ART, ");
+            certSql.append("ART, REQ_TYPE, TID");
         }
         certSql.append("USER_ID, LAST_UPDATE, REVOKED, REV_REASON, REV_TIME, ");
         certSql.append(col_revInvTime);
@@ -784,15 +785,29 @@ class CaCertStoreDbExporter extends DbPorter
                     cert.setId(id);
 
                     int art;
+                    int reqType;
+                    byte[] tid = null;
                     if(dbSchemaVersion > 1)
                     {
                         art = rs.getInt("ART");
+                        reqType = rs.getInt("REQ_TYPE");
+                        String s = rs.getString("TID");
+                        if(StringUtil.isNotBlank(s))
+                        {
+                            tid = Hex.decode(s);
+                        }
                     }
                     else
                     {
                         art = 1; // X.509
+                        reqType = 2; // CMP
                     }
                     cert.setArt(art);
+                    cert.setReqType(reqType);
+                    if(tid != null)
+                    {
+                        cert.setTid(tid);
+                    }
 
                     int cainfo_id = rs.getInt(col_caId);
                     cert.setCaId(cainfo_id);

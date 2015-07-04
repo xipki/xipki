@@ -110,6 +110,7 @@ import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.RequestorInfo;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.profile.CertValidity;
@@ -125,10 +126,10 @@ import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CRLControl;
-import org.xipki.ca.server.mgmt.api.DuplicationMode;
-import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.CRLControl.HourMinute;
 import org.xipki.ca.server.mgmt.api.CRLControl.UpdateMode;
+import org.xipki.ca.server.mgmt.api.DuplicationMode;
+import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.HealthCheckResult;
@@ -149,7 +150,7 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-class X509CA
+public class X509CA
 {
 
     private class ScheduledNextSerialCommitService implements Runnable
@@ -642,6 +643,54 @@ class X509CA
     public X509CAInfo getCAInfo()
     {
         return caInfo;
+    }
+
+    public X509Certificate getCertificate(
+            final BigInteger serialNumber)
+    throws CertificateException, OperationException
+    {
+        X509CertificateInfo certInfo = certstore.getCertificateInfoForSerial(
+                caInfo.getCertificate(), serialNumber);
+        return certInfo == null ? null :
+            certInfo.getCert().getCert();
+    }
+
+    /**
+     *
+     * @param subjectName
+     * @param transactionId <code>null</code> for all transactionIds
+     * @return
+     */
+    public List<X509Certificate> getCertificate(
+            final X500Name subjectName,
+            final byte[] transactionId)
+    throws OperationException
+    {
+        return certstore.getCertificate(subjectName, transactionId);
+    }
+
+    public boolean knowsCertificate(X509Certificate cert)
+    throws OperationException
+    {
+        if(caInfo.getSubject().equals(
+                X509Util.canonicalizName(cert.getIssuerX500Principal())) == false)
+        {
+            return false;
+        }
+
+        return certstore.containsCertForSerial(caInfo.getCertificate(), cert.getSerialNumber());
+    }
+
+    public boolean authenticateUser(String user, byte[] password)
+    throws OperationException
+    {
+        return certstore.authenticateUser(user, password);
+    }
+
+    public String getCNRegexForUser(String user)
+    throws OperationException
+    {
+        return certstore.getCNRegexForUser(user);
     }
 
     public CertificateList getCurrentCRL()
@@ -1158,9 +1207,29 @@ class X509CA
             final String user,
             final X500Name subject,
             final SubjectPublicKeyInfo publicKeyInfo,
+            final Extensions extensions,
+            final RequestType reqType,
+            final byte[] transactionId)
+    throws OperationException
+    {
+        return generateCertificate(requestedByRA, requestor, certprofileName, user, subject, publicKeyInfo,
+                (Date) null, // notBefore
+                (Date) null, // notAfter
+                extensions, reqType, transactionId);
+    }
+
+    public X509CertificateInfo generateCertificate(
+            final boolean requestedByRA,
+            final RequestorInfo requestor,
+            final String certprofileName,
+            final String user,
+            final X500Name subject,
+            final SubjectPublicKeyInfo publicKeyInfo,
             final Date notBefore,
             final Date notAfter,
-            final Extensions extensions)
+            final Extensions extensions,
+            final RequestType reqType,
+            final byte[] transactionId)
     throws OperationException
     {
         final String subjectText = X509Util.getRFC4519Name(subject);
@@ -1174,7 +1243,8 @@ class X509CA
                     requestedByRA, requestor,
                     certprofileName, user,
                     subject, publicKeyInfo,
-                    notBefore, notAfter, extensions, false);
+                    notBefore, notAfter, extensions, false,
+                    reqType, transactionId);
             successfull = true;
 
             String prefix = ret.isAlreadyIssued() ? "RETURN_OLD_CERT" : "SUCCESSFUL";
@@ -1211,7 +1281,9 @@ class X509CA
             final SubjectPublicKeyInfo publicKeyInfo,
             final Date notBefore,
             final Date notAfter,
-            final Extensions extensions)
+            final Extensions extensions,
+            final RequestType reqType,
+            final byte[] transactionId)
     throws OperationException
     {
         final String subjectText = X509Util.getRFC4519Name(subject);
@@ -1225,7 +1297,8 @@ class X509CA
             X509CertificateInfo ret = intern_generateCertificate(
                     requestedByRA, requestor, certprofileName, user,
                     subject, publicKeyInfo,
-                    notBefore, notAfter, extensions, false);
+                    notBefore, notAfter, extensions, false,
+                    reqType, transactionId);
             successfull = true;
             LOG.info("SUCCESSFUL generateCertificate: CA={}, profile={},"
                     + " subject='{}', serialNumber={}",
@@ -1997,7 +2070,9 @@ class X509CA
             Date notBefore,
             Date notAfter,
             final org.bouncycastle.asn1.x509.Extensions extensions,
-            final boolean keyUpdate)
+            final boolean keyUpdate,
+            final RequestType reqType,
+            final byte[] transactionId)
     throws OperationException
     {
         if(caInfo.getRevocationInfo() != null)
@@ -2208,6 +2283,8 @@ class X509CA
                         {
                             certInfo = new X509CertificateInfo(issuedCert,
                                     caInfo.getCertificate(), subjectPublicKeyData, certprofileName);
+                            certInfo.setReqType(reqType);
+                            certInfo.setTransactionId(transactionId);
                         } catch (CertificateEncodingException e)
                         {
                             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
@@ -2465,6 +2542,9 @@ class X509CA
                         subjectPublicKeyData, certprofileName);
                 ret.setUser(user);
                 ret.setRequestor(requestor);
+                ret.setReqType(reqType);
+                ret.setTransactionId(transactionId);
+                ret.setRequestedSubject(requestedSubject);
 
                 if(intern_publishCertificate(ret) == 1)
                 {
@@ -2547,6 +2627,14 @@ class X509CA
         }
 
         return caManager.getIdentifiedCertprofile(profileNames.get(certprofileLocalName));
+    }
+
+    public boolean supportsCertProfile(String certprofileLocalName)
+    {
+        ParamChecker.assertNotNull("certprofileLocalName", certprofileLocalName);
+
+        Map<String, String> profileNames = caManager.getCertprofilesForCA(caInfo.getName());
+        return profileNames.containsKey(certprofileLocalName);
     }
 
     public CmpRequestorInfo getRequestor(

@@ -36,8 +36,16 @@
 package org.xipki.ca.server.mgmt.api;
 
 import java.io.Serializable;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 
+import org.bouncycastle.util.encoders.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.common.ConfigurationException;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.util.SecurityUtil;
+import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -46,42 +54,86 @@ import org.xipki.common.ParamChecker;
 public class ScepEntry
 implements Serializable
 {
+    private static final Logger LOG = LoggerFactory.getLogger(ScepEntry.class);
     private static final long serialVersionUID = 1L;
 
-    private final String name;
-    private String caName;
-    private String profileName;
-    private boolean faulty;
+    private final String caName;
+    private final String control;
+    private final String responderType;
+    private final String responderConf;
+
+    private final String base64Cert;
+
+    private X509Certificate cert;
+    private boolean certFaulty;
+    private boolean confFaulty;
 
     public ScepEntry(
-            final String name,
             final String caName,
-            final String profileName)
-    throws CAMgmtException
+            final String responderType,
+            final String responderConf,
+            final String base64Cert,
+            final String control)
+    throws ConfigurationException
     {
-        ParamChecker.assertNotBlank("name", name);
         ParamChecker.assertNotBlank("caName", caName);
-        ParamChecker.assertNotBlank("profileName", profileName);
+        ParamChecker.assertNotBlank("responderType", responderType);
+        ParamChecker.assertNotNull("control", control);
 
-        this.name = name.toUpperCase();
+        this.base64Cert = base64Cert;
+
         this.caName = caName;
-        this.profileName = profileName;
+        this.responderType = responderType;
+        this.responderConf = responderConf;
+        this.control = control;
+
+        if(this.base64Cert != null)
+        {
+            try
+            {
+                this.cert = X509Util.parseBase64EncodedCert(base64Cert);
+            }catch(Throwable t)
+            {
+                LOG.debug("could not parse the certificate of SCEP responder for CA '" + caName + "'");
+                certFaulty = true;
+            }
+        }
+    }
+
+    public X509Certificate getCertificate()
+    {
+        return cert;
+    }
+
+    public String getBase64Cert()
+    {
+        return base64Cert;
+    }
+
+    public String getControl()
+    {
+        return control;
+    }
+
+    public String getResponderType()
+    {
+        return responderType;
+    }
+
+    public String getResponderConf()
+    {
+        return responderConf;
     }
 
     public boolean isFaulty()
     {
-        return faulty;
+        return certFaulty || confFaulty;
     }
 
-    public void setFaulty(
-            final boolean faulty)
+    public void setConfFaulty(
+            boolean faulty)
     {
-        this.faulty = faulty;
-    }
-
-    public String getName()
-    {
-        return name;
+        this.confFaulty = faulty;
     }
 
     public String getCaName()
@@ -89,31 +141,72 @@ implements Serializable
         return caName;
     }
 
-    public void setCaName(final String caName)
+    public void setCertificate(
+            final X509Certificate cert)
     {
-        ParamChecker.assertNotBlank("caName", caName);
-        this.caName = caName;
-    }
-
-    public String getProfileName()
-    {
-        return profileName;
-    }
-
-    public void setProfileName(final String profileName)
-    {
-        ParamChecker.assertNotBlank("profileName", profileName);
-        this.profileName = profileName;
+        if(base64Cert != null)
+        {
+            throw new IllegalStateException("certificate is already by specified by base64Cert");
+        }
+        this.cert = cert;
     }
 
     @Override
     public String toString()
     {
+        return toString(false);
+    }
+
+    public String toString(
+            final boolean verbose)
+    {
+        return toString(verbose, true);
+    }
+
+    public String toString(
+            final boolean verbose,
+            final boolean ignoreSensitiveInfo)
+    {
         StringBuilder sb = new StringBuilder();
-        sb.append("name: ").append(name).append('\n');
-        sb.append("faulty: ").append(faulty).append('\n');
-        sb.append("CA: ").append(caName).append("\n");
-        sb.append("Profile: ").append(profileName);
+        sb.append("caName: ").append(caName).append('\n');
+        sb.append("faulty: ").append(isFaulty()).append('\n');
+        sb.append("responderType: ").append(responderType).append('\n');
+        sb.append("responderConf: ");
+        if(responderConf == null)
+        {
+            sb.append("null");
+        } else
+        {
+            sb.append(SecurityUtil.signerConfToString(responderConf, verbose, ignoreSensitiveInfo));
+        }
+        sb.append('\n');
+        sb.append("control: ").append(control).append("\n");
+        if(cert != null)
+        {
+            sb.append("cert: ").append("\n");
+            sb.append("\tissuer: ").append(
+                    X509Util.getRFC4519Name(cert.getIssuerX500Principal())).append('\n');
+            sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append('\n');
+            sb.append("\tsubject: ").append(
+                    X509Util.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
+
+            if(verbose)
+            {
+                sb.append("\tencoded: ");
+                try
+                {
+                    sb.append(Base64.toBase64String(cert.getEncoded()));
+                } catch (CertificateEncodingException e)
+                {
+                    sb.append("ERROR");
+                }
+            }
+        }
+        else
+        {
+            sb.append("cert: null\n");
+        }
+
         return sb.toString();
     }
 

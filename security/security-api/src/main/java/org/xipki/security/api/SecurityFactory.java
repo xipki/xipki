@@ -63,6 +63,12 @@ public interface SecurityFactory
 
     PasswordResolver getPasswordResolver();
 
+    KeyCertPair createPrivateKeyAndCert(
+            String type,
+            String conf,
+            X509Certificate cert)
+    throws SignerException;
+
     ConcurrentContentSigner createSigner(
             String type,
             String conf,

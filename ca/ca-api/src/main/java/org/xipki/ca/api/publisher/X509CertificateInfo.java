@@ -37,6 +37,8 @@ package org.xipki.ca.api.publisher;
 
 import java.security.cert.CertificateEncodingException;
 
+import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.RequestorInfo;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.common.CertRevocationInfo;
@@ -52,6 +54,8 @@ public class X509CertificateInfo
     private final X509CertWithDBCertId cert;
     private final X509CertWithDBCertId issuerCert;
     private final String profileName;
+    private RequestType reqType;
+    private byte[] transactionId;
 
     private RequestorInfo requestor;
     private String user;
@@ -59,6 +63,7 @@ public class X509CertificateInfo
     private String warningMessage;
 
     private CertRevocationInfo revInfo;
+    private X500Name requestedSubject;
     private boolean alreadyIssued;
 
     public X509CertificateInfo(
@@ -158,6 +163,38 @@ public class X509CertificateInfo
             final boolean alreadyIssued)
     {
         this.alreadyIssued = alreadyIssued;
+    }
+
+    public RequestType getReqType()
+    {
+        return reqType;
+    }
+
+    public byte[] getTransactionId()
+    {
+        return transactionId;
+    }
+
+    public void setReqType(
+            final RequestType reqType)
+    {
+        this.reqType = reqType;
+    }
+
+    public void setTransactionId(
+            final byte[] transactionId)
+    {
+        this.transactionId = transactionId;
+    }
+
+    public X500Name getRequestedSubject()
+    {
+        return requestedSubject;
+    }
+
+    public void setRequestedSubject(X500Name requestedSubject)
+    {
+        this.requestedSubject = requestedSubject;
     }
 
 }

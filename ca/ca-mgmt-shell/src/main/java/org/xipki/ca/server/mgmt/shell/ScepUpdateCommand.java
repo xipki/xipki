@@ -35,18 +35,22 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.io.ByteArrayInputStream;
+
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.ScepEntry;
-import org.xipki.common.ConfigurationException;
+import org.bouncycastle.util.encoders.Base64;
+import org.xipki.ca.server.mgmt.api.CAManager;
+import org.xipki.ca.server.mgmt.api.ChangeScepEntry;
 import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.X509Util;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "scep-add", description="add SCEP")
-public class ScepAddCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "scep-up", description="Update SCEP")
+public class ScepUpdateCommand extends CaCommand
 {
     @Option(name = "--ca",
             required = true,
@@ -55,9 +59,7 @@ public class ScepAddCommand extends CaCommand
     private String caName;
 
     @Option(name = "--resp-type",
-            required = true,
-            description = "type of the responder\n"
-                    + "(required)")
+            description = "type of the responder")
     private String responderType;
 
     @Option(name = "--resp-conf",
@@ -65,27 +67,42 @@ public class ScepAddCommand extends CaCommand
     private String responderConf;
 
     @Option(name = "--resp-cert",
-            description = "responder certificate file")
+            description = "responder certificate file or 'NULL'")
     private String certFile;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        String base64Cert = null;
-        if(certFile != null)
+        String certConf = null;
+        if(CAManager.NULL.equalsIgnoreCase(certFile))
         {
-            base64Cert= IoUtil.base64Encode(IoUtil.read(certFile), false);
+            certConf = CAManager.NULL;
+        }
+        else if(certFile != null)
+        {
+            byte[] certBytes = IoUtil.read(certFile);
+            X509Util.parseCert(new ByteArrayInputStream(certBytes));
+            certConf = Base64.toBase64String(certBytes);
         }
 
-        ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert, null);
-        if(entry.isFaulty())
+        ChangeScepEntry entry = new ChangeScepEntry(caName);
+        if(responderType != null)
         {
-            throw new ConfigurationException("certificate is invalid");
+            entry.setResponderType(responderType);
+        }
+        if(responderConf == null)
+        {
+            entry.setResponderConf(responderConf);
         }
 
-        boolean b = caManager.addScep(entry);
-        output(b, "added", "could not add", "SCEP responder " + caName);
+        if(certConf != null)
+        {
+            entry.setBase64Cert(certConf);
+        }
+
+        boolean b = caManager.changeScep(entry);
+        output(b, "updated", "could not update", "SCEP responder " + caName);
         return null;
     }
 }

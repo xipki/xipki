@@ -94,6 +94,7 @@ import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
+import org.xipki.security.api.KeyCertPair;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11Control;
 import org.xipki.security.api.p11.P11CryptService;
@@ -1026,6 +1027,76 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             signerTypeMapping.put(alias, signerType);
             LOG.info("add alias '" + alias + "' for signerType '" + signerType + "'");
         }
+    }
+
+    @Override
+    public KeyCertPair createPrivateKeyAndCert(String type, String conf, X509Certificate cert)
+    throws SignerException
+    {
+        if("PKCS11".equalsIgnoreCase(type) == false && "PKCS12".equalsIgnoreCase(type) == false)
+        {
+            throw new SignerException("unsupported SCEP responder type '" + type + "'");
+        }
+
+        CmpUtf8Pairs keyValues = new CmpUtf8Pairs(conf);
+
+        String passwordHint = keyValues.getValue("password");
+        char[] password;
+        if(passwordHint == null)
+        {
+            password = null;
+        }
+        else
+        {
+            if(passwordResolver == null)
+            {
+                password = passwordHint.toCharArray();
+            }
+            else
+            {
+                try
+                {
+                    password = passwordResolver.resolvePassword(passwordHint);
+                }catch(PasswordResolverException e)
+                {
+                    throw new SignerException("could not resolve password. Message: " + e.getMessage());
+                }
+            }
+        }
+
+        String s = keyValues.getValue("keystore");
+        String keyLabel = keyValues.getValue("key-label");
+
+        InputStream keystoreStream;
+        if(StringUtil.startsWithIgnoreCase(s, "base64:"))
+        {
+            keystoreStream = new ByteArrayInputStream(
+                    Base64.decode(s.substring("base64:".length())));
+        }
+        else if(StringUtil.startsWithIgnoreCase(s, "file:"))
+        {
+            String fn = s.substring("file:".length());
+            try
+            {
+                keystoreStream = new FileInputStream(IoUtil.expandFilepath(fn));
+            } catch (FileNotFoundException e)
+            {
+                throw new SignerException("file not found: " + fn);
+            }
+        }
+        else
+        {
+            throw new SignerException("unknown keystore content format");
+        }
+
+        SoftTokenContentSignerBuilder signerBuilder = new SoftTokenContentSignerBuilder(
+                type, keystoreStream, password, keyLabel, password,
+                cert == null ? null : new X509Certificate[]{cert});
+
+        KeyCertPair keycertPair = new KeyCertPair(
+                signerBuilder.getKey(), signerBuilder.getCert());
+        // TODO: validiate whether private key and certificate match
+        return keycertPair;
     }
 
 }

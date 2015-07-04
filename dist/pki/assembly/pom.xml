@@ -349,7 +349,7 @@
                     <descriptor>src/main/descriptors/unix-bin.xml</descriptor>
                   </descriptors>
                   <appendAssemblyId>false</appendAssemblyId>
-                  <tarLongFileMode>gnu</tarLongFileMode>
+                  <tarLongFileMode>posix</tarLongFileMode>
                 </configuration>
               </execution>
             </executions>

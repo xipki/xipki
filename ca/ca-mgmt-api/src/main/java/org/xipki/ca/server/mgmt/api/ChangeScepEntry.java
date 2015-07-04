@@ -33,59 +33,82 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.mgmt.shell;
+package org.xipki.ca.server.mgmt.api;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.ScepEntry;
+import java.io.Serializable;
+
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.util.IoUtil;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "scep-add", description="add SCEP")
-public class ScepAddCommand extends CaCommand
+public class ChangeScepEntry implements Serializable
 {
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    private String caName;
+    private static final long serialVersionUID = 1L;
 
-    @Option(name = "--resp-type",
-            required = true,
-            description = "type of the responder\n"
-                    + "(required)")
+    private final String caName;
     private String responderType;
-
-    @Option(name = "--resp-conf",
-            description = "conf of the responder")
     private String responderConf;
+    private String base64Cert;
+    private String control;
 
-    @Option(name = "--resp-cert",
-            description = "responder certificate file")
-    private String certFile;
-
-    @Override
-    protected Object _doExecute()
-    throws Exception
+    public ChangeScepEntry(
+            final String caName)
+    throws ConfigurationException
     {
-        String base64Cert = null;
-        if(certFile != null)
-        {
-            base64Cert= IoUtil.base64Encode(IoUtil.read(certFile), false);
-        }
-
-        ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert, null);
-        if(entry.isFaulty())
-        {
-            throw new ConfigurationException("certificate is invalid");
-        }
-
-        boolean b = caManager.addScep(entry);
-        output(b, "added", "could not add", "SCEP responder " + caName);
-        return null;
+        ParamChecker.assertNotBlank("caName", caName);
+        this.caName = caName;
     }
+
+    public String getCaName()
+    {
+        return caName;
+    }
+
+    public String getResponderType()
+    {
+        return responderType;
+    }
+
+    public void setResponderType(
+            final String responderType)
+    {
+        this.responderType = responderType;
+    }
+
+    public String getResponderConf()
+    {
+        return responderConf;
+    }
+
+    public void setResponderConf(
+            final String responderConf)
+    {
+        this.responderConf = responderConf;
+    }
+
+    public String getBase64Cert()
+    {
+        return base64Cert;
+    }
+
+    public void setBase64Cert(
+            final String base64Cert)
+    {
+        this.base64Cert = base64Cert;
+    }
+
+    public String getControl()
+    {
+        return control;
+    }
+
+    public void setCrlControl(
+            final String control)
+    {
+        this.control = control;
+    }
+
 }

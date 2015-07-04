@@ -45,9 +45,9 @@ import org.apache.karaf.shell.commands.Option;
 @Command(scope = "xipki-ca", name = "scep-rm", description="remove SCEP")
 public class ScepRemoveCommand extends CaCommand
 {
-    @Option(name = "--name",
+    @Option(name = "--ca",
             required = true,
-            description = "SCEP name\n"
+            description = "SCEP CA name\n"
                     + "(required)")
     private String name;
 
@@ -56,7 +56,7 @@ public class ScepRemoveCommand extends CaCommand
     throws Exception
     {
         boolean b = caManager.removeScep(name);
-        output(b, "removed", "could not remove", "SCEP with name " + name);
+        output(b, "removed", "could not remove", "SCEP for CA " + name);
         return null;
     }
 }
