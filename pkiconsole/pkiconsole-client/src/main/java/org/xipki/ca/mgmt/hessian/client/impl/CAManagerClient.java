@@ -56,6 +56,7 @@ import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCAEntry;
+import org.xipki.ca.server.mgmt.api.ChangeScepEntry;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
@@ -696,8 +697,7 @@ public class CAManagerClient implements CAManager
             final String cnRegex)
     throws CAMgmtException
     {
-		// TODO Auto-generated method stub
-        return false;
+        return client.changeUser(username, password, cnRegex);
     }
 
     @Override
@@ -705,8 +705,7 @@ public class CAManagerClient implements CAManager
             final String username)
     throws CAMgmtException
     {
-		// TODO Auto-generated method stub
-        return null;
+        return client.getUser(username);
     }
 
     @Override
@@ -726,13 +725,10 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public boolean changeScep(
-            final String name,
-            final String caName,
-            final String profileName)
+    public boolean changeScep(ChangeScepEntry scepEntry)
     throws CAMgmtException
     {
-        return client.changeScep(name, caName, profileName);
+        return client.changeScep(scepEntry);
     }
 
     @Override
@@ -742,10 +738,10 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public ScepEntry getScep(String name)
+    public ScepEntry getScepEntry(String name)
     throws CAMgmtException
     {
-        return client.getScep(name);
+        return client.getScepEntry(name);
     }
 
     public static void main(

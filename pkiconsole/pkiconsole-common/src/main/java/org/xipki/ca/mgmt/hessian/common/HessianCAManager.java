@@ -48,6 +48,7 @@ import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCAEntry;
+import org.xipki.ca.server.mgmt.api.ChangeScepEntry;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
@@ -356,15 +357,13 @@ public interface HessianCAManager
             String name)
     throws HessianCAMgmtException;
 
-    boolean changeScep(
-            String name,
-            String caName,
-            String profileName)
+    public boolean changeScep(
+            ChangeScepEntry scepEntry)
     throws HessianCAMgmtException;
 
     Set<String> getScepNames();
 
-    ScepEntry getScep(
+    ScepEntry getScepEntry(
             String name)
     throws HessianCAMgmtException;
 }
