@@ -1587,8 +1587,11 @@ public class OcspServer
 
         Set<Certificate> certstore = new HashSet<>();
 
-        Set<X509Certificate> trustAnchros = requestOption.getTrustAnchors();
-        certstore.addAll(trustAnchros);
+        Set<CertWithEncoded> trustAnchors = requestOption.getTrustAnchors();
+        for(CertWithEncoded m : trustAnchors)
+        {
+            certstore.add(m.getCertificate());
+        }
 
         final int n = certsInReq.length;
         if(n > 1)
@@ -1638,9 +1641,13 @@ public class OcspServer
 
         for(int i = certpath.length - 1; i >= 0; i--)
         {
-            if(trustAnchros.contains(certpath[i]))
+            X509Certificate targetCert = certpath[i];
+            for(CertWithEncoded m : trustAnchors)
             {
-                return true;
+                if(m.equalsCert(targetCert))
+                {
+                    return true;
+                }
             }
         }
 
