@@ -37,24 +37,30 @@ package org.xipki.security.shell;
 
 import java.io.File;
 import java.security.MessageDigest;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.karaf.shell.commands.Option;
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.qualified.BiometricData;
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
@@ -67,6 +73,7 @@ import org.xipki.common.KeyUsage;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.SignatureAlgoControl;
 import org.xipki.common.util.AlgorithmUtil;
+import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
@@ -105,6 +112,10 @@ public abstract class CertRequestGenCommand extends SecurityCommand
             description = "output file name\n"
                     + "(required)")
     private String outputFilename;
+
+    @Option(name = "--challenge-password", aliases = "-c",
+            description = "Challenge password")
+    private String challengePassword;
 
     @Option(name = "--keyusage",
             multiValued = true,
@@ -188,6 +199,7 @@ public abstract class CertRequestGenCommand extends SecurityCommand
 
         // SubjectAltNames
         List<Extension> extensions = new LinkedList<>();
+
         if(isNotEmpty(subjectAltNames))
         {
             extensions.add(P10RequestGenerator.createExtensionSubjectAltName(subjectAltNames, false));
@@ -336,6 +348,18 @@ public abstract class CertRequestGenCommand extends SecurityCommand
             subjectDN = cert.getSubject();
         }
 
+        Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
+        if(CollectionUtil.isNotEmpty(extensions))
+        {
+            attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest,
+                    new Extensions(extensions.toArray(new Extension[0])));
+        }
+
+        if(StringUtil.isNotBlank(challengePassword))
+        {
+            attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword,
+                    new DERPrintableString(challengePassword));
+        }
         SubjectPublicKeyInfo subjectPublicKeyInfo = cert.getSubjectPublicKeyInfo();
 
         ContentSigner signer = identifiedSigner.borrowContentSigner();
@@ -343,7 +367,7 @@ public abstract class CertRequestGenCommand extends SecurityCommand
         PKCS10CertificationRequest p10Req;
         try
         {
-            p10Req  = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN, extensions);
+            p10Req  = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN, attributes);
         }finally
         {
             identifiedSigner.returnContentSigner(signer);
