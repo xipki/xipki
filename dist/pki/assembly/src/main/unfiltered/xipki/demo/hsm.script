@@ -241,5 +241,4 @@ xipki-ca:careq-add \
   --profile all \
   --ca SubCAwithCRL1
 
-## Restart the CA
-xipki-ca:restart
+source ./xipki/demo/scep-server.script

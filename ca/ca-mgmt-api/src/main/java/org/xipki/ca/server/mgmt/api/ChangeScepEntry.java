@@ -59,7 +59,7 @@ public class ChangeScepEntry implements Serializable
     throws ConfigurationException
     {
         ParamChecker.assertNotBlank("caName", caName);
-        this.caName = caName;
+        this.caName = caName.toUpperCase();
     }
 
     public String getCaName()

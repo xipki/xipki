@@ -33,54 +33,54 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl.scep;
+package org.xipki.ca.scep.client.shell;
 
-import java.io.IOException;
-import java.security.cert.CertificateException;
+import java.io.File;
+import java.math.BigInteger;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cms.CMSAbsentContent;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSSignedData;
-import org.bouncycastle.cms.CMSSignedDataGenerator;
-import org.bouncycastle.util.Arrays;
-import org.xipki.common.ParamChecker;
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.scep4j.client.ScepClient;
 
 /**
-*
-* @author Lijun Liao
-*
-*/
+ * @author Lijun Liao
+ */
 
-class CACertRespBytes
+@Command(scope = "scep", name = "getcert", description="download certificate")
+public class GetCertCommand extends ClientCommand
 {
-    private final byte[] bytes;
+    @Option(name = "--serial", aliases = "-s",
+            required = true,
+            description = "serial number\n"
+                    + "(required)")
+    private String serialNumber;
 
-    CACertRespBytes(
-            final X509Certificate cACert,
-            final X509Certificate responderCert)
-    throws CMSException, CertificateException
+    @Option(name = "--out", aliases = "-o",
+            required = true,
+            description = "where to save the certificate\n"
+                    + "(required)")
+    private String outputFile;
+
+    @Override
+    protected Object _doExecute()
+    throws Exception
     {
-        ParamChecker.assertNotNull("cACert", cACert);
-        ParamChecker.assertNotNull("responderCert", responderCert);
-
-        CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
-        try
+        ScepClient client = getScepClient();
+        BigInteger serial = toBigInt(serialNumber);
+        X509Certificate caCert = client.getAuthorityCertStore().getCACert();
+        X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
+        List<X509Certificate> certs = client.scepGetCert(getIdentityKey(), getIdentityCert(),
+                caSubject, serial);
+        if(certs == null || certs.isEmpty())
         {
-            cmsSignedDataGen.addCertificate(new X509CertificateHolder(cACert.getEncoded()));
-            cmsSignedDataGen.addCertificate(new X509CertificateHolder(responderCert.getEncoded()));
-            CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
-            bytes = degenerateSignedData.getEncoded();
-        } catch (IOException e)
-        {
-            throw new CMSException("could not build CMS SignedDta");
+            throw new CmdFailure("received no certficate from server");
         }
-    }
 
-    byte[] getBytes()
-    {
-        return Arrays.clone(bytes);
+        saveVerbose("saved certificate to file", new File(outputFile), certs.get(0).getEncoded());
+        return null;
     }
-
 }

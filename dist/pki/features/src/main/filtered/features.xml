@@ -97,6 +97,13 @@
     <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki/security-shell/${project.version}</bundle>
   </feature>
+  <feature name="xipki-scepclient-shell" version="${project.version}" resolver="(obr)">
+    <feature>bouncycastle</feature>
+    <bundle>mvn:org.xipki.scep4j/scep4j-common/${scep4j.version}</bundle>
+    <bundle>mvn:org.xipki.scep4j/scep4j-client/${scep4j.version}</bundle>
+    <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki/scep-client-shell/${project.version}</bundle>
+  </feature>
   <feature name="xipki-ocspserver" version="${project.version}" resolver="(obr)">
     <feature>xipki-datasource</feature>
     <feature>xipki-security</feature>

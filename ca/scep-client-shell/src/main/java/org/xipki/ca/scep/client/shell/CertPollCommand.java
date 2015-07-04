@@ -33,54 +33,58 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl.scep;
+package org.xipki.ca.scep.client.shell;
 
-import java.io.IOException;
-import java.security.cert.CertificateException;
+import java.io.File;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cms.CMSAbsentContent;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSSignedData;
-import org.bouncycastle.cms.CMSSignedDataGenerator;
-import org.bouncycastle.util.Arrays;
-import org.xipki.common.ParamChecker;
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.scep4j.client.EnrolmentResponse;
+import org.xipki.scep4j.client.ScepClient;
 
 /**
-*
-* @author Lijun Liao
-*
-*/
+ * @author Lijun Liao
+ */
 
-class CACertRespBytes
+@Command(scope = "scep", name = "certpoll", description="poll certificate")
+public class CertPollCommand extends ClientCommand
 {
-    private final byte[] bytes;
+    @Option(name = "--out", aliases = "-o",
+            required = true,
+            description = "where to save the certificate\n"
+                    + "(required)")
+    private String outputFile;
 
-    CACertRespBytes(
-            final X509Certificate cACert,
-            final X509Certificate responderCert)
-    throws CMSException, CertificateException
+    @Override
+    protected Object _doExecute()
+    throws Exception
     {
-        ParamChecker.assertNotNull("cACert", cACert);
-        ParamChecker.assertNotNull("responderCert", responderCert);
+        ScepClient client = getScepClient();
+        X509Certificate caCert = client.getAuthorityCertStore().getCACert();
+        X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
 
-        CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
-        try
+        EnrolmentResponse resp = client.scepCertPoll(getIdentityKey(), getIdentityCert(), caSubject);
+        if(resp.isFailure())
         {
-            cmsSignedDataGen.addCertificate(new X509CertificateHolder(cACert.getEncoded()));
-            cmsSignedDataGen.addCertificate(new X509CertificateHolder(responderCert.getEncoded()));
-            CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
-            bytes = degenerateSignedData.getEncoded();
-        } catch (IOException e)
-        {
-            throw new CMSException("could not build CMS SignedDta");
+            throw new CmdFailure("server returned 'failure'");
         }
-    }
 
-    byte[] getBytes()
-    {
-        return Arrays.clone(bytes);
-    }
+        if(resp.isPending())
+        {
+            throw new CmdFailure("server returned 'pending'");
+        }
 
+        List<X509Certificate> certs = resp.getCertificates();
+        if(certs == null || certs.isEmpty())
+        {
+            throw new CmdFailure("received no certficate from server");
+        }
+
+        saveVerbose("saved certificate to file", new File(outputFile), certs.get(0).getEncoded());
+        return null;
+    }
 }

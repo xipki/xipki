@@ -112,8 +112,10 @@ public class ScepServlet extends HttpServlet
         service(request, response, true);
     }
 
-    private void service(final HttpServletRequest request,
-            final HttpServletResponse response, boolean post)
+    private void service(
+            final HttpServletRequest request,
+            final HttpServletResponse response,
+            final boolean post)
     throws ServletException, IOException
     {
         String requestURI = request.getRequestURI();

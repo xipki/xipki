@@ -1,0 +1,33 @@
+## Add SCEP support to SubCAwithCRL1
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out output/SCEP1.p12 \
+  --subject "CN=SCEP Responder1,O=xipki,C=DE"
+
+xipki-tk:req-p12 \
+  --p12 output/SCEP1.p12 \
+  --password 1234 \
+  --out output/SCEP1.p10
+
+xipki-ca:enroll-cert \
+  --ca SubCAwithCRL1 \
+  --p10 output/SCEP1.p10 \
+  --out output/SCEP1.der \
+  --profile OCSP
+
+xipki-tk:update-cert-p12 \
+  --p12 output/SCEP1.p12 \
+  --password 1234 \
+  --cert output/SCEP1.der
+
+xipki-ca:scep-add \
+  --ca SubCAwithCRL1 \
+  --resp-type PKCS12 \
+  --resp-conf password?1234%keystore?file:output/SCEP1.p12
+  
+## add user
+xipki-ca:user-add \
+  --name user1\
+  --password password1\
+  --cn-regex "SCEP-OCSP[1-9]{0,9}"

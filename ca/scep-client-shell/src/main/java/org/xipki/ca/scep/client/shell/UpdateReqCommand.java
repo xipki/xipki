@@ -33,32 +33,35 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl.scep;
+package org.xipki.ca.scep.client.shell;
 
-import org.xipki.common.ParamChecker;
-import org.xipki.scep4j.transaction.FailInfo;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+
+import org.apache.karaf.shell.commands.Command;
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.xipki.scep4j.client.EnrolmentResponse;
+import org.xipki.scep4j.client.ScepClient;
+import org.xipki.scep4j.client.exception.ScepClientException;
 
 /**
  * @author Lijun Liao
  */
 
-public class FailInfoException extends Exception
+@Command(scope = "scep", name = "update-req", description="enroll certificate via messageType UpdateReq")
+
+public class UpdateReqCommand extends AbstractEnrollCertCommand
 {
 
-    private static final long serialVersionUID = 1L;
-
-    private FailInfo failInfo;
-
-    public FailInfoException(
-            final FailInfo failInfo)
+    @Override
+    protected EnrolmentResponse requestCertificate(
+            final ScepClient client,
+            final CertificationRequest csr,
+            final PrivateKey identityKey,
+            final X509Certificate identityCert)
+    throws ScepClientException
     {
-        ParamChecker.assertNotNull("failInfo", failInfo);
-        this.failInfo = failInfo;
-    }
-
-    public FailInfo getFailInfo()
-    {
-        return failInfo;
+        return client.scepUpdateReq(csr, identityKey, identityCert);
     }
 
 }

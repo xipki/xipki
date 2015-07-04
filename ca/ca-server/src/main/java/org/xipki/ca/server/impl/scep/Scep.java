@@ -134,7 +134,8 @@ public class Scep
         this.caManager = caManager;
     }
 
-    public void refreshCA(SecurityFactory securityFactory)
+    public void refreshCA(
+            final SecurityFactory securityFactory)
     throws CAMgmtException
     {
         ParamChecker.assertNotNull("securityFactory", securityFactory);
@@ -206,7 +207,8 @@ public class Scep
         return caCaps;
     }
 
-    public void setCaCaps(CACaps caCaps)
+    public void setCaCaps(
+            final CACaps caCaps)
     {
         ParamChecker.assertNotNull("caCaps", caCaps);
         this.caCaps = caCaps;
@@ -217,7 +219,8 @@ public class Scep
         return cACertRespBytes;
     }
 
-    public boolean supportsCertProfile(String profileName)
+    public boolean supportsCertProfile(
+            final String profileName)
     throws CAMgmtException
     {
         return caManager.getX509CA(caName).supportsCertProfile(profileName);
@@ -229,8 +232,10 @@ public class Scep
         return caManager.getX509CA(caName).getCAInfo().getStatus();
     }
 
-    public ContentInfo servicePkiOperation(CMSSignedData requestContent,
-            String certProfileName, AuditEvent auditEvent)
+    public ContentInfo servicePkiOperation(
+            final CMSSignedData requestContent,
+            final String certProfileName,
+            final AuditEvent auditEvent)
     throws MessageDecodingException, OperationException
     {
     	// verify and decrypt the request
@@ -363,7 +368,9 @@ public class Scep
         return encodeResponse(rep, req);
     }
 
-    private SignedData getCert(X509CA ca, BigInteger serialNumber)
+    private SignedData getCert(
+            final X509CA ca,
+            final BigInteger serialNumber)
     throws FailInfoException, OperationException
     {
         X509Certificate cert;
@@ -382,7 +389,10 @@ public class Scep
         return buildSignedData(cert);
     }
 
-    private SignedData pollCert(X509CA ca, X500Name subject, TransactionId tid)
+    private SignedData pollCert(
+            final X509CA ca,
+            final X500Name subject,
+            final TransactionId tid)
     throws FailInfoException, OperationException
     {
         byte[] tidBytes = getTransactionIdBytes(tid);
@@ -406,7 +416,8 @@ public class Scep
         return buildSignedData(certs.get(0));
     }
 
-    private static SignedData buildSignedData(X509Certificate cert)
+    private static SignedData buildSignedData(
+            final X509Certificate cert)
     throws OperationException
     {
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
@@ -423,7 +434,9 @@ public class Scep
         }
     }
 
-    private SignedData getCRL(X509CA ca, BigInteger serialNumber)
+    private SignedData getCRL(
+            final X509CA ca,
+            final BigInteger serialNumber)
     throws FailInfoException, OperationException
     {
         try
@@ -447,7 +460,9 @@ public class Scep
         }
     }
 
-    private ContentInfo encodeResponse(PkiMessage response, DecodedPkiMessage request)
+    private ContentInfo encodeResponse(
+            final PkiMessage response,
+            final DecodedPkiMessage request)
     throws OperationException
     {
         String signatureAlgorithm = getSignatureAlgorithm(responderKey, request.getDigestAlgorithm());
@@ -466,7 +481,9 @@ public class Scep
 
     }
 
-    private static String getSignatureAlgorithm(PrivateKey key, ASN1ObjectIdentifier digestOid)
+    private static String getSignatureAlgorithm(
+            final PrivateKey key,
+            final ASN1ObjectIdentifier digestOid)
     {
         HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(digestOid.getId());
         if(hashAlgo == null)
@@ -483,7 +500,9 @@ public class Scep
         }
     }
 
-    private static void ensureIssuedByThisCA(X500Name thisCAX500Name, X500Name caX500Name)
+    private static void ensureIssuedByThisCA(
+            final X500Name thisCAX500Name,
+            final X500Name caX500Name)
     throws FailInfoException
     {
         if(thisCAX500Name.equals(caX500Name) == false)
@@ -493,7 +512,7 @@ public class Scep
     }
 
     static CMSSignedData createDegeneratedSigendData(
-            X509Certificate... certs)
+            final X509Certificate... certs)
     throws CMSException, CertificateException
     {
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
@@ -510,7 +529,8 @@ public class Scep
         }
     }
 
-    private static byte[] getTransactionIdBytes(TransactionId tid)
+    private static byte[] getTransactionIdBytes(
+            final TransactionId tid)
     {
         byte[] tidBytes;
         try
