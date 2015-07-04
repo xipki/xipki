@@ -1230,7 +1230,7 @@ implements CAManager, CmpResponderManager, ScepManager
         sceps.clear();
         scepDbEntries.clear();
 
-        List<String> names = queryExecutor.getNamesFromTable("SCEP");
+        List<String> names = queryExecutor.getNamesFromTable("SCEP", "CA_NAME");
 
         if(CollectionUtil.isNotEmpty(names))
         {
@@ -1405,6 +1405,11 @@ implements CAManager, CmpResponderManager, ScepManager
         {
             createCA(name);
             startCA(name);
+            Scep scep = sceps.get(name);
+            if(scep != null)
+            {
+                scep.refreshCA(securityFactory);
+            }
         }
 
         return changed;
@@ -2413,6 +2418,7 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamChecker.assertNotBlank("name", name);
         asssertMasterMode();
         name = name.toUpperCase();
+
         boolean b = queryExecutor.removeCA(name);
         if(b == false)
         {

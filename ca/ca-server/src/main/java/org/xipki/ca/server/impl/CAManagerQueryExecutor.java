@@ -380,7 +380,16 @@ class CAManagerQueryExecutor
             final String table)
     throws CAMgmtException
     {
-        final String sql = new StringBuilder("SELECT NAME FROM ").append(table).toString();
+        return getNamesFromTable(table, "NAME");
+    }
+
+    List<String> getNamesFromTable(
+            final String table,
+            final String nameColumn)
+    throws CAMgmtException
+    {
+        final String sql = new StringBuilder("SELECT ")
+                .append(nameColumn).append(" FROM ").append(table).toString();
         Statement stmt = null;
         ResultSet rs = null;
         try
@@ -392,7 +401,7 @@ class CAManagerQueryExecutor
 
             while(rs.next())
             {
-                String name = rs.getString("NAME");
+                String name = rs.getString(nameColumn);
                 if(StringUtil.isNotBlank(name))
                 {
                     names.add(name);
