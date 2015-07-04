@@ -261,7 +261,7 @@
       <column name="NAME" type="VARCHAR(200)">
         <constraints nullable="false"/>
       </column>
-      <column name="PASSWORD" type="VARCHAR(100)">
+      <column name="PASSWORD" type="VARCHAR(150)">
         <!-- hex salted hashed password: first byte identifies hash algorithm,
          second byte identifies length of salt, third and forth bytes specifies the iteration,
          following by the salt and hash value-->

@@ -458,3 +458,5 @@ feature:uninstall xipki-caclient-shell
 feature:uninstall xipki-caclient
 feature:uninstall xipki-camgmt-shell
 feature:uninstall xipki-security-shell
+
+source ./xipki/demo/scep.script

@@ -78,11 +78,11 @@ implements Serializable
     {
         ParamChecker.assertNotBlank("caName", caName);
         ParamChecker.assertNotBlank("responderType", responderType);
-        ParamChecker.assertNotNull("control", control);
+        ParamChecker.assertNotNull("responderConf", responderConf);
 
         this.base64Cert = base64Cert;
 
-        this.caName = caName;
+        this.caName = caName.toUpperCase();
         this.responderType = responderType;
         this.responderConf = responderConf;
         this.control = control;

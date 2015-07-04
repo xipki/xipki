@@ -1,0 +1,96 @@
+SCEP_URL = http://localhost:8080/scep/SubCAwithCRL/OCSP/pkiclient.exe
+
+#################################################################
+#              MANAGE CERTIFICATE WITH RA CLIENT                #
+#################################################################
+feature:install xipki-security-shell
+
+feature:install xipki-scepclient-shell
+
+# Wait two seconds
+sleep 2000
+
+# Prepare
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out output/SCEP-OCSP1.p12 \
+  --subject "CN=SCEP-OCSP1,O=xipki,C=DE"
+
+xipki-tk:req-p12 \
+  --p12 output/SCEP-OCSP1.p12 \
+  --password 1234 \
+  --out output/SCEP-OCSP1.p10
+
+## Enroll certificate via PKCSReq
+scep:pkcs-req \
+  --url $SCEP_URL \
+  --ca-cert output/SubCAwithCRL1.der \
+  --p12 output/SCEP-OCSP1.p12 \
+  --password 1234 \
+  --p10 output/SCEP-OCSP1.p10 \
+  --out output/SCEP-OCSP1.der \
+  --challenge-password "user1:password1"
+
+## Poll Cert
+scep:certpoll \
+  --url $SCEP_URL \
+  --ca-cert output/SubCAwithCRL1.der \
+  --p12 output/SCEP-OCSP1.p12 \
+  --password 1234 \
+  --out output/SCEP-OCSP1-certpoll.der \
+  
+## Get Cert
+
+scep:getcert \
+  --url $SCEP_URL \
+  --ca-cert output/SubCAwithCRL1.der \
+  --p12 output/SCEP-OCSP1.p12 \
+  --password 1234 \
+  --out output/SCEP-OCSP1-certpoll.der \
+
+## Update the certificate in PKCS#12 file
+xipki-tk:update-cert-p12 \
+  --p12 output/SCEP-OCSP1.p12 \
+  --password 1234 \
+  --cert output/SCEP-OCSP1.der \
+  --ca-cert output/SubCAwithCRL1.der \
+  --ca-cert output/RCA1.der
+
+## Get CRL
+xipki-cli:getcrl \
+  --ca SubCAwithCRL1 \
+  --out output/SubCAwithCRL1-get.crl
+  
+## Renewal
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out output/SCEP-OCSP2.p12 \
+  --subject "CN=SCEP-OCSP2,O=xipki,C=DE"
+
+xipki-tk:req-p12 \
+  --p12 output/SCEP-OCSP2.p12 \
+  --password 1234 \
+  --out output/SCEP-OCSP2.p10
+
+## Enroll certificate via Renewal, hence signed by the old key SCEP-OCSP1.p12
+scep:renewal-req \
+  --url $SCEP_URL \
+  --ca-cert output/SubCAwithCRL1.der \
+  --p12 output/SCEP-OCSP1.p12 \
+  --password 1234 \
+  --p10 output/SCEP-OCSP2.p10 \
+  --out output/SCEP-OCSP2.der \
+
+## Update the certificate in PKCS#12 file
+xipki-tk:update-cert-p12 \
+  --p12 output/SCEP-OCSP2.p12 \
+  --password 1234 \
+  --cert output/SCEP-OCSP2.der \
+  --ca-cert output/SubCAwithCRL2.der \
+  --ca-cert output/RCA2.der
+
+#################################################################
+#              UNINSTALL UNNEEDED FEATURES                      #
+#################################################################
+feature:uninstall xipki-scepclient-shell
+feature:uninstall xipki-security-shell

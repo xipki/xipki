@@ -38,20 +38,20 @@ package org.xipki.security;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUTF8String;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -80,11 +80,11 @@ public class P10RequestGenerator
             final String signerConf,
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
             final String subject,
-            final List<Extension> extensions)
+            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
     throws PasswordResolverException, SignerException
     {
         X500Name subjectDN = new X500Name(subject);
-        return generateRequest(securityFactory, signerType, signerConf, subjectPublicKeyInfo, subjectDN, extensions);
+        return generateRequest(securityFactory, signerType, signerConf, subjectPublicKeyInfo, subjectDN, attributes);
     }
 
     public PKCS10CertificationRequest generateRequest(
@@ -93,7 +93,7 @@ public class P10RequestGenerator
             final String signerConf,
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
             final X500Name subjectDN,
-            final List<Extension> extensions)
+            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
     throws PasswordResolverException, SignerException
     {
         ConcurrentContentSigner signer = securityFactory.createSigner(signerType, signerConf,
@@ -108,7 +108,7 @@ public class P10RequestGenerator
         }
         try
         {
-            return generateRequest(contentSigner, subjectPublicKeyInfo, subjectDN, extensions);
+            return generateRequest(contentSigner, subjectPublicKeyInfo, subjectDN, attributes);
         }finally
         {
             signer.returnContentSigner(contentSigner);
@@ -119,14 +119,16 @@ public class P10RequestGenerator
             final ContentSigner contentSigner,
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
             final X500Name subjectDN,
-            final List<Extension> extensions)
+            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
     {
         PKCS10CertificationRequestBuilder p10ReqBuilder =
                 new PKCS10CertificationRequestBuilder(subjectDN, subjectPublicKeyInfo);
-        if(CollectionUtil.isNotEmpty(extensions))
+        if(CollectionUtil.isNotEmpty(attributes))
         {
-            Extensions _extensions = new Extensions(extensions.toArray(new Extension[0]));
-            p10ReqBuilder.addAttribute(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest, _extensions);
+            for(ASN1ObjectIdentifier attrType : attributes.keySet())
+            {
+                p10ReqBuilder.addAttribute(attrType, attributes.get(attrType));
+            }
         }
         return p10ReqBuilder.build(contentSigner);
     }

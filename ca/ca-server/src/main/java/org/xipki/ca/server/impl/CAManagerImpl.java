@@ -3248,13 +3248,16 @@ implements CAManager, CmpResponderManager, ScepManager
             pairs = new CmpUtf8Pairs(typeMap);
         }catch(IllegalArgumentException e)
         {
-            LOG.error("CA environment {}: '{}' is not valid CMP UTF-8 pairs",typeMap, type);
+            LOG.error("CA environment {}: '{}"
+                    + ""
+                    + "' is not valid CMP UTF-8 pairs",typeMap, type);
             return null;
         }
         return pairs.getValue(type);
     }
 
-    static List<String[]> splitCASignerConfs(String conf)
+    static List<String[]> splitCASignerConfs(
+            final String conf)
     throws SignerException
     {
         CmpUtf8Pairs pairs = new CmpUtf8Pairs(conf);
@@ -3345,7 +3348,8 @@ implements CAManager, CmpResponderManager, ScepManager
         return b;
     }
 
-    public boolean changeScep(ChangeScepEntry scepEntry)
+    public boolean changeScep(
+            final ChangeScepEntry scepEntry)
     throws CAMgmtException
     {
         ParamChecker.assertNotNull("scepEntry", scepEntry);
@@ -3375,13 +3379,15 @@ implements CAManager, CmpResponderManager, ScepManager
     }
 
     @Override
-    public ScepEntry getScepEntry(String caName)
+    public ScepEntry getScepEntry(
+            final String caName)
     {
         return scepDbEntries == null ? null : scepDbEntries.get(caName);
     }
 
     @Override
-    public Scep getScep(String caName)
+    public Scep getScep(
+            final String caName)
     {
         return sceps == null ? null : sceps.get(caName);
     }

@@ -33,32 +33,51 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl.scep;
+package org.xipki.ca.scep.client.shell;
 
-import org.xipki.common.ParamChecker;
-import org.xipki.scep4j.transaction.FailInfo;
+import java.io.File;
+import java.security.cert.X509CRL;
+
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
+import org.bouncycastle.asn1.x509.Certificate;
+import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.scep4j.client.ScepClient;
 
 /**
  * @author Lijun Liao
  */
 
-public class FailInfoException extends Exception
+@Command(scope = "scep", name = "getcrl", description="download CRL")
+public class GetCRLCommand extends ClientCommand
 {
+    @Option(name = "--cert", aliases = "-c",
+            required = true,
+            description = "certificate\n"
+                    + "(required)")
+    private String certFile;
 
-    private static final long serialVersionUID = 1L;
+    @Option(name = "--out", aliases = "-o",
+            required = true,
+            description = "where to save the certificate\n"
+                    + "(required)")
+    private String outputFile;
 
-    private FailInfo failInfo;
-
-    public FailInfoException(
-            final FailInfo failInfo)
+    @Override
+    protected Object _doExecute()
+    throws Exception
     {
-        ParamChecker.assertNotNull("failInfo", failInfo);
-        this.failInfo = failInfo;
-    }
+        Certificate cert = Certificate.getInstance(IoUtil.read(certFile));
+        ScepClient client = getScepClient();
+        X509CRL crl = client.scepGetCRL(getIdentityKey(), getIdentityCert(),
+                cert.getIssuer(), cert.getSerialNumber().getPositiveValue());
+        if(crl == null)
+        {
+            throw new CmdFailure("received no CRL from server");
+        }
 
-    public FailInfo getFailInfo()
-    {
-        return failInfo;
+        saveVerbose("saved CRL to file", new File(outputFile), crl.getEncoded());
+        return null;
     }
-
 }
