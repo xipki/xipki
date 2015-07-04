@@ -139,7 +139,6 @@ public class DbCertStatusStore extends CertStatusStore
         this.issuerFilter = issuerFilter;
     }
 
-    @SuppressWarnings("resource")
     private synchronized void initIssuerStore()
     {
         try

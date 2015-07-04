@@ -90,7 +90,7 @@ class RequestOption
     private final int nonceMinLen;
     private final int nonceMaxLen;
     private final Set<HashAlgoType> hashAlgos;
-    private final Set<X509Certificate> trustAnchors;
+    private final Set<CertWithEncoded> trustAnchors;
     private final Set<X509Certificate> certs;
     private final CertpathValidationModel certpathValidationModel;
 
@@ -206,7 +206,12 @@ class RequestOption
 
             try
             {
-                this.trustAnchors = getCerts(certpathConf.getTrustAnchors());
+                Set<X509Certificate> tmpCerts = getCerts(certpathConf.getTrustAnchors());
+                trustAnchors = new HashSet<>(tmpCerts.size());
+                for(X509Certificate m : tmpCerts)
+                {
+                    trustAnchors.add(new CertWithEncoded(m));
+                }
             }catch(Exception e)
             {
                 throw new ConfigurationException("error while initializing the trustAnchors: " + e.getMessage(), e);
@@ -282,7 +287,7 @@ class RequestOption
         return certpathValidationModel;
     }
 
-    public Set<X509Certificate> getTrustAnchors()
+    public Set<CertWithEncoded> getTrustAnchors()
     {
         return trustAnchors;
     }
