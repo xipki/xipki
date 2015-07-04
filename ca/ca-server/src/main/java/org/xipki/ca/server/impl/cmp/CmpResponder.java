@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl;
+package org.xipki.ca.server.impl.cmp;
 
 import java.security.InvalidKeyException;
 import java.security.SecureRandom;

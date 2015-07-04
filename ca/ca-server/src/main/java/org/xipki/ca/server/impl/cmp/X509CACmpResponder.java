@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl;
+package org.xipki.ca.server.impl.cmp;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -124,6 +124,9 @@ import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.RequestorInfo;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.common.cmp.CmpUtil;
+import org.xipki.ca.server.impl.CAManagerImpl;
+import org.xipki.ca.server.impl.RemoveExpiredCertsInfo;
+import org.xipki.ca.server.impl.X509CA;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
@@ -147,7 +150,7 @@ import org.xml.sax.SAXException;
  * @author Lijun Liao
  */
 
-class X509CACmpResponder extends CmpResponder
+public class X509CACmpResponder extends CmpResponder
 {
     private static final Set<String> knownGenMsgIds = new HashSet<>();
 

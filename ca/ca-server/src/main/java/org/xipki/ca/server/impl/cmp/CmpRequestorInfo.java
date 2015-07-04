@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl;
+package org.xipki.ca.server.impl.cmp;
 
 import org.xipki.ca.api.RequestorInfo;
 import org.xipki.ca.api.X509CertWithDBCertId;
@@ -44,7 +44,7 @@ import org.xipki.common.ParamChecker;
  * @author Lijun Liao
  */
 
-class CmpRequestorInfo implements RequestorInfo
+public class CmpRequestorInfo implements RequestorInfo
 {
     private final CAHasRequestorEntry caHasRequestor;
     private final X509CertWithDBCertId cert;
