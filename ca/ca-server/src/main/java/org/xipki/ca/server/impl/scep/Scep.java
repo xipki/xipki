@@ -42,7 +42,9 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.ContentInfo;
@@ -75,6 +77,7 @@ import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.scep4j.crypto.HashAlgoType;
 import org.xipki.scep4j.exception.MessageDecodingException;
@@ -86,7 +89,6 @@ import org.xipki.scep4j.message.EnvelopedDataDecryptorInstance;
 import org.xipki.scep4j.message.IssuerAndSubject;
 import org.xipki.scep4j.message.PkiMessage;
 import org.xipki.scep4j.transaction.CACapability;
-import org.xipki.scep4j.transaction.FailInfo;
 import org.xipki.scep4j.transaction.MessageType;
 import org.xipki.scep4j.transaction.Nonce;
 import org.xipki.scep4j.transaction.PkiStatus;
@@ -126,6 +128,12 @@ public class Scep
         this.caName = dbEntry.getCaName();
         this.dbEntry = dbEntry;
         this.caManager = caManager;
+    }
+
+    public long getMaxSigningTimeBiasInMs()
+    {
+    	// TODO: make it configurable
+        return 5L * 60 * 1000;
     }
 
     public void refreshCA()
@@ -231,6 +239,7 @@ public class Scep
     {
     	// verify and decrypt the request
         DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, envelopedDataDecryptor);
+
         PkiMessage rep = new PkiMessage(req.getTransactionId(), MessageType.CertRep, Nonce.randomNonce());
         rep.setRecipientNonce(req.getSenderNonce());
 
@@ -243,13 +252,34 @@ public class Scep
         	// TODO log
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
+
         X500Name caX500Name = ca.getCAInfo().getCertificate().getSubjectAsX500Name();
 
         try
         {
+            Date signingTime = req.getSigningTime();
+            long maxSigningTimeBias = getMaxSigningTimeBiasInMs();
+            if(maxSigningTimeBias > 0)
+            {
+                if(signingTime == null)
+                {
+                    throw FailInfoException.badTime;
+                }
+
+                long now = System.currentTimeMillis();
+                long diff = now - signingTime.getTime();
+                if(diff < 0)
+                {
+                    diff = -1 * diff;
+                }
+                if(diff > maxSigningTimeBias)
+                {
+                    throw FailInfoException.badTime;
+                }
+            }
+
             SignedData signedData;
 
-	        //TODO: check the time
             MessageType mt = req.getMessageType();
             switch(mt)
             {
@@ -258,6 +288,12 @@ public class Scep
                 case UpdateReq:
                 {
                     CertificationRequest p10Req = (CertificationRequest) req.getMessageData();
+                    if(caManager.getSecurityFactory().verifyPOPO(p10Req) == false)
+                    {
+                    	// TODO LOG
+                        throw FailInfoException.badMessageCheck;
+                    }
+
                     CertificationRequestInfo p10ReqInfo = p10Req.getCertificationRequestInfo();
 
                     Extensions extensions = X509Util.getExtensions(p10ReqInfo);
@@ -268,38 +304,69 @@ public class Scep
                             reqSignatureCert.getIssuerX500Principal());
                     String user = null;
 
-                    if(selfSigned == false &&
-                            ca.knowsCertificate(reqSignatureCert) == false)
+                    String cn = X509Util.getCommonName(p10ReqInfo.getSubject());
+                    if(cn == null)
                     {
-                		// TODO log
-                        throw new FailInfoException(FailInfo.badRequest);
+                        throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+                                "no CommonName in requested subject");
+                    }
+
+                    if(selfSigned)
+                    {
+                        if(MessageType.PKCSReq != mt)
+                        {
+                        	// TODO log
+                            throw FailInfoException.badRequest;
+                        }
+
+                        String challengePwd = X509Util.getChallengePassword(p10ReqInfo);
+                        if(challengePwd == null)
+                        {
+                    		// TODO LOG
+                            throw FailInfoException.badRequest;
+                        }
+
+                        String[] strs = challengePwd.split(":");
+                        if(strs == null || strs.length != 2)
+                        {
+                        	// TODO LOG
+                            throw FailInfoException.badRequest;
+                        }
+                        user = strs[0];
+                        String password = strs[1];
+
+                        if(ca.authenticateUser(user, password.getBytes()) == false)
+                        {
+                    		// TODO log
+                            throw FailInfoException.badRequest;
+                        }
+
+                        String cnRegex = ca.getCNRegexForUser(user);
+                        if(StringUtil.isNotBlank(cnRegex))
+                        {
+                            Pattern pattern = Pattern.compile(cnRegex);
+                            if(pattern.matcher(cn).matches() == false)
+                            {
+                                throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+                                        "commonName in requested subject '" + cn + "' is not permitted");
+                            }
+                        }
                     } else
                     {
-                        if(MessageType.PKCSReq == mt)
+		        		// up to draft-nourse-scep-23 the client sends all messages to enroll certificate
+		        		// via MessageType PKCSReq
+                        if(ca.knowsCertificate(reqSignatureCert) == false)
                         {
-    		        		// up to draft-nourse-scep-23 the client sends all messages to enrol certificate
-    		        		// via MessageType PKCSReq
-                            String challengePwd = X509Util.getChallengePassword(p10ReqInfo);
-                            if(challengePwd == null)
-                            {
-                        		// TODO LOG
-                                throw new FailInfoException(FailInfo.badRequest);
-                            }
+                    		// TODO log
+                            throw FailInfoException.badRequest;
+                        }
 
-                            String[] strs = challengePwd.split(":");
-                            if(strs == null || strs.length != 2)
-                            {
-                            	// TODO LOG
-                                throw new FailInfoException(FailInfo.badRequest);
-                            }
-                            user = strs[0];
-                            String password = strs[1];
-
-                            if(ca.authenticateUser(user, password.getBytes()) == false)
-                            {
-                        		// TODO log
-                                throw new FailInfoException(FailInfo.badRequest);
-                            }
+                    	// only the same subject is permitted
+                        String cnInSignatureCert = X509Util.getCommonName(
+                                X500Name.getInstance(reqSignatureCert.getSubjectX500Principal()));
+                        if(cn.equals(cnInSignatureCert) == false)
+                        {
+                            throw FailInfoException.badRequest;
                         }
                     }
 
@@ -347,7 +414,7 @@ public class Scep
                 default:
                 {
                     LOG.error("unknown SCEP messageType '{}'", req.getMessageType());
-                    throw new FailInfoException(FailInfo.badRequest);
+                    throw FailInfoException.badRequest;
                 }
             } // end switch
 
@@ -378,7 +445,7 @@ public class Scep
         }
         if(cert == null)
         {
-            throw new FailInfoException(FailInfo.badCertId);
+            throw FailInfoException.badCertId;
         }
         return buildSignedData(cert);
     }
@@ -398,13 +465,13 @@ public class Scep
 
         if(CollectionUtil.isEmpty(certs))
         {
-            throw new FailInfoException(FailInfo.badCertId);
+            throw FailInfoException.badCertId;
         }
 
         if(certs.size() > 1)
         {
         	// TODO
-            throw new FailInfoException(FailInfo.badCertId);
+            throw FailInfoException.badCertId;
         }
 
         return buildSignedData(certs.get(0));
@@ -438,7 +505,7 @@ public class Scep
             CertificateList crl = ca.getCurrentCRL();
             if(crl == null)
             {
-                throw new FailInfoException(FailInfo.badRequest);
+                throw FailInfoException.badRequest;
             }
             CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
             cmsSignedDataGen.addCRL(new X509CRLHolder(crl));
@@ -501,7 +568,7 @@ public class Scep
     {
         if(thisCAX500Name.equals(caX500Name) == false)
         {
-            throw new FailInfoException(FailInfo.badCertId);
+            throw FailInfoException.badCertId;
         }
     }
 
