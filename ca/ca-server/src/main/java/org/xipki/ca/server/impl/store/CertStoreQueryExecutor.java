@@ -1759,17 +1759,9 @@ class CertStoreQueryExecutor
     throws DataAccessException, OperationException
     {
         final String sql = dataSource.createFetchFirstSelectSQL(
-                "PASSWORD FROM USERNAME WHERE USER=?", 1);
+                "PASSWORD FROM USERNAME WHERE NAME=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
-        String passwordText;
-        try
-        {
-            passwordText = PasswordHash.createHash(password);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e)
-        {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
-        }
 
         try
         {
@@ -1782,7 +1774,18 @@ class CertStoreQueryExecutor
             }
 
             String expPasswordText = rs.getString("PASSWORD");
-            return expPasswordText != null && expPasswordText.equals(passwordText);
+            if(StringUtil.isBlank(expPasswordText))
+            {
+                return false;
+            }
+
+            try
+            {
+                return PasswordHash.validatePassword(password, expPasswordText);
+            } catch (NoSuchAlgorithmException | InvalidKeySpecException e)
+            {
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+            }
         }catch(SQLException e)
         {
             throw dataSource.translate(sql, e);
@@ -1796,7 +1799,7 @@ class CertStoreQueryExecutor
     throws DataAccessException, OperationException
     {
         final String sql = dataSource.createFetchFirstSelectSQL(
-                "CN_REGEX FROM USERNAME WHERE USER=?", 1);
+                "CN_REGEX FROM USERNAME WHERE NAME=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
