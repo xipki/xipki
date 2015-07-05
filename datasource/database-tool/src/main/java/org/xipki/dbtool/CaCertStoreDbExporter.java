@@ -62,6 +62,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.LruCache;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
@@ -115,6 +116,8 @@ class CaCertStoreDbExporter extends DbPorter
     private final String table_profile;
     private final String table_requestor;
     private final String table_publisher;
+
+    private final LruCache<Integer, String> userIdNameMap = new LruCache<>(100);
 
     CaCertStoreDbExporter(
             final DataSourceWrapper dataSource,
@@ -445,19 +448,16 @@ class CaCertStoreDbExporter extends DbPorter
     {
         System.out.println("exporting table USERNAME");
         UsersFiles usersFiles = new UsersFiles();
+        if(dbSchemaVersion > 1)
+        {
+            certstore.setUsersFiles(usersFiles);
+            System.out.println(" exported 0 users from table USERNAME");
+            return;
+        }
 
         final String tableName = "USERNAME";
         final int minId = (int) getMin(tableName, "ID");
-        String coreSql;
-        if(dbSchemaVersion > 1)
-        {
-            coreSql = "ID, NAME, PASSWORD, CN_REGEX FROM " + tableName + " WHERE ID >= ?";
-        }
-        else
-        {
-            coreSql = "ID, NAME FROM " + tableName + " WHERE ID >= ?";
-        }
-
+        String coreSql = "ID, NAME, PASSWORD, CN_REGEX FROM " + tableName + " WHERE ID >= ?";
         final int rows = 100;
         final String sql = dataSource.createFetchFirstSelectSQL(coreSql, rows, "ID ASC");
 
@@ -509,14 +509,11 @@ class CaCertStoreDbExporter extends DbPorter
                     UserType user = new UserType();
                     user.setId(id);
                     user.setName(name);
-                    if(dbSchemaVersion > 1)
-                    {
-                        String password = rs.getString("PASSWORD");
-                        user.setPassword(password);
+                    String password = rs.getString("PASSWORD");
+                    user.setPassword(password);
 
-                        String cnRegex = rs.getString("CN_REGEX");
-                        user.setCnRegex(cnRegex);
-                    }
+                    String cnRegex = rs.getString("CN_REGEX");
+                    user.setCnRegex(cnRegex);
                     usersInCurrentFile.getUser().add(user);
 
                     numUsersInCurrentFile ++;
@@ -686,9 +683,12 @@ class CaCertStoreDbExporter extends DbPorter
         certSql.append(col_revInvTime).append(", ");
         if(dbSchemaVersion > 1)
         {
-            certSql.append("ART, REQ_TYPE, TID");
+            certSql.append("ART, REQ_TYPE, TID, USER, ");
+        }else
+        {
+            certSql.append("USER_ID, ");
         }
-        certSql.append("USER_ID, LAST_UPDATE, REVOKED, REV_REASON, REV_TIME, ");
+        certSql.append("LAST_UPDATE, REVOKED, REV_REASON, REV_TIME, ");
         certSql.append(col_revInvTime);
         certSql.append(" FROM CERT WHERE ID >= ? AND ID < ? ORDER BY ID ASC");
 
@@ -843,10 +843,26 @@ class CaCertStoreDbExporter extends DbPorter
                         }
                     }
 
-                    int user_id = rs.getInt("USER_ID");
-                    if(user_id != 0)
+                    String user = null;
+                    if(dbSchemaVersion > 1)
                     {
-                        cert.setUserId(user_id);
+                        user = rs.getString("USER");
+                    }
+                    else
+                    {
+                        int user_id = rs.getInt("USER_ID");
+                        if(user_id != 0)
+                        {
+                            user = getUserName(user_id);
+                            if(user == null)
+                            {
+                                throw new DataAccessException("found no entry in table USERNAME with ID '" + user_id + "'");
+                            }
+                        }
+                    }
+                    if(user != null)
+                    {
+                        cert.setUser(user);
                     }
                     cert.setCertFile(sha1_cert + ".der");
 
@@ -1074,4 +1090,36 @@ class CaCertStoreDbExporter extends DbPorter
         return info;
     }
 
+    private String getUserName(int id)
+    throws DataAccessException
+    {
+        String name = userIdNameMap.get(id);
+        if(name != null)
+        {
+            return name;
+        }
+
+        String coreSql = "NAME FROM USERNAME WHERE ID=?";
+        String sql = dataSource.createFetchFirstSelectSQL(coreSql, 1);
+        PreparedStatement ps = prepareStatement(sql);
+        ResultSet rs = null;
+        try
+        {
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+            if(rs.next())
+            {
+                name = rs.getString("NAME");
+                userIdNameMap.put(id, name);
+                return name;
+            }
+            return null;
+        }catch(SQLException e)
+        {
+            throw translate(sql, e);
+        }finally
+        {
+            releaseResources(ps, rs);
+        }
+    }
 }

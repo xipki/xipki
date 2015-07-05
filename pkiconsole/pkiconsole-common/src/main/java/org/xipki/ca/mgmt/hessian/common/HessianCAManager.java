@@ -345,6 +345,10 @@ public interface HessianCAManager
             String cnRegex)
     throws HessianCAMgmtException;
 
+    boolean removeUser(
+            final String username)
+    throws HessianCAMgmtException;
+
     UserEntry getUser(
             String username)
     throws HessianCAMgmtException;

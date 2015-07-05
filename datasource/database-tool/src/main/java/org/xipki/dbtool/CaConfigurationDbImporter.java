@@ -147,7 +147,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" imported CA configuration to database");
     }
 
-    @SuppressWarnings("resource")
     private void import_cmpcontrol(
             final Cmpcontrols controls)
     throws DataAccessException
@@ -185,7 +184,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" imported table CMPCONTROL");
     }
 
-    @SuppressWarnings("resource")
     private void import_responder(
             final Responders responders)
     throws DataAccessException
@@ -228,7 +226,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" imported table RESPONDER");
     }
 
-    @SuppressWarnings("resource")
     private void import_environment(
             final Environments environments)
     throws DataAccessException
@@ -260,7 +257,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" imported table ENVIRONMENT");
     }
 
-    @SuppressWarnings("resource")
     private void import_crlsigner(
             final Crlsigners crlsigners)
     throws DataAccessException
@@ -297,7 +293,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" imported table CRLSIGNER");
     }
 
-    @SuppressWarnings("resource")
     private void import_requestor(Requestors requestors)
     throws DataAccessException
     {
@@ -330,7 +325,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" imported table REQUESTOR");
     }
 
-    @SuppressWarnings("resource")
     private void import_publisher(
             final Publishers publishers)
     throws DataAccessException
@@ -364,7 +358,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" imported table PUBLISHER");
     }
 
-    @SuppressWarnings("resource")
     private void import_profile(
             final Profiles profiles)
     throws DataAccessException, IOException
@@ -629,7 +622,8 @@ class CaConfigurationDbImporter extends DbPorter
     throws DataAccessException
     {
         System.out.println("importing table SCEP");
-        final String sql = "INSERT INTO SCEP (NAME, CA_NAME, PROFILE_NAME) VALUES (?, ?, ?)";
+        final String sql = "INSERT INTO SCEP (CA_NAME, RESPONDER_TYPE, RESPONDER_CONF, "
+                + "RESPONDER_CERT, CONTROL) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement ps = prepareStatement(sql);
         try
         {
@@ -638,13 +632,15 @@ class CaConfigurationDbImporter extends DbPorter
                 try
                 {
                     int idx = 1;
-                    ps.setString(idx++, entry.getName());
                     ps.setString(idx++, entry.getCaName().toUpperCase());
-                    ps.setString(idx++, entry.getProfileName());
+                    ps.setString(idx++, entry.getResponderType());
+                    ps.setString(idx++, entry.getResponderConf());
+                    ps.setString(idx++, entry.getResponderCert());
+                    ps.setString(idx++, entry.getControl());
                     ps.executeUpdate();
                 }catch(SQLException e)
                 {
-                    System.err.println("error while importing SCEP with NAME=" + entry.getName());
+                    System.err.println("error while importing SCEP with NAME=" + entry.getCaName());
                     throw translate(sql, e);
                 }
             }

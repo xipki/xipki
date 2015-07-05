@@ -803,4 +803,20 @@ public class X509Util
         }
         return null;
     }
+
+    public static String getChallengePassword(CertificationRequestInfo p10Req)
+    {
+        ASN1Set attrs = p10Req.getAttributes();
+        for(int i = 0; i < attrs.size(); i++)
+        {
+            Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
+            if(PKCSObjectIdentifiers.pkcs_9_at_challengePassword.equals(attr.getAttrType()))
+            {
+                ASN1String str = (ASN1String) attr.getAttributeValues()[0];
+                return str.getString();
+            }
+        }
+        return null;
+    }
+
 }
