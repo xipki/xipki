@@ -49,7 +49,6 @@ import org.xipki.scep4j.client.exception.ScepClientException;
  */
 
 @Command(scope = "scep", name = "update-req", description="enroll certificate via messageType UpdateReq")
-
 public class UpdateReqCommand extends AbstractEnrollCertCommand
 {
 

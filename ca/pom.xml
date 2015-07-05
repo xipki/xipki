@@ -27,5 +27,6 @@
     <module>ca-mgmt-shell</module>
     <module>ca-mgmt-qa-shell</module>
     <module>certprofile-demo</module>
+    <module>scep-client-shell</module>
   </modules>
 </project>

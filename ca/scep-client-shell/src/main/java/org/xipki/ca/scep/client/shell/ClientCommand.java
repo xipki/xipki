@@ -77,11 +77,11 @@ public abstract class ClientCommand extends XipkiOsgiCommandSupport
             required = true,
             description = "PKCS#12 keystore file\n"
                     + "(required)")
-    protected String p12File;
+    private String p12File;
 
     @Option(name = "--password",
             description = "password of the PKCS#12 file")
-    protected String password;
+    private String password;
 
     private ScepClient scepClient;
     private PrivateKey identityKey;

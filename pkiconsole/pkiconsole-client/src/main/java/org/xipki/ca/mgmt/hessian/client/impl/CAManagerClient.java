@@ -701,6 +701,14 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
+    public boolean removeUser(
+            final String username)
+    throws CAMgmtException
+    {
+        return client.removeUser(username);
+    }
+
+    @Override
     public UserEntry getUser(
             final String username)
     throws CAMgmtException
