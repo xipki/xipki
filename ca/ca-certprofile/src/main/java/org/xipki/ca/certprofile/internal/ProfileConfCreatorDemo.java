@@ -509,7 +509,7 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setIncSerialNumber(false);
+        subject.setIncSerialNumber(true);
 
         List<RdnType> rdnControls = subject.getRdn();
         rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
