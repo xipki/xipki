@@ -329,6 +329,10 @@ public interface CAManager
             String cnRegex)
     throws CAMgmtException;
 
+    boolean removeUser(
+            String username)
+    throws CAMgmtException;
+
     UserEntry getUser(
             String username)
     throws CAMgmtException;

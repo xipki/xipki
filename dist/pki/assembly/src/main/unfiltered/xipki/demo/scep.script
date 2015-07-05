@@ -19,6 +19,7 @@ xipki-tk:rsa-p12 \
 xipki-tk:req-p12 \
   --p12 output/SCEP-OCSP1.p12 \
   --password 1234 \
+  --challenge-password user1:password1 \
   --out output/SCEP-OCSP1.p10
 
 ## Enroll certificate via PKCSReq
@@ -28,8 +29,7 @@ scep:pkcs-req \
   --p12 output/SCEP-OCSP1.p12 \
   --password 1234 \
   --p10 output/SCEP-OCSP1.p10 \
-  --out output/SCEP-OCSP1.der \
-  --challenge-password "user1:password1"
+  --out output/SCEP-OCSP1.der
 
 ## Poll Cert
 scep:certpoll \
@@ -37,7 +37,7 @@ scep:certpoll \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/SCEP-OCSP1.p12 \
   --password 1234 \
-  --out output/SCEP-OCSP1-certpoll.der \
+  --out output/SCEP-OCSP1-certpoll.der
   
 ## Get Cert
 
@@ -67,7 +67,7 @@ xipki-tk:rsa-p12 \
   --out output/SCEP-OCSP2.p12 \
   --subject "CN=SCEP-OCSP2,O=xipki,C=DE"
 
-xipki-tk:req-p12 \
+xipki-tk:req-p12 \s
   --p12 output/SCEP-OCSP2.p12 \
   --password 1234 \
   --out output/SCEP-OCSP2.p10

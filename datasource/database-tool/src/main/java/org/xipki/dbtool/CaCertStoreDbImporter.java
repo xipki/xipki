@@ -106,7 +106,7 @@ class CaCertStoreDbImporter extends DbPorter
             "(ID, ART, LAST_UPDATE, SERIAL, SUBJECT,"
             + " NOTBEFORE, NOTAFTER, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME,"
             + " PROFILE_ID, CA_ID,"
-            + " REQUESTOR_ID, USER_ID, FP_PK, FP_SUBJECT, EE, REQ_TYPE, TID)" +
+            + " REQUESTOR_ID, USER, FP_PK, FP_SUBJECT, EE, REQ_TYPE, TID)" +
             " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, FP, CERT) VALUES (?, ?, ?)";
@@ -773,7 +773,7 @@ class CaCertStoreDbImporter extends DbPorter
                     setInt(ps_cert, idx++, cert.getProfileId());
                     setInt(ps_cert, idx++, cert.getCaId());
                     setInt(ps_cert, idx++, cert.getRequestorId());
-                    setInt(ps_cert, idx++, cert.getUserId());
+                    ps_cert.setString(idx++, cert.getUser());
 
                     ps_cert.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
                     String sha1FpSubject = X509Util.sha1sum_canonicalized_name(c.getSubject());

@@ -258,10 +258,11 @@
       <column name="ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="NAME" type="VARCHAR(200)">
+      <column name="NAME" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
       <column name="PASSWORD" type="VARCHAR(150)">
+        <constraints nullable="false"/>
         <!-- hex salted hashed password: first byte identifies hash algorithm,
          second byte identifies length of salt, third and forth bytes specifies the iteration,
          following by the salt and hash value-->
@@ -350,7 +351,7 @@
       <column name="EE" type="SMALLINT" remarks="whether it is an end entity cert">
         <constraints nullable="false"/>
       </column>
-      <column name="USER_ID" type="INT"/>
+      <column name="USER" type="VARCHAR(100)"/>
       <column name="FP_PK" type="CHAR(40)">
         <constraints nullable="false"/>
       </column>
@@ -517,11 +518,6 @@
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="REQUESTOR_ID" baseTableName="CERT"
       referencedColumnNames="ID" referencedTableName="CS_REQUESTOR"/>
-    <addForeignKeyConstraint constraintName="FK_CERT_USER1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="USER_ID" baseTableName="CERT"
-      referencedColumnNames="ID" referencedTableName="USERNAME"/>
     <addForeignKeyConstraint constraintName="FK_CERT_CS_PROFILE1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"

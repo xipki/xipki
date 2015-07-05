@@ -60,7 +60,7 @@ implements Serializable
     {
         ParamChecker.assertNotBlank("name", name);
 
-        this.name = name.toUpperCase();
+        this.name = name;
         this.hashedPassword = hashedPassword;
         this.cnRegex = cnRegex;
     }

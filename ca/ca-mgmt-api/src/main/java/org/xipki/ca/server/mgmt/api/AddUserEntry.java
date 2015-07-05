@@ -62,7 +62,7 @@ implements Serializable
         ParamChecker.assertNotBlank("password", password);
         ParamChecker.assertNotBlank("cnRegex", cnRegex);
 
-        this.name = name.toUpperCase();
+        this.name = name;
         this.password = password;
         this.cnRegex = cnRegex;
     }

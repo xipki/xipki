@@ -675,7 +675,7 @@ public class X509CA
     throws OperationException
     {
         if(caInfo.getSubject().equals(
-                X509Util.canonicalizName(cert.getIssuerX500Principal())) == false)
+                X509Util.getRFC4519Name(cert.getIssuerX500Principal())) == false)
         {
             return false;
         }
@@ -3015,6 +3015,9 @@ public class X509CA
             expiredCertsRemover = null;
         }
 
-        s.purge();
+        if(s != null)
+        {
+            s.purge();
+        }
     }
 }

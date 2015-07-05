@@ -191,6 +191,10 @@ public class ProfileConfCreatorDemo
             profile = Certprofile_OCSP();
             marshall(m, profile, "Certprofile_OCSP.xml");
 
+            // SCEP
+            profile = Certprofile_SCEP();
+            marshall(m, profile, "Certprofile_SCEP.xml");
+
             // EE_Complex
             profile = Certprofile_EE_complex();
             marshall(m, profile, "Certprofile_EE_Complex.xml");
@@ -544,6 +548,54 @@ public class ProfileConfCreatorDemo
         // Extensions - extenedKeyUsage
         extensionValue = createExtendedKeyUsage(new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_OCSPSigning}, null);
         list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
+
+        return profile;
+    }
+
+    private static X509ProfileType Certprofile_SCEP()
+    throws Exception
+    {
+        X509ProfileType profile = getBaseProfile("Certprofile SCEP", false, "5y", false,
+                new String[]{"SHA256"});
+
+        profile.setKeyAlgorithms(createRSAKeyAlgorithms());
+
+        // Subject
+        Subject subject = profile.getSubject();
+        subject.setIncSerialNumber(false);
+
+        List<RdnType> rdnControls = subject.getRdn();
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+
+        // Extensions
+        ExtensionsType extensions = profile.getExtensions();
+        List<ExtensionType> list = extensions.getExtension();
+
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+        list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+        // Extensions - basicConstraints
+        ExtensionValueType extensionValue = null;
+        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
+
+        // Extensions - AuthorityKeyIdentifier
+        extensionValue = createAuthorityKeyIdentifier(true);
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
+
+        // Extensions - keyUsage
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.KEY_ENCIPHERMENT},
+                null);
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
     }
@@ -1490,6 +1542,30 @@ public class ProfileConfCreatorDemo
             params.setPointEncodings(new PointEncodings());
             final Byte unpressed = 4;
             params.getPointEncodings().getPointEncoding().add(unpressed);
+        }
+
+        return ret;
+    }
+
+    private static KeyAlgorithms createRSAKeyAlgorithms()
+    {
+        KeyAlgorithms ret = new KeyAlgorithms();
+        List<AlgorithmType> list = ret.getAlgorithm();
+        // RSA
+        {
+            AlgorithmType algorithm = new AlgorithmType();
+            list.add(algorithm);
+
+            algorithm.getAlgorithm().add(createOidType(PKCSObjectIdentifiers.rsaEncryption, "RSA"));
+
+            RSAParameters params = new RSAParameters();
+            algorithm.setParameters(createKeyParametersType(params));
+
+            RangesType ranges = new RangesType();
+            params.setModulusLength(ranges);
+            List<RangeType> modulusLengths = ranges.getRange();
+            modulusLengths.add(createRange(2048));
+            modulusLengths.add(createRange(3072));
         }
 
         return ret;

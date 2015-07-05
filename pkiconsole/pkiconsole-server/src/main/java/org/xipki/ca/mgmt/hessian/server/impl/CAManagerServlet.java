@@ -967,6 +967,20 @@ implements HessianCAManager
     }
 
     @Override
+    public boolean removeUser(
+            final String username)
+    throws HessianCAMgmtException
+    {
+        try
+        {
+            return caManager.removeUser(username);
+        } catch (CAMgmtException e)
+        {
+            throw new HessianCAMgmtException(e.getMessage());
+        }
+    }
+
+    @Override
     public boolean addScep(
             final ScepEntry scepEntry)
     throws HessianCAMgmtException

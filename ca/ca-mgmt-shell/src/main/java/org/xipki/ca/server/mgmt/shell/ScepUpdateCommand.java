@@ -42,8 +42,11 @@ import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.ChangeScepEntry;
+import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.X509Util;
+import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.security.api.PasswordResolver;
 
 /**
  * @author Lijun Liao
@@ -70,6 +73,35 @@ public class ScepUpdateCommand extends CaCommand
             description = "responder certificate file or 'NULL'")
     private String certFile;
 
+    private PasswordResolver passwordResolver;
+
+    public void setPasswordResolver(
+            final PasswordResolver passwordResolver)
+    {
+        this.passwordResolver = passwordResolver;
+    }
+
+    private String getResponderConf()
+    throws Exception
+    {
+        if(responderConf == null)
+        {
+            return responderConf;
+        }
+        String _respType = responderType;
+        if(_respType == null)
+        {
+            ScepEntry entry = caManager.getScepEntry(caName);
+            if(entry == null)
+            {
+                throw new IllegalCmdParamException("please specify the responderType");
+            }
+            _respType = entry.getResponderType();
+        }
+
+        return ShellUtil.canonicalizeSignerConf(_respType, responderConf, passwordResolver);
+    }
+
     @Override
     protected Object _doExecute()
     throws Exception
@@ -91,9 +123,11 @@ public class ScepUpdateCommand extends CaCommand
         {
             entry.setResponderType(responderType);
         }
-        if(responderConf == null)
+
+        String conf = getResponderConf();
+        if(conf != null)
         {
-            entry.setResponderConf(responderConf);
+            entry.setResponderConf(conf);
         }
 
         if(certConf != null)

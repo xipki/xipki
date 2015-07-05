@@ -26,17 +26,27 @@
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
   <service ref="caManager" interface="org.xipki.ca.server.mgmt.api.CAManager"/>
-  <!-- create the servlet and inject our own app factory -->
-  <bean id="caServlet" class="org.xipki.ca.server.impl.cmp.Rfc6712Servlet">
+  <!-- CMP servlet -->
+  <bean id="cmpServlet" class="org.xipki.ca.server.impl.cmp.Rfc6712Servlet">
     <property name="responderManager" ref="caManager"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
-  <!-- register it as a servlet service for the web extender -->
-  <service ref="caServlet" interface="javax.servlet.Servlet">
+  <service ref="cmpServlet" interface="javax.servlet.Servlet">
     <service-properties>
       <entry key="urlPatterns" value="${urlPatterns}"/>
     </service-properties>
   </service>
+  <!-- SCEP servlet -->
+  <bean id="scepServlet" class="org.xipki.ca.server.impl.scep.ScepServlet">
+    <property name="responderManager" ref="caManager"/>
+    <property name="auditServiceRegister" ref="auditServiceRegister"/>
+  </bean>
+  <service ref="scepServlet" interface="javax.servlet.Servlet">
+    <service-properties>
+      <entry key="urlPatterns" value="/scep/*"/>
+    </service-properties>
+  </service>
+  
   <bean id="healthServlet" class="org.xipki.ca.server.impl.HealthCheckServlet">
     <property name="responderManager" ref="caManager"/>
   </bean>

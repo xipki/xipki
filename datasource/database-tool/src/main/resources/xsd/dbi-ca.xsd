@@ -241,9 +241,11 @@
   <xs:element name="scep" type="scepType"/>
   <xs:complexType name="scepType">
     <xs:sequence>
-      <xs:element name="name" type="xs:string"/>
       <xs:element name="caName" type="xs:string"/>
-      <xs:element name="profileName" type="xs:string"/>
+      <xs:element name="responderType" type="xs:string"/>
+      <xs:element name="responderConf" type="xs:string"/>
+      <xs:element name="responderCert" type="xs:string" minOccurs="0"/>
+      <xs:element name="control" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <!-- CertStore -->
@@ -385,7 +387,7 @@
       <xs:element name="revReason" type="xs:int" minOccurs="0"/>
       <xs:element name="revTime" type="xs:long" minOccurs="0"/>
       <xs:element name="revInvTime" type="xs:long" minOccurs="0"/>
-      <xs:element name="userId" type="xs:int" minOccurs="0"/>
+      <xs:element name="user" type="xs:string" minOccurs="0"/>
       <xs:element name="tid" type="xs:hexBinary" minOccurs="0"/>
       <xs:element name="reqType" type="xs:int"/>
       <xs:element name="certFile" type="xs:string"/>

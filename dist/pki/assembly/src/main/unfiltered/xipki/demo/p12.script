@@ -225,6 +225,10 @@ xipki-ca:caprofile-add \
 
 xipki-ca:caprofile-add \
   --ca SubCAwithCRL1 \
+  --profile SCEP
+
+xipki-ca:caprofile-add \
+  --ca SubCAwithCRL1 \
   --profile multipleOUs
 
 xipki-ca:caprofile-add \

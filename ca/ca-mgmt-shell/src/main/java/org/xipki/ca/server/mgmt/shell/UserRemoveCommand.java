@@ -33,34 +33,31 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.scep.client.shell;
-
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
+package org.xipki.ca.server.mgmt.shell;
 
 import org.apache.karaf.shell.commands.Command;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.xipki.scep4j.client.EnrolmentResponse;
-import org.xipki.scep4j.client.ScepClient;
-import org.xipki.scep4j.client.exception.ScepClientException;
+import org.apache.karaf.shell.commands.Option;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "scep", name = "update-req", description="enroll certificate via messageType UpdateReq")
-public class UpdateReqCommand extends AbstractEnrollCertCommand
+@Command(scope = "xipki-ca", name = "user-rm", description="remove user")
+public class UserRemoveCommand extends CaCommand
 {
 
-    @Override
-    protected EnrolmentResponse requestCertificate(
-            final ScepClient client,
-            final CertificationRequest csr,
-            final PrivateKey identityKey,
-            final X509Certificate identityCert)
-    throws ScepClientException
-    {
-        return client.scepUpdateReq(csr, identityKey, identityCert);
-    }
+    @Option(name = "--name", aliases = "-n",
+            required = true,
+            description = "user Name\n"
+                    + "(required)")
+    private String name;
 
+    @Override
+    protected Object _doExecute()
+    throws Exception
+    {
+        boolean b = caManager.removeUser(name);
+        output(b, "removed", "could not remove", "user " + name);
+        return null;
+    }
 }
