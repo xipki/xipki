@@ -835,6 +835,24 @@ implements CAManager, CmpResponderManager, ScepManager
 
         X509CACmpResponder caResponder = new X509CACmpResponder(this, caName);
         x509Responders.put(caName, caResponder);
+
+        // referesh the SCEP
+        if(sceps.containsKey(caName))
+        {
+            try
+            {
+                sceps.get(caName).refreshCA();
+            } catch (CAMgmtException e)
+            {
+                final String message = "X509CA.SCEP (ca=" + caName + ")";
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(message, e);
+                return false;
+            }
+        }
         return true;
     }
 
@@ -1409,11 +1427,6 @@ implements CAManager, CmpResponderManager, ScepManager
         {
             createCA(name);
             startCA(name);
-            Scep scep = sceps.get(name);
-            if(scep != null)
-            {
-                scep.refreshCA(securityFactory);
-            }
         }
 
         return changed;
@@ -1478,7 +1491,7 @@ implements CAManager, CmpResponderManager, ScepManager
 
         if(certprofiles.containsKey(profileName) == false)
         {
-            throw new CAMgmtException("cerptofile '" + profileName + "' is faulty");
+            throw new CAMgmtException("certprofile '" + profileName + "' is faulty");
         }
 
         queryExecutor.addCertprofileToCA(profileName, profileLocalname, caName);
@@ -3305,6 +3318,14 @@ implements CAManager, CmpResponderManager, ScepManager
     }
 
     @Override
+    public boolean removeUser(
+            final String username)
+    throws CAMgmtException
+    {
+        return queryExecutor.removeUser(username);
+    }
+
+    @Override
     public UserEntry getUser(
             final String username)
     throws CAMgmtException
@@ -3325,6 +3346,7 @@ implements CAManager, CmpResponderManager, ScepManager
         {
             final String caName = dbEntry.getCaName();
             Scep scep = new Scep(dbEntry, this);
+            scep.refreshCA();
             scepDbEntries.put(caName, dbEntry);
             sceps.put(caName, scep);
         }
@@ -3333,12 +3355,13 @@ implements CAManager, CmpResponderManager, ScepManager
 
     @Override
     public boolean removeScep(
-            final String name)
+            String name)
     throws CAMgmtException
     {
         ParamChecker.assertNotBlank("name", name);
         asssertMasterMode();
 
+        name = name.toUpperCase();
         boolean b = queryExecutor.removeScep(name);
         if(b)
         {
@@ -3370,6 +3393,7 @@ implements CAManager, CmpResponderManager, ScepManager
         {
             return false;
         }
+        scep.refreshCA();
 
         sceps.remove(caName);
         scepDbEntries.remove(caName);
@@ -3382,14 +3406,14 @@ implements CAManager, CmpResponderManager, ScepManager
     public ScepEntry getScepEntry(
             final String caName)
     {
-        return scepDbEntries == null ? null : scepDbEntries.get(caName);
+        return scepDbEntries == null ? null : scepDbEntries.get(caName.toUpperCase());
     }
 
     @Override
     public Scep getScep(
             final String caName)
     {
-        return sceps == null ? null : sceps.get(caName);
+        return sceps == null ? null : sceps.get(caName.toUpperCase());
     }
 
     @Override

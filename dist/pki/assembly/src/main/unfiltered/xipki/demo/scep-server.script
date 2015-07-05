@@ -14,7 +14,7 @@ xipki-ca:enroll-cert \
   --ca SubCAwithCRL1 \
   --p10 output/SCEP1.p10 \
   --out output/SCEP1.der \
-  --profile OCSP
+  --profile SCEP
 
 xipki-tk:update-cert-p12 \
   --p12 output/SCEP1.p12 \

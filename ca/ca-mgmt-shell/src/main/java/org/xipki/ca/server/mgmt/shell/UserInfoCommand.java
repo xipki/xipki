@@ -60,7 +60,7 @@ public class UserInfoCommand extends CaCommand
         UserEntry userEntry = caManager.getUser(name);
         if(userEntry == null)
         {
-            throw new UnexpectedException("\tno user named '" + name + " is configured");
+            throw new UnexpectedException("\tno user named '" + name + "' is configured");
         }
         else
         {

@@ -768,7 +768,7 @@ class CaConfigurationDbExporter extends DbPorter
             return;
         }
 
-        final String sql = "SELECT NAME, CA_NAME, PROFILE_NAME FROM SCEP";
+        final String sql = "SELECT CA_NAME, RESPONDER_TYPE, RESPONDER_CONF, RESPONDER_CERT, CONTROL FROM SCEP";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -779,14 +779,18 @@ class CaConfigurationDbExporter extends DbPorter
 
             while(rs.next())
             {
-                String name = rs.getString("NAME");
                 String ca_name = rs.getString("CA_NAME");
-                String profile_name = rs.getString("PROFILE_NAME");
+                String resp_type = rs.getString("RESPONDER_TYPE");
+                String resp_conf = rs.getString("RESPONDER_CONF");
+                String resp_cert = rs.getString("RESPONDER_CERT");
+                String control = rs.getString("CONTROL");
 
                 ScepType scep = new ScepType();
-                scep.setName(name);
                 scep.setCaName(ca_name);
-                scep.setProfileName(profile_name);
+                scep.setResponderType(resp_type);
+                scep.setResponderConf(resp_conf);
+                scep.setResponderCert(resp_cert);
+                scep.setControl(control);
                 sceps.getScep().add(scep);
             }
         }catch(SQLException e)

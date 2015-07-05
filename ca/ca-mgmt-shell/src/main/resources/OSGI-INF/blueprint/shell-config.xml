@@ -635,6 +635,11 @@
         <property name="caManager" ref="caManager"/>
       </action>
     </command>
+    <command>
+      <action class="org.xipki.ca.server.mgmt.shell.UserRemoveCommand">
+        <property name="caManager" ref="caManager"/>
+      </action>
+    </command>
     <!-- SCEP -->
     <command>
       <action class="org.xipki.ca.server.mgmt.shell.ScepAddCommand">

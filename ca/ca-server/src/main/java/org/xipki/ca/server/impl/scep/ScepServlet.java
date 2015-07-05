@@ -62,6 +62,7 @@ import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.ca.api.OperationException;
+import org.xipki.ca.server.impl.CAManagerImpl;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
@@ -83,12 +84,12 @@ public class ScepServlet extends HttpServlet
     private static final String CGI_PROGRAM = "/pkiclient.exe";
     private static final int CGI_PROGRAM_LEN = CGI_PROGRAM.length();
 
-    private static final String CT_REQUEST  = "application/x-pki-message";
+    private static final String CT_REQUEST  = ScepConstants.CT_x_pki_message;
     private static final String CT_REQUEST_FUTURE  = "application/pki-message";
-    private static final String CT_RESPONSE = "application/x-pki-message";
+    private static final String CT_RESPONSE = ScepConstants.CT_x_pki_message;
 
     private AuditLoggingServiceRegister auditServiceRegister;
-    private ScepManager responderManager;
+    private CAManagerImpl responderManager;
 
     public ScepServlet()
     {
@@ -131,7 +132,7 @@ public class ScepServlet extends HttpServlet
             if(scepPath.endsWith(CGI_PROGRAM))
             {
                 String path = scepPath.substring(0, scepPath.length() - CGI_PROGRAM_LEN);
-                String[] tokens = path.split(":");
+                String[] tokens = path.split("/");
                 if(tokens.length == 2)
                 {
                     scepName = tokens[0];
@@ -175,9 +176,14 @@ public class ScepServlet extends HttpServlet
                 return;
             }
 
+            String realScepName = responderManager.getCaNameForAlias(scepName);
+            if(realScepName != null)
+            {
+                scepName = realScepName;
+            }
             Scep responder = responderManager.getScep(scepName);
             if(responder == null || responder.getStatus() != CAStatus.ACTIVE ||
-                    responder.supportsCertProfile(certProfileName))
+                    responder.supportsCertProfile(certProfileName) == false)
             {
                 auditMessage = "unknown SCEP '" + scepName + "/" + certProfileName + "'";
                 LOG.warn(auditMessage);
@@ -366,7 +372,7 @@ public class ScepServlet extends HttpServlet
     }
 
     public void setResponderManager(
-            final ScepManager responderManager)
+            final CAManagerImpl responderManager)
     {
         this.responderManager = responderManager;
     }

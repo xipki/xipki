@@ -44,19 +44,14 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertificateList;
-import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -97,7 +92,6 @@ import org.xipki.scep4j.transaction.Nonce;
 import org.xipki.scep4j.transaction.PkiStatus;
 import org.xipki.scep4j.transaction.TransactionId;
 import org.xipki.security.api.KeyCertPair;
-import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 
 /**
@@ -134,12 +128,9 @@ public class Scep
         this.caManager = caManager;
     }
 
-    public void refreshCA(
-            final SecurityFactory securityFactory)
+    public void refreshCA()
     throws CAMgmtException
     {
-        ParamChecker.assertNotNull("securityFactory", securityFactory);
-
         String type = dbEntry.getResponderType();
         if("PKCS12".equalsIgnoreCase(type) == false && "JKS".equalsIgnoreCase(type) == false)
         {
@@ -149,7 +140,7 @@ public class Scep
         KeyCertPair privKeyAndCert;
         try
         {
-            privKeyAndCert = securityFactory.createPrivateKeyAndCert(
+            privKeyAndCert = caManager.getSecurityFactory().createPrivateKeyAndCert(
                     dbEntry.getResponderType(), dbEntry.getResponderConf(), dbEntry.getCertificate());
         } catch (SignerException e)
         {
@@ -240,7 +231,7 @@ public class Scep
     {
     	// verify and decrypt the request
         DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, envelopedDataDecryptor);
-        PkiMessage rep = new PkiMessage(req.getTransactionId(), req.getMessageType(), Nonce.randomNonce());
+        PkiMessage rep = new PkiMessage(req.getTransactionId(), MessageType.CertRep, Nonce.randomNonce());
         rep.setRecipientNonce(req.getSenderNonce());
 
         X509CA ca;
@@ -288,28 +279,31 @@ public class Scep
                         {
     		        		// up to draft-nourse-scep-23 the client sends all messages to enrol certificate
     		        		// via MessageType PKCSReq
-                            Extension ext = extensions.getExtension(PKCSObjectIdentifiers.pkcs_9_at_challengePassword);
-                            if(ext != null)
+                            String challengePwd = X509Util.getChallengePassword(p10ReqInfo);
+                            if(challengePwd == null)
                             {
-                                ASN1Encodable t = ((ASN1Set) ext.getParsedValue()).getObjectAt(0);
-                                String challengePwd = ((ASN1String) t).getString();
-                                String[] strs = challengePwd.split(":");
-                                if(strs == null || strs.length != 2)
-                                {
-                                	// TODO LOG
-                                    throw new FailInfoException(FailInfo.badRequest);
-                                }
-                                user = strs[0];
-                                String password = strs[1];
+                        		// TODO LOG
+                                throw new FailInfoException(FailInfo.badRequest);
+                            }
 
-                                if(ca.authenticateUser(user, password.getBytes()) == false)
-                                {
-                            		// TODO log
-                                    throw new FailInfoException(FailInfo.badRequest);
-                                }
+                            String[] strs = challengePwd.split(":");
+                            if(strs == null || strs.length != 2)
+                            {
+                            	// TODO LOG
+                                throw new FailInfoException(FailInfo.badRequest);
+                            }
+                            user = strs[0];
+                            String password = strs[1];
+
+                            if(ca.authenticateUser(user, password.getBytes()) == false)
+                            {
+                        		// TODO log
+                                throw new FailInfoException(FailInfo.badRequest);
                             }
                         }
                     }
+
+                    // TODO: check CN-REGEX
 
                     TransactionId tid = req.getTransactionId();
                     byte[] tidBytes = getTransactionIdBytes(tid);

@@ -55,7 +55,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -100,7 +99,6 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.datasource.api.exception.DuplicateKeyException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 
@@ -112,7 +110,6 @@ class CAManagerQueryExecutor
 {
 
     private static final Logger LOG = LoggerFactory.getLogger(CAManagerQueryExecutor.class);
-    private Random random;
 
     private DataSourceWrapper dataSource;
 
@@ -121,7 +118,6 @@ class CAManagerQueryExecutor
     {
         ParamChecker.assertNotNull("dataSource", dataSource);
         this.dataSource = dataSource;
-        this.random = new Random();
     }
 
     private X509Certificate generateCert(
@@ -2527,26 +2523,14 @@ class CAManagerQueryExecutor
             throw new CAMgmtException(e);
         }
         UserEntry _userEntry = new UserEntry(name, hashedPassword, userEntry.getCnRegex());
-        final int tries = 3;
 
-        for(int i = 0; i < tries; i++)
+        try
         {
-            int tmpId = (i == 0) ? name.hashCode() : random.nextInt();
-            try
-            {
-                executeAddUserSql(tmpId, _userEntry);
-                break;
-            }catch(DataAccessException e)
-            {
-                if(e instanceof DuplicateKeyException && i < tries - 1)
-                {
-                    continue;
-                }
-                else
-                {
-                    throw new CAMgmtException(e);
-                }
-            }
+            int maxId = (int) dataSource.getMax(null, "USERNAME", "ID");
+            executeAddUserSql(maxId + 1, _userEntry);
+        }catch(DataAccessException e)
+        {
+            throw new CAMgmtException(e);
         }
 
         LOG.info("added user '{}'", name);
@@ -2612,6 +2596,28 @@ class CAManagerQueryExecutor
         }
     }
 
+    boolean removeUser(
+            final String userName)
+    throws CAMgmtException
+    {
+        final String sql = "DELETE FROM USERNAME WHERE NAME=?";
+
+        PreparedStatement ps = null;
+        try
+        {
+            ps = prepareStatement(sql);
+            ps.setString(1, userName);
+            return ps.executeUpdate() > 0;
+        }catch(SQLException e)
+        {
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
+        }finally
+        {
+            dataSource.releaseResources(ps, null);
+        }
+    }
+
     boolean changeUser(
             final String username,
             final String password,
@@ -2631,7 +2637,7 @@ class CAManagerQueryExecutor
         Integer iPassword = addToSqlIfNotNull(sqlBuilder, index, password, "PASSWORD");
         Integer iCnRegex = addToSqlIfNotNull(sqlBuilder, index, cnRegex, "CN_REGEX");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(" WHERE NAME=?");
+        sqlBuilder.append(" WHERE ID=?");
 
         if(index.get() == 1)
         {
@@ -2659,7 +2665,7 @@ class CAManagerQueryExecutor
                 ps.setString(iCnRegex, cnRegex);
             }
 
-            ps.setString(index.get(), username);
+            ps.setInt(index.get(), existingId);
 
             ps.executeUpdate();
 

@@ -38,7 +38,6 @@ package org.xipki.ca.server.impl.store;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -84,7 +83,6 @@ import org.xipki.ca.server.impl.SubjectKeyProfileBundle;
 import org.xipki.ca.server.mgmt.api.CertArt;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.LruCache;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
@@ -111,9 +109,6 @@ class CertStoreQueryExecutor
     private final NameIdStore requestorInfoStore;
     private final NameIdStore certprofileStore;
     private final NameIdStore publisherStore;
-
-    private final SecureRandom random = new SecureRandom();
-    private final LruCache<String, Integer> usernameIdCache = new LruCache<>(500);
 
     CertStoreQueryExecutor(
             final DataSourceWrapper dataSource)
@@ -211,12 +206,11 @@ class CertStoreQueryExecutor
                 "INSERT INTO CERT" +
                 " (ID, ART, LAST_UPDATE, SERIAL, SUBJECT, FP_SUBJECT, REQ_SUBJECT, FP_REQ_SUBJECT, "
                 + "NOTBEFORE, NOTAFTER, REVOKED, PROFILE_ID," +
-                " CA_ID, REQUESTOR_ID, USER_ID, FP_PK, EE, REQ_TYPE, TID)" +
+                " CA_ID, REQUESTOR_ID, USER, FP_PK, EE, REQ_TYPE, TID)" +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, FP, CERT) VALUES (?, ?, ?)";
 
-        Integer userId = (user == null) ? null : getUserId(user);
         int certId = nextCertId();
         int caId = getCaId(issuer);
         X509Certificate cert = certificate.getCert();
@@ -286,15 +280,7 @@ class CertStoreQueryExecutor
                 ps_addcert.setNull(idx++, Types.INTEGER);
             }
 
-            if(userId != null)
-            {
-                ps_addcert.setInt(idx++, userId.intValue());
-            }
-            else
-            {
-                ps_addcert.setNull(idx++, Types.INTEGER);
-            }
-
+            ps_addcert.setString(idx++, user);
             ps_addcert.setString(idx++, fpPK);
 
             boolean isEECert = cert.getBasicConstraints() == -1;
@@ -1183,13 +1169,15 @@ class CertStoreQueryExecutor
             return Collections.emptyList();
         }
 
+        boolean considerUserLike = false;
         if(userLike == null)
         {
-            sqlBuilder.append(" AND USER_ID IS NULL");
+            sqlBuilder.append(" AND USER IS NULL");
         }
         else if("all".equalsIgnoreCase(userLike) == false)
         {
-            sqlBuilder.append(" AND USER_ID IN (SELECT ID FROM USERNAME WHERE NAME LIKE ?)");
+            considerUserLike = true;
+            sqlBuilder.append(" AND USER LIKE ?");
         }
 
         final String sql = dataSource.createFetchFirstSelectSQL(sqlBuilder.toString(), numEntries);
@@ -1203,7 +1191,7 @@ class CertStoreQueryExecutor
             ps.setLong(idx++, expiredAt);
             ps.setInt(idx++, certprofileId);
 
-            if(userLike != null && "all".equalsIgnoreCase(userLike) == false)
+            if(considerUserLike)
             {
                 ps.setString(idx++, userLike);
             }
@@ -1257,13 +1245,15 @@ class CertStoreQueryExecutor
             return 0;
         }
 
+        boolean considerUserLike = false;
         if(userLike == null)
         {
-            sqlBuilder.append(" AND USER_ID IS NULL");
+            sqlBuilder.append(" AND USER IS NULL");
         }
         else if("all".equalsIgnoreCase(userLike) == false)
         {
-            sqlBuilder.append(" AND USER_ID IN (SELECT ID FROM USERNAME WHERE NAME LIKE ?)");
+            considerUserLike = true;
+            sqlBuilder.append(" AND USER LIKE ?)");
         }
 
         String sql = sqlBuilder.toString();
@@ -1277,7 +1267,7 @@ class CertStoreQueryExecutor
             ps.setLong(idx++, expiredAt);
             ps.setInt(idx++, certprofileId);
 
-            if(userLike != null && "all".equalsIgnoreCase(userLike) == false)
+            if(considerUserLike)
             {
                 ps.setString(idx++, userLike);
             }
@@ -2310,114 +2300,6 @@ class CertStoreQueryExecutor
         } finally
         {
             releaseDbResources(ps, null);
-        }
-    }
-
-    private int getUserId(
-            final String user)
-    throws DataAccessException
-    {
-        Integer id = usernameIdCache.get(user);
-        if(id != null)
-        {
-            return id.intValue();
-        }
-
-        id = executeGetUserIdSql(user);
-
-        if(id == null)
-        {
-            int i = 0;
-            final int tries = 5;
-            for(; i < tries; i++)
-            {
-                int tmpId = (i == 0) ? user.hashCode() : random.nextInt();
-                try
-                {
-                    executeAddUserSql(user, tmpId);
-                    id = tmpId;
-                    break;
-                }catch(DataAccessException e)
-                {
-                    Integer id2 = executeGetUserIdSql(user);
-                    if(id2 != null)
-                    {
-                        id = id2.intValue();
-                        break;
-                    }
-
-                    if(e instanceof DuplicateKeyException && i < tries - 1)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        throw e;
-                    }
-                }
-            }
-
-            if(id != null && i > 0)
-            {
-                LOG.debug("datasource {} added user {} after {} tries",
-                        dataSource.getDatasourceName(), user, i + 1);
-            }
-        }
-
-        if(id == null)
-        {
-            throw new RuntimeException("userId is null, this should not happen");
-        }
-        usernameIdCache.put(user, id);
-        return id;
-    }
-
-    private Integer executeGetUserIdSql(
-            final String user)
-    throws DataAccessException
-    {
-        final String sql = dataSource.createFetchFirstSelectSQL("ID FROM USERNAME WHERE NAME=?", 1);
-        ResultSet rs = null;
-        PreparedStatement ps = borrowPreparedStatement(sql);
-        try
-        {
-            int idx = 1;
-            ps.setString(idx++, user);
-            rs = ps.executeQuery();
-            if(rs.next())
-            {
-                return rs.getInt("ID");
-            } else
-            {
-                return null;
-            }
-        }catch(SQLException e)
-        {
-            throw dataSource.translate(sql, e);
-        } finally
-        {
-            dataSource.releaseResources(ps, rs);
-        }
-    }
-
-    private void executeAddUserSql(
-            final String user,
-            final int userId)
-    throws DataAccessException
-    {
-        final String sql = "INSERT INTO USERNAME (ID, NAME) VALUES (?, ?)";
-        PreparedStatement ps = borrowPreparedStatement(sql);
-        try
-        {
-            ps.setInt(1, userId);
-            ps.setString(2, user);
-            ps.executeUpdate();
-        }catch(SQLException e)
-        {
-            throw dataSource.translate(sql, e);
-        } finally
-        {
-            dataSource.releaseResources(ps, null);
         }
     }
 

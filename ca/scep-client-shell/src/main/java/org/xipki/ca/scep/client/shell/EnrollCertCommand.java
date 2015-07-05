@@ -38,6 +38,7 @@ package org.xipki.ca.scep.client.shell;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
+import org.apache.karaf.shell.commands.Command;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.scep4j.client.EnrolmentResponse;
 import org.xipki.scep4j.client.ScepClient;
@@ -47,6 +48,7 @@ import org.xipki.scep4j.client.exception.ScepClientException;
  * @author Lijun Liao
  */
 
+@Command(scope = "scep", name = "enroll", description="enroll certificate via automic selected messageType")
 public class EnrollCertCommand extends AbstractEnrollCertCommand
 {
 

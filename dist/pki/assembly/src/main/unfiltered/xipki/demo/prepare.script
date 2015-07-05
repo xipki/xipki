@@ -33,6 +33,11 @@ xipki-ca:profile-add \
   --conf-file xipki/demo/profile/Certprofile_OCSP.xml
 
 xipki-ca:profile-add \
+  --name SCEP \
+  --type XML \
+  --conf-file xipki/demo/profile/Certprofile_SCEP.xml
+
+xipki-ca:profile-add \
   --name multipleOUs \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_multipleOUs.xml

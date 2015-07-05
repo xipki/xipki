@@ -40,6 +40,7 @@ import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.util.IoUtil;
+import org.xipki.security.api.PasswordResolver;
 
 /**
  * @author Lijun Liao
@@ -61,12 +62,22 @@ public class ScepAddCommand extends CaCommand
     private String responderType;
 
     @Option(name = "--resp-conf",
-            description = "conf of the responder")
+            required = true,
+            description = "conf of the responder\n"
+                    + "(required)")
     private String responderConf;
 
     @Option(name = "--resp-cert",
             description = "responder certificate file")
     private String certFile;
+
+    private PasswordResolver passwordResolver;
+
+    public void setPasswordResolver(
+            final PasswordResolver passwordResolver)
+    {
+        this.passwordResolver = passwordResolver;
+    }
 
     @Override
     protected Object _doExecute()
@@ -76,6 +87,11 @@ public class ScepAddCommand extends CaCommand
         if(certFile != null)
         {
             base64Cert= IoUtil.base64Encode(IoUtil.read(certFile), false);
+        }
+
+        if("PKCS12".equalsIgnoreCase(responderType) || "JKS".equalsIgnoreCase(responderType))
+        {
+            responderConf = ShellUtil.canonicalizeSignerConf(responderType, responderConf, passwordResolver);
         }
 
         ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert, null);
