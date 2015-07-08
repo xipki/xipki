@@ -17,6 +17,7 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
   - FullCRL and DeltaCRL
   - Customized extension to embed certificates in CRL
   - CMP (RFC 4210 and RFC 4211)
+  - SCEP (draft-gutmann-scep-00, draft-nourse-scep-23)
   - API to specify customized certificate profiles
   - Embedded support of XML-based certificate profile
   - API to specify customized publisher, e.g. for LDAP and OCSP responder

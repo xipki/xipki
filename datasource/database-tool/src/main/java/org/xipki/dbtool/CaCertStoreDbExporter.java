@@ -683,7 +683,7 @@ class CaCertStoreDbExporter extends DbPorter
         certSql.append(col_revInvTime).append(", ");
         if(dbSchemaVersion > 1)
         {
-            certSql.append("ART, REQ_TYPE, TID, USER, ");
+            certSql.append("ART, REQ_TYPE, TID, UNAME, ");
         }else
         {
             certSql.append("USER_ID, ");
@@ -846,7 +846,7 @@ class CaCertStoreDbExporter extends DbPorter
                     String user = null;
                     if(dbSchemaVersion > 1)
                     {
-                        user = rs.getString("USER");
+                        user = rs.getString("UNAME");
                     }
                     else
                     {
