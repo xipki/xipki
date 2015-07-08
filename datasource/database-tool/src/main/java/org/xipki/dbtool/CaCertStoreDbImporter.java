@@ -106,7 +106,7 @@ class CaCertStoreDbImporter extends DbPorter
             "(ID, ART, LAST_UPDATE, SERIAL, SUBJECT,"
             + " NOTBEFORE, NOTAFTER, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME,"
             + " PROFILE_ID, CA_ID,"
-            + " REQUESTOR_ID, USER, FP_PK, FP_SUBJECT, EE, REQ_TYPE, TID)" +
+            + " REQUESTOR_ID, UNAME, FP_PK, FP_SUBJECT, EE, REQ_TYPE, TID)" +
             " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, FP, CERT) VALUES (?, ?, ?)";

@@ -134,7 +134,7 @@ public class P12ComplexCertRequestGenCommand extends CertRequestGenCommand
 
         ASN1ObjectIdentifier id;
 
-		// dateOfBirth
+        // dateOfBirth
         id = ObjectIdentifiers.DN_DATE_OF_BIRTH;
         RDN[] rdns = name.getRDNs(id);
 
@@ -145,7 +145,7 @@ public class P12ComplexCertRequestGenCommand extends CertRequestGenCommand
             l.add(rdn);
         }
 
-		// postalAddress
+        // postalAddress
         id = ObjectIdentifiers.DN_POSTAL_ADDRESS;
         rdns = name.getRDNs(id);
 
@@ -160,7 +160,7 @@ public class P12ComplexCertRequestGenCommand extends CertRequestGenCommand
             l.add(rdn);
         }
 
-		// DN_UNIQUE_IDENTIFIER
+        // DN_UNIQUE_IDENTIFIER
         id = ObjectIdentifiers.DN_UNIQUE_IDENTIFIER;
         rdns = name.getRDNs(id);
 

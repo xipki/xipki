@@ -98,28 +98,28 @@ public class SubjectDNSpec
 
         Set<ASN1ObjectIdentifier> ids = new HashSet<>();
 
-		// businessCategory
+        // businessCategory
         id = ObjectIdentifiers.DN_BUSINESS_CATEGORY;
         ids.add(id);
         ranges.put(id, r_128);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-    	// countryName
+        // countryName
         id = ObjectIdentifiers.DN_C;
         ids.add(id);
         ranges.put(id, r_countryName);
         stringTypeSets.put(id, printableStringOnly);
         defaultStringTypes.put(id, StringType.printableString);
 
-		// commonName
+        // commonName
         id = ObjectIdentifiers.DN_CN;
         ids.add(id);
         ranges.put(id, r_64);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// countryOfCitizenship
+        // countryOfCitizenship
         id = ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP;
         ids.add(id);
         ranges.put(id, r_countryName);
@@ -127,7 +127,7 @@ public class SubjectDNSpec
         stringTypeSets.put(id, printableStringOnly);
         defaultStringTypes.put(id, StringType.printableString);
 
-		// countryOfResidence
+        // countryOfResidence
         id = ObjectIdentifiers.DN_COUNTRY_OF_RESIDENCE;
         ids.add(id);
         ranges.put(id, r_countryName);
@@ -147,13 +147,13 @@ public class SubjectDNSpec
         stringTypeSets.put(id, ia5StringOnly);
         defaultStringTypes.put(id, StringType.ia5String);
 
-		// RFC 2256 dmdName
+        // RFC 2256 dmdName
         id = ObjectIdentifiers.DN_DMD_NAME;
         ids.add(id);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// gender
+        // gender
         id = ObjectIdentifiers.DN_GENDER;
         ids.add(id);
         patterns.put(id, p_gender);
@@ -168,41 +168,41 @@ public class SubjectDNSpec
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// givenName
+        // givenName
         id = ObjectIdentifiers.DN_GIVENNAME;
         ids.add(id);
         ranges.put(id, r_64);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// initials
+        // initials
         id = ObjectIdentifiers.DN_INITIALS;
         ids.add(id);
         ranges.put(id, r_64);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// LDAP user ID
+        // LDAP user ID
         id = ObjectIdentifiers.DN_LDAP_UID;
         ids.add(id);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// localityName 
+        // localityName
         id = ObjectIdentifiers.DN_LOCALITYNAME;
         ids.add(id);
         ranges.put(id, r_128);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// name
+        // name
         id = ObjectIdentifiers.DN_NAME;
         ids.add(id);
         ranges.put(id, r_name);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// nameOfBirth
+        // nameOfBirth
         id = ObjectIdentifiers.DN_NAME_AT_BIRTH;
         ids.add(id);
         ranges.put(id, r_64);
@@ -216,14 +216,14 @@ public class SubjectDNSpec
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// organizationalUnitName
+        // organizationalUnitName
         id = ObjectIdentifiers.DN_OU;
         ids.add(id);
         ranges.put(id, r_64);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// placeOfBirth
+        // placeOfBirth
         id = ObjectIdentifiers.DN_PLACE_OF_BIRTH;
         ids.add(id);
         ranges.put(id, r_128);
@@ -237,81 +237,81 @@ public class SubjectDNSpec
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// postalCode
+        // postalCode
         id = ObjectIdentifiers.DN_POSTAL_CODE;
         ids.add(id);
         ranges.put(id, r_postalCode);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// pseudonym
+        // pseudonym
         id = ObjectIdentifiers.DN_PSEUDONYM;
         ids.add(id);
         ranges.put(id, r_64);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// distinguishedNameQualifier
+        // distinguishedNameQualifier
         id = ObjectIdentifiers.DN_QUALIFIER;
         ids.add(id);
         ranges.put(id, r_64);
         stringTypeSets.put(id, printableStringOnly);
         defaultStringTypes.put(id, StringType.printableString);
 
-		// serialNumber
+        // serialNumber
         id = ObjectIdentifiers.DN_SERIALNUMBER;
         ids.add(id);
         ranges.put(id, r_64);
         stringTypeSets.put(id, printableStringOnly);
         defaultStringTypes.put(id, StringType.printableString);
 
-		// stateOrProvinceName 
+        // stateOrProvinceName
         id = ObjectIdentifiers.DN_ST;
         ids.add(id);
         ranges.put(id, r_128);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// streetAddress 
+        // streetAddress
         id = ObjectIdentifiers.DN_STREET;
         ids.add(id);
         ranges.put(id, r_128);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// surName
+        // surName
         id = ObjectIdentifiers.DN_SURNAME;
         ids.add(id);
         ranges.put(id, r_64);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// title
+        // title
         id = ObjectIdentifiers.DN_T;
         ids.add(id);
         ranges.put(id, r_64);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// telefonNumber
+        // telefonNumber
         id = ObjectIdentifiers.DN_TELEPHONE_NUMBER;
         ids.add(id);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// unique Identifier
+        // unique Identifier
         id = ObjectIdentifiers.DN_UNIQUE_IDENTIFIER;
         ids.add(id);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// unstructedAddress
+        // unstructedAddress
         id = ObjectIdentifiers.DN_UnstructuredAddress;
         ids.add(id);
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-		// unstructedName
+        // unstructedName
         id = ObjectIdentifiers.DN_UnstructuredName;
         ids.add(id);
         stringTypeSets.put(id, directoryStrings);

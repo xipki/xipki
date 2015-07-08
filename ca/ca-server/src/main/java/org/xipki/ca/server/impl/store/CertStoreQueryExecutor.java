@@ -79,6 +79,7 @@ import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.server.impl.CertRevInfoWithSerial;
 import org.xipki.ca.server.impl.CertStatus;
+import org.xipki.ca.server.impl.KnowCertResult;
 import org.xipki.ca.server.impl.SubjectKeyProfileBundle;
 import org.xipki.ca.server.mgmt.api.CertArt;
 import org.xipki.common.CRLReason;
@@ -206,7 +207,7 @@ class CertStoreQueryExecutor
                 "INSERT INTO CERT" +
                 " (ID, ART, LAST_UPDATE, SERIAL, SUBJECT, FP_SUBJECT, REQ_SUBJECT, FP_REQ_SUBJECT, "
                 + "NOTBEFORE, NOTAFTER, REVOKED, PROFILE_ID," +
-                " CA_ID, REQUESTOR_ID, USER, FP_PK, EE, REQ_TYPE, TID)" +
+                " CA_ID, REQUESTOR_ID, UNAME, FP_PK, EE, REQ_TYPE, TID)" +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, FP, CERT) VALUES (?, ?, ?)";
@@ -1172,12 +1173,12 @@ class CertStoreQueryExecutor
         boolean considerUserLike = false;
         if(userLike == null)
         {
-            sqlBuilder.append(" AND USER IS NULL");
+            sqlBuilder.append(" AND UNAME IS NULL");
         }
         else if("all".equalsIgnoreCase(userLike) == false)
         {
             considerUserLike = true;
-            sqlBuilder.append(" AND USER LIKE ?");
+            sqlBuilder.append(" AND UNAME LIKE ?");
         }
 
         final String sql = dataSource.createFetchFirstSelectSQL(sqlBuilder.toString(), numEntries);
@@ -1248,12 +1249,12 @@ class CertStoreQueryExecutor
         boolean considerUserLike = false;
         if(userLike == null)
         {
-            sqlBuilder.append(" AND USER IS NULL");
+            sqlBuilder.append(" AND UNAME IS NULL");
         }
         else if("all".equalsIgnoreCase(userLike) == false)
         {
             considerUserLike = true;
-            sqlBuilder.append(" AND USER LIKE ?)");
+            sqlBuilder.append(" AND UNAME LIKE ?)");
         }
 
         String sql = sqlBuilder.toString();
@@ -1813,21 +1814,30 @@ class CertStoreQueryExecutor
         return null;
     }
 
-    boolean containsCertForSerial(
+    KnowCertResult knowsCertForSerial(
             final X509CertWithDBCertId caCert,
             final BigInteger serial)
-    throws DataAccessException
+    throws DataAccessException, OperationException
     {
-        final String sql = dataSource.createFetchFirstSelectSQL("ID FROM CERT WHERE SERIAL=?", 1);
+        int caId = getCaId(caCert);
+
+        final String sql = dataSource.createFetchFirstSelectSQL("UNAME FROM CERT WHERE CA_ID=? AND SERIAL=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try
         {
-            ps.setLong(1, serial.longValue());
+            ps.setInt(1, caId);
+            ps.setLong(2, serial.longValue());
             rs = ps.executeQuery();
 
-            return rs.next();
+            if(rs.next() == false)
+            {
+                return KnowCertResult.UNKNOWN;
+            }
+
+            String user = rs.getString("UNAME");
+            return new KnowCertResult(true, user);
         }catch(SQLException e)
         {
             throw dataSource.translate(sql, e);

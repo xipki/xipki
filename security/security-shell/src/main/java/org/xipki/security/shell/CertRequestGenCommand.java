@@ -318,7 +318,7 @@ public abstract class CertRequestGenCommand extends SecurityCommand
         }
         else if(biometricType == null && biometricHashAlgo == null && biometricFile == null)
         {
-        	// Do nothing
+            // Do nothing
         }
         else
         {

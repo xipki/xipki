@@ -438,7 +438,7 @@ public class CrlCertStatusStore extends CertStatusStore
             byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
             if(extnValue == null)
             {
-            	// try the legacy OID
+                // try the legacy OID
                 extnValue = crl.getExtensionValue("1.3.6.1.4.1.12655.100");
             }
 

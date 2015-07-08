@@ -85,7 +85,6 @@ public class ScepServlet extends HttpServlet
     private static final int CGI_PROGRAM_LEN = CGI_PROGRAM.length();
 
     private static final String CT_REQUEST  = ScepConstants.CT_x_pki_message;
-    private static final String CT_REQUEST_FUTURE  = "application/pki-message";
     private static final String CT_RESPONSE = ScepConstants.CT_x_pki_message;
 
     private AuditLoggingServiceRegister auditServiceRegister;
@@ -151,9 +150,9 @@ public class ScepServlet extends HttpServlet
         AuditEvent auditEvent = (auditLoggingService != null) ? new AuditEvent(new Date()) : null;
         if(auditEvent != null)
         {
-            auditEvent.setApplicationName("SCEP-Server");
+            auditEvent.setApplicationName("SCEP");
             auditEvent.setName("PERF");
-            auditEvent.addEventData(new AuditEventData("NAME", scepName));
+            auditEvent.addEventData(new AuditEventData("NAME", scepName + "/" + certProfileName));
         }
 
         AuditLevel auditLevel = AuditLevel.INFO;
@@ -201,7 +200,7 @@ public class ScepServlet extends HttpServlet
             if("PKIOperation".equalsIgnoreCase(operation))
             {
                 String reqCt = request.getContentType();
-                if(CT_REQUEST.equalsIgnoreCase(reqCt) == false && CT_REQUEST_FUTURE.equalsIgnoreCase(reqCt) == false)
+                if(CT_REQUEST.equalsIgnoreCase(reqCt) == false)
                 {
                     response.setContentLength(0);
                     response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -212,7 +211,7 @@ public class ScepServlet extends HttpServlet
                 }
 
                 CMSSignedData reqMessage;
-            	// parse the request
+                // parse the request
                 try
                 {
                     byte[] content;
@@ -285,14 +284,14 @@ public class ScepServlet extends HttpServlet
             }
             else if(Operation.GetCACaps.getCode().equalsIgnoreCase(operation))
             {
-            	// CA-Ident is ignored
+                // CA-Ident is ignored
                 response.setContentType(ScepConstants.CT_text_palin);
                 byte[] caCapsBytes = responder.getCaCaps().getBytes();
                 respStream.write(caCapsBytes);
             }
             else if(Operation.GetCACert.getCode().equalsIgnoreCase(operation))
             {
-            	// CA-Ident is ignored
+                // CA-Ident is ignored
                 byte[] respBytes = responder.getCACertResp().getBytes();
                 response.setContentType(ScepConstants.CT_x_x509_ca_ra_cert);
                 response.setContentLength(respBytes.length);

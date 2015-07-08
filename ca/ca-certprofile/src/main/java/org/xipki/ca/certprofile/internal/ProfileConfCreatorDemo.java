@@ -1251,7 +1251,7 @@ public class ProfileConfCreatorDemo
 
         // type
         {
-        	// predefined image (0)
+            // predefined image (0)
             BiometricTypeType type = new BiometricTypeType();
             IntWithDescType predefined = new IntWithDescType();
             predefined.setValue(0);
@@ -1259,7 +1259,7 @@ public class ProfileConfCreatorDemo
             type.setPredefined(predefined);
             extValue.getType().add(type);
 
-        	// predefined handwritten-signature(1)
+            // predefined handwritten-signature(1)
             type = new BiometricTypeType();
             predefined = new IntWithDescType();
             predefined.setValue(1);
@@ -1267,7 +1267,7 @@ public class ProfileConfCreatorDemo
             type.setPredefined(predefined);
             extValue.getType().add(type);
 
-        	// OID
+            // OID
             type = new BiometricTypeType();
             type.setOid(createOidType(new ASN1ObjectIdentifier("1.2.3.4.5.6"), "dummy biometric type"));
             extValue.getType().add(type);
@@ -1639,7 +1639,7 @@ public class ProfileConfCreatorDemo
         X509ProfileType profile = getBaseProfile("Certprofile EE complex", false, "5y", true,
                 new String[]{"SHA1"});
 
-	    // Subject
+        // Subject
         Subject subject = profile.getSubject();
         subject.setIncSerialNumber(false);
 
@@ -1653,53 +1653,53 @@ public class ProfileConfCreatorDemo
         rdnControls.add(createRDN(ObjectIdentifiers.DN_POSTAL_ADDRESS, 1, 1));
         rdnControls.add(createRDN(ObjectIdentifiers.DN_UNIQUE_IDENTIFIER, 1, 1));
 
-	    // Extensions
-	    // Extensions - general
+        // Extensions
+        // Extensions - general
         ExtensionsType extensions = profile.getExtensions();
 
-	    // Extensions - controls
+        // Extensions - controls
         List<ExtensionType> list = extensions.getExtension();
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
         list.add(createExtension(Extension.freshestCRL, false, false, null));
 
-	    // Extensions - basicConstraints
+        // Extensions - basicConstraints
         ExtensionValueType extensionValue = null;
         list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
 
-	    // Extensions - AuthorityInfoAccess
+        // Extensions - AuthorityInfoAccess
         extensionValue = createAuthorityInfoAccess();
         list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
 
-	    // Extensions - AuthorityKeyIdentifier
+        // Extensions - AuthorityKeyIdentifier
         extensionValue = createAuthorityKeyIdentifier(true);
         list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
 
-	    // Extensions - keyUsage
+        // Extensions - keyUsage
         extensionValue = createKeyUsages(
                 new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.DATA_ENCIPHERMENT,
                         KeyUsageEnum.KEY_ENCIPHERMENT},
                 null);
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
-	    // Extensions - extenedKeyUsage
+        // Extensions - extenedKeyUsage
         extensionValue = createExtendedKeyUsage(new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_serverAuth},
                 new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth});
         list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
 
-	    // Admission
+        // Admission
         extensionValue = createAdmission(new ASN1ObjectIdentifier("1.1.1.2"), "demo item");
         list.add(createExtension(ObjectIdentifiers.id_extension_admission, true, false, extensionValue));
 
-	    // restriction
+        // restriction
         extensionValue = createRestriction(DirectoryStringType.UTF_8_STRING, "demo restriction");
         list.add(createExtension(ObjectIdentifiers.id_extension_restriction, true, false, extensionValue));
 
-	    // additionalInformation
+        // additionalInformation
         extensionValue = createAdditionalInformation(DirectoryStringType.UTF_8_STRING, "demo additional information");
         list.add(createExtension(ObjectIdentifiers.id_extension_additionalInformation, true, false, extensionValue));
 
-	    // validationModel
+        // validationModel
         extensionValue = createConstantExtValue(
                 new ASN1ObjectIdentifier("1.3.6.1.4.1.8301.3.5.1").getEncoded(), "chain");
         list.add(createExtension(ObjectIdentifiers.id_extension_validityModel,
