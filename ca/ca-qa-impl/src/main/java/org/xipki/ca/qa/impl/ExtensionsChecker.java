@@ -678,33 +678,33 @@ public class ExtensionsChecker
                     checkExtensionOcspNocheck(failureMsg, extensionValue);
                 } else if(ObjectIdentifiers.id_extension_restriction.equals(oid))
                 {
-                	// restriction
+                    // restriction
                     checkExtensionRestriction(failureMsg, extensionValue, requestExtensions, extControl);
                 } else if(ObjectIdentifiers.id_extension_additionalInformation.equals(oid))
                 {
-                	// additionalInformation
+                    // additionalInformation
                     checkExtensionAdditionalInformation(failureMsg, extensionValue, requestExtensions, extControl);
                 } else if(ObjectIdentifiers.id_extension_validityModel.equals(oid))
                 {
-                	// validityModel
+                    // validityModel
                     checkExtensionValidityModel(failureMsg, extensionValue, requestExtensions, extControl);
                 } else if(Extension.privateKeyUsagePeriod.equals(oid))
                 {
-                	// privateKeyUsagePeriod
+                    // privateKeyUsagePeriod
                     checkExtensionPrivateKeyUsagePeriod(failureMsg, extensionValue,
                             jceCert.getNotBefore(), jceCert.getNotAfter());
                 } else if(Extension.qCStatements.equals(oid))
                 {
-                	// qCStatements
+                    // qCStatements
                     checkExtensionQCStatements(failureMsg, extensionValue, requestExtensions, extControl);
                 } else if (Extension.biometricInfo.equals(oid))
                 {
-                	// biometricInfo
+                    // biometricInfo
                     checkExtensionBiometricInfo(failureMsg, extensionValue, requestExtensions, extControl);
                 }
                 else if(ObjectIdentifiers.id_xipki_ext_authorizationTemplate.equals(oid))
                 {
-                	// authorizationTemplate
+                    // authorizationTemplate
                     checkExtensionAuthorizationTemplate(failureMsg, extensionValue, requestExtensions, extControl);
                 }
                 else
@@ -2461,7 +2461,7 @@ public class ExtensionsChecker
             return;
         }
 
-		// extract the euLimit data from request
+        // extract the euLimit data from request
         Map<String, int[]> reqQcEuLimits = new HashMap<>();
         Extension extension = requestExtensions.getExtension(Extension.qCStatements);
         if(extension != null)

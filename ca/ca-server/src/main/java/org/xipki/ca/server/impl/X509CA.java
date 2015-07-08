@@ -671,16 +671,16 @@ public class X509CA
         return certstore.getCertificate(subjectName, transactionId);
     }
 
-    public boolean knowsCertificate(X509Certificate cert)
+    public KnowCertResult knowsCertificate(X509Certificate cert)
     throws OperationException
     {
         if(caInfo.getSubject().equals(
                 X509Util.getRFC4519Name(cert.getIssuerX500Principal())) == false)
         {
-            return false;
+            return KnowCertResult.UNKNOWN;
         }
 
-        return certstore.containsCertForSerial(caInfo.getCertificate(), cert.getSerialNumber());
+        return certstore.knowsCertForSerial(caInfo.getCertificate(), cert.getSerialNumber());
     }
 
     public boolean authenticateUser(String user, byte[] password)

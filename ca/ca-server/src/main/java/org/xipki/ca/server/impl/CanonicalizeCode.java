@@ -210,8 +210,9 @@ public class CanonicalizeCode
     {
         if(line.trim().startsWith("//"))
         {
-    		// comments
-            return line;
+            // comments
+            String nline = line.replace("\t", "    ");
+            return removeTrailingSpaces(nline);
         }
 
         StringBuilder sb = new StringBuilder();
@@ -421,6 +422,28 @@ public class CanonicalizeCode
                     ": no authors line");
         }
 
+    }
+
+    private static String removeTrailingSpaces(String line)
+    {
+        final int n = line.length();
+        int i;
+        for(i = n - 1; i >= 0; i--)
+        {
+            char c = line.charAt(i);
+            if(c != ' ')
+            {
+                break;
+            }
+        }
+        if(i == n - 1)
+        {
+            return line;
+        }
+        else
+        {
+            return line.substring(0, i + 1);
+        }
     }
 
 }

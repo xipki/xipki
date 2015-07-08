@@ -81,7 +81,7 @@ public class CaCheckCommand extends CaUpdateCommand
 
         X509CAEntry ca = (X509CAEntry) entry;
 
-    	// CA cert uris
+        // CA cert uris
         if(ey.getCaCertUris() != null)
         {
             List<String> ex = ey.getCaCertUris();
@@ -89,7 +89,7 @@ public class CaCheckCommand extends CaUpdateCommand
             MgmtQAShellUtil.assertEquals("CA cert uris", ex, is);
         }
 
-    	// CA certificate
+        // CA certificate
         if(ey.getCert() != null)
         {
             X509Certificate ex = ey.getCert();
@@ -100,7 +100,7 @@ public class CaCheckCommand extends CaUpdateCommand
             }
         }
 
-    	// CMP control name
+        // CMP control name
         if(ey.getCmpControlName() != null)
         {
             String ex = ey.getCmpControlName();
@@ -108,7 +108,7 @@ public class CaCheckCommand extends CaUpdateCommand
             MgmtQAShellUtil.assertEquals("CMP control name", ex, is);
         }
 
-    	// CRL signer name 
+        // CRL signer name
         if(ey.getCrlSignerName() != null)
         {
             String ex = ey.getCrlSignerName();
@@ -116,7 +116,7 @@ public class CaCheckCommand extends CaUpdateCommand
             MgmtQAShellUtil.assertEquals("CRL signer name", ex, is);
         }
 
-    	// CRL uris
+        // CRL uris
         if(ey.getCrlUris() != null)
         {
             List<String> ex = ey.getCrlUris();
@@ -124,7 +124,7 @@ public class CaCheckCommand extends CaUpdateCommand
             MgmtQAShellUtil.assertEquals("CRL uris", ex, is);
         }
 
-    	// DeltaCRL uris
+        // DeltaCRL uris
         if(ey.getDeltaCrlUris() != null)
         {
             List<String> ex = ey.getDeltaCrlUris();
@@ -132,7 +132,7 @@ public class CaCheckCommand extends CaUpdateCommand
             MgmtQAShellUtil.assertEquals("Delta CRL uris", ex, is);
         }
 
-    	// Duplicate key mode
+        // Duplicate key mode
         if(ey.getDuplicateKeyMode() != null)
         {
             DuplicationMode ex = ey.getDuplicateKeyMode();
@@ -143,7 +143,7 @@ public class CaCheckCommand extends CaUpdateCommand
             }
         }
 
-    	// Duplicate subject mode
+        // Duplicate subject mode
         if(ey.getDuplicateSubjectMode() != null)
         {
             DuplicationMode ex = ey.getDuplicateSubjectMode();
@@ -154,7 +154,7 @@ public class CaCheckCommand extends CaUpdateCommand
             }
         }
 
-    	// Expiration period
+        // Expiration period
         if(ey.getExpirationPeriod() != null)
         {
             Integer ex = ey.getExpirationPeriod();
@@ -165,7 +165,7 @@ public class CaCheckCommand extends CaUpdateCommand
             }
         }
 
-    	// Extra control
+        // Extra control
         if(ey.getExtraControl() != null)
         {
             String ex = ey.getExtraControl();
@@ -176,7 +176,7 @@ public class CaCheckCommand extends CaUpdateCommand
             }
         }
 
-    	// Max validity 
+        // Max validity
         if(ey.getMaxValidity() != null)
         {
             CertValidity ex = ey.getMaxValidity();
@@ -187,7 +187,7 @@ public class CaCheckCommand extends CaUpdateCommand
             }
         }
 
-    	// Num CRLs
+        // Num CRLs
         if(ey.getNumCrls() != null)
         {
             int ex = ey.getNumCrls();
@@ -198,7 +198,7 @@ public class CaCheckCommand extends CaUpdateCommand
             }
         }
 
-    	// OCSP uris
+        // OCSP uris
         if(ey.getOcspUris() != null)
         {
             List<String> ex = ey.getOcspUris();
@@ -206,7 +206,7 @@ public class CaCheckCommand extends CaUpdateCommand
             MgmtQAShellUtil.assertEquals("OCSP uris", ex, is);
         }
 
-    	// Permissions
+        // Permissions
         if(ey.getPermissions() != null)
         {
             Set<Permission> ex = ey.getPermissions();
@@ -214,7 +214,7 @@ public class CaCheckCommand extends CaUpdateCommand
             MgmtQAShellUtil.assertEquals("permissions", ex, is);
         }
 
-    	// Responder name
+        // Responder name
         if(ey.getResponderName() != null)
         {
             String ex = ey.getResponderName();
@@ -222,7 +222,7 @@ public class CaCheckCommand extends CaUpdateCommand
             MgmtQAShellUtil.assertEquals("responder name", ex, is);
         }
 
-    	// Signer Type
+        // Signer Type
         if(ey.getSignerType() != null)
         {
             String ex = ey.getSignerType();
@@ -242,7 +242,7 @@ public class CaCheckCommand extends CaUpdateCommand
             }
         }
 
-    	// Status
+        // Status
         if(ey.getStatus() != null)
         {
             CAStatus ex = ey.getStatus();
@@ -253,7 +253,7 @@ public class CaCheckCommand extends CaUpdateCommand
             }
         }
 
-    	// validity mode
+        // validity mode
         if(ey.getValidityMode() != null)
         {
             ValidityMode ex = ey.getValidityMode();

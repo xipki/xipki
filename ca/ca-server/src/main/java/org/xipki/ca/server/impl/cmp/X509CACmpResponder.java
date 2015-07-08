@@ -595,7 +595,7 @@ public class X509CACmpResponder extends CmpResponder
             X500Name subject = certTemp.getSubject();
             if(childAuditEvent != null)
             {
-                childAuditEvent.addEventData(new AuditEventData("subject", X509Util.getRFC4519Name(subject)));
+                childAuditEvent.addEventData(new AuditEventData("req-subject", X509Util.getRFC4519Name(subject)));
             }
 
             SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
@@ -692,7 +692,7 @@ public class X509CACmpResponder extends CmpResponder
 
             if(childAuditEvent != null)
             {
-                childAuditEvent.addEventData(new AuditEventData("subject",
+                childAuditEvent.addEventData(new AuditEventData("req-subject",
                         certInfo.getCert().getSubject()));
             }
 
@@ -905,17 +905,17 @@ public class X509CACmpResponder extends CmpResponder
                 X509CA ca = getCA();
                 if(Permission.UNREVOKE_CERT == permission)
                 {
-                	// unrevoke
+                    // unrevoke
                     returnedObj = ca.unrevokeCertificate(snBigInt);
                 }
                 else if(Permission.REMOVE_CERT == permission)
                 {
-                	// remove
+                    // remove
                     returnedObj = ca.removeCertificate(snBigInt);
                 }
                 else
                 {
-                	// revoke
+                    // revoke
                     Date invalidityDate = null;
                     CRLReason reason = null;
 

@@ -54,6 +54,7 @@ import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.server.impl.CertRevInfoWithSerial;
 import org.xipki.ca.server.impl.CertStatus;
+import org.xipki.ca.server.impl.KnowCertResult;
 import org.xipki.ca.server.impl.SubjectKeyProfileBundle;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.ParamChecker;
@@ -678,14 +679,14 @@ public class CertificateStore
         }
     }
 
-    public boolean containsCertForSerial(
+    public KnowCertResult knowsCertForSerial(
             final X509CertWithDBCertId caCert,
             final BigInteger serial)
     throws OperationException
     {
         try
         {
-            return queryExecutor.containsCertForSerial(caCert, serial);
+            return queryExecutor.knowsCertForSerial(caCert, serial);
         } catch (DataAccessException e)
         {
             LOG.debug("DataAccessException", e);

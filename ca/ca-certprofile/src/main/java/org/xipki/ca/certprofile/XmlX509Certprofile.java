@@ -976,7 +976,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             }
             else if(qcStatementsOption != null)
             {
-        		// extract the euLimit data from request
+                // extract the euLimit data from request
                 Extension extension = requestedExtensions.getExtension(type);
                 if(extension == null)
                 {

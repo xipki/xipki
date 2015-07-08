@@ -112,7 +112,7 @@ public class CaAddFromFileCommand extends CaCommand
             stream.close();
         }
 
-    	// ART
+        // ART
         String key = "ART";
         String s = getStrProp(props, key, true);
         CertArt art = CertArt.valueOf(s);
@@ -123,7 +123,7 @@ public class CaAddFromFileCommand extends CaCommand
             throw new IllegalCmdParamException("unsupported " + key + ": '" + s + "'");
         }
 
-    	// NEXT_SERIAL
+        // NEXT_SERIAL
         key = "NEXT_SERIAL";
         long nextSerial = getRequiredLongProp(props, key);
         if(nextSerial < 0)
@@ -238,7 +238,7 @@ public class CaAddFromFileCommand extends CaCommand
         assertNotNull(validityMode, key, s);
         entry.setValidityMode(validityMode);
 
-    	// CRLSIGNER_NAME
+        // CRLSIGNER_NAME
         key = "CRLSIGNER_NAME";
         s = getStrProp(props, key, false);
         if(s != null)
@@ -303,15 +303,15 @@ public class CaAddFromFileCommand extends CaCommand
 
         if(revoked)
         {
-        	// REV_REASON
+            // REV_REASON
             key = "REV_REASON";
             int reasonCode = getRequiredIntProp(props, key);
 
-        	// REV_TIME
+            // REV_TIME
             key = "REV_TIME";
             Date revocationTime = new Date(getRequiredLongProp(props, key) * 1000);
 
-        	// REV_INV_TIME
+            // REV_INV_TIME
             key = "REV_INV_TIME";
             Long t = getLongProp(props, key, false);
             Date invalidityTime = null;

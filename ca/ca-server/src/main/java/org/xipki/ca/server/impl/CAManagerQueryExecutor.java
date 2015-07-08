@@ -2726,7 +2726,7 @@ class CAManagerQueryExecutor
         PreparedStatement ps = null;
         try
         {
-        	// TODO: validate the entries before writing to DB
+            // TODO: validate the entries before writing to DB
             ps = prepareStatement(sql);
             int idx = 1;
             ps.setString(idx++, scepEntry.getCaName());
