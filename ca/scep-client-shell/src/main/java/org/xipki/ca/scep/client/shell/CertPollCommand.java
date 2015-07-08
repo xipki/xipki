@@ -41,7 +41,9 @@ import java.util.List;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.scep4j.client.EnrolmentResponse;
 import org.xipki.scep4j.client.ScepClient;
@@ -53,6 +55,12 @@ import org.xipki.scep4j.client.ScepClient;
 @Command(scope = "scep", name = "certpoll", description="poll certificate")
 public class CertPollCommand extends ClientCommand
 {
+    @Option(name = "--p10",
+            required = true,
+            description = "PKCS#10 request file\n"
+                    + "(required)")
+    private String p10File;
+
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"
@@ -63,11 +71,14 @@ public class CertPollCommand extends ClientCommand
     protected Object _doExecute()
     throws Exception
     {
+        CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(p10File));
+
         ScepClient client = getScepClient();
         X509Certificate caCert = client.getAuthorityCertStore().getCACert();
         X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
 
-        EnrolmentResponse resp = client.scepCertPoll(getIdentityKey(), getIdentityCert(), caSubject);
+        EnrolmentResponse resp = client.scepCertPoll(getIdentityKey(), getIdentityCert(),
+                csr, caSubject);
         if(resp.isFailure())
         {
             throw new CmdFailure("server returned 'failure'");

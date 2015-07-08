@@ -345,7 +345,7 @@ public abstract class EnrollCertCommand extends ClientCommand
         }
         else if(biometricType == null && biometricHashAlgo == null && biometricFile == null)
         {
-        	// Do nothing
+            // Do nothing
         }
         else
         {

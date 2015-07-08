@@ -347,7 +347,7 @@ public class SubjectChecker
     {
         ValidationIssue issue = createSubjectIssue(type);
 
-        // control        
+        // control
         int minOccurs;
         int maxOccurs;
         RDNControl rdnControl = subjectControl.getControl(type);
