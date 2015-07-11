@@ -317,6 +317,7 @@
                 <feature>xipki-audit-syslog</feature>
                 <feature>xipki-pkiconsole-server</feature>
                 <feature>xipki-scepclient-shell</feature>
+                <feature>xipki-jscepclient-shell</feature>
               </features>
             </configuration>
           </execution>
