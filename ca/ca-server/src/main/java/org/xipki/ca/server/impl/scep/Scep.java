@@ -49,6 +49,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.cms.SignedData;
@@ -629,7 +630,8 @@ public class Scep
                 }
             } // end switch
 
-            rep.setMessageData(signedData);
+            ContentInfo ci = new ContentInfo(CMSObjectIdentifiers.signedData, signedData);
+            rep.setMessageData(ci);
             rep.setPkiStatus(PkiStatus.SUCCESS);
         }catch(FailInfoException e)
         {

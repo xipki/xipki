@@ -84,7 +84,6 @@ public class ScepServlet extends HttpServlet
     private static final String CGI_PROGRAM = "/pkiclient.exe";
     private static final int CGI_PROGRAM_LEN = CGI_PROGRAM.length();
 
-    private static final String CT_REQUEST  = ScepConstants.CT_x_pki_message;
     private static final String CT_RESPONSE = ScepConstants.CT_x_pki_message;
 
     private AuditLoggingServiceRegister auditServiceRegister;
@@ -199,17 +198,6 @@ public class ScepServlet extends HttpServlet
 
             if("PKIOperation".equalsIgnoreCase(operation))
             {
-                String reqCt = request.getContentType();
-                if(CT_REQUEST.equalsIgnoreCase(reqCt) == false)
-                {
-                    response.setContentLength(0);
-                    response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-
-                    auditStatus = AuditStatus.FAILED;
-                    auditMessage = "unsupported media type " + request.getContentType();
-                    return;
-                }
-
                 CMSSignedData reqMessage;
                 // parse the request
                 try

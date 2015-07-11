@@ -3,18 +3,7 @@
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
-      <action class="org.xipki.ca.scep.client.shell.EnrollCertCommand">
-      </action>
-      <optional-completers>
-        <entry key="--ca-cert" value-ref="filePathCompleter"/>
-        <entry key="--out" value-ref="filePathCompleter"/>
-        <entry key="--p10" value-ref="filePathCompleter"/>
-        <entry key="--p12" value-ref="filePathCompleter"/>
-      </optional-completers>
-    </command>
-    <!--
-    <command>
-      <action class="org.xipki.ca.scep.client.shell.PkcsReqCommand">
+      <action class="org.xipki.ca.jscep.client.shell.EnrollCertCommand">
       </action>
       <optional-completers>
         <entry key="--ca-cert" value-ref="filePathCompleter"/>
@@ -24,27 +13,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.scep.client.shell.RenewalReqCommand">
-      </action>
-      <optional-completers>
-        <entry key="--ca-cert" value-ref="filePathCompleter"/>
-        <entry key="--out" value-ref="filePathCompleter"/>
-        <entry key="--p10" value-ref="filePathCompleter"/>
-        <entry key="--p12" value-ref="filePathCompleter"/>
-      </optional-completers>
-    </command>
-    <command>
-      <action class="org.xipki.ca.scep.client.shell.UpdateReqCommand">
-      </action>
-      <optional-completers>
-        <entry key="--ca-cert" value-ref="filePathCompleter"/>
-        <entry key="--out" value-ref="filePathCompleter"/>
-        <entry key="--p10" value-ref="filePathCompleter"/>
-        <entry key="--p12" value-ref="filePathCompleter"/>
-      </optional-completers>
-    </command>
-    <command>
-      <action class="org.xipki.ca.scep.client.shell.GetCertCommand">
+      <action class="org.xipki.ca.jscep.client.shell.GetCertCommand">
       </action>
       <optional-completers>
         <entry key="--ca-cert" value-ref="filePathCompleter"/>
@@ -53,7 +22,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.scep.client.shell.CertPollCommand">
+      <action class="org.xipki.ca.jscep.client.shell.CertPollCommand">
       </action>
       <optional-completers>
         <entry key="--ca-cert" value-ref="filePathCompleter"/>
@@ -62,7 +31,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.scep.client.shell.GetCRLCommand">
+      <action class="org.xipki.ca.jscep.client.shell.GetCRLCommand">
       </action>
       <optional-completers>
         <entry key="--ca-cert" value-ref="filePathCompleter"/>
@@ -71,6 +40,5 @@
         <entry key="--p12" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
-    -->
   </command-bundle>
 </blueprint>

@@ -30,4 +30,5 @@ xipki-ca:scep-add \
 xipki-ca:user-add \
   --name user1\
   --password password1\
-  --cn-regex "SCEP-OCSP[1-9]{0,9}"
+  --cn-regex "J?SCEP-OCSP[1-9]{0,9}"
+

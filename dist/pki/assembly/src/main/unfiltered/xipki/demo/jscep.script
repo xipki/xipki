@@ -1,0 +1,130 @@
+JSCEP_URL = http://localhost:8080/scep/SubCAwithCRL/OCSP/pkiclient.exe
+
+#################################################################
+#              MANAGE CERTIFICATE WITH RA CLIENT                #
+#################################################################
+feature:install xipki-security-shell
+
+feature:install xipki-jscepclient-shell
+
+# Wait two seconds
+sleep 2000
+
+# Prepare
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out output/JSCEP-OCSP1.p12 \
+  --subject "CN=JSCEP-OCSP1,O=xipki,C=DE"
+
+xipki-tk:req-p12 \
+  --p12 output/JSCEP-OCSP1.p12 \
+  --password 1234 \
+  --challenge-password user1:password1 \
+  --out output/JSCEP-OCSP1.p10
+
+## Enroll certificate via PKCSReq
+jscep:enroll \
+  --url $JSCEP_URL \
+  --ca-cert output/SubCAwithCRL1.der \
+  --p12 output/JSCEP-OCSP1.p12 \
+  --password 1234 \
+  --p10 output/JSCEP-OCSP1.p10 \
+  --out output/JSCEP-OCSP1.der
+
+## Poll Cert
+jscep:certpoll \
+  --url $JSCEP_URL \
+  --ca-cert output/SubCAwithCRL1.der \
+  --p12 output/JSCEP-OCSP1.p12 \
+  --password 1234 \
+  --p10 output/JSCEP-OCSP1.p10 \
+  --out output/JSCEP-OCSP1-certpoll.der
+  
+## Get Cert
+
+jscep:getcert \
+  --url $JSCEP_URL \
+  --ca-cert output/SubCAwithCRL1.der \
+  --p12 output/JSCEP-OCSP1.p12 \
+  --password 1234 \
+  --out output/JSCEP-OCSP1-getcert.der \
+  --serial 2
+
+## Update the certificate in PKCS#12 file
+xipki-tk:update-cert-p12 \
+  --p12 output/JSCEP-OCSP1.p12 \
+  --password 1234 \
+  --cert output/JSCEP-OCSP1.der \
+  --ca-cert output/SubCAwithCRL1.der \
+  --ca-cert output/RCA1.der
+
+## Get CRL
+jscep:getcrl \
+  --url $JSCEP_URL \
+  --ca-cert output/SubCAwithCRL1.der \
+  --cert output/JSCEP-OCSP1.der \
+  --p12 output/JSCEP-OCSP1.p12 \
+  --password 1234 \
+  --out output/SubCAwithCRL1-jscep.crl
+ 
+## Renewal with same CommonName 
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out output/JSCEP-OCSP1-2.p12 \
+  --subject "CN=JSCEP-OCSP1,O=xipki,C=DE"
+
+xipki-tk:req-p12 \
+  --p12 output/JSCEP-OCSP1-2.p12 \
+  --password 1234 \
+  --out output/JSCEP-OCSP1-2.p10
+
+## Enroll certificate via Renewal, hence signed by the old key JSCEP-OCSP1.p12
+jscep:enroll \
+  --url $JSCEP_URL \
+  --ca-cert output/SubCAwithCRL1.der \
+  --p12 output/JSCEP-OCSP1.p12 \
+  --password 1234 \
+  --p10 output/JSCEP-OCSP1-2.p10 \
+  --out output/JSCEP-OCSP1-2.der \
+
+## Update the certificate in PKCS#12 file
+xipki-tk:update-cert-p12 \
+  --p12 output/JSCEP-OCSP1-2.p12 \
+  --password 1234 \
+  --cert output/JSCEP-OCSP1-2.der \
+  --ca-cert output/SubCAwithCRL1.der \
+  --ca-cert output/RCA1.der
+
+## Renewal with different CommonName 
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out output/JSCEP-OCSP2.p12 \
+  --subject "CN=JSCEP-OCSP2,O=xipki,C=DE"
+
+xipki-tk:req-p12 \
+  --p12 output/JSCEP-OCSP2.p12 \
+  --password 1234 \
+  --out output/JSCEP-OCSP2.p10
+
+## Enroll certificate via Renewal, hence signed by the old key JSCEP-OCSP1.p12
+jscep:enroll \
+  --url $JSCEP_URL \
+  --ca-cert output/SubCAwithCRL1.der \
+  --p12 output/JSCEP-OCSP1.p12 \
+  --password 1234 \
+  --p10 output/JSCEP-OCSP2.p10 \
+  --out output/JSCEP-OCSP2.der \
+
+## Update the certificate in PKCS#12 file
+xipki-tk:update-cert-p12 \
+  --p12 output/JSCEP-OCSP2.p12 \
+  --password 1234 \
+  --cert output/JSCEP-OCSP2.der \
+  --ca-cert output/SubCAwithCRL1.der \
+  --ca-cert output/RCA1.der
+
+#################################################################
+#              UNINSTALL UNNEEDED FEATURES                      #
+#################################################################
+feature:uninstall xipki-jscepclient-shell
+feature:uninstall xipki-security-shell
