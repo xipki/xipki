@@ -71,6 +71,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
+import org.xipki.audit.api.AuditStatus;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
@@ -272,6 +273,10 @@ public class Scep
         if(auditEvent != null)
         {
             audit(auditEvent, "pkiStatus", rep.getPkiStatus().toString());
+            if(rep.getPkiStatus() == PkiStatus.FAILURE)
+            {
+                auditEvent.setStatus(AuditStatus.FAILED);
+            }
             if(rep.getFailInfo() != null)
             {
                 audit(auditEvent, "failInfo", rep.getFailInfo().toString());
