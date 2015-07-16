@@ -172,7 +172,7 @@ Tested Platforms
  * Windows
  * Mac OS
 
-Build and Assembly
+Build and Assembly from Source Code
 ------------------
 * Get a copy of XiPKI code
   ```sh
@@ -202,10 +202,15 @@ Build and Assembly
     mvn clean install
     ```
 
+Download the Released Binary Package
+------
+
+Download the released binary package xipki-<version>.tar.gz from the URL https://github.com/xipki/xipki/releases
+
 Install
 -------
 
-* Copy the assembled file `xipki/dist/pki/assembly/target/xipki-<version>.tar.gz` to the destination folder
+* Copy the file `xipki-<version>.tar.gz` to the destination folder
 
 * Unpack the assembled file
  
@@ -252,4 +257,3 @@ In the OSGi console, call `source <OSGi batch script file>`, the demo script fil
 |DSA               | p12-dsa-demo.script    | hsm-dsa-demo.script     |
 |ECDSA             | p12-ec-demo.script     | hsm-ec-demo.script      |
 |PlainECDSA (BSI)  | p12-plainec-demo.script| hsm-plainec-demo.script |
-  
