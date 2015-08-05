@@ -54,13 +54,13 @@ xipki-ca:cmpcontrol-rm cmpcontrol2
 
 ##### crlsigner #####
 
-xipki-ca:crlsigner-add --name CASIGN.CRLSIGNER2 --signer-type CA --crl-control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
+xipki-ca:crlsigner-add --name CASIGN.CRLSIGNER2 --signer-type CA --control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
 
 xipki-ca:crlsigner-info
 
 xipki-ca:crlsigner-info CASIGN.CRLSIGNER2
 
-xipki-ca:crlsigner-up --name CASIGN.CRLSIGNER2 --signer-type CA --crl-control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:30%
+xipki-ca:crlsigner-up --name CASIGN.CRLSIGNER2 --signer-type CA --control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:30%
 
 xipki-ca:crlsigner-rm CASIGN.CRLSIGNER2
 

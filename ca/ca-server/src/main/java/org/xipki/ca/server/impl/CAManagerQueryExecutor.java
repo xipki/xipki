@@ -74,6 +74,7 @@ import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
+import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CertArt;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.ChangeCAEntry;
@@ -1177,6 +1178,19 @@ class CAManagerQueryExecutor
             final X509CrlSignerEntry dbEntry)
     throws CAMgmtException
     {
+        String crlControl = dbEntry.getCrlControl();
+        // validate crlControl
+        if(crlControl != null)
+        {
+            try
+            {
+                new CRLControl(crlControl);
+            } catch (ConfigurationException e)
+            {
+                throw new CAMgmtException("invalid CRL control '" + crlControl + "'");
+            }
+        }
+
         String name = dbEntry.getName();
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL)");
@@ -1194,7 +1208,6 @@ class CAManagerQueryExecutor
             ps.setString(idx++, dbEntry.getCertificate() == null ? null :
                     Base64.toBase64String(dbEntry.getCertificate().getEncoded()));
 
-            String crlControl = dbEntry.getCrlControl();
             ps.setString(idx++, crlControl);
 
             ps.executeUpdate();
@@ -1929,6 +1942,19 @@ class CAManagerQueryExecutor
         if(crlControl == null)
         {
             crlControl = dbEntry.getCrlControl();
+        } else
+        {
+            // validate crlControl
+            if(crlControl != null)
+            {
+                try
+                {
+                    new CRLControl(crlControl);
+                } catch (ConfigurationException e)
+                {
+                    throw new CAMgmtException("invalid CRL control '" + crlControl + "'");
+                }
+            }
         }
 
         try
@@ -2053,6 +2079,9 @@ class CAManagerQueryExecutor
         if(control == null)
         {
             control = dbEntry.getControl();
+        } else if(CAManager.NULL.equals(control))
+        {
+            control = null;
         }
 
         ScepEntry newDbEntry;
@@ -2726,7 +2755,6 @@ class CAManagerQueryExecutor
         PreparedStatement ps = null;
         try
         {
-            // TODO: validate the entries before writing to DB
             ps = prepareStatement(sql);
             int idx = 1;
             ps.setString(idx++, scepEntry.getCaName());

@@ -69,7 +69,7 @@ public class CrlSignerAddCommand extends CaCommand
             description = "CRL signer's certificate file")
     private String signerCertFile;
 
-    @Option(name = "--crl-control",
+    @Option(name = "--control",
             required = true,
             description = "CRL control\n"
                     + "(required)")
