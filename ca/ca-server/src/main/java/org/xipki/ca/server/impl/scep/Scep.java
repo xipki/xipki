@@ -81,7 +81,9 @@ import org.xipki.ca.server.impl.KnowCertResult;
 import org.xipki.ca.server.impl.X509CA;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
+import org.xipki.ca.server.mgmt.api.ScepControl;
 import org.xipki.ca.server.mgmt.api.ScepEntry;
+import org.xipki.common.ConfigurationException;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
@@ -120,11 +122,13 @@ public class Scep
 
     private final String caName;
     private final ScepEntry dbEntry;
+    private final ScepControl control;
     private final CAManagerImpl caManager;
 
     private PrivateKey responderKey;
     private X509Certificate responderCert;
     private CACertRespBytes cACertRespBytes;
+    private X509CertificateHolder cACert;
 
     private CACaps caCaps;
     private EnvelopedDataDecryptor envelopedDataDecryptor;
@@ -150,11 +154,19 @@ public class Scep
     {
         ParamChecker.assertNotNull("caManager", caManager);
         ParamChecker.assertNotNull("dbEntry", dbEntry);
-        ParamChecker.assertNotNull("caManager", caManager);
 
         this.caName = dbEntry.getCaName();
         this.dbEntry = dbEntry;
         this.caManager = caManager;
+        try
+        {
+            this.control = new ScepControl(dbEntry.getControl());
+        } catch (ConfigurationException e)
+        {
+            throw new CAMgmtException(e);
+        }
+        LOG.info("SCEP {}: caCert.included={}, signerCert.included={}",
+                this.caName, this.control.isIncludeCACert(), this.control.isIncludeSignerCert());
     }
 
     /**
@@ -207,12 +219,16 @@ public class Scep
         X509CA ca = caManager.getX509CA(caName);
         try
         {
+            this.cACert = new X509CertificateHolder(ca.getCAInfo().getCertificate().getEncodedCert());
             this.cACertRespBytes = new CACertRespBytes(
                     ca.getCAInfo().getCertificate().getCert(), responderCert);
         } catch (CertificateException e)
         {
             throw new CAMgmtException(e);
         } catch (CMSException e)
+        {
+            throw new CAMgmtException(e);
+        } catch (IOException e)
         {
             throw new CAMgmtException(e);
         }
@@ -267,7 +283,7 @@ public class Scep
             final AuditEvent auditEvent)
     throws MessageDecodingException, OperationException
     {
-        DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, envelopedDataDecryptor);
+        DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, envelopedDataDecryptor, null);
 
         PkiMessage rep = doServicePkiOperation(req, certProfileName, auditEvent);
         if(auditEvent != null)
@@ -701,7 +717,7 @@ public class Scep
         return buildSignedData(certs.get(0));
     }
 
-    private static SignedData buildSignedData(
+    private SignedData buildSignedData(
             final X509Certificate cert)
     throws OperationException
     {
@@ -710,6 +726,10 @@ public class Scep
         {
             X509CertificateHolder certHolder = new X509CertificateHolder(cert.getEncoded());
             cmsSignedDataGen.addCertificate(certHolder);
+            if(control.isIncludeCACert())
+            {
+                cmsSignedDataGen.addCertificate(cACert);
+            }
             CMSSignedData signedData = cmsSignedDataGen.generate(new CMSAbsentContent());
             return (SignedData) signedData.toASN1Structure().getContent();
         } catch (CMSException | IOException | CertificateEncodingException e)
@@ -763,8 +783,17 @@ public class Scep
         ContentInfo ci;
         try
         {
+            X509Certificate[] cmsCertSet;
+            if(control.isIncludeSignerCert())
+            {
+                cmsCertSet = new X509Certificate[]{responderCert};
+            } else
+            {
+                cmsCertSet = null;
+            }
+
             ci = response.encode(responderKey,
-                    signatureAlgorithm, responderCert, null,
+                    signatureAlgorithm, responderCert, cmsCertSet,
                     request.getSignatureCert(), request.getContentEncryptionAlgorithm());
         } catch (MessageEncodingException e)
         {

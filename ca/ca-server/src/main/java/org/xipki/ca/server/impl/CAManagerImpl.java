@@ -1267,9 +1267,20 @@ implements CAManager, CmpResponderManager, ScepManager
                 scepDb.setConfFaulty(true);
                 scepDbEntries.put(name, scepDb);
 
-                Scep scep = new Scep(scepDb, this);
-                scepDb.setConfFaulty(false);
-                sceps.put(name, scep);
+                try
+                {
+                    Scep scep = new Scep(scepDb, this);
+                    scepDb.setConfFaulty(false);
+                    sceps.put(name, scep);
+                }catch(CAMgmtException e)
+                {
+                    final String message = "could not initialize SCEP entry " + name + ", ignore it";
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
+                }
             }
         }
 
@@ -3341,11 +3352,11 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamChecker.assertNotNull("dbEntry", dbEntry);
         asssertMasterMode();
 
+        Scep scep = new Scep(dbEntry, this);
         boolean b = queryExecutor.addScep(dbEntry);
         if(b)
         {
             final String caName = dbEntry.getCaName();
-            Scep scep = new Scep(dbEntry, this);
             scep.refreshCA();
             scepDbEntries.put(caName, dbEntry);
             sceps.put(caName, scep);

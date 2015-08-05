@@ -71,6 +71,11 @@ public class ScepAddCommand extends CaCommand
             description = "responder certificate file")
     private String certFile;
 
+    @Option(name = "--control",
+            required = false,
+            description = "SCEP control")
+    private String scepControl;
+
     private PasswordResolver passwordResolver;
 
     public void setPasswordResolver(
@@ -94,7 +99,7 @@ public class ScepAddCommand extends CaCommand
             responderConf = ShellUtil.canonicalizeSignerConf(responderType, responderConf, passwordResolver);
         }
 
-        ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert, null);
+        ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert, scepControl);
         if(entry.isFaulty())
         {
             throw new ConfigurationException("certificate is invalid");

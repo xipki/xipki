@@ -105,7 +105,7 @@ public class ChangeScepEntry implements Serializable
         return control;
     }
 
-    public void setCrlControl(
+    public void setControl(
             final String control)
     {
         this.control = control;

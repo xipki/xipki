@@ -73,6 +73,10 @@ public class ScepUpdateCommand extends CaCommand
             description = "responder certificate file or 'NULL'")
     private String certFile;
 
+    @Option(name = "--control",
+            description = "SCEP control or 'NULL'")
+    private String control;
+
     private PasswordResolver passwordResolver;
 
     public void setPasswordResolver(
@@ -133,6 +137,11 @@ public class ScepUpdateCommand extends CaCommand
         if(certConf != null)
         {
             entry.setBase64Cert(certConf);
+        }
+
+        if(control != null)
+        {
+            entry.setControl(control);
         }
 
         boolean b = caManager.changeScep(entry);

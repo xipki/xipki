@@ -24,7 +24,8 @@ xipki-tk:update-cert-p12 \
 xipki-ca:scep-add \
   --ca SubCAwithCRL1 \
   --resp-type PKCS12 \
-  --resp-conf password?1234%keystore?file:output/SCEP1.p12
+  --resp-conf password?1234%keystore?file:output/SCEP1.p12 \
+  --control caCert.included?true%signerCert.included?false
   
 ## add user
 xipki-ca:user-add \

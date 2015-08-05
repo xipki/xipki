@@ -274,47 +274,47 @@ xipki-caqa:neg-profile-rm \
 xipki-caqa:crlsigner-check \
   --name CASIGN.CRLSIGNER \
   --signer-type CA \
-  --crl-control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?02:00%
+  --control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?02:00%
 
 # direct CRL signer (signed by CA)
 xipki-ca:crlsigner-add \
   --name qa-direct-crlsigner1 \
   --signer-type CA \
-  --crl-control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
+  --control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
 
 # name already exists
 xipki-caqa:neg-crlsigner-add \
   --name qa-direct-crlsigner1 \
   --signer-type CA \
-  --crl-control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
+  --control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
 
 # invalid control
 xipki-caqa:neg-crlsigner-add \
   --name qa-direct-crlsigner2 \
   --signer-type CA \
-  --crl-control updateMode?unknown%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
+  --control updateMode?unknown%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
 
 xipki-caqa:crlsigner-check \
   --name qa-direct-crlsigner1 \
   --signer-type CA \
-  --crl-control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
+  --control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
 
 xipki-ca:crlsigner-up \
   --name qa-direct-crlsigner1 \
-  --crl-control updateMode?interval%fullCRL.intervals?2%overlap.minutes?90%interval.time?03:00%
+  --control updateMode?interval%fullCRL.intervals?2%overlap.minutes?90%interval.time?03:00%
 
 xipki-caqa:crlsigner-check \
   --name qa-direct-crlsigner1 \
-  --crl-control updateMode?interval%fullCRL.intervals?2%overlap.minutes?90%interval.time?03:00%
+  --control updateMode?interval%fullCRL.intervals?2%overlap.minutes?90%interval.time?03:00%
 
 # invalid fullCRL.intervals
 xipki-caqa:neg-crlsigner-up \
   --name qa-direct-crlsigner1 \
-  --crl-control updateMode?interval%fullCRL.intervals?abc%overlap.minutes?90%interval.time?03:00%
+  --control updateMode?interval%fullCRL.intervals?abc%overlap.minutes?90%interval.time?03:00%
 
 xipki-caqa:crlsigner-check \
   --name qa-direct-crlsigner1 \
-  --crl-control updateMode?interval%fullCRL.intervals?2%overlap.minutes?90%interval.time?03:00%
+  --control updateMode?interval%fullCRL.intervals?2%overlap.minutes?90%interval.time?03:00%
 
 xipki-ca:crlsigner-rm \
   qa-direct-crlsigner1
@@ -328,21 +328,21 @@ xipki-ca:crlsigner-add \
   --name qa-indirect-crlsigner1 \
   --signer-type PKCS12 \
   --signer-conf password?1234%keystore?file:xipki/demo/keys/crlsigner.p12%algo?SHA256withRSA \
-  --crl-control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
+  --control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
 
 # No keyusage CRLSign
 xipki-caqa:neg-crlsigner-add \
   --name qa-indirect-crlsigner2 \
   --signer-type JKS \
   --signer-conf password?1234%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?SHA1withRSA \
-  --crl-control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?02:00%
+  --control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?02:00%
 
 # Unknown signature algorithm
 xipki-caqa:neg-crlsigner-add \
   --name qa-indirect-crlsigner2 \
   --signer-type PKCS12 \
   --signer-conf password?1234%keystore?file:xipki/demo/keys/crlsigner.p12%algo?INVALIDALGO \
-  --crl-control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?02:00%
+  --control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?02:00%
 
 xipki-ca:crlsigner-rm \
   qa-indirect-crlsigner1
