@@ -337,6 +337,7 @@ xipki-cli:revoke \
   --reason affiliationChanged
 
 ## Enroll certificates
+
 # Certificate TLS_C1
 xipki-tk:rsa-p12 \
   --password 1234 \
@@ -441,6 +442,30 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/SubCA1.der \
   --ca-cert output/RCA1.der
 
+# Certificate MaxTime1
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out output/MaxTime1.p12 \
+  --subject "CN=MaxTime1.xipki.org,O=xipki,C=DE"
+
+xipki-tk:req-p12 \
+  --p12 output/MaxTime1.p12 \
+  --password 1234 \
+  --out output/MaxTime1.p10
+
+xipki-cli:p10-enroll \
+  --p10 output/MaxTime1.p10 \
+  --out output/MaxTime1.der \
+  --profile MaxTime \
+  --user USER-T
+
+xipki-tk:update-cert-p12 \
+  --p12 output/MaxTime1.p12 \
+  --password 1234 \
+  --cert output/MaxTime1.der \
+  --ca-cert output/SubCAwithCRL1.der \
+  --ca-cert output/RCA1.der
+  
 ## Generate CRL
 xipki-cli:gencrl \
   --ca SubCAwithCRL1 \

@@ -57,7 +57,8 @@ public enum RequestType
         return code;
     }
 
-    public static RequestType getInstance(int code)
+    public static RequestType getInstance(
+            final int code)
     {
         for(RequestType value : values())
         {

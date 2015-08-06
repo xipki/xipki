@@ -62,5 +62,8 @@
     <X509Certprofile name="EE.Complex">
       <file>xipki/demo/profile/Certprofile_EE_Complex.xml</file>
     </X509Certprofile>
+    <X509Certprofile name="MaxTime">
+      <file>xipki/demo/profile/Certprofile_MaxTime.xml</file>
+    </X509Certprofile>
   </X509Certprofiles>
 </QAConf>

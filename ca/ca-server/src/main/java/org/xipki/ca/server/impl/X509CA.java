@@ -541,6 +541,7 @@ public class X509CA
     private static final int SECOND_PER_MIN = 60;
     private static final int MIN_PER_DAY = 24 * 60;
     private static final long DAY = MS_PER_SECOND * SECOND_PER_MIN * MIN_PER_DAY;
+    private static final long MAX_CERT_TIME_MS = 253402300799982L; //9999-12-31-23-59-59
 
     private static Logger LOG = LoggerFactory.getLogger(X509CA.class);
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd-HH:mm:ss.SSSz");
@@ -2424,6 +2425,10 @@ public class X509CA
             }
 
             Date maxNotAfter = validity.add(notBefore);
+            if(maxNotAfter.getTime() > MAX_CERT_TIME_MS)
+            {
+                maxNotAfter = new Date(MAX_CERT_TIME_MS);
+            }
             Date origMaxNotAfter = maxNotAfter;
 
             if(certprofile.getSpecialCertprofileBehavior() == SpecialX509CertprofileBehavior.gematik_gSMC_K)

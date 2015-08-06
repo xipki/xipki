@@ -197,7 +197,7 @@ xipki-ca:ca-add \
   --permission all \
   --next-serial 1 \
   --next-crl-no 2 \
-  --max-validity 5y \
+  --max-validity 8000y \
   --signer-type PKCS12 \
   --signer-conf password?1234%keystore?file:output/SubCAwithCRL1.p12%algo?$CA_SIGNER_ALGO \
   --ocsp-uri http://localhost:8080/ocsp/responder2 \
@@ -208,7 +208,8 @@ xipki-ca:ca-add \
   --cmp-control  cmpcontrol1 \
   --responder responder1 \
   --duplicate-subject  permitted \
-  --duplicate-key permitted
+  --duplicate-key permitted \
+   --validity-mode LAX
 
 xipki-ca:caalias-add \
   --ca SubCAwithCRL1 \
@@ -234,6 +235,10 @@ xipki-ca:caprofile-add \
 xipki-ca:caprofile-add \
   --ca SubCAwithCRL1 \
   --profile multiValuedRDN
+
+xipki-ca:caprofile-add \
+  --ca SubCAwithCRL1 \
+  --profile MaxTime
 
 ## Add CMP requestor to CA
 xipki-ca:careq-add \
