@@ -69,6 +69,12 @@ xipki-qa:check-cert \
   --p10 output/multiValuedRDN1.p10 \
   --cert output/multiValuedRDN1.der
 
+xipki-qa:check-cert \
+  --issuer SubCAwithCRL \
+  --profile MaxTime \
+  --p10 output/MaxTime1.p10 \
+  --cert output/MaxTime1.der
+
 ## SubCA
 
 xipki-qa:check-cert \

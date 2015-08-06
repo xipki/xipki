@@ -73,6 +73,11 @@ xipki-ca:profile-add \
   --conf-file xipki/demo/profile/Certprofile_gSMC_K.xml
 
 xipki-ca:profile-add \
+  --name MaxTime \
+  --type XML \
+  --conf-file xipki/demo/profile/Certprofile_MaxTime.xml
+
+xipki-ca:profile-add \
   --name DEMO \
   --type DemoEE1
 

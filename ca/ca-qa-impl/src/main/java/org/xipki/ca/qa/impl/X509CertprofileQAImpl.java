@@ -92,6 +92,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
     private static final Logger LOG = LoggerFactory.getLogger(X509CertprofileQAImpl.class);
     private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     private static final long SECOND = 1000L;
+    private static final long MAX_CERT_TIME_MS = 253402300799982L; //9999-12-31-23-59-59
 
     private final SubjectChecker subjectChecker;
     private final PublicKeyChecker publicKeyChecker;
@@ -255,6 +256,11 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             resultIssues.add(issue);
 
             Date expectedNotAfter = validity.add(cert.getNotBefore());
+            if(expectedNotAfter.getTime() > MAX_CERT_TIME_MS)
+            {
+                expectedNotAfter = new Date(MAX_CERT_TIME_MS);
+            }
+
             if(Math.abs(expectedNotAfter.getTime() - cert.getNotAfter().getTime()) > 60 * SECOND)
             {
                 issue.setFailureMessage("cert validity is not within " + validity.toString());
