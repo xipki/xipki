@@ -599,8 +599,8 @@ abstract class X509CmpRequestor extends CmpRequestor
     }
 
     private PKIMessage buildCertConfirmRequest(
-            ASN1OctetString tid,
-            CertificateConfirmationContentBuilder certConfirmBuilder)
+            final ASN1OctetString tid,
+            final CertificateConfirmationContentBuilder certConfirmBuilder)
     throws CmpRequestorException
     {
         PKIHeader header = buildPKIHeader(implicitConfirm, tid, null, (InfoTypeAndValue[]) null);

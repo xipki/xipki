@@ -78,7 +78,7 @@ public class PublicKeyChecker
     private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
 
     public PublicKeyChecker(
-            X509ProfileType conf)
+            final X509ProfileType conf)
     throws CertprofileException
     {
         try

@@ -63,16 +63,16 @@ public class DSAPlainDigestSigner
     private int keyBitLen;
 
     public DSAPlainDigestSigner(
-        DSA    signer,
-        Digest digest)
+            final DSA    signer,
+            final Digest digest)
     {
         this.digest = digest;
         this.dsaSigner = signer;
     }
 
     public void init(
-        boolean           forSigning,
-        CipherParameters   parameters)
+            final boolean forSigning,
+            final CipherParameters parameters)
     {
         this.forSigning = forSigning;
 
@@ -128,7 +128,7 @@ public class DSAPlainDigestSigner
      * update the internal digest with the byte b
      */
     public void update(
-        byte input)
+            final byte input)
     {
         digest.update(input);
     }
@@ -137,9 +137,9 @@ public class DSAPlainDigestSigner
      * update the internal digest with the byte array in
      */
     public void update(
-        byte[]  input,
-        int     inOff,
-        int     length)
+            final byte[]  input,
+            final int inOff,
+            final int length)
     {
         digest.update(input, inOff, length);
     }
@@ -171,7 +171,7 @@ public class DSAPlainDigestSigner
     }
 
     public boolean verifySignature(
-        byte[] signature)
+            final byte[] signature)
     {
         if (forSigning)
         {
@@ -198,9 +198,9 @@ public class DSAPlainDigestSigner
     }
 
     private byte[] encode(
-        BigInteger  r,
-        BigInteger  s)
-        throws IOException
+            final BigInteger r,
+            final BigInteger s)
+    throws IOException
     {
         int blockSize = (keyBitLen + 7) / 8;;
         if((r.bitLength() + 7) / 8 > blockSize)
@@ -226,7 +226,7 @@ public class DSAPlainDigestSigner
     }
 
     private BigInteger[] decode(
-        final byte[] encoding)
+            final byte[] encoding)
     throws IOException
     {
         int blockSize = (keyBitLen + 7) / 8;

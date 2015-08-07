@@ -408,7 +408,8 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
         return text != null && text.isEmpty() == false;
     }
 
-    private Severity getSeverity(AuditLevel auditLevel)
+    private Severity getSeverity(
+            final AuditLevel auditLevel)
     {
         if(auditLevel == null)
         {

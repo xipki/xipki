@@ -128,7 +128,8 @@ public class ScepControl implements Serializable
         return includeCACert;
     }
 
-    public void setIncludeCACert(boolean includeCACert)
+    public void setIncludeCACert(
+            final boolean includeCACert)
     {
         this.includeCACert = includeCACert;
     }
@@ -138,7 +139,8 @@ public class ScepControl implements Serializable
         return includeSignerCert;
     }
 
-    public void setIncludeSignerCert(boolean includeSignerCert)
+    public void setIncludeSignerCert(
+            final boolean includeSignerCert)
     {
         this.includeSignerCert = includeSignerCert;
     }
@@ -150,7 +152,8 @@ public class ScepControl implements Serializable
     }
 
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(
+            final Object obj)
     {
         if(obj instanceof ScepControl == false)
         {

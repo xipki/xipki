@@ -133,7 +133,8 @@ public class CertRevocationInfo implements Serializable
         return invalidityTime;
     }
 
-    public void setInvalidityTime(Date invalidityTime)
+    public void setInvalidityTime(
+            final Date invalidityTime)
     {
         this.invalidityTime = invalidityTime;
     }
@@ -168,7 +169,7 @@ public class CertRevocationInfo implements Serializable
 
     @SuppressWarnings("unchecked")
     private void readObject(
-            java.io.ObjectInputStream in)
+            final java.io.ObjectInputStream in)
     throws IOException, ClassNotFoundException
     {
         final Map<String, Object> serialMap = (Map<String, Object>) in.readObject();

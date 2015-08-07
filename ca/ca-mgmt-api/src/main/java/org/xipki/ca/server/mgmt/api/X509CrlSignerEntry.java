@@ -112,7 +112,7 @@ public class X509CrlSignerEntry implements Serializable
     }
 
     public void setConfFaulty(
-            boolean faulty)
+            final boolean faulty)
     {
         this.confFaulty = faulty;
     }

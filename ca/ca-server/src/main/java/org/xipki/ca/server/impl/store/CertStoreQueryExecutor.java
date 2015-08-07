@@ -1746,7 +1746,9 @@ class CertStoreQueryExecutor
         }
     }
 
-    boolean authenticateUser(String user, byte[] password)
+    boolean authenticateUser(
+            final String user,
+            final byte[] password)
     throws DataAccessException, OperationException
     {
         final String sql = dataSource.createFetchFirstSelectSQL(
@@ -1786,7 +1788,8 @@ class CertStoreQueryExecutor
         }
     }
 
-    String getCNRegexForUser(String user)
+    String getCNRegexForUser(
+            final String user)
     throws DataAccessException, OperationException
     {
         final String sql = dataSource.createFetchFirstSelectSQL(

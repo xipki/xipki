@@ -424,7 +424,8 @@ public class CanonicalizeCode
 
     }
 
-    private static String removeTrailingSpaces(String line)
+    private static String removeTrailingSpaces(
+            final String line)
     {
         final int n = line.length();
         int i;

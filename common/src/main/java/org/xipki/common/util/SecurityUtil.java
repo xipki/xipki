@@ -102,7 +102,7 @@ public class SecurityUtil
     public static byte[] extractMinimalKeyStore(
             final String keystoreType,
             final byte[] keystoreBytes,
-            String keyname,
+            final String keyname,
             final char[] password)
     throws Exception
     {

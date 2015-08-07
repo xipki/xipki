@@ -67,7 +67,8 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier>
     }
 
     @Override
-    public boolean equals(Object b)
+    public boolean equals(
+            final Object b)
     {
         if(this == b)
         {

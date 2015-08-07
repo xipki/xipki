@@ -47,7 +47,10 @@ import org.xipki.console.karaf.CmdFailure;
 public class MgmtQAShellUtil
 {
 
-    public static void assertEquals(String desc, String ex, String is)
+    public static void assertEquals(
+            final String desc,
+            String ex,
+            final String is)
     throws CmdFailure
     {
         if(CAManager.NULL.equals(ex))
@@ -71,7 +74,9 @@ public class MgmtQAShellUtil
         }
     }
 
-    public static void assertEquals(String desc, Collection<?> ex, Collection<?> is)
+    public static void assertEquals(
+            final String desc,
+            final Collection<?> ex, Collection<?> is)
     throws CmdFailure
     {
         boolean b;

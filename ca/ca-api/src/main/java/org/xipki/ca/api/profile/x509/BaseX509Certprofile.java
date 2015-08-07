@@ -368,8 +368,8 @@ extends X509Certprofile
     }
 
     private static RDN[] getRDNs(
-            RDN[] rdns,
-            ASN1ObjectIdentifier type)
+            final RDN[] rdns,
+            final ASN1ObjectIdentifier type)
     {
         List<RDN> ret = new ArrayList<>(1);
         for(int i = 0; i < rdns.length; i++)

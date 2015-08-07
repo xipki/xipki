@@ -182,7 +182,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     public byte[] CKM_DSA_Plain(
             final byte[] hash,
             final P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         checkSlotId(slotId);
@@ -193,7 +193,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     public byte[] CKM_DSA_X962(
             final byte[] hash,
             final P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
+            final P11KeyIdentifier keyId)
     throws SignerException
     {
         checkSlotId(slotId);

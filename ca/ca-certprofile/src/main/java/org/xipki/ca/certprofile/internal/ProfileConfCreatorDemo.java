@@ -982,7 +982,7 @@ public class ProfileConfCreatorDemo
             final String[] regexArrays,
             final String prefix,
             final String suffix,
-            String group)
+            final String group)
     {
         RdnType ret = new RdnType();
         ret.setType(createOidType(type));
@@ -1296,7 +1296,7 @@ public class ProfileConfCreatorDemo
 
     @SuppressWarnings("unused")
     private static ExtensionValueType createValidityModel(
-            OidWithDescType modelId)
+            final OidWithDescType modelId)
     {
         ValidityModel extValue = new ValidityModel();
         extValue.setModelId(modelId);
@@ -1341,8 +1341,8 @@ public class ProfileConfCreatorDemo
     }
 
     private static PolicyConstraints createPolicyConstraints(
-            Integer inhibitPolicyMapping,
-            Integer requireExplicitPolicy)
+            final Integer inhibitPolicyMapping,
+            final Integer requireExplicitPolicy)
     {
         PolicyConstraints ret = new PolicyConstraints();
         if(inhibitPolicyMapping != null)
@@ -1390,18 +1390,16 @@ public class ProfileConfCreatorDemo
     }
 
     private static OidWithDescType createOidType(
-            ASN1ObjectIdentifier oid,
-            String description)
+            final ASN1ObjectIdentifier oid,
+            final String description)
     {
         OidWithDescType ret = new OidWithDescType();
         ret.setValue(oid.getId());
-        if(description == null)
+
+        String desc = description == null ? getDescription(oid) : description;
+        if(desc != null)
         {
-            description = getDescription(oid);
-        }
-        if(description != null)
-        {
-            ret.setDescription(description);
+            ret.setDescription(desc);
         }
         return ret;
     }
@@ -1424,7 +1422,7 @@ public class ProfileConfCreatorDemo
             final boolean ca,
             final String validity,
             final boolean useMidnightNotBefore,
-            String[] sigHashAlgos)
+            final String[] sigHashAlgos)
     {
         X509ProfileType profile = new X509ProfileType();
 

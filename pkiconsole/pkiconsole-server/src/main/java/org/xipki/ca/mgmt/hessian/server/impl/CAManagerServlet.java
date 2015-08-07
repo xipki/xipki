@@ -815,7 +815,8 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean unrevokeCa(final String caName)
+    public boolean unrevokeCa(
+            final String caName)
     throws HessianCAMgmtException
     {
         try
@@ -846,8 +847,8 @@ implements HessianCAManager
 
     @Override
     public boolean unrevokeCertificate(
-            String caName,
-            BigInteger serialNumber)
+            final String caName,
+            final BigInteger serialNumber)
     throws HessianCAMgmtException
     {
         try
@@ -861,8 +862,8 @@ implements HessianCAManager
 
     @Override
     public boolean removeCertificate(
-            String caName,
-            BigInteger serialNumber)
+            final String caName,
+            final BigInteger serialNumber)
     throws HessianCAMgmtException
     {
         try
@@ -913,7 +914,7 @@ implements HessianCAManager
 
     @Override
     public String getAttribute(
-            String attributeKey)
+            final String attributeKey)
     {
         if("version".equalsIgnoreCase(attributeKey))
         {
@@ -924,7 +925,7 @@ implements HessianCAManager
 
     @Override
     public boolean addUser(
-            AddUserEntry userEntry)
+            final AddUserEntry userEntry)
     throws HessianCAMgmtException
     {
         try
@@ -1009,7 +1010,8 @@ implements HessianCAManager
     }
 
     @Override
-    public boolean changeScep(ChangeScepEntry scepEntry)
+    public boolean changeScep(
+            final ChangeScepEntry scepEntry)
     throws HessianCAMgmtException
     {
         try
@@ -1028,7 +1030,8 @@ implements HessianCAManager
     }
 
     @Override
-    public ScepEntry getScepEntry(String name)
+    public ScepEntry getScepEntry(
+            final String name)
     throws HessianCAMgmtException
     {
         try
@@ -1042,8 +1045,8 @@ implements HessianCAManager
 
     @Override
     public void service(
-            ServletRequest request,
-            ServletResponse response)
+            final ServletRequest request,
+            final ServletResponse response)
     throws IOException, ServletException
     {
         X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
@@ -1170,7 +1173,7 @@ implements HessianCAManager
     }
 
     public  void setSecurityFactory(
-            SecurityFactory securityFactory)
+            final SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;
     }

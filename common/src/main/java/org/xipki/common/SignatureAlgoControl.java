@@ -50,7 +50,9 @@ public class SignatureAlgoControl
         this.dsaPlain = false;
     }
 
-    public SignatureAlgoControl(boolean rsaMgf1, boolean dsaPlain)
+    public SignatureAlgoControl(
+            final boolean rsaMgf1,
+            final boolean dsaPlain)
     {
         this.rsaMgf1 = rsaMgf1;
         this.dsaPlain = dsaPlain;
