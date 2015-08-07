@@ -67,7 +67,8 @@ public class LruCache<K, V>
      *     the maximum number of entries in the cache. For all other caches,
      *     this is the maximum sum of the sizes of the entries in this cache.
      */
-    public LruCache(int maxSize)
+    public LruCache(
+            final int maxSize)
     {
         if (maxSize <= 0)
         {
@@ -82,7 +83,8 @@ public class LruCache<K, V>
      *
      * @param maxSize The new maximum size.
      */
-    public void resize(int maxSize)
+    public void resize(
+            final int maxSize)
     {
         if (maxSize <= 0)
         {

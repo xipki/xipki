@@ -448,7 +448,8 @@ public class X509CAInfo
         return useRandomSerialNumber;
     }
 
-    public ConcurrentContentSigner getSigner(List<String> algoNames)
+    public ConcurrentContentSigner getSigner(
+            final List<String> algoNames)
     {
         if(CollectionUtil.isEmpty(algoNames))
         {

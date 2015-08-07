@@ -261,7 +261,8 @@ public class QASystemManagerImpl implements QASystemManager
         }
     }
 
-    private static byte[] readData(FileOrValueType fileOrValue)
+    private static byte[] readData(
+            final FileOrValueType fileOrValue)
     throws IOException
     {
         byte[] data = fileOrValue.getValue();

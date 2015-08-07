@@ -1894,7 +1894,7 @@ class CAManagerQueryExecutor
             String signerConf,
             String base64Cert,
             String crlControl,
-            CAManagerImpl caManager)
+            final CAManagerImpl caManager)
     throws CAMgmtException
     {
         StringBuilder sqlBuilder = new StringBuilder();

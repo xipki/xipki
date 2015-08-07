@@ -90,7 +90,8 @@ public class BiometricInfoOption
         }
     }
 
-    public boolean isTypePermitted(TypeOfBiometricData type)
+    public boolean isTypePermitted(
+            final TypeOfBiometricData type)
     {
         if(type.isPredefined())
         {
@@ -102,7 +103,8 @@ public class BiometricInfoOption
         }
     }
 
-    public boolean isHashAlgorithmPermitted(ASN1ObjectIdentifier hashAlgorithm)
+    public boolean isHashAlgorithmPermitted(
+            final ASN1ObjectIdentifier hashAlgorithm)
     {
         return hashAlgorithms.contains(hashAlgorithm);
     }

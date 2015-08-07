@@ -1964,8 +1964,11 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     private static void setKeyAttributes(
-            byte[] id, String label, long keyType,
-            PrivateKey privateKey, PublicKey publicKey)
+            final byte[] id,
+            final String label,
+            final long keyType,
+            final PrivateKey privateKey,
+            final PublicKey publicKey)
     {
         if(privateKey != null)
         {

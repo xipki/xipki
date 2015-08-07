@@ -72,7 +72,7 @@ public class ExtensionExistence extends ASN1Object
 
     public ExtensionExistence(
             final List<ASN1ObjectIdentifier> needExtensions,
-            List<ASN1ObjectIdentifier> wantExtensions)
+            final List<ASN1ObjectIdentifier> wantExtensions)
     {
         this.needExtensions = needExtensions;
         this.wantExtensions = wantExtensions;

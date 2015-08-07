@@ -339,22 +339,26 @@ public class SubjectDNSpec
         }
     }
 
-    public static Range getStringLengthRange(ASN1ObjectIdentifier rdnType)
+    public static Range getStringLengthRange(
+            final ASN1ObjectIdentifier rdnType)
     {
         return ranges.get(rdnType);
     }
 
-    public static Pattern getPattern(ASN1ObjectIdentifier rdnType)
+    public static Pattern getPattern(
+            final ASN1ObjectIdentifier rdnType)
     {
         return patterns.get(rdnType);
     }
 
-    public static StringType getStringType(ASN1ObjectIdentifier rdnType)
+    public static StringType getStringType(
+            final ASN1ObjectIdentifier rdnType)
     {
         return defaultStringTypes.get(rdnType);
     }
 
-    public static RDNControl getRDNControl(ASN1ObjectIdentifier rdnType)
+    public static RDNControl getRDNControl(
+            final ASN1ObjectIdentifier rdnType)
     {
         RDNControl control = controls.get(rdnType);
         if(control == null)
@@ -368,7 +372,8 @@ public class SubjectDNSpec
         return control;
     }
 
-    public static void fixRDNControl(RDNControl control)
+    public static void fixRDNControl(
+            final RDNControl control)
     throws CertprofileException
     {
         ASN1ObjectIdentifier type = control.getType();
@@ -440,21 +445,4 @@ public class SubjectDNSpec
         } // specRange
     }
 
-    public static void main(String[] args)
-    {
-        try
-        {
-            boolean b;
-            b = p_country.matcher("CN").matches();
-            System.out.println(b);
-
-            b = p_gender.matcher("M").matches();
-            System.out.println(b);
-
-            b = p_dateOfBirth.matcher("20010203000000Z").matches();
-            System.out.println(b);
-        }catch(Exception e)
-        {
-        }
-    }
 }

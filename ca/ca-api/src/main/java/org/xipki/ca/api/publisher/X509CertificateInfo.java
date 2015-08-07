@@ -192,7 +192,8 @@ public class X509CertificateInfo
         return requestedSubject;
     }
 
-    public void setRequestedSubject(X500Name requestedSubject)
+    public void setRequestedSubject(
+            final X500Name requestedSubject)
     {
         this.requestedSubject = requestedSubject;
     }

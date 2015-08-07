@@ -293,7 +293,8 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" imported table CRLSIGNER");
     }
 
-    private void import_requestor(Requestors requestors)
+    private void import_requestor(
+            final Requestors requestors)
     throws DataAccessException
     {
         System.out.println("importing table REQUESTOR");

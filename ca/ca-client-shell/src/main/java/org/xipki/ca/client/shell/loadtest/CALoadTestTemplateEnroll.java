@@ -287,7 +287,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
     }
 
     private static EnrollTemplateType parse(
-            InputStream configStream)
+            final InputStream configStream)
     throws ConfigurationException
     {
         synchronized (jaxbUnmarshallerLock)

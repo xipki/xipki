@@ -647,7 +647,9 @@ public class CertificateStore
         }
     }
 
-    public boolean authenticateUser(String user, byte[] password)
+    public boolean authenticateUser(
+            final String user,
+            final byte[] password)
     throws OperationException
     {
         try
@@ -663,7 +665,8 @@ public class CertificateStore
         }
     }
 
-    public String getCNRegexForUser(String user)
+    public String getCNRegexForUser(
+            final String user)
     throws OperationException
     {
         try
@@ -828,7 +831,8 @@ public class CertificateStore
         }
     }
 
-    public String getLatestSN(X500Name nameWithSN)
+    public String getLatestSN(
+            final X500Name nameWithSN)
     throws OperationException
     {
         try

@@ -253,7 +253,9 @@ extends Provider
 
         private String type;
         private String classPrefix;
-        private Service(String type, String classPrefix)
+        private Service(
+                final String type,
+                final String classPrefix)
         {
             this.type = type;
             this.classPrefix = classPrefix;

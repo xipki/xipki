@@ -74,7 +74,8 @@ public class HttpsClientTestor
         new HttpsClientTestor().testIt();
     }
 
-    public static long hashCode(String s)
+    public static long hashCode(
+            final String s)
     {
         long h = 0;
         char[] value = s.toCharArray();
@@ -132,7 +133,8 @@ public class HttpsClientTestor
         }
     }
 
-    private void print_https_cert(HttpsURLConnection con)
+    private void print_https_cert(
+            final HttpsURLConnection con)
     {
         if(con!=null)
         {
@@ -165,7 +167,8 @@ public class HttpsClientTestor
     }
 
     @SuppressWarnings("unused")
-    private void print_content(HttpsURLConnection con)
+    private void print_content(
+            final HttpsURLConnection con)
     {
         if(con!=null)
         {

@@ -145,12 +145,15 @@ public class StringUtil
         return prefix.equalsIgnoreCase(s.substring(0, prefix.length()));
     }
 
-    public static boolean isNumber(String s)
+    public static boolean isNumber(
+            final String s)
     {
         return isNumber(s, 10);
     }
 
-    public static boolean isNumber(String s, int radix)
+    public static boolean isNumber(
+            final String s,
+            final int radix)
     {
         try
         {

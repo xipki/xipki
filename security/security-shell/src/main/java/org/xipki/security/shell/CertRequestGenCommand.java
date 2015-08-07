@@ -378,7 +378,8 @@ public abstract class CertRequestGenCommand extends SecurityCommand
         return null;
     }
 
-    protected X500Name getSubject(String subject)
+    protected X500Name getSubject(
+            final String subject)
     {
         return new X500Name(subject);
     }

@@ -525,7 +525,8 @@ implements CAManager, CmpResponderManager, ScepManager
         }
     }
 
-    private boolean lockCA(boolean forceRelock)
+    private boolean lockCA(
+            final boolean forceRelock)
     throws DataAccessException, CAMgmtException
     {
         SystemEvent lockInfo = queryExecutor.getSystemEvent(EVENT_LOCK);

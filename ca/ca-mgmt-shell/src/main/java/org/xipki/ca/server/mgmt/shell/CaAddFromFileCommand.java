@@ -98,7 +98,8 @@ public class CaAddFromFileCommand extends CaCommand
         return null;
     }
 
-    protected X509CAEntry getCAEntry(boolean ignoreCert)
+    protected X509CAEntry getCAEntry(
+            final boolean ignoreCert)
     throws Exception
     {
         Properties props = new Properties();
@@ -353,7 +354,10 @@ public class CaAddFromFileCommand extends CaCommand
         return entry;
     }
 
-    private String getStrProp(Properties props, String propKey, boolean required)
+    private String getStrProp(
+            final Properties props,
+            final String propKey,
+            final boolean required)
     throws IllegalCmdParamException
     {
         String s = props.getProperty(propKey);
@@ -381,33 +385,46 @@ public class CaAddFromFileCommand extends CaCommand
         }
     }
 
-    private int getRequiredIntProp(Properties props, String propKey)
+    private int getRequiredIntProp(
+            final Properties props,
+            final String propKey)
     throws IllegalCmdParamException
     {
         return getIntProp(props, propKey, true).intValue();
     }
 
-    private Integer getIntProp(Properties props, String propKey, boolean required)
+    private Integer getIntProp(
+            final Properties props,
+            final String propKey,
+            final boolean required)
     throws IllegalCmdParamException
     {
         String s = getStrProp(props, propKey, required);
         return s == null ? null : Integer.parseInt(s);
     }
 
-    private long getRequiredLongProp(Properties props, String propKey)
+    private long getRequiredLongProp(
+            final Properties props,
+            final String propKey)
     throws IllegalCmdParamException
     {
         return getLongProp(props, propKey, true).longValue();
     }
 
-    private Long getLongProp(Properties props, String propKey, boolean required)
+    private Long getLongProp(
+            final Properties props,
+            final String propKey,
+            final boolean required)
     throws IllegalCmdParamException
     {
         String s = getStrProp(props, propKey, required);
         return s == null ? null : Long.parseLong(s);
     }
 
-    private static void assertNotNull(Object obj, String key, String value)
+    private static void assertNotNull(
+            final Object obj,
+            final String key,
+            final String value)
     throws IllegalCmdParamException
     {
         if(obj == null)

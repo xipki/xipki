@@ -672,7 +672,8 @@ public class X509CA
         return certstore.getCertificate(subjectName, transactionId);
     }
 
-    public KnowCertResult knowsCertificate(X509Certificate cert)
+    public KnowCertResult knowsCertificate(
+            final X509Certificate cert)
     throws OperationException
     {
         if(caInfo.getSubject().equals(
@@ -684,13 +685,16 @@ public class X509CA
         return certstore.knowsCertForSerial(caInfo.getCertificate(), cert.getSerialNumber());
     }
 
-    public boolean authenticateUser(String user, byte[] password)
+    public boolean authenticateUser(
+            final String user,
+            final byte[] password)
     throws OperationException
     {
         return certstore.authenticateUser(user, password);
     }
 
-    public String getCNRegexForUser(String user)
+    public String getCNRegexForUser(
+            final String user)
     throws OperationException
     {
         return certstore.getCNRegexForUser(user);
@@ -2636,7 +2640,8 @@ public class X509CA
         return caManager.getIdentifiedCertprofile(profileNames.get(certprofileLocalName));
     }
 
-    public boolean supportsCertProfile(String certprofileLocalName)
+    public boolean supportsCertProfile(
+            final String certprofileLocalName)
     {
         ParamChecker.assertNotNull("certprofileLocalName", certprofileLocalName);
 

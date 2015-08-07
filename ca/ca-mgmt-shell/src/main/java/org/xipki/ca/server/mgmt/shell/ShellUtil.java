@@ -48,8 +48,10 @@ import org.xipki.security.api.PasswordResolver;
 
 class ShellUtil
 {
-    static String canonicalizeSignerConf(String keystoreType, String signerConf,
-            PasswordResolver passwordResolver)
+    static String canonicalizeSignerConf(
+            final String keystoreType,
+            final String signerConf,
+            final PasswordResolver passwordResolver)
     throws Exception
     {
         if(signerConf.contains("file:") == false && signerConf.contains("base64:") == false

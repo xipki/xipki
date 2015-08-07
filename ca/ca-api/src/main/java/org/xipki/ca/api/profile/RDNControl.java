@@ -108,17 +108,20 @@ public class RDNControl
         return stringLengthRange;
     }
 
-    public void setStringType(StringType stringType)
+    public void setStringType(
+            final StringType stringType)
     {
         this.stringType = stringType;
     }
 
-    public void setStringLengthRange(Range stringLengthRange)
+    public void setStringLengthRange(
+            final Range stringLengthRange)
     {
         this.stringLengthRange = stringLengthRange;
     }
 
-    public void setPatterns(List<Pattern> patterns)
+    public void setPatterns(
+            final List<Pattern> patterns)
     {
         this.patterns = patterns;
     }
@@ -128,7 +131,8 @@ public class RDNControl
         return prefix;
     }
 
-    public void setPrefix(String prefix)
+    public void setPrefix(
+            final String prefix)
     {
         this.prefix = prefix;
     }
@@ -138,7 +142,8 @@ public class RDNControl
         return suffix;
     }
 
-    public void setSuffix(String suffix)
+    public void setSuffix(
+            final String suffix)
     {
         this.suffix = suffix;
     }
@@ -148,7 +153,8 @@ public class RDNControl
         return group;
     }
 
-    public void setGroup(String group)
+    public void setGroup(
+            final String group)
     {
         this.group = group;
     }

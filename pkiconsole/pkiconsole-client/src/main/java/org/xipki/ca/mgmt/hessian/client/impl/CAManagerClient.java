@@ -733,7 +733,8 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public boolean changeScep(ChangeScepEntry scepEntry)
+    public boolean changeScep(
+            final ChangeScepEntry scepEntry)
     throws CAMgmtException
     {
         return client.changeScep(scepEntry);
@@ -746,7 +747,8 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public ScepEntry getScepEntry(String name)
+    public ScepEntry getScepEntry(
+            final String name)
     throws CAMgmtException
     {
         return client.getScepEntry(name);

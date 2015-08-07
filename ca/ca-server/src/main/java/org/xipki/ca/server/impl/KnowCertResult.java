@@ -45,7 +45,9 @@ public class KnowCertResult
     private final boolean known;
     private final String user;
 
-    public KnowCertResult(boolean known, String user)
+    public KnowCertResult(
+            final boolean known,
+            final String user)
     {
         this.known = known;
         this.user = user;

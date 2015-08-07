@@ -211,7 +211,8 @@ public class PCIAuditEvent
         this.affectedResource = affectedResource;
     }
 
-    public CharArrayWriter toCharArrayWriter(String prefix)
+    public CharArrayWriter toCharArrayWriter(
+            final String prefix)
     {
         CharArrayWriter buffer = new CharArrayWriter();
 

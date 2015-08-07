@@ -156,7 +156,8 @@ public class CaUpdateCommand extends CaCommand
 
     private PasswordResolver passwordResolver;
 
-    public void setPasswordResolver(PasswordResolver passwordResolver)
+    public void setPasswordResolver(
+            final PasswordResolver passwordResolver)
     {
         this.passwordResolver = passwordResolver;
     }
@@ -292,7 +293,8 @@ public class CaUpdateCommand extends CaCommand
         return null;
     }
 
-    private static List<String> getUris(List<String> uris)
+    private static List<String> getUris(
+            final List<String> uris)
     {
         if(uris == null)
         {

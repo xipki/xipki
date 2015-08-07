@@ -173,7 +173,8 @@ public class Scep
      *
      * @param ms signing time bias in milliseconds. non-positive value deactivate the check of signing time.
      */
-    public void setMaxSigningTimeBias(long ms)
+    public void setMaxSigningTimeBias(
+            final long ms)
     {
         this.maxSigningTimeBiasInMs = ms;
     }
@@ -302,7 +303,7 @@ public class Scep
     }
 
     private PkiMessage doServicePkiOperation(
-            DecodedPkiMessage req,
+            final DecodedPkiMessage req,
             final String certProfileName,
             final AuditEvent auditEvent)
     throws MessageDecodingException, OperationException
@@ -809,7 +810,10 @@ public class Scep
 
     }
 
-    private static void checkCN(X509CA ca, String user, String cn)
+    private static void checkCN(
+            final X509CA ca,
+            final String user,
+            final String cn)
     throws OperationException
     {
         String cnRegex = ca.getCNRegexForUser(user);
@@ -899,7 +903,10 @@ public class Scep
         return tid.getBytes();
     }
 
-    private static void audit(AuditEvent audit, String name, String value)
+    private static void audit(
+            final AuditEvent audit,
+            final String name,
+            final String value)
     {
         if(audit != null)
         {

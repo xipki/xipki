@@ -51,7 +51,8 @@ public class CertWithEncoded
     private final String className;
     private final byte[] encoded;
 
-    public CertWithEncoded(X509Certificate cert)
+    public CertWithEncoded(
+            final X509Certificate cert)
     throws CertificateEncodingException
     {
         ParamChecker.assertNotNull("cert", cert);
@@ -65,7 +66,8 @@ public class CertWithEncoded
         return certificate;
     }
 
-    public boolean equalsCert(X509Certificate cert)
+    public boolean equalsCert(
+            final X509Certificate cert)
     {
         if(certificate == cert)
         {

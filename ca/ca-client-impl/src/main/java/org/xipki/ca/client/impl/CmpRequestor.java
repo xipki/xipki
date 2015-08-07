@@ -309,8 +309,8 @@ public abstract class CmpRequestor
     }
 
     protected ASN1Encodable extractXipkiActionRepContent(
-            PKIResponse response,
-            int action)
+            final PKIResponse response,
+            final int action)
     throws CmpRequestorException, PKIErrorException
     {
         ASN1Encodable itvValue = extractGeneralRepContent(response, ObjectIdentifiers.id_xipki_cmp.getId(), true);

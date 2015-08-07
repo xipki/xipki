@@ -174,7 +174,10 @@ public class CaExportCommand extends CaCommand
         return null;
     }
 
-    private static void propsput(Properties props, String key, Object value)
+    private static void propsput(
+            final Properties props,
+            final String key,
+            final Object value)
     {
         if(value instanceof String)
         {
