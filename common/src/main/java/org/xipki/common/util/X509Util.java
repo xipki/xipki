@@ -790,7 +790,8 @@ public class X509Util
         }
     }
 
-    public static Extensions getExtensions(CertificationRequestInfo p10Req)
+    public static Extensions getExtensions(
+            final CertificationRequestInfo p10Req)
     {
         ASN1Set attrs = p10Req.getAttributes();
         for(int i = 0; i < attrs.size(); i++)
@@ -804,7 +805,8 @@ public class X509Util
         return null;
     }
 
-    public static String getChallengePassword(CertificationRequestInfo p10Req)
+    public static String getChallengePassword(
+            final CertificationRequestInfo p10Req)
     {
         ASN1Set attrs = p10Req.getAttributes();
         for(int i = 0; i < attrs.size(); i++)

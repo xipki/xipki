@@ -816,7 +816,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
 
     @Override
     public String getParameter(
-            String paramName)
+            final String paramName)
     {
         return parameters == null ? null : parameters.get(paramName);
     }

@@ -113,7 +113,8 @@ public abstract class AbstractLoadTest
 
     private static int DEFAULT_DURATION = 30; // 30 seconds
     private int duration = DEFAULT_DURATION; // in seconds
-    public void setDuration(int duration)
+    public void setDuration(
+            final int duration)
     {
         if(duration > 0)
         {
@@ -123,7 +124,8 @@ public abstract class AbstractLoadTest
 
     private static int DEFAULT_THREADS = 25;
     private int threads = DEFAULT_THREADS;
-    public void setThreads(int threads)
+    public void setThreads(
+            final int threads)
     {
         if(threads > 0)
         {

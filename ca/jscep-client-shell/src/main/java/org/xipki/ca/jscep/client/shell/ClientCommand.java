@@ -151,7 +151,8 @@ public abstract class ClientCommand extends XipkiOsgiCommandSupport
         this.identityCert = (X509Certificate) ks.getCertificate(keyname);
     }
 
-    protected X509Certificate extractEECerts(CertStore certstore)
+    protected X509Certificate extractEECerts(
+            final CertStore certstore)
     throws CertStoreException
     {
         Iterator<?> it = certstore.getCertificates(null).iterator();

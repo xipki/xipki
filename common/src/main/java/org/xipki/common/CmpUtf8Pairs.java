@@ -254,7 +254,8 @@ public class CmpUtf8Pairs
     }
 
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(
+            final Object obj)
     {
         if(obj instanceof CmpUtf8Pairs == false)
         {

@@ -144,7 +144,10 @@ public abstract class Pkcs12_RSA_Test
         }
     }
 
-    protected boolean verify(byte[] data, byte[] signatureValue, X509Certificate cert)
+    protected boolean verify(
+            final byte[] data,
+            final byte[] signatureValue,
+            final X509Certificate cert)
     throws Exception
     {
         Signature signature = Signature.getInstance(getSignatureAlgorithm().getId());

@@ -1090,7 +1090,8 @@ class CaCertStoreDbExporter extends DbPorter
         return info;
     }
 
-    private String getUserName(int id)
+    private String getUserName(
+            final int id)
     throws DataAccessException
     {
         String name = userIdNameMap.get(id);

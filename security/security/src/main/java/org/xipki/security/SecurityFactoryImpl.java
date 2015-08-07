@@ -1030,7 +1030,10 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
     }
 
     @Override
-    public KeyCertPair createPrivateKeyAndCert(String type, String conf, X509Certificate cert)
+    public KeyCertPair createPrivateKeyAndCert(
+            final String type,
+            final String conf,
+            final X509Certificate cert)
     throws SignerException
     {
         if("PKCS11".equalsIgnoreCase(type) == false && "PKCS12".equalsIgnoreCase(type) == false)
