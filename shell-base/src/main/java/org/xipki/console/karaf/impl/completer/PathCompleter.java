@@ -134,7 +134,11 @@ abstract class PathCompleter
         return new File(".");
     }
 
-    protected int matchFiles(final String buffer, final String translated, final File[] files, final List<String> candidates)
+    protected int matchFiles(
+            final String buffer,
+            final String translated,
+            final File[] files,
+            final List<String> candidates)
     {
         if (files == null)
         {
@@ -165,7 +169,9 @@ abstract class PathCompleter
         return index + separator().length();
     }
 
-    protected CharSequence render(final File file, final CharSequence name)
+    protected CharSequence render(
+            final File file,
+            final CharSequence name)
     {
         return name;
     }

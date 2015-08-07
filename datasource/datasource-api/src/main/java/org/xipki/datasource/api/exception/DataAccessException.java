@@ -50,7 +50,8 @@ public class DataAccessException extends Exception
      * Constructor for DataAccessException.
      * @param msg the detail message
      */
-    public DataAccessException(String msg)
+    public DataAccessException(
+            final String msg)
     {
         super(msg);
     }
@@ -61,7 +62,9 @@ public class DataAccessException extends Exception
      * @param cause the root cause (usually from using a underlying
      * data access API such as JDBC)
      */
-    public DataAccessException(String msg, Throwable cause)
+    public DataAccessException(
+            final String msg,
+            final Throwable cause)
     {
         super(msg, cause);
     }

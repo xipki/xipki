@@ -75,7 +75,7 @@ public class InvalidResultSetAccessException extends InvalidDataAccessResourceUs
      * @param ex the root cause
      */
     public InvalidResultSetAccessException(
-            SQLException ex)
+            final SQLException ex)
     {
         super(ex.getMessage(), ex);
     }

@@ -53,7 +53,7 @@ public class DataAccessResourceFailureException extends NonTransientDataAccessRe
      * @param msg the detail message
      */
     public DataAccessResourceFailureException(
-            String msg)
+            final String msg)
     {
         super(msg);
     }
@@ -64,8 +64,8 @@ public class DataAccessResourceFailureException extends NonTransientDataAccessRe
      * @param cause the root cause from the data access API in use
      */
     public DataAccessResourceFailureException(
-            String msg,
-            Throwable cause)
+            final String msg,
+            final Throwable cause)
     {
         super(msg, cause);
     }

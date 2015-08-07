@@ -122,7 +122,8 @@ public class P12ComplexCertRequestGenCommand extends CertRequestGenCommand
     }
 
     @Override
-    protected X500Name getSubject(String subject)
+    protected X500Name getSubject(
+            final String subject)
     {
         X500Name name = new X500Name(subject);
         List<RDN> l = new LinkedList<>();

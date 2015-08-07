@@ -94,7 +94,8 @@ public interface P11WritableSlot
             List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception;
 
-    X509Certificate exportCert(P11KeyIdentifier keyIdentifier)
+    X509Certificate exportCert(
+            P11KeyIdentifier keyIdentifier)
     throws Exception;
 
     List<? extends P11Identity> getP11Identities();

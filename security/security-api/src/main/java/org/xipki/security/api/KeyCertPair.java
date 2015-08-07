@@ -50,7 +50,9 @@ public class KeyCertPair
     private final PrivateKey privateKey;
     private final X509Certificate certificate;
 
-    public KeyCertPair(PrivateKey privateKey, X509Certificate certificate)
+    public KeyCertPair(
+            final PrivateKey privateKey,
+            final X509Certificate certificate)
     {
         ParamChecker.assertNotNull("privateKey", privateKey);
         ParamChecker.assertNotNull("certificate", certificate);

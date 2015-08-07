@@ -108,7 +108,8 @@ public class PasswordHash
      * @param   password    the password to hash
      * @return              a salted PBKDF2 hash of the password
      */
-    public static String createHash(String password)
+    public static String createHash(
+            final String password)
     throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         return createHash(password.getBytes());
@@ -120,7 +121,8 @@ public class PasswordHash
      * @param   password    the password to hash
      * @return              a salted PBKDF2 hash of the password
      */
-    public static String createHash(byte[] password)
+    public static String createHash(
+            final byte[] password)
     throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         return createHash(password, SALT_BYTE_SIZE, PBKDF2_ITERATIONS, DERIVED_KEY_SIZE);
@@ -132,7 +134,11 @@ public class PasswordHash
      * @param   password    the password to hash
      * @return              a salted PBKDF2 hash of the password
      */
-    public static String createHash(byte[] password, int saltSize, int iterations, int dkSize)
+    public static String createHash(
+            final byte[] password,
+            final int saltSize,
+            final int iterations,
+            final int dkSize)
     throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         // Generate a random salt
@@ -153,7 +159,9 @@ public class PasswordHash
      * @param   correctHash     the hash of the valid password
      * @return                  true if the password is correct, false if not
      */
-    public static boolean validatePassword(String password, String correctHash)
+    public static boolean validatePassword(
+            final String password,
+            final String correctHash)
     throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         return validatePassword(password.getBytes(), correctHash);
@@ -166,7 +174,9 @@ public class PasswordHash
      * @param   correctHash     the hash of the valid password
      * @return                  true if the password is correct, false if not
      */
-    public static boolean validatePassword(byte[] password, String correctHash)
+    public static boolean validatePassword(
+            final byte[] password,
+            final String correctHash)
     throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         // Decode the hash into its parameters
@@ -191,7 +201,9 @@ public class PasswordHash
      * @param   b       the second byte array
      * @return          true if both byte arrays are the same, false if not
      */
-    private static boolean slowEquals(byte[] a, byte[] b)
+    private static boolean slowEquals(
+            final byte[] a,
+            final byte[] b)
     {
         int diff = a.length ^ b.length;
         for(int i = 0; i < a.length && i < b.length; i++)
@@ -210,7 +222,11 @@ public class PasswordHash
      * @param   bytes       the length of the hash to compute in bytes
      * @return              the PBDKF2 hash of the password
      */
-    public static byte[] pbkdf2(byte[] password, byte[] salt, int iterations, int bytes)
+    public static byte[] pbkdf2(
+            final byte[] password,
+            final byte[] salt,
+            final int iterations,
+            final int bytes)
     throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         byte[] pwdBytes;
@@ -235,7 +251,8 @@ public class PasswordHash
      * @param   hex         the hex string
      * @return              the hex string decoded into a byte array
      */
-    private static byte[] fromHex(String hex)
+    private static byte[] fromHex(
+            final String hex)
     {
         byte[] binary = new byte[hex.length() / 2];
         for(int i = 0; i < binary.length; i++)
@@ -251,7 +268,8 @@ public class PasswordHash
      * @param   array       the byte array to convert
      * @return              a length*2 character string encoding the byte array
      */
-    private static String toHex(byte[] array)
+    private static String toHex(
+            final byte[] array)
     {
         BigInteger bi = new BigInteger(1, array);
         String hex = bi.toString(16);
@@ -267,7 +285,8 @@ public class PasswordHash
      *
      * @param   args        ignored
      */
-    public static void main(String[] args)
+    public static void main(
+            final String[] args)
     {
         try
         {

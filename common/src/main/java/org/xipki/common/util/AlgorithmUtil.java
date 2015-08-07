@@ -125,7 +125,7 @@ public class AlgorithmUtil
     }
 
     public static int getHashOutputSizeInOctets(
-            ASN1ObjectIdentifier hashAlgo)
+            final ASN1ObjectIdentifier hashAlgo)
     throws NoSuchAlgorithmException
     {
         if(X509ObjectIdentifiers.id_SHA1.equals(hashAlgo))
@@ -275,7 +275,8 @@ public class AlgorithmUtil
         }
     }
 
-    public static boolean isDSAPlainSigAlg(AlgorithmIdentifier algId)
+    public static boolean isDSAPlainSigAlg(
+            final AlgorithmIdentifier algId)
     {
         ParamChecker.assertNotNull("algId", algId);
         ASN1ObjectIdentifier algOid = algId.getAlgorithm();
@@ -291,7 +292,8 @@ public class AlgorithmUtil
         return false;
     }
 
-    static public String canonicalizeSignatureAlgo(String algoName)
+    static public String canonicalizeSignatureAlgo(
+            final String algoName)
     throws NoSuchAlgorithmException
     {
         return getSignatureAlgoName(getSignatureAlgoId(algoName));
