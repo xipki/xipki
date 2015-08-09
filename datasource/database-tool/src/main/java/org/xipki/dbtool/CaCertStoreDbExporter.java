@@ -764,9 +764,9 @@ class CaCertStoreDbExporter extends DbPorter
                     byte[] certBytes = rawCertMaps.remove(id);
                     if(certBytes == null)
                     {
-                        String msg = "found no certificate in table RAWCERT for cert_id '" + id + "'";
+                        final String msg = "found no certificate in table RAWCERT for cert_id '" + id + "'";
                         LOG.error(msg);
-                        continue;
+                        throw new DataAccessException(msg);
                     }
 
                     String sha1_cert = SecurityUtil.sha1sum(certBytes);
@@ -856,7 +856,9 @@ class CaCertStoreDbExporter extends DbPorter
                             user = getUserName(user_id);
                             if(user == null)
                             {
-                                throw new DataAccessException("found no entry in table USERNAME with ID '" + user_id + "'");
+                                final String msg = "found no entry in table USERNAME with ID '" + user_id + "'";
+                                LOG.error(msg);
+                                throw new DataAccessException(msg);
                             }
                         }
                     }
