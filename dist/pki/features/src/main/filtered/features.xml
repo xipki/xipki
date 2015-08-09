@@ -47,13 +47,13 @@
   <feature name="xipki-ca-api" version="${project.version}" resolver="(obr)">
     <bundle>mvn:org.xipki/common/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-common/${project.version}</bundle>
-    <bundle>mvn:org.xipki/audit/${project.version}</bundle>
+    <bundle>mvn:org.xipki.audit/audit/${audit.version}</bundle>
     <bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
   </feature>
   <feature name="xipki-cabase" version="${project.version}" resolver="(obr)">
     <feature>xipki-security</feature>
     <feature>xipki-ca-api</feature>
-    <bundle>mvn:org.xipki/audit/${project.version}</bundle>
+    <bundle>mvn:org.xipki.audit/audit/${audit.version}</bundle>
     <bundle>mvn:org.xipki/datasource-api/${project.version}</bundle>
   </feature>
   <feature name="xipki-caserver" version="${project.version}" resolver="(obr)">
@@ -118,7 +118,7 @@
     <feature>xipki-datasource</feature>
     <feature>xipki-security</feature>
     <feature>xipki-audit</feature>
-    <bundle>mvn:org.xipki/audit/${project.version}</bundle>
+    <bundle>mvn:org.xipki.audit/audit/${audit.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-server/${project.version}</bundle>
   </feature>
@@ -145,14 +145,14 @@
     <bundle>mvn:org.liquibase/liquibase-osgi/${liquibase.version}</bundle>
     <bundle>mvn:org.xipki/database-tool/${project.version}</bundle>
   </feature>
-  <feature name="xipki-audit" version="${project.version}" resolver="(obr)">
-    <bundle>mvn:org.xipki/audit/${project.version}</bundle>
+  <feature name="xipki-audit" version="${audit.version}" resolver="(obr)">
+    <bundle>mvn:org.xipki.audit/audit/${audit.version}</bundle>
   </feature>
-  <feature name="xipki-audit-syslog" version="${project.version}" resolver="(obr)">
+  <feature name="xipki-audit-syslog" version="${audit.version}" resolver="(obr)">
     <feature>xipki-audit</feature>
     <bundle><![CDATA[wrap:mvn:com.google.code.findbugs/jsr305/${jsr305.version}/$Bundle-SymbolicName=jsr305&Bundle-Version=${jsr305.version}]]></bundle>
     <bundle><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
-    <bundle>mvn:org.xipki/audit-syslog/${project.version}</bundle>
+    <bundle>mvn:org.xipki.audit/audit-syslog/${audit.version}</bundle>
   </feature>
   <feature name="xipki-pkiconsole-server" version="${project.version}" resolver="(obr)">
     <feature>xipki-caserver</feature>
