@@ -29,9 +29,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xipki.audit</groupId>
       <artifactId>audit</artifactId>
-      <version>${project.version}</version>
+      <version>${audit.version}</version>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>

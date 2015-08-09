@@ -17,7 +17,7 @@
   <feature name="xipki-pkiconsole" version="${project.version}" resolver="(obr)">
     <feature>xipki-security</feature>
     <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/audit/${project.version}</bundle>
+    <bundle>mvn:org.xipki.audit/audit/${audit.version}</bundle>
     <bundle>mvn:org.xipki/datasource-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.caucho/hessian/${hessian.version}/$Bundle-SymbolicName=hessian&Bundle-Version=${hessian.version}]]></bundle>
