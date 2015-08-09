@@ -369,9 +369,9 @@ class OcspCertStoreDbExporter extends DbPorter
                     byte[] certBytes = rawCertMaps.remove(id);
                     if(certBytes == null)
                     {
-                        String msg = "found no certificate in table RAWCERT for cert_id '" + id + "'";
+                        final String msg = "found no certificate in table RAWCERT for cert_id '" + id + "'";
                         LOG.error(msg);
-                        continue;
+                        throw new DataAccessException(msg);
                     }
 
                     String sha1_cert = SecurityUtil.sha1sum(certBytes);
