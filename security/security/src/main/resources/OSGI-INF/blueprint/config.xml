@@ -16,7 +16,7 @@
   <bean id="sshBcBugfix" class="org.xipki.security.SshdBcBugfix">
   </bean>
 
-  <reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver"/>
+  <reference id="passwordResolver" interface="org.xipki.password.api.PasswordResolver"/>
 
   <bean id="XipkiProviderNssRegister" class="org.xipki.security.p11.sun.nss.XipkiNSSProviderRegister"
       init-method="regist" destroy-method="unregist"/>
