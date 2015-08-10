@@ -59,7 +59,7 @@ import org.xipki.common.ParamChecker;
 import org.xipki.common.util.X509Util;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.security.api.PasswordResolver;
+import org.xipki.password.api.PasswordResolver;
 
 /**
  * @author Lijun Liao

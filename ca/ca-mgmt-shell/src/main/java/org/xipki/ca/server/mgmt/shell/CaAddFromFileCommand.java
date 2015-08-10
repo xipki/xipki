@@ -58,7 +58,7 @@ import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.security.api.PasswordResolver;
+import org.xipki.password.api.PasswordResolver;
 
 /**
  * @author Lijun Liao

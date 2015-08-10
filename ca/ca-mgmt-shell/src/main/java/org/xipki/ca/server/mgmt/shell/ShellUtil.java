@@ -40,7 +40,7 @@ import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.security.api.PasswordResolver;
+import org.xipki.password.api.PasswordResolver;
 
 /**
  * @author Lijun Liao

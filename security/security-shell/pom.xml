@@ -23,5 +23,10 @@
       <artifactId>shell-base</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xipki.password</groupId>
+      <artifactId>password-impl</artifactId>
+      <version>${password.version}</version>
+    </dependency>
   </dependencies>
 </project>

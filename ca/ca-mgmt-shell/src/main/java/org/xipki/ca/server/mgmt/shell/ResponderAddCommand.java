@@ -42,7 +42,7 @@ import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.X509Util;
-import org.xipki.security.api.PasswordResolver;
+import org.xipki.password.api.PasswordResolver;
 
 /**
  * @author Lijun Liao

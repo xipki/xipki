@@ -48,7 +48,7 @@ import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.security.api.PasswordResolver;
+import org.xipki.password.api.PasswordResolver;
 
 /**
  * @author Lijun Liao

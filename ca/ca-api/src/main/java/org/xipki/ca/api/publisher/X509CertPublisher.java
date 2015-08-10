@@ -44,7 +44,7 @@ import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.security.api.PasswordResolver;
+import org.xipki.password.api.PasswordResolver;
 
 /**
  * @author Lijun Liao

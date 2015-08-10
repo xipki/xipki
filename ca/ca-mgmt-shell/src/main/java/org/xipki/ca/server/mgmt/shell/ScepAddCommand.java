@@ -40,7 +40,7 @@ import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.util.IoUtil;
-import org.xipki.security.api.PasswordResolver;
+import org.xipki.password.api.PasswordResolver;
 
 /**
  * @author Lijun Liao

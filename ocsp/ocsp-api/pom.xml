@@ -16,12 +16,10 @@
     <dependency>
       <groupId>org.xipki.audit</groupId>
       <artifactId>audit</artifactId>
-      <version>${audit.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xipki.datasource</groupId>
       <artifactId>datasource-api</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

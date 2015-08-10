@@ -28,5 +28,9 @@
       <artifactId>common</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xipki.password</groupId>
+      <artifactId>password-api</artifactId>
+    </dependency>
   </dependencies>
 </project>

@@ -45,6 +45,8 @@
     <pkcs11Wrapper.version>1.3.0</pkcs11Wrapper.version>
     <scep4j.version>1.0.0-SNAPSHOT</scep4j.version>
     <audit.version>1.0.0-SNAPSHOT</audit.version>
+    <password.version>1.0.0-SNAPSHOT</password.version>
+    <datasource.version>1.0.0-SNAPSHOT</datasource.version>
     <ldapsdk.version>2.3.6</ldapsdk.version>
     <liquibase.version>3.2.2</liquibase.version>
     <hessian.version>4.0.38</hessian.version>
@@ -58,7 +60,6 @@
     <module>shell-base</module>
     <module>common</module>
     <module>security</module>
-    <module>datasource</module>
     <module>ca</module>
     <module>ocsp</module>
     <module>pkiconsole</module>
@@ -70,6 +71,21 @@
   </scm>
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.xipki.audit</groupId>
+        <artifactId>audit</artifactId>
+        <version>${audit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xipki.password</groupId>
+        <artifactId>password-api</artifactId>
+        <version>${password.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xipki.datasource</groupId>
+        <artifactId>datasource-api</artifactId>
+        <version>${datasource.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-jdk15on</artifactId>

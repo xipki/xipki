@@ -41,8 +41,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.api.PasswordResolverException;
+import org.xipki.password.api.PasswordResolver;
+import org.xipki.password.api.PasswordResolverException;
 import org.xipki.security.api.p11.P11PasswordRetriever;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 
