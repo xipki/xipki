@@ -185,7 +185,7 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
-                  <artifactId>database-tool</artifactId>
+                  <artifactId>dbtool-shell</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>

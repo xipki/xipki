@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" default-activation="lazy">
   <reference id="caManager" interface="org.xipki.ca.server.mgmt.api.CAManager"/>
-  <reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver"/>
+  <reference id="passwordResolver" interface="org.xipki.password.api.PasswordResolver"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <reference id="yesNoCompleter" interface="org.xipki.console.karaf.YesNoCompleter"/>
   <reference id="clientCrlReasonCompleter" interface="org.xipki.console.karaf.ClientCRLReasonCompleter"/>  
