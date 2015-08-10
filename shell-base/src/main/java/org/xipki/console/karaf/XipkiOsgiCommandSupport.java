@@ -43,15 +43,15 @@ import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.List;
 
-import jline.console.ConsoleReader;
-
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.SecurePasswordInputPanel;
 import org.xipki.common.util.StringUtil;
+import org.xipki.password.api.SecurePasswordInputPanel;
+
+import jline.console.ConsoleReader;
 
 /**
  * @author Lijun Liao

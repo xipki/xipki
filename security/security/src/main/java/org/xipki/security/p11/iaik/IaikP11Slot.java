@@ -35,29 +35,6 @@
 
 package org.xipki.security.p11.iaik;
 
-import iaik.pkcs.pkcs11.Mechanism;
-import iaik.pkcs.pkcs11.Session;
-import iaik.pkcs.pkcs11.SessionInfo;
-import iaik.pkcs.pkcs11.Slot;
-import iaik.pkcs.pkcs11.State;
-import iaik.pkcs.pkcs11.Token;
-import iaik.pkcs.pkcs11.TokenException;
-import iaik.pkcs.pkcs11.objects.ByteArrayAttribute;
-import iaik.pkcs.pkcs11.objects.Certificate.CertificateType;
-import iaik.pkcs.pkcs11.objects.CharArrayAttribute;
-import iaik.pkcs.pkcs11.objects.DSAPrivateKey;
-import iaik.pkcs.pkcs11.objects.DSAPublicKey;
-import iaik.pkcs.pkcs11.objects.ECDSAPrivateKey;
-import iaik.pkcs.pkcs11.objects.ECDSAPublicKey;
-import iaik.pkcs.pkcs11.objects.KeyPair;
-import iaik.pkcs.pkcs11.objects.PrivateKey;
-import iaik.pkcs.pkcs11.objects.PublicKey;
-import iaik.pkcs.pkcs11.objects.RSAPrivateKey;
-import iaik.pkcs.pkcs11.objects.RSAPublicKey;
-import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -134,7 +111,7 @@ import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.X509Util;
-import org.xipki.security.api.PasswordResolverException;
+import org.xipki.password.api.PasswordResolverException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11Identity;
@@ -142,6 +119,29 @@ import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
+
+import iaik.pkcs.pkcs11.Mechanism;
+import iaik.pkcs.pkcs11.Session;
+import iaik.pkcs.pkcs11.SessionInfo;
+import iaik.pkcs.pkcs11.Slot;
+import iaik.pkcs.pkcs11.State;
+import iaik.pkcs.pkcs11.Token;
+import iaik.pkcs.pkcs11.TokenException;
+import iaik.pkcs.pkcs11.objects.ByteArrayAttribute;
+import iaik.pkcs.pkcs11.objects.Certificate.CertificateType;
+import iaik.pkcs.pkcs11.objects.CharArrayAttribute;
+import iaik.pkcs.pkcs11.objects.DSAPrivateKey;
+import iaik.pkcs.pkcs11.objects.DSAPublicKey;
+import iaik.pkcs.pkcs11.objects.ECDSAPrivateKey;
+import iaik.pkcs.pkcs11.objects.ECDSAPublicKey;
+import iaik.pkcs.pkcs11.objects.KeyPair;
+import iaik.pkcs.pkcs11.objects.PrivateKey;
+import iaik.pkcs.pkcs11.objects.PublicKey;
+import iaik.pkcs.pkcs11.objects.RSAPrivateKey;
+import iaik.pkcs.pkcs11.objects.RSAPublicKey;
+import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 
 /**
  * @author Lijun Liao

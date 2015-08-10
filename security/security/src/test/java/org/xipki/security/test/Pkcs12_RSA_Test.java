@@ -47,7 +47,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.util.X509Util;
-import org.xipki.security.PasswordResolverImpl;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
 
@@ -60,11 +59,6 @@ public abstract class Pkcs12_RSA_Test
     protected abstract ASN1ObjectIdentifier getSignatureAlgorithm();
 
     private static final SecurityFactoryImpl securityFactory = new SecurityFactoryImpl();
-
-    static
-    {
-        securityFactory.setPasswordResolver(new PasswordResolverImpl());
-    }
 
     protected Pkcs12_RSA_Test()
     {

@@ -48,7 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.IoUtil;
-import org.xipki.security.api.PasswordResolverException;
+import org.xipki.password.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11Module;
 import org.xipki.security.api.p11.P11ModuleConf;

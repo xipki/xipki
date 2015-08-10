@@ -47,7 +47,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.util.X509Util;
-import org.xipki.security.api.PasswordResolverException;
+import org.xipki.password.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 
 /**

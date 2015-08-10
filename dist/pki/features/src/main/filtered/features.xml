@@ -26,15 +26,20 @@
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
   </feature>
-  <feature name="xipki-datasource" version="${project.version}" resolver="(obr)">
+  <feature name="xipki-password" version="${password.version}" resolver="(obr)">
+    <bundle>mvn:org.xipki.password/password-api/${password.version}</bundle>
+    <bundle>mvn:org.xipki.password/password-impl/${password.version}</bundle>
+  </feature>
+  <feature name="xipki-datasource" version="${datasource.version}" resolver="(obr)">
+    <feature>xipki-password</feature>
     <bundle>mvn:com.zaxxer/HikariCP-java6/${hikaricp.version}</bundle>
     <bundle>mvn:org.javassist/javassist/${javassist.version}</bundle>
-    <bundle>mvn:org.xipki/common/${project.version}</bundle>
-    <bundle>mvn:org.xipki/datasource-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/datasource-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki.datasource/datasource-api/${datasource.version}</bundle>
+    <bundle>mvn:org.xipki.datasource/datasource-impl/${datasource.version}</bundle>
   </feature>
   <feature name="xipki-security-base" version="${project.version}" resolver="(obr)">
     <feature>bouncycastle</feature>
+    <feature>xipki-password</feature>
     <bundle>mvn:org.xipki/common/${project.version}</bundle>
     <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/iaikPkcs11Wrapper/${pkcs11Wrapper.version}/$Bundle-SymbolicName=iaikPkcs11Wrapper&Bundle-Version=${pkcs11Wrapper.version}]]></bundle>
     <bundle>mvn:org.xipki/security-api/${project.version}</bundle>

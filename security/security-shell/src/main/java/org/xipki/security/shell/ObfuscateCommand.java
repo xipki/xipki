@@ -36,7 +36,7 @@
 package org.xipki.security.shell;
 
 import org.apache.karaf.shell.commands.Command;
-import org.xipki.security.OBFPasswordResolver;
+import org.xipki.password.OBFPasswordResolver;
 
 /**
  * @author Lijun Liao

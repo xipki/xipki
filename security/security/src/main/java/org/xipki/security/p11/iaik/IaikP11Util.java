@@ -35,11 +35,11 @@
 
 package org.xipki.security.p11.iaik;
 
+import java.security.SecureRandom;
+
 import iaik.pkcs.pkcs11.Session;
 import iaik.pkcs.pkcs11.objects.Key;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
-
-import java.security.SecureRandom;
 
 /**
  * @author Lijun Liao

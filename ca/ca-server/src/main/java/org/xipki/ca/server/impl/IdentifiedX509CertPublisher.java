@@ -50,7 +50,7 @@ import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.security.api.PasswordResolver;
+import org.xipki.password.api.PasswordResolver;
 
 /**
  * @author Lijun Liao
