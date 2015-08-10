@@ -30,5 +30,8 @@
     <module>scep-client-shell</module>
     <module>jscep-client-shell</module>
     <module>dbtool-shell</module>
+    <module>pkiconsole-common</module>
+    <module>pkiconsole-client</module>
+    <module>pkiconsole-server</module>
   </modules>
 </project>
