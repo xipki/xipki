@@ -61,9 +61,9 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.X509Util;
+import org.xipki.password.api.PasswordResolverException;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
-import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 

@@ -39,7 +39,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.security.OBFPasswordResolver;
+import org.xipki.password.OBFPasswordResolver;
 
 /**
  * @author Lijun Liao

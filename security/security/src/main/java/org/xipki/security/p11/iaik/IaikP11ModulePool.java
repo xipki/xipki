@@ -35,11 +35,6 @@
 
 package org.xipki.security.p11.iaik;
 
-import iaik.pkcs.pkcs11.DefaultInitializeArgs;
-import iaik.pkcs.pkcs11.Module;
-import iaik.pkcs.pkcs11.TokenException;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,6 +45,11 @@ import org.xipki.common.util.LogUtil;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11ModuleConf;
+
+import iaik.pkcs.pkcs11.DefaultInitializeArgs;
+import iaik.pkcs.pkcs11.Module;
+import iaik.pkcs.pkcs11.TokenException;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
  * @author Lijun Liao

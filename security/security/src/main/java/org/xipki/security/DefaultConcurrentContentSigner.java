@@ -52,9 +52,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.util.LogUtil;
+import org.xipki.password.api.PasswordResolver;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
-import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SignerException;
 
 /**
