@@ -37,7 +37,7 @@ package org.xipki.security.api.p11;
 
 import java.util.List;
 
-import org.xipki.security.api.PasswordResolverException;
+import org.xipki.password.api.PasswordResolverException;
 
 /**
  * @author Lijun Liao

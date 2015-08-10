@@ -35,8 +35,6 @@
 
 package org.xipki.security.p11.iaik;
 
-import iaik.pkcs.pkcs11.wrapper.PKCS11RuntimeException;
-
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
@@ -57,6 +55,8 @@ import org.xipki.security.api.p11.P11Identity;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11ModuleConf;
 import org.xipki.security.api.p11.P11SlotIdentifier;
+
+import iaik.pkcs.pkcs11.wrapper.PKCS11RuntimeException;
 
 /**
  * @author Lijun Liao
