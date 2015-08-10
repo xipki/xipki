@@ -62,7 +62,6 @@
     <module>security</module>
     <module>ca</module>
     <module>ocsp</module>
-    <module>pkiconsole</module>
   </modules>
   <scm>
     <connection>scm:git:git@github.com:xipki/xipki.git</connection>
