@@ -41,8 +41,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -58,7 +58,7 @@ public class P11Control
             final String defaultModuleName,
             final Set<P11ModuleConf> moduleConfs)
     {
-        ParamChecker.assertNotBlank("defaultModuleName", defaultModuleName);
+        ParamUtil.assertNotBlank("defaultModuleName", defaultModuleName);
 
         this.defaultModuleName = defaultModuleName;
         if(CollectionUtil.isEmpty(moduleConfs))

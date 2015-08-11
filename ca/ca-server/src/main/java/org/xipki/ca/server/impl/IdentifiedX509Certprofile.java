@@ -92,10 +92,10 @@ import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.api.profile.x509.X509Certprofile;
 import org.xipki.ca.certprofile.XmlX509Certprofile;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
-import org.xipki.common.KeyUsage;
 import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.KeyUsage;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.security.api.ExtensionExistence;
@@ -156,7 +156,7 @@ class IdentifiedX509Certprofile
             final String realType)
     throws CertprofileException
     {
-        ParamChecker.assertNotNull("entry", dbEntry);
+        ParamUtil.assertNotNull("entry", dbEntry);
         this.dbEntry = dbEntry;
         this.name = dbEntry.getName();
         X509Certprofile tmpCertprofile = null;

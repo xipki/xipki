@@ -37,7 +37,7 @@ package org.xipki.ocsp.server.impl;
 
 import java.util.List;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.api.CertStatusStore;
 import org.xipki.ocsp.api.CertprofileOption;
 
@@ -64,11 +64,11 @@ class Responder
             final ResponderSigner signer,
             final List<CertStatusStore> stores)
     {
-        ParamChecker.assertNotNull("responderOption", responderOption);
-        ParamChecker.assertNotNull("requestOption", requestOption);
-        ParamChecker.assertNotNull("responseOption", responseOption);
-        ParamChecker.assertNotNull("signer", signer);
-        ParamChecker.assertNotEmpty("stores", stores);
+        ParamUtil.assertNotNull("responderOption", responderOption);
+        ParamUtil.assertNotNull("requestOption", requestOption);
+        ParamUtil.assertNotNull("responseOption", responseOption);
+        ParamUtil.assertNotNull("signer", signer);
+        ParamUtil.assertNotEmpty("stores", stores);
 
         this.responderOption = responderOption;
         this.requestOption = requestOption;

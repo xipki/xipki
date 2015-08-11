@@ -43,7 +43,7 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.client.api.CertprofileInfo;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
@@ -73,10 +73,10 @@ class CAConf
             final String requestorName,
             final X509Certificate responder)
     {
-        ParamChecker.assertNotBlank("name", name);
-        ParamChecker.assertNotBlank("url", url);
-        ParamChecker.assertNotNull("requestorName", requestorName);
-        ParamChecker.assertNotNull("responder", responder);
+        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.assertNotBlank("url", url);
+        ParamUtil.assertNotNull("requestorName", requestorName);
+        ParamUtil.assertNotNull("responder", responder);
 
         this.name = name;
         this.url = url;

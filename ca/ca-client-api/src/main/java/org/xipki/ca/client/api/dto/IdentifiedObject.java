@@ -35,7 +35,7 @@
 
 package org.xipki.ca.client.api.dto;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -48,7 +48,7 @@ public class IdentifiedObject
     public IdentifiedObject(
             final String id)
     {
-        ParamChecker.assertNotBlank("id", id);
+        ParamUtil.assertNotBlank("id", id);
         this.id = id;
     }
 

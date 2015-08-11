@@ -87,9 +87,9 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
@@ -132,9 +132,9 @@ public class SoftTokenContentSignerBuilder
             throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
         }
 
-        ParamChecker.assertNotNull("keystoreStream", keystoreStream);
-        ParamChecker.assertNotNull("keystorePassword", keystorePassword);
-        ParamChecker.assertNotNull("keyPassword", keyPassword);
+        ParamUtil.assertNotNull("keystoreStream", keystoreStream);
+        ParamUtil.assertNotNull("keystorePassword", keystorePassword);
+        ParamUtil.assertNotNull("keyPassword", keyPassword);
 
         try
         {

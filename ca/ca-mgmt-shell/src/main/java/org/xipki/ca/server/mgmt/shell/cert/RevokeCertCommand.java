@@ -39,8 +39,8 @@ import java.util.Date;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.CRLReason;
 import org.xipki.common.ConfigurationException;
+import org.xipki.common.security.CRLReason;
 import org.xipki.common.util.DateUtil;
 
 /**

@@ -41,7 +41,7 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -62,8 +62,8 @@ public class P11Identity implements Comparable<P11Identity>
             final X509Certificate[] certificateChain,
             final PublicKey publicKey)
     {
-        ParamChecker.assertNotNull("slotId", slotId);
-        ParamChecker.assertNotNull("keyId", keyId);
+        ParamUtil.assertNotNull("slotId", slotId);
+        ParamUtil.assertNotNull("keyId", keyId);
 
         if((certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
                 && publicKey == null)

@@ -37,7 +37,7 @@ package org.xipki.ca.certprofile.internal;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -52,7 +52,7 @@ public class QcStatementOption
     public QcStatementOption(
             final QCStatement statement)
     {
-        ParamChecker.assertNotNull("statement", statement);
+        ParamUtil.assertNotNull("statement", statement);
         this.statement = statement;
         this.statementId = null;
         this.monetaryValueOption = null;
@@ -62,8 +62,8 @@ public class QcStatementOption
             final ASN1ObjectIdentifier statementId,
             final MonetaryValueOption monetaryValueOption)
     {
-        ParamChecker.assertNotNull("statementId", statementId);
-        ParamChecker.assertNotNull("monetaryValueOption", monetaryValueOption);
+        ParamUtil.assertNotNull("statementId", statementId);
+        ParamUtil.assertNotNull("monetaryValueOption", monetaryValueOption);
         this.statement = null;
         this.statementId = statementId;
         this.monetaryValueOption = monetaryValueOption;

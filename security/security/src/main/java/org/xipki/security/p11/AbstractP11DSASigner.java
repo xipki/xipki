@@ -42,7 +42,7 @@ import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bouncycastle.crypto.Signer;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.SignerException;
 
 /**
@@ -61,7 +61,7 @@ abstract class AbstractP11DSASigner implements Signer
     public AbstractP11DSASigner(
             final Digest digest)
     {
-        ParamChecker.assertNotNull("digest", digest);
+        ParamUtil.assertNotNull("digest", digest);
         this.digest = digest;
     }
 

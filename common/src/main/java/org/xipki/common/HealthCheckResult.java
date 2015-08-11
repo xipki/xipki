@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -63,7 +64,7 @@ public class HealthCheckResult
     public HealthCheckResult(
             final String name)
     {
-        ParamChecker.assertNotBlank("name", name);
+        ParamUtil.assertNotBlank("name", name);
         this.name = name;
     }
 

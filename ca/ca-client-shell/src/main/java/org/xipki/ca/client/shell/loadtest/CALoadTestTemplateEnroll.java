@@ -76,9 +76,9 @@ import org.xipki.ca.client.shell.loadtest.KeyEntry.DSAKeyEntry;
 import org.xipki.ca.client.shell.loadtest.KeyEntry.ECKeyEntry;
 import org.xipki.ca.client.shell.loadtest.KeyEntry.RSAKeyEntry;
 import org.xipki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
-import org.xipki.common.AbstractLoadTest;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.qa.AbstractLoadTest;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xml.sax.SAXException;
 
@@ -194,8 +194,8 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
             final String templateFile)
     throws Exception
     {
-        ParamChecker.assertNotNull("caClient", caClient);
-        ParamChecker.assertNotBlank("templateFile", templateFile);
+        ParamUtil.assertNotNull("caClient", caClient);
+        ParamUtil.assertNotBlank("templateFile", templateFile);
 
         this.caClient = caClient;
 

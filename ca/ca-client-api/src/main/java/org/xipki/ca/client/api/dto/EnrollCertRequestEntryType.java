@@ -37,7 +37,7 @@ package org.xipki.ca.client.api.dto;
 
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -57,7 +57,7 @@ public class EnrollCertRequestEntryType extends IdentifiedObject
             final ProofOfPossession popo)
     {
         super(id);
-        ParamChecker.assertNotNull("certReq", certReq);
+        ParamUtil.assertNotNull("certReq", certReq);
 
         this.certprofile = certprofile;
         this.certReq = certReq;

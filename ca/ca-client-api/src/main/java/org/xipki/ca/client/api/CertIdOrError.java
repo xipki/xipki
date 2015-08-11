@@ -37,7 +37,7 @@ package org.xipki.ca.client.api;
 
 import org.bouncycastle.asn1.crmf.CertId;
 import org.xipki.ca.common.cmp.PKIStatusInfo;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -51,7 +51,7 @@ public class CertIdOrError
     public CertIdOrError(
             final CertId certId)
     {
-        ParamChecker.assertNotNull("certId", certId);
+        ParamUtil.assertNotNull("certId", certId);
 
         this.certId = certId;
         this.error = null;
@@ -60,7 +60,7 @@ public class CertIdOrError
     public CertIdOrError(
             final PKIStatusInfo error)
     {
-        ParamChecker.assertNotNull("error", error);
+        ParamUtil.assertNotNull("error", error);
 
         this.certId = null;
         this.error = error;

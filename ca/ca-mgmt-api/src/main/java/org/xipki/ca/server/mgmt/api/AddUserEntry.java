@@ -37,7 +37,7 @@ package org.xipki.ca.server.mgmt.api;
 
 import java.io.Serializable;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -58,9 +58,9 @@ implements Serializable
             final String cnRegex)
     throws CAMgmtException
     {
-        ParamChecker.assertNotBlank("name", name);
-        ParamChecker.assertNotBlank("password", password);
-        ParamChecker.assertNotBlank("cnRegex", cnRegex);
+        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.assertNotBlank("password", password);
+        ParamUtil.assertNotBlank("cnRegex", cnRegex);
 
         this.name = name;
         this.password = password;

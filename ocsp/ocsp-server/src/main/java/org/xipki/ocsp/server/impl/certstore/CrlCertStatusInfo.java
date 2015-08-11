@@ -38,9 +38,9 @@ package org.xipki.ocsp.server.impl.certstore;
 import java.util.Date;
 import java.util.Map;
 
-import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.HashAlgoType;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CertRevocationInfo;
+import org.xipki.common.security.HashAlgoType;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.api.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo;
 
@@ -76,7 +76,7 @@ class CrlCertStatusInfo
             final String certprofile,
             final Map<HashAlgoType, byte[]> certHashes)
     {
-        ParamChecker.assertNotBlank("certprofile", certprofile);
+        ParamUtil.assertNotBlank("certprofile", certprofile);
         return new CrlCertStatusInfo(CertStatus.GOOD, null, certprofile, certHashes);
     }
 
@@ -85,7 +85,7 @@ class CrlCertStatusInfo
             final String certprofile,
             final Map<HashAlgoType, byte[]> certHashes)
     {
-        ParamChecker.assertNotNull("revocationInfo", revocationInfo);
+        ParamUtil.assertNotNull("revocationInfo", revocationInfo);
         return new CrlCertStatusInfo(CertStatus.REVOKED, revocationInfo, certprofile, certHashes);
     }
 

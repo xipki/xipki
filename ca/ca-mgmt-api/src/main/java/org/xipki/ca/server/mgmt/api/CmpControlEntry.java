@@ -37,7 +37,7 @@ package org.xipki.ca.server.mgmt.api;
 
 import java.io.Serializable;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -55,8 +55,8 @@ public class CmpControlEntry implements Serializable
             final String name,
             final String conf)
     {
-        ParamChecker.assertNotBlank("name", name);
-        ParamChecker.assertNotBlank("conf", conf);
+        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.assertNotBlank("conf", conf);
         this.name = name;
         this.conf = conf;
     }

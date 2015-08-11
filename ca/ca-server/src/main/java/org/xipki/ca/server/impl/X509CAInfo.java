@@ -59,9 +59,9 @@ import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
-import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CertRevocationInfo;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
@@ -97,8 +97,8 @@ public class X509CAInfo
             final CertificateStore certStore)
     throws OperationException
     {
-        ParamChecker.assertNotNull("caEntry", caEntry);
-        ParamChecker.assertNotNull("certStore", certStore);
+        ParamUtil.assertNotNull("caEntry", caEntry);
+        ParamUtil.assertNotNull("certStore", certStore);
         this.caEntry = caEntry;
         this.certStore = certStore;
 

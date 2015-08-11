@@ -40,10 +40,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
-import org.xipki.common.CRLReason;
-import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.HashAlgoType;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CRLReason;
+import org.xipki.common.security.CertRevocationInfo;
+import org.xipki.common.security.HashAlgoType;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.api.IssuerHashNameAndKey;
 
 /**
@@ -63,8 +63,8 @@ public class IssuerEntry
             final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap,
             final Date caNotBefore)
     {
-        ParamChecker.assertNotEmpty("issuerHashMap", issuerHashMap);
-        ParamChecker.assertNotNull("caNotBefore", caNotBefore);
+        ParamUtil.assertNotEmpty("issuerHashMap", issuerHashMap);
+        ParamUtil.assertNotNull("caNotBefore", caNotBefore);
 
         this.id = id;
         this.issuerHashMap = issuerHashMap;
@@ -88,7 +88,7 @@ public class IssuerEntry
     public void setRevocationInfo(
             final Date revocationTime)
     {
-        ParamChecker.assertNotNull("revocationTime", revocationTime);
+        ParamUtil.assertNotNull("revocationTime", revocationTime);
         this.revocationInfo = new CertRevocationInfo(CRLReason.CA_COMPROMISE, revocationTime, null);
     }
 

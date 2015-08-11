@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -68,7 +68,7 @@ public class RDNControl
             final int minOccurs,
             final int maxOccurs)
     {
-        ParamChecker.assertNotNull("type", type);
+        ParamUtil.assertNotNull("type", type);
         if(minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs)
         {
             throw new IllegalArgumentException("illegal minOccurs=" + minOccurs + ", maxOccurs=" + maxOccurs);

@@ -39,7 +39,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -65,7 +65,7 @@ public class ChangeCAEntry implements Serializable
             final String name)
     throws CAMgmtException
     {
-        ParamChecker.assertNotBlank("name", name);
+        ParamUtil.assertNotBlank("name", name);
         this.name = name;
     }
 

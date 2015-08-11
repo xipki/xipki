@@ -55,7 +55,7 @@ import javax.xml.bind.Unmarshaller;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.AbstractLoadTest;
+import org.xipki.common.qa.AbstractLoadTest;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.datasource.api.DataSourceFactory;

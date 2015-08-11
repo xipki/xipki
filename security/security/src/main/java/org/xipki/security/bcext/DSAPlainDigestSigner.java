@@ -48,7 +48,7 @@ import org.bouncycastle.crypto.params.DSAPublicKeyParameters;
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -87,7 +87,7 @@ public class DSAPlainDigestSigner
             k = (AsymmetricKeyParameter)parameters;
         }
 
-        ParamChecker.assertNotNull("k", k);
+        ParamUtil.assertNotNull("k", k);
         if(k instanceof ECPublicKeyParameters)
         {
             keyBitLen = ((ECPublicKeyParameters) k).getParameters().getCurve().getFieldSize();

@@ -35,7 +35,7 @@
 
 package org.xipki.ca.api.profile.x509;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -57,14 +57,14 @@ public class CertificatePolicyQualifier
     public static CertificatePolicyQualifier getInstanceForUserNotice(
             final String userNotice)
     {
-        ParamChecker.assertNotBlank("userNotice", userNotice);
+        ParamUtil.assertNotBlank("userNotice", userNotice);
         return new CertificatePolicyQualifier(null, userNotice);
     }
 
     public static CertificatePolicyQualifier getInstanceForCpsUri(
             final String cpsUri)
     {
-        ParamChecker.assertNotBlank("cpsUri", cpsUri);
+        ParamUtil.assertNotBlank("cpsUri", cpsUri);
         return new CertificatePolicyQualifier(cpsUri, null);
     }
 

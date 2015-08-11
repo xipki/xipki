@@ -33,71 +33,70 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common;
-
-import java.util.Collection;
-import java.util.Map;
+package org.xipki.common.security;
 
 /**
  * @author Lijun Liao
  */
 
-public class ParamChecker
+public enum HashAlgoType
 {
+    SHA1  (20, "1.3.14.3.2.26", "SHA1"),
+    SHA224(28, "2.16.840.1.101.3.4.2.4", "SHA224"),
+    SHA256(32, "2.16.840.1.101.3.4.2.1", "SHA256"),
+    SHA384(48, "2.16.840.1.101.3.4.2.2", "SHA384"),
+    SHA512(64, "2.16.840.1.101.3.4.2.3", "SHA512");
 
-    public static void assertNotNull(
-            final String parameterName,
-            final Object parameter)
+    private final int length;
+    private final String oid;
+    private final String name;
+
+    private HashAlgoType(
+            final int length,
+            final String oid,
+            final String name)
     {
-        if(parameter == null)
-        {
-            throw new IllegalArgumentException(parameterName + " could not be null");
-        }
+        this.length = length;
+        this.oid = oid;
+        this.name = name;
     }
 
-    public static void assertNotBlank(
-            final String parameterName,
-            final String parameter)
+    public int getLength()
     {
-        if(parameter == null)
-        {
-            throw new IllegalArgumentException(parameterName + " could not be null");
-        }
-
-        if(parameter.isEmpty())
-        {
-            throw new IllegalArgumentException(parameterName + " could not be blank");
-        }
+        return length;
     }
 
-    public static void assertNotEmpty(
-            final String parameterName,
-            final Collection<?> parameter)
+    public String getOid()
     {
-        if(parameter == null)
-        {
-            throw new IllegalArgumentException(parameterName + " could not be null");
-        }
-
-        if(parameter.isEmpty())
-        {
-            throw new IllegalArgumentException(parameterName + " could not be empty");
-        }
+        return oid;
     }
 
-    public static void assertNotEmpty(
-            final String parameterName,
-            final Map<?, ?> parameter)
+    public String getName()
     {
-        if(parameter == null)
-        {
-            throw new IllegalArgumentException(parameterName + " could not be null");
-        }
-
-        if(parameter.isEmpty())
-        {
-            throw new IllegalArgumentException(parameterName + " could not be empty");
-        }
+        return name;
     }
 
+    public static HashAlgoType getHashAlgoType(
+            String nameOrOid)
+    {
+        for(HashAlgoType hashAlgo : values())
+        {
+            if(hashAlgo.oid.equals(nameOrOid))
+            {
+                return hashAlgo;
+            }
+
+            if(nameOrOid.indexOf('-') != -1)
+            {
+                nameOrOid = nameOrOid.replace("-", "");
+            }
+
+            if(hashAlgo.name.equalsIgnoreCase(nameOrOid))
+            {
+                return hashAlgo;
+            }
+        }
+
+        return null;
+    }
 }

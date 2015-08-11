@@ -36,7 +36,7 @@
 package org.xipki.ca.api.profile;
 
 import org.bouncycastle.asn1.ASN1Encodable;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -51,7 +51,7 @@ public class ExtensionValue
             final boolean critical,
             final ASN1Encodable value)
     {
-        ParamChecker.assertNotNull("value", value);
+        ParamUtil.assertNotNull("value", value);
 
         this.critical = critical;
         this.value = value;

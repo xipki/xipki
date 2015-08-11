@@ -43,7 +43,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.X509Util;
 
@@ -76,9 +76,9 @@ implements Serializable
             final String control)
     throws ConfigurationException
     {
-        ParamChecker.assertNotBlank("caName", caName);
-        ParamChecker.assertNotBlank("responderType", responderType);
-        ParamChecker.assertNotNull("responderConf", responderConf);
+        ParamUtil.assertNotBlank("caName", caName);
+        ParamUtil.assertNotBlank("responderType", responderType);
+        ParamUtil.assertNotNull("responderConf", responderConf);
 
         this.base64Cert = base64Cert;
 

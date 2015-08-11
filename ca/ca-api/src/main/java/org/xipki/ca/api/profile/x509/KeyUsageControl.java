@@ -35,8 +35,8 @@
 
 package org.xipki.ca.api.profile.x509;
 
-import org.xipki.common.KeyUsage;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.KeyUsage;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -51,7 +51,7 @@ public class KeyUsageControl
             final KeyUsage keyUsage,
             final boolean required)
     {
-        ParamChecker.assertNotNull("keyUsage", keyUsage);
+        ParamUtil.assertNotNull("keyUsage", keyUsage);
         this.keyUsage = keyUsage;
         this.required = required;
     }

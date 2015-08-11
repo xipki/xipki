@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common;
+package org.xipki.common.qa;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;

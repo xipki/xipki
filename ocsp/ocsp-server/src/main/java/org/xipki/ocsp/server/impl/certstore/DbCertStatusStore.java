@@ -54,10 +54,10 @@ import java.util.concurrent.TimeUnit;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.HashAlgoType;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CertRevocationInfo;
+import org.xipki.common.security.HashAlgoType;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.ocsp.api.CertStatusInfo;
@@ -135,7 +135,7 @@ public class DbCertStatusStore extends CertStatusStore
             final IssuerFilter issuerFilter)
     {
         super(name);
-        ParamChecker.assertNotNull("issuerFilter", issuerFilter);
+        ParamUtil.assertNotNull("issuerFilter", issuerFilter);
         this.issuerFilter = issuerFilter;
     }
 
@@ -564,7 +564,7 @@ public class DbCertStatusStore extends CertStatusStore
             final DataSourceWrapper datasource)
     throws CertStatusStoreException
     {
-        ParamChecker.assertNotNull("datasource", datasource);
+        ParamUtil.assertNotNull("datasource", datasource);
         this.dataSource = datasource;
         initIssuerStore();
 

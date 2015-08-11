@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common;
+package org.xipki.common.security;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,6 +41,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -181,8 +183,8 @@ public class CmpUtf8Pairs
             final String name,
             final String value)
     {
-        ParamChecker.assertNotBlank("name", name);
-        ParamChecker.assertNotNull("value", value);
+        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.assertNotNull("value", value);
 
         char c = name.charAt(0);
         if(c >= '0' && c <= '9')

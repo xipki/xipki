@@ -35,7 +35,7 @@
 
 package org.xipki.ca.server.impl.scep;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.scep4j.transaction.FailInfo;
 
 /**
@@ -57,7 +57,7 @@ public class FailInfoException extends Exception
     private FailInfoException(
             final FailInfo failInfo)
     {
-        ParamChecker.assertNotNull("failInfo", failInfo);
+        ParamUtil.assertNotNull("failInfo", failInfo);
         this.failInfo = failInfo;
     }
 

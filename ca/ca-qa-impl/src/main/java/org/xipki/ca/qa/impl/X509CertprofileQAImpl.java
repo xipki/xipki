@@ -75,12 +75,12 @@ import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.qa.api.X509CertprofileQA;
 import org.xipki.ca.qa.api.X509IssuerInfo;
 import org.xipki.ca.qa.impl.internal.QaExtensionValue;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
 import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.X509Util;
 
 /**
@@ -170,10 +170,10 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             final SubjectPublicKeyInfo requestedPublicKey,
             final Extensions requestedExtensions)
     {
-        ParamChecker.assertNotNull("certBytes", certBytes);
-        ParamChecker.assertNotNull("issuerInfo", issuerInfo);
-        ParamChecker.assertNotNull("requestedSubject", requestedSubject);
-        ParamChecker.assertNotNull("requestedPublicKey", requestedPublicKey);
+        ParamUtil.assertNotNull("certBytes", certBytes);
+        ParamUtil.assertNotNull("issuerInfo", issuerInfo);
+        ParamUtil.assertNotNull("requestedSubject", requestedSubject);
+        ParamUtil.assertNotNull("requestedPublicKey", requestedPublicKey);
 
         List<ValidationIssue> resultIssues = new LinkedList<ValidationIssue>();
 

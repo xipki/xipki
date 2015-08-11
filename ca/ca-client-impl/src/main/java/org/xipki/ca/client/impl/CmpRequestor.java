@@ -77,12 +77,12 @@ import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.common.cmp.PKIResponse;
 import org.xipki.ca.common.cmp.ProtectionResult;
 import org.xipki.ca.common.cmp.ProtectionVerificationResult;
-import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
+import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.X509Util;
@@ -117,8 +117,8 @@ public abstract class CmpRequestor
             final X509Certificate responderCert,
             final SecurityFactory securityFactory)
     {
-        ParamChecker.assertNotNull("requestorCert", requestorCert);
-        ParamChecker.assertNotNull("securityFactory", securityFactory);
+        ParamUtil.assertNotNull("requestorCert", requestorCert);
+        ParamUtil.assertNotNull("securityFactory", securityFactory);
 
         this.requestor = null;
         this.securityFactory = securityFactory;
@@ -146,8 +146,8 @@ public abstract class CmpRequestor
             final SecurityFactory securityFactory,
             final boolean signRequest)
     {
-        ParamChecker.assertNotNull("requestor", requestor);
-        ParamChecker.assertNotNull("securityFactory", securityFactory);
+        ParamUtil.assertNotNull("requestor", requestor);
+        ParamUtil.assertNotNull("securityFactory", securityFactory);
 
         this.requestor = requestor;
         this.securityFactory = securityFactory;
@@ -165,7 +165,7 @@ public abstract class CmpRequestor
     private void setResponderCert(
             final X509Certificate responderCert)
     {
-        ParamChecker.assertNotNull("responderCert", responderCert);
+        ParamUtil.assertNotNull("responderCert", responderCert);
 
         this.responderCert = responderCert;
         X500Name subject = X500Name.getInstance(responderCert.getSubjectX500Principal().getEncoded());

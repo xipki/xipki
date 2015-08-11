@@ -40,7 +40,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.X509Util;
 
@@ -65,8 +65,8 @@ public class CmpResponderEntry implements Serializable
             final String conf,
             final String base64Cert)
     {
-        ParamChecker.assertNotBlank("name", name);
-        ParamChecker.assertNotBlank("type", type);
+        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.assertNotBlank("type", type);
 
         this.name = name;
         this.type = type;

@@ -50,7 +50,7 @@ import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.X509ChangeCAEntry;
 import org.xipki.ca.server.mgmt.shell.CaUpdateCommand;
-import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.console.karaf.CmdFailure;
 
 /**

@@ -35,7 +35,7 @@
 
 package org.xipki.ca.qa.impl.internal;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -51,7 +51,7 @@ public abstract class QaPolicyQualifierInfo
         public QaCPSUriPolicyQualifier(
                 final String cPSUri)
         {
-            ParamChecker.assertNotBlank("cPSUri", cPSUri);
+            ParamUtil.assertNotBlank("cPSUri", cPSUri);
             this.cPSUri = cPSUri;
         }
 
@@ -68,7 +68,7 @@ public abstract class QaPolicyQualifierInfo
         public QaUserNoticePolicyQualifierInfo(
                 final String userNotice)
         {
-            ParamChecker.assertNotBlank("userNotice", userNotice);
+            ParamUtil.assertNotBlank("userNotice", userNotice);
             this.userNotice = userNotice;
         }
 

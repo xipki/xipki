@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common.util;
+package org.xipki.security.p11.remote;
 
 import java.math.BigInteger;
 
@@ -43,7 +43,7 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1String;
-import org.xipki.common.BadASN1ObjectException;
+import org.xipki.security.api.BadASN1ObjectException;
 
 /**
  * @author Lijun Liao

@@ -124,13 +124,13 @@ import org.xipki.ca.client.api.dto.RevokeCertResultType;
 import org.xipki.ca.client.api.dto.UnrevokeOrRemoveCertRequestType;
 import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.common.cmp.PKIResponse;
-import org.xipki.common.CRLReason;
-import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.XipkiCmpConstants;
+import org.xipki.common.security.CRLReason;
+import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
@@ -881,7 +881,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             final RequestResponseDebug debug)
     throws CmpRequestorException, PKIErrorException
     {
-        ParamChecker.assertNotBlank("certprofile", certprofile);
+        ParamUtil.assertNotBlank("certprofile", certprofile);
         if(overlapSeconds < 0)
         {
             throw new IllegalArgumentException("overlapSeconds could not be negative");

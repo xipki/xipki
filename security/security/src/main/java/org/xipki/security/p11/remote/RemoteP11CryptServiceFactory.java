@@ -40,7 +40,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11Control;
@@ -63,7 +63,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
     public void init(
             final P11Control p11Control)
     {
-        ParamChecker.assertNotNull("p11Control", p11Control);
+        ParamUtil.assertNotNull("p11Control", p11Control);
         this.p11Control = p11Control;
     }
 
@@ -74,7 +74,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
             String moduleName)
     throws SignerException
     {
-        ParamChecker.assertNotNull("moduleName", moduleName);
+        ParamUtil.assertNotNull("moduleName", moduleName);
         if(p11Control == null)
         {
             throw new IllegalStateException("please call init() first");

@@ -132,14 +132,14 @@ import org.xipki.ca.server.mgmt.api.CRLControl.HourMinute;
 import org.xipki.ca.server.mgmt.api.CRLControl.UpdateMode;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.common.CRLReason;
-import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.HealthCheckResult;
-import org.xipki.common.KeyUsage;
 import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CRLReason;
+import org.xipki.common.security.CertRevocationInfo;
+import org.xipki.common.security.KeyUsage;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.X509Util;
@@ -572,9 +572,9 @@ public class X509CA
             final boolean masterMode)
     throws OperationException
     {
-        ParamChecker.assertNotNull("caManager", caManager);
-        ParamChecker.assertNotNull("caInfo", caInfo);
-        ParamChecker.assertNotNull("certstore", certstore);
+        ParamUtil.assertNotNull("caManager", caManager);
+        ParamUtil.assertNotNull("caInfo", caInfo);
+        ParamUtil.assertNotNull("certstore", certstore);
 
         this.caManager = caManager;
         this.caInfo = caInfo;
@@ -1998,7 +1998,7 @@ public class X509CA
             final CertRevocationInfo revocationInfo)
     throws OperationException
     {
-        ParamChecker.assertNotNull("revocationInfo", revocationInfo);
+        ParamUtil.assertNotNull("revocationInfo", revocationInfo);
 
         caInfo.setRevocationInfo(revocationInfo);
         if(caInfo.isSelfSigned())
@@ -2643,7 +2643,7 @@ public class X509CA
     public boolean supportsCertProfile(
             final String certprofileLocalName)
     {
-        ParamChecker.assertNotNull("certprofileLocalName", certprofileLocalName);
+        ParamUtil.assertNotNull("certprofileLocalName", certprofileLocalName);
 
         Map<String, String> profileNames = caManager.getCertprofilesForCA(caInfo.getName());
         return profileNames.containsKey(certprofileLocalName);

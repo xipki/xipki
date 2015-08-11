@@ -51,9 +51,9 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDefaultDigestProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -82,10 +82,10 @@ public class P11RSAContentSigner implements ContentSigner
             final AlgorithmIdentifier signatureAlgId)
     throws NoSuchAlgorithmException, NoSuchPaddingException, OperatorCreationException
     {
-        ParamChecker.assertNotNull("slot", slot);
-        ParamChecker.assertNotNull("cryptService", cryptService);
-        ParamChecker.assertNotNull("keyId", keyId);
-        ParamChecker.assertNotNull("signatureAlgId", signatureAlgId);
+        ParamUtil.assertNotNull("slot", slot);
+        ParamUtil.assertNotNull("cryptService", cryptService);
+        ParamUtil.assertNotNull("keyId", keyId);
+        ParamUtil.assertNotNull("signatureAlgId", signatureAlgId);
 
         if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm()))
         {

@@ -40,7 +40,7 @@ import java.security.InvalidKeyException;
 import java.security.interfaces.RSAPublicKey;
 
 import org.bouncycastle.crypto.params.RSAKeyParameters;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -80,9 +80,9 @@ public class P11RSAKeyParameter extends RSAKeyParameters
             final P11KeyIdentifier keyId)
     throws InvalidKeyException
     {
-        ParamChecker.assertNotNull("p11CryptService", p11CryptService);
-        ParamChecker.assertNotNull("slot", slot);
-        ParamChecker.assertNotNull("keyId", keyId);
+        ParamUtil.assertNotNull("p11CryptService", p11CryptService);
+        ParamUtil.assertNotNull("slot", slot);
+        ParamUtil.assertNotNull("keyId", keyId);
 
         RSAPublicKey key;
         try

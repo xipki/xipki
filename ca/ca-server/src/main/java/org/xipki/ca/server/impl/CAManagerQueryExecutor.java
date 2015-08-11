@@ -91,9 +91,9 @@ import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.X509ChangeCAEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
-import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CertRevocationInfo;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.PasswordHash;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
@@ -117,7 +117,7 @@ class CAManagerQueryExecutor
     CAManagerQueryExecutor(
             final DataSourceWrapper dataSource)
     {
-        ParamChecker.assertNotNull("dataSource", dataSource);
+        ParamUtil.assertNotNull("dataSource", dataSource);
         this.dataSource = dataSource;
     }
 
@@ -2871,7 +2871,7 @@ class CAManagerQueryExecutor
             final String permissionsText)
     throws CAMgmtException
     {
-        ParamChecker.assertNotBlank("permissionsText", permissionsText);
+        ParamUtil.assertNotBlank("permissionsText", permissionsText);
 
         List<String> l = StringUtil.split(permissionsText, ", ");
         Set<Permission> permissions = new HashSet<>();

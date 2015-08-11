@@ -43,8 +43,8 @@ import java.util.List;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.CRLReason;
-import org.xipki.common.CertRevocationInfo;
+import org.xipki.common.security.CRLReason;
+import org.xipki.common.security.CertRevocationInfo;
 import org.xipki.common.util.DateUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 
