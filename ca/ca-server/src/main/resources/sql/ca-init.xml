@@ -114,7 +114,7 @@
       <column name="STATUS" remarks="valid values: active, inactive" type="VARCHAR(10)">
         <constraints nullable="false"/>
       </column>
-      <column name="SUBJECT" type="VARCHAR(300)">
+      <column name="SUBJECT" type="VARCHAR(400)">
         <constraints nullable="false"/>
       </column>
       <column name="CRL_URIS" type="VARCHAR(1000)"/>
