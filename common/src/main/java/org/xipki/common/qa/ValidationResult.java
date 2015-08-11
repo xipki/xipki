@@ -39,8 +39,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -61,7 +61,7 @@ public class ValidationResult
     public ValidationResult(
             final List<ValidationIssue> validationIssues)
     {
-        ParamChecker.assertNotEmpty("validationIssues", validationIssues);
+        ParamUtil.assertNotEmpty("validationIssues", validationIssues);
 
         List<ValidationIssue> failedIssues = new LinkedList<>();
         List<ValidationIssue> successfulIssues = new LinkedList<>();

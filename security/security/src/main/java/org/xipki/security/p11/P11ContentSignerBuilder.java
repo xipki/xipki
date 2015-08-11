@@ -55,8 +55,8 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.AlgorithmUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.security.DefaultConcurrentContentSigner;
 import org.xipki.security.api.ConcurrentContentSigner;
@@ -85,9 +85,9 @@ public class P11ContentSignerBuilder
             final X509Certificate[] certificateChain)
     throws SignerException
     {
-        ParamChecker.assertNotNull("cryptService", cryptService);
-        ParamChecker.assertNotNull("slot", slot);
-        ParamChecker.assertNotNull("keyId", keyId);
+        ParamUtil.assertNotNull("cryptService", cryptService);
+        ParamUtil.assertNotNull("slot", slot);
+        ParamUtil.assertNotNull("keyId", keyId);
 
         X509Certificate signerCertInP11 = cryptService.getCertificate(slot, keyId);
         boolean keyExists = (signerCertInP11 != null);

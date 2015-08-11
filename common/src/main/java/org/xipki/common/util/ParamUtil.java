@@ -33,47 +33,71 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common;
+package org.xipki.common.util;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author Lijun Liao
  */
 
-public class BadASN1ObjectException extends Exception
+public class ParamUtil
 {
 
-    private static final long serialVersionUID = 1L;
-
-    public BadASN1ObjectException()
+    public static void assertNotNull(
+            final String parameterName,
+            final Object parameter)
     {
+        if(parameter == null)
+        {
+            throw new IllegalArgumentException(parameterName + " could not be null");
+        }
     }
 
-    public BadASN1ObjectException(
-            final String message)
+    public static void assertNotBlank(
+            final String parameterName,
+            final String parameter)
     {
-        super(message);
+        if(parameter == null)
+        {
+            throw new IllegalArgumentException(parameterName + " could not be null");
+        }
+
+        if(parameter.isEmpty())
+        {
+            throw new IllegalArgumentException(parameterName + " could not be blank");
+        }
     }
 
-    public BadASN1ObjectException(
-            final Throwable cause)
+    public static void assertNotEmpty(
+            final String parameterName,
+            final Collection<?> parameter)
     {
-        super(cause);
+        if(parameter == null)
+        {
+            throw new IllegalArgumentException(parameterName + " could not be null");
+        }
+
+        if(parameter.isEmpty())
+        {
+            throw new IllegalArgumentException(parameterName + " could not be empty");
+        }
     }
 
-    public BadASN1ObjectException(
-            final String message,
-            final Throwable cause)
+    public static void assertNotEmpty(
+            final String parameterName,
+            final Map<?, ?> parameter)
     {
-        super(message, cause);
-    }
+        if(parameter == null)
+        {
+            throw new IllegalArgumentException(parameterName + " could not be null");
+        }
 
-    public BadASN1ObjectException(
-            final String message,
-            final Throwable cause,
-            final boolean enableSuppression,
-            final boolean writableStackTrace)
-    {
-        super(message, cause, enableSuppression, writableStackTrace);
+        if(parameter.isEmpty())
+        {
+            throw new IllegalArgumentException(parameterName + " could not be empty");
+        }
     }
 
 }

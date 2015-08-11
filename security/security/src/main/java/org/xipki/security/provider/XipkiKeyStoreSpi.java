@@ -57,7 +57,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
@@ -106,8 +106,8 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
                 final PrivateKey key,
                 final Certificate[] chain)
         {
-            ParamChecker.assertNotNull("key", key);
-            ParamChecker.assertNotNull("chain", chain);
+            ParamUtil.assertNotNull("key", key);
+            ParamUtil.assertNotNull("chain", chain);
             if(chain.length < 1)
             {
                 throw new IllegalArgumentException("chain does not contain any certificate");

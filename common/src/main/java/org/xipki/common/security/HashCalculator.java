@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common;
+package org.xipki.common.security;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -44,6 +44,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.bouncycastle.operator.RuntimeOperatorException;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -95,8 +96,8 @@ public class HashCalculator
             final HashAlgoType hashAlgoType,
             final byte[] data)
     {
-        ParamChecker.assertNotNull("hashAlgoType", hashAlgoType);
-        ParamChecker.assertNotNull("data", data);
+        ParamUtil.assertNotNull("hashAlgoType", hashAlgoType);
+        ParamUtil.assertNotNull("data", data);
         if(mdsMap.containsKey(hashAlgoType) == false)
         {
             throw new IllegalArgumentException("unknown hash algo " + hashAlgoType);

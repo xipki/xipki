@@ -89,8 +89,8 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.common.KeyUsage;
 import org.xipki.common.ObjectIdentifiers;
+import org.xipki.common.security.KeyUsage;
 
 /**
  * @author Lijun Liao

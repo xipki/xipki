@@ -58,7 +58,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
-import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.password.api.PasswordResolverException;

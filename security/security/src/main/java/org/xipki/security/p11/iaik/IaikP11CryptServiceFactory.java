@@ -35,7 +35,7 @@
 
 package org.xipki.security.p11.iaik;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11Control;
@@ -55,7 +55,7 @@ public class IaikP11CryptServiceFactory implements P11CryptServiceFactory
     public void init(
             final P11Control p11Control)
     {
-        ParamChecker.assertNotNull("p11Control", p11Control);
+        ParamUtil.assertNotNull("p11Control", p11Control);
         this.p11Control = p11Control;
         IaikP11ModulePool.getInstance().setDefaultModuleName(p11Control.getDefaultModuleName());
     }
@@ -70,7 +70,7 @@ public class IaikP11CryptServiceFactory implements P11CryptServiceFactory
             throw new IllegalStateException("please call init() first");
         }
 
-        ParamChecker.assertNotNull("moduleName", moduleName);
+        ParamUtil.assertNotNull("moduleName", moduleName);
 
         if(SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
         {

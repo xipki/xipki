@@ -65,7 +65,7 @@ import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.DigestInfo;
 import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.xipki.common.HashAlgoType;
+import org.xipki.common.security.HashAlgoType;
 
 /**
  * @author Lijun Liao

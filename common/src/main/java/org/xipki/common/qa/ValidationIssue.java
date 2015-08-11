@@ -35,7 +35,7 @@
 
 package org.xipki.common.qa;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -52,8 +52,8 @@ public class ValidationIssue
             final String code,
             final String description)
     {
-        ParamChecker.assertNotBlank("code", code);
-        ParamChecker.assertNotBlank("description", description);
+        ParamUtil.assertNotBlank("code", code);
+        ParamUtil.assertNotBlank("description", description);
         this.code = code;
         this.description = description;
         this.failed = false;

@@ -33,14 +33,47 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common;
+package org.xipki.security.api;
 
 /**
  * @author Lijun Liao
  */
 
-public enum CertpathValidationModel
+public class BadASN1ObjectException extends Exception
 {
-    PKIX,
-    CHAIN
+
+    private static final long serialVersionUID = 1L;
+
+    public BadASN1ObjectException()
+    {
+    }
+
+    public BadASN1ObjectException(
+            final String message)
+    {
+        super(message);
+    }
+
+    public BadASN1ObjectException(
+            final Throwable cause)
+    {
+        super(cause);
+    }
+
+    public BadASN1ObjectException(
+            final String message,
+            final Throwable cause)
+    {
+        super(message, cause);
+    }
+
+    public BadASN1ObjectException(
+            final String message,
+            final Throwable cause,
+            final boolean enableSuppression,
+            final boolean writableStackTrace)
+    {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+
 }

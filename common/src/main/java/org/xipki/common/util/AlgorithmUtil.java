@@ -56,7 +56,6 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.SignatureAlgoControl;
 
 /**
@@ -95,7 +94,7 @@ public class AlgorithmUtil
     throws NoSuchAlgorithmException
     {
         hashAlgName = hashAlgName.trim();
-        ParamChecker.assertNotBlank("hashAlgName", hashAlgName);
+        ParamUtil.assertNotBlank("hashAlgName", hashAlgName);
         hashAlgName = hashAlgName.replace("-", "").toUpperCase();
 
         if("SHA1".equalsIgnoreCase(hashAlgName))
@@ -278,7 +277,7 @@ public class AlgorithmUtil
     public static boolean isDSAPlainSigAlg(
             final AlgorithmIdentifier algId)
     {
-        ParamChecker.assertNotNull("algId", algId);
+        ParamUtil.assertNotNull("algId", algId);
         ASN1ObjectIdentifier algOid = algId.getAlgorithm();
         if(BSIObjectIdentifiers.ecdsa_plain_SHA1.equals(algOid) ||
                 BSIObjectIdentifiers.ecdsa_plain_SHA224.equals(algOid) ||
@@ -467,7 +466,7 @@ public class AlgorithmUtil
             final SignatureAlgoControl algoControl)
     throws NoSuchAlgorithmException
     {
-        ParamChecker.assertNotNull("pubKey", pubKey);
+        ParamUtil.assertNotNull("pubKey", pubKey);
         boolean rsaMgf1 = algoControl == null ? false : algoControl.isRsaMgf1();
         boolean dsaPlain = algoControl == null ? false : algoControl.isDsaPlain();
 
