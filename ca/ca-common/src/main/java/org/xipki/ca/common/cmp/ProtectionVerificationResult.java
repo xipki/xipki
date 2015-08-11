@@ -35,7 +35,7 @@
 
 package org.xipki.ca.common.cmp;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -50,7 +50,7 @@ public class ProtectionVerificationResult
             final Object requestor,
             final ProtectionResult protectionResult)
     {
-        ParamChecker.assertNotNull("protectionResult", protectionResult);
+        ParamUtil.assertNotNull("protectionResult", protectionResult);
 
         this.requestor = requestor;
         this.protectionResult = protectionResult;

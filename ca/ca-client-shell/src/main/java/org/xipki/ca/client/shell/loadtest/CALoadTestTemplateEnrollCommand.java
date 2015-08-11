@@ -37,7 +37,7 @@ package org.xipki.ca.client.shell.loadtest;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.AbstractLoadTest;
+import org.xipki.common.qa.AbstractLoadTest;
 import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**

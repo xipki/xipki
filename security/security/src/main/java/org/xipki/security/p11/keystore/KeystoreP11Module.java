@@ -46,8 +46,8 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.password.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11Module;
@@ -70,7 +70,7 @@ public class KeystoreP11Module implements P11Module
     public KeystoreP11Module(
             final P11ModuleConf moduleConf)
     {
-        ParamChecker.assertNotNull("moduleConf", moduleConf);
+        ParamUtil.assertNotNull("moduleConf", moduleConf);
         this.moduleConf = moduleConf;
 
         final String nativeLib = moduleConf.getNativeLibrary();

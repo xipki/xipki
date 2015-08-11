@@ -45,7 +45,7 @@ import java.security.SignatureException;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.RuntimeOperatorException;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -63,9 +63,9 @@ public class SignatureSigner implements ContentSigner
             final Signature signer,
             final PrivateKey key)
     {
-        ParamChecker.assertNotNull("sigAlgId", sigAlgId);
-        ParamChecker.assertNotNull("signer", signer);
-        ParamChecker.assertNotNull("key", key);
+        ParamUtil.assertNotNull("sigAlgId", sigAlgId);
+        ParamUtil.assertNotNull("signer", signer);
+        ParamUtil.assertNotNull("key", key);
 
         this.sigAlgId = sigAlgId;
         this.signer = signer;

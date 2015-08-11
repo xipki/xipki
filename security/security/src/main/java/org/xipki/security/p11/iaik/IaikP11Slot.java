@@ -106,10 +106,10 @@ import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.password.api.PasswordResolverException;
 import org.xipki.security.api.SecurityFactory;
@@ -204,8 +204,8 @@ public class IaikP11Slot implements P11WritableSlot
             final List<char[]> password)
     throws SignerException
     {
-        ParamChecker.assertNotNull("slotId", slotId);
-        ParamChecker.assertNotNull("slot", slot);
+        ParamUtil.assertNotNull("slotId", slotId);
+        ParamUtil.assertNotNull("slot", slot);
 
         this.slotId = slotId;
         this.slot = slot;
@@ -1257,8 +1257,8 @@ public class IaikP11Slot implements P11WritableSlot
             final SecurityFactory securityFactory)
     throws Exception
     {
-        ParamChecker.assertNotNull("keyIdentifier", keyIdentifier);
-        ParamChecker.assertNotNull("newCert", newCert);
+        ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
+        ParamUtil.assertNotNull("newCert", newCert);
 
         String keyLabel = keyIdentifier.getKeyLabel();
         char[] keyLabelChars = (keyLabel == null) ?
@@ -1340,7 +1340,7 @@ public class IaikP11Slot implements P11WritableSlot
             final P11KeyIdentifier keyIdentifier)
     throws Exception
     {
-        ParamChecker.assertNotNull("keyIdentifier", keyIdentifier);
+        ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
 
         String keyLabel = keyIdentifier.getKeyLabel();
         char[] keyLabelChars = (keyLabel == null) ?
@@ -1411,7 +1411,7 @@ public class IaikP11Slot implements P11WritableSlot
             final P11KeyIdentifier keyIdentifier)
     throws Exception
     {
-        ParamChecker.assertNotNull("keyIdentifier", keyIdentifier);
+        ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
 
         String keyLabel = keyIdentifier.getKeyLabel();
         char[] keyLabelChars = (keyLabel == null) ?
@@ -1609,7 +1609,7 @@ public class IaikP11Slot implements P11WritableSlot
             final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception
     {
-        ParamChecker.assertNotBlank("label", label);
+        ParamUtil.assertNotBlank("label", label);
 
         if (keySize < 1024)
         {
@@ -1660,7 +1660,7 @@ public class IaikP11Slot implements P11WritableSlot
             final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception
     {
-        ParamChecker.assertNotBlank("label", label);
+        ParamUtil.assertNotBlank("label", label);
 
         if (pLength < 1024)
         {
@@ -1706,8 +1706,8 @@ public class IaikP11Slot implements P11WritableSlot
             final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception
     {
-        ParamChecker.assertNotBlank("curveNameOrOid", curveNameOrOid);
-        ParamChecker.assertNotBlank("label", label);
+        ParamUtil.assertNotBlank("curveNameOrOid", curveNameOrOid);
+        ParamUtil.assertNotBlank("label", label);
 
         ASN1ObjectIdentifier curveId = getCurveId(curveNameOrOid);
         if(curveId == null)

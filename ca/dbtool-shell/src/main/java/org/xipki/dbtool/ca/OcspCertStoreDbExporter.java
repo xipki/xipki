@@ -56,8 +56,8 @@ import javax.xml.bind.Unmarshaller;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -99,8 +99,8 @@ class OcspCertStoreDbExporter extends DbPorter
     throws Exception
     {
         super(dataSource, baseDir);
-        ParamChecker.assertNotNull("marshaller", marshaller);
-        ParamChecker.assertNotNull("unmarshaller", unmarshaller);
+        ParamUtil.assertNotNull("marshaller", marshaller);
+        ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         if(numCertsInBundle < 1)
         {
             numCertsInBundle = 1;

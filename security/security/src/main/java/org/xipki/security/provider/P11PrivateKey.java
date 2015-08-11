@@ -43,7 +43,7 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -70,9 +70,9 @@ public class P11PrivateKey implements PrivateKey
             final P11KeyIdentifier keyId)
     throws InvalidKeyException
     {
-        ParamChecker.assertNotNull("p11CryptService", p11CryptService);
-        ParamChecker.assertNotNull("slotId", slotId);
-        ParamChecker.assertNotNull("keyId", keyId);
+        ParamUtil.assertNotNull("p11CryptService", p11CryptService);
+        ParamUtil.assertNotNull("slotId", slotId);
+        ParamUtil.assertNotNull("keyId", keyId);
 
         this.p11CryptService = p11CryptService;
         this.slotId = slotId;

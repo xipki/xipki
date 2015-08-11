@@ -36,7 +36,7 @@
 package org.xipki.ca.client.api.dto;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -51,8 +51,8 @@ public class P10EnrollCertEntryType
             final CertificationRequest p10Request,
             final String profile)
     {
-        ParamChecker.assertNotNull("p10Request", p10Request);
-        ParamChecker.assertNotBlank("profile", profile);
+        ParamUtil.assertNotNull("p10Request", p10Request);
+        ParamUtil.assertNotBlank("profile", profile);
 
         this.p10Request = p10Request;
         this.profile = profile;

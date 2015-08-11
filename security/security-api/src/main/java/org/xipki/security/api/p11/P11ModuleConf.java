@@ -39,8 +39,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -69,8 +69,8 @@ public class P11ModuleConf
             final Set<P11SlotIdentifier> includeSlots,
             final Set<P11SlotIdentifier> excludeSlots)
     {
-        ParamChecker.assertNotBlank("name", name);
-        ParamChecker.assertNotBlank("nativeLibrary", nativeLibrary);
+        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.assertNotBlank("nativeLibrary", nativeLibrary);
 
         this.name = name.toLowerCase();
         this.nativeLibrary = nativeLibrary;

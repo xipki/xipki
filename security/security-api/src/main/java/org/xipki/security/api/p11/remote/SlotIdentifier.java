@@ -46,7 +46,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
-import org.xipki.common.BadASN1ObjectException;
+import org.xipki.security.api.BadASN1ObjectException;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 
 /**

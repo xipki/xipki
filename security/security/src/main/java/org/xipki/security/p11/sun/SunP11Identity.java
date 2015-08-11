@@ -52,7 +52,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.security.SignerUtil;
 import org.xipki.security.api.SignerException;
@@ -85,10 +85,10 @@ class SunP11Identity implements Comparable<SunP11Identity>
     {
         super();
 
-        ParamChecker.assertNotNull("p11Provider", p11Provider);
-        ParamChecker.assertNotNull("slotId", slotId);
-        ParamChecker.assertNotNull("privateKey", privateKey);
-        ParamChecker.assertNotNull("keyLabel", keyLabel);
+        ParamUtil.assertNotNull("p11Provider", p11Provider);
+        ParamUtil.assertNotNull("slotId", slotId);
+        ParamUtil.assertNotNull("privateKey", privateKey);
+        ParamUtil.assertNotNull("keyLabel", keyLabel);
 
         if((certificateChain == null || certificateChain.length == 0 || certificateChain[0] == null)
                 && publicKey == null)

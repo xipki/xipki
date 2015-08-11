@@ -41,7 +41,7 @@ import java.util.Properties;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.common.AbstractLoadTest;
+import org.xipki.common.qa.AbstractLoadTest;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.datasource.api.DataSourceFactory;

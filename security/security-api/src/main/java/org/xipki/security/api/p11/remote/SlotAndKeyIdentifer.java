@@ -42,8 +42,7 @@ import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
-import org.xipki.common.BadASN1ObjectException;
-import org.xipki.common.util.ASN1Util;
+import org.xipki.security.api.BadASN1ObjectException;
 
 /**
  *
@@ -85,7 +84,16 @@ public class SlotAndKeyIdentifer extends ASN1Object
             final ASN1Sequence seq)
     throws BadASN1ObjectException
     {
-        ASN1Util.assertSequenceLength(seq, 2, "SlotAndKeyIdentifier");
+        final int n = seq.size();
+        if (n != 2)
+        {
+            StringBuilder sb = new StringBuilder(100);
+            sb.append("wrong number of elements in sequence 'SlotAndKeyIdentifier'");
+            sb.append(", is '").append(n).append("'");
+            sb.append(", but expected '").append(2).append("'");
+            throw new BadASN1ObjectException(sb.toString());
+        }
+
         this.slotIdentifier = SlotIdentifier.getInstance(seq.getObjectAt(0));
         this.keyIdentifier = KeyIdentifier.getInstance(seq.getObjectAt(1));
     }

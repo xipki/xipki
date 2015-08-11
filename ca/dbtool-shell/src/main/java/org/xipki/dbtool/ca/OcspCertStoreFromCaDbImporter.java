@@ -60,11 +60,11 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.HashAlgoType;
-import org.xipki.common.HashCalculator;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CmpUtf8Pairs;
+import org.xipki.common.security.HashAlgoType;
+import org.xipki.common.security.HashCalculator;
 import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -102,8 +102,8 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
     throws DataAccessException, InvalidInputException
     {
         super(dataSource, srcDir);
-        ParamChecker.assertNotNull("unmarshaller", unmarshaller);
-        ParamChecker.assertNotBlank("publisherName", publisherName);
+        ParamUtil.assertNotNull("unmarshaller", unmarshaller);
+        ParamUtil.assertNotBlank("publisherName", publisherName);
         this.unmarshaller = unmarshaller;
         this.publisherName = publisherName;
         File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);

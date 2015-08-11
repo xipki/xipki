@@ -47,8 +47,8 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11Identity;
@@ -91,7 +91,7 @@ public class KeystoreP11CryptService implements P11CryptService
             final P11ModuleConf moduleConf)
     throws SignerException
     {
-        ParamChecker.assertNotNull("moduleConf", moduleConf);
+        ParamUtil.assertNotNull("moduleConf", moduleConf);
         this.moduleConf = moduleConf;
         refresh();
     }

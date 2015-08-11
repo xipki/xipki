@@ -76,12 +76,12 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.BadASN1ObjectException;
 import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.XipkiCmpConstants;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.X509Util;
+import org.xipki.security.api.BadASN1ObjectException;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -109,7 +109,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     public RemoteP11CryptService(
             final P11ModuleConf moduleConf)
     {
-        ParamChecker.assertNotNull("moduleConf", moduleConf);
+        ParamUtil.assertNotNull("moduleConf", moduleConf);
         this.moduleConf = moduleConf;
     }
 

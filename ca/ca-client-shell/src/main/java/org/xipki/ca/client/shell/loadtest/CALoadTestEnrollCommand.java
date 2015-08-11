@@ -41,7 +41,7 @@ import org.xipki.ca.client.shell.loadtest.KeyEntry.DSAKeyEntry;
 import org.xipki.ca.client.shell.loadtest.KeyEntry.ECKeyEntry;
 import org.xipki.ca.client.shell.loadtest.KeyEntry.RSAKeyEntry;
 import org.xipki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
-import org.xipki.common.AbstractLoadTest;
+import org.xipki.common.qa.AbstractLoadTest;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 

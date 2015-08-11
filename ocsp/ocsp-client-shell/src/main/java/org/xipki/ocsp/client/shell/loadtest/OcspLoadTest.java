@@ -49,8 +49,8 @@ import org.bouncycastle.cert.ocsp.SingleResp;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.AbstractLoadTest;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.qa.AbstractLoadTest;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.OCSPRequestorException;
 import org.xipki.ocsp.client.api.OCSPResponseException;
@@ -88,11 +88,11 @@ public class OcspLoadTest extends AbstractLoadTest
             final URL serverUrl,
             final RequestOptions options)
     {
-        ParamChecker.assertNotNull("requestor", requestor);
-        ParamChecker.assertNotEmpty("serials", serials);
-        ParamChecker.assertNotNull("caCert", caCert);
-        ParamChecker.assertNotNull("serverUrl", serverUrl);
-        ParamChecker.assertNotNull("options", options);
+        ParamUtil.assertNotNull("requestor", requestor);
+        ParamUtil.assertNotEmpty("serials", serials);
+        ParamUtil.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("serverUrl", serverUrl);
+        ParamUtil.assertNotNull("options", options);
 
         this.requestor = requestor;
         this.serials = serials;

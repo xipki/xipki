@@ -38,7 +38,7 @@ package org.xipki.ca.client.api.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -56,7 +56,7 @@ public class RevokeCertResultType
     public void addResultEntry(
             final ResultEntryType resultEntry)
     {
-        ParamChecker.assertNotNull("resultEntry", resultEntry);
+        ParamUtil.assertNotNull("resultEntry", resultEntry);
 
         if((resultEntry instanceof RevokeCertResultEntryType || resultEntry instanceof ErrorResultEntryType) == false)
         {

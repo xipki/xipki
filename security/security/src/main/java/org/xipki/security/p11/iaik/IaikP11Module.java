@@ -43,8 +43,8 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.password.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11Module;
@@ -75,8 +75,8 @@ public class IaikP11Module implements P11Module
             final P11ModuleConf moduleConf)
     throws SignerException
     {
-        ParamChecker.assertNotNull("module", module);
-        ParamChecker.assertNotNull("moduleConf", moduleConf);
+        ParamUtil.assertNotNull("module", module);
+        ParamUtil.assertNotNull("moduleConf", moduleConf);
 
         this.module = module;
         this.moduleConf = moduleConf;

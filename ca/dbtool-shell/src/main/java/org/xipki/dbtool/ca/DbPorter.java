@@ -53,9 +53,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.xipki.common.AbstractLoadTest;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.qa.AbstractLoadTest;
 import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xml.sax.SAXException;
@@ -92,8 +92,8 @@ public class DbPorter
     throws DataAccessException
     {
         super();
-        ParamChecker.assertNotNull("dataSource", dataSource);
-        ParamChecker.assertNotBlank("baseDir", baseDir);
+        ParamUtil.assertNotNull("dataSource", dataSource);
+        ParamUtil.assertNotBlank("baseDir", baseDir);
 
         this.dataSource = dataSource;
         this.connection = this.dataSource.getConnection();

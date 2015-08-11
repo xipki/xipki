@@ -43,7 +43,7 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERUTF8String;
-import org.xipki.common.BadASN1ObjectException;
+import org.xipki.security.api.BadASN1ObjectException;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 
 /**

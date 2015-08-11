@@ -57,7 +57,7 @@ import javax.crypto.NoSuchPaddingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.security.SignerUtil;
 import org.xipki.security.SoftTokenContentSignerBuilder;
@@ -88,8 +88,8 @@ public class KeystoreP11Identity extends P11Identity
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException
     {
         super(slotId, keyId, certificateChain, getPublicKeyOfFirstCert(certificateChain));
-        ParamChecker.assertNotNull("privateKey", privateKey);
-        ParamChecker.assertNotBlank("sha1sum", sha1sum);
+        ParamUtil.assertNotNull("privateKey", privateKey);
+        ParamUtil.assertNotBlank("sha1sum", sha1sum);
 
         if(certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
         {

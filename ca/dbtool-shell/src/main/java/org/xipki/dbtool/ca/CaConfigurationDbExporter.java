@@ -45,9 +45,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
@@ -104,7 +104,7 @@ class CaConfigurationDbExporter extends DbPorter
     throws DataAccessException, PasswordResolverException, IOException
     {
         super(dataSource, destDir);
-        ParamChecker.assertNotNull("marshaller", marshaller);
+        ParamUtil.assertNotNull("marshaller", marshaller);
         this.marshaller = marshaller;
         this.dbSchemaVersion = getDbSchemaVersion();
         if(this.dbSchemaVersion > 1)

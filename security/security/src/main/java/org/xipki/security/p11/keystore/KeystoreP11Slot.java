@@ -63,10 +63,10 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.password.api.PasswordResolverException;
@@ -116,8 +116,8 @@ public class KeystoreP11Slot implements P11WritableSlot
             final P11SlotIdentifier slotId,
             final List<char[]> password)
     {
-        ParamChecker.assertNotNull("slotDir", slotDir);
-        ParamChecker.assertNotNull("slotId", slotId);
+        ParamUtil.assertNotNull("slotDir", slotDir);
+        ParamUtil.assertNotNull("slotId", slotId);
         if(password == null)
         {
             throw new IllegalArgumentException("no password is configured");
@@ -269,7 +269,7 @@ public class KeystoreP11Slot implements P11WritableSlot
             final P11KeyIdentifier keyIdentifier)
     throws SignerException
     {
-        ParamChecker.assertNotNull("keyIdentifier", keyIdentifier);
+        ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
 
         KeystoreP11Identity identity = getIdentity(keyIdentifier);
         if(identity == null)
@@ -289,8 +289,8 @@ public class KeystoreP11Slot implements P11WritableSlot
             final SecurityFactory securityFactory)
     throws Exception
     {
-        ParamChecker.assertNotNull("keyIdentifier", keyIdentifier);
-        ParamChecker.assertNotNull("newCert", newCert);
+        ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
+        ParamUtil.assertNotNull("newCert", newCert);
 
         KeystoreP11Identity identity = getIdentity(keyIdentifier);
         if(identity == null)
@@ -379,7 +379,7 @@ public class KeystoreP11Slot implements P11WritableSlot
             final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception
     {
-        ParamChecker.assertNotBlank("label", label);
+        ParamUtil.assertNotBlank("label", label);
 
         if (keySize < 1024)
         {
@@ -419,7 +419,7 @@ public class KeystoreP11Slot implements P11WritableSlot
             final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception
     {
-        ParamChecker.assertNotBlank("label", label);
+        ParamUtil.assertNotBlank("label", label);
 
         if (pLength < 1024)
         {
@@ -458,8 +458,8 @@ public class KeystoreP11Slot implements P11WritableSlot
             final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception
     {
-        ParamChecker.assertNotBlank("curveNameOrOid", curveNameOrOid);
-        ParamChecker.assertNotBlank("label", label);
+        ParamUtil.assertNotBlank("curveNameOrOid", curveNameOrOid);
+        ParamUtil.assertNotBlank("label", label);
 
         if(labelExists(label))
         {

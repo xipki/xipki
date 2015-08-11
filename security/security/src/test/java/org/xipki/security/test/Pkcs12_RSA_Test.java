@@ -45,7 +45,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.X509Util;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;

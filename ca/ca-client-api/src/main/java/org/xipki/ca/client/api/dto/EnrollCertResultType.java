@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -67,7 +67,7 @@ public class EnrollCertResultType
     public void addResultEntry(
             final ResultEntryType resultEntry)
     {
-        ParamChecker.assertNotNull("resultEntry", resultEntry);
+        ParamUtil.assertNotNull("resultEntry", resultEntry);
 
         if((resultEntry instanceof EnrollCertResultEntryType ||
                 resultEntry instanceof ErrorResultEntryType) == false)

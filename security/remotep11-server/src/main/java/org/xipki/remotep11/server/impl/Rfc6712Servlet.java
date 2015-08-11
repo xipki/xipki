@@ -49,7 +49,7 @@ import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.BadASN1ObjectException;
+import org.xipki.security.api.BadASN1ObjectException;
 import org.xipki.security.api.SecurityFactory;
 
 /**

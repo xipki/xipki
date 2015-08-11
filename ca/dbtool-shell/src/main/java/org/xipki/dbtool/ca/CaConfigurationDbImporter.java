@@ -47,9 +47,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -98,7 +98,7 @@ class CaConfigurationDbImporter extends DbPorter
     throws DataAccessException, PasswordResolverException, IOException
     {
         super(dataSource, srcDir);
-        ParamChecker.assertNotNull("unmarshaller", unmarshaller);
+        ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         this.unmarshaller = unmarshaller;
     }
 

@@ -69,9 +69,9 @@ import org.xipki.ca.certprofile.x509.jaxb.RdnType;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
 import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.X509Util;
 
 /**
@@ -149,8 +149,8 @@ public class SubjectChecker
             final X500Name subject,
             final X500Name requestedSubject)
     {
-        ParamChecker.assertNotNull("subject", subject);
-        ParamChecker.assertNotNull("requestedSubject", requestedSubject);
+        ParamUtil.assertNotNull("subject", subject);
+        ParamUtil.assertNotNull("requestedSubject", requestedSubject);
 
         // collect subject attribute types to check
         Set<ASN1ObjectIdentifier> oids = new HashSet<>();

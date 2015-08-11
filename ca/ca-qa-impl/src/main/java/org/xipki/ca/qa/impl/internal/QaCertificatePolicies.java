@@ -41,7 +41,7 @@ import java.util.List;
 
 import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicies;
 import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -91,7 +91,7 @@ public class QaCertificatePolicies extends QaExtension
         public QaCertificatePolicyInformation(
                 final CertificatePolicyInformationType jaxb)
         {
-            ParamChecker.assertNotNull("jaxb", jaxb);
+            ParamUtil.assertNotNull("jaxb", jaxb);
             this.policyId = jaxb.getPolicyIdentifier().getValue();
             if(jaxb.getPolicyQualifiers() == null)
             {
