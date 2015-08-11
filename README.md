@@ -171,6 +171,7 @@ Tested Platforms
  * Ubuntu
  * Windows
  * Mac OS
+* Raspbian (tested on Raspberry Pi 2 Model B)
 
 Build and Assembly from Source Code
 ------------------
