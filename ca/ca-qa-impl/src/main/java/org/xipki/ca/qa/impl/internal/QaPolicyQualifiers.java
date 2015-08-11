@@ -44,7 +44,7 @@ import javax.xml.bind.JAXBElement;
 import org.xipki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
 import org.xipki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
 import org.xipki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -57,7 +57,7 @@ public class QaPolicyQualifiers
     public QaPolicyQualifiers(
             final PolicyQualifiers jaxb)
     {
-        ParamChecker.assertNotNull("jaxb", jaxb);
+        ParamUtil.assertNotNull("jaxb", jaxb);
 
         List<QaPolicyQualifierInfo> list = new LinkedList<>();
 

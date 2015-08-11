@@ -56,11 +56,11 @@ import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
-import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.HashAlgoType;
-import org.xipki.common.HashCalculator;
 import org.xipki.common.InvalidOIDorNameException;
 import org.xipki.common.ObjectIdentifiers;
+import org.xipki.common.security.CmpUtf8Pairs;
+import org.xipki.common.security.HashAlgoType;
+import org.xipki.common.security.HashCalculator;
 
 /**
  * @author Lijun Liao

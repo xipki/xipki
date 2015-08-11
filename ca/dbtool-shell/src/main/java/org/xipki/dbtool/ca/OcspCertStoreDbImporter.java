@@ -54,10 +54,10 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.HashAlgoType;
-import org.xipki.common.HashCalculator;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.HashAlgoType;
+import org.xipki.common.security.HashCalculator;
 import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -114,7 +114,7 @@ class OcspCertStoreDbImporter extends DbPorter
     throws Exception
     {
         super(dataSource, srcDir);
-        ParamChecker.assertNotNull("unmarshaller", unmarshaller);
+        ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         this.unmarshaller = unmarshaller;
         File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
         if(resume)

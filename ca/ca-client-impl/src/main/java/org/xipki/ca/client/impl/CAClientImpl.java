@@ -119,11 +119,11 @@ import org.xipki.ca.client.impl.jaxb.RequestorType;
 import org.xipki.ca.client.impl.jaxb.ResponderType;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.HealthCheckResult;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
@@ -260,8 +260,8 @@ public final class CAClientImpl implements CAClient
     public void init()
     throws ConfigurationException, IOException
     {
-        ParamChecker.assertNotNull("confFile", confFile);
-        ParamChecker.assertNotNull("securityFactory", securityFactory);
+        ParamUtil.assertNotNull("confFile", confFile);
+        ParamUtil.assertNotNull("securityFactory", securityFactory);
 
         if(Security.getProvider("BC") == null)
         {
@@ -603,7 +603,7 @@ public final class CAClientImpl implements CAClient
             final RequestResponseDebug debug)
     throws CAClientException, PKIErrorException
     {
-        ParamChecker.assertNotNull("request", request);
+        ParamUtil.assertNotNull("request", request);
 
         List<EnrollCertRequestEntryType> requestEntries = request.getRequestEntries();
         if(CollectionUtil.isEmpty(requestEntries))
@@ -735,7 +735,7 @@ public final class CAClientImpl implements CAClient
             final RequestResponseDebug debug)
     throws CAClientException, PKIErrorException
     {
-        ParamChecker.assertNotNull("request", request);
+        ParamUtil.assertNotNull("request", request);
 
         List<RevokeCertRequestEntryType> requestEntries = request.getRequestEntries();
         if(CollectionUtil.isEmpty(requestEntries))
@@ -815,7 +815,7 @@ public final class CAClientImpl implements CAClient
             final RequestResponseDebug debug)
     throws CAClientException, PKIErrorException
     {
-        ParamChecker.assertNotNull("caName", caName);
+        ParamUtil.assertNotNull("caName", caName);
 
         if(casMap.containsKey(caName) == false)
         {
@@ -848,7 +848,7 @@ public final class CAClientImpl implements CAClient
             final RequestResponseDebug debug)
     throws CAClientException, PKIErrorException
     {
-        ParamChecker.assertNotNull("caName", caName);
+        ParamUtil.assertNotNull("caName", caName);
 
         if(casMap.containsKey(caName) == false)
         {
@@ -1149,7 +1149,7 @@ public final class CAClientImpl implements CAClient
             final RequestResponseDebug debug)
     throws CAClientException, PKIErrorException
     {
-        ParamChecker.assertNotNull("request", request);
+        ParamUtil.assertNotNull("request", request);
 
         List<IssuerSerialEntryType> requestEntries = request.getRequestEntries();
         if(CollectionUtil.isEmpty(requestEntries))
@@ -1214,7 +1214,7 @@ public final class CAClientImpl implements CAClient
             final RequestResponseDebug debug)
     throws CAClientException, PKIErrorException
     {
-        ParamChecker.assertNotNull("request", request);
+        ParamUtil.assertNotNull("request", request);
 
         List<IssuerSerialEntryType> requestEntries = request.getRequestEntries();
         if(CollectionUtil.isEmpty(requestEntries))
@@ -1280,7 +1280,7 @@ public final class CAClientImpl implements CAClient
             final RequestResponseDebug debug)
     throws CAClientException, PKIErrorException
     {
-        ParamChecker.assertNotNull("caName", caName);
+        ParamUtil.assertNotNull("caName", caName);
 
         if(casMap.containsKey(caName) == false)
         {
@@ -1302,7 +1302,7 @@ public final class CAClientImpl implements CAClient
             final String caName)
     throws CAClientException
     {
-        ParamChecker.assertNotNull("caName", caName);
+        ParamUtil.assertNotNull("caName", caName);
 
         if(casMap.containsKey(caName) == false)
         {

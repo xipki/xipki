@@ -36,7 +36,7 @@
 package org.xipki.ca.qa.impl.internal;
 
 import org.bouncycastle.util.Arrays;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -51,7 +51,7 @@ public class QaExtensionValue
             final boolean critical,
             final byte[] value)
     {
-        ParamChecker.assertNotNull("value", value);
+        ParamUtil.assertNotNull("value", value);
 
         this.critical = critical;
         this.value = Arrays.clone(value);

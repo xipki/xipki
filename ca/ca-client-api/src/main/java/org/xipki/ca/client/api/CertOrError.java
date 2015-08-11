@@ -38,7 +38,7 @@ package org.xipki.ca.client.api;
 import java.security.cert.Certificate;
 
 import org.xipki.ca.common.cmp.PKIStatusInfo;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -52,7 +52,7 @@ public class CertOrError
     public CertOrError(
             final Certificate certificate)
     {
-        ParamChecker.assertNotNull("certificate", certificate);
+        ParamUtil.assertNotNull("certificate", certificate);
 
         this.certificate = certificate;
         this.error = null;
@@ -61,7 +61,7 @@ public class CertOrError
     public CertOrError(
             final PKIStatusInfo error)
     {
-        ParamChecker.assertNotNull("error", error);
+        ParamUtil.assertNotNull("error", error);
 
         this.certificate = null;
         this.error = error;

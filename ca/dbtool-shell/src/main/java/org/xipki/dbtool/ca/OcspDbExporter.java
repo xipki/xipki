@@ -48,7 +48,7 @@ import javax.xml.validation.Schema;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.AbstractLoadTest;
+import org.xipki.common.qa.AbstractLoadTest;
 import org.xipki.common.util.IoUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;

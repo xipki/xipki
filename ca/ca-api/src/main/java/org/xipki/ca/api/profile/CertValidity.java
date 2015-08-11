@@ -40,7 +40,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -78,7 +78,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
     public static CertValidity getInstance(
             final String validityS)
     {
-        ParamChecker.assertNotBlank("validityS", validityS);
+        ParamUtil.assertNotBlank("validityS", validityS);
         final int len = validityS.length();
         final char suffix = validityS.charAt(len - 1);
         Unit unit;
@@ -127,7 +127,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
         {
             throw new IllegalArgumentException("validity could not be less than 1");
         }
-        ParamChecker.assertNotNull("unit", unit);
+        ParamUtil.assertNotNull("unit", unit);
         this.validity = validity;
         this.unit = unit;
     }

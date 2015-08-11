@@ -50,9 +50,9 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.common.CertpathValidationModel;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.HashAlgoType;
+import org.xipki.common.security.CertpathValidationModel;
+import org.xipki.common.security.HashAlgoType;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.ocsp.server.impl.jaxb.CertCollectionType;

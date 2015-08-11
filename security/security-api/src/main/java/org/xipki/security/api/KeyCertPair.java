@@ -38,7 +38,7 @@ package org.xipki.security.api;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -54,8 +54,8 @@ public class KeyCertPair
             final PrivateKey privateKey,
             final X509Certificate certificate)
     {
-        ParamChecker.assertNotNull("privateKey", privateKey);
-        ParamChecker.assertNotNull("certificate", certificate);
+        ParamUtil.assertNotNull("privateKey", privateKey);
+        ParamUtil.assertNotNull("certificate", certificate);
         this.privateKey = privateKey;
         this.certificate = certificate;
     }

@@ -36,7 +36,7 @@
 package org.xipki.ca.api.profile.x509;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -51,7 +51,7 @@ public class SubjectInfo
             final X500Name grantedSubject,
             final String warning)
     {
-        ParamChecker.assertNotNull("grantedSubject", grantedSubject);
+        ParamUtil.assertNotNull("grantedSubject", grantedSubject);
 
         this.grantedSubject = grantedSubject;
         this.warning = warning;

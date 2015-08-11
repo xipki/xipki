@@ -43,7 +43,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.X509Util;
 
@@ -75,9 +75,9 @@ public class X509CrlSignerEntry implements Serializable
             final String crlControl)
     throws ConfigurationException
     {
-        ParamChecker.assertNotBlank("name", name);
-        ParamChecker.assertNotBlank("type", signerType);
-        ParamChecker.assertNotNull("crlControl", crlControl);
+        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.assertNotBlank("type", signerType);
+        ParamUtil.assertNotNull("crlControl", crlControl);
 
         if("CA".equalsIgnoreCase(name))
         {

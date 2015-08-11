@@ -53,9 +53,9 @@ import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.publisher.X509CertPublisher;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
-import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CertRevocationInfo;
+import org.xipki.common.security.CmpUtf8Pairs;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
@@ -88,8 +88,8 @@ public class OCSPCertPublisher extends X509CertPublisher
             final Map<String, DataSourceWrapper> dataSources)
     throws CertPublisherException
     {
-        ParamChecker.assertNotNull("conf", conf);
-        ParamChecker.assertNotEmpty("dataSources", dataSources);
+        ParamUtil.assertNotNull("conf", conf);
+        ParamUtil.assertNotEmpty("dataSources", dataSources);
 
         CmpUtf8Pairs utf8pairs = new CmpUtf8Pairs(conf);
         String v = utf8pairs.getValue("publish.goodcerts");

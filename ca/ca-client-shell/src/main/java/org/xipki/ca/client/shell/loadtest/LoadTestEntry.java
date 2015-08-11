@@ -41,7 +41,7 @@ import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.X509Util;
 
 /**
@@ -63,7 +63,7 @@ public class LoadTestEntry
         static RandomDN getInstance(
                 final String text)
         {
-            ParamChecker.assertNotNull("text", text);
+            ParamUtil.assertNotNull("text", text);
             for(RandomDN value : values())
             {
                 if(value.name().equalsIgnoreCase(text))
@@ -159,10 +159,10 @@ public class LoadTestEntry
             final String subjectTemplate,
             final RandomDN randomDN)
     {
-        ParamChecker.assertNotBlank("certprofile", certprofile);
-        ParamChecker.assertNotNull("keyEntry", keyEntry);
-        ParamChecker.assertNotNull("subjectTemplate", subjectTemplate);
-        ParamChecker.assertNotNull("randomDN", randomDN);
+        ParamUtil.assertNotBlank("certprofile", certprofile);
+        ParamUtil.assertNotNull("keyEntry", keyEntry);
+        ParamUtil.assertNotNull("subjectTemplate", subjectTemplate);
+        ParamUtil.assertNotNull("randomDN", randomDN);
 
         this.certprofile = certprofile;
         this.keyEntry = keyEntry;

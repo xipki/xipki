@@ -39,7 +39,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.common.KeyUsage;
+import org.xipki.common.security.KeyUsage;
 import org.xipki.console.karaf.DynamicEnumCompleter;
 import org.xipki.console.karaf.KeyusageCompleter;
 

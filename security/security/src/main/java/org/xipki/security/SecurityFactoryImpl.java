@@ -78,17 +78,16 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.SignatureAlgoControl;
+import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.X509Util;
-import org.xipki.common.util.XMLUtil;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.password.api.PasswordResolverException;
 import org.xipki.security.api.AbstractSecurityFactory;
@@ -565,9 +564,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             final int parallelism,
             final String keyLabel)
     {
-        ParamChecker.assertNotBlank("keystoreFile", keystoreFile);
-        ParamChecker.assertNotBlank("password", password);
-        ParamChecker.assertNotNull("signatureAlgorithm", signatureAlgorithm);
+        ParamUtil.assertNotBlank("keystoreFile", keystoreFile);
+        ParamUtil.assertNotBlank("password", password);
+        ParamUtil.assertNotNull("signatureAlgorithm", signatureAlgorithm);
 
         CmpUtf8Pairs conf = new CmpUtf8Pairs("password", password);
         conf.putUtf8Pair("algo", signatureAlgorithm);
@@ -595,8 +594,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             final int parallelism,
             final String keyLabel)
     {
-        ParamChecker.assertNotBlank("keystoreFile", keystoreFile);
-        ParamChecker.assertNotBlank("password", password);
+        ParamUtil.assertNotBlank("keystoreFile", keystoreFile);
+        ParamUtil.assertNotBlank("password", password);
 
         CmpUtf8Pairs conf = new CmpUtf8Pairs("password", password);
         conf.putUtf8Pair("parallelism", Integer.toString(parallelism));
@@ -616,8 +615,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             final String signatureAlgorithm,
             final int parallelism)
     {
-        ParamChecker.assertNotNull("algo", signatureAlgorithm);
-        ParamChecker.assertNotNull("keyId", keyId);
+        ParamUtil.assertNotNull("algo", signatureAlgorithm);
+        ParamUtil.assertNotNull("keyId", keyId);
 
         CmpUtf8Pairs conf = new CmpUtf8Pairs("algo", signatureAlgorithm);
         conf.putUtf8Pair("parallelism", Integer.toString(parallelism));
@@ -655,7 +654,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             final P11KeyIdentifier keyId,
             final int parallelism)
     {
-        ParamChecker.assertNotNull("keyId", keyId);
+        ParamUtil.assertNotNull("keyId", keyId);
 
         CmpUtf8Pairs conf = new CmpUtf8Pairs();
         conf.putUtf8Pair("parallelism", Integer.toString(parallelism));
@@ -876,7 +875,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 final String exceptionMessage;
                 if(e instanceof JAXBException)
                 {
-                    exceptionMessage = XMLUtil.getMessage((JAXBException) e);
+                    exceptionMessage = getMessage((JAXBException) e);
                 } else
                 {
                     exceptionMessage = e.getMessage();
@@ -1100,6 +1099,17 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 signerBuilder.getKey(), signerBuilder.getCert());
         // TODO: validiate whether private key and certificate match
         return keycertPair;
+    }
+
+    private static String getMessage(
+            final JAXBException e)
+    {
+        String ret = e.getMessage();
+        if(ret == null && e.getLinkedException() != null)
+        {
+            ret = e.getLinkedException().getMessage();
+        }
+        return ret;
     }
 
 }

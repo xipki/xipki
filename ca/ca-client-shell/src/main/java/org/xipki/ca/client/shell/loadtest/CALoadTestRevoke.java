@@ -58,10 +58,10 @@ import org.xipki.ca.client.api.CertIdOrError;
 import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.dto.RevokeCertRequestEntryType;
 import org.xipki.ca.client.api.dto.RevokeCertRequestType;
-import org.xipki.common.AbstractLoadTest;
-import org.xipki.common.CRLReason;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.qa.AbstractLoadTest;
+import org.xipki.common.security.CRLReason;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
@@ -110,9 +110,9 @@ class CALoadTestRevoke extends AbstractLoadTest
             final int n)
     throws Exception
     {
-        ParamChecker.assertNotNull("caClient", caClient);
-        ParamChecker.assertNotNull("caCert", caCert);
-        ParamChecker.assertNotNull("caDataSource", caDataSource);
+        ParamUtil.assertNotNull("caClient", caClient);
+        ParamUtil.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("caDataSource", caDataSource);
         if(n < 1)
         {
             throw new IllegalArgumentException("non-positive n " + n + " is not allowed");

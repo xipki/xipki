@@ -38,7 +38,7 @@ package org.xipki.ca.server.impl.publisher;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -62,7 +62,7 @@ class IssuerStore
     void addIdentityEntry(
             final IssuerEntry entry)
     {
-        ParamChecker.assertNotNull("entry", entry);
+        ParamUtil.assertNotNull("entry", entry);
 
         for(IssuerEntry existingEntry : entries)
         {

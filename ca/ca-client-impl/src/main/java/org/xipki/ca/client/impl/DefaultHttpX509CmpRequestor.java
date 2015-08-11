@@ -43,8 +43,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 
@@ -66,7 +66,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor
             final SecurityFactory securityFactory)
     {
         super(requestorCert, responderCert, securityFactory);
-        ParamChecker.assertNotBlank("serverUrl", serverUrl);
+        ParamUtil.assertNotBlank("serverUrl", serverUrl);
 
         try
         {
@@ -85,7 +85,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor
             final boolean signRequest)
     {
         super(requestor, responderCert, securityFactory, signRequest);
-        ParamChecker.assertNotBlank("serverUrl", serverUrl);
+        ParamUtil.assertNotBlank("serverUrl", serverUrl);
 
         try
         {

@@ -38,7 +38,7 @@ package org.xipki.security.p11;
 import java.security.InvalidKeyException;
 
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11SlotIdentifier;
@@ -72,9 +72,9 @@ public class P11KeyParameter extends AsymmetricKeyParameter
             final P11KeyIdentifier keyId)
     throws InvalidKeyException
     {
-        ParamChecker.assertNotNull("p11CryptService", p11CryptService);
-        ParamChecker.assertNotNull("slot", slot);
-        ParamChecker.assertNotNull("keyId", keyId);
+        ParamUtil.assertNotNull("p11CryptService", p11CryptService);
+        ParamUtil.assertNotNull("slot", slot);
+        ParamUtil.assertNotNull("keyId", keyId);
 
         return new P11KeyParameter(p11CryptService, slot, keyId);
     }

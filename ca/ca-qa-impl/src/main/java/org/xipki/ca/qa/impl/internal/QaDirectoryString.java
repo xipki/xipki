@@ -36,7 +36,7 @@
 package org.xipki.ca.qa.impl.internal;
 
 import org.xipki.ca.api.profile.DirectoryStringType;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -51,8 +51,8 @@ public class QaDirectoryString
             final DirectoryStringType type,
             final String text)
     {
-        ParamChecker.assertNotNull("type", type);
-        ParamChecker.assertNotBlank("text", text);
+        ParamUtil.assertNotNull("type", type);
+        ParamUtil.assertNotBlank("text", text);
 
         this.type = type;
         this.text = text;

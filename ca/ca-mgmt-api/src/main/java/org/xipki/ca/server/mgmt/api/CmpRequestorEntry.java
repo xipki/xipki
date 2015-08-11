@@ -42,8 +42,8 @@ import java.security.cert.X509Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.X509Util;
 
 /**
@@ -63,8 +63,8 @@ public class CmpRequestorEntry implements Serializable
             final String name,
             final String base64Cert)
     {
-        ParamChecker.assertNotBlank("name", name);
-        ParamChecker.assertNotBlank("base64Cert", base64Cert);
+        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.assertNotBlank("base64Cert", base64Cert);
         this.name = name;
         this.base64Cert = base64Cert;
         try

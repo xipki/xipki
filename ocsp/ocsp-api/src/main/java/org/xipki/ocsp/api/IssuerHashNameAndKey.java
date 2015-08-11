@@ -37,8 +37,8 @@ package org.xipki.ocsp.api;
 
 import java.util.Arrays;
 
-import org.xipki.common.HashAlgoType;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.HashAlgoType;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -55,7 +55,7 @@ public class IssuerHashNameAndKey
             final byte[] issuerNameHash,
             final byte[] issuerKeyHash)
     {
-        ParamChecker.assertNotNull("algo", algo);
+        ParamUtil.assertNotNull("algo", algo);
 
         int len = algo.getLength();
         if(issuerNameHash == null || issuerNameHash.length != len)

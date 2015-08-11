@@ -50,8 +50,8 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
@@ -104,7 +104,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
             final List<ContentSigner> signers,
             final PrivateKey privateKey)
     {
-        ParamChecker.assertNotEmpty("signers", signers);
+        ParamUtil.assertNotEmpty("signers", signers);
 
         this.algorithmIdentifier = signers.get(0).getAlgorithmIdentifier();
         for(ContentSigner signer : signers)
@@ -155,7 +155,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     public void returnContentSigner(
             final ContentSigner signer)
     {
-        ParamChecker.assertNotNull("signer", signer);
+        ParamUtil.assertNotNull("signer", signer);
 
         boolean isBusySigner = busySigners.remove(signer);
         if(isBusySigner)

@@ -55,7 +55,7 @@ import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.x509.AbstractEEX509Certprofile;
 import org.xipki.ca.api.profile.x509.KeyUsageControl;
-import org.xipki.common.KeyUsage;
+import org.xipki.common.security.KeyUsage;
 
 /**
  * @author Lijun Liao

@@ -37,7 +37,7 @@ package org.xipki.ca.server.mgmt.api;
 
 import java.io.Serializable;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -56,8 +56,8 @@ public class CertprofileEntry implements Serializable
             final String type,
             final String conf)
     {
-        ParamChecker.assertNotBlank("name", name);
-        ParamChecker.assertNotBlank("type", type);
+        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.assertNotBlank("type", type);
 
         if("all".equalsIgnoreCase(name) || "null".equalsIgnoreCase(name))
         {

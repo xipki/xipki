@@ -36,7 +36,7 @@
 package org.xipki.ca.api.profile.x509;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -51,7 +51,7 @@ public class ExtKeyUsageControl
             final ASN1ObjectIdentifier extKeyUsage,
             final boolean required)
     {
-        ParamChecker.assertNotNull("extKeyUsage", extKeyUsage);
+        ParamUtil.assertNotNull("extKeyUsage", extKeyUsage);
         this.extKeyUsage = extKeyUsage;
         this.required = required;
     }

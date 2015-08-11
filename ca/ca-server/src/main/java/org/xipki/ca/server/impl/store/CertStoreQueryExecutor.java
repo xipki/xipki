@@ -82,11 +82,11 @@ import org.xipki.ca.server.impl.CertStatus;
 import org.xipki.ca.server.impl.KnowCertResult;
 import org.xipki.ca.server.impl.SubjectKeyProfileBundle;
 import org.xipki.ca.server.mgmt.api.CertArt;
-import org.xipki.common.CRLReason;
-import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CRLReason;
+import org.xipki.common.security.CertRevocationInfo;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.PasswordHash;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
@@ -958,7 +958,7 @@ class CertStoreQueryExecutor
             final X509CertWithDBCertId caCert)
     throws DataAccessException, OperationException
     {
-        ParamChecker.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("caCert", caCert);
 
         int caId = getCaId(caCert);
 
@@ -987,7 +987,7 @@ class CertStoreQueryExecutor
             final int numEntries)
     throws DataAccessException, OperationException
     {
-        ParamChecker.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("caCert", caCert);
         if(numEntries < 1)
         {
             throw new IllegalArgumentException("numEntries is not positive");
@@ -1033,7 +1033,7 @@ class CertStoreQueryExecutor
             final boolean ee)
     throws DataAccessException, OperationException
     {
-        ParamChecker.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("caCert", caCert);
         final String sql = dataSource.createFetchFirstSelectSQL("COUNT(*) FROM CERT WHERE CA_ID=? AND EE=?", 1);
         int caId = getCaId(caCert);
 
@@ -1074,7 +1074,7 @@ class CertStoreQueryExecutor
             final boolean onlyUserCerts)
     throws DataAccessException, OperationException
     {
-        ParamChecker.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("caCert", caCert);
         if(numEntries < 1)
         {
             throw new IllegalArgumentException("numEntries is not positive");
@@ -1141,9 +1141,9 @@ class CertStoreQueryExecutor
             String userLike)
     throws DataAccessException, OperationException
     {
-        ParamChecker.assertNotNull("caCert", caCert);
-        ParamChecker.assertNotNull("expiredAt", expiredAt);
-        ParamChecker.assertNotBlank("certprofile", certprofile);
+        ParamUtil.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("expiredAt", expiredAt);
+        ParamUtil.assertNotBlank("certprofile", certprofile);
 
         if(numEntries < 1)
         {
@@ -1223,9 +1223,9 @@ class CertStoreQueryExecutor
             String userLike)
     throws DataAccessException, OperationException
     {
-        ParamChecker.assertNotNull("caCert", caCert);
-        ParamChecker.assertNotNull("expiredAt", expiredAt);
-        ParamChecker.assertNotBlank("certprofile", certprofile);
+        ParamUtil.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("expiredAt", expiredAt);
+        ParamUtil.assertNotBlank("certprofile", certprofile);
 
         int caId = getCaId(caCert);
 
@@ -1290,7 +1290,7 @@ class CertStoreQueryExecutor
             final BigInteger crlNumber)
     throws DataAccessException, OperationException
     {
-        ParamChecker.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("caCert", caCert);
 
         int caId = getCaId(caCert);
 
@@ -1351,7 +1351,7 @@ class CertStoreQueryExecutor
             throw new IllegalArgumentException("numCRLs is not positive");
         }
 
-        ParamChecker.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("caCert", caCert);
         int caId = getCaId(caCert);
 
         String sql = "SELECT CRL_NO FROM CRL WHERE CA_ID=? AND DELTACRL=?";
@@ -1415,7 +1415,7 @@ class CertStoreQueryExecutor
             final int certId)
     throws DataAccessException, OperationException, CertificateException
     {
-        ParamChecker.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("caCert", caCert);
 
         StringBuilder m = new StringBuilder();
         m.append("T1.PROFILE_ID PROFILE_ID, T1.REVOKED REVOKED, T1.REV_REASON REV_REASON, ");
@@ -1528,8 +1528,8 @@ class CertStoreQueryExecutor
             final BigInteger serial)
     throws DataAccessException, OperationException
     {
-        ParamChecker.assertNotNull("caCert", caCert);
-        ParamChecker.assertNotNull("serial", serial);
+        ParamUtil.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("serial", serial);
 
         int caId = getCaId(caCert);
 
@@ -1603,8 +1603,8 @@ class CertStoreQueryExecutor
             final BigInteger serial)
     throws DataAccessException, OperationException, CertificateException
     {
-        ParamChecker.assertNotNull("caCert", caCert);
-        ParamChecker.assertNotNull("serial", serial);
+        ParamUtil.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("serial", serial);
 
         int caId = getCaId(caCert);
 
@@ -1859,8 +1859,8 @@ class CertStoreQueryExecutor
             final boolean onlyUserCerts)
     throws DataAccessException, OperationException
     {
-        ParamChecker.assertNotNull("caCert", caCert);
-        ParamChecker.assertNotNull("notExpiredAt", notExpiredAt);
+        ParamUtil.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("notExpiredAt", notExpiredAt);
 
         if(numEntries < 1)
         {
@@ -1927,7 +1927,7 @@ class CertStoreQueryExecutor
             final boolean onlyUserCerts)
     throws DataAccessException, OperationException
     {
-        ParamChecker.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("caCert", caCert);
 
         if(numEntries < 1)
         {

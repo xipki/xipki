@@ -56,8 +56,8 @@ import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType.Type;
-import org.xipki.common.AbstractLoadTest;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.qa.AbstractLoadTest;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -87,8 +87,8 @@ class CALoadTestEnroll extends AbstractLoadTest
             final LoadTestEntry loadtestEntry,
             final int n)
     {
-        ParamChecker.assertNotNull("caClient", caClient);
-        ParamChecker.assertNotNull("loadtestEntry", loadtestEntry);
+        ParamUtil.assertNotNull("caClient", caClient);
+        ParamUtil.assertNotNull("loadtestEntry", loadtestEntry);
         if(n < 1)
         {
             throw new IllegalArgumentException("non-positive n " + n + " is not allowed");

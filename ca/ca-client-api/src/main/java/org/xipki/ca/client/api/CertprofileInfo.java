@@ -35,7 +35,7 @@
 
 package org.xipki.ca.client.api;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
@@ -53,7 +53,7 @@ public class CertprofileInfo
             final String type,
             final String conf)
     {
-        ParamChecker.assertNotBlank("name", name);
+        ParamUtil.assertNotBlank("name", name);
         this.name = name;
         if(StringUtil.isBlank(type))
         {

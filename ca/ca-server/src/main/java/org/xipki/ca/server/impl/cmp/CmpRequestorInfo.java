@@ -38,7 +38,7 @@ package org.xipki.ca.server.impl.cmp;
 import org.xipki.ca.api.RequestorInfo;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -53,8 +53,8 @@ public class CmpRequestorInfo implements RequestorInfo
             final CAHasRequestorEntry caHasRequestor,
             final X509CertWithDBCertId cert)
     {
-        ParamChecker.assertNotNull("caHasRequestor", caHasRequestor);
-        ParamChecker.assertNotNull("cert", cert);
+        ParamUtil.assertNotNull("caHasRequestor", caHasRequestor);
+        ParamUtil.assertNotNull("cert", cert);
         this.caHasRequestor = caHasRequestor;
         this.cert = cert;
     }

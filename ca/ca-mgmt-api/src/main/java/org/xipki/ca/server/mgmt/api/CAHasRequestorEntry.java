@@ -39,8 +39,8 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Set;
 
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -58,7 +58,7 @@ public class CAHasRequestorEntry implements Serializable
     public CAHasRequestorEntry(
             final String requestorName)
     {
-        ParamChecker.assertNotBlank("requestorName", requestorName);
+        ParamUtil.assertNotBlank("requestorName", requestorName);
         this.requestorName = requestorName;
     }
 

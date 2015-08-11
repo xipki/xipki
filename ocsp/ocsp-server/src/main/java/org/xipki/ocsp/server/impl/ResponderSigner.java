@@ -50,7 +50,7 @@ import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 
 /**
@@ -73,7 +73,7 @@ class ResponderSigner
             final List<ConcurrentContentSigner> signers)
     throws CertificateEncodingException, IOException
     {
-        ParamChecker.assertNotEmpty("signers", signers);
+        ParamUtil.assertNotEmpty("signers", signers);
 
         this.signers = signers;
         X509Certificate[] _certificateChain = signers.get(0).getCertificateChain();

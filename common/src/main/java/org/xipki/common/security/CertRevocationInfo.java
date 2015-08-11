@@ -33,13 +33,15 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common;
+package org.xipki.common.security;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -68,8 +70,8 @@ public class CertRevocationInfo implements Serializable
             final Date revocationTime,
             final Date invalidityTime)
     {
-        ParamChecker.assertNotNull("reason", reason);
-        ParamChecker.assertNotNull("revocationTime", revocationTime);
+        ParamUtil.assertNotNull("reason", reason);
+        ParamUtil.assertNotNull("revocationTime", revocationTime);
         this.reason = reason;
         this.revocationTime = revocationTime;
         this.invalidityTime = invalidityTime;
@@ -81,7 +83,7 @@ public class CertRevocationInfo implements Serializable
             final Date revocationTime,
             final Date invalidityTime)
     {
-        ParamChecker.assertNotNull("revocationTime", revocationTime);
+        ParamUtil.assertNotNull("revocationTime", revocationTime);
 
         this.reason = CRLReason.forReasonCode(reasonCode);
         if(this.reason == null)
@@ -96,7 +98,7 @@ public class CertRevocationInfo implements Serializable
     public void setReason(
             final CRLReason reason)
     {
-        ParamChecker.assertNotNull("reason", reason);
+        ParamUtil.assertNotNull("reason", reason);
         this.reason = reason;
     }
 

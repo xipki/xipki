@@ -39,7 +39,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -55,7 +55,7 @@ public class CertWithEncoded
             final X509Certificate cert)
     throws CertificateEncodingException
     {
-        ParamChecker.assertNotNull("cert", cert);
+        ParamUtil.assertNotNull("cert", cert);
         this.certificate = cert;
         this.className = cert.getClass().getName();
         this.encoded = cert.getEncoded();

@@ -38,7 +38,7 @@ package org.xipki.ca.server.impl.store;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -65,7 +65,7 @@ class CertBasedIdentityStore
     void addIdentityEntry(
             final CertBasedIdentityEntry entry)
     {
-        ParamChecker.assertNotNull("entry", entry);
+        ParamUtil.assertNotNull("entry", entry);
 
         for(CertBasedIdentityEntry existingEntry : entries)
         {

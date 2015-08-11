@@ -37,7 +37,7 @@ package org.xipki.ca.certprofile.internal;
 
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.xipki.ca.certprofile.x509.jaxb.Range2Type;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -55,9 +55,9 @@ public class MonetaryValueOption
             final Range2Type amountRange,
             final Range2Type exponentRange)
     {
-        ParamChecker.assertNotNull("currency", currency);
-        ParamChecker.assertNotNull("amountRange", amountRange);
-        ParamChecker.assertNotNull("exponentRange", exponentRange);
+        ParamUtil.assertNotNull("currency", currency);
+        ParamUtil.assertNotNull("amountRange", amountRange);
+        ParamUtil.assertNotNull("exponentRange", exponentRange);
         this.currency = currency;
         this.currencyString = currency.isAlphabetic() ? currency.getAlphabetic().toUpperCase() :
                 Integer.toString(currency.getNumeric());

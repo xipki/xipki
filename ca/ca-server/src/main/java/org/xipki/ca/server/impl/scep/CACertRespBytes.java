@@ -45,7 +45,7 @@ import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.util.Arrays;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
 *
@@ -62,8 +62,8 @@ class CACertRespBytes
             final X509Certificate responderCert)
     throws CMSException, CertificateException
     {
-        ParamChecker.assertNotNull("cACert", cACert);
-        ParamChecker.assertNotNull("responderCert", responderCert);
+        ParamUtil.assertNotNull("cACert", cACert);
+        ParamUtil.assertNotNull("responderCert", responderCert);
 
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
         try

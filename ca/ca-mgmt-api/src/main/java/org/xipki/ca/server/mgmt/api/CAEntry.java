@@ -39,8 +39,8 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.SecurityUtil;
 
 /**
@@ -70,8 +70,8 @@ public class CAEntry
             final int expirationPeriod)
     throws CAMgmtException
     {
-        ParamChecker.assertNotBlank("name", name);
-        ParamChecker.assertNotBlank("signerType", signerType);
+        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.assertNotBlank("signerType", signerType);
 
         if(expirationPeriod < 0)
         {
@@ -150,7 +150,7 @@ public class CAEntry
     public void setDuplicateKeyMode(
             final DuplicationMode mode)
     {
-        ParamChecker.assertNotNull("mode", mode);
+        ParamUtil.assertNotNull("mode", mode);
         this.duplicateKeyMode = mode;
     }
 
@@ -162,7 +162,7 @@ public class CAEntry
     public void setDuplicateSubjectMode(
             final DuplicationMode mode)
     {
-        ParamChecker.assertNotNull("mode", mode);
+        ParamUtil.assertNotNull("mode", mode);
         this.duplicateSubjectMode = mode;
     }
 
@@ -174,7 +174,7 @@ public class CAEntry
     public void setValidityMode(
             final ValidityMode mode)
     {
-        ParamChecker.assertNotNull("mode", mode);
+        ParamUtil.assertNotNull("mode", mode);
         this.validityMode = mode;
     }
 

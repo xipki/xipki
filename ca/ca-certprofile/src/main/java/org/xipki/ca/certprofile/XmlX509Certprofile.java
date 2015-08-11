@@ -140,10 +140,10 @@ import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Parameters;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
 import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
@@ -240,7 +240,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             final String data)
     throws CertprofileException
     {
-        ParamChecker.assertNotBlank("data", data);
+        ParamUtil.assertNotBlank("data", data);
         reset();
         try
         {

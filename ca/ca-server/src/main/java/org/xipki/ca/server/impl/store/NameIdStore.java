@@ -38,7 +38,7 @@ package org.xipki.ca.server.impl.store;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -66,8 +66,8 @@ class NameIdStore
             final String name,
             final Integer id)
     {
-        ParamChecker.assertNotBlank("name", name);
-        ParamChecker.assertNotNull("id", id);
+        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.assertNotNull("id", id);
 
         if(entries.containsKey(name))
         {

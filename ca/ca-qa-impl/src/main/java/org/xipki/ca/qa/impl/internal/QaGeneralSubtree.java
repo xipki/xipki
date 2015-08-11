@@ -36,7 +36,7 @@
 package org.xipki.ca.qa.impl.internal;
 
 import org.xipki.ca.certprofile.x509.jaxb.GeneralSubtreeBaseType;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -49,7 +49,7 @@ public class QaGeneralSubtree
     public QaGeneralSubtree(
             final GeneralSubtreeBaseType jaxb)
     {
-        ParamChecker.assertNotNull("jaxb", jaxb);
+        ParamUtil.assertNotNull("jaxb", jaxb);
         Integer i = jaxb.getMinimum();
         if(i != null && i < 0)
         {

@@ -51,8 +51,8 @@ import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.X509CertWithDBCertId;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.X509Util;
 
 /**
@@ -82,7 +82,7 @@ class PublicCAInfo
             final List<String> deltaCrlUris)
     throws OperationException
     {
-        ParamChecker.assertNotNull("caCertificate", caCertificate);
+        ParamUtil.assertNotNull("caCertificate", caCertificate);
         this.caCertificate = new X509CertWithDBCertId(caCertificate);
         this.serialNumber = caCertificate.getSerialNumber();
         this.subject = caCertificate.getSubjectX500Principal();
@@ -128,8 +128,8 @@ class PublicCAInfo
             final List<String> deltaCrlUris)
     throws OperationException
     {
-        ParamChecker.assertNotNull("subject", subject);
-        ParamChecker.assertNotNull("serialNumber", serialNumber);
+        ParamUtil.assertNotNull("subject", subject);
+        ParamUtil.assertNotNull("serialNumber", serialNumber);
 
         this.caCertificate = null;
         this.x500Subject = subject;

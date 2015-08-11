@@ -40,7 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bouncycastle.asn1.ASN1Integer;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -61,7 +61,7 @@ public class EnrollCertRequestType
     public EnrollCertRequestType(
             final Type type)
     {
-        ParamChecker.assertNotNull("type", type);
+        ParamUtil.assertNotNull("type", type);
         this.type = type;
     }
 

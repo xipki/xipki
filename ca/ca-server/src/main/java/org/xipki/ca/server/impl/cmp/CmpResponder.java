@@ -73,10 +73,10 @@ import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.common.cmp.ProtectionResult;
 import org.xipki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.ca.server.mgmt.api.CmpControl;
-import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
@@ -140,7 +140,7 @@ abstract class CmpResponder
     protected CmpResponder(
             final SecurityFactory securityFactory)
     {
-        ParamChecker.assertNotNull("securityFactory", securityFactory);
+        ParamUtil.assertNotNull("securityFactory", securityFactory);
 
         this.securityFactory = securityFactory;
     }

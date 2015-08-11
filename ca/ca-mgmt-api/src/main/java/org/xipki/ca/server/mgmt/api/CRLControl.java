@@ -41,10 +41,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
@@ -220,7 +220,7 @@ public class CRLControl implements Serializable
             final String conf)
     throws ConfigurationException
     {
-        ParamChecker.assertNotBlank("conf", conf);
+        ParamUtil.assertNotBlank("conf", conf);
         CmpUtf8Pairs props;
         try
         {

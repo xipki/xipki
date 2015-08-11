@@ -36,7 +36,7 @@
 package org.xipki.ca.client.api.dto;
 
 import org.xipki.ca.common.cmp.PKIStatusInfo;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -51,7 +51,7 @@ public class ErrorResultEntryType extends ResultEntryType
             final PKIStatusInfo statusInfo)
     {
         super(id);
-        ParamChecker.assertNotNull("statusInfo", statusInfo);
+        ParamUtil.assertNotNull("statusInfo", statusInfo);
         this.statusInfo = statusInfo;
     }
 

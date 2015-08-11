@@ -35,7 +35,7 @@
 
 package org.xipki.ocsp.server.impl;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -50,8 +50,8 @@ class ResponderAndRelativeUri
             final Responder responder,
             final String relativeUri)
     {
-        ParamChecker.assertNotNull("responder", responder);
-        ParamChecker.assertNotNull("relativeUri", relativeUri);
+        ParamUtil.assertNotNull("responder", responder);
+        ParamUtil.assertNotNull("relativeUri", relativeUri);
         this.responder = responder;
         this.relativeUri = relativeUri;
     }

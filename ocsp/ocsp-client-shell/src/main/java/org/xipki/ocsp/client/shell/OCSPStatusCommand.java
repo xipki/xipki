@@ -64,7 +64,7 @@ import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.common.CRLReason;
+import org.xipki.common.security.CRLReason;
 import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.console.karaf.CmdFailure;

@@ -41,11 +41,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
@@ -85,7 +85,7 @@ public class CmpControl
             final CmpControlEntry dbEntry)
     throws ConfigurationException
     {
-        ParamChecker.assertNotNull("dbEntry", dbEntry);
+        ParamUtil.assertNotNull("dbEntry", dbEntry);
 
         CmpUtf8Pairs pairs = new CmpUtf8Pairs(dbEntry.getConf());
         this.confirmCert = getBoolean(pairs, KEY_CONFIRM_CERT, false);
@@ -124,7 +124,7 @@ public class CmpControl
             final Set<String> sigAlgos)
     throws ConfigurationException
     {
-        ParamChecker.assertNotBlank("name", name);
+        ParamUtil.assertNotBlank("name", name);
         CmpUtf8Pairs pairs = new CmpUtf8Pairs();
 
         this.confirmCert = confirmCert == null ? false: confirmCert;

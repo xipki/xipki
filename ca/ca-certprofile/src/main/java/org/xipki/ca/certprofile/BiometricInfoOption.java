@@ -44,8 +44,8 @@ import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.xipki.ca.certprofile.x509.jaxb.BiometricInfo;
 import org.xipki.ca.certprofile.x509.jaxb.BiometricTypeType;
 import org.xipki.ca.certprofile.x509.jaxb.TripleState;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.AlgorithmUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -62,7 +62,7 @@ public class BiometricInfoOption
             final BiometricInfo jaxb)
     throws NoSuchAlgorithmException
     {
-        ParamChecker.assertNotNull("jaxb", jaxb);
+        ParamUtil.assertNotNull("jaxb", jaxb);
         this.sourceDataUriOccurrence = jaxb.getIncludeSourceDataUri();
         this.hashAlgorithms = XmlX509CertprofileUtil.toOIDSet(jaxb.getHashAlgorithm());
 

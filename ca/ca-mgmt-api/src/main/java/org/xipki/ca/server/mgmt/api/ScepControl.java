@@ -37,9 +37,9 @@ package org.xipki.ca.server.mgmt.api;
 
 import java.io.Serializable;
 
-import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CmpUtf8Pairs;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
@@ -74,7 +74,7 @@ public class ScepControl implements Serializable
         {
             return;
         }
-        ParamChecker.assertNotBlank("conf", conf);
+        ParamUtil.assertNotBlank("conf", conf);
         CmpUtf8Pairs props;
         try
         {

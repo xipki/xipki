@@ -42,7 +42,7 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -57,8 +57,8 @@ public class ExtensionValues
             final boolean critical,
             final ASN1Encodable value)
     {
-        ParamChecker.assertNotNull("type", type);
-        ParamChecker.assertNotNull("value", value);
+        ParamUtil.assertNotNull("type", type);
+        ParamUtil.assertNotNull("value", value);
         if(extensions.containsKey(type))
         {
             return false;
@@ -71,8 +71,8 @@ public class ExtensionValues
             final ASN1ObjectIdentifier type,
             final ExtensionValue value)
     {
-        ParamChecker.assertNotNull("type", type);
-        ParamChecker.assertNotNull("value", value);
+        ParamUtil.assertNotNull("type", type);
+        ParamUtil.assertNotNull("value", value);
         if(extensions.containsKey(type))
         {
             return false;

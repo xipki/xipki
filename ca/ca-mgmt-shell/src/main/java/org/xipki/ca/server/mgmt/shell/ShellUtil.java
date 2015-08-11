@@ -36,7 +36,7 @@
 package org.xipki.ca.server.mgmt.shell;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;

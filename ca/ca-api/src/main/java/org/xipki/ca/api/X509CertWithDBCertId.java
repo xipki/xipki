@@ -42,7 +42,7 @@ import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.util.Arrays;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.X509Util;
 
 /**
@@ -68,7 +68,7 @@ public class X509CertWithDBCertId
             final X509Certificate cert,
             final byte[] encodedCert)
     {
-        ParamChecker.assertNotNull("cert", cert);
+        ParamUtil.assertNotNull("cert", cert);
 
         this.cert = cert;
         X500Principal x500Subject = cert.getSubjectX500Principal();

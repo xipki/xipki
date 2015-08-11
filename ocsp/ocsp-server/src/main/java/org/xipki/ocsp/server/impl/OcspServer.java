@@ -108,17 +108,17 @@ import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
-import org.xipki.common.CRLReason;
-import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.CertpathValidationModel;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.HashAlgoType;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CRLReason;
+import org.xipki.common.security.CertRevocationInfo;
+import org.xipki.common.security.CertpathValidationModel;
+import org.xipki.common.security.HashAlgoType;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
@@ -176,8 +176,8 @@ public class OcspServer
                 final String path,
                 final String responderName)
         {
-            ParamChecker.assertNotNull("path", path);
-            ParamChecker.assertNotBlank("responderName", responderName);
+            ParamUtil.assertNotNull("path", path);
+            ParamUtil.assertNotBlank("responderName", responderName);
 
             this.path = path;
             this.responderName = responderName;

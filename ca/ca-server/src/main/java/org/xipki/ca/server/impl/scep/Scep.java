@@ -84,9 +84,9 @@ import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.ScepControl;
 import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.scep4j.crypto.HashAlgoType;
@@ -152,8 +152,8 @@ public class Scep
             final CAManagerImpl caManager)
     throws CAMgmtException
     {
-        ParamChecker.assertNotNull("caManager", caManager);
-        ParamChecker.assertNotNull("dbEntry", dbEntry);
+        ParamUtil.assertNotNull("caManager", caManager);
+        ParamUtil.assertNotNull("dbEntry", dbEntry);
 
         this.caName = dbEntry.getCaName();
         this.dbEntry = dbEntry;
@@ -256,7 +256,7 @@ public class Scep
     public void setCaCaps(
             final CACaps caCaps)
     {
-        ParamChecker.assertNotNull("caCaps", caCaps);
+        ParamUtil.assertNotNull("caCaps", caCaps);
         this.caCaps = caCaps;
     }
 

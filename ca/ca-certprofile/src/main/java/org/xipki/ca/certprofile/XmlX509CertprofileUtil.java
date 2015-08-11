@@ -110,7 +110,7 @@ import org.xipki.ca.certprofile.x509.jaxb.RangesType;
 import org.xipki.ca.certprofile.x509.jaxb.UsageType;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
-import org.xipki.common.KeyUsage;
+import org.xipki.common.security.KeyUsage;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;

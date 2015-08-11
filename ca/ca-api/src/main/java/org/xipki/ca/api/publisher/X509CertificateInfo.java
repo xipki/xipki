@@ -41,8 +41,8 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.RequestorInfo;
 import org.xipki.ca.api.X509CertWithDBCertId;
-import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.ParamChecker;
+import org.xipki.common.security.CertRevocationInfo;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -73,10 +73,10 @@ public class X509CertificateInfo
             final String profileName)
     throws CertificateEncodingException
     {
-        ParamChecker.assertNotNull("cert", cert);
-        ParamChecker.assertNotNull("issuerCert", issuerCert);
-        ParamChecker.assertNotBlank("profileName", profileName);
-        ParamChecker.assertNotNull("subjectPublicKey", subjectPublicKey);
+        ParamUtil.assertNotNull("cert", cert);
+        ParamUtil.assertNotNull("issuerCert", issuerCert);
+        ParamUtil.assertNotBlank("profileName", profileName);
+        ParamUtil.assertNotNull("subjectPublicKey", subjectPublicKey);
 
         this.cert = cert;
         this.subjectPublicKey = subjectPublicKey;

@@ -38,8 +38,8 @@ package org.xipki.ocsp.api;
 import java.util.Date;
 
 import org.bouncycastle.asn1.ocsp.CrlID;
-import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.HashAlgoType;
+import org.xipki.common.security.CertRevocationInfo;
+import org.xipki.common.security.HashAlgoType;
 
 /**
  * @author Lijun Liao

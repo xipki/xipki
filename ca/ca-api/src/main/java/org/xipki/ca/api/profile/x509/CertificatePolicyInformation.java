@@ -37,8 +37,8 @@ package org.xipki.ca.api.profile.x509;
 
 import java.util.List;
 
-import org.xipki.common.ParamChecker;
 import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -53,7 +53,7 @@ public class CertificatePolicyInformation
             final String certPolicyId,
             final List<CertificatePolicyQualifier> qualifiers)
     {
-        ParamChecker.assertNotBlank("certPolicyId", certPolicyId);
+        ParamUtil.assertNotBlank("certPolicyId", certPolicyId);
         this.certPolicyId = certPolicyId;
         this.qualifiers = CollectionUtil.unmodifiableList(qualifiers);
     }

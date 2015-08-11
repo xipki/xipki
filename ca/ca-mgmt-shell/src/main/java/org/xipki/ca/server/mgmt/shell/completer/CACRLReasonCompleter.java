@@ -36,7 +36,7 @@
 package org.xipki.ca.server.mgmt.shell.completer;
 
 import org.xipki.ca.server.mgmt.shell.CaRevokeCommand;
-import org.xipki.common.CRLReason;
+import org.xipki.common.security.CRLReason;
 import org.xipki.console.karaf.EnumCompleter;
 
 /**
