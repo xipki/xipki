@@ -13,8 +13,10 @@
   <packaging>pom</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <modules>
+    <module>password-api</module>
+    <module>password-impl</module>
     <module>security-api</module>
-    <module>security</module>
+    <module>security-impl</module>
     <module>security-shell</module>
     <module>remotep11-server</module>
   </modules>
