@@ -44,7 +44,8 @@
     <junit.version>4.8.2</junit.version>
     <pkcs11-wrapper.version>1.3</pkcs11-wrapper.version>
     <!--ldapsdk.version>2.3.6</ldapsdk.version-->
-    <liquibase.version>3.2.2</liquibase.version>
+    <liquibase.version>3.4.1</liquibase.version>
+    <snakeyaml.version>1.13</snakeyaml.version>
     <hessian.version>4.0.38</hessian.version>
     <!-- required by hikaricp -->
     <hikaricp.version>2.3.2</hikaricp.version>
