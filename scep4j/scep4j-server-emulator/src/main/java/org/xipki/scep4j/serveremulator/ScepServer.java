@@ -37,7 +37,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.xipki.audit.slf4j.impl.Slf4jAuditLoggingServiceImpl;
 import org.xipki.scep4j.crypto.HashAlgoType;
 import org.xipki.scep4j.message.CACaps;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 import org.xipki.scep4j.util.ScepUtil;
 
 /**
@@ -68,9 +68,9 @@ public class ScepServer
             final boolean generateCRL,
             final ScepControl control)
     {
-        ParamChecker.assertNotBlank("name", name);
-        ParamChecker.assertNotNull("caCaps", caCaps);
-        ParamChecker.assertNotNull("control", control);
+        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.assertNotNull("caCaps", caCaps);
+        ParamUtil.assertNotNull("control", control);
         this.name = name;
         this.caCaps = caCaps;
         this.withRA = withRA;

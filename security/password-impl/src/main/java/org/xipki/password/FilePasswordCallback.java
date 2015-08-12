@@ -22,9 +22,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.xipki.common.util.StringUtil;
 import org.xipki.password.api.PasswordCallback;
 import org.xipki.password.api.PasswordResolverException;
-import org.xipki.password.api.util.StringUtil;
 
 /**
  * @author Lijun Liao

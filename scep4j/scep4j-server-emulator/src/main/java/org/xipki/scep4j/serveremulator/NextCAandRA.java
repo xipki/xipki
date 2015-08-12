@@ -18,7 +18,7 @@
 package org.xipki.scep4j.serveremulator;
 
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -33,7 +33,7 @@ public class NextCAandRA
             final Certificate cACert,
             final Certificate rACert)
     {
-        ParamChecker.assertNotNull("cACert", cACert);
+        ParamUtil.assertNotNull("cACert", cACert);
         this.cACert = cACert;
         this.rACert = rACert;
     }

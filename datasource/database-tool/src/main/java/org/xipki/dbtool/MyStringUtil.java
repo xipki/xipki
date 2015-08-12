@@ -21,7 +21,7 @@ package org.xipki.dbtool;
  * @author Lijun Liao
  */
 
-class StringUtil
+class MyStringUtil
 {
     public static boolean isBlank(
             final String s)
