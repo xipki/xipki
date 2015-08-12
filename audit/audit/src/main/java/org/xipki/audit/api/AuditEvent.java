@@ -39,7 +39,7 @@ public class AuditEvent
     /**
      * The data array belonging to the event.
      */
-    private final List<AuditEventData> eventDatas = new LinkedList<AuditEventData>();
+    private final List<AuditEventData> eventDatas = new LinkedList<>();
 
     /**
      * The name of the event type.
@@ -60,7 +60,7 @@ public class AuditEvent
 
     private long duration = -1;
 
-    private final List<AuditChildEvent> childAuditEvents = new LinkedList<AuditChildEvent>();
+    private final List<AuditChildEvent> childAuditEvents = new LinkedList<>();
 
     public AuditEvent(
             final Date timestamp)
@@ -171,7 +171,7 @@ public class AuditEvent
             return Arrays.asList(this);
         }
 
-        List<AuditEvent> expandedEvents = new ArrayList<AuditEvent>(size);
+        List<AuditEvent> expandedEvents = new ArrayList<>(size);
         for(AuditChildEvent child : childAuditEvents)
         {
             AuditEvent event = new AuditEvent(timestamp);

@@ -29,7 +29,7 @@ import java.util.StringTokenizer;
  * @author Lijun Liao
  */
 
-public class StringUtil
+class StringUtil
 {
     public static List<String> split(
             final String str,
