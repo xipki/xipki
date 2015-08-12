@@ -41,8 +41,8 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.RequestorInfo;
 import org.xipki.ca.api.X509CertWithDBCertId;
-import org.xipki.common.security.CertRevocationInfo;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.security.api.CertRevocationInfo;
 
 /**
  * @author Lijun Liao

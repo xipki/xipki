@@ -41,8 +41,8 @@ import java.security.cert.X509Certificate;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.SecurityUtil;
-import org.xipki.common.util.X509Util;
+import org.xipki.security.api.util.SecurityUtil;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

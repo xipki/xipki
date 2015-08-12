@@ -53,12 +53,12 @@ import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
-import org.xipki.common.security.CertRevocationInfo;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.password.api.PasswordResolver;
+import org.xipki.security.api.CertRevocationInfo;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

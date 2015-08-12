@@ -39,9 +39,9 @@ import java.util.Date;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.ConfigurationException;
-import org.xipki.common.security.CRLReason;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.DateUtil;
+import org.xipki.security.api.CRLReason;
 
 /**
  * @author Lijun Liao
@@ -67,12 +67,12 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
         CRLReason crlReason = CRLReason.getInstance(reason);
         if(crlReason == null)
         {
-            throw new ConfigurationException("invalid reason " + reason);
+            throw new InvalidConfException("invalid reason " + reason);
         }
 
         if(CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason) == false)
         {
-            throw new ConfigurationException("reason " + reason + " is not permitted");
+            throw new InvalidConfException("reason " + reason + " is not permitted");
         }
 
         Date invalidityDate = null;

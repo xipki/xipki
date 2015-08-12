@@ -50,7 +50,6 @@ import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
@@ -81,7 +80,9 @@ import org.xipki.dbi.ca.jaxb.PublisherType;
 import org.xipki.dbi.ca.jaxb.RequestorType;
 import org.xipki.dbi.ca.jaxb.ResponderType;
 import org.xipki.dbi.ca.jaxb.ScepType;
+import org.xipki.dbtool.InvalidInputException;
 import org.xipki.password.api.PasswordResolverException;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

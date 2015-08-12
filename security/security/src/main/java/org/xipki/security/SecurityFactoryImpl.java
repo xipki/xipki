@@ -78,22 +78,20 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ConfigurationException;
-import org.xipki.common.SignatureAlgoControl;
-import org.xipki.common.security.CmpUtf8Pairs;
-import org.xipki.common.util.AlgorithmUtil;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.password.api.PasswordResolverException;
 import org.xipki.security.api.AbstractSecurityFactory;
+import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.KeyCertPair;
 import org.xipki.security.api.NoIdleSignerException;
+import org.xipki.security.api.SignatureAlgoControl;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11Control;
 import org.xipki.security.api.p11.P11CryptService;
@@ -103,6 +101,8 @@ import org.xipki.security.api.p11.P11ModuleConf;
 import org.xipki.security.api.p11.P11NullPasswordRetriever;
 import org.xipki.security.api.p11.P11PasswordRetriever;
 import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.util.AlgorithmUtil;
+import org.xipki.security.api.util.X509Util;
 import org.xipki.security.p11.P11ContentSignerBuilder;
 import org.xipki.security.p11.P11PasswordRetrieverImpl;
 import org.xipki.security.p11.conf.jaxb.ModuleType;
@@ -792,12 +792,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 String name = moduleType.getName();
                 if(DEFAULT_P11MODULE_NAME.equals(name))
                 {
-                    throw new ConfigurationException("invald module name " + DEFAULT_P11MODULE_NAME + ", it is reserved");
+                    throw new InvalidConfException("invald module name " + DEFAULT_P11MODULE_NAME + ", it is reserved");
                 }
 
                 if(confs.containsKey(name))
                 {
-                    throw new ConfigurationException("multiple modules with the same module name is not permitted");
+                    throw new InvalidConfException("multiple modules with the same module name is not permitted");
                 }
 
                 P11PasswordRetriever pwdRetriever;
@@ -852,7 +852,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
 
                 if(nativeLibraryPath == null)
                 {
-                    throw new ConfigurationException("could not find PKCS#11 library for OS " + osName);
+                    throw new InvalidConfException("could not find PKCS#11 library for OS " + osName);
                 }
 
                 P11ModuleConf conf = new P11ModuleConf(name,
@@ -863,11 +863,11 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             final String defaultModuleName = modulesType.getDefaultModule();
             if(confs.containsKey(defaultModuleName) == false)
             {
-                throw new ConfigurationException("default module " + defaultModuleName + " is not defined");
+                throw new InvalidConfException("default module " + defaultModuleName + " is not defined");
             }
 
             this.p11Control = new P11Control(defaultModuleName, new HashSet<>(confs.values()));
-        } catch (JAXBException | SAXException | ConfigurationException e)
+        } catch (JAXBException | SAXException | InvalidConfException e)
         {
             final String message = "invalid configuration file " + pkcs11ConfFile;
             if(LOG.isErrorEnabled())
@@ -903,7 +903,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
 
     private static Set<P11SlotIdentifier> getSlots(
             final SlotsType type)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         if(type == null || CollectionUtil.isEmpty(type.getSlot()))
         {
@@ -931,7 +931,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 {
                     String message = "invalid slotId '" + str + "'";
                     LOG.error(message);
-                    throw new ConfigurationException(message);
+                    throw new InvalidConfException(message);
                 }
             }
             slots.add(new P11SlotIdentifier(slotType.getIndex(), slotId));

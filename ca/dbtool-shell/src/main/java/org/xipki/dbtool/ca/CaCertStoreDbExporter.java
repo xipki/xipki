@@ -66,7 +66,6 @@ import org.xipki.common.LruCache;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -91,6 +90,8 @@ import org.xipki.dbi.ca.jaxb.ObjectFactory;
 import org.xipki.dbi.ca.jaxb.ToPublishType;
 import org.xipki.dbi.ca.jaxb.UserType;
 import org.xipki.dbi.ca.jaxb.UsersType;
+import org.xipki.dbtool.InvalidInputException;
+import org.xipki.security.api.util.SecurityUtil;
 
 /**
  * @author Lijun Liao

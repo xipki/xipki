@@ -132,18 +132,18 @@ import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.Permission;
-import org.xipki.common.ConfigurationException;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.HealthCheckResult;
-import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.XipkiCmpConstants;
-import org.xipki.common.security.CRLReason;
-import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
+import org.xipki.security.api.CRLReason;
+import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.ObjectIdentifiers;
+import org.xipki.security.api.XipkiCmpConstants;
+import org.xipki.security.api.util.X509Util;
 import org.xml.sax.SAXException;
 
 /**
@@ -232,7 +232,7 @@ public class X509CACmpResponder extends CmpResponder
         {
             responderHealthy = caManager.getCmpResponderWrapper(
                     getResponderName()).getSigner().isHealthy();
-        }catch(ConfigurationException e)
+        }catch(InvalidConfException e)
         {
             responderHealthy = false;
         }
@@ -247,12 +247,12 @@ public class X509CACmpResponder extends CmpResponder
     }
 
     public String getResponderName()
-    throws ConfigurationException
+    throws InvalidConfException
     {
         String name = getCA().getCAInfo().getResponderName();
         if(name == null)
         {
-            throw new ConfigurationException("No responder is configured for CA " + caName);
+            throw new InvalidConfException("No responder is configured for CA " + caName);
         }
         return name;
     }
@@ -264,7 +264,7 @@ public class X509CACmpResponder extends CmpResponder
             final ASN1OctetString tid,
             final GeneralPKIMessage message,
             final AuditEvent auditEvent)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         if(requestor instanceof CmpRequestorInfo == false)
         {
@@ -1466,7 +1466,7 @@ public class X509CACmpResponder extends CmpResponder
 
     @Override
     protected ConcurrentContentSigner getSigner()
-    throws ConfigurationException
+    throws InvalidConfException
     {
         String name = getResponderName();
         return caManager.getCmpResponderWrapper(name).getSigner();
@@ -1474,7 +1474,7 @@ public class X509CACmpResponder extends CmpResponder
 
     @Override
     protected GeneralName getSender()
-    throws ConfigurationException
+    throws InvalidConfException
     {
         return caManager.getCmpResponderWrapper(getResponderName()).getSubjectAsGeneralName();
     }
@@ -1482,7 +1482,7 @@ public class X509CACmpResponder extends CmpResponder
     @Override
     protected boolean intendsMe(
             final GeneralName requestRecipient)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         if(requestRecipient == null)
         {

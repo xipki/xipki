@@ -56,11 +56,11 @@ import org.xipki.ca.server.impl.CertRevInfoWithSerial;
 import org.xipki.ca.server.impl.CertStatus;
 import org.xipki.ca.server.impl.KnowCertResult;
 import org.xipki.ca.server.impl.SubjectKeyProfileBundle;
-import org.xipki.common.security.CertRevocationInfo;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.security.api.CertRevocationInfo;
 
 /**
  * @author Lijun Liao

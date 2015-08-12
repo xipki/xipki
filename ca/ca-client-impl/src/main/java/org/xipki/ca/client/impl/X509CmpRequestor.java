@@ -124,18 +124,18 @@ import org.xipki.ca.client.api.dto.RevokeCertResultType;
 import org.xipki.ca.client.api.dto.UnrevokeOrRemoveCertRequestType;
 import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.common.cmp.PKIResponse;
-import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.XipkiCmpConstants;
-import org.xipki.common.security.CRLReason;
-import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
+import org.xipki.security.api.CRLReason;
+import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.ObjectIdentifiers;
 import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.XipkiCmpConstants;
+import org.xipki.security.api.util.X509Util;
 import org.xml.sax.SAXException;
 
 /**

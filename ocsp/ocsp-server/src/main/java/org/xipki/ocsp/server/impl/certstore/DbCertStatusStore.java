@@ -54,8 +54,6 @@ import java.util.concurrent.TimeUnit;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.security.CertRevocationInfo;
-import org.xipki.common.security.HashAlgoType;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -67,6 +65,8 @@ import org.xipki.ocsp.api.CertprofileOption;
 import org.xipki.ocsp.api.IssuerHashNameAndKey;
 import org.xipki.ocsp.server.impl.IssuerEntry;
 import org.xipki.ocsp.server.impl.IssuerStore;
+import org.xipki.security.api.CertRevocationInfo;
+import org.xipki.security.api.HashAlgoType;
 
 /**
  * @author Lijun Liao

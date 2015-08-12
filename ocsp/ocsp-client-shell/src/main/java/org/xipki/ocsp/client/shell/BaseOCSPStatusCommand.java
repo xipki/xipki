@@ -50,10 +50,10 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

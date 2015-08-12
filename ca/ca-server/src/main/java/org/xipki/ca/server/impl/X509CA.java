@@ -133,20 +133,20 @@ import org.xipki.ca.server.mgmt.api.CRLControl.UpdateMode;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.common.HealthCheckResult;
-import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.security.CRLReason;
-import org.xipki.common.security.CertRevocationInfo;
-import org.xipki.common.security.KeyUsage;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.X509Util;
+import org.xipki.security.api.CRLReason;
+import org.xipki.security.api.CertRevocationInfo;
 import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.KeyUsage;
 import org.xipki.security.api.NoIdleSignerException;
+import org.xipki.security.api.ObjectIdentifiers;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.util.SecurityUtil;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

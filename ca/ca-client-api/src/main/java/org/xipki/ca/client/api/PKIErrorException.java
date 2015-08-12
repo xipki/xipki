@@ -36,7 +36,7 @@
 package org.xipki.ca.client.api;
 
 import org.bouncycastle.asn1.cmp.PKIStatusInfo;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.security.api.util.SecurityUtil;
 
 /**
  * @author Lijun Liao

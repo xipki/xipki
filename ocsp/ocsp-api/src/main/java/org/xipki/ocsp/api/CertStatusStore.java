@@ -40,10 +40,10 @@ import java.util.Set;
 
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
-import org.xipki.common.security.CertRevocationInfo;
-import org.xipki.common.security.HashAlgoType;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.security.api.CertRevocationInfo;
+import org.xipki.security.api.HashAlgoType;
 
 /**
  * @author Lijun Liao

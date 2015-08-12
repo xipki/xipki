@@ -80,8 +80,8 @@ import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.security.api.P12KeypairGenerationResult;
+import org.xipki.security.api.util.X509Util;
 import org.xipki.security.bcext.ECDSAContentSignerBuilder;
 
 /**

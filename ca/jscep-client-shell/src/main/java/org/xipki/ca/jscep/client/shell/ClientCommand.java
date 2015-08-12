@@ -50,8 +50,8 @@ import java.util.Iterator;
 import org.apache.karaf.shell.commands.Option;
 import org.jscep.client.Client;
 import org.jscep.client.verification.PreProvisionedCertificateVerifier;
-import org.xipki.common.util.X509Util;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

@@ -47,7 +47,7 @@ import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.profile.RDNControl;
 import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.api.profile.StringType;
-import org.xipki.common.ObjectIdentifiers;
+import org.xipki.security.api.ObjectIdentifiers;
 
 /**
  * @author Lijun Liao

@@ -35,12 +35,12 @@
 
 package org.xipki.ocsp.server.impl;
 
-import org.xipki.common.ConfigurationException;
-import org.xipki.common.security.HashAlgoType;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.StringUtil;
 import org.xipki.ocsp.server.impl.jaxb.CacheType;
 import org.xipki.ocsp.server.impl.jaxb.EmbedCertsMode;
 import org.xipki.ocsp.server.impl.jaxb.ResponseOptionType;
+import org.xipki.security.api.HashAlgoType;
 
 /**
  * @author Lijun Liao
@@ -57,7 +57,7 @@ class ResponseOption
 
     public ResponseOption(
             final ResponseOptionType conf)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         this.includeInvalidityDate = getBoolean(conf.isIncludeInvalidityDate(), true);
         this.includeRevReason = getBoolean(conf.isIncludeRevReason(), true);
@@ -87,7 +87,7 @@ class ResponseOption
                 }
                 else
                 {
-                    throw new ConfigurationException("hash algorithm " +token + " is unsupported");
+                    throw new InvalidConfException("hash algorithm " +token + " is unsupported");
                 }
             }
         }

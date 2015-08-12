@@ -85,23 +85,23 @@ import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
-import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.security.CRLReason;
-import org.xipki.common.security.CertRevocationInfo;
-import org.xipki.common.security.HashAlgoType;
-import org.xipki.common.security.HashCalculator;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
 import org.xipki.ocsp.api.CertStatusStoreException;
 import org.xipki.ocsp.api.CertprofileOption;
 import org.xipki.ocsp.api.IssuerHashNameAndKey;
+import org.xipki.security.api.CRLReason;
+import org.xipki.security.api.CertRevocationInfo;
+import org.xipki.security.api.HashAlgoType;
+import org.xipki.security.api.HashCalculator;
+import org.xipki.security.api.ObjectIdentifiers;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

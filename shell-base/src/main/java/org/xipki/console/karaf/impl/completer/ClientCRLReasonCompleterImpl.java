@@ -35,9 +35,9 @@
 
 package org.xipki.console.karaf.impl.completer;
 
-import org.xipki.common.security.CRLReason;
 import org.xipki.console.karaf.ClientCRLReasonCompleter;
 import org.xipki.console.karaf.EnumCompleter;
+import org.xipki.security.api.CRLReason;
 
 /**
  * @author Lijun Liao

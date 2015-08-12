@@ -161,17 +161,17 @@ import org.xipki.ca.qa.impl.internal.QaPolicyQualifierInfo;
 import org.xipki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
 import org.xipki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
 import org.xipki.ca.qa.impl.internal.QaPolicyQualifiers;
-import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.qa.ValidationIssue;
-import org.xipki.common.security.HashAlgoType;
-import org.xipki.common.security.HashCalculator;
-import org.xipki.common.security.KeyUsage;
-import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.security.api.ExtensionExistence;
+import org.xipki.security.api.HashAlgoType;
+import org.xipki.security.api.HashCalculator;
+import org.xipki.security.api.KeyUsage;
+import org.xipki.security.api.ObjectIdentifiers;
+import org.xipki.security.api.util.AlgorithmUtil;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

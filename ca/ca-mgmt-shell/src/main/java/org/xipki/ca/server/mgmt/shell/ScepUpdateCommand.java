@@ -44,9 +44,9 @@ import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.ChangeScepEntry;
 import org.xipki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.password.api.PasswordResolver;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

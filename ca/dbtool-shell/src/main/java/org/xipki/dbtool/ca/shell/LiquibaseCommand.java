@@ -48,8 +48,8 @@ import java.util.Set;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
-import org.xipki.dbtool.ca.LiquibaseDatabaseConf;
-import org.xipki.dbtool.ca.LiquibaseMain;
+import org.xipki.dbtool.LiquibaseDatabaseConf;
+import org.xipki.dbtool.LiquibaseMain;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.password.api.PasswordResolverException;
 

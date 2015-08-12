@@ -66,9 +66,9 @@ import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
-import org.xipki.common.CRLReason;
-import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.util.X509Util;
+import org.xipki.security.api.CRLReason;
+import org.xipki.security.api.CertRevocationInfo;
+import org.xipki.security.api.util.X509Util;
 
 import com.caucho.hessian.client.HessianProxyFactory;
 

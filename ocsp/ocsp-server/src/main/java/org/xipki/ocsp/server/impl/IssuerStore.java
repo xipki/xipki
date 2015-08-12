@@ -41,8 +41,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.xipki.common.security.HashAlgoType;
 import org.xipki.ocsp.api.IssuerHashNameAndKey;
+import org.xipki.security.api.HashAlgoType;
 
 /**
  * @author Lijun Liao

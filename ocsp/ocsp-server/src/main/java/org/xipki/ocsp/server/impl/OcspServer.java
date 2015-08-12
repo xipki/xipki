@@ -108,19 +108,13 @@ import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
-import org.xipki.common.ConfigurationException;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.HealthCheckResult;
-import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.security.CRLReason;
-import org.xipki.common.security.CertRevocationInfo;
-import org.xipki.common.security.CertpathValidationModel;
-import org.xipki.common.security.HashAlgoType;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -155,10 +149,16 @@ import org.xipki.ocsp.server.impl.jaxb.SignerType;
 import org.xipki.ocsp.server.impl.jaxb.StoreType;
 import org.xipki.ocsp.server.impl.jaxb.StoreType.Source;
 import org.xipki.password.api.PasswordResolverException;
+import org.xipki.security.api.CRLReason;
+import org.xipki.security.api.CertRevocationInfo;
+import org.xipki.security.api.CertpathValidationModel;
 import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.HashAlgoType;
 import org.xipki.security.api.NoIdleSignerException;
+import org.xipki.security.api.ObjectIdentifiers;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.util.X509Util;
 import org.xml.sax.SAXException;
 
 /**
@@ -300,7 +300,7 @@ public class OcspServer
     }
 
     public void init()
-    throws ConfigurationException, PasswordResolverException, DataAccessException
+    throws InvalidConfException, PasswordResolverException, DataAccessException
     {
         boolean successfull = false;
         try
@@ -322,7 +322,7 @@ public class OcspServer
     }
 
     private void do_init()
-    throws ConfigurationException, DataAccessException, PasswordResolverException
+    throws InvalidConfException, DataAccessException, PasswordResolverException
     {
         if(confFile == null)
         {
@@ -353,12 +353,12 @@ public class OcspServer
             String name = m.getName();
             if(c.contains(m))
             {
-                throw new ConfigurationException("responder named '" + name + "' defined duplicatedly");
+                throw new InvalidConfException("responder named '" + name + "' defined duplicatedly");
             }
 
             if(StringUtil.isBlank(name))
             {
-                throw new ConfigurationException("responder name could not be empty");
+                throw new InvalidConfException("responder name could not be empty");
             }
 
             for(int i = 0; i < name.length(); i++)
@@ -366,7 +366,7 @@ public class OcspServer
                 char ch = name.charAt(i);
                 if(((ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) == false)
                 {
-                    throw new ConfigurationException("invalid OCSP responder name '" + name + "'");
+                    throw new InvalidConfException("invalid OCSP responder name '" + name + "'");
                 }
             }
         }
@@ -378,7 +378,7 @@ public class OcspServer
             String name = m.getName();
             if(c.contains(m))
             {
-                throw new ConfigurationException("signer option named '" + name + "' defined duplicatedly");
+                throw new InvalidConfException("signer option named '" + name + "' defined duplicatedly");
             }
         }
 
@@ -389,7 +389,7 @@ public class OcspServer
             String name = m.getName();
             if(c.contains(m))
             {
-                throw new ConfigurationException("request option named '" + name + "' defined duplicatedly");
+                throw new InvalidConfException("request option named '" + name + "' defined duplicatedly");
             }
         }
 
@@ -400,7 +400,7 @@ public class OcspServer
             String name = m.getName();
             if(c.contains(m))
             {
-                throw new ConfigurationException("response option named '" + name + "' defined duplicatedly");
+                throw new InvalidConfException("response option named '" + name + "' defined duplicatedly");
             }
         }
 
@@ -413,7 +413,7 @@ public class OcspServer
                 String name = m.getName();
                 if(c.contains(m))
                 {
-                    throw new ConfigurationException("audit option named '" + name + "' defined duplicatedly");
+                    throw new InvalidConfException("audit option named '" + name + "' defined duplicatedly");
                 }
             }
         }
@@ -425,7 +425,7 @@ public class OcspServer
             String name = m.getName();
             if(c.contains(m))
             {
-                throw new ConfigurationException("store named '" + name + "' defined duplicatedly");
+                throw new InvalidConfException("store named '" + name + "' defined duplicatedly");
             }
         }
 
@@ -438,7 +438,7 @@ public class OcspServer
                 String name = m.getName();
                 if(c.contains(m))
                 {
-                    throw new ConfigurationException("certprofile option named '" + name + "' defined duplicatedly");
+                    throw new InvalidConfException("certprofile option named '" + name + "' defined duplicatedly");
                 }
             }
         }
@@ -452,7 +452,7 @@ public class OcspServer
                 String name = m.getName();
                 if(c.contains(m))
                 {
-                    throw new ConfigurationException("datasource named '" + name + "' defined duplicatedly");
+                    throw new InvalidConfException("datasource named '" + name + "' defined duplicatedly");
                 }
             }
         }
@@ -515,7 +515,7 @@ public class OcspServer
                                 dsStream, securityFactory.getPasswordResolver());
                 } catch(IOException e)
                 {
-                    throw new ConfigurationException(e.getMessage(), e);
+                    throw new InvalidConfException(e.getMessage(), e);
                 }
                 finally
                 {
@@ -540,31 +540,31 @@ public class OcspServer
             String n = option.getAuditOptionName();
             if(n != null && auditOptions.containsKey(n) == false)
             {
-                throw new ConfigurationException("no auditOption named '" + n + "' is defined");
+                throw new InvalidConfException("no auditOption named '" + n + "' is defined");
             }
 
             n = option.getCertprofileOptionName();
             if(n != null && certprofileOptions.containsKey(n) == false)
             {
-                throw new ConfigurationException("no certprofileOption named '" + n + "' is defined");
+                throw new InvalidConfException("no certprofileOption named '" + n + "' is defined");
             }
 
             n = option.getRequestOptionName();
             if(requestOptions.containsKey(n) == false)
             {
-                throw new ConfigurationException("no requestOption named '" + n + "' is defined");
+                throw new InvalidConfException("no requestOption named '" + n + "' is defined");
             }
 
             n = option.getResponseOptionName();
             if(responseOptions.containsKey(n) == false)
             {
-                throw new ConfigurationException("no responseOption named '" + n + "' is defined");
+                throw new InvalidConfException("no responseOption named '" + n + "' is defined");
             }
 
             n = option.getSignerName();
             if(signers.containsKey(n) == false)
             {
-                throw new ConfigurationException("no signer named '" + n + "' is defined");
+                throw new InvalidConfException("no signer named '" + n + "' is defined");
             }
 
             List<String> names = option.getStoreNames();
@@ -572,7 +572,7 @@ public class OcspServer
             {
                 if(stores.containsKey(name) == false)
                 {
-                    throw new ConfigurationException("no store named '" + name + "' is defined");
+                    throw new InvalidConfException("no store named '" + name + "' is defined");
                 }
             }
             responderOptions.put(m.getName(), option);
@@ -595,7 +595,7 @@ public class OcspServer
             {
                 if(pathTexts.contains(path))
                 {
-                    throw new ConfigurationException("duplicated definition of servlet path '" + path + "'");
+                    throw new InvalidConfException("duplicated definition of servlet path '" + path + "'");
                 }
                 this.servletPaths.add(new ServletPathResponderName(path, name));
             }
@@ -1296,7 +1296,7 @@ public class OcspServer
 
     private ResponderSigner initSigner(
             final SignerType m)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         X509Certificate[] explicitCertificateChain = null;
 
@@ -1337,7 +1337,7 @@ public class OcspServer
                 singleSigners.add(requestorSigner);
             } catch (SignerException e)
             {
-                throw new ConfigurationException("SignerException: " + e.getMessage(), e);
+                throw new InvalidConfException("SignerException: " + e.getMessage(), e);
             }
         }
 
@@ -1346,14 +1346,14 @@ public class OcspServer
             return new ResponderSigner(singleSigners);
         } catch (CertificateEncodingException | IOException e)
         {
-            throw new ConfigurationException(e.getMessage(), e);
+            throw new InvalidConfException(e.getMessage(), e);
         }
     }
 
     private CertStatusStore initStore(
             final StoreType conf,
             final Map<String, DataSourceWrapper> datasources)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         String name = conf.getName();
 
@@ -1391,7 +1391,7 @@ public class OcspServer
                 issuerFilter = new IssuerFilter(includeIssuers, excludeIssuers);
             } catch (CertificateException e)
             {
-                throw new ConfigurationException(e.getMessage(), e);
+                throw new InvalidConfException(e.getMessage(), e);
             }
             store = new DbCertStatusStore(name, issuerFilter);
 
@@ -1424,7 +1424,7 @@ public class OcspServer
                 XMLGregorianCalendar caRevTime = crlStoreConf.getCaRevocationTime();
                 if(caRevTime == null)
                 {
-                    throw new ConfigurationException("caRevocationTime is not specified");
+                    throw new InvalidConfException("caRevocationTime is not specified");
                 }
                 crlStore.setCARevocationInfo(caRevTime.toGregorianCalendar().getTime());
             }
@@ -1448,7 +1448,7 @@ public class OcspServer
                 instance = clazz.newInstance();
             }catch(Exception e)
             {
-                throw new ConfigurationException(e.getMessage(), e);
+                throw new InvalidConfException(e.getMessage(), e);
             }
 
             if(instance instanceof CertStatusStore)
@@ -1456,7 +1456,7 @@ public class OcspServer
                 store = (CertStatusStore) instance;
             }
             {
-                throw new ConfigurationException(className + " is not instanceof " + CertStatusStore.class.getName());
+                throw new InvalidConfException(className + " is not instanceof " + CertStatusStore.class.getName());
             }
         }
         else
@@ -1475,7 +1475,7 @@ public class OcspServer
             datasource = datasources.get(datasourceName);
             if(datasource == null)
             {
-                throw new ConfigurationException("datasource named '" + datasourceName + "'  not definied");
+                throw new InvalidConfException("datasource named '" + datasourceName + "'  not definied");
             }
         }
         try
@@ -1483,7 +1483,7 @@ public class OcspServer
             store.init(statusStoreConf, datasource);
         }catch(CertStatusStoreException e)
         {
-            throw new ConfigurationException("CertStatusStoreException of store " + conf.getName() +
+            throw new InvalidConfException("CertStatusStoreException of store " + conf.getName() +
                     ":" + e.getMessage(), e);
         }
 
@@ -1663,7 +1663,7 @@ public class OcspServer
 
     private static Set<X509Certificate> parseCerts(
             final List<FileOrValueType> certConfs)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         Set<X509Certificate> certs = new HashSet<>(certConfs.size());
         for(FileOrValueType m : certConfs)
@@ -1717,7 +1717,7 @@ public class OcspServer
 
     private static X509Certificate parseCert(
             final FileOrValueType certConf)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         InputStream is = null;
         try
@@ -1731,7 +1731,7 @@ public class OcspServer
             {
                 msg += " from file " + certConf.getFile();
             }
-            throw new ConfigurationException(msg);
+            throw new InvalidConfException(msg);
         }finally
         {
             close(is);
@@ -1740,7 +1740,7 @@ public class OcspServer
 
     private static OCSPServer parseConf(
             final String confFilename)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         try
         {
@@ -1752,10 +1752,10 @@ public class OcspServer
             return (OCSPServer) unmarshaller.unmarshal(new File(IoUtil.expandFilepath(confFilename)));
         } catch(SAXException e)
         {
-            throw new ConfigurationException("parse profile failed, message: " + e.getMessage(), e);
+            throw new InvalidConfException("parse profile failed, message: " + e.getMessage(), e);
         } catch(JAXBException e)
         {
-            throw new ConfigurationException("parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e), e);
+            throw new InvalidConfException("parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e), e);
         }
     }
 

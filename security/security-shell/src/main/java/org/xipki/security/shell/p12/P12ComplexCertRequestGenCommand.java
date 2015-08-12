@@ -52,10 +52,10 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.SignatureAlgoControl;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.ObjectIdentifiers;
+import org.xipki.security.api.SignatureAlgoControl;
 import org.xipki.security.shell.CertRequestGenCommand;
 
 /**

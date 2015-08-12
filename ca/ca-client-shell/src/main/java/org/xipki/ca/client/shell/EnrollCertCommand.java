@@ -72,21 +72,21 @@ import org.xipki.ca.client.api.CertOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
-import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.SignatureAlgoControl;
-import org.xipki.common.security.KeyUsage;
-import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.security.P10RequestGenerator;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.ExtensionExistence;
+import org.xipki.security.api.KeyUsage;
+import org.xipki.security.api.ObjectIdentifiers;
 import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.SignatureAlgoControl;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.util.AlgorithmUtil;
+import org.xipki.security.api.util.SecurityUtil;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

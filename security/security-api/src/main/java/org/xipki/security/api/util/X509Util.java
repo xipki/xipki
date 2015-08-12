@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common.util;
+package org.xipki.security.api.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -89,8 +89,10 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.security.KeyUsage;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.IoUtil;
+import org.xipki.security.api.KeyUsage;
+import org.xipki.security.api.ObjectIdentifiers;
 
 /**
  * @author Lijun Liao

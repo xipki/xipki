@@ -39,10 +39,10 @@ import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.util.X509Util;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
+import org.xipki.security.api.util.X509Util;
 import org.xipki.security.shell.SecurityCommand;
 
 /**

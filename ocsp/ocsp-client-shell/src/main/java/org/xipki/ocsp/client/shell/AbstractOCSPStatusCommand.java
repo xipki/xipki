@@ -39,10 +39,10 @@ import java.util.List;
 
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
+import org.xipki.security.api.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao

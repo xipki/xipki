@@ -33,46 +33,20 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.dbtool.ca;
+package org.xipki.security.api;
 
 /**
  * @author Lijun Liao
  */
 
 @SuppressWarnings("serial")
-class InvalidInputException extends Exception
+public class InvalidOIDorNameException extends Exception
 {
 
-    public InvalidInputException()
+    public InvalidOIDorNameException(
+            final String declaredOidOrName)
     {
-    }
-
-    public InvalidInputException(
-            final String message)
-    {
-        super(message);
-    }
-
-    public InvalidInputException(
-            final Throwable cause)
-    {
-        super(cause);
-    }
-
-    public InvalidInputException(
-            final String message,
-            final Throwable cause)
-    {
-        super(message, cause);
-    }
-
-    public InvalidInputException(
-            final String message,
-            final Throwable cause,
-            final boolean enableSuppression,
-            final boolean writableStackTrace)
-    {
-        super(message, cause, enableSuppression, writableStackTrace);
+        super("invalid ObjectIdentifer or name '" + declaredOidOrName + "'");
     }
 
 }

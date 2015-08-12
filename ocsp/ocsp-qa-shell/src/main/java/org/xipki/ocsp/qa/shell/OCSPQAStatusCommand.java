@@ -46,7 +46,6 @@ import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
-import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.ocsp.client.shell.BaseOCSPStatusCommand;
@@ -55,6 +54,7 @@ import org.xipki.ocsp.qa.api.OcspCertStatus;
 import org.xipki.ocsp.qa.api.OcspError;
 import org.xipki.ocsp.qa.api.OcspQA;
 import org.xipki.ocsp.qa.api.OcspResponseOption;
+import org.xipki.security.api.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao

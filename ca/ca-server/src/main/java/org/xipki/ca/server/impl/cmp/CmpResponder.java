@@ -73,13 +73,13 @@ import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.common.cmp.ProtectionResult;
 import org.xipki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.ca.server.mgmt.api.CmpControl;
-import org.xipki.common.ConfigurationException;
-import org.xipki.common.security.CmpUtf8Pairs;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.X509Util;
+import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -92,14 +92,14 @@ abstract class CmpResponder
     private final SecureRandom random = new SecureRandom();
 
     protected abstract ConcurrentContentSigner getSigner()
-    throws ConfigurationException;
+    throws InvalidConfException;
 
     protected abstract GeneralName getSender()
-    throws ConfigurationException;
+    throws InvalidConfException;
 
     protected abstract boolean intendsMe(
             GeneralName requestRecipient)
-    throws ConfigurationException;
+    throws InvalidConfException;
 
     protected final SecurityFactory securityFactory;
 
@@ -135,7 +135,7 @@ abstract class CmpResponder
             ASN1OctetString transactionId,
             GeneralPKIMessage pkiMessage,
             AuditEvent auditEvent)
-    throws ConfigurationException;
+    throws InvalidConfException;
 
     protected CmpResponder(
             final SecurityFactory securityFactory)
@@ -149,7 +149,7 @@ abstract class CmpResponder
             final PKIMessage pkiMessage,
             final X509Certificate tlsClientCert,
             final AuditEvent auditEvent)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
 
@@ -432,7 +432,7 @@ abstract class CmpResponder
             final PKIHeader requestHeader,
             final int failureCode,
             final String statusText)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         GeneralName respRecipient = requestHeader.getSender();
 
@@ -473,14 +473,14 @@ abstract class CmpResponder
     }
 
     public X500Name getResponderSubject()
-    throws ConfigurationException
+    throws InvalidConfException
     {
         GeneralName sender = getSender();
         return sender == null ? null : (X500Name) sender.getName();
     }
 
     public X509Certificate getResponderCert()
-    throws ConfigurationException
+    throws InvalidConfException
     {
         ConcurrentContentSigner signer = getSigner();
         return signer == null ? null : signer.getCertificate();

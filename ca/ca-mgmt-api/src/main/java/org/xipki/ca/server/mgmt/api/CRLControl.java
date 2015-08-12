@@ -41,11 +41,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.common.ConfigurationException;
-import org.xipki.common.security.CmpUtf8Pairs;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.security.api.CmpUtf8Pairs;
 
 /**
  *
@@ -218,7 +218,7 @@ public class CRLControl implements Serializable
 
     public CRLControl(
             final String conf)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         ParamUtil.assertNotBlank("conf", conf);
         CmpUtf8Pairs props;
@@ -227,7 +227,7 @@ public class CRLControl implements Serializable
             props = new CmpUtf8Pairs(conf);
         }catch(RuntimeException e)
         {
-            throw new ConfigurationException(e.getClass().getName() + ": " + e.getMessage(), e);
+            throw new InvalidConfException(e.getClass().getName() + ": " + e.getMessage(), e);
         }
 
         String s = props.getValue(KEY_updateMode);
@@ -240,7 +240,7 @@ public class CRLControl implements Serializable
             this.updateMode = UpdateMode.getUpdateMode(s);
             if(this.updateMode == null)
             {
-                throw new ConfigurationException("invalid " + KEY_updateMode + ": " + s);
+                throw new InvalidConfException("invalid " + KEY_updateMode + ": " + s);
             }
         }
 
@@ -263,7 +263,7 @@ public class CRLControl implements Serializable
                     new ASN1ObjectIdentifier(extensionOID);
                 }catch(IllegalArgumentException e)
                 {
-                    throw new ConfigurationException(extensionOID + " is not a valid OID");
+                    throw new InvalidConfException(extensionOID + " is not a valid OID");
                 }
             }
             this.extensionOIDs = extensionOIDs;
@@ -284,7 +284,7 @@ public class CRLControl implements Serializable
                 List<String> tokens = StringUtil.split(s.trim(), ":");
                 if(tokens.size() != 2)
                 {
-                    throw new ConfigurationException("invalid " + KEY_interval_time + ": '" + s + "'");
+                    throw new InvalidConfException("invalid " + KEY_interval_time + ": '" + s + "'");
                 }
 
                 try
@@ -294,7 +294,7 @@ public class CRLControl implements Serializable
                     this.intervalDayTime = new HourMinute(hour, minute);
                 }catch(IllegalArgumentException e)
                 {
-                    throw new ConfigurationException("invalid " + KEY_interval_time + ": '" + s + "'");
+                    throw new InvalidConfException("invalid " + KEY_interval_time + ": '" + s + "'");
                 }
             }
             else
@@ -302,7 +302,7 @@ public class CRLControl implements Serializable
                 int minutes = getInteger(props, KEY_interval_minutes, 0);
                 if(minutes < this.overlapMinutes + 30)
                 {
-                    throw new ConfigurationException("invalid " + KEY_interval_minutes + ": '" + minutes +
+                    throw new InvalidConfException("invalid " + KEY_interval_minutes + ": '" + minutes +
                             " is less than than 30 + " + this.overlapMinutes);
                 }
                 this.intervalMinutes = minutes;
@@ -316,7 +316,7 @@ public class CRLControl implements Serializable
             final CmpUtf8Pairs props,
             final String propKey,
             final int dfltValue)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         String s = props.getValue(propKey);
         if(s != null)
@@ -326,7 +326,7 @@ public class CRLControl implements Serializable
                 return Integer.parseInt(s.trim());
             }catch(NumberFormatException e)
             {
-                throw new ConfigurationException(propKey + " does not have numeric value: " + s);
+                throw new InvalidConfException(propKey + " does not have numeric value: " + s);
             }
         }
         return dfltValue;
@@ -336,7 +336,7 @@ public class CRLControl implements Serializable
             final CmpUtf8Pairs props,
             final String propKey,
             final boolean dfltValue)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         String s = props.getValue(propKey);
         if(s != null)
@@ -352,7 +352,7 @@ public class CRLControl implements Serializable
             }
             else
             {
-                throw new ConfigurationException(propKey + " does not have boolean value: " + s);
+                throw new InvalidConfException(propKey + " does not have boolean value: " + s);
             }
         }
         return dfltValue;
@@ -464,11 +464,11 @@ public class CRLControl implements Serializable
     }
 
     public void validate()
-    throws ConfigurationException
+    throws InvalidConfException
     {
         if(onlyContainsCACerts && onlyContainsUserCerts)
         {
-            throw new ConfigurationException("onlyContainsCACerts and onlyContainsUserCerts can not be both true");
+            throw new InvalidConfException("onlyContainsCACerts and onlyContainsUserCerts can not be both true");
         }
 
         if(updateMode == UpdateMode.onDemand)
@@ -478,18 +478,18 @@ public class CRLControl implements Serializable
 
         if(fullCRLIntervals < deltaCRLIntervals)
         {
-            throw new ConfigurationException("fullCRLIntervals could not be less than deltaCRLIntervals " +
+            throw new InvalidConfException("fullCRLIntervals could not be less than deltaCRLIntervals " +
                     fullCRLIntervals + " < " + deltaCRLIntervals);
         }
 
         if(fullCRLIntervals < 1)
         {
-            throw new ConfigurationException("fullCRLIntervals could not be less than 1: " + fullCRLIntervals);
+            throw new InvalidConfException("fullCRLIntervals could not be less than 1: " + fullCRLIntervals);
         }
 
         if(deltaCRLIntervals < 0)
         {
-            throw new ConfigurationException("deltaCRLIntervals could not be less than 0: " + deltaCRLIntervals);
+            throw new InvalidConfException("deltaCRLIntervals could not be less than 0: " + deltaCRLIntervals);
         }
     }
 

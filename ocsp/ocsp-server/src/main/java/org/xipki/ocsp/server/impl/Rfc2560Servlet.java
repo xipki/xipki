@@ -61,9 +61,9 @@ import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
+import org.xipki.security.api.util.SecurityUtil;
 
 /**
  * @author Lijun Liao

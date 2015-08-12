@@ -66,8 +66,8 @@ import org.bouncycastle.operator.bc.BcDefaultDigestProvider;
 import org.bouncycastle.operator.bc.BcDigestProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
-import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.util.AlgorithmUtil;
 
 /**
  * utility class for converting java.security RSA objects into their

@@ -77,11 +77,11 @@ import org.xipki.ca.qa.api.X509IssuerInfo;
 import org.xipki.ca.qa.impl.internal.QaExtensionValue;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
-import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.X509Util;
+import org.xipki.security.api.util.AlgorithmUtil;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

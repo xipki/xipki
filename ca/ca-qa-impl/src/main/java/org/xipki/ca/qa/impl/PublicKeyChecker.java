@@ -63,8 +63,8 @@ import org.xipki.common.LruCache;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.SecurityUtil;
-import org.xipki.common.util.X509Util;
+import org.xipki.security.api.util.SecurityUtil;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

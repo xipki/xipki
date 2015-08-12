@@ -69,18 +69,18 @@ import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.SignatureAlgoControl;
-import org.xipki.common.security.KeyUsage;
-import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.security.P10RequestGenerator;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.ExtensionExistence;
+import org.xipki.security.api.KeyUsage;
+import org.xipki.security.api.ObjectIdentifiers;
+import org.xipki.security.api.SignatureAlgoControl;
+import org.xipki.security.api.util.AlgorithmUtil;
+import org.xipki.security.api.util.SecurityUtil;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

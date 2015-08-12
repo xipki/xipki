@@ -55,13 +55,13 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.X509CertWithDBCertId;
-import org.xipki.common.security.CertRevocationInfo;
-import org.xipki.common.security.HashAlgoType;
-import org.xipki.common.security.HashCalculator;
 import org.xipki.common.util.LogUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.datasource.api.exception.DuplicateKeyException;
+import org.xipki.security.api.CertRevocationInfo;
+import org.xipki.security.api.HashAlgoType;
+import org.xipki.security.api.HashCalculator;
 
 /**
  * @author Lijun Liao

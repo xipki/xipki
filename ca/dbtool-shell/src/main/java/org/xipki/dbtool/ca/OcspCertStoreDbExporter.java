@@ -58,7 +58,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
@@ -69,6 +68,7 @@ import org.xipki.dbi.ocsp.jaxb.CertType;
 import org.xipki.dbi.ocsp.jaxb.CertsType;
 import org.xipki.dbi.ocsp.jaxb.IssuerType;
 import org.xipki.dbi.ocsp.jaxb.ObjectFactory;
+import org.xipki.security.api.util.SecurityUtil;
 
 /**
  * @author Lijun Liao

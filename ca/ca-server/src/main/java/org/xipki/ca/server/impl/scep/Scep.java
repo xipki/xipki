@@ -83,12 +83,11 @@ import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.ScepControl;
 import org.xipki.ca.server.mgmt.api.ScepEntry;
-import org.xipki.common.ConfigurationException;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.scep4j.crypto.HashAlgoType;
 import org.xipki.scep4j.exception.MessageDecodingException;
 import org.xipki.scep4j.exception.MessageEncodingException;
@@ -106,6 +105,7 @@ import org.xipki.scep4j.transaction.PkiStatus;
 import org.xipki.scep4j.transaction.TransactionId;
 import org.xipki.security.api.KeyCertPair;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.util.X509Util;
 
 /**
  *
@@ -161,7 +161,7 @@ public class Scep
         try
         {
             this.control = new ScepControl(dbEntry.getControl());
-        } catch (ConfigurationException e)
+        } catch (InvalidConfException e)
         {
             throw new CAMgmtException(e);
         }

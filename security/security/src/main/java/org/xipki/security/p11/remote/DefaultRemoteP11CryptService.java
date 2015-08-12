@@ -43,9 +43,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11ModuleConf;
 

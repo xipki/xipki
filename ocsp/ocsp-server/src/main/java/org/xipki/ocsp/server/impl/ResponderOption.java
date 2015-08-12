@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.xipki.common.ConfigurationException;
+import org.xipki.common.InvalidConfException;
 import org.xipki.ocsp.api.OCSPMode;
 import org.xipki.ocsp.server.impl.jaxb.ResponderType;
 
@@ -61,7 +61,7 @@ class ResponderOption
 
     public ResponderOption(
             final ResponderType conf)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         String s = conf.getMode();
         if(s == null || "RFC6960".equalsIgnoreCase(s))
@@ -74,7 +74,7 @@ class ResponderOption
         }
         else
         {
-            throw new ConfigurationException("invalid OCSP mode '" + s + "'");
+            throw new InvalidConfException("invalid OCSP mode '" + s + "'");
         }
 
         this.signerName = conf.getSigner();
@@ -99,11 +99,11 @@ class ResponderOption
                 int n = path.length();
                 if(n > 0 && path.charAt(0) == '/')
                 {
-                    throw new ConfigurationException("servlet path '" + path + "' must not start with '/'");
+                    throw new InvalidConfException("servlet path '" + path + "' must not start with '/'");
                 }
                 if(n > 1 && path.charAt(n - 1) == '/')
                 {
-                    throw new ConfigurationException("servlet path '" + path + "' must not end with '/'");
+                    throw new InvalidConfException("servlet path '" + path + "' must not end with '/'");
                 }
             }
             list = new ArrayList<>(paths);

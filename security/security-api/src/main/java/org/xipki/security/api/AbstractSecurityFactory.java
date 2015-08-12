@@ -41,7 +41,6 @@ import java.security.cert.X509Certificate;
 
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentVerifierProvider;
-import org.xipki.common.SignatureAlgoControl;
 
 /**
  * @author Lijun Liao
