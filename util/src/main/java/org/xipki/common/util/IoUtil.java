@@ -50,8 +50,6 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bouncycastle.util.encoders.Base64;
-
 /**
  * @author Lijun Liao
  */
@@ -273,7 +271,7 @@ public class IoUtil
             final boolean withLineBreak)
     {
 
-        String b64Str = Base64.toBase64String(data);
+        String b64Str = Base64.encodeToString(data, Base64.NO_WRAP);
         if(withLineBreak == false)
         {
             return b64Str;

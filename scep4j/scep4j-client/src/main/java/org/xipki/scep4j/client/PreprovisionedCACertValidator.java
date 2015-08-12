@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.xipki.scep4j.crypto.HashAlgoType;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -37,7 +37,7 @@ implements CACertValidator
     public PreprovisionedCACertValidator(
             final X509Certificate cert)
     {
-        ParamChecker.assertNotNull("cert", cert);
+        ParamUtil.assertNotNull("cert", cert);
         fpOfCerts = new HashSet<String>(1);
         String hexFp;
         try
@@ -53,7 +53,7 @@ implements CACertValidator
     public PreprovisionedCACertValidator(
             final Set<X509Certificate> certs)
     {
-        ParamChecker.assertNotEmpty("certs", certs);
+        ParamUtil.assertNotEmpty("certs", certs);
         fpOfCerts = new HashSet<String>(certs.size());
         for(X509Certificate m : certs)
         {

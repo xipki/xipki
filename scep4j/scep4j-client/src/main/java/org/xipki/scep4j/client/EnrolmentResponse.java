@@ -31,7 +31,7 @@ import org.xipki.scep4j.message.PkiMessage;
 import org.xipki.scep4j.transaction.FailInfo;
 import org.xipki.scep4j.transaction.MessageType;
 import org.xipki.scep4j.transaction.PkiStatus;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 import org.xipki.scep4j.util.ScepUtil;
 
 /**
@@ -47,7 +47,7 @@ public final class EnrolmentResponse
             final PkiMessage pkcsRep)
     throws ScepClientException
     {
-        ParamChecker.assertNotNull("pkcsRep", pkcsRep);
+        ParamUtil.assertNotNull("pkcsRep", pkcsRep);
         MessageType messageType = pkcsRep.getMessageType();
         if(MessageType.CertRep != messageType)
         {

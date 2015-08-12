@@ -15,7 +15,7 @@
  *
  */
 
-package org.xipki.password.api.util;
+package org.xipki.common.util;
 
 import java.io.UnsupportedEncodingException;
 

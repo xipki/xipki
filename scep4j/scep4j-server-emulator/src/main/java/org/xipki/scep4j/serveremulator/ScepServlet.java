@@ -52,7 +52,7 @@ import org.xipki.scep4j.message.CACaps;
 import org.xipki.scep4j.message.NextCAMessage;
 import org.xipki.scep4j.transaction.CACapability;
 import org.xipki.scep4j.transaction.Operation;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 import org.xipki.scep4j.util.ScepConstants;
 import org.xipki.scep4j.util.ScepUtil;
 
@@ -76,7 +76,7 @@ public class ScepServlet extends HttpServlet
     public ScepServlet(
             final ScepResponder responder)
     {
-        ParamChecker.assertNotNull("responder", responder);
+        ParamUtil.assertNotNull("responder", responder);
         this.responder = responder;
     }
 

@@ -21,11 +21,11 @@ import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
+import org.xipki.common.util.Base64;
+import org.xipki.common.util.StringUtil;
 import org.xipki.password.api.PasswordCallback;
 import org.xipki.password.api.PasswordResolverException;
 import org.xipki.password.api.SinglePasswordResolver;
-import org.xipki.password.api.util.Base64;
-import org.xipki.password.api.util.StringUtil;
 
 /**
  * @author Lijun Liao

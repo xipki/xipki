@@ -15,7 +15,7 @@
  *
  */
 
-package org.xipki.datasource.impl;
+package org.xipki.common.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +29,7 @@ import java.util.StringTokenizer;
  * @author Lijun Liao
  */
 
-class StringUtil
+public class StringUtil
 {
     public static List<String> split(
             final String str,

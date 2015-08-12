@@ -63,7 +63,7 @@ import org.xipki.scep4j.transaction.MessageType;
 import org.xipki.scep4j.transaction.Nonce;
 import org.xipki.scep4j.transaction.PkiStatus;
 import org.xipki.scep4j.transaction.TransactionId;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 import org.xipki.scep4j.util.ScepUtil;
 
 /**
@@ -104,8 +104,8 @@ public class PkiMessage
             final TransactionId transactionId,
             final MessageType messageType)
     {
-        ParamChecker.assertNotNull("transactionId", transactionId);
-        ParamChecker.assertNotNull("messageType", messageType);
+        ParamUtil.assertNotNull("transactionId", transactionId);
+        ParamUtil.assertNotNull("messageType", messageType);
 
         this.transactionId = transactionId;
         this.messageType = messageType;
@@ -117,9 +117,9 @@ public class PkiMessage
             final MessageType messageType,
             final Nonce senderNonce)
     {
-        ParamChecker.assertNotNull("transactionId", transactionId);
-        ParamChecker.assertNotNull("messageType", messageType);
-        ParamChecker.assertNotNull("senderNonce", senderNonce);
+        ParamUtil.assertNotNull("transactionId", transactionId);
+        ParamUtil.assertNotNull("messageType", messageType);
+        ParamUtil.assertNotNull("senderNonce", senderNonce);
 
         this.transactionId = transactionId;
         this.messageType = messageType;

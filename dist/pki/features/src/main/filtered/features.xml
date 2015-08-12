@@ -28,6 +28,7 @@
   </feature>
   <feature name="xipki-password" version="${proejct.version}" resolver="(obr)">
     <bundle>mvn:org.xipki.pki/password-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/util/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/password-impl/${project.version}</bundle>
   </feature>
   <feature name="xipki-datasource" version="${project.version}" resolver="(obr)">
@@ -50,6 +51,7 @@
     <feature>xipki-signers</feature>
   </feature>
   <feature name="xipki-ca-api" version="${project.version}" resolver="(obr)">
+    <bundle>mvn:org.xipki.pki/util/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/common/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-common/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/audit/${project.version}</bundle>

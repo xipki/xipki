@@ -59,7 +59,7 @@ import org.xipki.scep4j.transaction.CACapability;
 import org.xipki.scep4j.transaction.MessageType;
 import org.xipki.scep4j.transaction.Operation;
 import org.xipki.scep4j.transaction.TransactionId;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 import org.xipki.scep4j.util.ScepConstants;
 import org.xipki.scep4j.util.ScepUtil;
 
@@ -89,8 +89,8 @@ public abstract class Client
             final CACertValidator cACertValidator)
     throws MalformedURLException
     {
-        ParamChecker.assertNotNull("cAId", cAId);
-        ParamChecker.assertNotNull("cACertValidator", cACertValidator);
+        ParamUtil.assertNotNull("cAId", cAId);
+        ParamUtil.assertNotNull("cACertValidator", cACertValidator);
 
         this.cAId = cAId;
         this.cACertValidator = cACertValidator;
@@ -259,10 +259,10 @@ public abstract class Client
             final BigInteger serialNumber)
     throws ScepClientException
     {
-        ParamChecker.assertNotNull("identityKey", identityKey);
-        ParamChecker.assertNotNull("identityCert", identityCert);
-        ParamChecker.assertNotNull("issuer", issuer);
-        ParamChecker.assertNotNull("serialNumber", serialNumber);
+        ParamUtil.assertNotNull("identityKey", identityKey);
+        ParamUtil.assertNotNull("identityCert", identityCert);
+        ParamUtil.assertNotNull("issuer", issuer);
+        ParamUtil.assertNotNull("serialNumber", serialNumber);
 
         initIfNotInited();
 
@@ -291,10 +291,10 @@ public abstract class Client
             final BigInteger serialNumber)
     throws ScepClientException
     {
-        ParamChecker.assertNotNull("identityKey", identityKey);
-        ParamChecker.assertNotNull("identityCert", identityCert);
-        ParamChecker.assertNotNull("issuer", issuer);
-        ParamChecker.assertNotNull("serialNumber", serialNumber);
+        ParamUtil.assertNotNull("identityKey", identityKey);
+        ParamUtil.assertNotNull("identityCert", identityCert);
+        ParamUtil.assertNotNull("issuer", issuer);
+        ParamUtil.assertNotNull("serialNumber", serialNumber);
 
         initIfNotInited();
 
@@ -325,7 +325,7 @@ public abstract class Client
             final X500Name issuer)
     throws ScepClientException
     {
-        ParamChecker.assertNotNull("csr", csr);
+        ParamUtil.assertNotNull("csr", csr);
 
         TransactionId tid;
         try
@@ -347,10 +347,10 @@ public abstract class Client
             final X500Name subject)
     throws ScepClientException
     {
-        ParamChecker.assertNotNull("identityKey", identityKey);
-        ParamChecker.assertNotNull("identityCert", identityCert);
-        ParamChecker.assertNotNull("issuer", issuer);
-        ParamChecker.assertNotNull("transactionId", transactionId);
+        ParamUtil.assertNotNull("identityKey", identityKey);
+        ParamUtil.assertNotNull("identityCert", identityCert);
+        ParamUtil.assertNotNull("issuer", issuer);
+        ParamUtil.assertNotNull("transactionId", transactionId);
 
         initIfNotInited();
 
@@ -372,9 +372,9 @@ public abstract class Client
             final X509Certificate identityCert)
     throws ScepClientException
     {
-        ParamChecker.assertNotNull("csr", csr);
-        ParamChecker.assertNotNull("identityKey", identityKey);
-        ParamChecker.assertNotNull("identityCert", identityCert);
+        ParamUtil.assertNotNull("csr", csr);
+        ParamUtil.assertNotNull("identityKey", identityKey);
+        ParamUtil.assertNotNull("identityCert", identityCert);
 
         initIfNotInited();
 
@@ -412,9 +412,9 @@ public abstract class Client
             final X509Certificate identityCert)
     throws ScepClientException
     {
-        ParamChecker.assertNotNull("csr", csr);
-        ParamChecker.assertNotNull("identityKey", identityKey);
-        ParamChecker.assertNotNull("identityCert", identityCert);
+        ParamUtil.assertNotNull("csr", csr);
+        ParamUtil.assertNotNull("identityKey", identityKey);
+        ParamUtil.assertNotNull("identityCert", identityCert);
 
         initIfNotInited();
 

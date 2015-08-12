@@ -17,7 +17,7 @@
 
 package org.xipki.scep4j.serveremulator;
 
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -39,7 +39,7 @@ public class ScepControl
             final boolean useInsecureAlg,
             final String secret)
     {
-        ParamChecker.assertNotBlank("secret", secret);
+        ParamUtil.assertNotBlank("secret", secret);
         this.sendCACert = sendCACert;
         this.pendingCert = pendingCert;
         this.sendSignerCert = sendSignerCert;
