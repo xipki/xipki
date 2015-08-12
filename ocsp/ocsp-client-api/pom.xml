@@ -6,7 +6,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>ocsp-group</artifactId>
-    <groupId>org.xipki</groupId>
+    <groupId>org.xipki.pki</groupId>
     <version>2.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>ocsp-client-api</artifactId>
@@ -14,7 +14,7 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki</groupId>
+      <groupId>org.xipki.pki</groupId>
       <artifactId>common</artifactId>
       <version>${project.version}</version>
     </dependency>
