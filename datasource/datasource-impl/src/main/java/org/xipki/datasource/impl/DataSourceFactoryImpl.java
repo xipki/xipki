@@ -36,6 +36,7 @@ import org.xipki.password.api.PasswordResolverException;
 
 public class DataSourceFactoryImpl implements DataSourceFactory
 {
+    @Override
     public DataSourceWrapper createDataSourceForFile(
             final String name,
             final String confFile,
@@ -48,6 +49,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
         return createDataSource(name, fIn, passwordResolver);
     }
 
+    @Override
     public DataSourceWrapper createDataSource(
             final String name,
             final InputStream conf,
@@ -73,6 +75,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
         return createDataSource(name, config, passwordResolver);
     }
 
+    @Override
     public DataSourceWrapper createDataSource(
             final String name,
             final Properties conf,

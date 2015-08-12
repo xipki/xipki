@@ -30,7 +30,7 @@ public class AuditChildEvent
     /**
      * The data array belonging to the event.
      */
-    private final List<AuditEventData> eventDatas = new LinkedList<AuditEventData>();
+    private final List<AuditEventData> eventDatas = new LinkedList<>();
 
     /**
      * The AuditLevel this Event belongs to.

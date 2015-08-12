@@ -47,7 +47,7 @@ public class SQLErrorCodes
     public static SQLErrorCodes newInstance(
             final DatabaseType dbType)
     {
-        ParamChecker.assertNotNull("dbType", dbType);
+        ParamUtil.assertNotNull("dbType", dbType);
         switch(dbType)
         {
         case DB2:

@@ -538,7 +538,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final HikariDataSource service,
             final DatabaseType dbType)
     {
-        ParamChecker.assertNotNull("service", service);
+        ParamUtil.assertNotNull("service", service);
         this.name = name;
         this.service = service;
         this.sqlErrorCodes = SQLErrorCodes.newInstance(dbType);
@@ -550,8 +550,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final Properties props,
             final DatabaseType databaseType)
     {
-        ParamChecker.assertNotEmpty("props", props);
-        ParamChecker.assertNotNull("databaseType", databaseType);
+        ParamUtil.assertNotEmpty("props", props);
+        ParamUtil.assertNotNull("databaseType", databaseType);
 
         // The DB2 schema name is case-sensitive, and must be specified in uppercase characters
         String dataSourceClassName = props.getProperty("dataSourceClassName");
@@ -1189,7 +1189,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             String sql,
             final SQLException ex)
     {
-        ParamChecker.assertNotNull("ex", ex);
+        ParamUtil.assertNotNull("ex", ex);
         if(sql == null)
         {
             sql = "";

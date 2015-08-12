@@ -35,6 +35,7 @@ public class AuditLoggingServiceRegisterImpl implements AuditLoggingServiceRegis
 
     private boolean auditEnabled;
 
+    @Override
     public AuditLoggingService getAuditLoggingService()
     {
         if(auditEnabled)
@@ -94,6 +95,7 @@ public class AuditLoggingServiceRegisterImpl implements AuditLoggingServiceRegis
         this.auditEnabled = auditEnabled;
     }
 
+    @Override
     public boolean isAuditEnabled()
     {
         return auditEnabled;
