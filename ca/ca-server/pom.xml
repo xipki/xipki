@@ -29,9 +29,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.scep4j</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>scep4j-common</artifactId>
-      <version>${scep4j.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>

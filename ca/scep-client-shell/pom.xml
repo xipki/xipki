@@ -14,9 +14,9 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.scep4j</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>scep4j-client</artifactId>
-      <version>${scep4j.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
