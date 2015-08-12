@@ -2,8 +2,8 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="xipki-remotep11-${project.version}" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
   <repository>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</repository>
   <feature name="xipki-security" version="${project.version}" resolver="(obr)">
-    <bundle>mvn:org.xipki.password/password-api/${password.version}</bundle>
-    <bundle>mvn:org.xipki.password/password-impl/${password.version}</bundle>
+    <bundle>mvn:org.xipki/password-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/password-impl/${project.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.xipki/common/${project.version}</bundle>
@@ -19,7 +19,7 @@
   <feature name="xipki-pkiconsole" version="${project.version}" resolver="(obr)">
     <feature>xipki-security</feature>
     <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki.audit/audit/${audit.version}</bundle>
+    <bundle>mvn:org.xipki/audit/${project.version}</bundle>
     <bundle>mvn:org.xipki/datasource-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.caucho/hessian/${hessian.version}/$Bundle-SymbolicName=hessian&Bundle-Version=${hessian.version}]]></bundle>

@@ -19,8 +19,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.datasource</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>datasource-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

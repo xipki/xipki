@@ -1,0 +1,2 @@
+1. server-emulator: use 2-levels CA
+2. server-emulator: add check of challengepassword

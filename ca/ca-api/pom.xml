@@ -24,12 +24,14 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.datasource</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>datasource-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.audit</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>audit</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
