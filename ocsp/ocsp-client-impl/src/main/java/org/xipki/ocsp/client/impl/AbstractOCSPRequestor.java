@@ -71,7 +71,6 @@ import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.ocsp.client.api.InvalidOCSPResponseException;
 import org.xipki.ocsp.client.api.OCSPNonceUnmatchedException;
 import org.xipki.ocsp.client.api.OCSPRequestor;
@@ -83,6 +82,7 @@ import org.xipki.ocsp.client.api.ResponderUnreachableException;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

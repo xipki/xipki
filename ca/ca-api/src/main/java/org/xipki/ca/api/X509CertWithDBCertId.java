@@ -43,7 +43,7 @@ import javax.security.auth.x500.X500Principal;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.util.Arrays;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.X509Util;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

@@ -46,12 +46,12 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
-import org.xipki.common.ConfigurationException;
-import org.xipki.common.security.KeyUsage;
-import org.xipki.common.util.X509Util;
+import org.xipki.common.InvalidConfException;
 import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.KeyUsage;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -70,7 +70,7 @@ class X509CrlSignerEntryWrapper
 
     public void setDbEntry(
             final X509CrlSignerEntry dbEntry)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         this.dbEntry = dbEntry;
         this.crlControl = new CRLControl(dbEntry.getCrlControl());
@@ -83,7 +83,7 @@ class X509CrlSignerEntryWrapper
 
     public void initSigner(
             final SecurityFactory securityFactory)
-    throws SignerException, OperationException, ConfigurationException
+    throws SignerException, OperationException, InvalidConfException
     {
         if(signer != null)
         {

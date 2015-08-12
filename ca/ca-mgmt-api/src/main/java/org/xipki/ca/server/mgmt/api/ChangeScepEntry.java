@@ -37,7 +37,7 @@ package org.xipki.ca.server.mgmt.api;
 
 import java.io.Serializable;
 
-import org.xipki.common.ConfigurationException;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.ParamUtil;
 
 /**
@@ -56,7 +56,7 @@ public class ChangeScepEntry implements Serializable
 
     public ChangeScepEntry(
             final String caName)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         ParamUtil.assertNotBlank("caName", caName);
         this.caName = caName.toUpperCase();

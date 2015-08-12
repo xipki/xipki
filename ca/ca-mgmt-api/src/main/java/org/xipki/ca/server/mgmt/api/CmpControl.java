@@ -41,12 +41,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.xipki.common.ConfigurationException;
-import org.xipki.common.security.CmpUtf8Pairs;
-import org.xipki.common.util.AlgorithmUtil;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.security.api.CmpUtf8Pairs;
+import org.xipki.security.api.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao
@@ -83,7 +83,7 @@ public class CmpControl
 
     public CmpControl(
             final CmpControlEntry dbEntry)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         ParamUtil.assertNotNull("dbEntry", dbEntry);
 
@@ -122,7 +122,7 @@ public class CmpControl
             final Integer messageTimeBias,
             final Integer confirmWaitTime,
             final Set<String> sigAlgos)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         ParamUtil.assertNotBlank("name", name);
         CmpUtf8Pairs pairs = new CmpUtf8Pairs();
@@ -160,7 +160,7 @@ public class CmpControl
 
     private static Set<String> canonicalizeAlgos(
             final Set<String> algos)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         Set<String> ret = new HashSet<String>();
         for(String m : algos)
@@ -170,7 +170,7 @@ public class CmpControl
                 ret.add(AlgorithmUtil.canonicalizeSignatureAlgo(m));
             } catch (NoSuchAlgorithmException e)
             {
-                throw new ConfigurationException(e.getMessage(), e);
+                throw new InvalidConfException(e.getMessage(), e);
             }
         }
         return Collections.unmodifiableSet(ret);

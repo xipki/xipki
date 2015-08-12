@@ -65,11 +65,8 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.security.HashAlgoType;
-import org.xipki.common.security.HashCalculator;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
@@ -92,6 +89,9 @@ import org.xipki.dbi.ca.jaxb.NameIdType;
 import org.xipki.dbi.ca.jaxb.ToPublishType;
 import org.xipki.dbi.ca.jaxb.UserType;
 import org.xipki.dbi.ca.jaxb.UsersType;
+import org.xipki.security.api.HashAlgoType;
+import org.xipki.security.api.HashCalculator;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

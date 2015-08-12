@@ -37,10 +37,10 @@ package org.xipki.ca.server.mgmt.api;
 
 import java.io.Serializable;
 
-import org.xipki.common.ConfigurationException;
-import org.xipki.common.security.CmpUtf8Pairs;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.security.api.CmpUtf8Pairs;
 
 /**
  *
@@ -68,7 +68,7 @@ public class ScepControl implements Serializable
 
     public ScepControl(
             final String conf)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         if(StringUtil.isBlank(conf))
         {
@@ -81,7 +81,7 @@ public class ScepControl implements Serializable
             props = new CmpUtf8Pairs(conf);
         }catch(RuntimeException e)
         {
-            throw new ConfigurationException(e.getClass().getName() + ": " + e.getMessage(), e);
+            throw new InvalidConfException(e.getClass().getName() + ": " + e.getMessage(), e);
         }
 
         this.includeCACert = getBoolean(props, KEY_caCertIncluded, true);
@@ -92,7 +92,7 @@ public class ScepControl implements Serializable
             final CmpUtf8Pairs props,
             final String propKey,
             final boolean dfltValue)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         String s = props.getValue(propKey);
         if(s != null)
@@ -108,7 +108,7 @@ public class ScepControl implements Serializable
             }
             else
             {
-                throw new ConfigurationException(propKey + " does not have boolean value: " + s);
+                throw new InvalidConfException(propKey + " does not have boolean value: " + s);
             }
         }
         return dfltValue;

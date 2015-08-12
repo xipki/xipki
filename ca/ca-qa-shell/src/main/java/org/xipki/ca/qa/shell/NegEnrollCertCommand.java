@@ -52,10 +52,10 @@ import org.xipki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.ca.client.shell.ClientCommand;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.SignatureAlgoControl;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.SignatureAlgoControl;
 import org.xipki.security.api.SignerException;
 
 /**

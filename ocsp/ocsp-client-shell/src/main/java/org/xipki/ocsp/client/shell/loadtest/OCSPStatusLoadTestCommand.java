@@ -44,10 +44,10 @@ import java.util.List;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.common.qa.AbstractLoadTest;
-import org.xipki.common.util.X509Util;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.shell.AbstractOCSPStatusCommand;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

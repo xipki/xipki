@@ -45,8 +45,8 @@ import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.CertArt;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
-import org.xipki.common.security.CertRevocationInfo;
 import org.xipki.common.util.IoUtil;
+import org.xipki.security.api.CertRevocationInfo;
 
 /**
  * @author Lijun Liao

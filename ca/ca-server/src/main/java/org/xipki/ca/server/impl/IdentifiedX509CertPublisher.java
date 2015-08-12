@@ -46,11 +46,11 @@ import org.xipki.ca.api.publisher.X509CertPublisher;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.server.impl.publisher.OCSPCertPublisher;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
-import org.xipki.common.security.CertRevocationInfo;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.password.api.PasswordResolver;
+import org.xipki.security.api.CertRevocationInfo;
 
 /**
  * @author Lijun Liao

@@ -49,11 +49,11 @@ import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.util.SecurityUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.security.api.ObjectIdentifiers;
+import org.xipki.security.api.util.SecurityUtil;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

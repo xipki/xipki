@@ -82,19 +82,19 @@ import org.xipki.ca.server.impl.CertStatus;
 import org.xipki.ca.server.impl.KnowCertResult;
 import org.xipki.ca.server.impl.SubjectKeyProfileBundle;
 import org.xipki.ca.server.mgmt.api.CertArt;
-import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.security.CRLReason;
-import org.xipki.common.security.CertRevocationInfo;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.PasswordHash;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.datasource.api.exception.DataIntegrityViolationException;
 import org.xipki.datasource.api.exception.DuplicateKeyException;
+import org.xipki.security.api.CRLReason;
+import org.xipki.security.api.CertRevocationInfo;
+import org.xipki.security.api.ObjectIdentifiers;
+import org.xipki.security.api.util.PasswordHash;
+import org.xipki.security.api.util.SecurityUtil;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

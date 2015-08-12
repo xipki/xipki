@@ -46,8 +46,8 @@ import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

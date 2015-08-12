@@ -117,18 +117,18 @@ import org.xipki.ca.client.impl.jaxb.FileOrValueType;
 import org.xipki.ca.client.impl.jaxb.ObjectFactory;
 import org.xipki.ca.client.impl.jaxb.RequestorType;
 import org.xipki.ca.client.impl.jaxb.ResponderType;
-import org.xipki.common.ConfigurationException;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.util.X509Util;
 import org.xml.sax.SAXException;
 
 /**
@@ -258,7 +258,7 @@ public final class CAClientImpl implements CAClient
     }
 
     public void init()
-    throws ConfigurationException, IOException
+    throws InvalidConfException, IOException
     {
         ParamUtil.assertNotNull("confFile", confFile);
         ParamUtil.assertNotNull("securityFactory", securityFactory);
@@ -312,7 +312,7 @@ public final class CAClientImpl implements CAClient
                 }
                 LOG.debug(message, e);
 
-                throw new ConfigurationException(e.getMessage(), e);
+                throw new InvalidConfException(e.getMessage(), e);
             }
             responders.put(m.getName(), cert);
         }
@@ -336,7 +336,7 @@ public final class CAClientImpl implements CAClient
                 X509Certificate responder = responders.get(caType.getResponder());
                 if(responder == null)
                 {
-                    throw new ConfigurationException("no responder named " + caType.getResponder() + " is configured");
+                    throw new InvalidConfException("no responder named " + caType.getResponder() + " is configured");
                 }
                 CAConf ca = new CAConf(caName, caType.getUrl(), caType.getHealthUrl(), caType.getRequestor(), responder);
 
@@ -393,7 +393,7 @@ public final class CAClientImpl implements CAClient
 
                 if(devMode == false)
                 {
-                    throw new ConfigurationException(e.getMessage(), e);
+                    throw new InvalidConfException(e.getMessage(), e);
                 }
             }
         }
@@ -417,7 +417,7 @@ public final class CAClientImpl implements CAClient
                     requestorCerts.put(name, requestorCert);
                 } catch (Exception e)
                 {
-                    throw new ConfigurationException(e.getMessage(), e);
+                    throw new InvalidConfException(e.getMessage(), e);
                 }
             }
 
@@ -431,16 +431,16 @@ public final class CAClientImpl implements CAClient
                     requestorSigners.put(name, requestorSigner);
                 } catch (SignerException e)
                 {
-                    throw new ConfigurationException(e.getMessage(), e);
+                    throw new InvalidConfException(e.getMessage(), e);
                 }
             } else
             {
                 if(requestorConf.isSignRequest())
                 {
-                    throw new ConfigurationException("signer of requestor must be configured");
+                    throw new InvalidConfException("signer of requestor must be configured");
                 } else if(requestorCert == null)
                 {
-                    throw new ConfigurationException("at least one of certificate and signer of requestor must be configured");
+                    throw new InvalidConfException("at least one of certificate and signer of requestor must be configured");
                 }
             }
         }
@@ -450,7 +450,7 @@ public final class CAClientImpl implements CAClient
         {
             if(this.casMap.containsKey(ca.getName()))
             {
-                throw new ConfigurationException("duplicate CAs with the same name " + ca.getName());
+                throw new InvalidConfException("duplicate CAs with the same name " + ca.getName());
             }
 
             if(ca.isCertAutoconf() || ca.isCertprofilesAutoconf())
@@ -474,7 +474,7 @@ public final class CAClientImpl implements CAClient
             }
             else
             {
-                throw new ConfigurationException("could not find requestor named " + requestorName +
+                throw new InvalidConfException("could not find requestor named " + requestorName +
                         " for CA " + ca.getName());
             }
 
@@ -513,7 +513,7 @@ public final class CAClientImpl implements CAClient
                     LOG.warn(msg);
                 } else
                 {
-                    throw new ConfigurationException(msg);
+                    throw new InvalidConfException(msg);
                 }
             }
 
@@ -1393,7 +1393,7 @@ public final class CAClientImpl implements CAClient
 
     private static CAClientType parse(
             final InputStream configStream)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         synchronized (jaxbUnmarshallerLock)
         {
@@ -1415,10 +1415,10 @@ public final class CAClientImpl implements CAClient
             }
             catch(SAXException e)
             {
-                throw new ConfigurationException("parse profile failed, message: " + e.getMessage(), e);
+                throw new InvalidConfException("parse profile failed, message: " + e.getMessage(), e);
             } catch(JAXBException e)
             {
-                throw new ConfigurationException("parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e), e);
+                throw new InvalidConfException("parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e), e);
             }
 
             if(root instanceof JAXBElement)
@@ -1427,7 +1427,7 @@ public final class CAClientImpl implements CAClient
             }
             else
             {
-                throw new ConfigurationException("invalid root element type");
+                throw new InvalidConfException("invalid root element type");
             }
         }
     }

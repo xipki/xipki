@@ -38,8 +38,8 @@ package org.xipki.ca.server.impl;
 import java.math.BigInteger;
 import java.util.Date;
 
-import org.xipki.common.security.CRLReason;
-import org.xipki.common.security.CertRevocationInfo;
+import org.xipki.security.api.CRLReason;
+import org.xipki.security.api.CertRevocationInfo;
 
 /**
  * @author Lijun Liao

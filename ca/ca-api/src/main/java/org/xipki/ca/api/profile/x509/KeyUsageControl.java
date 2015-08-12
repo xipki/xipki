@@ -35,8 +35,8 @@
 
 package org.xipki.ca.api.profile.x509;
 
-import org.xipki.common.security.KeyUsage;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.security.api.KeyUsage;
 
 /**
  * @author Lijun Liao

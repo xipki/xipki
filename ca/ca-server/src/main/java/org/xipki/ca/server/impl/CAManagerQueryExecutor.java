@@ -91,17 +91,17 @@ import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.X509ChangeCAEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
-import org.xipki.common.ConfigurationException;
-import org.xipki.common.security.CertRevocationInfo;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.PasswordHash;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.security.api.CertRevocationInfo;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.util.PasswordHash;
+import org.xipki.security.api.util.SecurityUtil;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -508,7 +508,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }catch(ConfigurationException e)
+        }catch(InvalidConfException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
         }finally
@@ -1185,7 +1185,7 @@ class CAManagerQueryExecutor
             try
             {
                 new CRLControl(crlControl);
-            } catch (ConfigurationException e)
+            } catch (InvalidConfException e)
             {
                 throw new CAMgmtException("invalid CRL control '" + crlControl + "'");
             }
@@ -1710,7 +1710,7 @@ class CAManagerQueryExecutor
         try
         {
             cmpControl = new CmpControl(newDbEntry);
-        } catch (ConfigurationException e)
+        } catch (InvalidConfException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
         }
@@ -1950,7 +1950,7 @@ class CAManagerQueryExecutor
                 try
                 {
                     new CRLControl(crlControl);
-                } catch (ConfigurationException e)
+                } catch (InvalidConfException e)
                 {
                     throw new CAMgmtException("invalid CRL control '" + crlControl + "'");
                 }
@@ -1960,7 +1960,7 @@ class CAManagerQueryExecutor
         try
         {
             dbEntry = new X509CrlSignerEntry(name, signerType, signerConf, base64Cert, crlControl);
-        } catch (ConfigurationException e)
+        } catch (InvalidConfException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
         }
@@ -2088,7 +2088,7 @@ class CAManagerQueryExecutor
         try
         {
             newDbEntry = new ScepEntry(caName, responderType, responderConf, responderBase64Cert, control);
-        } catch (ConfigurationException e)
+        } catch (InvalidConfException e)
         {
             throw new CAMgmtException(e);
         }
@@ -2834,7 +2834,7 @@ class CAManagerQueryExecutor
         }catch(SQLException e)
         {
             throw new CAMgmtException(dataSource.translate(sql, e));
-        } catch (ConfigurationException e)
+        } catch (InvalidConfException e)
         {
             throw new CAMgmtException(e);
         } finally

@@ -42,9 +42,9 @@ import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.ca.api.CertPublisherException;
 import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.X509CertWithDBCertId;
-import org.xipki.common.security.CertRevocationInfo;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.password.api.PasswordResolver;
+import org.xipki.security.api.CertRevocationInfo;
 
 /**
  * @author Lijun Liao

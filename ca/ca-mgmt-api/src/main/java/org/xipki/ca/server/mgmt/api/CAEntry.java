@@ -41,7 +41,7 @@ import java.util.Set;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.SecurityUtil;
+import org.xipki.security.api.util.SecurityUtil;
 
 /**
  * @author Lijun Liao

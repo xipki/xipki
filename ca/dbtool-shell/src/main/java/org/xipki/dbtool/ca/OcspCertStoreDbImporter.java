@@ -54,11 +54,8 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.security.HashAlgoType;
-import org.xipki.common.security.HashCalculator;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
@@ -68,6 +65,9 @@ import org.xipki.dbi.ocsp.jaxb.CertStoreType.Issuers;
 import org.xipki.dbi.ocsp.jaxb.CertType;
 import org.xipki.dbi.ocsp.jaxb.CertsType;
 import org.xipki.dbi.ocsp.jaxb.IssuerType;
+import org.xipki.security.api.HashAlgoType;
+import org.xipki.security.api.HashCalculator;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

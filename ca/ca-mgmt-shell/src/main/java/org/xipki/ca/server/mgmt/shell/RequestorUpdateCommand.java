@@ -41,7 +41,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.X509Util;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

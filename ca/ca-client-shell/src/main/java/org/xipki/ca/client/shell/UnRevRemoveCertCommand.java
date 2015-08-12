@@ -46,7 +46,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.util.X509Util;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

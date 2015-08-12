@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common.util;
+package org.xipki.security.api.util;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -56,7 +56,9 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.xipki.common.SignatureAlgoControl;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.security.api.SignatureAlgoControl;
 
 /**
  * @author Lijun Liao

@@ -38,11 +38,11 @@ package org.xipki.ocsp.server.impl.certstore;
 import java.util.Date;
 import java.util.Map;
 
-import org.xipki.common.security.CertRevocationInfo;
-import org.xipki.common.security.HashAlgoType;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.ocsp.api.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo;
+import org.xipki.security.api.CertRevocationInfo;
+import org.xipki.security.api.HashAlgoType;
 
 /**
  * @author Lijun Liao

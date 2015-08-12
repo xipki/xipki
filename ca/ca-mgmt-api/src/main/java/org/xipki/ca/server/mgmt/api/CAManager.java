@@ -42,8 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.xipki.common.security.CRLReason;
-import org.xipki.common.security.CertRevocationInfo;
+import org.xipki.security.api.CRLReason;
+import org.xipki.security.api.CertRevocationInfo;
 
 /**
  * @author Lijun Liao

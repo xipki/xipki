@@ -77,14 +77,14 @@ import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.x509.SubjectInfo;
-import org.xipki.common.ConfigurationException;
-import org.xipki.common.security.CmpUtf8Pairs;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.X509Util;
+import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -129,11 +129,11 @@ class X509SelfSignedCertBuilder
             final List<String> ocspUris,
             final List<String> crlUris,
             final List<String> deltaCrlUris)
-    throws OperationException, ConfigurationException
+    throws OperationException, InvalidConfException
     {
         if(securityFactory.verifyPOPO(p10Request) == false)
         {
-            throw new ConfigurationException("could not validate POP for the pkcs#10 requst");
+            throw new InvalidConfException("could not validate POP for the pkcs#10 requst");
         }
 
         if("pkcs12".equalsIgnoreCase(signerType) || "jks".equalsIgnoreCase(signerType))
@@ -142,7 +142,7 @@ class X509SelfSignedCertBuilder
             String keystoreConf = keyValues.getValue("keystore");
             if(keystoreConf == null)
             {
-                throw new ConfigurationException("required parameter 'keystore', for types PKCS12 and JKS, is not specified");
+                throw new InvalidConfException("required parameter 'keystore', for types PKCS12 and JKS, is not specified");
             }
         }
 

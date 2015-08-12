@@ -53,13 +53,13 @@ import org.xipki.ca.api.EnvParameterResolver;
 import org.xipki.ca.api.X509CertWithDBCertId;
 import org.xipki.ca.api.publisher.X509CertPublisher;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
-import org.xipki.common.security.CertRevocationInfo;
-import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.password.api.PasswordResolver;
+import org.xipki.security.api.CertRevocationInfo;
+import org.xipki.security.api.CmpUtf8Pairs;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

@@ -39,9 +39,9 @@ import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.SignatureAlgoControl;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.SignatureAlgoControl;
 import org.xipki.security.api.SignerException;
 
 /**

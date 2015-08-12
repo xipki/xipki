@@ -113,25 +113,25 @@ import org.xipki.ca.server.mgmt.api.UserEntry;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
-import org.xipki.common.ConfigurationException;
-import org.xipki.common.security.CRLReason;
-import org.xipki.common.security.CertRevocationInfo;
-import org.xipki.common.security.CmpUtf8Pairs;
-import org.xipki.common.util.AlgorithmUtil;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.password.api.PasswordResolverException;
+import org.xipki.security.api.CRLReason;
+import org.xipki.security.api.CertRevocationInfo;
+import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.util.AlgorithmUtil;
+import org.xipki.security.api.util.SecurityUtil;
 
 /**
  * @author Lijun Liao
@@ -327,7 +327,7 @@ implements CAManager, CmpResponderManager, ScepManager
     private CAManagerQueryExecutor queryExecutor;
 
     public CAManagerImpl()
-    throws ConfigurationException
+    throws InvalidConfException
     {
         if(Security.getProvider("BC") == null)
         {
@@ -801,7 +801,7 @@ implements CAManager, CmpResponderManager, ScepManager
                 crlSignerEntry.getDbEntry().setConfFaulty(true);
                 crlSignerEntry.initSigner(securityFactory);
                 crlSignerEntry.getDbEntry().setConfFaulty(false);
-            } catch (SignerException | OperationException | ConfigurationException e)
+            } catch (SignerException | OperationException | InvalidConfException e)
             {
                 final String message = "X09CrlSignerEntryWrapper.initSigner (name=" + crlSignerName + ")";
                 if(LOG.isErrorEnabled())
@@ -1227,7 +1227,7 @@ implements CAManager, CmpResponderManager, ScepManager
                     cmpControl = new CmpControl(cmpControlDb);
                     cmpControlDb.setFaulty(false);
                     cmpControls.put(name, cmpControl);
-                }catch(ConfigurationException e)
+                }catch(InvalidConfException e)
                 {
                     final String message = "could not initialize CMP control " + name + ", ignore it";
                     if(LOG.isErrorEnabled())
@@ -2207,7 +2207,7 @@ implements CAManager, CmpResponderManager, ScepManager
         try
         {
             cmpControl = new CmpControl(dbEntry);
-        } catch (ConfigurationException e)
+        } catch (InvalidConfException e)
         {
             final String message = "exception while adding CMP requestor to certStore";
             if(LOG.isErrorEnabled())
@@ -2992,7 +2992,7 @@ implements CAManager, CmpResponderManager, ScepManager
                     signer_type, signer_conf,
                     certprofile, p10Request, serialOfThisCert,
                     cacert_uris, ocsp_uris, crl_uris, delta_crl_uris);
-        } catch (OperationException | ConfigurationException e)
+        } catch (OperationException | InvalidConfException e)
         {
             throw new CAMgmtException(e.getClass().getName() + ": " + e.getMessage(), e);
         }
@@ -3161,14 +3161,14 @@ implements CAManager, CmpResponderManager, ScepManager
         try
         {
             signer.setDbEntry(dbEntry);
-        } catch (ConfigurationException e)
+        } catch (InvalidConfException e)
         {
             throw new CAMgmtException("ConfigurationException: " + e.getMessage());
         }
         try
         {
             signer.initSigner(securityFactory);
-        } catch (SignerException | OperationException | ConfigurationException e)
+        } catch (SignerException | OperationException | InvalidConfException e)
         {
             final String message = "exception while creating CRL signer " + dbEntry.getName();
             if(LOG.isErrorEnabled())

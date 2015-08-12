@@ -45,8 +45,8 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.ca.api.profile.RDNControl;
-import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.util.StringUtil;
+import org.xipki.security.api.ObjectIdentifiers;
 
 /**
  * @author Lijun Liao

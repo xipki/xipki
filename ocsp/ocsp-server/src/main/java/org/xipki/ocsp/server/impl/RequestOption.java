@@ -50,17 +50,17 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.common.ConfigurationException;
-import org.xipki.common.security.CertpathValidationModel;
-import org.xipki.common.security.HashAlgoType;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.ocsp.server.impl.jaxb.CertCollectionType;
 import org.xipki.ocsp.server.impl.jaxb.CertCollectionType.Keystore;
 import org.xipki.ocsp.server.impl.jaxb.NonceType;
 import org.xipki.ocsp.server.impl.jaxb.RequestOptionType;
 import org.xipki.ocsp.server.impl.jaxb.RequestOptionType.CertpathValidation;
 import org.xipki.ocsp.server.impl.jaxb.RequestOptionType.HashAlgorithms;
+import org.xipki.security.api.CertpathValidationModel;
+import org.xipki.security.api.HashAlgoType;
+import org.xipki.security.api.util.X509Util;
 import org.xipki.ocsp.server.impl.jaxb.VersionsType;
 
 /**
@@ -96,7 +96,7 @@ class RequestOption
 
     public RequestOption(
             final RequestOptionType conf)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         NonceType nonceConf = conf.getNonce();
 
@@ -168,7 +168,7 @@ class RequestOption
                 }
                 else
                 {
-                    throw new ConfigurationException("hash algorithm " + token + " is unsupported");
+                    throw new InvalidConfException("hash algorithm " + token + " is unsupported");
                 }
             }
         }
@@ -183,7 +183,7 @@ class RequestOption
         {
             if(validateSignature)
             {
-                throw new ConfigurationException("certpathValidation is not specified");
+                throw new InvalidConfException("certpathValidation is not specified");
             }
             trustAnchors = null;
             certs = null;
@@ -214,7 +214,7 @@ class RequestOption
                 }
             }catch(Exception e)
             {
-                throw new ConfigurationException("error while initializing the trustAnchors: " + e.getMessage(), e);
+                throw new InvalidConfException("error while initializing the trustAnchors: " + e.getMessage(), e);
             }
 
             CertCollectionType certsType = certpathConf.getCerts();
@@ -229,7 +229,7 @@ class RequestOption
                     this.certs = getCerts(certsType);
                 }catch(Exception e)
                 {
-                    throw new ConfigurationException("error while initializing the certs: " + e.getMessage(), e);
+                    throw new InvalidConfException("error while initializing the certs: " + e.getMessage(), e);
                 }
             }
         }

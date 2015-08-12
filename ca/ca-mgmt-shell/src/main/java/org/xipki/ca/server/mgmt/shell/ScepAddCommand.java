@@ -38,7 +38,7 @@ package org.xipki.ca.server.mgmt.shell;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.ScepEntry;
-import org.xipki.common.ConfigurationException;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.IoUtil;
 import org.xipki.password.api.PasswordResolver;
 
@@ -102,7 +102,7 @@ public class ScepAddCommand extends CaCommand
         ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert, scepControl);
         if(entry.isFaulty())
         {
-            throw new ConfigurationException("certificate is invalid");
+            throw new InvalidConfException("certificate is invalid");
         }
 
         boolean b = caManager.addScep(entry);

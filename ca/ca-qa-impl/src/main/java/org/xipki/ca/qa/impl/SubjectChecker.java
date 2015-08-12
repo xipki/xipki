@@ -68,11 +68,11 @@ import org.xipki.ca.certprofile.XmlX509CertprofileUtil;
 import org.xipki.ca.certprofile.x509.jaxb.RdnType;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
-import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.X509Util;
+import org.xipki.security.api.ObjectIdentifiers;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
