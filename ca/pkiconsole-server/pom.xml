@@ -6,7 +6,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>ca-group</artifactId>
-    <groupId>org.xipki</groupId>
+    <groupId>org.xipki.pki</groupId>
     <version>2.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>pkiconsole-server</artifactId>
@@ -14,12 +14,12 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki</groupId>
+      <groupId>org.xipki.pki</groupId>
       <artifactId>pkiconsole-common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki</groupId>
+      <groupId>org.xipki.pki</groupId>
       <artifactId>security-api</artifactId>
       <version>${project.version}</version>
     </dependency>
