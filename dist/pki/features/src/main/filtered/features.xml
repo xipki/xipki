@@ -148,7 +148,7 @@
   <feature name="xipki-database-tool" version="${project.version}" resolver="(obr)">
     <feature>xipki-datasource</feature>
     <bundle>mvn:org.xipki.pki/shell-base/${project.version}</bundle>
-    <bundle><![CDATA[wrap:mvn:junit/junit/${junit.version}/$Bundle-SymbolicName=junit&Bundle-Version=${junit.version}]]></bundle>
+    <bundle>mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
     <bundle>mvn:org.liquibase/liquibase-osgi/${liquibase.version}</bundle>
     <bundle>mvn:org.xipki.pki/database-tool/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/dbtool-shell/${project.version}</bundle>
