@@ -33,39 +33,20 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common;
+package org.xipki.security.api;
 
 /**
  * @author Lijun Liao
  */
 
-public class SignatureAlgoControl
+@SuppressWarnings("serial")
+public class InvalidOIDorNameException extends Exception
 {
-    private final boolean rsaMgf1;
-    private final boolean dsaPlain;
 
-    public SignatureAlgoControl()
+    public InvalidOIDorNameException(
+            final String declaredOidOrName)
     {
-        this.rsaMgf1 = false;
-        this.dsaPlain = false;
-    }
-
-    public SignatureAlgoControl(
-            final boolean rsaMgf1,
-            final boolean dsaPlain)
-    {
-        this.rsaMgf1 = rsaMgf1;
-        this.dsaPlain = dsaPlain;
-    }
-
-    public boolean isRsaMgf1()
-    {
-        return rsaMgf1;
-    }
-
-    public boolean isDsaPlain()
-    {
-        return dsaPlain;
+        super("invalid ObjectIdentifer or name '" + declaredOidOrName + "'");
     }
 
 }

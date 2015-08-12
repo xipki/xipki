@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common.util;
+package org.xipki.security.api.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -56,11 +56,12 @@ import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
-import org.xipki.common.InvalidOIDorNameException;
-import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.security.CmpUtf8Pairs;
-import org.xipki.common.security.HashAlgoType;
-import org.xipki.common.security.HashCalculator;
+import org.xipki.common.util.StringUtil;
+import org.xipki.security.api.CmpUtf8Pairs;
+import org.xipki.security.api.HashAlgoType;
+import org.xipki.security.api.HashCalculator;
+import org.xipki.security.api.InvalidOIDorNameException;
+import org.xipki.security.api.ObjectIdentifiers;
 
 /**
  * @author Lijun Liao

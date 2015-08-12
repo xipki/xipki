@@ -55,15 +55,15 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
-import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.security.DefaultConcurrentContentSigner;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.util.AlgorithmUtil;
+import org.xipki.security.api.util.X509Util;
 import org.xipki.security.provider.P11PrivateKey;
 
 /**

@@ -33,38 +33,39 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common;
+package org.xipki.security.api;
 
 /**
  * @author Lijun Liao
  */
 
-public class ConfigurationException extends Exception
+public class SignatureAlgoControl
 {
+    private final boolean rsaMgf1;
+    private final boolean dsaPlain;
 
-    private static final long serialVersionUID = 1L;
-
-    public ConfigurationException()
+    public SignatureAlgoControl()
     {
+        this.rsaMgf1 = false;
+        this.dsaPlain = false;
     }
 
-    public ConfigurationException(
-            final String message)
+    public SignatureAlgoControl(
+            final boolean rsaMgf1,
+            final boolean dsaPlain)
     {
-        super(message);
+        this.rsaMgf1 = rsaMgf1;
+        this.dsaPlain = dsaPlain;
     }
 
-    public ConfigurationException(
-            final Throwable cause)
+    public boolean isRsaMgf1()
     {
-        super(cause);
+        return rsaMgf1;
     }
 
-    public ConfigurationException(
-            final String message,
-            final Throwable cause)
+    public boolean isDsaPlain()
     {
-        super(message, cause);
+        return dsaPlain;
     }
 
 }

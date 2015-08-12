@@ -39,9 +39,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.common.ObjectIdentifiers;
 import org.xipki.console.karaf.DynamicEnumCompleter;
 import org.xipki.console.karaf.ExtKeyusageCompleter;
+import org.xipki.security.api.ObjectIdentifiers;
 
 /**
  * @author Lijun Liao

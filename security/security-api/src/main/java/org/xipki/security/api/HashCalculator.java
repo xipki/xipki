@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common.security;
+package org.xipki.security.api;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

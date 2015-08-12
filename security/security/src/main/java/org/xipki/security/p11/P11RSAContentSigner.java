@@ -51,13 +51,13 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDefaultDigestProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.util.AlgorithmUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao

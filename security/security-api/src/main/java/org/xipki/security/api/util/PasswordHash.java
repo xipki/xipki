@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common.util;
+package org.xipki.security.api.util;
 
 /*
  * Original header text:
