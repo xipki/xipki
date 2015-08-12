@@ -257,7 +257,7 @@ public class PCIAuditEvent
 
     private static String getHostAddress()
     {
-        List<String> addresses = new LinkedList<String>();
+        List<String> addresses = new LinkedList<>();
 
         Enumeration<NetworkInterface> interfaces;
         try

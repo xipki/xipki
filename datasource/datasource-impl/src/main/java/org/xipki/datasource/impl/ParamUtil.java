@@ -24,7 +24,7 @@ import java.util.Map;
  * @author Lijun Liao
  */
 
-public class ParamChecker
+class ParamUtil
 {
 
     public static void assertNotNull(

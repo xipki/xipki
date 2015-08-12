@@ -94,6 +94,7 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
     {
     }
 
+    @Override
     public void logEvent(
             final AuditEvent event)
     {
@@ -174,6 +175,7 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
         }
     }
 
+    @Override
     public void logEvent(
             final PCIAuditEvent event)
     {

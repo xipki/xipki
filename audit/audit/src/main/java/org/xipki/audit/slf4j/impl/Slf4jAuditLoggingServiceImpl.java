@@ -41,6 +41,7 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
     {
     }
 
+    @Override
     public void logEvent(
             final AuditEvent event)
     {
@@ -120,6 +121,7 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
         return sb.toString();
     }
 
+    @Override
     public void logEvent(
             final PCIAuditEvent event)
     {
