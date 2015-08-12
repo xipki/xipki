@@ -14,12 +14,12 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.pki</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>pkiconsole-common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.pki</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>security-api</artifactId>
       <version>${project.version}</version>
     </dependency>
