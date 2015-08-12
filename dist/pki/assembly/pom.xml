@@ -130,8 +130,8 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>at.tugraz.iaik</groupId>
-                  <artifactId>iaikPkcs11Wrapper-native</artifactId>
-                  <version>${pkcs11Wrapper.version}</version>
+                  <artifactId>pkcs11-wrapper-native</artifactId>
+                  <version>${pkcs11-wrapper.version}</version>
                   <type>zip</type>
                   <outputDirectory>target/xipki/native-lib</outputDirectory>
                 </artifactItem>
