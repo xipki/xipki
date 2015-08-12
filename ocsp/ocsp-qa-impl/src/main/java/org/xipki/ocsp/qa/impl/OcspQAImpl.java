@@ -67,15 +67,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
-import org.xipki.common.security.CRLReason;
-import org.xipki.common.util.AlgorithmUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.ocsp.qa.api.Occurrence;
 import org.xipki.ocsp.qa.api.OcspCertStatus;
 import org.xipki.ocsp.qa.api.OcspError;
 import org.xipki.ocsp.qa.api.OcspQA;
 import org.xipki.ocsp.qa.api.OcspResponseOption;
 import org.xipki.security.KeyUtil;
+import org.xipki.security.api.CRLReason;
+import org.xipki.security.api.util.AlgorithmUtil;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

@@ -76,7 +76,7 @@ import org.xipki.ca.client.shell.loadtest.KeyEntry.DSAKeyEntry;
 import org.xipki.ca.client.shell.loadtest.KeyEntry.ECKeyEntry;
 import org.xipki.ca.client.shell.loadtest.KeyEntry.RSAKeyEntry;
 import org.xipki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
-import org.xipki.common.ConfigurationException;
+import org.xipki.common.InvalidConfException;
 import org.xipki.common.qa.AbstractLoadTest;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XMLUtil;
@@ -235,7 +235,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
             RandomDN randomDN = RandomDN.getInstance(randomDNStr);
             if(randomDN == null)
             {
-                throw new ConfigurationException("invalid randomDN " + randomDNStr);
+                throw new InvalidConfException("invalid randomDN " + randomDNStr);
             }
 
             LoadTestEntry loadtestEntry = new LoadTestEntry(entry.getCertprofile(),
@@ -288,7 +288,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
 
     private static EnrollTemplateType parse(
             final InputStream configStream)
-    throws ConfigurationException
+    throws InvalidConfException
     {
         synchronized (jaxbUnmarshallerLock)
         {
@@ -310,10 +310,10 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
             }
             catch(SAXException e)
             {
-                throw new ConfigurationException("parse profile failed, message: " + e.getMessage(), e);
+                throw new InvalidConfException("parse profile failed, message: " + e.getMessage(), e);
             } catch(JAXBException e)
             {
-                throw new ConfigurationException("parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e), e);
+                throw new InvalidConfException("parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e), e);
             }
 
             if(root instanceof JAXBElement)
@@ -322,7 +322,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
             }
             else
             {
-                throw new ConfigurationException("invalid root element type");
+                throw new InvalidConfException("invalid root element type");
             }
         }
     }

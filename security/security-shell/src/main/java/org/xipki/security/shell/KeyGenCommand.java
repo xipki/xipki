@@ -40,7 +40,7 @@ import java.util.List;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.xipki.common.ObjectIdentifiers;
+import org.xipki.security.api.ObjectIdentifiers;
 
 /**
  * @author Lijun Liao

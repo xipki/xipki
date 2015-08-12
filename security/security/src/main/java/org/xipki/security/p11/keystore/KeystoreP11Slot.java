@@ -63,15 +63,13 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.SecurityUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.password.api.PasswordResolverException;
 import org.xipki.security.P12KeypairGenerator;
 import org.xipki.security.P12KeypairGenerator.ECDSAIdentityGenerator;
+import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
@@ -80,6 +78,8 @@ import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
+import org.xipki.security.api.util.SecurityUtil;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

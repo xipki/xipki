@@ -76,13 +76,11 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ObjectIdentifiers;
-import org.xipki.common.XipkiCmpConstants;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.SecurityUtil;
-import org.xipki.common.util.X509Util;
 import org.xipki.security.api.BadASN1ObjectException;
+import org.xipki.security.api.ObjectIdentifiers;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.XipkiCmpConstants;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11ModuleConf;
@@ -91,6 +89,8 @@ import org.xipki.security.api.p11.remote.KeyIdentifier;
 import org.xipki.security.api.p11.remote.PSOTemplate;
 import org.xipki.security.api.p11.remote.SlotAndKeyIdentifer;
 import org.xipki.security.api.p11.remote.SlotIdentifier;
+import org.xipki.security.api.util.SecurityUtil;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

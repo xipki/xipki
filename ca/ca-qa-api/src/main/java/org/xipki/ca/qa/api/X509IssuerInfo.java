@@ -47,7 +47,7 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.Arrays;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.X509Util;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

@@ -59,12 +59,12 @@ import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.dto.RevokeCertRequestEntryType;
 import org.xipki.ca.client.api.dto.RevokeCertRequestType;
 import org.xipki.common.qa.AbstractLoadTest;
-import org.xipki.common.security.CRLReason;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.security.api.CRLReason;
+import org.xipki.security.api.util.SecurityUtil;
 
 /**
  * @author Lijun Liao

@@ -53,10 +53,10 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.SecurityUtil;
 import org.xipki.security.SignerUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.util.SecurityUtil;
 
 /**
  * @author Lijun Liao

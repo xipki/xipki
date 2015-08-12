@@ -38,7 +38,7 @@ package org.xipki.dbtool.ca.shell;
 import java.util.Map;
 
 import org.apache.karaf.shell.commands.Command;
-import org.xipki.dbtool.ca.LiquibaseDatabaseConf;
+import org.xipki.dbtool.LiquibaseDatabaseConf;
 
 /**
  * @author Lijun Liao

@@ -47,9 +47,9 @@ import javax.net.ssl.SSLSession;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.security.CmpUtf8Pairs;
 import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.X509Util;
+import org.xipki.security.api.CmpUtf8Pairs;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
