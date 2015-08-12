@@ -7,8 +7,8 @@
   <!-- Add the custom bundles for certprofiles here -->
   <feature name="xipki-certprofiles" version="${project.version}" resolver="(obr)">
     <feature>xipki-ca-api</feature>
-    <bundle>mvn:org.xipki/ca-certprofile/${project.version}</bundle>
-    <bundle>mvn:org.xipki/certprofile-demo/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-certprofile/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/certprofile-demo/${project.version}</bundle>
   </feature>
   <!-- Add the custom bundles for cert publishers here -->
   <feature name="xipki-publishers" version="${project.version}" resolver="(obr)">
@@ -27,39 +27,39 @@
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
   </feature>
   <feature name="xipki-password" version="${proejct.version}" resolver="(obr)">
-    <bundle>mvn:org.xipki/password-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/password-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/password-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/password-impl/${project.version}</bundle>
   </feature>
   <feature name="xipki-datasource" version="${project.version}" resolver="(obr)">
     <feature>xipki-password</feature>
     <bundle>mvn:com.zaxxer/HikariCP-java6/${hikaricp.version}</bundle>
     <bundle>mvn:org.javassist/javassist/${javassist.version}</bundle>
-    <bundle>mvn:org.xipki/datasource-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/datasource-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/datasource-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/datasource-impl/${project.version}</bundle>
   </feature>
   <feature name="xipki-security-base" version="${project.version}" resolver="(obr)">
     <feature>bouncycastle</feature>
     <feature>xipki-password</feature>
-    <bundle>mvn:org.xipki/common/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/common/${project.version}</bundle>
     <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/iaikPkcs11Wrapper/${pkcs11Wrapper.version}/$Bundle-SymbolicName=iaikPkcs11Wrapper&Bundle-Version=${pkcs11Wrapper.version}]]></bundle>
-    <bundle>mvn:org.xipki/security-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/security-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/security-impl/${project.version}</bundle>
   </feature>
   <feature name="xipki-security" version="${project.version}" resolver="(obr)">
     <feature>xipki-security-base</feature>
     <feature>xipki-signers</feature>
   </feature>
   <feature name="xipki-ca-api" version="${project.version}" resolver="(obr)">
-    <bundle>mvn:org.xipki/common/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-common/${project.version}</bundle>
-    <bundle>mvn:org.xipki/audit/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/common/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/audit/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-api/${project.version}</bundle>
   </feature>
   <feature name="xipki-cabase" version="${project.version}" resolver="(obr)">
     <feature>xipki-security</feature>
     <feature>xipki-ca-api</feature>
-    <bundle>mvn:org.xipki/audit/${project.version}</bundle>
-    <bundle>mvn:org.xipki/datasource-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/audit/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/datasource-api/${project.version}</bundle>
   </feature>
   <feature name="xipki-caserver" version="${project.version}" resolver="(obr)">
     <feature>xipki-datasource</feature>
@@ -67,47 +67,47 @@
     <feature>xipki-audit</feature>
     <feature>xipki-certprofiles</feature>
     <feature>xipki-publishers</feature>
-    <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/scep4j-common/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-server/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/scep4j-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-server/${project.version}</bundle>
   </feature>
   <feature name="xipki-camgmt-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-caserver</feature>
-    <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-mgmt-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-mgmt-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-camgmt-qa-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-camgmt-shell</feature>
-    <bundle>mvn:org.xipki/ca-mgmt-qa-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-mgmt-qa-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-caclient" version="${project.version}" resolver="(obr)">
     <feature>xipki-cabase</feature>
-    <bundle>mvn:org.xipki/ca-client-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-client-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-client-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-client-impl/${project.version}</bundle>
   </feature>
   <feature name="xipki-caclient-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-caclient</feature>
-    <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-client-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-caqa-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-caclient-shell</feature>
     <feature>xipki-certprofiles</feature>
-    <bundle>mvn:org.xipki/ca-qa-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-qa-impl/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-qa-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-qa-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-qa-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-qa-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-security-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-security</feature>
-    <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/security-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-scepclient-shell" version="${project.version}" resolver="(obr)">
     <feature>bouncycastle</feature>
-    <bundle>mvn:org.xipki/scep4j-common/${project.version}</bundle>
-    <bundle>mvn:org.xipki/scep4j-client/${project.version}</bundle>
-    <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
-    <bundle>mvn:org.xipki/scep-client-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/scep4j-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/scep4j-client/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/scep-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-jscepclient-shell" version="${project.version}" resolver="(obr)">
     <feature>bouncycastle</feature>
@@ -116,54 +116,54 @@
     <bundle>mvn:commons-codec/commons-codec/1.7</bundle>
     <bundle>mvn:commons-io/commons-io/2.4</bundle>
     <bundle>mvn:commons-lang/commons-lang/2.6</bundle>
-    <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
-    <bundle>mvn:org.xipki/jscep-client-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/jscep-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspserver" version="${project.version}" resolver="(obr)">
     <feature>xipki-datasource</feature>
     <feature>xipki-security</feature>
     <feature>xipki-audit</feature>
-    <bundle>mvn:org.xipki/audit/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ocsp-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ocsp-server/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/audit/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ocsp-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ocsp-server/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspclient" version="${project.version}" resolver="(obr)">
     <feature>xipki-security</feature>
-    <bundle>mvn:org.xipki/ocsp-client-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ocsp-client-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ocsp-client-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ocsp-client-impl/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspclient-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-ocspclient</feature>
-    <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ocsp-client-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ocsp-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspqa-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-ocspclient-shell</feature>
-    <bundle>mvn:org.xipki/ocsp-qa-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ocsp-qa-impl/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ocsp-qa-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ocsp-qa-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ocsp-qa-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ocsp-qa-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-database-tool" version="${project.version}" resolver="(obr)">
     <feature>xipki-datasource</feature>
-    <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/shell-base/${project.version}</bundle>
     <bundle><![CDATA[wrap:mvn:junit/junit/${junit.version}/$Bundle-SymbolicName=junit&Bundle-Version=${junit.version}]]></bundle>
     <bundle>mvn:org.liquibase/liquibase-osgi/${liquibase.version}</bundle>
-    <bundle>mvn:org.xipki/database-tool/${project.version}</bundle>
-    <bundle>mvn:org.xipki/dbtool-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/database-tool/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/dbtool-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit" version="${project.version}" resolver="(obr)">
-    <bundle>mvn:org.xipki/audit/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/audit/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit-syslog" version="${project.version}" resolver="(obr)">
     <feature>xipki-audit</feature>
     <bundle><![CDATA[wrap:mvn:com.google.code.findbugs/jsr305/${jsr305.version}/$Bundle-SymbolicName=jsr305&Bundle-Version=${jsr305.version}]]></bundle>
     <bundle><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
-    <bundle>mvn:org.xipki/audit-syslog/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/audit-syslog/${project.version}</bundle>
   </feature>
   <feature name="xipki-pkiconsole-server" version="${project.version}" resolver="(obr)">
     <feature>xipki-caserver</feature>
-    <bundle>mvn:org.xipki/pkiconsole-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/pkiconsole-common/${project.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.caucho/hessian/${hessian.version}/$Bundle-SymbolicName=hessian&Bundle-Version=${hessian.version}]]></bundle>
-    <bundle>mvn:org.xipki/pkiconsole-server/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/pkiconsole-server/${project.version}</bundle>
   </feature>
 </features>

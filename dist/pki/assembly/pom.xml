@@ -148,7 +148,7 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xipki</groupId>
+                  <groupId>org.xipki.pki</groupId>
                   <artifactId>ca-server</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
@@ -168,7 +168,7 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xipki</groupId>
+                  <groupId>org.xipki.pki</groupId>
                   <artifactId>ocsp-server</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
@@ -176,15 +176,15 @@
                   <outputDirectory>target/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>security</artifactId>
+                  <groupId>org.xipki.pki</groupId>
+                  <artifactId>security-impl</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
                   <outputDirectory>target/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki</groupId>
+                  <groupId>org.xipki.pki</groupId>
                   <artifactId>dbtool-shell</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
@@ -192,7 +192,7 @@
                   <outputDirectory>target/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki</groupId>
+                  <groupId>org.xipki.pki</groupId>
                   <artifactId>ca-client-impl</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
@@ -200,7 +200,7 @@
                   <outputDirectory>target/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki</groupId>
+                  <groupId>org.xipki.pki</groupId>
                   <artifactId>ca-client-shell</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
@@ -208,7 +208,7 @@
                   <outputDirectory>target/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki</groupId>
+                  <groupId>org.xipki.pki</groupId>
                   <artifactId>ca-qa-shell</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
@@ -216,7 +216,7 @@
                   <outputDirectory>target/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki</groupId>
+                  <groupId>org.xipki.pki</groupId>
                   <artifactId>ca-certprofile</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
@@ -236,7 +236,7 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xipki</groupId>
+                  <groupId>org.xipki.pki</groupId>
                   <artifactId>ca-server</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
