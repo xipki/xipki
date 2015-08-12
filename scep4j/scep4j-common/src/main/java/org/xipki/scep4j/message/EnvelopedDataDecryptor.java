@@ -25,7 +25,7 @@ import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.RecipientInformation;
 import org.bouncycastle.cms.RecipientInformationStore;
 import org.xipki.scep4j.exception.MessageDecodingException;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -38,14 +38,14 @@ public final class EnvelopedDataDecryptor
     public EnvelopedDataDecryptor(
             final List<EnvelopedDataDecryptorInstance> decryptors)
     {
-        ParamChecker.assertNotEmpty("decryptors", decryptors);
+        ParamUtil.assertNotEmpty("decryptors", decryptors);
         this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(decryptors);
     }
 
     public EnvelopedDataDecryptor(
             final EnvelopedDataDecryptorInstance decryptor)
     {
-        ParamChecker.assertNotNull("decryptor", decryptor);
+        ParamUtil.assertNotNull("decryptor", decryptor);
         this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(1);
         this.decryptors.add(decryptor);
     }

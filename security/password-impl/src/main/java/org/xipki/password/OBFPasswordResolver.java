@@ -19,9 +19,9 @@ package org.xipki.password;
 
 import java.nio.charset.StandardCharsets;
 
+import org.xipki.common.util.StringUtil;
 import org.xipki.password.api.PasswordResolverException;
 import org.xipki.password.api.SinglePasswordResolver;
-import org.xipki.password.api.util.StringUtil;
 
 /**
  * @author Lijun Liao

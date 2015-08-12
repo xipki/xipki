@@ -49,7 +49,7 @@ import org.bouncycastle.util.CollectionStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.scep4j.exception.MessageDecodingException;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 import org.xipki.scep4j.util.ScepUtil;
 
 /**
@@ -132,7 +132,7 @@ public class DecodedNextCAMessage
             final CollectionStore<X509CertificateHolder> certStore)
     throws MessageDecodingException
     {
-        ParamChecker.assertNotNull("pkiMessage", pkiMessage);
+        ParamUtil.assertNotNull("pkiMessage", pkiMessage);
 
         SignerInformationStore signerStore = pkiMessage.getSignerInfos();
         Collection<SignerInformation> signerInfos = signerStore.getSigners();

@@ -24,7 +24,7 @@ import org.bouncycastle.cms.KeyTransRecipient;
 import org.bouncycastle.cms.RecipientId;
 import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientId;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -39,8 +39,8 @@ public final class EnvelopedDataDecryptorInstance
         final X509Certificate recipientCert,
         final PrivateKey privKey)
     {
-        ParamChecker.assertNotNull("recipientCert", recipientCert);
-        ParamChecker.assertNotNull("privKey", privKey);
+        ParamUtil.assertNotNull("recipientCert", recipientCert);
+        ParamUtil.assertNotNull("privKey", privKey);
         this.recipientId = new JceKeyTransRecipientId(recipientCert);
         this.recipient = new JceKeyTransEnvelopedRecipient(privKey);
     }

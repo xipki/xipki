@@ -20,7 +20,7 @@ package org.xipki.scep4j.transaction;
 import java.security.SecureRandom;
 
 import org.bouncycastle.util.Arrays;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -37,7 +37,7 @@ public class Nonce
             final byte[] bytes,
             final boolean cloneBytes)
     {
-        ParamChecker.assertNotNull("bytes", bytes);
+        ParamUtil.assertNotNull("bytes", bytes);
         if(bytes.length != 16)
         {
             throw new IllegalArgumentException("bytes.len is not 16: " + bytes.length);

@@ -73,7 +73,7 @@ public class LiquibaseDatabaseConf
             {
                 driverClassName = "oracle.jdbc.driver.OracleDriver";
                 String s = dbProps.getProperty("dataSource.URL");
-                if(StringUtil.isNotBlank(s))
+                if(MyStringUtil.isNotBlank(s))
                 {
                     urlBuilder.append(s);
                 }
@@ -149,7 +149,7 @@ public class LiquibaseDatabaseConf
                 url= dbProps.getProperty("db.url");
             }
 
-            if(StringUtil.startsWithIgnoreCase(url, "jdbc:db2:"))
+            if(MyStringUtil.startsWithIgnoreCase(url, "jdbc:db2:"))
             {
                 String sep = ":currentSchema=";
                 int idx = url.indexOf(sep);
@@ -170,7 +170,7 @@ public class LiquibaseDatabaseConf
             throw new IllegalArgumentException("unsupported configuration");
         }
 
-        if(passwordResolver != null && StringUtil.isNotBlank(password))
+        if(passwordResolver != null && MyStringUtil.isNotBlank(password))
         {
             password = new String(passwordResolver.resolvePassword(password));
         }

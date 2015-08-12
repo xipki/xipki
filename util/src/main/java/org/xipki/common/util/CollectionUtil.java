@@ -101,7 +101,7 @@ public class CollectionUtil
         }
 
         return Collections.unmodifiableMap(
-                newMap ? new HashMap<>(m) : m);
+                newMap ? new HashMap<K,V>(m) : m);
     }
 
     public static <T> Set<T> unmodifiableSet(
@@ -131,7 +131,7 @@ public class CollectionUtil
         }
 
         return Collections.unmodifiableSet(
-                newSet ? new HashSet<>(s) : s);
+                newSet ? new HashSet<T>(s) : s);
     }
 
     public static <T> Collection<T> unmodifiableCollection(
@@ -189,7 +189,7 @@ public class CollectionUtil
         }
 
         return Collections.unmodifiableList(
-                newList ? new ArrayList<>(l) : l);
+                newList ? new ArrayList<T>(l) : l);
     }
 
 }

@@ -24,7 +24,7 @@ import java.security.spec.InvalidKeySpecException;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -39,14 +39,14 @@ public class TransactionId
     public TransactionId(
             final String id)
     {
-        ParamChecker.assertNotBlank("id", id);
+        ParamUtil.assertNotBlank("id", id);
         this.id = id;
     }
 
     private TransactionId(
             final byte[] bytes)
     {
-        ParamChecker.assertNotNull("bytes", bytes);
+        ParamUtil.assertNotNull("bytes", bytes);
         if(bytes.length < 1)
         {
             throw new IllegalArgumentException("bytes could not be null");
@@ -70,7 +70,7 @@ public class TransactionId
             final SubjectPublicKeyInfo spk)
     throws InvalidKeySpecException
     {
-        ParamChecker.assertNotNull("spk", spk);
+        ParamUtil.assertNotNull("spk", spk);
         byte[] encoded;
         try
         {
@@ -86,7 +86,7 @@ public class TransactionId
     public static TransactionId sha1TransactionId(
             final byte[] content)
     {
-        ParamChecker.assertNotNull("content", content);
+        ParamUtil.assertNotNull("content", content);
         SHA1Digest dgst = new SHA1Digest();
         dgst.update(content, 0, content.length);
         final int size = 20;
