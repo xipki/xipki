@@ -23,8 +23,8 @@
     </dependency>
     <dependency>
       <groupId>at.tugraz.iaik</groupId>
-      <artifactId>iaikPkcs11Wrapper</artifactId>
-      <version>${pkcs11Wrapper.version}</version>
+      <artifactId>pkcs11-wrapper</artifactId>
+      <version>${pkcs11-wrapper.version}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
