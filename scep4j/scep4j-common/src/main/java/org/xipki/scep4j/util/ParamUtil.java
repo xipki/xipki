@@ -15,7 +15,7 @@
  *
  */
 
-package org.xipki.datasource.impl;
+package org.xipki.scep4j.util;
 
 import java.util.Collection;
 import java.util.Map;
@@ -24,7 +24,7 @@ import java.util.Map;
  * @author Lijun Liao
  */
 
-class ParamUtil
+public class ParamUtil
 {
 
     public static void assertNotNull(

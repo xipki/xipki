@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.xipki.scep4j.crypto.HashAlgoType;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -41,8 +41,8 @@ implements CACertValidator
         final HashAlgoType hashAlgo,
         final Set<byte[]> hashValues)
     {
-        ParamChecker.assertNotNull("hashAlgo", hashAlgo);
-        ParamChecker.assertNotEmpty("hashValues", hashValues);
+        ParamUtil.assertNotNull("hashAlgo", hashAlgo);
+        ParamUtil.assertNotEmpty("hashValues", hashValues);
 
         final int hLen = hashAlgo.getLength();
         for(byte[] m : hashValues)

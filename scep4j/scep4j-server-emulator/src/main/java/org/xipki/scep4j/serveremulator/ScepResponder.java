@@ -63,7 +63,7 @@ import org.xipki.scep4j.transaction.MessageType;
 import org.xipki.scep4j.transaction.Nonce;
 import org.xipki.scep4j.transaction.PkiStatus;
 import org.xipki.scep4j.transaction.TransactionId;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 import org.xipki.scep4j.util.ScepUtil;
 
 /**
@@ -105,9 +105,9 @@ public class ScepResponder
             final ScepControl control)
     throws Exception
     {
-        ParamChecker.assertNotNull("cACaps", cACaps);
-        ParamChecker.assertNotNull("cAEmulator", cAEmulator);
-        ParamChecker.assertNotNull("control", control);
+        ParamUtil.assertNotNull("cACaps", cACaps);
+        ParamUtil.assertNotNull("cAEmulator", cAEmulator);
+        ParamUtil.assertNotNull("control", control);
 
         this.cAEmulator = cAEmulator;
         this.rAEmulator = rAEmulator;

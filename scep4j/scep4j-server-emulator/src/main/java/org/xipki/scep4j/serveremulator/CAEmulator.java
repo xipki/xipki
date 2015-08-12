@@ -44,7 +44,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.util.Arrays;
 import org.xipki.scep4j.crypto.HashAlgoType;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 import org.xipki.scep4j.util.ScepUtil;
 
 /**
@@ -74,8 +74,8 @@ public class CAEmulator
             final boolean generateCRL)
     throws CertificateEncodingException
     {
-        ParamChecker.assertNotNull("cAKey", cAKey);
-        ParamChecker.assertNotNull("cACert", cACert);
+        ParamUtil.assertNotNull("cAKey", cAKey);
+        ParamUtil.assertNotNull("cACert", cACert);
 
         this.cAKey = cAKey;
         this.cACert = cACert;

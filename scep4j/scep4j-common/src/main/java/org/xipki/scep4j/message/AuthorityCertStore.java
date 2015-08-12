@@ -20,7 +20,7 @@ package org.xipki.scep4j.message;
 import java.security.cert.X509Certificate;
 
 import org.xipki.scep4j.crypto.KeyUsage;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -46,7 +46,7 @@ public class AuthorityCertStore
             final X509Certificate cACert,
             final X509Certificate... rACerts)
     {
-        ParamChecker.assertNotNull("cACert", cACert);
+        ParamUtil.assertNotNull("cACert", cACert);
 
         X509Certificate encryptionCert = null;
         X509Certificate signatureCert = null;

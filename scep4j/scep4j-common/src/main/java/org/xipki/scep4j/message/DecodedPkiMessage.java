@@ -59,7 +59,7 @@ import org.xipki.scep4j.transaction.MessageType;
 import org.xipki.scep4j.transaction.Nonce;
 import org.xipki.scep4j.transaction.PkiStatus;
 import org.xipki.scep4j.transaction.TransactionId;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 import org.xipki.scep4j.util.ScepUtil;
 
 /**
@@ -185,8 +185,8 @@ public class DecodedPkiMessage extends PkiMessage
             final CollectionStore<X509CertificateHolder> certStore)
     throws MessageDecodingException
     {
-        ParamChecker.assertNotNull("pkiMessage", pkiMessage);
-        ParamChecker.assertNotNull("recipient", recipient);
+        ParamUtil.assertNotNull("pkiMessage", pkiMessage);
+        ParamUtil.assertNotNull("recipient", recipient);
 
         SignerInformationStore signerStore = pkiMessage.getSignerInfos();
         Collection<SignerInformation> signerInfos = signerStore.getSigners();

@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.xipki.scep4j.crypto.HashAlgoType;
-import org.xipki.scep4j.util.ParamChecker;
+import org.xipki.scep4j.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -37,7 +37,7 @@ implements CertificateValidator
     public CollectionCertificateValidator(
             final Collection<X509Certificate> certs)
     {
-        ParamChecker.assertNotEmpty("certs", certs);
+        ParamUtil.assertNotEmpty("certs", certs);
         certHashes = new HashSet<String>(certs.size());
         for(X509Certificate cert : certs)
         {
@@ -56,7 +56,7 @@ implements CertificateValidator
     public CollectionCertificateValidator(
             final X509Certificate cert)
     {
-        ParamChecker.assertNotNull("cert", cert);
+        ParamUtil.assertNotNull("cert", cert);
 
         certHashes = new HashSet<String>(1);
         String hash;
@@ -75,7 +75,7 @@ implements CertificateValidator
             final X509Certificate signerCert,
             final X509Certificate[] signerCaCerts)
     {
-        ParamChecker.assertNotNull("signerCert", signerCert);
+        ParamUtil.assertNotNull("signerCert", signerCert);
 
         String hash;
         try
