@@ -80,7 +80,7 @@ public abstract class SecurityCommand extends XipkiOsgiCommandSupport
 
         P11Module module;
         String pkcs11Provider = securityFactory.getPkcs11Provider();
-        if(IaikP11CryptServiceFactory.class.equals(pkcs11Provider))
+        if(IaikP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
         {
             // the returned object could not be null
             module = IaikP11ModulePool.getInstance().getModule(moduleName);
