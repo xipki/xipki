@@ -33,42 +33,31 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.dbtool.ca;
+package org.xipki.ca.dbtool.shell;
+
+import java.util.Map;
+
+import org.apache.karaf.shell.commands.Command;
+import org.xipki.dbtool.LiquibaseDatabaseConf;
 
 /**
  * @author Lijun Liao
  */
 
-public class DbiUtil
+@Command(scope = "xipki-db", name = "initdb-ca", description="reset and initialize the CA database")
+public class InitDbCaCommand extends LiquibaseCommand
 {
-    public static String buildFilename(
-            final String prefix,
-            final String suffix,
-            final int minCertIdOfCurrentFile,
-            final int maxCertIdOfCurrentFile,
-            final int maxCertId)
+    private static final String schemaFile = "xipki/sql/ca-init.xml";
+
+    @Override
+    protected Object _doExecute()
+    throws Exception
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix);
+        Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
-        int len = Integer.toString(maxCertId).length();
-        String a = Integer.toString(minCertIdOfCurrentFile);
-        for(int i = 0; i < len - a.length(); i++)
-        {
-            sb.append('0');
-        }
-        sb.append(a);
-        sb.append("-");
-
-        String b = Integer.toString(maxCertIdOfCurrentFile);
-        for(int i = 0; i < len - b.length(); i++)
-        {
-            sb.append('0');
-        }
-        sb.append(b);
-
-        sb.append(suffix);
-        return sb.toString();
+        LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
+        resetAndInit(dbConf, schemaFile);
+        return null;
     }
 
 }

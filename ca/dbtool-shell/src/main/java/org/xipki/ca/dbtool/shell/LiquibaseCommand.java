@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.dbtool.ca.shell;
+package org.xipki.ca.dbtool.shell;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

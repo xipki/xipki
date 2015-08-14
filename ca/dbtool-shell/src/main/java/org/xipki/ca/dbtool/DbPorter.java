@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.dbtool.ca;
+package org.xipki.ca.dbtool;
 
 import java.io.File;
 import java.io.FileOutputStream;
