@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.certprofile.demo.x509;
+package org.xipki.ca.demo.certprofile.x509;
 
 import java.util.Collections;
 import java.util.Date;
@@ -61,13 +61,13 @@ import org.xipki.security.api.KeyUsage;
  * @author Lijun Liao
  */
 
-public class DemoEE1X509Certprofile extends AbstractEEX509Certprofile
+public class DemoEE2X509Certprofile extends AbstractEEX509Certprofile
 {
     private final CertValidity validity;
     private final Set<KeyUsageControl> keyUsage;
     private final Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
 
-    public DemoEE1X509Certprofile()
+    public DemoEE2X509Certprofile()
     {
         validity = new CertValidity(10, Unit.YEAR);
 

@@ -33,18 +33,15 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.dbtool.ca;
+package org.xipki.ca.dbtool;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +50,7 @@ import org.xipki.common.util.IoUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.dbi.ocsp.jaxb.ObjectFactory;
+import org.xipki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.password.api.PasswordResolverException;
 
@@ -61,80 +58,45 @@ import org.xipki.password.api.PasswordResolverException;
  * @author Lijun Liao
  */
 
-public class OcspDbExporter
+public class OcspFromCaDbImporter
 {
-    private static final Logger LOG = LoggerFactory.getLogger(OcspDbImporter.class);
-    protected final DataSourceWrapper dataSource;
-    protected final Marshaller marshaller;
-    protected final Unmarshaller unmarshaller;
-    protected final String destFolder;
-    protected final boolean resume;
+    private static final Logger LOG = LoggerFactory.getLogger(OcspFromCaDbImporter.class);
+    private final DataSourceWrapper dataSource;
+    private final Unmarshaller unmarshaller;
+    private final String publisherName;
+    private final boolean resume;
 
-    public OcspDbExporter(
+    public OcspFromCaDbImporter(
             final DataSourceFactory dataSourceFactory,
             final PasswordResolver passwordResolver,
             final String dbConfFile,
-            final String destFolder,
+            final String publisherName,
             final boolean resume)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
         this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
-
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-        marshaller = jaxbContext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-
-        Schema schema = DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd");
-        marshaller.setSchema(schema);
-
         unmarshaller = jaxbContext.createUnmarshaller();
-        unmarshaller.setSchema(schema);
-
-        File f = new File(destFolder);
-        if(f.exists() == false)
-        {
-            f.mkdirs();
-        }
-        else
-        {
-            if(f.isDirectory() == false)
-            {
-                throw new IOException(destFolder + " is not a folder");
-            }
-
-            if(f.canWrite() == false)
-            {
-                throw new IOException(destFolder + " is not writable");
-            }
-        }
-
-        if(resume == false)
-        {
-            String[] children = f.list();
-            if(children != null && children.length > 0)
-            {
-                throw new IOException(destFolder + " is not empty");
-            }
-        }
+        unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
+        this.publisherName = publisherName;
         this.resume = resume;
-        this.destFolder = destFolder;
     }
 
-    public void exportDatabase(
-            final int numCertsInBundle)
+    public void importDatabase(
+            final String srcFolder)
     throws Exception
     {
         long start = System.currentTimeMillis();
+        // CertStore
         try
         {
-            // CertStore
-            OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(
-                    dataSource, marshaller, unmarshaller, destFolder, numCertsInBundle, resume);
-            certStoreExporter.export();
-            certStoreExporter.shutdown();
-        }finally
+            OcspCertStoreFromCaDbImporter certStoreImporter =
+                    new OcspCertStoreFromCaDbImporter(dataSource, unmarshaller, srcFolder, publisherName, resume);
+            certStoreImporter.importToDB();
+            certStoreImporter.shutdown();
+        } finally
         {
             try
             {
@@ -144,7 +106,7 @@ public class OcspDbExporter
                 LOG.error("dataSource.shutdown()", e);
             }
             long end = System.currentTimeMillis();
-            System.out.println("inished in " + AbstractLoadTest.formatTime((end - start) / 1000).trim());
+            System.out.println("finished in " + AbstractLoadTest.formatTime((end - start) / 1000).trim());
         }
     }
 

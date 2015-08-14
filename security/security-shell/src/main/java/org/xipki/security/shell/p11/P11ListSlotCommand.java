@@ -35,13 +35,6 @@
 
 package org.xipki.security.shell.p11;
 
-import iaik.pkcs.pkcs11.objects.DSAPublicKey;
-import iaik.pkcs.pkcs11.objects.ECDSAPublicKey;
-import iaik.pkcs.pkcs11.objects.PrivateKey;
-import iaik.pkcs.pkcs11.objects.PublicKey;
-import iaik.pkcs.pkcs11.objects.RSAPublicKey;
-import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
-
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -72,6 +65,13 @@ import org.xipki.security.api.util.X509Util;
 import org.xipki.security.p11.iaik.IaikP11Slot;
 import org.xipki.security.p11.keystore.KeystoreP11Slot;
 import org.xipki.security.shell.SecurityCommand;
+
+import iaik.pkcs.pkcs11.objects.DSAPublicKey;
+import iaik.pkcs.pkcs11.objects.ECDSAPublicKey;
+import iaik.pkcs.pkcs11.objects.PrivateKey;
+import iaik.pkcs.pkcs11.objects.PublicKey;
+import iaik.pkcs.pkcs11.objects.RSAPublicKey;
+import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 /**
  * @author Lijun Liao

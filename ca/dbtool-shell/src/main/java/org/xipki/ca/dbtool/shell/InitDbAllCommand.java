@@ -33,63 +33,43 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.dbtool.ca.shell;
+package org.xipki.ca.dbtool.shell;
+
+import java.util.Map;
 
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.console.karaf.XipkiOsgiCommandSupport;
-import org.xipki.datasource.api.DataSourceFactory;
-import org.xipki.dbtool.ca.OcspDbExporter;
-import org.xipki.password.api.PasswordResolver;
+import org.xipki.dbtool.LiquibaseDatabaseConf;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "export-ocsp", description="export OCSP database")
-public class ExportOcspCommand extends XipkiOsgiCommandSupport
+@Command(scope = "xipki-db", name = "initdb", description="reset and initialize the CA and OCSP databases")
+public class InitDbAllCommand extends LiquibaseCommand
 {
-    private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
-    private static final int DFLT_NUM_CERTS_IN_BUNDLE = 1000;
-
-    @Option(name = "--db-conf",
-            description = "database configuration file.")
-    private String dbconfFile = DFLT_DBCONF_FILE;
-
-    @Option(name = "--out-dir",
-            required = true,
-            description = "output directory\n"
-                    + "(required)")
-    private String outdir;
-
-    @Option(name = "-n",
-            description = "number of certificates in one zip file")
-    private Integer numCertsInBundle = DFLT_NUM_CERTS_IN_BUNDLE;
-
-    @Option(name = "--resume")
-    private Boolean resume = Boolean.FALSE;
-
-    private DataSourceFactory dataSourceFactory;
-    private PasswordResolver passwordResolver;
+    private static final String ca_schemaFile = "xipki/sql/ca-init.xml";
+    private static final String ocsp_schemaFile = "xipki/sql/ocsp-init.xml";
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        OcspDbExporter exporter = new OcspDbExporter(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume);
-        exporter.exportDatabase(numCertsInBundle);
+        Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
+
+        LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
+        resetAndInit(dbConf, ca_schemaFile);
+
+        for(String dbName : dbConfs.keySet())
+        {
+            if(dbName.toLowerCase().contains("ocsp") == false)
+            {
+                continue;
+            }
+
+            dbConf = dbConfs.get(dbName);
+            resetAndInit(dbConf, ocsp_schemaFile);
+        }
         return null;
     }
 
-    public void setDataSourceFactory(
-            final DataSourceFactory dataSourceFactory)
-    {
-        this.dataSourceFactory = dataSourceFactory;
-    }
-
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver)
-    {
-        this.passwordResolver = passwordResolver;
-    }
 }

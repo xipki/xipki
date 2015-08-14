@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.dbtool.ca;
+package org.xipki.ca.dbtool;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,12 +59,12 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.dbi.ocsp.jaxb.CertStoreType;
-import org.xipki.dbi.ocsp.jaxb.CertStoreType.CertsFiles;
-import org.xipki.dbi.ocsp.jaxb.CertStoreType.Issuers;
-import org.xipki.dbi.ocsp.jaxb.CertType;
-import org.xipki.dbi.ocsp.jaxb.CertsType;
-import org.xipki.dbi.ocsp.jaxb.IssuerType;
+import org.xipki.ca.dbtool.jaxb.ocsp.CertStoreType;
+import org.xipki.ca.dbtool.jaxb.ocsp.CertStoreType.CertsFiles;
+import org.xipki.ca.dbtool.jaxb.ocsp.CertStoreType.Issuers;
+import org.xipki.ca.dbtool.jaxb.ocsp.CertType;
+import org.xipki.ca.dbtool.jaxb.ocsp.CertsType;
+import org.xipki.ca.dbtool.jaxb.ocsp.IssuerType;
 import org.xipki.security.api.HashAlgoType;
 import org.xipki.security.api.HashCalculator;
 import org.xipki.security.api.util.X509Util;

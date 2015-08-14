@@ -33,39 +33,64 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.dbtool.ca.shell;
-
-import java.util.Map;
+package org.xipki.ca.dbtool.shell;
 
 import org.apache.karaf.shell.commands.Command;
-import org.xipki.dbtool.LiquibaseDatabaseConf;
+import org.apache.karaf.shell.commands.Option;
+import org.xipki.ca.dbtool.OcspFromCaDbImporter;
+import org.xipki.console.karaf.XipkiOsgiCommandSupport;
+import org.xipki.datasource.api.DataSourceFactory;
+import org.xipki.password.api.PasswordResolver;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "initdb-ocsp", description="reset and initialize the OCSP databases")
-public class InitDbOcspCommand extends LiquibaseCommand
+@Command(scope = "xipki-db", name = "import-ocspfromca", description="import OCSP database from CA data")
+public class ImportOcspFromCaCommand extends XipkiOsgiCommandSupport
 {
-    private static final String schemaFile = "xipki/sql/ocsp-init.xml";
+    private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
+    private static final String DFLT_PUBLISHER = "OCSP.PUBLISHER";
+
+    @Option(name = "--db-conf",
+            description = "database configuration file")
+    private String dbconfFile = DFLT_DBCONF_FILE;
+
+    @Option(name = "--in-dir",
+            required = true,
+            description = "input directory\n"
+                    + "(required)")
+    private String indir;
+
+    @Option(name = "--publisher",
+            description = "publisher name")
+    private String publisherName = DFLT_PUBLISHER;
+
+    @Option(name = "--resume")
+    private Boolean resume = Boolean.FALSE;
+
+    private DataSourceFactory dataSourceFactory;
+    private PasswordResolver passwordResolver;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
-
-        for(String dbName : dbConfs.keySet())
-        {
-            if(dbName.toLowerCase().contains("ocsp") == false)
-            {
-                continue;
-            }
-
-            LiquibaseDatabaseConf dbConf = dbConfs.get(dbName);
-            resetAndInit(dbConf, schemaFile);
-        }
+        OcspFromCaDbImporter importer = new OcspFromCaDbImporter(
+                dataSourceFactory, passwordResolver, dbconfFile, publisherName, resume);
+        importer.importDatabase(indir);
         return null;
     }
 
+    public void setDataSourceFactory(
+            final DataSourceFactory dataSourceFactory)
+    {
+        this.dataSourceFactory = dataSourceFactory;
+    }
+
+    public void setPasswordResolver(
+            final PasswordResolver passwordResolver)
+    {
+        this.passwordResolver = passwordResolver;
+    }
 }

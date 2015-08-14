@@ -33,31 +33,58 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.dbtool.ca.shell;
-
-import java.util.Map;
+package org.xipki.ca.dbtool.shell;
 
 import org.apache.karaf.shell.commands.Command;
-import org.xipki.dbtool.LiquibaseDatabaseConf;
+import org.apache.karaf.shell.commands.Option;
+import org.xipki.ca.dbtool.CaDbImporter;
+import org.xipki.console.karaf.XipkiOsgiCommandSupport;
+import org.xipki.datasource.api.DataSourceFactory;
+import org.xipki.password.api.PasswordResolver;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "initdb-ca", description="reset and initialize the CA database")
-public class InitDbCaCommand extends LiquibaseCommand
+@Command(scope = "xipki-db", name = "import-ca", description="import CA database")
+public class ImportCaCommand extends XipkiOsgiCommandSupport
 {
-    private static final String schemaFile = "xipki/sql/ca-init.xml";
+    private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ca-db.properties";
+
+    @Option(name = "--db-conf",
+            description = "database configuration file")
+    private String dbconfFile = DFLT_DBCONF_FILE;
+
+    @Option(name = "--in-dir",
+            required = true,
+            description = "input directory\n"
+                    + "(required)")
+    private String indir;
+
+    @Option(name = "--resume")
+    private Boolean resume = Boolean.FALSE;
+
+    private DataSourceFactory dataSourceFactory;
+    private PasswordResolver passwordResolver;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
-
-        LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
-        resetAndInit(dbConf, schemaFile);
+        CaDbImporter importer = new CaDbImporter(dataSourceFactory, passwordResolver, dbconfFile, resume);
+        importer.importDatabase(indir);
         return null;
     }
 
+    public void setDataSourceFactory(
+            final DataSourceFactory dataSourceFactory)
+    {
+        this.dataSourceFactory = dataSourceFactory;
+    }
+
+    public void setPasswordResolver(
+            final PasswordResolver passwordResolver)
+    {
+        this.passwordResolver = passwordResolver;
+    }
 }

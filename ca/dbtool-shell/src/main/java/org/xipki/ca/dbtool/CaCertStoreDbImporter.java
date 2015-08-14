@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.dbtool.ca;
+package org.xipki.ca.dbtool;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -70,25 +70,25 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.dbi.ca.jaxb.CertStoreType;
-import org.xipki.dbi.ca.jaxb.CertStoreType.Cas;
-import org.xipki.dbi.ca.jaxb.CertStoreType.CertsFiles;
-import org.xipki.dbi.ca.jaxb.CertStoreType.Crls;
-import org.xipki.dbi.ca.jaxb.CertStoreType.DeltaCRLCache;
-import org.xipki.dbi.ca.jaxb.CertStoreType.Profiles;
-import org.xipki.dbi.ca.jaxb.CertStoreType.PublishQueue;
-import org.xipki.dbi.ca.jaxb.CertStoreType.Publishers;
-import org.xipki.dbi.ca.jaxb.CertStoreType.Requestors;
-import org.xipki.dbi.ca.jaxb.CertStoreType.UsersFiles;
-import org.xipki.dbi.ca.jaxb.CertType;
-import org.xipki.dbi.ca.jaxb.CertsType;
-import org.xipki.dbi.ca.jaxb.CertstoreCaType;
-import org.xipki.dbi.ca.jaxb.CrlType;
-import org.xipki.dbi.ca.jaxb.DeltaCRLCacheEntryType;
-import org.xipki.dbi.ca.jaxb.NameIdType;
-import org.xipki.dbi.ca.jaxb.ToPublishType;
-import org.xipki.dbi.ca.jaxb.UserType;
-import org.xipki.dbi.ca.jaxb.UsersType;
+import org.xipki.ca.dbtool.jaxb.ca.CertStoreType;
+import org.xipki.ca.dbtool.jaxb.ca.CertStoreType.Cas;
+import org.xipki.ca.dbtool.jaxb.ca.CertStoreType.CertsFiles;
+import org.xipki.ca.dbtool.jaxb.ca.CertStoreType.Crls;
+import org.xipki.ca.dbtool.jaxb.ca.CertStoreType.DeltaCRLCache;
+import org.xipki.ca.dbtool.jaxb.ca.CertStoreType.Profiles;
+import org.xipki.ca.dbtool.jaxb.ca.CertStoreType.PublishQueue;
+import org.xipki.ca.dbtool.jaxb.ca.CertStoreType.Publishers;
+import org.xipki.ca.dbtool.jaxb.ca.CertStoreType.Requestors;
+import org.xipki.ca.dbtool.jaxb.ca.CertStoreType.UsersFiles;
+import org.xipki.ca.dbtool.jaxb.ca.CertType;
+import org.xipki.ca.dbtool.jaxb.ca.CertsType;
+import org.xipki.ca.dbtool.jaxb.ca.CertstoreCaType;
+import org.xipki.ca.dbtool.jaxb.ca.CrlType;
+import org.xipki.ca.dbtool.jaxb.ca.DeltaCRLCacheEntryType;
+import org.xipki.ca.dbtool.jaxb.ca.NameIdType;
+import org.xipki.ca.dbtool.jaxb.ca.ToPublishType;
+import org.xipki.ca.dbtool.jaxb.ca.UserType;
+import org.xipki.ca.dbtool.jaxb.ca.UsersType;
 import org.xipki.security.api.HashAlgoType;
 import org.xipki.security.api.HashCalculator;
 import org.xipki.security.api.util.X509Util;

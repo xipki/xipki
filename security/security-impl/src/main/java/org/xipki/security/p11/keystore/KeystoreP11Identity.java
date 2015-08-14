@@ -296,10 +296,10 @@ public class KeystoreP11Identity extends P11Identity
     {
         return sha1sum;
     }
-    
+
     public PrivateKey getPrivateKey()
     {
-    	return privateKey;
+        return privateKey;
     }
 
 }

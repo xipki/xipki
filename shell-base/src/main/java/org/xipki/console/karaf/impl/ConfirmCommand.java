@@ -37,12 +37,12 @@ package org.xipki.console.karaf.impl;
 
 import java.io.IOException;
 
-import jline.console.ConsoleReader;
-
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
+
+import jline.console.ConsoleReader;
 
 /**
  * @author Lijun Liao

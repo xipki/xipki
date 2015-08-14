@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.dbtool.ca;
+package org.xipki.ca.dbtool;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -50,7 +50,7 @@ import org.xipki.common.util.IoUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.dbi.ca.jaxb.ObjectFactory;
+import org.xipki.ca.dbtool.jaxb.ocsp.ObjectFactory;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.password.api.PasswordResolverException;
 
@@ -58,19 +58,17 @@ import org.xipki.password.api.PasswordResolverException;
  * @author Lijun Liao
  */
 
-public class OcspFromCaDbImporter
+public class OcspDbImporter
 {
-    private static final Logger LOG = LoggerFactory.getLogger(OcspFromCaDbImporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OcspDbImporter.class);
     private final DataSourceWrapper dataSource;
     private final Unmarshaller unmarshaller;
-    private final String publisherName;
     private final boolean resume;
 
-    public OcspFromCaDbImporter(
+    public OcspDbImporter(
             final DataSourceFactory dataSourceFactory,
             final PasswordResolver passwordResolver,
             final String dbConfFile,
-            final String publisherName,
             final boolean resume)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
@@ -79,8 +77,7 @@ public class OcspFromCaDbImporter
         this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         unmarshaller = jaxbContext.createUnmarshaller();
-        unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
-        this.publisherName = publisherName;
+        unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd"));
         this.resume = resume;
     }
 
@@ -92,8 +89,8 @@ public class OcspFromCaDbImporter
         // CertStore
         try
         {
-            OcspCertStoreFromCaDbImporter certStoreImporter =
-                    new OcspCertStoreFromCaDbImporter(dataSource, unmarshaller, srcFolder, publisherName, resume);
+            OcspCertStoreDbImporter certStoreImporter =
+                    new OcspCertStoreDbImporter(dataSource, unmarshaller, srcFolder, resume);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
         } finally
