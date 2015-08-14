@@ -473,9 +473,7 @@ public class IaikP11Slot implements P11WritableSlot
             if(signingKey == null)
             {
                 LOG.info("try to retieve private key " + keyId);
-                String label = keyId.getKeyLabel();
-                signingKey = getPrivateObject(Boolean.TRUE, null, keyId.getKeyId(),
-                        (label == null) ? null : label.toCharArray());
+                signingKey = getPrivateObject(Boolean.TRUE, null, keyId);
 
                 if(signingKey != null)
                 {
@@ -894,10 +892,14 @@ public class IaikP11Slot implements P11WritableSlot
     private PrivateKey getPrivateObject(
             final Boolean forSigning,
             final Boolean forDecrypting,
-            final byte[] keyId,
-            final char[] keyLabel)
+            final P11KeyIdentifier keyIdentifier)
     throws SignerException
     {
+        String _keyLabel = keyIdentifier.getKeyLabel();
+        char[] keyLabel = (_keyLabel == null) ?
+                null : _keyLabel.toCharArray();
+        byte[] keyId = keyIdentifier.getKeyId();
+
         Session session = borrowIdleSession();
 
         try
@@ -1260,11 +1262,7 @@ public class IaikP11Slot implements P11WritableSlot
         ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
         ParamUtil.assertNotNull("newCert", newCert);
 
-        String keyLabel = keyIdentifier.getKeyLabel();
-        char[] keyLabelChars = (keyLabel == null) ?
-                null : keyLabel.toCharArray();
-
-        PrivateKey privKey = getPrivateObject(null, null, keyIdentifier.getKeyId(), keyLabelChars);
+        PrivateKey privKey = getPrivateObject(null, null, keyIdentifier);
 
         if(privKey == null)
         {
@@ -1342,11 +1340,7 @@ public class IaikP11Slot implements P11WritableSlot
     {
         ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
 
-        String keyLabel = keyIdentifier.getKeyLabel();
-        char[] keyLabelChars = (keyLabel == null) ?
-                null : keyLabel.toCharArray();
-
-        PrivateKey privKey = getPrivateObject(null, null, keyIdentifier.getKeyId(), keyLabelChars);
+        PrivateKey privKey = getPrivateObject(null, null, keyIdentifier);
         if(privKey == null)
         {
             return false;
@@ -2199,11 +2193,7 @@ public class IaikP11Slot implements P11WritableSlot
             final P11KeyIdentifier keyIdentifier)
     throws Exception
     {
-        String keyLabel = keyIdentifier.getKeyLabel();
-        char[] keyLabelChars = (keyLabel == null) ?
-                null : keyLabel.toCharArray();
-
-        PrivateKey privKey = getPrivateObject(null, null, keyIdentifier.getKeyId(), keyLabelChars);
+        PrivateKey privKey = getPrivateObject(null, null, keyIdentifier);
         if(privKey == null)
         {
             return null;
