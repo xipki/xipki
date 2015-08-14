@@ -321,7 +321,12 @@ public class XMLUtil
         if(node instanceof Element)
         {
             Element element = (Element) node;
-            if(element.getLocalName().equals(localname))
+            String ln = element.getLocalName();
+            if(ln == null)
+            {
+            	ln = element.getTagName();
+            }
+            if(ln.equals(localname))
             {
                 if(namespace == null || namespace.equals(element.getNamespaceURI()))
                 {

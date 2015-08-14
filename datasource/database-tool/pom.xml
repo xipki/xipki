@@ -28,13 +28,6 @@
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-osgi</artifactId>
-      <version>${liquibase.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.liquibase</groupId>
-          <artifactId>liquibase-core</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
 </project>
