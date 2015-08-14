@@ -72,24 +72,14 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.xipki.audit</groupId>
-        <artifactId>audit</artifactId>
-        <version>${audit.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.password</groupId>
-        <artifactId>password-api</artifactId>
-        <version>${password.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.datasource</groupId>
-        <artifactId>datasource-api</artifactId>
-        <version>${datasource.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-jdk15on</artifactId>
         <version>${bc.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>at.tugraz.iaik</groupId>
+        <artifactId>pkcs11-wrapper</artifactId>
+        <version>${pkcs11-wrapper.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bouncycastle</groupId>
@@ -102,10 +92,56 @@
         <version>${slf4j.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.zaxxer</groupId>
+        <artifactId>HikariCP-java6</artifactId>
+        <version>${hikaricp.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.cloudbees</groupId>
+        <artifactId>syslog-java-client</artifactId>
+        <version>${syslog-java-client.version}</version>
+      </dependency>
+      <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>servlet-api</artifactId>
         <version>${servlet-api.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.karaf.shell</groupId>
+        <artifactId>org.apache.karaf.shell.console</artifactId>
+        <version>${karaf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.core</artifactId>
+        <version>${osgi.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.caucho</groupId>
+        <artifactId>hessian</artifactId>
+        <version>${hessian.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.liquibase</groupId>
+        <artifactId>liquibase-osgi</artifactId>
+        <version>${liquibase.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <!--dependency>
+        <groupId>com.unboundid</groupId>
+        <artifactId>unboundid-ldapsdk</artifactId>
+        <version>${ldapsdk.version}</version>
+      </dependency-->
     </dependencies>
   </dependencyManagement>
   <build>

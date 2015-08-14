@@ -25,12 +25,10 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>${slf4j.version}</version>
     </dependency>
     <dependency>
       <groupId>com.cloudbees</groupId>
       <artifactId>syslog-java-client</artifactId>
-      <version>${syslog-java-client.version}</version>
     </dependency>
   </dependencies>
 </project>
