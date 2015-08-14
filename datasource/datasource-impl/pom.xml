@@ -29,8 +29,6 @@
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP-java6</artifactId>
-      <version>${hikaricp.version}</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

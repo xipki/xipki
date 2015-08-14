@@ -26,7 +26,6 @@
     <dependency>
       <groupId>com.caucho</groupId>
       <artifactId>hessian</artifactId>
-      <version>${hessian.version}</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>

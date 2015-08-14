@@ -41,7 +41,6 @@
     <!--dependency>
       <groupId>com.unboundid</groupId>
       <artifactId>unboundid-ldapsdk</artifactId>
-      <version>${ldapsdk.version}</version>
     </dependency-->
   </dependencies>
   <build>
