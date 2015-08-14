@@ -75,6 +75,7 @@ public class KeystoreP11Identity extends P11Identity
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Identity.class);
 
     private final String sha1sum;
+    private final PrivateKey privateKey;
     private final BlockingDeque<Cipher> rsaCiphers = new LinkedBlockingDeque<>();
     private final BlockingDeque<Signature> dsaSignatures = new LinkedBlockingDeque<>();
 
@@ -96,6 +97,7 @@ public class KeystoreP11Identity extends P11Identity
             throw new IllegalArgumentException("no certificate is specified");
         }
 
+        this.privateKey = privateKey;
         this.sha1sum = sha1sum;
         if(this.publicKey instanceof RSAPublicKey)
         {
@@ -293,6 +295,11 @@ public class KeystoreP11Identity extends P11Identity
     public String getSha1Sum()
     {
         return sha1sum;
+    }
+    
+    public PrivateKey getPrivateKey()
+    {
+    	return privateKey;
     }
 
 }
