@@ -40,12 +40,12 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import jline.console.ConsoleReader;
-
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
+
+import jline.console.ConsoleReader;
 
 /**
  * @author Lijun Liao
