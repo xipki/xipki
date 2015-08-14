@@ -6,7 +6,7 @@
     <artifactId>dist-group</artifactId>
     <version>2.0.0-SNAPSHOT</version>
   </parent>
-  <groupId>org.xipki.dist.pki</groupId>
+  <groupId>org.xipki.pki.dist.pki</groupId>
   <artifactId>dist-group</artifactId>
   <name>${project.groupId}.${project.artifactId}</name>
   <packaging>pom</packaging>

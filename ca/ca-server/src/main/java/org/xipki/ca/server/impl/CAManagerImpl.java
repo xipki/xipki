@@ -2528,6 +2528,7 @@ implements CAManager, CmpResponderManager, ScepManager
             ci = new X509CertificateInfo(
                     certInfo, certInfo, encodedSubjectPublicKey,
                     certprofile == null ? "UNKNOWN" : certprofile);
+            ci.setReqType(RequestType.CA);
         } catch (CertificateEncodingException e)
         {
             throw new CAMgmtException(e.getMessage(), e);

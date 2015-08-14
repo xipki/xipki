@@ -324,7 +324,7 @@ public class XMLUtil
             String ln = element.getLocalName();
             if(ln == null)
             {
-            	ln = element.getTagName();
+                ln = element.getTagName();
             }
             if(ln.equals(localname))
             {

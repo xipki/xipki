@@ -47,7 +47,7 @@ sleep 1000
 #################################################################
 xipki-caqa:env-check \
   --name certprofileType.map \
-  --value "DemoEE1?java:org.xipki.certprofile.demo.x509.DemoEE1X509Certprofile%DemoEE2?java:org.xipki.certprofile.demo.x509.DemoEE2X509Certprofile%"
+  --value "DemoEE1?java:org.xipki.ca.demo.certprofile.x509.DemoEE1X509Certprofile%DemoEE2?java:org.xipki.ca.demo.certprofile.x509.DemoEE2X509Certprofile%"
 
 xipki-ca:env-add \
   --name qa-env1 \

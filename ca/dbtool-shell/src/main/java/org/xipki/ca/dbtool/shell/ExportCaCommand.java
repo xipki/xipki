@@ -33,33 +33,43 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.dbtool.ca.shell;
+package org.xipki.ca.dbtool.shell;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.xipki.ca.dbtool.CaDbExporter;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.datasource.api.DataSourceFactory;
-import org.xipki.dbtool.ca.OcspDbImporter;
 import org.xipki.password.api.PasswordResolver;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "import-ocsp", description="import OCSP database")
-public class ImportOcspCommand extends XipkiOsgiCommandSupport
+@Command(scope = "xipki-db", name = "export-ca", description="export CA database")
+public class ExportCaCommand extends XipkiOsgiCommandSupport
 {
-    private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
+    private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ca-db.properties";
+    private static final int DFLT_NUM_CERTS_IN_BUNDLE = 1000;
+    private static final int DFLT_NUM_CRLS = 30;
 
     @Option(name = "--db-conf",
             description = "database configuration file")
     private String dbconfFile = DFLT_DBCONF_FILE;
 
-    @Option(name = "--in-dir",
+    @Option(name = "--out-dir",
             required = true,
-            description = "input directory\n"
+            description = "output directory\n"
                     + "(required)")
-    private String indir;
+    private String outdir;
+
+    @Option(name = "-n",
+            description = "number of certificates in one zip file")
+    private Integer numCertsInBundle = DFLT_NUM_CERTS_IN_BUNDLE;
+
+    @Option(name = "--num-crls",
+            description = "number of CRLs in one zip file")
+    private Integer numCrls = DFLT_NUM_CRLS;
 
     @Option(name = "--resume")
     private Boolean resume = Boolean.FALSE;
@@ -71,8 +81,8 @@ public class ImportOcspCommand extends XipkiOsgiCommandSupport
     protected Object _doExecute()
     throws Exception
     {
-        OcspDbImporter importer = new OcspDbImporter(dataSourceFactory, passwordResolver, dbconfFile, resume);
-        importer.importDatabase(indir);
+        CaDbExporter exporter = new CaDbExporter(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume);
+        exporter.exportDatabase(numCertsInBundle, numCrls);
         return null;
     }
 

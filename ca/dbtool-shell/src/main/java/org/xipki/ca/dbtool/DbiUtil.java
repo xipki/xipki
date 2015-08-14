@@ -33,58 +33,42 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.dbtool.ca.shell;
-
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.console.karaf.XipkiOsgiCommandSupport;
-import org.xipki.datasource.api.DataSourceFactory;
-import org.xipki.dbtool.ca.CaDbImporter;
-import org.xipki.password.api.PasswordResolver;
+package org.xipki.ca.dbtool;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "import-ca", description="import CA database")
-public class ImportCaCommand extends XipkiOsgiCommandSupport
+public class DbiUtil
 {
-    private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ca-db.properties";
-
-    @Option(name = "--db-conf",
-            description = "database configuration file")
-    private String dbconfFile = DFLT_DBCONF_FILE;
-
-    @Option(name = "--in-dir",
-            required = true,
-            description = "input directory\n"
-                    + "(required)")
-    private String indir;
-
-    @Option(name = "--resume")
-    private Boolean resume = Boolean.FALSE;
-
-    private DataSourceFactory dataSourceFactory;
-    private PasswordResolver passwordResolver;
-
-    @Override
-    protected Object _doExecute()
-    throws Exception
+    public static String buildFilename(
+            final String prefix,
+            final String suffix,
+            final int minCertIdOfCurrentFile,
+            final int maxCertIdOfCurrentFile,
+            final int maxCertId)
     {
-        CaDbImporter importer = new CaDbImporter(dataSourceFactory, passwordResolver, dbconfFile, resume);
-        importer.importDatabase(indir);
-        return null;
+        StringBuilder sb = new StringBuilder();
+        sb.append(prefix);
+
+        int len = Integer.toString(maxCertId).length();
+        String a = Integer.toString(minCertIdOfCurrentFile);
+        for(int i = 0; i < len - a.length(); i++)
+        {
+            sb.append('0');
+        }
+        sb.append(a);
+        sb.append("-");
+
+        String b = Integer.toString(maxCertIdOfCurrentFile);
+        for(int i = 0; i < len - b.length(); i++)
+        {
+            sb.append('0');
+        }
+        sb.append(b);
+
+        sb.append(suffix);
+        return sb.toString();
     }
 
-    public void setDataSourceFactory(
-            final DataSourceFactory dataSourceFactory)
-    {
-        this.dataSourceFactory = dataSourceFactory;
-    }
-
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver)
-    {
-        this.passwordResolver = passwordResolver;
-    }
 }

@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.dbtool.ca;
+package org.xipki.ca.dbtool;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,17 +65,17 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.dbi.ca.jaxb.CAConfigurationType;
-import org.xipki.dbi.ca.jaxb.CaHasPublisherType;
-import org.xipki.dbi.ca.jaxb.CaType;
-import org.xipki.dbi.ca.jaxb.CertStoreType;
-import org.xipki.dbi.ca.jaxb.CertStoreType.Cas;
-import org.xipki.dbi.ca.jaxb.CertStoreType.CertsFiles;
-import org.xipki.dbi.ca.jaxb.CertType;
-import org.xipki.dbi.ca.jaxb.CertsType;
-import org.xipki.dbi.ca.jaxb.CertstoreCaType;
-import org.xipki.dbi.ca.jaxb.NameIdType;
-import org.xipki.dbi.ca.jaxb.PublisherType;
+import org.xipki.ca.dbtool.jaxb.ca.CAConfigurationType;
+import org.xipki.ca.dbtool.jaxb.ca.CaHasPublisherType;
+import org.xipki.ca.dbtool.jaxb.ca.CaType;
+import org.xipki.ca.dbtool.jaxb.ca.CertStoreType;
+import org.xipki.ca.dbtool.jaxb.ca.CertStoreType.Cas;
+import org.xipki.ca.dbtool.jaxb.ca.CertStoreType.CertsFiles;
+import org.xipki.ca.dbtool.jaxb.ca.CertType;
+import org.xipki.ca.dbtool.jaxb.ca.CertsType;
+import org.xipki.ca.dbtool.jaxb.ca.CertstoreCaType;
+import org.xipki.ca.dbtool.jaxb.ca.NameIdType;
+import org.xipki.ca.dbtool.jaxb.ca.PublisherType;
 import org.xipki.dbtool.InvalidInputException;
 import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.HashAlgoType;
