@@ -9,7 +9,7 @@
       Note: Don't include a "-" in the persistent-id, or the config admin will
       interpret it as a service-factory.
   -->
-  <cm:property-placeholder persistent-id="org.xipki.pkiconsole.server" update-strategy="reload">
+  <cm:property-placeholder persistent-id="org.xipki.pki.pkiconsole.server" update-strategy="reload">
     <cm:default-properties>
       <cm:property name="truststore.type" value="PKCS12"/>
       <cm:property name="truststore.provider" value=""/>

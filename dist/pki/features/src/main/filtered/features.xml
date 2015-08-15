@@ -2,7 +2,10 @@
 <!-- 
  Copyright (c) 2014 Lijun Liao
 -->
-<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="xipki-${project.version}" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   name="xipki-${project.version}"
+   xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
   <repository>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</repository>
   <!-- Add the custom bundles for certprofiles here -->
   <feature name="xipki-certprofiles" version="${project.version}" resolver="(obr)">
@@ -18,17 +21,16 @@
   <feature name="xipki-signers" version="${project.version}" resolver="(obr)">
     <feature>xipki-security-base</feature>
   </feature>
-  <!--
-        Note: instead of defining all features monolithically in a central features file,
-        Project-plugins should be defined in their own feature descriptors and then aggregated later
-    -->
-  <feature name="bouncycastle" version="${project.version}" resolver="(obr)">
+  <!-- Note: instead of defining all features monolithically in a central features file,
+    Project-plugins should be defined in their own feature descriptors and then aggregated later
+  -->
+  <feature name="bouncycastle" version="${bc.version}" resolver="(obr)">
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
   </feature>
   <feature name="xipki-password" version="${proejct.version}" resolver="(obr)">
     <bundle>mvn:org.xipki.pki/password-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/common/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/password-impl/${project.version}</bundle>
   </feature>
   <feature name="xipki-datasource" version="${project.version}" resolver="(obr)">
@@ -41,7 +43,6 @@
   <feature name="xipki-security-base" version="${project.version}" resolver="(obr)">
     <feature>bouncycastle</feature>
     <feature>xipki-password</feature>
-    <bundle>mvn:org.xipki.pki/common/${project.version}</bundle>
     <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/pkcs11-wrapper/${pkcs11-wrapper.version}/$Bundle-SymbolicName=pkcs11-wrapper&Bundle-Version=${pkcs11-wrapper.version}]]></bundle>
     <bundle>mvn:org.xipki.pki/security-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/security-impl/${project.version}</bundle>
@@ -51,22 +52,24 @@
     <feature>xipki-signers</feature>
   </feature>
   <feature name="xipki-ca-api" version="${project.version}" resolver="(obr)">
-    <bundle>mvn:org.xipki.pki/util/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/common/${project.version}</bundle>
+    <feature>bouncycastle</feature>
+    <feature>xipki-audit</feature>
     <bundle>mvn:org.xipki.pki/ca-common/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/audit/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/security-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/common/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/datasource-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/password-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-api/${project.version}</bundle>
   </feature>
   <feature name="xipki-cabase" version="${project.version}" resolver="(obr)">
     <feature>xipki-security</feature>
     <feature>xipki-ca-api</feature>
-    <bundle>mvn:org.xipki.pki/audit/${project.version}</bundle>
+    <feature>xipki-audit</feature>
     <bundle>mvn:org.xipki.pki/datasource-api/${project.version}</bundle>
   </feature>
   <feature name="xipki-caserver" version="${project.version}" resolver="(obr)">
     <feature>xipki-datasource</feature>
     <feature>xipki-cabase</feature>
-    <feature>xipki-audit</feature>
     <feature>xipki-certprofiles</feature>
     <feature>xipki-publishers</feature>
     <bundle>mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
@@ -125,7 +128,6 @@
     <feature>xipki-datasource</feature>
     <feature>xipki-security</feature>
     <feature>xipki-audit</feature>
-    <bundle>mvn:org.xipki.pki/audit/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ocsp-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ocsp-server/${project.version}</bundle>
   </feature>

@@ -78,6 +78,13 @@ public class KeystoreP11Module implements P11Module
         File baseDir = new File(IoUtil.expandFilepath(nativeLib));
         File[] children = baseDir.listFiles();
 
+        if(children == null || children.length == 0)
+        {
+            LOG.error("found no slots");
+            this.slotIds = Collections.emptyList();
+            return;
+        }
+
         Set<Integer> allSlotIndexes = new HashSet<>();
         Set<Long> allSlotIdentifiers = new HashSet<>();
 
