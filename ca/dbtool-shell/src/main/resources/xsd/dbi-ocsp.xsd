@@ -12,7 +12,7 @@
   <xs:annotation>
     <xs:appinfo>
       <jxb:schemaBindings>
-        <jxb:package name="org.xipki.ca.dbtool.jaxb.ocsp"/>
+        <jxb:package name="org.xipki.pki.ca.dbtool.jaxb.ocsp"/>
       </jxb:schemaBindings>
     </xs:appinfo>
   </xs:annotation>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
-  <cm:property-placeholder persistent-id="org.xipki.ocsp.client" update-strategy="reload">
+  <cm:property-placeholder persistent-id="org.xipki.pki.ocsp.client" update-strategy="reload">
     <cm:default-properties>
       <cm:property name="signer.type" value=""/>
       <cm:property name="signer.conf" value=""/>
@@ -8,11 +8,11 @@
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
-  <bean id="ocspRequestor" class="org.xipki.ocsp.client.impl.DefaultHttpOCSPRequestor">
+  <bean id="ocspRequestor" class="org.xipki.pki.ocsp.client.impl.DefaultHttpOCSPRequestor">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="signerType" value="${signer.type}"/>
     <property name="signerConf" value="${signer.conf}"/>
     <property name="signerCertFile" value="${signer.cert}"/>
   </bean>
-  <service ref="ocspRequestor" interface="org.xipki.ocsp.client.api.OCSPRequestor"/>
+  <service ref="ocspRequestor" interface="org.xipki.pki.ocsp.client.api.OCSPRequestor"/>
 </blueprint>

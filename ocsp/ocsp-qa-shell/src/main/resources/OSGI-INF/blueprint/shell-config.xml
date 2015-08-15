@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" default-activation="lazy">
-  <reference id="ocspQA" interface="org.xipki.ocsp.qa.api.OcspQA"/>
+  <reference id="ocspQA" interface="org.xipki.pki.ocsp.qa.api.OcspQA"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
-  <reference id="ocspRequestor" interface="org.xipki.ocsp.client.api.OCSPRequestor"/>
+  <reference id="ocspRequestor" interface="org.xipki.pki.ocsp.client.api.OCSPRequestor"/>
   <reference id="sigAlgCompleter" interface="org.xipki.console.karaf.SigAlgCompleter"/>
   <reference id="hashAlgCompleter" interface="org.xipki.console.karaf.HashAlgCompleter"/>
-  <bean id="certStatusCompleter" class="org.xipki.ocsp.qa.shell.completer.CertStatusCompleter"/>
-  <bean id="ocspErrorCompleter" class="org.xipki.ocsp.qa.shell.completer.OcspErrorCompleter"/>
-  <bean id="occurrenceCompleter" class="org.xipki.ocsp.qa.shell.completer.OccurrenceCompleter"/>  
+  <bean id="certStatusCompleter" class="org.xipki.pki.ocsp.qa.shell.completer.CertStatusCompleter"/>
+  <bean id="ocspErrorCompleter" class="org.xipki.pki.ocsp.qa.shell.completer.OcspErrorCompleter"/>
+  <bean id="occurrenceCompleter" class="org.xipki.pki.ocsp.qa.shell.completer.OccurrenceCompleter"/>  
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
-      <action class="org.xipki.ocsp.qa.shell.OCSPQAStatusCommand">
+      <action class="org.xipki.pki.ocsp.qa.shell.OCSPQAStatusCommand">
         <property name="requestor" ref="ocspRequestor"/>
         <property name="ocspQA" ref="ocspQA"/>
       </action>

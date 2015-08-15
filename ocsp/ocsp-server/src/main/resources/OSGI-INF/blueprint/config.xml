@@ -11,7 +11,7 @@
       Note: Don't include a "-" in the persistent-id, or the config admin will
       interpret it as a service-factory.
   -->
-  <cm:property-placeholder persistent-id="org.xipki.ocsp.server" update-strategy="reload">
+  <cm:property-placeholder persistent-id="org.xipki.pki.ocsp.server" update-strategy="reload">
     <cm:default-properties>
       <cm:property name="confFile" value="xipki/ocsp-config/ocsp-responder.xml"/>
       <cm:property name="urlPatterns" value="/ocsp/*"/>
@@ -21,7 +21,7 @@
   <reference id="dataSourceFactory" interface="org.xipki.datasource.api.DataSourceFactory"/>
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
   <reference id="auditServiceRegister" interface="org.xipki.audit.api.AuditLoggingServiceRegister"/>
-  <bean id="ocspServer" class="org.xipki.ocsp.server.impl.OcspServer" 
+  <bean id="ocspServer" class="org.xipki.pki.ocsp.server.impl.OcspServer" 
       init-method="init" destroy-method="shutdown">
     <property name="confFile" value="${confFile}"/>
     <property name="dataSourceFactory" ref="dataSourceFactory"/>
@@ -29,7 +29,7 @@
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
   <!-- create the servlet and inject our own app factory -->
-  <bean id="ocspServlet" class="org.xipki.ocsp.server.impl.Rfc2560Servlet">
+  <bean id="ocspServlet" class="org.xipki.pki.ocsp.server.impl.Rfc2560Servlet">
     <property name="server" ref="ocspServer"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
@@ -40,7 +40,7 @@
     </service-properties>
   </service>
   <!-- create the servlet and inject our own app factory -->
-  <bean id="healthServlet" class="org.xipki.ocsp.server.impl.HealthCheckServlet">
+  <bean id="healthServlet" class="org.xipki.pki.ocsp.server.impl.HealthCheckServlet">
     <property name="server" ref="ocspServer"/>
   </bean>
   <service ref="healthServlet" interface="javax.servlet.Servlet">

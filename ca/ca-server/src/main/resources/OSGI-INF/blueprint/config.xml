@@ -9,7 +9,7 @@
       Note: Don't include a "-" in the persistent-id, or the config admin will
       interpret it as a service-factory.
   -->
-  <cm:property-placeholder persistent-id="org.xipki.ca.server" update-strategy="reload">
+  <cm:property-placeholder persistent-id="org.xipki.pki.ca.server" update-strategy="reload">
     <cm:default-properties>
       <cm:property name="urlPatterns" value="/cmp/*"/>
       <cm:property name="caConfFile" value="xipki/ca-config/ca.properties"/>
@@ -19,15 +19,15 @@
   <reference id="dataSourceFactory" interface="org.xipki.datasource.api.DataSourceFactory"/>
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
   <reference id="auditServiceRegister" interface="org.xipki.audit.api.AuditLoggingServiceRegister"/>
-  <bean id="caManager" class="org.xipki.ca.server.impl.CAManagerImpl" init-method="startCaSystem" destroy-method="shutdown">
+  <bean id="caManager" class="org.xipki.pki.ca.server.impl.CAManagerImpl" init-method="startCaSystem" destroy-method="shutdown">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="dataSourceFactory" ref="dataSourceFactory"/>
     <property name="caConfFile" value="${caConfFile}"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
-  <service ref="caManager" interface="org.xipki.ca.server.mgmt.api.CAManager"/>
+  <service ref="caManager" interface="org.xipki.pki.ca.server.mgmt.api.CAManager"/>
   <!-- CMP servlet -->
-  <bean id="cmpServlet" class="org.xipki.ca.server.impl.cmp.Rfc6712Servlet">
+  <bean id="cmpServlet" class="org.xipki.pki.ca.server.impl.cmp.Rfc6712Servlet">
     <property name="responderManager" ref="caManager"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
@@ -37,7 +37,7 @@
     </service-properties>
   </service>
   <!-- SCEP servlet -->
-  <bean id="scepServlet" class="org.xipki.ca.server.impl.scep.ScepServlet">
+  <bean id="scepServlet" class="org.xipki.pki.ca.server.impl.scep.ScepServlet">
     <property name="responderManager" ref="caManager"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
@@ -47,7 +47,7 @@
     </service-properties>
   </service>
   
-  <bean id="healthServlet" class="org.xipki.ca.server.impl.HealthCheckServlet">
+  <bean id="healthServlet" class="org.xipki.pki.ca.server.impl.HealthCheckServlet">
     <property name="responderManager" ref="caManager"/>
   </bean>
   <service ref="healthServlet" interface="javax.servlet.Servlet">
