@@ -55,7 +55,6 @@
   </properties>
   <modules>
     <module>shell-base</module>
-    <module>util</module>
     <module>scep4j</module>
     <module>audit</module>
     <module>datasource</module>
