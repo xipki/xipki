@@ -62,6 +62,9 @@ goto OS_END
 SET NATIVE_LIB=native-lib\windows\win_x86
 :OS_END
 
+rem prevent from regenerating the host key for SSH server on every newstart of karaf
+SET KARAF_OPTS=%KARAF_OPTS% -Dorg.apache.sshd.registerBouncyCastle=false
+
 SET PATH = %PATH% %NATIVE_LIB%
 
 rem SET KARAF_OPTS=%KARAF_OPTS% -DNSSLIB=point\to\firefox

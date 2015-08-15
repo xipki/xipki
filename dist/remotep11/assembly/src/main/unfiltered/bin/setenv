@@ -49,6 +49,9 @@ UNAME=`echo $UNAME | tr '[:upper:]' '[:lower:]'`
 
 NATIVE_LIB="xipki/native-lib/unix/$UNAME"
 
+# prevent from regenerating the host key for SSH server on every newstart of karaf
+KARAF_OPTS="$KARAF_OPTS -Dorg.apache.sshd.registerBouncyCastle=false"
+
 KARAF_OPTS="$KARAF_OPTS -Djava.library.path=$NATIVE_LIB"
 KARAF_OPTS="$KARAF_OPTS -Dsun.net.http.errorstream.enableBuffering=true"
 #KARAF_OPTS="$KARAF_OPTS -Djavax.net.debug=all"

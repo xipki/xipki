@@ -49,6 +49,9 @@ UNAME=`echo $UNAME | tr '[:upper:]' '[:lower:]'`
 
 NATIVE_LIB="xipki/native-lib/unix/$UNAME"
 
+# prevent from regenerating the host key for SSH server on every newstart of karaf
+KARAF_OPTS="$KARAF_OPTS -Dorg.apache.sshd.registerBouncyCastle=false"
+
 #KARAF_OPTS="$KARAF_OPTS -DNSSLIB=/point/to/firefox"
 KARAF_OPTS="$KARAF_OPTS -Djava.library.path=$NATIVE_LIB"
 #KARAF_OPTS="$KARAF_OPTS -Dorg.xipki.signservice.timeout=10000"
