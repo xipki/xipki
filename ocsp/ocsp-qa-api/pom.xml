@@ -18,5 +18,9 @@
       <artifactId>common</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk15on</artifactId>
+    </dependency>
   </dependencies>
 </project>

@@ -26,10 +26,5 @@
       <artifactId>security-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>password-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
   </dependencies>
 </project>
