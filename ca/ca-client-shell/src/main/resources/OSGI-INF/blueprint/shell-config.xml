@@ -2,7 +2,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" default-activation="lazy">
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
   <reference id="hashAlgCompleter" interface="org.xipki.console.karaf.HashAlgCompleter"/>
-  <reference id="caClient" interface="org.xipki.ca.client.api.CAClient"/>
+  <reference id="caClient" interface="org.xipki.pki.ca.client.api.CAClient"/>
   <reference id="dataSourceFactory" interface="org.xipki.datasource.api.DataSourceFactory" availability="optional"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <reference id="clientCrlReasonCompleter" interface="org.xipki.console.karaf.ClientCRLReasonCompleter"/>
@@ -10,16 +10,16 @@
   <reference id="keyusageCompleter" interface="org.xipki.console.karaf.KeyusageCompleter"/>
   <reference id="extKeyusageCompleter" interface="org.xipki.console.karaf.ExtKeyusageCompleter"/>
   <reference id="extNameCompleter" interface="org.xipki.console.karaf.ExtensionNameCompleter"/>
-  <bean id="randomDNCompleter" class="org.xipki.ca.client.shell.completer.RandomDNCompleter"/>
-  <bean id="caNameCompleter" class="org.xipki.ca.client.shell.completer.CaNameCompleter">
+  <bean id="randomDNCompleter" class="org.xipki.pki.ca.client.shell.completer.RandomDNCompleter"/>
+  <bean id="caNameCompleter" class="org.xipki.pki.ca.client.shell.completer.CaNameCompleter">
     <property name="caClient" ref="caClient"/>
   </bean>
-  <bean id="p11ModuleNameCompleter" class="org.xipki.ca.client.shell.completer.P11ModuleNameCompleter">
+  <bean id="p11ModuleNameCompleter" class="org.xipki.pki.ca.client.shell.completer.P11ModuleNameCompleter">
     <property name="securityFactory" ref="securityFactory"/>
   </bean>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
-      <action class="org.xipki.ca.client.shell.P10EnrollCertCommand">
+      <action class="org.xipki.pki.ca.client.shell.P10EnrollCertCommand">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -31,7 +31,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.client.shell.P11EnrollCertCommand">
+      <action class="org.xipki.pki.ca.client.shell.P11EnrollCertCommand">
         <property name="caClient" ref="caClient"/>
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -50,7 +50,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.client.shell.P12EnrollCertCommand">
+      <action class="org.xipki.pki.ca.client.shell.P12EnrollCertCommand">
         <property name="caClient" ref="caClient"/>
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -69,7 +69,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.client.shell.RevokeCertCommand">
+      <action class="org.xipki.pki.ca.client.shell.RevokeCertCommand">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -81,7 +81,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.client.shell.UnrevokeCertCommand">
+      <action class="org.xipki.pki.ca.client.shell.UnrevokeCertCommand">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -92,7 +92,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.client.shell.RemoveCertCommand">
+      <action class="org.xipki.pki.ca.client.shell.RemoveCertCommand">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -103,7 +103,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.client.shell.RemoveExpiredCertsCommand">
+      <action class="org.xipki.pki.ca.client.shell.RemoveExpiredCertsCommand">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -113,7 +113,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.client.shell.GenCRLCommand">
+      <action class="org.xipki.pki.ca.client.shell.GenCRLCommand">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -124,7 +124,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.client.shell.GetCRLCommand">
+      <action class="org.xipki.pki.ca.client.shell.GetCRLCommand">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -136,7 +136,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.client.shell.loadtest.CALoadTestEnrollCommand">
+      <action class="org.xipki.pki.ca.client.shell.loadtest.CALoadTestEnrollCommand">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -145,7 +145,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.client.shell.loadtest.CALoadTestTemplateEnrollCommand">
+      <action class="org.xipki.pki.ca.client.shell.loadtest.CALoadTestTemplateEnrollCommand">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -153,7 +153,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.client.shell.loadtest.CALoadTestRevokeCommand">
+      <action class="org.xipki.pki.ca.client.shell.loadtest.CALoadTestRevokeCommand">
         <property name="caClient" ref="caClient"/>
         <property name="securityFactory" ref="securityFactory"/>
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
@@ -164,7 +164,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.client.shell.HealthCommand">
+      <action class="org.xipki.pki.ca.client.shell.HealthCommand">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>

@@ -44,7 +44,7 @@
 	com.caucho.services.client;resolution:=optional,
 	com.caucho.services.message;resolution:=optional,
 	com.caucho.services.name;resolution:=optional,
-	org.xipki.ca.api.profile;resolution:=optional,
+	org.xipki.pki.ca.api.profile;resolution:=optional,
 	*
             </Import-Package>
           </instructions>
