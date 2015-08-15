@@ -90,6 +90,7 @@
         <include>camgmt-demo.script</include>
         <include>prepare.script</include>
         <include>p12.script</include>
+        <include>scep-server.script</include>
         <include>profile/**</include>
       </includes>
       <outputDirectory>xipki/demo</outputDirectory>
