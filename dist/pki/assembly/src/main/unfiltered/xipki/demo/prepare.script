@@ -4,7 +4,7 @@
 
 xipki-ca:env-add \
   --name certprofileType.map \
-  --value "DemoEE1?java:org.xipki.ca.demo.certprofile.x509.DemoEE1X509Certprofile%DemoEE2?java:org.xipki.ca.demo.certprofile.x509.DemoEE2X509Certprofile%"
+  --value "DemoEE1?java:org.xipki.pki.ca.demo.certprofile.x509.DemoEE1X509Certprofile%DemoEE2?java:org.xipki.pki.ca.demo.certprofile.x509.DemoEE2X509Certprofile%"
 
 ## CMP control: messageTimeBias is set to 300 seconds.
 xipki-ca:cmpcontrol-add \

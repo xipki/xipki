@@ -7,22 +7,22 @@
       interpret it as a service-factory.
   -->
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
-  <reference id="caClient" interface="org.xipki.ca.client.api.CAClient"/>
+  <reference id="caClient" interface="org.xipki.pki.ca.client.api.CAClient"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <reference id="clientCrlReasonCompleter" interface="org.xipki.console.karaf.ClientCRLReasonCompleter"/>
-  <bean id="caNameCompleter" class="org.xipki.ca.client.shell.completer.CaNameCompleter">
+  <bean id="caNameCompleter" class="org.xipki.pki.ca.client.shell.completer.CaNameCompleter">
     <property name="caClient" ref="caClient"/>
   </bean>
-  <reference id="qaSystemManager" interface="org.xipki.ca.qa.api.QASystemManager"/>
-  <bean id="x509IssuerNameCompleter" class="org.xipki.ca.qa.shell.completer.X509IssuerNameCompleter">
+  <reference id="qaSystemManager" interface="org.xipki.pki.ca.qa.api.QASystemManager"/>
+  <bean id="x509IssuerNameCompleter" class="org.xipki.pki.ca.qa.shell.completer.X509IssuerNameCompleter">
     <property name="qaSystemManager" ref="qaSystemManager"/>
   </bean>
-  <bean id="x509CertprofileNameCompleter" class="org.xipki.ca.qa.shell.completer.X509CertprofileNameCompleter">
+  <bean id="x509CertprofileNameCompleter" class="org.xipki.pki.ca.qa.shell.completer.X509CertprofileNameCompleter">
     <property name="qaSystemManager" ref="qaSystemManager"/>
   </bean>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
-      <action class="org.xipki.ca.qa.shell.CheckCertCommand">
+      <action class="org.xipki.pki.ca.qa.shell.CheckCertCommand">
         <property name="qaSystemManager" ref="qaSystemManager"/>
       </action>
       <optional-completers>
@@ -33,7 +33,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.qa.shell.NegP10EnrollCertCommand">
+      <action class="org.xipki.pki.ca.qa.shell.NegP10EnrollCertCommand">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -45,7 +45,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.qa.shell.NegP12EnrollCertCommand">
+      <action class="org.xipki.pki.ca.qa.shell.NegP12EnrollCertCommand">
         <property name="caClient" ref="caClient"/>
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -58,7 +58,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.qa.shell.NegRevokeCertCommand">
+      <action class="org.xipki.pki.ca.qa.shell.NegRevokeCertCommand">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -70,7 +70,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.qa.shell.NegUnrevokeCertCommand">
+      <action class="org.xipki.pki.ca.qa.shell.NegUnrevokeCertCommand">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -81,7 +81,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.qa.shell.NegGenCRLCommand">
+      <action class="org.xipki.pki.ca.qa.shell.NegGenCRLCommand">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -92,7 +92,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.qa.shell.NegGetCRLCommand">
+      <action class="org.xipki.pki.ca.qa.shell.NegGetCRLCommand">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>

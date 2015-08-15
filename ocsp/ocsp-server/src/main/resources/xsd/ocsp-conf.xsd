@@ -2,8 +2,8 @@
 <!--
  Copyright (c) 2014 - 2015 Lijun Liao
 -->
-<xs:schema  xmlns="http://xipki.org/xipki/ocsp/conf/v2"
-  targetNamespace="http://xipki.org/xipki/ocsp/conf/v2"
+<xs:schema  xmlns="http://xipki.org.xipki.pki.ocsp.conf/v2"
+  targetNamespace="http://xipki.org.xipki.pki.ocsp.conf/v2"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
   elementFormDefault="qualified"
@@ -12,7 +12,7 @@
   <xs:annotation>
     <xs:appinfo>
       <jxb:schemaBindings>
-        <jxb:package name="org.xipki.ocsp.server.impl.jaxb"/>
+        <jxb:package name="org.xipki.pki.ocsp.server.impl.jaxb"/>
       </jxb:schemaBindings>
     </xs:appinfo>
   </xs:annotation>
@@ -396,7 +396,7 @@
       <xs:element name="className" type="xs:string">
         <xs:annotation>
           <xs:documentation>
-             class that extends the Java class org.xipki.ocsp.api.CertStatusStore
+             class that extends the Java class org.xipki.pki.ocsp.api.CertStatusStore
           </xs:documentation>
         </xs:annotation>
       </xs:element>

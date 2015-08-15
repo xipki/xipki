@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<enrollTemplate xmlns="http://xipki.org/xipki/caclient/loadtest">
+<enrollTemplate xmlns="http://xipki.org.xipki.pki.ca.lient/loadtest">
   <!--
   <enrollCert>
     <certprofile>certificate profile name</certprofile>

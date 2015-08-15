@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" default-activation="lazy">
-  <reference id="caManager" interface="org.xipki.ca.server.mgmt.api.CAManager"/>
+  <reference id="caManager" interface="org.xipki.pki.ca.server.mgmt.api.CAManager"/>
   <reference id="passwordResolver" interface="org.xipki.password.api.PasswordResolver"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <reference id="yesNoCompleter" interface="org.xipki.console.karaf.YesNoCompleter"/>
@@ -12,86 +12,86 @@
   <bean id="crlSignerTypeCompleter" class="org.xipki.console.karaf.EnumCompleter">
     <property name="tokens" value="CA, JKS, PKCS11, PKCS12"/>
   </bean>
-  <bean id="duplicationModeCompleter" class="org.xipki.ca.server.mgmt.shell.completer.DuplicationModeCompleter"/>
-  <bean id="validityModeCompleter" class="org.xipki.ca.server.mgmt.shell.completer.ValidityModeCompleter"/>
-  <bean id="caCrlReasonCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CACRLReasonCompleter"/>
-  <bean id="rcaNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.RcaNameCompleter">
+  <bean id="duplicationModeCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.DuplicationModeCompleter"/>
+  <bean id="validityModeCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.ValidityModeCompleter"/>
+  <bean id="caCrlReasonCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.CACRLReasonCompleter"/>
+  <bean id="rcaNameCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.RcaNameCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
-  <bean id="caNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter">
+  <bean id="caNameCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
-  <bean id="caNamePlusAllCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CaNamePlusAllCompleter">
+  <bean id="caNamePlusAllCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.CaNamePlusAllCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
-  <bean id="scepNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.ScepNameCompleter">
+  <bean id="scepNameCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
-  <bean id="caAliasCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CaAliasCompleter">
+  <bean id="caAliasCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.CaAliasCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
-  <bean id="profileNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter">
+  <bean id="profileNameCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
-  <bean id="profileNameAndAllCompleter" class="org.xipki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter">
+  <bean id="profileNameAndAllCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
-  <bean id="publisherNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter">
+  <bean id="publisherNameCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
-  <bean id="publisherNamePlusAllCompleter" class="org.xipki.ca.server.mgmt.shell.completer.PublisherNamePlusAllCompleter">
+  <bean id="publisherNamePlusAllCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNamePlusAllCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
-  <bean id="requestorNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.RequestorNameCompleter">
+  <bean id="requestorNameCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.RequestorNameCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
-  <bean id="responderNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.ResponderNameCompleter">
+  <bean id="responderNameCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.ResponderNameCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
-  <bean id="responderNamePlusNullCompleter" class="org.xipki.ca.server.mgmt.shell.completer.ResponderNamePlusNullCompleter">
+  <bean id="responderNamePlusNullCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.ResponderNamePlusNullCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
-  <bean id="crlSignerNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter">
+  <bean id="crlSignerNameCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
-  <bean id="crlSignerNamePlusNullCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CrlSignerNamePlusNullCompleter">
+  <bean id="crlSignerNamePlusNullCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNamePlusNullCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
-  <bean id="cmpControlNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CmpControlNameCompleter">
+  <bean id="cmpControlNameCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNameCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
-  <bean id="cmpControlNamePlusNullCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CmpControlNamePlusNullCompleter">
+  <bean id="cmpControlNamePlusNullCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNamePlusNullCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
-  <bean id="envNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.EnvNameCompleter">
+  <bean id="envNameCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.EnvNameCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
-  <bean id="permissionCompleter" class="org.xipki.ca.server.mgmt.shell.completer.PermissionCompleter"/>
+  <bean id="permissionCompleter" class="org.xipki.pki.ca.server.mgmt.shell.completer.PermissionCompleter"/>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <!-- CA system -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaSystemNotifyChangeCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaSystemNotifyChangeCommand">
         <property name="caManager" ref="caManager"/>
       </action>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaSystemRestartCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaSystemRestartCommand">
         <property name="caManager" ref="caManager"/>
       </action>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaSystemStatusCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaSystemStatusCommand">
         <property name="caManager" ref="caManager"/>
       </action>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaSystemUnlockCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaSystemUnlockCommand">
         <property name="caManager" ref="caManager"/>
       </action>
     </command>
     <!-- CA -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaAddFromFileCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaAddFromFileCommand">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -100,7 +100,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaAddCommand">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -118,7 +118,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaRevokeCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaRevokeCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -130,7 +130,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaUnrevokeCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaUnrevokeCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -139,7 +139,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaRemoveCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -148,7 +148,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaGenRootCAFromFileCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaGenRootCAFromFileCommand">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -159,7 +159,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaGenRootCACommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaGenRootCACommand">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -178,7 +178,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaPublishRCACertCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaPublishRCACertCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -187,7 +187,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaInfoCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -196,7 +196,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaUpdateCommand">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -215,7 +215,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaExportCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaExportCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -225,7 +225,7 @@
     </command>
     <!-- CA Alias -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaAliasAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaAliasAddCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -233,7 +233,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaAliasInfoCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaAliasInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -242,7 +242,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaAliasRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaAliasRemoveCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -252,7 +252,7 @@
     </command>
     <!--  CA-Profile -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaProfileAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaProfileAddCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -261,7 +261,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaProfileInfoCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaProfileInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -269,7 +269,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaProfileRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaProfileRemoveCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -278,7 +278,7 @@
     </command>
     <!--  CA-Publisher -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaPublisherAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaPublisherAddCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -287,7 +287,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaPublisherInfoCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaPublisherInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -295,7 +295,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaPublisherRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaPublisherRemoveCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -305,7 +305,7 @@
     </command>
     <!--  CA requestor -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaRequestorAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaRequestorAddCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -317,7 +317,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaRequestorInfoCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaRequestorInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -325,7 +325,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaRequestorRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CaRequestorRemoveCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -335,7 +335,7 @@
     </command>
     <!-- CMPControl -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CmpControlInfoCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CmpControlInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -344,7 +344,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CmpControlRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CmpControlRemoveCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -353,12 +353,12 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CmpControlAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CmpControlAddCommand">
         <property name="caManager" ref="caManager"/>
       </action>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CmpControlUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CmpControlUpdateCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -367,7 +367,7 @@
     </command>
     <!-- CRL signer -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CrlSignerAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CrlSignerAddCommand">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -377,7 +377,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CrlSignerInfoCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CrlSignerInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -386,7 +386,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CrlSignerRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CrlSignerRemoveCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -395,7 +395,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CrlSignerUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.CrlSignerUpdateCommand">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -407,21 +407,12 @@
     </command>
     <!-- Environment -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.EnvAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.EnvAddCommand">
         <property name="caManager" ref="caManager"/>
       </action>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.EnvInfoCommand">
-        <property name="caManager" ref="caManager"/>
-      </action>
-      <completers>
-        <ref component-id="envNameCompleter"/>
-        <null/>
-      </completers>
-    </command>
-    <command>
-      <action class="org.xipki.ca.server.mgmt.shell.EnvRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.EnvInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -430,7 +421,16 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.EnvUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.EnvRemoveCommand">
+        <property name="caManager" ref="caManager"/>
+      </action>
+      <completers>
+        <ref component-id="envNameCompleter"/>
+        <null/>
+      </completers>
+    </command>
+    <command>
+      <action class="org.xipki.pki.ca.server.mgmt.shell.EnvUpdateCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -439,7 +439,7 @@
     </command>
     <!-- Profile -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.ProfileAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.ProfileAddCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -447,7 +447,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.ProfileInfoCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.ProfileInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -456,7 +456,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.ProfileRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.ProfileRemoveCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -465,7 +465,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.ProfileUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.ProfileUpdateCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -474,7 +474,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.ProfileExportCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.ProfileExportCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -484,7 +484,7 @@
     </command>
     <!-- Publisher -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.PublisherAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.PublisherAddCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -492,7 +492,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.PublisherExportCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.PublisherExportCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -501,7 +501,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.PublisherInfoCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.PublisherInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -510,7 +510,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.PublisherRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.PublisherRemoveCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -519,7 +519,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.PublisherUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.PublisherUpdateCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -528,7 +528,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.RepublishCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.RepublishCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -537,7 +537,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.ClearPublishQueueCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.ClearPublishQueueCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -547,7 +547,7 @@
     </command>
     <!-- Requestor -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.RequestorAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.RequestorAddCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -555,7 +555,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.RequestorInfoCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.RequestorInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -564,7 +564,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.RequestorRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.RequestorRemoveCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -573,7 +573,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.RequestorUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.RequestorUpdateCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -583,7 +583,7 @@
     </command>
     <!-- Responder -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.ResponderInfoCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.ResponderInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -591,7 +591,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.ResponderRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.ResponderRemoveCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -599,7 +599,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.ResponderAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.ResponderAddCommand">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -609,7 +609,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.ResponderUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.ResponderUpdateCommand">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -621,28 +621,28 @@
     </command>
     <!-- Add user -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.UserAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.UserAddCommand">
         <property name="caManager" ref="caManager"/>
       </action>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.UserUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.UserUpdateCommand">
         <property name="caManager" ref="caManager"/>
       </action>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.UserInfoCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.UserInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.UserRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.UserRemoveCommand">
         <property name="caManager" ref="caManager"/>
       </action>
     </command>
     <!-- SCEP -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.ScepAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.ScepAddCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -651,7 +651,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.ScepInfoCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.ScepInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -659,7 +659,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.ScepRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.ScepRemoveCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -667,7 +667,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.ScepUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.ScepUpdateCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -677,7 +677,7 @@
     <!-- Certificate management -->
     <!-- Enroll Certificate -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.cert.EnrollCertCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.cert.EnrollCertCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -689,7 +689,7 @@
     </command>
     <!-- Enroll Certificate -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.cert.RevokeCertCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.cert.RevokeCertCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -700,7 +700,7 @@
     </command>
     <!-- Enroll Certificate -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.cert.UnrevokeCertCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.cert.UnrevokeCertCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -710,7 +710,7 @@
     </command>
     <!-- Remove Certificate -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.cert.RemoveCertCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.shell.cert.RemoveCertCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
