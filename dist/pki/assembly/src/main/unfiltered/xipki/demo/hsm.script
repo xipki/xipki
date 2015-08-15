@@ -134,7 +134,7 @@ xipki-tk:update-cert \
 #################################################################
 ## Add CA
 xipki-ca:ca-add \
-  --name SubCA1 \
+  --name SubCA1.complex-Name \
   --permission all \
   --next-serial 1 \
   --next-crl-no 2 \
@@ -149,7 +149,7 @@ xipki-ca:ca-add \
   --duplicate-key permitted
 
 xipki-ca:caalias-add \
-  --ca SubCA1 \
+  --ca SubCA1.complex-Name \
   --alias SubCA
 
 ## Add cert profile to CA
@@ -176,7 +176,7 @@ xipki-ca:caprofile-add \
 
 ## Add publisher
 xipki-ca:capub-add \
-  --ca SubCA1 \
+  --ca SubCA1.complex-Name \
   --publisher OCSP.PUBLISHER
 
 # Add requestor to CA
@@ -185,7 +185,7 @@ xipki-ca:careq-add \
   --permission all \
   --ra yes \
   --profile all \
-  --ca SubCA1
+  --ca SubCA1.complex-Name
 
 ## Restart the CA
 #xipki-ca:restart
