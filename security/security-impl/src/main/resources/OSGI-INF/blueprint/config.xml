@@ -13,8 +13,6 @@
       <cm:property name="signerType.map" value=""/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <bean id="sshBcBugfix" class="org.xipki.security.SshdBcBugfix">
-  </bean>
 
   <reference id="passwordResolver" interface="org.xipki.password.api.PasswordResolver"/>
 
