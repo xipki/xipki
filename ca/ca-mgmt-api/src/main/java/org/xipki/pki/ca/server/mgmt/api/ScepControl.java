@@ -37,10 +37,10 @@ package org.xipki.pki.ca.server.mgmt.api;
 
 import java.io.Serializable;
 
+import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.security.api.CmpUtf8Pairs;
 
 /**
  *
@@ -48,10 +48,10 @@ import org.xipki.security.api.CmpUtf8Pairs;
  * caCert.included?true%signerCert.included?false
  *
  * # Whether CA certificate is included in the response. Default is true
- * caCert.included?<'true'|'false'>
+ * caCert.included=<'true'|'false'>
  *
  * # Whether CMS signer certificate is embedded in the CMS message. Default is true
- * signerCert.included = <'true'|'false'>
+ * signerCert.included=<'true'|'false'>
  *
  * @author Lijun Liao
  */
@@ -75,10 +75,10 @@ public class ScepControl implements Serializable
             return;
         }
         ParamUtil.assertNotBlank("conf", conf);
-        CmpUtf8Pairs props;
+        ConfPairs props;
         try
         {
-            props = new CmpUtf8Pairs(conf);
+            props = new ConfPairs(conf);
         }catch(RuntimeException e)
         {
             throw new InvalidConfException(e.getClass().getName() + ": " + e.getMessage(), e);
@@ -89,7 +89,7 @@ public class ScepControl implements Serializable
     }
 
     private static boolean getBoolean(
-            final CmpUtf8Pairs props,
+            final ConfPairs props,
             final String propKey,
             final boolean dfltValue)
     throws InvalidConfException
@@ -116,9 +116,9 @@ public class ScepControl implements Serializable
 
     public String getConf()
     {
-        CmpUtf8Pairs pairs = new CmpUtf8Pairs();
-        pairs.putUtf8Pair(KEY_caCertIncluded, Boolean.toString(includeCACert));
-        pairs.putUtf8Pair(KEY_signerCertIncluded, Boolean.toString(includeSignerCert));
+        ConfPairs pairs = new ConfPairs();
+        pairs.putPair(KEY_caCertIncluded, Boolean.toString(includeCACert));
+        pairs.putPair(KEY_signerCertIncluded, Boolean.toString(includeSignerCert));
 
         return pairs.getEncoded();
     }

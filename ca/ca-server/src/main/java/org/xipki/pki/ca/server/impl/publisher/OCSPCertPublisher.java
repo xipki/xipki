@@ -48,17 +48,17 @@ import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
+import org.xipki.common.ConfPairs;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.password.api.PasswordResolver;
 import org.xipki.pki.ca.api.CertPublisherException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.X509CertWithDBCertId;
 import org.xipki.pki.ca.api.publisher.X509CertPublisher;
 import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.password.api.PasswordResolver;
 import org.xipki.security.api.CertRevocationInfo;
-import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -91,7 +91,7 @@ public class OCSPCertPublisher extends X509CertPublisher
         ParamUtil.assertNotNull("conf", conf);
         ParamUtil.assertNotEmpty("dataSources", dataSources);
 
-        CmpUtf8Pairs utf8pairs = new CmpUtf8Pairs(conf);
+        ConfPairs utf8pairs = new ConfPairs(conf);
         String v = utf8pairs.getValue("publish.goodcerts");
         this.publishsGoodCert = (v == null) ? true : Boolean.parseBoolean(v);
 
@@ -99,10 +99,10 @@ public class OCSPCertPublisher extends X509CertPublisher
         this.asyn = (v == null) ? false : Boolean.parseBoolean(v);
 
         String datasourceName = null;
-        CmpUtf8Pairs confPairs = null;
+        ConfPairs confPairs = null;
         try
         {
-            confPairs = new CmpUtf8Pairs(conf);
+            confPairs = new ConfPairs(conf);
             datasourceName = confPairs.getValue("datasource");
         }catch(Exception e)
         {

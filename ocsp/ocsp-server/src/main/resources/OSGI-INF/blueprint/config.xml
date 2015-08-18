@@ -29,7 +29,7 @@
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
   <!-- create the servlet and inject our own app factory -->
-  <bean id="ocspServlet" class="org.xipki.pki.ocsp.server.impl.Rfc2560Servlet">
+  <bean id="ocspServlet" class="org.xipki.pki.ocsp.server.impl.HttpOcspServlet">
     <property name="server" ref="ocspServer"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>

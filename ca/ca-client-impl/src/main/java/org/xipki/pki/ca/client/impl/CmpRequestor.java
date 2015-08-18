@@ -72,17 +72,17 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pki.ca.client.api.PKIErrorException;
-import org.xipki.pki.ca.common.cmp.CmpUtil;
-import org.xipki.pki.ca.common.cmp.PKIResponse;
-import org.xipki.pki.ca.common.cmp.ProtectionResult;
-import org.xipki.pki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.security.api.CmpUtf8Pairs;
+import org.xipki.pki.ca.client.api.PKIErrorException;
+import org.xipki.pki.ca.common.cmp.CmpUtf8Pairs;
+import org.xipki.pki.ca.common.cmp.CmpUtil;
+import org.xipki.pki.ca.common.cmp.PKIResponse;
+import org.xipki.pki.ca.common.cmp.ProtectionResult;
+import org.xipki.pki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.ObjectIdentifiers;
@@ -97,16 +97,15 @@ import org.xipki.security.api.util.X509Util;
 public abstract class CmpRequestor
 {
     private static final Logger LOG = LoggerFactory.getLogger(CmpRequestor.class);
-    private static GeneralName DUMMY_RECIPIENT = new GeneralName(new X500Name("CN=DUMMY"));
 
     private final  Random random = new Random();
 
     private final ConcurrentContentSigner requestor;
     private final GeneralName sender;
 
-    private X509Certificate responderCert;
-    private GeneralName recipient;
-    private String c14nRecipientName;
+    private final X509Certificate responderCert;
+    private final GeneralName recipient;
+    private final String c14nRecipientName;
 
     protected final SecurityFactory securityFactory;
     protected boolean signRequest;
@@ -118,6 +117,7 @@ public abstract class CmpRequestor
             final SecurityFactory securityFactory)
     {
         ParamUtil.assertNotNull("requestorCert", requestorCert);
+        ParamUtil.assertNotNull("responderCert", responderCert);
         ParamUtil.assertNotNull("securityFactory", securityFactory);
 
         this.requestor = null;
@@ -127,10 +127,10 @@ public abstract class CmpRequestor
         X500Name x500Name = X500Name.getInstance(requestorCert.getSubjectX500Principal().getEncoded());
         this.sender = new GeneralName(x500Name);
 
-        if(responderCert != null)
-        {
-            setResponderCert(responderCert);
-        }
+        this.responderCert = responderCert;
+        X500Name subject = X500Name.getInstance(responderCert.getSubjectX500Principal().getEncoded());
+        this.recipient = new GeneralName(subject);
+        this.c14nRecipientName = getSortedRFC4519Name(subject);
     }
 
     public CmpRequestor(
@@ -147,6 +147,7 @@ public abstract class CmpRequestor
             final boolean signRequest)
     {
         ParamUtil.assertNotNull("requestor", requestor);
+        ParamUtil.assertNotNull("responderCert", responderCert);
         ParamUtil.assertNotNull("securityFactory", securityFactory);
 
         this.requestor = requestor;
@@ -155,17 +156,6 @@ public abstract class CmpRequestor
 
         X500Name x500Name = X500Name.getInstance(requestor.getCertificate().getSubjectX500Principal().getEncoded());
         this.sender = new GeneralName(x500Name);
-
-        if(responderCert != null)
-        {
-            setResponderCert(responderCert);
-        }
-    }
-
-    private void setResponderCert(
-            final X509Certificate responderCert)
-    {
-        ParamUtil.assertNotNull("responderCert", responderCert);
 
         this.responderCert = responderCert;
         X500Name subject = X500Name.getInstance(responderCert.getSubjectX500Principal().getEncoded());
@@ -313,7 +303,7 @@ public abstract class CmpRequestor
             final int action)
     throws CmpRequestorException, PKIErrorException
     {
-        ASN1Encodable itvValue = extractGeneralRepContent(response, ObjectIdentifiers.id_xipki_cmp.getId(), true);
+        ASN1Encodable itvValue = extractGeneralRepContent(response, ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId(), true);
         return extractXipkiActionContent(itvValue, action);
     }
 
@@ -408,7 +398,7 @@ public abstract class CmpRequestor
     protected PKIHeader buildPKIHeader(
             final ASN1OctetString tid)
     {
-        return buildPKIHeader(false, tid, null, (InfoTypeAndValue[]) null);
+        return buildPKIHeader(false, tid, (CmpUtf8Pairs) null, (InfoTypeAndValue[]) null);
     }
 
     protected PKIHeader buildPKIHeader(
@@ -459,7 +449,7 @@ public abstract class CmpRequestor
         PKIHeaderBuilder hBuilder = new PKIHeaderBuilder(
                 PKIHeader.CMP_2000,
                 sender,
-                recipient != null ? recipient : DUMMY_RECIPIENT);
+                recipient);
         hBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));
 
         ASN1OctetString _tid;
@@ -581,7 +571,7 @@ public abstract class CmpRequestor
         {
             v.add(value);
         }
-        InfoTypeAndValue itv = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cmp, new DERSequence(v));
+        InfoTypeAndValue itv = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cm_cmpGenmsg, new DERSequence(v));
         GenMsgContent genMsgContent = new GenMsgContent(itv);
         PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
 

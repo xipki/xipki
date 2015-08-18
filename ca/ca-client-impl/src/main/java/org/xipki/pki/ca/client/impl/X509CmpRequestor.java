@@ -105,6 +105,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.XMLUtil;
 import org.xipki.pki.ca.client.api.CertprofileInfo;
 import org.xipki.pki.ca.client.api.PKIErrorException;
 import org.xipki.pki.ca.client.api.RemoveExpiredCertsResult;
@@ -122,15 +127,10 @@ import org.xipki.pki.ca.client.api.dto.RevokeCertRequestType;
 import org.xipki.pki.ca.client.api.dto.RevokeCertResultEntryType;
 import org.xipki.pki.ca.client.api.dto.RevokeCertResultType;
 import org.xipki.pki.ca.client.api.dto.UnrevokeOrRemoveCertRequestType;
+import org.xipki.pki.ca.common.cmp.CmpUtf8Pairs;
 import org.xipki.pki.ca.common.cmp.CmpUtil;
 import org.xipki.pki.ca.common.cmp.PKIResponse;
-import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.XMLUtil;
 import org.xipki.security.api.CRLReason;
-import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.ObjectIdentifiers;
 import org.xipki.security.api.SecurityFactory;
@@ -247,7 +247,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         }
 
         ASN1ObjectIdentifier expectedType = xipkiAction == null ?
-                CMPObjectIdentifiers.it_currentCRL : ObjectIdentifiers.id_xipki_cmp;
+                CMPObjectIdentifiers.it_currentCRL : ObjectIdentifiers.id_xipki_cm_cmpGenmsg;
 
         GenRepContent genRep = (GenRepContent) respBody.getContent();
 

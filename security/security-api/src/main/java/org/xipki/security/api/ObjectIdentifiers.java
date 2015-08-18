@@ -61,11 +61,13 @@ public class ObjectIdentifiers
     private static final ASN1ObjectIdentifier id_pen = new ASN1ObjectIdentifier("1.3.6.2.4.1");
     private static final ASN1ObjectIdentifier id_xipki = id_pen.branch("45522");
 
-    public static final ASN1ObjectIdentifier id_xipki_ext_crlCertset           = id_xipki.branch("1.1");
-    public static final ASN1ObjectIdentifier id_xipki_ext_cmpRequestExtensions = id_xipki.branch("1.2");
-    public static final ASN1ObjectIdentifier id_xipki_ext_authorizationTemplate = id_xipki.branch("1.3");
+    private static final ASN1ObjectIdentifier id_xipki_ext = id_xipki.branch("1");
+    public static final ASN1ObjectIdentifier id_xipki_ext_crlCertset            = id_xipki_ext.branch("1");
+    public static final ASN1ObjectIdentifier id_xipki_ext_cmRequestExtensions   = id_xipki_ext.branch("2");
+    public static final ASN1ObjectIdentifier id_xipki_ext_authorizationTemplate = id_xipki_ext.branch("3");
 
-    public static final ASN1ObjectIdentifier id_xipki_cmp                  = id_xipki.branch("2");
+    private static final ASN1ObjectIdentifier id_xipki_cm = id_xipki.branch("2");
+    public static final ASN1ObjectIdentifier id_xipki_cm_cmpGenmsg              = id_xipki_cm.branch("1");
 
     /**
      * country code - StringType(SIZE(2))
@@ -387,7 +389,7 @@ public class ObjectIdentifiers
         oidNameMap.put(DN_NAME_AT_BIRTH, "nameAtBirth");
 
         oidNameMap.put(id_xipki_ext_crlCertset, "xipki-crlCertset");
-        oidNameMap.put(id_xipki_ext_cmpRequestExtensions, "xipki-cmpRequestExtensions");
+        oidNameMap.put(id_xipki_ext_cmRequestExtensions, "xipki-cmpRequestExtensions");
         oidNameMap.put(id_xipki_ext_authorizationTemplate, "xipki-authorizationTemplate");
 
         oidNameMap.put(id_kp_clientAuth, "kp-clientAuth");

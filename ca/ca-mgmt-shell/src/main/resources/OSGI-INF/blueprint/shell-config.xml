@@ -586,17 +586,19 @@
       <action class="org.xipki.pki.ca.server.mgmt.shell.ResponderInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
-      <optional-completers>
-        <entry key="--name" value-ref="responderNameCompleter"/>
-      </optional-completers>
+      <completers>
+        <ref component-id="responderNameCompleter"/>
+        <null/>
+      </completers>
     </command>
     <command>
       <action class="org.xipki.pki.ca.server.mgmt.shell.ResponderRemoveCommand">
         <property name="caManager" ref="caManager"/>
       </action>
-      <optional-completers>
-        <entry key="--name" value-ref="responderNameCompleter"/>
-      </optional-completers>
+      <completers>
+        <ref component-id="responderNameCompleter"/>
+        <null/>
+      </completers>
     </command>
     <command>
       <action class="org.xipki.pki.ca.server.mgmt.shell.ResponderAddCommand">

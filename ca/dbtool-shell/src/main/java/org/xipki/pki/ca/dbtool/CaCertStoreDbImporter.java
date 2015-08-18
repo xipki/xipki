@@ -115,17 +115,26 @@ class CaCertStoreDbImporter extends DbPorter
 
     private final Unmarshaller unmarshaller;
     private final boolean resume;
+    private final int batchEntriesPerCommit;
 
     CaCertStoreDbImporter(
             final DataSourceWrapper dataSource,
             final Unmarshaller unmarshaller,
             final String srcDir,
+            final int batchEntriesPerCommit,
             final boolean resume)
     throws Exception
     {
         super(dataSource, srcDir);
+        if(batchEntriesPerCommit < 1)
+        {
+            throw new IllegalArgumentException("batchEntriesPerCommit could not be less than 1: " + batchEntriesPerCommit);
+        }
         ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         this.unmarshaller = unmarshaller;
+        this.batchEntriesPerCommit = batchEntriesPerCommit;
+        this.resume = resume;
+
         File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
         if(resume)
         {
@@ -142,7 +151,6 @@ class CaCertStoreDbImporter extends DbPorter
                         processLogFile.getPath() + " first");
             }
         }
-        this.resume = resume;
     }
 
     public void importToDB()
@@ -385,7 +393,7 @@ class CaCertStoreDbImporter extends DbPorter
     private int do_import_user(
             final PreparedStatement ps_adduser,
             final String usersFile)
-    throws JAXBException, SQLException
+    throws JAXBException, SQLException, DataAccessException
     {
         System.out.println("importing table USERNAME");
 
@@ -401,27 +409,70 @@ class CaCertStoreDbImporter extends DbPorter
             throw XMLUtil.convert(e);
         }
 
-        int sum = 0;
-        for(UserType user : users.getUser())
+        List<UserType> list = users.getUser();
+        final int size = list.size();
+        int numProcessed = 0;
+        int numEntriesInBatch = 0;
+
+        disableAutoCommit();
+
+        try
+        {
+            for(int i = 0; i < size; i++)
+            {
+                UserType user = list.get(i);
+
+                numEntriesInBatch++;
+                try
+                {
+                    int idx = 1;
+                    ps_adduser.setInt(idx++, user.getId());
+                    ps_adduser.setString(idx++, user.getName());
+                    ps_adduser.setString(idx++, user.getPassword());
+                    ps_adduser.setString(idx++, user.getCnRegex());
+                    ps_adduser.addBatch();
+                }catch(SQLException e)
+                {
+                    System.err.println("error while importing USERNAME with ID=" +
+                            user.getId() + ", message: " + e.getMessage());
+                    throw e;
+                }
+
+                if(numEntriesInBatch > 0 && (numEntriesInBatch % this.batchEntriesPerCommit == 0 || i == size - 1))
+                {
+                    String sql = null;
+                    try
+                    {
+                        sql = SQL_ADD_CERT;
+                        ps_adduser.executeBatch();
+
+                        sql = null;
+                        commit("(commit import user to CA)");
+                    } catch(SQLException e)
+                    {
+                        rollback();
+                        throw translate(sql, e);
+                    } catch(DataAccessException e)
+                    {
+                        rollback();
+                        throw e;
+                    }
+
+                    numProcessed += numEntriesInBatch;
+                    numEntriesInBatch = 0;
+                }
+            }
+            return numProcessed;
+        }
+        finally
         {
             try
             {
-                int idx = 1;
-                ps_adduser.setInt(idx++, user.getId());
-                ps_adduser.setString(idx++, user.getName());
-                ps_adduser.setString(idx++, user.getPassword());
-                ps_adduser.setString(idx++, user.getCnRegex());
-                ps_adduser.execute();
-                sum ++;
-            }catch(SQLException e)
+                recoverAutoCommit();
+            }catch(DataAccessException e)
             {
-                System.err.println("error while importing USERNAME with ID=" +
-                        user.getId() + ", message: " + e.getMessage());
-                throw e;
             }
         }
-
-        return sum;
     }
 
     private void import_publishQueue(
@@ -635,6 +686,28 @@ class CaCertStoreDbImporter extends DbPorter
         {
             for(String certsFile : certsfiles.getCertsFile())
             {
+                // extract the toId from the filename
+                int fromIdx = certsFile.indexOf('-');
+                int toIdx = certsFile.indexOf(".zip");
+                if(fromIdx != -1 && toIdx == -1)
+                {
+                    try
+                    {
+                        long toId = Integer.parseInt(certsFile.substring(fromIdx + 1, toIdx));
+                        if(toId < minId)
+                        {
+                            // try next file
+                            continue;
+                        }
+                    }catch(Exception e)
+                    {
+                        LOG.warn("invalid file name '{}', but will still be processed", certsFile);
+                    }
+                } else
+                {
+                    LOG.warn("invalid file name '{}', but will still be processed", certsFile);
+                }
+
                 try
                 {
                     int[] numAndLastId = do_import_cert(ps_cert, ps_rawcert, certsFile, minId,
@@ -642,11 +715,8 @@ class CaCertStoreDbImporter extends DbPorter
                     int numProcessed = numAndLastId[0];
                     int lastId = numAndLastId[1];
                     minId = lastId + 1;
-                    if(numProcessed > 0)
-                    {
-                        sum += numProcessed;
-                        printStatus(total, sum, startTime);
-                    }
+                    sum += numProcessed;
+                    printStatus(total, sum, startTime);
                 }catch(Exception e)
                 {
                     System.err.println("\nerror while importing certificates from file " + certsFile +
@@ -705,7 +775,6 @@ class CaCertStoreDbImporter extends DbPorter
         {
             List<CertType> list = certs.getCert();
             final int size = list.size();
-            final int n = 100;
             int numProcessed = 0;
             int numEntriesInBatch = 0;
             int lastSuccessfulCertId = 0;
@@ -816,7 +885,7 @@ class CaCertStoreDbImporter extends DbPorter
                     throw translate(SQL_ADD_RAWCERT, e);
                 }
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % n == 0 || i == size - 1))
+                if(numEntriesInBatch > 0 && (numEntriesInBatch % this.batchEntriesPerCommit == 0 || i == size - 1))
                 {
                     String sql = null;
                     try

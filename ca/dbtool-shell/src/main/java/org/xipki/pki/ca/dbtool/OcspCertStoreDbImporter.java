@@ -105,17 +105,24 @@ class OcspCertStoreDbImporter extends DbPorter
 
     private final Unmarshaller unmarshaller;
     private final boolean resume;
+    private final int batchEntriesPerCommit;
 
     OcspCertStoreDbImporter(
             final DataSourceWrapper dataSource,
             final Unmarshaller unmarshaller,
             final String srcDir,
+            final int batchEntriesPerCommit,
             final boolean resume)
     throws Exception
     {
         super(dataSource, srcDir);
+        if(batchEntriesPerCommit < 1)
+        {
+            throw new IllegalArgumentException("batchEntriesPerCommit could not be less than 1: " + batchEntriesPerCommit);
+        }
         ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         this.unmarshaller = unmarshaller;
+        this.batchEntriesPerCommit = batchEntriesPerCommit;
         File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
         if(resume)
         {
@@ -291,6 +298,28 @@ class OcspCertStoreDbImporter extends DbPorter
         {
             for(String certsFile : certsfiles.getCertsFile())
             {
+                // extract the toId from the filename
+                int fromIdx = certsFile.indexOf('-');
+                int toIdx = certsFile.indexOf(".zip");
+                if(fromIdx != -1 && toIdx == -1)
+                {
+                    try
+                    {
+                        long toId = Integer.parseInt(certsFile.substring(fromIdx + 1, toIdx));
+                        if(toId < minId)
+                        {
+                            // try next file
+                            continue;
+                        }
+                    }catch(Exception e)
+                    {
+                        LOG.warn("invalid file name '{}', but will still be processed", certsFile);
+                    }
+                } else
+                {
+                    LOG.warn("invalid file name '{}', but will still be processed", certsFile);
+                }
+
                 try
                 {
                     int[] numAndLastId = do_import_cert(ps_cert, ps_certhash, ps_rawcert, certsFile, minId,
@@ -298,11 +327,8 @@ class OcspCertStoreDbImporter extends DbPorter
                     int numProcessed = numAndLastId[0];
                     int lastId = numAndLastId[1];
                     minId = lastId + 1;
-                    if(numProcessed > 0)
-                    {
-                        sum += numProcessed;
-                        printStatus(total, sum, startTime);
-                    }
+                    sum += numProcessed;
+                    printStatus(total, sum, startTime);
                 }catch(Exception e)
                 {
                     System.err.println("\nerror while importing certificates from file " + certsFile +
@@ -364,7 +390,6 @@ class OcspCertStoreDbImporter extends DbPorter
         {
             List<CertType> list = certs.getCert();
             final int size = list.size();
-            final int n = 100;
             int numProcessed = 0;
             int numEntriesInBatch = 0;
             int lastSuccessfulCertId = 0;
@@ -456,7 +481,7 @@ class OcspCertStoreDbImporter extends DbPorter
                     throw translate(SQL_ADD_RAWCERT, e);
                 }
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % n == 0 || i == size - 1))
+                if(numEntriesInBatch > 0 && (numEntriesInBatch % this.batchEntriesPerCommit == 0 || i == size - 1))
                 {
                     String sql = null;
                     try

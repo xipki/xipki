@@ -54,7 +54,7 @@ import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 public class ResponderInfoCommand extends CaCommand
 {
 
-    @Argument(index = 0, name = "name", description = "certificate profile name")
+    @Argument(index = 0, name = "name", description = "responder name")
     private String name;
 
     @Option(name = "--verbose", aliases="-v",

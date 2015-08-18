@@ -85,15 +85,16 @@ public class OcspFromCaDbImporter
     }
 
     public void importDatabase(
-            final String srcFolder)
+            final String srcFolder,
+            final int batchEntriesPerCommit)
     throws Exception
     {
         long start = System.currentTimeMillis();
         // CertStore
         try
         {
-            OcspCertStoreFromCaDbImporter certStoreImporter =
-                    new OcspCertStoreFromCaDbImporter(dataSource, unmarshaller, srcFolder, publisherName, resume);
+            OcspCertStoreFromCaDbImporter certStoreImporter = new OcspCertStoreFromCaDbImporter(
+                    dataSource, unmarshaller, srcFolder, publisherName, batchEntriesPerCommit, resume);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
         } finally

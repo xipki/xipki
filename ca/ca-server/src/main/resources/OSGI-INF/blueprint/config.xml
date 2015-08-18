@@ -27,7 +27,7 @@
   </bean>
   <service ref="caManager" interface="org.xipki.pki.ca.server.mgmt.api.CAManager"/>
   <!-- CMP servlet -->
-  <bean id="cmpServlet" class="org.xipki.pki.ca.server.impl.cmp.Rfc6712Servlet">
+  <bean id="cmpServlet" class="org.xipki.pki.ca.server.impl.cmp.HttpCmpServlet">
     <property name="responderManager" ref="caManager"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>

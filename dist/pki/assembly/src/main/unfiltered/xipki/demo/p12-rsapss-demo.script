@@ -2,7 +2,7 @@ KEYSIZE = 2048
 
 # Valid signer algos are SHA<n>withRSAandMGF1, where n is 1, 256, 384 and 512
 #
-CA_SIGNER_ALGO = SHA256withRSAandMGF1,SHA1withRSAandMGF1
+CA_SIGNER_ALGO = SHA256withRSAandMGF1:SHA1withRSAandMGF1
 
 echo "========================================================"
 echo "||         DEMO RSA (PSS) with PKCS#12 Key            ||"

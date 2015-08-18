@@ -47,8 +47,8 @@ import javax.net.ssl.SSLSession;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.ConfPairs;
 import org.xipki.common.util.StringUtil;
-import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -137,11 +137,11 @@ public class HttpsHostnameVerifier implements HostnameVerifier
             return;
         }
 
-        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(commonnameHostMap);
-        Set<String> commonNames = utf8Pairs.getNames();
+        ConfPairs pairs = new ConfPairs(commonnameHostMap);
+        Set<String> commonNames = pairs.getNames();
         for(String commonName :commonNames)
         {
-            String v = utf8Pairs.getValue(commonName);
+            String v = pairs.getValue(commonName);
             Set<String> hosts = StringUtil.splitAsSet(v, ",; \t");
             hostnameMap.put(commonName, hosts);
         }

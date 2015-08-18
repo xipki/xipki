@@ -2,7 +2,7 @@ PLEN = 1024
 
 # Valid signer algos are SHA<n>withDSA, where n is 1, 256, 384 and 512
 #
-CA_SIGNER_ALGO = SHA256withDSA,SHA1withDSA
+CA_SIGNER_ALGO = SHA256withDSA:SHA1withDSA
 
 echo "========================================================"
 echo "||           DEMO DSA with PKCS#12 Key                ||"

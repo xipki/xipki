@@ -18,6 +18,6 @@
     <module>security-api</module>
     <module>security-impl</module>
     <module>security-shell</module>
-    <module>remotep11-server</module>
+    <module>pkcs11-proxy</module>
   </modules>
 </project>

@@ -1,0 +1,11 @@
+KEYSIZE = 2048
+
+feature:install xipki-security-shell
+
+sleep 1000
+
+xipki-cmd:rm -r -f output
+
+source ./xipki/demo/initdb.script
+
+feature:install xipki-ncm-server

@@ -29,7 +29,7 @@
   <signers>
     <signer name="signer1">
       <type>PKCS12</type>
-      <key>password?1234%keystore?file:output/OCSP1.p12</key>
+      <key>password=1234,keystore=file:output/OCSP1.p12</key>
       <algorithms>
         <algorithm>SHA256withRSA</algorithm>
         <algorithm>SHA256withRSAandMGF1</algorithm>

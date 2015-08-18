@@ -206,26 +206,26 @@ Build and Assembly from Source Code
 Download the Released Binary Package
 ------
 
-Download the released binary package xipki-<version>.tar.gz from the URL https://github.com/xipki/xipki/releases
+Download the released binary package xipki-pki-<version>.tar.gz from the URL https://github.com/xipki/xipki/releases
 
 Install
 -------
 
-* Copy the file `xipki-<version>.tar.gz` to the destination folder
+* Copy the file `xipki-pki-<version>.tar.gz` to the destination folder
 
 * Unpack the assembled file
  
     In destination folder of the installation
     ```sh
-    tar xvf xipki-<version>.tar.gz
+    tar xvf xipki-pki-<version>.tar.gz
     ```
     The following steps use `$XIPKI_HOME` to point to the unpacked folder
 
 * Adapt the database configuration (access rights read and write of database are required)
 
     ```sh
-    $XIPKI_HOME/ca-config/ca-db.properties
-    $XIPKI_HOME/ca-config/ocsp-db.properties
+    $XIPKI_HOME/xipki/ca-config/ca-db.properties
+    $XIPKI_HOME/xipki/ca-config/ocsp-db.properties
     ```
 
 Run Demo

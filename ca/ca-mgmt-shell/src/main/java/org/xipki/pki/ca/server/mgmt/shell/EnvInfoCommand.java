@@ -48,7 +48,7 @@ import org.apache.karaf.shell.commands.Command;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "env-info", description="show information of CA environment parameters")
+@Command(scope = "xipki-ca", name = "env-info", description="show information of CA environment parameter")
 public class EnvInfoCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "environment parameter name")

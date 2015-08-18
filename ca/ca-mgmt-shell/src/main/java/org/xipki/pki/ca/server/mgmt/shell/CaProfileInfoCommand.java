@@ -47,7 +47,7 @@ import org.xipki.common.util.CollectionUtil;
  */
 
 @Command(scope = "xipki-ca", name = "caprofile-info",
-        description="show information of certificate profiles in given CA")
+        description="show information of certificate profile in given CA")
 public class CaProfileInfoCommand extends CaCommand
 {
     @Option(name = "--ca",
