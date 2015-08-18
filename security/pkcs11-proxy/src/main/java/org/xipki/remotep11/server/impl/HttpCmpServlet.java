@@ -56,9 +56,9 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-public class Rfc6712Servlet extends HttpServlet
+public class HttpCmpServlet extends HttpServlet
 {
-    private static final Logger LOG = LoggerFactory.getLogger(Rfc6712Servlet.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HttpCmpServlet.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -68,7 +68,7 @@ public class Rfc6712Servlet extends HttpServlet
     private final CmpResponder responder;
     private LocalP11CryptServicePool localP11CryptServicePool;
 
-    public Rfc6712Servlet()
+    public HttpCmpServlet()
     {
         responder = new CmpResponder();
     }
@@ -149,7 +149,7 @@ public class Rfc6712Servlet extends HttpServlet
             PKIMessage pkiResp = responder.processPKIMessage(localP11CryptServicePool, moduleName, pkiReq);
             byte[] pkiRespBytes = pkiResp.getEncoded("DER");
 
-            response.setContentType(Rfc6712Servlet.CT_RESPONSE);
+            response.setContentType(HttpCmpServlet.CT_RESPONSE);
             response.setStatus(HttpServletResponse.SC_OK);
             response.setContentLength(pkiRespBytes.length);
             response.getOutputStream().write(pkiRespBytes);

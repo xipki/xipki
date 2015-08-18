@@ -9,7 +9,7 @@
     <groupId>org.xipki.pki</groupId>
     <version>2.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>remotep11-server</artifactId>
+  <artifactId>pkcs11-proxy</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>

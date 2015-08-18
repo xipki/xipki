@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.api;
+package org.xipki.common;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,28 +48,25 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class CmpUtf8Pairs
+public class ConfPairs
 {
-    public static final String KEY_CERT_PROFILE = "cert_profile";
-    public static final String KEY_USER = "user";
-
-    private static final char NAME_TERM = '?';
-    private static final char TOKEN_TERM = '%';
+    public static final char NAME_TERM = '=';
+    public static final char TOKEN_TERM = ',';
 
     private final Map<String, String> pairs = new HashMap<>();
 
-    public CmpUtf8Pairs(
+    public ConfPairs(
             final String name,
             final String value)
     {
-        putUtf8Pair(name, value);
+        putPair(name, value);
     }
 
-    public CmpUtf8Pairs()
+    public ConfPairs()
     {
     }
 
-    public CmpUtf8Pairs(
+    public ConfPairs(
             String string)
     {
         if(string == null || string.length() < 2)
@@ -77,109 +74,140 @@ public class CmpUtf8Pairs
             return;
         }
 
-        // remove the ending '%'-symbols
-        while(string.charAt(string.length() - 1) == TOKEN_TERM)
-        {
-            string = string.substring(0, string.length() - 1);
-        }
-
-        // find the position of terminators
-        List<Integer> positions = new LinkedList<>();
-
-        int idx = 1;
         int n = string.length();
-        while(idx < n)
+        List<String> tokens = new LinkedList<>();
+
+        StringBuilder tokenBuilder = new StringBuilder();
+
+        for(int i = 0; i < n; i++)
         {
-            char c = string.charAt(idx++);
-            if(c == TOKEN_TERM)
+            char c = string.charAt(i);
+            if('\\' == c)
             {
-                char b = string.charAt(idx);
-                if(b < '0' || b > '9')
+                if(i == n - 1)
                 {
-                    positions.add(idx-1);
+                    throw new IllegalArgumentException("invalid ConfPairs '" + string + "'");
+                } else
+                {
+                    tokenBuilder.append(c);
+                    c = string.charAt(++i);
                 }
             }
-        }
-        positions.add(string.length());
-
-        // parse the token
-        int beginIndex = 0;
-        for(int i = 0; i < positions.size(); i++)
-        {
-            int endIndex = positions.get(i);
-            String token = string.substring(beginIndex, endIndex);
-
-            int sepIdx = token.indexOf(NAME_TERM);
-            if(sepIdx == -1 || sepIdx == token.length() - 1)
+            else if(TOKEN_TERM == c)
             {
-                throw new IllegalArgumentException("invalid token: " + token);
+                if(tokenBuilder.length() > 0)
+                {
+                    tokens.add(tokenBuilder.toString());
+                }
+                // reset tokenBuilder
+                tokenBuilder = new StringBuilder();
+                continue;
             }
-            String name = token.substring(0, sepIdx);
-            name = decodeNameOrValue(name);
-            String value = token.substring(sepIdx + 1);
-            value = decodeNameOrValue(value);
-            pairs.put(name, value);
 
-            beginIndex = endIndex + 1;
+            tokenBuilder.append(c);
+        }
+
+        if(tokenBuilder.length() > 0)
+        {
+            tokens.add(tokenBuilder.toString());
+        }
+
+        for(String token : tokens)
+        {
+            int termPosition = -1;
+            n = token.length();
+            for(int i = 0; i < n; i++)
+            {
+                char c = token.charAt(i);
+                if('\\' == c)
+                {
+                    if(i == n - 1)
+                    {
+                        throw new IllegalArgumentException("invalid ConfPairs '" + string + "'");
+                    } else
+                    {
+                        i++;
+                    }
+                }
+                if(c == NAME_TERM)
+                {
+                    termPosition = i;
+                    break;
+                }
+            }
+
+            if(termPosition < 1)
+            {
+                throw new IllegalArgumentException("invalid ConfPair '" + token + "'");
+            }
+
+            tokenBuilder = new StringBuilder();
+            for(int i = 0; i < termPosition; i++)
+            {
+                char c = token.charAt(i);
+                if('\\' == c)
+                {
+                    if(i == termPosition - 1)
+                    {
+                        throw new IllegalArgumentException("invalid ConfPair '" + string + "'");
+                    } else
+                    {
+                        i++;
+                        continue;
+                    }
+                }
+
+                tokenBuilder.append(c);
+            }
+
+            String name = tokenBuilder.toString();
+
+            tokenBuilder = new StringBuilder();
+            for(int i = termPosition + 1; i < n; i++)
+            {
+                char c = token.charAt(i);
+                if('\\' == c)
+                {
+                    if(i == n - 1)
+                    {
+                        throw new IllegalArgumentException("invalid ConfPair '" + string + "'");
+                    } else
+                    {
+                        c = token.charAt(++i);
+                    }
+                }
+
+                tokenBuilder.append(c);
+            }
+
+            String value = tokenBuilder.toString();
+            pairs.put(name, value);
         }
     }
 
     private static String encodeNameOrValue(
             String s)
     {
-        if(s.indexOf("%") != -1)
-        {
-            s = s.replaceAll("%", "%25");
-        }
-
-        if(s.indexOf("?") != -1)
-        {
-            s = s.replaceAll("\\?", "%3f");
-        }
-
-        return s;
-    }
-
-    private static String decodeNameOrValue(
-            final String s)
-    {
-        int idx = s.indexOf(TOKEN_TERM);
-        if(idx == -1)
+        if(s.indexOf(NAME_TERM) == -1 && s.indexOf(TOKEN_TERM) == -1)
         {
             return s;
         }
 
-        StringBuilder newS = new StringBuilder();
-
-        for(int i = 0; i < s.length();)
+        final int n = s.length();
+        StringBuilder sb = new StringBuilder(n + 1);
+        for(int i = 0; i < n; i++)
         {
             char c = s.charAt(i);
-            if(c != TOKEN_TERM)
+            if(c == NAME_TERM || c == TOKEN_TERM)
             {
-                newS.append(c);
-                i++;
+                sb.append('\\');
             }
-            else
-            {
-                if(i + 3 <= s.length())
-                {
-                    String hex = s.substring(i + 1, i + 3);
-                    c = (char) Byte.parseByte(hex, 16);
-                    newS.append(c);
-                    i += 3;
-                }
-                else
-                {
-                    newS.append(s.substring(i));
-                    break;
-                }
-            }
+            sb.append(c);
         }
-
-        return newS.toString();
+        return sb.toString();
     }
 
-    public void putUtf8Pair(
+    public void putPair(
             final String name,
             final String value)
     {
@@ -192,7 +220,7 @@ public class CmpUtf8Pairs
         pairs.put(name, value);
     }
 
-    public void removeUtf8Pair(
+    public void removePair(
             final String name)
     {
         pairs.remove(name);
@@ -240,6 +268,10 @@ public class CmpUtf8Pairs
             sb.append(TOKEN_TERM);
         }
 
+        if(sb.length() > 0)
+        {
+            sb.deleteCharAt(sb.length() - 1);
+        }
         return sb.toString();
     }
 
@@ -259,12 +291,12 @@ public class CmpUtf8Pairs
     public boolean equals(
             final Object obj)
     {
-        if(obj instanceof CmpUtf8Pairs == false)
+        if(obj instanceof ConfPairs == false)
         {
             return false;
         }
 
-        CmpUtf8Pairs b = (CmpUtf8Pairs) obj;
+        ConfPairs b = (ConfPairs) obj;
         return pairs.equals(b.pairs);
     }
 
@@ -272,43 +304,65 @@ public class CmpUtf8Pairs
     {
         try
         {
-            CmpUtf8Pairs pairs = new CmpUtf8Pairs("key-a", "value-a");
-            pairs.putUtf8Pair("key-b", "value-b");
+            ConfPairs pairs = new ConfPairs("key-a?", "value-a=");
+            pairs.putPair("key-b", "value-b");
 
             String encoded = pairs.getEncoded();
             System.out.println(encoded);
-            pairs = new CmpUtf8Pairs(encoded);
+            pairs = new ConfPairs(encoded);
             for(String name : pairs.getNames())
             {
                 System.out.println(name + ": " + pairs.getValue(name));
             }
 
-            System.out.println("--------------");
-            pairs = new CmpUtf8Pairs("key-a?value-a");
+            String str = "key-a=value-a";
+            System.out.println("--------------: '" + str + "'");
+            pairs = new ConfPairs(str);
             System.out.println(pairs.getEncoded());
             for(String name : pairs.getNames())
             {
                 System.out.println(name + ": " + pairs.getValue(name));
             }
 
-            System.out.println("--------------");
-            pairs = new CmpUtf8Pairs("key-a?value-a%");
+            str = "key-empty-value=";
+            System.out.println("--------------: '" + str + "'");
+            pairs = new ConfPairs(str);
             System.out.println(pairs.getEncoded());
             for(String name : pairs.getNames())
             {
                 System.out.println(name + ": " + pairs.getValue(name));
             }
 
-            System.out.println("--------------");
-            pairs = new CmpUtf8Pairs("key-a?value-a%3f%");
+            str = "key-empty-value=,key-b=value-b";
+            System.out.println("--------------: '" + str + "'");
+            pairs = new ConfPairs(str);
             System.out.println(pairs.getEncoded());
             for(String name : pairs.getNames())
             {
                 System.out.println(name + ": " + pairs.getValue(name));
             }
 
-            System.out.println("--------------");
-            pairs = new CmpUtf8Pairs("key-a?value-a%3f%3f%25%");
+            str = "key-a=value-a\\,";
+            System.out.println("--------------: '" + str + "'");
+            pairs = new ConfPairs(str);
+            System.out.println(pairs.getEncoded());
+            for(String name : pairs.getNames())
+            {
+                System.out.println(name + ": " + pairs.getValue(name));
+            }
+
+            str = "key-a=value-a\\=\\,";
+            System.out.println("--------------: '" + str + "'");
+            pairs = new ConfPairs(str);
+            System.out.println(pairs.getEncoded());
+            for(String name : pairs.getNames())
+            {
+                System.out.println(name + ": " + pairs.getValue(name));
+            }
+
+            str = "key-a=value-a\\=\\?";
+            System.out.println("--------------: '" + str + "'");
+            pairs = new ConfPairs(str);
             System.out.println(pairs.getEncoded());
             for(String name : pairs.getNames())
             {

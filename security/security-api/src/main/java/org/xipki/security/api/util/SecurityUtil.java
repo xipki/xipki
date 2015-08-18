@@ -56,8 +56,8 @@ import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
+import org.xipki.common.ConfPairs;
 import org.xipki.common.util.StringUtil;
-import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.HashAlgoType;
 import org.xipki.security.api.HashCalculator;
 import org.xipki.security.api.InvalidOIDorNameException;
@@ -385,11 +385,11 @@ public class SecurityUtil
 
         try
         {
-            CmpUtf8Pairs pairs = new CmpUtf8Pairs(conf);
+            ConfPairs pairs = new ConfPairs(conf);
             String value = pairs.getValue("password");
             if(value != null && StringUtil.startsWithIgnoreCase(value, "PBE:") == false)
             {
-                pairs.putUtf8Pair("password", "<sensitve>");
+                pairs.putPair("password", "<sensitve>");
             }
             return pairs.getEncoded();
         }catch(Exception e)

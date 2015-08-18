@@ -78,6 +78,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
@@ -87,7 +88,6 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.password.api.PasswordResolverException;
 import org.xipki.security.api.AbstractSecurityFactory;
-import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.KeyCertPair;
 import org.xipki.security.api.NoIdleSignerException;
@@ -224,13 +224,13 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 sb.append("key and certificate not match. ");
                 sb.append("key type='").append(signerType).append("'; ");
 
-                CmpUtf8Pairs keyValues = new CmpUtf8Pairs(signerConf);
+                ConfPairs keyValues = new ConfPairs(signerConf);
                 String pwd = keyValues.getValue("password");
                 if(pwd != null)
                 {
-                    keyValues.putUtf8Pair("password", "****");
+                    keyValues.putPair("password", "****");
                 }
-                keyValues.putUtf8Pair("algo", signatureAlgoName);
+                keyValues.putPair("algo", signatureAlgoName);
                 sb.append("conf='").append(keyValues.getEncoded()).append("', ");
                 sb.append("certificate subject='").append(subject).append("'");
 
@@ -269,7 +269,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
 
         if("PKCS11".equalsIgnoreCase(type) || "PKCS12".equalsIgnoreCase(type) || "JKS".equalsIgnoreCase(type))
         {
-            CmpUtf8Pairs keyValues = new CmpUtf8Pairs(conf);
+            ConfPairs keyValues = new ConfPairs(conf);
 
             String s = keyValues.getValue("parallelism");
             int parallelism = defaultParallelism;
@@ -477,7 +477,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             final String signerConf)
     throws SignerException
     {
-        CmpUtf8Pairs keyValues = new CmpUtf8Pairs(signerConf);
+        ConfPairs keyValues = new ConfPairs(signerConf);
         String algoS = keyValues.getValue("algo");
         if(algoS == null)
         {
@@ -568,14 +568,14 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         ParamUtil.assertNotBlank("password", password);
         ParamUtil.assertNotNull("signatureAlgorithm", signatureAlgorithm);
 
-        CmpUtf8Pairs conf = new CmpUtf8Pairs("password", password);
-        conf.putUtf8Pair("algo", signatureAlgorithm);
-        conf.putUtf8Pair("parallelism", Integer.toString(parallelism));
+        ConfPairs conf = new ConfPairs("password", password);
+        conf.putPair("algo", signatureAlgorithm);
+        conf.putPair("parallelism", Integer.toString(parallelism));
         if(keyLabel != null)
         {
-            conf.putUtf8Pair("key-label", keyLabel);
+            conf.putPair("key-label", keyLabel);
         }
-        conf.putUtf8Pair("keystore", "file:" + keystoreFile);
+        conf.putPair("keystore", "file:" + keystoreFile);
 
         return conf.getEncoded();
     }
@@ -597,13 +597,13 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         ParamUtil.assertNotBlank("keystoreFile", keystoreFile);
         ParamUtil.assertNotBlank("password", password);
 
-        CmpUtf8Pairs conf = new CmpUtf8Pairs("password", password);
-        conf.putUtf8Pair("parallelism", Integer.toString(parallelism));
+        ConfPairs conf = new ConfPairs("password", password);
+        conf.putPair("parallelism", Integer.toString(parallelism));
         if(keyLabel != null)
         {
-            conf.putUtf8Pair("key-label", keyLabel);
+            conf.putPair("key-label", keyLabel);
         }
-        conf.putUtf8Pair("keystore", "file:" + keystoreFile);
+        conf.putPair("keystore", "file:" + keystoreFile);
 
         return conf.getEncoded();
     }
@@ -618,31 +618,31 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         ParamUtil.assertNotNull("algo", signatureAlgorithm);
         ParamUtil.assertNotNull("keyId", keyId);
 
-        CmpUtf8Pairs conf = new CmpUtf8Pairs("algo", signatureAlgorithm);
-        conf.putUtf8Pair("parallelism", Integer.toString(parallelism));
+        ConfPairs conf = new ConfPairs("algo", signatureAlgorithm);
+        conf.putPair("parallelism", Integer.toString(parallelism));
 
         if(pkcs11ModuleName != null && pkcs11ModuleName.length() > 0)
         {
-            conf.putUtf8Pair("module", pkcs11ModuleName);
+            conf.putPair("module", pkcs11ModuleName);
         }
 
         if(slotId.getSlotId() != null)
         {
-            conf.putUtf8Pair("slot-id", slotId.getSlotId().toString());
+            conf.putPair("slot-id", slotId.getSlotId().toString());
         }
         else
         {
-            conf.putUtf8Pair("slot", slotId.getSlotIndex().toString());
+            conf.putPair("slot", slotId.getSlotIndex().toString());
         }
 
         if(keyId.getKeyId() != null)
         {
-            conf.putUtf8Pair("key-id", Hex.toHexString(keyId.getKeyId()));
+            conf.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
         }
 
         if(keyId.getKeyLabel() != null)
         {
-            conf.putUtf8Pair("key-label", keyId.getKeyLabel());
+            conf.putPair("key-label", keyId.getKeyLabel());
         }
 
         return conf.getEncoded();
@@ -656,31 +656,31 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
     {
         ParamUtil.assertNotNull("keyId", keyId);
 
-        CmpUtf8Pairs conf = new CmpUtf8Pairs();
-        conf.putUtf8Pair("parallelism", Integer.toString(parallelism));
+        ConfPairs conf = new ConfPairs();
+        conf.putPair("parallelism", Integer.toString(parallelism));
 
         if(pkcs11ModuleName != null && pkcs11ModuleName.length() > 0)
         {
-            conf.putUtf8Pair("module", pkcs11ModuleName);
+            conf.putPair("module", pkcs11ModuleName);
         }
 
         if(slotId.getSlotId() != null)
         {
-            conf.putUtf8Pair("slot-id", slotId.getSlotId().toString());
+            conf.putPair("slot-id", slotId.getSlotId().toString());
         }
         else
         {
-            conf.putUtf8Pair("slot", slotId.getSlotIndex().toString());
+            conf.putPair("slot", slotId.getSlotIndex().toString());
         }
 
         if(keyId.getKeyId() != null)
         {
-            conf.putUtf8Pair("key-id", Hex.toHexString(keyId.getKeyId()));
+            conf.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
         }
 
         if(keyId.getKeyLabel() != null)
         {
-            conf.putUtf8Pair("key-label", keyId.getKeyLabel());
+            conf.putPair("key-label", keyId.getKeyLabel());
         }
 
         return conf.getEncoded();
@@ -1040,7 +1040,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             throw new SignerException("unsupported SCEP responder type '" + type + "'");
         }
 
-        CmpUtf8Pairs keyValues = new CmpUtf8Pairs(conf);
+        ConfPairs keyValues = new ConfPairs(conf);
 
         String passwordHint = keyValues.getValue("password");
         char[] password;

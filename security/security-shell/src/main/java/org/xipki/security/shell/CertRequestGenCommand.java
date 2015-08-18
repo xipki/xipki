@@ -332,7 +332,7 @@ public abstract class CertRequestGenCommand extends SecurityCommand
                     SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
                     SecurityUtil.textToASN1ObjectIdentifers(wantExtensionTypes));
             extensions.add(new Extension(
-                    ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions, false, ee.toASN1Primitive().getEncoded()));
+                    ObjectIdentifiers.id_xipki_ext_cmRequestExtensions, false, ee.toASN1Primitive().getEncoded()));
         }
 
         ConcurrentContentSigner identifiedSigner = getSigner(hashAlgo, new SignatureAlgoControl(rsaMgf1, dsaPlain));
