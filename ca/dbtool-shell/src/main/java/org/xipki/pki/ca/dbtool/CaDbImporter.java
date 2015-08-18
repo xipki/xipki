@@ -114,7 +114,8 @@ public class CaDbImporter
     }
 
     public void importDatabase(
-            final String srcFolder)
+            final String srcFolder,
+            final int batchEntriesPerCommit)
     throws Exception
     {
         File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
@@ -147,7 +148,8 @@ public class CaDbImporter
             }
 
             // CertStore
-            CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(dataSource, unmarshaller, srcFolder, resume);
+            CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(
+                    dataSource, unmarshaller, srcFolder, batchEntriesPerCommit, resume);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
 

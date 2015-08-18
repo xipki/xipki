@@ -50,7 +50,7 @@ import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "profile-info", description="show information of profiles")
+@Command(scope = "xipki-ca", name = "profile-info", description="show information of certifiate profile")
 public class ProfileInfoCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "certificate profile name")

@@ -66,6 +66,10 @@ public class ImportOcspFromCaCommand extends XipkiOsgiCommandSupport
             description = "publisher name")
     private String publisherName = DFLT_PUBLISHER;
 
+    @Option(name = "-n",
+            description = "number of certificates in one commit")
+    private Integer numCertsPerCommit = 100;
+
     @Option(name = "--resume")
     private Boolean resume = Boolean.FALSE;
 
@@ -78,7 +82,7 @@ public class ImportOcspFromCaCommand extends XipkiOsgiCommandSupport
     {
         OcspFromCaDbImporter importer = new OcspFromCaDbImporter(
                 dataSourceFactory, passwordResolver, dbconfFile, publisherName, resume);
-        importer.importDatabase(indir);
+        importer.importDatabase(indir, numCertsPerCommit.intValue());
         return null;
     }
 

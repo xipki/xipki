@@ -164,10 +164,10 @@
     <bundle><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
     <bundle>mvn:org.xipki.pki/audit-syslog/${project.version}</bundle>
   </feature>
-  <feature name="xipki-pkiconsole-server" version="${project.version}" resolver="(obr)">
+  <feature name="xipki-ncm-server" version="${project.version}" resolver="(obr)">
     <feature>xipki-caserver</feature>
-    <bundle>mvn:org.xipki.pki/pkiconsole-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ncm-common/${project.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.caucho/hessian/${hessian.version}/$Bundle-SymbolicName=hessian&Bundle-Version=${hessian.version}]]></bundle>
-    <bundle>mvn:org.xipki.pki/pkiconsole-server/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ncm-server/${project.version}</bundle>
   </feature>
 </features>

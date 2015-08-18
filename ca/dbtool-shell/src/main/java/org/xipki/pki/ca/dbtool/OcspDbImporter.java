@@ -82,15 +82,16 @@ public class OcspDbImporter
     }
 
     public void importDatabase(
-            final String srcFolder)
+            final String srcFolder,
+            final int batchEntriesPerCommit)
     throws Exception
     {
         long start = System.currentTimeMillis();
         // CertStore
         try
         {
-            OcspCertStoreDbImporter certStoreImporter =
-                    new OcspCertStoreDbImporter(dataSource, unmarshaller, srcFolder, resume);
+            OcspCertStoreDbImporter certStoreImporter = new OcspCertStoreDbImporter(
+                    dataSource, unmarshaller, srcFolder, batchEntriesPerCommit, resume);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
         } finally

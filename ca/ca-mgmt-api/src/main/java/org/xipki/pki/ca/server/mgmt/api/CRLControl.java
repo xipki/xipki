@@ -41,61 +41,61 @@ import java.util.List;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.security.api.CmpUtf8Pairs;
 
 /**
  *
  * Example configuration
- * updateMode?<'interval'|'onDemand'>
+ * updateMode=<'interval'|'onDemand'>
  *
  * # For all updateMode
  *
  * # Whether expired certificates are considered. Default is false
- * expiredCerts.included?<'true'|'false'>
+ * expiredCerts.included=<'true'|'false'>
  *
  * # Whether certificates are embedded in CRL, XiPKI-customized extension. Default is false
- * certs.embedded = <'true'|'false'>
+ * certs.embedded=<'true'|'false'>
  *
  * # List of OIDs of extensions to be embedded in CRL,
  * # Unspecified or empty extensions indicates that the CA decides.
- * extensions?<comma delimited OIDs of extensions>
+ * extensions=<comma delimited OIDs of extensions>
  *
  * # The following settings are only for updateMode 'interval'
  *
  * # Number of intervals to generate a full CRL. Default is 1
  * # Should be greater than 0
- * fullCRL.intervals?<integer>
+ * fullCRL.intervals=<integer>
  *
  * # should be 0 or not greater than baseCRL.intervals. Default is 0.
  * # 0 indicates that no deltaCRL will be generated
  * deltaCRL.intervals=<integer>
  *
- * overlap.minutes?<minutes of overlap>
+ * overlap.minutes=<minutes of overlap>
  *
  * # should be less than fullCRL.intervals.
  * # If activated, a deltaCRL will be generated only between two full CRLs
- * deltaCRL.intervals?<integer>
+ * deltaCRL.intervals=<integer>
  *
  * # Exactly one of interval.minutes and interval.days should be specified
  * # Number of minutes of one interval. At least 60 minutes
  * interval.minutes=<minutes of one interval>
  *
  * # UTC time of generation of CRL, one interval covers 1 day.
- * interval.time?<updatet time (hh:mm of UTC time)>
+ * interval.time=<updatet time (hh:mm of UTC time)>
  *
  * # Whether the nextUpdate of a fullCRL is the update time of the fullCRL
  * # Default is false
- * fullCRL.extendedNextUpdate?<'true'|'false'>
+ * fullCRL.extendedNextUpdate=<'true'|'false'>
  *
  * # Whether only user certificates are considered in CRL
- * onlyContainsUserCerts?<'true'|'false'>
+ * onlyContainsUserCerts=<'true'|'false'>
  *
  * # Whether only CA certificates are considered in CRL
- * onlyContainsCACerts?<'true'|'false'>
+ * onlyContainsCACerts=<'true'|'false'>
  *
  * @author Lijun Liao
  */
@@ -221,10 +221,10 @@ public class CRLControl implements Serializable
     throws InvalidConfException
     {
         ParamUtil.assertNotBlank("conf", conf);
-        CmpUtf8Pairs props;
+        ConfPairs props;
         try
         {
-            props = new CmpUtf8Pairs(conf);
+            props = new ConfPairs(conf);
         }catch(RuntimeException e)
         {
             throw new InvalidConfException(e.getClass().getName() + ": " + e.getMessage(), e);
@@ -313,7 +313,7 @@ public class CRLControl implements Serializable
     }
 
     private static int getInteger(
-            final CmpUtf8Pairs props,
+            final ConfPairs props,
             final String propKey,
             final int dfltValue)
     throws InvalidConfException
@@ -333,7 +333,7 @@ public class CRLControl implements Serializable
     }
 
     private static boolean getBoolean(
-            final CmpUtf8Pairs props,
+            final ConfPairs props,
             final String propKey,
             final boolean dfltValue)
     throws InvalidConfException
@@ -360,26 +360,26 @@ public class CRLControl implements Serializable
 
     public String getConf()
     {
-        CmpUtf8Pairs pairs = new CmpUtf8Pairs();
-        pairs.putUtf8Pair(KEY_updateMode, updateMode.name());
-        pairs.putUtf8Pair(KEY_expiredCerts_included, Boolean.toString(includeExpiredCerts));
-        pairs.putUtf8Pair(KEY_certs_embedded, Boolean.toString(embedsCerts));
-        pairs.putUtf8Pair(KEY_onlyContainsCACerts, Boolean.toString(onlyContainsCACerts));
-        pairs.putUtf8Pair(KEY_onlyContainsUserCerts, Boolean.toString(onlyContainsUserCerts));
+        ConfPairs pairs = new ConfPairs();
+        pairs.putPair(KEY_updateMode, updateMode.name());
+        pairs.putPair(KEY_expiredCerts_included, Boolean.toString(includeExpiredCerts));
+        pairs.putPair(KEY_certs_embedded, Boolean.toString(embedsCerts));
+        pairs.putPair(KEY_onlyContainsCACerts, Boolean.toString(onlyContainsCACerts));
+        pairs.putPair(KEY_onlyContainsUserCerts, Boolean.toString(onlyContainsUserCerts));
         if(updateMode != UpdateMode.onDemand)
         {
-            pairs.putUtf8Pair(KEY_fullCRL_intervals, Integer.toString(fullCRLIntervals));
-            pairs.putUtf8Pair(KEY_fullCRL_extendedNextUpdate, Boolean.toString(extendedNextUpdate));
-            pairs.putUtf8Pair(KEY_deltaCRL_intervals, Integer.toString(deltaCRLIntervals));
+            pairs.putPair(KEY_fullCRL_intervals, Integer.toString(fullCRLIntervals));
+            pairs.putPair(KEY_fullCRL_extendedNextUpdate, Boolean.toString(extendedNextUpdate));
+            pairs.putPair(KEY_deltaCRL_intervals, Integer.toString(deltaCRLIntervals));
 
             if(intervalDayTime != null)
             {
-                pairs.putUtf8Pair(KEY_interval_time, intervalDayTime.toString());
+                pairs.putPair(KEY_interval_time, intervalDayTime.toString());
             }
 
             if(intervalMinutes != null)
             {
-                pairs.putUtf8Pair(KEY_interval_minutes, intervalMinutes.toString());
+                pairs.putPair(KEY_interval_minutes, intervalMinutes.toString());
             }
         }
 
@@ -391,7 +391,7 @@ public class CRLControl implements Serializable
                 extensionsSb.append(oid).append(",");
             }
             extensionsSb.deleteCharAt(extensionsSb.length() - 1);
-            pairs.putUtf8Pair(KEY_extensions, extensionsSb.toString());
+            pairs.putPair(KEY_extensions, extensionsSb.toString());
         }
 
         return pairs.getEncoded();

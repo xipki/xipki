@@ -45,8 +45,8 @@ import java.util.Set;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.xipki.common.ConfPairs;
 import org.xipki.password.api.PasswordResolverException;
-import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.util.X509Util;
 
@@ -131,10 +131,10 @@ public class P12CertUpdateCommand extends P12SecurityCommand
             final String password)
     throws SignerException, PasswordResolverException
     {
-        CmpUtf8Pairs pairs = new CmpUtf8Pairs("keystore", "file:" + p12File);
+        ConfPairs pairs = new ConfPairs("keystore", "file:" + p12File);
         if(password != null)
         {
-            pairs.putUtf8Pair("password", new String(password));
+            pairs.putPair("password", new String(password));
         }
 
         securityFactory.createSigner("PKCS12", pairs.getEncoded(), "SHA1", null, cert);

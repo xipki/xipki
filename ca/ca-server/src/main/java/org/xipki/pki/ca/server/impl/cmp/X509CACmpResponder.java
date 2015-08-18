@@ -117,12 +117,19 @@ import org.xipki.audit.api.AuditChildEvent;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditStatus;
+import org.xipki.common.HealthCheckResult;
+import org.xipki.common.InvalidConfException;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.XMLUtil;
 import org.xipki.pki.ca.api.InsuffientPermissionException;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.RequestorInfo;
 import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
+import org.xipki.pki.ca.common.cmp.CmpUtf8Pairs;
 import org.xipki.pki.ca.common.cmp.CmpUtil;
 import org.xipki.pki.ca.server.impl.CAManagerImpl;
 import org.xipki.pki.ca.server.impl.RemoveExpiredCertsInfo;
@@ -132,14 +139,7 @@ import org.xipki.pki.ca.server.mgmt.api.CAStatus;
 import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpControl;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
-import org.xipki.common.HealthCheckResult;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.XMLUtil;
 import org.xipki.security.api.CRLReason;
-import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.ObjectIdentifiers;
 import org.xipki.security.api.XipkiCmpConstants;
@@ -166,7 +166,7 @@ public class X509CACmpResponder extends CmpResponder
     static
     {
         knownGenMsgIds.add(CMPObjectIdentifiers.it_currentCRL.getId());
-        knownGenMsgIds.add(ObjectIdentifiers.id_xipki_cmp.getId());
+        knownGenMsgIds.add(ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId());
     }
 
     public X509CACmpResponder(
@@ -1743,7 +1743,7 @@ public class X509CACmpResponder extends CmpResponder
 
                 itvResp = new InfoTypeAndValue(infoType, crl);
             }
-            else if(ObjectIdentifiers.id_xipki_cmp.equals(infoType))
+            else if(ObjectIdentifiers.id_xipki_cm_cmpGenmsg.equals(infoType))
             {
                 ASN1Encodable asn1 = itv.getInfoValue();
                 ASN1Integer asn1Code = null;
@@ -1760,7 +1760,7 @@ public class X509CACmpResponder extends CmpResponder
                 }catch(IllegalArgumentException e)
                 {
                     String statusMessage = "invalid value of the InfoTypeAndValue for " +
-                            ObjectIdentifiers.id_xipki_cmp.getId();
+                            ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId();
                     return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badRequest, statusMessage);
                 }
 

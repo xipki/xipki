@@ -106,11 +106,11 @@ import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.ConfPairs;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.password.api.PasswordResolverException;
-import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11Identity;
@@ -1542,14 +1542,14 @@ public class IaikP11Slot implements P11WritableSlot
             final SecurityFactory securityFactory)
     throws SignerException, PasswordResolverException
     {
-        CmpUtf8Pairs pairs = new CmpUtf8Pairs("slot-id", Long.toString(slot.getSlotID()));
+        ConfPairs pairs = new ConfPairs("slot-id", Long.toString(slot.getSlotID()));
         if(keyId.getKeyId() != null)
         {
-            pairs.putUtf8Pair("key-id", Hex.toHexString(keyId.getKeyId()));
+            pairs.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
         }
         if(keyId.getKeyLabel() != null)
         {
-            pairs.putUtf8Pair("key-label", keyId.getKeyLabel());
+            pairs.putPair("key-label", keyId.getKeyLabel());
         }
 
         securityFactory.createSigner("PKCS11", pairs.getEncoded(), "SHA1", null, cert);

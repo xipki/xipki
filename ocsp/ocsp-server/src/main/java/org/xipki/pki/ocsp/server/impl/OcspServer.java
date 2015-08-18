@@ -108,6 +108,7 @@ import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
+import org.xipki.common.ConfPairs;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.CollectionUtil;
@@ -1332,7 +1333,7 @@ public class OcspServer
             try
             {
                 ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
-                        responderSignerType, "algo?" + sigAlgo + "%" + responderKeyConf,
+                        responderSignerType, "algo" +ConfPairs.NAME_TERM + sigAlgo + ConfPairs.TOKEN_TERM + responderKeyConf,
                         explicitCertificateChain);
                 singleSigners.add(requestorSigner);
             } catch (SignerException e)

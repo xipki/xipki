@@ -45,7 +45,7 @@ import org.xipki.pki.ca.server.mgmt.api.UserEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "user-info", description="show information of CA user")
+@Command(scope = "xipki-ca", name = "user-info", description="show information of user")
 public class UserInfoCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", required = true, description = "user name")

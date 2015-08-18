@@ -774,7 +774,7 @@ public class ExtensionsChecker
         if(requestedExtensions != null)
         {
             Extension reqExtension = requestedExtensions.getExtension(
-                    ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions);
+                    ObjectIdentifiers.id_xipki_ext_cmRequestExtensions);
             if(reqExtension != null)
             {
                 ExtensionExistence ee = ExtensionExistence.getInstance(reqExtension.getParsedValue());

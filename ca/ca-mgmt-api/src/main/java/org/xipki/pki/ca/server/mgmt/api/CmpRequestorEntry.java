@@ -120,7 +120,6 @@ public class CmpRequestorEntry implements Serializable
 
             if(verbose)
             {
-                sb.deleteCharAt(sb.length() - 1);
                 sb.append("\tencoded: ");
                 try
                 {

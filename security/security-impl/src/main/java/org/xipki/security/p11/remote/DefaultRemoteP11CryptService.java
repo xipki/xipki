@@ -43,9 +43,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.xipki.common.ConfPairs;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11ModuleConf;
 
@@ -68,7 +68,7 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
 
         ParamUtil.assertNotNull("moduleConf", moduleConf);
 
-        CmpUtf8Pairs conf = new CmpUtf8Pairs(moduleConf.getNativeLibrary());
+        ConfPairs conf = new ConfPairs(moduleConf.getNativeLibrary());
         serverUrl = conf.getValue("url");
         if(StringUtil.isBlank(serverUrl))
         {

@@ -47,7 +47,7 @@ sleep 1000
 #################################################################
 xipki-caqa:env-check \
   --name certprofileType.map \
-  --value "DemoEE1?java:org.xipki.pki.ca.demo.certprofile.x509.DemoEE1X509Certprofile%DemoEE2?java:org.xipki.pki.ca.demo.certprofile.x509.DemoEE2X509Certprofile%"
+  --value "DemoEE1=java:org.xipki.pki.ca.demo.certprofile.x509.DemoEE1X509Certprofile,DemoEE2=java:org.xipki.pki.ca.demo.certprofile.x509.DemoEE2X509Certprofile"
 
 xipki-ca:env-add \
   --name qa-env1 \
@@ -86,32 +86,32 @@ xipki-caqa:neg-env-rm \
 #################################################################
 xipki-caqa:cmpcontrol-check \
   --name cmpcontrol1 \
-  --conf send.ca?true%messageTime.bias?300%protection.sigalgo?SHA256withRSA,SHA256withRSAandMGF1,SHA256withDSA,SHA256withECDSA%
+  --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA,SHA256withRSAandMGF1,SHA256withDSA,SHA256withECDSA
 
 xipki-ca:cmpcontrol-add \
   --name qa-cmpcontrol1 \
-  --conf send.ca?true%messageTime.bias?300%protection.sigalgo?SHA256withRSA,SHA256withRSAandMGF1,SHA256withDSA,SHA256withECDSA%
+  --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA,SHA256withRSAandMGF1,SHA256withDSA,SHA256withECDSA
 
 xipki-caqa:cmpcontrol-check \
   --name qa-cmpcontrol1 \
-  --conf send.ca?true%messageTime.bias?300%protection.sigalgo?SHA256withRSA,SHA256withRSAandMGF1,SHA256withDSA,SHA256withECDSA%
+  --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA,SHA256withRSAandMGF1,SHA256withDSA,SHA256withECDSA
 
 xipki-ca:cmpcontrol-up \
   --name qa-cmpcontrol1 \
-  --conf send.ca?true%messageTime.bias?300%
+  --conf send.ca=true,messageTime.bias=300
 
 xipki-caqa:neg-cmpcontrol-up \
   --name qa-cmpcontrol1 \
-  --conf send.ca?true%messageTime.bias?300%protection.sigalgo?INVALIDALGO%
+  --conf send.ca=true,messageTime.bias=300,protection.sigalgo=INVALIDALGO
 
 xipki-caqa:cmpcontrol-check \
   --name qa-cmpcontrol1 \
-  --conf send.ca?true%messageTime.bias?300%
+  --conf send.ca=true,messageTime.bias=300
 
 # name already exists
 xipki-caqa:neg-cmpcontrol-add \
   --name qa-cmpcontrol1 \
-  --conf send.ca?true%messageTime.bias?300%
+  --conf send.ca=true,messageTime.bias=300
 
 xipki-ca:cmpcontrol-rm \
   qa-cmpcontrol1 \
@@ -165,44 +165,44 @@ xipki-caqa:neg-requestor-rm \
 xipki-caqa:responder-check \
   --name responder1 \
   --signer-type JKS \
-  --signer-conf password?1234%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?SHA256withRSA
+  --signer-conf password=1234,keystore=file:etc/tlskeys/tls-server-keystore.jks,algo=SHA256withRSA
 
 xipki-ca:responder-add \
   --name qa-responder1 \
   --signer-type JKS \
-  --signer-conf password?1234%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?SHA1withRSA
+  --signer-conf password=1234,keystore=file:etc/tlskeys/tls-server-keystore.jks,algo=SHA1withRSA
 
 # name already exists
 xipki-caqa:neg-responder-add \
   --name qa-responder1 \
   --signer-type JKS \
-  --signer-conf password?1234%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?SHA1withRSA
+  --signer-conf password=1234,keystore=file:etc/tlskeys/tls-server-keystore.jks,algo=SHA1withRSA
 
 # password incorrect
 xipki-caqa:neg-responder-add \
   --name qa-responder2 \
   --signer-type JKS \
-  --signer-conf password?123456%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?SHA1withRSA
+  --signer-conf password=123456,keystore=file:etc/tlskeys/tls-server-keystore.jks,algo=SHA1withRSA
 
 # invalid algo
 xipki-caqa:neg-responder-add \
   --name qa-responder2 \
   --signer-type JKS \
-  --signer-conf password?1234%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?INVALIDALGO
+  --signer-conf password=1234,keystore=file:etc/tlskeys/tls-server-keystore.jks,algo=INVALIDALGO
 
 xipki-caqa:responder-check \
   --name qa-responder1 \
   --signer-type JKS \
-  --signer-conf password?1234%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?SHA1withRSA
+  --signer-conf password=1234,keystore=file:etc/tlskeys/tls-server-keystore.jks,algo=SHA1withRSA
 
 xipki-ca:responder-up \
   --name qa-responder1 \
-  --signer-conf password?1234%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?SHA256withRSA
+  --signer-conf password=1234,keystore=file:etc/tlskeys/tls-server-keystore.jks,algo=SHA256withRSA
 
 xipki-caqa:responder-check \
   --name qa-responder1 \
   --signer-type JKS \
-  --signer-conf password?1234%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?SHA256withRSA
+  --signer-conf password=1234,keystore=file:etc/tlskeys/tls-server-keystore.jks,algo=SHA256withRSA
 
 xipki-ca:responder-rm \
   qa-responder1
@@ -274,47 +274,47 @@ xipki-caqa:neg-profile-rm \
 xipki-caqa:crlsigner-check \
   --name CASIGN.CRLSIGNER \
   --signer-type CA \
-  --control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?02:00%
+  --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00
 
 # direct CRL signer (signed by CA)
 xipki-ca:crlsigner-add \
   --name qa-direct-crlsigner1 \
   --signer-type CA \
-  --control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
+  --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=03:00
 
 # name already exists
 xipki-caqa:neg-crlsigner-add \
   --name qa-direct-crlsigner1 \
   --signer-type CA \
-  --control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
+  --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=03:00
 
 # invalid control
 xipki-caqa:neg-crlsigner-add \
   --name qa-direct-crlsigner2 \
   --signer-type CA \
-  --control updateMode?unknown%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
+  --control updateMode=unknown,fullCRL.intervals=1,overlap.minutes=90,interval.time=03:00
 
 xipki-caqa:crlsigner-check \
   --name qa-direct-crlsigner1 \
   --signer-type CA \
-  --control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
+  --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=03:00
 
 xipki-ca:crlsigner-up \
   --name qa-direct-crlsigner1 \
-  --control updateMode?interval%fullCRL.intervals?2%overlap.minutes?90%interval.time?03:00%
+  --control updateMode=interval,fullCRL.intervals=2,overlap.minutes=90,interval.time=03:00
 
 xipki-caqa:crlsigner-check \
   --name qa-direct-crlsigner1 \
-  --control updateMode?interval%fullCRL.intervals?2%overlap.minutes?90%interval.time?03:00%
+  --control updateMode=interval,fullCRL.intervals=2,overlap.minutes=90,interval.time=03:00
 
 # invalid fullCRL.intervals
 xipki-caqa:neg-crlsigner-up \
   --name qa-direct-crlsigner1 \
-  --control updateMode?interval%fullCRL.intervals?abc%overlap.minutes?90%interval.time?03:00%
+  --control updateMode=interval,fullCRL.intervals=abc,overlap.minutes=90,interval.time=03:00
 
 xipki-caqa:crlsigner-check \
   --name qa-direct-crlsigner1 \
-  --control updateMode?interval%fullCRL.intervals?2%overlap.minutes?90%interval.time?03:00%
+  --control updateMode=interval,fullCRL.intervals=2,overlap.minutes=90,interval.time=03:00
 
 xipki-ca:crlsigner-rm \
   qa-direct-crlsigner1
@@ -327,22 +327,22 @@ xipki-caqa:neg-crlsigner-rm \
 xipki-ca:crlsigner-add \
   --name qa-indirect-crlsigner1 \
   --signer-type PKCS12 \
-  --signer-conf password?1234%keystore?file:xipki/demo/keys/crlsigner.p12%algo?SHA256withRSA \
-  --control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?03:00%
+  --signer-conf password=1234,keystore=file:xipki/demo/keys/crlsigner.p12,algo=SHA256withRSA \
+  --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=03:00
 
 # No keyusage CRLSign
 xipki-caqa:neg-crlsigner-add \
   --name qa-indirect-crlsigner2 \
   --signer-type JKS \
-  --signer-conf password?1234%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?SHA1withRSA \
-  --control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?02:00%
+  --signer-conf password=1234,keystore=file:etc/tlskeys/tls-server-keystore.jks,algo=SHA1withRSA \
+  --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00
 
 # Unknown signature algorithm
 xipki-caqa:neg-crlsigner-add \
   --name qa-indirect-crlsigner2 \
   --signer-type PKCS12 \
-  --signer-conf password?1234%keystore?file:xipki/demo/keys/crlsigner.p12%algo?INVALIDALGO \
-  --control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?02:00%
+  --signer-conf password=1234,keystore=file:xipki/demo/keys/crlsigner.p12,algo=INVALIDALGO \
+  --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00
 
 xipki-ca:crlsigner-rm \
   qa-indirect-crlsigner1
@@ -356,7 +356,7 @@ xipki-caqa:ca-check \
   --permission all \
   --max-validity 5y \
   --signer-type PKCS12 \
-  --signer-conf password?1234%keystore?file:output/SubCA1.p12%algo?$CA_SIGNER_ALGO \
+  --signer-conf password=1234,keystore=file:output/SubCA1.p12,algo=$CA_SIGNER_ALGO \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/SubCA1.der \
   --cmp-control cmpcontrol1 \
@@ -368,7 +368,7 @@ xipki-caqa:ca-check --name RCA1 \
   --permission all \
   --max-validity 10y \
   --signer-type PKCS12 \
-  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?$CA_SIGNER_ALGO \
+  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO \
   --cert output/RCA1.der \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
@@ -383,7 +383,7 @@ xipki-ca:ca-up --name RCA1 \
   --permission enroll \
   --permission revoke \
   --max-validity 8y \
-  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?$CA_SIGNER_ALGO \
+  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO \
   --ocsp-uri http://localhost:8080/ocsp/responder2 \
   --ca-cert-uri http://example.org/RCA1-2.der \
   --duplicate-subject forbidden \
@@ -395,7 +395,7 @@ xipki-caqa:ca-check --name RCA1 \
   --permission revoke \
   --max-validity 8y \
   --signer-type PKCS12 \
-  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?$CA_SIGNER_ALGO \
+  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO \
   --cert output/RCA1.der \
   --ocsp-uri http://localhost:8080/ocsp/responder2 \
   --ca-cert-uri http://example.org/RCA1-2.der \
@@ -419,7 +419,7 @@ xipki-caqa:neg-gen-rca \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS12 \
-  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?$CA_SIGNER_ALGO \
+  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
@@ -439,7 +439,7 @@ xipki-caqa:neg-gen-rca \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS12 \
-  --signer-conf password?123456%keystore?file:output/RCA1.p12%algo?SHA256withRSA \
+  --signer-conf password=123456,keystore=file:output/RCA1.p12,algo=SHA256withRSA \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
@@ -459,7 +459,7 @@ xipki-caqa:neg-gen-rca \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS12 \
-  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?SHA256withDSA \
+  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=SHA256withDSA \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
@@ -478,7 +478,7 @@ xipki-caqa:neg-ca-add \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS12 \
-  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?SHA256withRSA \
+  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=SHA256withRSA \
   --cert output/SubCA1.der \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
@@ -496,7 +496,7 @@ xipki-caqa:neg-ca-add \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS12 \
-  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?SHA256withRSA \
+  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=SHA256withRSA \
   --cert output/SubCA1.der \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
@@ -514,7 +514,7 @@ xipki-caqa:neg-ca-add \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS12 \
-  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?SHA256withRSA \
+  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=SHA256withRSA \
   --cert output/SubCA1.der \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
@@ -533,7 +533,7 @@ xipki-caqa:neg-ca-add \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS12 \
-  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?SHA256withRSA \
+  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=SHA256withRSA \
   --cert output/SubCA1.der \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \

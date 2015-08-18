@@ -77,6 +77,18 @@ import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
+import org.xipki.common.ConfPairs;
+import org.xipki.common.InvalidConfException;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.datasource.api.DataSourceFactory;
+import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.password.api.PasswordResolver;
+import org.xipki.password.api.PasswordResolverException;
 import org.xipki.pki.ca.api.CertPublisherException;
 import org.xipki.pki.ca.api.CertprofileException;
 import org.xipki.pki.ca.api.DfltEnvParameterResolver;
@@ -113,20 +125,8 @@ import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
-import org.xipki.datasource.api.DataSourceFactory;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.password.api.PasswordResolver;
-import org.xipki.password.api.PasswordResolverException;
 import org.xipki.security.api.CRLReason;
 import org.xipki.security.api.CertRevocationInfo;
-import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
@@ -3062,10 +3062,10 @@ implements CAManager, CmpResponderManager, ScepManager
             return signerConf;
         }
 
-        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(signerConf);
-        String keystoreConf = utf8Pairs.getValue("keystore");
-        String passwordHint = utf8Pairs.getValue("password");
-        String keyLabel     = utf8Pairs.getValue("key-label");
+        ConfPairs pairs = new ConfPairs(signerConf);
+        String keystoreConf = pairs.getValue("keystore");
+        String passwordHint = pairs.getValue("password");
+        String keyLabel     = pairs.getValue("key-label");
 
         byte[] keystoreBytes;
         if(StringUtil.startsWithIgnoreCase(keystoreConf, "file:"))
@@ -3086,8 +3086,8 @@ implements CAManager, CmpResponderManager, ScepManager
                 keystoreBytes, keyLabel,
                 passwordResolver.resolvePassword(passwordHint), certChain);
 
-        utf8Pairs.putUtf8Pair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
-        return utf8Pairs.getEncoded();
+        pairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
+        return pairs.getEncoded();
     }
 
     void shutdownCertprofile(
@@ -3268,10 +3268,10 @@ implements CAManager, CmpResponderManager, ScepManager
             return null;
         }
 
-        CmpUtf8Pairs pairs;
+        ConfPairs pairs;
         try
         {
-            pairs = new CmpUtf8Pairs(typeMap);
+            pairs = new ConfPairs(typeMap);
         }catch(IllegalArgumentException e)
         {
             LOG.error("CA environment {}: '{}"
@@ -3286,9 +3286,9 @@ implements CAManager, CmpResponderManager, ScepManager
             final String conf)
     throws SignerException
     {
-        CmpUtf8Pairs pairs = new CmpUtf8Pairs(conf);
+        ConfPairs pairs = new ConfPairs(conf);
         String str = pairs.getValue("algo");
-        List<String> list = StringUtil.split(str, ", ");
+        List<String> list = StringUtil.split(str, ":");
         if(list == null)
         {
             throw new SignerException("no algo is defined in CA signerConf");
@@ -3305,7 +3305,7 @@ implements CAManager, CmpResponderManager, ScepManager
             {
                 throw new SignerException(e.getMessage(), e);
             }
-            pairs.putUtf8Pair("algo", c14nAlgo);
+            pairs.putPair("algo", c14nAlgo);
             signerConfs.add(new String[]{c14nAlgo, pairs.getEncoded()});
         }
 

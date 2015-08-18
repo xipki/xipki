@@ -69,6 +69,9 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.operator.ContentSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.ConfPairs;
+import org.xipki.common.InvalidConfException;
+import org.xipki.common.util.CollectionUtil;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.CertprofileException;
 import org.xipki.pki.ca.api.OperationException;
@@ -77,9 +80,6 @@ import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.api.profile.ExtensionValue;
 import org.xipki.pki.ca.api.profile.ExtensionValues;
 import org.xipki.pki.ca.api.profile.x509.SubjectInfo;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.SecurityFactory;
@@ -138,7 +138,7 @@ class X509SelfSignedCertBuilder
 
         if("pkcs12".equalsIgnoreCase(signerType) || "jks".equalsIgnoreCase(signerType))
         {
-            CmpUtf8Pairs keyValues = new CmpUtf8Pairs(signerConf);
+            ConfPairs keyValues = new ConfPairs(signerConf);
             String keystoreConf = keyValues.getValue("keystore");
             if(keystoreConf == null)
             {

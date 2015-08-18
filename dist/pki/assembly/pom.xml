@@ -18,8 +18,8 @@
     <postgresql.version>9.3-1100-jdbc41</postgresql.version>
     <h2-jdbc.version>1.4.185</h2-jdbc.version>
     <hsqldb.version>2.3.2</hsqldb.version>
-    <application.shell.name>xipki</application.shell.name>
-    <application.log.file>xipki.log</application.log.file>
+    <application.shell.name>pki</application.shell.name>
+    <application.log.file>pki.log</application.log.file>
   </properties>
   <dependencies>
     <dependency>
@@ -315,7 +315,7 @@
                 <feature>xipki-ocspqa-shell</feature>
                 <feature>xipki-database-tool</feature>
                 <feature>xipki-audit-syslog</feature>
-                <feature>xipki-pkiconsole-server</feature>
+                <feature>xipki-ncm-server</feature>
                 <feature>xipki-scepclient-shell</feature>
                 <feature>xipki-jscepclient-shell</feature>
               </features>
@@ -346,7 +346,7 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
-                  <finalName>xipki-${project.version}</finalName>
+                  <finalName>xipki-pki-${project.version}</finalName>
                   <descriptors>
                     <descriptor>src/main/descriptors/unix-bin.xml</descriptor>
                   </descriptors>
@@ -379,7 +379,7 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
-                  <finalName>xipki-${project.version}</finalName>
+                  <finalName>xipki-pki-${project.version}</finalName>
                   <descriptors>
                     <descriptor>src/main/descriptors/windows-bin.xml</descriptor>
                   </descriptors>

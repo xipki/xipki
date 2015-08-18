@@ -29,7 +29,7 @@ xipki-ca:gen-rca \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS12 \
-  --signer-conf password?1234%keystore?file:output/RCA1.p12%algo?$CA_SIGNER_ALGO \
+  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
@@ -115,7 +115,7 @@ xipki-tk:req-p12 \
   --subject-alt-name "[7]192.168.0.1" \
   --subject-alt-name "[8]1.2.3.4" \
   --subject-alt-name "[0]2.5.4.10=long organization name" \
-  --subject-info-access "1.3.6.1.5.5.7.48.5?[6]http://example.org/abc" \
+  --subject-info-access "1.3.6.1.5.5.7.48.5=[6]http://example.org/abc" \
   --keyusage cRLSign
 
 xipki-ca:enroll-cert \
@@ -141,7 +141,7 @@ xipki-ca:ca-add \
   --next-crl-no 2 \
   --max-validity 5y \
   --signer-type PKCS12 \
-  --signer-conf password?1234%keystore?file:output/SubCA1.p12%algo?$CA_SIGNER_ALGO \
+  --signer-conf password=1234,keystore=file:output/SubCA1.p12,algo=$CA_SIGNER_ALGO \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/SubCA1.der \
   --cmp-control cmpcontrol1 \
@@ -199,7 +199,7 @@ xipki-ca:ca-add \
   --next-crl-no 2 \
   --max-validity 8000y \
   --signer-type PKCS12 \
-  --signer-conf password?1234%keystore?file:output/SubCAwithCRL1.p12%algo?$CA_SIGNER_ALGO \
+  --signer-conf password=1234,keystore=file:output/SubCAwithCRL1.p12,algo=$CA_SIGNER_ALGO \
   --ocsp-uri http://localhost:8080/ocsp/responder2 \
   --ca-cert-uri http://example.org/SubCAwithCRL1.der \
   --crl-uri http://subcawithcrl.example.org/crl \

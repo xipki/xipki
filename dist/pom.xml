@@ -11,7 +11,7 @@
   <packaging>pom</packaging>
   <modules>
     <module>pki</module>
-    <module>pkiconsole</module>
-    <module>remotep11</module>
+    <module>ncm-client</module>
+    <module>pkcs11-proxy</module>
   </modules>
 </project>

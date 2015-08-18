@@ -4,12 +4,12 @@
 
 xipki-ca:env-add \
   --name certprofileType.map \
-  --value "DemoEE1?java:org.xipki.pki.ca.demo.certprofile.x509.DemoEE1X509Certprofile%DemoEE2?java:org.xipki.pki.ca.demo.certprofile.x509.DemoEE2X509Certprofile%"
+  --value "DemoEE1=java:org.xipki.pki.ca.demo.certprofile.x509.DemoEE1X509Certprofile,DemoEE2=java:org.xipki.pki.ca.demo.certprofile.x509.DemoEE2X509Certprofile"
 
 ## CMP control: messageTimeBias is set to 300 seconds.
 xipki-ca:cmpcontrol-add \
   --name cmpcontrol1 \
-  --conf send.ca?true%messageTime.bias?300%protection.sigalgo?SHA256withRSA,SHA256withRSAandMGF1,SHA256withDSA,SHA256withECDSA%
+  --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA
 
 ## Certificate Profiles
 xipki-ca:profile-add \
@@ -85,13 +85,13 @@ xipki-ca:profile-add \
 xipki-ca:publisher-add \
   --name OCSP.PUBLISHER \
   --type OCSP \
-  --conf datasource?ocsp%publish.goodcerts?true
+  --conf datasource=ocsp,publish.goodcerts=true
 
 # CMP Responder
 xipki-ca:responder-add \
   --name responder1 \
   --signer-type JKS \
-  --signer-conf password?1234%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?SHA256withRSA
+  --signer-conf password=1234,keystore=file:etc/tlskeys/tls-server-keystore.jks,algo=SHA256withRSA
 
 # CMP Requestors
 xipki-ca:requestor-add \
@@ -103,4 +103,4 @@ xipki-ca:requestor-add \
 xipki-ca:crlsigner-add \
   --name CASIGN.CRLSIGNER \
   --signer-type CA \
-  --control updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?02:00%
+  --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00

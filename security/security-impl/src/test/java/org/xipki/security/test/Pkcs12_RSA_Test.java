@@ -45,8 +45,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xipki.common.ConfPairs;
 import org.xipki.security.SecurityFactoryImpl;
-import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.util.X509Util;
 
@@ -85,9 +85,9 @@ public abstract class Pkcs12_RSA_Test
 
     private String getSignerConf()
     {
-        CmpUtf8Pairs conf = new CmpUtf8Pairs("password", getPassword());
-        conf.putUtf8Pair("algo", getSignatureAlgorithm().getId());
-        conf.putUtf8Pair("keystore", "file:" + getPkcs12File());
+        ConfPairs conf = new ConfPairs("password", getPassword());
+        conf.putPair("algo", getSignatureAlgorithm().getId());
+        conf.putPair("keystore", "file:" + getPkcs12File());
         return conf.getEncoded();
     }
 

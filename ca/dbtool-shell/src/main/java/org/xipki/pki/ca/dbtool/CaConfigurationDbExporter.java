@@ -45,11 +45,13 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import org.xipki.common.ConfPairs;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.password.api.PasswordResolverException;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasProfiles;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasPublishers;
@@ -78,8 +80,6 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.PublisherType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.RequestorType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.ResponderType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.ScepType;
-import org.xipki.password.api.PasswordResolverException;
-import org.xipki.security.api.CmpUtf8Pairs;
 
 /**
  * @author Lijun Liao
@@ -875,14 +875,14 @@ class CaConfigurationDbExporter extends DbPorter
         final String KEY_MESSAGETIME_BIAS = "messageTime.bias";
         final String KEY_CONFIRM_WAITTIME = "confirm.waittime";
 
-        CmpUtf8Pairs pairs = new CmpUtf8Pairs();
+        ConfPairs pairs = new ConfPairs();
 
-        pairs.putUtf8Pair(KEY_CONFIRM_CERT, Boolean.toString(confirmCert));
-        pairs.putUtf8Pair(KEY_SEND_CA, Boolean.toString(sendCaCert));
-        pairs.putUtf8Pair(KEY_MESSAGETIME_REQUIRED, Boolean.toString(messageTimeRequired));
-        pairs.putUtf8Pair(KEY_SEND_RESPONDER, Boolean.toString(sendResponderCert));
-        pairs.putUtf8Pair(KEY_MESSAGETIME_BIAS, Integer.toString(messageTimeBias));
-        pairs.putUtf8Pair(KEY_CONFIRM_WAITTIME, Integer.toString(confirmWaitTime));
+        pairs.putPair(KEY_CONFIRM_CERT, Boolean.toString(confirmCert));
+        pairs.putPair(KEY_SEND_CA, Boolean.toString(sendCaCert));
+        pairs.putPair(KEY_MESSAGETIME_REQUIRED, Boolean.toString(messageTimeRequired));
+        pairs.putPair(KEY_SEND_RESPONDER, Boolean.toString(sendResponderCert));
+        pairs.putPair(KEY_MESSAGETIME_BIAS, Integer.toString(messageTimeBias));
+        pairs.putPair(KEY_CONFIRM_WAITTIME, Integer.toString(confirmWaitTime));
         return pairs.getEncoded();
     }
 }

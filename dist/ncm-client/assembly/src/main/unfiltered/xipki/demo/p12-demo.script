@@ -1,0 +1,31 @@
+KEYSIZE = 2048
+
+# Valid signer algos are SHA<n>withRSA where n is 1, 256, 384 and 512
+#
+CA_SIGNER_ALGO = SHA256withRSA:SHA1withRSA
+
+echo "========================================================"
+echo "||       DEMO RSA (PKCS#1 v1.5) with PKCS#12 Key      ||"
+echo "========================================================"
+
+feature:install xipki-security-shell
+
+# Wait one second
+sleep 1000
+
+xipki-cmd:rm -r -f output
+
+xipki-tk:rsa-p12 --password 1234 --key-size $KEYSIZE --out output/RCA1.p12 \
+  --subject "CN=RCA1,O=xipki,C=DE"
+
+xipki-tk:rsa-p12 --password 1234 --key-size $KEYSIZE --out output/SubCA1.p12 \
+  --subject "CN=SubCA1"
+
+xipki-tk:rsa-p12 --password 1234 --key-size $KEYSIZE --out output/SubCAwithCRL1.p12 \
+  --subject "CN=SubCAwithCRL1"
+
+source ./xipki/demo/prepare.script
+
+source ./xipki/demo/p12.script
+
+feature:uninstall xipki-security-shell

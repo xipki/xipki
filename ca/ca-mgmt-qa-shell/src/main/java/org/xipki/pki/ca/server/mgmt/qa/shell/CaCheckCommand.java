@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.karaf.shell.commands.Command;
+import org.xipki.common.ConfPairs;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CAEntry;
 import org.xipki.pki.ca.server.mgmt.api.CAStatus;
@@ -50,8 +52,6 @@ import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509ChangeCAEntry;
 import org.xipki.pki.ca.server.mgmt.shell.CaUpdateCommand;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.security.api.CmpUtf8Pairs;
 
 /**
  * @author Lijun Liao
@@ -232,10 +232,10 @@ public class CaCheckCommand extends CaUpdateCommand
 
         if(ey.getSignerConf() != null)
         {
-            CmpUtf8Pairs ex = new CmpUtf8Pairs(ey.getSignerConf());
-            ex.removeUtf8Pair("keystore");
-            CmpUtf8Pairs is = new CmpUtf8Pairs(ca.getSignerConf());
-            is.removeUtf8Pair("keystore");
+            ConfPairs ex = new ConfPairs(ey.getSignerConf());
+            ex.removePair("keystore");
+            ConfPairs is = new ConfPairs(ca.getSignerConf());
+            is.removePair("keystore");
             if(ex.equals(is) == false)
             {
                 throw new CmdFailure("signer conf: is '" + is + "', but expected '" + ex + "'");

@@ -336,7 +336,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
         {
             v.add(content);
         }
-        InfoTypeAndValue itvReq = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cmp, new DERSequence(v));
+        InfoTypeAndValue itvReq = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cm_cmpGenmsg, new DERSequence(v));
 
         GenMsgContent genMsgContent = new GenMsgContent(itvReq);
         PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
@@ -413,7 +413,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
         {
             for(InfoTypeAndValue m : itvs)
             {
-                if(ObjectIdentifiers.id_xipki_cmp.equals(m.getInfoType()))
+                if(ObjectIdentifiers.id_xipki_cm_cmpGenmsg.equals(m.getInfoType()))
                 {
                     itv = m;
                     break;
@@ -423,14 +423,14 @@ public abstract class RemoteP11CryptService implements P11CryptService
         if(itv == null)
         {
             throw new SignerException("the response does not contain InfoTypeAndValue '"
-                    + ObjectIdentifiers.id_xipki_cmp.getId() + "'");
+                    + ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId() + "'");
         }
 
         ASN1Encodable itvValue = itv.getInfoValue();
         if(itvValue == null)
         {
             throw new SignerException("value of InfoTypeAndValue '"
-                    + ObjectIdentifiers.id_xipki_cmp.getId() + "'  is incorrect");
+                    + ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId() + "'  is incorrect");
         }
         try
         {
@@ -445,7 +445,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
         }catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e)
         {
             throw new SignerException("value of response (type nfoTypeAndValue) '"
-                    + ObjectIdentifiers.id_xipki_cmp.getId() + "'  is incorrect");
+                    + ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId() + "'  is incorrect");
         }
     }
 
