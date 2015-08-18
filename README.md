@@ -206,7 +206,7 @@ Build and Assembly from Source Code
 Download the Released Binary Package
 ------
 
-Download the released binary package xipki-pki-<version>.tar.gz from the URL https://github.com/xipki/xipki/releases
+Download the released binary package `xipki-pki-<version>.tar.gz` from the URL https://github.com/xipki/xipki/releases
 
 Install
 -------
