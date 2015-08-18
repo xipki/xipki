@@ -10,7 +10,7 @@
     <version>2.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>scep4j-common</artifactId>
-  <name>SCEP4J :: ${project.artifactId}</name>
+  <name>XiPKI :: ${project.artifactId}</name>
   <packaging>bundle</packaging>
   <dependencies>
     <dependency>

@@ -61,6 +61,10 @@ public class ImportOcspCommand extends XipkiOsgiCommandSupport
                     + "(required)")
     private String indir;
 
+    @Option(name = "-n",
+            description = "number of certificates in one commit")
+    private Integer numCertsPerCommit = 100;
+
     @Option(name = "--resume")
     private Boolean resume = Boolean.FALSE;
 
@@ -72,7 +76,7 @@ public class ImportOcspCommand extends XipkiOsgiCommandSupport
     throws Exception
     {
         OcspDbImporter importer = new OcspDbImporter(dataSourceFactory, passwordResolver, dbconfFile, resume);
-        importer.importDatabase(indir);
+        importer.importDatabase(indir, numCertsPerCommit.intValue());
         return null;
     }
 

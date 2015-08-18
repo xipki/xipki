@@ -60,11 +60,13 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.ConfPairs;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.dbtool.InvalidInputException;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CaHasPublisherType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CaType;
@@ -76,8 +78,6 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.CertsType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertstoreCaType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.NameIdType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.PublisherType;
-import org.xipki.dbtool.InvalidInputException;
-import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.HashAlgoType;
 import org.xipki.security.api.HashCalculator;
 import org.xipki.security.api.util.X509Util;
@@ -93,20 +93,28 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
     private final Unmarshaller unmarshaller;
     private final String publisherName;
     private final boolean resume;
+    private final int batchEntriesPerCommit;
 
     OcspCertStoreFromCaDbImporter(
             final DataSourceWrapper dataSource,
             final Unmarshaller unmarshaller,
             final String srcDir,
             final String publisherName,
+            final int batchEntriesPerCommit,
             final boolean resume)
     throws DataAccessException, InvalidInputException
     {
         super(dataSource, srcDir);
+        if(batchEntriesPerCommit < 1)
+        {
+            throw new IllegalArgumentException("batchEntriesPerCommit could not be less than 1: " + batchEntriesPerCommit);
+        }
         ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         ParamUtil.assertNotBlank("publisherName", publisherName);
         this.unmarshaller = unmarshaller;
         this.publisherName = publisherName;
+        this.batchEntriesPerCommit = batchEntriesPerCommit;
+
         File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);
         if(resume)
         {
@@ -192,7 +200,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 throw new InvalidInputException("Unkwown publisher type " + type);
             }
 
-            CmpUtf8Pairs utf8pairs = new CmpUtf8Pairs(publisherType.getConf());
+            ConfPairs utf8pairs = new ConfPairs(publisherType.getConf());
             String v = utf8pairs.getValue("publish.goodcerts");
             boolean revokedOnly = false;
             if(v != null)
@@ -420,6 +428,28 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
         {
             for(String certsFile : certsfiles.getCertsFile())
             {
+                // extract the toId from the filename
+                int fromIdx = certsFile.indexOf('-');
+                int toIdx = certsFile.indexOf(".zip");
+                if(fromIdx != -1 && toIdx == -1)
+                {
+                    try
+                    {
+                        long toId = Integer.parseInt(certsFile.substring(fromIdx + 1, toIdx));
+                        if(toId < minId)
+                        {
+                            // try next file
+                            continue;
+                        }
+                    }catch(Exception e)
+                    {
+                        LOG.warn("invalid file name '{}', but will still be processed", certsFile);
+                    }
+                } else
+                {
+                    LOG.warn("invalid file name '{}', but will still be processed", certsFile);
+                }
+
                 try
                 {
                     int[] numAndLastId = do_import_cert(ps_cert, ps_certhash, ps_rawcert,
@@ -428,11 +458,8 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                     int numProcessed = numAndLastId[0];
                     int lastId = numAndLastId[1];
                     minId = lastId + 1;
-                    if(numProcessed > 0)
-                    {
-                        sum += numProcessed;
-                        printStatus(total, sum, startTime);
-                    }
+                    sum += numProcessed;
+                    printStatus(total, sum, startTime);
                 }catch(Exception e)
                 {
                     System.err.println("\nerror while importing certificates from file " + certsFile +
@@ -493,7 +520,6 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
         {
             List<CertType> list = certs.getCert();
             final int size = list.size();
-            final int n = 100;
             int numProcessed = 0;
             int numEntriesInBatch = 0;
             int lastSuccessfulCertId = 0;
@@ -602,7 +628,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                     throw translate(OcspCertStoreDbImporter.SQL_ADD_RAWCERT, e);
                 }
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % n == 0 || i == size - 1))
+                if(numEntriesInBatch > 0 && (numEntriesInBatch % this.batchEntriesPerCommit == 0 || i == size - 1))
                 {
                     String sql = null;
                     try

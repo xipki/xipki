@@ -58,9 +58,9 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.xipki.common.ConfPairs;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.password.api.PasswordResolverException;
-import org.xipki.security.api.CmpUtf8Pairs;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.SecurityFactory;
@@ -200,10 +200,10 @@ public class P10RequestGenerator
             final String accessMethodAndLocation)
     throws BadInputException
     {
-        CmpUtf8Pairs pairs;
+        ConfPairs pairs;
         try
         {
-            pairs = new CmpUtf8Pairs(accessMethodAndLocation);
+            pairs = new ConfPairs(accessMethodAndLocation);
         }catch(IllegalArgumentException e)
         {
             throw new BadInputException("invalid accessMethodAndLocation " + accessMethodAndLocation);

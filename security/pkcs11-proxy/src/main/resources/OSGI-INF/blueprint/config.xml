@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+  <cm:property-placeholder persistent-id="org.xipki.security.pkcs11proxy" update-strategy="reload">
+    <cm:default-properties>
+      <cm:property name="urlPatterns" value="/p11proxy/*"/>
+    </cm:default-properties>
+  </cm:property-placeholder>
+  <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
+  <bean id="localP11CryptServicePool" class="org.xipki.remotep11.server.impl.LocalP11CryptServicePool" init-method="init">
+    <property name="securityFactory" ref="securityFactory"/>
+  </bean>
+  <!-- create the servlet and inject our own app factory -->
+  <bean id="serverServlet" class="org.xipki.remotep11.server.impl.HttpCmpServlet">
+    <property name="localP11CryptServicePool" ref="localP11CryptServicePool"/>
+  </bean>
+  <!-- register it as a servlet service for the web extender -->
+  <service ref="serverServlet" interface="javax.servlet.Servlet">
+    <service-properties>
+      <entry key="urlPatterns" value="${urlPatterns}"/>
+    </service-properties>
+  </service>
+</blueprint>
