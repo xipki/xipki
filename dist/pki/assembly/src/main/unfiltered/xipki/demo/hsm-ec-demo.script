@@ -40,10 +40,13 @@ source ./xipki/demo/prepare.script
 source ./xipki/demo/hsm.script
 
 source ./xipki/demo/ra.script
+#source ./xipki/demo/ra-minimum.script 
 
 source ./xipki/demo/ca-qa.script
+#source ./xipki/demo/ca-qa-minimum.script
 
 source ./xipki/demo/ocsp.script
+#source ./xipki/demo/ocsp-minimum.script
 
 #source ./xipki/demo/loadtest-enroll.script
 

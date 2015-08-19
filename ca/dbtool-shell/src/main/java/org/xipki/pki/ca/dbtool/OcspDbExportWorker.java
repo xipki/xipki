@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -61,21 +62,25 @@ import org.xipki.password.api.PasswordResolverException;
  * @author Lijun Liao
  */
 
-public class OcspDbExporter
+public class OcspDbExportWorker extends DbPorterWorker
 {
-    private static final Logger LOG = LoggerFactory.getLogger(OcspDbImporter.class);
-    protected final DataSourceWrapper dataSource;
-    protected final Marshaller marshaller;
-    protected final Unmarshaller unmarshaller;
-    protected final String destFolder;
-    protected final boolean resume;
+    private static final Logger LOG = LoggerFactory.getLogger(OcspDbImportWorker.class);
+    private final DataSourceWrapper dataSource;
+    private final Marshaller marshaller;
+    private final Unmarshaller unmarshaller;
+    private final String destFolder;
+    private final boolean resume;
+    private final int numCertsInBundle;
+    private final int numCertsPerCommit;
 
-    public OcspDbExporter(
+    public OcspDbExportWorker(
             final DataSourceFactory dataSourceFactory,
             final PasswordResolver passwordResolver,
             final String dbConfFile,
             final String destFolder,
-            final boolean resume)
+            final boolean resume,
+            final int numCertsInBundle,
+            final int numCertsPerCommit)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
@@ -120,11 +125,12 @@ public class OcspDbExporter
         }
         this.resume = resume;
         this.destFolder = destFolder;
+        this.numCertsInBundle = numCertsInBundle;
+        this.numCertsPerCommit = numCertsPerCommit;
     }
 
-    public void exportDatabase(
-            final int numCertsInBundle,
-            final int numCertsPerCommit)
+    @Override
+    public void doRun(AtomicBoolean stopMe)
     throws Exception
     {
         long start = System.currentTimeMillis();
@@ -132,10 +138,11 @@ public class OcspDbExporter
         {
             // CertStore
             OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(
-                    dataSource, marshaller, unmarshaller, destFolder, numCertsInBundle, numCertsPerCommit, resume);
+                    dataSource, marshaller, unmarshaller, destFolder,
+                    numCertsInBundle, numCertsPerCommit, resume, stopMe);
             certStoreExporter.export();
             certStoreExporter.shutdown();
-        }finally
+        } finally
         {
             try
             {

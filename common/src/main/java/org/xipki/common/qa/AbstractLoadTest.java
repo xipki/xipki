@@ -163,7 +163,7 @@ public abstract class AbstractLoadTest
 
     protected static void printHeader()
     {
-        System.out.println(" processed      time       #/s");
+        System.out.println(" processed       time       #/s");
     }
 
     protected void printStatus()
@@ -198,10 +198,10 @@ public abstract class AbstractLoadTest
             referenceMeasurePoint = measureDeque.getFirst();
         }
 
-        long t2inms = now - referenceMeasurePoint.measureTime; // in ms
+        long t2inms = now - referenceMeasurePoint.getMeasureTime(); // in ms
         if(t2inms > 0)
         {
-            long average = (currentAccount - referenceMeasurePoint.measureAccount) * 1000 / t2inms;
+            long average = (currentAccount - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
 
             String averageS = Long.toString(average);
             for (int i = 0; i < 10 -averageS.length(); i++)
@@ -260,9 +260,13 @@ public abstract class AbstractLoadTest
         // hours
         if(h == 0)
         {
-            sb.append("   ");
+            sb.append("    ");
         }
         else if(h < 10)
+        {
+            sb.append("  " + h + ":");
+        }
+        else if(h < 100)
         {
             sb.append(" " + h + ":");
         }
@@ -292,19 +296,5 @@ public abstract class AbstractLoadTest
         }
 
         return sb.toString();
-    }
-
-    private static class MeasurePoint
-    {
-        private long measureTime;
-        private long measureAccount;
-
-        public MeasurePoint(
-                final long measureTime,
-                final long measureAccount)
-        {
-            this.measureTime = measureTime;
-            this.measureAccount = measureAccount;
-        }
     }
 }

@@ -48,12 +48,13 @@ import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.xipki.common.qa.AbstractLoadTest;
+import org.slf4j.Logger;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -77,10 +78,10 @@ public class DbPorter
     public static final String IMPORT_PROCESS_LOG_FILENAME = "import.process";
     public static final String MSG_CERTS_FINISHED = "CERTS.FINISHED";
     public static final String IMPORT_TO_OCSP_PROCESS_LOG_FILENAME = "importToOcsp.process";
-    public static final long MS_IN_SECOND = 1000L;
 
     public static final int VERSION = 1;
 
+    protected final AtomicBoolean stopMe;
     protected final DataSourceWrapper dataSource;
     private Connection connection;
     private boolean connectionAutoCommit;
@@ -89,13 +90,16 @@ public class DbPorter
 
     public DbPorter(
             final DataSourceWrapper dataSource,
-            final String baseDir)
+            final String baseDir,
+            final AtomicBoolean stopMe)
     throws DataAccessException
     {
         super();
         ParamUtil.assertNotNull("dataSource", dataSource);
         ParamUtil.assertNotBlank("baseDir", baseDir);
+        ParamUtil.assertNotNull("stopMe", stopMe);
 
+        this.stopMe = stopMe;
         this.dataSource = dataSource;
         this.connection = this.dataSource.getConnection();
         try
@@ -196,6 +200,24 @@ public class DbPorter
             }catch(SQLException e)
             {
             }
+        }
+    }
+
+    public void deleteFromTableWithLargerId(String tableName, int id, Logger log)
+    {
+        PreparedStatement ps = null;
+        try
+        {
+            ps = prepareStatement("DELETE FROM " + tableName + " WITH ID > ?");
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch(Throwable t)
+        {
+            log.error("could not delete columns from table " + tableName + " with ID > " + id, t);
+        }
+        finally
+        {
+            releaseResources(ps, null);
         }
     }
 
@@ -356,57 +378,6 @@ public class DbPorter
         }
 
         return props;
-    }
-
-    public static void printHeader()
-    {
-        System.out.println("-----------------------------------------");
-        System.out.println(" processed   percent      time       #/s");
-    }
-
-    public static void printTrailer()
-    {
-        System.out.println("\n-----------------------------------------");
-    }
-
-    public static void printStatus(
-            final long total,
-            final long currentAccount,
-            final long startTime)
-    {
-        long now = System.currentTimeMillis();
-        String accountS = Long.toString(currentAccount);
-        StringBuilder sb = new StringBuilder("\r");
-
-        // 10 characters for processed account
-        for (int i = 0; i < 10 -accountS.length(); i++)
-        {
-            sb.append(" ");
-        }
-        sb.append(currentAccount);
-
-        // 10 characters for processed percent
-        String percent = Long.toString(currentAccount * 100 / total);
-        for (int i = 0; i < 9 -percent.length(); i++)
-        {
-            sb.append(" ");
-        }
-        sb.append(percent).append('%');
-
-        long t = (now - startTime)/1000;  // in s
-        String time = AbstractLoadTest.formatTime(t);
-        sb.append("  ");
-        sb.append(time);
-
-        String averageS = (t > 0) ? Long.toString(currentAccount / t) : "";
-        for (int i = 0; i < 10 -averageS.length(); i++)
-        {
-            sb.append(" ");
-        }
-        sb.append(averageS);
-
-        System.out.print(sb.toString());
-        System.out.flush();
     }
 
     public static void echoToFile(

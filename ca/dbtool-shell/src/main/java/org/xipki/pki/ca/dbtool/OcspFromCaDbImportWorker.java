@@ -38,6 +38,7 @@ package org.xipki.pki.ca.dbtool;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -58,20 +59,24 @@ import org.xipki.password.api.PasswordResolverException;
  * @author Lijun Liao
  */
 
-public class OcspFromCaDbImporter
+public class OcspFromCaDbImportWorker extends DbPorterWorker
 {
-    private static final Logger LOG = LoggerFactory.getLogger(OcspFromCaDbImporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OcspFromCaDbImportWorker.class);
     private final DataSourceWrapper dataSource;
     private final Unmarshaller unmarshaller;
     private final String publisherName;
     private final boolean resume;
+    private final String srcFolder;
+    private final int batchEntriesPerCommit;
 
-    public OcspFromCaDbImporter(
+    public OcspFromCaDbImportWorker(
             final DataSourceFactory dataSourceFactory,
             final PasswordResolver passwordResolver,
             final String dbConfFile,
             final String publisherName,
-            final boolean resume)
+            final boolean resume,
+            final String srcFolder,
+            final int batchEntriesPerCommit)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
@@ -82,11 +87,12 @@ public class OcspFromCaDbImporter
         unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
         this.publisherName = publisherName;
         this.resume = resume;
+        this.srcFolder = IoUtil.expandFilepath(srcFolder);
+        this.batchEntriesPerCommit = batchEntriesPerCommit;
     }
 
-    public void importDatabase(
-            final String srcFolder,
-            final int batchEntriesPerCommit)
+    @Override
+    public void doRun(AtomicBoolean stopMe)
     throws Exception
     {
         long start = System.currentTimeMillis();
@@ -94,7 +100,7 @@ public class OcspFromCaDbImporter
         try
         {
             OcspCertStoreFromCaDbImporter certStoreImporter = new OcspCertStoreFromCaDbImporter(
-                    dataSource, unmarshaller, srcFolder, publisherName, batchEntriesPerCommit, resume);
+                    dataSource, unmarshaller, srcFolder, publisherName, batchEntriesPerCommit, resume, stopMe);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
         } finally

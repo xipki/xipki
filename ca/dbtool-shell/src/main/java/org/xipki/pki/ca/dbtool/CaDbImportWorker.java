@@ -47,6 +47,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -69,7 +70,7 @@ import org.xipki.password.api.PasswordResolverException;
  * @author Lijun Liao
  */
 
-public class CaDbImporter
+public class CaDbImportWorker extends DbPorterWorker
 {
     private static class CAInfoBundle
     {
@@ -92,16 +93,20 @@ public class CaDbImporter
         }
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(CaDbImporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CaDbImportWorker.class);
     private final DataSourceWrapper dataSource;
     private final Unmarshaller unmarshaller;
-    protected final boolean resume;
+    private final boolean resume;
+    private final String srcFolder;
+    private final int batchEntriesPerCommit;
 
-    public CaDbImporter(
+    public CaDbImportWorker(
             final DataSourceFactory dataSourceFactory,
             final PasswordResolver passwordResolver,
             final String dbConfFile,
-            final boolean resume)
+            final boolean resume,
+            final String srcFolder,
+            final int batchEntriesPerCommit)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
@@ -111,11 +116,12 @@ public class CaDbImporter
         unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
         this.resume = resume;
+        this.srcFolder = IoUtil.expandFilepath(srcFolder);
+        this.batchEntriesPerCommit = batchEntriesPerCommit;
     }
 
-    public void importDatabase(
-            final String srcFolder,
-            final int batchEntriesPerCommit)
+    @Override
+    public void doRun(AtomicBoolean stopMe)
     throws Exception
     {
         File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
@@ -142,14 +148,14 @@ public class CaDbImporter
             {
                 // CAConfiguration
                 CaConfigurationDbImporter caConfImporter = new CaConfigurationDbImporter(
-                        dataSource, unmarshaller, srcFolder);
+                        dataSource, unmarshaller, srcFolder, stopMe);
                 caConfImporter.importToDB();
                 caConfImporter.shutdown();
             }
 
             // CertStore
             CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(
-                    dataSource, unmarshaller, srcFolder, batchEntriesPerCommit, resume);
+                    dataSource, unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
 
