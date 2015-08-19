@@ -50,7 +50,6 @@ import org.xipki.password.api.PasswordResolver;
 public class ExportOcspCommand extends XipkiOsgiCommandSupport
 {
     private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
-    private static final int DFLT_NUM_CERTS_IN_BUNDLE = 1000;
 
     @Option(name = "--db-conf",
             description = "database configuration file.")
@@ -64,7 +63,11 @@ public class ExportOcspCommand extends XipkiOsgiCommandSupport
 
     @Option(name = "-n",
             description = "number of certificates in one zip file")
-    private Integer numCertsInBundle = DFLT_NUM_CERTS_IN_BUNDLE;
+    private Integer numCertsInBundle = 1000;
+
+    @Option(name = "-k",
+            description = "number of certificates per commit")
+    private Integer numCertsPerCommit = 100;
 
     @Option(name = "--resume")
     private Boolean resume = Boolean.FALSE;
@@ -77,7 +80,7 @@ public class ExportOcspCommand extends XipkiOsgiCommandSupport
     throws Exception
     {
         OcspDbExporter exporter = new OcspDbExporter(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume);
-        exporter.exportDatabase(numCertsInBundle);
+        exporter.exportDatabase(numCertsInBundle, numCertsPerCommit);
         return null;
     }
 

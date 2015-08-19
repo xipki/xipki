@@ -106,6 +106,7 @@ class CaCertStoreDbExporter extends DbPorter
     private final ObjectFactory objFact = new ObjectFactory();
 
     private final int numCertsInBundle;
+    private final int numCertsPerCommit;
     private final int numCrls;
     private final boolean resume;
     private final int dbSchemaVersion;
@@ -125,8 +126,9 @@ class CaCertStoreDbExporter extends DbPorter
             final Marshaller marshaller,
             final Unmarshaller unmarshaller,
             final String baseDir,
-            int numCertsInBundle,
-            int numCrls,
+            final int numCertsInBundle,
+            final int numCrls,
+            final int numCertsPerCommit,
             final boolean resume)
     throws DataAccessException
     {
@@ -135,14 +137,19 @@ class CaCertStoreDbExporter extends DbPorter
         ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         if(numCertsInBundle < 1)
         {
-            numCertsInBundle = 1;
+            throw new IllegalArgumentException("numCertsInBundle could not be less than 1: " + numCertsInBundle);
         }
-        this.numCertsInBundle = numCertsInBundle;
-
+        if(numCertsPerCommit < 1)
+        {
+            throw new IllegalArgumentException("numCertsPerCommit could not be less than 1: " + numCertsPerCommit);
+        }
         if(numCrls < 1)
         {
-            numCrls = 1;
+            throw new IllegalArgumentException("numCrls could not be less than 1: " + numCrls);
         }
+
+        this.numCertsInBundle = numCertsInBundle;
+        this.numCertsPerCommit = numCertsInBundle;
         this.numCrls = numCrls;
 
         this.marshaller = marshaller;
@@ -702,7 +709,7 @@ class CaCertStoreDbExporter extends DbPorter
         CertsType certsInCurrentFile = new CertsType();
 
         long sum = 0;
-        final int n = 100;
+        final int n = numCertsPerCommit;
 
         File currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
         FileOutputStream out = new FileOutputStream(currentCertsZipFile);
@@ -712,6 +719,8 @@ class CaCertStoreDbExporter extends DbPorter
         int maxIdOfCurrentFile = -1;
 
         final long startTime = System.currentTimeMillis();
+        long lastPrintTime = 0;
+
         printHeader();
 
         try
@@ -884,7 +893,13 @@ class CaCertStoreDbExporter extends DbPorter
                         certsFiles.getCertsFile().add(currentCertsFilename);
                         certsFiles.setCountCerts(numProcessedBefore + sum);
                         echoToFile(Integer.toString(id), processLogFile);
-                        printStatus(total, sum, startTime);
+
+                        long now = System.currentTimeMillis();
+                        if(now - lastPrintTime > MS_IN_SECOND)
+                        {
+                            printStatus(total, sum, startTime);
+                        }
+                        lastPrintTime = now;
 
                         // reset
                         certsInCurrentFile = new CertsType();

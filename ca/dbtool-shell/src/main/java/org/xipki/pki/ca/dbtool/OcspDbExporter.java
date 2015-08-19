@@ -123,7 +123,8 @@ public class OcspDbExporter
     }
 
     public void exportDatabase(
-            final int numCertsInBundle)
+            final int numCertsInBundle,
+            final int numCertsPerCommit)
     throws Exception
     {
         long start = System.currentTimeMillis();
@@ -131,7 +132,7 @@ public class OcspDbExporter
         {
             // CertStore
             OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(
-                    dataSource, marshaller, unmarshaller, destFolder, numCertsInBundle, resume);
+                    dataSource, marshaller, unmarshaller, destFolder, numCertsInBundle, numCertsPerCommit, resume);
             certStoreExporter.export();
             certStoreExporter.shutdown();
         }finally

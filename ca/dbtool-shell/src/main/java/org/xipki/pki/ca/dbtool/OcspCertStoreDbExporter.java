@@ -85,6 +85,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
     private final ObjectFactory objFact = new ObjectFactory();
     private final int numCertsInBundle;
+    private final int numCertsPerCommit;
     private final boolean resume;
     private final int dbSchemaVersion;
     private final String col_revInvTime;
@@ -94,7 +95,8 @@ class OcspCertStoreDbExporter extends DbPorter
             final Marshaller marshaller,
             final Unmarshaller unmarshaller,
             final String baseDir,
-            int numCertsInBundle,
+            final int numCertsInBundle,
+            final int numCertsPerCommit,
             final boolean resume)
     throws Exception
     {
@@ -103,10 +105,17 @@ class OcspCertStoreDbExporter extends DbPorter
         ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         if(numCertsInBundle < 1)
         {
-            numCertsInBundle = 1;
+            throw new IllegalArgumentException("numCertsInBundle could not be less than 1: " + numCertsInBundle);
         }
-        this.dbSchemaVersion = getDbSchemaVersion();
+        if(numCertsPerCommit < 1)
+        {
+            throw new IllegalArgumentException("numCertsPerCommit could not be less than 1: " + numCertsPerCommit);
+        }
+
         this.numCertsInBundle = numCertsInBundle;
+        this.numCertsPerCommit = numCertsInBundle;
+
+        this.dbSchemaVersion = getDbSchemaVersion();
         this.marshaller = marshaller;
         this.unmarshaller = unmarshaller;
         if(resume)
@@ -303,7 +312,7 @@ class OcspCertStoreDbExporter extends DbPorter
         CertsType certsInCurrentFile = new CertsType();
 
         long sum = 0;
-        final int n = 100;
+        final int n = numCertsPerCommit;
 
         File currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
         FileOutputStream out = new FileOutputStream(currentCertsZipFile);
@@ -313,6 +322,7 @@ class OcspCertStoreDbExporter extends DbPorter
         int maxCertIdOfCurrentFile = -1;
 
         final long startTime = System.currentTimeMillis();
+        long lastPrintTime = 0;
         printHeader();
 
         String sql = null;
@@ -438,7 +448,12 @@ class OcspCertStoreDbExporter extends DbPorter
                         certsFiles.setCountCerts(numProcessedBefore + sum);
                         echoToFile(Integer.toString(id), processLogFile);
 
-                        printStatus(total, sum, startTime);
+                        long now = System.currentTimeMillis();
+                        if(now - lastPrintTime > MS_IN_SECOND)
+                        {
+                            printStatus(total, sum, startTime);
+                        }
+                        lastPrintTime = now;
 
                         // reset
                         certsInCurrentFile = new CertsType();
