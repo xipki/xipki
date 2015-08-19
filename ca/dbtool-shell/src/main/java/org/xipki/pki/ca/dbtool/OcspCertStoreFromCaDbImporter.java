@@ -201,8 +201,8 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 throw new InvalidInputException("Unkwown publisher type " + type);
             }
 
-            ConfPairs utf8pairs = new ConfPairs(publisherType.getConf());
-            String v = utf8pairs.getValue("publish.goodcerts");
+            ConfPairs confPairs = new ConfPairs(publisherType.getConf());
+            String v = confPairs.getValue("publish.goodcerts");
             boolean revokedOnly = false;
             if(v != null)
             {
@@ -225,6 +225,12 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 {
                     relatedCas.add(cType);
                 }
+            }
+
+            if(relatedCas.isEmpty())
+            {
+                System.out.println("No CA has publisher " + publisherName);
+                return;
             }
 
             Map<Integer, String> profileMap = new HashMap<Integer, String>();
@@ -395,7 +401,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
     throws Exception
     {
         int numProcessedBefore = 0;
-        int minId = 0;
+        int minId = 1;
         if(processLogFile.exists())
         {
             byte[] content = IoUtil.read(processLogFile);

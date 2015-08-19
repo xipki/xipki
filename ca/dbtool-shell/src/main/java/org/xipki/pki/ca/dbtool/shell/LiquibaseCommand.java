@@ -38,12 +38,12 @@ package org.xipki.pki.ca.dbtool.shell;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.common.util.IoUtil;
@@ -63,7 +63,7 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
 {
     private static final String DFLT_CACONF_FILE = "xipki/ca-config/ca.properties";
 
-    private static final Set<String> yesNo = new HashSet<>();
+    private static final List<String> yesNo = new ArrayList<>(2);
 
     private PasswordResolver passwordResolver;
 
@@ -191,12 +191,12 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
 
     private String read(
             String prompt,
-            Set<String> validValues)
+            List<String> validValues)
     throws IOException
     {
         if(validValues == null)
         {
-            validValues = Collections.emptySet();
+            validValues = Collections.emptyList();
         }
 
         if(prompt == null)
