@@ -66,8 +66,8 @@ public class ImportOcspFromCaCommand extends XipkiOsgiCommandSupport
             description = "publisher name")
     private String publisherName = DFLT_PUBLISHER;
 
-    @Option(name = "-n",
-            description = "number of certificates in one commit")
+    @Option(name = "-k",
+            description = "number of certificates per commit")
     private Integer numCertsPerCommit = 100;
 
     @Option(name = "--resume")

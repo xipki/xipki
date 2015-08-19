@@ -162,7 +162,8 @@ public class CaDbExporter
 
     public void exportDatabase(
             final int numCertsInBundle,
-            final int numCrls)
+            final int numCrls,
+            final int numCertsPerCommit)
     throws Exception
     {
         long start = System.currentTimeMillis();
@@ -178,7 +179,7 @@ public class CaDbExporter
 
             // CertStore
             CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(
-                    dataSource, marshaller, unmarshaller, destFolder, numCertsInBundle, numCrls, resume);
+                    dataSource, marshaller, unmarshaller, destFolder, numCertsInBundle, numCrls, numCertsPerCommit, resume);
             certStoreExporter.export();
             certStoreExporter.shutdown();
         }finally
