@@ -41,6 +41,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -95,10 +96,11 @@ class CaConfigurationDbImporter extends DbPorter
     CaConfigurationDbImporter(
             final DataSourceWrapper dataSource,
             final Unmarshaller unmarshaller,
-            final String srcDir)
+            final String srcDir,
+            final AtomicBoolean stopMe)
     throws DataAccessException, PasswordResolverException, IOException
     {
-        super(dataSource, srcDir);
+        super(dataSource, srcDir, stopMe);
         ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         this.unmarshaller = unmarshaller;
     }

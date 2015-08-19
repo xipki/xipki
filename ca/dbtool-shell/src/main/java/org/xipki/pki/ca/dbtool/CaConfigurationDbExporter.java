@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -100,10 +101,11 @@ class CaConfigurationDbExporter extends DbPorter
     CaConfigurationDbExporter(
             final DataSourceWrapper dataSource,
             final Marshaller marshaller,
-            final String destDir)
+            final String destDir,
+            final AtomicBoolean stopMe)
     throws DataAccessException, PasswordResolverException, IOException
     {
-        super(dataSource, destDir);
+        super(dataSource, destDir, stopMe);
         ParamUtil.assertNotNull("marshaller", marshaller);
         this.marshaller = marshaller;
         this.dbSchemaVersion = getDbSchemaVersion();

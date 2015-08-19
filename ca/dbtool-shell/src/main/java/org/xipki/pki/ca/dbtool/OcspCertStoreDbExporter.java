@@ -45,6 +45,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -97,10 +98,11 @@ class OcspCertStoreDbExporter extends DbPorter
             final String baseDir,
             final int numCertsInBundle,
             final int numCertsPerCommit,
-            final boolean resume)
+            final boolean resume,
+            final AtomicBoolean stopMe)
     throws Exception
     {
-        super(dataSource, baseDir);
+        super(dataSource, baseDir, stopMe);
         ParamUtil.assertNotNull("marshaller", marshaller);
         ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         if(numCertsInBundle < 1)
@@ -264,7 +266,7 @@ class OcspCertStoreDbExporter extends DbPorter
     private void do_export_cert(
             final CertStoreType certstore,
             final File processLogFile)
-    throws DataAccessException, IOException, JAXBException
+    throws DataAccessException, IOException, JAXBException, InterruptedException
     {
         CertsFiles certsFiles = certstore.getCertsFiles();
         int numProcessedBefore = 0;
@@ -302,16 +304,21 @@ class OcspCertStoreDbExporter extends DbPorter
         String rawCertSql = "SELECT CERT_ID, CERT FROM RAWCERT WHERE CERT_ID >= ? AND CERT_ID < ?";
 
         final int maxCertId = (int) getMax("CERT", "ID");
-        final long total = getCount("CERT") - numProcessedBefore;
+
+        ProcessLog processLog;
+        {
+            final long total = getCount("CERT") - numProcessedBefore;
+            processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore);
+        }
 
         PreparedStatement certPs = prepareStatement(certSql);
         PreparedStatement rawCertPs = prepareStatement(rawCertSql);
 
+        long sum = 0;
         int numCertInCurrentFile = 0;
 
         CertsType certsInCurrentFile = new CertsType();
 
-        long sum = 0;
         final int n = numCertsPerCommit;
 
         File currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
@@ -321,17 +328,22 @@ class OcspCertStoreDbExporter extends DbPorter
         int minCertIdOfCurrentFile = -1;
         int maxCertIdOfCurrentFile = -1;
 
-        final long startTime = System.currentTimeMillis();
-        long lastPrintTime = 0;
-        printHeader();
+        ProcessLog.printHeader();
 
         String sql = null;
 
         Integer id = null;
         try
         {
+            boolean interrupted = false;
             for(int i = minCertId; i <= maxCertId; i += n)
             {
+                if(stopMe.get())
+                {
+                    interrupted = true;
+                    break;
+                }
+
                 Map<Integer, byte[]> rawCertMaps = new HashMap<>();
 
                 // retrieve raw certificates
@@ -434,7 +446,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
                     certsInCurrentFile.getCert().add(cert);
                     numCertInCurrentFile ++;
-                    sum ++;
+                    sum++;
 
                     if(numCertInCurrentFile == numCertsInBundle)
                     {
@@ -448,12 +460,8 @@ class OcspCertStoreDbExporter extends DbPorter
                         certsFiles.setCountCerts(numProcessedBefore + sum);
                         echoToFile(Integer.toString(id), processLogFile);
 
-                        long now = System.currentTimeMillis();
-                        if(now - lastPrintTime > MS_IN_SECOND)
-                        {
-                            printStatus(total, sum, startTime);
-                        }
-                        lastPrintTime = now;
+                        processLog.addNumProcessed(numCertInCurrentFile);
+                        processLog.printStatus();
 
                         // reset
                         certsInCurrentFile = new CertsType();
@@ -468,6 +476,11 @@ class OcspCertStoreDbExporter extends DbPorter
 
                 rawCertMaps.clear();
                 rawCertMaps = null;
+            } // end for
+
+            if(interrupted)
+            {
+                justThrowsException();
             }
 
             if(numCertInCurrentFile > 0)
@@ -482,7 +495,8 @@ class OcspCertStoreDbExporter extends DbPorter
                 certsFiles.setCountCerts(numProcessedBefore + sum);
                 echoToFile(Integer.toString(id), processLogFile);
 
-                printStatus(total, sum, startTime);
+                processLog.addNumProcessed(numCertInCurrentFile);
+                processLog.printStatus();
             }
             else
             {
@@ -498,11 +512,18 @@ class OcspCertStoreDbExporter extends DbPorter
             releaseResources(rawCertPs, null);
         }
 
-        printTrailer();
+        ProcessLog.printTrailer();
         // all successful, delete the processLogFile
         processLogFile.delete();
 
-        System.out.println(" exported " + sum + " certificates from tables cert, certhash and rawcert");
+        System.out.println(" exported " + processLog.getNumProcessed() +
+                " certificates from tables cert, certhash and rawcert");
+    }
+
+    private void justThrowsException()
+    throws InterruptedException
+    {
+        throw new InterruptedException("interrupted by the user");
     }
 
     private void finalizeZip(

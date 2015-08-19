@@ -37,17 +37,17 @@ package org.xipki.pki.ca.dbtool.shell;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.pki.ca.dbtool.OcspDbImporter;
-import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.password.api.PasswordResolver;
+import org.xipki.pki.ca.dbtool.DbPorterWorker;
+import org.xipki.pki.ca.dbtool.OcspDbImportWorker;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "xipki-db", name = "import-ocsp", description="import OCSP database")
-public class ImportOcspCommand extends XipkiOsgiCommandSupport
+public class ImportOcspCommand extends DbPortCommand
 {
     private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
 
@@ -72,12 +72,11 @@ public class ImportOcspCommand extends XipkiOsgiCommandSupport
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object _doExecute()
+    protected DbPorterWorker getDbPortWorker()
     throws Exception
     {
-        OcspDbImporter importer = new OcspDbImporter(dataSourceFactory, passwordResolver, dbconfFile, resume);
-        importer.importDatabase(indir, numCertsPerCommit.intValue());
-        return null;
+        return new OcspDbImportWorker(dataSourceFactory, passwordResolver, dbconfFile, resume,
+                indir, numCertsPerCommit.intValue());
     }
 
     public void setDataSourceFactory(
