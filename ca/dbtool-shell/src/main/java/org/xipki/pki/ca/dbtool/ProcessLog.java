@@ -35,27 +35,49 @@
 
 package org.xipki.pki.ca.dbtool;
 
+import java.util.concurrent.ConcurrentLinkedDeque;
+
+import org.xipki.common.qa.AbstractLoadTest;
+import org.xipki.common.qa.MeasurePoint;
+
 /**
  * @author Lijun Liao
  */
 
 class ProcessLog
 {
+    private static final long MS_800 = 800L;
+
     private final long total;
     private final long startTime;
     private final long sumInLastProcess;
     private long numProcessed;
+    private long lastPrintTime = 0;
+
+    private final ConcurrentLinkedDeque<MeasurePoint> measureDeque = new ConcurrentLinkedDeque<>();
+
+    public static void printHeader()
+    {
+        System.out.println("---------------------------------------------------");
+        System.out.println(" processed   percent       time       #/s        ETR");
+        System.out.flush();
+    }
+
+    public static void printTrailer()
+    {
+        System.out.println("\n---------------------------------------------------");
+        System.out.flush();
+    }
 
     public ProcessLog(
             final long total,
             final long startTime,
-            final long sumInLastProcess,
-            final long numProcessed)
+            final long sumInLastProcess)
     {
         this.total = total;
         this.startTime = startTime;
         this.sumInLastProcess = sumInLastProcess;
-        this.numProcessed = numProcessed;
+        this.numProcessed = 0;
     }
 
     public long getSumInLastProcess()
@@ -80,8 +102,81 @@ class ProcessLog
 
     public long addNumProcessed(long numProcessed)
     {
-        this.numProcessed = numProcessed;
+        this.numProcessed += numProcessed;
         return this.numProcessed;
+    }
+
+    public void printStatus()
+    {
+        final long now = System.currentTimeMillis();
+        if(now - lastPrintTime < MS_800)
+        {
+            return;
+        }
+
+        measureDeque.addLast(new MeasurePoint(now, numProcessed));
+        lastPrintTime = now;
+
+        String accountS = Long.toString(numProcessed);
+        StringBuilder sb = new StringBuilder("\r");
+
+        // 10 characters for processed account
+        for (int i = 0; i < 10 -accountS.length(); i++)
+        {
+            sb.append(" ");
+        }
+        sb.append(numProcessed);
+
+        // 10 characters for processed percent
+        String percent = Long.toString(numProcessed * 100 / total);
+        for (int i = 0; i < 9 -percent.length(); i++)
+        {
+            sb.append(" ");
+        }
+        sb.append(percent).append('%');
+
+        long t = (now - startTime)/1000;  // in s
+        String time = AbstractLoadTest.formatTime(t);
+        sb.append("  ");
+        sb.append(time);
+
+        MeasurePoint referenceMeasurePoint;
+        int numMeasurePoints = measureDeque.size();
+        if(numMeasurePoints > 5)
+        {
+            referenceMeasurePoint = measureDeque.removeFirst();
+        }
+        else
+        {
+            referenceMeasurePoint = measureDeque.getFirst();
+        }
+
+        long average = 0;
+        long t2inms = now - referenceMeasurePoint.getMeasureTime(); // in ms
+        if(t2inms > 0)
+        {
+            average = (numProcessed - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
+        }
+
+        String averageS = (t > 0) ? Long.toString(average) : "--";
+        for (int i = 0; i < 10 - averageS.length(); i++)
+        {
+            sb.append(" ");
+        }
+        sb.append(averageS);
+
+        if(average > 0)
+        {
+            long remaining = (total - numProcessed) / average;
+            sb.append("  ");
+            sb.append(AbstractLoadTest.formatTime(remaining));
+        } else
+        {
+            sb.append("         --");
+        }
+
+        System.out.print(sb.toString());
+        System.out.flush();
     }
 
 }

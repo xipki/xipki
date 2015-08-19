@@ -49,6 +49,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -70,6 +71,7 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.dbtool.InvalidInputException;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Cas;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.CertsFiles;
@@ -90,7 +92,6 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.pki.ca.dbtool.jaxb.ca.ToPublishType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.UserType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.UsersType;
-import org.xipki.dbtool.InvalidInputException;
 import org.xipki.security.api.util.SecurityUtil;
 
 /**
@@ -100,6 +101,7 @@ import org.xipki.security.api.util.SecurityUtil;
 class CaCertStoreDbExporter extends DbPorter
 {
     private static final Logger LOG = LoggerFactory.getLogger(CaCertStoreDbExporter.class);
+
     private final Marshaller marshaller;
     private final Unmarshaller unmarshaller;
     private final SHA1Digest sha1md = new SHA1Digest();
@@ -129,10 +131,11 @@ class CaCertStoreDbExporter extends DbPorter
             final int numCertsInBundle,
             final int numCrls,
             final int numCertsPerCommit,
-            final boolean resume)
+            final boolean resume,
+            final AtomicBoolean stopMe)
     throws DataAccessException
     {
-        super(dataSource, baseDir);
+        super(dataSource, baseDir, stopMe);
         ParamUtil.assertNotNull("marshaller", marshaller);
         ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         if(numCertsInBundle < 1)
@@ -630,7 +633,7 @@ class CaCertStoreDbExporter extends DbPorter
         {
             do_export_cert(certstore, processLogFile);
             return null;
-        }catch(DataAccessException | IOException | JAXBException e)
+        }catch(DataAccessException | IOException | JAXBException | InterruptedException e)
         {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-certs-");
@@ -644,7 +647,7 @@ class CaCertStoreDbExporter extends DbPorter
     private void do_export_cert(
             final CertStoreType certstore,
             final File processLogFile)
-    throws DataAccessException, IOException, JAXBException
+    throws DataAccessException, IOException, JAXBException, InterruptedException
     {
         CertsFiles certsFiles = certstore.getCertsFiles();
         int numProcessedBefore = 0;
@@ -677,10 +680,14 @@ class CaCertStoreDbExporter extends DbPorter
         System.out.println("exporting tables CERT and RAWCERT from ID " + minId);
 
         final int maxId = (int) getMax("CERT", "ID");
-        long total = getCount("CERT") - numProcessedBefore;
-        if(total < 1)
+        ProcessLog processLog;
         {
-            total = 1; // to avoid exception
+            long total = getCount("CERT") - numProcessedBefore;
+            if(total < 1)
+            {
+                total = 1; // to avoid exception
+            }
+            processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore);
         }
 
         StringBuilder certSql = new StringBuilder("SELECT ID, SERIAL, ");
@@ -718,17 +725,20 @@ class CaCertStoreDbExporter extends DbPorter
         int minIdOfCurrentFile = -1;
         int maxIdOfCurrentFile = -1;
 
-        final long startTime = System.currentTimeMillis();
-        long lastPrintTime = 0;
-
-        printHeader();
+        ProcessLog.printHeader();
 
         try
         {
             Integer id = null;
-
+            boolean interrupted = false;
             for(int i = minId; i <= maxId; i += n)
             {
+                if(stopMe.get())
+                {
+                    interrupted = true;
+                    break;
+                }
+
                 Map<Integer, byte[]> rawCertMaps = new HashMap<>();
 
                 // retrieve raw certificates
@@ -894,12 +904,8 @@ class CaCertStoreDbExporter extends DbPorter
                         certsFiles.setCountCerts(numProcessedBefore + sum);
                         echoToFile(Integer.toString(id), processLogFile);
 
-                        long now = System.currentTimeMillis();
-                        if(now - lastPrintTime > MS_IN_SECOND)
-                        {
-                            printStatus(total, sum, startTime);
-                        }
-                        lastPrintTime = now;
+                        processLog.addNumProcessed(numCertsInCurrentFile);
+                        processLog.printStatus();
 
                         // reset
                         certsInCurrentFile = new CertsType();
@@ -916,6 +922,11 @@ class CaCertStoreDbExporter extends DbPorter
                 rawCertMaps = null;
             } // end for
 
+            if(interrupted)
+            {
+                throw new InterruptedException("interrupted by the user");
+            }
+
             if(numCertsInCurrentFile > 0)
             {
                 finalizeZip(currentCertsZip, certsInCurrentFile);
@@ -930,7 +941,9 @@ class CaCertStoreDbExporter extends DbPorter
                 {
                     echoToFile(Integer.toString(id), processLogFile);
                 }
-                printStatus(total, sum, startTime);
+
+                processLog.addNumProcessed(numCertsInCurrentFile);
+                processLog.printStatus();
             }
             else
             {
@@ -946,7 +959,7 @@ class CaCertStoreDbExporter extends DbPorter
             releaseResources(ps, null);
         } // end try
 
-        printTrailer();
+        ProcessLog.printTrailer();
         // all successful, delete the processLogFile
         processLogFile.delete();
         System.out.println(" exported " + sum + " certificates from tables CERT and RAWCERT");

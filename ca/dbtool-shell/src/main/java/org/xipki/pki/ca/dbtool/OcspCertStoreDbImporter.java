@@ -36,13 +36,13 @@
 package org.xipki.pki.ca.dbtool;
 
 import java.io.File;
-import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -97,11 +97,20 @@ class OcspCertStoreDbImporter extends DbPorter
             " REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, PROFILE)" +
             " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
+    static final String SQL_DEL_CERT =
+            "DELETE FROM CERT WHERE ID > ?";
+
     static final String SQL_ADD_CERTHASH = "INSERT INTO CERTHASH (" +
             "CERT_ID, SHA1, SHA224, SHA256, SHA384, SHA512)" +
             " VALUES (?, ?, ?, ?, ?, ?)";
 
+    static final String SQL_DEL_CERTHASH =
+            "DELETE FROM CERTHASH WHERE ID > ?";
+
     static final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, CERT) VALUES (?, ?)";
+
+    static final String SQL_DEL_RAWCERT =
+            "DELETE FROM RAWCERT WHERE ID > ?";
 
     private final Unmarshaller unmarshaller;
     private final boolean resume;
@@ -112,10 +121,11 @@ class OcspCertStoreDbImporter extends DbPorter
             final Unmarshaller unmarshaller,
             final String srcDir,
             final int numCertsPerCommit,
-            final boolean resume)
+            final boolean resume,
+            final AtomicBoolean stopMe)
     throws Exception
     {
-        super(dataSource, srcDir);
+        super(dataSource, srcDir, stopMe);
         if(numCertsPerCommit < 1)
         {
             throw new IllegalArgumentException("numCertsPerCommit could not be less than 1: " + numCertsPerCommit);
@@ -283,10 +293,10 @@ class OcspCertStoreDbImporter extends DbPorter
         }
 
         final long total = certsfiles.getCountCerts() - numProcessedBefore;
-        final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore, 0);
+        final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore);
 
         System.out.println("importing certificates from ID " + minId);
-        printHeader();
+        ProcessLog.printHeader();
 
         PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
         PreparedStatement ps_certhash = prepareStatement(SQL_ADD_CERTHASH);
@@ -299,7 +309,7 @@ class OcspCertStoreDbImporter extends DbPorter
                 // extract the toId from the filename
                 int fromIdx = certsFile.indexOf('-');
                 int toIdx = certsFile.indexOf(".zip");
-                if(fromIdx != -1 && toIdx == -1)
+                if(fromIdx != -1 && toIdx != -1)
                 {
                     try
                     {
@@ -330,7 +340,7 @@ class OcspCertStoreDbImporter extends DbPorter
                     LOG.error("Exception", e);
                     throw e;
                 }
-            }
+            } // end for
         }finally
         {
             releaseResources(ps_cert, null);
@@ -342,7 +352,7 @@ class OcspCertStoreDbImporter extends DbPorter
         String seqName = "CERT_ID";
         dataSource.dropAndCreateSequence(seqName, maxId + 1);
 
-        printTrailer();
+        ProcessLog.printTrailer();
         echoToFile(MSG_CERTS_FINISHED, processLogFile);
         System.out.println("processed " + processLog.getNumProcessed() + " certificates");
     }
@@ -355,7 +365,7 @@ class OcspCertStoreDbImporter extends DbPorter
             final int minId,
             final File processLogFile,
             final ProcessLog processLog)
-    throws IOException, JAXBException, DataAccessException, CertificateException
+    throws Exception
     {
         ZipFile zipFile = new ZipFile(new File(baseDir, certsZipFile));
         ZipEntry certsXmlEntry = zipFile.getEntry("certs.xml");
@@ -386,13 +396,16 @@ class OcspCertStoreDbImporter extends DbPorter
             final int size = list.size();
             int numEntriesInBatch = 0;
             int lastSuccessfulCertId = 0;
-            long lastPrintTime = 0;
 
             for(int i = 0; i < size; i++)
             {
+                if(stopMe.get())
+                {
+                    throw new InterruptedException("interrupted by the user");
+                }
+
                 CertType cert = list.get(i);
                 int id = cert.getId();
-                lastSuccessfulCertId = id;
                 if(id < minId)
                 {
                     continue;
@@ -491,29 +504,31 @@ class OcspCertStoreDbImporter extends DbPorter
 
                         sql = null;
                         commit("(commit import cert to OCSP)");
-                    } catch(SQLException e)
+                    } catch(Throwable t)
                     {
                         rollback();
-                        throw translate(sql, e);
-                    } catch(DataAccessException e)
-                    {
-                        rollback();
-                        throw e;
+                        deleteCertGreatherThan(lastSuccessfulCertId);
+                        if(t instanceof SQLException)
+                        {
+                            throw translate(sql, (SQLException) t);
+                        } else if(t instanceof Exception)
+                        {
+                            throw (Exception) t;
+                        } else
+                        {
+                            throw new Exception(t);
+                        }
                     }
 
+                    lastSuccessfulCertId = id;
                     processLog.addNumProcessed(numEntriesInBatch);
                     numEntriesInBatch = 0;
                     echoToFile((processLog.getSumInLastProcess() + processLog.getNumProcessed()) + ":" +
                             lastSuccessfulCertId, processLogFile);
 
-                    long now = System.currentTimeMillis();
-                    if(now - lastPrintTime > MS_IN_SECOND)
-                    {
-                        printStatus(processLog.getTotal(), processLog.getNumProcessed(), processLog.getStartTime());
-                    }
-                    lastPrintTime = now;
+                    processLog.printStatus();
                 }
-            }
+            } // end for
 
             return lastSuccessfulCertId;
         }
@@ -527,6 +542,13 @@ class OcspCertStoreDbImporter extends DbPorter
             }
             zipFile.close();
         }
+    }
+
+    private void deleteCertGreatherThan(int id)
+    {
+        deleteFromTableWithLargerId("RAWCERT", id, LOG);
+        deleteFromTableWithLargerId("CERTHASH", id, LOG);
+        deleteFromTableWithLargerId("CERT", id, LOG);
     }
 
 }

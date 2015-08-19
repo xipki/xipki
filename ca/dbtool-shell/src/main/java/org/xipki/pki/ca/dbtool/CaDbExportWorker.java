@@ -40,6 +40,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -62,22 +63,28 @@ import org.xipki.password.api.PasswordResolverException;
  * @author Lijun Liao
  */
 
-public class CaDbExporter
+public class CaDbExportWorker extends DbPorterWorker
 {
-    private static final Logger LOG = LoggerFactory.getLogger(CaDbExporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CaDbExportWorker.class);
 
-    protected final DataSourceWrapper dataSource;
-    protected final Marshaller marshaller;
-    protected final Unmarshaller unmarshaller;
-    protected final String destFolder;
-    protected final boolean resume;
+    private final DataSourceWrapper dataSource;
+    private final Marshaller marshaller;
+    private final Unmarshaller unmarshaller;
+    private final String destFolder;
+    private final boolean resume;
+    private final int numCertsInBundle;
+    private final int numCrls;
+    private final int numCertsPerCommit;
 
-    public CaDbExporter(
+    public CaDbExportWorker(
             final DataSourceFactory dataSourceFactory,
             final PasswordResolver passwordResolver,
             final InputStream dbConfStream,
             final String destFolder,
-            final boolean resume)
+            final boolean resume,
+            final int numCertsInBundle,
+            final int numCrls,
+            final int numCertsPerCommit)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         ParamUtil.assertNotBlank("destFolder", destFolder);
@@ -87,19 +94,26 @@ public class CaDbExporter
         this.unmarshaller = getUnmarshaller();
         this.destFolder = IoUtil.expandFilepath(destFolder);
         this.resume = resume;
+        this.numCertsInBundle = numCertsInBundle;
+        this.numCrls = numCrls;
+        this.numCertsPerCommit = numCertsPerCommit;
         checkDestFolder();
     }
 
-    public CaDbExporter(
+    public CaDbExportWorker(
             final DataSourceFactory dataSourceFactory,
             final PasswordResolver passwordResolver,
             final String dbConfFile,
             final String destFolder,
-            final boolean destFolderEmpty)
+            final boolean destFolderEmpty,
+            final int numCertsInBundle,
+            final int numCrls,
+            final int numCertsPerCommit)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         this(dataSourceFactory, passwordResolver,
-                new FileInputStream(IoUtil.expandFilepath(dbConfFile)), destFolder, destFolderEmpty);
+                new FileInputStream(IoUtil.expandFilepath(dbConfFile)), destFolder, destFolderEmpty,
+                    numCertsInBundle, numCrls, numCertsPerCommit);
     }
 
     private static Marshaller getMarshaller()
@@ -160,10 +174,8 @@ public class CaDbExporter
         }
     }
 
-    public void exportDatabase(
-            final int numCertsInBundle,
-            final int numCrls,
-            final int numCertsPerCommit)
+    @Override
+    public void doRun(AtomicBoolean stopMe)
     throws Exception
     {
         long start = System.currentTimeMillis();
@@ -172,17 +184,19 @@ public class CaDbExporter
             if(resume == false)
             {
                 // CAConfiguration
-                CaConfigurationDbExporter caConfExporter = new CaConfigurationDbExporter(dataSource, marshaller, destFolder);
+                CaConfigurationDbExporter caConfExporter = new CaConfigurationDbExporter(
+                        dataSource, marshaller, destFolder, stopMe);
                 caConfExporter.export();
                 caConfExporter.shutdown();
             }
 
             // CertStore
             CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(
-                    dataSource, marshaller, unmarshaller, destFolder, numCertsInBundle, numCrls, numCertsPerCommit, resume);
+                    dataSource, marshaller, unmarshaller, destFolder,
+                    numCertsInBundle, numCrls, numCertsPerCommit, resume, stopMe);
             certStoreExporter.export();
             certStoreExporter.shutdown();
-        }finally
+        } finally
         {
             try
             {

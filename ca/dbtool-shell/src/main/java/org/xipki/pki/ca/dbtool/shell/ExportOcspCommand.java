@@ -37,17 +37,17 @@ package org.xipki.pki.ca.dbtool.shell;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.pki.ca.dbtool.OcspDbExporter;
-import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.password.api.PasswordResolver;
+import org.xipki.pki.ca.dbtool.DbPorterWorker;
+import org.xipki.pki.ca.dbtool.OcspDbExportWorker;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "xipki-db", name = "export-ocsp", description="export OCSP database")
-public class ExportOcspCommand extends XipkiOsgiCommandSupport
+public class ExportOcspCommand extends DbPortCommand
 {
     private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
 
@@ -76,12 +76,11 @@ public class ExportOcspCommand extends XipkiOsgiCommandSupport
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object _doExecute()
+    protected DbPorterWorker getDbPortWorker()
     throws Exception
     {
-        OcspDbExporter exporter = new OcspDbExporter(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume);
-        exporter.exportDatabase(numCertsInBundle, numCertsPerCommit);
-        return null;
+        return new OcspDbExportWorker(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume,
+                numCertsInBundle, numCertsPerCommit);
     }
 
     public void setDataSourceFactory(

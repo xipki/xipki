@@ -37,17 +37,17 @@ package org.xipki.pki.ca.dbtool.shell;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.pki.ca.dbtool.CaDbImporter;
-import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.password.api.PasswordResolver;
+import org.xipki.pki.ca.dbtool.CaDbImportWorker;
+import org.xipki.pki.ca.dbtool.DbPorterWorker;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "xipki-db", name = "import-ca", description="import CA database")
-public class ImportCaCommand extends XipkiOsgiCommandSupport
+public class ImportCaCommand extends DbPortCommand
 {
     private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ca-db.properties";
 
@@ -72,12 +72,11 @@ public class ImportCaCommand extends XipkiOsgiCommandSupport
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object _doExecute()
+    protected DbPorterWorker getDbPortWorker()
     throws Exception
     {
-        CaDbImporter importer = new CaDbImporter(dataSourceFactory, passwordResolver, dbconfFile, resume);
-        importer.importDatabase(indir, numCertsPerCommit.intValue());
-        return null;
+        return new CaDbImportWorker(dataSourceFactory, passwordResolver, dbconfFile, resume,
+                indir, numCertsPerCommit.intValue());
     }
 
     public void setDataSourceFactory(

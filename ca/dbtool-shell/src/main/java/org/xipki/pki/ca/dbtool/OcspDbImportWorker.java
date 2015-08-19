@@ -38,6 +38,7 @@ package org.xipki.pki.ca.dbtool;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -58,18 +59,22 @@ import org.xipki.password.api.PasswordResolverException;
  * @author Lijun Liao
  */
 
-public class OcspDbImporter
+public class OcspDbImportWorker extends DbPorterWorker
 {
-    private static final Logger LOG = LoggerFactory.getLogger(OcspDbImporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OcspDbImportWorker.class);
     private final DataSourceWrapper dataSource;
     private final Unmarshaller unmarshaller;
     private final boolean resume;
+    private final String srcFolder;
+    private final int batchEntriesPerCommit;
 
-    public OcspDbImporter(
+    public OcspDbImportWorker(
             final DataSourceFactory dataSourceFactory,
             final PasswordResolver passwordResolver,
             final String dbConfFile,
-            final boolean resume)
+            final boolean resume,
+            final String srcFolder,
+            final int batchEntriesPerCommit)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
@@ -79,11 +84,12 @@ public class OcspDbImporter
         unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd"));
         this.resume = resume;
+        this.srcFolder = IoUtil.expandFilepath(srcFolder);
+        this.batchEntriesPerCommit = batchEntriesPerCommit;
     }
 
-    public void importDatabase(
-            final String srcFolder,
-            final int batchEntriesPerCommit)
+    @Override
+    public void doRun(AtomicBoolean stopMe)
     throws Exception
     {
         long start = System.currentTimeMillis();
@@ -91,7 +97,7 @@ public class OcspDbImporter
         try
         {
             OcspCertStoreDbImporter certStoreImporter = new OcspCertStoreDbImporter(
-                    dataSource, unmarshaller, srcFolder, batchEntriesPerCommit, resume);
+                    dataSource, unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
         } finally
