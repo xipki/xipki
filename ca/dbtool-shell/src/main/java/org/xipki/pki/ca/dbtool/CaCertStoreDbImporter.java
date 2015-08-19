@@ -115,24 +115,24 @@ class CaCertStoreDbImporter extends DbPorter
 
     private final Unmarshaller unmarshaller;
     private final boolean resume;
-    private final int batchEntriesPerCommit;
+    private final int numCertsPerCommit;
 
     CaCertStoreDbImporter(
             final DataSourceWrapper dataSource,
             final Unmarshaller unmarshaller,
             final String srcDir,
-            final int batchEntriesPerCommit,
+            final int numCertsPerCommit,
             final boolean resume)
     throws Exception
     {
         super(dataSource, srcDir);
-        if(batchEntriesPerCommit < 1)
+        if(numCertsPerCommit < 1)
         {
-            throw new IllegalArgumentException("batchEntriesPerCommit could not be less than 1: " + batchEntriesPerCommit);
+            throw new IllegalArgumentException("numCertsPerCommit could not be less than 1: " + numCertsPerCommit);
         }
         ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         this.unmarshaller = unmarshaller;
-        this.batchEntriesPerCommit = batchEntriesPerCommit;
+        this.numCertsPerCommit = numCertsPerCommit;
         this.resume = resume;
 
         File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
@@ -438,7 +438,7 @@ class CaCertStoreDbImporter extends DbPorter
                     throw e;
                 }
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % this.batchEntriesPerCommit == 0 || i == size - 1))
+                if(numEntriesInBatch > 0 && (numEntriesInBatch % this.numCertsPerCommit == 0 || i == size - 1))
                 {
                     String sql = null;
                     try
@@ -673,8 +673,7 @@ class CaCertStoreDbImporter extends DbPorter
         }
 
         final long total = certsfiles.getCountCerts() - numProcessedBefore;
-        final long startTime = System.currentTimeMillis();
-        int sum = 0;
+        final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore, 0);
 
         System.out.println("importing certificates from ID " + minId);
         printHeader();
@@ -710,13 +709,9 @@ class CaCertStoreDbImporter extends DbPorter
 
                 try
                 {
-                    int[] numAndLastId = do_import_cert(ps_cert, ps_rawcert, certsFile, minId,
-                            processLogFile, sum + numProcessedBefore);
-                    int numProcessed = numAndLastId[0];
-                    int lastId = numAndLastId[1];
+                    int lastId = do_import_cert(ps_cert, ps_rawcert, certsFile, minId,
+                            processLogFile, processLog);
                     minId = lastId + 1;
-                    sum += numProcessed;
-                    printStatus(total, sum, startTime);
                 }catch(Exception e)
                 {
                     System.err.println("\nerror while importing certificates from file " + certsFile +
@@ -736,16 +731,16 @@ class CaCertStoreDbImporter extends DbPorter
 
         printTrailer();
         echoToFile(MSG_CERTS_FINISHED, processLogFile);
-        System.out.println(" imported " + sum + " certificates");
+        System.out.println(" imported " + processLog.getNumProcessed() + " certificates");
     }
 
-    private int[] do_import_cert(
+    private int do_import_cert(
             final PreparedStatement ps_cert,
             final PreparedStatement ps_rawcert,
             final String certsZipFile,
             final int minId,
             final File processLogFile,
-            final int totalProcessedSum)
+            final ProcessLog processLog)
     throws IOException, JAXBException, DataAccessException, CertificateException
     {
         ZipFile zipFile = new ZipFile(new File(baseDir, certsZipFile));
@@ -775,9 +770,9 @@ class CaCertStoreDbImporter extends DbPorter
         {
             List<CertType> list = certs.getCert();
             final int size = list.size();
-            int numProcessed = 0;
             int numEntriesInBatch = 0;
             int lastSuccessfulCertId = 0;
+            long lastPrintTime = 0;
 
             for(int i = 0; i < size; i++)
             {
@@ -885,7 +880,7 @@ class CaCertStoreDbImporter extends DbPorter
                     throw translate(SQL_ADD_RAWCERT, e);
                 }
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % this.batchEntriesPerCommit == 0 || i == size - 1))
+                if(numEntriesInBatch > 0 && (numEntriesInBatch % this.numCertsPerCommit == 0 || i == size - 1))
                 {
                     String sql = null;
                     try
@@ -908,13 +903,21 @@ class CaCertStoreDbImporter extends DbPorter
                         throw e;
                     }
 
-                    numProcessed += numEntriesInBatch;
+                    processLog.addNumProcessed(numEntriesInBatch);
                     numEntriesInBatch = 0;
-                    echoToFile((totalProcessedSum + numProcessed) + ":" + lastSuccessfulCertId, processLogFile);
+                    echoToFile((processLog.getSumInLastProcess() + processLog.getNumProcessed()) + ":" +
+                            lastSuccessfulCertId, processLogFile);
+
+                    long now = System.currentTimeMillis();
+                    if(now - lastPrintTime > MS_IN_SECOND)
+                    {
+                        printStatus(processLog.getTotal(), processLog.getNumProcessed(), processLog.getStartTime());
+                    }
+                    lastPrintTime = now;
                 }
             }
 
-            return new int[]{numProcessed, lastSuccessfulCertId};
+            return lastSuccessfulCertId;
         }
         finally
         {

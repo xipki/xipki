@@ -50,8 +50,6 @@ import org.xipki.password.api.PasswordResolver;
 public class ExportCaCommand extends XipkiOsgiCommandSupport
 {
     private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ca-db.properties";
-    private static final int DFLT_NUM_CERTS_IN_BUNDLE = 1000;
-    private static final int DFLT_NUM_CRLS = 30;
 
     @Option(name = "--db-conf",
             description = "database configuration file")
@@ -65,11 +63,15 @@ public class ExportCaCommand extends XipkiOsgiCommandSupport
 
     @Option(name = "-n",
             description = "number of certificates in one zip file")
-    private Integer numCertsInBundle = DFLT_NUM_CERTS_IN_BUNDLE;
+    private Integer numCertsInBundle = 1000;
+
+    @Option(name = "-k",
+            description = "number of certificates per commit")
+    private Integer numCertsPerCommit = 100;
 
     @Option(name = "--num-crls",
             description = "number of CRLs in one zip file")
-    private Integer numCrls = DFLT_NUM_CRLS;
+    private Integer numCrls = 30;
 
     @Option(name = "--resume")
     private Boolean resume = Boolean.FALSE;
@@ -82,7 +84,7 @@ public class ExportCaCommand extends XipkiOsgiCommandSupport
     throws Exception
     {
         CaDbExporter exporter = new CaDbExporter(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume);
-        exporter.exportDatabase(numCertsInBundle, numCrls);
+        exporter.exportDatabase(numCertsInBundle, numCrls, numCertsPerCommit);
         return null;
     }
 

@@ -77,6 +77,7 @@ public class DbPorter
     public static final String IMPORT_PROCESS_LOG_FILENAME = "import.process";
     public static final String MSG_CERTS_FINISHED = "CERTS.FINISHED";
     public static final String IMPORT_TO_OCSP_PROCESS_LOG_FILENAME = "importToOcsp.process";
+    public static final long MS_IN_SECOND = 1000L;
 
     public static final int VERSION = 1;
 
