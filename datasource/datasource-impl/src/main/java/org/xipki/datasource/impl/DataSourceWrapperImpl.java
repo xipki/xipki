@@ -924,6 +924,54 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     }
 
     @Override
+    public boolean deleteFromTable(
+            final Connection conn,
+            final String table,
+            final String idColumn,
+            final int id)
+    {
+        final StringBuilder sb = new StringBuilder(50);
+        sb.append("DELETE FROM ").append(table).append(" WHERE ").append(idColumn).append(" = ").append(id);
+        final String sql = sb.toString();
+
+        Connection _conn = conn;
+        if(_conn == null)
+        {
+            try
+            {
+                _conn = getConnection();
+            } catch (Throwable t)
+            {
+                LOG.warn("datasource " + name + ": could not get connection", t);
+                return false;
+            }
+        }
+
+        Statement stmt = null;
+        try
+        {
+            stmt = conn.createStatement();
+            stmt.execute(sql);
+        } catch(Throwable t)
+        {
+            LOG.warn("datasource " + name + ": could not delete from table " + table, t);
+            return false;
+        }
+        finally
+        {
+            if(conn == null)
+            {
+                releaseResources(stmt, null);
+            } else
+            {
+                releaseStatementAndResultSet(stmt, null);
+            }
+        }
+
+        return true;
+    }
+
+    @Override
     public boolean columnExists(
             final Connection conn,
             final String table,

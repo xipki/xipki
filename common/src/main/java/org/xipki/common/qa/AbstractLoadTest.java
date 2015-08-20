@@ -163,7 +163,7 @@ public abstract class AbstractLoadTest
 
     protected static void printHeader()
     {
-        System.out.println(" processed       time       #/s");
+        System.out.println("    processed       time       #/s   AVG-#/s");
     }
 
     protected void printStatus()
@@ -172,15 +172,9 @@ public abstract class AbstractLoadTest
         long now = System.currentTimeMillis();
         measureDeque.addLast(new MeasurePoint(now, currentAccount));
 
-        String accountS = Long.toString(currentAccount);
         StringBuilder sb = new StringBuilder("\r");
 
-        // 10 characters for processed account
-        for (int i = 0; i < 10 -accountS.length(); i++)
-        {
-            sb.append(" ");
-        }
-        sb.append(currentAccount);
+        sb.append(formatAccount(currentAccount));
 
         long t = (now - startTime)/1000;  // in s
         String time = formatTime(t);
@@ -198,18 +192,17 @@ public abstract class AbstractLoadTest
             referenceMeasurePoint = measureDeque.getFirst();
         }
 
+        long speed = 0;
         long t2inms = now - referenceMeasurePoint.getMeasureTime(); // in ms
         if(t2inms > 0)
         {
-            long average = (currentAccount - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
-
-            String averageS = Long.toString(average);
-            for (int i = 0; i < 10 -averageS.length(); i++)
-            {
-                sb.append(" ");
-            }
-            sb.append(average);
+            speed = (currentAccount - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
         }
+        sb.append(formatSpeed(speed));
+
+        long t2 = now - startTime;
+        speed = t2 > 0 ? currentAccount * 1000 / t2 : 0;
+        sb.append(formatSpeed(speed));
 
         System.out.print(sb.toString());
         System.out.flush();
@@ -247,6 +240,60 @@ public abstract class AbstractLoadTest
         sb.append(" failed: " + errorAccount.get() + " " + unit + "\n");
         sb.append("average: " + (account.get() * 1000 / ms) + " " + unit + "/s\n");
         System.out.println(sb.toString());
+    }
+
+    public static String formatSpeed(long speed)
+    {
+        StringBuilder sb = new StringBuilder(10);
+        String speedS = speed == 0 ? "--" : Long.toString(speed);
+        for (int i = 0; i < 10 - speedS.length(); i++)
+        {
+            sb.append(" ");
+        }
+        sb.append(speed);
+        return sb.toString();
+    }
+
+    public static String formatAccount(long account)
+    {
+        String accountS = Long.toString(account);
+
+        final int n = accountS.length();
+        if(n > 3)
+        {
+            StringBuilder sb = new StringBuilder(n + 3);
+            int firstBlockLen = n % 3;
+            if(firstBlockLen != 0)
+            {
+                sb.append(accountS.substring(0, firstBlockLen));
+                sb.append(",");
+            }
+
+            for(int i = 0; ;i++)
+            {
+                int offset = firstBlockLen + i * 3;
+                if(offset >= n)
+                {
+                    break;
+                }
+
+                sb.append(accountS.substring(offset, offset + 3));
+                if(offset + 3 < n)
+                {
+                    sb.append(",");
+                }
+            }
+            accountS = sb.toString();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        // 13 characters for processed account
+        for (int i = 0; i < 13 - accountS.length(); i++)
+        {
+            sb.append(" ");
+        }
+        sb.append(accountS);
+        return sb.toString();
     }
 
     public static String formatTime(
@@ -296,5 +343,15 @@ public abstract class AbstractLoadTest
         }
 
         return sb.toString();
+    }
+
+    public static void main(String[] args)
+    {
+        long[] ls = new long[]{1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890};
+        for(long l : ls)
+        {
+            String s = formatAccount(l);
+            System.out.println("'" + s + "': " + l);
+        }
     }
 }
