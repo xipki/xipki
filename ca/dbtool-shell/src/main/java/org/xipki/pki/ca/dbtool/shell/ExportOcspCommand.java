@@ -63,14 +63,18 @@ public class ExportOcspCommand extends DbPortCommand
 
     @Option(name = "-n",
             description = "number of certificates in one zip file")
-    private Integer numCertsInBundle = 1000;
+    private Integer numCertsInBundle = 100000;
 
     @Option(name = "-k",
-            description = "number of certificates per commit")
-    private Integer numCertsPerCommit = 100;
+            description = "number of certificates per SELECT")
+    private Integer numCertsPerSelect = 100;
 
     @Option(name = "--resume")
     private Boolean resume = Boolean.FALSE;
+
+    @Option(name = "--test",
+            description = "just test the export, no real export")
+    private Boolean testOnly = Boolean.FALSE;
 
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
@@ -80,7 +84,7 @@ public class ExportOcspCommand extends DbPortCommand
     throws Exception
     {
         return new OcspDbExportWorker(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume,
-                numCertsInBundle, numCertsPerCommit);
+                numCertsInBundle, numCertsPerSelect, testOnly);
     }
 
     public void setDataSourceFactory(

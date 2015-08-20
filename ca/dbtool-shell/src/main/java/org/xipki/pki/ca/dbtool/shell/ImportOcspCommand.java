@@ -68,6 +68,10 @@ public class ImportOcspCommand extends DbPortCommand
     @Option(name = "--resume")
     private Boolean resume = Boolean.FALSE;
 
+    @Option(name = "--test",
+            description = "just test the import, no real import")
+    private Boolean testOnly = Boolean.FALSE;
+
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
 
@@ -76,7 +80,7 @@ public class ImportOcspCommand extends DbPortCommand
     throws Exception
     {
         return new OcspDbImportWorker(dataSourceFactory, passwordResolver, dbconfFile, resume,
-                indir, numCertsPerCommit.intValue());
+                indir, numCertsPerCommit.intValue(), testOnly);
     }
 
     public void setDataSourceFactory(
