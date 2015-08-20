@@ -164,7 +164,7 @@ class OcspCertStoreDbExporter extends DbPorter
             certstore = new CertStoreType();
             certstore.setVersion(VERSION);
         }
-        System.out.println(getExportingText() + " OCSP certstore from database");
+        System.out.println("exporting OCSP certstore from database");
 
         if(resume == false)
         {
@@ -183,7 +183,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
         if(exception == null)
         {
-            System.out.println(getExportedText() + " OCSP certstore from database");
+            System.out.println(" exported OCSP certstore from database");
         }
         else
         {
@@ -195,7 +195,7 @@ class OcspCertStoreDbExporter extends DbPorter
             final CertStoreType certstore)
     throws DataAccessException
     {
-        System.out.println(getExportingText() + " table ISSUER");
+        System.out.println("exporting table ISSUER");
         Issuers issuers = new Issuers();
         certstore.setIssuers(issuers);
         final String sql = "SELECT ID, CERT, REVOKED, REV_REASON, REV_TIME, " + col_revInvTime + " FROM ISSUER";
@@ -242,7 +242,7 @@ class OcspCertStoreDbExporter extends DbPorter
             releaseResources(stmt, rs);
         }
 
-        System.out.println(getExportedText() + " table ISSUER");
+        System.out.println(" exported table ISSUER");
     }
 
     private Exception export_cert(
@@ -297,7 +297,7 @@ class OcspCertStoreDbExporter extends DbPorter
             minCertId = (int) getMin("CERT", "ID");
         }
 
-        System.out.println(getExportingText() + " tables CERT, CERTHASH and RAWCERT from ID " + minCertId);
+        System.out.println(getExportingText() + "tables CERT, CERTHASH and RAWCERT from ID " + minCertId);
 
         String certSql = "SELECT ID, SERIAL, ISSUER_ID, LAST_UPDATE, REVOKED, REV_REASON, REV_TIME, " + col_revInvTime +
                 ", PROFILE FROM CERT WHERE ID >= ? AND ID < ?";
@@ -399,14 +399,17 @@ class OcspCertStoreDbExporter extends DbPorter
 
                     String sha1_cert = SecurityUtil.sha1sum(certBytes);
 
-                    ZipEntry certZipEntry = new ZipEntry(sha1_cert + ".der");
-                    currentCertsZip.putNextEntry(certZipEntry);
-                    try
+                    if(evaulateOnly == false)
                     {
-                        currentCertsZip.write(certBytes);
-                    }finally
-                    {
-                        currentCertsZip.closeEntry();
+                        ZipEntry certZipEntry = new ZipEntry(sha1_cert + ".der");
+                        currentCertsZip.putNextEntry(certZipEntry);
+                        try
+                        {
+                            currentCertsZip.write(certBytes);
+                        }finally
+                        {
+                            currentCertsZip.closeEntry();
+                        }
                     }
 
                     CertType cert = new CertType();
@@ -517,7 +520,7 @@ class OcspCertStoreDbExporter extends DbPorter
         // all successful, delete the processLogFile
         processLogFile.delete();
 
-        System.out.println(getExportedText() + " " + processLog.getNumProcessed() +
+        System.out.println(getExportedText() + processLog.getNumProcessed() +
                 " certificates from tables cert, certhash and rawcert");
     }
 

@@ -145,4 +145,9 @@ public interface DataSourceWrapper
             String sql,
             SQLException ex);
 
+    boolean deleteFromTable(
+            Connection conn,
+            String table,
+            String idColumn,
+            int id);
 }

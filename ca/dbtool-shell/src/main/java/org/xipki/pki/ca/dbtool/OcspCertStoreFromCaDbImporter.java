@@ -175,7 +175,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                     VERSION + ": " + certstore.getVersion());
         }
 
-        System.out.println(getImportingText() + " CA certstore to OCSP database");
+        System.out.println("importing CA certstore to OCSP database");
         try
         {
             PublisherType publisherType = null;
@@ -258,7 +258,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
             System.err.println("error while importing OCSP certstore to database");
             throw e;
         }
-        System.out.println(getImportedText() + " OCSP certstore to database");
+        System.out.println(" imported OCSP certstore to database");
     }
 
     private List<Integer> getIssuerIds(
@@ -296,7 +296,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
             final List<CaType> cas)
     throws DataAccessException, CertificateException
     {
-        System.out.println(getImportingText() + " table ISSUER");
+        System.out.println(" importing table ISSUER");
         final String sql = OcspCertStoreDbImporter.SQL_ADD_CAINFO;
         PreparedStatement ps = prepareStatement(sql);
 
@@ -389,7 +389,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
             releaseResources(ps, null);
         }
 
-        System.out.println(getImportedText() + " table ISSUER");
+        System.out.println(" imported table ISSUER");
         return relatedCaIds;
     }
 
@@ -421,10 +421,12 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
             }
         }
 
+        deleteCertGreatherThan(minId - 1);
+
         final long total = certsfiles.getCountCerts() - numProcessedBefore;
         final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore);
 
-        System.out.println(getImportingText() + " certificates from ID " + minId);
+        System.out.println(getImportingText() + "certificates from ID " + minId);
         ProcessLog.printHeader();
 
         PreparedStatement ps_cert = prepareStatement(OcspCertStoreDbImporter.SQL_ADD_CERT);
@@ -480,7 +482,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
 
         ProcessLog.printTrailer();
         DbPorter.echoToFile(MSG_CERTS_FINISHED, processLogFile);
-        System.out.println("processed " + processLog.getNumProcessed() + " certificates");
+        System.out.println(getImportedText() + processLog.getNumProcessed() + " certificates");
     }
 
     private int do_import_cert(
@@ -637,33 +639,41 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
 
                 if(numEntriesInBatch > 0 && (numEntriesInBatch % this.numCertsPerCommit == 0 || i == size - 1))
                 {
-                    String sql = null;
-                    try
+                    if(evaulateOnly)
                     {
-                        sql = OcspCertStoreDbImporter.SQL_ADD_CERT;
-                        ps_cert.executeBatch();
-
-                        sql = OcspCertStoreDbImporter.SQL_ADD_CERTHASH;
-                        ps_certhash.executeBatch();
-
-                        sql = OcspCertStoreDbImporter.SQL_ADD_RAWCERT;
-                        ps_rawcert.executeBatch();
-
-                        sql = null;
-                        commit("(commit import cert to OCSP)");
-                    } catch(Throwable t)
+                        ps_cert.clearBatch();
+                        ps_certhash.clearBatch();
+                        ps_rawcert.clearBatch();
+                    } else
                     {
-                        rollback();
-                        deleteCertGreatherThan(lastSuccessfulCertId);
-                        if(t instanceof SQLException)
+                        String sql = null;
+                        try
                         {
-                            throw translate(sql, (SQLException) t);
-                        } else if(t instanceof Exception)
+                            sql = OcspCertStoreDbImporter.SQL_ADD_CERT;
+                            ps_cert.executeBatch();
+
+                            sql = OcspCertStoreDbImporter.SQL_ADD_CERTHASH;
+                            ps_certhash.executeBatch();
+
+                            sql = OcspCertStoreDbImporter.SQL_ADD_RAWCERT;
+                            ps_rawcert.executeBatch();
+
+                            sql = null;
+                            commit("(commit import cert to OCSP)");
+                        } catch(Throwable t)
                         {
-                            throw (Exception) t;
-                        } else
-                        {
-                            throw new Exception(t);
+                            rollback();
+                            deleteCertGreatherThan(lastSuccessfulCertId);
+                            if(t instanceof SQLException)
+                            {
+                                throw translate(sql, (SQLException) t);
+                            } else if(t instanceof Exception)
+                            {
+                                throw (Exception) t;
+                            } else
+                            {
+                                throw new Exception(t);
+                            }
                         }
                     }
 
@@ -693,9 +703,9 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
 
     private void deleteCertGreatherThan(int id)
     {
-        deleteFromTableWithLargerId("RAWCERT", id, LOG);
-        deleteFromTableWithLargerId("CERTHASH", id, LOG);
-        deleteFromTableWithLargerId("CERT", id, LOG);
+        deleteFromTableWithLargerId("RAWCERT", "CERT_ID", id, LOG);
+        deleteFromTableWithLargerId("CERTHASH", "CERT_ID", id, LOG);
+        deleteFromTableWithLargerId("CERT", "ID", id, LOG);
     }
 
 }

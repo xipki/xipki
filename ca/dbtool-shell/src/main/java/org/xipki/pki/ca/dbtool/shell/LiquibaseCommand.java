@@ -124,6 +124,33 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
 
     }
 
+    protected void update(
+            final LiquibaseDatabaseConf dbConf,
+            final String schemaFile)
+    throws Exception
+    {
+        printDatabaseInfo(dbConf, schemaFile);
+        if(quiet == false)
+        {
+            if(confirm("update") == false)
+            {
+                out("cancelled");
+                return;
+            }
+        }
+
+        LiquibaseMain liquibase = new LiquibaseMain(dbConf, schemaFile);
+        try
+        {
+            liquibase.init(logLevel);
+            liquibase.update();
+        }finally
+        {
+            liquibase.shutdown();
+        }
+
+    }
+
     private static Properties getDbConfPoperties(
             final String dbconfFile)
     throws FileNotFoundException, IOException
