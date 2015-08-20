@@ -88,5 +88,21 @@
         <entry key="--log-level" value-ref="logLevelCompleter"/>
       </optional-completers>
     </command>
+    <command>
+      <action class="org.xipki.pki.ca.dbtool.shell.UpdateDbCaCommand">
+        <property name="passwordResolver" ref="passwordResolver"/>
+      </action>
+      <optional-completers>
+        <entry key="--log-level" value-ref="logLevelCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.pki.ca.dbtool.shell.UpdateDbOcspCommand">
+        <property name="passwordResolver" ref="passwordResolver"/>
+      </action>
+      <optional-completers>
+        <entry key="--log-level" value-ref="logLevelCompleter"/>
+      </optional-completers>
+    </command>
   </command-bundle>
 </blueprint>

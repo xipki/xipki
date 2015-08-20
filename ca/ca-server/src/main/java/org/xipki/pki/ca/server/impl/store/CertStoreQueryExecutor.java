@@ -321,18 +321,28 @@ class CertStoreQueryExecutor
 
                     sql = "(commit add cert to CA certstore)";
                     conn.commit();
-                }catch(SQLException e)
+                }catch(Throwable t)
                 {
                     conn.rollback();
-                    DataAccessException tEx = dataSource.translate(sql, e);
-                    if(tEx instanceof DuplicateKeyException && i < tries - 1)
-                    {
-                        continue;
-                    }
+                    // more secure
+                    dataSource.deleteFromTable(null, "RAWCERT", "CERT_ID", certId);
+                    dataSource.deleteFromTable(null, "CERT", "ID", certId);
 
-                    LOG.error("datasource {} SQLException while adding certificate with id {}: {}",
-                            dataSource.getDatasourceName(), certId, e.getMessage());
-                    throw e;
+                    if(t instanceof SQLException)
+                    {
+                        SQLException e = (SQLException) t;
+                        DataAccessException tEx = dataSource.translate(sql, e);
+                        if(tEx instanceof DuplicateKeyException && i < tries - 1)
+                        {
+                            continue;
+                        }
+                        LOG.error("datasource {} SQLException while adding certificate with id {}: {}",
+                                dataSource.getDatasourceName(), certId, t.getMessage());
+                        throw e;
+                    } else
+                    {
+                        throw new OperationException(ErrorCode.SYSTEM_FAILURE, t.getClass().getName() + ": " + t.getMessage());
+                    }
                 }
                 finally
                 {

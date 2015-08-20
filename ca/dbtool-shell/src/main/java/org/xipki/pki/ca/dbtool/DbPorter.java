@@ -206,22 +206,34 @@ public class DbPorter
         }
     }
 
-    public void deleteFromTableWithLargerId(String tableName, int id, Logger log)
+    public boolean deleteFromTableWithLargerId(String tableName, String idColumn, int id, Logger log)
     {
-        PreparedStatement ps = null;
+        StringBuilder sb = new StringBuilder(50);
+        sb.append("DELETE FROM ").append(tableName).append(" WHERE ").append(idColumn).append(" > ").append(id);
+
+        Statement stmt;
         try
         {
-            ps = prepareStatement("DELETE FROM " + tableName + " WITH ID > ?");
-            ps.setInt(1, id);
-            ps.executeUpdate();
+            stmt = createStatement();
+        } catch (DataAccessException e)
+        {
+            log.error("could not create statement", e);
+            return false;
+        }
+        try
+        {
+            stmt.execute(sb.toString());
         } catch(Throwable t)
         {
-            log.error("could not delete columns from table " + tableName + " with ID > " + id, t);
+            log.error("could not delete columns from table " + tableName + " with " + idColumn + " > " + id, t);
+            return false;
         }
         finally
         {
-            releaseResources(ps, null);
+            releaseResources(stmt, null);
         }
+
+        return true;
     }
 
     public void shutdown()
@@ -439,22 +451,22 @@ public class DbPorter
 
     protected String getImportingText()
     {
-        return evaulateOnly ? "evaluating import" : "importing";
+        return evaulateOnly ? "evaluating import " : "importing ";
     }
 
     protected String getImportedText()
     {
-        return evaulateOnly ? " evaluated import" : " imported";
+        return evaulateOnly ? " evaluated import " : " imported ";
     }
 
     protected String getExportingText()
     {
-        return evaulateOnly ? "evaluating export" : "exporting";
+        return evaulateOnly ? "evaluating export " : "exporting ";
     }
 
     protected String getExportedText()
     {
-        return evaulateOnly ? " evaluated export" : " exported";
+        return evaulateOnly ? " evaluated export " : " exported ";
     }
 
 }

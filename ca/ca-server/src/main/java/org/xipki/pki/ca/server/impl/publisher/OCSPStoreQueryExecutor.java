@@ -54,7 +54,9 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.X509CertWithDBCertId;
+import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.common.util.LogUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
@@ -128,7 +130,7 @@ class OCSPStoreQueryExecutor
             final X509CertWithDBCertId issuer,
             final X509CertWithDBCertId certificate,
             final String certprofile)
-    throws DataAccessException, CertificateEncodingException
+    throws DataAccessException, CertificateEncodingException, OperationException
     {
         addCert(issuer, certificate, certprofile, null);
     }
@@ -138,7 +140,7 @@ class OCSPStoreQueryExecutor
             final X509CertWithDBCertId certificate,
             final String certprofile,
             final CertRevocationInfo revInfo)
-    throws DataAccessException, CertificateEncodingException
+    throws DataAccessException, CertificateEncodingException, OperationException
     {
         addOrUpdateCert(issuer, certificate, certprofile, revInfo);
     }
@@ -148,7 +150,7 @@ class OCSPStoreQueryExecutor
             final X509CertWithDBCertId certificate,
             final String certprofile,
             final CertRevocationInfo revInfo)
-    throws DataAccessException, CertificateEncodingException
+    throws DataAccessException, CertificateEncodingException, OperationException
     {
         boolean revoked = revInfo != null;
         int issuerId = getIssuerId(issuer);
@@ -313,17 +315,29 @@ class OCSPStoreQueryExecutor
 
                     sql = "(commit add cert to OCSP)";
                     conn.commit();
-                }catch(SQLException e)
+                }catch(Throwable t)
                 {
                     conn.rollback();
-                    DataAccessException tEx = dataSource.translate(sql, e);
-                    if(tEx instanceof DuplicateKeyException && i < tries - 1)
+                    // more secure
+                    dataSource.deleteFromTable(null, "RAWCERT", "CERT_ID", certId);
+                    dataSource.deleteFromTable(null, "CERTHASH", "CERT_ID", certId);
+                    dataSource.deleteFromTable(null, "CERT", "ID", certId);
+
+                    if(t instanceof SQLException)
                     {
-                        continue;
+                        SQLException e = (SQLException) t;
+                        DataAccessException tEx = dataSource.translate(sql, e);
+                        if(tEx instanceof DuplicateKeyException && i < tries - 1)
+                        {
+                            continue;
+                        }
+                        LOG.error("datasource {} SQLException while adding certificate with id {}: {}",
+                                dataSource.getDatasourceName(), certId, t.getMessage());
+                        throw e;
+                    } else
+                    {
+                        throw new OperationException(ErrorCode.SYSTEM_FAILURE, t.getClass().getName() + ": " + t.getMessage());
                     }
-                    LOG.error("datasource {} SQLException while adding certificate with id {}: {}",
-                            dataSource.getDatasourceName(), certId, e.getMessage());
-                    throw tEx;
                 }
                 finally
                 {
@@ -357,7 +371,7 @@ class OCSPStoreQueryExecutor
             final X509CertWithDBCertId cert,
             final String certprofile,
             final CertRevocationInfo revInfo)
-    throws DataAccessException, CertificateEncodingException
+    throws DataAccessException, CertificateEncodingException, OperationException
     {
         addOrUpdateCert(caCert, cert, certprofile, revInfo);
     }
