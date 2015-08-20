@@ -58,14 +58,14 @@ class ProcessLog
 
     public static void printHeader()
     {
-        System.out.println("----------------------------------------------------");
-        System.out.println(" processed   percent       time       #/s        ETR");
+        System.out.println("----------------------------------------------------------------------------");
+        System.out.println("    processed   percent       time       #/s        ETR   AVG-#/s    AVG-ETR");
         System.out.flush();
     }
 
     public static void printTrailer()
     {
-        System.out.println("\n----------------------------------------------------");
+        System.out.println("\n----------------------------------------------------------------------------");
         System.out.flush();
     }
 
@@ -117,19 +117,12 @@ class ProcessLog
         measureDeque.addLast(new MeasurePoint(now, numProcessed));
         lastPrintTime = now;
 
-        String accountS = Long.toString(numProcessed);
         StringBuilder sb = new StringBuilder("\r");
-
-        // 10 characters for processed account
-        for (int i = 0; i < 10 -accountS.length(); i++)
-        {
-            sb.append(" ");
-        }
-        sb.append(numProcessed);
+        sb.append(AbstractLoadTest.formatAccount(numProcessed));
 
         // 10 characters for processed percent
         String percent = Long.toString(numProcessed * 100 / total);
-        for (int i = 0; i < 9 -percent.length(); i++)
+        for (int i = 0; i < 9 - percent.length(); i++)
         {
             sb.append(" ");
         }
@@ -142,7 +135,7 @@ class ProcessLog
 
         MeasurePoint referenceMeasurePoint;
         int numMeasurePoints = measureDeque.size();
-        if(numMeasurePoints > 5)
+        if(numMeasurePoints > 10)
         {
             referenceMeasurePoint = measureDeque.removeFirst();
         }
@@ -151,23 +144,37 @@ class ProcessLog
             referenceMeasurePoint = measureDeque.getFirst();
         }
 
-        long average = 0;
+        long speed = 0;
         long t2inms = now - referenceMeasurePoint.getMeasureTime(); // in ms
         if(t2inms > 0)
         {
-            average = (numProcessed - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
+            speed = (numProcessed - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
+        }
+        sb.append(AbstractLoadTest.formatSpeed(speed));
+
+        if(speed > 0)
+        {
+            long remaining = (total - numProcessed) / speed;
+            sb.append("  ");
+            sb.append(AbstractLoadTest.formatTime(remaining));
+        } else
+        {
+            sb.append("         --");
         }
 
-        String averageS = (t > 0) ? Long.toString(average) : "--";
-        for (int i = 0; i < 10 - averageS.length(); i++)
-        {
-            sb.append(" ");
-        }
-        sb.append(averageS);
+        // average
 
-        if(average > 0)
+        speed = 0;
+        long t2 = now - startTime;
+        if(t2 > 0)
         {
-            long remaining = (total - numProcessed) / average;
+            speed = numProcessed * 1000 / t2;
+        }
+        sb.append(AbstractLoadTest.formatSpeed(speed));
+
+        if(speed > 0)
+        {
+            long remaining = (total - numProcessed) / speed;
             sb.append("  ");
             sb.append(AbstractLoadTest.formatTime(remaining));
         } else
