@@ -74,7 +74,8 @@ public class CaDbExportWorker extends DbPorterWorker
     private final boolean resume;
     private final int numCertsInBundle;
     private final int numCrls;
-    private final int numCertsPerCommit;
+    private final int numCertsPerSelect;
+    private final boolean evaluateOnly;
 
     public CaDbExportWorker(
             final DataSourceFactory dataSourceFactory,
@@ -84,7 +85,8 @@ public class CaDbExportWorker extends DbPorterWorker
             final boolean resume,
             final int numCertsInBundle,
             final int numCrls,
-            final int numCertsPerCommit)
+            final int numCertsPerSelect,
+            final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         ParamUtil.assertNotBlank("destFolder", destFolder);
@@ -96,7 +98,8 @@ public class CaDbExportWorker extends DbPorterWorker
         this.resume = resume;
         this.numCertsInBundle = numCertsInBundle;
         this.numCrls = numCrls;
-        this.numCertsPerCommit = numCertsPerCommit;
+        this.numCertsPerSelect = numCertsPerSelect;
+        this.evaluateOnly = evaluateOnly;
         checkDestFolder();
     }
 
@@ -108,12 +111,13 @@ public class CaDbExportWorker extends DbPorterWorker
             final boolean destFolderEmpty,
             final int numCertsInBundle,
             final int numCrls,
-            final int numCertsPerCommit)
+            final int numCertsPerSelect,
+            final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         this(dataSourceFactory, passwordResolver,
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)), destFolder, destFolderEmpty,
-                    numCertsInBundle, numCrls, numCertsPerCommit);
+                    numCertsInBundle, numCrls, numCertsPerSelect, evaluateOnly);
     }
 
     private static Marshaller getMarshaller()
@@ -185,7 +189,7 @@ public class CaDbExportWorker extends DbPorterWorker
             {
                 // CAConfiguration
                 CaConfigurationDbExporter caConfExporter = new CaConfigurationDbExporter(
-                        dataSource, marshaller, destFolder, stopMe);
+                        dataSource, marshaller, destFolder, stopMe, evaluateOnly);
                 caConfExporter.export();
                 caConfExporter.shutdown();
             }
@@ -193,7 +197,7 @@ public class CaDbExportWorker extends DbPorterWorker
             // CertStore
             CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(
                     dataSource, marshaller, unmarshaller, destFolder,
-                    numCertsInBundle, numCrls, numCertsPerCommit, resume, stopMe);
+                    numCertsInBundle, numCrls, numCertsPerSelect, resume, stopMe, evaluateOnly);
             certStoreExporter.export();
             certStoreExporter.shutdown();
         } finally

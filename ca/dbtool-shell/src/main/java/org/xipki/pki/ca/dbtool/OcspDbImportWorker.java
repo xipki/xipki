@@ -67,6 +67,7 @@ public class OcspDbImportWorker extends DbPorterWorker
     private final boolean resume;
     private final String srcFolder;
     private final int batchEntriesPerCommit;
+    private final boolean evaluateOnly;
 
     public OcspDbImportWorker(
             final DataSourceFactory dataSourceFactory,
@@ -74,7 +75,8 @@ public class OcspDbImportWorker extends DbPorterWorker
             final String dbConfFile,
             final boolean resume,
             final String srcFolder,
-            final int batchEntriesPerCommit)
+            final int batchEntriesPerCommit,
+            final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
@@ -86,6 +88,7 @@ public class OcspDbImportWorker extends DbPorterWorker
         this.resume = resume;
         this.srcFolder = IoUtil.expandFilepath(srcFolder);
         this.batchEntriesPerCommit = batchEntriesPerCommit;
+        this.evaluateOnly = evaluateOnly;
     }
 
     @Override
@@ -97,7 +100,7 @@ public class OcspDbImportWorker extends DbPorterWorker
         try
         {
             OcspCertStoreDbImporter certStoreImporter = new OcspCertStoreDbImporter(
-                    dataSource, unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe);
+                    dataSource, unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe, evaluateOnly);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
         } finally

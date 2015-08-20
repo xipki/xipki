@@ -108,7 +108,7 @@ class CaCertStoreDbExporter extends DbPorter
     private final ObjectFactory objFact = new ObjectFactory();
 
     private final int numCertsInBundle;
-    private final int numCertsPerCommit;
+    private final int numCertsPerSelect;
     private final int numCrls;
     private final boolean resume;
     private final int dbSchemaVersion;
@@ -130,21 +130,22 @@ class CaCertStoreDbExporter extends DbPorter
             final String baseDir,
             final int numCertsInBundle,
             final int numCrls,
-            final int numCertsPerCommit,
+            final int numCertsPerSelect,
             final boolean resume,
-            final AtomicBoolean stopMe)
+            final AtomicBoolean stopMe,
+            final boolean evaluateOnly)
     throws DataAccessException
     {
-        super(dataSource, baseDir, stopMe);
+        super(dataSource, baseDir, stopMe, evaluateOnly);
         ParamUtil.assertNotNull("marshaller", marshaller);
         ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         if(numCertsInBundle < 1)
         {
             throw new IllegalArgumentException("numCertsInBundle could not be less than 1: " + numCertsInBundle);
         }
-        if(numCertsPerCommit < 1)
+        if(numCertsPerSelect < 1)
         {
-            throw new IllegalArgumentException("numCertsPerCommit could not be less than 1: " + numCertsPerCommit);
+            throw new IllegalArgumentException("numCertsPerSelect could not be less than 1: " + numCertsPerSelect);
         }
         if(numCrls < 1)
         {
@@ -152,7 +153,7 @@ class CaCertStoreDbExporter extends DbPorter
         }
 
         this.numCertsInBundle = numCertsInBundle;
-        this.numCertsPerCommit = numCertsInBundle;
+        this.numCertsPerSelect = numCertsInBundle;
         this.numCrls = numCrls;
 
         this.marshaller = marshaller;
@@ -215,7 +216,7 @@ class CaCertStoreDbExporter extends DbPorter
         }
 
         Exception exception = null;
-        System.out.println("exporting CA certstore from database");
+        System.out.println(getExportingText() + " CA certstore from database");
         try
         {
             if(resume == false)
@@ -249,7 +250,7 @@ class CaCertStoreDbExporter extends DbPorter
 
         if(exception == null)
         {
-            System.out.println(" exported CA certstore from database");
+            System.out.println(getExportedText() + " CA certstore from database");
         }
         else
         {
@@ -261,7 +262,7 @@ class CaCertStoreDbExporter extends DbPorter
             final CertStoreType certstore)
     throws DataAccessException, IOException
     {
-        System.out.println("exporting table CRL");
+        System.out.println(getExportingText() + " table CRL");
         Crls crls = new Crls();
         StringBuilder sqlBuilder = new StringBuilder("SELECT");
         sqlBuilder.append(" ID, ");
@@ -342,14 +343,14 @@ class CaCertStoreDbExporter extends DbPorter
         }
 
         certstore.setCrls(crls);
-        System.out.println(" exported table CRL");
+        System.out.println(getExportedText() + " table CRL");
     }
 
     private void export_ca(
             final CertStoreType certstore)
     throws DataAccessException
     {
-        System.out.println("exporting table " + table_ca);
+        System.out.println(getExportingText() + " table " + table_ca);
         Cas cas = new Cas();
         final String sql = "SELECT ID, CERT FROM " + table_ca;
 
@@ -380,14 +381,14 @@ class CaCertStoreDbExporter extends DbPorter
         }
 
         certstore.setCas(cas);
-        System.out.println(" exported table " + table_ca);
+        System.out.println(getExportedText() + " table " + table_ca);
     }
 
     private void export_requestor(
             final CertStoreType certstore)
     throws DataAccessException
     {
-        System.out.println("exporting table " + table_requestor);
+        System.out.println(getExportingText() + " table " + table_requestor);
         Requestors infos = new Requestors();
         final String sql = "SELECT ID, NAME FROM " + table_requestor;
 
@@ -415,14 +416,14 @@ class CaCertStoreDbExporter extends DbPorter
         }
 
         certstore.setRequestors(infos);
-        System.out.println(" exported table " + table_requestor);
+        System.out.println(getExportedText() + " table " + table_requestor);
     }
 
     private void export_publisherinfo(
             final CertStoreType certstore)
     throws DataAccessException
     {
-        System.out.println("exporting table " + table_publisher);
+        System.out.println(getExportingText() + " table " + table_publisher);
         Publishers infos = new Publishers();
         final String sql = "SELECT ID, NAME FROM " + table_publisher;
 
@@ -450,19 +451,19 @@ class CaCertStoreDbExporter extends DbPorter
         }
 
         certstore.setPublishers(infos);
-        System.out.println(" exported table " + table_publisher);
+        System.out.println(getExportedText() + " table " + table_publisher);
     }
 
     private void export_user(
             final CertStoreType certstore)
     throws DataAccessException, JAXBException
     {
-        System.out.println("exporting table USERNAME");
+        System.out.println(getExportingText() + " table USERNAME");
         UsersFiles usersFiles = new UsersFiles();
         if(dbSchemaVersion > 1)
         {
             certstore.setUsersFiles(usersFiles);
-            System.out.println(" exported 0 users from table USERNAME");
+            System.out.println(getExportedText() + " 0 users from table USERNAME");
             return;
         }
 
@@ -539,8 +540,9 @@ class CaCertStoreDbExporter extends DbPorter
 
                         usersFiles.getUsersFile().add(currentCertsFilename);
 
-                        System.out.println(" exported " + numUsersInCurrentFile + " users in " + currentCertsFilename);
-                        System.out.println(" exported " + sum + " users ...");
+                        System.out.println(getExportedText() + " " +
+                                numUsersInCurrentFile + " users in " + currentCertsFilename);
+                        System.out.println(getExportedText() + " " + sum + " users ...");
 
                         // reset
                         usersInCurrentFile = new UsersType();
@@ -572,7 +574,7 @@ class CaCertStoreDbExporter extends DbPorter
 
                 usersFiles.getUsersFile().add(currentCertsFilename);
 
-                System.out.println(" exported " + numUsersInCurrentFile + " users in " + currentCertsFilename);
+                System.out.println(getExportedText() + " " + numUsersInCurrentFile + " users in " + currentCertsFilename);
             }
         }catch(SQLException e)
         {
@@ -583,14 +585,14 @@ class CaCertStoreDbExporter extends DbPorter
         }
 
         certstore.setUsersFiles(usersFiles);
-        System.out.println(" exported " + sum + " users from table USERNAME");
+        System.out.println(getExportedText() + " " + sum + " users from table USERNAME");
     }
 
     private void export_certprofileinfo(
             final CertStoreType certstore)
     throws DataAccessException
     {
-        System.out.println("exporting table " + table_profile);
+        System.out.println(getExportingText() + " table " + table_profile);
         Profiles infos = new Profiles();
         final String sql = "SELECT ID, NAME FROM " + table_profile;
 
@@ -618,7 +620,7 @@ class CaCertStoreDbExporter extends DbPorter
         }
 
         certstore.setProfiles(infos);
-        System.out.println(" exported table " + table_profile);
+        System.out.println(getExportedText() + " table " + table_profile);
     }
 
     /**
@@ -677,7 +679,7 @@ class CaCertStoreDbExporter extends DbPorter
             minId = (int) getMin("CERT", "ID");
         }
 
-        System.out.println("exporting tables CERT and RAWCERT from ID " + minId);
+        System.out.println(getExportingText() + " tables CERT and RAWCERT from ID " + minId);
 
         final int maxId = (int) getMax("CERT", "ID");
         ProcessLog processLog;
@@ -716,7 +718,7 @@ class CaCertStoreDbExporter extends DbPorter
         CertsType certsInCurrentFile = new CertsType();
 
         long sum = 0;
-        final int n = numCertsPerCommit;
+        final int n = numCertsPerSelect;
 
         File currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
         FileOutputStream out = new FileOutputStream(currentCertsZipFile);
@@ -962,14 +964,14 @@ class CaCertStoreDbExporter extends DbPorter
         ProcessLog.printTrailer();
         // all successful, delete the processLogFile
         processLogFile.delete();
-        System.out.println(" exported " + sum + " certificates from tables CERT and RAWCERT");
+        System.out.println(getExportedText() + " " + sum + " certificates from tables CERT and RAWCERT");
     }
 
     private void export_publishQueue(
             final CertStoreType certstore)
     throws DataAccessException, IOException, JAXBException
     {
-        System.out.println("exporting table PUBLISHQUEUE");
+        System.out.println(getExportingText() + " table PUBLISHQUEUE");
 
         StringBuilder sqlBuilder = new StringBuilder("SELECT");
         sqlBuilder.append(" CERT_ID, PUBLISHER_ID, ");
@@ -983,7 +985,7 @@ class CaCertStoreDbExporter extends DbPorter
         certstore.setPublishQueue(queue);
         if(maxId == 0)
         {
-            System.out.println(" exported table PUBLISHQUEUE");
+            System.out.println(getExportedText() + " table PUBLISHQUEUE");
             return;
         }
 
@@ -1022,14 +1024,14 @@ class CaCertStoreDbExporter extends DbPorter
         {
             releaseResources(ps, rs);
         }
-        System.out.println(" exported table PUBLISHQUEUE");
+        System.out.println(getExportedText() + " table PUBLISHQUEUE");
     }
 
     private void export_deltaCRLCache(
             final CertStoreType certstore)
     throws DataAccessException, IOException, JAXBException
     {
-        System.out.println("exporting table DELTACRL_CACHE");
+        System.out.println(getExportingText() + " table DELTACRL_CACHE");
 
         StringBuilder sqlBuilder = new StringBuilder("SELECT");
         sqlBuilder.append(" SERIAL, ");
@@ -1067,7 +1069,7 @@ class CaCertStoreDbExporter extends DbPorter
             releaseResources(ps, rs);
         }
 
-        System.out.println(" exported table DELTACRL_CACHE");
+        System.out.println(getExportedText() + " table DELTACRL_CACHE");
     }
 
     private void finalizeZip(

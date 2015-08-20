@@ -124,10 +124,11 @@ class CaCertStoreDbImporter extends DbPorter
             final String srcDir,
             final int numCertsPerCommit,
             final boolean resume,
-            final AtomicBoolean stopMe)
+            final AtomicBoolean stopMe,
+            final boolean evaluateOnly)
     throws Exception
     {
-        super(dataSource, srcDir, stopMe);
+        super(dataSource, srcDir, stopMe, evaluateOnly);
         if(numCertsPerCommit < 1)
         {
             throw new IllegalArgumentException("numCertsPerCommit could not be less than 1: " + numCertsPerCommit);
@@ -176,7 +177,7 @@ class CaCertStoreDbImporter extends DbPorter
         }
 
         File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
-        System.out.println("importing CA certstore to database");
+        System.out.println(getImportingText() + " CA certstore to database");
         try
         {
             if(resume == false)
@@ -199,7 +200,7 @@ class CaCertStoreDbImporter extends DbPorter
             System.err.println("error while importing CA certstore to database");
             throw e;
         }
-        System.out.println(" imported CA certstore to database");
+        System.out.println(getImportedText() + " CA certstore to database");
     }
 
     private void import_ca(
@@ -207,7 +208,7 @@ class CaCertStoreDbImporter extends DbPorter
     throws DataAccessException, CertificateException, IOException
     {
         final String sql = "INSERT INTO CS_CA (ID, SUBJECT, FP_CERT, CERT) VALUES (?, ?, ?, ?)";
-        System.out.println("importing table CS_CA");
+        System.out.println(getImportingText() + " table CS_CA");
         PreparedStatement ps = prepareStatement(sql);
 
         try
@@ -243,7 +244,7 @@ class CaCertStoreDbImporter extends DbPorter
             releaseResources(ps, null);
         }
 
-        System.out.println(" imported table CS_CA");
+        System.out.println(getImportedText() + " table CS_CA");
     }
 
     private void import_requestor(
@@ -251,7 +252,7 @@ class CaCertStoreDbImporter extends DbPorter
     throws DataAccessException
     {
         final String sql = "INSERT INTO CS_REQUESTOR (ID, NAME) VALUES (?, ?)";
-        System.out.println("importing table CS_REQUESTOR");
+        System.out.println(getImportingText() + " table CS_REQUESTOR");
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -280,7 +281,7 @@ class CaCertStoreDbImporter extends DbPorter
             releaseResources(ps, null);
         }
 
-        System.out.println(" imported table CS_REQUESTOR");
+        System.out.println(getImportedText() + " table CS_REQUESTOR");
     }
 
     private void import_publisher(
@@ -289,7 +290,7 @@ class CaCertStoreDbImporter extends DbPorter
     {
         final String sql = "INSERT INTO CS_PUBLISHER (ID, NAME) VALUES (?, ?)";
 
-        System.out.println("importing table CS_PUBLISHER");
+        System.out.println(getImportingText() + " table CS_PUBLISHER");
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -318,7 +319,7 @@ class CaCertStoreDbImporter extends DbPorter
             releaseResources(ps, null);
         }
 
-        System.out.println(" imported table CS_PUBLISHER");
+        System.out.println(getImportedText() + " table CS_PUBLISHER");
     }
 
     private void import_profile(
@@ -326,7 +327,7 @@ class CaCertStoreDbImporter extends DbPorter
     throws DataAccessException
     {
         final String sql = "INSERT INTO CS_PROFILE (ID, NAME) VALUES (?, ?)";
-        System.out.println("importing table CS_PROFILE");
+        System.out.println(getImportingText() + " table CS_PROFILE");
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -353,7 +354,7 @@ class CaCertStoreDbImporter extends DbPorter
             releaseResources(ps, null);
         }
 
-        System.out.println(" imported table CS_PROFILE");
+        System.out.println(getImportedText() + " table CS_PROFILE");
     }
 
     private void import_user(
@@ -367,13 +368,13 @@ class CaCertStoreDbImporter extends DbPorter
         {
             for(String file : usersFiles.getUsersFile())
             {
-                System.out.println("importing users from file " + file);
+                System.out.println(getImportingText() + " users from file " + file);
 
                 try
                 {
                     sum += do_import_user(ps, file);
-                    System.out.println(" imported users from file " + file);
-                    System.out.println(" imported " + sum + " users ...");
+                    System.out.println(getImportedText() + " users from file " + file);
+                    System.out.println(getImportedText() + " " + sum + " users ...");
                 }catch(SQLException e)
                 {
                     System.err.println("error while importing users from file " + file);
@@ -389,7 +390,7 @@ class CaCertStoreDbImporter extends DbPorter
             releaseResources(ps, null);
         }
 
-        System.out.println(" imported " + sum + " users");
+        System.out.println(getImportedText() + " " + sum + " users");
     }
 
     private int do_import_user(
@@ -397,7 +398,7 @@ class CaCertStoreDbImporter extends DbPorter
             final String usersFile)
     throws JAXBException, SQLException, DataAccessException
     {
-        System.out.println("importing table USERNAME");
+        System.out.println(getImportingText() + " table USERNAME");
 
         UsersType users;
         try
@@ -482,7 +483,7 @@ class CaCertStoreDbImporter extends DbPorter
     throws DataAccessException
     {
         final String sql = "INSERT INTO PUBLISHQUEUE (CERT_ID, PUBLISHER_ID, CA_ID) VALUES (?, ?, ?)";
-        System.out.println("importing table PUBLISHQUEUE");
+        System.out.println(getImportingText() + " table PUBLISHQUEUE");
         PreparedStatement ps = prepareStatement(sql);
 
         try
@@ -508,7 +509,7 @@ class CaCertStoreDbImporter extends DbPorter
             releaseResources(ps, null);
         }
 
-        System.out.println(" imported table PUBLISHQUEUE");
+        System.out.println(getImportedText() + " table PUBLISHQUEUE");
     }
 
     private void import_deltaCRLCache(
@@ -516,7 +517,7 @@ class CaCertStoreDbImporter extends DbPorter
     throws DataAccessException
     {
         final String sql = "INSERT INTO DELTACRL_CACHE (ID, SERIAL, CA_ID) VALUES (?, ?, ?)";
-        System.out.println("importing table DELTACRL_CACHE");
+        System.out.println(getImportingText() + " table DELTACRL_CACHE");
         PreparedStatement ps = prepareStatement(sql);
 
         try
@@ -546,7 +547,7 @@ class CaCertStoreDbImporter extends DbPorter
         long maxId = getMax("DELTACRL_CACHE", "ID");
         dataSource.dropAndCreateSequence("DCC_ID", maxId + 1);
 
-        System.out.println(" imported table DELTACRL_CACHE");
+        System.out.println(getImportedText() + " table DELTACRL_CACHE");
     }
 
     private void import_crl(
@@ -556,7 +557,7 @@ class CaCertStoreDbImporter extends DbPorter
         final String sql = "INSERT INTO CRL (ID, CA_ID, CRL_NO, THISUPDATE, NEXTUPDATE, DELTACRL, BASECRL_NO, CRL)"
                 + " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        System.out.println("importing table CRL");
+        System.out.println(getImportingText() + " table CRL");
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -646,7 +647,7 @@ class CaCertStoreDbImporter extends DbPorter
             releaseResources(ps, null);
         }
 
-        System.out.println(" imported table CRL");
+        System.out.println(getImportedText() + " table CRL");
     }
 
     private void import_cert(
@@ -677,7 +678,7 @@ class CaCertStoreDbImporter extends DbPorter
         final long total = certsfiles.getCountCerts() - numProcessedBefore;
         final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore);
 
-        System.out.println("importing certificates from ID " + minId);
+        System.out.println(getImportingText() + " certificates from ID " + minId);
         ProcessLog.printHeader();
 
         PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
@@ -733,7 +734,7 @@ class CaCertStoreDbImporter extends DbPorter
 
         ProcessLog.printTrailer();
         echoToFile(MSG_CERTS_FINISHED, processLogFile);
-        System.out.println(" imported " + processLog.getNumProcessed() + " certificates");
+        System.out.println(getImportedText() + " " + processLog.getNumProcessed() + " certificates");
     }
 
     private int do_import_cert(

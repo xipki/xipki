@@ -71,7 +71,8 @@ public class OcspDbExportWorker extends DbPorterWorker
     private final String destFolder;
     private final boolean resume;
     private final int numCertsInBundle;
-    private final int numCertsPerCommit;
+    private final int numCertsPerSelect;
+    private final boolean evaluateOnly;
 
     public OcspDbExportWorker(
             final DataSourceFactory dataSourceFactory,
@@ -80,7 +81,8 @@ public class OcspDbExportWorker extends DbPorterWorker
             final String destFolder,
             final boolean resume,
             final int numCertsInBundle,
-            final int numCertsPerCommit)
+            final int numCertsPerSelect,
+            final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
@@ -96,6 +98,7 @@ public class OcspDbExportWorker extends DbPorterWorker
 
         unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(schema);
+        this.evaluateOnly = evaluateOnly;
 
         File f = new File(destFolder);
         if(f.exists() == false)
@@ -126,7 +129,7 @@ public class OcspDbExportWorker extends DbPorterWorker
         this.resume = resume;
         this.destFolder = destFolder;
         this.numCertsInBundle = numCertsInBundle;
-        this.numCertsPerCommit = numCertsPerCommit;
+        this.numCertsPerSelect = numCertsPerSelect;
     }
 
     @Override
@@ -139,7 +142,7 @@ public class OcspDbExportWorker extends DbPorterWorker
             // CertStore
             OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(
                     dataSource, marshaller, unmarshaller, destFolder,
-                    numCertsInBundle, numCertsPerCommit, resume, stopMe);
+                    numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
             certStoreExporter.export();
             certStoreExporter.shutdown();
         } finally
