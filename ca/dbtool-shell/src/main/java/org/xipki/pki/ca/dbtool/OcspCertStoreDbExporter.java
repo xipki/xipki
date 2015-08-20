@@ -86,7 +86,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
     private final ObjectFactory objFact = new ObjectFactory();
     private final int numCertsInBundle;
-    private final int numCertsPerCommit;
+    private final int numCertsPerSelect;
     private final boolean resume;
     private final int dbSchemaVersion;
     private final String col_revInvTime;
@@ -97,25 +97,26 @@ class OcspCertStoreDbExporter extends DbPorter
             final Unmarshaller unmarshaller,
             final String baseDir,
             final int numCertsInBundle,
-            final int numCertsPerCommit,
+            final int numCertsPerSelect,
             final boolean resume,
-            final AtomicBoolean stopMe)
+            final AtomicBoolean stopMe,
+            final boolean evaluateOnly)
     throws Exception
     {
-        super(dataSource, baseDir, stopMe);
+        super(dataSource, baseDir, stopMe, evaluateOnly);
         ParamUtil.assertNotNull("marshaller", marshaller);
         ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         if(numCertsInBundle < 1)
         {
             throw new IllegalArgumentException("numCertsInBundle could not be less than 1: " + numCertsInBundle);
         }
-        if(numCertsPerCommit < 1)
+        if(numCertsPerSelect < 1)
         {
-            throw new IllegalArgumentException("numCertsPerCommit could not be less than 1: " + numCertsPerCommit);
+            throw new IllegalArgumentException("numCertsPerSelect could not be less than 1: " + numCertsPerSelect);
         }
 
         this.numCertsInBundle = numCertsInBundle;
-        this.numCertsPerCommit = numCertsInBundle;
+        this.numCertsPerSelect = numCertsInBundle;
 
         this.dbSchemaVersion = getDbSchemaVersion();
         this.marshaller = marshaller;
@@ -163,7 +164,7 @@ class OcspCertStoreDbExporter extends DbPorter
             certstore = new CertStoreType();
             certstore.setVersion(VERSION);
         }
-        System.out.println("exporting OCSP certstore from database");
+        System.out.println(getExportingText() + " OCSP certstore from database");
 
         if(resume == false)
         {
@@ -182,7 +183,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
         if(exception == null)
         {
-            System.out.println(" exported OCSP certstore from database");
+            System.out.println(getExportedText() + " OCSP certstore from database");
         }
         else
         {
@@ -194,7 +195,7 @@ class OcspCertStoreDbExporter extends DbPorter
             final CertStoreType certstore)
     throws DataAccessException
     {
-        System.out.println("exporting table ISSUER");
+        System.out.println(getExportingText() + " table ISSUER");
         Issuers issuers = new Issuers();
         certstore.setIssuers(issuers);
         final String sql = "SELECT ID, CERT, REVOKED, REV_REASON, REV_TIME, " + col_revInvTime + " FROM ISSUER";
@@ -241,7 +242,7 @@ class OcspCertStoreDbExporter extends DbPorter
             releaseResources(stmt, rs);
         }
 
-        System.out.println(" exported table ISSUER");
+        System.out.println(getExportedText() + " table ISSUER");
     }
 
     private Exception export_cert(
@@ -296,7 +297,7 @@ class OcspCertStoreDbExporter extends DbPorter
             minCertId = (int) getMin("CERT", "ID");
         }
 
-        System.out.println("exporting tables CERT, CERTHASH and RAWCERT from ID " + minCertId);
+        System.out.println(getExportingText() + " tables CERT, CERTHASH and RAWCERT from ID " + minCertId);
 
         String certSql = "SELECT ID, SERIAL, ISSUER_ID, LAST_UPDATE, REVOKED, REV_REASON, REV_TIME, " + col_revInvTime +
                 ", PROFILE FROM CERT WHERE ID >= ? AND ID < ?";
@@ -319,7 +320,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
         CertsType certsInCurrentFile = new CertsType();
 
-        final int n = numCertsPerCommit;
+        final int n = numCertsPerSelect;
 
         File currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
         FileOutputStream out = new FileOutputStream(currentCertsZipFile);
@@ -516,7 +517,7 @@ class OcspCertStoreDbExporter extends DbPorter
         // all successful, delete the processLogFile
         processLogFile.delete();
 
-        System.out.println(" exported " + processLog.getNumProcessed() +
+        System.out.println(getExportedText() + " " + processLog.getNumProcessed() +
                 " certificates from tables cert, certhash and rawcert");
     }
 

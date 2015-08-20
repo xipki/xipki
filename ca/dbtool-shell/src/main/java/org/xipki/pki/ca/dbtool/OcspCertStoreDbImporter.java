@@ -122,10 +122,11 @@ class OcspCertStoreDbImporter extends DbPorter
             final String srcDir,
             final int numCertsPerCommit,
             final boolean resume,
-            final AtomicBoolean stopMe)
+            final AtomicBoolean stopMe,
+            final boolean evaluateOnly)
     throws Exception
     {
-        super(dataSource, srcDir, stopMe);
+        super(dataSource, srcDir, stopMe, evaluateOnly);
         if(numCertsPerCommit < 1)
         {
             throw new IllegalArgumentException("numCertsPerCommit could not be less than 1: " + numCertsPerCommit);
@@ -173,7 +174,7 @@ class OcspCertStoreDbImporter extends DbPorter
         }
 
         File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
-        System.out.println("importing OCSP certstore to database");
+        System.out.println(getImportingText() + " OCSP certstore to database");
         try
         {
             if(resume == false)
@@ -187,14 +188,14 @@ class OcspCertStoreDbImporter extends DbPorter
             System.err.println("error while importing OCSP certstore to database");
             throw e;
         }
-        System.out.println(" imported OCSP certstore to database");
+        System.out.println(getImportedText() + " OCSP certstore to database");
     }
 
     private void import_issuer(
             final Issuers issuers)
     throws DataAccessException, CertificateException
     {
-        System.out.println("importing table ISSUER");
+        System.out.println(getImportingText() + " table ISSUER");
         PreparedStatement ps = prepareStatement(SQL_ADD_CAINFO);
 
         try
@@ -264,7 +265,7 @@ class OcspCertStoreDbImporter extends DbPorter
         {
             releaseResources(ps, null);
         }
-        System.out.println(" imported table ISSUER");
+        System.out.println(getImportedText() + " table ISSUER");
     }
 
     private void import_cert(
@@ -295,7 +296,7 @@ class OcspCertStoreDbImporter extends DbPorter
         final long total = certsfiles.getCountCerts() - numProcessedBefore;
         final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore);
 
-        System.out.println("importing certificates from ID " + minId);
+        System.out.println(getImportingText() + " certificates from ID " + minId);
         ProcessLog.printHeader();
 
         PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);

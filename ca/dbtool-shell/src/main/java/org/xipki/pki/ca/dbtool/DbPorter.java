@@ -85,13 +85,15 @@ public class DbPorter
     protected final DataSourceWrapper dataSource;
     private Connection connection;
     private boolean connectionAutoCommit;
+    protected final boolean evaulateOnly;
 
     protected final String baseDir;
 
     public DbPorter(
             final DataSourceWrapper dataSource,
             final String baseDir,
-            final AtomicBoolean stopMe)
+            final AtomicBoolean stopMe,
+            final boolean evaluateOnly)
     throws DataAccessException
     {
         super();
@@ -101,6 +103,7 @@ public class DbPorter
 
         this.stopMe = stopMe;
         this.dataSource = dataSource;
+        this.evaulateOnly = evaluateOnly;
         this.connection = this.dataSource.getConnection();
         try
         {
@@ -432,6 +435,26 @@ public class DbPorter
             int version = (int) dataSource.getMax(null, tblName, "VERSION");
             return Math.max(1, version);
         }
+    }
+
+    protected String getImportingText()
+    {
+        return evaulateOnly ? "evaluating import" : "importing";
+    }
+
+    protected String getImportedText()
+    {
+        return evaulateOnly ? " evaluated import" : " imported";
+    }
+
+    protected String getExportingText()
+    {
+        return evaulateOnly ? "evaluating export" : "exporting";
+    }
+
+    protected String getExportedText()
+    {
+        return evaulateOnly ? " evaluated export" : " exported";
     }
 
 }

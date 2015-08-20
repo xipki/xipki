@@ -102,10 +102,11 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
             final String publisherName,
             final int numCertsPerCommit,
             final boolean resume,
-            final AtomicBoolean stopMe)
+            final AtomicBoolean stopMe,
+            final boolean evaluateOnly)
     throws DataAccessException, InvalidInputException
     {
-        super(dataSource, srcDir, stopMe);
+        super(dataSource, srcDir, stopMe, evaluateOnly);
         if(numCertsPerCommit < 1)
         {
             throw new IllegalArgumentException("numCertsPerCommit could not be less than 1: " + numCertsPerCommit);
@@ -174,7 +175,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                     VERSION + ": " + certstore.getVersion());
         }
 
-        System.out.println("importing CA certstore to OCSP database");
+        System.out.println(getImportingText() + " CA certstore to OCSP database");
         try
         {
             PublisherType publisherType = null;
@@ -257,7 +258,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
             System.err.println("error while importing OCSP certstore to database");
             throw e;
         }
-        System.out.println(" imported OCSP certstore to database");
+        System.out.println(getImportedText() + " OCSP certstore to database");
     }
 
     private List<Integer> getIssuerIds(
@@ -295,7 +296,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
             final List<CaType> cas)
     throws DataAccessException, CertificateException
     {
-        System.out.println("importing table ISSUER");
+        System.out.println(getImportingText() + " table ISSUER");
         final String sql = OcspCertStoreDbImporter.SQL_ADD_CAINFO;
         PreparedStatement ps = prepareStatement(sql);
 
@@ -388,7 +389,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
             releaseResources(ps, null);
         }
 
-        System.out.println(" imported table ISSUER");
+        System.out.println(getImportedText() + " table ISSUER");
         return relatedCaIds;
     }
 
@@ -423,7 +424,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
         final long total = certsfiles.getCountCerts() - numProcessedBefore;
         final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore);
 
-        System.out.println("importing certificates from ID " + minId);
+        System.out.println(getImportingText() + " certificates from ID " + minId);
         ProcessLog.printHeader();
 
         PreparedStatement ps_cert = prepareStatement(OcspCertStoreDbImporter.SQL_ADD_CERT);

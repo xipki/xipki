@@ -102,10 +102,11 @@ class CaConfigurationDbExporter extends DbPorter
             final DataSourceWrapper dataSource,
             final Marshaller marshaller,
             final String destDir,
-            final AtomicBoolean stopMe)
+            final AtomicBoolean stopMe,
+            final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException
     {
-        super(dataSource, destDir, stopMe);
+        super(dataSource, destDir, stopMe, evaluateOnly);
         ParamUtil.assertNotNull("marshaller", marshaller);
         this.marshaller = marshaller;
         this.dbSchemaVersion = getDbSchemaVersion();
@@ -137,7 +138,7 @@ class CaConfigurationDbExporter extends DbPorter
         CAConfigurationType caconf = new CAConfigurationType();
         caconf.setVersion(VERSION);
 
-        System.out.println("exporting CA configuration from database");
+        System.out.println(getExportingText() + " CA configuration from database");
 
         export_cmpcontrol(caconf);
         export_responder(caconf);
@@ -162,7 +163,7 @@ class CaConfigurationDbExporter extends DbPorter
             throw XMLUtil.convert(e);
         }
 
-        System.out.println(" exported CA configuration from database");
+        System.out.println(getExportedText() + " CA configuration from database");
     }
 
     private void export_cmpcontrol(
@@ -171,7 +172,7 @@ class CaConfigurationDbExporter extends DbPorter
     {
         Cmpcontrols cmpcontrols = new Cmpcontrols();
         caconf.setCmpcontrols(cmpcontrols);
-        System.out.println("exporting table CMPCONTROL");
+        System.out.println(getExportingText() + " table CMPCONTROL");
 
         final String sql;
 
@@ -227,14 +228,14 @@ class CaConfigurationDbExporter extends DbPorter
             releaseResources(stmt, rs);
         }
 
-        System.out.println(" exported table CMPCONTROL");
+        System.out.println(getExportedText() + " table CMPCONTROL");
     }
 
     private void export_environment(
             final CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("exporting table ENVIRONMENT");
+        System.out.println(getExportingText() + " table ENVIRONMENT");
         Environments environments = new Environments();
         final String sql = "SELECT NAME, VALUE2 FROM ENVIRONMENT";
 
@@ -265,14 +266,14 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setEnvironments(environments);
-        System.out.println(" exported table ENVIRONMENT");
+        System.out.println(getExportedText() + " table ENVIRONMENT");
     }
 
     private void export_crlsigner(
             final CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("exporting table CRLSIGNER");
+        System.out.println(getExportingText() + " table CRLSIGNER");
         Crlsigners crlsigners = new Crlsigners();
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("SELECT NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL");
@@ -312,14 +313,14 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setCrlsigners(crlsigners);
-        System.out.println(" exported table CRLSIGNER");
+        System.out.println(getExportedText() + " table CRLSIGNER");
     }
 
     private void export_caalias(
             final CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("exporting table CAALIAS");
+        System.out.println(getExportingText() + " table CAALIAS");
         Caaliases caaliases = new Caaliases();
         final String sql = "SELECT NAME, CA_NAME FROM CAALIAS";
 
@@ -350,14 +351,14 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setCaaliases(caaliases);
-        System.out.println(" exported table CAALIAS");
+        System.out.println(getExportedText() + " table CAALIAS");
     }
 
     private void export_requestor(
             final CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("exporting table REQUESTOR");
+        System.out.println(getExportingText() + " table REQUESTOR");
         Requestors requestors = new Requestors();
         final String sql = "SELECT NAME, CERT FROM REQUESTOR";
 
@@ -388,16 +389,16 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setRequestors(requestors);
-        System.out.println(" exported table REQUESTOR");
+        System.out.println(getExportedText() + " table REQUESTOR");
     }
 
     private void export_responder(
             final CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("exporting table RESPONDER");
+        System.out.println(getExportingText() + " table RESPONDER");
 
-        System.out.println("exporting table CRLSIGNER");
+        System.out.println(getExportingText() + " table CRLSIGNER");
         Responders responders = new Responders();
         final String sql = "SELECT NAME, TYPE, CONF, CERT FROM RESPONDER";
 
@@ -431,14 +432,14 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setResponders(responders);
-        System.out.println(" exported table RESPONDER");
+        System.out.println(getExportedText() + " table RESPONDER");
     }
 
     private void export_publisher(
             final CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("exporting table PUBLISHER");
+        System.out.println(getExportingText() + " table PUBLISHER");
         Publishers publishers = new Publishers();
         final String sql = "SELECT NAME, TYPE, CONF FROM PUBLISHER";
 
@@ -471,14 +472,14 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setPublishers(publishers);
-        System.out.println(" exported table PUBLISHER");
+        System.out.println(getExportedText() + " table PUBLISHER");
     }
 
     private void export_profile(
             final CAConfigurationType caconf)
     throws DataAccessException, IOException
     {
-        System.out.println("exporting table " + table_profile);
+        System.out.println(getExportingText() + " table " + table_profile);
         Profiles profiles = new Profiles();
         StringBuilder sqlBuilder = new StringBuilder("SELECT");
         sqlBuilder.append(" NAME");
@@ -539,14 +540,14 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setProfiles(profiles);
-        System.out.println(" exported table " + table_profile);
+        System.out.println(getExportedText() + " table " + table_profile);
     }
 
     private void export_ca(
             final CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("exporting table CA");
+        System.out.println(getExportingText() + " table CA");
         Cas cas = new Cas();
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("SELECT NAME, ");
@@ -672,14 +673,14 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setCas(cas);
-        System.out.println(" exported table CA");
+        System.out.println(getExportedText() + " table CA");
     }
 
     private void export_ca_has_requestor(
             final CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("exporting table CA_HAS_REQUESTOR");
+        System.out.println(getExportingText() + " table CA_HAS_REQUESTOR");
         CaHasRequestors ca_has_requestors = new CaHasRequestors();
         final String sql = "SELECT CA_NAME, REQUESTOR_NAME, RA, PERMISSIONS, PROFILES FROM CA_HAS_REQUESTOR";
 
@@ -716,14 +717,14 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setCaHasRequestors(ca_has_requestors);
-        System.out.println(" exported table CA_HAS_REQUESTOR");
+        System.out.println(getExportedText() + " table CA_HAS_REQUESTOR");
     }
 
     private void export_ca_has_publisher(
             final CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("exporting table CA_HAS_PUBLISHER");
+        System.out.println(getExportingText() + " table CA_HAS_PUBLISHER");
         CaHasPublishers ca_has_publishers = new CaHasPublishers();
         final String sql = "SELECT CA_NAME, PUBLISHER_NAME FROM CA_HAS_PUBLISHER";
 
@@ -754,19 +755,19 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setCaHasPublishers(ca_has_publishers);
-        System.out.println(" exported table CA_HAS_PUBLISHER");
+        System.out.println(getExportedText() + " table CA_HAS_PUBLISHER");
     }
 
     private void export_scep(
             final CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("exporting table SCEP");
+        System.out.println(getExportingText() + " table SCEP");
         Sceps sceps = new Sceps();
         caconf.setSceps(sceps);
         if(dbSchemaVersion < 2)
         {
-            System.out.println(" exported table SCEP");
+            System.out.println(getExportedText() + " table SCEP");
             return;
         }
 
@@ -803,14 +804,14 @@ class CaConfigurationDbExporter extends DbPorter
             releaseResources(stmt, rs);
         }
 
-        System.out.println(" exported table SCEP");
+        System.out.println(getExportedText() + " table SCEP");
     }
 
     private void export_ca_has_profile(
             final CAConfigurationType caconf)
     throws DataAccessException
     {
-        System.out.println("exporting table " + table_caHasProfile);
+        System.out.println(getExportingText() + " table " + table_caHasProfile);
         CaHasProfiles ca_has_profiles = new CaHasProfiles();
         StringBuilder sqlBuilder = new StringBuilder(100);
         sqlBuilder.append("SELECT CA_NAME");
@@ -859,7 +860,7 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         caconf.setCaHasProfiles(ca_has_profiles);
-        System.out.println(" exported table " + table_caHasProfile);
+        System.out.println(getExportedText() + " table " + table_caHasProfile);
     }
 
     private static String convertCmpControlConf(
