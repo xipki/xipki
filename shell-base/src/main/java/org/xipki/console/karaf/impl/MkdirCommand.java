@@ -39,67 +39,40 @@ import java.io.File;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
-
-import jline.console.ConsoleReader;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-cmd", name = "rm", description="remove file or directory")
-public class FileRmCommand extends XipkiOsgiCommandSupport
+@Command(scope = "xipki-cmd", name = "mkdir", description="make directories")
+public class MkdirCommand extends XipkiOsgiCommandSupport
 {
-    @Argument(index = 0, name = "file",
+    @Argument(index = 0, name = "directory_name",
             required = true,
-            description = "file or directory to be deleted\n"
+            description = "directory\n"
                     + "(required)")
-    private String targetPath;
-
-    @Option(name = "--recursive", aliases="-r",
-            description = "remove directories and their contents recursively")
-    private Boolean recursive = Boolean.FALSE;
-
-    @Option(name = "--force", aliases="-f",
-            description = "ignore nonexistent files, never prompt")
-    private Boolean force = Boolean.FALSE;
+    private String dirName;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
-
-        File target = new File(expandFilepath(targetPath));
-        if(target.exists() == false)
+        File target = new File(expandFilepath(dirName));
+        if(target.exists())
         {
-            return null;
-        }
-
-        if(target.isDirectory())
-        {
-            if(recursive == false)
+            if(target.isDirectory() == false)
             {
-                out("Please use option --recursive to delete directory");
+                System.err.println(dirName + " exists but is not a directory, cannot override it");
                 return null;
-            }
-
-            if(force || FileUtils.confirm(reader, "Do you want to remove directory " + targetPath + " [yes/no]?"))
-            {
-                FileUtils.deleteDirectory(target);
-                out("removed directory " + targetPath);
             }
         }
         else
         {
-            if(force || FileUtils.confirm(reader, "Do you want o remove file " + targetPath + " [yes/no]?"))
-            {
-                target.delete();
-                out("removed file " + targetPath);
-            }
+            target.mkdirs();
         }
 
         return null;
     }
+
 }

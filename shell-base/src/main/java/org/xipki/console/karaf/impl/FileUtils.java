@@ -35,11 +35,19 @@
 
 package org.xipki.console.karaf.impl;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.util.List;
 
 import org.xipki.console.karaf.impl.completer.Configuration;
+
+import jline.console.ConsoleReader;
 
 /**
  * @author Lijun Liao
@@ -49,6 +57,13 @@ public class FileUtils
 {
 
     /**
+     * The file copy buffer size (30 MB)
+     */
+    private static final long FILE_COPY_BUFFER_SIZE = 1024L * 1024 * 30;
+
+    /**
+     * Copied from the apache commons io project
+     *
      * Deletes a directory recursively.
      *
      * @param directory  directory to delete
@@ -76,6 +91,8 @@ public class FileUtils
     }
 
     /**
+     * Copied from the apache commons io project
+     *
      * Determines whether the specified file is a Symbolic Link rather than an actual file.
      * <p>
      * Will not return true if there is a Symbolic Link anywhere in the path,
@@ -118,6 +135,8 @@ public class FileUtils
     }
 
     /**
+     * Copied from the apache commons io project
+     *
      * Cleans a directory without deleting it.
      *
      * @param directory directory to clean
@@ -163,6 +182,8 @@ public class FileUtils
     }
 
     /**
+     * Copied from the apache commons io project
+     *
      * Deletes a file. If file is a directory, delete it and all sub-directories.
      * <p>
      * The difference between File.delete() and this method are:
@@ -195,6 +216,218 @@ public class FileUtils
                 }
                 throw new IOException("Unable to delete file: " + file);
             }
+        }
+    }
+
+    /**
+     * Copied from the apache commons io project
+     *
+     * Internal copy file method.
+     * This caches the original file length, and an IOException will be thrown
+     * if the output file length is different from the current input file length.
+     * So it may fail if the file changes size.
+     * It may also fail with "IllegalArgumentException: Negative size" if the input file is truncated part way
+     * through copying the data and the new file size is less than the current position.
+     *
+     * @param srcFile          the validated source file, must not be {@code null}
+     * @param destFile         the validated destination file, must not be {@code null}
+     * @param preserveFileDate whether to preserve the file date
+     * @throws IOException              if an error occurs
+     * @throws IOException              if the output file length is not the same as the input file length after the
+     * copy completes
+     * @throws IllegalArgumentException "Negative size" if the file is truncated so that the size is less than the
+     * position
+     */
+    public static void copyFile(
+            final File srcFile,
+            final File destFile,
+            final boolean preserveFileDate)
+    throws IOException
+    {
+        if (destFile.exists() && destFile.isDirectory())
+        {
+            throw new IOException("Destination '" + destFile + "' exists but is a directory");
+        }
+
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
+        FileChannel input = null;
+        FileChannel output = null;
+        try
+        {
+            fis = new FileInputStream(srcFile);
+            fos = new FileOutputStream(destFile);
+            input = fis.getChannel();
+            output = fos.getChannel();
+            final long size = input.size(); // TODO See IO-386
+            long pos = 0;
+            long count = 0;
+            while (pos < size)
+            {
+                final long remain = size - pos;
+                count = remain > FILE_COPY_BUFFER_SIZE ? FILE_COPY_BUFFER_SIZE : remain;
+                final long bytesCopied = output.transferFrom(input, pos, count);
+                if (bytesCopied == 0) { // IO-385 - can happen if file is truncated after caching the size
+                    break; // ensure we don't loop forever
+                }
+                pos += bytesCopied;
+            }
+        } finally
+        {
+            closeQuietly(output, fos, input, fis);
+        }
+
+        final long srcLen = srcFile.length(); // TODO See IO-386
+        final long dstLen = destFile.length(); // TODO See IO-386
+        if (srcLen != dstLen)
+        {
+            throw new IOException("Failed to copy full contents from '" +
+                    srcFile + "' to '" + destFile + "' Expected length: " + srcLen + " Actual: " + dstLen);
+        }
+        if (preserveFileDate)
+        {
+            destFile.setLastModified(srcFile.lastModified());
+        }
+    }
+
+    public static void copyDirectory(
+            final File srcDir,
+            final File destDir)
+    throws IOException
+    {
+        copyDirectory(srcDir, destDir, null, true, null);
+    }
+
+    /**
+     * Copied from the apache commons io project
+     *
+     * Internal copy directory method.
+     *
+     * @param srcDir           the validated source directory, must not be {@code null}
+     * @param destDir          the validated destination directory, must not be {@code null}
+     * @param filter           the filter to apply, null means copy all directories and files
+     * @param preserveFileDate whether to preserve the file date
+     * @param exclusionList    List of files and directories to exclude from the copy, may be null
+     * @throws IOException if an error occurs
+     * @since 1.1
+     */
+    public static void copyDirectory(
+            final File srcDir,
+            final File destDir,
+            final FileFilter filter,
+            final boolean preserveFileDate,
+            final List<String> exclusionList)
+    throws IOException
+    {
+        // recurse
+        final File[] srcFiles = filter == null ? srcDir.listFiles() : srcDir.listFiles(filter);
+        if (srcFiles == null) {  // null if abstract pathname does not denote a directory, or if an I/O error occurs
+            throw new IOException("Failed to list contents of " + srcDir);
+        }
+        if (destDir.exists())
+        {
+            if (destDir.isDirectory() == false)
+            {
+                throw new IOException("Destination '" + destDir + "' exists but is not a directory");
+            }
+        } else
+        {
+            if (!destDir.mkdirs() && !destDir.isDirectory())
+            {
+                throw new IOException("Destination '" + destDir + "' directory cannot be created");
+            }
+        }
+        if (destDir.canWrite() == false)
+        {
+            throw new IOException("Destination '" + destDir + "' cannot be written to");
+        }
+        for (final File srcFile : srcFiles)
+        {
+            final File dstFile = new File(destDir, srcFile.getName());
+            if (exclusionList == null || !exclusionList.contains(srcFile.getCanonicalPath()))
+            {
+                if (srcFile.isDirectory())
+                {
+                    copyDirectory(srcFile, dstFile, filter, preserveFileDate, exclusionList);
+                } else
+                {
+                    copyFile(srcFile, dstFile, preserveFileDate);
+                }
+            }
+        }
+
+        // Do this last, as the above has probably affected directory metadata
+        if (preserveFileDate)
+        {
+            destDir.setLastModified(srcDir.lastModified());
+        }
+    }
+
+    public static boolean confirm(
+            final ConsoleReader reader,
+            final String prompt)
+    throws IOException
+    {
+        System.out.println(prompt);
+        String answer = reader.readLine();
+        if(answer == null)
+        {
+            throw new IOException("interrupted");
+        }
+
+        int tries = 0;
+
+        while(tries < 3)
+        {
+            if("yes".equalsIgnoreCase(answer))
+            {
+                return true;
+            }
+            else if("no".equalsIgnoreCase(answer))
+            {
+                return false;
+            }
+            else
+            {
+                tries++;
+                System.out.println("Please answer with yes or no. ");
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Copied from the apache commons io project
+     *
+     * @param closeables
+     */
+    public static void closeQuietly(
+            final Closeable... closeables)
+    {
+        if (closeables == null)
+        {
+            return;
+        }
+        for (final Closeable closeable : closeables)
+        {
+            doCloseQuietly(closeable);
+        }
+    }
+
+    private static void doCloseQuietly(
+            final Closeable closable)
+    {
+        if(closable == null)
+        {
+            return;
+        }
+
+        try
+        {
+            closable.close();
+        }catch(Throwable t)
+        {
         }
     }
 

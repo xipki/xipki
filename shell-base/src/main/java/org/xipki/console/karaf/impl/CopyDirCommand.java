@@ -39,67 +39,60 @@ import java.io.File;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
-
-import jline.console.ConsoleReader;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-cmd", name = "rm", description="remove file or directory")
-public class FileRmCommand extends XipkiOsgiCommandSupport
+@Command(scope = "xipki-cmd", name = "copy-dir", description="copy content of the directory to destination")
+public class CopyDirCommand extends XipkiOsgiCommandSupport
 {
-    @Argument(index = 0, name = "file",
+    @Argument(index = 0, name = "source_directory",
             required = true,
-            description = "file or directory to be deleted\n"
+            description = "content of this directory will be copied\n"
                     + "(required)")
-    private String targetPath;
+    private String source;
 
-    @Option(name = "--recursive", aliases="-r",
-            description = "remove directories and their contents recursively")
-    private Boolean recursive = Boolean.FALSE;
-
-    @Option(name = "--force", aliases="-f",
-            description = "ignore nonexistent files, never prompt")
-    private Boolean force = Boolean.FALSE;
+    @Argument(index = 1, name = "destination",
+            required = true,
+            description = "destination directory\n"
+                    + "(required)")
+    private String dest;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
-
-        File target = new File(expandFilepath(targetPath));
-        if(target.exists() == false)
+        File sourceDir = new File(expandFilepath(source));
+        if(sourceDir.exists() == false)
         {
+            System.err.println(source + " does not exist");
             return null;
         }
 
-        if(target.isDirectory())
+        if(sourceDir.isDirectory() == false)
         {
-            if(recursive == false)
+            System.err.println(source + " is not a directory");
+            return null;
+        }
+
+        File destDir = new File(dest);
+        if(destDir.exists())
+        {
+            if(destDir.isFile())
             {
-                out("Please use option --recursive to delete directory");
+                System.err.println(dest + " is not a directory");
                 return null;
             }
-
-            if(force || FileUtils.confirm(reader, "Do you want to remove directory " + targetPath + " [yes/no]?"))
-            {
-                FileUtils.deleteDirectory(target);
-                out("removed directory " + targetPath);
-            }
-        }
-        else
+        } else
         {
-            if(force || FileUtils.confirm(reader, "Do you want o remove file " + targetPath + " [yes/no]?"))
-            {
-                target.delete();
-                out("removed file " + targetPath);
-            }
+            destDir.mkdirs();
         }
+
+        FileUtils.copyDirectory(sourceDir, destDir);
 
         return null;
     }
+
 }
