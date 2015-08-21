@@ -1,13 +1,9 @@
 ## Add SCEP support to SubCAwithCRL1
 
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out output/SCEP1.p12 \
-  --subject "CN=SCEP Responder1,O=xipki,C=DE"
-
 xipki-tk:req-p12 \
   --p12 output/SCEP1.p12 \
   --password 1234 \
+  --subject "CN=SCEP Responder1,O=xipki,C=DE" \
   --out output/SCEP1.p10
 
 xipki-ca:enroll-cert \

@@ -1488,6 +1488,7 @@ public class ProfileConfCreatorDemo
             List<RangeType> modulusLengths = ranges.getRange();
             modulusLengths.add(createRange(2048));
             modulusLengths.add(createRange(3072));
+            modulusLengths.add(createRange(4096));
         }
 
         // DSA

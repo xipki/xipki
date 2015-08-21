@@ -11,13 +11,13 @@ xipki-ca:profile-add \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_RootCA.xml
 
-## Create the PKCS#10 request for the command caqa:check-cert in QA 
-xipki-tk:req-p12 \
-  --p12 output/RCA1.p12 \
-  --password 1234 \
+## Create the PKCS#10 request for the command caqa:check-cert in QA
+xipki-tk:req \
+  --slot 1 \
+  --key-label $RCA_KEY_LABEL \
   --out output/RCA1.p10 \
   --subject "CN=RCA1,O=xipki,C=DE"
-  
+
 ## Generate selfsigned RCA
 xipki-ca:gen-rca \
   --name RCA1 \
@@ -28,20 +28,20 @@ xipki-ca:gen-rca \
   --next-serial 1 \
   --next-crl-no 2 \
   --max-validity 10y \
-  --signer-type PKCS12 \
-  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO \
+  --signer-type PKCS11 \
+  --signer-conf algo=$CA_SIGNER_ALGO,slot=1,key-label=$RCA_KEY_LABEL \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
   --responder responder1 \
-  --duplicate-subject  permitted \
+  --duplicate-subject permitted \
   --duplicate-key permitted \
   --validity-mode CUTOFF
 
 ## Update the certificate in the device
-xipki-tk:update-cert-p12 \
-  --p12 output/RCA1.p12 \
-  --password 1234 \
+xipki-tk:update-cert \
+  --slot 1 \
+  --key-label $RCA_KEY_LABEL \
   --cert output/RCA1.der
 
 xipki-ca:caalias-add \
@@ -84,9 +84,9 @@ xipki-ca:publish-self \
   RCA1
 
 ## Generate keys and PKCS#10 request for SubCA1
-xipki-tk:req-p12 \
-  --p12 output/SubCA1.p12 \
-  --password 1234 \
+xipki-tk:req \
+  --slot 1 \
+  --key-label $SubCA_KEY_LABEL \
   --out output/SubCA1.p10 \
   --subject "CN=SubCA1,O=xipki,C=DE"
 
@@ -96,17 +96,16 @@ xipki-ca:enroll-cert \
   --out output/SubCA1.der \
   --profile SubCA
 
-xipki-tk:update-cert-p12 \
-  --p12 output/SubCA1.p12 \
-  --password 1234 \
+xipki-tk:update-cert \
+  --slot 1 \
+  --key-label $SubCA_KEY_LABEL \
   --cert output/SubCA1.der \
   --ca-cert output/RCA1.der
 
 ## Generate keys and PKCS#10 request for SubCAwithCRL1
-xipki-tk:req-p12 \
-  --p12 output/SubCAwithCRL1.p12 \
-  --password 1234 \
-  --out output/SubCAwithCRL1.p10 \
+xipki-tk:req \
+  --slot 1 \
+  --key-label $SubCAwithCRL_KEY_LABEL --out output/SubCAwithCRL1.p10 \
   --subject "CN=SubCAwithCRL1, O=xipki, C=DE" \
   --subject-alt-name "[1]info@xipki.org" \
   --subject-alt-name "[2]xipki.org" \
@@ -124,9 +123,9 @@ xipki-ca:enroll-cert \
   --out output/SubCAwithCRL1.der \
   --profile SubCA.Complex
 
-xipki-tk:update-cert-p12 \
-  --p12 output/SubCAwithCRL1.p12 \
-  --password 1234 \
+xipki-tk:update-cert \
+  --slot 1 \
+  --key-label $SubCAwithCRL_KEY_LABEL \
   --cert output/SubCAwithCRL1.der \
   --ca-cert output/RCA1.der
 
@@ -140,8 +139,8 @@ xipki-ca:ca-add \
   --next-serial 1 \
   --next-crl-no 2 \
   --max-validity 5y \
-  --signer-type PKCS12 \
-  --signer-conf password=1234,keystore=file:output/SubCA1.p12,algo=$CA_SIGNER_ALGO \
+  --signer-type PKCS11 \
+  --signer-conf algo=$CA_SIGNER_ALGO,slot=1,key-label=$SubCA_KEY_LABEL \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/SubCA1.der \
   --cmp-control cmpcontrol1 \
@@ -188,6 +187,9 @@ xipki-ca:careq-add \
   --profile all \
   --ca SubCA1.complex-Name
 
+## Restart the CA
+#xipki-ca:restart
+
 #################################################################
 #                       ADD SubCA with CRL                      #
 #################################################################
@@ -198,18 +200,18 @@ xipki-ca:ca-add \
   --next-serial 1 \
   --next-crl-no 2 \
   --max-validity 8000y \
-  --signer-type PKCS12 \
-  --signer-conf password=1234,keystore=file:output/SubCAwithCRL1.p12,algo=$CA_SIGNER_ALGO \
+  --signer-type PKCS11 \
+  --signer-conf algo=$CA_SIGNER_ALGO,slot=1,key-label=$SubCAwithCRL_KEY_LABEL \
   --ocsp-uri http://localhost:8080/ocsp/responder2 \
   --ca-cert-uri http://example.org/SubCAwithCRL1.der \
   --crl-uri http://subcawithcrl.example.org/crl \
   --deltacrl-uri http://subcawithcrl.example.org/deltacrl \
-  --crl-signer  CASIGN.CRLSIGNER \
-  --cmp-control  cmpcontrol1 \
+  --crl-signer CASIGN.CRLSIGNER \
+  --cmp-control cmpcontrol1 \
   --responder responder1 \
-  --duplicate-subject  permitted \
+  --duplicate-subject permitted \
   --duplicate-key permitted \
-   --validity-mode LAX
+  --validity-mode LAX
 
 xipki-ca:caalias-add \
   --ca SubCAwithCRL1 \
@@ -219,7 +221,7 @@ xipki-ca:caalias-add \
 xipki-ca:caprofile-add \
   --ca SubCAwithCRL1 \
   --profile OCSP
-  
+
 xipki-ca:caprofile-add \
   --ca SubCAwithCRL1 \
   --profile DEMO
@@ -248,4 +250,4 @@ xipki-ca:careq-add \
   --profile all \
   --ca SubCAwithCRL1
 
-source ./xipki/demo/scep-server.script
+source ./xipki/demo/demo.d/scep-server.script

@@ -11,15 +11,12 @@ feature:install xipki-jscepclient-shell
 sleep 2000
 
 # Prepare
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out output/JSCEP-OCSP1.p12 \
-  --subject "CN=JSCEP-OCSP1,O=xipki,C=DE"
 
 xipki-tk:req-p12 \
   --p12 output/JSCEP-OCSP1.p12 \
   --password 1234 \
   --challenge-password user1:password1 \
+  --subject "CN=JSCEP-OCSP1,O=xipki,C=DE" \
   --out output/JSCEP-OCSP1.p10
 
 ## Enroll certificate via PKCSReq
@@ -68,14 +65,11 @@ jscep:getcrl \
   --out output/SubCAwithCRL1-jscep.crl
  
 ## Renewal with same CommonName 
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out output/JSCEP-OCSP1-2.p12 \
-  --subject "CN=JSCEP-OCSP1,O=xipki,C=DE"
 
 xipki-tk:req-p12 \
   --p12 output/JSCEP-OCSP1-2.p12 \
   --password 1234 \
+  --subject "CN=JSCEP-OCSP1,O=xipki,C=DE" \
   --out output/JSCEP-OCSP1-2.p10
 
 ## Enroll certificate via Renewal, hence signed by the old key JSCEP-OCSP1.p12
@@ -96,14 +90,11 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/RCA1.der
 
 ## Renewal with different CommonName 
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out output/JSCEP-OCSP2.p12 \
-  --subject "CN=JSCEP-OCSP2,O=xipki,C=DE"
 
 xipki-tk:req-p12 \
   --p12 output/JSCEP-OCSP2.p12 \
   --password 1234 \
+  --subject "CN=JSCEP-OCSP2,O=xipki,C=DE" \
   --out output/JSCEP-OCSP2.p10
 
 ## Enroll certificate via Renewal, hence signed by the old key JSCEP-OCSP1.p12

@@ -79,10 +79,12 @@
     <fileSet>
       <directory>${project.basedir}/../../pki/assembly/src/main/unfiltered/xipki/demo</directory>
       <includes>
+        <include>p12/ca-rsa/**</include>
+        <include>p12/ee/SCEP1.p12</include>
         <include>camgmt-demo.script</include>
-        <include>prepare.script</include>
-        <include>p12.script</include>
-        <include>scep-server.script</include>
+        <include>demo.d/prepare.script</include>
+        <include>demo.d/p12.script</include>
+        <include>demo.d/scep-server.script</include>
         <include>profile/**</include>
       </includes>
       <outputDirectory>xipki/demo</outputDirectory>

@@ -6,6 +6,6 @@ sleep 1000
 
 xipki-cmd:rm -r -f output
 
-source ./xipki/demo/initdb.script
+source ./xipki/demo/demo.d/initdb.script
 
 feature:install xipki-ncm-server

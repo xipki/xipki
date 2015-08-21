@@ -1,5 +1,4 @@
-# Curve name or OID, e.g. secp256r1, brainpoolp256r1
-CURVE = secp256r1
+P12_CA_DIR = ca-ec
 
 CA_SIGNER_ALGO = SHA256withECDSA:SHA1withECDSA
 
@@ -7,46 +6,4 @@ echo "========================================================"
 echo "||            DEMO EC with PKCS#12 Key                ||"
 echo "========================================================"
 
-feature:install xipki-security-shell
-
-# Wait one second
-sleep 1000
-
-xipki-cmd:rm -r -f output
-
-xipki-tk:ec-p12 \
-  --curve $CURVE \
-  --password 1234 \
-  --out output/RCA1.p12 \
-  --subject "CN=RCA1,O=xipki,C=DE"
-
-xipki-tk:ec-p12 \
-  --curve $CURVE \
-  --password 1234 \
-  --out output/SubCA1.p12 \
-  --subject "CN=SubCA1,O=xipki,C=DE"
-
-xipki-tk:ec-p12 \
-  --curve $CURVE \
-  --password 1234 \
-  --out output/SubCAwithCRL1.p12 \
-  --subject "CN=SubCAwithCRL1,O=xipki,C=DE"
-
-source ./xipki/demo/initdb.script
-
-source ./xipki/demo/prepare.script
-
-source ./xipki/demo/p12.script
-
-source ./xipki/demo/ra.script
-#source ./xipki/demo/ra-minimum.script 
-
-source ./xipki/demo/ca-qa.script
-#source ./xipki/demo/ca-qa-minimum.script
-
-source ./xipki/demo/ocsp.script
-#source ./xipki/demo/ocsp-minimum.script
-
-#source ./xipki/demo/loadtest-enroll.script
-
-#source ./xipki/demo/loadtest-ocsp.script
+source ./xipki/demo/demo.d/do-p12-demo.script

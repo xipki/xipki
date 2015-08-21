@@ -14,7 +14,7 @@ xipki-cli:loadtest-template-enroll \
   --thread 8
 
 # Loadtest RSA key
-echo "Enroll load test with RSA key"
+echo "Enroll load test"
 xipki-cli:loadtest-enroll \
   --key-type RSA \
   --subject "CN=xipki.org,O=example PKI company RSA,C=DE" \
@@ -24,29 +24,6 @@ xipki-cli:loadtest-enroll \
   --duration 10 \
   --thread 8
 
-# Loadtest EC key
-echo "Enroll load test with EC key"
-xipki-cli:loadtest-enroll \
-  --key-type EC \
-  --curve secp256r1 \
-  --subject "CN=xipki.org,O=example PKI company EC,C=DE" \
-  --profile TLS \
-  -n 4 \
-  --random-dn O \
-  --duration 10 \
-  --thread 8
- 
-# Loadtest DSA key
-echo "Enroll load test with DSA key"
-xipki-cli:loadtest-enroll \
-  --key-type DSA \
-  --subject "CN=xipki.org,O=example PKI company DSA,C=DE" \
-  --profile TLS \
-  -n 4 \
-  --random-dn O \
-  --duration 10 \
-  --thread 8
- 
 #################################################################
 #              UNINSTALL UNNEEDED FEATURES                      #
 #################################################################
