@@ -55,6 +55,29 @@
       </completers>
     </command>
     <command>
+      <action class="org.xipki.console.karaf.impl.CopyFileCommand"/>
+      <completers>
+        <ref component-id="filePathCompleter"/>
+        <ref component-id="filePathCompleter"/>
+        <null/>
+      </completers>
+    </command>
+    <command>
+      <action class="org.xipki.console.karaf.impl.CopyDirCommand"/>
+      <completers>
+        <ref component-id="dirPathCompleter"/>
+        <ref component-id="dirPathCompleter"/>
+        <null/>
+      </completers>
+    </command>
+    <command>
+      <action class="org.xipki.console.karaf.impl.MkdirCommand"/>
+      <completers>
+        <ref component-id="dirPathCompleter"/>
+        <null/>
+      </completers>
+    </command>
+    <command>
       <action class="org.xipki.console.karaf.impl.ConfirmCommand"/>
     </command>
   </command-bundle>

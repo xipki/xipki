@@ -48,58 +48,70 @@ import jline.console.ConsoleReader;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-cmd", name = "rm", description="remove file or directory")
-public class FileRmCommand extends XipkiOsgiCommandSupport
+@Command(scope = "xipki-cmd", name = "copy-file", description="copy file")
+public class CopyFileCommand extends XipkiOsgiCommandSupport
 {
-    @Argument(index = 0, name = "file",
+    @Argument(index = 0, name = "source file",
             required = true,
-            description = "file or directory to be deleted\n"
+            description = "file to be copied\n"
                     + "(required)")
-    private String targetPath;
+    private String source;
+
+    @Argument(index = 1, name = "destination",
+            required = true,
+            description = "destination directory or file\n"
+                    + "(required)")
+    private String dest;
 
     @Option(name = "--recursive", aliases="-r",
-            description = "remove directories and their contents recursively")
+            description = "copy directories and their contents recursively")
     private Boolean recursive = Boolean.FALSE;
-
-    @Option(name = "--force", aliases="-f",
-            description = "ignore nonexistent files, never prompt")
-    private Boolean force = Boolean.FALSE;
 
     @Override
     protected Object _doExecute()
     throws Exception
     {
-        ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
-
-        File target = new File(expandFilepath(targetPath));
-        if(target.exists() == false)
+        File sourceFile = new File(expandFilepath(source));
+        if(sourceFile.exists() == false)
         {
+            System.err.println(source + " does not exist");
             return null;
         }
 
-        if(target.isDirectory())
+        if(sourceFile.isFile() == false)
         {
-            if(recursive == false)
+            System.err.println(source + " is not a file");
+            return null;
+        }
+
+        File destFile = new File(dest);
+        if(destFile.exists())
+        {
+            if(destFile.isFile() == false)
             {
-                out("Please use option --recursive to delete directory");
+                System.err.println("cannot override an existing directory by a file");
                 return null;
             }
-
-            if(force || FileUtils.confirm(reader, "Do you want to remove directory " + targetPath + " [yes/no]?"))
+            else
             {
-                FileUtils.deleteDirectory(target);
-                out("removed directory " + targetPath);
+                ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
+                if(false == FileUtils.confirm(reader, "Do you want to override the file " + dest))
+                {
+                    return null;
+                }
             }
-        }
-        else
+        } else
         {
-            if(force || FileUtils.confirm(reader, "Do you want o remove file " + targetPath + " [yes/no]?"))
+            File parent = destFile.getParentFile();
+            if(parent != null)
             {
-                target.delete();
-                out("removed file " + targetPath);
+                parent.mkdirs();
             }
         }
+
+        FileUtils.copyFile(sourceFile, destFile, true);
 
         return null;
     }
+
 }
