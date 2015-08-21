@@ -1,4 +1,4 @@
-KEYSIZE = 2048
+P12_CA_DIR = ca-rsa
 
 # Valid signer algos are SHA<n>withRSA where n is 1, 256, 384 and 512
 #
@@ -8,48 +8,4 @@ echo "========================================================"
 echo "||       DEMO RSA (PKCS#1 v1.5) with PKCS#12 Key      ||"
 echo "========================================================"
 
-feature:install xipki-security-shell
-
-# Wait one second
-sleep 1000
-
-xipki-cmd:rm -r -f output
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --key-size $KEYSIZE \
-  --out output/RCA1.p12 \
-  --subject "CN=RCA1,O=xipki,C=DE"
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --key-size $KEYSIZE \
-  --out output/SubCA1.p12 \
-  --subject "CN=SubCA1"
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --key-size $KEYSIZE \
-  --out output/SubCAwithCRL1.p12 \
-  --subject "CN=SubCAwithCRL1"
-
-source ./xipki/demo/initdb.script
-
-source ./xipki/demo/prepare.script
-
-source ./xipki/demo/p12.script
-
-source ./xipki/demo/ra.script
-#source ./xipki/demo/ra-minimum.script 
-
-source ./xipki/demo/ca-qa.script
-#source ./xipki/demo/ca-qa-minimum.script
-
-source ./xipki/demo/ocsp.script
-#source ./xipki/demo/ocsp-minimum.script
-
-#source ./xipki/demo/loadtest-enroll.script
-
-#source ./xipki/demo/loadtest-ocsp.script
-
-
+source ./xipki/demo/demo.d/do-p12-demo.script

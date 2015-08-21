@@ -1,6 +1,6 @@
-CA_SIGNER_ALGO = SHA256withRSA,SHA1withRSA
+CA_SIGNER_ALGO = SHA256withRSA:SHA1withRSA
 
-KEYSIZE = 2048
+P12_DIR = xipki/demo/p12
 
 echo "========================================================"
 echo "||                      CA-MGMT QA                    ||"
@@ -12,30 +12,15 @@ feature:install xipki-security-shell
 sleep 1000
 
 xipki-cmd:rm -r -f output
+xipki-cmd:mkdir output
+xipki-cmd:copy-dir $P12_DIR/ca-rsa output
+xipki-cmd:copy-dir $P12_DIR/ee output
 
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --key-size $KEYSIZE \
-  --out output/RCA1.p12 \
-  --subject "CN=RCA1,O=xipki,C=DE"
+source ./xipki/demo/demo.d/initdb.script
 
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --key-size $KEYSIZE \
-  --out output/SubCA1.p12 \
-  --subject "CN=SubCA1"
+source ./xipki/demo/demo.d/prepare.script
 
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --key-size $KEYSIZE \
-  --out output/SubCAwithCRL1.p12 \
-  --subject "CN=SubCAwithCRL1"
-
-source ./xipki/demo/initdb.script
-
-source ./xipki/demo/prepare.script
-
-source ./xipki/demo/p12.script
+source ./xipki/demo/demo.d/p12.script
 
 feature:install xipki-camgmt-qa-shell
 
@@ -86,15 +71,15 @@ xipki-caqa:neg-env-rm \
 #################################################################
 xipki-caqa:cmpcontrol-check \
   --name cmpcontrol1 \
-  --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA,SHA256withRSAandMGF1,SHA256withDSA,SHA256withECDSA
+  --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA
 
 xipki-ca:cmpcontrol-add \
   --name qa-cmpcontrol1 \
-  --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA,SHA256withRSAandMGF1,SHA256withDSA,SHA256withECDSA
+  --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA
 
 xipki-caqa:cmpcontrol-check \
   --name qa-cmpcontrol1 \
-  --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA,SHA256withRSAandMGF1,SHA256withDSA,SHA256withECDSA
+  --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA
 
 xipki-ca:cmpcontrol-up \
   --name qa-cmpcontrol1 \
@@ -713,7 +698,7 @@ xipki-caqa:neg-careq-add \
   --profile all
 
 ## Positive CA demo script
-source ./xipki/demo/camgmt-demo.script
+source ./xipki/demo/demo.d/do-camgmt-demo.script
 
 #################################################################
 #              UNINSTALL UNNEEDED FEATURES                      #

@@ -1,0 +1,220 @@
+P12_DIR = p12
+DSA_PLEN = 1024
+RSA_NLEN = 2048
+# Curve name or OID, e.g. secp256r1, brainpoolp256r1
+EC_CURVE = secp256r1
+
+## SCEP responder
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/SCEP1.p12 \
+  --subject "CN=DUMMY"
+
+echo "========================================================"
+echo "||                     CA DSA Key                     ||"
+echo "========================================================"
+
+feature:install xipki-security-shell
+
+# Wait one second
+sleep 1000
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --plen $DSA_PLEN \
+  --out $P12_DIR/ca-dsa/RCA1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --plen $DSA_PLEN \
+  --out $P12_DIR/ca-dsa/SubCA1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --plen $DSA_PLEN \
+  --out $P12_DIR/ca-dsa/SubCAwithCRL1.p12 \
+  --subject "CN=DUMMY"
+
+echo "========================================================"
+echo "||                     CA RSA Key                     ||"
+echo "========================================================"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --key-size $RSA_NLEN \
+  --out $P12_DIR/ca-rsa/RCA1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --key-size $RSA_NLEN \
+  --out $P12_DIR/ca-rsa/SubCA1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --key-size $RSA_NLEN \
+  --out $P12_DIR/ca-rsa/SubCAwithCRL1.p12 \
+  --subject "CN=DUMMY"
+
+echo "========================================================"
+echo "||                      CA EC Key                     ||"
+echo "========================================================"
+
+xipki-tk:ec-p12 \
+  --curve $EC_CURVE \
+  --password 1234 \
+  --out $P12_DIR/ca-ec/RCA1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:ec-p12 \
+  --curve $EC_CURVE \
+  --password 1234 \
+  --out $P12_DIR/ca-ec/SubCA1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:ec-p12 \
+  --curve $EC_CURVE \
+  --password 1234 \
+  --out $P12_DIR/ca-ec/SubCAwithCRL1.p12 \
+  --subject "CN=DUMMY"
+
+echo "========================================================"
+echo "||                       EE Keys                      ||"
+echo "========================================================"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/Cross1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/OCSP1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/OCSP2.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/multipleOUs1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/multipleOUs2.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/multiValuedRDN1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/DEMO1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/EE.Complex1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/TLS1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/TLS-neg.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/TLSwithIncSN1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/TLSwithIncSN1-1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/TLSwithIncSN1-2.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/TLS2.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/TLS_C1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/TLS_C2.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/gSMC_K1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/gSMC_K2.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/MaxTime1.p12 \
+  --subject "CN=DUMMY"
+
+## SCEP
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/SCEP-OCSP1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/SCEP-OCSP1-2.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/SCEP-OCSP2.p12 \
+  --subject "CN=DUMMY"
+
+## JSCEP
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/JSCEP-OCSP1.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/JSCEP-OCSP1-2.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out $P12_DIR/ee/JSCEP-OCSP2.p12 \
+  --subject "CN=DUMMY"
+
+#################################################################
+#              UNINSTALL UNNEEDED FEATURES                      #
+#################################################################
+feature:uninstall xipki-security-shell

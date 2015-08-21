@@ -35,6 +35,7 @@
           <modulusLength>
             <range min="2048" max="2048"/>
             <range min="3072" max="3072"/>
+            <range min="4096" max="4096"/>
           </modulusLength>
         </RSAParameters>
       </parameters>

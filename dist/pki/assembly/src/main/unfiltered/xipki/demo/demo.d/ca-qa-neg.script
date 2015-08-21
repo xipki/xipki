@@ -16,14 +16,10 @@ xipki-cmd:rm -r -f output/neg
 ## Subject does not satisfy the requirement
 
 # TLS
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out output/neg/TLS101.p12 \
-  --subject "CN=TLS101,O=xipki,C=DE"
-
 xipki-tk:req-p12 \
-  --p12 output/neg/TLS101.p12 \
+  --p12 output/TLS-neg.p12 \
   --password 1234 \
+  --subject "CN=TLS101,O=xipki,C=DE" \
   --out output/neg/TLS101.p10
 
 xipki-qa:neg-p10-enroll \
@@ -32,43 +28,31 @@ xipki-qa:neg-p10-enroll \
   --user USER-T
 
 xipki-qa:neg-enroll-p12 \
-  --p12 output/neg/TLS101.p12 \
+  --p12 output/TLS-neg.p12 \
   --password 1234 \
   --profile TLS \
   --user USER-T
 
 # multipleOUs
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out output/neg/multipleOUs101.p12 \
-  --subject "CN=multipleOUs101,OU=A12345,OU=A54321,O=xipki,C=DE"
-
 xipki-qa:neg-enroll-p12 \
-  --p12 output/neg/multipleOUs101.p12 \
+  --p12 output/TLS-neg.p12 \
   --password 1234 \
   --profile multipleOUs \
+  --subject "CN=multipleOUs101,OU=A12345,OU=A54321,O=xipki,C=DE" \
   --user USER-O
 
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out output/neg/multipleOUs102.p12 \
-  --subject "CN=multipleOUs102,OU=12345,OU=54321,O=xipki,C=DE"
-
 xipki-qa:neg-enroll-p12 \
-  --p12 output/neg/multipleOUs102.p12 \
+  --p12 output/TLS-neg.p12 \
   --password 1234 \
   --profile multipleOUs \
+  --subject "CN=multipleOUs102,OU=12345,OU=54321,O=xipki,C=DE" \
   --user USER-O
 
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out output/neg/multipleOUs103.p12 \
-  --subject "CN=multipleOUs103,OU=A12345,O=xipki,C=DE"
-
 xipki-qa:neg-enroll-p12 \
-  --p12 output/neg/multipleOUs103.p12 \
+  --p12 output/TLS-neg.p12 \
   --password 1234 \
   --profile multipleOUs \
+  --subject "CN=multipleOUs103,OU=A12345,O=xipki,C=DE" \
   --user USER-O
 
 ## Revoke certificate that has been revoked

@@ -1,0 +1,24 @@
+P12_DIR = xipki/demo/p12
+
+feature:install xipki-security-shell
+
+xipki-cmd:rm -r -f output
+xipki-cmd:mkdir output
+xipki-cmd:copy-dir $P12_DIR/$P12_CA_DIR output
+xipki-cmd:copy-dir $P12_DIR/ee output
+
+source ./xipki/demo/demo.d/initdb.script
+
+source ./xipki/demo/demo.d/prepare.script
+
+source ./xipki/demo/demo.d/p12.script
+
+source ./xipki/demo/demo.d/ra.script
+
+source ./xipki/demo/ca-qa.script
+
+source ./xipki/demo/ocsp.script
+
+#source ./xipki/demo/loadtest-enroll.script
+
+#source ./xipki/demo/loadtest-ocsp.script

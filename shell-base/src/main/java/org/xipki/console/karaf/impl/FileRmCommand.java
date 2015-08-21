@@ -36,7 +36,6 @@
 package org.xipki.console.karaf.impl;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
@@ -86,7 +85,7 @@ public class FileRmCommand extends XipkiOsgiCommandSupport
                 return null;
             }
 
-            if(force || confirm(reader, "Do you want to remove directory " + targetPath + " [yes/no]?"))
+            if(force || FileUtils.confirm(reader, "Do you want to remove directory " + targetPath + " [yes/no]?"))
             {
                 FileUtils.deleteDirectory(target);
                 out("removed directory " + targetPath);
@@ -94,7 +93,7 @@ public class FileRmCommand extends XipkiOsgiCommandSupport
         }
         else
         {
-            if(force || confirm(reader, "Do you want o remove file " + targetPath + " [yes/no]?"))
+            if(force || FileUtils.confirm(reader, "Do you want o remove file " + targetPath + " [yes/no]?"))
             {
                 target.delete();
                 out("removed file " + targetPath);
@@ -102,39 +101,5 @@ public class FileRmCommand extends XipkiOsgiCommandSupport
         }
 
         return null;
-    }
-
-    private boolean confirm(
-            final ConsoleReader reader,
-            final String prompt)
-    throws IOException
-    {
-        out(prompt);
-        String answer = reader.readLine();
-        if(answer == null)
-        {
-            throw new IOException("interrupted");
-        }
-
-        int tries = 0;
-
-        while(tries < 3)
-        {
-            if("yes".equalsIgnoreCase(answer))
-            {
-                return true;
-            }
-            else if("no".equalsIgnoreCase(answer))
-            {
-                return false;
-            }
-            else
-            {
-                tries++;
-                out("Please answer with yes or no. ");
-            }
-        }
-
-        return false;
     }
 }

@@ -1,4 +1,4 @@
-KEYSIZE = 2048
+P12_DIR=xipki/demo/p12
 
 # Valid signer algos are SHA<n>withRSA where n is 1, 256, 384 and 512
 #
@@ -14,18 +14,12 @@ feature:install xipki-security-shell
 sleep 1000
 
 xipki-cmd:rm -r -f output
+xipki-cmd:mkdir output
+xipki-cmd:copy-dir $P12_DIR/ca-rsa output
+xipki-cmd:copy-dir $P12_DIR/ee output
 
-xipki-tk:rsa-p12 --password 1234 --key-size $KEYSIZE --out output/RCA1.p12 \
-  --subject "CN=RCA1,O=xipki,C=DE"
+source ./xipki/demo/demo.d/prepare.script
 
-xipki-tk:rsa-p12 --password 1234 --key-size $KEYSIZE --out output/SubCA1.p12 \
-  --subject "CN=SubCA1"
-
-xipki-tk:rsa-p12 --password 1234 --key-size $KEYSIZE --out output/SubCAwithCRL1.p12 \
-  --subject "CN=SubCAwithCRL1"
-
-source ./xipki/demo/prepare.script
-
-source ./xipki/demo/p12.script
+source ./xipki/demo/demo.d/p12.script
 
 feature:uninstall xipki-security-shell
