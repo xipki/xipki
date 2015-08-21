@@ -138,6 +138,9 @@
       <column defaultValueNumeric="2" name="DUPLICATE_SUBJECT" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
+      <column defaultValueNumeric="2" name="DUPLICATE_CN" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
       <column name="VALIDITY_MODE" type="varchar(100)"/>
       <column name="PERMISSIONS" type="VARCHAR(200)">
         <constraints nullable="false"/>
@@ -228,7 +231,7 @@
       <column name="ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="SUBJECT" type="VARCHAR(300)">
+      <column name="SUBJECT" type="VARCHAR(400)">
         <constraints nullable="false"/>
       </column>
       <column name="CERT" type="VARCHAR(3000)">
@@ -328,13 +331,16 @@
         <constraints nullable="false"/>
       </column>
       <column name="REQUESTOR_ID" type="INT"/>
-      <column name="SUBJECT" type="VARCHAR(300)">
+      <column name="CN" type="VARCHAR(80)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SUBJECT" type="VARCHAR(400)">
         <constraints nullable="false"/>
       </column>
       <column name="FP_SUBJECT" type="CHAR(40)">
         <constraints nullable="false"/>
       </column>
-      <column name="REQ_SUBJECT" type="VARCHAR(300)"/>
+      <column name="REQ_SUBJECT" type="VARCHAR(400)"/>
       <column name="FP_REQ_SUBJECT" type="CHAR(40)"/>
       <column name="LAST_UPDATE" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT">
         <constraints nullable="false"/>

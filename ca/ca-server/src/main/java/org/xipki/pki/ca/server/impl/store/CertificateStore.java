@@ -96,10 +96,13 @@ public class CertificateStore
                     certInfo.getRequestedSubject());
         } catch (Exception e)
         {
-            LOG.error("could not save certificate {}: {}. Message: {}",
-                    new Object[]{certInfo.getCert().getSubject(),
-                        Base64.toBase64String(certInfo.getCert().getEncodedCert()),
-                        e.getMessage()});
+        	if(LOG.isErrorEnabled())
+        	{
+	            LOG.error("could not save certificate {}: {}. Message: {}",
+	                    new Object[]{certInfo.getCert().getSubject(),
+	                        Base64.toBase64String(certInfo.getCert().getEncodedCert()),
+	                        e.getMessage()});
+        	}
             LOG.debug("error", e);
             return false;
         }
@@ -786,6 +789,33 @@ public class CertificateStore
         try
         {
             return queryExecutor.isCertForKeyIssued(caCert, keyFp, profile);
+        } catch (DataAccessException e)
+        {
+            LOG.debug("DataAccessException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (RuntimeException e)
+        {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        }
+    }
+
+    public boolean isCertForCNIssued(
+            final X509CertWithDBCertId caCert,
+            final String cn)
+    throws OperationException
+    {
+        return isCertForCNIssued(caCert, cn, null);
+    }
+
+    public boolean isCertForCNIssued(
+            final X509CertWithDBCertId caCert,
+            final String cn,
+            final String profile)
+    throws OperationException
+    {
+        try
+        {
+            return queryExecutor.isCertForCNIssued(caCert, cn, profile);
         } catch (DataAccessException e)
         {
             LOG.debug("DataAccessException", e);

@@ -118,6 +118,7 @@
         <entry key="--cert" value-ref="filePathCompleter"/>
         <entry key="--signer-type" value-ref="signerTypeCompleter"/>
         <entry key="--duplicate-subject" value-ref="duplicationModeCompleter"/>
+        <entry key="--duplicate-cn" value-ref="duplicationModeCompleter"/>
         <entry key="--duplicate-key" value-ref="duplicationModeCompleter"/>
         <entry key="--validity-mode" value-ref="validityModeCompleter"/>
       </optional-completers>
@@ -178,6 +179,7 @@
         <entry key="--cmp-control" value-ref="cmpControlNameCompleter"/>
         <entry key="--signer-type" value-ref="signerTypeCompleter"/>
         <entry key="--duplicate-subject" value-ref="duplicationModeCompleter"/>
+        <entry key="--duplicate-cn" value-ref="duplicationModeCompleter"/>
         <entry key="--duplicate-key" value-ref="duplicationModeCompleter"/>
         <entry key="--validity-mode" value-ref="validityModeCompleter"/>
       </optional-completers>

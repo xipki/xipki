@@ -2240,6 +2240,13 @@ public class X509CA
             subjectMode = DuplicationMode.FORBIDDEN_WITHIN_PROFILE;
         }
 
+        DuplicationMode cnMode = caInfo.getDuplicateCNMode();
+        if(cnMode == DuplicationMode.PERMITTED && certprofile.isDuplicateCNPermitted() == false)
+        {
+            cnMode = DuplicationMode.FORBIDDEN_WITHIN_PROFILE;
+        }
+
+        String cn = X509Util.getCommonName(grantedSubject);
         String sha1FpSubject = X509Util.sha1sum_canonicalized_name(grantedSubject);
         String grandtedSubjectText = X509Util.getRFC4519Name(grantedSubject);
 
@@ -2326,6 +2333,30 @@ public class X509CA
                     throw new RuntimeException("should not reach here, unknown key DuplicationMode " + keyMode);
                 }
             } // end if(keyMode)
+
+            if(cnMode != DuplicationMode.PERMITTED)
+            {
+                if(cnMode == DuplicationMode.FORBIDDEN)
+                {
+                    if(certstore.isCertForCNIssued(caInfo.getCertificate(), cn))
+                    {
+                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                                "certificate for the given CN already issued");
+                    }
+                }
+                else if(cnMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
+                {
+                    if(certstore.isCertForCNIssued(caInfo.getCertificate(), cn, certprofileName))
+                    {
+                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                                "certificate for the given CN and profile " + certprofileName + " already issued");
+                    }
+                }
+                else
+                {
+                    throw new RuntimeException("should not reach here, unknown CN DuplicationMode " + keyMode);
+                }
+            } // end if(cnMode)
 
             if(subjectMode != DuplicationMode.PERMITTED)
             {

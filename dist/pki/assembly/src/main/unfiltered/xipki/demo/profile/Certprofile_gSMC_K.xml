@@ -19,6 +19,7 @@
   <notBeforeTime>current</notBeforeTime>
   <duplicateKey>false</duplicateKey>
   <duplicateSubject>true</duplicateSubject>
+  <duplicateCN>false</duplicateCN>
   <serialNumberInReq>false</serialNumberInReq>
   <specialBehavior>gematik_gSMC_K</specialBehavior>
   <parameters>
