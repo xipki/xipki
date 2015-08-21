@@ -80,6 +80,10 @@ import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.CertprofileException;
 import org.xipki.pki.ca.api.profile.CertValidity;
@@ -139,10 +143,6 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.Parameters;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.security.api.ObjectIdentifiers;
 import org.xipki.security.api.util.AlgorithmUtil;
 
@@ -170,6 +170,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     private boolean ca;
     private boolean duplicateKeyPermitted;
     private boolean duplicateSubjectPermitted;
+    private boolean duplicateCNPermitted;
     private boolean serialNumberInReqPermitted;
     private boolean notBeforeMidnight;
     private boolean includeIssuerAndSerialInAKI;
@@ -212,6 +213,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         ca = false;
         duplicateKeyPermitted = true;
         duplicateSubjectPermitted = true;
+        duplicateCNPermitted = true;
         serialNumberInReqPermitted = true;
         pathLen = null;
         aIAControl = null;
@@ -322,6 +324,11 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         if(conf.isDuplicateSubject() != null)
         {
             duplicateSubjectPermitted = conf.isDuplicateSubject().booleanValue();
+        }
+
+        if(conf.isDuplicateCN() != null)
+        {
+            duplicateCNPermitted = conf.isDuplicateCN().booleanValue();
         }
 
         if(conf.isSerialNumberInReq() != null)
@@ -1287,6 +1294,12 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     public boolean isDuplicateSubjectPermitted()
     {
         return duplicateSubjectPermitted;
+    }
+
+    @Override
+    public boolean isDuplicateCNPermitted()
+    {
+        return duplicateCNPermitted;
     }
 
     @Override
