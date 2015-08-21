@@ -719,6 +719,11 @@ class IdentifiedX509Certprofile
         return certprofile.isDuplicateSubjectPermitted();
     }
 
+    public boolean isDuplicateCNPermitted()
+    {
+        return certprofile.isDuplicateCNPermitted();
+    }
+
     public boolean isSerialNumberInReqPermitted()
     {
         return certprofile.isSerialNumberInReqPermitted();

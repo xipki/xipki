@@ -104,11 +104,11 @@ class CaCertStoreDbImporter extends DbPorter
 
     private static final String SQL_ADD_CERT =
             "INSERT INTO CERT " +
-            "(ID, ART, LAST_UPDATE, SERIAL, SUBJECT,"
+            "(ID, ART, LAST_UPDATE, SERIAL, CN, SUBJECT,"
             + " NOTBEFORE, NOTAFTER, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME,"
             + " PROFILE_ID, CA_ID,"
             + " REQUESTOR_ID, UNAME, FP_PK, FP_SUBJECT, EE, REQ_TYPE, TID)" +
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, FP, CERT) VALUES (?, ?, ?)";
 
@@ -841,6 +841,7 @@ class CaCertStoreDbImporter extends DbPorter
                     ps_cert.setInt(idx++, certArt);
                     ps_cert.setLong(idx++, cert.getLastUpdate());
                     ps_cert.setLong(idx++, c.getSerialNumber().getPositiveValue().longValue());
+                    ps_cert.setString(idx++, X509Util.getCommonName(c.getSubject()));
                     ps_cert.setString(idx++, X509Util.getRFC4519Name(c.getSubject()));
                     ps_cert.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
                     ps_cert.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);

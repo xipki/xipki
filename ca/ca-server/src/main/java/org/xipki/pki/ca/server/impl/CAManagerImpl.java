@@ -3020,6 +3020,7 @@ implements CAManager, CmpResponderManager, ScepManager
         entry.setCrlSignerName(caEntry.getCrlSignerName());
         entry.setDuplicateKeyMode(caEntry.getDuplicateKeyMode());
         entry.setDuplicateSubjectMode(caEntry.getDuplicateSubjectMode());
+        entry.setDuplicateCNMode(caEntry.getDuplicateCNMode());
         entry.setExtraControl(caEntry.getExtraControl());
         entry.setMaxValidity(caEntry.getMaxValidity());
         entry.setPermissions(caEntry.getPermissions());

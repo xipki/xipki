@@ -205,10 +205,10 @@ class CertStoreQueryExecutor
     {
         final String SQL_ADD_CERT =
                 "INSERT INTO CERT" +
-                " (ID, ART, LAST_UPDATE, SERIAL, SUBJECT, FP_SUBJECT, REQ_SUBJECT, FP_REQ_SUBJECT, "
+                " (ID, ART, LAST_UPDATE, SERIAL, CN, SUBJECT, FP_SUBJECT, REQ_SUBJECT, FP_REQ_SUBJECT, "
                 + "NOTBEFORE, NOTAFTER, REVOKED, PROFILE_ID," +
                 " CA_ID, REQUESTOR_ID, UNAME, FP_PK, EE, REQ_TYPE, TID)" +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, FP, CERT) VALUES (?, ?, ?)";
 
@@ -226,6 +226,7 @@ class CertStoreQueryExecutor
 
         String fpPK = fp(encodedSubjectPublicKey);
         String subjectText = certificate.getSubject();
+        String cn = X509Util.getCommonName(certificate.getSubjectAsX500Name());
         String fpSubject = X509Util.sha1sum_canonicalized_name(cert.getSubjectX500Principal());
 
         String reqSubjectText = null;
@@ -261,6 +262,7 @@ class CertStoreQueryExecutor
             ps_addcert.setInt(idx++, CertArt.X509PKC.getCode());
             ps_addcert.setLong(idx++, System.currentTimeMillis()/1000);
             ps_addcert.setLong(idx++, cert.getSerialNumber().longValue());
+            ps_addcert.setString(idx++, cn);
             ps_addcert.setString(idx++, subjectText);
             ps_addcert.setString(idx++, fpSubject);
             ps_addcert.setString(idx++, reqSubjectText);
@@ -2193,7 +2195,7 @@ class CertStoreQueryExecutor
             final String profile)
     throws DataAccessException
     {
-        return isCertIssuedForFp("FP_SUBJECT", caCert, subjectFp, profile);
+        return isCertIssuedForColumn("FP_SUBJECT", caCert, subjectFp, profile);
     }
 
     boolean isCertForKeyIssued(
@@ -2202,13 +2204,22 @@ class CertStoreQueryExecutor
             final String profile)
     throws DataAccessException
     {
-        return isCertIssuedForFp("FP_PK", caCert, keyFp, profile);
+        return isCertIssuedForColumn("FP_PK", caCert, keyFp, profile);
     }
 
-    private boolean isCertIssuedForFp(
+    boolean isCertForCNIssued(
+            final X509CertWithDBCertId caCert,
+            final String cn,
+            final String profile)
+    throws DataAccessException
+    {
+        return isCertIssuedForColumn("CN", caCert, cn, profile);
+    }
+
+    private boolean isCertIssuedForColumn(
             final String fpColumnName,
             final X509CertWithDBCertId caCert,
-            final String fp,
+            final String columnValue,
             final String profile)
     throws DataAccessException
     {
@@ -2244,7 +2255,7 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setString(idx++, fp);
+            ps.setString(idx++, columnValue);
             ps.setInt(idx++, caId);
             if(profile != null)
             {

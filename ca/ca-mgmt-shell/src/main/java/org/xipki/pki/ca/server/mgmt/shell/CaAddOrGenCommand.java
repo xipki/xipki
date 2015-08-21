@@ -146,11 +146,15 @@ public abstract class CaAddOrGenCommand extends CaCommand
 
     @Option(name = "--duplicate-key",
             description = "mode of duplicate key")
-    private String duplicateKeyS = "forbiddenWithinProfile";
+    private String duplicateKeyS = "permitted";
 
     @Option(name = "--duplicate-subject",
             description = "mode of duplicate subject")
-    private String duplicateSubjectS = "forbiddenWithinProfile";
+    private String duplicateSubjectS = "permitted";
+
+    @Option(name = "--duplicate-cn",
+            description = "mode of duplicateCN")
+    private String duplicateCNS = "permitted";
 
     @Option(name = "--validity-mode",
             description = "mode of valditity")
@@ -220,6 +224,13 @@ public abstract class CaAddOrGenCommand extends CaCommand
             throw new IllegalCmdParamException("invalid duplication mode: " + duplicateSubjectS);
         }
         entry.setDuplicateSubjectMode(duplicateSubject);
+
+        DuplicationMode duplicateCN = DuplicationMode.getInstance(duplicateCNS);
+        if(duplicateCN == null)
+        {
+            throw new IllegalCmdParamException("invalid duplication mode: " + duplicateCNS);
+        }
+        entry.setDuplicateCNMode(duplicateCN);
 
         ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
         if(validityMode == null)

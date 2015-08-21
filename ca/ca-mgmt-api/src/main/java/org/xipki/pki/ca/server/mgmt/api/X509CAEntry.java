@@ -44,6 +44,7 @@ import java.util.List;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.CertRevocationInfo;
 import org.xipki.security.api.KeyUsage;
 import org.xipki.security.api.util.X509Util;
@@ -69,6 +70,7 @@ implements Serializable
     private CertRevocationInfo revocationInfo;
     private String subject;
     private String serialSeqName;
+    private DuplicationMode duplicateCNMode;
 
     public X509CAEntry(
             final String name,
@@ -237,6 +239,8 @@ implements Serializable
         {
             sb.append('\n');
         }
+        sb.append("duplicateCN: ").append(
+                duplicateCNMode == null ? "null" : duplicateCNMode.getDescription()).append('\n');
         sb.append("nextSerial: ").append(nextSerial).append('\n');
         sb.append("nextCrlNumber: ").append(nextCRLNumber).append('\n');
         sb.append("deltaCrlUris: ").append(getDeltaCrlUrisAsString()).append('\n');
@@ -305,6 +309,18 @@ implements Serializable
     public String getSerialSeqName()
     {
         return serialSeqName;
+    }
+
+    public DuplicationMode getDuplicateCNMode()
+    {
+        return duplicateCNMode;
+    }
+
+    public void setDuplicateCNMode(
+            final DuplicationMode mode)
+    {
+        ParamUtil.assertNotNull("mode", mode);
+        this.duplicateCNMode = mode;
     }
 
 }

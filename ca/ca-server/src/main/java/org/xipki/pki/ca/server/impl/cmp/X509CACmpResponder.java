@@ -520,7 +520,7 @@ public class X509CACmpResponder extends CmpResponder
 
                 checkPermission(_requestor, certprofileName);
                 certResponses[i] = generateCertificate(_requestor, user, tid, certReqId,
-                        subject, publicKeyInfo,validity, extensions,
+                        subject, publicKeyInfo, validity, extensions,
                         certprofileName, keyUpdate, confirmWaitTime, childAuditEvent);
             } catch (CMPException e)
             {

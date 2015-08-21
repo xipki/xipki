@@ -57,6 +57,7 @@ implements Serializable
     private String crlSignerName;
     private Integer numCrls;
     private String extraControl;
+    private DuplicationMode duplicateCNMode;
 
     public X509ChangeCAEntry(
             final String name)
@@ -151,6 +152,17 @@ implements Serializable
             final String extraControl)
     {
         this.extraControl = extraControl;
+    }
+
+    public DuplicationMode getDuplicateCNMode()
+    {
+        return duplicateCNMode;
+    }
+
+    public void setDuplicateCNMode(
+            final DuplicationMode duplicateCNMode)
+    {
+        this.duplicateCNMode = duplicateCNMode;
     }
 
 }

@@ -359,6 +359,17 @@ public class X509CAInfo
         return caEntry.getDuplicateSubjectMode();
     }
 
+    public DuplicationMode getDuplicateCNMode()
+    {
+        return caEntry.getDuplicateCNMode();
+    }
+
+    public void setDuplicateCNMode(
+            final DuplicationMode mode)
+    {
+        caEntry.setDuplicateCNMode(mode);
+    }
+
     public void setDuplicateSubjectMode(
             final DuplicationMode mode)
     {
