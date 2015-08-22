@@ -40,7 +40,7 @@
     <bc.version>1.52</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
     <servlet-api.version>2.5</servlet-api.version>
-    <jscep.version>2.3.0-SNAPSHOT</jscep.version>
+    <jscep.version>2.3.0</jscep.version>
     <junit.version>4.8.2</junit.version>
     <pkcs11-wrapper.version>1.3</pkcs11-wrapper.version>
     <!--ldapsdk.version>2.3.6</ldapsdk.version-->
