@@ -45,6 +45,7 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.pki.ca.api.profile.RDNControl;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.security.api.ObjectIdentifiers;
 
@@ -54,10 +55,6 @@ import org.xipki.security.api.ObjectIdentifiers;
 
 public class SubjectControl
 {
-    public static final SubjectControl ALLOW_ALL = new SubjectControl(false, null);
-
-    private final boolean backwardsSubject = false;
-
     private final Map<ASN1ObjectIdentifier, RDNControl> controls;
     private final Map<ASN1ObjectIdentifier, String> typeGroups;
     private final Map<String, Set<ASN1ObjectIdentifier>> groupTypes;
@@ -68,15 +65,9 @@ public class SubjectControl
             final boolean backwardsSubject,
             final Map<ASN1ObjectIdentifier, RDNControl> pControls)
     {
-        if(pControls == null)
-        {
-            this.controls = Collections.emptyMap();
-        }
-        else
-        {
-            this.controls = pControls;
-        }
+        ParamUtil.assertNotEmpty("pControls", pControls);
 
+        this.controls = pControls;
         this.typeGroups = new HashMap<>();
 
         {
@@ -146,11 +137,6 @@ public class SubjectControl
     public Set<String> getGroups()
     {
         return groups;
-    }
-
-    public boolean isBackwardsSubject()
-    {
-        return backwardsSubject;
     }
 
     public List<ASN1ObjectIdentifier> getTypes()

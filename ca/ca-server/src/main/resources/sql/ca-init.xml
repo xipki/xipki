@@ -332,7 +332,6 @@
       </column>
       <column name="REQUESTOR_ID" type="INT"/>
       <column name="CN" type="VARCHAR(80)">
-        <constraints nullable="false"/>
       </column>
       <column name="SUBJECT" type="VARCHAR(400)">
         <constraints nullable="false"/>

@@ -17,9 +17,9 @@
   <ca>false</ca>
   <validity>5y</validity>
   <notBeforeTime>current</notBeforeTime>
-  <duplicateKey>false</duplicateKey>
-  <duplicateSubject>false</duplicateSubject>
-  <duplicateCN>false</duplicateCN>
+  <duplicateKey>true</duplicateKey>
+  <duplicateSubject>true</duplicateSubject>
+  <duplicateCN>true</duplicateCN>
   <serialNumberInReq>false</serialNumberInReq>
   <keyAlgorithms>
     <algorithm>

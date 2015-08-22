@@ -137,10 +137,11 @@ extends X509Certprofile
         return result.toArray(new String[0]);
     }
 
-    public SubjectControl getSubjectControl()
-    {
-        return null;
-    }
+    /**
+     *
+     * @return the subjectControl, could not be null.
+     */
+    protected abstract SubjectControl getSubjectControl();
 
     @Override
     public Date getNotBefore(
@@ -166,10 +167,6 @@ extends X509Certprofile
 
         RDN[] requstedRDNs = requestedSubject.getRDNs();
         SubjectControl scontrol = getSubjectControl();
-        if(scontrol == null)
-        {
-            scontrol = SubjectControl.ALLOW_ALL;
-        }
 
         List<RDN> rdns = new LinkedList<>();
 
