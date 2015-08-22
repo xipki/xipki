@@ -53,9 +53,12 @@ import org.xipki.pki.ca.api.profile.CertValidity.Unit;
 import org.xipki.pki.ca.api.profile.ExtensionControl;
 import org.xipki.pki.ca.api.profile.ExtensionValues;
 import org.xipki.pki.ca.api.profile.KeyParametersOption;
+import org.xipki.pki.ca.api.profile.RDNControl;
 import org.xipki.pki.ca.api.profile.x509.AbstractEEX509Certprofile;
 import org.xipki.pki.ca.api.profile.x509.KeyUsageControl;
+import org.xipki.pki.ca.api.profile.x509.SubjectControl;
 import org.xipki.security.api.KeyUsage;
+import org.xipki.security.api.ObjectIdentifiers;
 
 /**
  * @author Lijun Liao
@@ -66,6 +69,7 @@ public class DemoEE2X509Certprofile extends AbstractEEX509Certprofile
     private final CertValidity validity;
     private final Set<KeyUsageControl> keyUsage;
     private final Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
+    private final SubjectControl subjectControl;
 
     public DemoEE2X509Certprofile()
     {
@@ -95,6 +99,22 @@ public class DemoEE2X509Certprofile extends AbstractEEX509Certprofile
                 new ExtensionControl(true, true, false));
         extensionControls.put(Extension.keyUsage,
                 new ExtensionControl(true, true, true));
+
+        Map<ASN1ObjectIdentifier, RDNControl> controls = new HashMap<>();
+
+        ASN1ObjectIdentifier oid = ObjectIdentifiers.DN_CN;
+        controls.put(oid, new RDNControl(oid, 1, 1));
+
+        oid = ObjectIdentifiers.DN_O;
+        controls.put(oid, new RDNControl(oid, 1, 1));
+
+        oid = ObjectIdentifiers.DN_OU;
+        controls.put(oid, new RDNControl(oid, 0, 1));
+
+        oid = ObjectIdentifiers.DN_C;
+        controls.put(oid, new RDNControl(oid, 1, 1));
+
+        subjectControl = new SubjectControl(false, controls);
     }
 
     @Override
@@ -113,6 +133,12 @@ public class DemoEE2X509Certprofile extends AbstractEEX509Certprofile
     public Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls()
     {
         return extensionControls;
+    }
+
+    @Override
+    protected SubjectControl getSubjectControl()
+    {
+        return subjectControl;
     }
 
     @Override

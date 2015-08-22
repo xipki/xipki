@@ -2220,6 +2220,13 @@ public class X509CA
 
         X500Name grantedSubject = subjectInfo.getGrantedSubject();
 
+        // make sure that empty subject is not permitted
+        ASN1ObjectIdentifier[] attrTypes = grantedSubject.getAttributeTypes();
+        if(attrTypes == null || attrTypes.length == 0)
+        {
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, "empty subject is not permitted");
+        }
+
         // make sure that the grantedSubject does not equal the CA's subject
         if(X509Util.canonicalizName(grantedSubject).equals(
                 caInfo.getPublicCAInfo().getC14nSubject()))
@@ -2334,7 +2341,7 @@ public class X509CA
                 }
             } // end if(keyMode)
 
-            if(cnMode != DuplicationMode.PERMITTED)
+            if(cnMode != DuplicationMode.PERMITTED && StringUtil.isNotBlank(cn))
             {
                 if(cnMode == DuplicationMode.FORBIDDEN)
                 {

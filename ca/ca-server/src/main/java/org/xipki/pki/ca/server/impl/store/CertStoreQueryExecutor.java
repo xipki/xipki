@@ -226,6 +226,13 @@ class CertStoreQueryExecutor
 
         String fpPK = fp(encodedSubjectPublicKey);
         String subjectText = certificate.getSubject();
+        if(subjectText.length() > 350)
+        {
+            StringBuilder sb = new StringBuilder(350);
+            sb.append(subjectText.substring(0, 350 - 13));
+            sb.append("...skipped...");
+            subjectText = sb.toString();
+        }
         String cn = X509Util.getCommonName(certificate.getSubjectAsX500Name());
         String fpSubject = X509Util.sha1sum_canonicalized_name(cert.getSubjectX500Principal());
 

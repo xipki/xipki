@@ -96,13 +96,13 @@ public class CertificateStore
                     certInfo.getRequestedSubject());
         } catch (Exception e)
         {
-        	if(LOG.isErrorEnabled())
-        	{
-	            LOG.error("could not save certificate {}: {}. Message: {}",
-	                    new Object[]{certInfo.getCert().getSubject(),
-	                        Base64.toBase64String(certInfo.getCert().getEncodedCert()),
-	                        e.getMessage()});
-        	}
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error("could not save certificate {}: {}. Message: {}",
+                        new Object[]{certInfo.getCert().getSubject(),
+                            Base64.toBase64String(certInfo.getCert().getEncodedCert()),
+                            e.getMessage()});
+            }
             LOG.debug("error", e);
             return false;
         }
