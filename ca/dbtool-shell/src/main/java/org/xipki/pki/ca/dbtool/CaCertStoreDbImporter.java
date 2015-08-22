@@ -833,6 +833,14 @@ class CaCertStoreDbImporter extends DbPorter
                 String hexSha1FpCert = HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
 
                 // cert
+                String subjectText = X509Util.getRFC4519Name(c.getSubject());
+                if(subjectText.length() > 350)
+                {
+                    StringBuilder sb = new StringBuilder(350);
+                    sb.append(subjectText.substring(0, 350 - 13));
+                    sb.append("...skipped...");
+                    subjectText = sb.toString();
+                }
 
                 try
                 {
@@ -842,7 +850,7 @@ class CaCertStoreDbImporter extends DbPorter
                     ps_cert.setLong(idx++, cert.getLastUpdate());
                     ps_cert.setLong(idx++, c.getSerialNumber().getPositiveValue().longValue());
                     ps_cert.setString(idx++, X509Util.getCommonName(c.getSubject()));
-                    ps_cert.setString(idx++, X509Util.getRFC4519Name(c.getSubject()));
+                    ps_cert.setString(idx++, subjectText);
                     ps_cert.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
                     ps_cert.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
                     setBoolean(ps_cert, idx++, cert.isRevoked());
