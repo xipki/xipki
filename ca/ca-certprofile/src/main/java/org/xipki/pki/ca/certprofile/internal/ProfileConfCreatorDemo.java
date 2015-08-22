@@ -605,6 +605,9 @@ public class ProfileConfCreatorDemo
     {
         X509ProfileType profile = getBaseProfile("Certprofile TLS", false, "5y", true,
                 new String[]{"SHA1"});
+        profile.setDuplicateCN(true);
+        profile.setDuplicateKey(true);
+        profile.setDuplicateSubject(true);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -663,6 +666,9 @@ public class ProfileConfCreatorDemo
     {
         X509ProfileType profile = getBaseProfile("Certprofile TLS_C", false, "5y", false,
                 new String[]{"SHA1"});
+        profile.setDuplicateCN(true);
+        profile.setDuplicateKey(true);
+        profile.setDuplicateSubject(true);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -714,6 +720,7 @@ public class ProfileConfCreatorDemo
     {
         X509ProfileType profile = getBaseProfile("Certprofile TLSwithIncSN", false, "5y", false,
                 new String[]{"SHA1"});
+        profile.setDuplicateCN(true);
 
         // Subject
         Subject subject = profile.getSubject();

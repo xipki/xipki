@@ -942,10 +942,10 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 _conn = getConnection();
             } catch (Throwable t)
             {
-            	if(LOG.isWarnEnabled())
-            	{
-            		LOG.warn("datasource {} could not get connection: {}", name, t.getMessage());
-            	}
+                if(LOG.isWarnEnabled())
+                {
+                    LOG.warn("datasource {} could not get connection: {}", name, t.getMessage());
+                }
                 return false;
             }
         }
@@ -957,10 +957,10 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             stmt.execute(sql);
         } catch(Throwable t)
         {
-        	if(LOG.isWarnEnabled())
-        	{
-        		LOG.warn("datasource {} could not deletefrom table {}: {}", name, table, t.getMessage());
-        	}
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn("datasource {} could not deletefrom table {}: {}", name, table, t.getMessage());
+            }
             return false;
         }
         finally
