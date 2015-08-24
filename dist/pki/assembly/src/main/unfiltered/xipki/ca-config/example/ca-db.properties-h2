@@ -7,7 +7,7 @@
 
 dataSourceClassName = org.h2.jdbcx.JdbcDataSource
 
-dataSource.url = jdbc:h2:~/h2_ca
+dataSource.url = jdbc:h2:./db/h2/ca
 dataSource.user = root
 dataSource.password = 123456
 
