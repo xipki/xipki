@@ -1,7 +1,6 @@
 #################################################################
 #                              OCSP                             #
 #################################################################
-feature:install xipki-ocspserver
 feature:install xipki-ocspclient-shell
 
 URL = http://localhost:8080/ocsp/responder1
@@ -28,4 +27,3 @@ xipki-ocsp:loadtest-status \
 
 feature:uninstall xipki-ocspclient-shell
 feature:uninstall xipki-ocspclient
-feature:uninstall xipki-ocspserver
