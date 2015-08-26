@@ -77,10 +77,9 @@ class OcspCertStoreDbImporter extends DbPorter
 {
     private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbImporter.class);
 
-    static final String SQL_ADD_CAINFO =
+    static final String SQL_ADD_ISSUER =
             "INSERT INTO ISSUER (" +
-            " ID, SUBJECT," +
-            " NOTBEFORE, NOTAFTER," +
+            " ID, SUBJECT, NOTBEFORE, NOTAFTER," +
             " SHA1_NAME, SHA1_KEY," +
             " SHA224_NAME, SHA224_KEY," +
             " SHA256_NAME, SHA256_KEY," +
@@ -93,9 +92,9 @@ class OcspCertStoreDbImporter extends DbPorter
     static final String SQL_ADD_CERT =
             "INSERT INTO CERT (" +
             " ID, ISSUER_ID, SERIAL, " +
-            " SUBJECT, LAST_UPDATE, NOTBEFORE, NOTAFTER," +
+            " LAST_UPDATE, NOTBEFORE, NOTAFTER," +
             " REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, PROFILE)" +
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     static final String SQL_DEL_CERT =
             "DELETE FROM CERT WHERE ID > ?";
@@ -107,7 +106,7 @@ class OcspCertStoreDbImporter extends DbPorter
     static final String SQL_DEL_CERTHASH =
             "DELETE FROM CERTHASH WHERE ID > ?";
 
-    static final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, CERT) VALUES (?, ?)";
+    static final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SUBJECT, CERT) VALUES (?, ?, ?)";
 
     static final String SQL_DEL_RAWCERT =
             "DELETE FROM RAWCERT WHERE ID > ?";
@@ -196,7 +195,7 @@ class OcspCertStoreDbImporter extends DbPorter
     throws DataAccessException, CertificateException
     {
         System.out.println(" importing table ISSUER");
-        PreparedStatement ps = prepareStatement(SQL_ADD_CAINFO);
+        PreparedStatement ps = prepareStatement(SQL_ADD_ISSUER);
 
         try
         {
@@ -254,7 +253,7 @@ class OcspCertStoreDbImporter extends DbPorter
                 }catch(SQLException e)
                 {
                     System.err.println("error while importing issuer with id=" + issuer.getId());
-                    throw translate(SQL_ADD_CAINFO, e);
+                    throw translate(SQL_ADD_ISSUER, e);
                 }catch(CertificateException e)
                 {
                     System.err.println("error while importing issuer with id=" + issuer.getId());
@@ -448,7 +447,6 @@ class OcspCertStoreDbImporter extends DbPorter
                     ps_cert.setInt(idx++, id);
                     ps_cert.setInt(idx++, cert.getIssuerId());
                     ps_cert.setLong(idx++, c.getSerialNumber().longValue());
-                    ps_cert.setString(idx++, X509Util.getRFC4519Name(c.getSubjectX500Principal()));
                     ps_cert.setLong(idx++, cert.getLastUpdate());
                     ps_cert.setLong(idx++, c.getNotBefore().getTime() / 1000);
                     ps_cert.setLong(idx++, c.getNotAfter().getTime() / 1000);
@@ -484,6 +482,7 @@ class OcspCertStoreDbImporter extends DbPorter
                 {
                     int idx = 1;
                     ps_rawcert.setInt(idx++, cert.getId());
+                    ps_rawcert.setString(idx++, X509Util.cutX500Name(c.getSubjectX500Principal()));
                     ps_rawcert.setString(idx++, Base64.toBase64String(encodedCert));
                     ps_rawcert.addBatch();
                 }catch(SQLException e)

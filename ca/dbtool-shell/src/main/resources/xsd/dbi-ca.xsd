@@ -390,6 +390,8 @@
       <xs:element name="user" type="xs:string" minOccurs="0"/>
       <xs:element name="tid" type="xs:hexBinary" minOccurs="0"/>
       <xs:element name="reqType" type="xs:int"/>
+      <xs:element name="fpReqSubject" type="xs:long" minOccurs="0"/>
+      <xs:element name="reqSubject" type="xs:string" minOccurs="0"/>
       <xs:element name="certFile" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>

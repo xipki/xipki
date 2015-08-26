@@ -92,6 +92,7 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.UserType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.UsersType;
 import org.xipki.security.api.HashAlgoType;
 import org.xipki.security.api.HashCalculator;
+import org.xipki.security.api.FpIdCalculator;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -104,13 +105,13 @@ class CaCertStoreDbImporter extends DbPorter
 
     private static final String SQL_ADD_CERT =
             "INSERT INTO CERT " +
-            "(ID, ART, LAST_UPDATE, SERIAL, CN, SUBJECT,"
-            + " NOTBEFORE, NOTAFTER, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME,"
-            + " PROFILE_ID, CA_ID,"
-            + " REQUESTOR_ID, UNAME, FP_PK, FP_SUBJECT, EE, REQ_TYPE, TID)" +
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            "(ID, ART, LAST_UPDATE, SERIAL, SUBJECT, FP_SUBJECT, FP_CN, FP_REQ_SUBJECT," // 8
+            + " NOTBEFORE, NOTAFTER, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, PROFILE_ID, CA_ID," // 8
+            + " REQUESTOR_ID, UNAME, FP_PK, EE, REQ_TYPE, TID)" + // 6
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private static final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, FP, CERT) VALUES (?, ?, ?)";
+    private static final String SQL_ADD_RAWCERT =
+            "INSERT INTO RAWCERT (CERT_ID, SHA1, REQ_SUBJECT, CERT) VALUES (?, ?, ?, ?)";
 
     private static final String SQL_ADD_USER = "INSERT INTO USERNAME (ID, NAME, PASSWORD,CN_REGEX) VALUES (?, ?, ?, ?)";
 
@@ -207,7 +208,7 @@ class CaCertStoreDbImporter extends DbPorter
             final Cas cas)
     throws DataAccessException, CertificateException, IOException
     {
-        final String sql = "INSERT INTO CS_CA (ID, SUBJECT, FP_CERT, CERT) VALUES (?, ?, ?, ?)";
+        final String sql = "INSERT INTO CS_CA (ID, SUBJECT, SHA1_CERT, CERT) VALUES (?, ?, ?, ?)";
         System.out.println(" importing table CS_CA");
         PreparedStatement ps = prepareStatement(sql);
 
@@ -833,24 +834,38 @@ class CaCertStoreDbImporter extends DbPorter
                 String hexSha1FpCert = HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
 
                 // cert
-                String subjectText = X509Util.getRFC4519Name(c.getSubject());
-                if(subjectText.length() > 350)
-                {
-                    StringBuilder sb = new StringBuilder(350);
-                    sb.append(subjectText.substring(0, 350 - 13));
-                    sb.append("...skipped...");
-                    subjectText = sb.toString();
-                }
+                String subjectText = X509Util.cutX500Name(c.getSubject());
 
                 try
                 {
                     int idx = 1;
+
+                    // "ID, ART, LAST_UPDATE, SERIAL, SUBJECT, FP_SUBJECT, FP_CN, REQ_SUBJECT, FP_REQ_SUBJECT," // 9
                     ps_cert.setInt(idx++, id);
                     ps_cert.setInt(idx++, certArt);
                     ps_cert.setLong(idx++, cert.getLastUpdate());
                     ps_cert.setLong(idx++, c.getSerialNumber().getPositiveValue().longValue());
-                    ps_cert.setString(idx++, X509Util.getCommonName(c.getSubject()));
+
+                    // SUBJECT, FP_SUBJECT
                     ps_cert.setString(idx++, subjectText);
+                    long fpSubject = X509Util.fp_canonicalized_name(c.getSubject());
+                    ps_cert.setLong(idx++, fpSubject);
+
+                    // FP_CN
+                    String cn = X509Util.getCommonName(c.getSubject());
+                    long fpCn = FpIdCalculator.hash(cn);
+                    ps_cert.setLong(idx++, fpCn);
+
+                    // FP_REQ_SUBJECT
+                    if(cert.getFpReqSubject() != null)
+                    {
+                        ps_cert.setLong(idx++, cert.getFpReqSubject());
+                    } else
+                    {
+                        ps_cert.setNull(idx++, Types.BIGINT);
+                    }
+
+                    // " NOTBEFORE, NOTAFTER, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, PROFILE_ID, CA_ID," // 8
                     ps_cert.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
                     ps_cert.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
                     setBoolean(ps_cert, idx++, cert.isRevoked());
@@ -859,12 +874,11 @@ class CaCertStoreDbImporter extends DbPorter
                     setLong(ps_cert, idx++, cert.getRevInvTime());
                     setInt(ps_cert, idx++, cert.getProfileId());
                     setInt(ps_cert, idx++, cert.getCaId());
+
+                    // " REQUESTOR_ID, UNAME, FP_PK, EE, REQ_TYPE, TID)" + // 6
                     setInt(ps_cert, idx++, cert.getRequestorId());
                     ps_cert.setString(idx++, cert.getUser());
-
-                    ps_cert.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
-                    String sha1FpSubject = X509Util.sha1sum_canonicalized_name(c.getSubject());
-                    ps_cert.setString(idx++, sha1FpSubject);
+                    ps_cert.setLong(idx++, FpIdCalculator.hash(encodedKey));
                     Extension extension = c.getTBSCertificate().getExtensions().getExtension(Extension.basicConstraints);
                     boolean ee = true;
                     if(extension != null)
@@ -896,6 +910,7 @@ class CaCertStoreDbImporter extends DbPorter
                     int idx = 1;
                     ps_rawcert.setInt(idx++, cert.getId());
                     ps_rawcert.setString(idx++, hexSha1FpCert);
+                    ps_rawcert.setString(idx++, cert.getReqSubject());
                     ps_rawcert.setString(idx++, Base64.toBase64String(encodedCert));
                     ps_rawcert.addBatch();
                 }catch(SQLException e)
