@@ -63,7 +63,6 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.LruCache;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
@@ -111,17 +110,8 @@ class CaCertStoreDbExporter extends DbPorter
     private final int numCertsPerSelect;
     private final int numCrls;
     private final boolean resume;
+    @SuppressWarnings("unused")
     private final int dbSchemaVersion;
-    private final String col_caId;
-    private final String col_profileId;
-    private final String col_requestorId;
-    private final String col_revInvTime;
-    private final String table_ca;
-    private final String table_profile;
-    private final String table_requestor;
-    private final String table_publisher;
-
-    private final LruCache<Integer, String> userIdNameMap = new LruCache<>(100);
 
     CaCertStoreDbExporter(
             final DataSourceWrapper dataSource,
@@ -160,29 +150,6 @@ class CaCertStoreDbExporter extends DbPorter
         this.unmarshaller = unmarshaller;
         this.resume = resume;
         this.dbSchemaVersion = getDbSchemaVersion();
-
-        if(this.dbSchemaVersion > 1)
-        {
-            this.col_caId = "CA_ID";
-            this.col_profileId = "PROFILE_ID";
-            this.col_requestorId = "REQUESTOR_ID";
-            this.col_revInvTime = "REV_INV_TIME";
-            this.table_ca = "CS_CA";
-            this.table_profile = "CS_PROFILE";
-            this.table_requestor = "CS_REQUESTOR";
-            this.table_publisher = "CS_PUBLISHER";
-        }
-        else
-        {
-            this.col_caId = "CAINFO_ID";
-            this.col_profileId = "CERTPROFILEINFO_ID";
-            this.col_requestorId = "REQUESTORINFO_ID";
-            this.col_revInvTime = "REV_INVALIDITY_TIME";
-            this.table_ca = "CAINFO";
-            this.table_profile = "CERTPROFILEINFO";
-            this.table_requestor = "REQUESTORINFO";
-            this.table_publisher = "PUBLISHERINFO";
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -264,11 +231,7 @@ class CaCertStoreDbExporter extends DbPorter
     {
         System.out.println(getExportingText() + "table CRL");
         Crls crls = new Crls();
-        StringBuilder sqlBuilder = new StringBuilder("SELECT");
-        sqlBuilder.append(" ID, ");
-        sqlBuilder.append(col_caId);
-        sqlBuilder.append(" FROM CRL");
-        final String sql = sqlBuilder.toString();
+        final String sql = "SELECT ID, CA_ID FROM CRL";
 
         Statement stmt = null;
         try
@@ -282,7 +245,7 @@ class CaCertStoreDbExporter extends DbPorter
             while(rs.next())
             {
                 int id = rs.getInt("ID");
-                int cainfo_id = rs.getInt(col_caId);
+                int cainfo_id = rs.getInt("CA_ID");
                 List<Integer> ids = idMap.get(cainfo_id);
                 if(ids == null)
                 {
@@ -353,9 +316,9 @@ class CaCertStoreDbExporter extends DbPorter
             final CertStoreType certstore)
     throws DataAccessException
     {
-        System.out.println("exporting table " + table_ca);
+        System.out.println("exporting table CS_CA");
         Cas cas = new Cas();
-        final String sql = "SELECT ID, CERT FROM " + table_ca;
+        final String sql = "SELECT ID, CERT FROM CS_CA";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -384,16 +347,16 @@ class CaCertStoreDbExporter extends DbPorter
         }
 
         certstore.setCas(cas);
-        System.out.println(" exported table " + table_ca);
+        System.out.println(" exported table CS_CA");
     }
 
     private void export_requestor(
             final CertStoreType certstore)
     throws DataAccessException
     {
-        System.out.println("exporting table " + table_requestor);
+        System.out.println("exporting table CS_REQUESTOR");
         Requestors infos = new Requestors();
-        final String sql = "SELECT ID, NAME FROM " + table_requestor;
+        final String sql = "SELECT ID, NAME FROM CS_REQUESTOR";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -419,16 +382,16 @@ class CaCertStoreDbExporter extends DbPorter
         }
 
         certstore.setRequestors(infos);
-        System.out.println(" exported table " + table_requestor);
+        System.out.println(" exported table CS_REQUESTOR");
     }
 
     private void export_publisherinfo(
             final CertStoreType certstore)
     throws DataAccessException
     {
-        System.out.println("exporting table " + table_publisher);
+        System.out.println("exporting table CS_PUBLISHER");
         Publishers infos = new Publishers();
-        final String sql = "SELECT ID, NAME FROM " + table_publisher;
+        final String sql = "SELECT ID, NAME FROM CS_PUBLISHER";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -454,7 +417,7 @@ class CaCertStoreDbExporter extends DbPorter
         }
 
         certstore.setPublishers(infos);
-        System.out.println(" exported table " + table_publisher);
+        System.out.println(" exported table CS_PUBLISHER");
     }
 
     private void export_user(
@@ -463,12 +426,6 @@ class CaCertStoreDbExporter extends DbPorter
     {
         System.out.println(getExportingText() + "table USERNAME");
         UsersFiles usersFiles = new UsersFiles();
-        if(dbSchemaVersion > 1)
-        {
-            certstore.setUsersFiles(usersFiles);
-            System.out.println(getExportedText() + "0 user from table USERNAME");
-            return;
-        }
 
         final String tableName = "USERNAME";
         final int minId = (int) getMin(tableName, "ID");
@@ -598,9 +555,9 @@ class CaCertStoreDbExporter extends DbPorter
             final CertStoreType certstore)
     throws DataAccessException
     {
-        System.out.println("exporting table " + table_profile);
+        System.out.println("exporting table CS_PROFILE");
         Profiles infos = new Profiles();
-        final String sql = "SELECT ID, NAME FROM " + table_profile;
+        final String sql = "SELECT ID, NAME FROM CS_PROFILE";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -626,7 +583,7 @@ class CaCertStoreDbExporter extends DbPorter
         }
 
         certstore.setProfiles(infos);
-        System.out.println(" exported table " + table_profile);
+        System.out.println(" exported table CS_PROFILE");
     }
 
     /**
@@ -698,26 +655,13 @@ class CaCertStoreDbExporter extends DbPorter
             processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore);
         }
 
-        StringBuilder certSql = new StringBuilder("SELECT ID, SERIAL, ");
-        certSql.append(col_caId).append(", ");
-        certSql.append(col_profileId).append(", ");
-        certSql.append(col_profileId).append(", ");
-        certSql.append(col_requestorId).append(", ");
-        certSql.append(col_revInvTime).append(", ");
-        if(dbSchemaVersion > 1)
-        {
-            certSql.append("ART, REQ_TYPE, TID, UNAME, ");
-        }else
-        {
-            certSql.append("USER_ID, ");
-        }
-        certSql.append("LAST_UPDATE, REVOKED, REV_REASON, REV_TIME, ");
-        certSql.append(col_revInvTime);
-        certSql.append(" FROM CERT WHERE ID >= ? AND ID < ? ORDER BY ID ASC");
+        StringBuilder certSql = new StringBuilder("SELECT ID, SERIAL, CA_ID, PROFILE_ID, PROFILE_ID, REQUESTOR_ID, ");
+        certSql.append("ART, REQ_TYPE, TID, UNAME, LAST_UPDATE, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, FP_REQ_SUBJECT ");
+        certSql.append("FROM CERT WHERE ID >= ? AND ID < ? ORDER BY ID ASC");
 
         PreparedStatement ps = prepareStatement(certSql.toString());
 
-        final String rawCertSql = "SELECT CERT_ID, CERT FROM RAWCERT WHERE CERT_ID >= ? AND CERT_ID < ?";
+        final String rawCertSql = "SELECT CERT_ID, REQ_SUBJECT, CERT FROM RAWCERT WHERE CERT_ID >= ? AND CERT_ID < ?";
         PreparedStatement rawCertPs = prepareStatement(rawCertSql);
 
         int numCertsInCurrentFile = 0;
@@ -748,6 +692,7 @@ class CaCertStoreDbExporter extends DbPorter
                 }
 
                 Map<Integer, byte[]> rawCertMaps = new HashMap<>();
+                Map<Integer, String> reqSubjectMaps = new HashMap<>();
 
                 // retrieve raw certificates
                 rawCertPs.setInt(1, i);
@@ -759,6 +704,12 @@ class CaCertStoreDbExporter extends DbPorter
                     String b64Cert = rawCertRs.getString("CERT");
                     byte[] certBytes = Base64.decode(b64Cert);
                     rawCertMaps.put(certId, certBytes);
+
+                    String reqSubject = rawCertRs.getString("REQ_SUBJECT");
+                    if(StringUtil.isNotBlank(reqSubject))
+                    {
+                        reqSubjectMaps.put(certId, reqSubject);
+                    }
                 }
                 rawCertRs.close();
 
@@ -815,24 +766,15 @@ class CaCertStoreDbExporter extends DbPorter
                     CertType cert = new CertType();
                     cert.setId(id);
 
-                    int art;
-                    int reqType;
                     byte[] tid = null;
-                    if(dbSchemaVersion > 1)
+                    int art = rs.getInt("ART");
+                    int reqType = rs.getInt("REQ_TYPE");
+                    String s = rs.getString("TID");
+                    if(StringUtil.isNotBlank(s))
                     {
-                        art = rs.getInt("ART");
-                        reqType = rs.getInt("REQ_TYPE");
-                        String s = rs.getString("TID");
-                        if(StringUtil.isNotBlank(s))
-                        {
-                            tid = Hex.decode(s);
-                        }
+                        tid = Hex.decode(s);
                     }
-                    else
-                    {
-                        art = 1; // X.509
-                        reqType = 2; // CMP
-                    }
+
                     cert.setArt(art);
                     cert.setReqType(reqType);
                     if(tid != null)
@@ -840,16 +782,16 @@ class CaCertStoreDbExporter extends DbPorter
                         cert.setTid(tid);
                     }
 
-                    int cainfo_id = rs.getInt(col_caId);
+                    int cainfo_id = rs.getInt("CA_ID");
                     cert.setCaId(cainfo_id);
 
                     long serial = rs.getLong("SERIAL");
                     cert.setSerial(Long.toHexString(serial));
 
-                    int certprofile_id = rs.getInt(col_profileId);
+                    int certprofile_id = rs.getInt("PROFILE_ID");
                     cert.setProfileId(certprofile_id);
 
-                    int requestorinfo_id = rs.getInt(col_requestorId);
+                    int requestorinfo_id = rs.getInt("REQUESTOR_ID");
                     if(requestorinfo_id != 0)
                     {
                         cert.setRequestorId(requestorinfo_id);
@@ -865,7 +807,7 @@ class CaCertStoreDbExporter extends DbPorter
                     {
                         int rev_reason = rs.getInt("REV_REASON");
                         long rev_time = rs.getLong("REV_TIME");
-                        long rev_inv_time = rs.getLong(col_revInvTime);
+                        long rev_inv_time = rs.getLong("REV_INV_TIME");
                         cert.setRevReason(rev_reason);
                         cert.setRevTime(rev_time);
                         if(rev_inv_time != 0)
@@ -874,30 +816,20 @@ class CaCertStoreDbExporter extends DbPorter
                         }
                     }
 
-                    String user = null;
-                    if(dbSchemaVersion > 1)
-                    {
-                        user = rs.getString("UNAME");
-                    }
-                    else
-                    {
-                        int user_id = rs.getInt("USER_ID");
-                        if(user_id != 0)
-                        {
-                            user = getUserName(user_id);
-                            if(user == null)
-                            {
-                                final String msg = "found no entry in table USERNAME with ID '" + user_id + "'";
-                                LOG.error(msg);
-                                throw new DataAccessException(msg);
-                            }
-                        }
-                    }
+                    String user = rs.getString("UNAME");
                     if(user != null)
                     {
                         cert.setUser(user);
                     }
                     cert.setCertFile(sha1_cert + ".der");
+
+                    long fpReqSubject = rs.getLong("FP_REQ_SUBJECT");
+                    if(fpReqSubject != 0)
+                    {
+                        cert.setFpReqSubject(fpReqSubject);
+                        String reqSubject = reqSubjectMaps.remove(id);
+                        cert.setReqSubject(reqSubject);
+                    }
 
                     certsInCurrentFile.getCert().add(cert);
                     numCertsInCurrentFile ++;
@@ -983,7 +915,7 @@ class CaCertStoreDbExporter extends DbPorter
 
         StringBuilder sqlBuilder = new StringBuilder("SELECT");
         sqlBuilder.append(" CERT_ID, PUBLISHER_ID, ");
-        sqlBuilder.append(col_caId);
+        sqlBuilder.append("CA_ID");
         sqlBuilder.append(" FROM PUBLISHQUEUE WHERE CERT_ID >= ? AND CERT_ID < ? ORDER BY CERT_ID ASC");
         final String sql = sqlBuilder.toString();
         final int minId = (int) getMin("PUBLISHQUEUE", "CERT_ID");
@@ -1016,7 +948,7 @@ class CaCertStoreDbExporter extends DbPorter
                 {
                     int cert_id = rs.getInt("CERT_ID");
                     int pub_id = rs.getInt("PUBLISHER_ID");
-                    int ca_id = rs.getInt(col_caId);
+                    int ca_id = rs.getInt("CA_ID");
 
                     ToPublishType toPub = new ToPublishType();
                     toPub.setPubId(pub_id);
@@ -1043,7 +975,7 @@ class CaCertStoreDbExporter extends DbPorter
 
         StringBuilder sqlBuilder = new StringBuilder("SELECT");
         sqlBuilder.append(" SERIAL, ");
-        sqlBuilder.append(col_caId);
+        sqlBuilder.append("CA_ID");
         sqlBuilder.append(" FROM DELTACRL_CACHE");
         final String sql = sqlBuilder.toString();
 
@@ -1062,7 +994,7 @@ class CaCertStoreDbExporter extends DbPorter
             while(rs.next())
             {
                 long serial = rs.getLong("SERIAL");
-                int ca_id = rs.getInt(col_caId);
+                int ca_id = rs.getInt("CA_ID");
 
                 DeltaCRLCacheEntryType entry = new DeltaCRLCacheEntryType();
                 entry.setCaId(ca_id);
@@ -1131,37 +1063,4 @@ class CaCertStoreDbExporter extends DbPorter
         return info;
     }
 
-    private String getUserName(
-            final int id)
-    throws DataAccessException
-    {
-        String name = userIdNameMap.get(id);
-        if(name != null)
-        {
-            return name;
-        }
-
-        String coreSql = "NAME FROM USERNAME WHERE ID=?";
-        String sql = dataSource.createFetchFirstSelectSQL(coreSql, 1);
-        PreparedStatement ps = prepareStatement(sql);
-        ResultSet rs = null;
-        try
-        {
-            ps.setInt(1, id);
-            rs = ps.executeQuery();
-            if(rs.next())
-            {
-                name = rs.getString("NAME");
-                userIdNameMap.put(id, name);
-                return name;
-            }
-            return null;
-        }catch(SQLException e)
-        {
-            throw translate(sql, e);
-        }finally
-        {
-            releaseResources(ps, rs);
-        }
-    }
 }

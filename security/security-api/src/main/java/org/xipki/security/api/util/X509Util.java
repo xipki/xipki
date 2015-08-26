@@ -92,6 +92,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.security.api.KeyUsage;
+import org.xipki.security.api.FpIdCalculator;
 import org.xipki.security.api.ObjectIdentifiers;
 
 /**
@@ -306,14 +307,14 @@ public class X509Util
      * First canonicalized the name, and then compute the SHA-1 finger-print over the
      * canonicalized subject string.
      */
-    public static String sha1sum_canonicalized_name(
+    public static long fp_canonicalized_name(
             final X500Principal prin)
     {
         X500Name x500Name = X500Name.getInstance(prin.getEncoded());
-        return sha1sum_canonicalized_name(x500Name);
+        return fp_canonicalized_name(x500Name);
     }
 
-    public static String sha1sum_canonicalized_name(
+    public static long fp_canonicalized_name(
             final X500Name name)
     {
         String canonicalizedName = canonicalizName(name);
@@ -325,7 +326,7 @@ public class X509Util
         {
             encoded = canonicalizedName.getBytes();
         }
-        return SecurityUtil.sha1sum(encoded);
+        return FpIdCalculator.hash(encoded);
     }
 
     public static String canonicalizName(
@@ -821,6 +822,44 @@ public class X509Util
             }
         }
         return null;
+    }
+
+    public static String cutText(String text)
+    {
+        if(text.length() <= 350)
+        {
+            return text;
+        }
+        StringBuilder sb = new StringBuilder(350);
+        sb.append(text.substring(0, 350 - 13));
+        sb.append("...skipped...");
+        return sb.toString();
+    }
+
+    public static String cutX500Name(X500Name name)
+    {
+        String text = getRFC4519Name(name);
+        if(text.length() <= 350)
+        {
+            return text;
+        }
+        StringBuilder sb = new StringBuilder(350);
+        sb.append(text.substring(0, 350 - 13));
+        sb.append("...skipped...");
+        return sb.toString();
+    }
+
+    public static String cutX500Name(X500Principal name)
+    {
+        String text = getRFC4519Name(name);
+        if(text.length() <= 350)
+        {
+            return text;
+        }
+        StringBuilder sb = new StringBuilder(350);
+        sb.append(text.substring(0, 350 - 13));
+        sb.append("...skipped...");
+        return sb.toString();
     }
 
 }

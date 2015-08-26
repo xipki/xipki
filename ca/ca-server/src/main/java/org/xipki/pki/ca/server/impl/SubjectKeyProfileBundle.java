@@ -42,15 +42,15 @@ package org.xipki.pki.ca.server.impl;
 public class SubjectKeyProfileBundle
 {
     private final int certId;
-    private final String subjectFp;
-    private final String keyFp;
+    private final long subjectFp;
+    private final long keyFp;
     private final String profile;
     private final boolean revoked;
 
     public SubjectKeyProfileBundle(
             final int certId,
-            final String subjectFp,
-            final String keyFp,
+            final long subjectFp,
+            final long keyFp,
             final String profile,
             final boolean revoked)
     {
@@ -67,12 +67,12 @@ public class SubjectKeyProfileBundle
         return certId;
     }
 
-    public String getSubjectFp()
+    public long getSubjectFp()
     {
         return subjectFp;
     }
 
-    public String getKeyFp()
+    public long getKeyFp()
     {
         return keyFp;
     }

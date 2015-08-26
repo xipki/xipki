@@ -71,6 +71,13 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.datasource.api.exception.DataIntegrityViolationException;
+import org.xipki.datasource.api.exception.DuplicateKeyException;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.RequestType;
@@ -82,15 +89,9 @@ import org.xipki.pki.ca.server.impl.CertStatus;
 import org.xipki.pki.ca.server.impl.KnowCertResult;
 import org.xipki.pki.ca.server.impl.SubjectKeyProfileBundle;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.datasource.api.exception.DataIntegrityViolationException;
-import org.xipki.datasource.api.exception.DuplicateKeyException;
 import org.xipki.security.api.CRLReason;
 import org.xipki.security.api.CertRevocationInfo;
+import org.xipki.security.api.FpIdCalculator;
 import org.xipki.security.api.ObjectIdentifiers;
 import org.xipki.security.api.util.PasswordHash;
 import org.xipki.security.api.util.SecurityUtil;
@@ -128,7 +129,7 @@ class CertStoreQueryExecutor
     throws DataAccessException
     {
         final String sql =
-                new StringBuilder("SELECT ID, SUBJECT, FP_CERT, CERT FROM ").append(table).toString();
+                new StringBuilder("SELECT ID, SUBJECT, SHA1_CERT, CERT FROM ").append(table).toString();
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
         try
@@ -139,7 +140,7 @@ class CertStoreQueryExecutor
             {
                 int id = rs.getInt("ID");
                 String subject = rs.getString("SUBJECT");
-                String hexSha1Fp = rs.getString("FP_CERT");
+                String hexSha1Fp = rs.getString("SHA1_CERT");
                 String b64Cert = rs.getString("CERT");
 
                 CertBasedIdentityEntry caInfoEntry = new CertBasedIdentityEntry(id, subject, hexSha1Fp, b64Cert);
@@ -205,12 +206,13 @@ class CertStoreQueryExecutor
     {
         final String SQL_ADD_CERT =
                 "INSERT INTO CERT" +
-                " (ID, ART, LAST_UPDATE, SERIAL, CN, SUBJECT, FP_SUBJECT, REQ_SUBJECT, FP_REQ_SUBJECT, "
+                " (ID, ART, LAST_UPDATE, SERIAL, SUBJECT, FP_CN, FP_SUBJECT, FP_REQ_SUBJECT, "
                 + "NOTBEFORE, NOTAFTER, REVOKED, PROFILE_ID," +
                 " CA_ID, REQUESTOR_ID, UNAME, FP_PK, EE, REQ_TYPE, TID)" +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, FP, CERT) VALUES (?, ?, ?)";
+        final String SQL_ADD_RAWCERT =
+                "INSERT INTO RAWCERT (CERT_ID, SHA1, REQ_SUBJECT, CERT) VALUES (?, ?, ?, ?)";
 
         int certId = nextCertId();
         int caId = getCaId(issuer);
@@ -224,29 +226,23 @@ class CertStoreQueryExecutor
         int certprofileId = getCertprofileId(certprofileName);
         Integer requestorId = (requestor == null) ? null : getRequestorId(requestor.getName());
 
-        String fpPK = fp(encodedSubjectPublicKey);
-        String subjectText = certificate.getSubject();
-        if(subjectText.length() > 350)
-        {
-            StringBuilder sb = new StringBuilder(350);
-            sb.append(subjectText.substring(0, 350 - 13));
-            sb.append("...skipped...");
-            subjectText = sb.toString();
-        }
+        long fpPK = FpIdCalculator.hash(encodedSubjectPublicKey);
+        String subjectText = X509Util.cutText(certificate.getSubject());
         String cn = X509Util.getCommonName(certificate.getSubjectAsX500Name());
-        String fpSubject = X509Util.sha1sum_canonicalized_name(cert.getSubjectX500Principal());
+        long fpCn = FpIdCalculator.hash(cn);
+        long fpSubject = X509Util.fp_canonicalized_name(cert.getSubjectX500Principal());
 
         String reqSubjectText = null;
-        String fpReqSubject = null;
+        Long fpReqSubject = null;
         if(reqSubject != null)
         {
-            fpReqSubject = X509Util.sha1sum_canonicalized_name(reqSubject);
-            if(fpSubject.equals(fpReqSubject))
+            fpReqSubject = X509Util.fp_canonicalized_name(reqSubject);
+            if(fpSubject == fpReqSubject)
             {
                 fpReqSubject = null;
             } else
             {
-                reqSubjectText = X509Util.canonicalizName(X509Util.sortX509Name(reqSubject));
+                reqSubjectText = X509Util.cutX500Name(X509Util.sortX509Name(reqSubject));
             }
         }
 
@@ -269,11 +265,16 @@ class CertStoreQueryExecutor
             ps_addcert.setInt(idx++, CertArt.X509PKC.getCode());
             ps_addcert.setLong(idx++, System.currentTimeMillis()/1000);
             ps_addcert.setLong(idx++, cert.getSerialNumber().longValue());
-            ps_addcert.setString(idx++, cn);
             ps_addcert.setString(idx++, subjectText);
-            ps_addcert.setString(idx++, fpSubject);
-            ps_addcert.setString(idx++, reqSubjectText);
-            ps_addcert.setString(idx++, fpReqSubject);
+            ps_addcert.setLong(idx++, fpCn);
+            ps_addcert.setLong(idx++, fpSubject);
+            if(fpReqSubject != null)
+            {
+                ps_addcert.setLong(idx++, fpReqSubject);
+            } else
+            {
+                ps_addcert.setNull(idx++, Types.BIGINT);
+            }
 
             ps_addcert.setLong(idx++, cert.getNotBefore().getTime()/1000);
             ps_addcert.setLong(idx++, cert.getNotAfter().getTime()/1000);
@@ -291,7 +292,7 @@ class CertStoreQueryExecutor
             }
 
             ps_addcert.setString(idx++, user);
-            ps_addcert.setString(idx++, fpPK);
+            ps_addcert.setLong(idx++, fpPK);
 
             boolean isEECert = cert.getBasicConstraints() == -1;
             ps_addcert.setInt(idx++, isEECert ? 1 : 0);
@@ -302,6 +303,7 @@ class CertStoreQueryExecutor
             // rawcert
             idx = 2;
             ps_addRawcert.setString(idx++, fpCert);
+            ps_addRawcert.setString(idx++, reqSubjectText);
             ps_addRawcert.setString(idx++, b64Cert);
 
             final int tries = 3;
@@ -1718,7 +1720,7 @@ class CertStoreQueryExecutor
 
         String sql = sqlBuilder.toString();
 
-        String fp_subject = X509Util.sha1sum_canonicalized_name(subjectName);
+        long fp_subject = X509Util.fp_canonicalized_name(subjectName);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1729,8 +1731,8 @@ class CertStoreQueryExecutor
             {
                 ps.setString(idx++, Hex.toHexString(transactionId));
             }
-            ps.setString(idx++, fp_subject);
-            ps.setString(idx++, fp_subject);
+            ps.setLong(idx++, fp_subject);
+            ps.setLong(idx++, fp_subject);
             rs = ps.executeQuery();
 
             List<Integer> certIds =  new LinkedList<Integer>();
@@ -2047,7 +2049,7 @@ class CertStoreQueryExecutor
             final X500Principal subject)
     throws DataAccessException
     {
-        String subjectFp = X509Util.sha1sum_canonicalized_name(subject);
+        long subjectFp = X509Util.fp_canonicalized_name(subject);
         return getCertStatusForSubjectFp(caCert, subjectFp);
     }
 
@@ -2056,13 +2058,13 @@ class CertStoreQueryExecutor
             final X500Name subject)
     throws DataAccessException
     {
-        String subjectFp = X509Util.sha1sum_canonicalized_name(subject);
+        long subjectFp = X509Util.fp_canonicalized_name(subject);
         return getCertStatusForSubjectFp(caCert, subjectFp);
     }
 
     private CertStatus getCertStatusForSubjectFp(
             final X509CertWithDBCertId caCert,
-            final String subjectFp)
+            final long subjectFp)
     throws DataAccessException
     {
         byte[] encodedCert = caCert.getEncodedCert();
@@ -2073,14 +2075,14 @@ class CertStoreQueryExecutor
         }
 
         final String sql = dataSource.createFetchFirstSelectSQL(
-                "REVOKED FROM CERT WHERE FP_SUBJECT=? AND CA_ID=?", 1);
+                "REVOKED FROM CERT WHERE SHA1_SUBJECT=? AND CA_ID=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try
         {
             int idx = 1;
-            ps.setString(idx++, subjectFp);
+            ps.setLong(idx++, subjectFp);
             ps.setInt(idx++, caId);
 
             rs = ps.executeQuery();
@@ -2103,7 +2105,7 @@ class CertStoreQueryExecutor
 
     boolean certIssuedForSubject(
             final X509CertWithDBCertId caCert,
-            final String sha1FpSubject)
+            final long fpSubject)
     throws OperationException, DataAccessException
     {
         byte[] encodedCert = caCert.getEncodedCert();
@@ -2123,7 +2125,7 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setString(idx++, sha1FpSubject);
+            ps.setLong(idx++, fpSubject);
             ps.setInt(idx++, caId);
 
             rs = ps.executeQuery();
@@ -2144,8 +2146,8 @@ class CertStoreQueryExecutor
 
     SubjectKeyProfileBundle getLatestCert(
             final X509CertWithDBCertId caCert,
-            final String subjectFp,
-            final String keyFp,
+            final long subjectFp,
+            final long keyFp,
             final String profile)
     throws DataAccessException
     {
@@ -2172,8 +2174,8 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setString(idx++, keyFp);
-            ps.setString(idx++, subjectFp);
+            ps.setLong(idx++, keyFp);
+            ps.setLong(idx++, subjectFp);
             ps.setInt(idx++, caId);
             ps.setInt(idx++, profileId);
 
@@ -2198,7 +2200,7 @@ class CertStoreQueryExecutor
 
     boolean isCertForSubjectIssued(
             final X509CertWithDBCertId caCert,
-            final String subjectFp,
+            final long subjectFp,
             final String profile)
     throws DataAccessException
     {
@@ -2207,7 +2209,7 @@ class CertStoreQueryExecutor
 
     boolean isCertForKeyIssued(
             final X509CertWithDBCertId caCert,
-            final String keyFp,
+            final long keyFp,
             final String profile)
     throws DataAccessException
     {
@@ -2216,17 +2218,17 @@ class CertStoreQueryExecutor
 
     boolean isCertForCNIssued(
             final X509CertWithDBCertId caCert,
-            final String cn,
+            final long cnFp,
             final String profile)
     throws DataAccessException
     {
-        return isCertIssuedForColumn("CN", caCert, cn, profile);
+        return isCertIssuedForColumn("FP_CN", caCert, cnFp, profile);
     }
 
     private boolean isCertIssuedForColumn(
             final String fpColumnName,
             final X509CertWithDBCertId caCert,
-            final String columnValue,
+            final long columnValue,
             final String profile)
     throws DataAccessException
     {
@@ -2262,7 +2264,7 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setString(idx++, columnValue);
+            ps.setLong(idx++, columnValue);
             ps.setInt(idx++, caId);
             if(profile != null)
             {
@@ -2318,7 +2320,7 @@ class CertStoreQueryExecutor
         int id = (int) maxId + 1;
 
         final String sql = new StringBuilder("INSERT INTO ").append(tblName)
-                .append(" (ID, SUBJECT, FP_CERT, CERT)").append(" VALUES (?, ?, ?, ?)").toString();
+                .append(" (ID, SUBJECT, SHA1_CERT, CERT)").append(" VALUES (?, ?, ?, ?)").toString();
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try
@@ -2897,8 +2899,8 @@ class CertStoreQueryExecutor
     }
 
     void deleteCertInProcess(
-            final String fpKey,
-            final String fpSubject)
+            final long fpKey,
+            final long fpSubject)
     throws DataAccessException
     {
         final String sql = "DELETE FROM CERT_IN_PROCESS WHERE FP_PK=? AND FP_SUBJECT=?";
@@ -2906,8 +2908,8 @@ class CertStoreQueryExecutor
         ResultSet rs = null;
         try
         {
-            ps.setString(1, fpKey);
-            ps.setString(2, fpSubject);
+            ps.setLong(1, fpKey);
+            ps.setLong(2, fpSubject);
             ps.executeUpdate();
         }catch(SQLException e)
         {
@@ -2919,8 +2921,8 @@ class CertStoreQueryExecutor
     }
 
     boolean addCertInProcess(
-            final String fpKey,
-            final String fpSubject)
+            final long fpKey,
+            final long fpSubject)
     throws DataAccessException
     {
         final String sql = "INSERT INTO CERT_IN_PROCESS (FP_PK, FP_SUBJECT, TIME2) VALUES (?, ?, ?)";
@@ -2928,8 +2930,8 @@ class CertStoreQueryExecutor
         ResultSet rs = null;
         try
         {
-            ps.setString(1, fpKey);
-            ps.setString(2, fpSubject);
+            ps.setLong(1, fpKey);
+            ps.setLong(2, fpSubject);
             ps.setLong(3, System.currentTimeMillis() / 1000);
             try
             {

@@ -35,92 +35,62 @@
 
 package org.xipki.security.api;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA1Digest;
-import org.bouncycastle.crypto.digests.SHA224Digest;
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.digests.SHA384Digest;
-import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.operator.RuntimeOperatorException;
-import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
  */
 
-public class HashCalculator
+public class FpIdCalculator
 {
     private final static int parallelism = 50;
-    private final static ConcurrentHashMap<HashAlgoType, BlockingDeque<Digest>> mdsMap =
-            new ConcurrentHashMap<>();
+    private final static BlockingDeque<Digest> mds = getMD5MessageDigests();
 
-    static
-    {
-        mdsMap.put(HashAlgoType.SHA1, getMessageDigests(HashAlgoType.SHA1));
-        mdsMap.put(HashAlgoType.SHA224, getMessageDigests(HashAlgoType.SHA224));
-        mdsMap.put(HashAlgoType.SHA256, getMessageDigests(HashAlgoType.SHA256));
-        mdsMap.put(HashAlgoType.SHA384, getMessageDigests(HashAlgoType.SHA384));
-        mdsMap.put(HashAlgoType.SHA512, getMessageDigests(HashAlgoType.SHA512));
-    }
-
-    private static BlockingDeque<Digest> getMessageDigests(
-            final HashAlgoType hashAlgo)
+    private static BlockingDeque<Digest> getMD5MessageDigests()
     {
         BlockingDeque<Digest> mds = new LinkedBlockingDeque<>();
         for(int i = 0; i < parallelism; i++)
         {
-            Digest md;
-            switch(hashAlgo)
-            {
-                case SHA1:
-                    md = new SHA1Digest();
-                    break;
-                case SHA224:
-                    md = new SHA224Digest();
-                    break;
-                case SHA256:
-                    md = new SHA256Digest();
-                    break;
-                case SHA384:
-                    md = new SHA384Digest();
-                    break;
-                case SHA512:
-                    md = new SHA512Digest();
-                    break;
-                default:
-                    throw new RuntimeException("should not reach here, unknown HashAlgoType " + hashAlgo);
-            }
+            Digest md = new SHA1Digest();
             mds.addLast(md);
         }
         return mds;
     }
 
-    public static String hexHash(
-            final HashAlgoType hashAlgoType,
-            final byte[] data)
+    /**
+     * @return long represented of the first 8 bytes
+     */
+    public static long hash(
+            final String data)
     {
-        byte[] bytes = hash(hashAlgoType, data);
-        return bytes == null ? null : Hex.toHexString(bytes).toUpperCase();
+        ParamUtil.assertNotNull("data", data);
+        byte[] encoded;
+        try
+        {
+            encoded = data.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e)
+        {
+            encoded = data.getBytes();
+        }
+        return hash(encoded);
     }
 
-    public static byte[] hash(
-            final HashAlgoType hashAlgoType,
+    /**
+     * @return long represented of the first 8 bytes
+     */
+    public static long hash(
             final byte[] data)
     {
-        ParamUtil.assertNotNull("hashAlgoType", hashAlgoType);
         ParamUtil.assertNotNull("data", data);
-        if(mdsMap.containsKey(hashAlgoType) == false)
-        {
-            throw new IllegalArgumentException("unknown hash algo " + hashAlgoType);
-        }
-
-        BlockingDeque<Digest> mds = mdsMap.get(hashAlgoType);
 
         Digest md = null;
         for(int i = 0; i < 3; i++)
@@ -145,10 +115,20 @@ public class HashCalculator
             md.update(data, 0, data.length);
             byte[] b = new byte[md.getDigestSize()];
             md.doFinal(b, 0);
-            return b;
+
+            return bytesToLong(b);
         }finally
         {
             mds.addLast(md);
         }
     }
+
+    private static long bytesToLong(byte[] bytes)
+    {
+        ByteBuffer buffer = ByteBuffer.allocate(8);
+        buffer.put(bytes, 0, 8);
+        buffer.flip();//need flip
+        return buffer.getLong();
+    }
+
 }

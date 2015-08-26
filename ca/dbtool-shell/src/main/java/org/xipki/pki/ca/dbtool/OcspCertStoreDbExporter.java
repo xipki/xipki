@@ -88,8 +88,8 @@ class OcspCertStoreDbExporter extends DbPorter
     private final int numCertsInBundle;
     private final int numCertsPerSelect;
     private final boolean resume;
+    @SuppressWarnings("unused")
     private final int dbSchemaVersion;
-    private final String col_revInvTime;
 
     OcspCertStoreDbExporter(
             final DataSourceWrapper dataSource,
@@ -130,8 +130,6 @@ class OcspCertStoreDbExporter extends DbPorter
             }
         }
         this.resume = resume;
-
-        this.col_revInvTime = this.dbSchemaVersion > 1 ? "REV_INV_TIME" : "REV_INVALIDITY_TIME";
     }
 
     public void export()
@@ -198,7 +196,7 @@ class OcspCertStoreDbExporter extends DbPorter
         System.out.println("exporting table ISSUER");
         Issuers issuers = new Issuers();
         certstore.setIssuers(issuers);
-        final String sql = "SELECT ID, CERT, REVOKED, REV_REASON, REV_TIME, " + col_revInvTime + " FROM ISSUER";
+        final String sql = "SELECT ID, CERT, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME FROM ISSUER";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -223,7 +221,7 @@ class OcspCertStoreDbExporter extends DbPorter
                 {
                     int rev_reason = rs.getInt("REV_REASON");
                     long rev_time = rs.getLong("REV_TIME");
-                    long rev_invalidity_time = rs.getLong(col_revInvTime);
+                    long rev_invalidity_time = rs.getLong("REV_INV_TIME");
                     issuer.setRevReason(rev_reason);
                     issuer.setRevTime(rev_time);
                     if(rev_invalidity_time != 0)
@@ -299,7 +297,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
         System.out.println(getExportingText() + "tables CERT, CERTHASH and RAWCERT from ID " + minCertId);
 
-        String certSql = "SELECT ID, SERIAL, ISSUER_ID, LAST_UPDATE, REVOKED, REV_REASON, REV_TIME, " + col_revInvTime +
+        String certSql = "SELECT ID, SERIAL, ISSUER_ID, LAST_UPDATE, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME" +
                 ", PROFILE FROM CERT WHERE ID >= ? AND ID < ?";
 
         String rawCertSql = "SELECT CERT_ID, CERT FROM RAWCERT WHERE CERT_ID >= ? AND CERT_ID < ?";
@@ -432,7 +430,7 @@ class OcspCertStoreDbExporter extends DbPorter
                     {
                         int rev_reason = rs.getInt("REV_REASON");
                         long rev_time = rs.getLong("REV_TIME");
-                        long rev_invalidity_time = rs.getLong(col_revInvTime);
+                        long rev_invalidity_time = rs.getLong("REV_INV_TIME");
                         cert.setRevReason(rev_reason);
                         cert.setRevTime(rev_time);
                         if(rev_invalidity_time != 0)

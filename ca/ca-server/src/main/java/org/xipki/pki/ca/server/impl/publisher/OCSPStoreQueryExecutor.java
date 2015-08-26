@@ -64,6 +64,7 @@ import org.xipki.datasource.api.exception.DuplicateKeyException;
 import org.xipki.security.api.CertRevocationInfo;
 import org.xipki.security.api.HashAlgoType;
 import org.xipki.security.api.HashCalculator;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -208,14 +209,13 @@ class OCSPStoreQueryExecutor
 
         StringBuilder sb = new StringBuilder();
         sb.append("INSERT INTO CERT ");
-        sb.append("(ID, LAST_UPDATE, SERIAL, SUBJECT");
-        sb.append(", NOTBEFORE, NOTAFTER, REVOKED, ISSUER_ID, PROFILE");
+        sb.append("(ID, LAST_UPDATE, SERIAL, NOTBEFORE, NOTAFTER, REVOKED, ISSUER_ID, PROFILE");
         if(revoked)
         {
             sb.append(", REV_TIME, REV_INV_TIME, REV_REASON");
         }
         sb.append(")");
-        sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?");
+        sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?");
         if(revoked)
         {
             sb.append(", ?, ?, ?");
@@ -224,7 +224,7 @@ class OCSPStoreQueryExecutor
 
         final String SQL_ADD_CERT = sb.toString();
 
-        final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, CERT) VALUES (?, ?)";
+        final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SUBJECT, CERT) VALUES (?, ?, ?)";
 
         final String SQL_ADD_CERTHASH = "INSERT INTO CERTHASH "
                 + " (CERT_ID, SHA1, SHA224, SHA256, SHA384, SHA512)"
@@ -255,7 +255,6 @@ class OCSPStoreQueryExecutor
             int idx = 2;
             ps_addcert.setLong(idx++, System.currentTimeMillis()/1000);
             ps_addcert.setLong(idx++, serialNumber.longValue());
-            ps_addcert.setString(idx++, certificate.getSubject());
             ps_addcert.setLong(idx++, cert.getNotBefore().getTime()/1000);
             ps_addcert.setLong(idx++, cert.getNotAfter().getTime()/1000);
             setBoolean(ps_addcert, idx++, revoked);
@@ -277,6 +276,7 @@ class OCSPStoreQueryExecutor
 
             // RAWCERT
             idx = 2;
+            ps_addRawcert.setString(idx++, X509Util.cutText(certificate.getSubject()));
             ps_addRawcert.setString(idx++, b64Cert);
 
             // CERTHASH

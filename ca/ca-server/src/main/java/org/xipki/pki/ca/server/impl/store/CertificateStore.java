@@ -406,12 +406,12 @@ public class CertificateStore
 
     public boolean certIssuedForSubject(
             final X509CertWithDBCertId caCert,
-            final String sha1FpSubject)
+            final long fpSubject)
     throws OperationException
     {
         try
         {
-            return queryExecutor.certIssuedForSubject(caCert, sha1FpSubject);
+            return queryExecutor.certIssuedForSubject(caCert, fpSubject);
         } catch (DataAccessException e)
         {
             LOG.debug("DataAccessException", e);
@@ -727,8 +727,8 @@ public class CertificateStore
 
     public SubjectKeyProfileBundle getLatestCert(
             final X509CertWithDBCertId caCert,
-            final String subjectFp,
-            final String keyFp,
+            final long subjectFp,
+            final long keyFp,
             final String profile)
     throws OperationException
     {
@@ -747,7 +747,7 @@ public class CertificateStore
 
     public boolean isCertForSubjectIssued(
             final X509CertWithDBCertId caCert,
-            final String subjectFp)
+            final long subjectFp)
     throws OperationException
     {
         return isCertForSubjectIssued(caCert, subjectFp, null);
@@ -755,7 +755,7 @@ public class CertificateStore
 
     public boolean isCertForSubjectIssued(
             final X509CertWithDBCertId caCert,
-            final String subjectFp,
+            final long subjectFp,
             final String profile)
     throws OperationException
     {
@@ -774,7 +774,7 @@ public class CertificateStore
 
     public boolean isCertForKeyIssued(
             final X509CertWithDBCertId caCert,
-            final String keyFp)
+            final long keyFp)
     throws OperationException
     {
         return isCertForKeyIssued(caCert, keyFp, null);
@@ -782,7 +782,7 @@ public class CertificateStore
 
     public boolean isCertForKeyIssued(
             final X509CertWithDBCertId caCert,
-            final String keyFp,
+            final long keyFp,
             final String profile)
     throws OperationException
     {
@@ -801,21 +801,21 @@ public class CertificateStore
 
     public boolean isCertForCNIssued(
             final X509CertWithDBCertId caCert,
-            final String cn)
+            final long cnFp)
     throws OperationException
     {
-        return isCertForCNIssued(caCert, cn, null);
+        return isCertForCNIssued(caCert, cnFp, null);
     }
 
     public boolean isCertForCNIssued(
             final X509CertWithDBCertId caCert,
-            final String cn,
+            final long cnFp,
             final String profile)
     throws OperationException
     {
         try
         {
-            return queryExecutor.isCertForCNIssued(caCert, cn, profile);
+            return queryExecutor.isCertForCNIssued(caCert, cnFp, profile);
         } catch (DataAccessException e)
         {
             LOG.debug("DataAccessException", e);
@@ -1059,8 +1059,8 @@ public class CertificateStore
     }
 
     public boolean addCertInProcess(
-            final String fpKey,
-            final String fpSubject)
+            final long fpKey,
+            final long fpSubject)
     throws OperationException
     {
         try
@@ -1076,8 +1076,8 @@ public class CertificateStore
     }
 
     public void delteCertInProcess(
-            final String fpKey,
-            final String fpSubject)
+            final long fpKey,
+            final long fpSubject)
     throws OperationException
     {
         try
