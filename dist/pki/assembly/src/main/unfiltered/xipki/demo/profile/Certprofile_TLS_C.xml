@@ -19,7 +19,7 @@
   <notBeforeTime>current</notBeforeTime>
   <duplicateKey>false</duplicateKey>
   <duplicateSubject>false</duplicateSubject>
-  <duplicateCN>false</duplicateCN>
+  <duplicateCN>true</duplicateCN>
   <serialNumberInReq>false</serialNumberInReq>
   <keyAlgorithms>
     <algorithm>

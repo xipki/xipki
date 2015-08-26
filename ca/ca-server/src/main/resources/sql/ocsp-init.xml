@@ -82,9 +82,6 @@
       <column name="SERIAL" type="BIGINT">
         <constraints nullable="false"/>
       </column>
-      <column name="SUBJECT" type="VARCHAR(300)">
-        <constraints nullable="false"/>
-      </column>
       <column name="LAST_UPDATE" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
@@ -129,7 +126,10 @@
       <column name="CERT_ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="CERT" type="VARCHAR(3000)" remarks="Base64 encoded CERTificate">
+      <column name="SUBJECT" type="VARCHAR(400)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CERT" type="VARCHAR(3000)" remarks="Base64 encoded Certificate">
         <constraints nullable="false"/>
       </column>
     </createTable>

@@ -297,7 +297,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
     throws DataAccessException, CertificateException
     {
         System.out.println(" importing table ISSUER");
-        final String sql = OcspCertStoreDbImporter.SQL_ADD_CAINFO;
+        final String sql = OcspCertStoreDbImporter.SQL_ADD_ISSUER;
         PreparedStatement ps = prepareStatement(sql);
 
         List<Integer> relatedCaIds = new LinkedList<>();
@@ -425,6 +425,8 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
 
         final long total = certsfiles.getCountCerts() - numProcessedBefore;
         final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore);
+        // all initial values for importLog will be not evaluated, so just any number
+        final ProcessLog importLog = new ProcessLog(total, System.currentTimeMillis(), 0);
 
         System.out.println(getImportingText() + "certificates from ID " + minId);
         ProcessLog.printHeader();
@@ -463,7 +465,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 {
                     int lastId = do_import_cert(ps_cert, ps_certhash, ps_rawcert,
                             certsFile, profileMap, revokedOnly, caIds, minId,
-                            processLogFile, processLog);
+                            processLogFile, processLog, importLog);
                     minId = lastId + 1;
                 }catch(Exception e)
                 {
@@ -482,7 +484,8 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
 
         ProcessLog.printTrailer();
         DbPorter.echoToFile(MSG_CERTS_FINISHED, processLogFile);
-        System.out.println(getImportedText() + processLog.getNumProcessed() + " certificates");
+        System.out.println("processed " + processLog.getNumProcessed() + " and " +
+                getImportedText() + importLog.getNumProcessed() + " certificates");
     }
 
     private int do_import_cert(
@@ -495,7 +498,8 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
             final List<Integer> caIds,
             final int minId,
             final File processLogFile,
-            final ProcessLog processLog)
+            final ProcessLog processLog,
+            final ProcessLog importLog)
     throws Exception
     {
         ZipFile zipFile = new ZipFile(new File(baseDir, certsZipFile));
@@ -525,7 +529,8 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
         {
             List<CertType> list = certs.getCert();
             final int size = list.size();
-            int numEntriesInBatch = 0;
+            int numProcessedEntriesInBatch = 0;
+            int numImportedEntriesInBatch = 0;
             int lastSuccessfulCertId = 0;
 
             for(int i = 0; i < size; i++)
@@ -543,7 +548,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                     continue;
                 }
 
-                numEntriesInBatch++;
+                numProcessedEntriesInBatch++;
 
                 if(revokedOnly && cert.isRevoked() == false)
                 {
@@ -551,93 +556,93 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 }
 
                 int caId = cert.getCaId();
-                if(caIds.contains(caId) == false)
+                if(caIds.contains(caId))
                 {
-                    continue;
-                }
+                    numImportedEntriesInBatch++;
 
-                String filename = cert.getCertFile();
+                    String filename = cert.getCertFile();
 
-                // rawcert
-                ZipEntry certZipEnty = zipFile.getEntry(filename);
-                // rawcert
-                byte[] encodedCert = IoUtil.read(zipFile.getInputStream(certZipEnty));
+                    // rawcert
+                    ZipEntry certZipEnty = zipFile.getEntry(filename);
+                    // rawcert
+                    byte[] encodedCert = IoUtil.read(zipFile.getInputStream(certZipEnty));
 
-                X509Certificate c;
-                try
-                {
-                    c = X509Util.parseCert(encodedCert);
-                } catch (Exception e)
-                {
-                    LOG.error("could not parse certificate in file {}", filename);
-                    LOG.debug("could not parse certificate in file " + filename, e);
-                    if(e instanceof CertificateException)
+                    X509Certificate c;
+                    try
                     {
-                        throw (CertificateException) e;
-                    }
-                    else
+                        c = X509Util.parseCert(encodedCert);
+                    } catch (Exception e)
                     {
-                        throw new CertificateException(e.getMessage(), e);
+                        LOG.error("could not parse certificate in file {}", filename);
+                        LOG.debug("could not parse certificate in file " + filename, e);
+                        if(e instanceof CertificateException)
+                        {
+                            throw (CertificateException) e;
+                        }
+                        else
+                        {
+                            throw new CertificateException(e.getMessage(), e);
+                        }
+                    }
+
+                    // cert
+                    String seqName = "CID";
+                    int currentId = (int) dataSource.nextSeqValue(null, seqName);
+
+                    try
+                    {
+                        int idx = 1;
+                        ps_cert.setInt(idx++, currentId);
+                        ps_cert.setInt(idx++, caId);
+                        ps_cert.setLong(idx++, c.getSerialNumber().longValue());
+                        ps_cert.setLong(idx++, cert.getLastUpdate());
+                        ps_cert.setLong(idx++, c.getNotBefore().getTime() / 1000);
+                        ps_cert.setLong(idx++, c.getNotAfter().getTime() / 1000);
+                        setBoolean(ps_cert, idx++, cert.isRevoked());
+                        setInt(ps_cert, idx++, cert.getRevReason());
+                        setLong(ps_cert, idx++, cert.getRevTime());
+                        setLong(ps_cert, idx++, cert.getRevInvTime());
+
+                        int certprofileId = cert.getProfileId();
+                        String certprofileName = profileMap.get(certprofileId);
+                        ps_cert.setString(idx++, certprofileName);
+                        ps_cert.addBatch();
+                    }catch(SQLException e)
+                    {
+                        throw translate(OcspCertStoreDbImporter.SQL_ADD_CERT, e);
+                    }
+
+                    // certhash
+                    try
+                    {
+                        int idx = 1;
+                        ps_certhash.setInt(idx++, currentId);
+                        ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
+                        ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
+                        ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
+                        ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
+                        ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
+                        ps_certhash.addBatch();
+                    }catch(SQLException e)
+                    {
+                        throw translate(OcspCertStoreDbImporter.SQL_ADD_CERTHASH, e);
+                    }
+
+                    // rawcert
+                    try
+                    {
+                        int idx = 1;
+                        ps_rawcert.setInt(idx++, currentId);
+                        ps_rawcert.setString(idx++, X509Util.cutX500Name(c.getSubjectX500Principal()));
+                        ps_rawcert.setString(idx++, Base64.toBase64String(encodedCert));
+                        ps_rawcert.addBatch();
+                    }catch(SQLException e)
+                    {
+                        throw translate(OcspCertStoreDbImporter.SQL_ADD_RAWCERT, e);
                     }
                 }
 
-                // cert
-                String seqName = "CERT_ID";
-                int currentId = (int) dataSource.nextSeqValue(null, seqName);
-
-                try
-                {
-                    int idx = 1;
-                    ps_cert.setInt(idx++, currentId);
-                    ps_cert.setInt(idx++, caId);
-                    ps_cert.setLong(idx++, c.getSerialNumber().longValue());
-                    ps_cert.setString(idx++, X509Util.getRFC4519Name(c.getSubjectX500Principal()));
-                    ps_cert.setLong(idx++, cert.getLastUpdate());
-                    ps_cert.setLong(idx++, c.getNotBefore().getTime() / 1000);
-                    ps_cert.setLong(idx++, c.getNotAfter().getTime() / 1000);
-                    setBoolean(ps_cert, idx++, cert.isRevoked());
-                    setInt(ps_cert, idx++, cert.getRevReason());
-                    setLong(ps_cert, idx++, cert.getRevTime());
-                    setLong(ps_cert, idx++, cert.getRevInvTime());
-
-                    int certprofileId = cert.getProfileId();
-                    String certprofileName = profileMap.get(certprofileId);
-                    ps_cert.setString(idx++, certprofileName);
-                    ps_cert.addBatch();
-                }catch(SQLException e)
-                {
-                    throw translate(OcspCertStoreDbImporter.SQL_ADD_CERT, e);
-                }
-
-                // certhash
-                try
-                {
-                    int idx = 1;
-                    ps_certhash.setInt(idx++, currentId);
-                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
-                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
-                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
-                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
-                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
-                    ps_certhash.addBatch();
-                }catch(SQLException e)
-                {
-                    throw translate(OcspCertStoreDbImporter.SQL_ADD_CERTHASH, e);
-                }
-
-                // rawcert
-                try
-                {
-                    int idx = 1;
-                    ps_rawcert.setInt(idx++, currentId);
-                    ps_rawcert.setString(idx++, Base64.toBase64String(encodedCert));
-                    ps_rawcert.addBatch();
-                }catch(SQLException e)
-                {
-                    throw translate(OcspCertStoreDbImporter.SQL_ADD_RAWCERT, e);
-                }
-
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % this.numCertsPerCommit == 0 || i == size - 1))
+                if(numImportedEntriesInBatch > 0 && (numImportedEntriesInBatch % this.numCertsPerCommit == 0 || i == size - 1))
                 {
                     if(evaulateOnly)
                     {
@@ -678,8 +683,9 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                     }
 
                     lastSuccessfulCertId = id;
-                    processLog.addNumProcessed(numEntriesInBatch);
-                    numEntriesInBatch = 0;
+                    processLog.addNumProcessed(numProcessedEntriesInBatch);
+                    importLog.addNumProcessed(numImportedEntriesInBatch);
+                    numProcessedEntriesInBatch = 0;
                     echoToFile((processLog.getSumInLastProcess() + processLog.getNumProcessed()) + ":" +
                             lastSuccessfulCertId, processLogFile);
 
@@ -703,8 +709,8 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
 
     private void deleteCertGreatherThan(int id)
     {
-        deleteFromTableWithLargerId("RAWCERT", "CERT_ID", id, LOG);
-        deleteFromTableWithLargerId("CERTHASH", "CERT_ID", id, LOG);
+        deleteFromTableWithLargerId("CRAW", "CID", id, LOG);
+        deleteFromTableWithLargerId("CHASH", "CID", id, LOG);
         deleteFromTableWithLargerId("CERT", "ID", id, LOG);
     }
 

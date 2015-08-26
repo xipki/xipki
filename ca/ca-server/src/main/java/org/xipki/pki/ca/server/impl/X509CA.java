@@ -105,6 +105,11 @@ import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
+import org.xipki.common.HealthCheckResult;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.BadFormatException;
 import org.xipki.pki.ca.api.CertprofileException;
@@ -132,20 +137,15 @@ import org.xipki.pki.ca.server.mgmt.api.CRLControl.HourMinute;
 import org.xipki.pki.ca.server.mgmt.api.CRLControl.UpdateMode;
 import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.common.HealthCheckResult;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.security.api.CRLReason;
 import org.xipki.security.api.CertRevocationInfo;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.KeyUsage;
+import org.xipki.security.api.FpIdCalculator;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.ObjectIdentifiers;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
-import org.xipki.security.api.util.SecurityUtil;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -2254,11 +2254,12 @@ public class X509CA
         }
 
         String cn = X509Util.getCommonName(grantedSubject);
-        String sha1FpSubject = X509Util.sha1sum_canonicalized_name(grantedSubject);
+        long fpCn = FpIdCalculator.hash(cn);
+        long fpSubject = X509Util.fp_canonicalized_name(grantedSubject);
         String grandtedSubjectText = X509Util.getRFC4519Name(grantedSubject);
 
         byte[] subjectPublicKeyData =  publicKeyInfo.getPublicKeyData().getBytes();
-        String sha1FpPublicKey = SecurityUtil.sha1sum(subjectPublicKeyData);
+        long fpPublicKey = FpIdCalculator.hash(subjectPublicKeyData);
 
         if(keyUpdate)
         {
@@ -2276,7 +2277,7 @@ public class X509CA
         {
             // try to get certificate with the same subject, key and certificate profile
             SubjectKeyProfileBundle bundle = certstore.getLatestCert(caInfo.getCertificate(),
-                    sha1FpSubject, sha1FpPublicKey, certprofileName);
+                    fpSubject, fpPublicKey, certprofileName);
 
             if(bundle != null)
             {
@@ -2321,7 +2322,7 @@ public class X509CA
             {
                 if(keyMode == DuplicationMode.FORBIDDEN)
                 {
-                    if(certstore.isCertForKeyIssued(caInfo.getCertificate(), sha1FpPublicKey))
+                    if(certstore.isCertForKeyIssued(caInfo.getCertificate(), fpPublicKey))
                     {
                         throw new OperationException(ErrorCode.ALREADY_ISSUED,
                                 "certificate for the given public key already issued");
@@ -2329,7 +2330,7 @@ public class X509CA
                 }
                 else if(keyMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
                 {
-                    if(certstore.isCertForKeyIssued(caInfo.getCertificate(), sha1FpPublicKey, certprofileName))
+                    if(certstore.isCertForKeyIssued(caInfo.getCertificate(), fpPublicKey, certprofileName))
                     {
                         throw new OperationException(ErrorCode.ALREADY_ISSUED,
                                 "certificate for the given public key and profile " + certprofileName + " already issued");
@@ -2345,7 +2346,7 @@ public class X509CA
             {
                 if(cnMode == DuplicationMode.FORBIDDEN)
                 {
-                    if(certstore.isCertForCNIssued(caInfo.getCertificate(), cn))
+                    if(certstore.isCertForCNIssued(caInfo.getCertificate(), fpCn))
                     {
                         throw new OperationException(ErrorCode.ALREADY_ISSUED,
                                 "certificate for the given CN already issued");
@@ -2353,7 +2354,7 @@ public class X509CA
                 }
                 else if(cnMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
                 {
-                    if(certstore.isCertForCNIssued(caInfo.getCertificate(), cn, certprofileName))
+                    if(certstore.isCertForCNIssued(caInfo.getCertificate(), fpCn, certprofileName))
                     {
                         throw new OperationException(ErrorCode.ALREADY_ISSUED,
                                 "certificate for the given CN and profile " + certprofileName + " already issued");
@@ -2371,7 +2372,7 @@ public class X509CA
                 final boolean certIssued;
                 if(subjectMode == DuplicationMode.FORBIDDEN)
                 {
-                    certIssued = certstore.isCertForSubjectIssued(caInfo.getCertificate(), sha1FpSubject);
+                    certIssued = certstore.isCertForSubjectIssued(caInfo.getCertificate(), fpSubject);
                     if(certIssued && incSerial == false)
                     {
                         throw new OperationException(ErrorCode.ALREADY_ISSUED,
@@ -2380,7 +2381,7 @@ public class X509CA
                 }
                 else if(subjectMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
                 {
-                    certIssued = certstore.isCertForSubjectIssued(caInfo.getCertificate(), sha1FpSubject, certprofileName);
+                    certIssued = certstore.isCertForSubjectIssued(caInfo.getCertificate(), fpSubject, certprofileName);
                     if(certIssued && incSerial == false)
                     {
                         throw new OperationException(ErrorCode.ALREADY_ISSUED,
@@ -2420,7 +2421,7 @@ public class X509CA
                         }
 
                         foundUniqueSubject = (certstore.certIssuedForSubject(caInfo.getCertificate(),
-                                X509Util.sha1sum_canonicalized_name(grantedSubject)) == false);
+                                X509Util.fp_canonicalized_name(grantedSubject)) == false);
                         if(foundUniqueSubject)
                         {
                             break;
@@ -2440,7 +2441,7 @@ public class X509CA
 
         try
         {
-            boolean addedCertInProcess = certstore.addCertInProcess(sha1FpPublicKey, sha1FpSubject);
+            boolean addedCertInProcess = certstore.addCertInProcess(fpPublicKey, fpSubject);
             if(addedCertInProcess == false)
             {
                 throw new OperationException(ErrorCode.ALREADY_ISSUED,
@@ -2624,7 +2625,7 @@ public class X509CA
         {
             try
             {
-                certstore.delteCertInProcess(sha1FpPublicKey, sha1FpSubject);
+                certstore.delteCertInProcess(fpPublicKey, fpSubject);
             }catch(OperationException e)
             {
             }

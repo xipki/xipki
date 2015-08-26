@@ -73,6 +73,9 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.BadFormatException;
 import org.xipki.pki.ca.api.CertprofileException;
@@ -92,9 +95,6 @@ import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.pki.ca.api.profile.x509.X509Certprofile;
 import org.xipki.pki.ca.certprofile.XmlX509Certprofile;
 import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
 import org.xipki.security.api.ExtensionExistence;
 import org.xipki.security.api.KeyUsage;
 import org.xipki.security.api.ObjectIdentifiers;
@@ -335,8 +335,10 @@ class IdentifiedX509Certprofile
             {
                 throw new CertprofileException(e.getMessage(), e);
             }
-            byte[] skiValue = sha1.digest(publicKeyInfo.getPublicKeyData().getBytes());
+            sha1.reset();
 
+            byte[] encodedSPKI = publicKeyInfo.getPublicKeyData().getBytes();
+            byte[] skiValue = sha1.digest(encodedSPKI);
             SubjectKeyIdentifier value = new SubjectKeyIdentifier(skiValue);
             addExtension(values, extType, value, extControl,
                     neededExtensionTypes, wantedExtensionTypes);

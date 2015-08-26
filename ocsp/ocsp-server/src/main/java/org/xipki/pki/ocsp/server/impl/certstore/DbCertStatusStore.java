@@ -354,15 +354,14 @@ public class DbCertStatusStore extends CertStatusStore
                 return CertStatusInfo.getIssuerUnknownCertStatusInfo(thisUpdate, null);
             }
 
-            long serialNumberLong = serialNumber.longValue();
-            // our database supports up to 8 byte serialNumber
-            if(serialNumber.signum() < 0 || BigInteger.valueOf(serialNumberLong).equals(serialNumber) == false)
+            // our database supports up to 63 bit (8 byte positive) serialNumber
+            if(serialNumber.bitLength() > 63)
             {
                 return CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
             }
 
-            final String sql = "ID, NOTBEFORE, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, PROFILE" +
-                    " FROM CERT WHERE ISSUER_ID=? AND SERIAL=?";
+            final String sql =
+                "ID, NOTBEFORE, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, PROFILE FROM CERT WHERE ISSUER_ID=? AND SERIAL=?";
 
             ResultSet rs = null;
             CertStatusInfo certStatusInfo = null;
