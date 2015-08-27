@@ -189,12 +189,12 @@ public class CaDbImportWorker extends DbPorterWorker
         try
         {
             Statement st = dataSource.createStatement(conn);
-            sql = "SELECT NAME, NEXT_SERIAL, CERT FROM CA";
+            sql = "SELECT NAME, NEXT_SN, CERT FROM CA";
             ResultSet rs = st.executeQuery(sql);
 
             while(rs.next())
             {
-                long nextSerial = rs.getLong("NEXT_SERIAL");
+                long nextSerial = rs.getLong("NEXT_SN");
                 if(nextSerial < 1)
                 {
                     // random serial number assignment
@@ -235,7 +235,7 @@ public class CaDbImportWorker extends DbPorterWorker
             st.close();
 
             // get the maximal serial number
-            sql = "SELECT MAX(SERIAL) FROM CERT WHERE CA_ID=?";
+            sql = "SELECT MAX(SN) FROM CERT WHERE CA_ID=?";
             PreparedStatement ps = conn.prepareStatement(sql);
             for(CAInfoBundle entry : CAInfoBundles)
             {
@@ -255,7 +255,7 @@ public class CaDbImportWorker extends DbPorterWorker
             }
             ps.close();
 
-            sql = "UPDATE CA SET NEXT_SERIAL=? WHERE NAME=?";
+            sql = "UPDATE CA SET NEXT_SN=? WHERE NAME=?";
             ps = conn.prepareStatement(sql);
             for(CAInfoBundle entry : CAInfoBundles)
             {
@@ -278,7 +278,7 @@ public class CaDbImportWorker extends DbPorterWorker
         for(CAInfoBundle entry : CAInfoBundles)
         {
             long nextSerial = Math.max(entry.CA_nextSerial, entry.should_CA_nextSerial);
-            String seqName = IoUtil.convertSequenceName("SERIAL_" + entry.CA_name);
+            String seqName = IoUtil.convertSequenceName("SN_" + entry.CA_name);
             dataSource.dropAndCreateSequence(seqName, nextSerial);
         }
 

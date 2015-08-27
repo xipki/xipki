@@ -58,8 +58,6 @@ import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.util.StringUtil;
-import org.xipki.security.api.HashAlgoType;
-import org.xipki.security.api.HashCalculator;
 import org.xipki.security.api.InvalidOIDorNameException;
 import org.xipki.security.api.ObjectIdentifiers;
 
@@ -92,12 +90,6 @@ public class SecurityUtil
         statusTextMap.put(PKIStatus.REVOCATION_WARNING, "revocationWarning");
         statusTextMap.put(PKIStatus.REVOCATION_NOTIFICATION, "revocationNotification");
         statusTextMap.put(PKIStatus.KEY_UPDATE_WARNING, "keyUpdateWarning");
-    }
-
-    public static String sha1sum(
-            final byte[] data)
-    {
-        return HashCalculator.hexHash(HashAlgoType.SHA1, data);
     }
 
     public static byte[] extractMinimalKeyStore(

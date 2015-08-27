@@ -824,42 +824,28 @@ public class X509Util
         return null;
     }
 
-    public static String cutText(String text)
+    public static String cutText(String text, int maxLen)
     {
-        if(text.length() <= 350)
+        if(text.length() <= maxLen)
         {
             return text;
         }
-        StringBuilder sb = new StringBuilder(350);
-        sb.append(text.substring(0, 350 - 13));
+        StringBuilder sb = new StringBuilder(maxLen);
+        sb.append(text.substring(0, maxLen - 13));
         sb.append("...skipped...");
         return sb.toString();
     }
 
-    public static String cutX500Name(X500Name name)
+    public static String cutX500Name(X500Name name, int maxLen)
     {
         String text = getRFC4519Name(name);
-        if(text.length() <= 350)
-        {
-            return text;
-        }
-        StringBuilder sb = new StringBuilder(350);
-        sb.append(text.substring(0, 350 - 13));
-        sb.append("...skipped...");
-        return sb.toString();
+        return cutText(text, maxLen);
     }
 
-    public static String cutX500Name(X500Principal name)
+    public static String cutX500Name(X500Principal name, int maxLen)
     {
         String text = getRFC4519Name(name);
-        if(text.length() <= 350)
-        {
-            return text;
-        }
-        StringBuilder sb = new StringBuilder(350);
-        sb.append(text.substring(0, 350 - 13));
-        sb.append("...skipped...");
-        return sb.toString();
+        return cutText(text, maxLen);
     }
 
 }

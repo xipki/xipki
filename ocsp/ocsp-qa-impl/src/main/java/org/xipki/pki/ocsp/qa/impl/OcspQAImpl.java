@@ -433,7 +433,7 @@ public class OcspQAImpl implements OcspQA
             if(certhashAlg != null)
             {
                 // certHash algorithm
-                ValidationIssue issue = new ValidationIssue("OCSP.RESPONSE." + index + ".CERTHASH.ALG", "certhash algorithm");
+                ValidationIssue issue = new ValidationIssue("OCSP.RESPONSE." + index + ".CHASH.ALG", "certhash algorithm");
                 issues.add(issue);
 
                 ASN1ObjectIdentifier is = certHash.getHashAlgorithm().getAlgorithm();
@@ -447,7 +447,7 @@ public class OcspQAImpl implements OcspQA
             if(encodedCert != null)
             {
                 ValidationIssue issue = new ValidationIssue(
-                        "OCSP.RESPONSE." + index + ".CERTHASH.VALIDITY", "certhash validity");
+                        "OCSP.RESPONSE." + index + ".CHASH.VALIDITY", "certhash validity");
                 issues.add(issue);
 
                 try

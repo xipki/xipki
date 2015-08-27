@@ -54,13 +54,13 @@ import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.security.api.HashCalculator;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11Identity;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11Module;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
-import org.xipki.security.api.util.SecurityUtil;
 import org.xipki.security.api.util.X509Util;
 import org.xipki.security.p11.iaik.IaikP11Slot;
 import org.xipki.security.p11.keystore.KeystoreP11Slot;
@@ -324,7 +324,7 @@ public class P11ListSlotCommand extends SecurityCommand
             .append(x509Cert.getNotAfter())
             .append("\n");
         sb.append("\t\t\tSHA1 Sum:   ")
-            .append(SecurityUtil.sha1sum(certBytes))
+            .append(HashCalculator.hexSha1(certBytes))
             .append("\n");
     }
 
@@ -362,7 +362,7 @@ public class P11ListSlotCommand extends SecurityCommand
         sb.append("\t\t\tSHA1 Sum:   ");
         try
         {
-            sb.append(SecurityUtil.sha1sum(cert.getEncoded()));
+            sb.append(HashCalculator.hexSha1(cert.getEncoded()));
         } catch (CertificateEncodingException e)
         {
             sb.append("ERROR");

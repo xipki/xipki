@@ -6,155 +6,204 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog dbchangelog-3.0.xsd"
   logicalFilePath="ocsp-init.xml">
+  <property name="x500name.type" value="VARCHAR(350)"/>
   <changeSet author="xipki" id="1">
     <!-- table DBSCHEMAINFO -->
-    <createTable tableName="DBSCHEMAINFO">
-      <column name="VERSION" type="SMALLINT">
+    <createTable tableName="DBSCHEMA" remarks="database schema information">
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="VALUE2" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <insert tableName="DBSCHEMAINFO">
-      <column name="VERSION" value="2"/>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="VERSION"/>
+      <column name="VALUE2" value="2"/>
+    </insert>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="X500NAME_MAXLEN"/>
+      <!-- must be the length of x500name.type -->
+      <column name="VALUE2" value="350"/>
     </insert>
     <!-- table ISSUER -->
     <createTable tableName="ISSUER">
       <column name="ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="SUBJECT" type="VARCHAR(400)">
+      <column name="SUBJECT" type="${x500name.type}">
         <constraints nullable="false"/>
       </column>
-      <column name="NOTBEFORE" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
+      <column name="NBEFORE" type="BIGINT"
+          remarks="notBefore of certificate, seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
-      <column name="NOTAFTER" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
+      <column name="NAFTER" type="BIGINT"
+          remarks="notAfter of certificate, seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA1_NAME" type="CHAR(40)">
+      <column name="S1S" type="CHAR(28)"
+          remarks="base64 enoded SHA1 sum of the subject">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA1_KEY" type="CHAR(40)">
+      <column name="S1K" type="CHAR(28)"
+          remarks="base64 enoded SHA1 sum of the key">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA224_NAME" type="CHAR(56)">
+      <column name="S224S" type="CHAR(40)"
+          remarks="base64 enoded SHA224 sum of the subject">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA224_KEY" type="CHAR(56)">
+      <column name="S224K" type="CHAR(40)"
+          remarks="base64 enoded SHA224 sum of the key">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA256_NAME" type="CHAR(64)">
+      <column name="S256S" type="CHAR(44)"
+          remarks="base64 enoded SHA256 sum of the subject">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA256_KEY" type="CHAR(64)">
+      <column name="S256K" type="CHAR(44)"
+          remarks="base64 enoded SHA256 sum of the key">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA384_NAME" type="CHAR(96)">
+      <column name="S384S" type="CHAR(64)"
+          remarks="base64 enoded SHA384 sum of the subject">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA384_KEY" type="CHAR(96)">
+      <column name="S384K" type="CHAR(64)"
+          remarks="base64 enoded SHA384 sum of the key">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA512_NAME" type="CHAR(128)">
+      <column name="S512S" type="CHAR(88)"
+          remarks="base64 enoded SHA512 sum of the subject">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA512_KEY" type="CHAR(128)">
+      <column name="S512K" type="CHAR(88)"
+          remarks="base64 enoded SHA512 sum of the key">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA1_CERT" type="CHAR(40)">
+      <column name="S1C" type="CHAR(28)"
+          remarks="base64 enoded SHA1 sum of the certificate">
         <constraints nullable="false"/>
       </column>
-      <column defaultValueNumeric="0" name="REVOKED" type="SMALLINT"/>
-      <column name="REV_REASON" type="SMALLINT"/>
-      <column name="REV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
-      <column name="REV_INV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
+      <column defaultValueNumeric="0" name="REV" type="SMALLINT"
+          remarks="whether the certificate is revoked"/>
+      <column name="RR" type="SMALLINT"
+          remarks="revocation reason"/>
+      <column name="RT"  type="BIGINT"
+          remarks="revocation time, seconds since January 1, 1970, 00:00:00 GMT"/>
+      <column name="RIT" type="BIGINT" 
+          remarks="revocation invalidity time, seconds since January 1, 1970, 00:00:00 GMT"/>
       <column name="CERT" type="VARCHAR(3000)">
         <constraints nullable="false"/>
       </column>
     </createTable>
     <!-- table CERT -->
-    <createTable tableName="CERT">
+    <createTable tableName="CERT"
+        remarks="certificate information">
       <column name="ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="ISSUER_ID" type="INT">
+      <column name="IID" type="INT"
+          remarks="issuer id">
         <constraints nullable="false"/>
       </column>
-      <column name="SERIAL" type="BIGINT">
+      <column name="SN" type="BIGINT"
+          remarks="serial number">
         <constraints nullable="false"/>
       </column>
-      <column name="LAST_UPDATE" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
+      <column name="UPDATE" type="BIGINT"
+          remarks="last update of the this database entry, seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
-      <column name="NOTBEFORE" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
+      <column name="NBEFORE" type="BIGINT"
+          remarks="notBefore of certificate, seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
-      <column name="NOTAFTER" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
+      <column name="NAFTER" type="BIGINT"
+          remarks="notAfter of certificate, seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
-      <column name="REVOKED" type="SMALLINT">
+      <column name="REV" type="SMALLINT"
+          remarks="whether the certificate is revoked">
         <constraints nullable="false"/>
       </column>
-      <column name="REV_REASON" type="SMALLINT"/>
-      <column name="REV_TIME" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
-      <column name="REV_INV_TIME" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
-      <column name="PROFILE" type="VARCHAR(45)"/>
+      <column name="RR" type="SMALLINT"
+          remarks="revocation reason"/>
+      <column name="RT"  type="BIGINT"
+          remarks="revocation time, seconds since January 1, 1970, 00:00:00 GMT"/>
+      <column name="RIT" type="BIGINT"
+          remarks="revocation invalidity time, seconds since January 1, 1970, 00:00:00 GMT"/>
+      <column name="PN" type="VARCHAR(45)"
+          remarks="certificate profile name"/>
     </createTable>
-    <addUniqueConstraint tableName="CERT" columnNames="ISSUER_ID, SERIAL" constraintName="CONST_ISSUER_SERIAL"/>
+    <addUniqueConstraint tableName="CERT" columnNames="IID, SN" constraintName="CONST_ISSUER_SN"/>
     <!-- table CERTHASH -->
-    <createTable tableName="CERTHASH">
-      <column name="CERT_ID" type="INT">
+    <createTable tableName="CHASH"
+        remarks="hashes of certificates">
+      <column name="CID" type="INT"
+          remarks="certificate id">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="SHA1" type="CHAR(40)">
+      <column name="S1" type="CHAR(28)"
+          remarks="base64 enoded SHA1 sum of the certificate">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA224" type="CHAR(56)">
+      <column name="S224" type="CHAR(40)"
+          remarks="base64 enoded SHA1 sum of the certificate">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA256" type="CHAR(64)">
+      <column name="S256" type="CHAR(44)"
+          remarks="base64 enoded SHA1 sum of the certificate">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA384" type="CHAR(96)">
+      <column name="S384" type="CHAR(64)"
+          remarks="base64 enoded SHA1 sum of the certificate">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA512" type="CHAR(128)">
+      <column name="S512" type="CHAR(88)"
+          remarks="base64 enoded SHA1 sum of the certificate">
         <constraints nullable="false"/>
       </column>
     </createTable>
     <!-- table RAWCERT -->
-    <createTable tableName="RAWCERT">
-      <column name="CERT_ID" type="INT">
+    <createTable tableName="CRAW"
+        remarks="raw certificates">
+      <column name="CID" type="INT"
+          remarks="certificate id">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="SUBJECT" type="VARCHAR(400)">
+      <column name="SUBJECT" type="${x500name.type}"
+          remarks="subject of the certificate">
         <constraints nullable="false"/>
       </column>
-      <column name="CERT" type="VARCHAR(3000)" remarks="Base64 encoded Certificate">
+      <column name="CERT" type="VARCHAR(3000)"
+          remarks="Base64 encoded Certificate">
         <constraints nullable="false"/>
       </column>
     </createTable>
   </changeSet>
   <!-- foreign key -->
   <changeSet author="xipki" id="2">
-    <addForeignKeyConstraint constraintName="FK_CERT_CAINFO1"
+    <addForeignKeyConstraint constraintName="FK_CERT_ISSUER1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="ISSUER_ID" baseTableName="CERT"
+      baseColumnNames="IID" baseTableName="CERT"
       referencedColumnNames="ID" referencedTableName="ISSUER"/>
-    <addForeignKeyConstraint baseColumnNames="CERT_ID"
+    <addForeignKeyConstraint constraintName="FK_CHASH_CERT1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
-      baseTableName="CERTHASH" constraintName="FK_CERTHASH_CERT1"
+      baseColumnNames="CID" baseTableName="CHASH"
       referencedColumnNames="ID" referencedTableName="CERT"/>
-    <addForeignKeyConstraint constraintName="FK_RAWCERT_CERT1"
+    <addForeignKeyConstraint constraintName="FK_CRAW_CERT1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="CERT_ID" baseTableName="RAWCERT"
+      baseColumnNames="CID" baseTableName="CRAW"
       referencedColumnNames="ID" referencedTableName="CERT"/>
   </changeSet>
   <changeSet author="xipki" id="3" dbms="mysql">
     <createTable tableName="SEQ_TBL">
-      <column name="SEQ_NAME" type="CHAR(100)">
+      <column name="SEQ_NAME" type="CHAR(20)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="SEQ_VALUE" type="BIGINT">
@@ -162,11 +211,11 @@
       </column>
     </createTable>
     <insert tableName="SEQ_TBL">
-      <column name="SEQ_NAME" value="CERT_ID"/>
+      <column name="SEQ_NAME" value="CID"/>
       <column name="SEQ_VALUE" value="1"/>
     </insert>
   </changeSet>
   <changeSet author="xipki" id="4" dbms="oracle,postgresql,db2,h2,hsqldb">
-    <createSequence sequenceName="CERT_ID" incrementBy="1" startValue="1"/>
+    <createSequence sequenceName="CID" incrementBy="1" startValue="1"/>
   </changeSet>
 </databaseChangeLog>

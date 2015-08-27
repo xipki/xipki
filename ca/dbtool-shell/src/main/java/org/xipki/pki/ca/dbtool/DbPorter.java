@@ -89,6 +89,9 @@ public class DbPorter
 
     protected final String baseDir;
 
+    protected final int dbSchemaVersion;
+    protected final int maxX500nameLen;
+
     public DbPorter(
             final DataSourceWrapper dataSource,
             final String baseDir,
@@ -113,6 +116,12 @@ public class DbPorter
             throw dataSource.translate(null, e);
         }
         this.baseDir = IoUtil.expandFilepath(baseDir);
+
+        DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(dataSource);
+        String s = dbSchemaInfo.getVariableValue("VERSION");
+        this.dbSchemaVersion = Integer.parseInt(s);
+        s = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
+        this.maxX500nameLen = Integer.parseInt(s);
     }
 
     protected static void setLong(
@@ -431,21 +440,6 @@ public class DbPorter
                     child.delete();
                 }
             }
-        }
-    }
-
-    protected int getDbSchemaVersion()
-    throws DataAccessException
-    {
-        final String tblName = "DBSCHEMAINFO";
-        if(dataSource.tableExists(null, tblName) == false)
-        {
-            return 1;
-        }
-        else
-        {
-            int version = (int) dataSource.getMax(null, tblName, "VERSION");
-            return Math.max(1, version);
         }
     }
 
