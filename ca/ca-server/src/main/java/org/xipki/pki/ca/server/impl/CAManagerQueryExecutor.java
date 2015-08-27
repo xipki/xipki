@@ -588,10 +588,10 @@ class CAManagerQueryExecutor
             final CertificateStore certstore)
     throws CAMgmtException
     {
-        final String sql = "NAME, ART, NEXT_SERIAL, NEXT_CRLNO, STATUS, MAX_VALIDITY" +
+        final String sql = "NAME, ART, NEXT_SN, NEXT_CRLNO, STATUS, MAX_VALIDITY" +
                 ", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME" +
                 ", DUPLICATE_KEY, DUPLICATE_SUBJECT, DUPLICATE_CN, PERMISSIONS, NUM_CRLS" +
-                ", EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, VALIDITY_MODE" +
+                ", EXPIRATION_PERIOD, REV, RR, RT, RIT, VALIDITY_MODE" +
                 ", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS, EXTRA_CONTROL" +
                 " FROM CA WHERE NAME=?";
         PreparedStatement stmt = null;
@@ -610,7 +610,7 @@ class CAManagerQueryExecutor
                     throw new CAMgmtException("CA " + name + " is not X509CA, and is not supported");
                 }
 
-                long next_serial = rs.getLong("NEXT_SERIAL");
+                long next_serial = rs.getLong("NEXT_SN");
                 int next_crlNo = rs.getInt("NEXT_CRLNO");
                 String status = rs.getString("STATUS");
                 String crl_uris = rs.getString("CRL_URIS");
@@ -633,12 +633,12 @@ class CAManagerQueryExecutor
                 String extra_control = rs.getString("EXTRA_CONTROL");
 
                 CertRevocationInfo revocationInfo = null;
-                boolean revoked = rs.getBoolean("REVOKED");
+                boolean revoked = rs.getBoolean("REV");
                 if(revoked)
                 {
-                    int rev_reason = rs.getInt("REV_REASON");
-                    long rev_time = rs.getInt("REV_TIME");
-                    long rev_invalidity_time = rs.getInt("REV_INV_TIME");
+                    int rev_reason = rs.getInt("RR");
+                    long rev_time = rs.getInt("RT");
+                    long rev_invalidity_time = rs.getInt("RIT");
                     revocationInfo = new CertRevocationInfo(rev_reason, new Date(rev_time * 1000),
                             rev_invalidity_time == 0 ? null : new Date(rev_invalidity_time * 1000));
                 }
@@ -923,7 +923,7 @@ class CAManagerQueryExecutor
 
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("INSERT INTO CA (");
-        sqlBuilder.append("NAME, ART, SUBJECT, NEXT_SERIAL, NEXT_CRLNO, STATUS");
+        sqlBuilder.append("NAME, ART, SUBJECT, NEXT_SN, NEXT_CRLNO, STATUS");
         sqlBuilder.append(", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS");
         sqlBuilder.append(", MAX_VALIDITY, CERT, SIGNER_TYPE, SIGNER_CONF");
         sqlBuilder.append(", CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME");
@@ -2426,7 +2426,7 @@ class CAManagerQueryExecutor
             final CertRevocationInfo revocationInfo)
     throws CAMgmtException
     {
-        String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INV_TIME=? WHERE NAME=?";
+        String sql = "UPDATE CA SET REV=?, RR=?, RT=?, RIT=? WHERE NAME=?";
         PreparedStatement ps = null;
         try
         {
@@ -2522,7 +2522,7 @@ class CAManagerQueryExecutor
     {
         LOG.info("Unrevoking of CA '{}'", caName);
 
-        final String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INV_TIME=? WHERE NAME=?";
+        final String sql = "UPDATE CA SET REV=?, RR=?, RT=?, RIT=? WHERE NAME=?";
         PreparedStatement ps = null;
         try
         {

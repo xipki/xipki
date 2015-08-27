@@ -124,8 +124,8 @@ public class CaAddFromFileCommand extends CaCommand
             throw new IllegalCmdParamException("unsupported " + key + ": '" + s + "'");
         }
 
-        // NEXT_SERIAL
-        key = "NEXT_SERIAL";
+        // NEXT_SN
+        key = "NEXT_SN";
         long nextSerial = getRequiredLongProp(props, key);
         if(nextSerial < 0)
         {
@@ -286,7 +286,7 @@ public class CaAddFromFileCommand extends CaCommand
         entry.setPermissions(_permissions);
 
         // REVOKED
-        key = "REVOKED";
+        key = "REV";
         s = getStrProp(props, key, true);
         boolean revoked;
         if("true".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s))
@@ -305,15 +305,15 @@ public class CaAddFromFileCommand extends CaCommand
         if(revoked)
         {
             // REV_REASON
-            key = "REV_REASON";
+            key = "RR";
             int reasonCode = getRequiredIntProp(props, key);
 
             // REV_TIME
-            key = "REV_TIME";
+            key = "RT";
             Date revocationTime = new Date(getRequiredLongProp(props, key) * 1000);
 
             // REV_INV_TIME
-            key = "REV_INV_TIME";
+            key = "RIT";
             Long t = getLongProp(props, key, false);
             Date invalidityTime = null;
             if(t != null)

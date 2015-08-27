@@ -51,8 +51,8 @@ import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.security.api.HashCalculator;
 import org.xipki.security.api.ObjectIdentifiers;
-import org.xipki.security.api.util.SecurityUtil;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -113,7 +113,7 @@ public class ExtractCertFromCRLCommand extends SecurityCommand
             }
 
             byte[] certBytes = cert.getEncoded();
-            String sha1_fp_cert = SecurityUtil.sha1sum(certBytes);
+            String sha1_fp_cert = HashCalculator.hexSha1(certBytes);
 
             ZipEntry certZipEntry = new ZipEntry(sha1_fp_cert + ".der");
             zip.putNextEntry(certZipEntry);

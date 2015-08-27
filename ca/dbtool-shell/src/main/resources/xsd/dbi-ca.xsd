@@ -195,6 +195,7 @@
       <xs:element name="cmpcontrolName" type="xs:string" minOccurs="0"/>
       <xs:element name="duplicateKey" type="xs:int"/>
       <xs:element name="duplicateSubject" type="xs:int"/>
+      <xs:element name="duplicateCN" type="xs:int"/>
       <xs:element name="permissions" type="xs:string" minOccurs="0"/>
       <xs:element name="numCrls" type="xs:int" minOccurs="0"/>
       <xs:element name="expirationPeriod" type="xs:int"/>

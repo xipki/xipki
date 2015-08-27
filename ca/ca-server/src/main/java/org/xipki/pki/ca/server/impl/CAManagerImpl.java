@@ -1359,9 +1359,9 @@ implements CAManager, CmpResponderManager, ScepManager
             long maxId = dataSource.getMax(null, "DELTACRL_CACHE", "ID");
             dataSource.setLastUsedSeqValue("DCC_ID", maxId);
 
-            // sequence CERT_ID
+            // sequence CID
             maxId = dataSource.getMax(null, "CERT", "ID");
-            dataSource.setLastUsedSeqValue("CERT_ID", maxId);
+            dataSource.setLastUsedSeqValue("CID", maxId);
         }catch(DataAccessException e)
         {
             throw new CAMgmtException(e.getMessage(), e);

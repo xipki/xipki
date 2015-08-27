@@ -51,7 +51,7 @@ import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.LogUtil;
@@ -75,6 +75,15 @@ import org.xipki.security.api.HashAlgoType;
 public class DbCertStatusStore extends CertStatusStore
 {
     private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
+    private static final Map<HashAlgoType, String> selectChashSqlMaps = new HashMap<>();
+
+    static
+    {
+        for(HashAlgoType h : HashAlgoType.values())
+        {
+            selectChashSqlMaps.put(h, h.getShortName() + " FROM CHASH WHERE CID=?");
+        }
+    }
 
     private static class SimpleIssuerEntry
     {
@@ -145,7 +154,7 @@ public class DbCertStatusStore extends CertStatusStore
         {
             if(initialized)
             {
-                final String sql = "SELECT ID, REVOKED, REV_TIME, SHA1_CERT FROM ISSUER";
+                final String sql = "SELECT ID,REV,RT,S1C FROM ISSUER";
                 PreparedStatement ps = borrowPreparedStatement(sql);
                 ResultSet rs = null;
 
@@ -156,18 +165,18 @@ public class DbCertStatusStore extends CertStatusStore
                     rs = ps.executeQuery();
                     while(rs.next())
                     {
-                        String sha1Fp = rs.getString("SHA1_CERT");
+                        String sha1Fp = rs.getString("S1C");
                         if(issuerFilter.includeIssuerWithSha1Fp(sha1Fp) == false)
                         {
                                 continue;
                         }
 
                         int id = rs.getInt("ID");
-                        boolean revoked = rs.getBoolean("REVOKED");
+                        boolean revoked = rs.getBoolean("REV");
                         Long revTimeMs = null;
                         if(revoked)
                         {
-                            revTimeMs = rs.getLong("REV_TIME") * 1000;
+                            revTimeMs = rs.getLong("RT") * 1000;
                         }
 
                         SimpleIssuerEntry issuerEntry = new SimpleIssuerEntry(id, revTimeMs);
@@ -219,17 +228,8 @@ public class DbCertStatusStore extends CertStatusStore
             HashAlgoType[] hashAlgoTypes = {HashAlgoType.SHA1, HashAlgoType.SHA224, HashAlgoType.SHA256,
                     HashAlgoType.SHA384, HashAlgoType.SHA512};
 
-            StringBuilder sb = new StringBuilder();
-            sb.append("SELECT ID, NOTBEFORE, REVOKED, REV_TIME, SHA1_CERT");
-            for(HashAlgoType hashAlgoType : hashAlgoTypes)
-            {
-                String hashAlgo = hashAlgoType.name().toUpperCase();
-                sb.append(", ").append(hashAlgo).append("_NAME");
-                sb.append(", ").append(hashAlgo).append("_KEY");
-            };
-            sb.append(" FROM ISSUER");
-
-            String sql = sb.toString();
+            final String sql =
+                "SELECT ID,NBEFORE,REV,RT,S1C,S1S,S1K,S224S,S224K,S256S,S256K,S384S,S384K,S512S,S512K FROM ISSUER";
             PreparedStatement ps = borrowPreparedStatement(sql);
 
             ResultSet rs = null;
@@ -239,44 +239,43 @@ public class DbCertStatusStore extends CertStatusStore
                 List<IssuerEntry> caInfos = new LinkedList<>();
                 while(rs.next())
                 {
-                    String sha1Fp = rs.getString("SHA1_CERT");
+                    String sha1Fp = rs.getString("S1C");
                     if(issuerFilter.includeIssuerWithSha1Fp(sha1Fp) == false)
                     {
                         continue;
                     }
 
                     int id = rs.getInt("ID");
-                    long notBeforeInSecond = rs.getLong("NOTBEFORE");
+                    long notBeforeInSecond = rs.getLong("NBEFORE");
 
                     Map<HashAlgoType, IssuerHashNameAndKey> hashes = new HashMap<>();
-                    for(HashAlgoType hashAlgoType : hashAlgoTypes)
+                    for(HashAlgoType h : hashAlgoTypes)
                     {
-                        String hashAlgo = hashAlgoType.name().toUpperCase();
-                        String hash_name = rs.getString(hashAlgo + "_NAME");
-                        String hash_key = rs.getString(hashAlgo + "_KEY");
-                        byte[] hashNameBytes = Hex.decode(hash_name);
-                        byte[] hashKeyBytes = Hex.decode(hash_key);
+                        String hash_name = rs.getString(h.getShortName() + "S");
+                        String hash_key = rs.getString(h.getShortName() + "K");
+                        byte[] hashNameBytes = Base64.decode(hash_name);
+                        byte[] hashKeyBytes = Base64.decode(hash_key);
                         IssuerHashNameAndKey hash = new IssuerHashNameAndKey(
-                                hashAlgoType, hashNameBytes, hashKeyBytes);
+                                h, hashNameBytes, hashKeyBytes);
 
-                        if(hashAlgoType == HashAlgoType.SHA1)
+                        if(h == HashAlgoType.SHA1)
                         {
                             for(IssuerEntry existingIssuer : caInfos)
                             {
-                                if(existingIssuer.matchHash(hashAlgoType, hashNameBytes, hashKeyBytes))
+                                if(existingIssuer.matchHash(h, hashNameBytes, hashKeyBytes))
                                 {
                                     throw new Exception("found at least two issuers with the same subject and key");
                                 }
                             }
                         }
-                        hashes.put(hashAlgoType, hash);
+                        hashes.put(h, hash);
                     }
 
                     IssuerEntry caInfoEntry = new IssuerEntry(id, hashes, new Date(notBeforeInSecond * 1000));
-                    boolean revoked = rs.getBoolean("REVOKED");
+                    boolean revoked = rs.getBoolean("REV");
                     if(revoked)
                     {
-                        long l = rs.getLong("REV_TIME");
+                        long l = rs.getLong("RT");
                         caInfoEntry.setRevocationInfo(new Date(l * 1000));
                     }
 
@@ -360,8 +359,7 @@ public class DbCertStatusStore extends CertStatusStore
                 return CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
             }
 
-            final String sql =
-                "ID, NOTBEFORE, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, PROFILE FROM CERT WHERE ISSUER_ID=? AND SERIAL=?";
+            final String sql = "ID,NBEFORE,REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?";
 
             ResultSet rs = null;
             CertStatusInfo certStatusInfo = null;
@@ -378,7 +376,7 @@ public class DbCertStatusStore extends CertStatusStore
 
                 if(rs.next())
                 {
-                    String certprofile = rs.getString("PROFILE");
+                    String certprofile = rs.getString("PN");
                     boolean ignore = certprofile != null &&
                             certprofileOption != null &&
                             certprofileOption.include(certprofile) == false;
@@ -395,12 +393,12 @@ public class DbCertStatusStore extends CertStatusStore
                             certHash = getCertHash(certId, certHashAlgo);
                         }
 
-                        boolean revoked = rs.getBoolean("REVOKED");
+                        boolean revoked = rs.getBoolean("REV");
                         if(revoked)
                         {
-                            int reason = rs.getInt("REV_REASON");
-                            long revocationTime = rs.getLong("REV_TIME");
-                            long invalidatityTime = rs.getLong("REV_INV_TIME");
+                            int reason = rs.getInt("RR");
+                            long revocationTime = rs.getLong("RT");
+                            long invalidatityTime = rs.getLong("RIT");
 
                             Date invTime = null;
                             if(invalidatityTime != 0 && invalidatityTime != revocationTime)
@@ -471,7 +469,7 @@ public class DbCertStatusStore extends CertStatusStore
             final HashAlgoType hashAlgo)
     throws DataAccessException
     {
-        final String sql = hashAlgo.name().toUpperCase() + " FROM CERTHASH WHERE CERT_ID=?";
+        final String sql = selectChashSqlMaps.get(hashAlgo);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(
                 dataSource.createFetchFirstSelectSQL(sql, 1));
@@ -482,8 +480,8 @@ public class DbCertStatusStore extends CertStatusStore
 
             if(rs.next())
             {
-                String hexHash = rs.getString(1);
-                return Hex.decode(hexHash);
+                String b64Hash = rs.getString(1);
+                return Base64.decode(b64Hash);
             }
             else
             {

@@ -2296,7 +2296,7 @@ public class X509CA
                     if(issuedCert == null)
                     {
                         throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                            "could not find certificate in table RAWCERT for CERT_ID " + bundle.getCertId());
+                            "could not find certificate in table CRAW for CID " + bundle.getCertId());
                     }
                     else
                     {

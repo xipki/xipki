@@ -38,7 +38,6 @@ package org.xipki.pki.ca.server.impl.publisher;
 import java.util.Arrays;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.util.encoders.Hex;
 
 /**
  * @author Lijun Liao
@@ -54,13 +53,13 @@ class IssuerEntry
     IssuerEntry(
             final int id,
             final String subject,
-            final String hexSha1Fp,
+            final String b64Sha1Fp,
             final String b64Cert)
     {
         super();
         this.id = id;
         this.subject = subject;
-        this.sha1Fp = Hex.decode(hexSha1Fp);
+        this.sha1Fp = Base64.decode(b64Sha1Fp);
         this.cert = Base64.decode(b64Cert);
     }
 

@@ -296,7 +296,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
             final List<CaType> cas)
     throws DataAccessException, CertificateException
     {
-        System.out.println(" importing table ISSUER");
+        System.out.println("importing table ISSUER");
         final String sql = OcspCertStoreDbImporter.SQL_ADD_ISSUER;
         PreparedStatement ps = prepareStatement(sql);
 
@@ -352,20 +352,20 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
 
                     int idx = 1;
                     ps.setInt(idx++, issuer.getId());
-                    ps.setString(idx++, X509Util.getRFC4519Name(c.getSubject()));
+                    ps.setString(idx++, X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
                     ps.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
                     ps.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedName));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedName));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedKey));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedName));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedKey));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedName));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedKey));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedName));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedKey));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedName));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedKey));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA224, encodedName));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA224, encodedKey));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA256, encodedName));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA256, encodedKey));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA384, encodedName));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA384, encodedKey));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA512, encodedName));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA512, encodedKey));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert));
                     ps.setString(idx++, b64Cert);
 
                     setBoolean(ps, idx++, ca.isRevoked());
@@ -432,8 +432,8 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
         ProcessLog.printHeader();
 
         PreparedStatement ps_cert = prepareStatement(OcspCertStoreDbImporter.SQL_ADD_CERT);
-        PreparedStatement ps_certhash = prepareStatement(OcspCertStoreDbImporter.SQL_ADD_CERTHASH);
-        PreparedStatement ps_rawcert = prepareStatement(OcspCertStoreDbImporter.SQL_ADD_RAWCERT);
+        PreparedStatement ps_certhash = prepareStatement(OcspCertStoreDbImporter.SQL_ADD_CHASH);
+        PreparedStatement ps_rawcert = prepareStatement(OcspCertStoreDbImporter.SQL_ADD_CRAW);
 
         try
         {
@@ -617,15 +617,15 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                     {
                         int idx = 1;
                         ps_certhash.setInt(idx++, currentId);
-                        ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
-                        ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
-                        ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
-                        ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
-                        ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
+                        ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert));
+                        ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA224, encodedCert));
+                        ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA256, encodedCert));
+                        ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA384, encodedCert));
+                        ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA512, encodedCert));
                         ps_certhash.addBatch();
                     }catch(SQLException e)
                     {
-                        throw translate(OcspCertStoreDbImporter.SQL_ADD_CERTHASH, e);
+                        throw translate(OcspCertStoreDbImporter.SQL_ADD_CHASH, e);
                     }
 
                     // rawcert
@@ -633,12 +633,12 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                     {
                         int idx = 1;
                         ps_rawcert.setInt(idx++, currentId);
-                        ps_rawcert.setString(idx++, X509Util.cutX500Name(c.getSubjectX500Principal()));
+                        ps_rawcert.setString(idx++, X509Util.cutX500Name(c.getSubjectX500Principal(), maxX500nameLen));
                         ps_rawcert.setString(idx++, Base64.toBase64String(encodedCert));
                         ps_rawcert.addBatch();
                     }catch(SQLException e)
                     {
-                        throw translate(OcspCertStoreDbImporter.SQL_ADD_RAWCERT, e);
+                        throw translate(OcspCertStoreDbImporter.SQL_ADD_CRAW, e);
                     }
                 }
 
@@ -657,10 +657,10 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                             sql = OcspCertStoreDbImporter.SQL_ADD_CERT;
                             ps_cert.executeBatch();
 
-                            sql = OcspCertStoreDbImporter.SQL_ADD_CERTHASH;
+                            sql = OcspCertStoreDbImporter.SQL_ADD_CHASH;
                             ps_certhash.executeBatch();
 
-                            sql = OcspCertStoreDbImporter.SQL_ADD_RAWCERT;
+                            sql = OcspCertStoreDbImporter.SQL_ADD_CRAW;
                             ps_rawcert.executeBatch();
 
                             sql = null;

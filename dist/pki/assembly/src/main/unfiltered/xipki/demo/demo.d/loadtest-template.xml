@@ -16,6 +16,12 @@
     <rsaKey modulusLength="2048"/>
   </enrollCert>
   <enrollCert>
+    <certprofile>TLS</certprofile>
+    <subject>CN=xipki.org,O=example PKI TLS RSA,OU=A,C=DE</subject>
+    <randomDN>O</randomDN>
+    <rsaKey modulusLength="2048"/>
+  </enrollCert>
+  <enrollCert>
     <certprofile>TLSwithIncSN</certprofile>
     <subject>CN=xipki.org,O=example PKI TLSwithIncSN DSA,C=DE</subject>
     <randomDN>O</randomDN>

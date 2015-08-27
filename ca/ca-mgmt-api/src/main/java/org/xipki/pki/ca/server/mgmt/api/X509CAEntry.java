@@ -116,7 +116,7 @@ implements Serializable
         }
         this.numCrls = numCrls;
 
-        this.serialSeqName = IoUtil.convertSequenceName("SERIAL_" + getName());
+        this.serialSeqName = IoUtil.convertSequenceName("SN_" + getName());
         this.nextSerial = nextSerial;
         this.nextCRLNumber = nextCRLNumber;
 

@@ -33,75 +33,73 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.server.impl.certstore;
+package org.xipki.pki.ca.dbtool;
 
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.HashSet;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
-import org.xipki.security.api.HashCalculator;
+import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
 
 /**
  * @author Lijun Liao
  */
 
-public class IssuerFilter
+public class DbSchemaInfo
 {
-    private final Set<String> includeSha1Fps;
-    private final Set<String> excludeSha1Fps;
+    private final Map<String, String> variables = new HashMap<>();
 
-    public IssuerFilter(
-            final Set<X509Certificate> includes,
-            final Set<X509Certificate> excludes)
-    throws CertificateEncodingException
+    public DbSchemaInfo(DataSourceWrapper dataSource)
+    throws DataAccessException
     {
-        if(includes == null)
+        final String sql = "SELECT NAME, VALUE2 FROM DBSCHEMA";
+        Connection c = dataSource.getConnection();
+        if(c == null)
         {
-            includeSha1Fps = null;
-        }
-        else
-        {
-            includeSha1Fps = new HashSet<>(includes.size());
-            for(X509Certificate include : includes)
-            {
-                String sha1Fp = HashCalculator.base64Sha1(include.getEncoded());
-                includeSha1Fps.add(sha1Fp);
-            }
+            throw new DataAccessException("could not get connection");
         }
 
-        if(excludes == null)
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try
         {
-            excludeSha1Fps = null;
-        }
-        else
-        {
-            excludeSha1Fps = new HashSet<>(excludes.size());
-            for(X509Certificate exclude : excludes)
+            stmt = dataSource.createStatement(c);
+            if(stmt == null)
             {
-                String sha1Fp = HashCalculator.base64Sha1(exclude.getEncoded());
-                excludeSha1Fps.add(sha1Fp);
+                throw new DataAccessException("could not create statement");
             }
+
+            rs = stmt.executeQuery(sql);
+            while(rs.next())
+            {
+                String name = rs.getString("NAME");
+                String value = rs.getString("VALUE2");
+                variables.put(name, value);
+            }
+        } catch(SQLException e)
+        {
+            throw dataSource.translate(sql, e);
+        } finally
+        {
+            dataSource.releaseResources(stmt, rs);
         }
     }
 
-    public boolean includeIssuerWithSha1Fp(
-            final String sha1Fp)
+    public Set<String> getVariableNames()
     {
-        if(includeSha1Fps == null || includeSha1Fps.contains(sha1Fp))
-        {
-            if(excludeSha1Fps == null)
-            {
-                return true;
-            }
-            else
-            {
-                return excludeSha1Fps.contains(sha1Fp) == false;
-            }
-        }
-        else
-        {
-            return false;
-        }
+        return Collections.unmodifiableSet(variables.keySet());
     }
+
+    public String getVariableValue(String variableName)
+    {
+        return variables.get(variableName);
+    }
+
 }

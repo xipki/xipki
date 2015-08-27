@@ -6,26 +6,38 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog dbchangelog-3.0.xsd"
   logicalFilePath="ca-init.xml">
+  <property name="x500name.type" value="VARCHAR(350)"/>
   <!-- 100 MB for DB2 -->
   <property name="crl.data.type" value="CLOB(104857600)" dbms="db2"/>
   <property name="crl.data.type" value="CLOB" dbms="oracle,postgresql,mysql,h2,hsqldb"/>
   <!-- CA configuration :: create table -->
   <changeSet author="xipki" id="1">
     <!-- table DBSCHEMAINFO -->
-    <createTable tableName="DBSCHEMAINFO">
-      <column name="VERSION" type="SMALLINT">
+    <createTable tableName="DBSCHEMA"
+        remarks="database schema information">
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="VALUE2" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <insert tableName="DBSCHEMAINFO">
-      <column name="VERSION" value="2"/>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="VERSION"/>
+      <column name="VALUE2" value="2"/>
+    </insert>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="X500NAME_MAXLEN"/>
+      <!-- must be the length of x500name.type -->
+      <column name="VALUE2" value="350"/>
     </insert>
     <!-- table CALOCK -->
     <createTable tableName="SYSTEM_EVENT">
       <column name="NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="EVENT_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT">
+      <column name="EVENT_TIME" type="BIGINT"
+          remarks="seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
       <column name="EVENT_TIME2" type="TIMESTAMP"/>
@@ -102,7 +114,8 @@
       <column name="TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
-      <column name="CONF" remarks="profile data, depends on the type" type="CLOB"/>
+      <column name="CONF" type="CLOB"
+          remarks="profile data, depends on the type"/>
     </createTable>
     <!-- table CA -->
     <createTable tableName="CA">
@@ -112,12 +125,14 @@
       <column name="ART" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
-      <column name="NEXT_SERIAL" type="BIGINT"/>
+      <column name="NEXT_SN" type="BIGINT"
+          remarks="next serial number"/>
       <column name="NEXT_CRLNO" type="INT"/>
-      <column name="STATUS" remarks="valid values: active, inactive" type="VARCHAR(10)">
+      <column name="STATUS" type="VARCHAR(10)"
+          remarks="valid values: active, inactive">
         <constraints nullable="false"/>
       </column>
-      <column name="SUBJECT" type="VARCHAR(400)">
+      <column name="SUBJECT" type="${x500name.type}">
         <constraints nullable="false"/>
       </column>
       <column name="CRL_URIS" type="VARCHAR(1000)"/>
@@ -132,29 +147,38 @@
         <constraints nullable="false"/>
       </column>
       <column name="RESPONDER_NAME" type="VARCHAR(45)"/>
-      <column defaultValueNumeric="2" name="DUPLICATE_KEY" type="SMALLINT">
+      <column defaultValueNumeric="3" name="DUPLICATE_KEY" type="SMALLINT"
+          remarks="whether duplicate public key is allowed: 1 for forbidden, 2 for forbiddenWithinProfile and 3 for permitted">
         <constraints nullable="false"/>
       </column>
-      <column defaultValueNumeric="2" name="DUPLICATE_SUBJECT" type="SMALLINT">
+      <column defaultValueNumeric="3" name="DUPLICATE_SUBJECT" type="SMALLINT"
+          remarks="whether duplicate subject is allowed: 1 for forbidden, 2 for forbiddenWithinProfile and 3 for permitted">
         <constraints nullable="false"/>
       </column>
-      <column defaultValueNumeric="2" name="DUPLICATE_CN" type="SMALLINT">
+      <column defaultValueNumeric="3" name="DUPLICATE_CN" type="SMALLINT"
+          remarks="whether duplicate common name is allowed: 1 for forbidden, 2 for forbiddenWithinProfile and 3 for permitted">
         <constraints nullable="false"/>
       </column>
       <column name="VALIDITY_MODE" type="varchar(100)"/>
       <column name="PERMISSIONS" type="VARCHAR(200)">
         <constraints nullable="false"/>
       </column>
-      <column defaultValueNumeric="30" name="NUM_CRLS" type="SMALLINT">
+      <column name="NUM_CRLS" type="SMALLINT" defaultValueNumeric="30">
         <constraints nullable="false"/>
       </column>
-      <column defaultValueNumeric="365" name="EXPIRATION_PERIOD" type="SMALLINT"/>
-      <column defaultValueNumeric="0" name="REVOKED" type="SMALLINT">
+      <column name="EXPIRATION_PERIOD" type="SMALLINT" defaultValueNumeric="365" />
+
+      <column name="REV" type="SMALLINT" defaultValueNumeric="0" 
+          remarks="whether the certificate is revoked">
         <constraints nullable="false"/>
       </column>
-      <column name="REV_REASON" type="SMALLINT"/>
-      <column name="REV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
-      <column name="REV_INV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
+      <column name="RR" type="SMALLINT"
+          remarks="revocation reason"/>
+      <column name="RT"  type="BIGINT"
+          remarks="revocation time, seconds since January 1, 1970, 00:00:00 GMT"/>
+      <column name="RIT" type="BIGINT"
+          remarks="revocation invalidity time, seconds since January 1, 1970, 00:00:00 GMT"/>
+
       <column name="SIGNER_TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
@@ -231,13 +255,13 @@
       <column name="ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="SUBJECT" type="VARCHAR(400)">
+      <column name="SUBJECT" type="${x500name.type}">
         <constraints nullable="false"/>
       </column>
       <column name="CERT" type="VARCHAR(3000)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA1_CERT" type="CHAR(40)">
+      <column name="SHA1_CERT" type="CHAR(28)">
         <constraints nullable="false"/>
       </column>
     </createTable>
@@ -321,86 +345,104 @@
       <column name="ART" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
-      <column name="CA_ID" type="INT">
+      <column name="CA_ID" type="INT"
+          remarks="Issuer (CA) id">
         <constraints nullable="false"/>
       </column>
-      <column name="SERIAL" type="BIGINT">
+      <column name="SN" type="BIGINT"
+          remarks="serial number">
         <constraints nullable="false"/>
       </column>
-      <column name="PROFILE_ID" type="INT">
+      <column name="PID" type="INT"
+          remarks="certificate profile id">
         <constraints nullable="false"/>
       </column>
-      <column name="REQUESTOR_ID" type="INT"/>
-      <column name="FP_SUBJECT" type="BIGINT">
+      <column name="RID" type="INT"
+          remarks="requestor id"/>
+      <column name="FP_S" type="BIGINT"
+          remarks="first 8 bytes of the SHA1 sum of the subject">
         <constraints nullable="false"/>
       </column>
-      <column name="FP_REQ_SUBJECT" type="BIGINT"/>
-      <column name="FP_PK" type="BIGINT">
+      <column name="FP_RS" type="BIGINT"
+          remarks="first 8 bytes of the SHA1 sum of the requested subject"/>
+      <column name="FP_K" type="BIGINT"
+          remarks="first 8 bytes of the SHA1 sum of the public key">
         <constraints nullable="false"/>
       </column>
-      <column name="FP_CN" type="BIGINT">
+      <column name="FP_CN" type="BIGINT"
+          remarks="first 8 bytes of the SHA1 sum of the public key">
         <constraints nullable="false"/>
       </column>
-      <column name="LAST_UPDATE" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT">
+      <column name="UPDATE" type="BIGINT"
+          remarks="seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
-      <column name="NOTBEFORE" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT">
+      <column name="NBEFORE" type="BIGINT"
+          remarks="notBefore, seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
-      <column name="NOTAFTER" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT">
+      <column name="NAFTER" type="BIGINT"
+          remarks="notAfter, seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
-      <column name="REVOKED" type="SMALLINT">
+      <column name="REV" type="BIGINT"
+          remarks="whether the certificate is revoked">
         <constraints nullable="false"/>
       </column>
-      <column name="REV_REASON" type="SMALLINT"/>
-      <column name="REV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
-      <column name="REV_INV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
-      <column name="EE" type="SMALLINT" remarks="whether it is an end entity cert">
+      <column name="RR" type="SMALLINT"
+          remarks="revocation reason"/>
+      <column name="RT"  type="BIGINT"
+          remarks="revocation time, seconds since January 1, 1970, 00:00:00 GMT"/>
+      <column name="RIT" type="BIGINT"
+          remarks="revocation invalidity time, seconds since January 1, 1970, 00:00:00 GMT"/>
+      <column name="EE" type="SMALLINT"
+          remarks="whether it is an end entity cert">
         <constraints nullable="false"/>
       </column>
       <column name="UNAME" type="VARCHAR(100)"/>
-      <column name="REQ_TYPE" type="SMALLINT"
-         remarks="how the certificate is requested, 1 for direct via CA command, 2 for CMP, 3 for SCEP">
+      <column name="RTYPE" type="SMALLINT"
+         remarks="request type, 1 for direct via CA command, 2 for CMP, 3 for SCEP">
         <constraints nullable="false"/>
       </column>
-      <column name="SUBJECT" type="VARCHAR(400)">
+      <column name="SUBJECT" type="${x500name.type}">
         <constraints nullable="false"/>
       </column>
-      <column name="TID" remarks="heximal transactionId, maximal 256 bit" type="VARCHAR(64)"/>
+      <column name="TID" type="VARCHAR(43)"
+          remarks="base64 encoded transactionId, maximal 256 bit"/>
     </createTable>
-    <addUniqueConstraint tableName="CERT" columnNames="CA_ID, SERIAL" constraintName="CONST_CA_SERIAL"/>
-    <createIndex tableName="CERT" unique="false" indexName="IDX_FP_PK">
-      <column name="FP_PK"/>
+    <addUniqueConstraint tableName="CERT" columnNames="CA_ID, SN" constraintName="CONST_CA_SN"/>
+    <createIndex tableName="CERT" unique="false" indexName="IDX_FPK">
+      <column name="FP_K"/>
     </createIndex>
-    <createIndex tableName="CERT" unique="false" indexName="IDX_FP_SUBJECT">
-      <column name="FP_SUBJECT"/>
+    <createIndex tableName="CERT" unique="false" indexName="IDX_FPS">
+      <column name="FP_S"/>
     </createIndex>
-    <createIndex tableName="CERT" unique="false" indexName="IDX_FP_CN">
+    <createIndex tableName="CERT" unique="false" indexName="IDX_FPCN">
       <column name="FP_CN"/>
     </createIndex>
-    <createIndex tableName="CERT" unique="false" indexName="IDX_FP_REQ_SUBJECT">
-      <column name="FP_REQ_SUBJECT"/>
+    <createIndex tableName="CERT" unique="false" indexName="IDX_FPRS">
+      <column name="FP_RS"/>
     </createIndex>
-    <!-- table RAWCERT -->
-    <createTable tableName="RAWCERT">
-      <column name="CERT_ID" type="INT">
+    <!-- table CRAW -->
+    <createTable tableName="CRAW">
+      <column name="CID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="SHA1" type="CHAR(40)">
+      <column name="SHA1" type="CHAR(28)">
         <constraints nullable="false"/>
       </column>
-      <column name="REQ_SUBJECT" type="VARCHAR(400)"/>
-      <column name="CERT" remarks="Base64 encoded certificate" type="VARCHAR(3000)">
+      <column name="REQ_SUBJECT" type="${x500name.type}"/>
+      <column name="CERT" type="VARCHAR(3000)"
+          remarks="Base64 encoded certificate">
         <constraints nullable="false"/>
       </column>
     </createTable>
     <!-- table PUBLISHQUEUE -->
     <createTable tableName="PUBLISHQUEUE">
-      <column name="CERT_ID" type="INT">
+      <column name="CID" type="INT">
         <constraints nullable="false"/>
       </column>
-      <column name="PUBLISHER_ID" type="INT">
+      <column name="PID" type="INT">
         <constraints nullable="false"/>
       </column>
       <column name="CA_ID" type="INT">
@@ -415,18 +457,21 @@
       <column name="CA_ID" type="INT">
         <constraints nullable="false"/>
       </column>
-      <column name="SERIAL" type="BIGINT">
+      <column name="SN" type="BIGINT">
         <constraints nullable="false"/>
       </column>
     </createTable>
     <createTable tableName="CERT_IN_PROCESS">
-      <column name="FP_PK" type="BIGINT">
+      <column name="FP_K" type="BIGINT"
+          remarks="first 8 bytes of the SHA1 sum of the public key">
         <constraints primaryKey="true"/>
       </column>
-      <column name="FP_SUBJECT" type="BIGINT">
+      <column name="FP_S" type="BIGINT"
+          remarks="first 8 bytes of the SHA1 sum of the subject">
         <constraints primaryKey="true"/>
       </column>
-      <column name="TIME2" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT">
+      <column name="TIME2" type="BIGINT"
+          remarks="seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
     </createTable>
@@ -445,14 +490,14 @@
       <column name="SEQ_VALUE" value="1"/>
     </insert>
     <insert tableName="SEQ_TBL">
-      <column name="SEQ_NAME" value="CERT_ID"/>
+      <column name="SEQ_NAME" value="CID"/>
       <column name="SEQ_VALUE" value="1"/>
     </insert>
   </changeSet>
   <changeSet author="xipki" id="4" dbms="oracle,postgresql,db2,h2,hsqldb">
     <!-- sequence for the column ID in table DELTACRL_CACHE -->
     <createSequence sequenceName="DCC_ID" incrementBy="1" startValue="1"/>
-    <createSequence sequenceName="CERT_ID" incrementBy="1" startValue="1"/>
+    <createSequence sequenceName="CID" incrementBy="1" startValue="1"/>
   </changeSet>
   <!-- CA Configuration :: foreign key -->
   <changeSet author="xipki" id="5">
@@ -531,27 +576,27 @@
     <addForeignKeyConstraint constraintName="FK_CERT_CS_REQUESTOR1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="REQUESTOR_ID" baseTableName="CERT"
+      baseColumnNames="RID" baseTableName="CERT"
       referencedColumnNames="ID" referencedTableName="CS_REQUESTOR"/>
     <addForeignKeyConstraint constraintName="FK_CERT_CS_PROFILE1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="PROFILE_ID" baseTableName="CERT"
+      baseColumnNames="PID" baseTableName="CERT"
       referencedColumnNames="ID" referencedTableName="CS_PROFILE"/>
-    <addForeignKeyConstraint constraintName="FK_RAWCERT_CERT1"
+    <addForeignKeyConstraint constraintName="FK_CRAW_CERT1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="CERT_ID" baseTableName="RAWCERT"
+      baseColumnNames="CID" baseTableName="CRAW"
       referencedColumnNames="ID" referencedTableName="CERT"/>
     <addForeignKeyConstraint constraintName="FK_PUBLISHQUEUE_PUBLISHER1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="PUBLISHER_ID" baseTableName="PUBLISHQUEUE"
+      baseColumnNames="PID" baseTableName="PUBLISHQUEUE"
       referencedColumnNames="ID" referencedTableName="CS_PUBLISHER"/>
     <addForeignKeyConstraint constraintName="FK_PUBLISHQUEUE_CERT1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="CERT_ID" baseTableName="PUBLISHQUEUE"
+      baseColumnNames="CID" baseTableName="PUBLISHQUEUE"
       referencedColumnNames="ID" referencedTableName="CERT"/>
   </changeSet>
 </databaseChangeLog>

@@ -63,7 +63,7 @@ import org.xipki.audit.api.AuditStatus;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.pki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
-import org.xipki.security.api.util.SecurityUtil;
+import org.xipki.security.api.HashCalculator;
 
 /**
  * @author Lijun Liao
@@ -288,7 +288,7 @@ public class HttpOcspServlet extends HttpServlet
                     }
                     // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the ASCII HEX representation of the
                     // SHA1 hash of the OCSPResponse structure.
-                    response.setHeader("ETag", "\"" + SecurityUtil.sha1sum(encodedOcspResp).toLowerCase() + "\"");
+                    response.setHeader("ETag", "\"" + HashCalculator.hexSha1(encodedOcspResp) + "\"");
 
                     // Max age must be in seconds in the cache-control header
                     long maxAge;

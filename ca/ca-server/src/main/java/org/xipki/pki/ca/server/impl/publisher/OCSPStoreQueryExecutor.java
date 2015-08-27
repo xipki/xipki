@@ -57,6 +57,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.X509CertWithDBCertId;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
+import org.xipki.pki.ca.server.impl.DbSchemaInfo;
 import org.xipki.common.util.LogUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
@@ -80,6 +81,10 @@ class OCSPStoreQueryExecutor
 
     private final boolean publishGoodCerts;
 
+    @SuppressWarnings("unused")
+    private final int dbSchemaVersion;
+    private final int maxX500nameLen;
+
     OCSPStoreQueryExecutor(
             final DataSourceWrapper dataSource,
             final boolean publishGoodCerts)
@@ -88,12 +93,18 @@ class OCSPStoreQueryExecutor
         this.dataSource = dataSource;
         this.issuerStore = initIssuerStore();
         this.publishGoodCerts = publishGoodCerts;
+
+        DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(dataSource);
+        String s = dbSchemaInfo.getVariableValue("VERSION");
+        this.dbSchemaVersion = Integer.parseInt(s);
+        s = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
+        this.maxX500nameLen = Integer.parseInt(s);
     }
 
     private IssuerStore initIssuerStore()
     throws DataAccessException
     {
-        final String sql = "SELECT ID, SUBJECT, SHA1_CERT, CERT FROM ISSUER";
+        final String sql = "SELECT ID,SUBJECT,S1C,CERT FROM ISSUER";
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
 
@@ -105,10 +116,10 @@ class OCSPStoreQueryExecutor
             {
                 int id = rs.getInt("ID");
                 String subject = rs.getString("SUBJECT");
-                String hexSha1Fp = rs.getString("SHA1_CERT");
+                String sha1Fp = rs.getString("S1C");
                 String b64Cert = rs.getString("CERT");
 
-                IssuerEntry caInfoEntry = new IssuerEntry(id, subject, hexSha1Fp, b64Cert);
+                IssuerEntry caInfoEntry = new IssuerEntry(id, subject, sha1Fp, b64Cert);
                 caInfos.add(caInfoEntry);
             }
 
@@ -166,9 +177,7 @@ class OCSPStoreQueryExecutor
 
         if(certRegistered)
         {
-            final String sql = "UPDATE CERT" +
-                    " SET LAST_UPDATE=?, REVOKED=?, REV_TIME=?, REV_INV_TIME=?, REV_REASON=?" +
-                    " WHERE ISSUER_ID=? AND SERIAL=?";
+            final String sql = "UPDATE CERT SET UPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE IID=? AND SN=?";
             PreparedStatement ps = borrowPreparedStatement(sql);
 
             try
@@ -207,39 +216,30 @@ class OCSPStoreQueryExecutor
             return;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("INSERT INTO CERT ");
-        sb.append("(ID, LAST_UPDATE, SERIAL, NOTBEFORE, NOTAFTER, REVOKED, ISSUER_ID, PROFILE");
+        final String SQL_ADD_CERT;
         if(revoked)
         {
-            sb.append(", REV_TIME, REV_INV_TIME, REV_REASON");
-        }
-        sb.append(")");
-        sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?");
-        if(revoked)
+            SQL_ADD_CERT =
+                "INSERT INTO CERT (ID,UPDATE,SN,NBEFORE,NAFTER,REV,IID,PN,RT,RIT,RR) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+        } else
         {
-            sb.append(", ?, ?, ?");
+            SQL_ADD_CERT =
+                "INSERT INTO CERT (ID,UPDATE,SN,NBEFORE,NAFTER,REV,IID,PN) VALUES (?,?,?,?,?,?,?,?)";
         }
-        sb.append(")");
 
-        final String SQL_ADD_CERT = sb.toString();
-
-        final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SUBJECT, CERT) VALUES (?, ?, ?)";
-
-        final String SQL_ADD_CERTHASH = "INSERT INTO CERTHASH "
-                + " (CERT_ID, SHA1, SHA224, SHA256, SHA384, SHA512)"
-                + " VALUES (?, ?, ?, ?, ?, ?)";
+        final String SQL_ADD_CRAW = "INSERT INTO CRAW (CID,SUBJECT,CERT) VALUES (?,?,?)";
+        final String SQL_ADD_CHASH = "INSERT INTO CHASH (CID,S1,S224,S256,S384,S512) VALUES (?,?,?,?,?,?)";
 
         int certId = nextCertId();
         byte[] encodedCert = certificate.getEncodedCert();
         String b64Cert = Base64.toBase64String(encodedCert);
-        String sha1Fp = HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
-        String sha224Fp = HashCalculator.hexHash(HashAlgoType.SHA224, encodedCert);
-        String sha256Fp = HashCalculator.hexHash(HashAlgoType.SHA256, encodedCert);
-        String sha384Fp = HashCalculator.hexHash(HashAlgoType.SHA384, encodedCert);
-        String sha512Fp = HashCalculator.hexHash(HashAlgoType.SHA512, encodedCert);
+        String sha1Fp = HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert);
+        String sha224Fp = HashCalculator.base64Hash(HashAlgoType.SHA224, encodedCert);
+        String sha256Fp = HashCalculator.base64Hash(HashAlgoType.SHA256, encodedCert);
+        String sha384Fp = HashCalculator.base64Hash(HashAlgoType.SHA384, encodedCert);
+        String sha512Fp = HashCalculator.base64Hash(HashAlgoType.SHA512, encodedCert);
 
-        PreparedStatement[] pss = borrowPreparedStatements(SQL_ADD_CERT, SQL_ADD_RAWCERT, SQL_ADD_CERTHASH);
+        PreparedStatement[] pss = borrowPreparedStatements(SQL_ADD_CERT, SQL_ADD_CRAW, SQL_ADD_CHASH);
         // all statements have the same connection
         Connection conn = null;
 
@@ -274,12 +274,12 @@ class OCSPStoreQueryExecutor
                 ps_addcert.setInt(idx++, revInfo.getReason() == null? 0 : revInfo.getReason().getCode());
             }
 
-            // RAWCERT
+            // CRAW
             idx = 2;
-            ps_addRawcert.setString(idx++, X509Util.cutText(certificate.getSubject()));
+            ps_addRawcert.setString(idx++, X509Util.cutText(certificate.getSubject(), maxX500nameLen));
             ps_addRawcert.setString(idx++, b64Cert);
 
-            // CERTHASH
+            // CHASH
             idx = 2;
             ps_addCerthash.setString(idx++, sha1Fp);
             ps_addCerthash.setString(idx++, sha224Fp);
@@ -307,10 +307,10 @@ class OCSPStoreQueryExecutor
                     sql = SQL_ADD_CERT;
                     ps_addcert.executeUpdate();
 
-                    sql = SQL_ADD_CERTHASH;
+                    sql = SQL_ADD_CHASH;
                     ps_addRawcert.executeUpdate();
 
-                    sql = SQL_ADD_CERTHASH;
+                    sql = SQL_ADD_CHASH;
                     ps_addCerthash.executeUpdate();
 
                     sql = "(commit add cert to OCSP)";
@@ -319,8 +319,8 @@ class OCSPStoreQueryExecutor
                 {
                     conn.rollback();
                     // more secure
-                    dataSource.deleteFromTable(null, "RAWCERT", "CERT_ID", certId);
-                    dataSource.deleteFromTable(null, "CERTHASH", "CERT_ID", certId);
+                    dataSource.deleteFromTable(null, "CRAW", "CID", certId);
+                    dataSource.deleteFromTable(null, "CHASH", "CID", certId);
                     dataSource.deleteFromTable(null, "CERT", "ID", certId);
 
                     if(t instanceof SQLException)
@@ -397,9 +397,7 @@ class OCSPStoreQueryExecutor
 
         if(publishGoodCerts)
         {
-            final String sql = "UPDATE CERT" +
-                    " SET LAST_UPDATE=?, REVOKED=?, REV_TIME=?, REV_INV_TIME=?, REV_REASON=?" +
-                    " WHERE ISSUER_ID=? AND SERIAL=?";
+            final String sql = "UPDATE CERT SET UPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE IID=? AND SN=?";
             PreparedStatement ps = borrowPreparedStatement(sql);
 
             try
@@ -422,8 +420,7 @@ class OCSPStoreQueryExecutor
             }
         } else
         {
-            final String sql = "DELETE FROM CERT" +
-                    " WHERE ISSUER_ID=? AND SERIAL=?";
+            final String sql = "DELETE FROM CERT WHERE IID=? AND SN=?";
             PreparedStatement ps = borrowPreparedStatement(sql);
 
             try
@@ -454,7 +451,7 @@ class OCSPStoreQueryExecutor
             return;
         }
 
-        final String sql = "DELETE FROM CERT WHERE ISSUER_ID=? AND SERIAL=?";
+        final String sql = "DELETE FROM CERT WHERE IID=? AND SN=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try
@@ -485,7 +482,7 @@ class OCSPStoreQueryExecutor
         }
 
         int issuerId = getIssuerId(caCert);
-        final String sql = "UPDATE ISSUER SET REVOKED=?, REV_TIME=?, REV_INV_TIME=?, REV_REASON=? WHERE ID=?";
+        final String sql = "UPDATE ISSUER SET REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try
@@ -511,7 +508,7 @@ class OCSPStoreQueryExecutor
     throws DataAccessException, CertificateEncodingException
     {
         int issuerId = getIssuerId(caCert);
-        final String sql = "UPDATE ISSUER SET REVOKED=?, REV_TIME=?, REV_INV_TIME=?, REV_REASON=? WHERE ID=?";
+        final String sql = "UPDATE ISSUER SET REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try
@@ -554,7 +551,7 @@ class OCSPStoreQueryExecutor
             return;
         }
 
-        String hexSha1FpCert = HashCalculator.hexHash(HashAlgoType.SHA1, issuerCert.getEncodedCert());
+        String sha1FpCert = HashCalculator.base64Sha1(issuerCert.getEncodedCert());
 
         Certificate bcCert = Certificate.getInstance(issuerCert.getEncodedCert());
         byte[] encodedName;
@@ -571,10 +568,8 @@ class OCSPStoreQueryExecutor
         int id = (int) maxId + 1;
 
         final String sql =
-                "INSERT INTO ISSUER (ID, SUBJECT, NOTBEFORE, NOTAFTER," +
-                " SHA1_NAME, SHA1_KEY, SHA224_NAME, SHA224_KEY, SHA256_NAME, SHA256_KEY," +
-                " SHA384_NAME, SHA384_KEY, SHA512_NAME, SHA512_KEY,SHA1_CERT, CERT)" +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1S,S1K,S224S,S224K,S256S,S256K,S384S,S384K,"
+            + "S512S,S512K,S1C,CERT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try
@@ -586,22 +581,22 @@ class OCSPStoreQueryExecutor
             ps.setString(idx++, subject);
             ps.setLong  (idx++, issuerCert.getCert().getNotBefore().getTime() / 1000);
             ps.setLong  (idx++, issuerCert.getCert().getNotAfter() .getTime() / 1000);
-            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedName));
-            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
-            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedName));
-            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedKey));
-            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedName));
-            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedKey));
-            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedName));
-            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedKey));
-            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedName));
-            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedKey));
-            ps.setString(idx++, hexSha1FpCert);
+            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedName));
+            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedKey));
+            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA224, encodedName));
+            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA224, encodedKey));
+            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA256, encodedName));
+            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA256, encodedKey));
+            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA384, encodedName));
+            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA384, encodedKey));
+            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA512, encodedName));
+            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA512, encodedKey));
+            ps.setString(idx++, sha1FpCert);
             ps.setString(idx++, b64Cert);
 
             ps.execute();
 
-            IssuerEntry newInfo = new IssuerEntry(id, subject, hexSha1FpCert, b64Cert);
+            IssuerEntry newInfo = new IssuerEntry(id, subject, sha1FpCert, b64Cert);
             issuerStore.addIdentityEntry(newInfo);
         } catch(SQLException e)
         {
@@ -685,7 +680,7 @@ class OCSPStoreQueryExecutor
     throws DataAccessException
     {
         final String sql = dataSource.createFetchFirstSelectSQL(
-                "COUNT(*) FROM CERT WHERE ISSUER_ID=? AND SERIAL=?", 1);
+                "COUNT(*) FROM CERT WHERE IID=? AND SN=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -755,7 +750,7 @@ class OCSPStoreQueryExecutor
         {
             while(true)
             {
-                int certId = (int) dataSource.nextSeqValue(conn, "CERT_ID");
+                int certId = (int) dataSource.nextSeqValue(conn, "CID");
                 if(dataSource.columnExists(conn, "CERT", "ID", certId) == false)
                 {
                     return certId;

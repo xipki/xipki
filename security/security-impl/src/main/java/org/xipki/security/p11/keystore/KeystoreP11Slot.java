@@ -70,6 +70,7 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.password.api.PasswordResolverException;
 import org.xipki.security.P12KeypairGenerator;
 import org.xipki.security.P12KeypairGenerator.ECDSAIdentityGenerator;
+import org.xipki.security.api.HashCalculator;
 import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
@@ -78,7 +79,6 @@ import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
-import org.xipki.security.api.util.SecurityUtil;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -107,8 +107,8 @@ public class KeystoreP11Slot implements P11WritableSlot
             keyLabelBytes = keyLabel.getBytes();
         }
 
-        String sha1Fp = SecurityUtil.sha1sum(keyLabelBytes);
-        return Hex.decode(sha1Fp.substring(0, 16));
+        byte[] sha1Fp = HashCalculator.sha1(keyLabelBytes);
+        return Arrays.copyOf(sha1Fp, 8);
     }
 
     public KeystoreP11Slot(
@@ -167,7 +167,7 @@ public class KeystoreP11Slot implements P11WritableSlot
                 KeystoreP11Identity existingP11Identify = getIdentity(keyId);
 
                 byte[] contentBytes = IoUtil.read(file);
-                String sha1sum = SecurityUtil.sha1sum(contentBytes);
+                String sha1sum = HashCalculator.hexSha1(contentBytes);
                 if(existingP11Identify != null && existingP11Identify.getSha1Sum().equals(sha1sum))
                 {
                     currentIdentifies.add(existingP11Identify);

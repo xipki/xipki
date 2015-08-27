@@ -89,8 +89,8 @@ public class CaExportCommand extends CaCommand
         // ART
         propsput(props, "ART", CertArt.X509PKC.name());
 
-        // NEXT_SERIAL
-        propsput(props, "NEXT_SERIAL", entry.getNextSerial());
+        // NEXT_SN
+        propsput(props, "NEXT_SN", entry.getNextSerial());
 
         // NEXT_CRLNO
         propsput(props, "NEXT_CRLNO", entry.getNextCRLNumber());
@@ -136,22 +136,22 @@ public class CaExportCommand extends CaCommand
 
         // REVOKED
         CertRevocationInfo revInfo = entry.getRevocationInfo();
-        propsput(props, "REVOKED", revInfo != null);
+        propsput(props, "REV", revInfo != null);
         if(revInfo != null)
         {
             if(revInfo.getReason() != null)
             {
-                propsput(props, "REV_REASON", revInfo.getReason().getCode());
+                propsput(props, "RR", revInfo.getReason().getCode());
             }
 
             if(revInfo.getRevocationTime() != null)
             {
-                propsput(props, "REV_TIME", revInfo.getRevocationTime().getTime() / 1000);
+                propsput(props, "RT", revInfo.getRevocationTime().getTime() / 1000);
             }
 
             if(revInfo.getInvalidityTime() != null)
             {
-                propsput(props, "REV_INV_TIME", revInfo.getInvalidityTime().getTime() / 1000);
+                propsput(props, "RIT", revInfo.getInvalidityTime().getTime() / 1000);
             }
         }
 
