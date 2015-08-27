@@ -52,19 +52,19 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.qa.AbstractLoadTest;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.client.api.CAClient;
 import org.xipki.pki.ca.client.api.CAClientException;
 import org.xipki.pki.ca.client.api.CertIdOrError;
 import org.xipki.pki.ca.client.api.PKIErrorException;
 import org.xipki.pki.ca.client.api.dto.RevokeCertRequestEntryType;
 import org.xipki.pki.ca.client.api.dto.RevokeCertRequestType;
-import org.xipki.common.qa.AbstractLoadTest;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.security.api.CRLReason;
-import org.xipki.security.api.util.SecurityUtil;
+import org.xipki.security.api.HashCalculator;
 
 /**
  * @author Lijun Liao
@@ -128,8 +128,8 @@ class CALoadTestRevoke extends AbstractLoadTest
             this.excludeSerials.add(caCert.getSerialNumber().getPositiveValue().longValue());
         }
 
-        String sha1Fp = SecurityUtil.sha1sum(caCert.getEncoded());
-        String sql = "SELECT ID FROM CS_CA WHERE FP_CERT='" + sha1Fp + "'";
+        String b64Sha1Fp = HashCalculator.base64Sha1(caCert.getEncoded());
+        String sql = "SELECT ID FROM CS_CA WHERE SHA1_CERT='" + b64Sha1Fp + "'";
         Statement stmt = caDataSource.getConnection().createStatement();
         try
         {
@@ -144,13 +144,13 @@ class CALoadTestRevoke extends AbstractLoadTest
             }
             rs.close();
 
-            sql = "SELECT MIN(SERIAL) FROM CERT WHERE REVOKED=0 AND CA_ID=" + caInfoId;
+            sql = "SELECT MIN(SN) FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId;
             rs = stmt.executeQuery(sql);
             rs.next();
             minSerial = rs.getLong(1);
             nextStartSerial = minSerial;
 
-            sql = "SELECT MAX(SERIAL) FROM CERT WHERE REVOKED=0 AND CA_ID=" + caInfoId;
+            sql = "SELECT MAX(SN) FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId;
             rs = stmt.executeQuery(sql);
             rs.next();
             maxSerial = rs.getLong(1);
@@ -201,10 +201,10 @@ class CALoadTestRevoke extends AbstractLoadTest
 
             if(noUnrevokedCerts == false)
             {
-                String sql = "SERIAL FROM CERT WHERE REVOKED=0 AND CA_ID=" + caInfoId +
-                        " AND SERIAL > " + (nextStartSerial - 1) +
-                        " AND SERIAL < " + (maxSerial + 1);
-                sql = caDataSource.createFetchFirstSelectSQL(sql, 1000, "SERIAL");
+                String sql = "SN FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId +
+                        " AND SN > " + (nextStartSerial - 1) +
+                        " AND SN < " + (maxSerial + 1);
+                sql = caDataSource.createFetchFirstSelectSQL(sql, 1000, "SN");
                 PreparedStatement stmt = null;
                 ResultSet rs = null;
 
@@ -216,7 +216,7 @@ class CALoadTestRevoke extends AbstractLoadTest
                     while(rs.next())
                     {
                         n++;
-                        long serial = rs.getLong("SERIAL");
+                        long serial = rs.getLong("SN");
                         if(serial + 1 > nextStartSerial)
                         {
                             nextStartSerial = serial + 1;

@@ -33,78 +33,73 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.api;
+package org.xipki.pki.ca.dbtool;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
 
 /**
  * @author Lijun Liao
  */
 
-public enum HashAlgoType
+public class DbSchemaInfo
 {
-    SHA1  (20, "1.3.14.3.2.26", "SHA1", "S1"),
-    SHA224(28, "2.16.840.1.101.3.4.2.4", "SHA224", "S224"),
-    SHA256(32, "2.16.840.1.101.3.4.2.1", "SHA256", "S256"),
-    SHA384(48, "2.16.840.1.101.3.4.2.2", "SHA384", "S384"),
-    SHA512(64, "2.16.840.1.101.3.4.2.3", "SHA512", "S512");
+    private final Map<String, String> variables = new HashMap<>();
 
-    private final int length;
-    private final String oid;
-    private final String name;
-    private final String shortName;
-
-    private HashAlgoType(
-            final int length,
-            final String oid,
-            final String name,
-            final String shortName)
+    public DbSchemaInfo(DataSourceWrapper dataSource)
+    throws DataAccessException
     {
-        this.length = length;
-        this.oid = oid;
-        this.name = name;
-        this.shortName = shortName;
-    }
-
-    public int getLength()
-    {
-        return length;
-    }
-
-    public String getOid()
-    {
-        return oid;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public String getShortName()
-    {
-        return shortName;
-    }
-
-    public static HashAlgoType getHashAlgoType(
-            String nameOrOid)
-    {
-        for(HashAlgoType hashAlgo : values())
+        final String sql = "SELECT NAME, VALUE2 FROM DBSCHEMA";
+        Connection c = dataSource.getConnection();
+        if(c == null)
         {
-            if(hashAlgo.oid.equals(nameOrOid))
-            {
-                return hashAlgo;
-            }
-
-            if(nameOrOid.indexOf('-') != -1)
-            {
-                nameOrOid = nameOrOid.replace("-", "");
-            }
-
-            if(hashAlgo.name.equalsIgnoreCase(nameOrOid) || hashAlgo.shortName.equalsIgnoreCase(nameOrOid))
-            {
-                return hashAlgo;
-            }
+            throw new DataAccessException("could not get connection");
         }
 
-        return null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try
+        {
+            stmt = dataSource.createStatement(c);
+            if(stmt == null)
+            {
+                throw new DataAccessException("could not create statement");
+            }
+
+            rs = stmt.executeQuery(sql);
+            while(rs.next())
+            {
+                String name = rs.getString("NAME");
+                String value = rs.getString("VALUE2");
+                variables.put(name, value);
+            }
+        } catch(SQLException e)
+        {
+            throw dataSource.translate(sql, e);
+        } finally
+        {
+            dataSource.releaseResources(stmt, rs);
+        }
     }
+
+    public Set<String> getVariableNames()
+    {
+        return Collections.unmodifiableSet(variables.keySet());
+    }
+
+    public String getVariableValue(String variableName)
+    {
+        return variables.get(variableName);
+    }
+
 }

@@ -106,6 +106,10 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.qa.ValidationIssue;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.CertprofileException;
 import org.xipki.pki.ca.api.profile.CertValidity;
@@ -161,12 +165,7 @@ import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifierInfo;
 import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
 import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
 import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifiers;
-import org.xipki.common.qa.ValidationIssue;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.ExtensionExistence;
-import org.xipki.security.api.HashAlgoType;
 import org.xipki.security.api.HashCalculator;
 import org.xipki.security.api.KeyUsage;
 import org.xipki.security.api.ObjectIdentifiers;
@@ -1067,7 +1066,7 @@ public class ExtensionsChecker
         SubjectKeyIdentifier asn1 = SubjectKeyIdentifier.getInstance(extensionValue);
         byte[] ski = asn1.getKeyIdentifier();
         byte[] pkData = subjectPublicKeyInfo.getPublicKeyData().getBytes();
-        byte[] expectedSki = HashCalculator.hash(HashAlgoType.SHA1, pkData);
+        byte[] expectedSki = HashCalculator.sha1(pkData);
         if(Arrays.equals(expectedSki, ski) == false)
         {
             failureMsg.append("SKI is '" + hex(ski) + "' but expected is '" + hex(expectedSki) + "'");

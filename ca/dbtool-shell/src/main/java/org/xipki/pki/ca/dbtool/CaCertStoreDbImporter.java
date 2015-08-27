@@ -63,7 +63,6 @@ import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.IoUtil;
@@ -90,9 +89,8 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.NameIdType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.ToPublishType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.UserType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.UsersType;
-import org.xipki.security.api.HashAlgoType;
-import org.xipki.security.api.HashCalculator;
 import org.xipki.security.api.FpIdCalculator;
+import org.xipki.security.api.HashCalculator;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -105,13 +103,13 @@ class CaCertStoreDbImporter extends DbPorter
 
     private static final String SQL_ADD_CERT =
             "INSERT INTO CERT " +
-            "(ID, ART, LAST_UPDATE, SERIAL, SUBJECT, FP_SUBJECT, FP_CN, FP_REQ_SUBJECT," // 8
-            + " NOTBEFORE, NOTAFTER, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, PROFILE_ID, CA_ID," // 8
-            + " REQUESTOR_ID, UNAME, FP_PK, EE, REQ_TYPE, TID)" + // 6
+            "(ID, ART, UPDATE, SN, SUBJECT, FP_S, FP_CN, FP_RS," // 8
+            + " NBEFORE, NAFTER, REV, RR, RT, RIT, PID, CA_ID," // 8
+            + " RID, UNAME, FP_K, EE, RTYPE, TID)" + // 6
             " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private static final String SQL_ADD_RAWCERT =
-            "INSERT INTO RAWCERT (CERT_ID, SHA1, REQ_SUBJECT, CERT) VALUES (?, ?, ?, ?)";
+    private static final String SQL_ADD_CRAW =
+            "INSERT INTO CRAW (CID, SHA1, REQ_SUBJECT, CERT) VALUES (?, ?, ?, ?)";
 
     private static final String SQL_ADD_USER = "INSERT INTO USERNAME (ID, NAME, PASSWORD,CN_REGEX) VALUES (?, ?, ?, ?)";
 
@@ -209,7 +207,7 @@ class CaCertStoreDbImporter extends DbPorter
     throws DataAccessException, CertificateException, IOException
     {
         final String sql = "INSERT INTO CS_CA (ID, SUBJECT, SHA1_CERT, CERT) VALUES (?, ?, ?, ?)";
-        System.out.println(" importing table CS_CA");
+        System.out.println("importing table CS_CA");
         PreparedStatement ps = prepareStatement(sql);
 
         try
@@ -221,12 +219,12 @@ class CaCertStoreDbImporter extends DbPorter
                     String b64Cert = m.getCert();
                     byte[] encodedCert = Base64.decode(b64Cert);
                     X509Certificate c = X509Util.parseCert(encodedCert);
-                    String hexSha1FpCert = HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
+                    String b64Sha1FpCert = HashCalculator.base64Sha1(encodedCert);
 
                     int idx = 1;
                     ps.setInt(idx++, m.getId());
-                    ps.setString(idx++, X509Util.getRFC4519Name(c.getSubjectX500Principal()));
-                    ps.setString(idx++, hexSha1FpCert);
+                    ps.setString(idx++, X509Util.cutX500Name(c.getSubjectX500Principal(), maxX500nameLen));
+                    ps.setString(idx++, b64Sha1FpCert);
                     ps.setString(idx++, b64Cert);
 
                     ps.execute();
@@ -253,7 +251,7 @@ class CaCertStoreDbImporter extends DbPorter
     throws DataAccessException
     {
         final String sql = "INSERT INTO CS_REQUESTOR (ID, NAME) VALUES (?, ?)";
-        System.out.println(" importing table CS_REQUESTOR");
+        System.out.println("importing table CS_REQUESTOR");
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -291,7 +289,7 @@ class CaCertStoreDbImporter extends DbPorter
     {
         final String sql = "INSERT INTO CS_PUBLISHER (ID, NAME) VALUES (?, ?)";
 
-        System.out.println(" importing table CS_PUBLISHER");
+        System.out.println("importing table CS_PUBLISHER");
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -328,7 +326,7 @@ class CaCertStoreDbImporter extends DbPorter
     throws DataAccessException
     {
         final String sql = "INSERT INTO CS_PROFILE (ID, NAME) VALUES (?, ?)";
-        System.out.println(" importing table CS_PROFILE");
+        System.out.println("importing table CS_PROFILE");
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -399,7 +397,7 @@ class CaCertStoreDbImporter extends DbPorter
             final String usersFile)
     throws JAXBException, SQLException, DataAccessException
     {
-        System.out.println(" importing table USERNAME");
+        System.out.println("importing table USERNAME");
 
         UsersType users;
         try
@@ -489,8 +487,8 @@ class CaCertStoreDbImporter extends DbPorter
             final PublishQueue publishQueue)
     throws DataAccessException
     {
-        final String sql = "INSERT INTO PUBLISHQUEUE (CERT_ID, PUBLISHER_ID, CA_ID) VALUES (?, ?, ?)";
-        System.out.println(" importing table PUBLISHQUEUE");
+        final String sql = "INSERT INTO PUBLISHQUEUE (CID, PID, CA_ID) VALUES (?, ?, ?)";
+        System.out.println("importing table PUBLISHQUEUE");
         PreparedStatement ps = prepareStatement(sql);
 
         try
@@ -506,8 +504,8 @@ class CaCertStoreDbImporter extends DbPorter
                     ps.execute();
                 }catch(SQLException e)
                 {
-                    System.err.println("error while importing PUBLISHQUEUE with CERT_ID=" + tbp.getCertId()
-                            + " and PUBLISHER_ID=" + tbp.getPubId() + ", message: " + e.getMessage());
+                    System.err.println("error while importing PUBLISHQUEUE with CID=" + tbp.getCertId()
+                            + " and PID=" + tbp.getPubId() + ", message: " + e.getMessage());
                     throw translate(sql, e);
                 }
             }
@@ -523,8 +521,8 @@ class CaCertStoreDbImporter extends DbPorter
             final DeltaCRLCache deltaCRLCache)
     throws DataAccessException
     {
-        final String sql = "INSERT INTO DELTACRL_CACHE (ID, SERIAL, CA_ID) VALUES (?, ?, ?)";
-        System.out.println(" importing table DELTACRL_CACHE");
+        final String sql = "INSERT INTO DELTACRL_CACHE (ID, SN, CA_ID) VALUES (?, ?, ?)";
+        System.out.println("importing table DELTACRL_CACHE");
         PreparedStatement ps = prepareStatement(sql);
 
         try
@@ -564,7 +562,7 @@ class CaCertStoreDbImporter extends DbPorter
         final String sql = "INSERT INTO CRL (ID, CA_ID, CRL_NO, THISUPDATE, NEXTUPDATE, DELTACRL, BASECRL_NO, CRL)"
                 + " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        System.out.println(" importing table CRL");
+        System.out.println("importing table CRL");
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -691,7 +689,7 @@ class CaCertStoreDbImporter extends DbPorter
         ProcessLog.printHeader();
 
         PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
-        PreparedStatement ps_rawcert = prepareStatement(SQL_ADD_RAWCERT);
+        PreparedStatement ps_rawcert = prepareStatement(SQL_ADD_CRAW);
 
         try
         {
@@ -739,7 +737,7 @@ class CaCertStoreDbImporter extends DbPorter
         }
 
         long maxId = getMax("CERT", "ID");
-        dataSource.dropAndCreateSequence("CERT_ID", maxId + 1);
+        dataSource.dropAndCreateSequence("CID", maxId + 1);
 
         ProcessLog.printTrailer();
         echoToFile(MSG_CERTS_FINISHED, processLogFile);
@@ -831,32 +829,28 @@ class CaCertStoreDbImporter extends DbPorter
 
                 byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 
-                String hexSha1FpCert = HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
+                String b64Sha1FpCert = HashCalculator.base64Sha1(encodedCert);
 
                 // cert
-                String subjectText = X509Util.cutX500Name(c.getSubject());
+                String subjectText = X509Util.cutX500Name(c.getSubject(), maxX500nameLen);
 
                 try
                 {
                     int idx = 1;
 
-                    // "ID, ART, LAST_UPDATE, SERIAL, SUBJECT, FP_SUBJECT, FP_CN, REQ_SUBJECT, FP_REQ_SUBJECT," // 9
                     ps_cert.setInt(idx++, id);
                     ps_cert.setInt(idx++, certArt);
                     ps_cert.setLong(idx++, cert.getLastUpdate());
                     ps_cert.setLong(idx++, c.getSerialNumber().getPositiveValue().longValue());
 
-                    // SUBJECT, FP_SUBJECT
                     ps_cert.setString(idx++, subjectText);
                     long fpSubject = X509Util.fp_canonicalized_name(c.getSubject());
                     ps_cert.setLong(idx++, fpSubject);
 
-                    // FP_CN
                     String cn = X509Util.getCommonName(c.getSubject());
                     long fpCn = FpIdCalculator.hash(cn);
                     ps_cert.setLong(idx++, fpCn);
 
-                    // FP_REQ_SUBJECT
                     if(cert.getFpReqSubject() != null)
                     {
                         ps_cert.setLong(idx++, cert.getFpReqSubject());
@@ -865,7 +859,6 @@ class CaCertStoreDbImporter extends DbPorter
                         ps_cert.setNull(idx++, Types.BIGINT);
                     }
 
-                    // " NOTBEFORE, NOTAFTER, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, PROFILE_ID, CA_ID," // 8
                     ps_cert.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
                     ps_cert.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
                     setBoolean(ps_cert, idx++, cert.isRevoked());
@@ -875,7 +868,6 @@ class CaCertStoreDbImporter extends DbPorter
                     setInt(ps_cert, idx++, cert.getProfileId());
                     setInt(ps_cert, idx++, cert.getCaId());
 
-                    // " REQUESTOR_ID, UNAME, FP_PK, EE, REQ_TYPE, TID)" + // 6
                     setInt(ps_cert, idx++, cert.getRequestorId());
                     ps_cert.setString(idx++, cert.getUser());
                     ps_cert.setLong(idx++, FpIdCalculator.hash(encodedKey));
@@ -896,7 +888,7 @@ class CaCertStoreDbImporter extends DbPorter
                     String tidS = null;
                     if(cert.getTid() != null)
                     {
-                        tidS = Hex.toHexString(cert.getTid());
+                        tidS = Base64.toBase64String(cert.getTid());
                     }
                     ps_cert.setString(idx++, tidS);
                     ps_cert.addBatch();
@@ -909,13 +901,13 @@ class CaCertStoreDbImporter extends DbPorter
                 {
                     int idx = 1;
                     ps_rawcert.setInt(idx++, cert.getId());
-                    ps_rawcert.setString(idx++, hexSha1FpCert);
+                    ps_rawcert.setString(idx++, b64Sha1FpCert);
                     ps_rawcert.setString(idx++, cert.getReqSubject());
                     ps_rawcert.setString(idx++, Base64.toBase64String(encodedCert));
                     ps_rawcert.addBatch();
                 }catch(SQLException e)
                 {
-                    throw translate(SQL_ADD_RAWCERT, e);
+                    throw translate(SQL_ADD_CRAW, e);
                 }
 
                 if(numEntriesInBatch > 0 && (numEntriesInBatch % this.numCertsPerCommit == 0 || i == size - 1))
@@ -932,7 +924,7 @@ class CaCertStoreDbImporter extends DbPorter
                             sql = SQL_ADD_CERT;
                             ps_cert.executeBatch();
 
-                            sql = SQL_ADD_RAWCERT;
+                            sql = SQL_ADD_CRAW;
                             ps_rawcert.executeBatch();
 
                             sql = null;
@@ -981,7 +973,7 @@ class CaCertStoreDbImporter extends DbPorter
 
     private void deleteCertGreatherThan(int id)
     {
-        deleteFromTableWithLargerId("RAWCERT", "CERT_ID", id, LOG);
+        deleteFromTableWithLargerId("CRAW", "CID", id, LOG);
         deleteFromTableWithLargerId("CERT", "ID", id, LOG);
     }
 

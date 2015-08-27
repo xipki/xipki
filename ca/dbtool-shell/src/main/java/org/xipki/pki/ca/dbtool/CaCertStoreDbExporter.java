@@ -58,9 +58,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.CollectionUtil;
@@ -91,7 +89,7 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.pki.ca.dbtool.jaxb.ca.ToPublishType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.UserType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.UsersType;
-import org.xipki.security.api.util.SecurityUtil;
+import org.xipki.security.api.HashCalculator;
 
 /**
  * @author Lijun Liao
@@ -103,15 +101,12 @@ class CaCertStoreDbExporter extends DbPorter
 
     private final Marshaller marshaller;
     private final Unmarshaller unmarshaller;
-    private final SHA1Digest sha1md = new SHA1Digest();
     private final ObjectFactory objFact = new ObjectFactory();
 
     private final int numCertsInBundle;
     private final int numCertsPerSelect;
     private final int numCrls;
     private final boolean resume;
-    @SuppressWarnings("unused")
-    private final int dbSchemaVersion;
 
     CaCertStoreDbExporter(
             final DataSourceWrapper dataSource,
@@ -149,7 +144,6 @@ class CaCertStoreDbExporter extends DbPorter
         this.marshaller = marshaller;
         this.unmarshaller = unmarshaller;
         this.resume = resume;
-        this.dbSchemaVersion = getDbSchemaVersion();
     }
 
     @SuppressWarnings("unchecked")
@@ -279,11 +273,11 @@ class CaCertStoreDbExporter extends DbPorter
                     String b64Crl = rs.getString("CRL");
                     rs.close();
                     byte[] encodedCrl = Base64.decode(b64Crl);
-                    String fp = fp(encodedCrl);
+                    String hexSha1 = HashCalculator.hexSha1(encodedCrl);
 
                     if(evaulateOnly == false)
                     {
-                        File f = new File(baseDir, "CRL" + File.separator + fp + ".crl");
+                        File f = new File(baseDir, "CRL" + File.separator + hexSha1 + ".crl");
                         IoUtil.save(f, encodedCrl);
                     }
 
@@ -291,7 +285,7 @@ class CaCertStoreDbExporter extends DbPorter
 
                     crl.setId(id);
                     crl.setCaId(ca_id);
-                    crl.setCrlFile("CRL/" + fp + ".crl");
+                    crl.setCrlFile("CRL/" + hexSha1 + ".crl");
 
                     crls.getCrl().add(crl);
                 }
@@ -602,7 +596,7 @@ class CaCertStoreDbExporter extends DbPorter
         {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-certs-");
-            System.err.println("\nexporting table CERT and RAWCERT has been cancelled due to error,\n"
+            System.err.println("\nexporting table CERT and CRAW has been cancelled due to error,\n"
                     + "please continue with the option '--resume'");
             LOG.error("Exception", e);
             return e;
@@ -642,7 +636,7 @@ class CaCertStoreDbExporter extends DbPorter
             minId = (int) getMin("CERT", "ID");
         }
 
-        System.out.println(getExportingText() + "tables CERT and RAWCERT from ID " + minId);
+        System.out.println(getExportingText() + "tables CERT and CRAW from ID " + minId);
 
         final int maxId = (int) getMax("CERT", "ID");
         ProcessLog processLog;
@@ -655,13 +649,13 @@ class CaCertStoreDbExporter extends DbPorter
             processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore);
         }
 
-        StringBuilder certSql = new StringBuilder("SELECT ID, SERIAL, CA_ID, PROFILE_ID, PROFILE_ID, REQUESTOR_ID, ");
-        certSql.append("ART, REQ_TYPE, TID, UNAME, LAST_UPDATE, REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, FP_REQ_SUBJECT ");
+        StringBuilder certSql = new StringBuilder("SELECT ID, SN, CA_ID, PID, RID, ");
+        certSql.append("ART, RTYPE, TID, UNAME, UPDATE, REV, RR, RT, RIT, FP_RS ");
         certSql.append("FROM CERT WHERE ID >= ? AND ID < ? ORDER BY ID ASC");
 
         PreparedStatement ps = prepareStatement(certSql.toString());
 
-        final String rawCertSql = "SELECT CERT_ID, REQ_SUBJECT, CERT FROM RAWCERT WHERE CERT_ID >= ? AND CERT_ID < ?";
+        final String rawCertSql = "SELECT CID, REQ_SUBJECT, CERT FROM CRAW WHERE CID >= ? AND CID < ?";
         PreparedStatement rawCertPs = prepareStatement(rawCertSql);
 
         int numCertsInCurrentFile = 0;
@@ -700,7 +694,7 @@ class CaCertStoreDbExporter extends DbPorter
                 ResultSet rawCertRs = rawCertPs.executeQuery();
                 while(rawCertRs.next())
                 {
-                    int certId = rawCertRs.getInt("CERT_ID");
+                    int certId = rawCertRs.getInt("CID");
                     String b64Cert = rawCertRs.getString("CERT");
                     byte[] certBytes = Base64.decode(b64Cert);
                     rawCertMaps.put(certId, certBytes);
@@ -743,12 +737,12 @@ class CaCertStoreDbExporter extends DbPorter
                     byte[] certBytes = rawCertMaps.remove(id);
                     if(certBytes == null)
                     {
-                        final String msg = "found no certificate in table RAWCERT for cert_id '" + id + "'";
+                        final String msg = "found no certificate in table CRAW for cert_id '" + id + "'";
                         LOG.error(msg);
                         throw new DataAccessException(msg);
                     }
 
-                    String sha1_cert = SecurityUtil.sha1sum(certBytes);
+                    String sha1_cert = HashCalculator.hexSha1(certBytes);
 
                     if(evaulateOnly == false)
                     {
@@ -768,11 +762,11 @@ class CaCertStoreDbExporter extends DbPorter
 
                     byte[] tid = null;
                     int art = rs.getInt("ART");
-                    int reqType = rs.getInt("REQ_TYPE");
+                    int reqType = rs.getInt("RTYPE");
                     String s = rs.getString("TID");
                     if(StringUtil.isNotBlank(s))
                     {
-                        tid = Hex.decode(s);
+                        tid = Base64.decode(s);
                     }
 
                     cert.setArt(art);
@@ -785,29 +779,29 @@ class CaCertStoreDbExporter extends DbPorter
                     int cainfo_id = rs.getInt("CA_ID");
                     cert.setCaId(cainfo_id);
 
-                    long serial = rs.getLong("SERIAL");
+                    long serial = rs.getLong("SN");
                     cert.setSerial(Long.toHexString(serial));
 
-                    int certprofile_id = rs.getInt("PROFILE_ID");
+                    int certprofile_id = rs.getInt("PID");
                     cert.setProfileId(certprofile_id);
 
-                    int requestorinfo_id = rs.getInt("REQUESTOR_ID");
+                    int requestorinfo_id = rs.getInt("RID");
                     if(requestorinfo_id != 0)
                     {
                         cert.setRequestorId(requestorinfo_id);
                     }
 
-                    long last_update = rs.getLong("LAST_UPDATE");
+                    long last_update = rs.getLong("UPDATE");
                     cert.setLastUpdate(last_update);
 
-                    boolean revoked = rs.getBoolean("REVOKED");
+                    boolean revoked = rs.getBoolean("REV");
                     cert.setRevoked(revoked);
 
                     if(revoked)
                     {
-                        int rev_reason = rs.getInt("REV_REASON");
-                        long rev_time = rs.getLong("REV_TIME");
-                        long rev_inv_time = rs.getLong("REV_INV_TIME");
+                        int rev_reason = rs.getInt("RR");
+                        long rev_time = rs.getLong("RT");
+                        long rev_inv_time = rs.getLong("RIT");
                         cert.setRevReason(rev_reason);
                         cert.setRevTime(rev_time);
                         if(rev_inv_time != 0)
@@ -823,7 +817,7 @@ class CaCertStoreDbExporter extends DbPorter
                     }
                     cert.setCertFile(sha1_cert + ".der");
 
-                    long fpReqSubject = rs.getLong("FP_REQ_SUBJECT");
+                    long fpReqSubject = rs.getLong("FP_RS");
                     if(fpReqSubject != 0)
                     {
                         cert.setFpReqSubject(fpReqSubject);
@@ -904,7 +898,7 @@ class CaCertStoreDbExporter extends DbPorter
         ProcessLog.printTrailer();
         // all successful, delete the processLogFile
         processLogFile.delete();
-        System.out.println(getExportedText() + sum + " certificates from tables CERT and RAWCERT");
+        System.out.println(getExportedText() + sum + " certificates from tables CERT and CRAW");
     }
 
     private void export_publishQueue(
@@ -914,12 +908,12 @@ class CaCertStoreDbExporter extends DbPorter
         System.out.println("exporting table PUBLISHQUEUE");
 
         StringBuilder sqlBuilder = new StringBuilder("SELECT");
-        sqlBuilder.append(" CERT_ID, PUBLISHER_ID, ");
+        sqlBuilder.append(" CID, PID, ");
         sqlBuilder.append("CA_ID");
-        sqlBuilder.append(" FROM PUBLISHQUEUE WHERE CERT_ID >= ? AND CERT_ID < ? ORDER BY CERT_ID ASC");
+        sqlBuilder.append(" FROM PUBLISHQUEUE WHERE CID >= ? AND CID < ? ORDER BY CID ASC");
         final String sql = sqlBuilder.toString();
-        final int minId = (int) getMin("PUBLISHQUEUE", "CERT_ID");
-        final int maxId = (int) getMax("PUBLISHQUEUE", "CERT_ID");
+        final int minId = (int) getMin("PUBLISHQUEUE", "CID");
+        final int maxId = (int) getMax("PUBLISHQUEUE", "CID");
 
         PublishQueue queue = new PublishQueue();
         certstore.setPublishQueue(queue);
@@ -946,8 +940,8 @@ class CaCertStoreDbExporter extends DbPorter
 
                 while(rs.next())
                 {
-                    int cert_id = rs.getInt("CERT_ID");
-                    int pub_id = rs.getInt("PUBLISHER_ID");
+                    int cert_id = rs.getInt("CID");
+                    int pub_id = rs.getInt("PID");
                     int ca_id = rs.getInt("CA_ID");
 
                     ToPublishType toPub = new ToPublishType();
@@ -974,7 +968,7 @@ class CaCertStoreDbExporter extends DbPorter
         System.out.println("exporting table DELTACRL_CACHE");
 
         StringBuilder sqlBuilder = new StringBuilder("SELECT");
-        sqlBuilder.append(" SERIAL, ");
+        sqlBuilder.append(" SN, ");
         sqlBuilder.append("CA_ID");
         sqlBuilder.append(" FROM DELTACRL_CACHE");
         final String sql = sqlBuilder.toString();
@@ -993,7 +987,7 @@ class CaCertStoreDbExporter extends DbPorter
 
             while(rs.next())
             {
-                long serial = rs.getLong("SERIAL");
+                long serial = rs.getLong("SN");
                 int ca_id = rs.getInt("CA_ID");
 
                 DeltaCRLCacheEntryType entry = new DeltaCRLCacheEntryType();
@@ -1038,19 +1032,6 @@ class CaCertStoreDbExporter extends DbPorter
         }
 
         zipOutStream.close();
-    }
-
-    private String fp(
-            final byte[] data)
-    {
-        synchronized (sha1md)
-        {
-            sha1md.reset();
-            sha1md.update(data, 0, data.length);
-            byte[] digestValue = new byte[20];
-            sha1md.doFinal(digestValue, 0);
-            return Hex.toHexString(digestValue).toUpperCase();
-        }
     }
 
     private static NameIdType createNameId(

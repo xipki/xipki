@@ -78,38 +78,26 @@ class OcspCertStoreDbImporter extends DbPorter
     private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbImporter.class);
 
     static final String SQL_ADD_ISSUER =
-            "INSERT INTO ISSUER (" +
-            " ID, SUBJECT, NOTBEFORE, NOTAFTER," +
-            " SHA1_NAME, SHA1_KEY," +
-            " SHA224_NAME, SHA224_KEY," +
-            " SHA256_NAME, SHA256_KEY," +
-            " SHA384_NAME, SHA384_KEY," +
-            " SHA512_NAME, SHA512_KEY," +
-            " SHA1_CERT, CERT," +
-            " REVOKED, REV_REASON, REV_TIME, REV_INV_TIME" +
-            " ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1S,S1K,S224S,S224K,S256S,S256K,S384S,S384K,"
+        + "S512S,S512K,S1C,CERT,REV,RR,RT,RIT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     static final String SQL_ADD_CERT =
-            "INSERT INTO CERT (" +
-            " ID, ISSUER_ID, SERIAL, " +
-            " LAST_UPDATE, NOTBEFORE, NOTAFTER," +
-            " REVOKED, REV_REASON, REV_TIME, REV_INV_TIME, PROFILE)" +
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO CERT (ID,IID,SN,UPDATE,NBEFORE,NAFTER,REV,RR,RT,RIT,PN) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
     static final String SQL_DEL_CERT =
-            "DELETE FROM CERT WHERE ID > ?";
+        "DELETE FROM CERT WHERE ID>?";
 
-    static final String SQL_ADD_CERTHASH = "INSERT INTO CERTHASH (" +
-            "CERT_ID, SHA1, SHA224, SHA256, SHA384, SHA512)" +
-            " VALUES (?, ?, ?, ?, ?, ?)";
+    static final String SQL_ADD_CHASH =
+        "INSERT INTO CHASH (CID,S1,S224,S256,S384,S512) VALUES (?,?,?,?,?,?)";
 
-    static final String SQL_DEL_CERTHASH =
-            "DELETE FROM CERTHASH WHERE ID > ?";
+    static final String SQL_DEL_CHASH =
+        "DELETE FROM CHASH WHERE ID>?";
 
-    static final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SUBJECT, CERT) VALUES (?, ?, ?)";
+    static final String SQL_ADD_CRAW =
+        "INSERT INTO CRAW (CID,SUBJECT,CERT) VALUES (?,?,?)";
 
-    static final String SQL_DEL_RAWCERT =
-            "DELETE FROM RAWCERT WHERE ID > ?";
+    static final String SQL_DEL_CRAW =
+        "DELETE FROM CRAW WHERE ID>?";
 
     private final Unmarshaller unmarshaller;
     private final boolean resume;
@@ -194,7 +182,7 @@ class OcspCertStoreDbImporter extends DbPorter
             final Issuers issuers)
     throws DataAccessException, CertificateException
     {
-        System.out.println(" importing table ISSUER");
+        System.out.println("importing table ISSUER");
         PreparedStatement ps = prepareStatement(SQL_ADD_ISSUER);
 
         try
@@ -229,20 +217,20 @@ class OcspCertStoreDbImporter extends DbPorter
 
                     int idx = 1;
                     ps.setInt(idx++, issuer.getId());
-                    ps.setString(idx++, X509Util.getRFC4519Name(c.getSubject()));
+                    ps.setString(idx++, X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
                     ps.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
                     ps.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedName));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedName));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedKey));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedName));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedKey));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedName));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedKey));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedName));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedKey));
-                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedName));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedKey));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA224, encodedName));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA224, encodedKey));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA256, encodedName));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA256, encodedKey));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA384, encodedName));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA384, encodedKey));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA512, encodedName));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA512, encodedKey));
+                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert));
                     ps.setString(idx++, b64Cert);
                     setBoolean(ps, idx++, issuer.isRevoked());
                     setInt(ps, idx++, issuer.getRevReason());
@@ -301,8 +289,8 @@ class OcspCertStoreDbImporter extends DbPorter
         ProcessLog.printHeader();
 
         PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
-        PreparedStatement ps_certhash = prepareStatement(SQL_ADD_CERTHASH);
-        PreparedStatement ps_rawcert = prepareStatement(SQL_ADD_RAWCERT);
+        PreparedStatement ps_certhash = prepareStatement(SQL_ADD_CHASH);
+        PreparedStatement ps_rawcert = prepareStatement(SQL_ADD_CRAW);
 
         try
         {
@@ -351,7 +339,7 @@ class OcspCertStoreDbImporter extends DbPorter
         }
 
         long maxId = getMax("CERT", "ID");
-        String seqName = "CERT_ID";
+        String seqName = "CID";
         dataSource.dropAndCreateSequence(seqName, maxId + 1);
 
         ProcessLog.printTrailer();
@@ -466,15 +454,15 @@ class OcspCertStoreDbImporter extends DbPorter
                 {
                     int idx = 1;
                     ps_certhash.setInt(idx++, cert.getId());
-                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
-                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
-                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
-                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
-                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
+                    ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert));
+                    ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA224, encodedCert));
+                    ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA256, encodedCert));
+                    ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA384, encodedCert));
+                    ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA512, encodedCert));
                     ps_certhash.addBatch();
                 }catch(SQLException e)
                 {
-                    throw translate(SQL_ADD_CERTHASH, e);
+                    throw translate(SQL_ADD_CHASH, e);
                 }
 
                 // rawcert
@@ -482,12 +470,12 @@ class OcspCertStoreDbImporter extends DbPorter
                 {
                     int idx = 1;
                     ps_rawcert.setInt(idx++, cert.getId());
-                    ps_rawcert.setString(idx++, X509Util.cutX500Name(c.getSubjectX500Principal()));
+                    ps_rawcert.setString(idx++, X509Util.cutX500Name(c.getSubjectX500Principal(), maxX500nameLen));
                     ps_rawcert.setString(idx++, Base64.toBase64String(encodedCert));
                     ps_rawcert.addBatch();
                 }catch(SQLException e)
                 {
-                    throw translate(SQL_ADD_RAWCERT, e);
+                    throw translate(SQL_ADD_CRAW, e);
                 }
 
                 if(numEntriesInBatch > 0 && (numEntriesInBatch % this.numCertsPerCommit == 0 || i == size - 1))
@@ -505,10 +493,10 @@ class OcspCertStoreDbImporter extends DbPorter
                             sql = SQL_ADD_CERT;
                             ps_cert.executeBatch();
 
-                            sql = SQL_ADD_CERTHASH;
+                            sql = SQL_ADD_CHASH;
                             ps_certhash.executeBatch();
 
-                            sql = SQL_ADD_RAWCERT;
+                            sql = SQL_ADD_CRAW;
                             ps_rawcert.executeBatch();
 
                             sql = null;
@@ -556,8 +544,8 @@ class OcspCertStoreDbImporter extends DbPorter
 
     private void deleteCertGreatherThan(int id)
     {
-        deleteFromTableWithLargerId("RAWCERT", "CERT_ID", id, LOG);
-        deleteFromTableWithLargerId("CERTHASH", "CERT_ID", id, LOG);
+        deleteFromTableWithLargerId("CRAW", "CID", id, LOG);
+        deleteFromTableWithLargerId("CHASH", "CID", id, LOG);
         deleteFromTableWithLargerId("CERT", "ID", id, LOG);
     }
 

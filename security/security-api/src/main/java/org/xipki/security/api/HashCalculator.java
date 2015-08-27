@@ -48,6 +48,7 @@ import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.operator.RuntimeOperatorException;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
 
 /**
@@ -101,12 +102,57 @@ public class HashCalculator
         return mds;
     }
 
+    public static String base64Sha1(
+            final byte[] data)
+    {
+        return base64Hash(HashAlgoType.SHA1, data);
+    }
+
+    public static String hexSha1(
+            final byte[] data)
+    {
+        return hexHash(HashAlgoType.SHA1, data);
+    }
+
+    public static byte[] sha1(
+            final byte[] data)
+    {
+        return hash(HashAlgoType.SHA1, data);
+    }
+
+    public static String base64Sha256(
+            final byte[] data)
+    {
+        return base64Hash(HashAlgoType.SHA256, data);
+    }
+
+    public static String hexSha256(
+            final byte[] data)
+    {
+        return hexHash(HashAlgoType.SHA256, data);
+    }
+
+    public static byte[] sha256(
+            final HashAlgoType hashAlgoType,
+            final byte[] data)
+    {
+        return hash(HashAlgoType.SHA256, data);
+    }
+
     public static String hexHash(
             final HashAlgoType hashAlgoType,
             final byte[] data)
     {
         byte[] bytes = hash(hashAlgoType, data);
         return bytes == null ? null : Hex.toHexString(bytes).toUpperCase();
+    }
+
+    public static String base64Hash(
+            final HashAlgoType hashAlgoType,
+            final byte[] data)
+    {
+        byte[] bytes = hash(hashAlgoType, data);
+        return bytes == null ? null : Base64.encodeToString(bytes, Base64.NO_WRAP);
     }
 
     public static byte[] hash(
