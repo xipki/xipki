@@ -69,10 +69,6 @@ public class ExportCaCommand extends DbPortCommand
             description = "number of certificates per SELECT")
     private Integer numCertsPerCommit = 100;
 
-    @Option(name = "--num-crls",
-            description = "number of CRLs to be exported")
-    private Integer numCrls = 30;
-
     @Option(name = "--resume")
     private Boolean resume = Boolean.FALSE;
 
@@ -88,7 +84,7 @@ public class ExportCaCommand extends DbPortCommand
     throws Exception
     {
         return new CaDbExportWorker(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume,
-                numCertsInBundle, numCrls, numCertsPerCommit, onlyTest);
+                numCertsInBundle, numCertsPerCommit, onlyTest);
     }
 
     public void setDataSourceFactory(

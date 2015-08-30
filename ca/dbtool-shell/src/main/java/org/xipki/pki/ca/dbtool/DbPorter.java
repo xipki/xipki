@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -67,17 +68,20 @@ import org.xml.sax.SAXException;
 
 public class DbPorter
 {
-    public static final String FILENAME_CA_Configuration = "CA-Configuration.xml";
-    public static final String FILENAME_CA_CertStore = "CA-CertStore.xml";
-    public static final String FILENAME_OCSP_CertStore = "OCSP-CertStore.xml";
-    public static final String DIRNAME_CRL = "CRL";
-    public static final String DIRNAME_CERT = "CERT";
+    public static final String FILENAME_CA_Configuration = "ca-configuration.xml";
+    public static final String FILENAME_CA_CertStore = "ca-certstore.xml";
+    public static final String FILENAME_OCSP_CertStore = "ocsp-certstore.xml";
+    public static final String DIRNAME_CRL = "crl";
+    public static final String DIRNAME_CERT = "cert";
     public static final String PREFIX_FILENAME_CERTS = "certs-";
 
     public static final String EXPORT_PROCESS_LOG_FILENAME = "export.process";
     public static final String IMPORT_PROCESS_LOG_FILENAME = "import.process";
-    public static final String MSG_CERTS_FINISHED = "CERTS.FINISHED";
-    public static final String IMPORT_TO_OCSP_PROCESS_LOG_FILENAME = "importToOcsp.process";
+    public static final String MSG_CERTS_FINISHED = "certs.finished";
+    public static final String IMPORT_TO_OCSP_PROCESS_LOG_FILENAME = "import-to-ocsp.process";
+
+    private static final String CERTS_DIRNAME = "certs";
+    private static final String CERTS_MANIFEST_FILENAME = "certs-manifest";
 
     public static final int VERSION = 1;
 
@@ -88,6 +92,8 @@ public class DbPorter
     protected final boolean evaulateOnly;
 
     protected final String baseDir;
+    protected final String certsDir;
+    protected final String certsListFile;
 
     protected final int dbSchemaVersion;
     protected final int maxX500nameLen;
@@ -116,6 +122,8 @@ public class DbPorter
             throw dataSource.translate(null, e);
         }
         this.baseDir = IoUtil.expandFilepath(baseDir);
+        this.certsDir = this.baseDir + File.separator + CERTS_DIRNAME;
+        this.certsListFile = this.baseDir + File.separator + CERTS_MANIFEST_FILENAME;
 
         DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(dataSource);
         String s = dbSchemaInfo.getVariableValue("VERSION");
@@ -441,6 +449,13 @@ public class DbPorter
                 }
             }
         }
+    }
+
+    protected static void writeLine(OutputStream os, String text)
+    throws IOException
+    {
+        os.write(text.getBytes());
+        os.write('\n');
     }
 
     protected String getImportingText()

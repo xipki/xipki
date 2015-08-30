@@ -216,7 +216,7 @@ class CertStoreQueryExecutor
     {
         final String SQL_ADD_CERT =
                 "INSERT INTO CERT" +
-                " (ID, ART, UPDATE, SN, SUBJECT, FP_CN, FP_S, FP_RS, "
+                " (ID, ART, LUPDATE, SN, SUBJECT, FP_CN, FP_S, FP_RS, "
                 + "NBEFORE, NAFTER, REV, PID," +
                 " CA_ID, RID, UNAME, FP_K, EE, RTYPE, TID)" +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -771,7 +771,7 @@ class CertStoreQueryExecutor
         }
 
         final String SQL_REVOKE_CERT = "UPDATE CERT" +
-                " SET UPDATE=?, REV=?, RT=?, RIT=?, RR=?" +
+                " SET LUPDATE=?, REV=?, RT=?, RIT=?, RR=?" +
                 " WHERE ID=?";
         PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_CERT);
 
@@ -859,7 +859,7 @@ class CertStoreQueryExecutor
 
         final String sql =
                 "UPDATE CERT" +
-                " SET UPDATE=?, REV=?, RT=?, RIT=?, RR=?" +
+                " SET LUPDATE=?, REV=?, RT=?, RIT=?, RR=?" +
                 " WHERE ID=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -2037,7 +2037,7 @@ class CertStoreQueryExecutor
                 }
                 else
                 {
-                    long lastUpdate = rs.getLong("UPDATE");
+                    long lastUpdate = rs.getLong("LUPDATE");
                     revInfo = new CertRevInfoWithSerial(BigInteger.valueOf(serial),
                             CRLReason.REMOVE_FROM_CRL.getCode(), new Date(1000 * lastUpdate), null);
                 }

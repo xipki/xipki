@@ -27,14 +27,7 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="certsFiles">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="certsFile" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="countCerts" type="xs:long"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
+      <xs:element name="countCerts" type="xs:int"/>
     </xs:sequence>
     <xs:attribute name="version" type="xs:int" use="required"/>
   </xs:complexType>
@@ -59,15 +52,43 @@
   <xs:complexType name="certType">
     <xs:sequence>
       <xs:element name="id" type="xs:int"/>
-      <xs:element name="issuerId" type="xs:int"/>
-      <xs:element name="serial" type="xs:string"/>
-      <xs:element name="lastUpdate" type="xs:long"/>
-      <xs:element name="revoked" type="xs:boolean"/>
-      <xs:element name="revReason" type="xs:int" minOccurs="0"/>
-      <xs:element name="revTime" type="xs:long" minOccurs="0"/>
-      <xs:element name="revInvTime" type="xs:long" minOccurs="0"/>
+      <xs:element name="iid" type="xs:int">
+        <xs:annotation>
+          <xs:documentation>issuer id</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="sn" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>certificate serial number</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="update" type="xs:long"/>
+      <xs:element name="rev" type="xs:boolean">
+        <xs:annotation>
+          <xs:documentation>whether revoked</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="rr" type="xs:int" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>revocation reason</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="rt" type="xs:long" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>revocation time</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="rit" type="xs:long" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>revocation invalidity time</xs:documentation>
+        </xs:annotation>
+      </xs:element>
       <xs:element name="profile" type="xs:string" minOccurs="0"/>
-      <xs:element name="certFile" type="xs:string"/>
+      <xs:element name="file" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>file name of the certificate</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>

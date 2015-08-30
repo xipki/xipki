@@ -194,6 +194,31 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             return ret;
         }
 
+        @Override
+        protected String getSqlToDropForeignKeyConstraint(
+                final String constraintName,
+                final String baseTable)
+        throws DataAccessException
+        {
+            return "ALTER TABLE " + baseTable + " DROP FOREIGN KEY " + constraintName;
+        }
+
+        @Override
+        protected String getSqlToDropIndex(
+                final String table,
+                final String indexName)
+        {
+            return "DROP INDEX " + indexName + " ON " + table;
+        }
+
+        @Override
+        protected String getSqlToDropUniqueConstrain(
+                final String constraintName,
+                final String table)
+        {
+            return "ALTER TABLE " + table + " DROP KEY " + constraintName;
+        }
+
     }
 
     private static class DB2 extends DataSourceWrapperImpl
@@ -257,6 +282,37 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             StringBuilder sql = new StringBuilder(sequenceName.length() + 50);
             sql.append("SELECT NEXT VALUE FOR ").append(sequenceName).append(" FROM sysibm.sysdummy1");
             return sql.toString();
+        }
+
+        @Override
+        protected String getSqlToDropForeignKeyConstraint(
+                final String constraintName,
+                final String baseTable)
+        throws DataAccessException
+        {
+            return "ALTER TABLE " + baseTable + " DROP FOREIGN KEY " + constraintName;
+        }
+
+        @Override
+        protected String getSqlToAddUniqueConstrain(
+                final String constraintName,
+                final String table,
+                final String... columns)
+        {
+            final StringBuilder sb = new StringBuilder(100);
+            sb.append("CREATE UNIQUE INDEX ").append(constraintName);
+            sb.append(" ON ").append(table).append("(");
+            final int n = columns.length;
+            for(int i = 0; i < n; i++)
+            {
+                if(i != 0)
+                {
+                    sb.append(",");
+                }
+                sb.append(columns[i]);
+            }
+            sb.append(")");
+            return sb.toString();
         }
 
     }
@@ -328,6 +384,24 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         protected boolean isUseSqlStateAsCode()
         {
             return true;
+        }
+
+        @Override
+        protected String getSqlToDropPrimaryKey(
+                final String primaryKeyName,
+                final String table)
+        {
+            StringBuilder sb = new StringBuilder(200);
+            sb.append("DO $$ DECLARE constraint_name varchar;\n");
+            sb.append("BEGIN\n");
+            sb.append("  SELECT tc.CONSTRAINT_NAME into strict constraint_name\n");
+            sb.append("    FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc\n");
+            sb.append("    WHERE CONSTRAINT_TYPE = 'PRIMARY KEY'\n");
+            sb.append("      AND TABLE_NAME = '").append(table.toLowerCase()).
+                append("' AND TABLE_SCHEMA = 'public';\n");
+            sb.append("    EXECUTE 'alter table public.craw drop constraint ' || constraint_name;\n");
+            sb.append("END $$;");
+            return sb.toString();
         }
 
     }
@@ -408,6 +482,37 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             StringBuilder sql = new StringBuilder(sequenceName.length() + 50);
             sql.append("SELECT ").append(sequenceName).append(".NEXTVAL FROM DUAL");
             return sql.toString();
+        }
+
+        @Override
+        protected String getSqlToDropPrimaryKey(
+                final String primaryKeyName,
+                final String table)
+        {
+            return "ALTER TABLE " + table + " DROP CONSTRAINT " + primaryKeyName;
+        }
+
+        @Override
+        protected String getSqlToAddPrimaryKey(
+                final String primaryKeyName,
+                final String table,
+                final String... columns)
+        {
+            StringBuilder sb = new StringBuilder(100);
+            sb.append("ALTER TABLE ").append(table);
+            sb.append(" ADD CONSTRAINT ").append(primaryKeyName);
+            sb.append(" PRIMARY KEY(");
+            final int n = columns.length;
+            for(int i = 0; i < n; i++)
+            {
+                if(i != 0)
+                {
+                    sb.append(",");
+                }
+                sb.append(columns[i]);
+            }
+            sb.append(")");
+            return sb.toString();
         }
 
     }
@@ -1258,6 +1363,202 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         return next;
     }
 
+    protected String getSqlToDropPrimaryKey(
+            final String primaryKeyName,
+            final String table)
+    {
+        return "ALTER TABLE " + table + " DROP PRIMARY KEY ";
+    }
+
+    @Override
+    public void dropPrimaryKey(
+            final Connection conn,
+            final String primaryKeyName,
+            final String table)
+    throws DataAccessException
+    {
+        executeUpdate(conn, getSqlToDropPrimaryKey(primaryKeyName, table));
+    }
+
+    protected String getSqlToAddPrimaryKey(
+            final String primaryKeyName,
+            final String table,
+            final String... columns)
+    {
+        final StringBuilder sb = new StringBuilder(100);
+        sb.append("ALTER TABLE ").append(table).append(" ADD PRIMARY KEY (");
+        final int n = columns.length;
+        for(int i = 0; i < n; i++)
+        {
+            if(i != 0)
+            {
+                sb.append(",");
+            }
+            sb.append(columns[i]);
+        }
+        sb.append(")");
+
+        return sb.toString();
+    }
+
+    @Override
+    public void addPrimaryKey(
+            final Connection conn,
+            final String primaryKeyName,
+            final String table,
+            final String... columns)
+    throws DataAccessException
+    {
+        executeUpdate(conn, getSqlToAddPrimaryKey(primaryKeyName, table, columns));
+    }
+
+    protected String getSqlToDropForeignKeyConstraint(
+            final String constraintName,
+            final String baseTable)
+    throws DataAccessException
+    {
+        return "ALTER TABLE " + baseTable + " DROP CONSTRAINT " + constraintName;
+    }
+
+    @Override
+    public void dropForeignKeyConstraint(
+            final Connection conn,
+            final String constraintName,
+            final String baseTable)
+    throws DataAccessException
+    {
+        executeUpdate(conn, getSqlToDropForeignKeyConstraint(constraintName, baseTable));
+    }
+
+    protected String getSqlToAddForeignKeyConstraint(
+            final String constraintName,
+            final String baseTable,
+            final String baseColumn,
+            final String referencedTable,
+            final String referencedColumn,
+            final String onDeleteAction,
+            final String onUpdateAction)
+    {
+        final StringBuilder sb = new StringBuilder(100);
+        sb.append("ALTER TABLE ").append(baseTable);
+        sb.append(" ADD CONSTRAINT ").append(constraintName);
+        sb.append(" FOREIGN KEY (").append(baseColumn).append(")");
+        sb.append(" REFERENCES ").append(referencedTable);
+        sb.append(" (").append(referencedColumn).append(")");
+        sb.append(" ON DELETE ").append(onDeleteAction);
+        sb.append(" ON UPDATE ").append(onUpdateAction);
+        return sb.toString();
+    }
+
+    @Override
+    public void addForeignKeyConstraint(
+            final Connection conn,
+            final String constraintName,
+            final String baseTable,
+            final String baseColumn,
+            final String referencedTable,
+            final String referencedColumn,
+            final String onDeleteAction,
+            final String onUpdateAction)
+    throws DataAccessException
+    {
+        executeUpdate(conn,
+                getSqlToAddForeignKeyConstraint(
+                        constraintName,
+                        baseTable, baseColumn,
+                        referencedTable, referencedColumn,
+                        onDeleteAction, onUpdateAction));
+    }
+
+    protected String getSqlToDropIndex(
+            final String table,
+            final String indexName)
+    {
+        return "DROP INDEX " + indexName;
+    }
+
+    @Override
+    public void dropIndex(
+            final Connection conn,
+            final String table,
+            final String indexName)
+    throws DataAccessException
+    {
+        executeUpdate(conn, getSqlToDropIndex(table, indexName));
+    }
+
+    protected String getSqlToCreateIndex(
+            final String indexName,
+            final String table,
+            final String column)
+    {
+        final StringBuilder sb = new StringBuilder(100);
+        sb.append("CREATE INDEX ").append(indexName);
+        sb.append(" ON ").append(table).append("(").append(column).append(")");
+        return sb.toString();
+    }
+
+    @Override
+    public void createIndex(
+            final Connection conn,
+            final String indexName,
+            final String table,
+            final String column)
+    throws DataAccessException
+    {
+        executeUpdate(conn, getSqlToCreateIndex(indexName, table, column));
+    }
+
+    protected String getSqlToDropUniqueConstrain(
+            final String constraintName,
+            final String table)
+    {
+        return "ALTER TABLE " + table + " DROP CONSTRAINT " + constraintName;
+    }
+
+    @Override
+    public void dropUniqueConstrain(
+            final Connection conn,
+            final String constraintName,
+            final String table)
+    throws DataAccessException
+    {
+        executeUpdate(conn, getSqlToDropUniqueConstrain(constraintName, table));
+    }
+
+    protected String getSqlToAddUniqueConstrain(
+            final String constraintName,
+            final String table,
+            final String... columns)
+    {
+        final StringBuilder sb = new StringBuilder(100);
+        sb.append("ALTER TABLE ").append(table);
+        sb.append(" ADD CONSTRAINT ").append(constraintName);
+        sb.append(" UNIQUE (");
+        final int n = columns.length;
+        for(int i = 0; i < n; i++)
+        {
+            if(i != 0)
+            {
+                sb.append(",");
+            }
+            sb.append(columns[i]);
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
+    @Override
+    public void addUniqueConstrain(
+            final Connection conn,
+            final String constraintName,
+            final String table,
+            final String... columns)
+    throws DataAccessException
+    {
+        executeUpdate(conn, getSqlToAddUniqueConstrain(constraintName, table, columns));
+    }
+
     @Override
     public DataAccessException translate(
             String sql,
@@ -1424,6 +1725,30 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final SQLException ex)
     {
         return "SQL [" + sql + "]; " + ex.getMessage();
+    }
+
+    private void executeUpdate(Connection conn, String sql)
+    throws DataAccessException
+    {
+        Statement stmt = null;
+        try
+        {
+            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+            stmt.executeUpdate(sql);
+        } catch(SQLException e)
+        {
+            throw translate(sql, e);
+        }finally
+        {
+            if(conn == null)
+            {
+                releaseResources(stmt, null);
+            }
+            else
+            {
+                releaseStatementAndResultSet(stmt, null);
+            }
+        }
     }
 
 }

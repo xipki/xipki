@@ -41,6 +41,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -56,6 +57,19 @@ import java.util.List;
 
 public class IoUtil
 {
+    public static void closeStream(OutputStream stream)
+    {
+        if(stream == null)
+        {
+            return;
+        }
+        try
+        {
+            stream.close();
+        }catch(Throwable t)
+        {
+        }
+    }
     public static byte[] read(
             final String fileName)
     throws IOException

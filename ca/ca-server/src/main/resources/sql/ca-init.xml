@@ -237,7 +237,7 @@
     <!-- table SCEP -->
     <createTable tableName="SCEP">
       <column name="CA_NAME" type="VARCHAR(45)">
-        <constraints nullable="false"/>
+        <constraints primaryKey="true" nullable="false"/>
       </column>
       <!-- CONTROL is reserved for future, will currently not be used -->
       <column name="CONTROL" type="VARCHAR(400)"/>
@@ -373,7 +373,7 @@
           remarks="first 8 bytes of the SHA1 sum of the public key">
         <constraints nullable="false"/>
       </column>
-      <column name="UPDATE" type="BIGINT"
+      <column name="LUPDATE" type="BIGINT"
           remarks="seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
@@ -599,4 +599,65 @@
       baseColumnNames="CID" baseTableName="PUBLISHQUEUE"
       referencedColumnNames="ID" referencedTableName="CERT"/>
   </changeSet>
+
+  <!--changeSet author="xipki" id="TODO-delete-me-DROP-INDEX">
+    <dropIndex tableName="CERT" indexName="IDX_FPK"/>
+    <dropIndex tableName="CERT" indexName="IDX_FPS"/>
+    <dropIndex tableName="CERT" indexName="IDX_FPCN"/>
+    <dropIndex tableName="CERT" indexName="IDX_FPRS"/>
+    <dropForeignKeyConstraint baseTableName="CERT" constraintName="FK_CERT_CS_CA1"/>
+    <dropUniqueConstraint constraintName="CONST_CA_SN" tableName="CERT"/>
+    <dropForeignKeyConstraint baseTableName="CRAW" constraintName="FK_CRAW_CERT1"/>
+    <dropForeignKeyConstraint baseTableName="PUBLISHQUEUE" constraintName="FK_PUBLISHQUEUE_CERT1"/>
+    <dropPrimaryKey constraintName="PK_CRAW" tableName="CRAW"/>
+    <dropPrimaryKey constraintName="PK_CERT" tableName="CERT"/>
+  </changeSet>
+  <changeSet author="xipki" id="TODO-delete-me-CREATE-INDEX">
+    <addPrimaryKey constraintName="PK_CRAW" tableName="CRAW" columnNames="CID"/>
+    <addPrimaryKey constraintName="PK_CERT" tableName="CERT" columnNames="ID"/>
+    <addForeignKeyConstraint constraintName="FK_PUBLISHQUEUE_CERT1"
+      deferrable="false" initiallyDeferred="false"
+      baseTableName="PUBLISHQUEUE" baseColumnNames="CID" 
+      onDelete="CASCADE"
+      onUpdate="NO ACTION"
+      referencedColumnNames="ID"
+      referencedTableName="CERT"/>
+    <addForeignKeyConstraint constraintName="FK_CRAW_CERT1"
+      deferrable="false" initiallyDeferred="false"
+    		baseTableName="CRAW" baseColumnNames="CID" 
+    		onDelete="CASCADE"
+            onUpdate="NO ACTION"
+            referencedColumnNames="ID"
+            referencedTableName="CERT"/>
+   <addForeignKeyConstraint constraintName="FK_CERT_CS_CA1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
+      baseColumnNames="CA_ID" baseTableName="CERT"
+      referencedColumnNames="ID" referencedTableName="CS_CA"/>
+    <addUniqueConstraint
+            constraintName="CONST_CA_SN"
+            columnNames="CA_ID, SN"
+            tableName="CERT"/>
+    <createIndex
+            indexName="IDX_FPK"
+            tableName="CERT">
+        <column name="FP_K"/>
+    </createIndex>
+    <createIndex
+            indexName="IDX_FPS"
+            tableName="CERT">
+        <column name="FP_S"/>
+    </createIndex>
+    <createIndex
+            indexName="IDX_FPRS"
+            tableName="CERT">
+        <column name="FP_RS"/>
+    </createIndex>
+    <createIndex
+            indexName="IDX_FPCN"
+            tableName="CERT">
+        <column name="FP_CN"/>
+    </createIndex>
+  </changeSet-->
+  
 </databaseChangeLog>
