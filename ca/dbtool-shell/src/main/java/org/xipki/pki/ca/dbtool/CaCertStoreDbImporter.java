@@ -118,6 +118,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
     private final Unmarshaller unmarshaller;
     private final boolean resume;
     private final int numCertsPerCommit;
+    private final int numUsersPerCommit;
+    private final int numCrlsPerCommit;
 
     CaCertStoreDbImporter(
             final DataSourceWrapper dataSource,
@@ -137,6 +139,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
         ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         this.unmarshaller = unmarshaller;
         this.numCertsPerCommit = numCertsPerCommit;
+        this.numUsersPerCommit = numCertsPerCommit * 10;
+        this.numCrlsPerCommit = Math.max(1, numCertsPerCommit / 10);
+
         this.resume = resume;
 
         File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
@@ -189,8 +194,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                 import_requestor(certstore.getRequestors());
                 import_publisher(certstore.getPublishers());
                 import_profile(certstore.getProfiles());
-                import_user();
-                import_crl();
+                import_user(certstore);
+                import_crl(certstore);
             }
 
             import_cert(certstore, processLogFile);
@@ -362,12 +367,17 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
         System.out.println(" imported table CS_PROFILE");
     }
 
-    private void import_user()
+    private void import_user(
+            final CertStoreType certstore)
     throws DataAccessException, JAXBException, IOException
     {
         System.out.println(getImportingText() + "table USERNAME");
 
         PreparedStatement ps = prepareStatement(SQL_ADD_USER);
+
+        ProcessLog processLog = new ProcessLog(certstore.getCountUsers(), System.currentTimeMillis(), 0);
+        System.out.println(getImportingText() + "CRLs from ID 1");
+        ProcessLog.printHeader();
 
         DbPortFileNameIterator usersFileIterator = new DbPortFileNameIterator(usersListFile);
 
@@ -377,13 +387,10 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
             while(usersFileIterator.hasNext())
             {
                 String file = usersDir + File.separator + usersFileIterator.next();
-                System.out.println(getImportingText() + "users from file " + file);
 
                 try
                 {
-                    sum += do_import_user(ps, file);
-                    System.out.println(getImportedText() + "users from file " + file);
-                    System.out.println(getImportedText() + sum + " users ...");
+                    sum += do_import_user(ps, file, processLog);
                 }catch(SQLException e)
                 {
                     System.err.println("error while importing users from file " + file);
@@ -400,15 +407,19 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
             usersFileIterator.close();
         }
 
+        ProcessLog.printTrailer();
         System.out.println(getImportedText() + sum + " users");
         System.out.println(getImportedText() + "table USERNAME");
     }
 
     private int do_import_user(
             final PreparedStatement ps_adduser,
-            final String usersZipFile)
+            final String usersZipFile,
+            final ProcessLog processLog)
     throws JAXBException, SQLException, DataAccessException, IOException
     {
+        final int numEntriesPerCommit = numUsersPerCommit;
+
         ZipFile zipFile = new ZipFile(new File(usersZipFile));
         ZipEntry usersXmlEntry = zipFile.getEntry("users.xml");
 
@@ -459,7 +470,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw e;
                 }
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % this.numCertsPerCommit == 0 || i == size - 1))
+                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || i == size - 1))
                 {
                     if(evaulateOnly)
                     {
@@ -485,8 +496,10 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                         }
                     }
 
+                    processLog.addNumProcessed(numEntriesInBatch);
                     numProcessed += numEntriesInBatch;
                     numEntriesInBatch = 0;
+                    processLog.printStatus();
                 }
             }
             return numProcessed;
@@ -575,12 +588,17 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
         System.out.println(" imported table DELTACRL_CACHE");
     }
 
-    private void import_crl()
+    private void import_crl(
+            final CertStoreType certstore)
     throws Exception
     {
         System.out.println(getImportingText() + "table CRL");
 
         PreparedStatement ps = prepareStatement(SQL_ADD_CRL);
+
+        ProcessLog processLog = new ProcessLog(certstore.getCountCrls(), System.currentTimeMillis(), 0);
+        System.out.println(getImportingText() + "CRLs from ID 1");
+        ProcessLog.printHeader();
 
         DbPortFileNameIterator crlsFileIterator = new DbPortFileNameIterator(crlsListFile);
 
@@ -590,13 +608,10 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
             while(crlsFileIterator.hasNext())
             {
                 String file = crlsDir + File.separator + crlsFileIterator.next();
-                System.out.println(getImportingText() + "users from file " + file);
 
                 try
                 {
-                    sum += do_import_crl(ps, file);
-                    System.out.println(getImportedText() + "CRLs from file " + file);
-                    System.out.println(getImportedText() + sum + " CRLs ...");
+                    sum += do_import_crl(ps, file, processLog);
                 }catch(SQLException e)
                 {
                     System.err.println("error while importing CRLs from file " + file);
@@ -613,6 +628,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
             crlsFileIterator.close();
         }
 
+        ProcessLog.printTrailer();
         System.out.println(getImportedText() + sum + " CRLs");
         System.out.println(getImportedText() + "table CRL");
     }
@@ -620,9 +636,12 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
     @SuppressWarnings("resource")
     private int do_import_crl(
             final PreparedStatement ps_addCrl,
-            final String crlsZipFile)
+            final String crlsZipFile,
+            final ProcessLog processLog)
     throws Exception
     {
+        final int numEntriesPerCommit = numCrlsPerCommit;
+
         ZipFile zipFile = new ZipFile(new File(crlsZipFile));
         ZipEntry certsXmlEntry = zipFile.getEntry("crls.xml");
 
@@ -739,7 +758,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw e;
                 }
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % this.numCertsPerCommit == 0 || i == size - 1))
+                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || i == size - 1))
                 {
                     if(evaulateOnly)
                     {
@@ -765,8 +784,11 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                         }
                     }
 
+                    processLog.addNumProcessed(numEntriesInBatch);
                     numProcessed += numEntriesInBatch;
                     numEntriesInBatch = 0;
+                    processLog.printStatus();
+
                 }
             }
             return numProcessed;
@@ -884,6 +906,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
             final ProcessLog processLog)
     throws Exception
     {
+        final int numEntriesPerCommit = numCertsPerCommit;
+
         ZipFile zipFile = new ZipFile(new File(certsZipFile));
         ZipEntry certsXmlEntry = zipFile.getEntry("certs.xml");
 
@@ -1041,7 +1065,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw translate(SQL_ADD_CRAW, e);
                 }
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % this.numCertsPerCommit == 0 || i == size - 1))
+                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || i == size - 1))
                 {
                     if(evaulateOnly)
                     {
