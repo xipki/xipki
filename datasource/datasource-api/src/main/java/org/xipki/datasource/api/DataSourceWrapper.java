@@ -150,4 +150,61 @@ public interface DataSourceWrapper
             String table,
             String idColumn,
             int id);
+
+    void dropPrimaryKey(
+            Connection conn,
+            String primaryKeyName,
+            String table)
+    throws DataAccessException;
+
+    void addPrimaryKey(
+            Connection conn,
+            String primaryKeyName,
+            String table,
+            String... columns)
+    throws DataAccessException;
+
+    void dropForeignKeyConstraint(
+            Connection conn,
+            String constraintName,
+            String baseTable)
+    throws DataAccessException;
+
+    void addForeignKeyConstraint(
+            Connection conn,
+            String constraintName,
+            String baseTable,
+            String baseColumn,
+            String referencedTable,
+            String referencedColumn,
+            String onDeleteAction,
+            String onUpdateAction)
+    throws DataAccessException;
+
+    void dropIndex(
+            Connection conn,
+            String indexName,
+            String table)
+    throws DataAccessException;
+
+    void createIndex(
+            Connection conn,
+            String indexName,
+            String table,
+            String column)
+    throws DataAccessException;
+
+    void dropUniqueConstrain(
+            Connection conn,
+            String constraintName,
+            String table)
+    throws DataAccessException;
+
+    void addUniqueConstrain(
+            Connection conn,
+            String constraintName,
+            String table,
+            String... columns)
+    throws DataAccessException;
+
 }

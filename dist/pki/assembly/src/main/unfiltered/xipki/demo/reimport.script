@@ -7,17 +7,17 @@ feature:install xipki-database-tool
 # Wait two seconds
 sleep 1000
 
-xipki-cmd:rm -r -f output/DB
+xipki-cmd:rm -r -f output/dbexport
 
 ## Export CA
 
 xipki-db:export-ca \
-  --out-dir output/DB/CA
+  --out-dir output/dbexport/ca
 
 ## Export OCSP
 
 xipki-db:export-ocsp \
-  --out-dir output/DB/OCSP
+  --out-dir output/dbexport/ocsp
 
 # Reset the CA and OCSP database
 
@@ -27,12 +27,12 @@ xipki-db:initdb \
 ## Import CA
 
 xipki-db:import-ca \
-  --in-dir output/DB/CA
+  --in-dir output/dbexport/ca
 
 ## Import OCSP
 
 xipki-db:import-ocsp \
-  --in-dir output/DB/OCSP
+  --in-dir output/dbexport/ocsp
 
 ## Restart the CA
 feature:install xipki-camgmt-shell

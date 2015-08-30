@@ -47,6 +47,7 @@ import liquibase.integration.commandline.CommandLineUtils;
 import liquibase.lockservice.LockService;
 import liquibase.lockservice.LockServiceFactory;
 import liquibase.logging.LogFactory;
+import liquibase.logging.Logger;
 import liquibase.resource.CompositeResourceAccessor;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
@@ -90,12 +91,19 @@ public class LiquibaseMain
     }
 
     public void changeLogLevel(
-            final String logLevel)
+            final String logLevel, String logFile)
     throws CommandLineParsingException
     {
         try
         {
-            LogFactory.getInstance().getLog().setLogLevel(logLevel);
+            Logger log = LogFactory.getInstance().getLog();
+            if(logFile != null && logFile.length() > 0)
+            {
+                log.setLogLevel(logLevel, logFile);
+            } else
+            {
+                log.setLogLevel(logLevel);
+            }
         } catch (IllegalArgumentException e)
         {
             throw new CommandLineParsingException(e.getMessage(), e);
@@ -103,10 +111,10 @@ public class LiquibaseMain
     }
 
     public void init(
-            final String logLevel)
+            final String logLevel, String logFile)
     throws Exception
     {
-        changeLogLevel(logLevel);
+        changeLogLevel(logLevel, logFile);
 
         FileSystemResourceAccessor fsOpener = new FileSystemResourceAccessor();
         ClassLoader classLoader = getClass().getClassLoader();

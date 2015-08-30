@@ -112,7 +112,7 @@
           remarks="serial number">
         <constraints nullable="false"/>
       </column>
-      <column name="UPDATE" type="BIGINT"
+      <column name="LUPDATE" type="BIGINT"
           remarks="last update of the this database entry, seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>

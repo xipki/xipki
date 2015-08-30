@@ -70,6 +70,7 @@
       </action>
       <optional-completers>
         <entry key="--log-level" value-ref="logLevelCompleter"/>
+        <entry key="--ca-conf" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -78,6 +79,7 @@
       </action>
       <optional-completers>
         <entry key="--log-level" value-ref="logLevelCompleter"/>
+        <entry key="--ca-conf" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -86,6 +88,7 @@
       </action>
       <optional-completers>
         <entry key="--log-level" value-ref="logLevelCompleter"/>
+        <entry key="--ca-conf" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -94,6 +97,7 @@
       </action>
       <optional-completers>
         <entry key="--log-level" value-ref="logLevelCompleter"/>
+        <entry key="--ca-conf" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -102,6 +106,7 @@
       </action>
       <optional-completers>
         <entry key="--log-level" value-ref="logLevelCompleter"/>
+        <entry key="--ca-conf" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
   </command-bundle>

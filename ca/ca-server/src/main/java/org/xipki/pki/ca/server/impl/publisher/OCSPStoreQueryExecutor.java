@@ -177,7 +177,7 @@ class OCSPStoreQueryExecutor
 
         if(certRegistered)
         {
-            final String sql = "UPDATE CERT SET UPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE IID=? AND SN=?";
+            final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE IID=? AND SN=?";
             PreparedStatement ps = borrowPreparedStatement(sql);
 
             try
@@ -220,11 +220,11 @@ class OCSPStoreQueryExecutor
         if(revoked)
         {
             SQL_ADD_CERT =
-                "INSERT INTO CERT (ID,UPDATE,SN,NBEFORE,NAFTER,REV,IID,PN,RT,RIT,RR) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+                "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN,RT,RIT,RR) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
         } else
         {
             SQL_ADD_CERT =
-                "INSERT INTO CERT (ID,UPDATE,SN,NBEFORE,NAFTER,REV,IID,PN) VALUES (?,?,?,?,?,?,?,?)";
+                "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN) VALUES (?,?,?,?,?,?,?,?)";
         }
 
         final String SQL_ADD_CRAW = "INSERT INTO CRAW (CID,SUBJECT,CERT) VALUES (?,?,?)";
@@ -397,7 +397,7 @@ class OCSPStoreQueryExecutor
 
         if(publishGoodCerts)
         {
-            final String sql = "UPDATE CERT SET UPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE IID=? AND SN=?";
+            final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE IID=? AND SN=?";
             PreparedStatement ps = borrowPreparedStatement(sql);
 
             try
