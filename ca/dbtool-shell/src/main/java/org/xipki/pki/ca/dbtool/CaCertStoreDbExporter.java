@@ -331,14 +331,14 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                         String currentCrlsFilename = DbiUtil.buildFilename("crls_", ".zip",
                                 minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
                         finalizeZip(currentCrlsZip, crlsInCurrentFile);
-                        currentCrlsZipFile.renameTo(new File(certsDir, currentCrlsFilename));
+                        currentCrlsZipFile.renameTo(new File(crlsDir, currentCrlsFilename));
 
                         writeLine(certsFileOs, currentCrlsFilename);
                         certstore.setCountCrls(sum);
 
                         System.out.println(" exported " +
-                                numCrlsInCurrentFile + " users in " + currentCrlsFilename);
-                        System.out.println(" exported " + sum + " users ...");
+                                numCrlsInCurrentFile + " CRLs in " + currentCrlsFilename);
+                        System.out.println(" exported " + sum + " CRLs ...");
 
                         // reset
                         crlsInCurrentFile = new CrlsType();
