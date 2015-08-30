@@ -397,9 +397,10 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             sb.append("  SELECT tc.CONSTRAINT_NAME into strict constraint_name\n");
             sb.append("    FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc\n");
             sb.append("    WHERE CONSTRAINT_TYPE = 'PRIMARY KEY'\n");
-            sb.append("      AND TABLE_NAME = '").append(table.toLowerCase()).
-                append("' AND TABLE_SCHEMA = 'public';\n");
-            sb.append("    EXECUTE 'alter table public.craw drop constraint ' || constraint_name;\n");
+            sb.append("      AND TABLE_NAME = '").append(table.toLowerCase())
+                .append("' AND TABLE_SCHEMA = 'public';\n");
+            sb.append("    EXECUTE 'alter table public.").append(table.toLowerCase())
+                .append(" drop constraint ' || constraint_name;\n");
             sb.append("END $$;");
             return sb.toString();
         }
