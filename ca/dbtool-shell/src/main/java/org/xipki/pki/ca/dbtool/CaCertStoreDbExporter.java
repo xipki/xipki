@@ -98,7 +98,11 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
     private final ObjectFactory objFact = new ObjectFactory();
 
     private final int numCertsInBundle;
+    private final int numUsersInBundle;
+    private final int numCrlsInBundle;
     private final int numCertsPerSelect;
+    private final int numUsersPerSelect;
+    private final int numCrlsPerSelect;
     private final boolean resume;
 
     CaCertStoreDbExporter(
@@ -126,7 +130,11 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         }
 
         this.numCertsInBundle = numCertsInBundle;
+        this.numUsersInBundle = numCertsInBundle * 10;
+        this.numCrlsInBundle = Math.max(1, numCertsInBundle / 10);
         this.numCertsPerSelect = numCertsPerSelect;
+        this.numUsersPerSelect = numCertsInBundle * 10;
+        this.numCrlsPerSelect = Math.max(1, numCertsPerSelect / 10);
 
         this.marshaller = marshaller;
         this.unmarshaller = unmarshaller;
@@ -234,13 +242,29 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
     private void do_export_crl(
             final CertStoreType certstore,
-            final FileOutputStream certsFileOs)
+            final FileOutputStream filenameListOs)
     throws DataAccessException, IOException, JAXBException, InterruptedException
     {
         System.out.println(getExportingText() + "table CRL");
 
+        final int numEntriesPerSelect = numCrlsPerSelect;
+        final int numEntriesPerZip = numCrlsInBundle;
+        final String entriesDir = crlsDir;
+
         final int minId = (int) getMin("CRL", "ID");
         final int maxId = (int) getMax("CRL", "ID");
+
+        System.out.println(getExportingText() + "table CRL from ID " + minId);
+
+        ProcessLog processLog;
+        {
+            long total = getCount("CRL");
+            if(total < 1)
+            {
+                total = 1; // to avoid exception
+            }
+            processLog = new ProcessLog(total, System.currentTimeMillis(), 0);
+        }
 
         final String sql = "SELECT ID, CA_ID, CRL FROM CRL WHERE ID >= ? AND ID < ? ORDER BY ID ASC";
         PreparedStatement ps = prepareStatement(sql);
@@ -249,7 +273,6 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         CrlsType crlsInCurrentFile = new CrlsType();
 
         int sum = 0;
-        final int n = numCertsPerSelect;
 
         File currentCrlsZipFile = new File(baseDir, "tmp-crls-" + System.currentTimeMillis() + ".zip");
         FileOutputStream out = new FileOutputStream(currentCrlsZipFile);
@@ -258,11 +281,13 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         int minIdOfCurrentFile = -1;
         int maxIdOfCurrentFile = -1;
 
+        ProcessLog.printHeader();
+
         try
         {
             Integer id = null;
             boolean interrupted = false;
-            for(int i = minId; i <= maxId; i += n)
+            for(int i = minId; i <= maxId; i += numEntriesPerSelect)
             {
                 if(stopMe.get())
                 {
@@ -271,7 +296,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                 }
 
                 ps.setInt(1, i);
-                ps.setInt(2, i + n);
+                ps.setInt(2, i + numEntriesPerSelect);
 
                 ResultSet rs = ps.executeQuery();
 
@@ -326,19 +351,17 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                     numCrlsInCurrentFile ++;
                     sum ++;
 
-                    if(numCrlsInCurrentFile == numCertsInBundle)
+                    if(numCrlsInCurrentFile == numEntriesPerZip)
                     {
                         String currentCrlsFilename = DbiUtil.buildFilename("crls_", ".zip",
                                 minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
                         finalizeZip(currentCrlsZip, crlsInCurrentFile);
-                        currentCrlsZipFile.renameTo(new File(crlsDir, currentCrlsFilename));
+                        currentCrlsZipFile.renameTo(new File(entriesDir, currentCrlsFilename));
 
-                        writeLine(certsFileOs, currentCrlsFilename);
+                        writeLine(filenameListOs, currentCrlsFilename);
                         certstore.setCountCrls(sum);
-
-                        System.out.println(" exported " +
-                                numCrlsInCurrentFile + " CRLs in " + currentCrlsFilename);
-                        System.out.println(" exported " + sum + " CRLs ...");
+                        processLog.addNumProcessed(numCrlsInCurrentFile);
+                        processLog.printStatus();
 
                         // reset
                         crlsInCurrentFile = new CrlsType();
@@ -364,12 +387,10 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
                 String currentCrlsFilename = DbiUtil.buildFilename("crls_", ".zip",
                         minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
-                currentCrlsZipFile.renameTo(new File(crlsDir, currentCrlsFilename));
+                currentCrlsZipFile.renameTo(new File(entriesDir, currentCrlsFilename));
 
-                writeLine(certsFileOs, currentCrlsFilename);
+                writeLine(filenameListOs, currentCrlsFilename);
                 certstore.setCountCrls(sum);
-
-                System.out.println(getExportedText() + numCrlsInCurrentFile + " CRL in " + currentCrlsFilename);
             }
             else
             {
@@ -385,6 +406,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
             releaseResources(ps, null);
         } // end try
 
+        ProcessLog.printTrailer();
         System.out.println(getExportedText() + sum + " CRLs from table CRL");
     }
 
@@ -524,16 +546,31 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
     private void do_export_user(
             final CertStoreType certstore,
-            final FileOutputStream usersFileOs)
+            final FileOutputStream filenameListOs)
     throws DataAccessException, IOException, JAXBException, InterruptedException
     {
         System.out.println(getExportingText() + "table USERNAME");
+
+        final int numEntriesPerSelect = numUsersPerSelect;
+        final int numEntriesPerZip = numUsersInBundle;
+        final String entriesDir = usersDir;
 
         final String sql =
                 "SELECT ID, NAME, PASSWORD, CN_REGEX FROM USERNAME WHERE ID >= ? AND ID < ? ORDER BY ID ASC";
 
         final int minId = (int) getMin("USERNAME", "ID");
         final int maxId = (int) getMax("USERNAME", "ID");
+        System.out.println(getExportingText() + "table USERNAME from ID " + minId);
+
+        ProcessLog processLog;
+        {
+            long total = getCount("USERNAME");
+            if(total < 1)
+            {
+                total = 1; // to avoid exception
+            }
+            processLog = new ProcessLog(total, System.currentTimeMillis(), 0);
+        }
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -541,16 +578,17 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         UsersType usersInCurrentFile = new UsersType();
 
         int sum = 0;
-        final int n = numCertsPerSelect;
 
         int minIdOfCurrentFile = -1;
         int maxIdOfCurrentFile = -1;
+
+        ProcessLog.printHeader();
 
         try
         {
             Integer id = null;
             boolean interrupted = false;
-            for(int i = minId; i <= maxId; i += n)
+            for(int i = minId; i <= maxId; i += numEntriesPerSelect)
             {
                 if(stopMe.get())
                 {
@@ -559,7 +597,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                 }
 
                 ps.setInt(1, i);
-                ps.setInt(2, i + n);
+                ps.setInt(2, i + numEntriesPerSelect);
 
                 ResultSet rs = ps.executeQuery();
 
@@ -599,16 +637,15 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                     numUsersInCurrentFile ++;
                     sum ++;
 
-                    if(numUsersInCurrentFile == numCertsInBundle * 10)
+                    if(numUsersInCurrentFile == numEntriesPerZip)
                     {
                         String currentUsersFilename = "users_" + minIdOfCurrentFile + "_" + maxIdOfCurrentFile + ".zip";
-                        finalizeZip(usersDir + File.separator + currentUsersFilename, usersInCurrentFile);
+                        finalizeZip(entriesDir + File.separator + currentUsersFilename, usersInCurrentFile);
                         certstore.setCountUsers(sum);
-                        writeLine(usersFileOs, currentUsersFilename);
+                        writeLine(filenameListOs, currentUsersFilename);
 
-                        System.out.println(" exported " +
-                                numUsersInCurrentFile + " users in " + currentUsersFilename);
-                        System.out.println(" exported " + sum + " users ...");
+                        processLog.addNumProcessed(numUsersInCurrentFile);
+                        processLog.printStatus();
 
                         // reset
                         usersInCurrentFile = new UsersType();
@@ -627,11 +664,12 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
             if(numUsersInCurrentFile > 0)
             {
                 String currentUsersFilename = "users_" + minIdOfCurrentFile + "_" + maxIdOfCurrentFile + ".zip";
-                finalizeZip(usersDir + File.separator + currentUsersFilename, usersInCurrentFile);
+                finalizeZip(entriesDir + File.separator + currentUsersFilename, usersInCurrentFile);
                 certstore.setCountUsers(sum);
-                writeLine(usersFileOs, currentUsersFilename);
+                writeLine(filenameListOs, currentUsersFilename);
 
-                System.out.println(getExportedText() + numUsersInCurrentFile + " users in " + currentUsersFilename);
+                processLog.addNumProcessed(numUsersInCurrentFile);
+                processLog.printStatus();
             }
         }catch(SQLException e)
         {
@@ -641,6 +679,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
             releaseResources(ps, null);
         } // end try
 
+        ProcessLog.printTrailer();
         System.out.println(getExportedText() + sum + " users from table USERNAME");
     }
 
@@ -713,9 +752,13 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
     private void do_export_cert(
             final CertStoreType certstore,
             final File processLogFile,
-            final FileOutputStream certsFileOs)
+            final FileOutputStream filenameListOs)
     throws DataAccessException, IOException, JAXBException, InterruptedException
     {
+        final int numEntriesPerSelect = numCertsPerSelect;
+        final int numEntriesPerZip = numCertsInBundle;
+        final String entriesDir = certsDir;
+
         int numProcessedBefore = certstore.getCountCerts();
 
         Integer minId = null;
@@ -760,8 +803,6 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         CertsType certsInCurrentFile = new CertsType();
 
         int sum = 0;
-        final int n = numCertsPerSelect;
-
         File currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
         FileOutputStream out = new FileOutputStream(currentCertsZipFile);
         ZipOutputStream currentCertsZip = new ZipOutputStream(out);
@@ -775,7 +816,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         {
             Integer id = null;
             boolean interrupted = false;
-            for(int i = minId; i <= maxId; i += n)
+            for(int i = minId; i <= maxId; i += numEntriesPerSelect)
             {
                 if(stopMe.get())
                 {
@@ -788,7 +829,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
                 // retrieve raw certificates
                 rawCertPs.setInt(1, i);
-                rawCertPs.setInt(2, i + n);
+                rawCertPs.setInt(2, i + numEntriesPerSelect);
                 ResultSet rawCertRs = rawCertPs.executeQuery();
                 while(rawCertRs.next())
                 {
@@ -806,7 +847,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                 rawCertRs.close();
 
                 ps.setInt(1, i);
-                ps.setInt(2, i + n);
+                ps.setInt(2, i + numEntriesPerSelect);
 
                 ResultSet rs = ps.executeQuery();
 
@@ -927,14 +968,14 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                     numCertsInCurrentFile ++;
                     sum ++;
 
-                    if(numCertsInCurrentFile == numCertsInBundle)
+                    if(numCertsInCurrentFile == numEntriesPerZip)
                     {
                         String currentCertsFilename = DbiUtil.buildFilename("certs_", ".zip",
                                 minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
                         finalizeZip(currentCertsZip, certsInCurrentFile);
-                        currentCertsZipFile.renameTo(new File(certsDir, currentCertsFilename));
+                        currentCertsZipFile.renameTo(new File(entriesDir, currentCertsFilename));
 
-                        writeLine(certsFileOs, currentCertsFilename);
+                        writeLine(filenameListOs, currentCertsFilename);
                         certstore.setCountCerts(numProcessedBefore + sum);
                         echoToFile(Integer.toString(id), processLogFile);
 
@@ -968,9 +1009,9 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
                 String currentCertsFilename = DbiUtil.buildFilename("certs_", ".zip",
                         minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
-                currentCertsZipFile.renameTo(new File(certsDir, currentCertsFilename));
+                currentCertsZipFile.renameTo(new File(entriesDir, currentCertsFilename));
 
-                writeLine(certsFileOs, currentCertsFilename);
+                writeLine(filenameListOs, currentCertsFilename);
                 certstore.setCountCerts(numProcessedBefore + sum);
                 if(id != null)
                 {
