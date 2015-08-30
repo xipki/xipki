@@ -60,7 +60,6 @@ import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType;
-import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType.CertsFiles;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType.Issuers;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertType;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertsType;
@@ -73,31 +72,9 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-class OcspCertStoreDbImporter extends DbPorter
+class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
 {
     private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbImporter.class);
-
-    static final String SQL_ADD_ISSUER =
-        "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1S,S1K,S224S,S224K,S256S,S256K,S384S,S384K,"
-        + "S512S,S512K,S1C,CERT,REV,RR,RT,RIT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
-    static final String SQL_ADD_CERT =
-        "INSERT INTO CERT (ID,IID,SN,UPDATE,NBEFORE,NAFTER,REV,RR,RT,RIT,PN) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
-
-    static final String SQL_DEL_CERT =
-        "DELETE FROM CERT WHERE ID>?";
-
-    static final String SQL_ADD_CHASH =
-        "INSERT INTO CHASH (CID,S1,S224,S256,S384,S512) VALUES (?,?,?,?,?,?)";
-
-    static final String SQL_DEL_CHASH =
-        "DELETE FROM CHASH WHERE ID>?";
-
-    static final String SQL_ADD_CRAW =
-        "INSERT INTO CRAW (CID,SUBJECT,CERT) VALUES (?,?,?)";
-
-    static final String SQL_DEL_CRAW =
-        "DELETE FROM CRAW WHERE ID>?";
 
     private final Unmarshaller unmarshaller;
     private final boolean resume;
@@ -166,9 +143,11 @@ class OcspCertStoreDbImporter extends DbPorter
         {
             if(resume == false)
             {
+                dropIndexes();
                 import_issuer(certstore.getIssuers());
             }
-            import_cert(certstore.getCertsFiles(), processLogFile);
+            import_cert(certstore, processLogFile);
+            recoverIndexes();
             processLogFile.delete();
         }catch(Exception e)
         {
@@ -256,7 +235,7 @@ class OcspCertStoreDbImporter extends DbPorter
     }
 
     private void import_cert(
-            final CertsFiles certsfiles,
+            final CertStoreType certstore,
             final File processLogFile)
     throws Exception
     {
@@ -280,9 +259,9 @@ class OcspCertStoreDbImporter extends DbPorter
             }
         }
 
-        deleteCertGreatherThan(minId - 1);
+        deleteCertGreatherThan(minId - 1, LOG);
 
-        final long total = certsfiles.getCountCerts() - numProcessedBefore;
+        final long total = certstore.getCountCerts() - numProcessedBefore;
         final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore);
 
         System.out.println(getImportingText() + "certificates from ID " + minId);
@@ -292,10 +271,13 @@ class OcspCertStoreDbImporter extends DbPorter
         PreparedStatement ps_certhash = prepareStatement(SQL_ADD_CHASH);
         PreparedStatement ps_rawcert = prepareStatement(SQL_ADD_CRAW);
 
+        DbPortFileNameIterator certsFileIterator = new DbPortFileNameIterator(certsListFile);
         try
         {
-            for(String certsFile : certsfiles.getCertsFile())
+            while(certsFileIterator.hasNext())
             {
+                String certsFile = certsDir + File.separator + certsFileIterator.next();
+
                 // extract the toId from the filename
                 int fromIdx = certsFile.indexOf('-');
                 int toIdx = certsFile.indexOf(".zip");
@@ -336,6 +318,7 @@ class OcspCertStoreDbImporter extends DbPorter
             releaseResources(ps_cert, null);
             releaseResources(ps_certhash, null);
             releaseResources(ps_rawcert, null);
+            certsFileIterator.close();
         }
 
         long maxId = getMax("CERT", "ID");
@@ -357,7 +340,7 @@ class OcspCertStoreDbImporter extends DbPorter
             final ProcessLog processLog)
     throws Exception
     {
-        ZipFile zipFile = new ZipFile(new File(baseDir, certsZipFile));
+        ZipFile zipFile = new ZipFile(new File(certsZipFile));
         ZipEntry certsXmlEntry = zipFile.getEntry("certs.xml");
 
         CertsType certs;
@@ -403,7 +386,7 @@ class OcspCertStoreDbImporter extends DbPorter
 
                 numEntriesInBatch++;
 
-                String filename = cert.getCertFile();
+                String filename = cert.getFile();
 
                 // rawcert
                 ZipEntry certZipEnty = zipFile.getEntry(filename);
@@ -433,15 +416,15 @@ class OcspCertStoreDbImporter extends DbPorter
                 {
                     int idx = 1;
                     ps_cert.setInt(idx++, id);
-                    ps_cert.setInt(idx++, cert.getIssuerId());
+                    ps_cert.setInt(idx++, cert.getIid());
                     ps_cert.setLong(idx++, c.getSerialNumber().longValue());
-                    ps_cert.setLong(idx++, cert.getLastUpdate());
+                    ps_cert.setLong(idx++, cert.getUpdate());
                     ps_cert.setLong(idx++, c.getNotBefore().getTime() / 1000);
                     ps_cert.setLong(idx++, c.getNotAfter().getTime() / 1000);
-                    setBoolean(ps_cert, idx++, cert.isRevoked());
-                    setInt(ps_cert, idx++, cert.getRevReason());
-                    setLong(ps_cert, idx++, cert.getRevTime());
-                    setLong(ps_cert, idx++, cert.getRevInvTime());
+                    setBoolean(ps_cert, idx++, cert.isRev());
+                    setInt(ps_cert, idx++, cert.getRr());
+                    setLong(ps_cert, idx++, cert.getRt());
+                    setLong(ps_cert, idx++, cert.getRit());
                     ps_cert.setString(idx++, cert.getProfile());
                     ps_cert.addBatch();
                 }catch(SQLException e)
@@ -504,7 +487,7 @@ class OcspCertStoreDbImporter extends DbPorter
                         } catch(Throwable t)
                         {
                             rollback();
-                            deleteCertGreatherThan(lastSuccessfulCertId);
+                            deleteCertGreatherThan(lastSuccessfulCertId, LOG);
                             if(t instanceof SQLException)
                             {
                                 throw translate(sql, (SQLException) t);
@@ -540,13 +523,6 @@ class OcspCertStoreDbImporter extends DbPorter
             }
             zipFile.close();
         }
-    }
-
-    private void deleteCertGreatherThan(int id)
-    {
-        deleteFromTableWithLargerId("CRAW", "CID", id, LOG);
-        deleteFromTableWithLargerId("CHASH", "CID", id, LOG);
-        deleteFromTableWithLargerId("CERT", "ID", id, LOG);
     }
 
 }

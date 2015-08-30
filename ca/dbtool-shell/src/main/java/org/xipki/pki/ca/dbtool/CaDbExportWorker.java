@@ -73,7 +73,6 @@ public class CaDbExportWorker extends DbPorterWorker
     private final String destFolder;
     private final boolean resume;
     private final int numCertsInBundle;
-    private final int numCrls;
     private final int numCertsPerSelect;
     private final boolean evaluateOnly;
 
@@ -84,7 +83,6 @@ public class CaDbExportWorker extends DbPorterWorker
             final String destFolder,
             final boolean resume,
             final int numCertsInBundle,
-            final int numCrls,
             final int numCertsPerSelect,
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
@@ -97,7 +95,6 @@ public class CaDbExportWorker extends DbPorterWorker
         this.destFolder = IoUtil.expandFilepath(destFolder);
         this.resume = resume;
         this.numCertsInBundle = numCertsInBundle;
-        this.numCrls = numCrls;
         this.numCertsPerSelect = numCertsPerSelect;
         this.evaluateOnly = evaluateOnly;
         checkDestFolder();
@@ -110,14 +107,13 @@ public class CaDbExportWorker extends DbPorterWorker
             final String destFolder,
             final boolean destFolderEmpty,
             final int numCertsInBundle,
-            final int numCrls,
             final int numCertsPerSelect,
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         this(dataSourceFactory, passwordResolver,
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)), destFolder, destFolderEmpty,
-                    numCertsInBundle, numCrls, numCertsPerSelect, evaluateOnly);
+                    numCertsInBundle, numCertsPerSelect, evaluateOnly);
     }
 
     private static Marshaller getMarshaller()
@@ -197,7 +193,7 @@ public class CaDbExportWorker extends DbPorterWorker
             // CertStore
             CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(
                     dataSource, marshaller, unmarshaller, destFolder,
-                    numCertsInBundle, numCrls, numCertsPerSelect, resume, stopMe, evaluateOnly);
+                    numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
             certStoreExporter.export();
             certStoreExporter.shutdown();
         } finally
