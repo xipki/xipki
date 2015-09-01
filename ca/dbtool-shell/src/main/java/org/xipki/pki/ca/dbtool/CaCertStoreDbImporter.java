@@ -1129,7 +1129,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
         }
     }
 
-    private void deleteCertGreatherThan(int id)
+    private void deleteCertGreatherThan(
+            final int id)
     {
         deleteFromTableWithLargerId("CRAW", "CID", id, LOG);
         deleteFromTableWithLargerId("CERT", "ID", id, LOG);
