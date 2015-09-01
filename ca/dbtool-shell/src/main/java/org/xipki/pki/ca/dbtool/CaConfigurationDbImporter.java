@@ -49,11 +49,12 @@ import javax.xml.bind.Unmarshaller;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.dbtool.InvalidInputException;
+import org.xipki.password.api.PasswordResolverException;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasProfiles;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasPublishers;
@@ -81,8 +82,6 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.PublisherType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.RequestorType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.ResponderType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.ScepType;
-import org.xipki.dbtool.InvalidInputException;
-import org.xipki.password.api.PasswordResolverException;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -190,7 +189,7 @@ class CaConfigurationDbImporter extends DbPorter
 
     private void import_responder(
             final Responders responders)
-    throws DataAccessException
+    throws DataAccessException, IOException
     {
         System.out.println("importing table RESPONDER");
         if(responders == null)
@@ -198,7 +197,7 @@ class CaConfigurationDbImporter extends DbPorter
             System.out.println(" imported table RESPONDER: nothing to import");
             return;
         }
-        final String sql = "INSERT INTO RESPONDER (NAME, TYPE, CONF, CERT) VALUES (?, ?, ?, ?)";
+        final String sql = "INSERT INTO RESPONDER (NAME, TYPE, CERT, CONF) VALUES (?, ?, ?, ?)";
 
         PreparedStatement ps = null;
         try
@@ -212,8 +211,8 @@ class CaConfigurationDbImporter extends DbPorter
                     int idx = 1;
                     ps.setString(idx++, responder.getName());
                     ps.setString(idx++, responder.getType());
-                    ps.setString(idx++, responder.getConf());
-                    ps.setString(idx++, responder.getCert());
+                    ps.setString(idx++, getValue(responder.getCert()));
+                    ps.setString(idx++, getValue(responder.getConf()));
 
                     ps.executeUpdate();
                 }catch(SQLException e)
@@ -263,10 +262,10 @@ class CaConfigurationDbImporter extends DbPorter
 
     private void import_crlsigner(
             final Crlsigners crlsigners)
-    throws DataAccessException
+    throws DataAccessException, IOException
     {
         System.out.println("importing table CRLSIGNER");
-        final String sql = "INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL)" +
+        final String sql = "INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CERT, CRL_CONTROL, SIGNER_CONF)" +
                 " VALUES (?, ?, ?, ?, ?)";
         PreparedStatement ps = null;
         try
@@ -280,9 +279,9 @@ class CaConfigurationDbImporter extends DbPorter
                     int idx = 1;
                     ps.setString(idx++, crlsigner.getName());
                     ps.setString(idx++, crlsigner.getSignerType());
-                    ps.setString(idx++, crlsigner.getSignerConf());
-                    ps.setString(idx++, crlsigner.getSignerCert());
+                    ps.setString(idx++, getValue(crlsigner.getSignerCert()));
                     ps.setString(idx++, crlsigner.getCrlControl());
+                    ps.setString(idx++, getValue(crlsigner.getSignerConf()));
                     ps.executeUpdate();
                 }catch(SQLException e)
                 {
@@ -299,7 +298,7 @@ class CaConfigurationDbImporter extends DbPorter
 
     private void import_requestor(
             final Requestors requestors)
-    throws DataAccessException
+    throws DataAccessException, IOException
     {
         System.out.println("importing table REQUESTOR");
         final String sql = "INSERT INTO REQUESTOR (NAME, CERT) VALUES (?, ?)";
@@ -314,7 +313,7 @@ class CaConfigurationDbImporter extends DbPorter
                 {
                     int idx = 1;
                     ps.setString(idx++, requestor.getName());
-                    ps.setString(idx++, requestor.getCert());
+                    ps.setString(idx++, getValue(requestor.getCert()));
 
                     ps.executeUpdate();
                 }catch(SQLException e)
@@ -332,7 +331,7 @@ class CaConfigurationDbImporter extends DbPorter
 
     private void import_publisher(
             final Publishers publishers)
-    throws DataAccessException
+    throws DataAccessException, IOException
     {
         System.out.println("importing table PUBLISHER");
         final String sql = "INSERT INTO PUBLISHER (NAME, TYPE, CONF) VALUES (?, ?, ?)";
@@ -347,7 +346,7 @@ class CaConfigurationDbImporter extends DbPorter
                     int idx = 1;
                     ps.setString(idx++, publisher.getName());
                     ps.setString(idx++, publisher.getType());
-                    ps.setString(idx++, publisher.getConf());
+                    ps.setString(idx++, getValue(publisher.getConf()));
 
                     ps.executeUpdate();
                 }catch(SQLException e)
@@ -383,16 +382,7 @@ class CaConfigurationDbImporter extends DbPorter
                     ps.setInt(idx++, art);
                     ps.setString(idx++, certprofile.getType());
 
-                    String conf = certprofile.getConf();
-                    if(conf == null)
-                    {
-                        String confFilename = certprofile.getConfFile();
-                        if(confFilename != null)
-                        {
-                            File confFile = new File(baseDir, confFilename);
-                            conf = new String(IoUtil.read(confFile));
-                        }
-                    }
+                    String conf = getValue(certprofile.getConf());
                     ps.setString(idx++, conf);
 
                     ps.executeUpdate();
@@ -421,10 +411,10 @@ class CaConfigurationDbImporter extends DbPorter
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("INSERT INTO CA (NAME, ART, SUBJECT, NEXT_SN, NEXT_CRLNO, STATUS,");
         sqlBuilder.append(" CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS, MAX_VALIDITY,");
-        sqlBuilder.append(" CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME,");
+        sqlBuilder.append(" CERT, SIGNER_TYPE, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME,");
         sqlBuilder.append(" DUPLICATE_KEY, DUPLICATE_SUBJECT, DUPLICATE_CN, PERMISSIONS, NUM_CRLS,");
         sqlBuilder.append(" EXPIRATION_PERIOD, REV, RR, RT, RIT, VALIDITY_MODE,");
-        sqlBuilder.append(" EXTRA_CONTROL)");
+        sqlBuilder.append(" EXTRA_CONTROL, SIGNER_CONF)");
         sqlBuilder.append(" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         final String sql = sqlBuilder.toString();
 
@@ -439,7 +429,7 @@ class CaConfigurationDbImporter extends DbPorter
 
                 try
                 {
-                    String b64Cert = ca.getCert();
+                    String b64Cert = getValue(ca.getCert());
                     X509Certificate c = X509Util.parseCert(Base64.decode(b64Cert));
 
                     int idx = 1;
@@ -456,7 +446,6 @@ class CaConfigurationDbImporter extends DbPorter
                     ps.setString(idx++, ca.getMaxValidity());
                     ps.setString(idx++, b64Cert);
                     ps.setString(idx++, ca.getSignerType());
-                    ps.setString(idx++, ca.getSignerConf());
                     ps.setString(idx++, ca.getCrlsignerName());
                     ps.setString(idx++, ca.getResponderName());
                     ps.setString(idx++, ca.getCmpcontrolName());
@@ -473,6 +462,7 @@ class CaConfigurationDbImporter extends DbPorter
                     setLong(ps, idx++, ca.getRevInvTime());
                     ps.setString(idx++, ca.getValidityMode());
                     ps.setString(idx++, ca.getExtraControl());
+                    ps.setString(idx++, getValue(ca.getSignerConf()));
 
                     ps.executeUpdate();
                 }catch(SQLException e)
@@ -625,11 +615,11 @@ class CaConfigurationDbImporter extends DbPorter
 
     private void import_scep(
             final Sceps sceps)
-    throws DataAccessException
+    throws DataAccessException, IOException
     {
         System.out.println("importing table SCEP");
-        final String sql = "INSERT INTO SCEP (CA_NAME, RESPONDER_TYPE, RESPONDER_CONF, "
-                + "RESPONDER_CERT, CONTROL) VALUES (?, ?, ?, ?, ?)";
+        final String sql = "INSERT INTO SCEP (CA_NAME, RESPONDER_TYPE, "
+                + "RESPONDER_CERT, CONTROL, RESPONDER_CONF) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement ps = prepareStatement(sql);
         try
         {
@@ -640,9 +630,9 @@ class CaConfigurationDbImporter extends DbPorter
                     int idx = 1;
                     ps.setString(idx++, entry.getCaName().toUpperCase());
                     ps.setString(idx++, entry.getResponderType());
-                    ps.setString(idx++, entry.getResponderConf());
-                    ps.setString(idx++, entry.getResponderCert());
+                    ps.setString(idx++, getValue(entry.getResponderCert()));
                     ps.setString(idx++, entry.getControl());
+                    ps.setString(idx++, getValue(entry.getResponderConf()));
                     ps.executeUpdate();
                 }catch(SQLException e)
                 {

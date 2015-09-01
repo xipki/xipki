@@ -33,42 +33,25 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool;
+package org.xipki.pki.ca.dbtool.xmlio;
 
 /**
  * @author Lijun Liao
  */
 
-public class DbiUtil
+public class InvalidDataObjectException extends Exception
 {
-    public static String buildFilename(
-            final String prefix,
-            final String suffix,
-            final int minCertIdOfCurrentFile,
-            final int maxCertIdOfCurrentFile,
-            final int maxCertId)
+
+    private static final long serialVersionUID = 1L;
+
+    public InvalidDataObjectException()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix);
+    }
 
-        int len = Integer.toString(maxCertId).length();
-        String a = Integer.toString(minCertIdOfCurrentFile);
-        for(int i = 0; i < len - a.length(); i++)
-        {
-            sb.append('0');
-        }
-        sb.append(a);
-        sb.append("-");
-
-        String b = Integer.toString(maxCertIdOfCurrentFile);
-        for(int i = 0; i < len - b.length(); i++)
-        {
-            sb.append('0');
-        }
-        sb.append(b);
-
-        sb.append(suffix);
-        return sb.toString();
+    public InvalidDataObjectException(
+            final String message)
+    {
+        super(message);
     }
 
 }
