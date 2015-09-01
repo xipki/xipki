@@ -239,7 +239,11 @@ class CertStoreQueryExecutor
         long fpPK = FpIdCalculator.hash(encodedSubjectPublicKey);
         String subjectText = X509Util.cutText(certificate.getSubject(), maxX500nameLen);
         String cn = X509Util.getCommonName(certificate.getSubjectAsX500Name());
-        long fpCn = FpIdCalculator.hash(cn);
+        long fpCn = 0;
+        if(StringUtil.isNotBlank(cn))
+        {
+            fpCn = FpIdCalculator.hash(cn);
+        }
         long fpSubject = X509Util.fp_canonicalized_name(cert.getSubjectX500Principal());
 
         String reqSubjectText = null;
@@ -276,7 +280,13 @@ class CertStoreQueryExecutor
             ps_addcert.setLong(idx++, System.currentTimeMillis()/1000);
             ps_addcert.setLong(idx++, cert.getSerialNumber().longValue());
             ps_addcert.setString(idx++, subjectText);
-            ps_addcert.setLong(idx++, fpCn);
+            if(fpCn != 0)
+            {
+                ps_addcert.setLong(idx++, fpCn);
+            } else
+            {
+                ps_addcert.setNull(idx++, Types.BIGINT);
+            }
             ps_addcert.setLong(idx++, fpSubject);
             if(fpReqSubject != null)
             {
@@ -1024,8 +1034,18 @@ class CertStoreQueryExecutor
             throw new IllegalArgumentException("numEntries is not positive");
         }
 
-        int caId = getCaId(caCert);
-        int publisherId = getPublisherId(publisherName);
+        Integer publisherId = publisherStore.getId(publisherName);
+        if(publisherId == null)
+        {
+            return Collections.emptyList();
+        }
+
+        byte[] encodedCert = caCert.getEncodedCert();
+        Integer caId =  caInfoStore.getCaIdForCert(encodedCert);
+        if(caId == null)
+        {
+            return Collections.emptyList();
+        }
 
         final String sql = dataSource.createFetchFirstSelectSQL(
                 "CID FROM PUBLISHQUEUE WHERE CA_ID=? AND PID=?", numEntries, "CID ASC");

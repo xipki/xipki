@@ -35,7 +35,6 @@
 
 package org.xipki.pki.ca.dbtool;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -53,6 +52,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamException;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
@@ -64,8 +64,9 @@ import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType.Issuers;
-import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertType;
-import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertsType;
+import org.xipki.pki.ca.dbtool.xmlio.DbiXmlWriter;
+import org.xipki.pki.ca.dbtool.xmlio.OcspCertType;
+import org.xipki.pki.ca.dbtool.xmlio.OcspCertsWriter;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.IssuerType;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.ObjectFactory;
 import org.xipki.security.api.HashCalculator;
@@ -83,7 +84,6 @@ class OcspCertStoreDbExporter extends DbPorter
     private final Marshaller marshaller;
     private final Unmarshaller unmarshaller;
 
-    private final ObjectFactory objFact = new ObjectFactory();
     private final int numCertsInBundle;
     private final int numCertsPerSelect;
     private final boolean resume;
@@ -187,7 +187,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
     private void export_issuer(
             final CertStoreType certstore)
-    throws DataAccessException
+    throws DataAccessException, IOException
     {
         System.out.println("exporting table ISSUER");
         Issuers issuers = new Issuers();
@@ -202,6 +202,9 @@ class OcspCertStoreDbExporter extends DbPorter
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
 
+            String issuerCertsDir = "issuer-conf";
+            new File(issuerCertsDir).mkdirs();
+
             while(rs.next())
             {
                 int id = rs.getInt("ID");
@@ -209,7 +212,10 @@ class OcspCertStoreDbExporter extends DbPorter
 
                 IssuerType issuer = new IssuerType();
                 issuer.setId(id);
-                issuer.setCert(cert);
+
+                String certFileName = issuerCertsDir + "/cert-issuer-" + id;
+                IoUtil.save(new File(baseDir, certFileName), cert.getBytes("UTF-8"));
+                issuer.setCertFile(certFileName);
 
                 boolean revoked = rs.getBoolean("REV");
                 issuer.setRevoked(revoked);
@@ -271,7 +277,7 @@ class OcspCertStoreDbExporter extends DbPorter
             final CertStoreType certstore,
             final File processLogFile,
             final FileOutputStream certsFileOs)
-    throws DataAccessException, IOException, JAXBException, InterruptedException
+    throws Exception
     {
         int numProcessedBefore = certstore.getCountCerts();
 
@@ -310,7 +316,7 @@ class OcspCertStoreDbExporter extends DbPorter
         int sum = 0;
         int numCertInCurrentFile = 0;
 
-        CertsType certsInCurrentFile = new CertsType();
+        OcspCertsWriter certsInCurrentFile = new OcspCertsWriter();
 
         final int n = numCertsPerSelect;
 
@@ -404,7 +410,7 @@ class OcspCertStoreDbExporter extends DbPorter
                         }
                     }
 
-                    CertType cert = new CertType();
+                    OcspCertType cert = new OcspCertType();
 
                     cert.setId(id);
 
@@ -437,7 +443,7 @@ class OcspCertStoreDbExporter extends DbPorter
                     String profile = rs.getString("PN");
                     cert.setProfile(profile);
 
-                    certsInCurrentFile.getCert().add(cert);
+                    certsInCurrentFile.add(cert);
                     numCertInCurrentFile ++;
                     sum++;
 
@@ -445,7 +451,7 @@ class OcspCertStoreDbExporter extends DbPorter
                     {
                         finalizeZip(currentCertsZip, certsInCurrentFile);
 
-                        String currentCertsFilename = DbiUtil.buildFilename("certs_", ".zip",
+                        String currentCertsFilename = buildFilename("certs_", ".zip",
                                 minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxCertId);
                         currentCertsZipFile.renameTo(new File(certsDir, currentCertsFilename));
 
@@ -457,7 +463,7 @@ class OcspCertStoreDbExporter extends DbPorter
                         processLog.printStatus();
 
                         // reset
-                        certsInCurrentFile = new CertsType();
+                        certsInCurrentFile = new OcspCertsWriter();
                         numCertInCurrentFile = 0;
                         minCertIdOfCurrentFile = -1;
                         maxCertIdOfCurrentFile = -1;
@@ -480,7 +486,7 @@ class OcspCertStoreDbExporter extends DbPorter
             {
                 finalizeZip(currentCertsZip, certsInCurrentFile);
 
-                String currentCertsFilename = DbiUtil.buildFilename("certs_", ".zip",
+                String currentCertsFilename = buildFilename("certs_", ".zip",
                         minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxCertId);
                 currentCertsZipFile.renameTo(new File(certsDir, currentCertsFilename));
 
@@ -510,7 +516,7 @@ class OcspCertStoreDbExporter extends DbPorter
         processLogFile.delete();
 
         System.out.println(getExportedText() + processLog.getNumProcessed() +
-                " certificates from tables CERT, CHAHS and CRAW");
+                " certificates from tables CERT, CHASH and CRAW");
     }
 
     private void justThrowsException()
@@ -521,25 +527,14 @@ class OcspCertStoreDbExporter extends DbPorter
 
     private void finalizeZip(
             final ZipOutputStream zipOutStream,
-            final CertsType certsType)
-    throws JAXBException, IOException
+            final DbiXmlWriter certsType)
+    throws JAXBException, IOException, XMLStreamException
     {
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        try
-        {
-            marshaller.marshal(objFact.createCerts(certsType), bout);
-        }catch(JAXBException e)
-        {
-            throw XMLUtil.convert(e);
-        }
-
-        bout.flush();
-
         ZipEntry certZipEntry = new ZipEntry("certs.xml");
         zipOutStream.putNextEntry(certZipEntry);
         try
         {
-            zipOutStream.write(bout.toByteArray());
+            certsType.rewriteToZipStream(zipOutStream);
         }finally
         {
             zipOutStream.closeEntry();

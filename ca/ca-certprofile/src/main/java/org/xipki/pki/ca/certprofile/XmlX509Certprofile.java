@@ -321,16 +321,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             duplicateKeyPermitted = conf.isDuplicateKey().booleanValue();
         }
 
-        if(conf.isDuplicateSubject() != null)
-        {
-            duplicateSubjectPermitted = conf.isDuplicateSubject().booleanValue();
-        }
-
-        if(conf.isDuplicateCN() != null)
-        {
-            duplicateCNPermitted = conf.isDuplicateCN().booleanValue();
-        }
-
         if(conf.isSerialNumberInReq() != null)
         {
             serialNumberInReqPermitted = conf.isSerialNumberInReq().booleanValue();
@@ -361,6 +351,20 @@ public class XmlX509Certprofile extends BaseX509Certprofile
 
         // Subject
         Subject subject = conf.getSubject();
+
+        {
+            Boolean b = subject.isDuplicateSubjectPermitted();
+            if(b != null)
+            {
+                duplicateSubjectPermitted = b.booleanValue();
+            }
+
+            b = subject.isDuplicateCNPermitted();
+            if(b != null)
+            {
+                duplicateCNPermitted = b.booleanValue();
+            }
+        }
 
         Map<ASN1ObjectIdentifier, RDNControl> subjectDNControls = new HashMap<>();
 

@@ -223,6 +223,9 @@ public class ProfileConfCreatorDemo
             profile = Certprofile_MultipleValuedRDN();
             marshall(m, profile, "Certprofile_multiValuedRDN.xml");
 
+            //NOTAFTER = 9999-12-31-59-59
+            profile = Certprofile_MaxTime();
+            marshall(m, profile, "Certprofile_MaxTime.xml");
         }catch(Exception e)
         {
             e.printStackTrace();
@@ -260,6 +263,7 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
+        subject.setDuplicateCNPermitted(false);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -302,6 +306,7 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
+        subject.setDuplicateCNPermitted(false);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -347,6 +352,7 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
+        subject.setDuplicateCNPermitted(false);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -394,6 +400,7 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
+        subject.setDuplicateCNPermitted(false);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -562,6 +569,7 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
+        subject.setDuplicateCNPermitted(false);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -605,12 +613,12 @@ public class ProfileConfCreatorDemo
     {
         X509ProfileType profile = getBaseProfile("Certprofile TLS", false, "5y", true,
                 new String[]{"SHA1"});
-        profile.setDuplicateCN(true);
+
         profile.setDuplicateKey(true);
-        profile.setDuplicateSubject(true);
 
         // Subject
         Subject subject = profile.getSubject();
+        subject.setDuplicateSubjectPermitted(true);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -666,9 +674,6 @@ public class ProfileConfCreatorDemo
     {
         X509ProfileType profile = getBaseProfile("Certprofile TLS_C", false, "5y", false,
                 new String[]{"SHA1"});
-        profile.setDuplicateCN(true);
-        profile.setDuplicateKey(true);
-        profile.setDuplicateSubject(true);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -720,10 +725,12 @@ public class ProfileConfCreatorDemo
     {
         X509ProfileType profile = getBaseProfile("Certprofile TLSwithIncSN", false, "5y", false,
                 new String[]{"SHA1"});
-        profile.setDuplicateCN(true);
+
+        profile.setDuplicateKey(true);
 
         // Subject
         Subject subject = profile.getSubject();
+        subject.setDuplicateSubjectPermitted(true);
         subject.setIncSerialNumber(true);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -775,7 +782,6 @@ public class ProfileConfCreatorDemo
     {
         X509ProfileType profile = getBaseProfile("Certprofile gSMC_K", false, "5y", false,
                 new String[]{"SHA256"});
-        profile.setDuplicateSubject(true);
 
         // SpecialBehavior
         profile.setSpecialBehavior(SpecialX509CertprofileBehavior.gematik_gSMC_K.name());
@@ -790,6 +796,7 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
+        subject.setDuplicateSubjectPermitted(true);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -871,6 +878,7 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
+        subject.setDuplicateCNPermitted(false);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -924,6 +932,7 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
+        subject.setDuplicateCNPermitted(false);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -1440,7 +1449,6 @@ public class ProfileConfCreatorDemo
         profile.setNotBeforeTime(useMidnightNotBefore ? "midnight" : "current");
 
         profile.setDuplicateKey(false);
-        profile.setDuplicateSubject(false);
         profile.setSerialNumberInReq(false);
 
         // SignatureAlgorithms
@@ -1462,6 +1470,8 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = new Subject();
+        subject.setDuplicateCNPermitted(true);
+        subject.setDuplicateSubjectPermitted(false);
         profile.setSubject(subject);
 
         subject.setDnBackwards(false);
@@ -1572,6 +1582,7 @@ public class ProfileConfCreatorDemo
             List<RangeType> modulusLengths = ranges.getRange();
             modulusLengths.add(createRange(2048));
             modulusLengths.add(createRange(3072));
+            modulusLengths.add(createRange(4096));
         }
 
         return ret;
@@ -1647,6 +1658,7 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
+        subject.setDuplicateCNPermitted(false);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -1726,6 +1738,55 @@ public class ProfileConfCreatorDemo
         // authorizationTemplate
         extensionValue = createAuthorizationTemplate();
         list.add(createExtension(ObjectIdentifiers.id_xipki_ext_authorizationTemplate, true, false, extensionValue));
+
+        return profile;
+    }
+
+    private static X509ProfileType Certprofile_MaxTime()
+    throws Exception
+    {
+        X509ProfileType profile = getBaseProfile("Certprofile MaxTime", false, "9999y", false,
+                new String[]{"SHA1"});
+
+        // Subject
+        Subject subject = profile.getSubject();
+        subject.setDuplicateSubjectPermitted(false);
+        subject.setDuplicateCNPermitted(false);
+        subject.setIncSerialNumber(false);
+
+        List<RdnType> rdnControls = subject.getRdn();
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}, null, null));
+
+        // Extensions
+        ExtensionsType extensions = profile.getExtensions();
+        List<ExtensionType> list = extensions.getExtension();
+
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+        list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+        // Extensions - basicConstraints
+        ExtensionValueType extensionValue = null;
+        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
+
+        // Extensions - AuthorityKeyIdentifier
+        extensionValue = createAuthorityKeyIdentifier(true);
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
+
+        // Extensions - keyUsage
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.DATA_ENCIPHERMENT,
+                        KeyUsageEnum.KEY_ENCIPHERMENT},
+                null);
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
     }

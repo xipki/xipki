@@ -121,7 +121,7 @@ class ProcessLog
         sb.append(AbstractLoadTest.formatAccount(numProcessed));
 
         // 10 characters for processed percent
-        String percent = Long.toString(numProcessed * 100 / total);
+        String percent = total > 0 ? Long.toString(numProcessed * 100 / total) : "--";
         for (int i = 0; i < 9 - percent.length(); i++)
         {
             sb.append(" ");

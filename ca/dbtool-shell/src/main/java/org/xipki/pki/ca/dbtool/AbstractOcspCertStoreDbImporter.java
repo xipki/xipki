@@ -38,8 +38,11 @@ package org.xipki.pki.ca.dbtool;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
+import org.xipki.common.qa.AbstractLoadTest;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.security.api.HashAlgoType;
+import org.xipki.security.api.HashCalculator;
 
 /**
  * @author Lijun Liao
@@ -79,6 +82,31 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter
         super(dataSource, srcDir, stopMe, evaluateOnly);
     }
 
+    protected String sha1(byte[] data)
+    {
+        return HashCalculator.base64Hash(HashAlgoType.SHA1, data);
+    }
+
+    protected String sha224(byte[] data)
+    {
+        return HashCalculator.base64Hash(HashAlgoType.SHA224, data);
+    }
+
+    protected String sha256(byte[] data)
+    {
+        return HashCalculator.base64Hash(HashAlgoType.SHA256, data);
+    }
+
+    protected String sha384(byte[] data)
+    {
+        return HashCalculator.base64Hash(HashAlgoType.SHA384, data);
+    }
+
+    protected String sha512(byte[] data)
+    {
+        return HashCalculator.base64Hash(HashAlgoType.SHA512, data);
+    }
+
     protected void deleteCertGreatherThan(int id, Logger log)
     {
         deleteFromTableWithLargerId("CRAW", "CID", id, log);
@@ -89,6 +117,9 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter
     protected void dropIndexes()
     throws DataAccessException
     {
+        System.out.println("dropping indexes");
+        long start = System.currentTimeMillis();
+
         dataSource.dropForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT");
         dataSource.dropUniqueConstrain(null, "CONST_ISSUER_SN", "CERT");
 
@@ -98,11 +129,17 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter
         dataSource.dropPrimaryKey(null, "PK_CERT", "CERT");
         dataSource.dropPrimaryKey(null, "PK_CRAW", "CRAW");
         dataSource.dropPrimaryKey(null, "PK_CHASH", "CHASH");
+
+        long duration = (System.currentTimeMillis() - start) / 1000;
+        System.out.println(" dropped indexes in " + AbstractLoadTest.formatTime(duration));
     }
 
     protected void recoverIndexes()
     throws DataAccessException
     {
+        System.out.println("recovering indexes");
+        long start = System.currentTimeMillis();
+
         dataSource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");
         dataSource.addPrimaryKey(null, "PK_CRAW", "CRAW", "CID");
         dataSource.addPrimaryKey(null, "PK_CHASH", "CHASH", "CID");
@@ -115,6 +152,9 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter
                 "CASCADE", "NO ACTION");
         dataSource.addForeignKeyConstraint(null, "FK_CHASH_CERT1", "CHASH", "CID", "CERT", "ID",
                 "CASCADE", "NO ACTION");
+
+        long duration = (System.currentTimeMillis() - start) / 1000;
+        System.out.println(" recovered indexes in " + AbstractLoadTest.formatTime(duration));
     }
 
 }

@@ -35,10 +35,13 @@
 
 package org.xipki.pki.ca.dbtool;
 
-import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.cert.CRLException;
+import java.security.cert.X509CRL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -54,7 +57,11 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamException;
 
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,18 +79,20 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Profiles;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.PublishQueue;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Publishers;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Requestors;
-import org.xipki.pki.ca.dbtool.jaxb.ca.CertType;
-import org.xipki.pki.ca.dbtool.jaxb.ca.CertsType;
+import org.xipki.pki.ca.dbtool.xmlio.CaCertType;
+import org.xipki.pki.ca.dbtool.xmlio.CaCertsWriter;
+import org.xipki.pki.ca.dbtool.xmlio.CaCrlType;
+import org.xipki.pki.ca.dbtool.xmlio.CaCrlsWriter;
+import org.xipki.pki.ca.dbtool.xmlio.CaUserType;
+import org.xipki.pki.ca.dbtool.xmlio.CaUsersWriter;
+import org.xipki.pki.ca.dbtool.xmlio.DbiXmlWriter;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertstoreCaType;
-import org.xipki.pki.ca.dbtool.jaxb.ca.CrlType;
-import org.xipki.pki.ca.dbtool.jaxb.ca.CrlsType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.DeltaCRLCacheEntryType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.NameIdType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.pki.ca.dbtool.jaxb.ca.ToPublishType;
-import org.xipki.pki.ca.dbtool.jaxb.ca.UserType;
-import org.xipki.pki.ca.dbtool.jaxb.ca.UsersType;
 import org.xipki.security.api.HashCalculator;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -95,7 +104,6 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
     private final Marshaller marshaller;
     private final Unmarshaller unmarshaller;
-    private final ObjectFactory objFact = new ObjectFactory();
 
     private final int numCertsInBundle;
     private final int numUsersInBundle;
@@ -227,7 +235,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
             crlsFileOs = new FileOutputStream(crlsListFile, true);
             do_export_crl(certstore, crlsFileOs);
             return null;
-        }catch(DataAccessException | IOException | InterruptedException | JAXBException e)
+        }catch(Exception e)
         {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-crls-");
@@ -243,7 +251,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
     private void do_export_crl(
             final CertStoreType certstore,
             final FileOutputStream filenameListOs)
-    throws DataAccessException, IOException, JAXBException, InterruptedException
+    throws Exception
     {
         System.out.println(getExportingText() + "table CRL");
 
@@ -270,7 +278,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         PreparedStatement ps = prepareStatement(sql);
 
         int numCrlsInCurrentFile = 0;
-        CrlsType crlsInCurrentFile = new CrlsType();
+        CaCrlsWriter crlsInCurrentFile = new CaCrlsWriter();
 
         int sum = 0;
 
@@ -326,6 +334,34 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
                     String b64Crl = rs.getString("CRL");
                     byte[] crlBytes = Base64.decode(b64Crl);
+
+                    X509CRL x509Crl = null;
+                    try
+                    {
+                        x509Crl = X509Util.parseCRL(new ByteArrayInputStream(crlBytes));
+                    } catch (Exception e)
+                    {
+                        LOG.error("could not parse CRL with id {}", id);
+                        LOG.debug("could not parse CRL with id " + id, e);
+                        if(e instanceof CRLException)
+                        {
+                            throw (CRLException) e;
+                        }
+                        else
+                        {
+                            throw new CRLException(e.getMessage(), e);
+                        }
+                    }
+
+                    byte[] octetString = x509Crl.getExtensionValue(Extension.cRLNumber.getId());
+                    if(octetString == null)
+                    {
+                        LOG.warn("CRL without CRL number, ignore it");
+                        continue;
+                    }
+                    byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
+                    BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
+
                     String sha1_cert = HashCalculator.hexSha1(crlBytes);
 
                     final String crlFilename = sha1_cert + ".crl";
@@ -342,20 +378,21 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                         }
                     }
 
-                    CrlType crl = new CrlType();
+                    CaCrlType crl = new CaCrlType();
                     crl.setId(id);
                     crl.setCaId(caId);
+                    crl.setCrlNo(crlNumber.toString());
                     crl.setFile(crlFilename);
 
-                    crlsInCurrentFile.getCrl().add(crl);
+                    crlsInCurrentFile.add(crl);
                     numCrlsInCurrentFile ++;
                     sum ++;
 
                     if(numCrlsInCurrentFile == numEntriesPerZip)
                     {
-                        String currentCrlsFilename = DbiUtil.buildFilename("crls_", ".zip",
+                        String currentCrlsFilename = buildFilename("crls_", ".zip",
                                 minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
-                        finalizeZip(currentCrlsZip, crlsInCurrentFile);
+                        finalizeZip(currentCrlsZip, "crls.xml", crlsInCurrentFile);
                         currentCrlsZipFile.renameTo(new File(entriesDir, currentCrlsFilename));
 
                         writeLine(filenameListOs, currentCrlsFilename);
@@ -364,7 +401,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                         processLog.printStatus();
 
                         // reset
-                        crlsInCurrentFile = new CrlsType();
+                        crlsInCurrentFile = new CaCrlsWriter();
                         numCrlsInCurrentFile = 0;
                         minIdOfCurrentFile = -1;
                         maxIdOfCurrentFile = -1;
@@ -383,13 +420,16 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
             if(numCrlsInCurrentFile > 0)
             {
-                finalizeZip(currentCrlsZip, crlsInCurrentFile);
+                finalizeZip(currentCrlsZip, "crls.xml", crlsInCurrentFile);
 
-                String currentCrlsFilename = DbiUtil.buildFilename("crls_", ".zip",
+                String currentCrlsFilename = buildFilename("crls_", ".zip",
                         minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
                 currentCrlsZipFile.renameTo(new File(entriesDir, currentCrlsFilename));
 
                 writeLine(filenameListOs, currentCrlsFilename);
+                processLog.addNumProcessed(numCrlsInCurrentFile);
+                processLog.printStatus();
+
                 certstore.setCountCrls(sum);
             }
             else
@@ -412,7 +452,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
     private void export_ca(
             final CertStoreType certstore)
-    throws DataAccessException
+    throws DataAccessException, IOException
     {
         System.out.println("exporting table CS_CA");
         Cas cas = new Cas();
@@ -432,7 +472,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
                 CertstoreCaType ca = new CertstoreCaType();
                 ca.setId(id);
-                ca.setCert(cert);
+                ca.setCert(buildFileOrValue(cert, "ca-certstore/cert-ca-" + id));
 
                 cas.getCa().add(ca);
             }
@@ -531,7 +571,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
             usersFileOs = new FileOutputStream(usersListFile, true);
             do_export_user(certstore, usersFileOs);
             return null;
-        }catch(DataAccessException | IOException | JAXBException | InterruptedException e)
+        }catch(Exception e)
         {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-users-");
@@ -547,7 +587,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
     private void do_export_user(
             final CertStoreType certstore,
             final FileOutputStream filenameListOs)
-    throws DataAccessException, IOException, JAXBException, InterruptedException
+    throws Exception
     {
         System.out.println(getExportingText() + "table USERNAME");
 
@@ -575,7 +615,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         PreparedStatement ps = prepareStatement(sql);
 
         int numUsersInCurrentFile = 0;
-        UsersType usersInCurrentFile = new UsersType();
+        CaUsersWriter usersInCurrentFile = new CaUsersWriter();
 
         int sum = 0;
 
@@ -624,7 +664,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                     }
 
                     String name = rs.getString("NAME");
-                    UserType user = new UserType();
+                    CaUserType user = new CaUserType();
                     user.setId(id);
                     user.setName(name);
                     String password = rs.getString("PASSWORD");
@@ -632,7 +672,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
                     String cnRegex = rs.getString("CN_REGEX");
                     user.setCnRegex(cnRegex);
-                    usersInCurrentFile.getUser().add(user);
+                    usersInCurrentFile.add(user);
 
                     numUsersInCurrentFile ++;
                     sum ++;
@@ -648,7 +688,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                         processLog.printStatus();
 
                         // reset
-                        usersInCurrentFile = new UsersType();
+                        usersInCurrentFile = new CaUsersWriter();
                         numUsersInCurrentFile = 0;
                         minIdOfCurrentFile = -1;
                         maxIdOfCurrentFile = -1;
@@ -735,7 +775,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
             certsFileOs = new FileOutputStream(certsListFile, true);
             do_export_cert(certstore, processLogFile, certsFileOs);
             return null;
-        }catch(DataAccessException | IOException | JAXBException | InterruptedException e)
+        }catch(Exception e)
         {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-certs-");
@@ -753,7 +793,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
             final CertStoreType certstore,
             final File processLogFile,
             final FileOutputStream filenameListOs)
-    throws DataAccessException, IOException, JAXBException, InterruptedException
+    throws Exception
     {
         final int numEntriesPerSelect = numCertsPerSelect;
         final int numEntriesPerZip = numCertsInBundle;
@@ -800,7 +840,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         PreparedStatement rawCertPs = prepareStatement(rawCertSql);
 
         int numCertsInCurrentFile = 0;
-        CertsType certsInCurrentFile = new CertsType();
+        CaCertsWriter certsInCurrentFile = new CaCertsWriter();
 
         int sum = 0;
         File currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
@@ -896,7 +936,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                         }
                     }
 
-                    CertType cert = new CertType();
+                    CaCertType cert = new CaCertType();
                     cert.setId(id);
 
                     byte[] tid = null;
@@ -912,7 +952,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                     cert.setReqType(reqType);
                     if(tid != null)
                     {
-                        cert.setTid(tid);
+                        cert.setTid(Base64.toBase64String(tid));
                     }
 
                     int cainfo_id = rs.getInt("CA_ID");
@@ -964,15 +1004,15 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                         cert.setRs(reqSubject);
                     }
 
-                    certsInCurrentFile.getCert().add(cert);
+                    certsInCurrentFile.add(cert);
                     numCertsInCurrentFile ++;
                     sum ++;
 
                     if(numCertsInCurrentFile == numEntriesPerZip)
                     {
-                        String currentCertsFilename = DbiUtil.buildFilename("certs_", ".zip",
+                        String currentCertsFilename = buildFilename("certs_", ".zip",
                                 minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
-                        finalizeZip(currentCertsZip, certsInCurrentFile);
+                        finalizeZip(currentCertsZip, "certs.xml", certsInCurrentFile);
                         currentCertsZipFile.renameTo(new File(entriesDir, currentCertsFilename));
 
                         writeLine(filenameListOs, currentCertsFilename);
@@ -983,7 +1023,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                         processLog.printStatus();
 
                         // reset
-                        certsInCurrentFile = new CertsType();
+                        certsInCurrentFile = new CaCertsWriter();
                         numCertsInCurrentFile = 0;
                         minIdOfCurrentFile = -1;
                         maxIdOfCurrentFile = -1;
@@ -1005,9 +1045,9 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
             if(numCertsInCurrentFile > 0)
             {
-                finalizeZip(currentCertsZip, certsInCurrentFile);
+                finalizeZip(currentCertsZip, "certs.xml", certsInCurrentFile);
 
-                String currentCertsFilename = DbiUtil.buildFilename("certs_", ".zip",
+                String currentCertsFilename = buildFilename("certs_", ".zip",
                         minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
                 currentCertsZipFile.renameTo(new File(entriesDir, currentCertsFilename));
 
@@ -1148,52 +1188,15 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
     private void finalizeZip(
             final ZipOutputStream zipOutStream,
-            final CertsType certsType)
-    throws JAXBException, IOException
+            final String filename,
+            final DbiXmlWriter os)
+    throws JAXBException, IOException, XMLStreamException
     {
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        try
-        {
-            marshaller.marshal(objFact.createCerts(certsType), bout);
-        }catch(JAXBException e)
-        {
-            throw XMLUtil.convert(e);
-        }
-        bout.flush();
-
-        ZipEntry certZipEntry = new ZipEntry("certs.xml");
+        ZipEntry certZipEntry = new ZipEntry(filename);
         zipOutStream.putNextEntry(certZipEntry);
         try
         {
-            zipOutStream.write(bout.toByteArray());
-        }finally
-        {
-            zipOutStream.closeEntry();
-        }
-
-        zipOutStream.close();
-    }
-
-    private void finalizeZip(
-            final ZipOutputStream zipOutStream,
-            final CrlsType crlsType)
-    throws JAXBException, IOException
-    {
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        try
-        {
-            marshaller.marshal(objFact.createCrls(crlsType), bout);
-        }catch(JAXBException e)
-        {
-            throw XMLUtil.convert(e);
-        }
-        bout.flush();
-
-        ZipEntry certZipEntry = new ZipEntry("crls.xml");
-        zipOutStream.putNextEntry(certZipEntry);
-        try
-        {
-            zipOutStream.write(bout.toByteArray());
+            os.rewriteToZipStream(zipOutStream);
         }finally
         {
             zipOutStream.closeEntry();
@@ -1214,19 +1217,9 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
     private void finalizeZip(
             final String zipFilename,
-            final UsersType usersType)
-    throws JAXBException, IOException
+            final CaUsersWriter os)
+    throws JAXBException, IOException, XMLStreamException
     {
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        try
-        {
-            marshaller.marshal(objFact.createUsers(usersType), bout);
-        }catch(JAXBException e)
-        {
-            throw XMLUtil.convert(e);
-        }
-        bout.flush();
-
         File zipFile = new File(baseDir, "tmp-users-" + System.currentTimeMillis() + ".zip");
         FileOutputStream out = new FileOutputStream(zipFile);
         ZipOutputStream zipOutStream = new ZipOutputStream(out);
@@ -1235,7 +1228,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         zipOutStream.putNextEntry(certZipEntry);
         try
         {
-            zipOutStream.write(bout.toByteArray());
+            os.rewriteToZipStream(zipOutStream);
         }finally
         {
             zipOutStream.closeEntry();

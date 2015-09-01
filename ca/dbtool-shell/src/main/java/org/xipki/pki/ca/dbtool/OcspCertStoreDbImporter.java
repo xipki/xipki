@@ -36,11 +36,10 @@
 package org.xipki.pki.ca.dbtool;
 
 import java.io.File;
+import java.io.IOException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
@@ -51,6 +50,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,11 +61,9 @@ import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType.Issuers;
-import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertType;
-import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertsType;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.IssuerType;
-import org.xipki.security.api.HashAlgoType;
-import org.xipki.security.api.HashCalculator;
+import org.xipki.pki.ca.dbtool.xmlio.OcspCertType;
+import org.xipki.pki.ca.dbtool.xmlio.OcspCertsReader;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -159,7 +157,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
 
     private void import_issuer(
             final Issuers issuers)
-    throws DataAccessException, CertificateException
+    throws DataAccessException, CertificateException, IOException
     {
         System.out.println("importing table ISSUER");
         PreparedStatement ps = prepareStatement(SQL_ADD_ISSUER);
@@ -170,7 +168,9 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
             {
                 try
                 {
-                    String b64Cert = issuer.getCert();
+                    String certFilename = issuer.getCertFile();
+                    String b64Cert = new String(
+                            IoUtil.read(new File(baseDir, certFilename)));
                     byte[] encodedCert = Base64.decode(b64Cert);
 
                     Certificate c;
@@ -199,17 +199,17 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
                     ps.setString(idx++, X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
                     ps.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
                     ps.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedName));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedKey));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA224, encodedName));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA224, encodedKey));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA256, encodedName));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA256, encodedKey));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA384, encodedName));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA384, encodedKey));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA512, encodedName));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA512, encodedKey));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert));
+                    ps.setString(idx++, sha1(encodedName));
+                    ps.setString(idx++, sha1(encodedKey));
+                    ps.setString(idx++, sha224(encodedName));
+                    ps.setString(idx++, sha224(encodedKey));
+                    ps.setString(idx++, sha256(encodedName));
+                    ps.setString(idx++, sha256(encodedKey));
+                    ps.setString(idx++, sha384(encodedName));
+                    ps.setString(idx++, sha384(encodedKey));
+                    ps.setString(idx++, sha512(encodedName));
+                    ps.setString(idx++, sha512(encodedKey));
+                    ps.setString(idx++, sha1(encodedCert));
                     ps.setString(idx++, b64Cert);
                     setBoolean(ps, idx++, issuer.isRevoked());
                     setInt(ps, idx++, issuer.getRevReason());
@@ -343,14 +343,11 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
         ZipFile zipFile = new ZipFile(new File(certsZipFile));
         ZipEntry certsXmlEntry = zipFile.getEntry("certs.xml");
 
-        CertsType certs;
+        OcspCertsReader certs;
         try
         {
-            @SuppressWarnings("unchecked")
-            JAXBElement<CertsType> rootElement = (JAXBElement<CertsType>)
-                    unmarshaller.unmarshal(zipFile.getInputStream(certsXmlEntry));
-            certs = rootElement.getValue();
-        }catch(JAXBException e)
+            certs = new OcspCertsReader(zipFile.getInputStream(certsXmlEntry));
+        }catch(Exception e)
         {
             try
             {
@@ -358,26 +355,25 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
             }catch(Exception e2)
             {
             }
-            throw XMLUtil.convert(e);
+            throw e;
         }
 
         disableAutoCommit();
 
         try
         {
-            List<CertType> list = certs.getCert();
-            final int size = list.size();
             int numEntriesInBatch = 0;
             int lastSuccessfulCertId = 0;
 
-            for(int i = 0; i < size; i++)
+            while(certs.hasNext())
             {
                 if(stopMe.get())
                 {
                     throw new InterruptedException("interrupted by the user");
                 }
 
-                CertType cert = list.get(i);
+                OcspCertType cert = (OcspCertType) certs.next();
+
                 int id = cert.getId();
                 if(id < minId)
                 {
@@ -393,10 +389,11 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
                 // rawcert
                 byte[] encodedCert = IoUtil.read(zipFile.getInputStream(certZipEnty));
 
-                X509Certificate c;
+                TBSCertificate c;
                 try
                 {
-                    c = X509Util.parseCert(encodedCert);
+                    Certificate cc = Certificate.getInstance(encodedCert);
+                    c = cc.getTBSCertificate();
                 } catch (Exception e)
                 {
                     LOG.error("could not parse certificate in file {}", filename);
@@ -417,11 +414,11 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
                     int idx = 1;
                     ps_cert.setInt(idx++, id);
                     ps_cert.setInt(idx++, cert.getIid());
-                    ps_cert.setLong(idx++, c.getSerialNumber().longValue());
+                    ps_cert.setLong(idx++, c.getSerialNumber().getPositiveValue().longValue());
                     ps_cert.setLong(idx++, cert.getUpdate());
-                    ps_cert.setLong(idx++, c.getNotBefore().getTime() / 1000);
-                    ps_cert.setLong(idx++, c.getNotAfter().getTime() / 1000);
-                    setBoolean(ps_cert, idx++, cert.isRev());
+                    ps_cert.setLong(idx++, c.getStartDate().getDate().getTime() / 1000);
+                    ps_cert.setLong(idx++, c.getEndDate().getDate().getTime() / 1000);
+                    setBoolean(ps_cert, idx++, cert.getRev().booleanValue());
                     setInt(ps_cert, idx++, cert.getRr());
                     setLong(ps_cert, idx++, cert.getRt());
                     setLong(ps_cert, idx++, cert.getRit());
@@ -437,11 +434,11 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
                 {
                     int idx = 1;
                     ps_certhash.setInt(idx++, cert.getId());
-                    ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert));
-                    ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA224, encodedCert));
-                    ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA256, encodedCert));
-                    ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA384, encodedCert));
-                    ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA512, encodedCert));
+                    ps_certhash.setString(idx++, sha1(encodedCert));
+                    ps_certhash.setString(idx++, sha224(encodedCert));
+                    ps_certhash.setString(idx++, sha256(encodedCert));
+                    ps_certhash.setString(idx++, sha384(encodedCert));
+                    ps_certhash.setString(idx++, sha512(encodedCert));
                     ps_certhash.addBatch();
                 }catch(SQLException e)
                 {
@@ -453,7 +450,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
                 {
                     int idx = 1;
                     ps_rawcert.setInt(idx++, cert.getId());
-                    ps_rawcert.setString(idx++, X509Util.cutX500Name(c.getSubjectX500Principal(), maxX500nameLen));
+                    ps_rawcert.setString(idx++, X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
                     ps_rawcert.setString(idx++, Base64.toBase64String(encodedCert));
                     ps_rawcert.addBatch();
                 }catch(SQLException e)
@@ -461,7 +458,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
                     throw translate(SQL_ADD_CRAW, e);
                 }
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % this.numCertsPerCommit == 0 || i == size - 1))
+                if(numEntriesInBatch > 0 && (numEntriesInBatch % this.numCertsPerCommit == 0
+                        || certs.hasNext() == false))
                 {
                     if(evaulateOnly)
                     {
