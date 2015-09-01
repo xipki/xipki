@@ -55,7 +55,8 @@ public class DbSchemaInfo
 {
     private final Map<String, String> variables = new HashMap<>();
 
-    public DbSchemaInfo(DataSourceWrapper dataSource)
+    public DbSchemaInfo(
+            final DataSourceWrapper dataSource)
     throws DataAccessException
     {
         final String sql = "SELECT NAME, VALUE2 FROM DBSCHEMA";
@@ -97,7 +98,8 @@ public class DbSchemaInfo
         return Collections.unmodifiableSet(variables.keySet());
     }
 
-    public String getVariableValue(String variableName)
+    public String getVariableValue(
+            final String variableName)
     {
         return variables.get(variableName);
     }

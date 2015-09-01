@@ -56,7 +56,8 @@ public abstract class DbPorterWorker implements Runnable
         return exception;
     }
 
-    public void setStopMe(boolean b)
+    public void setStopMe(
+            final boolean b)
     {
         this.stopMe.set(b);
     }
@@ -73,7 +74,8 @@ public abstract class DbPorterWorker implements Runnable
         }
     }
 
-    protected abstract void doRun(AtomicBoolean stopMe)
+    protected abstract void doRun(
+            AtomicBoolean stopMe)
     throws Exception;
 
 }

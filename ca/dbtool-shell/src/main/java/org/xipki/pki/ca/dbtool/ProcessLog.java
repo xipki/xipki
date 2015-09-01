@@ -100,7 +100,8 @@ class ProcessLog
         return startTime;
     }
 
-    public long addNumProcessed(long numProcessed)
+    public long addNumProcessed(
+            final long numProcessed)
     {
         this.numProcessed += numProcessed;
         return this.numProcessed;

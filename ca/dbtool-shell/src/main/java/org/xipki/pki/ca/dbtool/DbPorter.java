@@ -224,7 +224,11 @@ public class DbPorter
         }
     }
 
-    public boolean deleteFromTableWithLargerId(String tableName, String idColumn, int id, Logger log)
+    public boolean deleteFromTableWithLargerId(
+            final String tableName,
+            final String idColumn,
+            final int id,
+            final Logger log)
     {
         StringBuilder sb = new StringBuilder(50);
         sb.append("DELETE FROM ").append(tableName).append(" WHERE ").append(idColumn).append(" > ").append(id);

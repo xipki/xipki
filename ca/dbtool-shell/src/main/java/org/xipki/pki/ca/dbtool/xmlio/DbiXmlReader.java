@@ -114,7 +114,8 @@ public abstract class DbiXmlReader
         return ret;
     }
 
-    protected abstract DbDataObject retrieveNext(XMLStreamReader reader)
+    protected abstract DbDataObject retrieveNext(
+            XMLStreamReader reader)
     throws InvalidDataObjectException, XMLStreamException;
 
 }
