@@ -212,7 +212,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         }
 
         @Override
-        protected String getSqlToDropUniqueConstrain(
+        protected String getSqlToDropUniqueConstraint(
                 final String constraintName,
                 final String table)
         {
@@ -261,7 +261,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
             sql.append("CREATE SEQUENCE ").append(sequenceName);
-            sql.append("AS BIGINT START WITH ").append(startValue);
+            sql.append(" AS BIGINT START WITH ").append(startValue);
             sql.append(" INCREMENT BY 1 NO CYCLE NO CACHE");
             return sql.toString();
         }
@@ -282,37 +282,6 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             StringBuilder sql = new StringBuilder(sequenceName.length() + 50);
             sql.append("SELECT NEXT VALUE FOR ").append(sequenceName).append(" FROM sysibm.sysdummy1");
             return sql.toString();
-        }
-
-        @Override
-        protected String getSqlToDropForeignKeyConstraint(
-                final String constraintName,
-                final String baseTable)
-        throws DataAccessException
-        {
-            return "ALTER TABLE " + baseTable + " DROP FOREIGN KEY " + constraintName;
-        }
-
-        @Override
-        protected String getSqlToAddUniqueConstrain(
-                final String constraintName,
-                final String table,
-                final String... columns)
-        {
-            final StringBuilder sb = new StringBuilder(100);
-            sb.append("CREATE UNIQUE INDEX ").append(constraintName);
-            sb.append(" ON ").append(table).append("(");
-            final int n = columns.length;
-            for(int i = 0; i < n; i++)
-            {
-                if(i != 0)
-                {
-                    sb.append(",");
-                }
-                sb.append(columns[i]);
-            }
-            sb.append(")");
-            return sb.toString();
         }
 
     }
@@ -490,7 +459,35 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 final String primaryKeyName,
                 final String table)
         {
-            return "ALTER TABLE " + table + " DROP CONSTRAINT " + primaryKeyName;
+            return "ALTER TABLE " + table + " DROP CONSTRAINT " + primaryKeyName + " DROP INDEX";
+        }
+
+        @Override
+        protected String getSqlToDropUniqueConstraint(
+                final String contraintName,
+                final String table)
+        {
+            return "ALTER TABLE " + table + " DROP CONSTRAINT " + contraintName + " DROP INDEX";
+        }
+
+        @Override
+        protected String getSqlToAddForeignKeyConstraint(
+                final String constraintName,
+                final String baseTable,
+                final String baseColumn,
+                final String referencedTable,
+                final String referencedColumn,
+                final String onDeleteAction,
+                final String onUpdateAction)
+        {
+            final StringBuilder sb = new StringBuilder(100);
+            sb.append("ALTER TABLE ").append(baseTable);
+            sb.append(" ADD CONSTRAINT ").append(constraintName);
+            sb.append(" FOREIGN KEY (").append(baseColumn).append(")");
+            sb.append(" REFERENCES ").append(referencedTable);
+            sb.append(" (").append(referencedColumn).append(")");
+            sb.append(" ON DELETE ").append(onDeleteAction);
+            return sb.toString();
         }
 
         @Override
@@ -1091,10 +1088,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final Object value)
     throws DataAccessException
     {
-        // TODO use fetch first
-        StringBuilder sb = new StringBuilder();
-        sb.append("SELECT COUNT(*) FROM ").append(table).append(" WHERE ").append(column).append("=?");
-        String sql = sb.toString();
+        StringBuilder sb = new StringBuilder(50);
+        sb.append(column).append(" FROM ").append(table).append(" WHERE ").append(column).append("=?");
+        String sql = createFetchFirstSelectSQL(sb.toString(), 1);
 
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -1115,8 +1111,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 stmt.setString(1, value.toString());
             }
             rs = stmt.executeQuery();
-            rs.next();
-            return rs.getInt(1) > 0;
+            return rs.next();
         } catch(SQLException e)
         {
             throw translate(sql, e);
@@ -1387,7 +1382,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final String... columns)
     {
         final StringBuilder sb = new StringBuilder(100);
-        sb.append("ALTER TABLE ").append(table).append(" ADD PRIMARY KEY (");
+        sb.append("ALTER TABLE ").append(table);
+        sb.append(" ADD CONSTRAINT ").append(primaryKeyName);
+        sb.append(" PRIMARY KEY (");
         final int n = columns.length;
         for(int i = 0; i < n; i++)
         {
@@ -1510,7 +1507,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         executeUpdate(conn, getSqlToCreateIndex(indexName, table, column));
     }
 
-    protected String getSqlToDropUniqueConstrain(
+    protected String getSqlToDropUniqueConstraint(
             final String constraintName,
             final String table)
     {
@@ -1524,7 +1521,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final String table)
     throws DataAccessException
     {
-        executeUpdate(conn, getSqlToDropUniqueConstrain(constraintName, table));
+        executeUpdate(conn, getSqlToDropUniqueConstraint(constraintName, table));
     }
 
     protected String getSqlToAddUniqueConstrain(
