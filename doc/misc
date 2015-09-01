@@ -1,0 +1,2 @@
+1. oracle
+  The CLOB columns should be the last ones in the INSERT statement
