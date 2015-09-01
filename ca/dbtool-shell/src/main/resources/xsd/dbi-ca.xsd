@@ -126,8 +126,8 @@
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="type" type="xs:string"/>
-      <xs:element name="conf" type="xs:string" minOccurs="0"/>
-      <xs:element name="cert" type="xs:string" minOccurs="0"/>
+      <xs:element name="conf" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="cert" type="fileOrValueType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="environment" type="environmentType"/>
@@ -142,8 +142,8 @@
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="signerType" type="xs:string"/>
-      <xs:element name="signerConf" type="xs:string" minOccurs="0"/>
-      <xs:element name="signerCert" type="xs:string" minOccurs="0"/>
+      <xs:element name="signerConf" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="signerCert" type="fileOrValueType" minOccurs="0"/>
       <xs:element name="crlControl" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
@@ -151,7 +151,7 @@
   <xs:complexType name="requestorType">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
-      <xs:element name="cert" type="xs:string"/>
+      <xs:element name="cert" type="fileOrValueType"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="publisher" type="publisherType"/>
@@ -159,7 +159,7 @@
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="type" type="xs:string"/>
-      <xs:element name="conf" type="xs:string" minOccurs="0"/>
+      <xs:element name="conf" type="fileOrValueType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="profile" type="profileType"/>
@@ -168,10 +168,7 @@
       <xs:element name="name" type="xs:string"/>
       <xs:element name="art" type="xs:int" minOccurs="0"/>
       <xs:element name="type" type="xs:string"/>
-      <xs:choice minOccurs="0">
-        <xs:element name="conf" type="xs:string"/>
-        <xs:element name="confFile" type="xs:string"/>
-      </xs:choice>
+      <xs:element name="conf" type="fileOrValueType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ca" type="caType"/>
@@ -187,9 +184,9 @@
       <xs:element name="ocspUris" type="xs:string" minOccurs="0"/>
       <xs:element name="cacertUris" type="xs:string" minOccurs="0"/>
       <xs:element name="maxValidity" type="xs:string"/>
-      <xs:element name="cert" type="xs:string"/>
+      <xs:element name="cert" type="fileOrValueType"/>
       <xs:element name="signerType" type="xs:string"/>
-      <xs:element name="signerConf" type="xs:string" minOccurs="0"/>
+      <xs:element name="signerConf" type="fileOrValueType" minOccurs="0"/>
       <xs:element name="crlsignerName" type="xs:string" minOccurs="0"/>
       <xs:element name="responderName" type="xs:string" minOccurs="0"/>
       <xs:element name="cmpcontrolName" type="xs:string" minOccurs="0"/>
@@ -244,8 +241,8 @@
     <xs:sequence>
       <xs:element name="caName" type="xs:string"/>
       <xs:element name="responderType" type="xs:string"/>
-      <xs:element name="responderConf" type="xs:string"/>
-      <xs:element name="responderCert" type="xs:string" minOccurs="0"/>
+      <xs:element name="responderConf" type="fileOrValueType"/>
+      <xs:element name="responderCert" type="fileOrValueType" minOccurs="0"/>
       <xs:element name="control" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
@@ -317,7 +314,7 @@
   <xs:complexType name="certstoreCaType">
     <xs:sequence>
       <xs:element name="id" type="xs:int"/>
-      <xs:element name="cert" type="xs:string"/>
+      <xs:element name="cert" type="fileOrValueType"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="nameIdType">
@@ -326,101 +323,10 @@
       <xs:element name="name" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="users" type="usersType"/>
-  <xs:complexType name="usersType">
-    <xs:sequence>
-      <xs:element ref="user" minOccurs="0" maxOccurs="unbounded"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="user" type="userType"/>
-  <xs:complexType name="userType">
-    <xs:sequence>
-      <xs:element name="id" type="xs:int"/>
-      <xs:element name="name" type="xs:string"/>
-      <xs:element name="password" type="xs:string"/>
-      <xs:element name="cnRegex" type="xs:string"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="crls" type="crlsType"/>
-  <xs:complexType name="crlsType">
-    <xs:sequence>
-      <xs:element ref="crl" minOccurs="0" maxOccurs="unbounded"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="crl" type="crlType"/>
-  <xs:complexType name="crlType">
-    <xs:sequence>
-      <xs:element name="id" type="xs:int"/>
-      <xs:element name="caId" type="xs:int"/>
+  <xs:complexType name="fileOrValueType">
+    <xs:choice>
+      <xs:element name="value" type="xs:string"/>
       <xs:element name="file" type="xs:string"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="certs" type="certsType"/>
-  <xs:complexType name="certsType">
-    <xs:sequence>
-      <xs:element ref="cert" minOccurs="0" maxOccurs="unbounded"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="cert" type="certType"/>
-  <xs:complexType name="certType">
-    <xs:sequence>
-      <xs:element name="id" type="xs:int"/>
-      <xs:element name="art" type="xs:int" minOccurs="0"/>
-      <xs:element name="caId" type="xs:int"/>
-      <xs:element name="sn" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>certificate serial number</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="pid" type="xs:int">
-        <xs:annotation>
-          <xs:documentation>certificate profile id</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="rid" type="xs:int" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>requestor id</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="update" type="xs:long"/>
-      <xs:element name="rev" type="xs:boolean">
-        <xs:annotation>
-          <xs:documentation>whether revoked</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="rr" type="xs:int" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>revocation reason</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="rt" type="xs:long" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>revocation time</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="rit" type="xs:long" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>revocation invalidity time</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="user" type="xs:string" minOccurs="0"/>
-      <xs:element name="tid" type="xs:hexBinary" minOccurs="0"/>
-      <xs:element name="reqType" type="xs:int"/>
-      <xs:element name="fpRs" type="xs:long" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>first 8 bytes of the SHA1 sum of the requested certificate</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="rs" type="xs:string" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>requested certificate, if differs from the one in certificate</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="file" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>file name of the certificate</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-    </xs:sequence>
+    </xs:choice>
   </xs:complexType>
 </xs:schema>

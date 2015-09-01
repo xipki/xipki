@@ -42,11 +42,9 @@ import java.math.BigInteger;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
@@ -62,11 +60,14 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.qa.AbstractLoadTest;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
@@ -77,16 +78,16 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Profiles;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.PublishQueue;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Publishers;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Requestors;
-import org.xipki.pki.ca.dbtool.jaxb.ca.CertType;
-import org.xipki.pki.ca.dbtool.jaxb.ca.CertsType;
+import org.xipki.pki.ca.dbtool.xmlio.CaCertType;
+import org.xipki.pki.ca.dbtool.xmlio.CaCertsReader;
+import org.xipki.pki.ca.dbtool.xmlio.CaCrlType;
+import org.xipki.pki.ca.dbtool.xmlio.CaCrlsReader;
+import org.xipki.pki.ca.dbtool.xmlio.CaUserType;
+import org.xipki.pki.ca.dbtool.xmlio.CaUsersReader;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertstoreCaType;
-import org.xipki.pki.ca.dbtool.jaxb.ca.CrlType;
-import org.xipki.pki.ca.dbtool.jaxb.ca.CrlsType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.DeltaCRLCacheEntryType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.NameIdType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.ToPublishType;
-import org.xipki.pki.ca.dbtool.jaxb.ca.UserType;
-import org.xipki.pki.ca.dbtool.jaxb.ca.UsersType;
 import org.xipki.security.api.FpIdCalculator;
 import org.xipki.security.api.HashCalculator;
 import org.xipki.security.api.util.X509Util;
@@ -227,14 +228,14 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
             {
                 try
                 {
-                    String b64Cert = m.getCert();
+                    String b64Cert = getValue(m.getCert());
                     byte[] encodedCert = Base64.decode(b64Cert);
-                    X509Certificate c = X509Util.parseCert(encodedCert);
+                    Certificate c = Certificate.getInstance(encodedCert);
                     String b64Sha1FpCert = HashCalculator.base64Sha1(encodedCert);
 
                     int idx = 1;
                     ps.setInt(idx++, m.getId());
-                    ps.setString(idx++, X509Util.cutX500Name(c.getSubjectX500Principal(), maxX500nameLen));
+                    ps.setString(idx++, X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
                     ps.setString(idx++, b64Sha1FpCert);
                     ps.setString(idx++, b64Cert);
 
@@ -243,7 +244,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                 {
                     System.err.println("error while importing CS_CA with ID=" + m.getId() + ", message: " + e.getMessage());
                     throw translate(sql, e);
-                }catch(CertificateException | IOException e)
+                }catch(IllegalArgumentException | IOException e)
                 {
                     System.err.println("error while importing CS_CA with ID=" + m.getId() + ", message: " + e.getMessage());
                     throw e;
@@ -369,14 +370,14 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
 
     private void import_user(
             final CertStoreType certstore)
-    throws DataAccessException, JAXBException, IOException
+    throws Exception
     {
         System.out.println(getImportingText() + "table USERNAME");
 
         PreparedStatement ps = prepareStatement(SQL_ADD_USER);
 
         ProcessLog processLog = new ProcessLog(certstore.getCountUsers(), System.currentTimeMillis(), 0);
-        System.out.println(getImportingText() + "CRLs from ID 1");
+        System.out.println(getImportingText() + "users from ID 1");
         ProcessLog.printHeader();
 
         DbPortFileNameIterator usersFileIterator = new DbPortFileNameIterator(usersListFile);
@@ -395,7 +396,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                 {
                     System.err.println("error while importing users from file " + file);
                     throw translate(SQL_ADD_USER, e);
-                }catch(JAXBException e)
+                }catch(Exception e)
                 {
                     System.err.println("error while importing users from file " + file);
                     throw e;
@@ -416,21 +417,18 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
             final PreparedStatement ps_adduser,
             final String usersZipFile,
             final ProcessLog processLog)
-    throws JAXBException, SQLException, DataAccessException, IOException
+    throws Exception
     {
         final int numEntriesPerCommit = numUsersPerCommit;
 
         ZipFile zipFile = new ZipFile(new File(usersZipFile));
         ZipEntry usersXmlEntry = zipFile.getEntry("users.xml");
 
-        UsersType users;
+        CaUsersReader users;
         try
         {
-            @SuppressWarnings("unchecked")
-            JAXBElement<UsersType> rootElement = (JAXBElement<UsersType>)
-                    unmarshaller.unmarshal(zipFile.getInputStream(usersXmlEntry));
-            users = rootElement.getValue();
-        }catch(JAXBException e)
+            users = new CaUsersReader(zipFile.getInputStream(usersXmlEntry));
+        }catch(Exception e)
         {
             try
             {
@@ -438,11 +436,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
             }catch(Exception e2)
             {
             }
-            throw XMLUtil.convert(e);
+            throw e;
         }
 
-        List<UserType> list = users.getUser();
-        final int size = list.size();
         int numProcessed = 0;
         int numEntriesInBatch = 0;
 
@@ -450,9 +446,14 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
 
         try
         {
-            for(int i = 0; i < size; i++)
+            while(users.hasNext())
             {
-                UserType user = list.get(i);
+                if(stopMe.get())
+                {
+                    throw new InterruptedException("interrupted by the user");
+                }
+
+                CaUserType user = (CaUserType) users.next();
 
                 numEntriesInBatch++;
                 try
@@ -470,7 +471,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw e;
                 }
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || i == size - 1))
+                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || users.hasNext() == false))
                 {
                     if(evaulateOnly)
                     {
@@ -645,14 +646,11 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
         ZipFile zipFile = new ZipFile(new File(crlsZipFile));
         ZipEntry certsXmlEntry = zipFile.getEntry("crls.xml");
 
-        CrlsType crls;
+        CaCrlsReader crls;
         try
         {
-            @SuppressWarnings("unchecked")
-            JAXBElement<CrlsType> rootElement = (JAXBElement<CrlsType>)
-                    unmarshaller.unmarshal(zipFile.getInputStream(certsXmlEntry));
-            crls = rootElement.getValue();
-        }catch(JAXBException e)
+            crls = new CaCrlsReader(zipFile.getInputStream(certsXmlEntry));
+        }catch(Exception e)
         {
             try
             {
@@ -660,11 +658,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
             }catch(Exception e2)
             {
             }
-            throw XMLUtil.convert(e);
+            throw e;
         }
 
-        List<CrlType> list = crls.getCrl();
-        final int size = list.size();
         int numProcessed = 0;
         int numEntriesInBatch = 0;
 
@@ -672,9 +668,14 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
 
         try
         {
-            for(int i = 0; i < size; i++)
+            while(crls.hasNext())
             {
-                CrlType crl = list.get(i);
+                if(stopMe.get())
+                {
+                    throw new InterruptedException("interrupted by the user");
+                }
+
+                CaCrlType crl = (CaCrlType) crls.next();
 
                 numEntriesInBatch++;
                 String filename = crl.getFile();
@@ -758,7 +759,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw e;
                 }
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || i == size - 1))
+                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || crls.hasNext() == false))
                 {
                     if(evaulateOnly)
                     {
@@ -911,14 +912,11 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
         ZipFile zipFile = new ZipFile(new File(certsZipFile));
         ZipEntry certsXmlEntry = zipFile.getEntry("certs.xml");
 
-        CertsType certs;
+        CaCertsReader certs;
         try
         {
-            @SuppressWarnings("unchecked")
-            JAXBElement<CertsType> rootElement = (JAXBElement<CertsType>)
-                    unmarshaller.unmarshal(zipFile.getInputStream(certsXmlEntry));
-            certs = rootElement.getValue();
-        }catch(JAXBException e)
+            certs = new CaCertsReader(zipFile.getInputStream(certsXmlEntry));
+        }catch(Exception e)
         {
             try
             {
@@ -926,26 +924,24 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
             }catch(Exception e2)
             {
             }
-            throw XMLUtil.convert(e);
+            throw e;
         }
 
         disableAutoCommit();
 
         try
         {
-            List<CertType> list = certs.getCert();
-            final int size = list.size();
             int numEntriesInBatch = 0;
             int lastSuccessfulCertId = 0;
 
-            for(int i = 0; i < size; i++)
+            while(certs.hasNext())
             {
                 if(stopMe.get())
                 {
                     throw new InterruptedException("interrupted by the user");
                 }
 
-                CertType cert = list.get(i);
+                CaCertType cert = (CaCertType) certs.next();
                 int id = cert.getId();
                 if(id < minId)
                 {
@@ -964,10 +960,11 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                 // rawcert
                 byte[] encodedCert = IoUtil.read(zipFile.getInputStream(certZipEnty));
 
-                Certificate c;
+                TBSCertificate c;
                 try
                 {
-                    c = Certificate.getInstance(encodedCert);
+                    Certificate cc = Certificate.getInstance(encodedCert);
+                    c = cc.getTBSCertificate();
                 } catch (Exception e)
                 {
                     LOG.error("could not parse certificate in file {}", filename);
@@ -1003,8 +1000,14 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     ps_cert.setLong(idx++, fpSubject);
 
                     String cn = X509Util.getCommonName(c.getSubject());
-                    long fpCn = FpIdCalculator.hash(cn);
-                    ps_cert.setLong(idx++, fpCn);
+                    if(StringUtil.isNotBlank(cn))
+                    {
+                        long fpCn = FpIdCalculator.hash(cn);
+                        ps_cert.setLong(idx++, fpCn);
+                    } else
+                    {
+                        ps_cert.setNull(idx++, Types.BIGINT);
+                    }
 
                     if(cert.getFpRs() != null)
                     {
@@ -1014,9 +1017,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                         ps_cert.setNull(idx++, Types.BIGINT);
                     }
 
-                    ps_cert.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
-                    ps_cert.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
-                    setBoolean(ps_cert, idx++, cert.isRev());
+                    ps_cert.setLong(idx++, c.getStartDate().getDate().getTime() / 1000);
+                    ps_cert.setLong(idx++, c.getEndDate().getDate().getTime() / 1000);
+                    setBoolean(ps_cert, idx++, cert.getRev());
                     setInt(ps_cert, idx++, cert.getRr());
                     setLong(ps_cert, idx++, cert.getRt());
                     setLong(ps_cert, idx++, cert.getRit());
@@ -1026,7 +1029,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     setInt(ps_cert, idx++, cert.getRid());
                     ps_cert.setString(idx++, cert.getUser());
                     ps_cert.setLong(idx++, FpIdCalculator.hash(encodedKey));
-                    Extension extension = c.getTBSCertificate().getExtensions().getExtension(Extension.basicConstraints);
+                    Extension extension = c.getExtensions().getExtension(Extension.basicConstraints);
                     boolean ee = true;
                     if(extension != null)
                     {
@@ -1043,7 +1046,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     String tidS = null;
                     if(cert.getTid() != null)
                     {
-                        tidS = Base64.toBase64String(cert.getTid());
+                        tidS = cert.getTid();
                     }
                     ps_cert.setString(idx++, tidS);
                     ps_cert.addBatch();
@@ -1065,7 +1068,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw translate(SQL_ADD_CRAW, e);
                 }
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || i == size - 1))
+                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || certs.hasNext() == false))
                 {
                     if(evaulateOnly)
                     {
@@ -1135,6 +1138,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
     private void dropIndexes()
     throws DataAccessException
     {
+        System.out.println("dropping indexes");
+        long start = System.currentTimeMillis();
+
         dataSource.dropIndex(null, "CERT", "IDX_FPK");
         dataSource.dropIndex(null, "CERT", "IDX_FPS");
         dataSource.dropIndex(null, "CERT", "IDX_FPCN");
@@ -1146,15 +1152,21 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
         dataSource.dropForeignKeyConstraint(null, "FK_CRAW_CERT1", "CRAW");
         dataSource.dropForeignKeyConstraint(null, "FK_PUBLISHQUEUE_CERT1", "PUBLISHQUEUE");
 
-        dataSource.dropPrimaryKey(null, "CERT_PK", "CERT");
-        dataSource.dropPrimaryKey(null, "CRAW_PK", "CRAW");
+        dataSource.dropPrimaryKey(null, "PK_CERT", "CERT");
+        dataSource.dropPrimaryKey(null, "PK_CRAW", "CRAW");
+
+        long duration = (System.currentTimeMillis() - start) / 1000;
+        System.out.println(" dropped indexes in " + AbstractLoadTest.formatTime(duration));
     }
 
     private void recoverIndexes()
     throws DataAccessException
     {
-        dataSource.addPrimaryKey(null, "CERT_PK", "CERT", "ID");
-        dataSource.addPrimaryKey(null, "CRAW_PK", "CRAW", "CID");
+        System.out.println("recovering indexes");
+        long start = System.currentTimeMillis();
+
+        dataSource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");
+        dataSource.addPrimaryKey(null, "PK_CRAW", "CRAW", "CID");
 
         dataSource.addForeignKeyConstraint(null, "FK_PUBLISHQUEUE_CERT1", "PUBLISHQUEUE",
                 "CID", "CERT", "ID", "CASCADE", "NO ACTION");
@@ -1170,6 +1182,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
         dataSource.createIndex(null, "IDX_FPS", "CERT", "FP_S");
         dataSource.createIndex(null, "IDX_FPCN", "CERT", "FP_CN");
         dataSource.createIndex(null, "IDX_FPRS", "CERT", "FP_RS");
+
+        long duration = (System.currentTimeMillis() - start) / 1000;
+        System.out.println(" recovered indexes in " + AbstractLoadTest.formatTime(duration));
     }
 
 }

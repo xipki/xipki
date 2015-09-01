@@ -46,7 +46,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -214,7 +213,7 @@ class CaConfigurationDbExporter extends DbPorter
 
     private void export_crlsigner(
             final CAConfigurationType caconf)
-    throws DataAccessException
+    throws DataAccessException, IOException
     {
         System.out.println("exporting table CRLSIGNER");
         Crlsigners crlsigners = new Crlsigners();
@@ -241,8 +240,10 @@ class CaConfigurationDbExporter extends DbPorter
                 CrlsignerType crlsigner = new CrlsignerType();
                 crlsigner.setName(name);
                 crlsigner.setSignerType(signer_type);
-                crlsigner.setSignerConf(signer_conf);
-                crlsigner.setSignerCert(signer_cert);
+                crlsigner.setSignerConf(
+                        buildFileOrValue(signer_conf, "ca-conf/signerconf-crlsigner-" + name));
+                crlsigner.setSignerCert(
+                        buildFileOrValue(signer_cert, "ca-conf/signercert-crlsigner-" + name));
                 crlsigner.setCrlControl(crl_control);
 
                 crlsigners.getCrlsigner().add(crlsigner);
@@ -299,7 +300,7 @@ class CaConfigurationDbExporter extends DbPorter
 
     private void export_requestor(
             final CAConfigurationType caconf)
-    throws DataAccessException
+    throws DataAccessException, IOException
     {
         System.out.println("exporting table REQUESTOR");
         Requestors requestors = new Requestors();
@@ -319,7 +320,8 @@ class CaConfigurationDbExporter extends DbPorter
 
                 RequestorType requestor = new RequestorType();
                 requestor.setName(name);
-                requestor.setCert(cert);
+                requestor.setCert(
+                        buildFileOrValue(cert, "ca-conf/cert-requestor-" + name));
 
                 requestors.getRequestor().add(requestor);
             }
@@ -337,7 +339,7 @@ class CaConfigurationDbExporter extends DbPorter
 
     private void export_responder(
             final CAConfigurationType caconf)
-    throws DataAccessException
+    throws DataAccessException, IOException
     {
         System.out.println("exporting table RESPONDER");
 
@@ -362,8 +364,10 @@ class CaConfigurationDbExporter extends DbPorter
                 ResponderType responder = new ResponderType();
                 responder.setName(name);
                 responder.setType(type);
-                responder.setConf(conf);
-                responder.setCert(cert);
+                responder.setConf(
+                        buildFileOrValue(conf, "ca-conf/conf-responder-" + name));
+                responder.setCert(
+                        buildFileOrValue(cert, "ca-conf/cert-responder-" + name));
                 responders.getResponder().add(responder);
             }
         }catch(SQLException e)
@@ -380,7 +384,7 @@ class CaConfigurationDbExporter extends DbPorter
 
     private void export_publisher(
             final CAConfigurationType caconf)
-    throws DataAccessException
+    throws DataAccessException, IOException
     {
         System.out.println("exporting table PUBLISHER");
         Publishers publishers = new Publishers();
@@ -402,7 +406,8 @@ class CaConfigurationDbExporter extends DbPorter
                 PublisherType publisher = new PublisherType();
                 publisher.setName(name);
                 publisher.setType(type);
-                publisher.setConf(conf);
+                publisher.setConf(
+                        buildFileOrValue(conf, "ca-conf/conf-publisher-" + name));
 
                 publishers.getPublisher().add(publisher);
             }
@@ -444,17 +449,8 @@ class CaConfigurationDbExporter extends DbPorter
                 profile.setName(name);
                 profile.setArt(art);
                 profile.setType(type);
-                if(conf != null && conf.length() > 200)
-                {
-                    String filepath = "certprofile" + File.separator + name + ".conf";
-                    File f = new File(baseDir, filepath);
-                    IoUtil.save(f, conf.getBytes());
-                    profile.setConfFile(filepath);
-                }
-                else
-                {
-                    profile.setConf(conf);
-                }
+                profile.setConf(
+                        buildFileOrValue(conf, "ca-conf/certprofile-" + name));
 
                 profiles.getProfile().add(profile);
             }
@@ -472,7 +468,7 @@ class CaConfigurationDbExporter extends DbPorter
 
     private void export_ca(
             final CAConfigurationType caconf)
-    throws DataAccessException
+    throws DataAccessException, IOException
     {
         System.out.println("exporting table CA");
         Cas cas = new Cas();
@@ -532,9 +528,11 @@ class CaConfigurationDbExporter extends DbPorter
                 ca.setOcspUris(ocsp_uris);
                 ca.setCacertUris(caCertUris);
                 ca.setMaxValidity(max_validity);
-                ca.setCert(cert);
+                ca.setCert(
+                        buildFileOrValue(cert, "ca-conf/cert-ca-" + name));
                 ca.setSignerType(signer_type);
-                ca.setSignerConf(signer_conf);
+                ca.setSignerConf(
+                        buildFileOrValue(signer_conf, "ca-conf/signerconf-ca-" + name));
                 ca.setCrlsignerName(crlsigner_name);
                 ca.setResponderName(responder_name);
                 ca.setCmpcontrolName(cmpcontrol_name);
@@ -659,7 +657,7 @@ class CaConfigurationDbExporter extends DbPorter
 
     private void export_scep(
             final CAConfigurationType caconf)
-    throws DataAccessException
+    throws DataAccessException, IOException
     {
         System.out.println("exporting table SCEP");
         Sceps sceps = new Sceps();
@@ -685,8 +683,10 @@ class CaConfigurationDbExporter extends DbPorter
                 ScepType scep = new ScepType();
                 scep.setCaName(ca_name);
                 scep.setResponderType(resp_type);
-                scep.setResponderConf(resp_conf);
-                scep.setResponderCert(resp_cert);
+                scep.setResponderConf(
+                        buildFileOrValue(resp_conf, "ca-conf/responderconf-scep-" + ca_name));
+                scep.setResponderCert(
+                        buildFileOrValue(resp_cert, "ca-conf/respondercert-scep-" + ca_name));
                 scep.setControl(control);
                 sceps.getScep().add(scep);
             }

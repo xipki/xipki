@@ -2253,8 +2253,13 @@ public class X509CA
             cnMode = DuplicationMode.FORBIDDEN_WITHIN_PROFILE;
         }
 
+        long fpCn = 0;
         String cn = X509Util.getCommonName(grantedSubject);
-        long fpCn = FpIdCalculator.hash(cn);
+
+        if(StringUtil.isNotBlank(cn))
+        {
+            fpCn = FpIdCalculator.hash(cn);
+        }
         long fpSubject = X509Util.fp_canonicalized_name(grantedSubject);
         String grandtedSubjectText = X509Util.getRFC4519Name(grantedSubject);
 
@@ -2346,7 +2351,7 @@ public class X509CA
             {
                 if(cnMode == DuplicationMode.FORBIDDEN)
                 {
-                    if(certstore.isCertForCNIssued(caInfo.getCertificate(), fpCn))
+                    if(fpCn != 0 && certstore.isCertForCNIssued(caInfo.getCertificate(), fpCn))
                     {
                         throw new OperationException(ErrorCode.ALREADY_ISSUED,
                                 "certificate for the given CN already issued");
@@ -2354,7 +2359,7 @@ public class X509CA
                 }
                 else if(cnMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
                 {
-                    if(certstore.isCertForCNIssued(caInfo.getCertificate(), fpCn, certprofileName))
+                    if(fpCn != 0 && certstore.isCertForCNIssued(caInfo.getCertificate(), fpCn, certprofileName))
                     {
                         throw new OperationException(ErrorCode.ALREADY_ISSUED,
                                 "certificate for the given CN and profile " + certprofileName + " already issued");

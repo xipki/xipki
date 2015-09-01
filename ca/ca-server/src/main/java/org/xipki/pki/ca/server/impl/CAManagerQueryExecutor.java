@@ -486,7 +486,7 @@ class CAManagerQueryExecutor
             final String name)
     throws CAMgmtException
     {
-        final String sql = "SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL FROM CRLSIGNER WHERE NAME=?";
+        final String sql = "SIGNER_TYPE, SIGNER_CERT, CRL_CONTROL, SIGNER_CONF FROM CRLSIGNER WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
@@ -553,7 +553,7 @@ class CAManagerQueryExecutor
             final String name)
     throws CAMgmtException
     {
-        final String sql = "TYPE, CONF, CERT FROM RESPONDER WHERE NAME=?";
+        final String sql = "TYPE, CERT, CONF FROM RESPONDER WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
@@ -589,10 +589,10 @@ class CAManagerQueryExecutor
     throws CAMgmtException
     {
         final String sql = "NAME, ART, NEXT_SN, NEXT_CRLNO, STATUS, MAX_VALIDITY" +
-                ", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME" +
+                ", CERT, SIGNER_TYPE, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME" +
                 ", DUPLICATE_KEY, DUPLICATE_SUBJECT, DUPLICATE_CN, PERMISSIONS, NUM_CRLS" +
                 ", EXPIRATION_PERIOD, REV, RR, RT, RIT, VALIDITY_MODE" +
-                ", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS, EXTRA_CONTROL" +
+                ", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS, EXTRA_CONTROL, SIGNER_CONF" +
                 " FROM CA WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -925,10 +925,10 @@ class CAManagerQueryExecutor
         sqlBuilder.append("INSERT INTO CA (");
         sqlBuilder.append("NAME, ART, SUBJECT, NEXT_SN, NEXT_CRLNO, STATUS");
         sqlBuilder.append(", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS");
-        sqlBuilder.append(", MAX_VALIDITY, CERT, SIGNER_TYPE, SIGNER_CONF");
+        sqlBuilder.append(", MAX_VALIDITY, CERT, SIGNER_TYPE");
         sqlBuilder.append(", CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME");
         sqlBuilder.append(", DUPLICATE_KEY, DUPLICATE_SUBJECT, DUPLICATE_CN, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD");
-        sqlBuilder.append(", VALIDITY_MODE, EXTRA_CONTROL");
+        sqlBuilder.append(", VALIDITY_MODE, EXTRA_CONTROL, SIGNER_CONF");
         sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         final String sql = sqlBuilder.toString();
 
@@ -959,7 +959,6 @@ class CAManagerQueryExecutor
             byte[] encodedCert = entry.getCertificate().getEncoded();
             ps.setString(idx++, Base64.toBase64String(encodedCert));
             ps.setString(idx++, entry.getSignerType());
-            ps.setString(idx++, entry.getSignerConf());
             ps.setString(idx++, entry.getCrlSignerName());
             ps.setString(idx++, entry.getResponderName());
             ps.setString(idx++, entry.getCmpControlName());
@@ -971,6 +970,7 @@ class CAManagerQueryExecutor
             ps.setInt(idx++, entry.getExpirationPeriod());
             ps.setString(idx++, entry.getValidityMode().name());
             ps.setString(idx++, entry.getExtraControl());
+            ps.setString(idx++, entry.getSignerConf());
 
             ps.executeUpdate();
 
@@ -1196,7 +1196,7 @@ class CAManagerQueryExecutor
 
         String name = dbEntry.getName();
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL)");
+        sqlBuilder.append("INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CERT, CRL_CONTROL, SIGNER_CONF)");
         sqlBuilder.append(" VALUES (?, ?, ?, ?, ?)");
         final String sql = sqlBuilder.toString();
 
@@ -1207,11 +1207,10 @@ class CAManagerQueryExecutor
             int idx = 1;
             ps.setString(idx++, name);
             ps.setString(idx++, dbEntry.getType());
-            ps.setString(idx++, dbEntry.getConf());
             ps.setString(idx++, dbEntry.getCertificate() == null ? null :
                     Base64.toBase64String(dbEntry.getCertificate().getEncoded()));
-
             ps.setString(idx++, crlControl);
+            ps.setString(idx++, dbEntry.getConf());
 
             ps.executeUpdate();
             LOG.info("added CRL signer '{}': {}", name, dbEntry.toString(false, true));
@@ -1340,7 +1339,7 @@ class CAManagerQueryExecutor
 
         if(signer_type != null || signer_conf != null || cert != null)
         {
-            final String sql = "SELECT SIGNER_TYPE, SIGNER_CONF, CERT FROM CA WHERE NAME=?";
+            final String sql = "SELECT SIGNER_TYPE, CERT, SIGNER_CONF FROM CA WHERE NAME=?";
             PreparedStatement stmt = null;
             ResultSet rs = null;
 
@@ -1421,7 +1420,6 @@ class CAManagerQueryExecutor
         Integer iCacert_uris = addToSqlIfNotNull(sqlBuilder, index, cacert_uris, "CACERT_URIS");
         Integer iMax_validity = addToSqlIfNotNull(sqlBuilder, index, max_validity, "MAX_VALIDITY");
         Integer iSigner_type = addToSqlIfNotNull(sqlBuilder, index, signer_type, "SIGNER_TYPE");
-        Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signer_conf, "SIGNER_CONF");
         Integer iCrlsigner_name = addToSqlIfNotNull(sqlBuilder, index, crlsigner_name, "CRLSIGNER_NAME");
         Integer iResponder_name = addToSqlIfNotNull(sqlBuilder, index, responder_name, "RESPONDER_NAME");
         Integer iCmpcontrol_name = addToSqlIfNotNull(sqlBuilder, index, cmpcontrol_name, "CMPCONTROL_NAME");
@@ -1433,6 +1431,7 @@ class CAManagerQueryExecutor
         Integer iExpiration_period = addToSqlIfNotNull(sqlBuilder, index, expirationPeriod, "EXPIRATION_PERIOD");
         Integer iValidity_mode = addToSqlIfNotNull(sqlBuilder, index, validityMode, "VALIDITY_MODE");
         Integer iExtra_control = addToSqlIfNotNull(sqlBuilder, index, extraControl, "EXTRA_CONTROL");
+        Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signer_conf, "SIGNER_CONF");
 
         // delete the last ','
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
@@ -1804,8 +1803,8 @@ class CAManagerQueryExecutor
 
         AtomicInteger index = new AtomicInteger(1);
         Integer iType = addToSqlIfNotNull(sqlBuilder, index, type, "TYPE");
-        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, conf, "CONF");
         Integer iCert = addToSqlIfNotNull(sqlBuilder, index, base64Cert, "CERT");
+        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, conf, "CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
 
@@ -1915,9 +1914,9 @@ class CAManagerQueryExecutor
         AtomicInteger index = new AtomicInteger(1);
 
         Integer iSigner_type = addToSqlIfNotNull(sqlBuilder, index, signerType, "SIGNER_TYPE");
-        Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signerConf, "SIGNER_CONF");
         Integer iSigner_cert = addToSqlIfNotNull(sqlBuilder, index, base64Cert, "SIGNER_CERT");
         Integer iCrlControl = addToSqlIfNotNull(sqlBuilder, index, crlControl, "CRL_CONTROL");
+        Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signerConf, "SIGNER_CONF");
 
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
@@ -2060,9 +2059,9 @@ class CAManagerQueryExecutor
 
         AtomicInteger index = new AtomicInteger(1);
         Integer iType = addToSqlIfNotNull(sqlBuilder, index, responderType, "RESPONDER_TYPE");
-        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, responderConf, "RESPONDER_CONF");
         Integer iCert = addToSqlIfNotNull(sqlBuilder, index, responderBase64Cert, "RESPONDER_CERT");
         Integer iControl= addToSqlIfNotNull(sqlBuilder, index, control, "CONTROL");
+        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, responderConf, "RESPONDER_CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE CA_NAME=?");
 
@@ -2462,7 +2461,7 @@ class CAManagerQueryExecutor
             final CmpResponderEntry dbEntry)
     throws CAMgmtException
     {
-        final String sql = "INSERT INTO RESPONDER (NAME, TYPE, CONF, CERT) VALUES (?, ?, ?, ?)";
+        final String sql = "INSERT INTO RESPONDER (NAME, TYPE, CERT, CONF) VALUES (?, ?, ?, ?)";
 
         PreparedStatement ps = null;
         try
@@ -2471,7 +2470,6 @@ class CAManagerQueryExecutor
             int idx = 1;
             ps.setString(idx++, dbEntry.getName());
             ps.setString(idx++, dbEntry.getType());
-            ps.setString(idx++, dbEntry.getConf());
 
             String b64Cert = null;
             X509Certificate cert = dbEntry.getCertificate();
@@ -2480,6 +2478,8 @@ class CAManagerQueryExecutor
                 b64Cert = Base64.toBase64String(dbEntry.getCertificate().getEncoded());
             }
             ps.setString(idx++, b64Cert);
+
+            ps.setString(idx++, dbEntry.getConf());
 
             ps.executeUpdate();
 
@@ -2763,7 +2763,7 @@ class CAManagerQueryExecutor
     throws CAMgmtException
     {
         final String sql = "INSERT INTO SCEP (CA_NAME, CONTROL, RESPONDER_TYPE, "
-                + "RESPONDER_CONF, RESPONDER_CERT) VALUES (?, ?, ?, ?, ?)";
+                + "RESPONDER_CERT, RESPONDER_CONF) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement ps = null;
         try
         {
@@ -2772,8 +2772,8 @@ class CAManagerQueryExecutor
             ps.setString(idx++, scepEntry.getCaName());
             ps.setString(idx++, scepEntry.getControl());
             ps.setString(idx++, scepEntry.getResponderType());
-            ps.setString(idx++, scepEntry.getResponderConf());
             ps.setString(idx++, scepEntry.getBase64Cert());
+            ps.setString(idx++, scepEntry.getResponderConf());
 
             ps.executeUpdate();
             LOG.info("added SCEP '{}': {}", scepEntry.getCaName(), scepEntry);
@@ -2816,7 +2816,7 @@ class CAManagerQueryExecutor
     throws CAMgmtException
     {
         final String sql = dataSource.createFetchFirstSelectSQL(
-                "CONTROL, RESPONDER_TYPE, RESPONDER_CONF, RESPONDER_CERT FROM SCEP WHERE CA_NAME=?", 1);
+                "CONTROL, RESPONDER_TYPE, RESPONDER_CERT, RESPONDER_CONF FROM SCEP WHERE CA_NAME=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = null;
         try

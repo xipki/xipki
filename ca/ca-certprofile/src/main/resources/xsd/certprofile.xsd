@@ -53,8 +53,6 @@
         </xs:annotation>
       </xs:element>
       <xs:element name="duplicateKey" type="xs:boolean" minOccurs="0"/>
-      <xs:element name="duplicateSubject" type="xs:boolean" minOccurs="0"/>
-      <xs:element name="duplicateCN" type="xs:boolean" minOccurs="0"/>
       <xs:element name="serialNumberInReq" type="xs:boolean" minOccurs="0"/>
       <xs:element name="specialBehavior" type="xs:string" minOccurs="0">
         <xs:annotation>
@@ -90,6 +88,8 @@
             <xs:element name="incSerialNumber" type="xs:boolean" default="false" minOccurs="0"/>
             <xs:element name="rdn" type="rdnType" maxOccurs="unbounded"/>
           </xs:sequence>
+          <xs:attribute name="duplicateSubjectPermitted" type="xs:boolean" use="optional"/>
+          <xs:attribute name="duplicateCNPermitted" type="xs:boolean" use="optional"/>
         </xs:complexType>
       </xs:element>
       <xs:element name="extensions" type="extensionsType"/>

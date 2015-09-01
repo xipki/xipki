@@ -1,0 +1,2 @@
+Sequence has gap:
+  http://stackoverflow.com/questions/2183932/hibernate-annotation-for-postgresql-serial-type/11752742#11752742

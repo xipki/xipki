@@ -60,6 +60,7 @@ import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.pki.ca.dbtool.jaxb.ca.FileOrValueType;
 import org.xml.sax.SAXException;
 
 /**
@@ -451,11 +452,61 @@ public class DbPorter
         }
     }
 
-    protected static void writeLine(OutputStream os, String text)
+    protected static void writeLine(
+            final OutputStream os,
+            final String text)
     throws IOException
     {
         os.write(text.getBytes());
         os.write('\n');
+    }
+
+    protected FileOrValueType buildFileOrValue(
+            final String content,
+            final String fileName)
+    throws IOException
+    {
+        if(content == null)
+        {
+            return null;
+        }
+
+        FileOrValueType ret = new FileOrValueType();
+        if(content.length() < 256)
+        {
+            ret.setValue(content);
+            return ret;
+        }
+
+        File file = new File(baseDir, fileName);
+        File parent = file.getParentFile();
+        if(parent != null && parent.exists() == false)
+        {
+            parent.mkdirs();
+        }
+
+        IoUtil.save(file, content.getBytes("UTF-8"));
+
+        ret.setFile(fileName);
+        return ret;
+    }
+
+    protected String getValue(
+            final FileOrValueType fileOrValue)
+    throws IOException
+    {
+        if(fileOrValue == null)
+        {
+            return null;
+        }
+
+        if(fileOrValue.getValue() != null)
+        {
+            return fileOrValue.getValue();
+        }
+
+        File file = new File(baseDir, fileOrValue.getFile());
+        return new String(IoUtil.read(file), "UTF-8");
     }
 
     protected String getImportingText()
@@ -478,4 +529,33 @@ public class DbPorter
         return evaulateOnly ? " evaluated export " : " exported ";
     }
 
+    public static String buildFilename(
+            final String prefix,
+            final String suffix,
+            final int minCertIdOfCurrentFile,
+            final int maxCertIdOfCurrentFile,
+            final int maxCertId)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append(prefix);
+
+        int len = Integer.toString(maxCertId).length();
+        String a = Integer.toString(minCertIdOfCurrentFile);
+        for(int i = 0; i < len - a.length(); i++)
+        {
+            sb.append('0');
+        }
+        sb.append(a);
+        sb.append("-");
+
+        String b = Integer.toString(maxCertIdOfCurrentFile);
+        for(int i = 0; i < len - b.length(); i++)
+        {
+            sb.append('0');
+        }
+        sb.append(b);
+
+        sb.append(suffix);
+        return sb.toString();
+    }
 }

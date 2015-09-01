@@ -102,10 +102,7 @@ public class DemoEE1X509Certprofile extends AbstractEEX509Certprofile
 
         Map<ASN1ObjectIdentifier, RDNControl> controls = new HashMap<>();
 
-        ASN1ObjectIdentifier oid = ObjectIdentifiers.DN_CN;
-        controls.put(oid, new RDNControl(oid, 1, 1));
-
-        oid = ObjectIdentifiers.DN_O;
+        ASN1ObjectIdentifier oid = ObjectIdentifiers.DN_O;
         controls.put(oid, new RDNControl(oid, 1, 1));
 
         oid = ObjectIdentifiers.DN_OU;

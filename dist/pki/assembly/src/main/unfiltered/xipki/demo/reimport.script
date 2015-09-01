@@ -10,29 +10,59 @@ sleep 1000
 xipki-cmd:rm -r -f output/dbexport
 
 ## Export CA
+echo "============================================================================"
+echo "||                             EXPORT CA DATABASE                         ||"
+echo "============================================================================"
 
 xipki-db:export-ca \
   --out-dir output/dbexport/ca
 
 ## Export OCSP
 
+echo "============================================================================"
+echo "||                            EXPORT OCSP DATABASE                        ||"
+echo "============================================================================"
+
 xipki-db:export-ocsp \
   --out-dir output/dbexport/ocsp
 
 # Reset the CA and OCSP database
 
-xipki-db:initdb \
-  --quiet
-
 ## Import CA
+
+echo "============================================================================"
+echo "||                             IMPORT CA DATABASE                         ||"
+echo "============================================================================"
+
+xipki-db:initdb-ca \
+  --quiet
 
 xipki-db:import-ca \
   --in-dir output/dbexport/ca
 
 ## Import OCSP
 
+echo "============================================================================"
+echo "||                            IMPORT OCSP DATABASE                        ||"
+echo "============================================================================"
+
+xipki-db:initdb-ocsp \
+  --quiet
+
 xipki-db:import-ocsp \
   --in-dir output/dbexport/ocsp
+
+## Import OCSP FROM CA
+
+echo "============================================================================"
+echo "||                         IMPORT CA DATABASE FROM CA                     ||"
+echo "============================================================================"
+
+xipki-db:initdb-ocsp \
+  --quiet
+
+xipki-db:import-ocspfromca \
+  --in-dir output/dbexport/ca
 
 ## Restart the CA
 feature:install xipki-camgmt-shell

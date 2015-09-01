@@ -18,8 +18,6 @@
   <validity>5y</validity>
   <notBeforeTime>midnight</notBeforeTime>
   <duplicateKey>false</duplicateKey>
-  <duplicateSubject>false</duplicateSubject>
-  <duplicateCN>false</duplicateCN>
   <serialNumberInReq>false</serialNumberInReq>
   <keyAlgorithms>
     <algorithm>
@@ -65,7 +63,7 @@
       </parameters>
     </algorithm>
   </keyAlgorithms>
-  <subject>
+  <subject duplicateSubjectPermitted="false" duplicateCNPermitted="false">
     <dnBackwards>false</dnBackwards>
     <incSerialNumber>false</incSerialNumber>
     <rdn minOccurs="1" maxOccurs="1">
