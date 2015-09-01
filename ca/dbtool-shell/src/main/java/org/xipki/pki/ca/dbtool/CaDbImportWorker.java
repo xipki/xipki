@@ -124,7 +124,8 @@ public class CaDbImportWorker extends DbPorterWorker
     }
 
     @Override
-    public void doRun(AtomicBoolean stopMe)
+    public void doRun(
+            final AtomicBoolean stopMe)
     throws Exception
     {
         File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);

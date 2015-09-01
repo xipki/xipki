@@ -82,32 +82,39 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter
         super(dataSource, srcDir, stopMe, evaluateOnly);
     }
 
-    protected String sha1(byte[] data)
+    protected String sha1(
+            final byte[] data)
     {
         return HashCalculator.base64Hash(HashAlgoType.SHA1, data);
     }
 
-    protected String sha224(byte[] data)
+    protected String sha224(
+            final byte[] data)
     {
         return HashCalculator.base64Hash(HashAlgoType.SHA224, data);
     }
 
-    protected String sha256(byte[] data)
+    protected String sha256(
+            final byte[] data)
     {
         return HashCalculator.base64Hash(HashAlgoType.SHA256, data);
     }
 
-    protected String sha384(byte[] data)
+    protected String sha384(
+            final byte[] data)
     {
         return HashCalculator.base64Hash(HashAlgoType.SHA384, data);
     }
 
-    protected String sha512(byte[] data)
+    protected String sha512(
+            final byte[] data)
     {
         return HashCalculator.base64Hash(HashAlgoType.SHA512, data);
     }
 
-    protected void deleteCertGreatherThan(int id, Logger log)
+    protected void deleteCertGreatherThan(
+            final int id,
+            final Logger log)
     {
         deleteFromTableWithLargerId("CRAW", "CID", id, log);
         deleteFromTableWithLargerId("CHASH", "CID", id, log);

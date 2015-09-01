@@ -51,7 +51,8 @@ class DbPortFileNameIterator implements Iterator<String>
     private BufferedReader reader;
     private String nextFilename;
 
-    public DbPortFileNameIterator(String filename)
+    public DbPortFileNameIterator(
+            final String filename)
     throws IOException
     {
         this.reader = new BufferedReader(new FileReader(filename));

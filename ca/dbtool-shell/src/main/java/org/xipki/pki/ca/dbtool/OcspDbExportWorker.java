@@ -133,7 +133,8 @@ public class OcspDbExportWorker extends DbPorterWorker
     }
 
     @Override
-    public void doRun(AtomicBoolean stopMe)
+    public void doRun(
+            final AtomicBoolean stopMe)
     throws Exception
     {
         long start = System.currentTimeMillis();
