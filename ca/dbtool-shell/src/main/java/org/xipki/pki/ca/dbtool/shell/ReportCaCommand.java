@@ -40,37 +40,30 @@ import org.apache.karaf.shell.commands.Option;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.pki.ca.dbtool.DbPortWorker;
-import org.xipki.pki.ca.dbtool.OcspDbImportWorker;
+import org.xipki.pki.ca.dbtool.report.CaDbReportWorker;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "import-ocsp", description="import OCSP database")
-public class ImportOcspCommand extends DbPortCommand
+@Command(scope = "xipki-db", name = "report-ca", description="report CA database")
+public class ReportCaCommand extends DbPortCommand
 {
-    private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
+    private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ca-db.properties";
 
     @Option(name = "--db-conf",
             description = "database configuration file")
     private String dbconfFile = DFLT_DBCONF_FILE;
 
-    @Option(name = "--in-dir",
+    @Option(name = "--out-dir",
             required = true,
-            description = "input directory\n"
+            description = "output directory\n"
                     + "(required)")
-    private String indir;
+    private String outdir;
 
     @Option(name = "-k",
-            description = "number of certificates per commit")
+            description = "number of certificates per SELECT")
     private Integer numCertsPerCommit = 100;
-
-    @Option(name = "--resume")
-    private Boolean resume = Boolean.FALSE;
-
-    @Option(name = "--test",
-            description = "just test the import, no real import")
-    private Boolean testOnly = Boolean.FALSE;
 
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
@@ -79,8 +72,7 @@ public class ImportOcspCommand extends DbPortCommand
     protected DbPortWorker getDbPortWorker()
     throws Exception
     {
-        return new OcspDbImportWorker(dataSourceFactory, passwordResolver, dbconfFile, resume,
-                indir, numCertsPerCommit.intValue(), testOnly);
+        return new CaDbReportWorker(dataSourceFactory, passwordResolver, dbconfFile, outdir, numCertsPerCommit);
     }
 
     public void setDataSourceFactory(

@@ -79,6 +79,11 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Profiles;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.PublishQueue;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Publishers;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Requestors;
+import org.xipki.pki.ca.dbtool.jaxb.ca.CertstoreCaType;
+import org.xipki.pki.ca.dbtool.jaxb.ca.DeltaCRLCacheEntryType;
+import org.xipki.pki.ca.dbtool.jaxb.ca.NameIdType;
+import org.xipki.pki.ca.dbtool.jaxb.ca.ObjectFactory;
+import org.xipki.pki.ca.dbtool.jaxb.ca.ToPublishType;
 import org.xipki.pki.ca.dbtool.xmlio.CaCertType;
 import org.xipki.pki.ca.dbtool.xmlio.CaCertsWriter;
 import org.xipki.pki.ca.dbtool.xmlio.CaCrlType;
@@ -86,11 +91,6 @@ import org.xipki.pki.ca.dbtool.xmlio.CaCrlsWriter;
 import org.xipki.pki.ca.dbtool.xmlio.CaUserType;
 import org.xipki.pki.ca.dbtool.xmlio.CaUsersWriter;
 import org.xipki.pki.ca.dbtool.xmlio.DbiXmlWriter;
-import org.xipki.pki.ca.dbtool.jaxb.ca.CertstoreCaType;
-import org.xipki.pki.ca.dbtool.jaxb.ca.DeltaCRLCacheEntryType;
-import org.xipki.pki.ca.dbtool.jaxb.ca.NameIdType;
-import org.xipki.pki.ca.dbtool.jaxb.ca.ObjectFactory;
-import org.xipki.pki.ca.dbtool.jaxb.ca.ToPublishType;
 import org.xipki.security.api.HashCalculator;
 import org.xipki.security.api.util.X509Util;
 
@@ -283,8 +283,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         int sum = 0;
 
         File currentCrlsZipFile = new File(baseDir, "tmp-crls-" + System.currentTimeMillis() + ".zip");
-        FileOutputStream out = new FileOutputStream(currentCrlsZipFile);
-        ZipOutputStream currentCrlsZip = new ZipOutputStream(out);
+        ZipOutputStream currentCrlsZip = getZipOutputStream(currentCrlsZipFile);
 
         int minIdOfCurrentFile = -1;
         int maxIdOfCurrentFile = -1;
@@ -406,8 +405,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                         minIdOfCurrentFile = -1;
                         maxIdOfCurrentFile = -1;
                         currentCrlsZipFile = new File(baseDir, "tmp-crls-" + System.currentTimeMillis() + ".zip");
-                        out = new FileOutputStream(currentCrlsZipFile);
-                        currentCrlsZip = new ZipOutputStream(out);
+                        currentCrlsZip = getZipOutputStream(currentCrlsZipFile);
                     }
                 }  // end while(rs.next)
             } // end for
@@ -428,7 +426,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
                 writeLine(filenameListOs, currentCrlsFilename);
                 processLog.addNumProcessed(numCrlsInCurrentFile);
-                processLog.printStatus();
+                processLog.printStatus(true);
 
                 certstore.setCountCrls(sum);
             }
@@ -709,7 +707,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                 writeLine(filenameListOs, currentUsersFilename);
 
                 processLog.addNumProcessed(numUsersInCurrentFile);
-                processLog.printStatus();
+                processLog.printStatus(true);
             }
         }catch(SQLException e)
         {
@@ -844,8 +842,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
         int sum = 0;
         File currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
-        FileOutputStream out = new FileOutputStream(currentCertsZipFile);
-        ZipOutputStream currentCertsZip = new ZipOutputStream(out);
+        ZipOutputStream currentCertsZip = getZipOutputStream(currentCertsZipFile);
 
         int minIdOfCurrentFile = -1;
         int maxIdOfCurrentFile = -1;
@@ -1028,8 +1025,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                         minIdOfCurrentFile = -1;
                         maxIdOfCurrentFile = -1;
                         currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
-                        out = new FileOutputStream(currentCertsZipFile);
-                        currentCertsZip = new ZipOutputStream(out);
+                        currentCertsZip = getZipOutputStream(currentCertsZipFile);
                     }
                 }  // end while(rs.next)
 
@@ -1059,7 +1055,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                 }
 
                 processLog.addNumProcessed(numCertsInCurrentFile);
-                processLog.printStatus();
+                processLog.printStatus(true);
             }
             else
             {
@@ -1221,9 +1217,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
     throws JAXBException, IOException, XMLStreamException
     {
         File zipFile = new File(baseDir, "tmp-users-" + System.currentTimeMillis() + ".zip");
-        FileOutputStream out = new FileOutputStream(zipFile);
-        ZipOutputStream zipOutStream = new ZipOutputStream(out);
-
+        ZipOutputStream zipOutStream = getZipOutputStream(zipFile);
         ZipEntry certZipEntry = new ZipEntry("users.xml");
         zipOutStream.putNextEntry(certZipEntry);
         try

@@ -41,13 +41,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Lijun Liao
  */
 
-public abstract class DbPorterWorker implements Runnable
+public abstract class DbPortWorker implements Runnable
 {
 
     private Exception exception;
     private final AtomicBoolean stopMe = new AtomicBoolean(false);
 
-    public DbPorterWorker()
+    public DbPortWorker()
     {
     }
 
