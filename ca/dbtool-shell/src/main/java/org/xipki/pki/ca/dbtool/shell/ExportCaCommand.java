@@ -40,7 +40,7 @@ import org.apache.karaf.shell.commands.Option;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.pki.ca.dbtool.CaDbExportWorker;
-import org.xipki.pki.ca.dbtool.DbPorterWorker;
+import org.xipki.pki.ca.dbtool.DbPortWorker;
 
 /**
  * @author Lijun Liao
@@ -63,7 +63,7 @@ public class ExportCaCommand extends DbPortCommand
 
     @Option(name = "-n",
             description = "number of certificates in one zip file")
-    private Integer numCertsInBundle = 100000;
+    private Integer numCertsInBundle = 10000;
 
     @Option(name = "-k",
             description = "number of certificates per SELECT")
@@ -80,7 +80,7 @@ public class ExportCaCommand extends DbPortCommand
     private PasswordResolver passwordResolver;
 
     @Override
-    protected DbPorterWorker getDbPortWorker()
+    protected DbPortWorker getDbPortWorker()
     throws Exception
     {
         return new CaDbExportWorker(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume,

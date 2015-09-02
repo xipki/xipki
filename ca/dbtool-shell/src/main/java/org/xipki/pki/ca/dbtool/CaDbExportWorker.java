@@ -63,7 +63,7 @@ import org.xipki.password.api.PasswordResolverException;
  * @author Lijun Liao
  */
 
-public class CaDbExportWorker extends DbPorterWorker
+public class CaDbExportWorker extends DbPortWorker
 {
     private static final Logger LOG = LoggerFactory.getLogger(CaDbExportWorker.class);
 

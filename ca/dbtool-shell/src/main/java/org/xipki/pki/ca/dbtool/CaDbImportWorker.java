@@ -70,7 +70,7 @@ import org.xipki.password.api.PasswordResolverException;
  * @author Lijun Liao
  */
 
-public class CaDbImportWorker extends DbPorterWorker
+public class CaDbImportWorker extends DbPortWorker
 {
     private static class CAInfoBundle
     {

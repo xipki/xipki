@@ -40,7 +40,7 @@ import org.apache.karaf.shell.commands.Option;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.pki.ca.dbtool.CaDbImportWorker;
-import org.xipki.pki.ca.dbtool.DbPorterWorker;
+import org.xipki.pki.ca.dbtool.DbPortWorker;
 
 /**
  * @author Lijun Liao
@@ -76,7 +76,7 @@ public class ImportCaCommand extends DbPortCommand
     private PasswordResolver passwordResolver;
 
     @Override
-    protected DbPorterWorker getDbPortWorker()
+    protected DbPortWorker getDbPortWorker()
     throws Exception
     {
         return new CaDbImportWorker(dataSourceFactory, passwordResolver, dbconfFile, resume,

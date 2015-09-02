@@ -471,7 +471,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw e;
                 }
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || users.hasNext() == false))
+                boolean isLastBlock = users.hasNext() == false;
+
+                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || isLastBlock))
                 {
                     if(evaulateOnly)
                     {
@@ -500,7 +502,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     processLog.addNumProcessed(numEntriesInBatch);
                     numProcessed += numEntriesInBatch;
                     numEntriesInBatch = 0;
-                    processLog.printStatus();
+                    processLog.printStatus(isLastBlock);
                 }
             }
             return numProcessed;
@@ -759,7 +761,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw e;
                 }
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || crls.hasNext() == false))
+                boolean isLastBlock = crls.hasNext() == false;
+
+                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || isLastBlock))
                 {
                     if(evaulateOnly)
                     {
@@ -788,7 +792,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     processLog.addNumProcessed(numEntriesInBatch);
                     numProcessed += numEntriesInBatch;
                     numEntriesInBatch = 0;
-                    processLog.printStatus();
+                    processLog.printStatus(isLastBlock);
 
                 }
             }
@@ -1068,7 +1072,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw translate(SQL_ADD_CRAW, e);
                 }
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || certs.hasNext() == false))
+                boolean isLastBlock = certs.hasNext() == false;
+                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || isLastBlock))
                 {
                     if(evaulateOnly)
                     {
@@ -1110,7 +1115,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     echoToFile((processLog.getSumInLastProcess() + processLog.getNumProcessed()) + ":" +
                             lastSuccessfulCertId, processLogFile);
 
-                    processLog.printStatus();
+                    processLog.printStatus(isLastBlock);
                 }
 
             } // end for
@@ -1139,7 +1144,6 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
     private void dropIndexes()
     throws DataAccessException
     {
-        System.out.println("dropping indexes");
         long start = System.currentTimeMillis();
 
         dataSource.dropIndex(null, "CERT", "IDX_FPK");
@@ -1163,7 +1167,6 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
     private void recoverIndexes()
     throws DataAccessException
     {
-        System.out.println("recovering indexes");
         long start = System.currentTimeMillis();
 
         dataSource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");
