@@ -64,11 +64,11 @@ import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType.Issuers;
+import org.xipki.pki.ca.dbtool.jaxb.ocsp.IssuerType;
+import org.xipki.pki.ca.dbtool.jaxb.ocsp.ObjectFactory;
 import org.xipki.pki.ca.dbtool.xmlio.DbiXmlWriter;
 import org.xipki.pki.ca.dbtool.xmlio.OcspCertType;
 import org.xipki.pki.ca.dbtool.xmlio.OcspCertsWriter;
-import org.xipki.pki.ca.dbtool.jaxb.ocsp.IssuerType;
-import org.xipki.pki.ca.dbtool.jaxb.ocsp.ObjectFactory;
 import org.xipki.security.api.HashCalculator;
 
 /**
@@ -321,8 +321,7 @@ class OcspCertStoreDbExporter extends DbPorter
         final int n = numCertsPerSelect;
 
         File currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
-        FileOutputStream out = new FileOutputStream(currentCertsZipFile);
-        ZipOutputStream currentCertsZip = new ZipOutputStream(out);
+        ZipOutputStream currentCertsZip = getZipOutputStream(currentCertsZipFile);
 
         int minCertIdOfCurrentFile = -1;
         int maxCertIdOfCurrentFile = -1;
@@ -468,8 +467,7 @@ class OcspCertStoreDbExporter extends DbPorter
                         minCertIdOfCurrentFile = -1;
                         maxCertIdOfCurrentFile = -1;
                         currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
-                        out = new FileOutputStream(currentCertsZipFile);
-                        currentCertsZip = new ZipOutputStream(out);
+                        currentCertsZip = getZipOutputStream(currentCertsZipFile);
                     }
                 }
 
@@ -495,7 +493,7 @@ class OcspCertStoreDbExporter extends DbPorter
                 echoToFile(Integer.toString(id), processLogFile);
 
                 processLog.addNumProcessed(numCertInCurrentFile);
-                processLog.printStatus();
+                processLog.printStatus(true);
             }
             else
             {

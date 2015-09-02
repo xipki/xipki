@@ -33,19 +33,14 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool;
+package org.xipki.pki.ca.dbtool.report;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,81 +49,34 @@ import org.xipki.common.util.IoUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.pki.ca.dbtool.jaxb.ocsp.ObjectFactory;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.password.api.PasswordResolverException;
+import org.xipki.pki.ca.dbtool.DbPortWorker;
+import org.xipki.pki.ca.dbtool.DbPorter;
 
 /**
  * @author Lijun Liao
  */
 
-public class OcspDbExportWorker extends DbPortWorker
+public class CaDbReportWorker extends DbPortWorker
 {
-    private static final Logger LOG = LoggerFactory.getLogger(OcspDbImportWorker.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CaDbReportWorker.class);
     private final DataSourceWrapper dataSource;
-    private final Marshaller marshaller;
-    private final Unmarshaller unmarshaller;
     private final String destFolder;
-    private final boolean resume;
-    private final int numCertsInBundle;
     private final int numCertsPerSelect;
-    private final boolean evaluateOnly;
 
-    public OcspDbExportWorker(
+    public CaDbReportWorker(
             final DataSourceFactory dataSourceFactory,
             final PasswordResolver passwordResolver,
             final String dbConfFile,
             final String destFolder,
-            final boolean resume,
-            final int numCertsInBundle,
-            final int numCertsPerSelect,
-            final boolean evaluateOnly)
+            final int numCertsPerSelect)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
         this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
-
-        JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-        marshaller = jaxbContext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-
-        Schema schema = DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd");
-        marshaller.setSchema(schema);
-
-        unmarshaller = jaxbContext.createUnmarshaller();
-        unmarshaller.setSchema(schema);
-        this.evaluateOnly = evaluateOnly;
-
-        File f = new File(destFolder);
-        if(f.exists() == false)
-        {
-            f.mkdirs();
-        }
-        else
-        {
-            if(f.isDirectory() == false)
-            {
-                throw new IOException(destFolder + " is not a folder");
-            }
-
-            if(f.canWrite() == false)
-            {
-                throw new IOException(destFolder + " is not writable");
-            }
-        }
-
-        if(resume == false)
-        {
-            String[] children = f.list();
-            if(children != null && children.length > 0)
-            {
-                throw new IOException(destFolder + " is not empty");
-            }
-        }
-        this.resume = resume;
         this.destFolder = destFolder;
-        this.numCertsInBundle = numCertsInBundle;
         this.numCertsPerSelect = numCertsPerSelect;
     }
 
@@ -140,12 +88,8 @@ public class OcspDbExportWorker extends DbPortWorker
         long start = System.currentTimeMillis();
         try
         {
-            // CertStore
-            OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(
-                    dataSource, marshaller, unmarshaller, destFolder,
-                    numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
-            certStoreExporter.export();
-            certStoreExporter.shutdown();
+            CaDbReporter reporter = new CaDbReporter(dataSource, destFolder, stopMe, numCertsPerSelect);
+            reporter.report();
         } finally
         {
             try

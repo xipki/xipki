@@ -44,7 +44,7 @@ import org.xipki.common.qa.MeasurePoint;
  * @author Lijun Liao
  */
 
-class ProcessLog
+public class ProcessLog
 {
     private static final long MS_800 = 800L;
 
@@ -59,7 +59,7 @@ class ProcessLog
     public static void printHeader()
     {
         System.out.println("----------------------------------------------------------------------------");
-        System.out.println("    processed   percent       time       #/s        ETR   AVG-#/s    AVG-ETR");
+        System.out.println("    processed   percent       time       #/s        ETA   AVG-#/s    AVG-ETA");
         System.out.flush();
     }
 
@@ -109,8 +109,13 @@ class ProcessLog
 
     public void printStatus()
     {
+        printStatus(false);
+    }
+
+    public void printStatus(boolean forcePrint)
+    {
         final long now = System.currentTimeMillis();
-        if(now - lastPrintTime < MS_800)
+        if(forcePrint == false && now - lastPrintTime < MS_800)
         {
             return;
         }

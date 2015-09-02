@@ -59,7 +59,7 @@ import org.xipki.password.api.PasswordResolverException;
  * @author Lijun Liao
  */
 
-public class OcspDbImportWorker extends DbPorterWorker
+public class OcspDbImportWorker extends DbPortWorker
 {
     private static final Logger LOG = LoggerFactory.getLogger(OcspDbImportWorker.class);
     private final DataSourceWrapper dataSource;

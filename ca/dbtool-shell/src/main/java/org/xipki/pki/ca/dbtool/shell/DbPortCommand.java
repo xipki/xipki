@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
-import org.xipki.pki.ca.dbtool.DbPorterWorker;
+import org.xipki.pki.ca.dbtool.DbPortWorker;
 
 /**
  * @author Lijun Liao
@@ -54,14 +54,14 @@ public abstract class DbPortCommand extends XipkiOsgiCommandSupport
     {
     }
 
-    protected abstract DbPorterWorker getDbPortWorker()
+    protected abstract DbPortWorker getDbPortWorker()
     throws Exception;
 
     protected Object _doExecute()
     throws Exception
     {
         ExecutorService executor = Executors.newFixedThreadPool(1);
-        DbPorterWorker myRun = getDbPortWorker();
+        DbPortWorker myRun = getDbPortWorker();
         executor.execute(myRun);
 
         executor.shutdown();

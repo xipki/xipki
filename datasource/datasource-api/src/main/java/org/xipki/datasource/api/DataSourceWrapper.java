@@ -95,6 +95,20 @@ public interface DataSourceWrapper
             String column)
     throws DataAccessException;
 
+    long getMin(
+            Connection conn,
+            String table,
+            String column,
+            String condition)
+    throws DataAccessException;
+
+    long getMax(
+            Connection conn,
+            String table,
+            String column,
+            String condition)
+    throws DataAccessException;
+
     int getCount(
             Connection conn,
             String table)

@@ -648,8 +648,9 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                     }
                 }
 
-                if(numImportedEntriesInBatch > 0 && (numImportedEntriesInBatch % this.numCertsPerCommit == 0
-                        || certs.hasNext() == false))
+                boolean isLastBlock = certs.hasNext() == false;
+
+                if(numImportedEntriesInBatch > 0 && (numImportedEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock))
                 {
                     if(evaulateOnly)
                     {
@@ -697,7 +698,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                     echoToFile((processLog.getSumInLastProcess() + processLog.getNumProcessed()) + ":" +
                             lastSuccessfulCertId, processLogFile);
 
-                    processLog.printStatus();
+                    processLog.printStatus(isLastBlock);
                 }
             } // end for
 
