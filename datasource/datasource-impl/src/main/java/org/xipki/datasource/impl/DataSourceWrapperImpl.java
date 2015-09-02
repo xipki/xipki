@@ -929,8 +929,24 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final String column)
     throws DataAccessException
     {
+        return getMin(conn, table, column, null);
+    }
+
+    @Override
+    public long getMin(
+            final Connection conn,
+            final String table,
+            final String column,
+            final String condition)
+    throws DataAccessException
+    {
         StringBuilder sqlBuilder = new StringBuilder(column.length() + table.length() + 20);
         sqlBuilder.append("SELECT MIN(").append(column).append(") FROM ").append(table);
+        if(StringUtil.isNotBlank(condition))
+        {
+            sqlBuilder.append(" WHERE ").append(condition);
+        }
+
         final String sql = sqlBuilder.toString();
 
         Statement stmt = null;
@@ -998,8 +1014,23 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final String column)
     throws DataAccessException
     {
+        return getMax(conn, table, column, null);
+    }
+
+    @Override
+    public long getMax(
+            final Connection conn,
+            final String table,
+            final String column,
+            final String condition)
+    throws DataAccessException
+    {
         StringBuilder sqlBuilder = new StringBuilder(column.length() + table.length() + 20);
         sqlBuilder.append("SELECT MAX(").append(column).append(") FROM ").append(table);
+        if(StringUtil.isNotBlank(condition))
+        {
+            sqlBuilder.append(" WHERE ").append(condition);
+        }
         final String sql = sqlBuilder.toString();
 
         Statement stmt = null;
