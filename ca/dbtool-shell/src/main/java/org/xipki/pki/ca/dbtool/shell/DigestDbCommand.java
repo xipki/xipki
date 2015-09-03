@@ -40,20 +40,19 @@ import org.apache.karaf.shell.commands.Option;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.pki.ca.dbtool.DbPortWorker;
-import org.xipki.pki.ca.dbtool.report.OcspDbReportWorker;
+import org.xipki.pki.ca.dbtool.report.DbDigestWorker;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "report-ocsp", description="report OCSP database")
-public class ReportOcspCommand extends DbPortCommand
+@Command(scope = "xipki-db", name = "digest-db", description="digest XiPKI/EJBCA database")
+public class DigestDbCommand extends DbPortCommand
 {
-    private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
-
     @Option(name = "--db-conf",
+            required = true,
             description = "database configuration file")
-    private String dbconfFile = DFLT_DBCONF_FILE;
+    private String dbconfFile;
 
     @Option(name = "--out-dir",
             required = true,
@@ -61,9 +60,12 @@ public class ReportOcspCommand extends DbPortCommand
                     + "(required)")
     private String outdir;
 
+    @Option(name = "--resume")
+    private Boolean resume = Boolean.FALSE;
+
     @Option(name = "-k",
             description = "number of certificates per SELECT")
-    private Integer numCertsPerCommit = 100;
+    private Integer numCertsPerSelect = 100;
 
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
@@ -72,7 +74,13 @@ public class ReportOcspCommand extends DbPortCommand
     protected DbPortWorker getDbPortWorker()
     throws Exception
     {
-        return new OcspDbReportWorker(dataSourceFactory, passwordResolver, dbconfFile, outdir, numCertsPerCommit);
+        return new DbDigestWorker(
+                dataSourceFactory,
+                passwordResolver,
+                dbconfFile,
+                outdir,
+                resume,
+                numCertsPerSelect);
     }
 
     public void setDataSourceFactory(
