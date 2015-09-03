@@ -35,84 +35,76 @@
 
 package org.xipki.pki.ca.dbtool.report;
 
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.xml.bind.JAXBException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.common.qa.AbstractLoadTest;
+import org.xipki.common.util.IoUtil;
+import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.pki.ca.dbtool.DbToolBase;
+import org.xipki.password.api.PasswordResolver;
+import org.xipki.password.api.PasswordResolverException;
+import org.xipki.pki.ca.dbtool.DbPortWorker;
+import org.xipki.pki.ca.dbtool.DbPorter;
 
 /**
  * @author Lijun Liao
  */
 
-public class DbReporter extends DbToolBase
+public class DbDigestWorker extends DbPortWorker
 {
-    public static final String REPORTS_DIRNAME = "report";
-    public static final String REPORTS_MANIFEST_FILENAME = "reports-manifest";
-    public static final int DFLT_NUM_CERTS_IN_BUNDLE = 100000;
+    private static final Logger LOG = LoggerFactory.getLogger(DbDigestWorker.class);
+    private final DataSourceWrapper dataSource;
+    private final String destFolder;
+    private final int numCertsPerSelect;
+    private final boolean resume;
 
-    protected final int numCertsPerSelect;
-
-    public DbReporter(
-            final DataSourceWrapper datasource,
-            final String baseDir,
-            final AtomicBoolean stopMe,
+    public DbDigestWorker(
+            final DataSourceFactory dataSourceFactory,
+            final PasswordResolver passwordResolver,
+            final String dbConfFile,
+            final String destFolder,
+            final boolean resume,
             final int numCertsPerSelect)
-    throws DataAccessException, IOException
+    throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
-        super(datasource, baseDir, stopMe);
-        if(numCertsPerSelect < 1)
-        {
-            throw new IllegalArgumentException("numCertsPerSelect could not be less than 1: " + numCertsPerSelect);
-        }
-
+        Properties props = DbPorter.getDbConfProperties(
+                new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
+        this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
+        this.destFolder = destFolder;
         this.numCertsPerSelect = numCertsPerSelect;
-
-        File f = new File(baseDir);
-        if(f.exists() == false)
-        {
-            f.mkdirs();
-        }
-        else
-        {
-            if(f.isDirectory() == false)
-            {
-                throw new IOException(baseDir + " is not a folder");
-            }
-
-            if(f.canWrite() == false)
-            {
-                throw new IOException(baseDir + " is not writable");
-            }
-        }
-
-        String[] children = f.list();
-        if(children != null && children.length > 0)
-        {
-            throw new IOException(baseDir + " is not empty");
-        }
+        this.resume = resume;
     }
 
-    public static String buildFilename(
-            final String prefix,
-            final String suffix,
-            final int minIdOfCurrentFile)
+    @Override
+    public void doRun(
+            final AtomicBoolean stopMe)
+    throws Exception
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix);
-
-        int len = 10;
-        String a = Integer.toString(minIdOfCurrentFile);
-        for(int i = 0; i < len - a.length(); i++)
+        long start = System.currentTimeMillis();
+        try
         {
-            sb.append('0');
+            DbDigester reporter = new DbDigester(dataSource, destFolder, stopMe, resume, numCertsPerSelect);
+            reporter.digest();
+        } finally
+        {
+            try
+            {
+                dataSource.shutdown();
+            }catch(Throwable e)
+            {
+                LOG.error("dataSource.shutdown()", e);
+            }
+            long end = System.currentTimeMillis();
+            System.out.println("finished in " + AbstractLoadTest.formatTime((end - start) / 1000).trim());
         }
-        sb.append(a);
-
-        sb.append(suffix);
-        return sb.toString();
     }
 
 }
