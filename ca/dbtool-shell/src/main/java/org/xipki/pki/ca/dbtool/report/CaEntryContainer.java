@@ -33,57 +33,67 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.shell;
+package org.xipki.pki.ca.dbtool.report;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.datasource.api.DataSourceFactory;
-import org.xipki.password.api.PasswordResolver;
-import org.xipki.pki.ca.dbtool.DbPortWorker;
-import org.xipki.pki.ca.dbtool.report.CaDbReportWorker;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.xipki.common.util.ParamUtil;
+import org.xipki.pki.ca.dbtool.xmlio.InvalidDataObjectException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "report-ca", description="report CA database")
-public class ReportCaCommand extends DbPortCommand
+public class CaEntryContainer
 {
-    private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ca-db.properties";
+    private final Map<Integer, CaEntry> caEntryMap;
 
-    @Option(name = "--db-conf",
-            description = "database configuration file")
-    private String dbconfFile = DFLT_DBCONF_FILE;
-
-    @Option(name = "--out-dir",
-            required = true,
-            description = "output directory\n"
-                    + "(required)")
-    private String outdir;
-
-    @Option(name = "-k",
-            description = "number of certificates per SELECT")
-    private Integer numCertsPerCommit = 100;
-
-    private DataSourceFactory dataSourceFactory;
-    private PasswordResolver passwordResolver;
-
-    @Override
-    protected DbPortWorker getDbPortWorker()
-    throws Exception
+    public CaEntryContainer(Set<CaEntry> caEntries)
     {
-        return new CaDbReportWorker(dataSourceFactory, passwordResolver, dbconfFile, outdir, numCertsPerCommit);
+        ParamUtil.assertNotEmpty("caEntries", caEntries);
+        caEntryMap = new HashMap<>(caEntries.size());
+        for(CaEntry m : caEntries)
+        {
+            caEntryMap.put(m.getCaId(), m);
+        }
     }
 
-    public void setDataSourceFactory(
-            final DataSourceFactory dataSourceFactory)
+    public void addDigestEntry(int caId, DbDigestEntry reportEntry)
+    throws IOException, InvalidDataObjectException
     {
-        this.dataSourceFactory = dataSourceFactory;
+        CaEntry m = caEntryMap.get(caId);
+        if(m == null)
+        {
+            throw new IllegalArgumentException("unknown caId '" + caId + "'");
+        }
+        m.addDigestEntry(reportEntry);
     }
 
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver)
+    public void close()
+    throws IOException
     {
-        this.passwordResolver = passwordResolver;
+        StringBuilder sb = new StringBuilder();
+
+        for(CaEntry m : caEntryMap.values())
+        {
+            try
+            {
+                m.close();
+            } catch (IOException e)
+            {
+                sb.append("could not close CAEntry '").append(m.getCaId());
+                sb.append("': ").append(e.getMessage()).append(", ");
+            }
+        }
+
+        int n = sb.length();
+        if(n > 0)
+        {
+            sb.delete(n - 2, n);
+            throw new IOException(sb.toString());
+        }
     }
 }

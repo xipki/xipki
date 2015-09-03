@@ -70,7 +70,7 @@ public class DbToolBase
 
     protected final AtomicBoolean stopMe;
     protected final DataSourceWrapper dataSource;
-    private Connection connection;
+    protected Connection connection;
     private boolean connectionAutoCommit;
 
     protected final String baseDir;
@@ -444,7 +444,7 @@ public class DbToolBase
         return sb.toString();
     }
 
-    public ZipOutputStream getZipOutputStream(File zipFile)
+    public static ZipOutputStream getZipOutputStream(File zipFile)
     throws FileNotFoundException
     {
         BufferedOutputStream out = new BufferedOutputStream(

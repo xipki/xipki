@@ -17,8 +17,12 @@ source ./xipki/demo/demo.d/ra.script
 
 source ./xipki/demo/ca-qa.script
 
+feature:install xipki-ocspserver
+
 source ./xipki/demo/ocsp.script
 
 #source ./xipki/demo/loadtest-enroll.script
 
 #source ./xipki/demo/loadtest-ocsp.script
+
+feature:uninstall xipki-ocspserver

@@ -408,6 +408,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                         currentCrlsZip = getZipOutputStream(currentCrlsZipFile);
                     }
                 }  // end while(rs.next)
+                rs.close();
             } // end for
 
             if(interrupted)
@@ -692,6 +693,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                         maxIdOfCurrentFile = -1;
                     }
                 }  // end while(rs.next)
+
+                rs.close();
             } // end for
 
             if(interrupted)
@@ -1029,6 +1032,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                     }
                 }  // end while(rs.next)
 
+                rs.close();
                 rawCertMaps.clear();
                 rawCertMaps = null;
             } // end for

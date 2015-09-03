@@ -41,7 +41,7 @@ import org.xipki.pki.ca.dbtool.xmlio.InvalidDataObjectException;
  * @author Lijun Liao
  */
 
-public class ReportEntry
+public class DbDigestEntry
 {
     private Integer id;
     private Long serialNumber;

@@ -299,7 +299,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
         System.out.println(getExportingText() + "tables CERT, CHASH and CRAW from ID " + minCertId);
 
-        final String certSql = "SELECT ID,SN,IID,LUPDATE,REV,RR,RT,RIT,PN FROM CERT WHERE ID>=? AND ID<?";
+        final String certSql = "SELECT ID,SN,IID,LUPDATE,REV,RR,RT,RIT,PN FROM CERT WHERE ID>=? AND ID<? ORDER BY ID ASC";
         final String rawCertSql = "SELECT CID,CERT FROM CRAW WHERE CID>=? AND CID<?";
 
         final int maxCertId = (int) getMax("CERT", "ID");
@@ -471,6 +471,7 @@ class OcspCertStoreDbExporter extends DbPorter
                     }
                 }
 
+                rs.close();
                 rawCertMaps.clear();
                 rawCertMaps = null;
             } // end for
