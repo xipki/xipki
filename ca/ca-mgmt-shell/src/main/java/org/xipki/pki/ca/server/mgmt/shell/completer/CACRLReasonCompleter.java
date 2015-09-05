@@ -35,7 +35,7 @@
 
 package org.xipki.pki.ca.server.mgmt.shell.completer;
 
-import org.xipki.pki.ca.server.mgmt.shell.CaRevokeCommand;
+import org.xipki.pki.ca.server.mgmt.shell.CaRevokeCmd;
 import org.xipki.console.karaf.EnumCompleter;
 import org.xipki.security.api.CRLReason;
 
@@ -49,7 +49,7 @@ public class CACRLReasonCompleter extends EnumCompleter
     {
         StringBuilder enums = new StringBuilder();
 
-        for(CRLReason reason : CaRevokeCommand.permitted_reasons)
+        for(CRLReason reason : CaRevokeCmd.permitted_reasons)
         {
             enums.append(reason.getDescription()).append(",");
         }

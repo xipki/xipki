@@ -28,7 +28,7 @@
   </bean>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
-      <action class="org.xipki.pki.ca.qa.shell.CheckCertCommand">
+      <action class="org.xipki.pki.ca.qa.shell.CheckCertCmd">
         <property name="qaSystemManager" ref="qaSystemManager"/>
       </action>
       <optional-completers>
@@ -39,7 +39,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.qa.shell.NegP10EnrollCertCommand">
+      <action class="org.xipki.pki.ca.qa.shell.NegP10EnrollCertCmd">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -51,7 +51,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.qa.shell.NegP12EnrollCertCommand">
+      <action class="org.xipki.pki.ca.qa.shell.NegP12EnrollCertCmd">
         <property name="caClient" ref="caClient"/>
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -64,7 +64,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.qa.shell.NegRevokeCertCommand">
+      <action class="org.xipki.pki.ca.qa.shell.NegRevokeCertCmd">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -76,7 +76,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.qa.shell.NegUnrevokeCertCommand">
+      <action class="org.xipki.pki.ca.qa.shell.NegUnrevokeCertCmd">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -87,7 +87,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.qa.shell.NegGenCRLCommand">
+      <action class="org.xipki.pki.ca.qa.shell.NegGenCRLCmd">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -98,7 +98,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.qa.shell.NegGetCRLCommand">
+      <action class="org.xipki.pki.ca.qa.shell.NegGetCRLCmd">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>

@@ -11,7 +11,7 @@
   <reference id="hashAlgCompleter" interface="org.xipki.console.karaf.HashAlgCompleter"/>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
-      <action class="org.xipki.pki.ocsp.client.shell.OCSPStatusCommand">
+      <action class="org.xipki.pki.ocsp.client.shell.OCSPStatusCmd">
         <property name="requestor" ref="ocspRequestor"/>
       </action>
       <optional-completers>
@@ -25,7 +25,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ocsp.client.shell.loadtest.OCSPStatusLoadTestCommand">
+      <action class="org.xipki.pki.ocsp.client.shell.loadtest.OCSPStatusLoadTestCmd">
         <property name="requestor" ref="ocspRequestor"/>
       </action>
       <optional-completers>

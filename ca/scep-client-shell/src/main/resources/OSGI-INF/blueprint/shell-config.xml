@@ -8,7 +8,7 @@
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
-      <action class="org.xipki.pki.ca.scep.client.shell.EnrollCertCommand">
+      <action class="org.xipki.pki.ca.scep.client.shell.EnrollCertCmd">
       </action>
       <optional-completers>
         <entry key="--ca-cert" value-ref="filePathCompleter"/>
@@ -18,7 +18,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.scep.client.shell.PkcsReqCommand">
+      <action class="org.xipki.pki.ca.scep.client.shell.PkcsReqCmd">
       </action>
       <optional-completers>
         <entry key="--ca-cert" value-ref="filePathCompleter"/>
@@ -28,7 +28,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.scep.client.shell.RenewalReqCommand">
+      <action class="org.xipki.pki.ca.scep.client.shell.RenewalReqCmd">
       </action>
       <optional-completers>
         <entry key="--ca-cert" value-ref="filePathCompleter"/>
@@ -38,7 +38,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.scep.client.shell.UpdateReqCommand">
+      <action class="org.xipki.pki.ca.scep.client.shell.UpdateReqCmd">
       </action>
       <optional-completers>
         <entry key="--ca-cert" value-ref="filePathCompleter"/>
@@ -48,7 +48,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.scep.client.shell.GetCertCommand">
+      <action class="org.xipki.pki.ca.scep.client.shell.GetCertCmd">
       </action>
       <optional-completers>
         <entry key="--ca-cert" value-ref="filePathCompleter"/>
@@ -57,7 +57,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.scep.client.shell.CertPollCommand">
+      <action class="org.xipki.pki.ca.scep.client.shell.CertPollCmd">
       </action>
       <optional-completers>
         <entry key="--ca-cert" value-ref="filePathCompleter"/>
@@ -66,7 +66,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.scep.client.shell.GetCRLCommand">
+      <action class="org.xipki.pki.ca.scep.client.shell.GetCRLCmd">
       </action>
       <optional-completers>
         <entry key="--ca-cert" value-ref="filePathCompleter"/>

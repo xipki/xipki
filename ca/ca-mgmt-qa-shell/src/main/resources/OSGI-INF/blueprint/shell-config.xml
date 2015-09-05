@@ -72,7 +72,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <!-- CA -->
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaAddCmd">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -90,7 +90,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaRevokeCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaRevokeCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -102,7 +102,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaUnrevokeCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaUnrevokeCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -111,7 +111,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaRemoveCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -120,7 +120,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaGenRootCACommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaGenRootCACmd">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -139,7 +139,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaPublishRCACertCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaPublishRCACertCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -148,7 +148,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.CaCheckCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.CaCheckCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -157,7 +157,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaUpdateCmd">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -177,7 +177,7 @@
     </command>
     <!-- CA Alias -->
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaAliasAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaAliasAddCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -185,7 +185,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.CaAliasCheckCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.CaAliasCheckCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -194,7 +194,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaAliasRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaAliasRemoveCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -204,7 +204,7 @@
     </command>
     <!--  CA-Profile -->
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaProfileAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaProfileAddCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -213,7 +213,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.CaProfileCheckCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.CaProfileCheckCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -221,7 +221,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaProfileRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaProfileRemoveCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -230,7 +230,7 @@
     </command>
     <!--  CA-Publisher -->
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaPublisherAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaPublisherAddCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -239,7 +239,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.CaPublisherCheckCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.CaPublisherCheckCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -247,7 +247,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaPublisherRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaPublisherRemoveCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -257,7 +257,7 @@
     </command>
     <!--  CA-Requestor -->
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaRequestorAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaRequestorAddCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -269,7 +269,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.CaRequestorCheckCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.CaRequestorCheckCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -277,7 +277,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaRequestorRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCaRequestorRemoveCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -287,7 +287,7 @@
     </command>
     <!-- CMPControl -->
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.CmpControlCheckCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.CmpControlCheckCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -296,7 +296,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCmpControlRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCmpControlRemoveCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -305,12 +305,12 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCmpControlAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCmpControlAddCmd">
         <property name="caManager" ref="caManager"/>
       </action>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCmpControlUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCmpControlUpdateCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -319,7 +319,7 @@
     </command>
     <!-- CRL signer -->
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCrlSignerAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCrlSignerAddCmd">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -329,7 +329,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.CrlSignerCheckCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.CrlSignerCheckCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -338,7 +338,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCrlSignerRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCrlSignerRemoveCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -347,7 +347,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCrlSignerUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegCrlSignerUpdateCmd">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -359,21 +359,12 @@
     </command>
     <!-- Environment -->
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegEnvAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegEnvAddCmd">
         <property name="caManager" ref="caManager"/>
       </action>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.EnvCheckCommand">
-        <property name="caManager" ref="caManager"/>
-      </action>
-      <completers>
-        <ref component-id="envNameCompleter"/>
-        <null/>
-      </completers>
-    </command>
-    <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegEnvRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.EnvCheckCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -382,7 +373,16 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegEnvUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegEnvRemoveCmd">
+        <property name="caManager" ref="caManager"/>
+      </action>
+      <completers>
+        <ref component-id="envNameCompleter"/>
+        <null/>
+      </completers>
+    </command>
+    <command>
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegEnvUpdateCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -391,7 +391,7 @@
     </command>
     <!-- Profile -->
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegProfileAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegProfileAddCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -399,7 +399,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.ProfileCheckCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.ProfileCheckCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -408,7 +408,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegProfileRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegProfileRemoveCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -417,7 +417,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegProfileUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegProfileUpdateCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -427,7 +427,7 @@
     </command>
     <!-- Publisher -->
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegPublisherAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegPublisherAddCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -435,7 +435,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.PublisherCheckCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.PublisherCheckCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -444,7 +444,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegPublisherRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegPublisherRemoveCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -453,7 +453,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegPublisherUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegPublisherUpdateCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -462,7 +462,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegRepublishCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegRepublishCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -471,7 +471,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegClearPublishQueueCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegClearPublishQueueCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -481,7 +481,7 @@
     </command>
     <!-- Requestor -->
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegRequestorAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegRequestorAddCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -489,7 +489,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.RequestorCheckCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.RequestorCheckCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -498,7 +498,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegRequestorRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegRequestorRemoveCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -507,7 +507,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegRequestorUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegRequestorUpdateCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -517,7 +517,7 @@
     </command>
     <!-- Responder -->
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.ResponderCheckCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.ResponderCheckCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -525,7 +525,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegResponderRemoveCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegResponderRemoveCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -533,7 +533,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegResponderAddCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegResponderAddCmd">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -543,7 +543,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegResponderUpdateCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.NegResponderUpdateCmd">
         <property name="caManager" ref="caManager"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -556,7 +556,7 @@
     <!-- Certificate management -->
     <!-- Enroll Certificate -->
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.cert.NegEnrollCertCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.cert.NegEnrollCertCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -568,7 +568,7 @@
     </command>
     <!-- Enroll Certificate -->
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.cert.NegRevokeCertCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.cert.NegRevokeCertCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -578,7 +578,7 @@
     </command>
     <!-- Enroll Certificate -->
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.cert.NegUnrevokeCertCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.cert.NegUnrevokeCertCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -587,7 +587,7 @@
     </command>
     <!-- Remove Certificate -->
     <command>
-      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.cert.NegRemoveCertCommand">
+      <action class="org.xipki.pki.ca.server.mgmt.qa.shell.cert.NegRemoveCertCmd">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>

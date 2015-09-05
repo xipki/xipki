@@ -14,7 +14,7 @@
   </bean>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
-      <action class="org.xipki.pki.ca.dbtool.shell.ExportCaCommand">
+      <action class="org.xipki.pki.ca.dbtool.shell.ExportCaCmd">
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -24,7 +24,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.dbtool.shell.ImportCaCommand">
+      <action class="org.xipki.pki.ca.dbtool.shell.ImportCaCmd">
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -34,7 +34,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.dbtool.shell.ExportOcspCommand">
+      <action class="org.xipki.pki.ca.dbtool.shell.ExportOcspCmd">
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -44,7 +44,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.dbtool.shell.ImportOcspCommand">
+      <action class="org.xipki.pki.ca.dbtool.shell.ImportOcspCmd">
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -54,7 +54,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.dbtool.shell.ImportOcspFromCaCommand">
+      <action class="org.xipki.pki.ca.dbtool.shell.ImportOcspFromCaCmd">
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -65,7 +65,7 @@
     </command>
     <!-- Report commands -->
     <command>
-      <action class="org.xipki.pki.ca.dbtool.shell.DigestDbCommand">
+      <action class="org.xipki.pki.ca.dbtool.shell.DigestDbCmd">
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -74,9 +74,9 @@
         <entry key="--db-conf" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
-    <!-- Liquibase Commands -->
+    <!-- Liquibase Cmds -->
     <command>
-      <action class="org.xipki.pki.ca.dbtool.shell.InitDbCaCommand">
+      <action class="org.xipki.pki.ca.dbtool.shell.InitDbCaCmd">
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
@@ -85,7 +85,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.dbtool.shell.InitDbAllCommand">
+      <action class="org.xipki.pki.ca.dbtool.shell.InitDbAllCmd">
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
@@ -94,7 +94,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.dbtool.shell.InitDbOcspCommand">
+      <action class="org.xipki.pki.ca.dbtool.shell.InitDbOcspCmd">
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
@@ -103,7 +103,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.dbtool.shell.UpdateDbCaCommand">
+      <action class="org.xipki.pki.ca.dbtool.shell.UpdateDbCaCmd">
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
@@ -112,7 +112,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.dbtool.shell.UpdateDbOcspCommand">
+      <action class="org.xipki.pki.ca.dbtool.shell.UpdateDbOcspCmd">
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
