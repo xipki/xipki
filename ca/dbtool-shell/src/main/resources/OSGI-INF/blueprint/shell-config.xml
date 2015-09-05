@@ -65,17 +65,7 @@
     </command>
     <!-- Report commands -->
     <command>
-      <action class="org.xipki.pki.ca.dbtool.shell.ReportCaCommand">
-        <property name="dataSourceFactory" ref="dataSourceFactory"/>
-        <property name="passwordResolver" ref="passwordResolver"/>
-      </action>
-      <optional-completers>
-        <entry key="--out-dir" value-ref="dirPathCompleter"/>
-        <entry key="--db-conf" value-ref="filePathCompleter"/>
-      </optional-completers>
-    </command>
-    <command>
-      <action class="org.xipki.pki.ca.dbtool.shell.ReportOcspCommand">
+      <action class="org.xipki.pki.ca.dbtool.shell.DigestDbCommand">
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
