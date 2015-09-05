@@ -35,8 +35,10 @@
 
 package org.xipki.pki.ca.dbtool.report;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -64,23 +66,44 @@ public class DbDigestWorker extends DbPortWorker
     private final DataSourceWrapper dataSource;
     private final String destFolder;
     private final int numCertsPerSelect;
-    private final boolean resume;
 
     public DbDigestWorker(
             final DataSourceFactory dataSourceFactory,
             final PasswordResolver passwordResolver,
             final String dbConfFile,
             final String destFolder,
-            final boolean resume,
             final int numCertsPerSelect)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
+        File f = new File(destFolder);
+        if(f.exists() == false)
+        {
+            f.mkdirs();
+        }
+        else
+        {
+            if(f.isDirectory() == false)
+            {
+                throw new IOException(destFolder + " is not a folder");
+            }
+
+            if(f.canWrite() == false)
+            {
+                throw new IOException(destFolder + " is not writable");
+            }
+        }
+
+        String[] children = f.list();
+        if(children != null && children.length > 0)
+        {
+            throw new IOException(destFolder + " is not empty");
+        }
+
         Properties props = DbPorter.getDbConfProperties(
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
         this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
         this.destFolder = destFolder;
         this.numCertsPerSelect = numCertsPerSelect;
-        this.resume = resume;
     }
 
     @Override
@@ -89,10 +112,20 @@ public class DbDigestWorker extends DbPortWorker
     throws Exception
     {
         long start = System.currentTimeMillis();
+
         try
         {
-            DbDigester reporter = new DbDigester(dataSource, destFolder, stopMe, resume, numCertsPerSelect);
-            reporter.digest();
+            DbSchemaType dbSchemaType = detectDbSchemaType();
+            System.out.println("database schema: " + dbSchemaType);
+            DbDigester digester;
+            if(dbSchemaType == DbSchemaType.EJBCA_CA_v3)
+            {
+                digester = new EjbcaDbDigester(dataSource, destFolder, stopMe, numCertsPerSelect, dbSchemaType);
+            } else
+            {
+                digester = new XipkiDbDigester(dataSource, destFolder, stopMe, numCertsPerSelect, dbSchemaType);
+            }
+            digester.digest();
         } finally
         {
             try
@@ -104,6 +137,39 @@ public class DbDigestWorker extends DbPortWorker
             }
             long end = System.currentTimeMillis();
             System.out.println("finished in " + AbstractLoadTest.formatTime((end - start) / 1000).trim());
+        }
+    }
+
+    private DbSchemaType detectDbSchemaType()
+    throws DataAccessException
+    {
+        Connection conn = dataSource.getConnection();
+        try
+        {
+            if(dataSource.tableExists(conn, "CAINFO") && dataSource.tableExists(conn, "RAWCERT"))
+            {
+                return DbSchemaType.XIPKI_CA_v1;
+            }
+            else if(dataSource.tableExists(conn, "ISSUER") && dataSource.tableExists(conn, "CERTHASH"))
+            {
+                return DbSchemaType.XIPKI_OCSP_v1;
+            }
+            else if(dataSource.tableExists(conn, "CS_CA") && dataSource.tableExists(conn, "CRAW"))
+            {
+                return DbSchemaType.XIPKI_CA_v2;
+            } else if( dataSource.tableExists(conn, "ISSUER") && dataSource.tableExists(conn, "CHASH"))
+            {
+                return DbSchemaType.XIPKI_OCSP_v2;
+            } else if( dataSource.tableExists(conn, "CAData") && dataSource.tableExists(conn, "CertificateData"))
+            {
+                return DbSchemaType.EJBCA_CA_v3;
+            } else
+            {
+                throw new IllegalArgumentException("unknown database schema");
+            }
+        }finally
+        {
+            dataSource.returnConnection(conn);
         }
     }
 
