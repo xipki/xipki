@@ -33,21 +33,19 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell.p11;
+package org.xipki.security.shell.loadtest.cmd;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.security.api.p11.P11KeyIdentifier;
-import org.xipki.security.api.p11.P11KeypairGenerationResult;
-import org.xipki.security.api.p11.P11WritableSlot;
+import org.xipki.common.qa.AbstractLoadTest;
+import org.xipki.security.shell.loadtest.p12.P12RSAKeyGenLoadTest;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "rsa", description="generate RSA keypair in PKCS#11 device")
-public class P11RSAKeyGenCommand extends P11KeyGenCommand
+@Command(scope = "xipki-tk", name = "speed-rsa-gen-p12", description="performance test of PKCS#12 RSA key generation")
+public class P12RSAKeyGenLoadtestCommand extends SecurityLoadtestCommand
 {
     @Option(name = "--key-size",
             description = "keysize in bit")
@@ -58,29 +56,10 @@ public class P11RSAKeyGenCommand extends P11KeyGenCommand
     private String publicExponent = "0x10001";
 
     @Override
-    protected Object _doExecute()
+    protected AbstractLoadTest getTester()
     throws Exception
     {
-        if(keysize % 1024 != 0)
-        {
-            throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
-        }
-
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        if(noCert)
-        {
-            P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent), label);
-            finalize(keyId);
-        } else
-        {
-            P11KeypairGenerationResult keyAndCert = slot.generateRSAKeypairAndCert(
-                    keysize, toBigInt(publicExponent),
-                    label, getSubject(),
-                    getKeyUsage(),
-                    getExtendedKeyUsage());
-            finalize(keyAndCert);
-        }
-        return null;
+        return new P12RSAKeyGenLoadTest(keysize, toBigInt(publicExponent));
     }
 
 }
