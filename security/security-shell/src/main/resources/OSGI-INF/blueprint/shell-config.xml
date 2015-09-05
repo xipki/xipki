@@ -227,5 +227,93 @@
         <entry key="--p10" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
+    <!-- load test PKCS#11 -->
+    <command>
+      <action class="org.xipki.security.shell.loadtest.cmd.P11DSAKeyGenLoadtestCommand">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.security.shell.loadtest.cmd.P11DSASignLoadtestCommand">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.security.shell.loadtest.cmd.P11ECKeyGenLoadtestCommand">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+        <entry key="--curve" value-ref="ecCurveNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.security.shell.loadtest.cmd.P11ECSignLoadtestCommand">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+        <entry key="--curve" value-ref="ecCurveNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.security.shell.loadtest.cmd.P11RSAKeyGenLoadtestCommand">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.security.shell.loadtest.cmd.P11RSASignLoadtestCommand">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+      </optional-completers>
+    </command>
+    <!-- load test PKCS#12 -->
+    <command>
+      <action class="org.xipki.security.shell.loadtest.cmd.P12DSAKeyGenLoadtestCommand">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+    </command>
+    <command>
+      <action class="org.xipki.security.shell.loadtest.cmd.P12DSASignLoadtestCommand">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+    </command>
+    <command>
+      <action class="org.xipki.security.shell.loadtest.cmd.P12ECKeyGenLoadtestCommand">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--curve" value-ref="ecCurveNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.security.shell.loadtest.cmd.P12ECSignLoadtestCommand">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--curve" value-ref="ecCurveNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.security.shell.loadtest.cmd.P12RSAKeyGenLoadtestCommand">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+    </command>
+    <command>
+      <action class="org.xipki.security.shell.loadtest.cmd.P12RSASignLoadtestCommand">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+    </command>
   </command-bundle>
 </blueprint>

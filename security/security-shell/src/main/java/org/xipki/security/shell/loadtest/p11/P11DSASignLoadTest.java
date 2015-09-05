@@ -33,11 +33,9 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell.p11;
+package org.xipki.security.shell.loadtest.p11;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.api.p11.P11WritableSlot;
@@ -46,41 +44,31 @@ import org.xipki.security.api.p11.P11WritableSlot;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "rsa", description="generate RSA keypair in PKCS#11 device")
-public class P11RSAKeyGenCommand extends P11KeyGenCommand
+public class P11DSASignLoadTest extends P11SignLoadTest
 {
-    @Option(name = "--key-size",
-            description = "keysize in bit")
-    private Integer keysize = 2048;
 
-    @Option(name = "-e",
-            description = "public exponent")
-    private String publicExponent = "0x10001";
-
-    @Override
-    protected Object _doExecute()
+    public P11DSASignLoadTest(
+            final SecurityFactory securityFactory,
+            final P11WritableSlot slot,
+            final String signatureAlgorithm,
+            final int pLength,
+            final int qLength)
     throws Exception
     {
-        if(keysize % 1024 != 0)
-        {
-            throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
-        }
+        super(securityFactory, slot, signatureAlgorithm,
+                generateKey(slot, pLength, qLength));
 
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        if(noCert)
-        {
-            P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent), label);
-            finalize(keyId);
-        } else
-        {
-            P11KeypairGenerationResult keyAndCert = slot.generateRSAKeypairAndCert(
-                    keysize, toBigInt(publicExponent),
-                    label, getSubject(),
-                    getKeyUsage(),
-                    getExtendedKeyUsage());
-            finalize(keyAndCert);
-        }
-        return null;
+    }
+
+    private static P11KeyIdentifier generateKey(
+            final P11WritableSlot slot,
+            final int pLength,
+            final int qLength)
+    throws Exception
+    {
+        P11KeypairGenerationResult kpAndCert = slot.generateDSAKeypairAndCert(
+                pLength, qLength, "loadtest-" + System.currentTimeMillis(), null, null, null);
+        return new P11KeyIdentifier(kpAndCert.getId(), kpAndCert.getLabel());
     }
 
 }

@@ -384,46 +384,6 @@ public abstract class P12KeypairGenerator
             return "ECDSA";
         }
 
-        public static ASN1ObjectIdentifier getCurveOID(
-                final String curveName)
-        {
-            ASN1ObjectIdentifier curveOID = X962NamedCurves.getOID(curveName);
-            if(curveOID == null)
-            {
-                curveOID = SECNamedCurves.getOID(curveName);
-            }
-            if(curveOID == null)
-            {
-                curveOID = TeleTrusTNamedCurves.getOID(curveName);
-            }
-            if(curveOID == null)
-            {
-                curveOID = NISTNamedCurves.getOID(curveName);
-            }
-
-            return curveOID;
-        }
-
-        public static String getCurveName(
-                final ASN1ObjectIdentifier curveOID)
-        {
-            String curveName = X962NamedCurves.getName(curveOID);
-            if(curveName == null)
-            {
-                curveName = SECNamedCurves.getName(curveOID);
-            }
-            if(curveName == null)
-            {
-                curveName = TeleTrusTNamedCurves.getName(curveOID);
-            }
-            if(curveName == null)
-            {
-                curveName = NISTNamedCurves.getName(curveOID);
-            }
-
-            return curveName;
-        }
-
     }
 
     public static class RSAIdentityGenerator extends P12KeypairGenerator
@@ -501,6 +461,46 @@ public abstract class P12KeypairGenerator
         {
             return "RSA";
         }
+    }
+
+    public static ASN1ObjectIdentifier getCurveOID(
+            final String curveName)
+    {
+        ASN1ObjectIdentifier curveOID = X962NamedCurves.getOID(curveName);
+        if(curveOID == null)
+        {
+            curveOID = SECNamedCurves.getOID(curveName);
+        }
+        if(curveOID == null)
+        {
+            curveOID = TeleTrusTNamedCurves.getOID(curveName);
+        }
+        if(curveOID == null)
+        {
+            curveOID = NISTNamedCurves.getOID(curveName);
+        }
+
+        return curveOID;
+    }
+
+    public static String getCurveName(
+            final ASN1ObjectIdentifier curveOID)
+    {
+        String curveName = X962NamedCurves.getName(curveOID);
+        if(curveName == null)
+        {
+            curveName = SECNamedCurves.getName(curveOID);
+        }
+        if(curveName == null)
+        {
+            curveName = TeleTrusTNamedCurves.getName(curveOID);
+        }
+        if(curveName == null)
+        {
+            curveName = NISTNamedCurves.getName(curveOID);
+        }
+
+        return curveName;
     }
 
 }

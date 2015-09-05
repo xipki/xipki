@@ -1334,8 +1334,23 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     @Override
+    public boolean removeKey(
+            final P11KeyIdentifier keyIdentifier)
+    throws Exception
+    {
+        return doRemoveKeyAndCerts(keyIdentifier, false);
+    }
+
+    @Override
     public boolean removeKeyAndCerts(
             final P11KeyIdentifier keyIdentifier)
+    throws Exception
+    {
+        return doRemoveKeyAndCerts(keyIdentifier, true);
+    }
+
+    private boolean doRemoveKeyAndCerts(
+            final P11KeyIdentifier keyIdentifier, boolean removeCerts)
     throws Exception
     {
         ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
@@ -1371,21 +1386,24 @@ public class IaikP11Slot implements P11WritableSlot
                 }
             }
 
-            X509PublicKeyCertificate[] certs = getCertificateObjects(privKey.getId().getByteArrayValue(), null);
-            if(certs != null && certs.length > 0)
+            if(removeCerts)
             {
-                for(int i = 0; i < certs.length; i++)
+                X509PublicKeyCertificate[] certs = getCertificateObjects(privKey.getId().getByteArrayValue(), null);
+                if(certs != null && certs.length > 0)
                 {
-                    try
+                    for(int i = 0; i < certs.length; i++)
                     {
-                        session.destroyObject(certs[i]);
-                    }catch(TokenException e)
-                    {
-                        msgBuilder.append("could not delete certificate at index ").append(i);
-                        msgBuilder.append(", ");
-                    }
-                }
-            }
+                        try
+                        {
+                            session.destroyObject(certs[i]);
+                        }catch(TokenException e)
+                        {
+                            msgBuilder.append("could not delete certificate at index ").append(i);
+                            msgBuilder.append(", ");
+                        }
+                    } // end for
+                } // end if(certs)
+            } // end removeCerts
         }finally
         {
             returnWritableSession(session);
@@ -1594,6 +1612,47 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     @Override
+    public P11KeyIdentifier generateRSAKeypair(
+            final int keySize,
+            final BigInteger publicExponent,
+            final String label)
+    throws Exception
+    {
+        ParamUtil.assertNotBlank("label", label);
+
+        if (keySize < 1024)
+        {
+            throw new IllegalArgumentException("keysize not allowed: " + keySize);
+        }
+
+        if(keySize % 1024 != 0)
+        {
+            throw new IllegalArgumentException("key size is not multiple of 1024: " + keySize);
+        }
+
+        Session session = borrowWritableSession();
+        try
+        {
+            if(IaikP11Util.labelExists(session, label))
+            {
+                throw new IllegalArgumentException("label " + label + " exists, please specify another one");
+            }
+
+            byte[] id = IaikP11Util.generateKeyID(session);
+
+            generateRSAKeyPair(
+                    session,
+                    keySize, publicExponent, id, label);
+
+            return new P11KeyIdentifier(id, label);
+        }
+        finally
+        {
+            returnWritableSession(session);
+        }
+    }
+
+    @Override
     public P11KeypairGenerationResult generateRSAKeypairAndCert(
             final int keySize,
             final BigInteger publicExponent,
@@ -1645,6 +1704,43 @@ public class IaikP11Slot implements P11WritableSlot
     }
 
     @Override
+    public P11KeyIdentifier generateDSAKeypair(
+            final int pLength,
+            final int qLength,
+            final String label)
+    throws Exception
+    {
+        ParamUtil.assertNotBlank("label", label);
+
+        if (pLength < 1024)
+        {
+            throw new IllegalArgumentException("keysize not allowed: " + pLength);
+        }
+
+        if(pLength % 1024 != 0)
+        {
+            throw new IllegalArgumentException("key size is not multiple of 1024: " + pLength);
+        }
+
+        Session session = borrowWritableSession();
+        try
+        {
+            if(IaikP11Util.labelExists(session, label))
+            {
+                throw new IllegalArgumentException("label " + label + " exists, please specify another one");
+            }
+
+            byte[] id = IaikP11Util.generateKeyID(session);
+            generateDSAKeyPair(session, pLength, qLength, id, label);
+            return new P11KeyIdentifier(id, label);
+        }
+        finally
+        {
+            returnWritableSession(session);
+        }
+    }
+
+    @Override
     public P11KeypairGenerationResult generateDSAKeypairAndCert(
             final int pLength,
             final int qLength,
@@ -1686,6 +1782,47 @@ public class IaikP11Slot implements P11WritableSlot
             return new P11KeypairGenerationResult(id, label, certificate);
         }
         finally
+        {
+            returnWritableSession(session);
+        }
+    }
+
+    @Override
+    public P11KeyIdentifier generateECKeypair(
+            final String curveNameOrOid,
+            final String label)
+    throws Exception
+    {
+        ParamUtil.assertNotBlank("curveNameOrOid", curveNameOrOid);
+        ParamUtil.assertNotBlank("label", label);
+
+        ASN1ObjectIdentifier curveId = getCurveId(curveNameOrOid);
+        if(curveId == null)
+        {
+            throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
+        }
+
+        X9ECParameters ecParams =  ECNamedCurveTable.getByOID(curveId);
+        if(ecParams == null)
+        {
+            throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
+        }
+
+        Session session = borrowWritableSession();
+        try
+        {
+            if(IaikP11Util.labelExists(session, label))
+            {
+                throw new IllegalArgumentException("label " + label + " exists, please specify another one");
+            }
+
+            byte[] id = IaikP11Util.generateKeyID(session);
+
+            generateECDSAKeyPair(
+                    session, curveId, ecParams, id, label);
+
+            return new P11KeyIdentifier(id, label);
+        }finally
         {
             returnWritableSession(session);
         }
@@ -2201,6 +2338,12 @@ public class IaikP11Slot implements P11WritableSlot
 
         X509PublicKeyCertificate cert = getCertificateObject(privKey.getId().getByteArrayValue(), null);
         return X509Util.parseCert(cert.getValue().getByteArrayValue());
+    }
+
+    @Override
+    public P11SlotIdentifier getSlotIdentifier()
+    {
+        return slotId;
     }
 
 }
