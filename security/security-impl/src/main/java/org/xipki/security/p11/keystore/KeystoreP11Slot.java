@@ -87,6 +87,7 @@ import org.xipki.security.api.util.X509Util;
 
 public class KeystoreP11Slot implements P11WritableSlot
 {
+    private static final String NOCERT_COMMON_NAME = "NO-CERT";
     private static Logger LOG = LoggerFactory.getLogger(KeystoreP11Slot.class);
 
     private final File slotDir;
@@ -265,6 +266,30 @@ public class KeystoreP11Slot implements P11WritableSlot
     }
 
     @Override
+    public boolean removeKey(
+            final P11KeyIdentifier keyIdentifier)
+    throws SignerException
+    {
+        ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
+
+        KeystoreP11Identity identity = getIdentity(keyIdentifier);
+        if(identity == null)
+        {
+            return false;
+        }
+        String commonName = X509Util.getCommonName(identity.getCertificate().getSubjectX500Principal());
+        if(NOCERT_COMMON_NAME.equals(commonName) == false)
+        {
+            throw new SignerException("could not delete only the key without deleting the certificate");
+        }
+
+        File file = new File(slotDir, identity.getKeyId().getKeyLabel() + ".p12");
+        file.delete();
+        identities.remove(identity);
+        return true;
+    }
+
+    @Override
     public boolean removeKeyAndCerts(
             final P11KeyIdentifier keyIdentifier)
     throws SignerException
@@ -278,6 +303,7 @@ public class KeystoreP11Slot implements P11WritableSlot
         }
         File file = new File(slotDir, identity.getKeyId().getKeyLabel() + ".p12");
         file.delete();
+        identities.remove(identity);
         return true;
     }
 
@@ -370,6 +396,19 @@ public class KeystoreP11Slot implements P11WritableSlot
     }
 
     @Override
+    public P11KeyIdentifier generateRSAKeypair(
+            final int keySize,
+            final BigInteger publicExponent,
+            final String label)
+    throws Exception
+    {
+        P11KeypairGenerationResult
+            kgResult = generateRSAKeypairAndCert(keySize, publicExponent, label,
+                    "CN=" + NOCERT_COMMON_NAME, null, null);
+        return new P11KeyIdentifier(kgResult.getId(), kgResult.getLabel());
+    }
+
+    @Override
     public P11KeypairGenerationResult generateRSAKeypairAndCert(
             final int keySize,
             final BigInteger publicExponent,
@@ -410,6 +449,18 @@ public class KeystoreP11Slot implements P11WritableSlot
     }
 
     @Override
+    public P11KeyIdentifier generateDSAKeypair(
+            final int pLength,
+            final int qLength,
+            final String label)
+    throws Exception
+    {
+        P11KeypairGenerationResult kgResult = generateDSAKeypairAndCert(pLength, qLength, label,
+                "CN=" + NOCERT_COMMON_NAME, null, null);
+        return new P11KeyIdentifier(kgResult.getId(), kgResult.getLabel());
+    }
+
+    @Override
     public P11KeypairGenerationResult generateDSAKeypairAndCert(
             final int pLength,
             final int qLength,
@@ -447,6 +498,17 @@ public class KeystoreP11Slot implements P11WritableSlot
 
         return new P11KeypairGenerationResult(KeystoreP11Slot.deriveKeyIdFromLabel(label), label,
                 keyAndCert.getCertificate());
+    }
+
+    @Override
+    public P11KeyIdentifier generateECKeypair(
+            final String curveNameOrOid,
+            final String label)
+    throws Exception
+    {
+        P11KeypairGenerationResult pgResult = generateECDSAKeypairAndCert(curveNameOrOid, label,
+                "CN=" + NOCERT_COMMON_NAME, null, null);
+        return new P11KeyIdentifier(pgResult.getId(), pgResult.getLabel());
     }
 
     @Override
@@ -544,6 +606,24 @@ public class KeystoreP11Slot implements P11WritableSlot
     throws Exception
     {
         KeystoreP11Identity identity = getIdentity(keyIdentifier);
-        return identity == null ? null : identity.getCertificate();
+        if(identity == null)
+        {
+            return null;
+        }
+
+        String commonName = X509Util.getCommonName(identity.getCertificate().getSubjectX500Principal());
+        if(NOCERT_COMMON_NAME.equals(commonName))
+        {
+            return null;
+        }
+
+        return identity.getCertificate();
     }
+
+    @Override
+    public P11SlotIdentifier getSlotIdentifier()
+    {
+        return slotId;
+    }
+
 }

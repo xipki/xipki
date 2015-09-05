@@ -37,6 +37,7 @@ package org.xipki.security.shell.p11;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.api.p11.P11WritableSlot;
 
@@ -58,10 +59,17 @@ public class P11ECKeyGenCommand extends P11KeyGenCommand
     throws Exception
     {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        P11KeypairGenerationResult keyAndCert = slot.generateECDSAKeypairAndCert(
-                curveName, label, getSubject(),
-                getKeyUsage(), getExtendedKeyUsage());
-        saveKeyAndCert(keyAndCert);
+        if(noCert)
+        {
+            P11KeyIdentifier keyId = slot.generateECKeypair(curveName, label);
+            finalize(keyId);
+        } else
+        {
+            P11KeypairGenerationResult keyAndCert = slot.generateECDSAKeypairAndCert(
+                    curveName, label, getSubject(),
+                    getKeyUsage(), getExtendedKeyUsage());
+            finalize(keyAndCert);
+        }
         return null;
     }
 

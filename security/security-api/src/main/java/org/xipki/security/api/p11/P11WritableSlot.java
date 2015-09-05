@@ -49,6 +49,8 @@ import org.xipki.security.api.SecurityFactory;
 
 public interface P11WritableSlot
 {
+    P11SlotIdentifier getSlotIdentifier();
+
     void updateCertificate(
             P11KeyIdentifier keyIdentifier,
             X509Certificate newCert,
@@ -60,12 +62,22 @@ public interface P11WritableSlot
             P11KeyIdentifier keyIdentifier)
     throws Exception;
 
+    boolean removeKey(
+            P11KeyIdentifier keyIdentifier)
+    throws Exception;
+
     void removeCerts(
             P11KeyIdentifier keyIdentifier)
     throws Exception;
 
     P11KeyIdentifier addCert(
             X509Certificate cert)
+    throws Exception;
+
+    P11KeyIdentifier generateRSAKeypair(
+            int keySize,
+            BigInteger publicExponent,
+            String label)
     throws Exception;
 
     P11KeypairGenerationResult generateRSAKeypairAndCert(
@@ -77,6 +89,12 @@ public interface P11WritableSlot
             List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception;
 
+    P11KeyIdentifier generateDSAKeypair(
+            int pLength,
+            int qLength,
+            String label)
+    throws Exception;
+
     P11KeypairGenerationResult generateDSAKeypairAndCert(
             int pLength,
             int qLength,
@@ -84,6 +102,11 @@ public interface P11WritableSlot
             String subject,
             Integer keyUsage,
             List<ASN1ObjectIdentifier> extendedKeyusage)
+    throws Exception;
+
+    P11KeyIdentifier generateECKeypair(
+            String curveNameOrOid,
+            String label)
     throws Exception;
 
     P11KeypairGenerationResult generateECDSAKeypairAndCert(

@@ -33,54 +33,36 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell.p11;
+package org.xipki.security.shell.loadtest.p11;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.p11.P11KeyIdentifier;
-import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "rsa", description="generate RSA keypair in PKCS#11 device")
-public class P11RSAKeyGenCommand extends P11KeyGenCommand
+public class P11ECKeyGenLoadTest extends P11KeyGenLoadTest
 {
-    @Option(name = "--key-size",
-            description = "keysize in bit")
-    private Integer keysize = 2048;
+    private final String curveNameOrOid;
 
-    @Option(name = "-e",
-            description = "public exponent")
-    private String publicExponent = "0x10001";
-
-    @Override
-    protected Object _doExecute()
+    public P11ECKeyGenLoadTest(
+            final P11WritableSlot slot,
+            final String curveNameOrOid)
     throws Exception
     {
-        if(keysize % 1024 != 0)
-        {
-            throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
-        }
+        super(slot);
+        ParamUtil.assertNotNull("curveNameOrOid", curveNameOrOid);
+        this.curveNameOrOid = curveNameOrOid;
+    }
 
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        if(noCert)
-        {
-            P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent), label);
-            finalize(keyId);
-        } else
-        {
-            P11KeypairGenerationResult keyAndCert = slot.generateRSAKeypairAndCert(
-                    keysize, toBigInt(publicExponent),
-                    label, getSubject(),
-                    getKeyUsage(),
-                    getExtendedKeyUsage());
-            finalize(keyAndCert);
-        }
-        return null;
+    @Override
+    protected void genKeypair()
+    throws Exception
+    {
+        P11KeyIdentifier keyId = slot.generateECKeypair(curveNameOrOid, getDummyLabel());
+        slot.removeKey(keyId);
     }
 
 }
