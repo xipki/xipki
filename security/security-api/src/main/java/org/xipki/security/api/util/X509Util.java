@@ -102,6 +102,12 @@ import org.xipki.security.api.ObjectIdentifiers;
 public class X509Util
 {
     public static String getCommonName(
+            final X500Principal name)
+    {
+        return getCommonName(X500Name.getInstance(name.getEncoded()));
+    }
+
+    public static String getCommonName(
             final X500Name name)
     {
         RDN[] rdns = name.getRDNs(ObjectIdentifiers.DN_CN);

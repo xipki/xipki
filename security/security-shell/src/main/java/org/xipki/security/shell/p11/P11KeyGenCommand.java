@@ -40,6 +40,7 @@ import java.io.File;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.shell.KeyGenCommand;
@@ -62,6 +63,11 @@ public abstract class P11KeyGenCommand extends KeyGenCommand
             description = "label of the PKCS#11 objects\n"
                     + "(required)")
     protected String label;
+
+    @Option(name = "--no-cert",
+            required = false,
+            description = "Generate only keypair without self-signed certificate")
+    protected Boolean noCert = Boolean.FALSE;
 
     @Option(name = "--subject", aliases = "-s",
             description = "subject in the self-signed certificate")
@@ -89,7 +95,18 @@ public abstract class P11KeyGenCommand extends KeyGenCommand
         return new P11SlotIdentifier(slotIndex, null);
     }
 
-    protected void saveKeyAndCert(
+    protected void finalize(
+            final P11KeyIdentifier keyId)
+    throws Exception
+    {
+        out("generate PKCS#11 key");
+        out("\tkey id: " + Hex.toHexString(keyId.getKeyId()));
+        out("\tkey label: " + keyId.getKeyLabel());
+
+        securityFactory.getP11CryptService(moduleName).refresh();
+    }
+
+    protected void finalize(
             final P11KeypairGenerationResult keyAndCert)
     throws Exception
     {

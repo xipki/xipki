@@ -38,6 +38,7 @@ package org.xipki.security.shell.p11;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.api.p11.P11WritableSlot;
 
@@ -78,12 +79,19 @@ public class P11DSAKeyGenCommand extends P11KeyGenCommand
         }
 
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        P11KeypairGenerationResult keyAndCert = slot.generateDSAKeypairAndCert(
-                pLen, qLen,
-                label, getSubject(),
-                getKeyUsage(),
-                getExtendedKeyUsage());
-        saveKeyAndCert(keyAndCert);
+        if(noCert)
+        {
+            P11KeyIdentifier keyId = slot.generateDSAKeypair(pLen, qLen, label);
+            finalize(keyId);
+        } else
+        {
+            P11KeypairGenerationResult keyAndCert = slot.generateDSAKeypairAndCert(
+                    pLen, qLen,
+                    label, getSubject(),
+                    getKeyUsage(),
+                    getExtendedKeyUsage());
+            finalize(keyAndCert);
+        }
 
         return null;
     }

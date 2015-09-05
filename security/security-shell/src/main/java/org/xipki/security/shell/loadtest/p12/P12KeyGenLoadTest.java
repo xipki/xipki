@@ -33,54 +33,43 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell.p11;
+package org.xipki.security.shell.loadtest.p12;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.security.api.p11.P11KeyIdentifier;
-import org.xipki.security.api.p11.P11KeypairGenerationResult;
-import org.xipki.security.api.p11.P11WritableSlot;
+import org.xipki.common.qa.AbstractLoadTest;
+import org.xipki.security.P12RawKeypairGenerator;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "rsa", description="generate RSA keypair in PKCS#11 device")
-public class P11RSAKeyGenCommand extends P11KeyGenCommand
+public abstract class P12KeyGenLoadTest extends AbstractLoadTest
 {
-    @Option(name = "--key-size",
-            description = "keysize in bit")
-    private Integer keysize = 2048;
-
-    @Option(name = "-e",
-            description = "public exponent")
-    private String publicExponent = "0x10001";
+    protected abstract P12RawKeypairGenerator getKeypairGenerator();
 
     @Override
-    protected Object _doExecute()
+    protected Runnable getTestor()
     throws Exception
     {
-        if(keysize % 1024 != 0)
-        {
-            throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
-        }
-
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        if(noCert)
-        {
-            P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent), label);
-            finalize(keyId);
-        } else
-        {
-            P11KeypairGenerationResult keyAndCert = slot.generateRSAKeypairAndCert(
-                    keysize, toBigInt(publicExponent),
-                    label, getSubject(),
-                    getKeyUsage(),
-                    getExtendedKeyUsage());
-            finalize(keyAndCert);
-        }
-        return null;
+        return new Testor();
     }
 
+    class Testor implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            P12RawKeypairGenerator kpGen = getKeypairGenerator();
+            while(stop() == false && getErrorAccout() < 1)
+            {
+                try
+                {
+                    kpGen.genKeypair();
+                    account(1, 0);
+                }catch(Exception e)
+                {
+                    account(1, 1);
+                }
+            }
+        }
+    }
 }
