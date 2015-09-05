@@ -15,7 +15,7 @@
   <bean id="occurrenceCompleter" class="org.xipki.pki.ocsp.qa.shell.completer.OccurrenceCompleter"/>  
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
-      <action class="org.xipki.pki.ocsp.qa.shell.OCSPQAStatusCommand">
+      <action class="org.xipki.pki.ocsp.qa.shell.OCSPQAStatusCmd">
         <property name="requestor" ref="ocspRequestor"/>
         <property name="ocspQA" ref="ocspQA"/>
       </action>

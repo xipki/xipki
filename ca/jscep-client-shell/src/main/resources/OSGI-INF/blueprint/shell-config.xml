@@ -8,7 +8,7 @@
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
-      <action class="org.xipki.pki.ca.jscep.client.shell.EnrollCertCommand">
+      <action class="org.xipki.pki.ca.jscep.client.shell.EnrollCertCmd">
       </action>
       <optional-completers>
         <entry key="--ca-cert" value-ref="filePathCompleter"/>
@@ -18,7 +18,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.jscep.client.shell.GetCertCommand">
+      <action class="org.xipki.pki.ca.jscep.client.shell.GetCertCmd">
       </action>
       <optional-completers>
         <entry key="--ca-cert" value-ref="filePathCompleter"/>
@@ -27,7 +27,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.jscep.client.shell.CertPollCommand">
+      <action class="org.xipki.pki.ca.jscep.client.shell.CertPollCmd">
       </action>
       <optional-completers>
         <entry key="--ca-cert" value-ref="filePathCompleter"/>
@@ -36,7 +36,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.jscep.client.shell.GetCRLCommand">
+      <action class="org.xipki.pki.ca.jscep.client.shell.GetCRLCmd">
       </action>
       <optional-completers>
         <entry key="--ca-cert" value-ref="filePathCompleter"/>

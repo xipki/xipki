@@ -17,7 +17,7 @@
   </bean>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
-      <action class="org.xipki.security.shell.p11.P11ListSlotCommand">
+      <action class="org.xipki.security.shell.p11.P11ListSlotCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -25,7 +25,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.p11.P11RSAKeyGenCommand">
+      <action class="org.xipki.security.shell.p11.P11RSAKeyGenCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -34,7 +34,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.p12.P12RSAKeyGenCommand">
+      <action class="org.xipki.security.shell.p12.P12RSAKeyGenCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -43,7 +43,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.p11.P11DSAKeyGenCommand">
+      <action class="org.xipki.security.shell.p11.P11DSAKeyGenCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -52,7 +52,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.p12.P12DSAKeyGenCommand">
+      <action class="org.xipki.security.shell.p12.P12DSAKeyGenCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -61,7 +61,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.p11.P11ECKeyGenCommand">
+      <action class="org.xipki.security.shell.p11.P11ECKeyGenCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -71,7 +71,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.p12.P12ECKeyGenCommand">
+      <action class="org.xipki.security.shell.p12.P12ECKeyGenCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -81,7 +81,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.p11.P11CertRequestGenCommand">
+      <action class="org.xipki.security.shell.p11.P11CertRequestGenCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -97,7 +97,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.p12.P12CertRequestGenCommand">
+      <action class="org.xipki.security.shell.p12.P12CertRequestGenCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -113,7 +113,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.p12.P12ComplexCertRequestGenCommand">
+      <action class="org.xipki.security.shell.p12.P12ComplexCertRequestGenCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -129,7 +129,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.p11.P11CertExportCommand">
+      <action class="org.xipki.security.shell.p11.P11CertExportCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -138,7 +138,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.p12.P12CertExportCommand">
+      <action class="org.xipki.security.shell.p12.P12CertExportCmd">
             </action>
       <optional-completers>
         <entry key="--out" value-ref="filePathCompleter"/>
@@ -146,7 +146,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.p11.P11CertUpdateCommand">
+      <action class="org.xipki.security.shell.p11.P11CertUpdateCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -156,7 +156,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.p11.P11CertAddCommand">
+      <action class="org.xipki.security.shell.p11.P11CertAddCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -165,7 +165,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.p11.P11CertDeleteCommand">
+      <action class="org.xipki.security.shell.p11.P11CertDeleteCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -173,7 +173,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.p12.P12CertUpdateCommand">
+      <action class="org.xipki.security.shell.p12.P12CertUpdateCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -183,7 +183,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.p11.P11KeyDeleteCommand">
+      <action class="org.xipki.security.shell.p11.P11KeyDeleteCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -191,27 +191,27 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.PBEEncryptCommand">
+      <action class="org.xipki.security.shell.PBEEncryptCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
     </command>
     <command>
-      <action class="org.xipki.security.shell.PBEDecryptCommand">
+      <action class="org.xipki.security.shell.PBEDecryptCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
     </command>
     <command>
-      <action class="org.xipki.security.shell.ObfuscateCommand">
+      <action class="org.xipki.security.shell.ObfuscateCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
     </command>
     <command>
-      <action class="org.xipki.security.shell.DeobfuscateCommand">
+      <action class="org.xipki.security.shell.DeobfuscateCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
     </command>
     <command>
-      <action class="org.xipki.security.shell.ExtractCertFromCRLCommand">
+      <action class="org.xipki.security.shell.ExtractCertFromCRLCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -220,7 +220,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.CertRequestValidateCommand">
+      <action class="org.xipki.security.shell.CertRequestValidateCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -229,7 +229,7 @@
     </command>
     <!-- load test PKCS#11 -->
     <command>
-      <action class="org.xipki.security.shell.loadtest.cmd.P11DSAKeyGenLoadtestCommand">
+      <action class="org.xipki.security.shell.loadtest.cmd.P11DSAKeyGenLoadtestCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -237,7 +237,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.loadtest.cmd.P11DSASignLoadtestCommand">
+      <action class="org.xipki.security.shell.loadtest.cmd.P11DSASignLoadtestCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -245,16 +245,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.loadtest.cmd.P11ECKeyGenLoadtestCommand">
-        <property name="securityFactory" ref="securityFactory"/>
-      </action>
-      <optional-completers>
-        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
-        <entry key="--curve" value-ref="ecCurveNameCompleter"/>
-      </optional-completers>
-    </command>
-    <command>
-      <action class="org.xipki.security.shell.loadtest.cmd.P11ECSignLoadtestCommand">
+      <action class="org.xipki.security.shell.loadtest.cmd.P11ECKeyGenLoadtestCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -263,7 +254,16 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.loadtest.cmd.P11RSAKeyGenLoadtestCommand">
+      <action class="org.xipki.security.shell.loadtest.cmd.P11ECSignLoadtestCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+        <entry key="--curve" value-ref="ecCurveNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.security.shell.loadtest.cmd.P11RSAKeyGenLoadtestCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -271,7 +271,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.loadtest.cmd.P11RSASignLoadtestCommand">
+      <action class="org.xipki.security.shell.loadtest.cmd.P11RSASignLoadtestCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -280,25 +280,17 @@
     </command>
     <!-- load test PKCS#12 -->
     <command>
-      <action class="org.xipki.security.shell.loadtest.cmd.P12DSAKeyGenLoadtestCommand">
+      <action class="org.xipki.security.shell.loadtest.cmd.P12DSAKeyGenLoadtestCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
     </command>
     <command>
-      <action class="org.xipki.security.shell.loadtest.cmd.P12DSASignLoadtestCommand">
+      <action class="org.xipki.security.shell.loadtest.cmd.P12DSASignLoadtestCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
     </command>
     <command>
-      <action class="org.xipki.security.shell.loadtest.cmd.P12ECKeyGenLoadtestCommand">
-        <property name="securityFactory" ref="securityFactory"/>
-      </action>
-      <optional-completers>
-        <entry key="--curve" value-ref="ecCurveNameCompleter"/>
-      </optional-completers>
-    </command>
-    <command>
-      <action class="org.xipki.security.shell.loadtest.cmd.P12ECSignLoadtestCommand">
+      <action class="org.xipki.security.shell.loadtest.cmd.P12ECKeyGenLoadtestCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -306,12 +298,20 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.security.shell.loadtest.cmd.P12RSAKeyGenLoadtestCommand">
+      <action class="org.xipki.security.shell.loadtest.cmd.P12ECSignLoadtestCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--curve" value-ref="ecCurveNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.security.shell.loadtest.cmd.P12RSAKeyGenLoadtestCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
     </command>
     <command>
-      <action class="org.xipki.security.shell.loadtest.cmd.P12RSASignLoadtestCommand">
+      <action class="org.xipki.security.shell.loadtest.cmd.P12RSASignLoadtestCmd">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
     </command>
