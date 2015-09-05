@@ -35,18 +35,16 @@
 
 package org.xipki.pki.ca.dbtool.report;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -55,12 +53,8 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.pki.ca.dbtool.DbPorter;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.ProcessLog;
 import org.xipki.security.api.HashCalculator;
@@ -69,7 +63,7 @@ import org.xipki.security.api.HashCalculator;
  * @author Lijun Liao
  */
 
-public class EjbcaDbDigester extends DbToolBase
+public class EjbcaDbDigester extends DbToolBase implements DbDigester
 {
     private static class CaInfo
     {
@@ -87,10 +81,7 @@ public class EjbcaDbDigester extends DbToolBase
 
     private static final Logger LOG = LoggerFactory.getLogger(EjbcaDbDigester.class);
 
-    public static final String PROCESS_LOG_FILENAME = "digest.process";
-
-    protected final boolean resume;
-    protected final int numCertsPerSelect;
+    private final int numCertsPerSelect;
 
     private final boolean tblCertHasId;
 
@@ -101,9 +92,9 @@ public class EjbcaDbDigester extends DbToolBase
             final DataSourceWrapper datasource,
             final String baseDir,
             final AtomicBoolean stopMe,
-            final boolean resume,
-            final int numCertsPerSelect)
-    throws DataAccessException, IOException
+            final int numCertsPerSelect,
+            final DbSchemaType dbSchemaType)
+    throws Exception
     {
         super(datasource, baseDir, stopMe);
         if(numCertsPerSelect < 1)
@@ -111,113 +102,58 @@ public class EjbcaDbDigester extends DbToolBase
             throw new IllegalArgumentException("numCertsPerSelect could not be less than 1: " + numCertsPerSelect);
         }
 
-        this.resume = resume;
+        if(dbSchemaType != DbSchemaType.EJBCA_CA_v3)
+        {
+            throw new RuntimeException("unsupported DbSchemaType " + dbSchemaType);
+        }
         this.numCertsPerSelect = numCertsPerSelect;
 
-        File f = new File(baseDir);
-        if(f.exists() == false)
-        {
-            f.mkdirs();
-        }
-        else
-        {
-            if(f.isDirectory() == false)
-            {
-                throw new IOException(baseDir + " is not a folder");
-            }
-
-            if(f.canWrite() == false)
-            {
-                throw new IOException(baseDir + " is not writable");
-            }
-        }
-
-        if(resume == false)
-        {
-            String[] children = f.list();
-            if(children != null && children.length > 0)
-            {
-                throw new IOException(baseDir + " is not empty");
-            }
-        }
-
-        // detect the type of:
-        int dbSchemaType = detectDbSchemaType();
-
-        if(dbSchemaType == 1)
-        {
-            tblCertHasId = true;
-            sql = "SELECT id, cAFingerprint, status, revocationReason, revocationDate, username " +
-                    " FROM CertificateData WHERE id >= ? AND id < ? ORDER BY id ASC";
-            certSql = "SELECT base64Cert FROM CertificateData WHERE id=?";
-        } else if(dbSchemaType == 2)
-        {
-            tblCertHasId = false;
-            String coreSql =
-                    "FINGERPRINT, cAFingerprint, status, revocationReason, revocationDate, username, base64Cert" +
-                    " FROM CertificateData WHERE FINGERPRINT > ?";
-            sql = dataSource.createFetchFirstSelectSQL(coreSql, numCertsPerSelect, "FINGERPRINT ASC");
-            certSql = "SELECT base64Cert FROM CertificateData WHERE FINGERPRINT=?";
-        } else
-        {
-            throw new RuntimeException("should not reach here");
-        }
-    }
-
-    /**
-     *
-     * @return 1 for EJBCA v3 with column id in table CertificateData,
-     *   2 for EJBCA v3 without column id in table CertificateData
-     */
-    private int detectDbSchemaType()
-    throws DataAccessException
-    {
+        // detect whether the table CertificateData has the column id
         if(dataSource.tableHasColumn(connection, "CertificateData", "id"))
         {
-            return 1;
-        }
-        else
+            tblCertHasId = true;
+            sql = "SELECT id, fingerprint, serialNumber, cAFingerprint, status, revocationReason, revocationDate, username " +
+                    " FROM CertificateData WHERE id >= ? AND id < ? ORDER BY id ASC";
+            certSql = "SELECT base64Cert FROM CertificateData WHERE id=?";
+        } else
         {
-            return 2;
+            String lang = System.getenv("LANG");
+            if(lang == null)
+            {
+                throw new Exception("no environment LANG is set");
+            }
+
+            String lLang = lang.toLowerCase();
+            if(lLang.startsWith("en_") == false || lLang.endsWith(".utf-8") == false)
+            {
+                throw new Exception("The environment LANG does not satisfy the pattern  'en_*.UTF-8': '" + lang + "'");
+            }
+
+            String osName = System.getProperty("os.name");
+            if(osName.toLowerCase().contains("linux") == false)
+            {
+                throw new Exception("Exporting EJBCA database is only possible in Linux, but not '" + osName + "'");
+            }
+
+            tblCertHasId = false;
+            String coreSql =
+                    "fingerprint, serialNumber, cAFingerprint, status, revocationReason, revocationDate, username" +
+                    " FROM CertificateData WHERE fingerprint > ?";
+            sql = dataSource.createFetchFirstSelectSQL(coreSql, numCertsPerSelect, "fingerprint ASC");
+            certSql = "SELECT base64Cert FROM CertificateData WHERE fingerprint=?";
         }
     }
 
+    @Override
     public void digest()
     throws Exception
     {
-        File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
-
         System.out.println("digesting database");
-
-        int numProcessedBefore = 0;
-        int minCertId = -1;
-        if(processLogFile.exists())
-        {
-            byte[] content = IoUtil.read(processLogFile);
-            if(content != null && content.length > 2)
-            {
-                String str = new String(content);
-                if(str.trim().equalsIgnoreCase(DbPorter.MSG_CERTS_FINISHED))
-                {
-                    return;
-                }
-
-                StringTokenizer st = new StringTokenizer(str, ":");
-                numProcessedBefore = Integer.parseInt(st.nextToken());
-                minCertId = Integer.parseInt(st.nextToken());
-                minCertId++;
-            }
-        }
-
-        if(minCertId == -1)
-        {
-            minCertId = (int) getMin("CERT", "ID");
-        }
 
         ProcessLog processLog;
         {
-            final long total = getCount("CERT") - numProcessedBefore;
-            processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore);
+            final long total = getCount("CertificateData");
+            processLog = new ProcessLog(total, System.currentTimeMillis(), 0);
         }
 
         Map<String, CaInfo> cas = getCas();
@@ -235,19 +171,12 @@ public class EjbcaDbDigester extends DbToolBase
         Exception exception = null;
         try
         {
-            if(tblCertHasId)
-            {
-                doReportWithId(minCertId, processLogFile, processLog, caEntryContainer, cas);
-            } else
-            {
-                // TODO doReportWithoutId(minCertId, processLogFile, processLog, caEntryContainer, cas);
-            }
+            doDigest(processLog, caEntryContainer, cas);
         }catch(Exception e)
         {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-");
-            System.err.println("\ndigesting process has been cancelled due to error,\n"
-                    + "please continue with the option '--resume'");
+            System.err.println("\ndigesting process has been cancelled due to error");
             LOG.error("Exception", e);
             exception = e;
         } finally
@@ -277,6 +206,8 @@ public class EjbcaDbDigester extends DbToolBase
         {
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
+            int caId = 0;
+
             while(rs.next())
             {
                 String name = rs.getString("NAME");
@@ -286,9 +217,10 @@ public class EjbcaDbDigester extends DbToolBase
                     continue;
                 }
 
-                Element rootElement = XMLUtil.getDocumentElment(data.getBytes());
+                XMLDocumentReader cadataReader = new XMLDocumentReader(
+                        new ByteArrayInputStream(data.getBytes()), false);
                 final String XPATH_CERT = "/java/object/void[string[position()=1]='certificatechain']/object/void/string[1]";
-                String cert = XMLUtil.getValueOfFirstMatch(rootElement, XPATH_CERT, null);
+                String cert = cadataReader.getValue(XPATH_CERT);
                 if(cert == null)
                 {
                     throw new Exception("Could not extract CA certificate");
@@ -297,42 +229,10 @@ public class EjbcaDbDigester extends DbToolBase
                 byte[] certBytes = Base64.decode(cert);
 
                 // find out the id
-                File fBaseDir = new File(baseDir);
-                File[] caDirs = fBaseDir.listFiles();
-                int maxCurrentCaId = 0;
-                int caId = 0;
-
-                if(caDirs != null)
-                {
-                    Map<Integer, byte[]> caIdCertMap = new HashMap<>(caDirs.length);
-                    for(File caDir : caDirs)
-                    {
-                        int id = Integer.parseInt(caDir.getName().substring("ca-".length()));
-                        byte[] cacertBytes = IoUtil.read(new File(caDir, "ca.der"));
-                        caIdCertMap.put(id, cacertBytes);
-
-                        if(maxCurrentCaId < id)
-                        {
-                            maxCurrentCaId = id;
-                        }
-                    }
-
-                    for(Integer id : caIdCertMap.keySet())
-                    {
-                        if(Arrays.equals(certBytes, caIdCertMap.get(caId)))
-                        {
-                            caId = id;
-                        }
-                    }
-                }
-
-                if(caId == 0)
-                {
-                    caId = maxCurrentCaId + 1;
-                    File caDir = new File(baseDir, "ca-" + caId);
-                    File caCertFile = new File(caDir, "ca.der");
-                    IoUtil.save(caCertFile, certBytes);
-                }
+                caId++;
+                File caDir = new File(baseDir, "ca-" + caId);
+                File caCertFile = new File(caDir, "ca.der");
+                IoUtil.save(caCertFile, certBytes);
 
                 CaInfo caInfo = new CaInfo(caId, certBytes);
                 cas.put(caInfo.hexSha1, caInfo);
@@ -348,118 +248,46 @@ public class EjbcaDbDigester extends DbToolBase
         return cas;
     }
 
-    private void doReportWithId(
-            final int minCertId,
-            final File processLogFile,
+    private void doDigest(
             final ProcessLog processLog,
             final CaEntryContainer caEntryContainer,
             final Map<String, CaInfo> caInfos)
     throws Exception
     {
-        System.out.println("digesting certificates from id " + minCertId);
+        int skippedAccount = 0;
+        final int minCertId;
+        final int maxCertId;
+        String lastProcessedHexCertFp;
 
-        final int maxCertId = (int) getMax("CertificateData", "id");
-
-        PreparedStatement ps = prepareStatement(sql);
-        PreparedStatement certPs = prepareStatement(certSql);
-
-        ProcessLog.printHeader();
-
-        String sql = null;
-        Integer id = null;
-
-        try
+        if(tblCertHasId)
         {
-            boolean interrupted = false;
-            int k = 0;
-
-            for(int i = minCertId; i <= maxCertId; i += numCertsPerSelect)
-            {
-                if(stopMe.get())
-                {
-                    interrupted = true;
-                    break;
-                }
-
-                certPs.setInt(1, i);
-                certPs.setInt(2, i + numCertsPerSelect);
-
-                ResultSet rs = ps.executeQuery();
-
-                while(rs.next())
-                {
-                    id = rs.getInt("id");
-                    String username = rs.getString("username");
-                    String hexCaFp = rs.getString("cAFingerprint");
-
-                    CaInfo caInfo = getCaInfo(caInfos, username, hexCaFp, id, null, certPs);
-                    if(caInfo == null)
-                    {
-                        continue;
-                    }
-
-                    DbDigestEntry cert = buildDigestEntry(id, rs);
-                    caEntryContainer.addDigestEntry(caInfo.caId, cert);
-
-                    processLog.addNumProcessed(1);
-
-                    k++;
-                    if(k == 1000)
-                    {
-                        processLog.printStatus();
-                        k = 0;
-                    }
-                }
-
-                rs.close();
-            } // end for
-
-            if(interrupted)
-            {
-                justThrowsException();
-            }
-        }catch(SQLException e)
+            minCertId = (int) getMin("CertificateData", "id");
+            maxCertId = (int) getMax("CertificateData", "id");
+            lastProcessedHexCertFp = null;
+            System.out.println("digesting certificates from id " + minCertId);
+        } else
         {
-            throw translate(sql, e);
-        }finally
-        {
-            releaseResources(ps, null);
-            releaseResources(certPs, null);
+            minCertId = -1;
+            maxCertId = -1;
+
+            lastProcessedHexCertFp = Hex.toHexString(new byte[20]); // 40 zeros
+            System.out.println("digesting certificates from fingerprint (exclusive)\n\t" + lastProcessedHexCertFp);
         }
 
-        processLog.printStatus(true);
-        ProcessLog.printTrailer();
-        // all successful, delete the processLogFile
-        processLogFile.delete();
-
-        System.out.println(" digested " + processLog.getNumProcessed() +
-                " certificates");
-    }
-
-    private void doReportWithoutId(
-            String lastProcessedHexCertFp,
-            final File processLogFile,
-            final ProcessLog processLog,
-            final CaEntryContainer caEntryContainer,
-            final Map<String, CaInfo> caInfos)
-    throws Exception
-    {
-        System.out.println("digesting certificates from fingerprint (exclusive)\n\t" + lastProcessedHexCertFp);
-
-        final int maxCertId = (int) getMax("CertificateData", "id");
-
         PreparedStatement ps = prepareStatement(sql);
-        PreparedStatement certPs = prepareStatement(certSql);
+        PreparedStatement rawCertPs = prepareStatement(certSql);
 
         ProcessLog.printHeader();
 
         String sql = null;
-        Integer id = null;
+        int id = 0;
 
         try
         {
             boolean interrupted = false;
             int k = 0;
+            int i = minCertId;
+            String hexCertFp = lastProcessedHexCertFp;
 
             while(true)
             {
@@ -469,40 +297,137 @@ public class EjbcaDbDigester extends DbToolBase
                     break;
                 }
 
-                ps.setString(1, lastProcessedHexCertFp);
+                if(tblCertHasId)
+                {
+                    ps.setInt(1, i);
+                    ps.setInt(2, i + numCertsPerSelect);
+                } else
+                {
+                    ps.setString(1, hexCertFp);
+                }
 
                 ResultSet rs = ps.executeQuery();
 
+                int countEntriesInResultSet = 0;
                 while(rs.next())
                 {
-                    id = rs.getInt("id");
-                    String username = rs.getString("username");
-                    String hexCaFp = rs.getString("cAFingerprint");
+                    if(tblCertHasId)
+                    {
+                        id = rs.getInt("id");
+                    } else
+                    {
+                        id++;
+                    }
 
-                    CaInfo caInfo = getCaInfo(caInfos, username, hexCaFp, id, null, certPs);
+                    countEntriesInResultSet++;
+                    String s = rs.getString("username");
+                    String username = s == null ? "" : s.toLowerCase();
+                    String hexCaFp = rs.getString("cAFingerprint");
+                    hexCertFp = rs.getString("fingerprint");
+
+                    CaInfo caInfo = null;
+
+                    if(username.startsWith("systemca") == false)
+                    {
+                        caInfo = caInfos.get(hexCaFp);
+                    }
+
+                    if ( caInfo == null)
+                    {
+                        if(tblCertHasId)
+                        {
+                            rawCertPs.setInt(1, id);
+                        } else
+                        {
+                            rawCertPs.setString(1, hexCertFp);
+                        }
+
+                        ResultSet certRs = rawCertPs.executeQuery();
+
+                        if(certRs.next())
+                        {
+                            String b64Cert = certRs.getString("base64Cert");
+                            Certificate cert = Certificate.getInstance(Base64.decode(b64Cert));
+                            for(CaInfo entry : caInfos.values())
+                            {
+                                if(entry.subject.equals(cert.getIssuer()))
+                                {
+                                    caInfo = entry;
+                                    break;
+                                }
+                            }
+                        }
+                        certRs.close();
+                    }
 
                     if(caInfo == null)
                     {
+                        if(tblCertHasId)
+                        {
+                            LOG.error("FOUND no CA for Cert with id '{}'", id);
+                        } else
+                        {
+                            LOG.error("FOUND no CA for Cert with fingerprint '{}'", hexCertFp);
+                        }
+                        skippedAccount++;
+                        processLog.addNumProcessed(1);
                         continue;
                     }
 
-                    lastProcessedHexCertFp = rs.getString("FINGERPRINT");
-                    DbDigestEntry cert = buildDigestEntry(id, rs);
+                    DbDigestEntry cert = new DbDigestEntry();
+                    cert.setId(id);
+
+                    String hash = Base64.toBase64String(Hex.decode(hexCertFp));
+                    cert.setBase64Sha1(hash);
+
+                    s = rs.getString("serialNumber");
+                    long serial = Long.parseLong(s);
+                    cert.setSerialNumber(serial);
+
+                    int status = rs.getInt("status");
+                    boolean revoked = (status != 20);
+                    cert.setRevoked(revoked);
+
+                    if(revoked)
+                    {
+                        int rev_reason = rs.getInt("revocationReason");
+                        cert.setRevReason(rev_reason);
+
+                        long rev_timeInMs = rs.getLong("revocationDate");
+                        // rev_time is milliseconds, convert it to seconds
+                        long rev_time = rev_timeInMs / 1000;
+                        cert.setRevTime(rev_time);
+                        cert.setRevInvTime(null);
+                    }
 
                     caEntryContainer.addDigestEntry(caInfo.caId, cert);
 
                     processLog.addNumProcessed(1);
 
                     k++;
-                    if(k == 1000)
+                    if(k == 100)
                     {
                         processLog.printStatus();
                         k = 0;
                     }
-                }
-
+                } // end while(rs.next())
                 rs.close();
-            } // end for
+
+                if(tblCertHasId)
+                {
+                    i += numCertsPerSelect;
+                    if(i > maxCertId)
+                    {
+                        break;
+                    }
+                } else
+                {
+                    if(countEntriesInResultSet == 0)
+                    {
+                        break;
+                    }
+                }
+            } // end while(true)
 
             if(interrupted)
             {
@@ -514,16 +439,19 @@ public class EjbcaDbDigester extends DbToolBase
         }finally
         {
             releaseResources(ps, null);
-            releaseResources(certPs, null);
+            releaseResources(rawCertPs, null);
         }
 
         processLog.printStatus(true);
         ProcessLog.printTrailer();
-        // all successful, delete the processLogFile
-        processLogFile.delete();
 
-        System.out.println(" reported " + processLog.getNumProcessed() +
-                " certificates");
+        StringBuilder sb = new StringBuilder(200);
+        sb.append(" digested ").append((processLog.getNumProcessed() - skippedAccount)).append(" certificates");
+        if(skippedAccount > 0)
+        {
+            sb.append(", ignored ").append(skippedAccount).append(" certificates (see log for details)");
+        }
+        System.out.println(sb.toString());
     }
 
     private void justThrowsException()
@@ -532,85 +460,4 @@ public class EjbcaDbDigester extends DbToolBase
         throw new InterruptedException("interrupted by the user");
     }
 
-    private static CaInfo getCaInfo(
-            final Map<String, CaInfo> caInfos,
-            final String username,
-            final String hexCaFp,
-            final Integer id,
-            final String hexFp,
-            final PreparedStatement certPs)
-    throws Exception
-    {
-        CaInfo caInfo = null;
-
-        if(username.startsWith("systemca") == false)
-        {
-            caInfo = caInfos.get(hexCaFp);
-        }
-
-        if ( caInfo != null)
-        {
-            return caInfo;
-        }
-
-        if(id != null)
-        {
-            certPs.setInt(1, id);
-        } else
-        {
-            certPs.setString(1, hexFp);
-        }
-
-        ResultSet certRs = certPs.executeQuery();
-
-        if(certRs.next())
-        {
-            String b64Cert = certRs.getString("base64Cert");
-            Certificate cert = Certificate.getInstance(Base64.decode(b64Cert));
-            for(CaInfo entry : caInfos.values())
-            {
-                if(entry.subject.equals(cert.getIssuer()))
-                {
-                    caInfo = entry;
-                    break;
-                }
-            }
-        }
-        certRs.close();
-
-        return caInfo;
-    }
-
-    private static DbDigestEntry buildDigestEntry(int id, ResultSet rs)
-    throws SQLException
-    {
-        DbDigestEntry cert = new DbDigestEntry();
-        cert.setId(id);
-
-        String hexHash = rs.getString("fingerprint");
-        String hash = Base64.toBase64String(Hex.decode(hexHash));
-        cert.setBase64Sha1(hash);
-
-        String s = rs.getString("serialNumber");
-        long serial = Long.parseLong(s);
-        cert.setSerialNumber(serial);
-
-        int status = rs.getInt("status");
-        boolean revoked = (status != 20);
-        cert.setRevoked(revoked);
-
-        if(revoked)
-        {
-            int rev_reason = rs.getInt("revocationReason");
-            cert.setRevReason(rev_reason);
-
-            long rev_timeInMs = rs.getLong("revocationDate");
-            // rev_time is milliseconds, convert it to seconds
-            long rev_time = rev_timeInMs / 1000;
-            cert.setRevTime(rev_time);
-            cert.setRevInvTime(null);
-        }
-
-        return cert;
-    }
 }

@@ -33,14 +33,14 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.shell;
+package org.xipki.pki.ca.dbtool.report;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.pki.ca.dbtool.DbPortWorker;
-import org.xipki.pki.ca.dbtool.report.DbDigestWorker;
+import org.xipki.pki.ca.dbtool.shell.DbPortCommand;
 
 /**
  * @author Lijun Liao
@@ -60,9 +60,6 @@ public class DigestDbCommand extends DbPortCommand
                     + "(required)")
     private String outdir;
 
-    @Option(name = "--resume")
-    private Boolean resume = Boolean.FALSE;
-
     @Option(name = "-k",
             description = "number of certificates per SELECT")
     private Integer numCertsPerSelect = 100;
@@ -79,7 +76,6 @@ public class DigestDbCommand extends DbPortCommand
                 passwordResolver,
                 dbconfFile,
                 outdir,
-                resume,
                 numCertsPerSelect);
     }
 

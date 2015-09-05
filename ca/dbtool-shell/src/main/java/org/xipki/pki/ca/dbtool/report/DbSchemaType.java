@@ -39,8 +39,11 @@ package org.xipki.pki.ca.dbtool.report;
  * @author Lijun Liao
  */
 
-public interface DbDigester
+public enum DbSchemaType
 {
-    void digest()
-    throws Exception;
+    XIPKI_CA_v1,
+    XIPKI_OCSP_v1,
+    XIPKI_CA_v2,
+    XIPKI_OCSP_v2,
+    EJBCA_CA_v3;
 }
