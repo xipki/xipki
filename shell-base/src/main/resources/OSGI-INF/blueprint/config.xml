@@ -41,21 +41,21 @@
   <!-- commands -->
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
-      <action class="org.xipki.console.karaf.impl.FileRmCommand"/>
+      <action class="org.xipki.console.karaf.impl.FileRmCmd"/>
       <completers>
         <ref component-id="filePathCompleter"/>
         <null/>
       </completers>
     </command>
     <command>
-      <action class="org.xipki.console.karaf.impl.FileListCommand"/>
+      <action class="org.xipki.console.karaf.impl.FileListCmd"/>
       <completers>
         <ref component-id="filePathCompleter"/>
         <null/>
       </completers>
     </command>
     <command>
-      <action class="org.xipki.console.karaf.impl.CopyFileCommand"/>
+      <action class="org.xipki.console.karaf.impl.CopyFileCmd"/>
       <completers>
         <ref component-id="filePathCompleter"/>
         <ref component-id="filePathCompleter"/>
@@ -63,7 +63,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.console.karaf.impl.CopyDirCommand"/>
+      <action class="org.xipki.console.karaf.impl.CopyDirCmd"/>
       <completers>
         <ref component-id="dirPathCompleter"/>
         <ref component-id="dirPathCompleter"/>
@@ -71,14 +71,14 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.console.karaf.impl.MkdirCommand"/>
+      <action class="org.xipki.console.karaf.impl.MkdirCmd"/>
       <completers>
         <ref component-id="dirPathCompleter"/>
         <null/>
       </completers>
     </command>
     <command>
-      <action class="org.xipki.console.karaf.impl.ConfirmCommand"/>
+      <action class="org.xipki.console.karaf.impl.ConfirmCmd"/>
     </command>
   </command-bundle>
 </blueprint>
