@@ -58,7 +58,6 @@ public class CaEntry
     private final FileOutputStream certsManifestOs;
     private final File caDir;
     private final File certsDir;
-    private final File baseDir;
 
     private final int numProcessedBefore;
     private int numProcessed;
@@ -72,14 +71,13 @@ public class CaEntry
 
     public CaEntry(
             final int caId,
-            final File baseDir)
+            final String caDir)
     throws IOException
     {
-        ParamUtil.assertNotNull("baseDir", baseDir);
+        ParamUtil.assertNotNull("caDir", caDir);
 
         this.caId = caId;
-        this.baseDir = baseDir;
-        this.caDir = new File(baseDir, "ca-" + caId);
+        this.caDir = new File(caDir);
         this.certsDir = new File(caDir, "certs");
         this.certsDir.mkdirs();
 
@@ -171,7 +169,7 @@ public class CaEntry
     private void createNewCsvFile()
     throws IOException
     {
-        this.csvFile = new File(baseDir, "tmp-ca-" + caId + "-" + System.currentTimeMillis() + ".csv");
+        this.csvFile = new File(caDir.getParentFile(), "tmp-ca-" + caId + "-" + System.currentTimeMillis() + ".csv");
         csvOutputStream = new BufferedOutputStream(
                 new FileOutputStream(this.csvFile), STREAM_BUFFERSIZE);
     }

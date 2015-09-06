@@ -35,7 +35,10 @@
 
 package org.xipki.pki.ca.dbtool.report;
 
-import org.xipki.pki.ca.dbtool.xmlio.InvalidDataObjectException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -43,52 +46,106 @@ import org.xipki.pki.ca.dbtool.xmlio.InvalidDataObjectException;
 
 public class DbDigestEntry
 {
-    private Integer id;
-    private Long serialNumber;
-    private Boolean revoked;
-    private Integer revReason;
-    private Long revTime;
-    private Long revInvTime;
-    private String base64Sha1;
+    private final int id;
+    private final long serialNumber;
+    private final boolean revoked;
+    private final Integer revReason;
+    private final Long revTime;
+    private final Long revInvTime;
+    private final String base64Sha1;
 
-    public Integer getId()
+    public DbDigestEntry(
+            final int id,
+            final long serialNumber,
+            final boolean revoked,
+            final Integer revReason,
+            final Long revTime,
+            final Long revInvTime,
+            final String base64Sha1)
+    {
+        ParamUtil.assertNotBlank("base64Sha1", base64Sha1);
+        if(revoked)
+        {
+            ParamUtil.assertNotNull("revReason", revReason);
+            ParamUtil.assertNotNull("revTime", revTime);
+        }
+
+        this.id = id;
+        this.serialNumber = serialNumber;
+        this.revoked = revoked;
+        this.revReason = revReason;
+        this.revTime = revTime;
+        this.revInvTime = revInvTime;
+        this.base64Sha1 = base64Sha1;
+    }
+
+    public DbDigestEntry(String encoded)
+    {
+        List<Integer> indexes = getIndexes(encoded);
+        if(indexes.size() != 6)
+        {
+            throw new IllegalArgumentException("invalid DbDigestEntry: " + encoded);
+        }
+
+        String s = encoded.substring(0, indexes.get(0));
+        this.id = Integer.parseInt(s);
+
+        int i = 0;
+        s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
+        this.serialNumber = Long.parseLong(s);
+
+        i++;
+        s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
+        this.revoked = "0".equals(s) == false;
+
+        if(this.revoked)
+        {
+            i++;
+            s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
+            this.revReason = Integer.parseInt(s);
+
+            i++;
+            s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
+            this.revTime = Long.parseLong(s);
+
+            i++;
+            s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
+            if(s.length() != 0)
+            {
+                this.revInvTime = Long.parseLong(s);
+            } else
+            {
+                this.revInvTime = null;
+            }
+        } else
+        {
+            this.revReason = null;
+            this.revTime = null;
+            this.revInvTime = null;
+        }
+
+        i = 5;
+        this.base64Sha1 = encoded.substring(indexes.get(i) + 1);
+    }
+
+    public int getId()
     {
         return id;
     }
 
-    public void setId(Integer id)
-    {
-        this.id = id;
-    }
-
-    public Long getSerialNumber()
+    public long getSerialNumber()
     {
         return serialNumber;
     }
 
-    public void setSerialNumber(Long serialNumber)
-    {
-        this.serialNumber = serialNumber;
-    }
-
-    public Boolean getRevoked()
+    public boolean isRevoked()
     {
         return revoked;
     }
 
-    public void setRevoked(Boolean revoked)
-    {
-        this.revoked = revoked;
-    }
-
-    public Integer getRevReason()
+    public int getRevReason()
     {
         return revReason;
-    }
-
-    public void setRevReason(Integer revReason)
-    {
-        this.revReason = revReason;
     }
 
     public Long getRevTime()
@@ -96,19 +153,9 @@ public class DbDigestEntry
         return revTime;
     }
 
-    public void setRevTime(Long revTime)
-    {
-        this.revTime = revTime;
-    }
-
     public Long getRevInvTime()
     {
         return revInvTime;
-    }
-
-    public void setRevInvTime(Long revInvTime)
-    {
-        this.revInvTime = revInvTime;
     }
 
     public String getBase64Sha1()
@@ -116,51 +163,8 @@ public class DbDigestEntry
         return base64Sha1;
     }
 
-    public void setBase64Sha1(String base64Sha1)
-    {
-        this.base64Sha1 = base64Sha1;
-    }
-
-    public void validate()
-    throws InvalidDataObjectException
-    {
-        assertNotNull("id", id);
-        assertNotNull("serialNumber", serialNumber);
-        assertNotNull("revoked", revoked);
-        if(revoked)
-        {
-            assertNotNull("revReason", revReason);
-            assertNotNull("revTime", revTime);
-        }
-        assertNotBlank("base64Sha1", base64Sha1);
-    }
-
-    private static void assertNotNull(
-            final String name,
-            final Object value)
-    throws InvalidDataObjectException
-    {
-        if(value == null)
-        {
-            throw new InvalidDataObjectException(name + " could not be null");
-        }
-    }
-
-    private static void assertNotBlank(
-            final String name,
-            final String value)
-    throws InvalidDataObjectException
-    {
-        if(value == null || value.isEmpty())
-        {
-            throw new InvalidDataObjectException(name + " could not be blank");
-        }
-    }
-
     public String getEncoded()
-    throws InvalidDataObjectException
     {
-        validate();
         StringBuilder sb = new StringBuilder();
         sb.append(id).append(";");
         sb.append(serialNumber).append(";");
@@ -186,5 +190,58 @@ public class DbDigestEntry
 
         sb.append(base64Sha1);
         return sb.toString();
+    }
+
+    public boolean contentEquals(DbDigestEntry b)
+    {
+        if(b == null)
+        {
+            return false;
+        }
+
+        if(serialNumber != b.serialNumber)
+        {
+            return false;
+        }
+
+        if(revoked != b.revoked)
+        {
+            return false;
+        }
+
+        if(revReason != b.revReason)
+        {
+            return false;
+        }
+
+        if(revTime != b.revTime)
+        {
+            return false;
+        }
+
+        if(revInvTime != b.revInvTime)
+        {
+            return false;
+        }
+
+        if(base64Sha1 != b.base64Sha1)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static List<Integer> getIndexes(String encoded)
+    {
+        List<Integer> ret = new ArrayList<>(6);
+        for(int i = 0; i < encoded.length(); i++)
+        {
+            if(encoded.charAt(i) == ';')
+            {
+                ret.add(i);
+            }
+        }
+        return ret;
     }
 }

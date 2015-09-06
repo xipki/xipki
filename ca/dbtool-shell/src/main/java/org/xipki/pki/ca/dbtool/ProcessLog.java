@@ -46,7 +46,7 @@ import org.xipki.common.qa.MeasurePoint;
 
 public class ProcessLog
 {
-    private static final long MS_800 = 800L;
+    private static final long MS_800 = 900L;
 
     private final long total;
     private final long startTime;

@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,14 +56,15 @@ import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.ProcessLog;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
  */
 
-public class XipkiDbDigester extends DbToolBase implements DbDigester
+public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
 {
-    private static final Logger LOG = LoggerFactory.getLogger(XipkiDbDigester.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XipkiDigestExporter.class);
 
     private final int numCertsPerSelect;
 
@@ -81,7 +83,7 @@ public class XipkiDbDigester extends DbToolBase implements DbDigester
     private final String certSql;
     private final String hashSql;
 
-    public XipkiDbDigester(
+    public XipkiDigestExporter(
             final DataSourceWrapper datasource,
             final String baseDir,
             final AtomicBoolean stopMe,
@@ -186,13 +188,12 @@ public class XipkiDbDigester extends DbToolBase implements DbDigester
             processLog = new ProcessLog(total, System.currentTimeMillis(), 0);
         }
 
-        Set<Integer> caIds = getCaIds();
-        Set<CaEntry> caEntries = new HashSet<>(caIds.size());
+        Map<Integer, String> caIdDirMap = getCaIds();
+        Set<CaEntry> caEntries = new HashSet<>(caIdDirMap.size());
 
-        File fBaseDir = new File(baseDir);
-        for(Integer caId : caIds)
+        for(Integer caId : caIdDirMap.keySet())
         {
-            CaEntry caEntry = new CaEntry(caId, fBaseDir);
+            CaEntry caEntry = new CaEntry(caId, baseDir + File.separator + caIdDirMap.get(caId));
             caEntries.add(caEntry);
         }
 
@@ -224,10 +225,10 @@ public class XipkiDbDigester extends DbToolBase implements DbDigester
         }
     }
 
-    private Set<Integer> getCaIds()
+    private Map<Integer, String> getCaIds()
     throws DataAccessException, IOException
     {
-        Set<Integer> caIds = new HashSet<>();
+        Map<Integer, String> caIdDirMap = new HashMap<>();
         final String sql = caSql;
 
         Statement stmt = null;
@@ -239,15 +240,25 @@ public class XipkiDbDigester extends DbToolBase implements DbDigester
             while(rs.next())
             {
                 int id = rs.getInt("ID");
-                File caDir = new File(baseDir, "ca-" + id);
-                File caCertFile = new File(caDir, "ca.der");
+                String b64Cert = rs.getString("CERT");
+                byte[] certBytes = Base64.decode(b64Cert);
 
+                Certificate cert = Certificate.getInstance(certBytes);
+                String commonName = X509Util.getCommonName(cert.getSubject());
+
+                String fn = toAsciiFilename("ca-" + commonName);
+                File caDir = new File(baseDir, fn);
+                int i = 2;
+                while(caDir.exists())
+                {
+                    caDir = new File(baseDir, fn + "." + (i++));
+                }
+
+                File caCertFile = new File(caDir, "ca.der");
                 caDir.mkdirs();
-                String cert = rs.getString("CERT");
-                byte[] certBytes = Base64.decode(cert);
                 IoUtil.save(caCertFile, certBytes);
 
-                caIds.add(id);
+                caIdDirMap.put(id, caDir.getName());
             }
         }catch(SQLException e)
         {
@@ -257,7 +268,7 @@ public class XipkiDbDigester extends DbToolBase implements DbDigester
             releaseResources(stmt, rs);
         }
 
-        return caIds;
+        return caIdDirMap;
     }
 
     private void doDigest(
@@ -318,9 +329,6 @@ public class XipkiDbDigester extends DbToolBase implements DbDigester
 
                     int caId = rs.getInt(col_caId);
 
-                    DbDigestEntry cert = new DbDigestEntry();
-                    cert.setId(id);
-
                     String hash = idHashMap.remove(id);
                     if(hash == null)
                     {
@@ -329,27 +337,27 @@ public class XipkiDbDigester extends DbToolBase implements DbDigester
                         LOG.error(msg);
                         throw new DataAccessException(msg);
                     }
-                    cert.setBase64Sha1(hash);
 
                     long serial = rs.getLong(col_serialNumber);
-                    cert.setSerialNumber(serial);
 
                     boolean revoked = rs.getBoolean(col_revoked);
-                    cert.setRevoked(revoked);
+
+                    Integer revReason = null;
+                    Long revTime = null;
+                    Long revInvTime = null;
 
                     if(revoked)
                     {
-                        int rev_reason = rs.getInt(col_revReason);
-                        long rev_time = rs.getLong(col_revTime);
-                        long rev_invalidity_time = rs.getLong(col_revInvTime);
-                        cert.setRevReason(rev_reason);
-                        cert.setRevTime(rev_time);
-                        if(rev_invalidity_time != 0)
+                        revReason = rs.getInt(col_revReason);
+                        revTime = rs.getLong(col_revTime);
+                        revInvTime = rs.getLong(col_revInvTime);
+                        if(revInvTime == 0)
                         {
-                            cert.setRevInvTime(rev_invalidity_time);
+                            revInvTime = null;
                         }
                     }
 
+                    DbDigestEntry cert = new DbDigestEntry(id, serial, revoked, revReason, revTime, revInvTime, hash);
                     caEntryContainer.addDigestEntry(caId, cert);
 
                     processLog.addNumProcessed(1);
@@ -391,6 +399,25 @@ public class XipkiDbDigester extends DbToolBase implements DbDigester
     throws InterruptedException
     {
         throw new InterruptedException("interrupted by the user");
+    }
+
+    static String toAsciiFilename(String filename)
+    {
+        final int n = filename.length();
+        StringBuilder sb = new StringBuilder(n);
+        for(int i = 0; i < n; i++)
+        {
+            char c = filename.charAt(i);
+            if((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') ||
+                    c == '.' || c == '_' || c == '-' || c == ' ')
+            {
+                sb.append(c);
+            } else
+            {
+                sb.append('_');
+            }
+        }
+        return sb.toString();
     }
 
 }
