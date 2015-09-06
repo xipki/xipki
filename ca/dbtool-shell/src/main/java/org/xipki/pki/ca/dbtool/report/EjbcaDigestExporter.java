@@ -58,28 +58,31 @@ import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.ProcessLog;
 import org.xipki.security.api.HashCalculator;
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
  */
 
-public class EjbcaDbDigester extends DbToolBase implements DbDigester
+public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
 {
     private static class CaInfo
     {
         final int caId;
         final X500Name subject;
         final String hexSha1;
+        final String caDirname;
 
-        public CaInfo(int caId, byte[] certBytes)
+        public CaInfo(int caId, byte[] certBytes, String caDirname)
         {
             this.caId = caId;
             this.hexSha1 = HashCalculator.hexSha1(certBytes);
             this.subject = Certificate.getInstance(certBytes).getSubject();
+            this.caDirname = caDirname;
         }
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(EjbcaDbDigester.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EjbcaDigestExporter.class);
 
     private final int numCertsPerSelect;
 
@@ -88,7 +91,7 @@ public class EjbcaDbDigester extends DbToolBase implements DbDigester
     private final String sql;
     private final String certSql;
 
-    public EjbcaDbDigester(
+    public EjbcaDigestExporter(
             final DataSourceWrapper datasource,
             final String baseDir,
             final AtomicBoolean stopMe,
@@ -159,10 +162,9 @@ public class EjbcaDbDigester extends DbToolBase implements DbDigester
         Map<String, CaInfo> cas = getCas();
         Set<CaEntry> caEntries = new HashSet<>(cas.size());
 
-        File fBaseDir = new File(baseDir);
         for(CaInfo caInfo : cas.values())
         {
-            CaEntry caEntry = new CaEntry(caInfo.caId, fBaseDir);
+            CaEntry caEntry = new CaEntry(caInfo.caId, baseDir + File.separator + caInfo.caDirname);
             caEntries.add(caEntry);
         }
 
@@ -220,21 +222,30 @@ public class EjbcaDbDigester extends DbToolBase implements DbDigester
                 XMLDocumentReader cadataReader = new XMLDocumentReader(
                         new ByteArrayInputStream(data.getBytes()), false);
                 final String XPATH_CERT = "/java/object/void[string[position()=1]='certificatechain']/object/void/string[1]";
-                String cert = cadataReader.getValue(XPATH_CERT);
-                if(cert == null)
+                String b64Cert = cadataReader.getValue(XPATH_CERT);
+                if(b64Cert == null)
                 {
                     throw new Exception("Could not extract CA certificate");
                 }
 
-                byte[] certBytes = Base64.decode(cert);
+                byte[] certBytes = Base64.decode(b64Cert);
+                Certificate cert = Certificate.getInstance(certBytes);
+                String commonName = X509Util.getCommonName(cert.getSubject());
+                String fn = XipkiDigestExporter.toAsciiFilename("ca-" + commonName);
+                File caDir = new File(baseDir, fn);
+                int i = 2;
+                while(caDir.exists())
+                {
+                    caDir = new File(baseDir, fn + "." + (i++));
+                }
 
                 // find out the id
                 caId++;
-                File caDir = new File(baseDir, "ca-" + caId);
                 File caCertFile = new File(caDir, "ca.der");
+                caDir.mkdirs();
                 IoUtil.save(caCertFile, certBytes);
 
-                CaInfo caInfo = new CaInfo(caId, certBytes);
+                CaInfo caInfo = new CaInfo(caId, certBytes, caDir.getName());
                 cas.put(caInfo.hexSha1, caInfo);
             }
         }catch(SQLException e)
@@ -374,31 +385,27 @@ public class EjbcaDbDigester extends DbToolBase implements DbDigester
                         continue;
                     }
 
-                    DbDigestEntry cert = new DbDigestEntry();
-                    cert.setId(id);
-
                     String hash = Base64.toBase64String(Hex.decode(hexCertFp));
-                    cert.setBase64Sha1(hash);
 
                     s = rs.getString("serialNumber");
                     long serial = Long.parseLong(s);
-                    cert.setSerialNumber(serial);
 
                     int status = rs.getInt("status");
                     boolean revoked = (status != 20);
-                    cert.setRevoked(revoked);
+
+                    Integer revReason = null;
+                    Long revTime = null;
+                    Long revInvTime = null;
 
                     if(revoked)
                     {
-                        int rev_reason = rs.getInt("revocationReason");
-                        cert.setRevReason(rev_reason);
-
+                        revReason = rs.getInt("revocationReason");
                         long rev_timeInMs = rs.getLong("revocationDate");
                         // rev_time is milliseconds, convert it to seconds
-                        long rev_time = rev_timeInMs / 1000;
-                        cert.setRevTime(rev_time);
-                        cert.setRevInvTime(null);
+                        revTime = rev_timeInMs / 1000;
                     }
+
+                    DbDigestEntry cert = new DbDigestEntry(id, serial, revoked, revReason, revTime, revInvTime, hash);
 
                     caEntryContainer.addDigestEntry(caInfo.caId, cert);
 

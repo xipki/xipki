@@ -60,14 +60,14 @@ import org.xipki.pki.ca.dbtool.DbPorter;
  * @author Lijun Liao
  */
 
-public class DbDigestWorker extends DbPortWorker
+public class DbDigestExportWorker extends DbPortWorker
 {
-    private static final Logger LOG = LoggerFactory.getLogger(DbDigestWorker.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DbDigestExportWorker.class);
     private final DataSourceWrapper dataSource;
     private final String destFolder;
     private final int numCertsPerSelect;
 
-    public DbDigestWorker(
+    public DbDigestExportWorker(
             final DataSourceFactory dataSourceFactory,
             final PasswordResolver passwordResolver,
             final String dbConfFile,
@@ -115,15 +115,15 @@ public class DbDigestWorker extends DbPortWorker
 
         try
         {
-            DbSchemaType dbSchemaType = detectDbSchemaType();
+            DbSchemaType dbSchemaType = detectDbSchemaType(dataSource);
             System.out.println("database schema: " + dbSchemaType);
-            DbDigester digester;
+            DbDigestExporter digester;
             if(dbSchemaType == DbSchemaType.EJBCA_CA_v3)
             {
-                digester = new EjbcaDbDigester(dataSource, destFolder, stopMe, numCertsPerSelect, dbSchemaType);
+                digester = new EjbcaDigestExporter(dataSource, destFolder, stopMe, numCertsPerSelect, dbSchemaType);
             } else
             {
-                digester = new XipkiDbDigester(dataSource, destFolder, stopMe, numCertsPerSelect, dbSchemaType);
+                digester = new XipkiDigestExporter(dataSource, destFolder, stopMe, numCertsPerSelect, dbSchemaType);
             }
             digester.digest();
         } finally
@@ -140,7 +140,7 @@ public class DbDigestWorker extends DbPortWorker
         }
     }
 
-    private DbSchemaType detectDbSchemaType()
+    static DbSchemaType detectDbSchemaType(DataSourceWrapper dataSource)
     throws DataAccessException
     {
         Connection conn = dataSource.getConnection();
