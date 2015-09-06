@@ -39,7 +39,7 @@ package org.xipki.pki.ca.dbtool.report;
  * @author Lijun Liao
  */
 
-public interface DbDigester
+public interface DbDigestExporter
 {
     void digest()
     throws Exception;

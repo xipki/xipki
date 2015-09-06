@@ -40,42 +40,52 @@ import org.apache.karaf.shell.commands.Option;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.pki.ca.dbtool.DbPortWorker;
-import org.xipki.pki.ca.dbtool.report.DbDigestExportWorker;
+import org.xipki.pki.ca.dbtool.report.DbDigestDiffWorker;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "digest-db", description="digest XiPKI/EJBCA database")
-public class DigestDbCmd extends DbPortCmd
+@Command(scope = "xipki-db", name = "digest-db-diff", description="diff digest XiPKI/EJBCA database")
+public class DiffDigestDbCmd extends DbPortCmd
 {
-    @Option(name = "--db-conf",
+    @Option(name = "--a-digest-dir", aliases="-a",
             required = true,
-            description = "database configuration file")
+            description = "database digest directory (A)\n"
+                    + "(required)")
+    private String digestDirA;
+
+    @Option(name = "--b-db-conf", aliases="-b",
+            required = true,
+            description = "database configuration file (B)")
     private String dbconfFile;
 
-    @Option(name = "--out-dir",
+    @Option(name = "--report-dir",
             required = true,
-            description = "output directory\n"
+            description = "report directory\n"
                     + "(required)")
-    private String outdir;
+    private String reportDir;
+
+    @Option(name = "--revoked-only")
+    private Boolean revokedOnly = Boolean.FALSE;
 
     @Option(name = "-k",
             description = "number of certificates per SELECT")
-    private Integer numCertsPerSelect = 100;
+    private Integer numCertsPerSelect = 1000;
 
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
 
-    @Override
     protected DbPortWorker getDbPortWorker()
     throws Exception
     {
-        return new DbDigestExportWorker(
+        return new DbDigestDiffWorker(
                 dataSourceFactory,
                 passwordResolver,
+                revokedOnly,
+                digestDirA,
                 dbconfFile,
-                outdir,
+                reportDir,
                 numCertsPerSelect);
     }
 
@@ -90,4 +100,5 @@ public class DigestDbCmd extends DbPortCmd
     {
         this.passwordResolver = passwordResolver;
     }
+
 }
