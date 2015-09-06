@@ -123,7 +123,7 @@ public class IoUtil
 
     public static void save(
             File file,
-            final byte[] encoded)
+            final byte[] content)
     throws IOException
     {
         file = expandFilepath(file);
@@ -137,7 +137,7 @@ public class IoUtil
         FileOutputStream out = new FileOutputStream(file);
         try
         {
-            out.write(encoded);
+            out.write(content);
         } finally
         {
             out.close();
