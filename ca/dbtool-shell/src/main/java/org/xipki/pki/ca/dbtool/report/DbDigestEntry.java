@@ -86,7 +86,7 @@ public class DbDigestEntry
         }
 
         String s = encoded.substring(0, indexes.get(0));
-        this.serialNumber = Long.parseLong(s, 16);
+        this.serialNumber = Long.parseLong(s);
 
         int i = 0;
         this.base64Sha1 = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
@@ -173,7 +173,7 @@ public class DbDigestEntry
         StringBuilder sb = new StringBuilder();
         if(withSerialNumber)
         {
-            sb.append(Long.toHexString(serialNumber)).append(";");
+            sb.append(serialNumber).append(";");
         }
         sb.append(base64Sha1).append(";");
         sb.append(revoked ? "1" : "0").append(";");
@@ -263,10 +263,4 @@ public class DbDigestEntry
         }
     }
 
-    public static void main(String[] args)
-    {
-        DbDigestEntry a = new DbDigestEntry("3;YlIfu2dOq9479nUpymPtASvxy8I=;1;1;1439915823;");
-        DbDigestEntry b = new DbDigestEntry("3;YlIfu2dOq9479nUpymPtASvxy8I=;1;1;1439915823;");
-        System.out.println(a.contentEquals(b));
-    }
 }
