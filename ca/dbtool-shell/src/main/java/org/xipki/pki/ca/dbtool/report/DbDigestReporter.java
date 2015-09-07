@@ -94,20 +94,25 @@ public class DbDigestReporter
     }
 
     public void addDiff(
-            final long serialNumber,
             final DbDigestEntry certA,
             final DbDigestEntry certB)
     throws IOException
     {
-        diffWriter.write(Long.toString(serialNumber));
+        if(certA.getSerialNumber() != certB.getSerialNumber())
+        {
+            throw new IllegalArgumentException("certA and certB do not have the same serialNumber");
+        }
+
+        diffWriter.write(Long.toString(certA.getSerialNumber(), 16));
         diffWriter.write('\t');
-        diffWriter.write(certA.getEncoded());
+        diffWriter.write(certA.getEncodedOmitSeriaNumber());
         diffWriter.write('\t');
-        diffWriter.write(certB.getEncoded());
+        diffWriter.write(certB.getEncodedOmitSeriaNumber());
         diffWriter.write('\n');
     }
 
-    public void addError(String errorMessage)
+    public void addError(
+            final String errorMessage)
     throws IOException
     {
         errorWriter.write(errorMessage);

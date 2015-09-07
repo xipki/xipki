@@ -42,7 +42,6 @@ import java.io.IOException;
 
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.xmlio.InvalidDataObjectException;
 
 /**
@@ -65,8 +64,8 @@ public class CaEntry
     private File csvFile;
     private BufferedOutputStream csvOutputStream;
 
-    private int minIdInCsvFile;
-    private int maxIdInCsvFile;
+    private long minSerialInCsvFile;
+    private long maxSerialInCsvFile;
     private int numInCsvFile;
 
     public CaEntry(
@@ -109,24 +108,25 @@ public class CaEntry
         return caId;
     }
 
-    public void addDigestEntry(DbDigestEntry reportEntry)
+    public void addDigestEntry(
+            final DbDigestEntry reportEntry)
     throws IOException, InvalidDataObjectException
     {
-        int id = reportEntry.getId();
-        if(minIdInCsvFile == 0)
+        long serial = reportEntry.getSerialNumber();
+        if(minSerialInCsvFile == 0)
         {
-            minIdInCsvFile = id;
-        } else if(minIdInCsvFile > id)
+            minSerialInCsvFile = serial;
+        } else if(minSerialInCsvFile > serial)
         {
-            minIdInCsvFile = id;
+            minSerialInCsvFile = serial;
         }
 
-        if(maxIdInCsvFile == 0)
+        if(maxSerialInCsvFile == 0)
         {
-            maxIdInCsvFile = id;
-        } else if(maxIdInCsvFile < id)
+            maxSerialInCsvFile = serial;
+        } else if(maxSerialInCsvFile < serial)
         {
-            maxIdInCsvFile = id;
+            maxSerialInCsvFile = serial;
         }
         numInCsvFile++;
 
@@ -137,8 +137,8 @@ public class CaEntry
         {
             closeCurrentCsvFile();
             numInCsvFile = 0;
-            minIdInCsvFile = 0;
-            maxIdInCsvFile = 0;
+            minSerialInCsvFile = 0;
+            maxSerialInCsvFile = 0;
             createNewCsvFile();
         }
         numProcessed++;
@@ -160,7 +160,7 @@ public class CaEntry
     {
         csvOutputStream.close();
 
-        String zipFilename = DbToolBase.buildFilename("certs_", ".csv", minIdInCsvFile, maxIdInCsvFile, 100000000);
+        String zipFilename = buildFilename("certs_", ".csv", minSerialInCsvFile, maxSerialInCsvFile, Long.MAX_VALUE);
         csvFile.renameTo(new File(caDir, "certs" + File.separator + zipFilename));
         certsManifestOs.write((zipFilename + "\n").getBytes());
         certsManifestOs.flush();
@@ -174,4 +174,33 @@ public class CaEntry
                 new FileOutputStream(this.csvFile), STREAM_BUFFERSIZE);
     }
 
+    public static String buildFilename(
+            final String prefix,
+            final String suffix,
+            final long minOfCurrentFile,
+            final long maxOfCurrentFile,
+            final long max)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append(prefix);
+
+        int len = Long.toString(max, 16).length();
+        String a = Long.toString(minOfCurrentFile, 16);
+        for(int i = 0; i < len - a.length(); i++)
+        {
+            sb.append('0');
+        }
+        sb.append(a);
+        sb.append("-");
+
+        String b = Long.toString(maxOfCurrentFile, 16);
+        for(int i = 0; i < len - b.length(); i++)
+        {
+            sb.append('0');
+        }
+        sb.append(b);
+
+        sb.append(suffix);
+        return sb.toString();
+    }
 }

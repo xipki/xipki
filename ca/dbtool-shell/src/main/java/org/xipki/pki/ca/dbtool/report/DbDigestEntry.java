@@ -46,7 +46,6 @@ import org.xipki.common.util.ParamUtil;
 
 public class DbDigestEntry
 {
-    private final int id;
     private final long serialNumber;
     private final boolean revoked;
     private final Integer revReason;
@@ -55,7 +54,6 @@ public class DbDigestEntry
     private final String base64Sha1;
 
     public DbDigestEntry(
-            final int id,
             final long serialNumber,
             final boolean revoked,
             final Integer revReason,
@@ -70,7 +68,6 @@ public class DbDigestEntry
             ParamUtil.assertNotNull("revTime", revTime);
         }
 
-        this.id = id;
         this.serialNumber = serialNumber;
         this.revoked = revoked;
         this.revReason = revReason;
@@ -79,20 +76,20 @@ public class DbDigestEntry
         this.base64Sha1 = base64Sha1;
     }
 
-    public DbDigestEntry(String encoded)
+    public DbDigestEntry(
+            final String encoded)
     {
         List<Integer> indexes = getIndexes(encoded);
-        if(indexes.size() != 6)
+        if(indexes.size() != 5)
         {
             throw new IllegalArgumentException("invalid DbDigestEntry: " + encoded);
         }
 
         String s = encoded.substring(0, indexes.get(0));
-        this.id = Integer.parseInt(s);
+        this.serialNumber = Long.parseLong(s, 16);
 
         int i = 0;
-        s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
-        this.serialNumber = Long.parseLong(s);
+        this.base64Sha1 = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
 
         i++;
         s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
@@ -109,7 +106,7 @@ public class DbDigestEntry
             this.revTime = Long.parseLong(s);
 
             i++;
-            s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
+            s = encoded.substring(indexes.get(i) + 1);
             if(s.length() != 0)
             {
                 this.revInvTime = Long.parseLong(s);
@@ -123,14 +120,6 @@ public class DbDigestEntry
             this.revTime = null;
             this.revInvTime = null;
         }
-
-        i = 5;
-        this.base64Sha1 = encoded.substring(indexes.get(i) + 1);
-    }
-
-    public int getId()
-    {
-        return id;
     }
 
     public long getSerialNumber()
@@ -163,11 +152,30 @@ public class DbDigestEntry
         return base64Sha1;
     }
 
+    @Override
+    public String toString()
+    {
+        return getEncoded();
+    }
+
+    public String getEncodedOmitSeriaNumber()
+    {
+        return getEncoded(false);
+    }
+
     public String getEncoded()
     {
+        return getEncoded(true);
+    }
+
+    private String getEncoded(boolean withSerialNumber)
+    {
         StringBuilder sb = new StringBuilder();
-        sb.append(id).append(";");
-        sb.append(serialNumber).append(";");
+        if(withSerialNumber)
+        {
+            sb.append(Long.toHexString(serialNumber)).append(";");
+        }
+        sb.append(base64Sha1).append(";");
         sb.append(revoked ? "1" : "0").append(";");
 
         if(revReason != null)
@@ -186,13 +194,12 @@ public class DbDigestEntry
         {
             sb.append(revInvTime);
         }
-        sb.append(";");
 
-        sb.append(base64Sha1);
         return sb.toString();
     }
 
-    public boolean contentEquals(DbDigestEntry b)
+    public boolean contentEquals(
+            final DbDigestEntry b)
     {
         if(b == null)
         {
@@ -209,22 +216,22 @@ public class DbDigestEntry
             return false;
         }
 
-        if(revReason != b.revReason)
+        if(equals(revReason, b.revReason) == false)
         {
             return false;
         }
 
-        if(revTime != b.revTime)
+        if(equals(revTime, b.revTime) == false)
         {
             return false;
         }
 
-        if(revInvTime != b.revInvTime)
+        if(equals(revInvTime, b.revInvTime) == false)
         {
             return false;
         }
 
-        if(base64Sha1 != b.base64Sha1)
+        if(equals(base64Sha1, b.base64Sha1) == false)
         {
             return false;
         }
@@ -243,5 +250,23 @@ public class DbDigestEntry
             }
         }
         return ret;
+    }
+
+    private static boolean equals(Object a, Object b)
+    {
+        if(a == null)
+        {
+            return b == null;
+        } else
+        {
+            return a.equals(b);
+        }
+    }
+
+    public static void main(String[] args)
+    {
+        DbDigestEntry a = new DbDigestEntry("3;YlIfu2dOq9479nUpymPtASvxy8I=;1;1;1439915823;");
+        DbDigestEntry b = new DbDigestEntry("3;YlIfu2dOq9479nUpymPtASvxy8I=;1;1;1439915823;");
+        System.out.println(a.contentEquals(b));
     }
 }

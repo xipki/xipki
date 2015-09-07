@@ -154,20 +154,21 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
 
         // CERT SQL
         sb.delete(0, sb.length());
-        sb.append("SELECT ID");
-        sb.append(",").append(col_caId);
-        sb.append(",").append(col_serialNumber);
-        sb.append(",").append(col_revoked);
-        sb.append(",").append(col_revReason);
-        sb.append(",").append(col_revTime);
-        sb.append(",").append(col_revInvTime);
+        sb.append("SELECT ID, ");
+        sb.append(col_caId).append(",");
+        sb.append(col_serialNumber).append(",");
+        sb.append(col_revoked).append(",");
+        sb.append(col_revReason).append(",");
+        sb.append(col_revTime).append(",");
+        sb.append(col_revInvTime);
         sb.append(" FROM CERT WHERE ID>=? AND ID<? ORDER BY ID ASC");
         this.certSql = sb.toString();
 
         // HASH SQL
         sb.delete(0, sb.length());
-        sb.append("SELECT ").append(col_certId);
-        sb.append(",").append(col_certhash);
+        sb.append("SELECT ");
+        sb.append(col_certId).append(",");
+        sb.append(col_certhash);
         sb.append(" FROM ").append(tbl_certhash);
         sb.append(" WHERE ");
         sb.append(col_certId).append(">=? AND ").append(col_certId).append("<?");
@@ -357,7 +358,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
                         }
                     }
 
-                    DbDigestEntry cert = new DbDigestEntry(id, serial, revoked, revReason, revTime, revInvTime, hash);
+                    DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime, revInvTime, hash);
                     caEntryContainer.addDigestEntry(caId, cert);
 
                     processLog.addNumProcessed(1);

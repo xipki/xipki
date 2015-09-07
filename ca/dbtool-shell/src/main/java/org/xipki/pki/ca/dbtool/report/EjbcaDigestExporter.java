@@ -73,7 +73,10 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         final String hexSha1;
         final String caDirname;
 
-        public CaInfo(int caId, byte[] certBytes, String caDirname)
+        public CaInfo(
+                final int caId,
+                final byte[] certBytes,
+                final String caDirname)
         {
             this.caId = caId;
             this.hexSha1 = HashCalculator.hexSha1(certBytes);
@@ -405,7 +408,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                         revTime = rev_timeInMs / 1000;
                     }
 
-                    DbDigestEntry cert = new DbDigestEntry(id, serial, revoked, revReason, revTime, revInvTime, hash);
+                    DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime, revInvTime, hash);
 
                     caEntryContainer.addDigestEntry(caInfo.caId, cert);
 
