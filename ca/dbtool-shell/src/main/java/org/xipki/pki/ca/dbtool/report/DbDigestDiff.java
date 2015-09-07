@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -78,6 +79,7 @@ public class DbDigestDiff
     private final String reportDirName;
     private final int numPerSelect;
     private Connection conn;
+    private final String sqlCert;
 
     public DbDigestDiff(
             final boolean revokedOnly,
@@ -150,6 +152,21 @@ public class DbDigestDiff
         {
             throw new RuntimeException("unsupported DbSchemaType " + datasourceType);
         }
+
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("SELECT ");
+        sqlBuilder.append(col_revoked).append(", ");
+        sqlBuilder.append(col_revReason).append(", ");
+        sqlBuilder.append(col_revTime).append(", ");
+        sqlBuilder.append(col_revInvTime).append(", ");
+        sqlBuilder.append(col_certhash).append(" ");
+        sqlBuilder.append("FROM CERT ");
+        sqlBuilder.append("INNER JOIN ");
+        sqlBuilder.append(tbl_certhash).append(" ON ");
+        sqlBuilder.append("CERT.").append(col_serialNumber).append("=? ");
+        sqlBuilder.append("AND CERT.").append(col_caId).append("=? ");
+        sqlBuilder.append("AND CERT.ID=").append(tbl_certhash).append(".").append(col_certId);
+        sqlCert = sqlBuilder.toString();
 
         this.conn = datasourceB.getConnection();
     }
@@ -253,17 +270,17 @@ public class DbDigestDiff
             final DbDigestReporter reporter)
     throws IOException, DataAccessException
     {
-        Statement selectStmt = null;
-        Statement updateStmt = null;
+        PreparedStatement selectStmt = null;
 
         try
         {
-            selectStmt = datasourceB.createStatement(conn);
-            updateStmt = datasourceB.createStatement(conn);
+            selectStmt = datasourceB.prepareStatement(conn, sqlCert);
+            selectStmt.setInt(2, caIdB);
 
             ProcessLog processLog = new ProcessLog(readerA.getTotalAccount(), System.currentTimeMillis(), 0);
             System.out.println("Processing certifiates of CA \n\t'" + readerA.getCaDirname() + "'");
             ProcessLog.printHeader();
+
             while(true)
             {
                 Object[] objs = readNextLines(readerA);
@@ -275,26 +292,27 @@ public class DbDigestDiff
                 }
 
                 Map<Long, DbDigestEntry> certsMap = (Map<Long, DbDigestEntry>) objs[1];
-                internal_diff(reporter, caIdB, selectStmt, updateStmt, serialNumbers, certsMap);
-                processLog.addNumProcessed(n);
-                processLog.printStatus();
+                internal_diff(reporter, selectStmt, serialNumbers, certsMap, processLog);
+                //processLog.addNumProcessed(n);
+                // TODO processLog.printStatus();
             }
             processLog.printStatus(true);
             ProcessLog.printTrailer();
+        } catch (SQLException e)
+        {
+            throw datasourceB.translate(sqlCert, e);
         }finally
         {
             releaseResources(selectStmt, null);
-            releaseResources(updateStmt, null);
         }
     }
 
     private void internal_diff(
             final DbDigestReporter reporter,
-            final int caIdB,
-            final Statement selectStmt,
-            final Statement updateStmt,
+            final PreparedStatement selectStmt,
             final List<Long> serialNumbers,
-            final Map<Long, DbDigestEntry> certsMap)
+            final Map<Long, DbDigestEntry> certsMap,
+            final ProcessLog processLog)
     throws DataAccessException, IOException
     {
         int n = serialNumbers.size();
@@ -309,67 +327,54 @@ public class DbDigestDiff
         }
         sb.append(")");
 
-        String serialNumbersText = sb.toString();
-
-        String sql = null;
+        String sql = sqlCert;
         ResultSet rs = null;
 
         try
         {
-            StringBuilder sqlBuilder = new StringBuilder();
-            sqlBuilder.append("SELECT T1.ID ID, ");
-            sqlBuilder.append("T1.").append(col_serialNumber).append(" SN, ");
-            sqlBuilder.append("T1.").append(col_revoked).append(" REV, ");
-            sqlBuilder.append("T1.").append(col_revReason).append(" RR, ");
-            sqlBuilder.append("T1.").append(col_revTime).append(" RT, ");
-            sqlBuilder.append("T1.").append(col_revInvTime).append(" RIT, ");
-            sqlBuilder.append("T2.").append(col_certhash).append(" SHA1 ");
-            sqlBuilder.append("FROM CERT T1, ");
-            sqlBuilder.append(tbl_certhash).append(" T2 WHERE T1.").append(col_caId).append("=").append(caIdB);
-            sqlBuilder.append(" AND T1.").append(col_serialNumber).append(" IN ").append(serialNumbersText);
-            sqlBuilder.append(" AND T1.ID=T2.").append(col_certId);
-            sql = sqlBuilder.toString();
-            rs = selectStmt.executeQuery(sql);
-            while(rs.next())
+            for(Long serialNumber : new ArrayList<>(serialNumbers))
             {
-                int id = rs.getInt("ID");
-                long serialNumber = rs.getLong("SN");
-                boolean revoked = rs.getBoolean("REV");
-                Integer revReason = null;
-                Long revTime = null;
-                Long revInvTime = null;
-                if(revoked)
+                selectStmt.setLong(1, serialNumber);
+                rs = selectStmt.executeQuery();
+                if(rs.next())
                 {
-                    revReason = rs.getInt("RR");
-                    revTime = rs.getLong("RT");
-                    revInvTime = rs.getLong("RIT");
-                    if(revInvTime == 0)
+                    boolean revoked = rs.getBoolean(col_revoked);
+                    Integer revReason = null;
+                    Long revTime = null;
+                    Long revInvTime = null;
+                    if(revoked)
                     {
-                        revInvTime = null;
+                        revReason = rs.getInt(col_revReason);
+                        revTime = rs.getLong(col_revTime);
+                        revInvTime = rs.getLong(col_revInvTime);
+                        if(revInvTime == 0)
+                        {
+                            revInvTime = null;
+                        }
                     }
-                }
-                String base64Sha1 = rs.getString("SHA1");
-                DbDigestEntry certB = new DbDigestEntry(id, serialNumber,
-                        revoked, revReason, revTime, revInvTime, base64Sha1);
-                serialNumbers.remove(serialNumber);
-                DbDigestEntry certA = certsMap.get(serialNumber);
+                    String base64Sha1 = rs.getString(col_certhash);
+                    DbDigestEntry certB = new DbDigestEntry(serialNumber,
+                            revoked, revReason, revTime, revInvTime, base64Sha1);
+                    serialNumbers.remove(serialNumber);
+                    DbDigestEntry certA = certsMap.get(serialNumber);
 
-                if(certA == null)
-                {
-                    reporter.addError("sql error (should not happen)");
-                }
-                else if(certA.contentEquals(certB) == false)
-                {
-                    reporter.addSame(serialNumber);
+                    if(certA == null)
+                    {
+                        reporter.addError("sql error (should not happen)");
+                    }
+                    else if(certA.contentEquals(certB))
+                    {
+                        reporter.addSame(serialNumber);
+                    } else
+                    {
+                        reporter.addDiff(certA, certB);
+                    }
                 } else
                 {
-                    reporter.addDiff(serialNumber, certA, certB);
+                    reporter.addOnlyInA(serialNumber);
                 }
-            }
-
-            for(Long sn : serialNumbers)
-            {
-                reporter.addOnlyInA(sn);
+                processLog.addNumProcessed(1);
+                processLog.printStatus();
             }
         } catch(SQLException e)
         {
@@ -382,7 +387,7 @@ public class DbDigestDiff
     }
 
     private Object[] readNextLines(
-            DbDigestReader reader)
+            final DbDigestReader reader)
     throws IOException
     {
         List<Long> serialNumbers = new ArrayList<>(numPerSelect);

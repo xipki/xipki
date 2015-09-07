@@ -104,7 +104,8 @@ public class DbDigestReader
         return ret;
     }
 
-    private DbDigestEntry retrieveNext(boolean firstTime)
+    private DbDigestEntry retrieveNext(
+            final boolean firstTime)
     throws IOException
     {
         String line = firstTime ? null : certsReader.readLine();
