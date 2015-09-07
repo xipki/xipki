@@ -174,7 +174,7 @@ public class CaEntry
                 new FileOutputStream(this.csvFile), STREAM_BUFFERSIZE);
     }
 
-    public static String buildFilename(
+    private static String buildFilename(
             final String prefix,
             final String suffix,
             final long minOfCurrentFile,
@@ -185,7 +185,7 @@ public class CaEntry
         sb.append(prefix);
 
         int len = Long.toString(max, 16).length();
-        String a = Long.toString(minOfCurrentFile, 16);
+        String a = Long.toString(minOfCurrentFile);
         for(int i = 0; i < len - a.length(); i++)
         {
             sb.append('0');
@@ -193,7 +193,7 @@ public class CaEntry
         sb.append(a);
         sb.append("-");
 
-        String b = Long.toString(maxOfCurrentFile, 16);
+        String b = Long.toString(maxOfCurrentFile);
         for(int i = 0; i < len - b.length(); i++)
         {
             sb.append('0');
