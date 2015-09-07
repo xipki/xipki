@@ -66,7 +66,9 @@ public class XMLDocumentReader
 
     private final XPathFactory xpathfactory;
 
-    public XMLDocumentReader(InputStream xmlStream, boolean namespaceAware)
+    public XMLDocumentReader(
+            final InputStream xmlStream,
+            final boolean namespaceAware)
     throws ParserConfigurationException, SAXException, IOException
     {
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
@@ -83,7 +85,9 @@ public class XMLDocumentReader
         db.setEntityResolver(new EntityResolver()
         {
         @Override
-        public InputSource resolveEntity(String publicId, String systemId)
+        public InputSource resolveEntity(
+                final String publicId,
+                final String systemId)
         throws SAXException, IOException
         {
             return new InputSource(new StringReader(""));
@@ -91,14 +95,16 @@ public class XMLDocumentReader
         });
     }
 
-    public String getValue(String xpathExpression)
+    public String getValue(
+            final String xpathExpression)
     throws XPathExpressionException
     {
         Node n = getNode(xpathExpression);
         return (n != null) ? n.getFirstChild().getTextContent() : null;
     }
 
-    private Node getNode(String xpathExpression)
+    private Node getNode(
+            final String xpathExpression)
     throws XPathExpressionException
     {
         XPath xpath = xpathfactory.newXPath();

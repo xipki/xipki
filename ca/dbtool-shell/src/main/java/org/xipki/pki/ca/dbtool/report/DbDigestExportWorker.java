@@ -140,7 +140,8 @@ public class DbDigestExportWorker extends DbPortWorker
         }
     }
 
-    static DbSchemaType detectDbSchemaType(DataSourceWrapper dataSource)
+    static DbSchemaType detectDbSchemaType(
+            final DataSourceWrapper dataSource)
     throws DataAccessException
     {
         Connection conn = dataSource.getConnection();
