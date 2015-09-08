@@ -215,10 +215,8 @@ class CertStoreQueryExecutor
     throws DataAccessException, OperationException
     {
         final String SQL_ADD_CERT =
-                "INSERT INTO CERT" +
-                " (ID, ART, LUPDATE, SN, SUBJECT, FP_CN, FP_S, FP_RS, "
-                + "NBEFORE, NAFTER, REV, PID," +
-                " CA_ID, RID, UNAME, FP_K, EE, RTYPE, TID)" +
+                "INSERT INTO CERT (ID, ART, LUPDATE, SN, SUBJECT, FP_CN, FP_S, FP_RS, "
+                + "NBEFORE, NAFTER, REV, PID, CA_ID, RID, UNAME, FP_K, EE, RTYPE, TID)" +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         final String SQL_ADD_CRAW =
@@ -460,7 +458,7 @@ class CertStoreQueryExecutor
             final X509CertWithDBCertId caCert)
     throws OperationException, DataAccessException
     {
-        String sql = "SELECT MAX(ID) FROM DELTACRL_CACHE WHERE CA_ID=?";
+        final String sql = "SELECT MAX(ID) FROM DELTACRL_CACHE WHERE CA_ID=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try
@@ -680,8 +678,7 @@ class CertStoreQueryExecutor
         }
 
         final String sql =
-                "INSERT INTO CRL (ID, CA_ID, CRL_NO, THISUPDATE, NEXTUPDATE, DELTACRL, BASECRL_NO, CRL)" +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL) VALUES (?,?,?,?,?,?,?,?)";
         int currentMaxCrlId = (int) dataSource.getMax(null, "CRL", "ID");
         int crlId = currentMaxCrlId + 1;
 
@@ -780,9 +777,7 @@ class CertStoreQueryExecutor
             }
         }
 
-        final String SQL_REVOKE_CERT = "UPDATE CERT" +
-                " SET LUPDATE=?, REV=?, RT=?, RIT=?, RR=?" +
-                " WHERE ID=?";
+        final String SQL_REVOKE_CERT = "UPDATE CERT SET LUPDATE=?, REV=?, RT=?, RIT=?, RR=? WHERE ID=?";
         PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_CERT);
 
         int certId = certWithRevInfo.getCert().getCertId().intValue();
@@ -867,10 +862,7 @@ class CertStoreQueryExecutor
             }
         }
 
-        final String sql =
-                "UPDATE CERT" +
-                " SET LUPDATE=?, REV=?, RT=?, RIT=?, RR=?" +
-                " WHERE ID=?";
+        final String sql = "UPDATE CERT SET LUPDATE=?, REV=?, RT=?, RIT=?, RR=? WHERE ID=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         int certId = certWithRevInfo.getCert().getCertId().intValue();
@@ -1468,12 +1460,9 @@ class CertStoreQueryExecutor
     {
         ParamUtil.assertNotNull("caCert", caCert);
 
-        StringBuilder m = new StringBuilder();
-        m.append("T1.PID PID, T1.REV REV, T1.RR RR, ");
-        m.append("T1.RT RT, T1.RIT RIT, T2.CERT CERT");
-        m.append(" FROM CERT T1, CRAW T2 WHERE T1.ID=? AND T2.CID=T1.ID");
+        final String coreSql = "PID, REV, RR, RT, RIT, CERT FROM CERT INNER JOIN CRAW ON CERT.ID=? AND CRAW.CID=CERT.ID";
+        final String sql = dataSource.createFetchFirstSelectSQL(coreSql, 1);
 
-        String sql = dataSource.createFetchFirstSelectSQL(m.toString(), 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1584,12 +1573,10 @@ class CertStoreQueryExecutor
 
         int caId = getCaId(caCert);
 
-        String sql = "T1.ID ID, T1.REV REV, T1.RR RR, T1.RT RT," +
-                " T1.RIT RIT, T1.PID PID," +
-                " T2.CERT CERT FROM CERT T1, CRAW T2" +
-                " WHERE T1.CA_ID=? AND T1.SN=? AND T2.CID=T1.ID";
+        final String coreSql =
+            "ID, REV, RR, RT, RIT, PID, CERT FROM CERT INNER JOIN CRAW ON CERT.CA_ID=? AND CERT.SN=? AND CRAW.CID=CERT.ID";
 
-        sql = dataSource.createFetchFirstSelectSQL(sql, 1);
+        final String sql = dataSource.createFetchFirstSelectSQL(coreSql, 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1659,13 +1646,10 @@ class CertStoreQueryExecutor
 
         int caId = getCaId(caCert);
 
-        StringBuilder m = new StringBuilder(200);
-        m.append("T1.PID PID, T1.REV REV, T1.RR RR,");
-        m.append("T1.RT RT, T1.RIT RIT, T2.CERT CERT");
-        m.append(" FROM CERT T1, CRAW T2");
-        m.append(" WHERE T1.CA_ID=? AND T1.SN=? AND T2.CID=T1.ID");
+        String coreSql =
+            "PID, REV, RR, RT, RIT, CERT FROM CERT INNER JOIN CRAW ON CERT.CA_ID=? AND CERT.SN=? AND CRAW.CID=CERT.ID";
 
-        final String sql = dataSource.createFetchFirstSelectSQL(m.toString(), 1);
+        final String sql = dataSource.createFetchFirstSelectSQL(coreSql, 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1736,19 +1720,14 @@ class CertStoreQueryExecutor
             final byte[] transactionId)
     throws DataAccessException, OperationException
     {
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("SELECT ID FROM CERT WHERE ");
+        String sql;
         if(transactionId != null)
         {
-            sqlBuilder.append("TID=? AND (");
-        }
-        sqlBuilder.append("FP_S=? OR FP_RS=?");
-        if(transactionId != null)
+            sql = "SELECT ID FROM CERT WHERE TID=? AND (FP_S=? OR FP_RS=?)";
+        } else
         {
-            sqlBuilder.append(")");
+            sql = "SELECT ID FROM CERT WHERE FP_S=? OR FP_RS=?";
         }
-
-        String sql = sqlBuilder.toString();
 
         long fp_subject = X509Util.fp_canonicalized_name(subjectName);
         ResultSet rs = null;
@@ -2349,8 +2328,12 @@ class CertStoreQueryExecutor
         long maxId = dataSource.getMax(null, tblName, "ID");
         int id = (int) maxId + 1;
 
-        final String sql = new StringBuilder("INSERT INTO ").append(tblName)
-                .append(" (ID, SUBJECT, SHA1_CERT, CERT)").append(" VALUES (?, ?, ?, ?)").toString();
+        final StringBuilder sqlBuilder = new StringBuilder("INSERT INTO ");
+        sqlBuilder.append(tblName);
+        sqlBuilder.append(" (ID, SUBJECT, SHA1_CERT, CERT)");
+        sqlBuilder.append(" VALUES (?, ?, ?, ?)");
+
+        final String sql = sqlBuilder.toString();
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try
