@@ -42,8 +42,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -299,8 +297,9 @@ class OcspCertStoreDbExporter extends DbPorter
 
         System.out.println(getExportingText() + "tables CERT, CHASH and CRAW from ID " + minCertId);
 
-        final String certSql = "SELECT ID,SN,IID,LUPDATE,REV,RR,RT,RIT,PN FROM CERT WHERE ID>=? AND ID<? ORDER BY ID ASC";
-        final String rawCertSql = "SELECT CID,CERT FROM CRAW WHERE CID>=? AND CID<?";
+        final String certSql = "SELECT ID,SN,IID,LUPDATE,REV,RR,RT,RIT,PN,CERT "
+                + "FROM CERT INNER JOIN CRAW ON "
+                + "CERT.ID>=? AND CERT.ID<? AND CERT.ID=CRAW.ID ORDER BY CERT.ID ASC";
 
         final int maxCertId = (int) getMax("CERT", "ID");
 
@@ -311,7 +310,6 @@ class OcspCertStoreDbExporter extends DbPorter
         }
 
         PreparedStatement certPs = prepareStatement(certSql);
-        PreparedStatement rawCertPs = prepareStatement(rawCertSql);
 
         int sum = 0;
         int numCertInCurrentFile = 0;
@@ -342,22 +340,6 @@ class OcspCertStoreDbExporter extends DbPorter
                     break;
                 }
 
-                Map<Integer, byte[]> rawCertMaps = new HashMap<>();
-
-                // retrieve raw certificates
-                sql = rawCertSql;
-                rawCertPs.setInt(1, i);
-                rawCertPs.setInt(2, i + n);
-                ResultSet rawCertRs = rawCertPs.executeQuery();
-                while(rawCertRs.next())
-                {
-                    int certId = rawCertRs.getInt("CID");
-                    String b64Cert = rawCertRs.getString("CERT");
-                    byte[] certBytes = Base64.decode(b64Cert);
-                    rawCertMaps.put(certId, certBytes);
-                }
-                rawCertRs.close();
-
                 sql = certSql;
                 certPs.setInt(1, i);
                 certPs.setInt(2, i + n);
@@ -386,13 +368,8 @@ class OcspCertStoreDbExporter extends DbPorter
                         maxCertIdOfCurrentFile = id;
                     }
 
-                    byte[] certBytes = rawCertMaps.remove(id);
-                    if(certBytes == null)
-                    {
-                        final String msg = "found no certificate in table CRAW for CID '" + id + "'";
-                        LOG.error(msg);
-                        throw new DataAccessException(msg);
-                    }
+                    String b64Cert = rs.getString("CERT");
+                    byte[] certBytes = Base64.decode(b64Cert);
 
                     String sha1_cert = HashCalculator.hexSha1(certBytes);
 
@@ -472,8 +449,6 @@ class OcspCertStoreDbExporter extends DbPorter
                 }
 
                 rs.close();
-                rawCertMaps.clear();
-                rawCertMaps = null;
             } // end for
 
             if(interrupted)
@@ -507,7 +482,6 @@ class OcspCertStoreDbExporter extends DbPorter
         }finally
         {
             releaseResources(certPs, null);
-            releaseResources(rawCertPs, null);
         }
 
         ProcessLog.printTrailer();
