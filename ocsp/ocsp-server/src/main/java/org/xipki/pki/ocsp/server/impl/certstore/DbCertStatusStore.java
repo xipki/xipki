@@ -75,13 +75,19 @@ import org.xipki.security.api.HashAlgoType;
 public class DbCertStatusStore extends CertStatusStore
 {
     private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
-    private static final Map<HashAlgoType, String> selectChashSqlMaps = new HashMap<>();
+    private static final String sqlCs = "REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?";
+    private static final Map<HashAlgoType, String> sqlCsHashMap = new HashMap<>();
 
     static
     {
         for(HashAlgoType h : HashAlgoType.values())
         {
-            selectChashSqlMaps.put(h, h.getShortName() + " FROM CHASH WHERE CID=?");
+            StringBuilder sb = new StringBuilder();
+            sb.append("ID,REV,RR,RT,RIT,PN,");
+            sb.append(h.getShortName()).append(" ");
+            sb.append(" FROM CERT INNER JOIN CHASH ON ");
+            sb.append(" CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID");
+            sqlCsHashMap.put(h, sb.toString());
         }
     }
 
@@ -337,10 +343,15 @@ public class DbCertStatusStore extends CertStatusStore
             throw new CertStatusStoreException("initialization of CertStore failed");
         }
 
+        String coreSql;
         HashAlgoType certHashAlgo = null;
         if(includeCertHash)
         {
             certHashAlgo = certHashAlg == null ? hashAlgo : certHashAlg;
+            coreSql = sqlCsHashMap.get(certHashAlgo);
+        } else
+        {
+            coreSql = sqlCs;
         }
 
         try
@@ -359,13 +370,11 @@ public class DbCertStatusStore extends CertStatusStore
                 return CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
             }
 
-            final String sql = "ID,NBEFORE,REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?";
-
             ResultSet rs = null;
             CertStatusInfo certStatusInfo = null;
 
             PreparedStatement ps = borrowPreparedStatement(
-                    dataSource.createFetchFirstSelectSQL(sql, 1));
+                    dataSource.createFetchFirstSelectSQL(coreSql, 1));
 
             try
             {
@@ -389,8 +398,7 @@ public class DbCertStatusStore extends CertStatusStore
                         byte[] certHash = null;
                         if(includeCertHash)
                         {
-                            int certId = rs.getInt("ID");
-                            certHash = getCertHash(certId, certHashAlgo);
+                            certHash = Base64.decode(rs.getString(certHashAlgo.getShortName()));
                         }
 
                         boolean revoked = rs.getBoolean("REV");
@@ -430,7 +438,7 @@ public class DbCertStatusStore extends CertStatusStore
                 } // end if(rs.next())
             } catch(SQLException e)
             {
-                throw dataSource.translate(sql, e);
+                throw dataSource.translate(coreSql, e);
             } finally
             {
                 releaseDbResources(ps, rs);
@@ -461,38 +469,6 @@ public class DbCertStatusStore extends CertStatusStore
         }catch(DataAccessException e)
         {
             throw new CertStatusStoreException(e.getMessage(), e);
-        }
-    }
-
-    private byte[] getCertHash(
-            final int certId,
-            final HashAlgoType hashAlgo)
-    throws DataAccessException
-    {
-        final String sql = selectChashSqlMaps.get(hashAlgo);
-        ResultSet rs = null;
-        PreparedStatement ps = borrowPreparedStatement(
-                dataSource.createFetchFirstSelectSQL(sql, 1));
-        try
-        {
-            ps.setInt(1, certId);
-            rs = ps.executeQuery();
-
-            if(rs.next())
-            {
-                String b64Hash = rs.getString(1);
-                return Base64.decode(b64Hash);
-            }
-            else
-            {
-                return null;
-            }
-        } catch(SQLException e)
-        {
-            throw dataSource.translate(sql, e);
-        } finally
-        {
-            releaseDbResources(ps, rs);
         }
     }
 
@@ -588,8 +564,7 @@ public class DbCertStatusStore extends CertStatusStore
             final byte[] issuerNameHash,
             final byte[] issuerKeyHash)
     {
-        IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
-        return issuer != null;
+        return null != issuerStore.getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
     }
 
     @Override

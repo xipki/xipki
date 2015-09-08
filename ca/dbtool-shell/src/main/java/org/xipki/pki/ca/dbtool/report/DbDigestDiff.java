@@ -293,8 +293,6 @@ public class DbDigestDiff
 
                 Map<Long, DbDigestEntry> certsMap = (Map<Long, DbDigestEntry>) objs[1];
                 internal_diff(reporter, selectStmt, serialNumbers, certsMap, processLog);
-                //processLog.addNumProcessed(n);
-                // TODO processLog.printStatus();
             }
             processLog.printStatus(true);
             ProcessLog.printTrailer();
@@ -352,9 +350,9 @@ public class DbDigestDiff
                             revInvTime = null;
                         }
                     }
-                    String base64Sha1 = rs.getString(col_certhash);
+                    String sha1Fp = rs.getString(col_certhash);
                     DbDigestEntry certB = new DbDigestEntry(serialNumber,
-                            revoked, revReason, revTime, revInvTime, base64Sha1);
+                            revoked, revReason, revTime, revInvTime, sha1Fp);
                     serialNumbers.remove(serialNumber);
                     DbDigestEntry certA = certsMap.get(serialNumber);
 

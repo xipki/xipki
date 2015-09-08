@@ -445,8 +445,8 @@ class OcspCertStoreDbExporter extends DbPorter
                         maxCertIdOfCurrentFile = -1;
                         currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
                         currentCertsZip = getZipOutputStream(currentCertsZipFile);
-                    }
-                }
+                    } // end if
+                } // end while(rs.next))
 
                 rs.close();
             } // end for
