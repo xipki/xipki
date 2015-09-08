@@ -46,9 +46,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -833,12 +831,11 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
         StringBuilder certSql = new StringBuilder("SELECT ID, SN, CA_ID, PID, RID, ");
         certSql.append("ART, RTYPE, TID, UNAME, LUPDATE, REV, RR, RT, RIT, FP_RS ");
-        certSql.append("FROM CERT WHERE ID >= ? AND ID < ? ORDER BY ID ASC");
+        certSql.append("REQ_SUBJECT, CERT ");
+        certSql.append("FROM CERT INNER JOIN CRAW ");
+        certSql.append("ON CERT.ID>=? AND CERT.ID<? AND CERT.ID=CRAW.CID ORDER BY CERT.ID ASC");
 
         PreparedStatement ps = prepareStatement(certSql.toString());
-
-        final String rawCertSql = "SELECT CID, REQ_SUBJECT, CERT FROM CRAW WHERE CID >= ? AND CID < ?";
-        PreparedStatement rawCertPs = prepareStatement(rawCertSql);
 
         int numCertsInCurrentFile = 0;
         CaCertsWriter certsInCurrentFile = new CaCertsWriter();
@@ -863,28 +860,6 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                     interrupted = true;
                     break;
                 }
-
-                Map<Integer, byte[]> rawCertMaps = new HashMap<>();
-                Map<Integer, String> reqSubjectMaps = new HashMap<>();
-
-                // retrieve raw certificates
-                rawCertPs.setInt(1, i);
-                rawCertPs.setInt(2, i + numEntriesPerSelect);
-                ResultSet rawCertRs = rawCertPs.executeQuery();
-                while(rawCertRs.next())
-                {
-                    int certId = rawCertRs.getInt("CID");
-                    String b64Cert = rawCertRs.getString("CERT");
-                    byte[] certBytes = Base64.decode(b64Cert);
-                    rawCertMaps.put(certId, certBytes);
-
-                    String reqSubject = rawCertRs.getString("REQ_SUBJECT");
-                    if(StringUtil.isNotBlank(reqSubject))
-                    {
-                        reqSubjectMaps.put(certId, reqSubject);
-                    }
-                }
-                rawCertRs.close();
 
                 ps.setInt(1, i);
                 ps.setInt(2, i + numEntriesPerSelect);
@@ -913,13 +888,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                         maxIdOfCurrentFile = id;
                     }
 
-                    byte[] certBytes = rawCertMaps.remove(id);
-                    if(certBytes == null)
-                    {
-                        final String msg = "found no certificate in table CRAW for cert_id '" + id + "'";
-                        LOG.error(msg);
-                        throw new DataAccessException(msg);
-                    }
+                    String b64Cert = rs.getString("CERT");
+                    byte[] certBytes = Base64.decode(b64Cert);
 
                     String sha1_cert = HashCalculator.hexSha1(certBytes);
 
@@ -1000,7 +970,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                     if(fpReqSubject != 0)
                     {
                         cert.setFpRs(fpReqSubject);
-                        String reqSubject = reqSubjectMaps.remove(id);
+                        String reqSubject = rs.getString("REQ_SUBJECT");
                         cert.setRs(reqSubject);
                     }
 
@@ -1033,8 +1003,6 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                 }  // end while(rs.next)
 
                 rs.close();
-                rawCertMaps.clear();
-                rawCertMaps = null;
             } // end for
 
             if(interrupted)
