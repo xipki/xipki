@@ -38,6 +38,8 @@ package org.xipki.pki.ca.dbtool.report;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.util.ParamUtil;
 
 /**
@@ -59,9 +61,20 @@ public class DbDigestEntry
             final Integer revReason,
             final Long revTime,
             final Long revInvTime,
-            final String base64Sha1)
+            final String sha1Fp)
     {
-        ParamUtil.assertNotBlank("base64Sha1", base64Sha1);
+        ParamUtil.assertNotBlank("sha1Fp", sha1Fp);
+
+        if(sha1Fp.length() == 28)
+        {
+            this.base64Sha1 = sha1Fp;
+        } else if(sha1Fp.length() == 40)
+        {
+            this.base64Sha1 = Base64.toBase64String(Hex.decode(sha1Fp));
+        } else
+        {
+            throw new IllegalArgumentException("invalid sha1Fp '" + sha1Fp + "'");
+        }
         if(revoked)
         {
             ParamUtil.assertNotNull("revReason", revReason);
@@ -73,10 +86,9 @@ public class DbDigestEntry
         this.revReason = revReason;
         this.revTime = revTime;
         this.revInvTime = revInvTime;
-        this.base64Sha1 = base64Sha1;
     }
 
-    public DbDigestEntry(
+    public static DbDigestEntry decode(
             final String encoded)
     {
         List<Integer> indexes = getIndexes(encoded);
@@ -86,40 +98,37 @@ public class DbDigestEntry
         }
 
         String s = encoded.substring(0, indexes.get(0));
-        this.serialNumber = Long.parseLong(s);
+        Long serialNumber = Long.parseLong(s);
 
         int i = 0;
-        this.base64Sha1 = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
+        String sha1Fp = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
 
         i++;
         s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
-        this.revoked = "0".equals(s) == false;
+        boolean revoked = "0".equals(s) == false;
 
-        if(this.revoked)
+        Integer revReason = null;
+        Long revTime = null;
+        Long revInvTime = null;
+        if(revoked)
         {
             i++;
             s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
-            this.revReason = Integer.parseInt(s);
+            revReason = Integer.parseInt(s);
 
             i++;
             s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
-            this.revTime = Long.parseLong(s);
+            revTime = Long.parseLong(s);
 
             i++;
             s = encoded.substring(indexes.get(i) + 1);
             if(s.length() != 0)
             {
-                this.revInvTime = Long.parseLong(s);
-            } else
-            {
-                this.revInvTime = null;
+                revInvTime = Long.parseLong(s);
             }
-        } else
-        {
-            this.revReason = null;
-            this.revTime = null;
-            this.revInvTime = null;
         }
+
+        return new DbDigestEntry(serialNumber, revoked, revReason, revTime, revInvTime, sha1Fp);
     }
 
     public long getSerialNumber()

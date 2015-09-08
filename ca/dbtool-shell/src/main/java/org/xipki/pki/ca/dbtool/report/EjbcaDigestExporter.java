@@ -118,7 +118,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         if(dataSource.tableHasColumn(connection, "CertificateData", "id"))
         {
             tblCertHasId = true;
-            sql = "SELECT id, fingerprint, serialNumber, cAFingerprint, status, revocationReason, revocationDate, username " +
+            sql = "SELECT id, fingerprint, serialNumber, cAFingerprint, status, revocationReason, revocationDate" +
                     " FROM CertificateData WHERE id >= ? AND id < ? ORDER BY id ASC";
             certSql = "SELECT base64Cert FROM CertificateData WHERE id=?";
         } else
@@ -143,7 +143,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
 
             tblCertHasId = false;
             String coreSql =
-                    "fingerprint, serialNumber, cAFingerprint, status, revocationReason, revocationDate, username" +
+                    "fingerprint, serialNumber, cAFingerprint, status, revocationReason, revocationDate" +
                     " FROM CertificateData WHERE fingerprint > ?";
             sql = dataSource.createFetchFirstSelectSQL(coreSql, numCertsPerSelect, "fingerprint ASC");
             certSql = "SELECT base64Cert FROM CertificateData WHERE fingerprint=?";
@@ -299,7 +299,6 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         try
         {
             boolean interrupted = false;
-            int k = 0;
             int i = minCertId;
             String hexCertFp = lastProcessedHexCertFp;
 
@@ -334,14 +333,12 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                     }
 
                     countEntriesInResultSet++;
-                    String s = rs.getString("username");
-                    String username = s == null ? "" : s.toLowerCase();
                     String hexCaFp = rs.getString("cAFingerprint");
                     hexCertFp = rs.getString("fingerprint");
 
                     CaInfo caInfo = null;
 
-                    if(username.startsWith("systemca") == false)
+                    if(hexCaFp.equals(hexCertFp) == false)
                     {
                         caInfo = caInfos.get(hexCaFp);
                     }
@@ -390,7 +387,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
 
                     String hash = Base64.toBase64String(Hex.decode(hexCertFp));
 
-                    s = rs.getString("serialNumber");
+                    String s = rs.getString("serialNumber");
                     long serial = Long.parseLong(s);
 
                     int status = rs.getInt("status");
@@ -410,16 +407,10 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
 
                     DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime, revInvTime, hash);
 
-                    caEntryContainer.addDigestEntry(caInfo.caId, cert);
+                    caEntryContainer.addDigestEntry(caInfo.caId, id, cert);
 
                     processLog.addNumProcessed(1);
-
-                    k++;
-                    if(k == 100)
-                    {
-                        processLog.printStatus();
-                        k = 0;
-                    }
+                    processLog.printStatus();
                 } // end while(rs.next())
                 rs.close();
 

@@ -64,6 +64,7 @@ public class CaEntryContainer
 
     public void addDigestEntry(
             final int caId,
+            final int id,
             final DbDigestEntry reportEntry)
     throws IOException, InvalidDataObjectException
     {
@@ -72,7 +73,7 @@ public class CaEntryContainer
         {
             throw new IllegalArgumentException("unknown caId '" + caId + "'");
         }
-        m.addDigestEntry(reportEntry);
+        m.addDigestEntry(id, reportEntry);
     }
 
     public void close()
