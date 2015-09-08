@@ -81,7 +81,6 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
 
     private final String caSql;
     private final String certSql;
-    private final String hashSql;
 
     public XipkiDigestExporter(
             final DataSourceWrapper datasource,
@@ -154,25 +153,19 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
 
         // CERT SQL
         sb.delete(0, sb.length());
-        sb.append("SELECT ID, ");
+        sb.append("SELECT ID,");
         sb.append(col_caId).append(",");
         sb.append(col_serialNumber).append(",");
         sb.append(col_revoked).append(",");
         sb.append(col_revReason).append(",");
         sb.append(col_revTime).append(",");
-        sb.append(col_revInvTime);
-        sb.append(" FROM CERT WHERE ID>=? AND ID<? ORDER BY ID ASC");
-        this.certSql = sb.toString();
-
-        // HASH SQL
-        sb.delete(0, sb.length());
-        sb.append("SELECT ");
-        sb.append(col_certId).append(",");
+        sb.append(col_revInvTime).append(",");
         sb.append(col_certhash);
-        sb.append(" FROM ").append(tbl_certhash);
-        sb.append(" WHERE ");
-        sb.append(col_certId).append(">=? AND ").append(col_certId).append("<?");
-        this.hashSql = sb.toString();
+        sb.append(" FROM CERT INNER JOIN ").append(tbl_certhash);
+        sb.append(" ON CERT.ID>=? AND CER.ID<? AND CERT.ID=");
+        sb.append(tbl_certhash).append(".").append(col_certId);
+        sb.append(" ORDER BY CERT.ID ASC");
+        this.certSql = sb.toString();
     }
 
     @Override
@@ -283,17 +276,14 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
         final int maxCertId = (int) getMax("CERT", "ID");
 
         PreparedStatement certPs = prepareStatement(certSql);
-        PreparedStatement hashPs = prepareStatement(hashSql);
 
         ProcessLog.printHeader();
 
         String sql = null;
-        Integer id = null;
 
         try
         {
             boolean interrupted = false;
-            int k = 0;
 
             for(int i = minCertId; i <= maxCertId; i += numCertsPerSelect)
             {
@@ -303,21 +293,6 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
                     break;
                 }
 
-                Map<Integer, String> idHashMap = new HashMap<>();
-
-                // retrieve hash values
-                sql = hashSql;
-                hashPs.setInt(1, i);
-                hashPs.setInt(2, i + numCertsPerSelect);
-                ResultSet rawCertRs = hashPs.executeQuery();
-                while(rawCertRs.next())
-                {
-                    int certId = rawCertRs.getInt(col_certId);
-                    String b64Sha1 = rawCertRs.getString(col_certhash);
-                    idHashMap.put(certId, b64Sha1);
-                }
-                rawCertRs.close();
-
                 sql = certSql;
                 certPs.setInt(1, i);
                 certPs.setInt(2, i + numCertsPerSelect);
@@ -326,21 +301,10 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
 
                 while(rs.next())
                 {
-                    id = rs.getInt("ID");
-
                     int caId = rs.getInt(col_caId);
-
-                    String hash = idHashMap.remove(id);
-                    if(hash == null)
-                    {
-                        final String msg = "found no entry in table " + tbl_certhash + " for " +
-                                col_certId + "'" + id + "'";
-                        LOG.error(msg);
-                        throw new DataAccessException(msg);
-                    }
-
+                    int id = rs.getInt("ID");
+                    String hash = rs.getString(col_certhash);
                     long serial = rs.getLong(col_serialNumber);
-
                     boolean revoked = rs.getBoolean(col_revoked);
 
                     Integer revReason = null;
@@ -359,21 +323,12 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
                     }
 
                     DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime, revInvTime, hash);
-                    caEntryContainer.addDigestEntry(caId, cert);
+                    caEntryContainer.addDigestEntry(caId, id, cert);
 
                     processLog.addNumProcessed(1);
-
-                    k++;
-                    if(k == 1000)
-                    {
-                        processLog.printStatus();
-                        k = 0;
-                    }
+                    processLog.printStatus();
                 }
                 rs.close();
-
-                idHashMap.clear();
-                idHashMap = null;
             } // end for
 
             if(interrupted)
@@ -386,7 +341,6 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
         }finally
         {
             releaseResources(certPs, null);
-            releaseResources(hashPs, null);
         }
 
         processLog.printStatus(true);

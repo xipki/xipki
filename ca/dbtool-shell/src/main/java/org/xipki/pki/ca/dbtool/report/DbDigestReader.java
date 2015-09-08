@@ -123,7 +123,7 @@ public class DbDigestReader
             line = certsReader.readLine();
         }
 
-        return line == null ? null : new DbDigestEntry(line);
+        return line == null ? null : DbDigestEntry.decode(line);
     }
 
     public void close()
