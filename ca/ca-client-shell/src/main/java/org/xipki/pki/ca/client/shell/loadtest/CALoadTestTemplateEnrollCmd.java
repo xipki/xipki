@@ -37,7 +37,7 @@ package org.xipki.pki.ca.client.shell.loadtest;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.qa.AbstractLoadTest;
+import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
@@ -81,7 +81,7 @@ public class CALoadTestTemplateEnrollCmd extends CALoadTestCmd
         int n = loadTest.getNumberOfCertsInOneRequest();
 
         startMsg.append("threads:         ").append(numThreads).append("\n");
-        startMsg.append("duration:        ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
+        startMsg.append("duration:        ").append(StringUtil.formatTime(durationInSecond, false)).append("\n");
         startMsg.append("template:        ").append(templateFile).append("\n");
         startMsg.append("#certs/Request:  ").append(n).append("\n");
         startMsg.append("unit:            ").append(n).append(" certificate");

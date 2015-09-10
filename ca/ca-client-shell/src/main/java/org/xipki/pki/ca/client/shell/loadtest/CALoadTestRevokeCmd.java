@@ -41,8 +41,8 @@ import java.util.Properties;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.common.qa.AbstractLoadTest;
 import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -104,7 +104,7 @@ public class CALoadTestRevokeCmd extends CALoadTestCmd
         StringBuilder startMsg = new StringBuilder();
 
         startMsg.append("threads:         ").append(numThreads).append("\n");
-        startMsg.append("max. duration:   ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
+        startMsg.append("max. duration:   ").append(StringUtil.formatTime(durationInSecond, false)).append("\n");
         startMsg.append("issuer:          ").append(issuerCertFile).append("\n");
         startMsg.append("cadb:            ").append(caDbConfFile).append("\n");
         startMsg.append("maxCerts:        ").append(maxCerts).append("\n");
