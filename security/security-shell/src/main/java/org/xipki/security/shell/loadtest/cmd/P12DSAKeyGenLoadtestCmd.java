@@ -59,6 +59,18 @@ public class P12DSAKeyGenLoadtestCmd extends SecurityLoadtestCmd
     protected AbstractLoadTest getTester()
     throws Exception
     {
+        if(qLen == null)
+        {
+            if(pLen >= 2048)
+            {
+                qLen = 256;
+            }
+            else
+            {
+                qLen = 160;
+            }
+        }
+
         return new P12DSAKeyGenLoadTest(pLen, qLen);
     }
 
