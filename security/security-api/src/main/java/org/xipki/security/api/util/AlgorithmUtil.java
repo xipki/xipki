@@ -279,18 +279,7 @@ public class AlgorithmUtil
     public static boolean isDSAPlainSigAlg(
             final AlgorithmIdentifier algId)
     {
-        ParamUtil.assertNotNull("algId", algId);
-        ASN1ObjectIdentifier algOid = algId.getAlgorithm();
-        if(BSIObjectIdentifiers.ecdsa_plain_SHA1.equals(algOid) ||
-                BSIObjectIdentifiers.ecdsa_plain_SHA224.equals(algOid) ||
-                BSIObjectIdentifiers.ecdsa_plain_SHA256.equals(algOid) ||
-                BSIObjectIdentifiers.ecdsa_plain_SHA384.equals(algOid) ||
-                BSIObjectIdentifiers.ecdsa_plain_SHA512.equals(algOid))
-        {
-            return true;
-        }
-
-        return false;
+        return isPlainECDSASigAlg(algId);
     }
 
     static public String canonicalizeSignatureAlgo(
@@ -460,6 +449,85 @@ public class AlgorithmUtil
         }
 
         return signatureAlgId;
+    }
+
+    static public boolean isRSASignatureAlgoId(
+            final AlgorithmIdentifier algId)
+    {
+        ParamUtil.assertNotNull("algId", algId);
+
+        ASN1ObjectIdentifier oid = algId.getAlgorithm();
+        if(PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(oid) ||
+                PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(oid) ||
+                PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(oid) ||
+                PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(oid) ||
+                PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(oid) ||
+                PKCSObjectIdentifiers.id_RSASSA_PSS.equals(oid))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    static public boolean isECSigAlg(
+            final AlgorithmIdentifier algId)
+    {
+        return isECDSASigAlg(algId) || isPlainECDSASigAlg(algId);
+    }
+
+    static public boolean isECDSASigAlg(
+            final AlgorithmIdentifier algId)
+    {
+        ParamUtil.assertNotNull("algId", algId);
+
+        ASN1ObjectIdentifier oid = algId.getAlgorithm();
+        if(X9ObjectIdentifiers.ecdsa_with_SHA1.equals(oid) ||
+                X9ObjectIdentifiers.ecdsa_with_SHA224.equals(oid) ||
+                X9ObjectIdentifiers.ecdsa_with_SHA256.equals(oid) ||
+                X9ObjectIdentifiers.ecdsa_with_SHA384.equals(oid) ||
+                X9ObjectIdentifiers.ecdsa_with_SHA512.equals(oid))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    static public boolean isPlainECDSASigAlg(
+            final AlgorithmIdentifier algId)
+    {
+        ParamUtil.assertNotNull("algId", algId);
+
+        ASN1ObjectIdentifier oid = algId.getAlgorithm();
+        if(BSIObjectIdentifiers.ecdsa_plain_SHA1.equals(oid) ||
+                BSIObjectIdentifiers.ecdsa_plain_SHA224.equals(oid) ||
+                BSIObjectIdentifiers.ecdsa_plain_SHA256.equals(oid) ||
+                BSIObjectIdentifiers.ecdsa_plain_SHA384.equals(oid) ||
+                BSIObjectIdentifiers.ecdsa_plain_SHA512.equals(oid))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    static public boolean isDSASigAlg(
+            final AlgorithmIdentifier algId)
+    {
+        ParamUtil.assertNotNull("algId", algId);
+
+        ASN1ObjectIdentifier oid = algId.getAlgorithm();
+        if(X9ObjectIdentifiers.id_dsa_with_sha1.equals(oid) ||
+                NISTObjectIdentifiers.dsa_with_sha224.equals(oid) ||
+                NISTObjectIdentifiers.dsa_with_sha224.equals(oid) ||
+                NISTObjectIdentifiers.dsa_with_sha224.equals(oid) ||
+                NISTObjectIdentifiers.dsa_with_sha224.equals(oid))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     static public AlgorithmIdentifier getSignatureAlgoId(
