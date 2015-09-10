@@ -59,7 +59,6 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.KeyUtil;
-import org.xipki.security.P12KeypairGenerator;
 import org.xipki.security.SignerUtil;
 
 /**
@@ -309,12 +308,12 @@ public abstract class KeyEntry
             if(isOid)
             {
                 curveOid = new ASN1ObjectIdentifier(curveNameOrOid);
-                curveName = P12KeypairGenerator.ECDSAIdentityGenerator.getCurveName(curveOid);
+                curveName = KeyUtil.getCurveName(curveOid);
             }
             else
             {
                 curveName = curveNameOrOid;
-                curveOid = P12KeypairGenerator.ECDSAIdentityGenerator.getCurveOID(curveName);
+                curveOid = KeyUtil.getCurveOID(curveName);
                 if(curveOid == null)
                 {
                     throw new IllegalArgumentException("no OID is defined for the curve " + curveName);

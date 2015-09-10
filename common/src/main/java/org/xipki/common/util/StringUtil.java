@@ -164,4 +164,127 @@ public class StringUtil
             return false;
         }
     }
+
+    public static String formatSpeed(
+            final long speed,
+            final boolean withPrefix)
+    {
+        return formatSpeed(speed, withPrefix ? 10 : 0);
+    }
+
+    private static String formatSpeed(
+            final long speed,
+            final int minLen)
+    {
+        StringBuilder sb = new StringBuilder(10);
+        String speedS = speed == 0 ? "--" : Long.toString(speed);
+        for (int i = 0; i < minLen - speedS.length(); i++)
+        {
+            sb.append(" ");
+        }
+        sb.append(speed);
+        return sb.toString();
+    }
+
+    public static String formatAccount(
+            final long account,
+            final boolean withPrefix)
+    {
+        return formatAccount(account, withPrefix ? 13 : 0);
+    }
+
+    public static String formatAccount(
+            final long account,
+            final int minLen)
+    {
+        String accountS = Long.toString(account);
+
+        final int n = accountS.length();
+        if(n > 3)
+        {
+            StringBuilder sb = new StringBuilder(n + 3);
+            int firstBlockLen = n % 3;
+            if(firstBlockLen != 0)
+            {
+                sb.append(accountS.substring(0, firstBlockLen));
+                sb.append(",");
+            }
+
+            for(int i = 0; ;i++)
+            {
+                int offset = firstBlockLen + i * 3;
+                if(offset >= n)
+                {
+                    break;
+                }
+
+                sb.append(accountS.substring(offset, offset + 3));
+                if(offset + 3 < n)
+                {
+                    sb.append(",");
+                }
+            }
+            accountS = sb.toString();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        // 13 characters for processed account
+        for (int i = 0; i < minLen - accountS.length(); i++)
+        {
+            sb.append(" ");
+        }
+        sb.append(accountS);
+        return sb.toString();
+    }
+
+    public static String formatTime(
+            final long seconds,
+            final boolean withPrefix)
+    {
+        return formatTime(seconds, withPrefix ? 9 : 0);
+    }
+
+    private static String formatTime(
+            final long seconds,
+            final int minLen)
+    {
+        long h = seconds / 3600;
+        long m = (seconds - h * 3600) / 60;
+        long s = seconds - h * 3600 - m * 60;
+
+        StringBuilder sb = new StringBuilder();
+        // hours
+        if(h > 0)
+        {
+            sb.append(h + ":");
+        }
+
+        // minutes
+        if(m < 10)
+        {
+            sb.append("0" + m + ":");
+        }
+        else
+        {
+            sb.append(m + ":");
+        }
+
+        // seconds
+        if(s < 10)
+        {
+            sb.append("0" + s);
+        }
+        else
+        {
+            sb.append(s);
+        }
+
+        while(sb.length() < minLen)
+        {
+            sb.insert(0, ' ');
+        }
+
+        return sb.toString();
+    }
+
 }
