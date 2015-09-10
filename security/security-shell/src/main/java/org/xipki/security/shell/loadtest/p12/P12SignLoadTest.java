@@ -36,16 +36,20 @@
 package org.xipki.security.shell.loadtest.p12;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.operator.ContentSigner;
 import org.xipki.common.qa.AbstractLoadTest;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.security.KeyUtil;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
-import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.api.SecurityFactory;
 
 /**
@@ -61,15 +65,15 @@ public abstract class P12SignLoadTest extends AbstractLoadTest
     public P12SignLoadTest(
             final SecurityFactory securityFactory,
             final String signatureAlgorithm,
-            final P12KeypairGenerationResult kpGenResult)
+            final byte[] keystore)
     throws Exception
     {
         ParamUtil.assertNotNull("securityFactory", securityFactory);
         ParamUtil.assertNotBlank("signatureAlgorithm", signatureAlgorithm);
-        ParamUtil.assertNotNull("kpGenResult", kpGenResult);
+        ParamUtil.assertNotNull("keystore", keystore);
 
         keystoreFile = "tmp-loadtest-" + System.currentTimeMillis() + ".p12";
-        IoUtil.save(keystoreFile, kpGenResult.getKeystore());
+        IoUtil.save(keystoreFile, keystore);
         String signerConf = SecurityFactoryImpl.getKeystoreSignerConf(
                 keystoreFile, password, signatureAlgorithm, 20);;
         this.signer = securityFactory.createSigner("PKCS12", signerConf, (X509Certificate) null);
@@ -85,6 +89,50 @@ public abstract class P12SignLoadTest extends AbstractLoadTest
     throws Exception
     {
         return new Testor();
+    }
+
+    protected static byte[] getPrecomputedRSAKeystore(
+            final int keysize,
+            final BigInteger publicExponent)
+    throws IOException
+    {
+        return getPrecomputedKeystore("rsa-" + keysize + "-" + publicExponent.toString(16) + ".p12");
+    }
+
+    protected static byte[] getPrecomputedDSAKeystore(
+            final int pLength,
+            final int qLength)
+    throws IOException
+    {
+        return getPrecomputedKeystore("dsa-" + pLength + "-" + qLength + ".p12");
+    }
+
+    protected static byte[] getPrecomputedECKeystore(
+            final String curveNamOrOid)
+    throws IOException
+    {
+        ASN1ObjectIdentifier oid = null;
+        try
+        {
+            new ASN1ObjectIdentifier(curveNamOrOid);
+        }catch(Exception e)
+        {
+            oid = KeyUtil.getCurveOID(curveNamOrOid);
+        }
+        if(oid == null)
+        {
+            return null;
+        }
+
+        return getPrecomputedKeystore("ec-" + oid.getId() + ".p12");
+    }
+
+    private static byte[] getPrecomputedKeystore(
+            final String filename)
+    throws IOException
+    {
+        InputStream in = P12ECSignLoadTest.class.getResourceAsStream("/testkeys/" + filename);
+        return in == null ? null : IoUtil.read(in);
     }
 
     class Testor implements Runnable

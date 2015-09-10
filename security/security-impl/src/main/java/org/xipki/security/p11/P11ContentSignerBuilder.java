@@ -147,9 +147,39 @@ public class P11ContentSignerBuilder
             throw new IllegalArgumentException("non-positive parallelism is not allowed: " + parallelism);
         }
 
+        PublicKey publicKey = certificateChain[0].getPublicKey();
+
+        if(publicKey instanceof RSAPublicKey)
+        {
+            if(AlgorithmUtil.isRSASignatureAlgoId(signatureAlgId) == false)
+            {
+                throw new OperatorCreationException("the given algorithm is not a valid RSA signature algirthm '" +
+                        signatureAlgId.getAlgorithm().getId() + "'");
+            }
+        }
+        else if(publicKey instanceof ECPublicKey)
+        {
+            if(AlgorithmUtil.isECSigAlg(signatureAlgId) == false)
+            {
+                throw new OperatorCreationException("the given algorithm is not a valid EC signature algirthm '" +
+                        signatureAlgId.getAlgorithm().getId() + "'");
+            }
+        }
+        else if(publicKey instanceof DSAPublicKey)
+        {
+            if(AlgorithmUtil.isDSASigAlg(signatureAlgId) == false)
+            {
+                throw new OperatorCreationException("the given algorithm is not a valid DSA signature algirthm '" +
+                        signatureAlgId.getAlgorithm().getId() + "'");
+            }
+        }
+        else
+        {
+            throw new OperatorCreationException("unsupported key " + publicKey.getClass().getName());
+        }
+
         List<ContentSigner> signers = new ArrayList<>(parallelism);
 
-        PublicKey publicKey = certificateChain[0].getPublicKey();
         try
         {
             for(int i = 0; i < parallelism; i++)

@@ -36,7 +36,6 @@
 package org.xipki.security.shell.loadtest.p12;
 
 import org.xipki.security.P12KeypairGenerator;
-import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.api.SecurityFactory;
 
 /**
@@ -54,18 +53,22 @@ public class P12DSASignLoadTest extends P12SignLoadTest
     throws Exception
     {
         super(securityFactory, signatureAlgorithm,
-                generateKey(pLength, qLength));
-
+                generateKeystore(pLength, qLength));
     }
 
-    private static P12KeypairGenerationResult generateKey(
+    private static byte[] generateKeystore(
             final int pLength,
             final int qLength)
     throws Exception
     {
-        P12KeypairGenerator kpGen = new P12KeypairGenerator.DSAIdentityGenerator(
-                pLength, qLength, password.toCharArray(), "CN=dummy", null, null);
-        return kpGen.generateIdentity();
+        byte[] keystoreBytes = getPrecomputedDSAKeystore(pLength, qLength);
+        if(keystoreBytes == null)
+        {
+            P12KeypairGenerator kpGen = new P12KeypairGenerator.DSAIdentityGenerator(
+                    pLength, qLength, password.toCharArray(), "CN=dummy", null, null);
+            keystoreBytes = kpGen.generateIdentity().getKeystore();
+        }
+        return keystoreBytes;
     }
 
 }
