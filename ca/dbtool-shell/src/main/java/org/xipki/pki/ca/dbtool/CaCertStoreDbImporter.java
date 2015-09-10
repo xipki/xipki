@@ -64,7 +64,6 @@ import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.qa.AbstractLoadTest;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
@@ -78,16 +77,16 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Profiles;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.PublishQueue;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Publishers;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Requestors;
+import org.xipki.pki.ca.dbtool.jaxb.ca.CertstoreCaType;
+import org.xipki.pki.ca.dbtool.jaxb.ca.DeltaCRLCacheEntryType;
+import org.xipki.pki.ca.dbtool.jaxb.ca.NameIdType;
+import org.xipki.pki.ca.dbtool.jaxb.ca.ToPublishType;
 import org.xipki.pki.ca.dbtool.xmlio.CaCertType;
 import org.xipki.pki.ca.dbtool.xmlio.CaCertsReader;
 import org.xipki.pki.ca.dbtool.xmlio.CaCrlType;
 import org.xipki.pki.ca.dbtool.xmlio.CaCrlsReader;
 import org.xipki.pki.ca.dbtool.xmlio.CaUserType;
 import org.xipki.pki.ca.dbtool.xmlio.CaUsersReader;
-import org.xipki.pki.ca.dbtool.jaxb.ca.CertstoreCaType;
-import org.xipki.pki.ca.dbtool.jaxb.ca.DeltaCRLCacheEntryType;
-import org.xipki.pki.ca.dbtool.jaxb.ca.NameIdType;
-import org.xipki.pki.ca.dbtool.jaxb.ca.ToPublishType;
 import org.xipki.security.api.FpIdCalculator;
 import org.xipki.security.api.HashCalculator;
 import org.xipki.security.api.util.X509Util;
@@ -1161,7 +1160,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
         dataSource.dropPrimaryKey(null, "PK_CRAW", "CRAW");
 
         long duration = (System.currentTimeMillis() - start) / 1000;
-        System.out.println(" dropped indexes in " + AbstractLoadTest.formatTime(duration));
+        System.out.println(" dropped indexes in " + StringUtil.formatTime(duration, false));
     }
 
     private void recoverIndexes()
@@ -1188,7 +1187,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
         dataSource.createIndex(null, "IDX_FPRS", "CERT", "FP_RS");
 
         long duration = (System.currentTimeMillis() - start) / 1000;
-        System.out.println(" recovered indexes in " + AbstractLoadTest.formatTime(duration));
+        System.out.println(" recovered indexes in " + StringUtil.formatTime(duration, false));
     }
 
 }

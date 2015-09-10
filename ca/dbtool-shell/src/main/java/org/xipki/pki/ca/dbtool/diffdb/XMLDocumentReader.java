@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.report;
+package org.xipki.pki.ca.dbtool.diffdb;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -80,7 +80,8 @@ public class XMLDocumentReader
         xpathfactory = XPathFactory.newInstance();
     }
 
-    private static void disableDtdValidation(DocumentBuilder db)
+    private static void disableDtdValidation(
+            final DocumentBuilder db)
     {
         db.setEntityResolver(new EntityResolver()
         {

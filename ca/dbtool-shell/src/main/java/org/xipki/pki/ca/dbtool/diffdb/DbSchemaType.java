@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.report;
+package org.xipki.pki.ca.dbtool.diffdb;
 
 /**
  * @author Lijun Liao

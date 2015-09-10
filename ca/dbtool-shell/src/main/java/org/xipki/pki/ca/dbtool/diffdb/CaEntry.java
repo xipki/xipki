@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.report;
+package org.xipki.pki.ca.dbtool.diffdb;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -59,7 +59,6 @@ public class CaEntry
     private final File caDir;
     private final File certsDir;
 
-    private final int numProcessedBefore;
     private int numProcessed;
 
     private File csvFile;
@@ -84,23 +83,6 @@ public class CaEntry
         this.certsManifestOs = new FileOutputStream(
                 new File(caDir, "certs-manifest"), true);
 
-        int _numProcessedBefore = 0;
-        File accountFile = new File(caDir, "acount");
-        if(accountFile.exists())
-        {
-            byte[] bytes = IoUtil.read(accountFile);
-            if(bytes != null && bytes.length > 0)
-            {
-                _numProcessedBefore = Integer.parseInt(new String(bytes));
-                if(_numProcessedBefore < 0)
-                {
-                    throw new IllegalArgumentException(
-                            "content of file 'account' is invalid, it could not be negative");
-                }
-            }
-        }
-
-        this.numProcessedBefore = _numProcessedBefore;
         createNewCsvFile();
     }
 
@@ -150,7 +132,7 @@ public class CaEntry
     {
         // write the account
         IoUtil.save(new File(caDir, "account"),
-                Integer.toString(numProcessed + numProcessedBefore).getBytes());
+                Integer.toString(numProcessed).getBytes());
 
         closeCurrentCsvFile();
         IoUtil.closeStream(certsManifestOs);

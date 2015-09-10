@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.report;
+package org.xipki.pki.ca.dbtool.diffdb;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -132,7 +132,8 @@ public class DbDigestReader
         close(certsReader);
     }
 
-    private static void close(Reader reader)
+    private static void close(
+            final Reader reader)
     {
         if(reader == null)
         {

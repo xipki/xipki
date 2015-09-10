@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.report;
+package org.xipki.pki.ca.dbtool.diffdb;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -160,8 +160,7 @@ public class DbDigestDiff
         sqlBuilder.append(col_revTime).append(", ");
         sqlBuilder.append(col_revInvTime).append(", ");
         sqlBuilder.append(col_certhash).append(" ");
-        sqlBuilder.append("FROM CERT ");
-        sqlBuilder.append("INNER JOIN ");
+        sqlBuilder.append("FROM CERT INNER JOIN ");
         sqlBuilder.append(tbl_certhash).append(" ON ");
         sqlBuilder.append("CERT.").append(col_serialNumber).append("=? ");
         sqlBuilder.append("AND CERT.").append(col_caId).append("=? ");
@@ -252,7 +251,6 @@ public class DbDigestDiff
                 doDiff(readerA, caIdB, reporter);
             }catch(Exception e)
             {
-                e.printStackTrace();
                 reporter.addError("Exception thrown: " + e.getClass().getName() + ": " + e.getMessage());
             } finally
             {
@@ -263,7 +261,6 @@ public class DbDigestDiff
 
     }
 
-    @SuppressWarnings("unchecked")
     private void doDiff(
             final DbDigestReader readerA,
             final int caIdB,
@@ -281,9 +278,11 @@ public class DbDigestDiff
             System.out.println("Processing certifiates of CA \n\t'" + readerA.getCaDirname() + "'");
             ProcessLog.printHeader();
 
+            int numProcessed = 0;
             while(true)
             {
                 Object[] objs = readNextLines(readerA);
+                @SuppressWarnings("unchecked")
                 List<Long> serialNumbers = (List<Long>) objs[0];
                 int n = serialNumbers.size();
                 if(n == 0)
@@ -291,8 +290,11 @@ public class DbDigestDiff
                     break;
                 }
 
+                @SuppressWarnings("unchecked")
                 Map<Long, DbDigestEntry> certsMap = (Map<Long, DbDigestEntry>) objs[1];
                 internal_diff(reporter, selectStmt, serialNumbers, certsMap, processLog);
+                numProcessed += n;
+                reporter.setAccout(numProcessed);
             }
             processLog.printStatus(true);
             ProcessLog.printTrailer();
@@ -313,19 +315,6 @@ public class DbDigestDiff
             final ProcessLog processLog)
     throws DataAccessException, IOException
     {
-        int n = serialNumbers.size();
-        StringBuilder sb = new StringBuilder("(");
-        for(int i = 0; i < n; i++)
-        {
-            if(i > 0)
-            {
-                sb.append(',');
-            }
-            sb.append(serialNumbers.get(i));
-        }
-        sb.append(")");
-
-        String sql = sqlCert;
         ResultSet rs = null;
 
         try
@@ -356,11 +345,7 @@ public class DbDigestDiff
                     serialNumbers.remove(serialNumber);
                     DbDigestEntry certA = certsMap.get(serialNumber);
 
-                    if(certA == null)
-                    {
-                        reporter.addError("sql error (should not happen)");
-                    }
-                    else if(certA.contentEquals(certB))
+                    if(certA.contentEquals(certB))
                     {
                         reporter.addSame(serialNumber);
                     } else
@@ -376,7 +361,7 @@ public class DbDigestDiff
             }
         } catch(SQLException e)
         {
-            throw datasourceB.translate(sql, e);
+            throw datasourceB.translate(sqlCert, e);
         }
         finally
         {
@@ -422,7 +407,7 @@ public class DbDigestDiff
             try
             {
                 ps.close();
-            }catch(SQLException e)
+            }catch(Exception e)
             {
             }
         }
@@ -432,7 +417,7 @@ public class DbDigestDiff
             try
             {
                 rs.close();
-            }catch(SQLException e)
+            }catch(Exception e)
             {
             }
         }

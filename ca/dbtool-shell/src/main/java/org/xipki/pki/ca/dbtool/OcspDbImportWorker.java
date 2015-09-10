@@ -46,14 +46,14 @@ import javax.xml.bind.Unmarshaller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.qa.AbstractLoadTest;
 import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.pki.ca.dbtool.jaxb.ocsp.ObjectFactory;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.password.api.PasswordResolverException;
+import org.xipki.pki.ca.dbtool.jaxb.ocsp.ObjectFactory;
 
 /**
  * @author Lijun Liao
@@ -114,7 +114,7 @@ public class OcspDbImportWorker extends DbPortWorker
                 LOG.error("dataSource.shutdown()", e);
             }
             long end = System.currentTimeMillis();
-            System.out.println("finished in " + AbstractLoadTest.formatTime((end - start) / 1000).trim());
+            System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
         }
     }
 

@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.report;
+package org.xipki.pki.ca.dbtool.diffdb;
 
 import java.io.File;
 import java.io.IOException;
@@ -333,7 +333,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
 
             if(interrupted)
             {
-                justThrowsException();
+                throw new InterruptedException("interrupted by the user");
             }
         }catch(SQLException e)
         {
@@ -350,13 +350,8 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
                 " certificates");
     }
 
-    private void justThrowsException()
-    throws InterruptedException
-    {
-        throw new InterruptedException("interrupted by the user");
-    }
-
-    static String toAsciiFilename(String filename)
+    static String toAsciiFilename(
+            final String filename)
     {
         final int n = filename.length();
         StringBuilder sb = new StringBuilder(n);
