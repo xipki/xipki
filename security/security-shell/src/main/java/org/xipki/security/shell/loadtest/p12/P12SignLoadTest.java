@@ -96,7 +96,7 @@ public abstract class P12SignLoadTest extends AbstractLoadTest
             final BigInteger publicExponent)
     throws IOException
     {
-        return getPrecomputedKeystore("rsa-" + keysize + "-" + publicExponent.toString(16) + ".p12");
+        return getPrecomputedKeystore("rsa-" + keysize + "-0x" + publicExponent.toString(16) + ".p12");
     }
 
     protected static byte[] getPrecomputedDSAKeystore(
