@@ -37,8 +37,8 @@ package org.xipki.pki.ca.dbtool;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import org.xipki.common.qa.AbstractLoadTest;
 import org.xipki.common.qa.MeasurePoint;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -112,7 +112,8 @@ public class ProcessLog
         printStatus(false);
     }
 
-    public void printStatus(boolean forcePrint)
+    public void printStatus(
+            final boolean forcePrint)
     {
         final long now = System.currentTimeMillis();
         if(forcePrint == false && now - lastPrintTime < MS_800)
@@ -124,7 +125,7 @@ public class ProcessLog
         lastPrintTime = now;
 
         StringBuilder sb = new StringBuilder("\r");
-        sb.append(AbstractLoadTest.formatAccount(numProcessed));
+        sb.append(StringUtil.formatAccount(numProcessed, true));
 
         // 10 characters for processed percent
         String percent = total > 0 ? Long.toString(numProcessed * 100 / total) : "--";
@@ -135,7 +136,7 @@ public class ProcessLog
         sb.append(percent).append('%');
 
         long t = (now - startTime)/1000;  // in s
-        String time = AbstractLoadTest.formatTime(t);
+        String time = StringUtil.formatTime(t, true);
         sb.append("  ");
         sb.append(time);
 
@@ -156,13 +157,13 @@ public class ProcessLog
         {
             speed = (numProcessed - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
         }
-        sb.append(AbstractLoadTest.formatSpeed(speed));
+        sb.append(StringUtil.formatSpeed(speed, true));
 
         if(speed > 0)
         {
             long remaining = (total - numProcessed) / speed;
             sb.append("  ");
-            sb.append(AbstractLoadTest.formatTime(remaining));
+            sb.append(StringUtil.formatTime(remaining, true));
         } else
         {
             sb.append("         --");
@@ -176,13 +177,13 @@ public class ProcessLog
         {
             speed = numProcessed * 1000 / t2;
         }
-        sb.append(AbstractLoadTest.formatSpeed(speed));
+        sb.append(StringUtil.formatSpeed(speed, true));
 
         if(speed > 0)
         {
             long remaining = (total - numProcessed) / speed;
             sb.append("  ");
-            sb.append(AbstractLoadTest.formatTime(remaining));
+            sb.append(StringUtil.formatTime(remaining, true));
         } else
         {
             sb.append("         --");

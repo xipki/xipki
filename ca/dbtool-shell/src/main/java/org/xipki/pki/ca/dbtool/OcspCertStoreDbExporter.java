@@ -453,7 +453,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
             if(interrupted)
             {
-                justThrowsException();
+                throw new InterruptedException("interrupted by the user");
             }
 
             if(numCertInCurrentFile > 0)
@@ -490,12 +490,6 @@ class OcspCertStoreDbExporter extends DbPorter
 
         System.out.println(getExportedText() + processLog.getNumProcessed() +
                 " certificates from tables CERT, CHASH and CRAW");
-    }
-
-    private void justThrowsException()
-    throws InterruptedException
-    {
-        throw new InterruptedException("interrupted by the user");
     }
 
     private void finalizeZip(

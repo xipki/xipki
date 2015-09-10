@@ -81,8 +81,8 @@
       </action>
       <optional-completers>
         <entry key="--report-dir" value-ref="dirPathCompleter"/>
-        <entry key="--a-digest-dir" value-ref="dirPathCompleter"/>
-        <entry key="--b-db-conf" value-ref="filePathCompleter"/>
+        <entry key="-a" value-ref="dirPathCompleter"/>
+        <entry key="-b" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <!-- Liquibase Cmds -->

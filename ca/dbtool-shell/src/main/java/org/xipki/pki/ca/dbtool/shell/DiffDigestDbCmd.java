@@ -40,22 +40,22 @@ import org.apache.karaf.shell.commands.Option;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.pki.ca.dbtool.DbPortWorker;
-import org.xipki.pki.ca.dbtool.report.DbDigestDiffWorker;
+import org.xipki.pki.ca.dbtool.diffdb.DbDigestDiffWorker;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "digest-db-diff", description="diff digest XiPKI/EJBCA database")
+@Command(scope = "xipki-db", name = "diff-digest-db", description="diff digest XiPKI/EJBCA database")
 public class DiffDigestDbCmd extends DbPortCmd
 {
-    @Option(name = "--a-digest-dir", aliases="-a",
+    @Option(name = "-a",
             required = true,
             description = "database digest directory (A)\n"
                     + "(required)")
     private String digestDirA;
 
-    @Option(name = "--b-db-conf", aliases="-b",
+    @Option(name = "-b",
             required = true,
             description = "database configuration file (B)")
     private String dbconfFile;

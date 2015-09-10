@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.report;
+package org.xipki.pki.ca.dbtool.diffdb;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -133,6 +133,12 @@ public class DbDigestReporter
     {
         writer.write(Long.toString(serialNumber));
         writer.write('\n');
+    }
+
+    public void setAccout(int account)
+    throws IOException
+    {
+        IoUtil.save(reportDirname + File.separator + "accout", Integer.toString(account).getBytes());
     }
 
     public void close()
