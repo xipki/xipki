@@ -37,13 +37,12 @@ package org.xipki.pki.ca.client.shell.loadtest;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.xipki.common.util.StringUtil;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.pki.ca.client.shell.loadtest.KeyEntry.DSAKeyEntry;
 import org.xipki.pki.ca.client.shell.loadtest.KeyEntry.ECKeyEntry;
 import org.xipki.pki.ca.client.shell.loadtest.KeyEntry.RSAKeyEntry;
 import org.xipki.pki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
-import org.xipki.common.qa.AbstractLoadTest;
-import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
@@ -115,7 +114,7 @@ public class CALoadTestEnrollCmd extends CALoadTestCmd
         StringBuilder startMsg = new StringBuilder();
 
         startMsg.append("threads:         ").append(numThreads).append("\n");
-        startMsg.append("duration:        ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
+        startMsg.append("duration:        ").append(StringUtil.formatTime(durationInSecond, false)).append("\n");
         startMsg.append("subjectTemplate: ").append(subjectTemplate).append("\n");
         startMsg.append("profile:         ").append(certprofile).append("\n");
         startMsg.append("keyType:         ").append(keyType).append("\n");

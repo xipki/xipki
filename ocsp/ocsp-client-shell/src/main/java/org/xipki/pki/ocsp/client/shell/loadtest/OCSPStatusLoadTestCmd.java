@@ -43,7 +43,7 @@ import java.util.List;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.qa.AbstractLoadTest;
+import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 import org.xipki.pki.ocsp.client.shell.AbstractOCSPStatusCmd;
@@ -133,7 +133,7 @@ public class OCSPStatusLoadTestCmd extends AbstractOCSPStatusCmd
         StringBuilder startMsg = new StringBuilder();
 
         startMsg.append("threads:        ").append(numThreads).append("\n");
-        startMsg.append("duration:       ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
+        startMsg.append("duration:       ").append(StringUtil.formatTime(durationInSecond, false)).append("\n");
         startMsg.append("serial numbers: ").append(this.serialNumbers).append("\n");
         startMsg.append("issuer cert:    ").append(issuerCertFile).append("\n");
         startMsg.append("server URL:     ").append(serverUrl.toString()).append("\n");

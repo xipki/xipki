@@ -44,6 +44,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.xipki.common.util.StringUtil;
+
 /**
  * @author Lijun Liao
  */
@@ -174,10 +176,10 @@ public abstract class AbstractLoadTest
 
         StringBuilder sb = new StringBuilder("\r");
 
-        sb.append(formatAccount(currentAccount));
+        sb.append(StringUtil.formatAccount(currentAccount, true));
 
         long t = (now - startTime)/1000;  // in s
-        String time = formatTime(t);
+        String time = StringUtil.formatTime(t, true);
         sb.append("  ");
         sb.append(time);
 
@@ -198,11 +200,11 @@ public abstract class AbstractLoadTest
         {
             speed = (currentAccount - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
         }
-        sb.append(formatSpeed(speed));
+        sb.append(StringUtil.formatSpeed(speed, true));
 
         long t2 = now - startTime;
         speed = t2 > 0 ? currentAccount * 1000 / t2 : 0;
-        sb.append(formatSpeed(speed));
+        sb.append(StringUtil.formatSpeed(speed, true));
 
         System.out.print(sb.toString());
         System.out.flush();
@@ -235,123 +237,11 @@ public abstract class AbstractLoadTest
     {
         StringBuilder sb = new StringBuilder();
         long ms = (System.currentTimeMillis() - startTime);
-        sb.append("\nfinished in " + formatTime(ms/1000) + "\n");
+        sb.append("\nfinished in " + StringUtil.formatTime(ms/1000, false) + "\n");
         sb.append("account: " + account.get() + " " + unit + "\n");
         sb.append(" failed: " + errorAccount.get() + " " + unit + "\n");
         sb.append("average: " + (account.get() * 1000 / ms) + " " + unit + "/s\n");
         System.out.println(sb.toString());
     }
 
-    public static String formatSpeed(long speed)
-    {
-        StringBuilder sb = new StringBuilder(10);
-        String speedS = speed == 0 ? "--" : Long.toString(speed);
-        for (int i = 0; i < 10 - speedS.length(); i++)
-        {
-            sb.append(" ");
-        }
-        sb.append(speed);
-        return sb.toString();
-    }
-
-    public static String formatAccount(long account)
-    {
-        String accountS = Long.toString(account);
-
-        final int n = accountS.length();
-        if(n > 3)
-        {
-            StringBuilder sb = new StringBuilder(n + 3);
-            int firstBlockLen = n % 3;
-            if(firstBlockLen != 0)
-            {
-                sb.append(accountS.substring(0, firstBlockLen));
-                sb.append(",");
-            }
-
-            for(int i = 0; ;i++)
-            {
-                int offset = firstBlockLen + i * 3;
-                if(offset >= n)
-                {
-                    break;
-                }
-
-                sb.append(accountS.substring(offset, offset + 3));
-                if(offset + 3 < n)
-                {
-                    sb.append(",");
-                }
-            }
-            accountS = sb.toString();
-        }
-
-        StringBuilder sb = new StringBuilder();
-        // 13 characters for processed account
-        for (int i = 0; i < 13 - accountS.length(); i++)
-        {
-            sb.append(" ");
-        }
-        sb.append(accountS);
-        return sb.toString();
-    }
-
-    public static String formatTime(
-            final long seconds)
-    {
-        long h = seconds / 3600;
-        long m = (seconds - h * 3600) / 60;
-        long s = seconds - h * 3600 - m * 60;
-
-        StringBuilder sb = new StringBuilder();
-        // hours
-        if(h == 0)
-        {
-            sb.append("    ");
-        }
-        else if(h < 10)
-        {
-            sb.append("  " + h + ":");
-        }
-        else if(h < 100)
-        {
-            sb.append(" " + h + ":");
-        }
-        else
-        {
-            sb.append(h + ":");
-        }
-
-        // minutes
-        if(m < 10)
-        {
-            sb.append("0" + m + ":");
-        }
-        else
-        {
-            sb.append(m + ":");
-        }
-
-        // seconds
-        if(s < 10)
-        {
-            sb.append("0" + s);
-        }
-        else
-        {
-            sb.append(s);
-        }
-
-        return sb.toString();
-    }
-
-    public static void main(String[] args)
-    {
-        long[] ls = new long[]{1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890};
-        for(long l : ls)
-        {
-            String s = formatAccount(l);
-            System.out.println("'" + s + "': " + l);
-        }
-    }
 }
