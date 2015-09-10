@@ -33,14 +33,71 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.report;
+package org.xipki.pki.ca.dbtool.diffdb;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.xipki.common.util.ParamUtil;
+import org.xipki.pki.ca.dbtool.xmlio.InvalidDataObjectException;
 
 /**
  * @author Lijun Liao
  */
 
-public interface DbDigestExporter
+public class CaEntryContainer
 {
-    void digest()
-    throws Exception;
+    private final Map<Integer, CaEntry> caEntryMap;
+
+    public CaEntryContainer(
+            final Set<CaEntry> caEntries)
+    {
+        ParamUtil.assertNotEmpty("caEntries", caEntries);
+        caEntryMap = new HashMap<>(caEntries.size());
+        for(CaEntry m : caEntries)
+        {
+            caEntryMap.put(m.getCaId(), m);
+        }
+    }
+
+    public void addDigestEntry(
+            final int caId,
+            final int id,
+            final DbDigestEntry reportEntry)
+    throws IOException, InvalidDataObjectException
+    {
+        CaEntry m = caEntryMap.get(caId);
+        if(m == null)
+        {
+            throw new IllegalArgumentException("unknown caId '" + caId + "'");
+        }
+        m.addDigestEntry(id, reportEntry);
+    }
+
+    public void close()
+    throws IOException
+    {
+        StringBuilder sb = new StringBuilder();
+
+        for(CaEntry m : caEntryMap.values())
+        {
+            try
+            {
+                m.close();
+            } catch (IOException e)
+            {
+                sb.append("could not close CAEntry '").append(m.getCaId());
+                sb.append("': ").append(e.getMessage()).append(", ");
+            }
+        }
+
+        int n = sb.length();
+        if(n > 0)
+        {
+            sb.delete(n - 2, n);
+            throw new IOException(sb.toString());
+        }
+    }
 }

@@ -38,7 +38,7 @@ package org.xipki.pki.ca.dbtool;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
-import org.xipki.common.qa.AbstractLoadTest;
+import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.security.api.HashAlgoType;
@@ -138,7 +138,7 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter
         dataSource.dropPrimaryKey(null, "PK_CHASH", "CHASH");
 
         long duration = (System.currentTimeMillis() - start) / 1000;
-        System.out.println(" dropped indexes in " + AbstractLoadTest.formatTime(duration));
+        System.out.println(" dropped indexes in " + StringUtil.formatTime(duration, false));
     }
 
     protected void recoverIndexes()
@@ -161,7 +161,7 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter
                 "CASCADE", "NO ACTION");
 
         long duration = (System.currentTimeMillis() - start) / 1000;
-        System.out.println(" recovered indexes in " + AbstractLoadTest.formatTime(duration));
+        System.out.println(" recovered indexes in " + StringUtil.formatTime(duration, false));
     }
 
 }

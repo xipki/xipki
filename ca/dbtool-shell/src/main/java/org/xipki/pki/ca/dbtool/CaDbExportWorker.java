@@ -49,15 +49,15 @@ import javax.xml.bind.Unmarshaller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.qa.AbstractLoadTest;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.pki.ca.dbtool.jaxb.ca.ObjectFactory;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.password.api.PasswordResolverException;
+import org.xipki.pki.ca.dbtool.jaxb.ca.ObjectFactory;
 
 /**
  * @author Lijun Liao
@@ -207,7 +207,7 @@ public class CaDbExportWorker extends DbPortWorker
                 LOG.error("dataSource.shutdown()", e);
             }
             long end = System.currentTimeMillis();
-            System.out.println("Finished in " + AbstractLoadTest.formatTime((end - start) / 1000).trim());
+            System.out.println("Finished in " + StringUtil.formatTime((end - start) / 1000, false));
         }
     }
 

@@ -444,7 +444,8 @@ public class DbToolBase
         return sb.toString();
     }
 
-    public static ZipOutputStream getZipOutputStream(File zipFile)
+    public static ZipOutputStream getZipOutputStream(
+            final File zipFile)
     throws FileNotFoundException
     {
         BufferedOutputStream out = new BufferedOutputStream(

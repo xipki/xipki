@@ -40,7 +40,7 @@ import org.apache.karaf.shell.commands.Option;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.pki.ca.dbtool.DbPortWorker;
-import org.xipki.pki.ca.dbtool.report.DbDigestExportWorker;
+import org.xipki.pki.ca.dbtool.diffdb.DbDigestExportWorker;
 
 /**
  * @author Lijun Liao

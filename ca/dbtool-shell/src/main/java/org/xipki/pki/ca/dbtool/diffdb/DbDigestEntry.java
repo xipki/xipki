@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.report;
+package org.xipki.pki.ca.dbtool.diffdb;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -177,7 +177,8 @@ public class DbDigestEntry
         return getEncoded(true);
     }
 
-    private String getEncoded(boolean withSerialNumber)
+    private String getEncoded(
+            final boolean withSerialNumber)
     {
         StringBuilder sb = new StringBuilder();
         if(withSerialNumber)
@@ -248,7 +249,8 @@ public class DbDigestEntry
         return true;
     }
 
-    private static List<Integer> getIndexes(String encoded)
+    private static List<Integer> getIndexes(
+            final String encoded)
     {
         List<Integer> ret = new ArrayList<>(6);
         for(int i = 0; i < encoded.length(); i++)
@@ -261,7 +263,9 @@ public class DbDigestEntry
         return ret;
     }
 
-    private static boolean equals(Object a, Object b)
+    private static boolean equals(
+            final Object a,
+            final Object b)
     {
         if(a == null)
         {
