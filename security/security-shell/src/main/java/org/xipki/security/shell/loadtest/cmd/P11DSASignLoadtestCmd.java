@@ -60,6 +60,18 @@ public class P11DSASignLoadtestCmd extends P11SignLoadtestCmd
     protected AbstractLoadTest getTester()
     throws Exception
     {
+        if(qLen == null)
+        {
+            if(pLen >= 2048)
+            {
+                qLen = 256;
+            }
+            else
+            {
+                qLen = 160;
+            }
+        }
+
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         return new P11DSASignLoadTest(securityFactory, slot, sigAlgo, pLen, qLen);
     }

@@ -36,7 +36,6 @@
 package org.xipki.security.shell.loadtest.p12;
 
 import org.xipki.security.P12KeypairGenerator;
-import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.api.SecurityFactory;
 
 /**
@@ -53,17 +52,22 @@ public class P12ECSignLoadTest extends P12SignLoadTest
     throws Exception
     {
         super(securityFactory, signatureAlgorithm,
-                generateKey(curveNameOrOid));
+                generateKeystore(curveNameOrOid));
 
     }
 
-    private static P12KeypairGenerationResult generateKey(
+    private static byte[] generateKeystore(
             final String curveNameOrOid)
     throws Exception
     {
-        P12KeypairGenerator kpGen = new P12KeypairGenerator.ECDSAIdentityGenerator(
+        byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
+        if(keystoreBytes == null)
+        {
+            P12KeypairGenerator kpGen = new P12KeypairGenerator.ECDSAIdentityGenerator(
                 curveNameOrOid, password.toCharArray(), "CN=dummy", null, null);
-        return kpGen.generateIdentity();
+            keystoreBytes = kpGen.generateIdentity().getKeystore();
+        }
+        return keystoreBytes;
     }
 
 }

@@ -38,7 +38,6 @@ package org.xipki.security.shell.loadtest.p12;
 import java.math.BigInteger;
 
 import org.xipki.security.P12KeypairGenerator;
-import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.api.SecurityFactory;
 
 /**
@@ -56,18 +55,23 @@ public class P12RSASignLoadTest extends P12SignLoadTest
     throws Exception
     {
         super(securityFactory, signatureAlgorithm,
-                generateKey(keysize, publicExponent));
+                generateKeystore(keysize, publicExponent));
 
     }
 
-    private static P12KeypairGenerationResult generateKey(
+    private static byte[] generateKeystore(
             final int keysize,
             final BigInteger publicExponent)
     throws Exception
     {
-        P12KeypairGenerator kpGen = new P12KeypairGenerator.RSAIdentityGenerator(
-                keysize, publicExponent, password.toCharArray(), "CN=dummy", null, null);
-        return kpGen.generateIdentity();
+        byte[] keystoreBytes = getPrecomputedRSAKeystore(keysize, publicExponent);
+        if(keystoreBytes == null)
+        {
+            P12KeypairGenerator kpGen = new P12KeypairGenerator.RSAIdentityGenerator(
+                    keysize, publicExponent, password.toCharArray(), "CN=dummy", null, null);
+            keystoreBytes = kpGen.generateIdentity().getKeystore();
+        }
+        return keystoreBytes;
     }
 
 }

@@ -359,6 +359,12 @@ public class SoftTokenContentSignerBuilder
                 final AlgorithmIdentifier digAlgId)
         throws OperatorCreationException
         {
+            if(AlgorithmUtil.isRSASignatureAlgoId(sigAlgId) == false)
+            {
+                throw new OperatorCreationException("the given algorithm is not a valid RSA signature algirthm '" +
+                        sigAlgId.getAlgorithm().getId() + "'");
+            }
+
             if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()))
             {
                 if(Security.getProvider(PROVIDER_XIPKI_NSS_CIPHER) != null)
@@ -383,8 +389,7 @@ public class SoftTokenContentSignerBuilder
                 {
                     return SignerUtil.createPSSRSASigner(sigAlgId);
                 }
-            }
-            else
+            } else
             {
                 Digest dig = digestProvider.get(digAlgId);
                 return new RSADigestSigner(dig);
@@ -411,6 +416,12 @@ public class SoftTokenContentSignerBuilder
                 final AlgorithmIdentifier digAlgId)
         throws OperatorCreationException
         {
+            if(AlgorithmUtil.isDSASigAlg(sigAlgId) == false)
+            {
+                throw new OperatorCreationException("the given algorithm is not a valid DSA signature algirthm '" +
+                        sigAlgId.getAlgorithm().getId() + "'");
+            }
+
             Digest dig = digestProvider.get(digAlgId);
             DSASigner dsaSigner = new DSASigner();
             if(plain)
@@ -442,6 +453,12 @@ public class SoftTokenContentSignerBuilder
                 final AlgorithmIdentifier digAlgId)
         throws OperatorCreationException
         {
+            if(AlgorithmUtil.isECSigAlg(sigAlgId) == false)
+            {
+                throw new OperatorCreationException("the given algorithm is not a valid EC signature algirthm '" +
+                        sigAlgId.getAlgorithm().getId() + "'");
+            }
+
             Digest dig = digestProvider.get(digAlgId);
             ECDSASigner dsaSigner = new ECDSASigner();
 

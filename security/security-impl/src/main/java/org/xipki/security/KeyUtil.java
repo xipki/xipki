@@ -59,6 +59,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,9 +68,13 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.sec.SECNamedCurves;
+import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.generators.DSAParametersGenerator;
@@ -357,6 +362,97 @@ public class KeyUtil
         return new SubjectPublicKeyInfo(
                 new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, dssParams),
                 new ASN1Integer(publicKey.getY()));
+    }
+
+    public static ASN1ObjectIdentifier getCurveOID(
+            final String curveName)
+    {
+        ASN1ObjectIdentifier curveOID = X962NamedCurves.getOID(curveName);
+        if(curveOID == null)
+        {
+            curveOID = SECNamedCurves.getOID(curveName);
+        }
+        if(curveOID == null)
+        {
+            curveOID = TeleTrusTNamedCurves.getOID(curveName);
+        }
+        if(curveOID == null)
+        {
+            curveOID = NISTNamedCurves.getOID(curveName);
+        }
+
+        return curveOID;
+    }
+
+    public static String getCurveName(
+            final ASN1ObjectIdentifier curveOID)
+    {
+        String curveName = X962NamedCurves.getName(curveOID);
+        if(curveName == null)
+        {
+            curveName = SECNamedCurves.getName(curveOID);
+        }
+        if(curveName == null)
+        {
+            curveName = TeleTrusTNamedCurves.getName(curveOID);
+        }
+        if(curveName == null)
+        {
+            curveName = NISTNamedCurves.getName(curveOID);
+        }
+
+        return curveName;
+    }
+
+    public static Map<String, ASN1ObjectIdentifier> getCurveNameOIDMap()
+    {
+        Map<String, ASN1ObjectIdentifier> map = new HashMap<>();
+        Enumeration<?> names = X962NamedCurves.getNames();
+        while(names.hasMoreElements())
+        {
+            String name = (String) names.nextElement();
+            ASN1ObjectIdentifier oid = X962NamedCurves.getOID(name);
+            if(oid != null)
+            {
+                map.put(name, oid);
+            }
+        }
+
+        names = SECNamedCurves.getNames();
+
+        while(names.hasMoreElements())
+        {
+            String name = (String) names.nextElement();
+            ASN1ObjectIdentifier oid = SECNamedCurves.getOID(name);
+            if(oid != null)
+            {
+                map.put(name, oid);
+            }
+        }
+
+        names = TeleTrusTNamedCurves.getNames();
+        while(names.hasMoreElements())
+        {
+            String name = (String) names.nextElement();
+            ASN1ObjectIdentifier oid = TeleTrusTNamedCurves.getOID(name);
+            if(oid != null)
+            {
+                map.put(name, oid);
+            }
+        }
+
+        names = NISTNamedCurves.getNames();
+        while(names.hasMoreElements())
+        {
+            String name = (String) names.nextElement();
+            ASN1ObjectIdentifier oid = NISTNamedCurves.getOID(name);
+            if(oid != null)
+            {
+                map.put(name, oid);
+            }
+        }
+
+        return map;
     }
 
 }
