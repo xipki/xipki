@@ -63,7 +63,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditLevel;
-import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditService;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.scep4j.exception.MessageDecodingException;
 import org.xipki.scep4j.message.CACaps;
@@ -88,7 +88,7 @@ public class ScepServlet extends HttpServlet
 
     private static final String CT_RESPONSE = ScepConstants.CT_x_pki_message;
 
-    private AuditLoggingService auditLoggingService;
+    private AuditService auditService;
     private ScepResponder responder;
 
     public ScepServlet(
@@ -98,15 +98,15 @@ public class ScepServlet extends HttpServlet
         this.responder = responder;
     }
 
-    public AuditLoggingService getAuditLoggingService()
+    public AuditService getAuditService()
     {
-        return auditLoggingService;
+        return auditService;
     }
 
-    public void setAuditLoggingService(
-            final AuditLoggingService auditLoggingService)
+    public void setAuditService(
+            final AuditService auditService)
     {
-        this.auditLoggingService = auditLoggingService;
+        this.auditService = auditService;
     }
 
     @Override
@@ -135,7 +135,7 @@ public class ScepServlet extends HttpServlet
     {
         String servletPath = request.getServletPath();
 
-        AuditEvent auditEvent = (auditLoggingService != null) ? new AuditEvent(new Date()) : null;
+        AuditEvent auditEvent = (auditService != null) ? new AuditEvent(new Date()) : null;
         if(auditEvent != null)
         {
             auditEvent.setApplicationName("SCEP");
@@ -375,7 +375,7 @@ public class ScepServlet extends HttpServlet
             {
                 if(auditEvent != null)
                 {
-                    audit(auditLoggingService, auditEvent, auditLevel, auditStatus, auditMessage);
+                    audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
                 }
             }
         }
@@ -400,7 +400,7 @@ public class ScepServlet extends HttpServlet
     }
 
     static void audit(
-            final AuditLoggingService auditLoggingService,
+            final AuditService auditService,
             final AuditEvent auditEvent,
             final AuditLevel auditLevel,
             final AuditStatus auditStatus,
@@ -422,7 +422,7 @@ public class ScepServlet extends HttpServlet
         }
 
         auditEvent.setDuration(System.currentTimeMillis() - auditEvent.getTimestamp().getTime());
-        auditLoggingService.logEvent(auditEvent);
+        auditService.logEvent(auditEvent);
     }
 
 }

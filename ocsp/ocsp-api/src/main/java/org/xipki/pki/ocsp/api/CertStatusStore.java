@@ -38,8 +38,8 @@ package org.xipki.pki.ocsp.api;
 import java.math.BigInteger;
 import java.util.Set;
 
-import org.xipki.audit.api.AuditLoggingService;
-import org.xipki.audit.api.AuditLoggingServiceRegister;
+import org.xipki.audit.api.AuditService;
+import org.xipki.audit.api.AuditServiceRegister;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.security.api.CertRevocationInfo;
@@ -91,7 +91,7 @@ public abstract class CertStatusStore
     protected boolean includeArchiveCutoff;
     protected boolean includeCrlID;
 
-    protected AuditLoggingServiceRegister auditServiceRegister;
+    protected AuditServiceRegister auditServiceRegister;
 
     protected CertStatusStore(
             final String name)
@@ -106,14 +106,14 @@ public abstract class CertStatusStore
     }
 
     public void setAuditServiceRegister(
-            final AuditLoggingServiceRegister auditServiceRegister)
+            final AuditServiceRegister auditServiceRegister)
     {
         this.auditServiceRegister = auditServiceRegister;
     }
 
-    public AuditLoggingService getAuditLoggingService()
+    public AuditService getAuditService()
     {
-        return auditServiceRegister == null ? null : auditServiceRegister.getAuditLoggingService();
+        return auditServiceRegister == null ? null : auditServiceRegister.getAuditService();
     }
 
     public boolean isUnknownSerialAsGood()

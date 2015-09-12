@@ -104,8 +104,8 @@ import org.xipki.audit.api.AuditChildEvent;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditLevel;
-import org.xipki.audit.api.AuditLoggingService;
-import org.xipki.audit.api.AuditLoggingServiceRegister;
+import org.xipki.audit.api.AuditService;
+import org.xipki.audit.api.AuditServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.common.ConfPairs;
@@ -216,7 +216,7 @@ public class OcspServer
     private SecurityFactory securityFactory;
 
     private String confFile;
-    private AuditLoggingServiceRegister auditServiceRegister;
+    private AuditServiceRegister auditServiceRegister;
 
     private Map<String, Responder> responders = new HashMap<>();
     private Map<String, ResponderSigner> signers = new HashMap<>();
@@ -1260,7 +1260,7 @@ public class OcspServer
     }
 
     public void setAuditServiceRegister(
-            final AuditLoggingServiceRegister auditServiceRegister)
+            final AuditServiceRegister auditServiceRegister)
     {
         this.auditServiceRegister = auditServiceRegister;
         for(CertStatusStore store : stores.values())
@@ -1273,9 +1273,9 @@ public class OcspServer
             final boolean successfull,
             final String eventType)
     {
-        AuditLoggingService auditLoggingService = auditServiceRegister == null ? null :
-            auditServiceRegister.getAuditLoggingService();
-        if(auditLoggingService != null)
+        AuditService auditService = auditServiceRegister == null ? null :
+            auditServiceRegister.getAuditService();
+        if(auditService != null)
         {
             PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());
             auditEvent.setUserId("OCSP-SYSTEM");
@@ -1291,7 +1291,7 @@ public class OcspServer
                 auditEvent.setStatus(AuditStatus.FAILED.name());
                 auditEvent.setLevel(AuditLevel.ERROR);
             }
-            auditLoggingService.logEvent(auditEvent);
+            auditService.logEvent(auditEvent);
         }
     }
 

@@ -39,9 +39,11 @@ package org.xipki.audit.api;
  * @author Lijun Liao
  */
 
-public interface AuditLoggingServiceRegister
+public interface AuditService
 {
-    AuditLoggingService getAuditLoggingService();
+    void logEvent(
+            AuditEvent event);
 
-    boolean isAuditEnabled();
+    void logEvent(
+            PCIAuditEvent event);
 }

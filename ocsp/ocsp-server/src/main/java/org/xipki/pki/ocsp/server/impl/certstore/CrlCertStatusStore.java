@@ -82,7 +82,7 @@ import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditLevel;
-import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditService;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.common.util.CollectionUtil;
@@ -878,8 +878,8 @@ public class CrlCertStatusStore extends CertStatusStore
             final String eventType,
             final String auditStatus)
     {
-        AuditLoggingService auditLoggingService = getAuditLoggingService();
-        if(auditLoggingService == null)
+        AuditService auditService = getAuditService();
+        if(auditService == null)
         {
             return;
         }
@@ -890,7 +890,7 @@ public class CrlCertStatusStore extends CertStatusStore
         auditEvent.setAffectedResource("CRL-Updater");
         auditEvent.setStatus(auditStatus);
         auditEvent.setLevel(auditLevel);
-        auditLoggingService.logEvent(auditEvent);
+        auditService.logEvent(auditEvent);
     }
 
     @Override
