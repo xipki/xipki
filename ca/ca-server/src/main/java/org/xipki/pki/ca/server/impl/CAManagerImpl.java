@@ -73,8 +73,8 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditLevel;
-import org.xipki.audit.api.AuditLoggingService;
-import org.xipki.audit.api.AuditLoggingServiceRegister;
+import org.xipki.audit.api.AuditService;
+import org.xipki.audit.api.AuditServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.common.ConfPairs;
@@ -318,7 +318,7 @@ implements CAManager, CmpResponderManager, ScepManager
     private boolean scepsInitialized = false;
     private Date lastStartTime;
 
-    private AuditLoggingServiceRegister auditServiceRegister;
+    private AuditServiceRegister auditServiceRegister;
 
     private DataSourceWrapper dataSource;
     private CertificateStore certstore;
@@ -2662,7 +2662,7 @@ implements CAManager, CmpResponderManager, ScepManager
     }
 
     public void setAuditServiceRegister(
-            final AuditLoggingServiceRegister serviceRegister)
+            final AuditServiceRegister serviceRegister)
     {
         this.auditServiceRegister = serviceRegister;
 
@@ -2683,9 +2683,9 @@ implements CAManager, CmpResponderManager, ScepManager
             final boolean successfull,
             final String eventType)
     {
-        AuditLoggingService auditLoggingService =
-                auditServiceRegister == null ? null : auditServiceRegister.getAuditLoggingService();
-        if(auditLoggingService == null)
+        AuditService auditService =
+                auditServiceRegister == null ? null : auditServiceRegister.getAuditService();
+        if(auditService == null)
         {
             return;
         }
@@ -2704,7 +2704,7 @@ implements CAManager, CmpResponderManager, ScepManager
             auditEvent.setStatus(AuditStatus.FAILED.name());
             auditEvent.setLevel(AuditLevel.ERROR);
         }
-        auditLoggingService.logEvent(auditEvent);
+        auditService.logEvent(auditEvent);
     }
 
     @Override

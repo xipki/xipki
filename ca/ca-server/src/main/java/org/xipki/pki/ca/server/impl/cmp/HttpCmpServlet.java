@@ -58,8 +58,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditLevel;
-import org.xipki.audit.api.AuditLoggingService;
-import org.xipki.audit.api.AuditLoggingServiceRegister;
+import org.xipki.audit.api.AuditService;
+import org.xipki.audit.api.AuditServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.common.util.LogUtil;
 
@@ -78,7 +78,7 @@ public class HttpCmpServlet extends HttpServlet
 
     private CmpResponderManager responderManager;
 
-    private AuditLoggingServiceRegister auditServiceRegister;
+    private AuditServiceRegister auditServiceRegister;
 
     public HttpCmpServlet()
     {
@@ -93,8 +93,8 @@ public class HttpCmpServlet extends HttpServlet
         X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
         X509Certificate clientCert = (certs == null || certs.length < 1)? null : certs[0];
 
-        AuditLoggingService auditLoggingService = auditServiceRegister.getAuditLoggingService();
-        AuditEvent auditEvent = (auditLoggingService != null) ? new AuditEvent(new Date()) : null;
+        AuditService auditService = auditServiceRegister.getAuditService();
+        AuditEvent auditEvent = (auditService != null) ? new AuditEvent(new Date()) : null;
         if(auditEvent != null)
         {
             auditEvent.setApplicationName("CA");
@@ -242,7 +242,7 @@ public class HttpCmpServlet extends HttpServlet
             {
                 if(auditEvent != null)
                 {
-                    audit(auditLoggingService, auditEvent, auditLevel, auditStatus, auditMessage);
+                    audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
                 }
             }
         }
@@ -273,13 +273,13 @@ public class HttpCmpServlet extends HttpServlet
     }
 
     public void setAuditServiceRegister(
-            final AuditLoggingServiceRegister auditServiceRegister)
+            final AuditServiceRegister auditServiceRegister)
     {
         this.auditServiceRegister = auditServiceRegister;
     }
 
     private static void audit(
-            final AuditLoggingService auditLoggingService,
+            final AuditService auditService,
             final AuditEvent auditEvent,
             final AuditLevel auditLevel,
             final AuditStatus auditStatus,
@@ -304,14 +304,14 @@ public class HttpCmpServlet extends HttpServlet
 
         if(auditEvent.containsChildAuditEvents() == false)
         {
-            auditLoggingService.logEvent(auditEvent);
+            auditService.logEvent(auditEvent);
         }
         else
         {
             List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
             for(AuditEvent event : expandedAuditEvents)
             {
-                auditLoggingService.logEvent(event);
+                auditService.logEvent(event);
             }
         }
     }

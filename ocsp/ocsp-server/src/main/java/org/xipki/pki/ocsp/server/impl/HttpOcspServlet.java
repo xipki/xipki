@@ -57,8 +57,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditLevel;
-import org.xipki.audit.api.AuditLoggingService;
-import org.xipki.audit.api.AuditLoggingServiceRegister;
+import org.xipki.audit.api.AuditService;
+import org.xipki.audit.api.AuditServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.StringUtil;
@@ -78,7 +78,7 @@ public class HttpOcspServlet extends HttpServlet
     private static final String CT_REQUEST  = "application/ocsp-request";
     private static final String CT_RESPONSE = "application/ocsp-response";
 
-    private AuditLoggingServiceRegister auditServiceRegister;
+    private AuditServiceRegister auditServiceRegister;
 
     private OcspServer server;
 
@@ -154,10 +154,10 @@ public class HttpOcspServlet extends HttpServlet
 
         long start = 0;
 
-        AuditLoggingService auditLoggingService = auditServiceRegister == null ? null :
-            auditServiceRegister.getAuditLoggingService();
+        AuditService auditService = auditServiceRegister == null ? null :
+            auditServiceRegister.getAuditService();
 
-        if(auditLoggingService != null && responder.getAuditOption() != null)
+        if(auditService != null && responder.getAuditOption() != null)
         {
             start = System.currentTimeMillis();
             auditEvent = new AuditEvent(new Date());
@@ -361,14 +361,14 @@ public class HttpOcspServlet extends HttpServlet
 
                     if(auditEvent.containsChildAuditEvents() == false)
                     {
-                        auditLoggingService.logEvent(auditEvent);
+                        auditService.logEvent(auditEvent);
                     }
                     else
                     {
                         List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
                         for(AuditEvent event : expandedAuditEvents)
                         {
-                            auditLoggingService.logEvent(event);
+                            auditService.logEvent(event);
                         }
                     }
                 } // end if(auditEvent != null)
@@ -377,7 +377,7 @@ public class HttpOcspServlet extends HttpServlet
     }
 
     public void setAuditServiceRegister(
-            final AuditLoggingServiceRegister auditServiceRegister)
+            final AuditServiceRegister auditServiceRegister)
     {
         this.auditServiceRegister = auditServiceRegister;
     }

@@ -102,8 +102,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditLevel;
-import org.xipki.audit.api.AuditLoggingService;
-import org.xipki.audit.api.AuditLoggingServiceRegister;
+import org.xipki.audit.api.AuditService;
+import org.xipki.audit.api.AuditServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.util.CollectionUtil;
@@ -243,7 +243,7 @@ public class X509CA
                 LOG.debug(message, t);
             } finally
             {
-                AuditLoggingService audit = getAuditLoggingService();
+                AuditService audit = getAuditService();
                 if(audit != null && task != null);
                 {
                     AuditEvent auditEvent = newAuditEvent();
@@ -313,7 +313,7 @@ public class X509CA
                     removed = false;
                 } finally
                 {
-                    AuditLoggingService audit = getAuditLoggingService();
+                    AuditService audit = getAuditService();
                     if(audit != null);
                     {
                         AuditEvent auditEvent = newAuditEvent();
@@ -524,7 +524,7 @@ public class X509CA
 
                 if(serviceRegister != null)
                 {
-                    serviceRegister.getAuditLoggingService().logEvent(auditEvent);
+                    serviceRegister.getAuditService().logEvent(auditEvent);
                 }
                 LOG.info("CRL_GEN_INTERVAL: {}", auditEvent.getStatus().name());
             } catch (Throwable t)
@@ -562,7 +562,7 @@ public class X509CA
     private ScheduledFuture<?> crlGenerationService;
     private ScheduledFuture<?> expiredCertsRemover;
 
-    private AuditLoggingServiceRegister serviceRegister;
+    private AuditServiceRegister serviceRegister;
 
     public X509CA(
             final CAManagerImpl caManager,
@@ -2880,14 +2880,14 @@ public class X509CA
     }
 
     public void setAuditServiceRegister(
-            final AuditLoggingServiceRegister serviceRegister)
+            final AuditServiceRegister serviceRegister)
     {
         this.serviceRegister = serviceRegister;
     }
 
-    private AuditLoggingService getAuditLoggingService()
+    private AuditService getAuditService()
     {
-        return serviceRegister == null ? null : serviceRegister.getAuditLoggingService();
+        return serviceRegister == null ? null : serviceRegister.getAuditService();
     }
 
     private AuditEvent newAuditEvent()

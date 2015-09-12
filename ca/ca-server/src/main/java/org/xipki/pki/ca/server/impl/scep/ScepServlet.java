@@ -58,8 +58,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditLevel;
-import org.xipki.audit.api.AuditLoggingService;
-import org.xipki.audit.api.AuditLoggingServiceRegister;
+import org.xipki.audit.api.AuditService;
+import org.xipki.audit.api.AuditServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.server.impl.CAManagerImpl;
@@ -86,7 +86,7 @@ public class ScepServlet extends HttpServlet
 
     private static final String CT_RESPONSE = ScepConstants.CT_x_pki_message;
 
-    private AuditLoggingServiceRegister auditServiceRegister;
+    private AuditServiceRegister auditServiceRegister;
     private CAManagerImpl responderManager;
 
     public ScepServlet()
@@ -145,8 +145,8 @@ public class ScepServlet extends HttpServlet
             return;
         }
 
-        AuditLoggingService auditLoggingService = auditServiceRegister.getAuditLoggingService();
-        AuditEvent auditEvent = (auditLoggingService != null) ? new AuditEvent(new Date()) : null;
+        AuditService auditService = auditServiceRegister.getAuditService();
+        AuditEvent auditEvent = (auditService != null) ? new AuditEvent(new Date()) : null;
         if(auditEvent != null)
         {
             auditEvent.setApplicationName("SCEP");
@@ -334,7 +334,7 @@ public class ScepServlet extends HttpServlet
             {
                 if(auditEvent != null)
                 {
-                    audit(auditLoggingService, auditEvent, auditLevel, auditStatus, auditMessage);
+                    audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
                 }
             }
         }
@@ -365,13 +365,13 @@ public class ScepServlet extends HttpServlet
     }
 
     public void setAuditServiceRegister(
-            final AuditLoggingServiceRegister auditServiceRegister)
+            final AuditServiceRegister auditServiceRegister)
     {
         this.auditServiceRegister = auditServiceRegister;
     }
 
     private static void audit(
-            final AuditLoggingService auditLoggingService,
+            final AuditService auditService,
             final AuditEvent auditEvent,
             final AuditLevel auditLevel,
             final AuditStatus auditStatus,
@@ -396,14 +396,14 @@ public class ScepServlet extends HttpServlet
 
         if(auditEvent.containsChildAuditEvents() == false)
         {
-            auditLoggingService.logEvent(auditEvent);
+            auditService.logEvent(auditEvent);
         }
         else
         {
             List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
             for(AuditEvent event : expandedAuditEvents)
             {
-                auditLoggingService.logEvent(event);
+                auditService.logEvent(event);
             }
         }
     }

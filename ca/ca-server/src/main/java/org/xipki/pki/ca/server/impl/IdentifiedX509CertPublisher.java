@@ -38,7 +38,7 @@ package org.xipki.pki.ca.server.impl;
 import java.security.cert.X509CRL;
 import java.util.Map;
 
-import org.xipki.audit.api.AuditLoggingServiceRegister;
+import org.xipki.audit.api.AuditServiceRegister;
 import org.xipki.pki.ca.api.CertPublisherException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.X509CertWithDBCertId;
@@ -154,7 +154,7 @@ class IdentifiedX509CertPublisher
     }
 
     public void setAuditServiceRegister(
-            final AuditLoggingServiceRegister auditServiceRegister)
+            final AuditServiceRegister auditServiceRegister)
     {
         certPublisher.setAuditServiceRegister(auditServiceRegister);
     }

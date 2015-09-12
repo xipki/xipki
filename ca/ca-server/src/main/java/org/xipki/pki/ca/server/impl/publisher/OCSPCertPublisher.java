@@ -45,8 +45,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditLevel;
-import org.xipki.audit.api.AuditLoggingService;
-import org.xipki.audit.api.AuditLoggingServiceRegister;
+import org.xipki.audit.api.AuditService;
+import org.xipki.audit.api.AuditServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.util.ParamUtil;
@@ -75,7 +75,7 @@ public class OCSPCertPublisher extends X509CertPublisher
     private boolean asyn = false;
     private boolean publishsGoodCert = true;
 
-    private AuditLoggingServiceRegister auditServiceRegister;
+    private AuditServiceRegister auditServiceRegister;
 
     public OCSPCertPublisher()
     {
@@ -216,10 +216,10 @@ public class OCSPCertPublisher extends X509CertPublisher
 
         LOG.debug("error", e);
 
-        AuditLoggingService auditLoggingService = auditServiceRegister == null ? null :
-            auditServiceRegister.getAuditLoggingService();
+        AuditService auditService = auditServiceRegister == null ? null :
+            auditServiceRegister.getAuditService();
 
-        if(auditLoggingService == null)
+        if(auditService == null)
         {
             return;
         }
@@ -237,7 +237,7 @@ public class OCSPCertPublisher extends X509CertPublisher
         auditEvent.addEventData(new AuditEventData("subject", subjectText));
         auditEvent.addEventData(new AuditEventData("serialNumber", serialText));
         auditEvent.addEventData(new AuditEventData("message", messagePrefix));
-        auditLoggingService.logEvent(auditEvent);
+        auditService.logEvent(auditEvent);
     }
 
     @Override
@@ -256,7 +256,7 @@ public class OCSPCertPublisher extends X509CertPublisher
 
     @Override
     public void setAuditServiceRegister(
-            final AuditLoggingServiceRegister auditServiceRegister)
+            final AuditServiceRegister auditServiceRegister)
     {
         this.auditServiceRegister = auditServiceRegister;
     }
