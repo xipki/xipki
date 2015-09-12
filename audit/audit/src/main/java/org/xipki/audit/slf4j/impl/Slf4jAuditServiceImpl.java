@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditLevel;
-import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditService;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
 
@@ -51,11 +51,11 @@ import org.xipki.audit.api.PCIAuditEvent;
  * @author Lijun Liao
  */
 
-public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
+public class Slf4jAuditServiceImpl implements AuditService
 {
-    private static final Logger LOG = LoggerFactory.getLogger(Slf4jAuditLoggingServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Slf4jAuditServiceImpl.class);
 
-    public Slf4jAuditLoggingServiceImpl()
+    public Slf4jAuditServiceImpl()
     {
     }
 

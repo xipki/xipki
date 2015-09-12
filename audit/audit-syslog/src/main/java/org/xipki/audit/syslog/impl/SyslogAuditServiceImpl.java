@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditLevel;
-import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditService;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
 
@@ -61,9 +61,9 @@ import com.cloudbees.syslog.sender.UdpSyslogMessageSender;
  * @author Lijun Liao
  */
 
-public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
+public class SyslogAuditServiceImpl implements AuditService
 {
-    private static final Logger LOG = LoggerFactory.getLogger(SyslogAuditLoggingServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SyslogAuditServiceImpl.class);
 
     /**
      * The default port is 514.
@@ -108,7 +108,7 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
 
     private boolean initialized;
 
-    public SyslogAuditLoggingServiceImpl()
+    public SyslogAuditServiceImpl()
     {
     }
 
@@ -244,7 +244,7 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
             return;
         }
 
-        LOG.info("initializing: {}", SyslogAuditLoggingServiceImpl.class);
+        LOG.info("initializing: {}", SyslogAuditServiceImpl.class);
 
         try
         {
@@ -313,7 +313,7 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
 
             // after we're finished set initialized to true
             this.initialized = true;
-            LOG.info("Initialized: {}", SyslogAuditLoggingServiceImpl.class);
+            LOG.info("Initialized: {}", SyslogAuditServiceImpl.class);
         }
         catch (Exception e)
         {
@@ -323,8 +323,8 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
 
     public void destroy()
     {
-        LOG.info("destroying: {}", SyslogAuditLoggingServiceImpl.class);
-        LOG.info("destroyed: {}", SyslogAuditLoggingServiceImpl.class);
+        LOG.info("destroying: {}", SyslogAuditServiceImpl.class);
+        LOG.info("destroyed: {}", SyslogAuditServiceImpl.class);
     }
 
     public void setFacility(
