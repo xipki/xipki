@@ -47,7 +47,8 @@ import org.xipki.security.shell.SecurityCmd;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "rm-cert", description="remove certificate from PKCS#11 device")
+@Command(scope = "xipki-tk", name = "rm-cert",
+        description="remove certificate from PKCS#11 device")
 public class P11CertDeleteCmd extends SecurityCmd
 {
     @Option(name = "--slot",

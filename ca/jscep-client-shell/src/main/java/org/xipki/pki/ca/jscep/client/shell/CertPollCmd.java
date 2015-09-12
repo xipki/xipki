@@ -54,7 +54,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "jscep", name = "certpoll", description="poll certificate")
+@Command(scope = "jscep", name = "certpoll",
+        description="poll certificate")
 public class CertPollCmd extends ClientCmd
 {
     @Option(name = "--p10",

@@ -47,7 +47,8 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-cli", name = "remove-expired-certs", description="remove expired certificates")
+@Command(scope = "xipki-cli", name = "remove-expired-certs",
+        description="remove expired certificates")
 public class RemoveExpiredCertsCmd extends ClientCmd
 {
     @Option(name = "--ca",

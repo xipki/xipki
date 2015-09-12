@@ -50,7 +50,8 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-cli", name = "unrevoke", description="unrevoke certificate")
+@Command(scope = "xipki-cli", name = "unrevoke",
+        description="unrevoke certificate")
 public class UnrevokeCertCmd extends UnRevRemoveCertCmd
 {
     @Override

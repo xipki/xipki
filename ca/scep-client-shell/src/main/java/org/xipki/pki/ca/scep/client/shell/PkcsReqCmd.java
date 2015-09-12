@@ -48,7 +48,8 @@ import org.xipki.scep4j.client.exception.ScepClientException;
  * @author Lijun Liao
  */
 
-@Command(scope = "scep", name = "pkcs-req", description="enroll certificate via messageType PkcsReq")
+@Command(scope = "scep", name = "pkcs-req",
+        description="enroll certificate via messageType PkcsReq")
 public class PkcsReqCmd extends AbstractEnrollCertCmd
 {
 

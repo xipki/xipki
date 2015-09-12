@@ -50,7 +50,8 @@ import org.xipki.scep4j.client.ScepClient;
  * @author Lijun Liao
  */
 
-@Command(scope = "scep", name = "getcert", description="download certificate")
+@Command(scope = "scep", name = "getcert",
+        description="download certificate")
 public class GetCertCmd extends ClientCmd
 {
     @Option(name = "--serial", aliases = "-s",

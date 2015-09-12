@@ -77,7 +77,6 @@ public abstract class DbPortCmd extends XipkiOsgiCommandSupport
             } catch (InterruptedException e)
             {
                 myRun.setStopMe(true);
-                break;
             }
         }
 

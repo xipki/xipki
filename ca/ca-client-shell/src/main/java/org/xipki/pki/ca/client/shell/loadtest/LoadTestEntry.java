@@ -60,7 +60,7 @@ public class LoadTestEntry
         OU,
         CN;
 
-        static RandomDN getInstance(
+        public static RandomDN getInstance(
                 final String text)
         {
             ParamUtil.assertNotNull("text", text);

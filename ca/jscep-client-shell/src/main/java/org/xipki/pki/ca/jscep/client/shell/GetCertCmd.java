@@ -49,7 +49,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "jscep", name = "getcert", description="download certificate")
+@Command(scope = "jscep", name = "getcert",
+        description="download certificate")
 public class GetCertCmd extends ClientCmd
 {
     @Option(name = "--serial", aliases = "-s",

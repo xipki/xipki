@@ -51,7 +51,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-cli", name = "p10-enroll", description="enroll certificate via PKCS#10 request")
+@Command(scope = "xipki-cli", name = "p10-enroll",
+        description="enroll certificate via PKCS#10 request")
 public class P10EnrollCertCmd extends ClientCmd
 {
 

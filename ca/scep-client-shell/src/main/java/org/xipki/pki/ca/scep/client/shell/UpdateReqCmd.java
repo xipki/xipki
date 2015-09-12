@@ -48,7 +48,8 @@ import org.xipki.scep4j.client.exception.ScepClientException;
  * @author Lijun Liao
  */
 
-@Command(scope = "scep", name = "update-req", description="enroll certificate via messageType UpdateReq")
+@Command(scope = "scep", name = "update-req",
+        description="enroll certificate via messageType UpdateReq")
 public class UpdateReqCmd extends AbstractEnrollCertCmd
 {
 

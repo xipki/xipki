@@ -52,7 +52,8 @@ import org.xipki.scep4j.client.ScepClient;
  * @author Lijun Liao
  */
 
-@Command(scope = "scep", name = "certpoll", description="poll certificate")
+@Command(scope = "scep", name = "certpoll",
+        description="poll certificate")
 public class CertPollCmd extends ClientCmd
 {
     @Option(name = "--p10",

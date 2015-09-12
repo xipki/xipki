@@ -54,7 +54,8 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-cli", name = "revoke", description="revoke certificate")
+@Command(scope = "xipki-cli", name = "revoke",
+        description="revoke certificate")
 public class RevokeCertCmd extends UnRevRemoveCertCmd
 {
     @Option(name = "--reason", aliases = "-r",

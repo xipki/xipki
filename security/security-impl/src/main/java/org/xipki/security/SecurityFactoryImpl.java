@@ -558,6 +558,16 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
     }
 
     public static String getKeystoreSignerConf(
+            final InputStream keystoreStream,
+            final String password,
+            final String signatureAlgorithm,
+            final int parallelism)
+    throws IOException
+    {
+        return getKeystoreSignerConf(keystoreStream, password, signatureAlgorithm, parallelism, null);
+    }
+
+    public static String getKeystoreSignerConf(
             final String keystoreFile,
             final String password,
             final String signatureAlgorithm,
@@ -580,12 +590,47 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         return conf.getEncoded();
     }
 
+    public static String getKeystoreSignerConf(
+            final InputStream keystoreStream,
+            final String password,
+            final String signatureAlgorithm,
+            final int parallelism,
+            final String keyLabel)
+    throws IOException
+    {
+        ParamUtil.assertNotNull("keystoreStream", keystoreStream);
+        ParamUtil.assertNotBlank("password", password);
+        ParamUtil.assertNotNull("signatureAlgorithm", signatureAlgorithm);
+
+        ConfPairs conf = new ConfPairs("password", password);
+        conf.putPair("algo", signatureAlgorithm);
+        conf.putPair("parallelism", Integer.toString(parallelism));
+        if(keyLabel != null)
+        {
+            conf.putPair("key-label", keyLabel);
+        }
+        conf.putPair("keystore", "base64:" +
+                Base64.toBase64String(
+                        IoUtil.read(keystoreStream)));
+
+        return conf.getEncoded();
+    }
+
     public static String getKeystoreSignerConfWithoutAlgo(
             final String keystoreFile,
             final String password,
             final int parallelism)
     {
         return getKeystoreSignerConfWithoutAlgo(keystoreFile, password, parallelism, null);
+    }
+
+    public static String getKeystoreSignerConfWithoutAlgo(
+            final InputStream keystoreStream,
+            final String password,
+            final int parallelism)
+    throws IOException
+    {
+        return getKeystoreSignerConfWithoutAlgo(keystoreStream, password, parallelism, null);
     }
 
     public static String getKeystoreSignerConfWithoutAlgo(
@@ -604,6 +649,29 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             conf.putPair("key-label", keyLabel);
         }
         conf.putPair("keystore", "file:" + keystoreFile);
+
+        return conf.getEncoded();
+    }
+
+    public static String getKeystoreSignerConfWithoutAlgo(
+            final InputStream keystoreStream,
+            final String password,
+            final int parallelism,
+            final String keyLabel)
+    throws IOException
+    {
+        ParamUtil.assertNotNull("keystoreStream", keystoreStream);
+        ParamUtil.assertNotBlank("password", password);
+
+        ConfPairs conf = new ConfPairs("password", password);
+        conf.putPair("parallelism", Integer.toString(parallelism));
+        if(keyLabel != null)
+        {
+            conf.putPair("key-label", keyLabel);
+        }
+        conf.putPair("keystore", "base64:" +
+                Base64.toBase64String(
+                        IoUtil.read(keystoreStream)));
 
         return conf.getEncoded();
     }
