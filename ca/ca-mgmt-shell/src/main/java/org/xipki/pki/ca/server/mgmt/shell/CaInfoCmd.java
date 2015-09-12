@@ -51,7 +51,8 @@ import org.xipki.common.util.CollectionUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "ca-info", description="show information of CA")
+@Command(scope = "xipki-ca", name = "ca-info",
+        description="show information of CA")
 public class CaInfoCmd extends CaCmd
 {
     @Argument(index = 0, name = "name", description = "CA name")

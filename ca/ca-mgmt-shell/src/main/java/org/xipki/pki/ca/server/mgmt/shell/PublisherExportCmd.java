@@ -47,7 +47,8 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "publisher-export", description="export publisher configuration")
+@Command(scope = "xipki-ca", name = "publisher-export",
+        description="export publisher configuration")
 public class PublisherExportCmd extends CaCmd
 {
     @Option(name = "--name", aliases = "-n",

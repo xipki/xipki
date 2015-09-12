@@ -52,7 +52,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.qa.AbstractLoadTest;
+import org.xipki.common.LoadExecutor;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -70,7 +70,7 @@ import org.xipki.security.api.HashCalculator;
  * @author Lijun Liao
  */
 
-class CALoadTestRevoke extends AbstractLoadTest
+public class CALoadTestRevoke extends LoadExecutor
 {
     private static final Logger LOG = LoggerFactory.getLogger(CALoadTestRevoke.class);
 
@@ -107,9 +107,11 @@ class CALoadTestRevoke extends AbstractLoadTest
             final Certificate caCert,
             final DataSourceWrapper caDataSource,
             final int maxCerts,
-            final int n)
+            final int n,
+            final String description)
     throws Exception
     {
+        super(description);
         ParamUtil.assertNotNull("caClient", caClient);
         ParamUtil.assertNotNull("caCert", caCert);
         ParamUtil.assertNotNull("caDataSource", caDataSource);

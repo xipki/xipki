@@ -43,7 +43,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "neg-env-up", description="update environment parameter (negative, QA)")
+@Command(scope = "xipki-caqa", name = "neg-env-up",
+        description="update environment parameter (negative, QA)")
 public class NegEnvUpdateCmd extends EnvUpdateCmd
 {
 

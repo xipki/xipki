@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- 
  Copyright (c) 2014 - 2015 Lijun Liao
+
+ Maximal column size: 4k
+  - DB2: PAGESIZE 4 k
 -->
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

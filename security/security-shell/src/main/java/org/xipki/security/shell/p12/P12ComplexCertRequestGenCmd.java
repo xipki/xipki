@@ -62,7 +62,8 @@ import org.xipki.security.shell.CertRequestGenCmd;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "req-p12-complex", description="generate complex PKCS#10 request with PKCS#12 keystore")
+@Command(scope = "xipki-tk", name = "req-p12-complex",
+        description="generate complex PKCS#10 request with PKCS#12 keystore")
 public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd
 {
     @Option(name = "--p12",

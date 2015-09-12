@@ -43,7 +43,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "neg-publisher-up", description="update publisher (negative, QA)")
+@Command(scope = "xipki-caqa", name = "neg-publisher-up",
+        description="update publisher (negative, QA)")
 public class NegPublisherUpdateCmd extends PublisherUpdateCmd
 {
 

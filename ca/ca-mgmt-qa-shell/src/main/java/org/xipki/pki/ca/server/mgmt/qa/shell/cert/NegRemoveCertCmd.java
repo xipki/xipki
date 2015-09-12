@@ -43,7 +43,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "neg-remove-cert", description="remove certificate (negative, QA)")
+@Command(scope = "xipki-caqa", name = "neg-remove-cert",
+        description="remove certificate (negative, QA)")
 public class NegRemoveCertCmd extends RemoveCertCmd
 {
 

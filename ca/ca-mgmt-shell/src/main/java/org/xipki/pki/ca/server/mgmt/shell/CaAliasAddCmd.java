@@ -42,7 +42,8 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "caalias-add", description="add CA alias")
+@Command(scope = "xipki-ca", name = "caalias-add",
+        description="add CA alias")
 public class CaAliasAddCmd extends CaCmd
 {
     @Option(name = "--ca",

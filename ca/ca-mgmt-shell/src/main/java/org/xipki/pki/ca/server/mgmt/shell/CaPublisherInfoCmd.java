@@ -46,7 +46,8 @@ import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "capub-info", description="show information of publisher in given CA")
+@Command(scope = "xipki-ca", name = "capub-info",
+        description="show information of publisher in given CA")
 public class CaPublisherInfoCmd extends CaCmd
 {
     @Option(name = "--ca",

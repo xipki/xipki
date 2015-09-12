@@ -43,7 +43,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "neg-responder-add", description="add responder (negative, QA)")
+@Command(scope = "xipki-caqa", name = "neg-responder-add",
+        description="add responder (negative, QA)")
 public class NegResponderAddCmd extends ResponderAddCmd
 {
 

@@ -43,7 +43,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "neg-revoke-cert", description="revoke certificate (negative, QA)")
+@Command(scope = "xipki-caqa", name = "neg-revoke-cert",
+        description="revoke certificate (negative, QA)")
 public class NegRevokeCertCmd extends RevokeCertCmd
 {
 

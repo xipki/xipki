@@ -50,7 +50,8 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-qa", name = "neg-unrevoke", description="unrevoke certificate (negative, for QA)")
+@Command(scope = "xipki-qa", name = "neg-unrevoke",
+        description="unrevoke certificate (negative, for QA)")
 public class NegUnrevokeCertCmd extends UnRevRemoveCertCmd
 {
 

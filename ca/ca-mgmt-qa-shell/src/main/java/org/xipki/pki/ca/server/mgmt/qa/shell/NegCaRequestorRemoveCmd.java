@@ -43,7 +43,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "neg-careq-rm", description="remove requestor in CA")
+@Command(scope = "xipki-caqa", name = "neg-careq-rm",
+        description="remove requestor in CA")
 public class NegCaRequestorRemoveCmd extends CaRequestorRemoveCmd
 {
 

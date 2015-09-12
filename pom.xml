@@ -48,8 +48,7 @@
     <snakeyaml.version>1.13</snakeyaml.version>
     <hessian.version>4.0.38</hessian.version>
     <!-- required by hikaricp -->
-    <hikaricp.version>2.3.2</hikaricp.version>
-    <javassist.version>3.19.0-GA</javassist.version>
+    <hikaricp.version>2.4.1</hikaricp.version>
     <syslog-java-client.version>1.0.6</syslog-java-client.version>
     <jsr305.version>3.0.0</jsr305.version>
   </properties>
@@ -97,7 +96,7 @@
       </dependency>
       <dependency>
         <groupId>com.zaxxer</groupId>
-        <artifactId>HikariCP-java6</artifactId>
+        <artifactId>HikariCP</artifactId>
         <version>${hikaricp.version}</version>
       </dependency>
       <dependency>

@@ -44,7 +44,8 @@ import org.xipki.common.util.IoUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "requestor-add", description="add requestor")
+@Command(scope = "xipki-ca", name = "requestor-add",
+        description="add requestor")
 public class RequestorAddCmd extends CaCmd
 {
     @Option(name = "--name", aliases = "-n",

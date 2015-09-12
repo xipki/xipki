@@ -53,7 +53,8 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "careq-check", description="check information of requestors in CA (QA)")
+@Command(scope = "xipki-caqa", name = "careq-check",
+        description="check information of requestors in CA (QA)")
 public class CaRequestorCheckCmd extends CaCmd
 {
     @Option(name = "--ca",

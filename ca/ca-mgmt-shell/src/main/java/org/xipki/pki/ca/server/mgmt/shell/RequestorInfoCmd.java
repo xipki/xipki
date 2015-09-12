@@ -50,7 +50,8 @@ import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "requestor-info", description="show information of requestor")
+@Command(scope = "xipki-ca", name = "requestor-info",
+        description="show information of requestor")
 public class RequestorInfoCmd extends CaCmd
 {
     @Argument(index = 0, name = "name", description = "requestor name")

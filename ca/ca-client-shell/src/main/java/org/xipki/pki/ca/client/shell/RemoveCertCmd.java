@@ -51,7 +51,8 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-cli", name = "remove-cert", description="remove certificate")
+@Command(scope = "xipki-cli", name = "remove-cert",
+        description="remove certificate")
 public class RemoveCertCmd extends UnRevRemoveCertCmd
 {
 

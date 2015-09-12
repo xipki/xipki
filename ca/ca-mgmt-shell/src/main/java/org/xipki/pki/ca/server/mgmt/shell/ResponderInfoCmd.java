@@ -50,7 +50,8 @@ import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "responder-info", description="show information of responder")
+@Command(scope = "xipki-ca", name = "responder-info",
+        description="show information of responder")
 public class ResponderInfoCmd extends CaCmd
 {
 

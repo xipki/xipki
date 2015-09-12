@@ -43,7 +43,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "neg-ca-add", description="add CA (negative, QA)")
+@Command(scope = "xipki-caqa", name = "neg-ca-add",
+        description="add CA (negative, QA)")
 public class NegCaAddCmd extends CaAddCmd
 {
     @Override

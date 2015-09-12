@@ -44,7 +44,8 @@ import org.xipki.dbtool.LiquibaseDatabaseConf;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "initdb-ocsp", description="reset and initialize the OCSP databases")
+@Command(scope = "xipki-db", name = "initdb-ocsp",
+        description="reset and initialize the OCSP databases")
 public class InitDbOcspCmd extends LiquibaseCmd
 {
     private static final String schemaFile = "xipki/sql/ocsp-init.xml";

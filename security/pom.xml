@@ -18,6 +18,7 @@
     <module>security-api</module>
     <module>security-impl</module>
     <module>security-shell</module>
+    <module>security-speed-shell</module>
     <module>pkcs11-proxy</module>
   </modules>
 </project>

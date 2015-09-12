@@ -46,7 +46,8 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "ca-add", description="add CA")
+@Command(scope = "xipki-ca", name = "ca-add",
+        description="add CA")
 public class CaAddCmd extends CaAddOrGenCmd
 {
     @Option(name = "--cert",

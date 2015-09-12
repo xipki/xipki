@@ -44,7 +44,8 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "republish", description="republish certificates")
+@Command(scope = "xipki-ca", name = "republish",
+        description="republish certificates")
 public class RepublishCmd extends CaCmd
 {
     @Option(name = "--ca",

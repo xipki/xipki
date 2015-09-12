@@ -46,7 +46,8 @@ import org.xipki.pki.ca.dbtool.DbPortWorker;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "import-ca", description="import CA database")
+@Command(scope = "xipki-db", name = "import-ca",
+        description="import CA database")
 public class ImportCaCmd extends DbPortCmd
 {
     private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ca-db.properties";

@@ -42,7 +42,8 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "scep-rm", description="remove SCEP")
+@Command(scope = "xipki-ca", name = "scep-rm",
+        description="remove SCEP")
 public class ScepRemoveCmd extends CaCmd
 {
     @Option(name = "--ca",

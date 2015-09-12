@@ -55,7 +55,8 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-cli", name = "getcrl", description="download CRL")
+@Command(scope = "xipki-cli", name = "getcrl",
+        description="download CRL")
 public class GetCRLCmd extends CRLCmd
 {
     @Option(name = "--with-basecrl",

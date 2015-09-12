@@ -42,7 +42,8 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "user-rm", description="remove user")
+@Command(scope = "xipki-ca", name = "user-rm",
+        description="remove user")
 public class UserRemoveCmd extends CaCmd
 {
 

@@ -43,7 +43,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "neg-publish-self", description="publish the certificate of root CA")
+@Command(scope = "xipki-caqa", name = "neg-publish-self",
+        description="publish the certificate of root CA")
 public class NegCaPublishRCACertCmd extends CaPublishRCACertCmd
 {
 

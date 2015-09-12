@@ -48,7 +48,8 @@ import jline.console.ConsoleReader;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-cmd", name = "copy-file", description="copy file")
+@Command(scope = "xipki-cmd", name = "copy-file",
+        description="copy file")
 public class CopyFileCmd extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "source file",

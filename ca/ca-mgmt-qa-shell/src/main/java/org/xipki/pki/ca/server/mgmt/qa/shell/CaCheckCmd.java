@@ -57,7 +57,8 @@ import org.xipki.pki.ca.server.mgmt.shell.CaUpdateCmd;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "ca-check", description="check information of CAs (QA)")
+@Command(scope = "xipki-caqa", name = "ca-check",
+        description="check information of CAs (QA)")
 public class CaCheckCmd extends CaUpdateCmd
 {
     @Override

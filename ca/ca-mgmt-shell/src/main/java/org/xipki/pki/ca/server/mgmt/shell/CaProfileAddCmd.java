@@ -43,7 +43,8 @@ import org.xipki.common.util.StringUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "caprofile-add", description="add certificate profile to CA")
+@Command(scope = "xipki-ca", name = "caprofile-add",
+        description="add certificate profile to CA")
 public class CaProfileAddCmd extends CaCmd
 {
     @Option(name = "--ca",

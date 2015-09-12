@@ -48,7 +48,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "requestor-check", description="check information of requestors (QA)")
+@Command(scope = "xipki-caqa", name = "requestor-check",
+        description="check information of requestors (QA)")
 public class RequestorCheckCmd extends RequestorUpdateCmd
 {
 

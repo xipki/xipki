@@ -52,7 +52,8 @@ import org.xipki.security.api.CertRevocationInfo;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "ca-export", description="export CA configuration")
+@Command(scope = "xipki-ca", name = "ca-export",
+        description="export CA configuration")
 public class CaExportCmd extends CaCmd
 {
     @Option(name = "--name", aliases = "-n",

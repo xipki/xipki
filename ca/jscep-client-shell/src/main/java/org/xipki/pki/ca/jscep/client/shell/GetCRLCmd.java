@@ -49,7 +49,8 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-@Command(scope = "jscep", name = "getcrl", description="download CRL")
+@Command(scope = "jscep", name = "getcrl",
+        description="download CRL")
 public class GetCRLCmd extends ClientCmd
 {
     @Option(name = "--cert", aliases = "-c",

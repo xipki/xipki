@@ -46,7 +46,8 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-cli", name = "health", description="check healty status of CA")
+@Command(scope = "xipki-cli", name = "health",
+        description="check healty status of CA")
 public class HealthCmd extends ClientCmd
 {
 

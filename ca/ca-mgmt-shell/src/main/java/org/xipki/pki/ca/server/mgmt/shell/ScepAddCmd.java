@@ -46,7 +46,8 @@ import org.xipki.password.api.PasswordResolver;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "scep-add", description="add SCEP")
+@Command(scope = "xipki-ca", name = "scep-add",
+        description="add SCEP")
 public class ScepAddCmd extends CaCmd
 {
     @Option(name = "--ca",

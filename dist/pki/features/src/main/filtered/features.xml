@@ -35,8 +35,7 @@
   </feature>
   <feature name="xipki-datasource" version="${project.version}" resolver="(obr)">
     <feature>xipki-password</feature>
-    <bundle>mvn:com.zaxxer/HikariCP-java6/${hikaricp.version}</bundle>
-    <bundle>mvn:org.javassist/javassist/${javassist.version}</bundle>
+    <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle>mvn:org.xipki.pki/datasource-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/datasource-impl/${project.version}</bundle>
   </feature>
@@ -106,6 +105,7 @@
     <feature>xipki-security</feature>
     <bundle>mvn:org.xipki.pki/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/security-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/security-speed-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-scepclient-shell" version="${project.version}" resolver="(obr)">
     <feature>bouncycastle</feature>

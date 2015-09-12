@@ -42,7 +42,8 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "careq-rm", description="remove requestor from CA")
+@Command(scope = "xipki-ca", name = "careq-rm",
+        description="remove requestor from CA")
 public class CaRequestorRemoveCmd extends CaCmd
 {
     @Option(name = "--ca",

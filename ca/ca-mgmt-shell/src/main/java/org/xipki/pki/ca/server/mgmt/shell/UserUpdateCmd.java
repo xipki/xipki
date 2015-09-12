@@ -42,7 +42,8 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "user-up", description="update user")
+@Command(scope = "xipki-ca", name = "user-up",
+        description="update user")
 public class UserUpdateCmd extends CaCmd
 {
 
