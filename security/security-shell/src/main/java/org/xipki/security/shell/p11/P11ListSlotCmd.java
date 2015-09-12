@@ -77,7 +77,8 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "list", description="list objects in PKCS#11 device")
+@Command(scope = "xipki-tk", name = "list",
+        description="list objects in PKCS#11 device")
 public class P11ListSlotCmd extends SecurityCmd
 {
     @Option(name = "--verbose", aliases="-v",
