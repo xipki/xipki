@@ -75,7 +75,8 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ocsp", name = "status", description="request certificate status")
+@Command(scope = "xipki-ocsp", name = "status",
+        description="request certificate status")
 public class OCSPStatusCmd extends BaseOCSPStatusCmd
 {
     @Override

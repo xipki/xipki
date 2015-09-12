@@ -141,7 +141,16 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.client.shell.loadtest.CALoadTestEnrollCmd">
+      <action class="org.xipki.pki.ca.client.shell.HealthCmd">
+        <property name="caClient" ref="caClient"/>
+      </action>
+      <optional-completers>
+        <entry key="--ca" value-ref="caNameCompleter"/>
+      </optional-completers>
+    </command>
+    <!-- load test -->
+    <command>
+      <action class="org.xipki.pki.ca.client.shell.loadtest.cmd.CALoadTestEnrollCmd">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -150,7 +159,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.client.shell.loadtest.CALoadTestTemplateEnrollCmd">
+      <action class="org.xipki.pki.ca.client.shell.loadtest.cmd.CALoadTestTemplateEnrollCmd">
         <property name="caClient" ref="caClient"/>
       </action>
       <optional-completers>
@@ -158,7 +167,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.client.shell.loadtest.CALoadTestRevokeCmd">
+      <action class="org.xipki.pki.ca.client.shell.loadtest.cmd.CALoadTestRevokeCmd">
         <property name="caClient" ref="caClient"/>
         <property name="securityFactory" ref="securityFactory"/>
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
@@ -166,14 +175,6 @@
       <optional-completers>
         <entry key="--issuer" value-ref="filePathCompleter"/>
         <entry key="--ca-db" value-ref="filePathCompleter"/>
-      </optional-completers>
-    </command>
-    <command>
-      <action class="org.xipki.pki.ca.client.shell.HealthCmd">
-        <property name="caClient" ref="caClient"/>
-      </action>
-      <optional-completers>
-        <entry key="--ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
   </command-bundle>

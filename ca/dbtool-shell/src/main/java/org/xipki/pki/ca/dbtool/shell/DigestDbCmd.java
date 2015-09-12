@@ -46,7 +46,8 @@ import org.xipki.pki.ca.dbtool.diffdb.DbDigestExportWorker;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "digest-db", description="digest XiPKI/EJBCA database")
+@Command(scope = "xipki-db", name = "digest-db",
+        description="digest XiPKI/EJBCA database")
 public class DigestDbCmd extends DbPortCmd
 {
     @Option(name = "--db-conf",
@@ -62,7 +63,7 @@ public class DigestDbCmd extends DbPortCmd
 
     @Option(name = "-k",
             description = "number of certificates per SELECT")
-    private Integer numCertsPerSelect = 100;
+    private Integer numCertsPerSelect = 1000;
 
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;

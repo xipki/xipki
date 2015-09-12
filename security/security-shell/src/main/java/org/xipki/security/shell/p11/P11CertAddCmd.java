@@ -49,7 +49,8 @@ import org.xipki.security.shell.SecurityCmd;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "add-cert", description="add certificate to PKCS#11 device")
+@Command(scope = "xipki-tk", name = "add-cert",
+        description="add certificate to PKCS#11 device")
 public class P11CertAddCmd extends SecurityCmd
 {
 

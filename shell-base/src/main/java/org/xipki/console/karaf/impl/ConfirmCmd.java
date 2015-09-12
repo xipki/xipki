@@ -46,7 +46,8 @@ import jline.console.ConsoleReader;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-cmd", name = "confirm", description="Prompt")
+@Command(scope = "xipki-cmd", name = "confirm",
+        description="prompt")
 public class ConfirmCmd extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "message",

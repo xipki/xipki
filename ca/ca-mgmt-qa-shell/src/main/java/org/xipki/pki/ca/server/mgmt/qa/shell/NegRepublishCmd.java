@@ -43,7 +43,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "neg-republish", description="republish certificates (negative, QA)")
+@Command(scope = "xipki-caqa", name = "neg-republish",
+        description="republish certificates (negative, QA)")
 public class NegRepublishCmd extends RepublishCmd
 {
     @Override

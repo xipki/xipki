@@ -45,7 +45,8 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-cmd", name = "copy-dir", description="copy content of the directory to destination")
+@Command(scope = "xipki-cmd", name = "copy-dir",
+        description="copy content of the directory to destination")
 public class CopyDirCmd extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "source_directory",

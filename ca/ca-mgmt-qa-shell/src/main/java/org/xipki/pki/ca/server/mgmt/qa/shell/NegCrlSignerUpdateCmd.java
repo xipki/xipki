@@ -43,7 +43,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "neg-crlsigner-up", description="update CRL signer (negative, QA)")
+@Command(scope = "xipki-caqa", name = "neg-crlsigner-up",
+        description="update CRL signer (negative, QA)")
 public class NegCrlSignerUpdateCmd extends CrlSignerUpdateCmd
 {
 

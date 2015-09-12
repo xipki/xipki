@@ -42,7 +42,8 @@ import org.xipki.password.OBFPasswordResolver;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "obfuscate", description="obfuscate password")
+@Command(scope = "xipki-tk", name = "obfuscate",
+        description="obfuscate password")
 public class ObfuscateCmd extends SecurityCmd
 {
     @Override

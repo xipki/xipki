@@ -44,7 +44,8 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "profile-up", description="update certificate profile")
+@Command(scope = "xipki-ca", name = "profile-up",
+        description="update certificate profile")
 public class ProfileUpdateCmd extends CaCmd
 {
 

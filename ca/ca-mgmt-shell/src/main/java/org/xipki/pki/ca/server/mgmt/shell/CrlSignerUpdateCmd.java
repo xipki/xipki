@@ -52,7 +52,8 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "crlsigner-up", description="update CRL signer")
+@Command(scope = "xipki-ca", name = "crlsigner-up",
+        description="update CRL signer")
 public class CrlSignerUpdateCmd extends CaCmd
 {
     @Option(name = "--name", aliases = "-n",

@@ -44,7 +44,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "publisher-check", description="check information of publishers (QA)")
+@Command(scope = "xipki-caqa", name = "publisher-check",
+        description="check information of publishers (QA)")
 public class PublisherCheckCmd extends PublisherUpdateCmd
 {
     @Override

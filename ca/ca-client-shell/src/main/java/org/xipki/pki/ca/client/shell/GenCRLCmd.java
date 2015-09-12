@@ -46,7 +46,8 @@ import org.xipki.common.RequestResponseDebug;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-cli", name = "gencrl", description="generate CRL")
+@Command(scope = "xipki-cli", name = "gencrl",
+        description="generate CRL")
 public class GenCRLCmd extends CRLCmd
 {
     @Override

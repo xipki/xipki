@@ -42,7 +42,8 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "cmpcontrol-up", description="update CMP control")
+@Command(scope = "xipki-ca", name = "cmpcontrol-up",
+        description="update CMP control")
 public class CmpControlUpdateCmd extends CaCmd
 {
     @Option(name = "--name", aliases = "-n",

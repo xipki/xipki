@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- 
  Copyright (c) 2014 - 2015 Lijun Liao
+
+ Maximal column size: 4k
+  - DB2: PAGESIZE 4 k
 -->
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -50,7 +53,7 @@
       <column name="NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="CONF" type="VARCHAR(4000)">
+      <column name="CONF" type="VARCHAR(1000)">
         <constraints nullable="false"/>
       </column>
     </createTable>
@@ -62,7 +65,7 @@
       <column name="TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
-      <column name="CERT" type="VARCHAR(3000)"/>
+      <column name="CERT" type="CLOB"/>
       <column name="CONF" type="CLOB"/>
     </createTable>
     <!-- table ENVIRONMENT -->
@@ -80,8 +83,8 @@
       <column name="SIGNER_TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
-      <column name="SIGNER_CERT" type="VARCHAR(3000)"/>
-      <column name="CRL_CONTROL" type="VARCHAR(4000)"/>
+      <column name="SIGNER_CERT" type="CLOB"/>
+      <column name="CRL_CONTROL" type="VARCHAR(1000)"/>
       <column name="SIGNER_CONF" type="CLOB"/>
     </createTable>
     <!-- table REQUESTOR -->
@@ -89,7 +92,7 @@
       <column name="NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="CERT" type="VARCHAR(3000)">
+      <column name="CERT" type="CLOB">
         <constraints nullable="false"/>
       </column>
     </createTable>
@@ -101,7 +104,7 @@
       <column name="TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
-      <column name="CONF" type="VARCHAR(4000)"/>
+      <column name="CONF" type="CLOB"/>
     </createTable>
     <!-- table "PROFILE" -->
     <createTable tableName="PROFILE">
@@ -135,10 +138,10 @@
       <column name="SUBJECT" type="${x500name.type}">
         <constraints nullable="false"/>
       </column>
-      <column name="CRL_URIS" type="VARCHAR(1000)"/>
-      <column name="DELTACRL_URIS" type="VARCHAR(1000)"/>
-      <column name="OCSP_URIS" type="VARCHAR(1000)"/>
-      <column name="CACERT_URIS" type="VARCHAR(1000)"/>
+      <column name="CRL_URIS" type="VARCHAR(500)"/>
+      <column name="DELTACRL_URIS" type="VARCHAR(500)"/>
+      <column name="OCSP_URIS" type="VARCHAR(500)"/>
+      <column name="CACERT_URIS" type="VARCHAR(500)"/>
       <column name="MAX_VALIDITY" type="VARCHAR(45)">
         <constraints nullable="false"/>
       </column>
@@ -182,10 +185,10 @@
       <column name="SIGNER_TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
-      <column name="CERT" type="VARCHAR(3000)">
+      <column name="CERT" type="CLOB">
         <constraints nullable="false"/>
       </column>
-      <column name="EXTRA_CONTROL" type="VARCHAR(4000)"/>
+      <column name="EXTRA_CONTROL" type="VARCHAR(500)"/>
       <column name="SIGNER_CONF" type="CLOB">
         <constraints nullable="false"/>
       </column>

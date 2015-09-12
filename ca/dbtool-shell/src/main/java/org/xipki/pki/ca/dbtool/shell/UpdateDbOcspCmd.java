@@ -44,7 +44,8 @@ import org.xipki.dbtool.LiquibaseDatabaseConf;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "updatedb-ocsp", description="update the OCSP database schema")
+@Command(scope = "xipki-db", name = "updatedb-ocsp",
+        description="update the OCSP database schema")
 public class UpdateDbOcspCmd extends LiquibaseCmd
 {
     private static final String schemaFile = "xipki/sql/ocsp-init.xml";

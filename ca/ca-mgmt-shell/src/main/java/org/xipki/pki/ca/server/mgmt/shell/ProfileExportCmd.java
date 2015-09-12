@@ -47,7 +47,8 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "profile-export", description="export certificate profile configuration")
+@Command(scope = "xipki-ca", name = "profile-export",
+        description="export certificate profile configuration")
 public class ProfileExportCmd extends CaCmd
 {
     @Option(name = "--name", aliases = "-n",

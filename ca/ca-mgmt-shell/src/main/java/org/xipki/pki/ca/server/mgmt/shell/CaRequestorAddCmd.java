@@ -48,7 +48,8 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "careq-add", description="add requestor to CA")
+@Command(scope = "xipki-ca", name = "careq-add",
+        description="add requestor to CA")
 public class CaRequestorAddCmd extends CaCmd
 {
     @Option(name = "--ca",

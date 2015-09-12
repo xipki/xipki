@@ -46,7 +46,8 @@ import org.xipki.common.RequestResponseDebug;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-qa", name = "neg-getcrl", description="download CRL (negative, for QA)")
+@Command(scope = "xipki-qa", name = "neg-getcrl",
+        description="download CRL (negative, for QA)")
 public class NegGetCRLCmd extends NegCRLCmd
 {
 

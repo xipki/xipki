@@ -51,7 +51,8 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "responder-up", description="update responder")
+@Command(scope = "xipki-ca", name = "responder-up",
+        description="update responder")
 public class ResponderUpdateCmd extends CaCmd
 {
     @Option(name = "--name", aliases = "-n",

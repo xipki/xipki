@@ -60,7 +60,8 @@ import org.xipki.security.api.util.AlgorithmUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-qa", name = "ocsp-status", description="request certificate status (QA)")
+@Command(scope = "xipki-qa", name = "ocsp-status",
+        description="request certificate status (QA)")
 public class OCSPQAStatusCmd extends BaseOCSPStatusCmd
 {
     @Option(name = "--exp-error",

@@ -47,7 +47,8 @@ import org.xipki.security.api.CRLReason;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "revoke-cert", description="revoke certificate")
+@Command(scope = "xipki-ca", name = "revoke-cert",
+        description="revoke certificate")
 public class RevokeCertCmd extends UnRevRemoveCertCmd
 {
     @Option(name = "--reason", aliases = "-r",

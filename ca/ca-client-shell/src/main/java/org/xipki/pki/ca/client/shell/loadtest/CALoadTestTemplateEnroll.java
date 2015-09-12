@@ -35,7 +35,6 @@
 
 package org.xipki.pki.ca.client.shell.loadtest;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.cert.X509Certificate;
@@ -61,6 +60,10 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.InvalidConfException;
+import org.xipki.common.LoadExecutor;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.XMLUtil;
 import org.xipki.pki.ca.client.api.CAClient;
 import org.xipki.pki.ca.client.api.CAClientException;
 import org.xipki.pki.ca.client.api.CertOrError;
@@ -76,17 +79,13 @@ import org.xipki.pki.ca.client.shell.loadtest.KeyEntry.DSAKeyEntry;
 import org.xipki.pki.ca.client.shell.loadtest.KeyEntry.ECKeyEntry;
 import org.xipki.pki.ca.client.shell.loadtest.KeyEntry.RSAKeyEntry;
 import org.xipki.pki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.qa.AbstractLoadTest;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.XMLUtil;
 import org.xml.sax.SAXException;
 
 /**
  * @author Lijun Liao
  */
 
-public class CALoadTestTemplateEnroll extends AbstractLoadTest
+public class CALoadTestTemplateEnroll extends LoadExecutor
 {
     private final static class CertRequestWithProfile
     {
@@ -191,11 +190,14 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
 
     public CALoadTestTemplateEnroll(
             final CAClient caClient,
-            final String templateFile)
+            final EnrollTemplateType template,
+            final String description)
     throws Exception
     {
+        super(description);
+
         ParamUtil.assertNotNull("caClient", caClient);
-        ParamUtil.assertNotBlank("templateFile", templateFile);
+        ParamUtil.assertNotNull("template", template);
 
         this.caClient = caClient;
 
@@ -205,8 +207,6 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
         baseTime.set(Calendar.DAY_OF_MONTH, 1);
 
         this.index = new AtomicLong(getSecureIndex());
-
-        EnrollTemplateType template = parse(new FileInputStream(templateFile));
 
         List<EnrollCertType> list = template.getEnrollCert();
         loadtestEntries = new ArrayList<>(list.size());
@@ -286,7 +286,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
         return certRequests;
     }
 
-    private static EnrollTemplateType parse(
+    public static EnrollTemplateType parse(
             final InputStream configStream)
     throws InvalidConfException
     {

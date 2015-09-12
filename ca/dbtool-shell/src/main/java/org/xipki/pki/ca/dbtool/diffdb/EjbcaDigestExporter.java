@@ -79,7 +79,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                 final String caDirname)
         {
             this.caId = caId;
-            this.hexSha1 = HashCalculator.hexSha1(certBytes);
+            this.hexSha1 = HashCalculator.hexSha1(certBytes).toLowerCase();
             this.subject = Certificate.getInstance(certBytes).getSubject();
             this.caDirname = caDirname;
         }
@@ -345,6 +345,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
 
                     if ( caInfo == null)
                     {
+                        LOG.debug("Found no CA by caFingerprint, try to resolve by issuer");
                         if(tblCertHasId)
                         {
                             rawCertPs.setInt(1, id);

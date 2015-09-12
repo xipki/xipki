@@ -56,14 +56,14 @@ import org.xipki.pki.ca.client.api.PKIErrorException;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType.Type;
-import org.xipki.common.qa.AbstractLoadTest;
+import org.xipki.common.LoadExecutor;
 import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
  */
 
-class CALoadTestEnroll extends AbstractLoadTest
+public class CALoadTestEnroll extends LoadExecutor
 {
     private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();
 
@@ -85,8 +85,10 @@ class CALoadTestEnroll extends AbstractLoadTest
     public CALoadTestEnroll(
             final CAClient caClient,
             final LoadTestEntry loadtestEntry,
-            final int n)
+            final int n,
+            final String description)
     {
+        super(description);
         ParamUtil.assertNotNull("caClient", caClient);
         ParamUtil.assertNotNull("loadtestEntry", loadtestEntry);
         if(n < 1)

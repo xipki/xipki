@@ -162,7 +162,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
         sb.append(col_revInvTime).append(",");
         sb.append(col_certhash);
         sb.append(" FROM CERT INNER JOIN ").append(tbl_certhash);
-        sb.append(" ON CERT.ID>=? AND CER.ID<? AND CERT.ID=");
+        sb.append(" ON CERT.ID>=? AND CERT.ID<? AND CERT.ID=");
         sb.append(tbl_certhash).append(".").append(col_certId);
         sb.append(" ORDER BY CERT.ID ASC");
         this.certSql = sb.toString();

@@ -46,7 +46,8 @@ import org.xipki.pki.ca.dbtool.diffdb.DbDigestDiffWorker;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "diff-digest-db", description="diff digest XiPKI/EJBCA database")
+@Command(scope = "xipki-db", name = "diff-digest-db",
+        description="diff digest XiPKI/EJBCA database")
 public class DiffDigestDbCmd extends DbPortCmd
 {
     @Option(name = "-a",

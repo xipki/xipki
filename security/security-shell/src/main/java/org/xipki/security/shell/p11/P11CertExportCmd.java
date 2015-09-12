@@ -48,7 +48,8 @@ import org.xipki.security.api.p11.P11WritableSlot;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "export-cert", description="export certificate from PKCS#11 device")
+@Command(scope = "xipki-tk", name = "export-cert",
+        description="export certificate from PKCS#11 device")
 public class P11CertExportCmd extends P11SecurityCmd
 {
 

@@ -52,7 +52,8 @@ import org.xipki.security.api.CertRevocationInfo;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "ca-revoke", description="revoke CA")
+@Command(scope = "xipki-ca", name = "ca-revoke",
+        description="revoke CA")
 public class CaRevokeCmd extends CaCmd
 {
     public static List<CRLReason> permitted_reasons = Collections.unmodifiableList(

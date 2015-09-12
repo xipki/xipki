@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+ Copyright (c) 2014 - 2015 Lijun Liao
+-->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+    default-activation="lazy">
+  <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
+  <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
+  <reference id="ecCurveNameCompleter" interface="org.xipki.console.karaf.ECCurveNameCompleter"/>
+  <bean id="p11ModuleNameCompleter" class="org.xipki.security.speed.p11.cmd.P11ModuleNameCompleter">
+    <property name="securityFactory" ref="securityFactory"/>
+  </bean>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
+
+    <!-- load test PKCS#11 -->
+    <command>
+      <action class="org.xipki.security.speed.p11.cmd.SpeedP11DSAKeyGenCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.security.speed.p11.cmd.BSpeedP11DSAKeyGenCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+      </optional-completers>
+    </command>
+
+    <command>
+      <action class="org.xipki.security.speed.p11.cmd.SpeedP11DSASignCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.security.speed.p11.cmd.BSpeedP11DSASignCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+      </optional-completers>
+    </command>
+
+    <command>
+      <action class="org.xipki.security.speed.p11.cmd.SpeedP11ECKeyGenCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+        <entry key="--curve" value-ref="ecCurveNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.security.speed.p11.cmd.BSpeedP11ECKeyGenCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+      </optional-completers>
+    </command>
+
+    <command>
+      <action class="org.xipki.security.speed.p11.cmd.SpeedP11ECSignCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+        <entry key="--curve" value-ref="ecCurveNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.security.speed.p11.cmd.BSpeedP11ECSignCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+      </optional-completers>
+    </command>
+
+    <command>
+      <action class="org.xipki.security.speed.p11.cmd.SpeedP11RSAKeyGenCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.security.speed.p11.cmd.BSpeedP11RSAKeyGenCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+      </optional-completers>
+    </command>
+
+    <command>
+      <action class="org.xipki.security.speed.p11.cmd.SpeedP11RSASignCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.security.speed.p11.cmd.BSpeedP11RSASignCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--module" value-ref="p11ModuleNameCompleter"/>
+      </optional-completers>
+    </command>
+
+    <!-- load test PKCS#12 -->
+    <command>
+      <action class="org.xipki.security.speed.p12.cmd.SpeedP12DSAKeyGenCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+    </command>
+    <command>
+      <action class="org.xipki.security.speed.p12.cmd.BSpeedP12DSAKeyGenCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+    </command>
+
+    <command>
+      <action class="org.xipki.security.speed.p12.cmd.SpeedP12DSASignCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+    </command>
+    <command>
+      <action class="org.xipki.security.speed.p12.cmd.BSpeedP12DSASignCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+    </command>
+
+    <command>
+      <action class="org.xipki.security.speed.p12.cmd.SpeedP12ECKeyGenCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--curve" value-ref="ecCurveNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.security.speed.p12.cmd.BSpeedP12ECKeyGenCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+    </command>
+
+    <command>
+      <action class="org.xipki.security.speed.p12.cmd.SpeedP12ECSignCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="--curve" value-ref="ecCurveNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command>
+      <action class="org.xipki.security.speed.p12.cmd.BSpeedP12ECSignCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+    </command>
+
+    <command>
+      <action class="org.xipki.security.speed.p12.cmd.SpeedP12RSAKeyGenCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+    </command>
+    <command>
+      <action class="org.xipki.security.speed.p12.cmd.BSpeedP12RSAKeyGenCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+    </command>
+
+    <command>
+      <action class="org.xipki.security.speed.p12.cmd.SpeedP12RSASignCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+    </command>
+    <command>
+      <action class="org.xipki.security.speed.p12.cmd.BSpeedP12RSASignCmd">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+    </command>
+  </command-bundle>
+</blueprint>

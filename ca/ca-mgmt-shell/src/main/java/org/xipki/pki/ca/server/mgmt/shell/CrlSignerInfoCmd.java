@@ -50,7 +50,8 @@ import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "crlsigner-info", description="show information of CRL signer")
+@Command(scope = "xipki-ca", name = "crlsigner-info",
+        description="show information of CRL signer")
 public class CrlSignerInfoCmd extends CaCmd
 {
     @Argument(index = 0, name = "name", description = "CRL signer name")

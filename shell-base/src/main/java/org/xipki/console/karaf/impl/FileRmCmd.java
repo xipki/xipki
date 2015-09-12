@@ -48,7 +48,8 @@ import jline.console.ConsoleReader;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-cmd", name = "rm", description="remove file or directory")
+@Command(scope = "xipki-cmd", name = "rm",
+        description="remove file or directory")
 public class FileRmCmd extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "file",

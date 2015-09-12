@@ -44,7 +44,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "caalias-check", description="check CA aliases (QA)")
+@Command(scope = "xipki-caqa", name = "caalias-check",
+        description="check CA aliases (QA)")
 public class CaAliasCheckCmd extends CaCmd
 {
     @Option(name = "--ca",

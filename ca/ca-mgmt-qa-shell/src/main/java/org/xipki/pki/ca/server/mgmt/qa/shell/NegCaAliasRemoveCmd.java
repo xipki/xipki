@@ -43,7 +43,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "neg-caalias-rm", description="remove CA alias (negative, QA)")
+@Command(scope = "xipki-caqa", name = "neg-caalias-rm",
+        description="remove CA alias (negative, QA)")
 public class NegCaAliasRemoveCmd extends CaAliasRemoveCmd
 {
 

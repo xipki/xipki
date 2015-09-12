@@ -43,7 +43,6 @@ import java.util.List;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 import org.xipki.pki.ocsp.client.shell.AbstractOCSPStatusCmd;
@@ -53,7 +52,8 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ocsp", name = "loadtest-status", description="OCSP Load test")
+@Command(scope = "xipki-ocsp", name = "loadtest-status",
+        description="OCSP Load test")
 public class OCSPStatusLoadTestCmd extends AbstractOCSPStatusCmd
 {
     @Option(name = "--serial",
@@ -130,22 +130,18 @@ public class OCSPStatusLoadTestCmd extends AbstractOCSPStatusCmd
             throw new RuntimeException("invalid URL: " + serverURL);
         }
 
-        StringBuilder startMsg = new StringBuilder();
-
-        startMsg.append("threads:        ").append(numThreads).append("\n");
-        startMsg.append("duration:       ").append(StringUtil.formatTime(durationInSecond, false)).append("\n");
-        startMsg.append("serial numbers: ").append(this.serialNumbers).append("\n");
-        startMsg.append("issuer cert:    ").append(issuerCertFile).append("\n");
-        startMsg.append("server URL:     ").append(serverUrl.toString()).append("\n");
-        startMsg.append("hash:           ").append(hashAlgo).append("\n");
-        System.out.print(startMsg.toString());
+        StringBuilder description = new StringBuilder();
+        description.append("serial numbers: ").append(this.serialNumbers).append("\n");
+        description.append("issuer cert: ").append(issuerCertFile).append("\n");
+        description.append("server URL: ").append(serverUrl.toString()).append("\n");
+        description.append("hash: ").append(hashAlgo);
 
         X509Certificate issuerCert = X509Util.parseCert(issuerCertFile);
 
         RequestOptions options = getRequestOptions();
 
         OcspLoadTest loadTest = new OcspLoadTest(requestor, serialNumbers,
-                issuerCert, serverUrl, options);
+                issuerCert, serverUrl, options, description.toString());
         loadTest.setDuration(durationInSecond);
         loadTest.setThreads(numThreads);
         loadTest.test();

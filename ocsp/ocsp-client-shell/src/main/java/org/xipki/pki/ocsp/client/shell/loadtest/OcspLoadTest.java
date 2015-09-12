@@ -49,7 +49,7 @@ import org.bouncycastle.cert.ocsp.SingleResp;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.qa.AbstractLoadTest;
+import org.xipki.common.LoadExecutor;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ocsp.client.api.OCSPRequestor;
 import org.xipki.pki.ocsp.client.api.OCSPRequestorException;
@@ -61,7 +61,7 @@ import org.xipki.pki.ocsp.client.shell.OCSPUtils;
  * @author Lijun Liao
  */
 
-public class OcspLoadTest extends AbstractLoadTest
+public class OcspLoadTest extends LoadExecutor
 {
     private static final Logger LOG = LoggerFactory.getLogger(OcspLoadTest.class);
 
@@ -86,8 +86,10 @@ public class OcspLoadTest extends AbstractLoadTest
             final List<Long> serials,
             final X509Certificate caCert,
             final URL serverUrl,
-            final RequestOptions options)
+            final RequestOptions options,
+            final String description)
     {
+        super(description);
         ParamUtil.assertNotNull("requestor", requestor);
         ParamUtil.assertNotEmpty("serials", serials);
         ParamUtil.assertNotNull("caCert", caCert);

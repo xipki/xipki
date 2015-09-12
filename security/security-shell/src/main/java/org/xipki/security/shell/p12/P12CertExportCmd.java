@@ -48,7 +48,8 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-tk", name = "export-cert-p12", description="export certificate from PKCS#12 keystore")
+@Command(scope = "xipki-tk", name = "export-cert-p12",
+        description="export certificate from PKCS#12 keystore")
 public class P12CertExportCmd extends P12SecurityCmd
 {
     @Option(name = "--out", aliases = "-o",
