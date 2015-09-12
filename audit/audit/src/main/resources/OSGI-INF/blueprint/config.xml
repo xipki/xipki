@@ -10,12 +10,12 @@
       <cm:property name="audit.enabled" value="true"/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <reference id="auditLoggingService" interface="org.xipki.audit.api.AuditLoggingService" availability="optional"/>
-  <bean id="auditServiceRegister" class="org.xipki.audit.api.AuditLoggingServiceRegisterImpl">
+  <reference id="auditService" interface="org.xipki.audit.api.AuditService" availability="optional"/>
+  <bean id="auditServiceRegister" class="org.xipki.audit.api.AuditServiceRegisterImpl">
     <property name="auditEnabled" value="${audit.enabled}"/>
   </bean>
-  <reference-list id="auditServices" interface="org.xipki.audit.api.AuditLoggingService" availability="optional">
+  <reference-list id="auditServices" interface="org.xipki.audit.api.AuditService" availability="optional">
     <reference-listener ref="auditServiceRegister" bind-method="bindService" unbind-method="unbindService"/>
   </reference-list>
-  <service ref="auditServiceRegister" interface="org.xipki.audit.api.AuditLoggingServiceRegister"/>
+  <service ref="auditServiceRegister" interface="org.xipki.audit.api.AuditServiceRegister"/>
 </blueprint>

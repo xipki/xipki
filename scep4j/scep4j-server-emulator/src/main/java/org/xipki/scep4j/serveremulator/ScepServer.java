@@ -52,7 +52,7 @@ import org.bouncycastle.jce.X509KeyUsage;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.xipki.audit.slf4j.impl.Slf4jAuditLoggingServiceImpl;
+import org.xipki.audit.slf4j.impl.Slf4jAuditServiceImpl;
 import org.xipki.scep4j.crypto.HashAlgoType;
 import org.xipki.scep4j.message.CACaps;
 import org.xipki.scep4j.util.ParamUtil;
@@ -197,7 +197,7 @@ public class ScepServer
         }
 
         this.servlet = new ScepServlet(scepResponder);
-        this.servlet.setAuditLoggingService(new Slf4jAuditLoggingServiceImpl());
+        this.servlet.setAuditService(new Slf4jAuditServiceImpl());
         return this.servlet;
     }
 

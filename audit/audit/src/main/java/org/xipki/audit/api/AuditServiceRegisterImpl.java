@@ -39,26 +39,26 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.slf4j.impl.Slf4jAuditLoggingServiceImpl;
+import org.xipki.audit.slf4j.impl.Slf4jAuditServiceImpl;
 
 /**
  * @author Lijun Liao
  */
 
-public class AuditLoggingServiceRegisterImpl implements AuditLoggingServiceRegister
+public class AuditServiceRegisterImpl implements AuditServiceRegister
 {
-    private static final Logger LOG = LoggerFactory.getLogger(AuditLoggingServiceRegisterImpl.class);
-    private ConcurrentLinkedDeque<AuditLoggingService> services = new ConcurrentLinkedDeque<AuditLoggingService>();
-    private Slf4jAuditLoggingServiceImpl defaultAuditLoggingService = new Slf4jAuditLoggingServiceImpl();
+    private static final Logger LOG = LoggerFactory.getLogger(AuditServiceRegisterImpl.class);
+    private ConcurrentLinkedDeque<AuditService> services = new ConcurrentLinkedDeque<AuditService>();
+    private Slf4jAuditServiceImpl defaultAuditService = new Slf4jAuditServiceImpl();
 
     private boolean auditEnabled;
 
     @Override
-    public AuditLoggingService getAuditLoggingService()
+    public AuditService getAuditService()
     {
         if(auditEnabled)
         {
-            return services.isEmpty() ? defaultAuditLoggingService : services.getLast();
+            return services.isEmpty() ? defaultAuditService : services.getLast();
         }
         else
         {
@@ -67,7 +67,7 @@ public class AuditLoggingServiceRegisterImpl implements AuditLoggingServiceRegis
     }
 
     public void bindService(
-            final AuditLoggingService service)
+            final AuditService service)
     {
         //might be null if dependency is optional
         if (service == null)
@@ -78,11 +78,11 @@ public class AuditLoggingServiceRegisterImpl implements AuditLoggingServiceRegis
 
         boolean replaced = services.remove(service);
         services.add(service);
-        LOG.debug("{} AuditLoggingService binding for {}", (replaced ? "replaced" : "added"), service);
+        LOG.debug("{} AuditService binding for {}", (replaced ? "replaced" : "added"), service);
     }
 
     public void unbindService(
-            final AuditLoggingService service)
+            final AuditService service)
     {
         //might be null if dependency is optional
         if (service == null)
@@ -95,11 +95,11 @@ public class AuditLoggingServiceRegisterImpl implements AuditLoggingServiceRegis
         {
             if(services.remove(service))
             {
-                LOG.debug("removed AuditLoggingService binding for {}", service);
+                LOG.debug("removed AuditService binding for {}", service);
             }
             else
             {
-                LOG.debug("no AuditLoggingService binding found to remove for '{}'", service);
+                LOG.debug("no AuditService binding found to remove for '{}'", service);
             }
         } catch (Exception e)
         {
