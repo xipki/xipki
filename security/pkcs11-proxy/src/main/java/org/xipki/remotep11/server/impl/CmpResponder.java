@@ -148,7 +148,8 @@ class CmpResponder
 
         if(itv == null)
         {
-            final String statusMessage = String.format("PKIBody type %s is only supported with the sub-knownTypes",
+            final String statusMessage = String.format(
+                    "PKIBody type %s is only supported with the sub-knownTypes",
                     ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId());
             return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, statusMessage);
         }
@@ -169,15 +170,17 @@ class CmpResponder
                 }
             }catch(IllegalArgumentException e)
             {
-                final String statusMessage = "invalid value of the InfoTypeAndValue for " +
-                        ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId();
-                return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, statusMessage);
+                final String statusMessage = "invalid value of the InfoTypeAndValue for "
+                        + ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId();
+                return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest,
+                        statusMessage);
             }
 
             int action = asn1Code.getPositiveValue().intValue();
             ASN1Encodable respItvInfoValue;
 
-            P11CryptService p11CryptService = localP11CryptServicePool.getP11CryptService(moduleName);
+            P11CryptService p11CryptService =
+                    localP11CryptServicePool.getP11CryptService(moduleName);
 
             switch(action)
             {

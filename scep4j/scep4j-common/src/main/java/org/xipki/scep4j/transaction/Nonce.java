@@ -60,7 +60,9 @@ public class Nonce
         {
             throw new IllegalArgumentException("bytes.len is not 16: " + bytes.length);
         }
-        this.bytes = cloneBytes ? Arrays.clone(bytes) : bytes;
+        this.bytes = cloneBytes
+                ? Arrays.clone(bytes)
+                : bytes;
     }
 
     public Nonce(

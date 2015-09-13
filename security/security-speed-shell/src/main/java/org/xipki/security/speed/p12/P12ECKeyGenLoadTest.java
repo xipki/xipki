@@ -50,8 +50,8 @@ public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest
             final String curveNameOrOid)
     throws Exception
     {
-        super("PKCS#12 EC key generation\n" +
-                "curve: " + curveNameOrOid);
+        super("PKCS#12 EC key generation\n"
+                + "curve: " + curveNameOrOid);
 
         this.kpGen = new ECKeypairGenerator(curveNameOrOid);
     }

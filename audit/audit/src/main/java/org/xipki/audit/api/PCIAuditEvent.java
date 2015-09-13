@@ -264,8 +264,8 @@ public class PCIAuditEvent
             final char delimiter,
             final String replaceDelimiter)
     {
-        if (replaceDelimiter == null || replaceDelimiter.length() < 1 ||
-                fieldValue == null || fieldValue.length() < 1)
+        if (replaceDelimiter == null || replaceDelimiter.length() < 1
+                || fieldValue == null || fieldValue.length() < 1)
         {
             return fieldValue;
         }

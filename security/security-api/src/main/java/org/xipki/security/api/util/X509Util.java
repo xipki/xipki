@@ -130,7 +130,9 @@ public class X509Util
             {
                 atv = rdn.getFirst();
             }
-            return atv == null ? null : rdnValueToString(atv.getValue());
+            return (atv == null)
+                    ? null
+                    : rdnValueToString(atv.getValue());
         }
         return null;
     }
@@ -175,7 +177,9 @@ public class X509Util
         {
             ASN1ObjectIdentifier type = sortedDNs.get(i);
             RDN[] thisRDNs = getRDNs(requstedRDNs, type);
-            int n = thisRDNs == null ? 0 : thisRDNs.length;
+            int n = (thisRDNs == null)
+                    ? 0
+                    : thisRDNs.length;
             if(n == 0)
             {
                 continue;
@@ -507,7 +511,9 @@ public class X509Util
         {
             AuthorityKeyIdentifier aki = AuthorityKeyIdentifier.fromExtensions(
                     cert.getTBSCertificate().getExtensions());
-            return aki == null ? null : aki.getKeyIdentifier();
+            return (aki == null)
+                    ? null
+                    : aki.getKeyIdentifier();
         } catch (IllegalArgumentException e)
         {
             throw new CertificateEncodingException("invalid extension AuthorityKeyIdentifier: " + e.getMessage());

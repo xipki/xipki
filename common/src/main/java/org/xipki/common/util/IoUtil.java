@@ -165,8 +165,8 @@ public class IoUtil
             for(int i = byteLenKey - 1; i > 0; i--)
             {
                 truncatedBytes[i] = (byte) (
-                        (byte2int(truncatedBytes[i]) >>> shiftBits) |
-                        ((byte2int(truncatedBytes[i- 1]) << (8 - shiftBits)) & 0xFF));
+                        (byte2int(truncatedBytes[i]) >>> shiftBits)
+                        | ((byte2int(truncatedBytes[i- 1]) << (8 - shiftBits)) & 0xFF));
             }
             truncatedBytes[0] = (byte)(byte2int(truncatedBytes[0]) >>> shiftBits);
         }
@@ -177,7 +177,9 @@ public class IoUtil
     private static int byte2int(
             final byte b)
     {
-        return b >= 0 ? b : 256 + b;
+        return (b >= 0)
+                ? b
+                : 256 + b;
     }
 
     public static String getHostAddress()

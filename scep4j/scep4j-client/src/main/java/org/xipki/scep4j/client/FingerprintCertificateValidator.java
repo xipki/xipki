@@ -66,7 +66,9 @@ implements CACertValidator
     public boolean isTrusted(
             final X509Certificate cert)
     {
-        HashAlgoType algo = hashAlgo == null ? DEFAULT_HASHALGO : hashAlgo;
+        HashAlgoType algo = (hashAlgo == null)
+                ? DEFAULT_HASHALGO
+                : hashAlgo;
         byte[] actual;
         try
         {

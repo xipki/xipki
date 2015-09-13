@@ -74,8 +74,8 @@ public class IaikP11ModulePool
             final String moduleName)
     {
         IaikP11Module module = modules.remove(moduleName);
-        if(module == null && defaultModuleName != null &&
-                SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
+        if(module == null && defaultModuleName != null
+                && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
         {
             module = modules.remove(defaultModuleName);
         }
@@ -106,8 +106,8 @@ public class IaikP11ModulePool
     throws SignerException
     {
         IaikP11Module module = modules.get(moduleName);
-        if(module == null && defaultModuleName != null &&
-                SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
+        if(module == null && defaultModuleName != null
+                && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
         {
             module = modules.get(defaultModuleName);
         }

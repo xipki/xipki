@@ -198,8 +198,8 @@ public class KeystoreP11Slot implements P11WritableSlot
 
                 PrivateKey privKey = (PrivateKey) ks.getKey(keyname, password);
 
-                if( (privKey instanceof RSAPrivateKey || privKey instanceof DSAPrivateKey ||
-                        privKey instanceof ECPrivateKey) == false)
+                if( (privKey instanceof RSAPrivateKey || privKey instanceof DSAPrivateKey
+                        || privKey instanceof ECPrivateKey) == false)
                 {
                     throw new SignerException("unsupported key " + privKey.getClass().getName());
                 }

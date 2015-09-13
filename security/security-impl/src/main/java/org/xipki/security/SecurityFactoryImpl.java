@@ -236,8 +236,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
 
                 throw new SignerException(sb.toString());
             }
-        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException |
-                SignatureException | NoSuchProviderException e)
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException
+                | SignatureException | NoSuchProviderException e)
         {
             throw new SignerException(e.getMessage(), e);
         }
@@ -298,10 +298,14 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 }
 
                 s = keyValues.getValue("slot");
-                Integer slotIndex = (s == null) ? null : Integer.parseInt(s);
+                Integer slotIndex = (s == null)
+                        ? null
+                        : Integer.parseInt(s);
 
                 s = keyValues.getValue("slot-id");
-                Long slotId = (s == null) ? null : Long.parseLong(s);
+                Long slotId = (s == null)
+                        ? null
+                        : Long.parseLong(s);
 
                 if((slotIndex == null && slotId == null) || (slotIndex != null && slotId != null))
                 {
@@ -609,8 +613,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         {
             conf.putPair("key-label", keyLabel);
         }
-        conf.putPair("keystore", "base64:" +
-                Base64.toBase64String(
+        conf.putPair("keystore", "base64:"
+                + Base64.toBase64String(
                         IoUtil.read(keystoreStream)));
 
         return conf.getEncoded();
@@ -669,8 +673,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         {
             conf.putPair("key-label", keyLabel);
         }
-        conf.putPair("keystore", "base64:" +
-                Base64.toBase64String(
+        conf.putPair("keystore", "base64:"
+                + Base64.toBase64String(
                         IoUtil.read(keystoreStream)));
 
         return conf.getEncoded();
@@ -767,7 +771,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
     public Set<String> getPkcs11ModuleNames()
     {
         initPkcs11ModuleConf();
-        return p11Control == null ? null : p11Control.getModuleNames();
+        return (p11Control == null)
+                ? null
+                : p11Control.getModuleNames();
     }
 
     private synchronized void initP11CryptServiceFactory()
@@ -1031,7 +1037,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
     public String getDefaultPkcs11ModuleName()
     {
         initPkcs11ModuleConf();
-        return p11Control == null ? null : p11Control.getDefaultModuleName();
+        return (p11Control == null)
+                ? null
+                : p11Control.getDefaultModuleName();
     }
 
     @Override
@@ -1050,7 +1058,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         try
         {
             P11CryptService p11 = getP11CryptService(moduleName);
-            return p11 == null ? null : p11.getPublicKey(slotId, keyId);
+            return (p11 == null)
+                    ? null
+                    : p11.getPublicKey(slotId, keyId);
         } catch (SignerException e)
         {
             throw new InvalidKeyException(e.getMessage(), e);
@@ -1159,9 +1169,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             throw new SignerException("unknown keystore content format");
         }
 
+        X509Certificate[] certs = (cert == null)
+                ? null
+                : new X509Certificate[]{cert};
         SoftTokenContentSignerBuilder signerBuilder = new SoftTokenContentSignerBuilder(
                 type, keystoreStream, password, keyLabel, password,
-                cert == null ? null : new X509Certificate[]{cert});
+                certs);
 
         KeyCertPair keycertPair = new KeyCertPair(
                 signerBuilder.getKey(), signerBuilder.getCert());

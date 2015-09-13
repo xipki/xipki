@@ -54,9 +54,9 @@ public class P12DSASignLoadTest extends P12SignLoadTest
     {
         super(securityFactory, signatureAlgorithm,
                 generateKeystore(pLength, qLength),
-                "PKCS#12 DSA signature creation\n" +
-                "pLength: " + pLength + "\n" +
-                "qLength: " + qLength);
+                "PKCS#12 DSA signature creation\n"
+                    + "pLength: " + pLength + "\n"
+                    + "qLength: " + qLength);
     }
 
     private static byte[] generateKeystore(

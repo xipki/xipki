@@ -56,9 +56,9 @@ public class P11RSAKeyGenLoadTest extends P11KeyGenLoadTest
     throws Exception
     {
         super(slot,
-                "PKCS#11 RSA key generation\n" +
-                "keysize: " + keysize + "\n" +
-                "public exponent: " + publicExponent);
+                "PKCS#11 RSA key generation\n"
+                        + "keysize: " + keysize + "\n"
+                        + "public exponent: " + publicExponent);
         this.keysize = keysize;
         this.publicExponent = publicExponent;
     }

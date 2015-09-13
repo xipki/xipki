@@ -180,7 +180,9 @@ public class XMLUtil
             final String localname)
     {
         Node node = getFirstElementChild(element, namespace, localname);
-        return (node == null) ? null : getNodeValue(node);
+        return (node == null)
+                ? null
+                : getNodeValue(node);
     }
 
     public static String getNodeValue(
@@ -344,7 +346,9 @@ public class XMLUtil
             final Map<String, String> nsPrefixURIMap)
     {
         Node node = getFirstMatch(contextNode, relativeXpath, nsPrefixURIMap);
-        return (node == null) ? null : getNodeValue(node);
+        return (node == null)
+                ? null
+                : getNodeValue(node);
     }
 
     public static Node getFirstMatch(
@@ -353,7 +357,9 @@ public class XMLUtil
             final Map<String, String> nsPrefixURIMap)
     {
         List<Node> nodes = getMatch(contextNode, relativeXPath, nsPrefixURIMap, true);
-        return CollectionUtil.isEmpty(nodes) ? null : nodes.get(0);
+        return CollectionUtil.isEmpty(nodes)
+                ? null
+                : nodes.get(0);
     }
 
     public static List<Node> getMatch(

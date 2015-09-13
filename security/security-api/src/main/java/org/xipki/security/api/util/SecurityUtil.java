@@ -190,7 +190,9 @@ public class SecurityUtil
         int status = pkiStatusInfo.getStatus().intValue();
         int failureInfo = pkiStatusInfo.getFailInfo().intValue();
         PKIFreeText text = pkiStatusInfo.getStatusString();
-        String statusMessage = text == null ? null : text.getStringAt(0).getString();
+        String statusMessage = (text == null)
+                ? null
+                : text.getStringAt(0).getString();
 
         return SecurityUtil.formatPKIStatusInfo(status, failureInfo, statusMessage);
     }
@@ -226,7 +228,9 @@ public class SecurityUtil
             }
         }
 
-        return sb.length() < 3 ? "" : sb.substring(2);
+        return (sb.length() < 3)
+                ? ""
+                : sb.substring(2);
     }
 
     public static byte[] leftmost(
@@ -249,9 +253,9 @@ public class SecurityUtil
 
             for(int i = byteLenKey - 1; i > 0; i--)
             {
-                truncatedBytes[i] = (byte) (
-                        (byte2int(truncatedBytes[i]) >>> shiftBits) |
-                        ((byte2int(truncatedBytes[i- 1]) << (8 - shiftBits)) & 0xFF));
+                truncatedBytes[i] = (byte)
+                        ( (byte2int(truncatedBytes[i]) >>> shiftBits)
+                        | ((byte2int(truncatedBytes[i- 1]) << (8 - shiftBits)) & 0xFF));
             }
             truncatedBytes[0] = (byte)(byte2int(truncatedBytes[0]) >>> shiftBits);
         }
@@ -262,7 +266,9 @@ public class SecurityUtil
     private static int byte2int(
             final byte b)
     {
-        return b >= 0 ? b : 256 + b;
+        return (b >= 0)
+                ? b
+                : 256 + b;
     }
 
     public static String getCurveName(

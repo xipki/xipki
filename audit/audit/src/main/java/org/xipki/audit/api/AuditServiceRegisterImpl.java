@@ -48,7 +48,8 @@ import org.xipki.audit.slf4j.impl.Slf4jAuditServiceImpl;
 public class AuditServiceRegisterImpl implements AuditServiceRegister
 {
     private static final Logger LOG = LoggerFactory.getLogger(AuditServiceRegisterImpl.class);
-    private ConcurrentLinkedDeque<AuditService> services = new ConcurrentLinkedDeque<AuditService>();
+    private ConcurrentLinkedDeque<AuditService> services =
+            new ConcurrentLinkedDeque<AuditService>();
     private Slf4jAuditServiceImpl defaultAuditService = new Slf4jAuditServiceImpl();
 
     private boolean auditEnabled;
@@ -58,7 +59,9 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister
     {
         if(auditEnabled)
         {
-            return services.isEmpty() ? defaultAuditService : services.getLast();
+            return services.isEmpty()
+                    ? defaultAuditService
+                    : services.getLast();
         }
         else
         {
@@ -78,7 +81,11 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister
 
         boolean replaced = services.remove(service);
         services.add(service);
-        LOG.debug("{} AuditService binding for {}", (replaced ? "replaced" : "added"), service);
+
+        String action = replaced
+                ? "replaced"
+                : "added";
+        LOG.debug("{} AuditService binding for {}", action, service);
     }
 
     public void unbindService(

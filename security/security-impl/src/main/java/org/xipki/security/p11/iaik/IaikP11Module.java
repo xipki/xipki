@@ -158,8 +158,8 @@ public class IaikP11Module implements P11Module
         P11SlotIdentifier _slotId = null;
         for(P11SlotIdentifier s : availableSlots.keySet())
         {
-            if(s.getSlotIndex() == slotId.getSlotIndex() ||
-                s.getSlotId() == slotId.getSlotId())
+            if(s.getSlotIndex() == slotId.getSlotIndex()
+                    || s.getSlotId() == slotId.getSlotId())
             {
                 _slotId = s;
                 slot = availableSlots.get(s);

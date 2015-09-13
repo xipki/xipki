@@ -265,7 +265,9 @@ public class FileUtils
             while (pos < size)
             {
                 final long remain = size - pos;
-                count = remain > FILE_COPY_BUFFER_SIZE ? FILE_COPY_BUFFER_SIZE : remain;
+                count = (remain > FILE_COPY_BUFFER_SIZE)
+                        ? FILE_COPY_BUFFER_SIZE
+                        : remain;
                 final long bytesCopied = output.transferFrom(input, pos, count);
                 if (bytesCopied == 0) { // IO-385 - can happen if file is truncated after caching the size
                     break; // ensure we don't loop forever
@@ -281,8 +283,9 @@ public class FileUtils
         final long dstLen = destFile.length(); // TODO See IO-386
         if (srcLen != dstLen)
         {
-            throw new IOException("Failed to copy full contents from '" +
-                    srcFile + "' to '" + destFile + "' Expected length: " + srcLen + " Actual: " + dstLen);
+            throw new IOException("Failed to copy full contents from '"
+                    + srcFile + "' to '" + destFile + "' Expected length: " + srcLen
+                    + " Actual: " + dstLen);
         }
         if (preserveFileDate)
         {
@@ -320,8 +323,11 @@ public class FileUtils
     throws IOException
     {
         // recurse
-        final File[] srcFiles = filter == null ? srcDir.listFiles() : srcDir.listFiles(filter);
-        if (srcFiles == null) {  // null if abstract pathname does not denote a directory, or if an I/O error occurs
+        final File[] srcFiles = (filter == null)
+                ? srcDir.listFiles()
+                : srcDir.listFiles(filter);
+        if (srcFiles == null)
+        {  // null if abstract pathname does not denote a directory, or if an I/O error occurs
             throw new IOException("Failed to list contents of " + srcDir);
         }
         if (destDir.exists())

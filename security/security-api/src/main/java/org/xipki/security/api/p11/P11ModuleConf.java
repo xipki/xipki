@@ -74,7 +74,9 @@ public class P11ModuleConf
 
         this.name = name.toLowerCase();
         this.nativeLibrary = nativeLibrary;
-        this.passwordRetriever = passwordRetriever == null ? P11NullPasswordRetriever.INSTANCE : passwordRetriever;
+        this.passwordRetriever = (passwordRetriever == null)
+                ? P11NullPasswordRetriever.INSTANCE
+                : passwordRetriever;
 
         Set<P11SlotIdentifier> set = new HashSet<>();
         if(includeSlots != null)

@@ -394,7 +394,9 @@ public final class IaikP11CryptService implements P11CryptService
     throws SignerException
     {
         IaikP11Identity identity = getIdentity2(slotId, keyId);
-        return identity == null ? null : identity.getPublicKey();
+        return (identity == null)
+                ? null
+                : identity.getPublicKey();
     }
 
     @Override
@@ -404,7 +406,9 @@ public final class IaikP11CryptService implements P11CryptService
     throws SignerException
     {
         IaikP11Identity identity = getIdentity2(slotId, keyId);
-        return identity == null ? null : identity.getCertificate();
+        return (identity == null)
+                ? null
+                : identity.getCertificate();
     }
 
     private IaikP11Identity getIdentity(
@@ -465,7 +469,9 @@ public final class IaikP11CryptService implements P11CryptService
     throws SignerException
     {
         IaikP11Identity identity = getIdentity2(slotId, keyId);
-        return identity == null ? null : identity.getCertificateChain();
+        return (identity == null)
+                ? null
+                : identity.getCertificateChain();
     }
 
     @Override

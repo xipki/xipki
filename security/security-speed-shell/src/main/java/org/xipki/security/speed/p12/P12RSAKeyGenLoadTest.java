@@ -53,9 +53,9 @@ public class P12RSAKeyGenLoadTest extends P12KeyGenLoadTest
             final BigInteger publicExponent)
     throws Exception
     {
-        super("PKCS#12 RSA key generation\n" +
-                "keysize: " + keysize + "\n" +
-                "public exponent: " + publicExponent);
+        super("PKCS#12 RSA key generation\n"
+                + "keysize: " + keysize + "\n"
+                + "public exponent: " + publicExponent);
 
         this.kpGen = new RSAKeypairGenerator(keysize, publicExponent);
     }
