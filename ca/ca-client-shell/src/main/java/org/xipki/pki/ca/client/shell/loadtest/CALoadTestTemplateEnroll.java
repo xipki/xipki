@@ -113,7 +113,10 @@ public class CALoadTestTemplateEnroll extends LoadExecutor
                 if(certReqs != null)
                 {
                     boolean successful = testNext(certReqs);
-                    account(1, successful ? 0 : 1);
+                    int numFailed = successful
+                            ? 0
+                            : 1;
+                    account(1, numFailed);
                 }
                 else
                 {

@@ -346,8 +346,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
         processLog.printStatus(true);
         ProcessLog.printTrailer();
 
-        System.out.println(" digested " + processLog.getNumProcessed() +
-                " certificates");
+        System.out.println(" digested " + processLog.getNumProcessed() + " certificates");
     }
 
     static String toAsciiFilename(
@@ -358,8 +357,8 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
         for(int i = 0; i < n; i++)
         {
             char c = filename.charAt(i);
-            if((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') ||
-                    c == '.' || c == '_' || c == '-' || c == ' ')
+            if((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')
+                    || c == '.' || c == '_' || c == '-' || c == ' ')
             {
                 sb.append(c);
             } else

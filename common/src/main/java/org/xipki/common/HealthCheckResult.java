@@ -82,7 +82,9 @@ public class HealthCheckResult
     public Object getStatus(
             final String statusName)
     {
-        return statusName == null ? null : statuses.get(statusName);
+        return (statusName == null)
+                ? null
+                : statuses.get(statusName);
     }
 
     public void clearChildChecks()

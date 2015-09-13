@@ -69,8 +69,8 @@ class IaikP11Identity extends P11Identity
     {
         if(publicKey instanceof RSAPublicKey == false)
         {
-            throw new SignerException("operation CKM_RSA_PKCS is not allowed for " +
-                    publicKey.getAlgorithm() + " public key");
+            throw new SignerException("operation CKM_RSA_PKCS is not allowed for "
+                    + publicKey.getAlgorithm() + " public key");
         }
 
         IaikP11Slot slot = module.getSlot(slotId);
@@ -89,8 +89,8 @@ class IaikP11Identity extends P11Identity
     {
         if(publicKey instanceof RSAPublicKey == false)
         {
-            throw new SignerException("operation CKM_RSA_X509 is not allowed for " +
-                    publicKey.getAlgorithm() + " public key");
+            throw new SignerException("operation CKM_RSA_X509 is not allowed for "
+                    + publicKey.getAlgorithm() + " public key");
         }
 
         IaikP11Slot slot = module.getSlot(slotId);

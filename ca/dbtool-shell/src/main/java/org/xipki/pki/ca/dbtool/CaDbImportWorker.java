@@ -140,8 +140,8 @@ public class CaDbImportWorker extends DbPortWorker
         {
             if(processLogFile.exists())
             {
-                throw new Exception("please either specify '--resume' option or delete the file " +
-                        processLogFile.getPath() + " first");
+                throw new Exception("please either specify '--resume' option or delete the file "
+                        + processLogFile.getPath() + " first");
             }
         }
 

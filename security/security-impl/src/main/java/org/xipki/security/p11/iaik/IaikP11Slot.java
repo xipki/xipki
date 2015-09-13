@@ -263,7 +263,9 @@ public class IaikP11Slot implements P11WritableSlot
         else
         {
             // 2 sessions as buffer, they may be used elsewhere.
-            maxSessionCount2 = maxSessionCount2 < 3 ? 1 : maxSessionCount2 - 2;
+            maxSessionCount2 = (maxSessionCount2 < 3)
+                    ? 1
+                    : maxSessionCount2 - 2;
         }
 
         this.maxSessionCount = (int) maxSessionCount2;
@@ -868,7 +870,9 @@ public class IaikP11Slot implements P11WritableSlot
         Boolean b = privateKey.getSign().getBooleanValue();
         byte[] id = privateKey.getId().getByteArrayValue();
         char[] _label = privateKey.getLabel().getCharArrayValue();
-        String label = (_label == null) ? null : new String(_label);
+        String label = (_label == null)
+                ? null
+                : new String(_label);
 
         if(b == null || b.booleanValue() == false)
         {
@@ -981,12 +985,20 @@ public class IaikP11Slot implements P11WritableSlot
 
                 msg.append("\tid(hex): ");
                 ByteArrayAttribute id = privKey.getId();
+
                 byte[] bytes = null;
                 if(id != null)
                 {
                     bytes = id.getByteArrayValue();
                 }
-                msg.append(bytes == null ? "null" : Hex.toHexString(bytes)).append("\n");
+                if(bytes == null)
+                {
+                    msg.append("null");
+                } else
+                {
+                    msg.append(Hex.toHexString(bytes));
+                }
+                msg.append("\n");
 
                 msg.append("\tlabel:   ");
                 CharArrayAttribute label = privKey.getLabel();
@@ -1124,7 +1136,10 @@ public class IaikP11Slot implements P11WritableSlot
             template.getSubject().setByteArrayValue(subject.getEncoded());
 
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            int n = tmpObjects == null ? 0 : tmpObjects.size();
+            int n = (tmpObjects == null)
+                    ? 0
+                    : tmpObjects.size();
+
             if(n == 0)
             {
                 LOG.warn("found no certificate with subject {}", X509Util.getRFC4519Name(subject));
@@ -1233,7 +1248,15 @@ public class IaikP11Slot implements P11WritableSlot
                 {
                     bytes = id.getByteArrayValue();
                 }
-                msg.append(bytes == null ? "null" : Hex.toHexString(bytes)).append("\n");
+
+                if(bytes == null)
+                {
+                    msg.append("null");
+                } else
+                {
+                    msg.append(Hex.toHexString(bytes));
+                }
+                msg.append("\n");
 
                 msg.append("\tlabel:   ");
                 CharArrayAttribute label = cert.getLabel();
@@ -1489,7 +1512,15 @@ public class IaikP11Slot implements P11WritableSlot
                 {
                     bytes = id.getByteArrayValue();
                 }
-                msg.append(bytes == null ? "null" : Hex.toHexString(bytes)).append("\n");
+
+                if(bytes == null)
+                {
+                    msg.append("null");
+                } else
+                {
+                    msg.append(Hex.toHexString(bytes));
+                }
+                msg.append("\n");
 
                 msg.append("\tlabel:   ");
                 CharArrayAttribute label = pubKey.getLabel();
@@ -1513,9 +1544,22 @@ public class IaikP11Slot implements P11WritableSlot
     {
         StringBuilder sb = new StringBuilder();
         sb.append("id ");
-        sb.append(keyId == null ? "null" : Hex.toHexString(keyId));
+        if(keyId == null)
+        {
+            sb.append("null");
+        } else
+        {
+            sb.append(Hex.toHexString(keyId));
+        }
+
         sb.append(" and label ");
-        sb.append(keyLabel == null ? "null" : new String(keyLabel));
+        if(keyLabel == null)
+        {
+            sb.append("null");
+        }else
+        {
+            sb.append(new String(keyLabel));
+        }
         return sb.toString();
     }
 
@@ -1975,8 +2019,8 @@ public class IaikP11Slot implements P11WritableSlot
         List<Extension> extensions = new ArrayList<>(2);
         if(keyUsage == null)
         {
-            keyUsage = KeyUsage.keyCertSign | KeyUsage.cRLSign |
-                    KeyUsage.digitalSignature | KeyUsage.keyEncipherment;
+            keyUsage = KeyUsage.keyCertSign | KeyUsage.cRLSign
+                    | KeyUsage.digitalSignature | KeyUsage.keyEncipherment;
         }
         extensions.add(new Extension(Extension.keyUsage, true,
                 new DEROctetString(new KeyUsage(keyUsage))));

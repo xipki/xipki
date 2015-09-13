@@ -90,7 +90,8 @@ public class SubjectDNSpec
     private static final Map<ASN1ObjectIdentifier, Range> ranges = new HashMap<>();
     private static final Map<ASN1ObjectIdentifier, Pattern> patterns = new HashMap<>();
     private static final Map<ASN1ObjectIdentifier, RDNControl> controls = new HashMap<>();
-    private static final Map<ASN1ObjectIdentifier, Set<StringType>> stringTypeSets = new HashMap<>();
+    private static final Map<ASN1ObjectIdentifier, Set<StringType>> stringTypeSets =
+            new HashMap<>();
 
     static
     {
@@ -381,9 +382,11 @@ public class SubjectDNSpec
         StringType stringType = control.getStringType();
         if(stringType != null)
         {
-            if(stringTypeSets.containsKey(type) && stringTypeSets.get(type).contains(stringType) == false)
+            if(stringTypeSets.containsKey(type)
+                    && stringTypeSets.get(type).contains(stringType) == false)
             {
-                throw new CertprofileException(stringType.name() + " is not allowed " + type.getId());
+                throw new CertprofileException(stringType.name() + " is not allowed "
+                        + type.getId());
             }
         }
         else

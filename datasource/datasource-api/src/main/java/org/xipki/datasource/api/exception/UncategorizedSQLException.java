@@ -63,8 +63,9 @@ public class UncategorizedSQLException extends UncategorizedDataAccessException
             final String sql,
             final SQLException ex)
     {
-        super("uncategorized SQLException for SQL [" + sql + "]; SQL state [" +
-                ex.getSQLState() + "]; error code [" + ex.getErrorCode() + "]; " + ex.getMessage(), ex);
+        super("uncategorized SQLException for SQL [" + sql + "]; SQL state ["
+                + ex.getSQLState() + "]; error code [" + ex.getErrorCode() + "]; "
+                + ex.getMessage(), ex);
         this.sql = sql;
     }
 

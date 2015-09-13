@@ -155,10 +155,13 @@ public class XmlX509CertprofileUtil
             }
             catch(SAXException e)
             {
-                throw new CertprofileException("parse profile failed, message: " + e.getMessage(), e);
+                throw new CertprofileException(
+                        "parse profile failed, message: " + e.getMessage(), e);
             } catch(JAXBException e)
             {
-                throw new CertprofileException("parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e), e);
+                throw new CertprofileException(
+                        "parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e),
+                        e);
             }
 
             Object rootType = rootElement.getValue();
@@ -176,13 +179,15 @@ public class XmlX509CertprofileUtil
     public static List<CertificatePolicyInformation> buildCertificatePolicies(
             final CertificatePolicies type)
     {
-        List<CertificatePolicyInformationType> policyPairs = type.getCertificatePolicyInformation();
+        List<CertificatePolicyInformationType> policyPairs =
+                type.getCertificatePolicyInformation();
         if(CollectionUtil.isEmpty(policyPairs))
         {
             return null;
         }
 
-        List<CertificatePolicyInformation> policies = new ArrayList<CertificatePolicyInformation>(policyPairs.size());
+        List<CertificatePolicyInformation> policies =
+                new ArrayList<CertificatePolicyInformation>(policyPairs.size());
         for(CertificatePolicyInformationType policyPair : policyPairs)
         {
             List<CertificatePolicyQualifier> qualifiers = null;
@@ -190,7 +195,8 @@ public class XmlX509CertprofileUtil
             PolicyQualifiers policyQualifiers = policyPair.getPolicyQualifiers();
             if(policyQualifiers != null)
             {
-                List<JAXBElement<String>> cpsUriOrUserNotice = policyQualifiers.getCpsUriOrUserNotice();
+                List<JAXBElement<String>> cpsUriOrUserNotice =
+                        policyQualifiers.getCpsUriOrUserNotice();
 
                 qualifiers = new ArrayList<CertificatePolicyQualifier>(cpsUriOrUserNotice.size());
                 for(JAXBElement<String> element : cpsUriOrUserNotice)
@@ -204,7 +210,8 @@ public class XmlX509CertprofileUtil
                     }
                     else
                     {
-                        qualifier = CertificatePolicyQualifier.getInstanceForUserNotice(elementValue);
+                        qualifier = CertificatePolicyQualifier.getInstanceForUserNotice(
+                                elementValue);
                     }
                     qualifiers.add(qualifier);
                 }
@@ -231,7 +238,8 @@ public class XmlX509CertprofileUtil
         for(int i = 0; i < n; i++)
         {
             PolicyIdMappingType mapping = mappings.get(i);
-            ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(mapping.getIssuerDomainPolicy().getValue());
+            ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(
+                    mapping.getIssuerDomainPolicy().getValue());
             issuerDomainPolicy[i] = CertPolicyId.getInstance(oid);
 
             oid = new ASN1ObjectIdentifier(mapping.getSubjectDomainPolicy().getValue());
@@ -302,7 +310,8 @@ public class XmlX509CertprofileUtil
         }
         else
         {
-            throw new RuntimeException("should not reach here, unknown child of GeneralSubtreeBaseType");
+            throw new RuntimeException(
+                    "should not reach here, unknown child of GeneralSubtreeBaseType");
         }
 
         Integer i = type.getMinimum();
@@ -311,7 +320,9 @@ public class XmlX509CertprofileUtil
             throw new CertprofileException("negative minimum is not allowed: " + i);
         }
 
-        BigInteger minimum = (i == null) ? null : BigInteger.valueOf(i.intValue());
+        BigInteger minimum = (i == null)
+                ? null
+                : BigInteger.valueOf(i.intValue());
 
         i = type.getMaximum();
         if(i != null && i < 0)
@@ -319,7 +330,9 @@ public class XmlX509CertprofileUtil
             throw new CertprofileException("negative maximum is not allowed: " + i);
         }
 
-        BigInteger maximum = (i == null) ? null : BigInteger.valueOf(i.intValue());
+        BigInteger maximum = (i == null)
+                ? null
+                : BigInteger.valueOf(i.intValue());
 
         return new GeneralSubtree(base, minimum, maximum);
     }
@@ -331,13 +344,15 @@ public class XmlX509CertprofileUtil
         Integer requireExplicitPolicy = type.getRequireExplicitPolicy();
         if(requireExplicitPolicy != null && requireExplicitPolicy < 0)
         {
-            throw new CertprofileException("negative requireExplicitPolicy is not allowed: " + requireExplicitPolicy);
+            throw new CertprofileException(
+                    "negative requireExplicitPolicy is not allowed: " + requireExplicitPolicy);
         }
 
         Integer inhibitPolicyMapping = type.getInhibitPolicyMapping();
         if(inhibitPolicyMapping != null && inhibitPolicyMapping < 0)
         {
-            throw new CertprofileException("negative inhibitPolicyMapping is not allowed: " + inhibitPolicyMapping);
+            throw new CertprofileException(
+                    "negative inhibitPolicyMapping is not allowed: " + inhibitPolicyMapping);
         }
 
         if(requireExplicitPolicy == null && inhibitPolicyMapping == null)
@@ -349,12 +364,14 @@ public class XmlX509CertprofileUtil
         ASN1EncodableVector vec = new ASN1EncodableVector();
         if (requireExplicitPolicy != null)
         {
-            vec.add(new DERTaggedObject(explicit, 0, new ASN1Integer(BigInteger.valueOf(requireExplicitPolicy))));
+            vec.add(new DERTaggedObject(explicit, 0,
+                    new ASN1Integer(BigInteger.valueOf(requireExplicitPolicy))));
         }
 
         if (inhibitPolicyMapping != null)
         {
-            vec.add(new DERTaggedObject(explicit, 1, new ASN1Integer(BigInteger.valueOf(inhibitPolicyMapping))));
+            vec.add(new DERTaggedObject(explicit, 1,
+                    new ASN1Integer(BigInteger.valueOf(inhibitPolicyMapping))));
         }
 
         return new DERSequence(vec);
@@ -446,7 +463,8 @@ public class XmlX509CertprofileUtil
                 ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(algId.getValue());
                 if(keyAlgorithms.containsKey(oid))
                 {
-                    throw new CertprofileException("duplicate definition of keyAlgorithm " + oid.getId());
+                    throw new CertprofileException(
+                            "duplicate definition of keyAlgorithm " + oid.getId());
                 }
                 oids.add(oid);
             }
@@ -471,9 +489,12 @@ public class XmlX509CertprofileUtil
             ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
             if(controls.containsKey(oid))
             {
-                throw new CertprofileException("duplicated definition of extension " + oid.getId());
+                throw new CertprofileException(
+                        "duplicated definition of extension " + oid.getId());
             }
-            controls.put(oid, new ExtensionControl(m.isCritical(), m.isRequired(), m.isPermittedInRequest()));
+            controls.put(oid,
+                    new ExtensionControl(
+                            m.isCritical(), m.isRequired(), m.isPermittedInRequest()));
         }
 
         return Collections.unmodifiableMap(controls);
@@ -534,7 +555,8 @@ public class XmlX509CertprofileUtil
                 controls.add(new KeyUsageControl(KeyUsage.keyEncipherment, required));
                 break;
             default:
-                throw new RuntimeException("should not reach here, unknown GeneralSubtreeBaseType " + m.getValue());
+                throw new RuntimeException(
+                        "should not reach here, unknown GeneralSubtreeBaseType " + m.getValue());
             }
         }
 
@@ -576,9 +598,9 @@ public class XmlX509CertprofileUtil
             }
 
             ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
-            if(Extension.subjectAlternativeName.equals(oid) ||
-                    Extension.subjectInfoAccess.equals(oid) ||
-                    Extension.biometricInfo.equals(oid))
+            if(Extension.subjectAlternativeName.equals(oid)
+                    || Extension.subjectInfoAccess.equals(oid)
+                    || Extension.biometricInfo.equals(oid))
             {
                 continue;
             }
@@ -635,7 +657,8 @@ public class XmlX509CertprofileUtil
         if(paramsObj instanceof ECParameters)
         {
             ECParameters params = (ECParameters) paramsObj;
-            KeyParametersOption.ECParamatersOption option = new KeyParametersOption.ECParamatersOption();
+            KeyParametersOption.ECParamatersOption option =
+                    new KeyParametersOption.ECParamatersOption();
 
             if(params.getCurves() != null)
             {
@@ -656,7 +679,8 @@ public class XmlX509CertprofileUtil
         else if(paramsObj instanceof RSAParameters)
         {
             RSAParameters params = (RSAParameters) paramsObj;
-            KeyParametersOption.RSAParametersOption option = new KeyParametersOption.RSAParametersOption();
+            KeyParametersOption.RSAParametersOption option =
+                    new KeyParametersOption.RSAParametersOption();
 
             Set<Range> modulusLengths = buildParametersMap(params.getModulusLength());
             option.setModulusLengths(modulusLengths);
@@ -666,7 +690,8 @@ public class XmlX509CertprofileUtil
         else if(paramsObj instanceof RSAPSSParameters)
         {
             RSAPSSParameters params = (RSAPSSParameters) paramsObj;
-            KeyParametersOption.RSAPSSParametersOption option = new KeyParametersOption.RSAPSSParametersOption();
+            KeyParametersOption.RSAPSSParametersOption option =
+                    new KeyParametersOption.RSAPSSParametersOption();
 
             Set<Range> modulusLengths = buildParametersMap(params.getModulusLength());
             option.setModulusLengths(modulusLengths);
@@ -676,7 +701,8 @@ public class XmlX509CertprofileUtil
         else if(paramsObj instanceof DSAParameters)
         {
             DSAParameters params = (DSAParameters) paramsObj;
-            KeyParametersOption.DSAParametersOption option = new KeyParametersOption.DSAParametersOption();
+            KeyParametersOption.DSAParametersOption option =
+                    new KeyParametersOption.DSAParametersOption();
 
             Set<Range> pLengths = buildParametersMap(params.getPLength());
             option.setPLengths(pLengths);
@@ -689,7 +715,8 @@ public class XmlX509CertprofileUtil
         else if(paramsObj instanceof DHParameters)
         {
             DHParameters params = (DHParameters) paramsObj;
-            KeyParametersOption.DHParametersOption option = new KeyParametersOption.DHParametersOption();
+            KeyParametersOption.DHParametersOption option =
+                    new KeyParametersOption.DHParametersOption();
 
             Set<Range> pLengths = buildParametersMap(params.getPLength());
             option.setPLengths(pLengths);
@@ -702,7 +729,8 @@ public class XmlX509CertprofileUtil
         else if(paramsObj instanceof GostParameters)
         {
             GostParameters params = (GostParameters) paramsObj;
-            KeyParametersOption.GostParametersOption option = new KeyParametersOption.GostParametersOption();
+            KeyParametersOption.GostParametersOption option =
+                    new KeyParametersOption.GostParametersOption();
 
             Set<ASN1ObjectIdentifier> set = toOIDSet(params.getPublicKeyParamSet());
             option.setPublicKeyParamSets(set);
@@ -717,7 +745,8 @@ public class XmlX509CertprofileUtil
         }
         else
         {
-            throw new CertprofileException("unknown public key parameters type " + paramsObj.getClass().getName());
+            throw new CertprofileException(
+                    "unknown public key parameters type " + paramsObj.getClass().getName());
         }
     }
 
@@ -739,7 +768,8 @@ public class XmlX509CertprofileUtil
         case UTF_8_STRING:
             return DirectoryStringType.utf8String;
         default:
-            throw new RuntimeException("should not reach here, undefined DirectoryStringType " + jaxbType);
+            throw new RuntimeException(
+                    "should not reach here, undefined DirectoryStringType " + jaxbType);
         }
     }
 

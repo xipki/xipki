@@ -98,7 +98,9 @@ class SunP11Identity implements Comparable<SunP11Identity>
 
         this.slotId = slotId;
         this.privateKey = privateKey;
-        this.publicKey = publicKey == null ? certificateChain[0].getPublicKey() : publicKey;
+        this.publicKey = (publicKey == null)
+                ? certificateChain[0].getPublicKey()
+                : publicKey;
         this.certificateChain = certificateChain;
 
         this.keyLabel = keyLabel;
@@ -159,8 +161,10 @@ class SunP11Identity implements Comparable<SunP11Identity>
         }
         else
         {
-            throw new IllegalArgumentException("currently only RSA, EC and DSA public key are supported, but not " +
-                    this.publicKey.getAlgorithm() + " (class: " + this.publicKey.getClass().getName() + ")");
+            throw new IllegalArgumentException(
+                    "currently only RSA, EC and DSA public key are supported, but not "
+                    + this.publicKey.getAlgorithm()
+                    + " (class: " + this.publicKey.getClass().getName() + ")");
         }
     }
 
@@ -176,7 +180,9 @@ class SunP11Identity implements Comparable<SunP11Identity>
 
     public X509Certificate getCertificate()
     {
-        return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0] : null;
+        return (certificateChain != null && certificateChain.length > 0)
+                ? certificateChain[0]
+                : null;
     }
 
     public X509Certificate[] getCertificateChain()
@@ -186,7 +192,9 @@ class SunP11Identity implements Comparable<SunP11Identity>
 
     public PublicKey getPublicKey()
     {
-        return publicKey == null ? certificateChain[0].getPublicKey() : publicKey;
+        return (publicKey == null)
+                ? certificateChain[0].getPublicKey()
+                : publicKey;
     }
 
     public P11SlotIdentifier getSlotId()

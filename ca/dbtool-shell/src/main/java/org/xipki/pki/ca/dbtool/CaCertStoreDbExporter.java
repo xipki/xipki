@@ -167,8 +167,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
             certstore = root.getValue();
             if(certstore.getVersion() > VERSION)
             {
-                throw new InvalidInputException("could not continue with CertStore greater than " +
-                        VERSION + ": " + certstore.getVersion());
+                throw new InvalidInputException("could not continue with CertStore greater than "
+                        + VERSION + ": " + certstore.getVersion());
             }
         }
         else

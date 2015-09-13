@@ -82,7 +82,9 @@ public class IssuerEntry
             final byte[] issuerKeyHash)
     {
         IssuerHashNameAndKey issuerHash = issuerHashMap.get(hashAlgo);
-        return issuerHash == null ? false : issuerHash.match(hashAlgo, issuerNameHash, issuerKeyHash);
+        return (issuerHash == null)
+                ? false
+                : issuerHash.match(hashAlgo, issuerNameHash, issuerKeyHash);
     }
 
     public void setRevocationInfo(

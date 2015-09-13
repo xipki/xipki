@@ -157,8 +157,12 @@ public class ScepResponder
             final AuditEvent auditEvent)
     throws MessageDecodingException, CAException
     {
-        PrivateKey recipientKey = rAEmulator != null ? rAEmulator.getRAKey() : cAEmulator.getCAKey();
-        Certificate recipientCert = rAEmulator != null ? rAEmulator.getRACert() : cAEmulator.getCACert();
+        PrivateKey recipientKey = (rAEmulator != null)
+                ? rAEmulator.getRAKey()
+                : cAEmulator.getCAKey();
+        Certificate recipientCert = (rAEmulator != null)
+                ? rAEmulator.getRACert()
+                : cAEmulator.getCACert();
         X509CertificateObject recipientX509Obj;
         try
         {
@@ -196,12 +200,15 @@ public class ScepResponder
         try
         {
             X509Certificate jceSignerCert = new X509CertificateObject(getSigningCert());
+            X509Certificate[] certs = control.isSendSignerCert()
+                    ? new X509Certificate[]{jceSignerCert}
+                    : null;
 
             return rep.encode(
                     getSigningKey(),
                     signatureAlgorithm,
                     jceSignerCert,
-                    control.isSendSignerCert() ? new X509Certificate[]{jceSignerCert} : null,
+                    certs,
                     req.getSignatureCert(),
                     req.getContentEncryptionAlgorithm());
         } catch (Exception e)
@@ -218,10 +225,13 @@ public class ScepResponder
         {
             X509Certificate jceSignerCert = new X509CertificateObject(getSigningCert());
 
+            X509Certificate[] certs = control.isSendSignerCert()
+                    ? new X509Certificate[]{jceSignerCert}
+                    : null;
             return nextCAMsg.encode(
                     getSigningKey(),
                     jceSignerCert,
-                    control.isSendSignerCert() ? new X509Certificate[]{jceSignerCert} : null);
+                    certs);
         } catch (Exception e)
         {
             throw new CAException(e);
@@ -575,12 +585,16 @@ public class ScepResponder
 
     public PrivateKey getSigningKey()
     {
-        return rAEmulator != null ? rAEmulator.getRAKey() : cAEmulator.getCAKey();
+        return (rAEmulator != null)
+                ? rAEmulator.getRAKey()
+                : cAEmulator.getCAKey();
     }
 
     public Certificate getSigningCert()
     {
-        return rAEmulator != null ? rAEmulator.getRACert() : cAEmulator.getCACert();
+        return (rAEmulator != null)
+                ? rAEmulator.getRACert()
+                : cAEmulator.getCACert();
     }
 
     public CACaps getCACaps()

@@ -113,7 +113,9 @@ public abstract class CertStatusStore
 
     public AuditService getAuditService()
     {
-        return auditServiceRegister == null ? null : auditServiceRegister.getAuditService();
+        return (auditServiceRegister == null)
+                ? null
+                : auditServiceRegister.getAuditService();
     }
 
     public boolean isUnknownSerialAsGood()

@@ -56,8 +56,10 @@ public abstract class AbstractSecurityFactory implements SecurityFactory
             final X509Certificate cert)
     throws SignerException
     {
-        return createSigner(type, conf,
-                (cert == null ? null : new X509Certificate[]{cert}));
+        X509Certificate[] certs = (cert == null)
+                ? null
+                : new X509Certificate[]{cert};
+        return createSigner(type, conf, certs);
     }
 
     @Override
@@ -69,8 +71,10 @@ public abstract class AbstractSecurityFactory implements SecurityFactory
             final X509Certificate cert)
     throws SignerException
     {
-        return createSigner(type, confWithoutAlgo, hashAlgo, sigAlgoControl,
-                (cert == null ? null : new X509Certificate[]{cert}));
+        X509Certificate[] certs = (cert == null)
+                ? null
+                : new X509Certificate[]{cert};
+        return createSigner(type, confWithoutAlgo, hashAlgo, sigAlgoControl, certs);
     }
 
     @Override

@@ -70,7 +70,11 @@ public class PasswordResolverImpl implements PasswordResolver
 
         boolean replaced = resolvers.remove(service);
         resolvers.add(service);
-        LOG.debug("{} SinglePasswordResolver binding for {}", (replaced ? "replaced" : "added"), service);
+        String txt = replaced
+                ? "replaced"
+                : "added";
+        LOG.debug("{} SinglePasswordResolver binding for {}",
+                txt, service);
     }
 
     public void unbindService(

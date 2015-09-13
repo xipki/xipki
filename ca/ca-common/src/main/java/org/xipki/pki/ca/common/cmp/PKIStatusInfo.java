@@ -79,7 +79,9 @@ public class PKIStatusInfo
             this.pkiFailureInfo = 0;
         }
         PKIFreeText text = bcPKIStatusInfo.getStatusString();
-        this.statusMessage = text == null ? null : text.getStringAt(0).getString();
+        this.statusMessage = (text == null)
+                ? null
+                : text.getStringAt(0).getString();
     }
 
     public int getStatus()

@@ -59,9 +59,9 @@ public class P11RSASignLoadTest extends P11SignLoadTest
     {
         super(securityFactory, slot, signatureAlgorithm,
                 generateKey(slot, keysize, publicExponent),
-                "PKCS#11 RSA signature creation\n" +
-                "keysize: " + keysize + "\n" +
-                "public exponent: " + publicExponent);
+                "PKCS#11 RSA signature creation\n"
+                        + "keysize: " + keysize + "\n"
+                        + "public exponent: " + publicExponent);
     }
 
     private static P11KeyIdentifier generateKey(

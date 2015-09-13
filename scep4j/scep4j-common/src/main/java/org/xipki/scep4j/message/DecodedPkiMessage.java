@@ -265,13 +265,14 @@ public class DecodedPkiMessage extends PkiMessage
             Integer i = getIntegerPrintStringAttrValue(signedAttrs, ScepObjectIdentifiers.id_messageType);
             if(i == null)
             {
-                throw new MessageDecodingException("tid " + transactionId.getId() +
-                        ": missing required SCEP attribute messageType");
+                throw new MessageDecodingException("tid " + transactionId.getId()
+                        + ": missing required SCEP attribute messageType");
             }
             messageType = MessageType.valueForCode(i);
             if(messageType == null)
             {
-                throw new MessageDecodingException("tid " + transactionId.getId() + ": invalid messageType '" + i + "'");
+                throw new MessageDecodingException("tid " + transactionId.getId()
+                        + ": invalid messageType '" + i + "'");
             }
         }
 
@@ -281,8 +282,8 @@ public class DecodedPkiMessage extends PkiMessage
             senderNonce = getNonceAttrValue(signedAttrs, ScepObjectIdentifiers.id_senderNonce);
             if(senderNonce == null)
             {
-                throw new MessageDecodingException("tid " + transactionId.getId() +
-                        ": missing required SCEP attribute senderNonce");
+                throw new MessageDecodingException("tid " + transactionId.getId()
+                        + ": missing required SCEP attribute senderNonce");
             }
         }
 
@@ -376,7 +377,9 @@ public class DecodedPkiMessage extends PkiMessage
 
         // unsignedAttributes
         AttributeTable unsignedAttrs = signerInfo.getUnsignedAttributes();
-        attrs = unsignedAttrs == null ? null : unsignedAttrs.toASN1Structure().getAttributes();
+        attrs = (unsignedAttrs == null)
+                ? null
+                : unsignedAttrs.toASN1Structure().getAttributes();
         if(attrs != null)
         {
             for(Attribute attr : attrs)
@@ -461,8 +464,8 @@ public class DecodedPkiMessage extends PkiMessage
             return ret;
         }
 
-        if(MessageType.CertRep == messageType &&
-                (pkiStatus == PkiStatus.FAILURE | pkiStatus == PkiStatus.PENDING))
+        if(MessageType.CertRep == messageType
+                && (pkiStatus == PkiStatus.FAILURE | pkiStatus == PkiStatus.PENDING))
         {
             return ret;
         }
@@ -475,8 +478,8 @@ public class DecodedPkiMessage extends PkiMessage
             // fall back: some SCEP client, such as JSCEP use id-data
             if(CMSObjectIdentifiers.data.equals(signedContentType) == false)
             {
-                ret.setFailureMessage("either id-envelopedData or id-data is excepted, but not '" +
-                        signedContentType.getId());
+                ret.setFailureMessage("either id-envelopedData or id-data is excepted, but not '"
+                        + signedContentType.getId());
                 return ret;
             }
         }
@@ -514,10 +517,11 @@ public class DecodedPkiMessage extends PkiMessage
 
         try
         {
-            if(MessageType.PKCSReq == messageType || MessageType.RenewalReq == messageType ||
-                    MessageType.UpdateReq == messageType)
+            if(MessageType.PKCSReq == messageType || MessageType.RenewalReq == messageType
+                    || MessageType.UpdateReq == messageType)
             {
-                CertificationRequest messageData = CertificationRequest.getInstance(encodedMessageData);
+                CertificationRequest messageData =
+                        CertificationRequest.getInstance(encodedMessageData);
                 ret.setMessageData(messageData);
             } else if(MessageType.CertPoll == messageType)
             {
@@ -525,7 +529,8 @@ public class DecodedPkiMessage extends PkiMessage
                 ret.setMessageData(messageData);
             } else if(MessageType.GetCert == messageType || MessageType.GetCRL == messageType)
             {
-                IssuerAndSerialNumber messageData = IssuerAndSerialNumber.getInstance(encodedMessageData);
+                IssuerAndSerialNumber messageData =
+                        IssuerAndSerialNumber.getInstance(encodedMessageData);
                 ret.setMessageData(messageData);
                 ret.setMessageData(messageData);
             } else if(MessageType.CertRep == messageType)
@@ -534,7 +539,8 @@ public class DecodedPkiMessage extends PkiMessage
                 ret.setMessageData(ci);
             }else
             {
-                throw new RuntimeException("should not reach here, unknown messageType " + messageType);
+                throw new RuntimeException("should not reach here, unknown messageType "
+                        + messageType);
             }
         }catch(Exception e)
         {
@@ -560,7 +566,8 @@ public class DecodedPkiMessage extends PkiMessage
         }
         else if(value != null)
         {
-            throw new MessageDecodingException("the value of attribute " + type.getId() + " is not PrintableString");
+            throw new MessageDecodingException("the value of attribute " + type.getId()
+                    + " is not PrintableString");
         }
         else
         {
@@ -601,7 +608,8 @@ public class DecodedPkiMessage extends PkiMessage
         }
         else if(value != null)
         {
-            throw new MessageDecodingException("the value of attribute " + type.getId() + " is not OctetString");
+            throw new MessageDecodingException("the value of attribute " + type.getId()
+                    + " is not OctetString");
         }
         else
         {

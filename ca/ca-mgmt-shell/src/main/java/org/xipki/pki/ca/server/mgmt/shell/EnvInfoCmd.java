@@ -68,11 +68,14 @@ public class EnvInfoCmd extends CaCmd
 
             if(n == 0 || n == 1)
             {
-                sb.append(((n == 0) ? "no" : "1") + " environment parameter is configured\n");
+                sb.append((n == 0)
+                        ? "no"
+                        : "1");
+                sb.append(" environment parameter is configured\n");
             }
             else
             {
-                sb.append(n + " enviroment paramters are configured:\n");
+                sb.append(n).append(" enviroment paramters are configured:\n");
             }
 
             List<String> sorted = new ArrayList<>(paramNames);

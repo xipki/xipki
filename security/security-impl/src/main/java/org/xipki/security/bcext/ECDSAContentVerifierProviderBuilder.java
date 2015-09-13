@@ -73,8 +73,9 @@ public class ECDSAContentVerifierProviderBuilder
         AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
         if(digAlg == null)
         {
-            throw new OperatorCreationException("could not retrieve digest algorithm from the signature algorithm " +
-                    sigAlgId.getAlgorithm().getId());
+            throw new OperatorCreationException(
+                    "could not retrieve digest algorithm from the signature algorithm "
+                    + sigAlgId.getAlgorithm().getId());
         }
         Digest dig = digestProvider.get(digAlg);
 

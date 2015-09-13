@@ -121,7 +121,9 @@ public abstract class NegEnrollCertCmd extends ClientCmd
         ConcurrentContentSigner signer = getSigner(hashAlgo, new SignatureAlgoControl(rsaMgf1, dsaPlain));
         X509CertificateHolder ssCert = signer.getCertificateAsBCObject();
 
-        X500Name x500Subject = subject == null ? ssCert.getSubject() : new X500Name(subject);
+        X500Name x500Subject = (subject == null)
+                ? ssCert.getSubject()
+                : new X500Name(subject);
         certTemplateBuilder.setSubject(x500Subject);
         certTemplateBuilder.setPublicKey(ssCert.getSubjectPublicKeyInfo());
         CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(), null);

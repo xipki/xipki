@@ -69,10 +69,11 @@ public class EnrollCertResultType
     {
         ParamUtil.assertNotNull("resultEntry", resultEntry);
 
-        if((resultEntry instanceof EnrollCertResultEntryType ||
-                resultEntry instanceof ErrorResultEntryType) == false)
+        if((resultEntry instanceof EnrollCertResultEntryType
+                || resultEntry instanceof ErrorResultEntryType) == false)
         {
-            throw new IllegalArgumentException("Unaccepted parameter of class " + resultEntry.getClass().getName());
+            throw new IllegalArgumentException(
+                    "Unaccepted parameter of class " + resultEntry.getClass().getName());
         }
 
         if(resultEntries == null)

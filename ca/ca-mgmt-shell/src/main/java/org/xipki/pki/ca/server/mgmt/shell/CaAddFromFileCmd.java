@@ -401,7 +401,9 @@ public class CaAddFromFileCmd extends CaCmd
     throws IllegalCmdParamException
     {
         String s = getStrProp(props, propKey, required);
-        return s == null ? null : Integer.parseInt(s);
+        return (s == null)
+                ? null
+                : Integer.parseInt(s);
     }
 
     private long getRequiredLongProp(
@@ -419,7 +421,9 @@ public class CaAddFromFileCmd extends CaCmd
     throws IllegalCmdParamException
     {
         String s = getStrProp(props, propKey, required);
-        return s == null ? null : Long.parseLong(s);
+        return (s == null)
+                ? null
+                : Long.parseLong(s);
     }
 
     private static void assertNotNull(

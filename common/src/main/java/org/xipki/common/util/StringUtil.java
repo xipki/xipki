@@ -169,7 +169,11 @@ public class StringUtil
             final long speed,
             final boolean withPrefix)
     {
-        return formatSpeed(speed, withPrefix ? 10 : 0);
+        int minLen = withPrefix
+                ? 10
+                : 0;
+
+        return formatSpeed(speed, minLen);
     }
 
     private static String formatSpeed(
@@ -177,7 +181,9 @@ public class StringUtil
             final int minLen)
     {
         StringBuilder sb = new StringBuilder(10);
-        String speedS = speed == 0 ? "--" : Long.toString(speed);
+        String speedS = (speed == 0)
+                ? "--"
+                : Long.toString(speed);
         for (int i = 0; i < minLen - speedS.length(); i++)
         {
             sb.append(" ");
@@ -190,7 +196,10 @@ public class StringUtil
             final long account,
             final boolean withPrefix)
     {
-        return formatAccount(account, withPrefix ? 13 : 0);
+        int minLen = withPrefix
+                ? 13
+                : 0;
+        return formatAccount(account, minLen);
     }
 
     public static String formatAccount(
@@ -241,7 +250,10 @@ public class StringUtil
             final long seconds,
             final boolean withPrefix)
     {
-        return formatTime(seconds, withPrefix ? 9 : 0);
+        int minLen = withPrefix
+                ? 9
+                : 0;
+        return formatTime(seconds, minLen);
     }
 
     private static String formatTime(

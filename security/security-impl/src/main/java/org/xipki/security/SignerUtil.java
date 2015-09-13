@@ -175,8 +175,8 @@ public class SignerUtil
 
             ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(pk);
             return p10Request.isSignatureValid(cvp);
-        } catch (OperatorCreationException | InvalidKeyException | PKCSException |
-                NoSuchAlgorithmException | InvalidKeySpecException e)
+        } catch (OperatorCreationException | InvalidKeyException | PKCSException
+                | NoSuchAlgorithmException | InvalidKeySpecException e)
         {
             return false;
         }
@@ -191,7 +191,8 @@ public class SignerUtil
 
         if (inLen+3 > blockSize)
         {
-            throw new SignerException("data too long (maximal " + (blockSize - 3) + " allowed): " + inLen);
+            throw new SignerException("data too long (maximal " + (blockSize - 3) + " allowed): "
+                    + inLen);
         }
 
         byte[]  block = new byte[blockSize];

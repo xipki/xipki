@@ -68,8 +68,8 @@ public class KeystoreP11ModulePool
             final String moduleName)
     {
         KeystoreP11Module module = modules.remove(moduleName);
-        if(module == null && defaultModuleName != null &&
-                SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
+        if(module == null && defaultModuleName != null
+                && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
         {
             module = modules.remove(defaultModuleName);
         }
@@ -100,8 +100,8 @@ public class KeystoreP11ModulePool
     throws SignerException
     {
         KeystoreP11Module module = modules.get(moduleName);
-        if(module == null && defaultModuleName != null &&
-                SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
+        if(module == null && defaultModuleName != null
+                && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
         {
             module = modules.get(defaultModuleName);
         }

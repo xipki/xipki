@@ -128,6 +128,8 @@ class ResponseOption
             final Boolean b,
             final boolean dflt)
     {
-        return b == null ? dflt : b.booleanValue();
+        return (b == null)
+                ? dflt
+                : b.booleanValue();
     }
 }

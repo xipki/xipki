@@ -344,9 +344,9 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             }
 
             ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
-            if(Extension.subjectAlternativeName.equals(oid) ||
-                    Extension.subjectInfoAccess.equals(oid) ||
-                    Extension.biometricInfo.equals(oid))
+            if(Extension.subjectAlternativeName.equals(oid)
+                    || Extension.subjectInfoAccess.equals(oid)
+                    || Extension.biometricInfo.equals(oid))
             {
                 continue;
             }

@@ -180,7 +180,9 @@ public class SoftTokenContentSignerBuilder
             Set<Certificate> caCerts = new HashSet<>();
 
             X509Certificate cert;
-            int n = certificateChain == null ? 0 : certificateChain.length;
+            int n = (certificateChain == null)
+                    ? 0
+                    : certificateChain.length;
             if(n > 0)
             {
                 cert = certificateChain[0];
@@ -207,8 +209,9 @@ public class SoftTokenContentSignerBuilder
             }
 
             this.certificateChain = X509Util.buildCertPath(cert, caCerts);
-        }catch(KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException |
-                CertificateException | IOException | UnrecoverableKeyException | ClassCastException e)
+        }catch(KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException
+                | CertificateException | IOException | UnrecoverableKeyException
+                | ClassCastException e)
         {
             throw new SignerException(e.getMessage(), e);
         }
@@ -221,16 +224,17 @@ public class SoftTokenContentSignerBuilder
     {
         if(parallelism < 1)
         {
-            throw new IllegalArgumentException("non-positive parallelism is not allowed: " + parallelism);
+            throw new IllegalArgumentException("non-positive parallelism is not allowed: "
+                    + parallelism);
         }
 
         List<ContentSigner> signers = new ArrayList<>(parallelism);
 
         ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
 
-        if(Security.getProvider(PROVIDER_XIPKI_NSS) != null &&
-                algOid.equals(PKCSObjectIdentifiers.id_RSASSA_PSS) == false &&
-                key instanceof ECPrivateKey == false)
+        if(Security.getProvider(PROVIDER_XIPKI_NSS) != null
+                && algOid.equals(PKCSObjectIdentifiers.id_RSASSA_PSS) == false
+                && key instanceof ECPrivateKey == false)
         {
             String algoName;
             try
@@ -361,8 +365,9 @@ public class SoftTokenContentSignerBuilder
         {
             if(AlgorithmUtil.isRSASignatureAlgoId(sigAlgId) == false)
             {
-                throw new OperatorCreationException("the given algorithm is not a valid RSA signature algirthm '" +
-                        sigAlgId.getAlgorithm().getId() + "'");
+                throw new OperatorCreationException(
+                        "the given algorithm is not a valid RSA signature algirthm '"
+                        + sigAlgId.getAlgorithm().getId() + "'");
             }
 
             if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()))
@@ -418,8 +423,9 @@ public class SoftTokenContentSignerBuilder
         {
             if(AlgorithmUtil.isDSASigAlg(sigAlgId) == false)
             {
-                throw new OperatorCreationException("the given algorithm is not a valid DSA signature algirthm '" +
-                        sigAlgId.getAlgorithm().getId() + "'");
+                throw new OperatorCreationException(
+                        "the given algorithm is not a valid DSA signature algirthm '"
+                        + sigAlgId.getAlgorithm().getId() + "'");
             }
 
             Digest dig = digestProvider.get(digAlgId);
@@ -455,8 +461,9 @@ public class SoftTokenContentSignerBuilder
         {
             if(AlgorithmUtil.isECSigAlg(sigAlgId) == false)
             {
-                throw new OperatorCreationException("the given algorithm is not a valid EC signature algirthm '" +
-                        sigAlgId.getAlgorithm().getId() + "'");
+                throw new OperatorCreationException(
+                        "the given algorithm is not a valid EC signature algirthm '"
+                        + sigAlgId.getAlgorithm().getId() + "'");
             }
 
             Digest dig = digestProvider.get(digAlgId);

@@ -108,7 +108,10 @@ public class P11ContentSignerBuilder
         Set<Certificate> caCerts = new HashSet<>();
 
         X509Certificate cert;
-        int n = certificateChain == null ? 0 : certificateChain.length;
+        int n = (certificateChain == null)
+                ? 0
+                : certificateChain.length;
+
         if(n > 0)
         {
             cert = certificateChain[0];
@@ -144,7 +147,8 @@ public class P11ContentSignerBuilder
     {
         if(parallelism < 1)
         {
-            throw new IllegalArgumentException("non-positive parallelism is not allowed: " + parallelism);
+            throw new IllegalArgumentException("non-positive parallelism is not allowed: "
+                    + parallelism);
         }
 
         PublicKey publicKey = certificateChain[0].getPublicKey();
@@ -153,24 +157,27 @@ public class P11ContentSignerBuilder
         {
             if(AlgorithmUtil.isRSASignatureAlgoId(signatureAlgId) == false)
             {
-                throw new OperatorCreationException("the given algorithm is not a valid RSA signature algirthm '" +
-                        signatureAlgId.getAlgorithm().getId() + "'");
+                throw new OperatorCreationException(
+                        "the given algorithm is not a valid RSA signature algorithm '"
+                        + signatureAlgId.getAlgorithm().getId() + "'");
             }
         }
         else if(publicKey instanceof ECPublicKey)
         {
             if(AlgorithmUtil.isECSigAlg(signatureAlgId) == false)
             {
-                throw new OperatorCreationException("the given algorithm is not a valid EC signature algirthm '" +
-                        signatureAlgId.getAlgorithm().getId() + "'");
+                throw new OperatorCreationException(
+                        "the given algorithm is not a valid EC signature algirthm '"
+                        + signatureAlgId.getAlgorithm().getId() + "'");
             }
         }
         else if(publicKey instanceof DSAPublicKey)
         {
             if(AlgorithmUtil.isDSASigAlg(signatureAlgId) == false)
             {
-                throw new OperatorCreationException("the given algorithm is not a valid DSA signature algirthm '" +
-                        signatureAlgId.getAlgorithm().getId() + "'");
+                throw new OperatorCreationException(
+                        "the given algorithm is not a valid DSA signature algirthm '"
+                        + signatureAlgId.getAlgorithm().getId() + "'");
             }
         }
         else

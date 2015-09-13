@@ -125,7 +125,11 @@ public class OcspLoadTest extends LoadExecutor
             while(stop() == false && getErrorAccout() < 10)
             {
                 long sn = nextSerialNumber();
-                account(1, (testNext(sn)? 0: 1));
+                int numFailed = testNext(sn)
+                        ? 0
+                        : 1;
+
+                account(1, numFailed);
             }
         }
 
@@ -153,7 +157,10 @@ public class OcspLoadTest extends LoadExecutor
 
             SingleResp[] singleResponses = basicResp.getResponses();
 
-            int n = singleResponses == null ? 0 : singleResponses.length;
+            int n = (singleResponses == null)
+                    ? 0
+                    : singleResponses.length;
+
             if(n == 0)
             {
                 LOG.warn("received no status from server");

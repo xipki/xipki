@@ -118,82 +118,82 @@ public abstract class KeyEntry
     public static final class DSAKeyEntry extends KeyEntry
     {
         private static final String P_1024 =
-                "AM/6AjYLnnzRa99zmdhuMmikFKF/HhotHagBxoHlT4alq415sX94psaJPI3D5+/e" +
-                "YUaZbnFMn/IEBh6YyEL4zPQs4xOYdcNoMJ6XccGelEHjVWDvocf00L417XiTJObM" +
-                "UVHgFrkTPZ7G/mDBFMQ1WVrSSwnjPPDSCkIRiiGiCQqv";
+                "AM/6AjYLnnzRa99zmdhuMmikFKF/HhotHagBxoHlT4alq415sX94psaJPI3D5+/e"
+                + "YUaZbnFMn/IEBh6YyEL4zPQs4xOYdcNoMJ6XccGelEHjVWDvocf00L417XiTJObM"
+                + "UVHgFrkTPZ7G/mDBFMQ1WVrSSwnjPPDSCkIRiiGiCQqv";
 
         private static final String Q_1024 =
                 "ANMDutPywwIBAbqpSxN8CAvbPkaL";
         private static final String G_1024 =
-                "AcFvVWWRJlZsT2xCtto0gZj6QyaVAVJmvkZinCm2kafbFPQ+MLeZJKk3mvCaq2i8" +
-                "DPptJ5LC1FaaE+Is4rhX0BcW5/rxxSk6JVboakH48KEg5nZvzphMNe9mC2bYV29z" +
-                "BbyiYvs9v7EhAI7bKlvOaAb6XyB//fUh1+GYzP15HOw=";
+                "AcFvVWWRJlZsT2xCtto0gZj6QyaVAVJmvkZinCm2kafbFPQ+MLeZJKk3mvCaq2i8"
+                + "DPptJ5LC1FaaE+Is4rhX0BcW5/rxxSk6JVboakH48KEg5nZvzphMNe9mC2bYV29z"
+                + "BbyiYvs9v7EhAI7bKlvOaAb6XyB//fUh1+GYzP15HOw=";
 
         private static final String Y_1024 =
-                "AMjz/ko+WVNXbLo7ixe+iIU2OpgngYIaSZQkbFFQ6E/ePlmgPlFY9gOV7CrjKYfn" +
-                "MgU33SZHipa7Zo6LmgjNZ6VE2FE8PGE+CHM+XZMQlZdOtKZLMfRWUdYfUZ5D7j+1" +
-                "3HlpW2ahfeClF5xuhwjcTDm7VdxZ+rVscp+QzF7Je35p";
+                "AMjz/ko+WVNXbLo7ixe+iIU2OpgngYIaSZQkbFFQ6E/ePlmgPlFY9gOV7CrjKYfn"
+                + "MgU33SZHipa7Zo6LmgjNZ6VE2FE8PGE+CHM+XZMQlZdOtKZLMfRWUdYfUZ5D7j+1"
+                + "3HlpW2ahfeClF5xuhwjcTDm7VdxZ+rVscp+QzF7Je35p";
 
         private static final String P_2048 =
-                "ANAwGdtm8DJ6YHsC9A9c5bmg8saK4TShCmWoC0sLRwaueN/thcXQKjG4qNQu1BiR" +
-                "wIGwlPqbX5F+i/kILuJ4xvcoffMsLZG9WoI8bG5Y+Ld9KWOJ/KDiYjdX5R9flbmq" +
-                "gnMBUbscsLMStNBaHFZYe58S4uClVS6v7poi6s3e/B3ryvWPG4zIamFxV72DmSWo" +
-                "nArfljTleJ/pVqlWW5WOTqXjk11ab53PSJGWPAyhfgZWhHTwsKt+HgemrA8D55us" +
-                "vDVPhYNsnEy4FtJEbIJSsIKO4qGrhDA2mZeH30EXhZx83HWRML0GIP+tDguBN+hI" +
-                "w7G9DpwQQL+f4lowf9rde38=";
+                "ANAwGdtm8DJ6YHsC9A9c5bmg8saK4TShCmWoC0sLRwaueN/thcXQKjG4qNQu1BiR"
+                + "wIGwlPqbX5F+i/kILuJ4xvcoffMsLZG9WoI8bG5Y+Ld9KWOJ/KDiYjdX5R9flbmq"
+                + "gnMBUbscsLMStNBaHFZYe58S4uClVS6v7poi6s3e/B3ryvWPG4zIamFxV72DmSWo"
+                + "nArfljTleJ/pVqlWW5WOTqXjk11ab53PSJGWPAyhfgZWhHTwsKt+HgemrA8D55us"
+                + "vDVPhYNsnEy4FtJEbIJSsIKO4qGrhDA2mZeH30EXhZx83HWRML0GIP+tDguBN+hI"
+                + "w7G9DpwQQL+f4lowf9rde38=";
 
         private static final String Q_2048 =
                 "AO236rjUtJKK0CDLx+koJmwrX4xzffhW/hdqCOb8eOmV";
 
         private static final String G_2048 =
-                "ALsVY3D6QRDnBiwfrbl4Br9wE5D9RZlPt6lUYmOIQFptcD1RWP0ZuajmDQ90FLJ/" +
-                "jamGgqeIY+ZyA0UZqDcDtfrIB0sOML7xIqqUyTxV/UiIHnWVf9Xa9JGUWrUoqvVG" +
-                "qiDI1G0OcIuBykDAHTUo0J54TKZP0DMILkwO0kqf+SM/mH4Q1qxV3RfRDUqc3v9s" +
-                "/LgmshkkBsIapsh5AADA2GAoHnrLlgimgJS4zKoytCYYGtL0NqN4vyGiIQaeoOv4" +
-                "JRwZ+gQsy7OA0nkDRWnAFsPOnPxQqsEGmfE8VGzXrHl42jcavPuJ1o3CCeMq30D0" +
-                "VbEuwEMCUNBcjHTEpF0jnqs=";
+                "ALsVY3D6QRDnBiwfrbl4Br9wE5D9RZlPt6lUYmOIQFptcD1RWP0ZuajmDQ90FLJ/"
+                + "jamGgqeIY+ZyA0UZqDcDtfrIB0sOML7xIqqUyTxV/UiIHnWVf9Xa9JGUWrUoqvVG"
+                + "qiDI1G0OcIuBykDAHTUo0J54TKZP0DMILkwO0kqf+SM/mH4Q1qxV3RfRDUqc3v9s"
+                + "/LgmshkkBsIapsh5AADA2GAoHnrLlgimgJS4zKoytCYYGtL0NqN4vyGiIQaeoOv4"
+                + "JRwZ+gQsy7OA0nkDRWnAFsPOnPxQqsEGmfE8VGzXrHl42jcavPuJ1o3CCeMq30D0"
+                + "VbEuwEMCUNBcjHTEpF0jnqs=";
 
         private static final String Y_2048 =
-                "Pmn2UvUGcvhAwl57D86OPUdhiPJr4qaBNy9GAkUca4nkoQthP90dhvqB6b4FvJBr" +
-                "jsWoPVQSxW+pX2vfbjscQMm4Kt5zaqeHnV/Rod4l5VeW7sqoRqBR7nzlke+xHkT0" +
-                "wM3XkCp2E6BTAhT0qtp05w6onOoWIMv5Ydd04xwNB8lFF+A2uJrt3QlHXHvRW1no" +
-                "Sf7bRDWC6JKLMRd+G0H8USMMT7UNUgen1lXbIH0q1GDph0z1MZkbUwewE/dG6KBL" +
-                "3Km1hBmuWyUrqHLznKYPwhmcOqWpTGn2PJrmdEJdjhdhwpWT1POhiyP+YxxbFNv/" +
-                "Kjkdw4wQAVloP0QZ4wH/IA==";
+                "Pmn2UvUGcvhAwl57D86OPUdhiPJr4qaBNy9GAkUca4nkoQthP90dhvqB6b4FvJBr"
+                + "jsWoPVQSxW+pX2vfbjscQMm4Kt5zaqeHnV/Rod4l5VeW7sqoRqBR7nzlke+xHkT0"
+                + "wM3XkCp2E6BTAhT0qtp05w6onOoWIMv5Ydd04xwNB8lFF+A2uJrt3QlHXHvRW1no"
+                + "Sf7bRDWC6JKLMRd+G0H8USMMT7UNUgen1lXbIH0q1GDph0z1MZkbUwewE/dG6KBL"
+                + "3Km1hBmuWyUrqHLznKYPwhmcOqWpTGn2PJrmdEJdjhdhwpWT1POhiyP+YxxbFNv/"
+                + "Kjkdw4wQAVloP0QZ4wH/IA==";
 
         private static final String P_3072 =
-                "AOcper98q/F5dOpeZMTAxQiD3Sptsr0b19WMMwO+/P0YqjiS1LNqhX2ULuCv/oD1" +
-                "TtgfRx5bNhsg4jA+mLtGHZAO2nGrF9fwlyxyv5gcx4D6WfDaLx1ZVGGcux8PlgLz" +
-                "dshN10t6Icyl28Ky/G8HOFwu7kmHSw6fujsCqW0CvjiRW+sQ9N2Fuzjivg9axCyL" +
-                "MtFLXUcQuIyHhlQWSQyrQkhAG0qLfLWpzM0BdWpL0hDSKgjOTNvYphRquqdzn90g" +
-                "bXTwcQQdtuiQWg6WGhAz7feyuATmhESE2i2P5LV9LQGBG6j3zfU3ITmyexb4rFbp" +
-                "gRSIWZ0nrs5uQ0lYZgUyr+dnzFnNqYZB7aNw5cFR5TWKcxTx0yp9kMMjjZSiQQc2" +
-                "TVm254f6rztbERjU7HXxPFROujufBoTeBj0ayNxVJRIBs6XgSpE7/Gw3OJWJVMYT" +
-                "5iA0MZv0Vs+WKdHoCKCZ8mfZbIisxCpFV8PW9/Xz6T59rBJxs51ZdwwyHz/EB7es" +
-                "EQ==";
+                "AOcper98q/F5dOpeZMTAxQiD3Sptsr0b19WMMwO+/P0YqjiS1LNqhX2ULuCv/oD1"
+                + "TtgfRx5bNhsg4jA+mLtGHZAO2nGrF9fwlyxyv5gcx4D6WfDaLx1ZVGGcux8PlgLz"
+                + "dshN10t6Icyl28Ky/G8HOFwu7kmHSw6fujsCqW0CvjiRW+sQ9N2Fuzjivg9axCyL"
+                + "MtFLXUcQuIyHhlQWSQyrQkhAG0qLfLWpzM0BdWpL0hDSKgjOTNvYphRquqdzn90g"
+                + "bXTwcQQdtuiQWg6WGhAz7feyuATmhESE2i2P5LV9LQGBG6j3zfU3ITmyexb4rFbp"
+                + "gRSIWZ0nrs5uQ0lYZgUyr+dnzFnNqYZB7aNw5cFR5TWKcxTx0yp9kMMjjZSiQQc2"
+                + "TVm254f6rztbERjU7HXxPFROujufBoTeBj0ayNxVJRIBs6XgSpE7/Gw3OJWJVMYT"
+                + "5iA0MZv0Vs+WKdHoCKCZ8mfZbIisxCpFV8PW9/Xz6T59rBJxs51ZdwwyHz/EB7es"
+                + "EQ==";
 
         private static final String Q_3072 =
                 "ALQa/gl8UpkX42IsgfnihnQDS+NQ5US6eYGDz34guCib";
 
         private static final String G_3072 =
-                "FyAOku6IrTU1iI6S0gl3soIF3mRbA/WiKpXu4ZCOdf9fHA12XtXPWRc7jaFBZucp" +
-                "uxYtmDeUwCZRFX+HWpkptVv6LT8OIDbCFFfJlo6i0d1ulq9ybOLtcWXlqIcp4Z0v" +
-                "LbFcxUr79CYp/mwdXzMwD+v7GFTa6feJdQENEfnwOGLUItOm+6OBcft+94xvDCmx" +
-                "tfYYkgEaFvRFjVKy+9kDuf6OfFKM0RDX4tvvpPwpXdYghjk6C/9e0jqloW20DhsW" +
-                "fBDmhp5cPSkjUDDSOz0JrOvT7MBeqefez6PbgMywZFiY+iBOZiIay2o5tI2uOaGq" +
-                "z1K/1xo7tXMlZu0wFuxtwrThFbmbGIXAMCC4hNeW4hFKDRnYZtnRKChhh3gNx3eO" +
-                "/58as/UIa8ApnjvG9tLpYtmlfJlgzlmEAuuB08qMg+T9tUjKQZWgEOiT6INFZS0P" +
-                "mbSZgzJACYY6dMnywnne97TrgCccXuoTRV3derD91tU6lhfR5B4ZADXVClNrf7Nl";
+                "FyAOku6IrTU1iI6S0gl3soIF3mRbA/WiKpXu4ZCOdf9fHA12XtXPWRc7jaFBZucp"
+                + "uxYtmDeUwCZRFX+HWpkptVv6LT8OIDbCFFfJlo6i0d1ulq9ybOLtcWXlqIcp4Z0v"
+                + "LbFcxUr79CYp/mwdXzMwD+v7GFTa6feJdQENEfnwOGLUItOm+6OBcft+94xvDCmx"
+                + "tfYYkgEaFvRFjVKy+9kDuf6OfFKM0RDX4tvvpPwpXdYghjk6C/9e0jqloW20DhsW"
+                + "fBDmhp5cPSkjUDDSOz0JrOvT7MBeqefez6PbgMywZFiY+iBOZiIay2o5tI2uOaGq"
+                + "z1K/1xo7tXMlZu0wFuxtwrThFbmbGIXAMCC4hNeW4hFKDRnYZtnRKChhh3gNx3eO"
+                + "/58as/UIa8ApnjvG9tLpYtmlfJlgzlmEAuuB08qMg+T9tUjKQZWgEOiT6INFZS0P"
+                + "mbSZgzJACYY6dMnywnne97TrgCccXuoTRV3derD91tU6lhfR5B4ZADXVClNrf7Nl";
 
         private static final String Y_3072 =
-                "aiFUID1NF6SllNJf2RDMik1rU2A5VQc4pLw8wfvxG2WXCSTeuWnDB7b3HBtQOwox" +
-                "lYaDQnKBEcly61aVbLKP+TD8dngJQNlr42M07u2drT2ADbk3cLWQ8lk27LBWjntX" +
-                "oXduWz2onw1FEdh2nJSTkHZGBaQpUt8vwxB3IWoGsaazOKLnm/rZlK9g9Rs0RCXA" +
-                "8KViQEUuAU1h/tt2bEFgOECQ6efm3oBeG3TfpstMud7QaGyyFnTgRxrZQpC1Et3D" +
-                "e8TVvIy3uUjnOjGDVV8qGVjsI3J9zX3w5TbTDB4+lbMpc9/oMd26veU+8+7GY5Sz" +
-                "iEPTcZF38POgm8I9Nxe5gxtiNJyOMQZC20rnffJljVLe8L1LrXPj0MJfVZMLXiyz" +
-                "SLFRUj7ZpN4rzgQYkB0ETN40DFFk3a2gC9E2g+EdksAW0h+IAElikX4Q4Ja0kzXu" +
-                "wJfVmq5g/Sp4ysk+JTzAl6r4T1dDr9BXpGgRdYdgwE/2RTMfunqTcUYlV752sbvy";
+                "aiFUID1NF6SllNJf2RDMik1rU2A5VQc4pLw8wfvxG2WXCSTeuWnDB7b3HBtQOwox"
+                + "lYaDQnKBEcly61aVbLKP+TD8dngJQNlr42M07u2drT2ADbk3cLWQ8lk27LBWjntX"
+                + "oXduWz2onw1FEdh2nJSTkHZGBaQpUt8vwxB3IWoGsaazOKLnm/rZlK9g9Rs0RCXA"
+                + "8KViQEUuAU1h/tt2bEFgOECQ6efm3oBeG3TfpstMud7QaGyyFnTgRxrZQpC1Et3D"
+                + "e8TVvIy3uUjnOjGDVV8qGVjsI3J9zX3w5TbTDB4+lbMpc9/oMd26veU+8+7GY5Sz"
+                + "iEPTcZF38POgm8I9Nxe5gxtiNJyOMQZC20rnffJljVLe8L1LrXPj0MJfVZMLXiyz"
+                + "SLFRUj7ZpN4rzgQYkB0ETN40DFFk3a2gC9E2g+EdksAW0h+IAElikX4Q4Ja0kzXu"
+                + "wJfVmq5g/Sp4ysk+JTzAl6r4T1dDr9BXpGgRdYdgwE/2RTMfunqTcUYlV752sbvy";
 
         private AlgorithmIdentifier algId;
         private BigInteger baseY;

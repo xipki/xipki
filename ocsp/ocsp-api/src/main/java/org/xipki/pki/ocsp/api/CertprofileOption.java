@@ -91,7 +91,9 @@ public class CertprofileOption
     {
         if(includes == null)
         {
-            return excludes == null ? true : excludes.contains(certprofile) == false;
+            return (excludes == null)
+                    ? true
+                    : excludes.contains(certprofile) == false;
         }
 
         if(includes.contains(certprofile) == false)
@@ -99,6 +101,8 @@ public class CertprofileOption
             return false;
         }
 
-        return excludes == null ? true : excludes.contains(certprofile) == false;
+        return (excludes == null)
+                ? true
+                : excludes.contains(certprofile) == false;
     }
 }

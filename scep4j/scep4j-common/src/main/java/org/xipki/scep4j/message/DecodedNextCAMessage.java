@@ -284,8 +284,8 @@ public class DecodedNextCAMessage
             // fall back: some SCEP client use id-data
             if(CMSObjectIdentifiers.data.equals(signedContentType) == false)
             {
-                ret.setFailureMessage("either id-signedData or id-data is excepted, but not '" +
-                        signedContentType.getId());
+                ret.setFailureMessage("either id-signedData or id-data is excepted, but not '"
+                        + signedContentType.getId());
                 return ret;
             }
         }
@@ -299,7 +299,8 @@ public class DecodedNextCAMessage
             certs = ScepUtil.getCertsFromSignedData(signedData);
         } catch (CertificateException e)
         {
-            final String msg = "error while extracting Certificates from the message: " + e.getMessage();
+            final String msg = "error while extracting Certificates from the message: "
+                    + e.getMessage();
             LOG.error(msg);
             LOG.debug(msg, e);
             ret.setFailureMessage(msg);

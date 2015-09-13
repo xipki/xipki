@@ -129,22 +129,34 @@ public class CmpControl
         ParamUtil.assertNotBlank("name", name);
         ConfPairs pairs = new ConfPairs();
 
-        this.confirmCert = confirmCert == null ? false: confirmCert;
+        this.confirmCert = (confirmCert == null)
+                ? false
+                : confirmCert;
         pairs.putPair(KEY_CONFIRM_CERT, Boolean.toString(this.confirmCert));
 
-        this.sendCaCert = sendCaCert == null ? false : sendCaCert;
+        this.sendCaCert = (sendCaCert == null)
+                ? false
+                : sendCaCert;
         pairs.putPair(KEY_SEND_CA, Boolean.toString(this.sendCaCert));
 
-        this.messageTimeRequired = messageTimeRequired == null ? true : messageTimeRequired;
+        this.messageTimeRequired = (messageTimeRequired == null)
+                ? true
+                : messageTimeRequired;
         pairs.putPair(KEY_MESSAGETIME_REQUIRED, Boolean.toString(this.messageTimeRequired));
 
-        this.sendResponderCert = sendResponderCert == null ? true : sendResponderCert.booleanValue();
+        this.sendResponderCert = (sendResponderCert == null)
+                ? true
+                : sendResponderCert.booleanValue();
         pairs.putPair(KEY_SEND_RESPONDER, Boolean.toString(this.sendResponderCert));
 
-        this.messageTimeBias = messageTimeBias == null ? DFLT_messageTimeBias : messageTimeBias;
+        this.messageTimeBias = (messageTimeBias == null)
+                ? DFLT_messageTimeBias
+                : messageTimeBias;
         pairs.putPair(KEY_MESSAGETIME_BIAS, Integer.toString(this.messageTimeBias));
 
-        this.confirmWaitTime = confirmWaitTime == null ? DFLT_confirmWaitTime : confirmWaitTime;
+        this.confirmWaitTime = (confirmWaitTime == null)
+                ? DFLT_confirmWaitTime
+                : confirmWaitTime;
         pairs.putPair(KEY_CONFIRM_WAITTIME, Integer.toString(this.confirmWaitTime));
 
         if(CollectionUtil.isEmpty(sigAlgos))
@@ -154,7 +166,8 @@ public class CmpControl
         else
         {
             this.sigAlgos = canonicalizeAlgos(sigAlgos);
-            pairs.putPair(KEY_PROTECTION_SIGALGO, StringUtil.collectionAsString(this.sigAlgos, ALGO_DELIMITER));
+            pairs.putPair(KEY_PROTECTION_SIGALGO,
+                    StringUtil.collectionAsString(this.sigAlgos, ALGO_DELIMITER));
         }
 
         this.dbEntry = new CmpControlEntry(name, pairs.getEncoded());
@@ -184,7 +197,9 @@ public class CmpControl
             final boolean defaultValue)
     {
         String s = pairs.getValue(key);
-        boolean ret = StringUtil.isBlank(s) ? defaultValue : Boolean.parseBoolean(s);
+        boolean ret = StringUtil.isBlank(s)
+                ? defaultValue
+                : Boolean.parseBoolean(s);
         pairs.putPair(key, Boolean.toString(ret));
         return ret;
     }
@@ -195,7 +210,9 @@ public class CmpControl
             final int defaultValue)
     {
         String s = pairs.getValue(key);
-        int ret = StringUtil.isBlank(s) ? defaultValue : Integer.parseInt(s);
+        int ret = StringUtil.isBlank(s)
+                ? defaultValue
+                : Integer.parseInt(s);
         pairs.putPair(key, Integer.toString(ret));
         return ret;
     }
@@ -260,16 +277,23 @@ public class CmpControl
     {
         StringBuilder sb = new StringBuilder();
         sb.append("               name: ").append(dbEntry.getName()).append('\n');
-        sb.append("        confirmCert: ").append(confirmCert ? "yes" : "no").append('\n');
-        sb.append("         sendCaCert: ").append(sendCaCert ? "yes" : "no").append("\n");
-        sb.append("  sendResponderCert: ").append(sendResponderCert ? "yes" : "no").append("\n");
-        sb.append("messageTimeRequired: ").append(messageTimeRequired ? "yes" : "no").append("\n");
+        sb.append("        confirmCert: ").append(getYesNo(confirmCert)).append('\n');
+        sb.append("         sendCaCert: ").append(getYesNo(sendCaCert)).append("\n");
+        sb.append("  sendResponderCert: ").append(getYesNo(sendResponderCert)).append("\n");
+        sb.append("messageTimeRequired: ").append(getYesNo(messageTimeRequired)).append("\n");
         sb.append("    messageTimeBias: ").append(messageTimeBias).append(" s").append('\n');
         sb.append("    confirmWaitTime: ").append(confirmWaitTime).append(" s").append('\n');
         sb.append("    signature algos: ").append(StringUtil.collectionAsString(sigAlgos, ALGO_DELIMITER)).append('\n');
         sb.append("               conf: ").append(dbEntry.getConf());
 
         return sb.toString();
+    }
+
+    private static String getYesNo(boolean b)
+    {
+        return b
+                ? "yes"
+                : "no";
     }
 
 }

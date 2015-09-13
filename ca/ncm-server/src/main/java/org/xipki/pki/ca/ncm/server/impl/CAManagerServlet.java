@@ -1049,8 +1049,11 @@ implements HessianCAManager
             final ServletResponse response)
     throws IOException, ServletException
     {
-        X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-        X509Certificate clientCert = (certs == null || certs.length < 1)? null : certs[0];
+        X509Certificate[] certs = (X509Certificate[]) request.getAttribute(
+                "javax.servlet.request.X509Certificate");
+        X509Certificate clientCert = (certs == null || certs.length < 1)
+                ? null
+                : certs[0];
 
         if(clientCert == null)
         {

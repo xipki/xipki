@@ -224,8 +224,10 @@ public class P11ListSlotCmd extends SecurityCmd
             }
         } else
         {
-            throw new CmdFailure("should not reach here, unknown P11WritableSlot " +
-                    (p11slot == null ? "null" : p11slot.getClass().getName()));
+            String clsName = (p11slot == null)
+                    ? "null"
+                    : p11slot.getClass().getName();
+            throw new CmdFailure("should not reach here, unknown P11WritableSlot " + clsName);
         }
 
         return null;
@@ -239,14 +241,14 @@ public class P11ListSlotCmd extends SecurityCmd
         X509PublicKeyCertificate cert = null;
         for(X509PublicKeyCertificate certObj : certificateObjects)
         {
-            if(keyId != null &&
-                    (Arrays.equals(keyId, certObj.getId().getByteArrayValue()) == false))
+            if(keyId != null
+                    && (Arrays.equals(keyId, certObj.getId().getByteArrayValue()) == false))
             {
                 continue;
             }
 
-            if(keyLabel != null &&
-                    (Arrays.equals(keyLabel, certObj.getLabel().getCharArrayValue()) == false))
+            if(keyLabel != null
+                    && (Arrays.equals(keyLabel, certObj.getLabel().getCharArrayValue()) == false))
             {
                 continue;
             }
@@ -484,7 +486,9 @@ public class P11ListSlotCmd extends SecurityCmd
 
         public String getKeyLabelAsText()
         {
-            return keyLabel == null ? null : new String(keyLabel);
+            return (keyLabel == null)
+                    ? null
+                    : new String(keyLabel);
         }
     }
 
@@ -496,7 +500,10 @@ public class P11ListSlotCmd extends SecurityCmd
 
         if(n == 0 || n == 1)
         {
-            out(((n == 0) ? "no" : "1") + " slot is configured");
+            String numText = (n == 0)
+                    ? "no"
+                    : "1";
+            out(numText + " slot is configured");
         }
         else
         {

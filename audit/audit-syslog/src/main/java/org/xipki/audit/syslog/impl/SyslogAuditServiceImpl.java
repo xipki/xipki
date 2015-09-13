@@ -249,13 +249,13 @@ public class SyslogAuditServiceImpl implements AuditService
         try
         {
             MessageFormat _messageFormat;
-            if("rfc3164".equalsIgnoreCase(messageFormat) ||
-                    "rfc_3164".equalsIgnoreCase(messageFormat))
+            if("rfc3164".equalsIgnoreCase(messageFormat)
+                    || "rfc_3164".equalsIgnoreCase(messageFormat))
             {
                 _messageFormat = MessageFormat.RFC_3164;
             }
-            else if("rfc5424".equalsIgnoreCase(messageFormat) ||
-                    "rfc_5424".equalsIgnoreCase(messageFormat))
+            else if("rfc5424".equalsIgnoreCase(messageFormat)
+                    || "rfc_5424".equalsIgnoreCase(messageFormat))
             {
                 _messageFormat = MessageFormat.RFC_5424;
             }

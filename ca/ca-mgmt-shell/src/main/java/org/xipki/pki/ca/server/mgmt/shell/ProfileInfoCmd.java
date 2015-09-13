@@ -74,11 +74,14 @@ public class ProfileInfoCmd extends CaCmd
 
             if(n == 0 || n == 1)
             {
-                sb.append(((n == 0) ? "no" : "1") + " profile is configured\n");
+                sb.append((n == 0)
+                        ? "no"
+                        : "1");
+                sb.append(" profile is configured\n");
             }
             else
             {
-                sb.append(n + " profiles are configured:\n");
+                sb.append(n).append(" profiles are configured:\n");
             }
 
             List<String> sorted = new ArrayList<>(names);

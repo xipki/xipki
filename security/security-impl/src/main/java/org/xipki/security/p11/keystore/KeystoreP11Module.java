@@ -162,8 +162,7 @@ public class KeystoreP11Module implements P11Module
         P11SlotIdentifier _slotId = null;
         for(P11SlotIdentifier s : slotIds)
         {
-            if(s.getSlotIndex() == slotId.getSlotIndex() ||
-                s.getSlotId() == slotId.getSlotId())
+            if(s.getSlotIndex() == slotId.getSlotIndex() || s.getSlotId() == slotId.getSlotId())
             {
                 _slotId = s;
                 break;

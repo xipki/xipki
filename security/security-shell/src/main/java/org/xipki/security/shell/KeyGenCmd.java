@@ -51,12 +51,12 @@ public abstract class KeyGenCmd extends SecurityCmd
     protected Integer getKeyUsage()
     throws Exception
     {
-        return KeyUsage.cRLSign |
-                KeyUsage.dataEncipherment |
-                KeyUsage.digitalSignature |
-                KeyUsage.keyAgreement |
-                KeyUsage.keyCertSign |
-                KeyUsage.keyEncipherment;
+        return KeyUsage.cRLSign
+                | KeyUsage.dataEncipherment
+                | KeyUsage.digitalSignature
+                | KeyUsage.keyAgreement
+                | KeyUsage.keyCertSign
+                | KeyUsage.keyEncipherment;
     }
 
     protected List<ASN1ObjectIdentifier> getExtendedKeyUsage()

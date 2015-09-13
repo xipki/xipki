@@ -271,7 +271,10 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         }
 
         SingleResp[] singleResponses = basicOCSPResp.getResponses();
-        final int countSingleResponses = singleResponses == null ? 0 : singleResponses.length;
+        final int countSingleResponses = (singleResponses == null)
+                ? 0
+                : singleResponses.length;
+
         if(countSingleResponses != serialNumbers.length)
         {
             StringBuilder sb = new StringBuilder(100);
@@ -293,9 +296,9 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         {
             SingleResp m = singleResponses[0];
             CertificateID cid = m.getCertID();
-            boolean issuerMatch = issuerHashAlg.equals(cid.getHashAlgOID()) &&
-                    Arrays.equals(issuerKeyHash, cid.getIssuerKeyHash()) &&
-                    Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
+            boolean issuerMatch = issuerHashAlg.equals(cid.getHashAlgOID())
+                    && Arrays.equals(issuerKeyHash, cid.getIssuerKeyHash())
+                    && Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
 
             if(issuerMatch == false)
             {
@@ -317,14 +320,14 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             {
                 SingleResp m = singleResponses[i];
                 CertificateID cid = m.getCertID();
-                boolean issuerMatch = issuerHashAlg.equals(cid.getHashAlgOID()) &&
-                        Arrays.equals(issuerKeyHash, cid.getIssuerKeyHash()) &&
-                        Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
+                boolean issuerMatch = issuerHashAlg.equals(cid.getHashAlgOID())
+                        && Arrays.equals(issuerKeyHash, cid.getIssuerKeyHash())
+                        && Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
 
                 if(issuerMatch == false)
                 {
-                    throw new OCSPTargetUnmatchedException("the issuer specified in singleResponse[" + i +
-                            "] is not requested");
+                    throw new OCSPTargetUnmatchedException("the issuer specified in singleResponse["
+                            + i + "] is not requested");
                 }
 
                 BigInteger serialNumber = cid.getSerialNumber();
@@ -332,13 +335,14 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                 {
                     if(tmpSerials1.contains(serialNumber))
                     {
-                        throw new OCSPTargetUnmatchedException("serialNumber " + serialNumber +
-                                "is contained in at least two singleResponses");
+                        throw new OCSPTargetUnmatchedException("serialNumber " + serialNumber
+                                + "is contained in at least two singleResponses");
                     }
                     else
                     {
-                        throw new OCSPTargetUnmatchedException("the serialNumber specified in singleResponse[" + i +
-                                "] is not requested");
+                        throw new OCSPTargetUnmatchedException(
+                                "the serialNumber specified in singleResponse[" + i
+                                + "] is not requested");
                     }
                 }
             }

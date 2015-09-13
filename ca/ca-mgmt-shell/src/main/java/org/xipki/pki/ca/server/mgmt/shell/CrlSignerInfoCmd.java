@@ -74,11 +74,14 @@ public class CrlSignerInfoCmd extends CaCmd
 
             if(n == 0 || n == 1)
             {
-                sb.append(((n == 0) ? "no" : "1") + " CRL signer is configured\n");
+                sb.append((n == 0)
+                        ? "no"
+                        : "1");
+                sb.append(" CRL signer is configured\n");
             }
             else
             {
-                sb.append(n + " CRL signers are configured:\n");
+                sb.append(n).append(" CRL signers are configured:\n");
             }
 
             List<String> sorted = new ArrayList<>(names);

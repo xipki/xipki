@@ -161,9 +161,9 @@ public enum CRLReason
     {
         for(CRLReason value : values())
         {
-            if(value.desription.equalsIgnoreCase(text) ||
-                    value.name().equalsIgnoreCase(text) ||
-                    Integer.toString(value.code).equals(text))
+            if(value.desription.equalsIgnoreCase(text)
+                    || value.name().equalsIgnoreCase(text)
+                    || Integer.toString(value.code).equals(text))
             {
                 return value;
             }

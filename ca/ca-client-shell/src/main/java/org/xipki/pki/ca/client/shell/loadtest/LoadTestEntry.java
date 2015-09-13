@@ -110,14 +110,15 @@ public class LoadTestEntry
                     this.subjectRDNForIncrement = ObjectIdentifiers.DN_CN;
                     break;
                 default:
-                    throw new RuntimeException("should not reach here, unknown RandomDN " + randomDN);
+                    throw new RuntimeException("should not reach here, unknown RandomDN "
+                            + randomDN);
             }
 
-            if(this.subjectRDNForIncrement != null &&
-                    this.subjectTemplate.getRDNs(this.subjectRDNForIncrement).length == 0)
+            if(this.subjectRDNForIncrement != null
+                    && this.subjectTemplate.getRDNs(this.subjectRDNForIncrement).length == 0)
             {
-                throw new IllegalArgumentException("subjectTemplate does not contain DN field " +
-                        ObjectIdentifiers.oidToDisplayName(this.subjectRDNForIncrement));
+                throw new IllegalArgumentException("subjectTemplate does not contain DN field "
+                        + ObjectIdentifiers.oidToDisplayName(this.subjectRDNForIncrement));
             }
         }
 

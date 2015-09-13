@@ -203,9 +203,9 @@ public class CALoadTestRevoke extends LoadExecutor
 
             if(noUnrevokedCerts == false)
             {
-                String sql = "SN FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId +
-                        " AND SN > " + (nextStartSerial - 1) +
-                        " AND SN < " + (maxSerial + 1);
+                String sql = "SN FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId
+                        + " AND SN > " + (nextStartSerial - 1)
+                        + " AND SN < " + (maxSerial + 1);
                 sql = caDataSource.createFetchFirstSelectSQL(sql, 1000, "SN");
                 PreparedStatement stmt = null;
                 ResultSet rs = null;
@@ -276,7 +276,10 @@ public class CALoadTestRevoke extends LoadExecutor
                 }
 
                 boolean successful = testNext(serialNumbers);
-                account(1, successful ? 0 : 1);
+                int numFailed = successful
+                        ? 0
+                        : 1;
+                account(1, numFailed);
             }
         }
 

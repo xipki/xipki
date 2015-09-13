@@ -134,8 +134,8 @@ public class CaRequestorCheckCmd extends CaCmd
 
             if(_permissions.equals(entry.getPermissions()) == false)
             {
-                throw new UnexpectedException("permissions: is '" + entry.getPermissions() +
-                        "', but expected '" + _permissions + "'");
+                throw new UnexpectedException("permissions: is '" + entry.getPermissions()
+                        + "', but expected '" + _permissions + "'");
             }
         }
 
@@ -151,8 +151,8 @@ public class CaRequestorCheckCmd extends CaCmd
 
             if(profiles.equals(entry.getProfiles()) == false)
             {
-                throw new UnexpectedException("profiles: is '" + entry.getProfiles() +
-                        "', but expected '" + profiles + "'");
+                throw new UnexpectedException("profiles: is '" + entry.getProfiles()
+                        + "', but expected '" + profiles + "'");
             }
         }
 
