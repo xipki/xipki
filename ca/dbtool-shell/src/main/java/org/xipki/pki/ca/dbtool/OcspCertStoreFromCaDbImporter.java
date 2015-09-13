@@ -129,8 +129,9 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
         {
             if(processLogFile.exists())
             {
-                throw new InvalidInputException("please either specify '--resume' option or delete the file " +
-                        processLogFile.getPath() + " first");
+                throw new InvalidInputException(
+                        "please either specify '--resume' option or delete the file "
+                        + processLogFile.getPath() + " first");
             }
         }
         this.resume = resume;
@@ -154,7 +155,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
         if(certstore.getVersion() > VERSION)
         {
             throw new InvalidInputException(
-                    "could not import CertStore greater than " + VERSION + ": " + certstore.getVersion());
+                    "could not import CertStore greater than " + VERSION + ": "
+                    + certstore.getVersion());
         }
 
         CAConfigurationType caConf;
@@ -162,7 +164,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
         {
             @SuppressWarnings("unchecked")
             JAXBElement<CAConfigurationType> rootCaConf = (JAXBElement<CAConfigurationType>)
-                    unmarshaller.unmarshal(new File(baseDir + File.separator + FILENAME_CA_Configuration));
+                    unmarshaller.unmarshal(
+                            new File(baseDir + File.separator + FILENAME_CA_Configuration));
             caConf = rootCaConf.getValue();
         }catch(JAXBException e)
         {
@@ -171,8 +174,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
 
         if(caConf.getVersion() > VERSION)
         {
-            throw new InvalidInputException("could not import CA Configuration greater than " +
-                    VERSION + ": " + certstore.getVersion());
+            throw new InvalidInputException("could not import CA Configuration greater than "
+                    + VERSION + ": " + certstore.getVersion());
         }
 
         System.out.println("importing CA certstore to OCSP database");
@@ -477,8 +480,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                     minId = lastId + 1;
                 }catch(Exception e)
                 {
-                    System.err.println("\nerror while importing certificates from file " + certsFile +
-                            ".\nplease continue with the option '--resume'");
+                    System.err.println("\nerror while importing certificates from file "
+                            + certsFile + ".\nplease continue with the option '--resume'");
                     LOG.error("Exception", e);
                     throw e;
                 }
@@ -493,8 +496,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
 
         ProcessLog.printTrailer();
         DbPorter.echoToFile(MSG_CERTS_FINISHED, processLogFile);
-        System.out.println("processed " + processLog.getNumProcessed() + " and " +
-                getImportedText() + importLog.getNumProcessed() + " certificates");
+        System.out.println("processed " + processLog.getNumProcessed() + " and "
+                + getImportedText() + importLog.getNumProcessed() + " certificates");
     }
 
     private int do_import_cert(
@@ -695,8 +698,10 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                     importLog.addNumProcessed(numImportedEntriesInBatch);
                     numProcessedEntriesInBatch = 0;
                     numImportedEntriesInBatch = 0;
-                    echoToFile((processLog.getSumInLastProcess() + processLog.getNumProcessed()) + ":" +
-                            lastSuccessfulCertId, processLogFile);
+                    echoToFile(
+                            (processLog.getSumInLastProcess() + processLog.getNumProcessed())
+                            + ":" + lastSuccessfulCertId,
+                            processLogFile);
 
                     processLog.printStatus(isLastBlock);
                 }

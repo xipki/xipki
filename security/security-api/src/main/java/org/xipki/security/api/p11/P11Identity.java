@@ -74,7 +74,9 @@ public class P11Identity implements Comparable<P11Identity>
         this.slotId = slotId;
         this.keyId = keyId;
         this.certificateChain = certificateChain;
-        this.publicKey = publicKey == null ? certificateChain[0].getPublicKey() : publicKey;
+        this.publicKey = (publicKey == null)
+                ? certificateChain[0].getPublicKey()
+                : publicKey;
 
         if(this.publicKey instanceof RSAPublicKey)
         {
@@ -82,7 +84,8 @@ public class P11Identity implements Comparable<P11Identity>
         }
         else if(this.publicKey instanceof ECPublicKey)
         {
-            signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getCurve().getField().getFieldSize();
+            signatureKeyBitLength = ((ECPublicKey) this.publicKey)
+                    .getParams().getCurve().getField().getFieldSize();
         }
         else if(this.publicKey instanceof DSAPublicKey)
         {
@@ -90,8 +93,10 @@ public class P11Identity implements Comparable<P11Identity>
         }
         else
         {
-            throw new IllegalArgumentException("currently only RSA, DSA and EC public key are supported, but not " +
-                    this.publicKey.getAlgorithm() + " (class: " + this.publicKey.getClass().getName() + ")");
+            throw new IllegalArgumentException(
+                    "currently only RSA, DSA and EC public key are supported, but not "
+                    + this.publicKey.getAlgorithm()
+                    + " (class: " + this.publicKey.getClass().getName() + ")");
         }
     }
 
@@ -102,7 +107,9 @@ public class P11Identity implements Comparable<P11Identity>
 
     public X509Certificate getCertificate()
     {
-        return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0] : null;
+        return (certificateChain != null && certificateChain.length > 0)
+                ? certificateChain[0]
+                : null;
     }
 
     public X509Certificate[] getCertificateChain()
@@ -114,7 +121,9 @@ public class P11Identity implements Comparable<P11Identity>
 
     public PublicKey getPublicKey()
     {
-        return publicKey == null ? certificateChain[0].getPublicKey() : publicKey;
+        return (publicKey == null)
+                ? certificateChain[0].getPublicKey()
+                : publicKey;
     }
 
     public P11SlotIdentifier getSlotId()

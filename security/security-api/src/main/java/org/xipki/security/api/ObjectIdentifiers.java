@@ -458,7 +458,9 @@ public class ObjectIdentifiers
             final ASN1ObjectIdentifier type)
     {
         String name = getName(type);
-        return type.getId() + (name == null ? "" : " (" + name + ")");
+        return name == null
+                ? type.getId()
+                : type.getId() + " (" + name + ")";
     }
 
     public static String getName(

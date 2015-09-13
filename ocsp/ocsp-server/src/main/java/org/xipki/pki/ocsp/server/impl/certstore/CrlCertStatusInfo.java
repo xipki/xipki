@@ -121,11 +121,14 @@ class CrlCertStatusInfo
             byte[] certHash = null;
             if(hashAlgo != null)
             {
-                certHash = certHashes == null ? null : certHashes.get(hashAlgo);
+                certHash = (certHashes == null)
+                        ? null
+                        : certHashes.get(hashAlgo);
             }
             if(certStatus == CertStatus.GOOD)
             {
-                return CertStatusInfo.getGoodCertStatusInfo(hashAlgo, certHash, thisUpdate, nextUpdate, certprofile);
+                return CertStatusInfo.getGoodCertStatusInfo(hashAlgo, certHash, thisUpdate,
+                        nextUpdate, certprofile);
             }
             else
             {

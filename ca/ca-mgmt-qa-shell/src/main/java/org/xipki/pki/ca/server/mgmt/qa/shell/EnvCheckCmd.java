@@ -56,8 +56,8 @@ public class EnvCheckCmd extends EnvUpdateCmd
         String is = caManager.getEnvParam(name);
         if(value.equals(is) == false)
         {
-            throw new CmdFailure("Environment parameter '" + name + "': is '" + is +
-                    "', but expected '" + value + "'");
+            throw new CmdFailure("Environment parameter '" + name + "': is '" + is
+                    + "', but expected '" + value + "'");
         }
 
         out(" checked environment " + name);

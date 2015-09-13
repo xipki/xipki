@@ -121,7 +121,9 @@ public class SubjectControl
 
     public RDNControl getControl(ASN1ObjectIdentifier type)
     {
-        return controls.isEmpty() ? SubjectDNSpec.getRDNControl(type) : controls.get(type);
+        return controls.isEmpty()
+                ? SubjectDNSpec.getRDNControl(type)
+                : controls.get(type);
     }
 
     public String getGroup(ASN1ObjectIdentifier type)

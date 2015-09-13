@@ -291,7 +291,9 @@ public class P10RequestGenerator
             {
                 throw new BadInputException("invalid ediPartyName " + value);
             }
-            String nameAssigner = idxSep == 0 ? null : value.substring(0, idxSep);
+            String nameAssigner = (idxSep == 0)
+                    ? null
+                    : value.substring(0, idxSep);
             String partyName = value.substring(idxSep + 1);
             ASN1EncodableVector vector = new ASN1EncodableVector();
             if(nameAssigner != null)

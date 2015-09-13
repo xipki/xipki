@@ -71,7 +71,8 @@ public class Range
         }
         if(min != null && max != null && min > max)
         {
-            throw new IllegalArgumentException("min cannot be greater than max: " + min + " > " + max);
+            throw new IllegalArgumentException("min cannot be greater than max: "
+                    + min + " > " + max);
         }
         this.min = min;
         this.max = max;

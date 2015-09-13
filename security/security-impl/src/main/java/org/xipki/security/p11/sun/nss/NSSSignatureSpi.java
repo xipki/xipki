@@ -98,8 +98,8 @@ public class NSSSignatureSpi extends SignatureSpi
         String ENCALGO = encrAlgorithmName.toUpperCase();
         if(RSA.equalsIgnoreCase(ENCALGO) || ECDSA.equals(ENCALGO))
         {
-            if (! (SHA1.equals(HASHALGO) || SHA224.equals(HASHALGO) || SHA256.equals(HASHALGO) ||
-                SHA384.equals(HASHALGO) || SHA512.equals(HASHALGO)))
+            if (! (SHA1.equals(HASHALGO) || SHA224.equals(HASHALGO) || SHA256.equals(HASHALGO)
+                    || SHA384.equals(HASHALGO) || SHA512.equals(HASHALGO)))
             {
                 throw new ProviderException(String.format(MSG_UNSUPPORTED_ALGO, HASHALGO, ENCALGO));
             }

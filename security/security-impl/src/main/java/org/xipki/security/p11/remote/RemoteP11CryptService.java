@@ -131,7 +131,9 @@ public abstract class RemoteP11CryptService implements P11CryptService
             throw new SignerException("the returned result is not INTEGER");
         }
 
-        return (derInt == null) ? 0 : derInt.getPositiveValue().intValue();
+        return (derInt == null)
+                ? 0
+                : derInt.getPositiveValue().intValue();
     }
 
     @Override
@@ -282,7 +284,9 @@ public abstract class RemoteP11CryptService implements P11CryptService
             throw new SignerException("the returned result is not OCTETSTRING");
         }
 
-        return (octetString == null) ? null : octetString.getOctets();
+        return (octetString == null)
+                ? null
+                : octetString.getOctets();
     }
 
     private byte[] getCertOrKey(
@@ -311,7 +315,9 @@ public abstract class RemoteP11CryptService implements P11CryptService
             throw new SignerException("the returned result is not OCTETSTRING");
         }
 
-        return (octetString == null) ? null : octetString.getOctets();
+        return (octetString == null)
+                ? null
+                : octetString.getOctets();
     }
 
     private SlotAndKeyIdentifer buildSlotAndKeyIdentifier(
@@ -397,12 +403,11 @@ public abstract class RemoteP11CryptService implements P11CryptService
             PKIStatusInfo statusInfo = content.getPKIStatusInfo();
             throw new SignerException("server answered with ERROR: " + SecurityUtil.formatPKIStatusInfo(statusInfo));
         }
-
         else if(PKIBody.TYPE_GEN_REP != bodyType)
         {
-            throw new SignerException("unknown PKI body type " + bodyType +
-                    " instead the exceptected [" + PKIBody.TYPE_GEN_REP  + ", " +
-                    PKIBody.TYPE_ERROR + "]");
+            throw new SignerException("unknown PKI body type " + bodyType
+                    + " instead the exceptected [" + PKIBody.TYPE_GEN_REP  + ", "
+                    + PKIBody.TYPE_ERROR + "]");
         }
 
         GenRepContent genRep = (GenRepContent) respBody.getContent();
@@ -441,7 +446,9 @@ public abstract class RemoteP11CryptService implements P11CryptService
                 throw new SignerException("xipki action '"
                         + receivedAction + "'  is not the expected '" + action + "'");
             }
-            return seq.size() > 1 ? seq.getObjectAt(1) : null;
+            return seq.size() > 1
+                    ? seq.getObjectAt(1)
+                    : null;
         }catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e)
         {
             throw new SignerException("value of response (type nfoTypeAndValue) '"

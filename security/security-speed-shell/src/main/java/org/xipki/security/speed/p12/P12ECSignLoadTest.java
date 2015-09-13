@@ -53,8 +53,8 @@ public class P12ECSignLoadTest extends P12SignLoadTest
     {
         super(securityFactory, signatureAlgorithm,
                 generateKeystore(curveNameOrOid),
-                "PKCS#12 EC signature creation\n" +
-                "curve: " + curveNameOrOid);
+                "PKCS#12 EC signature creation\n"
+                        + "curve: " + curveNameOrOid);
     }
 
     private static byte[] generateKeystore(

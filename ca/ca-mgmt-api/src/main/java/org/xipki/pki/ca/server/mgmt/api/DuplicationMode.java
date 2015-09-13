@@ -71,9 +71,9 @@ public enum DuplicationMode
     {
         for(DuplicationMode value : values())
         {
-            if(value.description.equalsIgnoreCase(text) ||
-                    value.name().equalsIgnoreCase(text) ||
-                    Integer.toString(value.mode).equalsIgnoreCase(text))
+            if(value.description.equalsIgnoreCase(text)
+                    || value.name().equalsIgnoreCase(text)
+                    || Integer.toString(value.mode).equalsIgnoreCase(text))
             {
                 return value;
             }

@@ -347,7 +347,9 @@ public class DbCertStatusStore extends CertStatusStore
         HashAlgoType certHashAlgo = null;
         if(includeCertHash)
         {
-            certHashAlgo = certHashAlg == null ? hashAlgo : certHashAlg;
+            certHashAlgo = (certHashAlg == null)
+                    ? hashAlgo
+                    : certHashAlg;
             coreSql = sqlCsHashMap.get(certHashAlgo);
         } else
         {
@@ -386,9 +388,9 @@ public class DbCertStatusStore extends CertStatusStore
                 if(rs.next())
                 {
                     String certprofile = rs.getString("PN");
-                    boolean ignore = certprofile != null &&
-                            certprofileOption != null &&
-                            certprofileOption.include(certprofile) == false;
+                    boolean ignore = certprofile != null
+                            && certprofileOption != null
+                            && certprofileOption.include(certprofile) == false;
                     if(ignore)
                     {
                         certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, null);
@@ -580,7 +582,9 @@ public class DbCertStatusStore extends CertStatusStore
             final byte[] issuerKeyHash)
     {
         IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
-        return issuer == null ? null : issuer.getRevocationInfo();
+        return (issuer == null)
+                ? null
+                : issuer.getRevocationInfo();
     }
 
 }

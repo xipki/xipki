@@ -135,7 +135,9 @@ public class ScepServlet extends HttpServlet
     {
         String servletPath = request.getServletPath();
 
-        AuditEvent auditEvent = (auditService != null) ? new AuditEvent(new Date()) : null;
+        AuditEvent auditEvent = (auditService != null)
+                ? new AuditEvent(new Date())
+                : null;
         if(auditEvent != null)
         {
             auditEvent.setApplicationName("SCEP");

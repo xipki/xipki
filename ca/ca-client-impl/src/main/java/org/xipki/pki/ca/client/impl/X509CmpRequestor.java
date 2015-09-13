@@ -241,9 +241,9 @@ abstract class X509CmpRequestor extends CmpRequestor
         }
         else if(PKIBody.TYPE_GEN_REP != bodyType)
         {
-            throw new CmpRequestorException("unknown PKI body type " + bodyType +
-                    " instead the exceptected [" + PKIBody.TYPE_GEN_REP  + ", " +
-                    PKIBody.TYPE_ERROR + "]");
+            throw new CmpRequestorException("unknown PKI body type " + bodyType
+                    + " instead the exceptected [" + PKIBody.TYPE_GEN_REP  + ", "
+                    + PKIBody.TYPE_ERROR + "]");
         }
 
         ASN1ObjectIdentifier expectedType = xipkiAction == null ?
@@ -343,17 +343,17 @@ abstract class X509CmpRequestor extends CmpRequestor
         }
         else if(PKIBody.TYPE_REVOCATION_REP != bodyType)
         {
-            throw new CmpRequestorException("unknown PKI body type " + bodyType +
-                    " instead the exceptected [" + PKIBody.TYPE_REVOCATION_REP  + ", " +
-                    PKIBody.TYPE_ERROR + "]");
+            throw new CmpRequestorException("unknown PKI body type " + bodyType
+                    + " instead the exceptected [" + PKIBody.TYPE_REVOCATION_REP  + ", "
+                    + PKIBody.TYPE_ERROR + "]");
         }
 
         RevRepContent content = (RevRepContent) respBody.getContent();
         PKIStatusInfo[] statuses = content.getStatus();
         if(statuses == null || statuses.length != reqEntries.size())
         {
-            throw new CmpRequestorException("incorrect number of status entries in response '" + statuses.length +
-                    "' instead the exceptected '" + reqEntries.size() + "'");
+            throw new CmpRequestorException("incorrect number of status entries in response '"
+                    + statuses.length + "' instead the exceptected '" + reqEntries.size() + "'");
         }
 
         CertId[] revCerts = content.getRevCerts();
@@ -368,7 +368,9 @@ abstract class X509CmpRequestor extends CmpRequestor
             if(status != PKIStatus.GRANTED && status != PKIStatus.GRANTED_WITH_MODS)
             {
                 PKIFreeText text = statusInfo.getStatusString();
-                String statusString = text == null ? null : text.getStringAt(0).getString();
+                String statusString = (text == null)
+                        ? null
+                        : text.getStringAt(0).getString();
 
                 ResultEntryType resultEntry = new ErrorResultEntryType(
                         re.getId(), status,
@@ -383,8 +385,8 @@ abstract class X509CmpRequestor extends CmpRequestor
             {
                 for(CertId _certId : revCerts)
                 {
-                    if(re.getIssuer().equals(_certId.getIssuer().getName()) &&
-                            re.getSerialNumber().equals(_certId.getSerialNumber().getValue()))
+                    if(re.getIssuer().equals(_certId.getIssuer().getName())
+                            && re.getSerialNumber().equals(_certId.getSerialNumber().getValue()))
                     {
                         certId = _certId;
                         break;
@@ -471,9 +473,9 @@ abstract class X509CmpRequestor extends CmpRequestor
 
         else if(expectedBodyType != bodyType)
         {
-            throw new CmpRequestorException("unknown PKI body type " + bodyType +
-                    " instead the exceptected [" + expectedBodyType  + ", " +
-                    PKIBody.TYPE_ERROR + "]");
+            throw new CmpRequestorException("unknown PKI body type " + bodyType
+                    + " instead the exceptected [" + expectedBodyType  + ", "
+                    + PKIBody.TYPE_ERROR + "]");
         }
 
         CertRepMessage certRep = (CertRepMessage) respBody.getContent();
@@ -561,7 +563,9 @@ abstract class X509CmpRequestor extends CmpRequestor
             else
             {
                 PKIFreeText statusString = statusInfo.getStatusString();
-                String errorMessage = statusString == null ? null : statusString.getStringAt(0).getString();
+                String errorMessage = (statusString == null)
+                        ? null
+                        : statusString.getStringAt(0).getString();
                 int failureInfo = statusInfo.getFailInfo().intValue();
 
                 resultEntry = new ErrorResultEntryType(thisId, status, failureInfo, errorMessage);
@@ -631,7 +635,10 @@ abstract class X509CmpRequestor extends CmpRequestor
             certTempBuilder.setSerialNumber(new ASN1Integer(requestEntry.getSerialNumber()));
 
             Date invalidityDate = requestEntry.getInvalidityDate();
-            Extension[] extensions = new Extension[invalidityDate == null ? 1 : 2];
+            int idx = (invalidityDate == null)
+                    ? 1
+                    : 2;
+            Extension[] extensions = new Extension[idx];
 
             try
             {
@@ -728,9 +735,12 @@ abstract class X509CmpRequestor extends CmpRequestor
             CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, reqEntry.getCertprofile());
             AttributeTypeAndValue certprofileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
 
+            AttributeTypeAndValue[] atvs = (certprofileInfo == null)
+                    ? null
+                    : new AttributeTypeAndValue[]{certprofileInfo};
             certReqMsgs[i] = new CertReqMsg(
                     reqEntry.getCertReq(), reqEntry.getPopo(),
-                    (certprofileInfo == null) ? null : new AttributeTypeAndValue[]{certprofileInfo});
+                    atvs);
         }
 
         int bodyType;
@@ -812,8 +822,8 @@ abstract class X509CmpRequestor extends CmpRequestor
             doc = xmlDocBuilder.parse(new ByteArrayInputStream(systemInfoStr.getBytes("UTF-8")));
         } catch (SAXException | IOException e)
         {
-            throw new CmpRequestorException("could not parse the returned systemInfo for CA " +
-                    caName + ": " + e.getMessage(), e);
+            throw new CmpRequestorException("could not parse the returned systemInfo for CA "
+                    + caName + ": " + e.getMessage(), e);
         }
 
         final String namespace = null;
@@ -824,7 +834,9 @@ abstract class X509CmpRequestor extends CmpRequestor
             s = root.getAttributeNS(namespace, "version");
         }
 
-        int version = StringUtil.isBlank(s) ? 1 : Integer.parseInt(s);
+        int version = StringUtil.isBlank(s)
+                ? 1
+                : Integer.parseInt(s);
 
         if(version == 2)
         {

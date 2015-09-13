@@ -143,7 +143,9 @@ public class CheckCertCmd extends XipkiOsgiCommandSupport
 
         sb.append(certFile).append(" (certprofile ").append(profileName).append(")\n");
         sb.append("\tcertificate is ");
-        sb.append(result.isAllSuccessful()? "valid" : "invalid");
+        sb.append(result.isAllSuccessful()
+                ? "valid"
+                : "invalid");
 
         if(verbose.booleanValue())
         {
@@ -175,7 +177,10 @@ public class CheckCertCmd extends XipkiOsgiCommandSupport
         sb.append(prefix);
         sb.append(issue.getCode());
         sb.append(", ").append(issue.getDescription());
-        sb.append(", ").append(issue.isFailed() ? "failed" : "successful");
+        sb.append(", ").append(
+                issue.isFailed()
+                    ? "failed"
+                    : "successful");
         if(issue.getMessage() != null)
         {
             sb.append(", ").append(issue.getMessage());

@@ -58,7 +58,9 @@ public abstract class CaCmd extends XipkiOsgiCommandSupport
     protected static String getRealString(
             final String s)
     {
-        return CAManager.NULL.equalsIgnoreCase(s) ? null : s;
+        return CAManager.NULL.equalsIgnoreCase(s)
+                ? null
+                : s;
     }
 
     protected static String toString(

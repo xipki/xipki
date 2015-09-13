@@ -474,8 +474,9 @@ public final class CAClientImpl implements CAClient
             }
             else
             {
-                throw new InvalidConfException("could not find requestor named " + requestorName +
-                        " for CA " + ca.getName());
+                throw new InvalidConfException("could not find requestor named "
+                        + requestorName
+                        + " for CA " + ca.getName());
             }
 
             ca.setRequestor(cmpRequestor);
@@ -687,8 +688,8 @@ public final class CAClientImpl implements CAClient
                 }
                 else
                 {
-                    throw new CAClientException("cert profile " + certprofile +
-                            " supported by more than one CA, please specify the CA name.");
+                    throw new CAClientException("cert profile " + certprofile
+                            + " supported by more than one CA, please specify the CA name.");
                 }
             }
         }
@@ -726,7 +727,9 @@ public final class CAClientImpl implements CAClient
         RevokeCertRequestType request = new RevokeCertRequestType();
         request.addRequestEntry(entry);
         Map<String, CertIdOrError> result = revokeCerts(request, debug);
-        return result == null ? null : result.get(id);
+        return (result == null)
+                ? null
+                : result.get(id);
     }
 
     @Override
@@ -914,8 +917,8 @@ public final class CAClientImpl implements CAClient
                 }
                 else
                 {
-                    throw new CAClientException("cert profile " + certprofile +
-                            " supported by more than one CA, please specify the CA name.");
+                    throw new CAClientException("cert profile " + certprofile
+                            + " supported by more than one CA, please specify the CA name.");
                 }
             }
         }
@@ -928,7 +931,9 @@ public final class CAClientImpl implements CAClient
     throws CertificateException
     {
         Certificate bcCert = cmpCert.getX509v3PKCert();
-        return (bcCert == null) ? null : new X509CertificateObject(bcCert);
+        return (bcCert == null)
+                ? null
+                : new X509CertificateObject(bcCert);
     }
 
     public String getConfFile()
@@ -1073,8 +1078,8 @@ public final class CAClientImpl implements CAClient
                 _cert.verify(caPublicKey);
                 return true;
             }
-        } catch (SignatureException | InvalidKeyException | CertificateException |
-                NoSuchAlgorithmException | NoSuchProviderException e)
+        } catch (SignatureException | InvalidKeyException | CertificateException
+                | NoSuchAlgorithmException | NoSuchProviderException e)
         {
             LOG.debug("{} while verifying signature: {}", e.getClass().getName(), e.getMessage());
             return false;
@@ -1130,7 +1135,9 @@ public final class CAClientImpl implements CAClient
         UnrevokeOrRemoveCertRequestType request = new UnrevokeOrRemoveCertRequestType();
         request.addRequestEntry(entry);
         Map<String, CertIdOrError> result = unrevokeCerts(request, debug);
-        return result == null ? null : result.get(id);
+        return (result == null)
+                ? null
+                : result.get(id);
     }
 
     @Override
@@ -1195,7 +1202,9 @@ public final class CAClientImpl implements CAClient
         UnrevokeOrRemoveCertRequestType request = new UnrevokeOrRemoveCertRequestType();
         request.addRequestEntry(entry);
         Map<String, CertIdOrError> result = removeCerts(request, debug);
-        return result == null ? null : result.get(id);
+        return (result == null)
+                ? null
+                : result.get(id);
     }
 
     @Override

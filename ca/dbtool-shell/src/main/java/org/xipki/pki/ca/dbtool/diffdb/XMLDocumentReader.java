@@ -101,7 +101,9 @@ public class XMLDocumentReader
     throws XPathExpressionException
     {
         Node n = getNode(xpathExpression);
-        return (n != null) ? n.getFirstChild().getTextContent() : null;
+        return (n != null)
+                ? n.getFirstChild().getTextContent()
+                : null;
     }
 
     private Node getNode(

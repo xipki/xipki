@@ -75,11 +75,14 @@ public class ResponderInfoCmd extends CaCmd
 
             if(n == 0 || n == 1)
             {
-                sb.append(((n == 0) ? "no" : "1") + " responder is configured\n");
+                sb.append((n == 0)
+                        ? "no"
+                        : "1");
+                sb.append(" responder is configured\n");
             }
             else
             {
-                sb.append(n + " responders are configured:\n");
+                sb.append(n).append(" responders are configured:\n");
             }
 
             List<String> sorted = new ArrayList<>(names);

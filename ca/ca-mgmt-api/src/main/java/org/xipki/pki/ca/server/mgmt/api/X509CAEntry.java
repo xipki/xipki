@@ -239,8 +239,12 @@ implements Serializable
         {
             sb.append('\n');
         }
-        sb.append("duplicateCN: ").append(
-                duplicateCNMode == null ? "null" : duplicateCNMode.getDescription()).append('\n');
+        sb.append("duplicateCN: ");
+        sb.append(
+                duplicateCNMode == null
+                        ? "null"
+                        : duplicateCNMode.getDescription());
+        sb.append('\n');
         sb.append("nextSerial: ").append(nextSerial).append('\n');
         sb.append("nextCrlNumber: ").append(nextCRLNumber).append('\n');
         sb.append("deltaCrlUris: ").append(getDeltaCrlUrisAsString()).append('\n');
@@ -275,7 +279,12 @@ implements Serializable
         }
 
         sb.append("crlsignerName: ").append(crlSignerName).append('\n');
-        sb.append("revocation: ").append(revocationInfo == null ? "not revoked" : "revoked").append("\n");
+        sb.append("revocation: ");
+        sb.append(
+                revocationInfo == null
+                        ? "not revoked"
+                        : "revoked");
+        sb.append("\n");
         if(revocationInfo != null)
         {
             sb.append("\treason: ").append(revocationInfo.getReason().getDescription()).append("\n");
@@ -298,7 +307,9 @@ implements Serializable
 
     public Date getCrlBaseTime()
     {
-        return cert == null ? null : cert.getNotBefore();
+        return (cert == null)
+                ? null
+                : cert.getNotBefore();
     }
 
     public String getSubject()

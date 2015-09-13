@@ -153,8 +153,10 @@ public class KeystoreP11Identity extends P11Identity
             }
             else
             {
-                throw new IllegalArgumentException("Currently only RSA, DSA and EC public key are supported, but not " +
-                        this.publicKey.getAlgorithm() + " (class: " + this.publicKey.getClass().getName() + ")");
+                throw new IllegalArgumentException(
+                        "Currently only RSA, DSA and EC public key are supported, but not "
+                        + this.publicKey.getAlgorithm()
+                        + " (class: " + this.publicKey.getClass().getName() + ")");
             }
 
             for(int i = 0; i < maxSessions; i++)
@@ -182,8 +184,8 @@ public class KeystoreP11Identity extends P11Identity
     {
         if(publicKey instanceof RSAPublicKey == false)
         {
-            throw new SignerException("operation CKM_RSA_PKCS is not allowed for " +
-                    publicKey.getAlgorithm() + " public key");
+            throw new SignerException("operation CKM_RSA_PKCS is not allowed for "
+                    + publicKey.getAlgorithm() + " public key");
         }
 
         byte[] padded = SignerUtil.pkcs1padding(encodedDigestInfo, (getSignatureKeyBitLength() + 7)/8);
@@ -196,8 +198,8 @@ public class KeystoreP11Identity extends P11Identity
     {
         if(publicKey instanceof RSAPublicKey == false)
         {
-            throw new SignerException("operation CKM_RSA_X509 is not allowed for " +
-                    publicKey.getAlgorithm() + " public key");
+            throw new SignerException("operation CKM_RSA_X509 is not allowed for "
+                    + publicKey.getAlgorithm() + " public key");
         }
         return do_rsa_sign(hash);
     }

@@ -120,7 +120,9 @@ public class SimpleXPath
     {
         List<Node> rv = new LinkedList<Node>();
         select(rv, context, this.steps, 0, true);
-        return CollectionUtil.isEmpty(rv) ? null : rv.get(0);
+        return CollectionUtil.isEmpty(rv)
+                ? null
+                : rv.get(0);
     }
 
     private static void select(
@@ -197,7 +199,9 @@ public class SimpleXPath
             }
             else
             {
-                prefix = isElement ? "" : null;
+                prefix = isElement
+                        ? ""
+                        : null;
                 this.localPart = step;
             }
 
@@ -220,7 +224,9 @@ public class SimpleXPath
         public String toString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.append(isElement ? "Element" : "Attribute");
+            sb.append(isElement
+                    ? "Element"
+                    : "Attribute");
             sb.append(" localPart='");
             sb.append(localPart);
             sb.append("'");

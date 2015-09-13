@@ -56,9 +56,9 @@ public class P12RSASignLoadTest extends P12SignLoadTest
     {
         super(securityFactory, signatureAlgorithm,
                 generateKeystore(keysize, publicExponent),
-                "PKCS#12 RSA signature creation\n" +
-                "keysize: " + keysize + "\n" +
-                "public exponent: " + publicExponent);
+                "PKCS#12 RSA signature creation\n"
+                        + "keysize: " + keysize + "\n"
+                        + "public exponent: " + publicExponent);
     }
 
     private static byte[] generateKeystore(

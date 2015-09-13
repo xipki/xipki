@@ -57,8 +57,8 @@ public class P11ECSignLoadTest extends P11SignLoadTest
     {
         super(securityFactory, slot, signatureAlgorithm,
                 generateKey(slot, curveNameOrOid),
-                "PKCS#11 EC signature creation\n" +
-                "curve: " + curveNameOrOid);
+                "PKCS#11 EC signature creation\n"
+                        + "curve: " + curveNameOrOid);
     }
 
     private static P11KeyIdentifier generateKey(

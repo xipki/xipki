@@ -57,9 +57,9 @@ public class P11DSASignLoadTest extends P11SignLoadTest
     {
         super(securityFactory, slot, signatureAlgorithm,
                 generateKey(slot, pLength, qLength),
-                "PKCS#11 DSA signature creation\n" +
-                "pLength: " + pLength + "\n" +
-                "qLength: " + qLength);
+                "PKCS#11 DSA signature creation\n"
+                        + "pLength: " + pLength + "\n"
+                        + "qLength: " + qLength);
     }
 
     private static P11KeyIdentifier generateKey(

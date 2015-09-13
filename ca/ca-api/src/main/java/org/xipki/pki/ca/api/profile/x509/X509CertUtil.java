@@ -106,7 +106,8 @@ public class X509CertUtil
             for(String uri : caIssuerUris)
             {
                 GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
-                accessDescriptions.add(new AccessDescription(X509ObjectIdentifiers.id_ad_caIssuers, gn));
+                accessDescriptions.add(
+                        new AccessDescription(X509ObjectIdentifiers.id_ad_caIssuers, gn));
             }
         }
 

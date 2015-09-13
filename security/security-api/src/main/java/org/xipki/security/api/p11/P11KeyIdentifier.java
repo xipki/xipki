@@ -58,7 +58,9 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
             throw new IllegalArgumentException("at least one of keyId an keyLabel must be non-null");
         }
         this.keyId = keyId;
-        this.keyIdHex = (keyId == null) ? null : new String(Hex.encode(keyId)).toUpperCase();
+        this.keyIdHex = (keyId == null)
+                ? null
+                : new String(Hex.encode(keyId)).toUpperCase();
         this.keyLabel = keyLabel;
     }
 
@@ -157,11 +159,15 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
 
         if(keyLabel == null)
         {
-            return (o.keyLabel == null) ? 0 : 1;
+            return (o.keyLabel == null)
+                    ? 0
+                    : 1;
         }
         else
         {
-            return (o.keyLabel == null) ? -1 : keyLabel.compareTo(o.keyLabel);
+            return (o.keyLabel == null)
+                    ? -1
+                    : keyLabel.compareTo(o.keyLabel);
         }
     }
 

@@ -109,7 +109,9 @@ public abstract class X509Certprofile
     {
         try
         {
-            int currentSN = currentSerialNumber == null ? 0 : Integer.parseInt(currentSerialNumber.trim());
+            int currentSN = (currentSerialNumber == null)
+                    ? 0
+                    : Integer.parseInt(currentSerialNumber.trim());
             return Integer.toString(currentSN + 1);
         }catch(NumberFormatException e)
         {

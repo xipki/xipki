@@ -204,7 +204,9 @@ public class OcspServer
                 return 0;
             }
 
-            return (d > 0) ? 1 : -1;
+            return (d > 0)
+                    ? 1
+                    : -1;
         }
     }
 
@@ -617,12 +619,20 @@ public class OcspServer
                 _stores.add(stores.get(storeName));
             }
 
+            AuditOption auditOption = (aoName == null)
+                    ? null
+                    : auditOptions.get(aoName);
+
+            CertprofileOption certprofileOption = (cfoName == null)
+                    ? null
+                    : certprofileOptions.get(cfoName);
+
             Responder responder = new Responder(
                     option,
                     requestOptions.get(option.getRequestOptionName()),
                     responseOptions.get(option.getResponseOptionName()),
-                    aoName == null ? null : auditOptions.get(aoName),
-                    cfoName == null ? null : certprofileOptions.get(cfoName),
+                    auditOption,
+                    certprofileOption,
                     signers.get(option.getSignerName()),
                     _stores);
             responders.put(name, responder);
@@ -925,19 +935,21 @@ public class OcspServer
                         break;
                     case REVOKED:
                         CertRevocationInfo revInfo = certStatusInfo.getRevocationInfo();
-                        ASN1GeneralizedTime revTime = new ASN1GeneralizedTime(revInfo.getRevocationTime());
+                        ASN1GeneralizedTime revTime = new ASN1GeneralizedTime(
+                                revInfo.getRevocationTime());
                         org.bouncycastle.asn1.x509.CRLReason _reason = null;
                         if(responseOption.isIncludeRevReason())
                         {
-                            _reason = org.bouncycastle.asn1.x509.CRLReason.lookup(revInfo.getReason().getCode());
+                            _reason = org.bouncycastle.asn1.x509.CRLReason.lookup(
+                                    revInfo.getReason().getCode());
                         }
                         RevokedInfo _revInfo = new RevokedInfo(revTime, _reason);
                         bcCertStatus = new RevokedStatus(_revInfo);
 
                         Date invalidityDate = revInfo.getInvalidityTime();
-                        if(responseOption.isIncludeInvalidityDate() &&
-                                invalidityDate != null &&
-                                invalidityDate.equals(revTime) == false)
+                        if(responseOption.isIncludeInvalidityDate()
+                                && invalidityDate != null
+                                && invalidityDate.equals(revTime) == false)
                         {
                             Extension extension = new Extension(Extension.invalidityDate,
                                     false, new ASN1GeneralizedTime(invalidityDate).getEncoded());
@@ -951,7 +963,8 @@ public class OcspServer
                 {
                     ASN1ObjectIdentifier hashAlgoOid =
                             new ASN1ObjectIdentifier(certStatusInfo.getCertHashAlgo().getOid());
-                    AlgorithmIdentifier aId = new AlgorithmIdentifier(hashAlgoOid, DERNull.INSTANCE);
+                    AlgorithmIdentifier aId =
+                            new AlgorithmIdentifier(hashAlgoOid, DERNull.INSTANCE);
                     CertHash bcCertHash = new CertHash(aId, certHash);
 
                     byte[] encodedCertHash;
@@ -994,7 +1007,9 @@ public class OcspServer
                 }
                 else if(bcCertStatus instanceof RevokedStatus)
                 {
-                    certStatusText = unknownAsRevoked ? "unknown_as_revoked" : "revoked";
+                    certStatusText = unknownAsRevoked
+                            ? "unknown_as_revoked"
+                            : "revoked";
                 }
                 else if(bcCertStatus == null)
                 {
@@ -1035,8 +1050,12 @@ public class OcspServer
                     LOG.debug(sb.toString());
                 }
 
-                basicOcspBuilder.addResponse(certID, bcCertStatus, thisUpdate, nextUpdate,
-                        CollectionUtil.isEmpty(extensions) ? null : new Extensions(extensions.toArray(new Extension[0])));
+                Extensions extns = null;
+                if(CollectionUtil.isNotEmpty(extensions))
+                {
+                    extns = new Extensions(extensions.toArray(new Extension[0]));
+                }
+                basicOcspBuilder.addResponse(certID, bcCertStatus, thisUpdate, nextUpdate, extns);
                 cacheThisUpdate = Math.max(cacheThisUpdate, thisUpdate.getTime());
                 if(nextUpdate != null)
                 {
@@ -1273,8 +1292,9 @@ public class OcspServer
             final boolean successfull,
             final String eventType)
     {
-        AuditService auditService = auditServiceRegister == null ? null :
-            auditServiceRegister.getAuditService();
+        AuditService auditService = (auditServiceRegister == null)
+                ? null
+                : auditServiceRegister.getAuditService();
         if(auditService != null)
         {
             PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());
@@ -1397,7 +1417,10 @@ public class OcspServer
             store = new DbCertStatusStore(name, issuerFilter);
 
             Integer i = conf.getRetentionInterval();
-            store.setRetentionInterval(i == null ? -1 : i.intValue());
+            int retentionInterva = (i == null)
+                    ? -1
+                    : i.intValue();
+            store.setRetentionInterval(retentionInterva);
             store.setUnknownSerialAsGood(
                     getBoolean(conf.isUnknownSerialAsGood(), false));
         }
@@ -1431,7 +1454,10 @@ public class OcspServer
             }
 
             Integer i = conf.getRetentionInterval();
-            store.setRetentionInterval(i == null ? 0 : i.intValue());
+            int retentionInterval = (i == null)
+                    ? 0
+                    : i.intValue();
+            store.setRetentionInterval(retentionInterval);
             store.setUnknownSerialAsGood(
                     getBoolean(conf.isUnknownSerialAsGood(), true));
         }
@@ -1484,8 +1510,8 @@ public class OcspServer
             store.init(statusStoreConf, datasource);
         }catch(CertStatusStoreException e)
         {
-            throw new InvalidConfException("CertStatusStoreException of store " + conf.getName() +
-                    ":" + e.getMessage(), e);
+            throw new InvalidConfException("CertStatusStoreException of store " + conf.getName()
+                    + ":" + e.getMessage(), e);
         }
 
         return store;
@@ -1659,7 +1685,9 @@ public class OcspServer
             final Boolean b,
             final boolean defaultValue)
     {
-        return (b == null) ? defaultValue : b.booleanValue();
+        return (b == null)
+                ? defaultValue
+                : b.booleanValue();
     }
 
     private static Set<X509Certificate> parseCerts(

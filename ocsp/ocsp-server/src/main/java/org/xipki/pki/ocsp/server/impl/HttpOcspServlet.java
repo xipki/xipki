@@ -154,8 +154,9 @@ public class HttpOcspServlet extends HttpServlet
 
         long start = 0;
 
-        AuditService auditService = auditServiceRegister == null ? null :
-            auditServiceRegister.getAuditService();
+        AuditService auditService = (auditServiceRegister == null)
+                ? null
+                : auditServiceRegister.getAuditService();
 
         if(auditService != null && responder.getAuditOption() != null)
         {

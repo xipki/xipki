@@ -74,11 +74,14 @@ public class RequestorInfoCmd extends CaCmd
 
             if(n == 0 || n == 1)
             {
-                sb.append(((n == 0) ? "no" : "1") + " CMP requestor is configured\n");
+                sb.append((n == 0)
+                        ? "no"
+                        : "1");
+                sb.append(" CMP requestor is configured\n");
             }
             else
             {
-                sb.append(n + " CMP requestors are configured:\n");
+                sb.append(n).append(" CMP requestors are configured:\n");
             }
 
             List<String> sorted = new ArrayList<>(names);

@@ -69,7 +69,8 @@ public enum DirectoryStringType
             return new DERBMPString(text);
         } else
         {
-            throw new RuntimeException("should not reach here, unkown DirectoryStringType '" + text + "'");
+            throw new RuntimeException("should not reach here, unkown DirectoryStringType '"
+                    + text + "'");
         }
     }
 }

@@ -78,9 +78,9 @@ public class IssuerHashNameAndKey
             final byte[] issuerNameHash,
             final byte[] issuerKeyHash)
     {
-        return this.algo == algo &&
-                Arrays.equals(this.issuerNameHash, issuerNameHash) &&
-                Arrays.equals(this.issuerKeyHash, issuerKeyHash);
+        return this.algo == algo
+                && Arrays.equals(this.issuerNameHash, issuerNameHash)
+                && Arrays.equals(this.issuerKeyHash, issuerKeyHash);
     }
 
 }

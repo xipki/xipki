@@ -161,8 +161,8 @@ public class ScepControl implements Serializable
         }
 
         ScepControl b = (ScepControl) obj;
-        if(includeCACert != b.includeCACert ||
-                includeSignerCert != b.includeSignerCert)
+        if(includeCACert != b.includeCACert
+                || includeSignerCert != b.includeSignerCert)
         {
             return false;
         }

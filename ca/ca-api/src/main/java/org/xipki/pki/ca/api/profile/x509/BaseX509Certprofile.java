@@ -179,7 +179,9 @@ extends X509Certprofile
             }
 
             RDN[] thisRDNs = getRDNs(requstedRDNs, type);
-            int n = thisRDNs == null ? 0 : thisRDNs.length;
+            int n = (thisRDNs == null)
+                    ? 0
+                    : thisRDNs.length;
             if(n == 0)
             {
                 continue;
@@ -227,7 +229,8 @@ extends X509Certprofile
                 {
                     for(int i = 0; i < n; i++)
                     {
-                        RDN rdn = createPostalAddressRDN(type, thisRDNs[i].getFirst().getValue(), control, i);
+                        RDN rdn = createPostalAddressRDN(type, thisRDNs[i].getFirst().getValue(),
+                                control, i);
                         rdns.add(rdn);
                     }
                 }
@@ -313,7 +316,8 @@ extends X509Certprofile
 
         if(SubjectDNSpec.p_dateOfBirth.matcher(text).matches() == false)
         {
-            throw new BadCertTemplateException("Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
+            throw new BadCertTemplateException(
+                    "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
         }
 
         if(newRdnValue == null)
@@ -340,7 +344,8 @@ extends X509Certprofile
         final int size = seq.size();
         if(size < 1 || size > 6)
         {
-            throw new BadCertTemplateException("Sequence size of RDN postalAddress is not within [1, 6]: " + size);
+            throw new BadCertTemplateException(
+                    "Sequence size of RDN postalAddress is not within [1, 6]: " + size);
         }
 
         ASN1EncodableVector v = new ASN1EncodableVector();
@@ -378,7 +383,9 @@ extends X509Certprofile
             }
         }
 
-        return CollectionUtil.isEmpty(ret) ? null : ret.toArray(new RDN[0]);
+        return CollectionUtil.isEmpty(ret)
+                ? null
+                : ret.toArray(new RDN[0]);
     }
 
     protected EnvParameterResolver parameterResolver;
@@ -429,12 +436,14 @@ extends X509Certprofile
                 curveOid = (ASN1ObjectIdentifier) algParam;
                 if(ecOption.allowsCurve(curveOid) == false)
                 {
-                    throw new BadCertTemplateException("EC curve " + SecurityUtil.getCurveName(curveOid) +
-                            " (OID: " + curveOid.getId() + ") is not allowed");
+                    throw new BadCertTemplateException("EC curve "
+                            + SecurityUtil.getCurveName(curveOid)
+                            + " (OID: " + curveOid.getId() + ") is not allowed");
                 }
             } else
             {
-                throw new BadCertTemplateException("only namedCurve or implictCA EC public key is supported");
+                throw new BadCertTemplateException(
+                        "only namedCurve or implictCA EC public key is supported");
             }
 
             // point encoding
@@ -448,7 +457,8 @@ extends X509Certprofile
                 byte pointEncoding = keyData[0];
                 if(ecOption.getPointEncodings().contains(pointEncoding) == false)
                 {
-                    throw new BadCertTemplateException("unaccepted EC point encoding " + pointEncoding);
+                    throw new BadCertTemplateException("unaccepted EC point encoding "
+                            + pointEncoding);
                 }
             }
 
@@ -473,7 +483,8 @@ extends X509Certprofile
             ASN1Integer modulus;
             try
             {
-                ASN1Sequence seq = ASN1Sequence.getInstance(publicKey.getPublicKeyData().getBytes());
+                ASN1Sequence seq = ASN1Sequence.getInstance(
+                        publicKey.getPublicKeyData().getBytes());
                 modulus = ASN1Integer.getInstance(seq.getObjectAt(0));
             }catch(IllegalArgumentException e)
             {
@@ -523,7 +534,8 @@ extends X509Certprofile
         }
         else
         {
-            throw new RuntimeException("should not reach here, unknown KeyParametersOption " + keyParamsOption);
+            throw new RuntimeException("should not reach here, unknown KeyParametersOption "
+                    + keyParamsOption);
         }
 
         throw new BadCertTemplateException("the given publicKey is not permitted");
@@ -552,15 +564,18 @@ extends X509Certprofile
             RDNControl occu = occurences.getControl(type);
             if(occu == null)
             {
-                throw new BadCertTemplateException("subject DN of type " + oidToDisplayName(type) + " is not allowed");
+                throw new BadCertTemplateException("subject DN of type "
+                        + oidToDisplayName(type) + " is not allowed");
             }
 
             RDN[] rdns = requestedSubject.getRDNs(type);
             if(rdns.length > occu.getMaxOccurs() || rdns.length < occu.getMinOccurs())
             {
-                throw new BadCertTemplateException("occurrence of subject DN of type " + oidToDisplayName(type) +
-                        " not within the allowed range. " + rdns.length +
-                        " is not within [" +occu.getMinOccurs() + ", " + occu.getMaxOccurs() + "]");
+                throw new BadCertTemplateException("occurrence of subject DN of type "
+                        + oidToDisplayName(type)
+                        + " not within the allowed range. " + rdns.length
+                        + " is not within [" +occu.getMinOccurs() + ", "
+                        + occu.getMaxOccurs() + "]");
             }
         }
 
@@ -584,8 +599,8 @@ extends X509Certprofile
 
             if(present == false)
             {
-                throw new BadCertTemplateException("requied subject DN of type " +
-                        oidToDisplayName(occurence.getType()) + " is not present");
+                throw new BadCertTemplateException("requied subject DN of type "
+                        + oidToDisplayName(occurence.getType()) + " is not present");
             }
         }
     }
@@ -598,7 +613,9 @@ extends X509Certprofile
     throws BadCertTemplateException
     {
         ASN1Encodable rdnValue = createRDNValue(text, type, option, index);
-        return rdnValue == null ? null : new RDN(type, rdnValue);
+        return (rdnValue == null)
+                ? null
+                : new RDN(type, rdnValue);
     }
 
     private static ASN1Encodable createRDNValue(
@@ -636,8 +653,9 @@ extends X509Certprofile
                 Pattern p = patterns.get(index);
                 if(p.matcher(ttext).matches() == false)
                 {
-                    throw new BadCertTemplateException("invalid subject " + ObjectIdentifiers.oidToDisplayName(type) +
-                            " '" + ttext + "' against regex '" + p.pattern() + "'");
+                    throw new BadCertTemplateException("invalid subject "
+                            + ObjectIdentifiers.oidToDisplayName(type)
+                            + " '" + ttext + "' against regex '" + p.pattern() + "'");
                 }
             }
 
@@ -655,18 +673,28 @@ extends X509Certprofile
 
             int len = ttext.length();
             Range range = option.getStringLengthRange();
-            Integer minLen = range == null ? null : range.getMin();
+            Integer minLen = (range == null)
+                    ? null
+                    : range.getMin();
+
             if(minLen != null && len < minLen)
             {
-                throw new BadCertTemplateException("subject " + ObjectIdentifiers.oidToDisplayName(type) +
-                        " '" + ttext + "' is too short (length (" + len + ") < minLen (" + minLen + ")");
+                throw new BadCertTemplateException("subject "
+                        + ObjectIdentifiers.oidToDisplayName(type)
+                        + " '" + ttext + "' is too short (length (" + len
+                        + ") < minLen (" + minLen + ")");
             }
 
-            Integer maxLen = range == null ? null : range.getMax();
+            Integer maxLen = (range == null)
+                    ? null
+                    : range.getMax();
+
             if(maxLen != null && len > maxLen)
             {
-                throw new BadCertTemplateException("subject " + ObjectIdentifiers.oidToDisplayName(type) +
-                        " '" + ttext + "' is too long (length (" + len + ") > maxLen (" + maxLen + ")");
+                throw new BadCertTemplateException("subject "
+                        + ObjectIdentifiers.oidToDisplayName(type)
+                        + " '" + ttext + "' is too long (length (" + len
+                        + ") > maxLen (" + maxLen + ")");
             }
         }
 
@@ -716,12 +744,14 @@ extends X509Certprofile
             {
                 if (encoded.length != (2 * expectedLength + 1))
                 {
-                    throw new BadCertTemplateException("incorrect length for uncompressed/hybrid encoding");
+                    throw new BadCertTemplateException(
+                            "incorrect length for uncompressed/hybrid encoding");
                 }
                 break;
             }
             default:
-                throw new BadCertTemplateException("invalid point encoding 0x" + Integer.toString(encoded[0], 16));
+                throw new BadCertTemplateException("invalid point encoding 0x"
+                        + Integer.toString(encoded[0], 16));
         }
     }
 

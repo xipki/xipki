@@ -111,9 +111,11 @@ public class ScepUtil
     {
         if(publicKey instanceof java.security.interfaces.RSAPublicKey)
         {
-            java.security.interfaces.RSAPublicKey rsaPubKey = (java.security.interfaces.RSAPublicKey) publicKey;
+            java.security.interfaces.RSAPublicKey rsaPubKey =
+                    (java.security.interfaces.RSAPublicKey) publicKey;
             SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo(
-                    new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE),
+                    new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption,
+                            DERNull.INSTANCE),
                     new RSAPublicKey(rsaPubKey.getModulus(), rsaPubKey.getPublicExponent()));
             return spki;
         } else
@@ -153,7 +155,8 @@ public class ScepUtil
             final List<Extension> extensions)
     throws OperatorCreationException
     {
-        Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
+        Map<ASN1ObjectIdentifier, ASN1Encodable> attributes =
+                new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
 
         if(challengePassword != null && challengePassword.isEmpty() == false)
         {
@@ -213,14 +216,17 @@ public class ScepUtil
                 pubKeyInfo);
 
         X509KeyUsage ku = new X509KeyUsage(
-                    X509KeyUsage.digitalSignature | X509KeyUsage.dataEncipherment |
-                    X509KeyUsage.keyAgreement | X509KeyUsage.keyEncipherment);
+                    X509KeyUsage.digitalSignature
+                    | X509KeyUsage.dataEncipherment
+                    | X509KeyUsage.keyAgreement
+                    | X509KeyUsage.keyEncipherment);
         try
         {
             certGenerator.addExtension(Extension.keyUsage, true, ku);
         }catch(CertIOException e)
         {
-            throw new CertificateException("error while generating self-signed certificate: " + e.getMessage(), e);
+            throw new CertificateException(
+                    "error while generating self-signed certificate: " + e.getMessage(), e);
         }
 
         String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(identityKey, HashAlgoType.SHA1);
@@ -477,7 +483,9 @@ public class ScepUtil
     public static String buildExceptionLogFormat(
             final String message)
     {
-        return message == null || message.isEmpty() ? "{}: {}" : message + ", {}: {}";
+        return (message == null || message.isEmpty())
+                ? "{}: {}"
+                : message + ", {}: {}";
     }
 
     static public ASN1ObjectIdentifier extractDigesetAlgorithmIdentifier(
@@ -535,7 +543,9 @@ public class ScepUtil
             return null;
         }
         ASN1Set set = attr.getAttrValues();
-        return (set.size() == 0) ? null : set.getObjectAt(0);
+        return (set.size() == 0)
+                ? null
+                : set.getObjectAt(0);
     }
 
     public static byte[] read(

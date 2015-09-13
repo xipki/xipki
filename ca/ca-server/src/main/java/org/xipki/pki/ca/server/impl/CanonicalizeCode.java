@@ -342,9 +342,15 @@ public class CanonicalizeCode
                 {
                     lastLine = line;
 
-                    if(line.length() > 128)
+                    if(line.length() > 128 || line.endsWith("+") || line.endsWith("|")
+                            || line.endsWith("&"))
                     {
                         lineNumbers.add(lineNumber);
+                        continue;
+                    } else if(line.contains("?") && line.contains(":"))
+                    {
+                        lineNumbers.add(lineNumber);
+                        continue;
                     }
                     else
                     {

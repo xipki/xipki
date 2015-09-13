@@ -720,9 +720,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             }
         }
 
-        if(databaseType == DatabaseType.DB2 || databaseType == DatabaseType.H2 ||
-                databaseType == DatabaseType.HSQL ||databaseType == DatabaseType.MYSQL ||
-                databaseType == DatabaseType.ORACLE ||databaseType == DatabaseType.POSTGRES)
+        if(databaseType == DatabaseType.DB2
+                || databaseType == DatabaseType.H2
+                || databaseType == DatabaseType.HSQL
+                || databaseType == DatabaseType.MYSQL
+                || databaseType == DatabaseType.ORACLE
+                ||databaseType == DatabaseType.POSTGRES)
         {
             HikariConfig conf = new HikariConfig(props);
             HikariDataSource service = new HikariDataSource(conf);
@@ -953,7 +956,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         ResultSet rs = null;
         try
         {
-            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+            stmt = (conn != null)
+                    ? conn.createStatement()
+                    : getConnection().createStatement();
             rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getLong(1);
@@ -987,7 +992,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         ResultSet rs = null;
         try
         {
-            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+            stmt = (conn != null)
+                    ? conn.createStatement()
+                    : getConnection().createStatement();
             rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getInt(1);
@@ -1037,7 +1044,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         ResultSet rs = null;
         try
         {
-            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+            stmt = (conn != null)
+                    ? conn.createStatement()
+                    : getConnection().createStatement();
             rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getLong(1);
@@ -1127,7 +1136,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         ResultSet rs = null;
         try
         {
-            stmt = (conn != null) ? conn.prepareStatement(sql) : getConnection().prepareStatement(sql);
+            stmt = (conn != null)
+                    ? conn.prepareStatement(sql)
+                    : getConnection().prepareStatement(sql);
             if(value instanceof Integer)
             {
                 stmt.setInt(1, (Integer) value);
@@ -1169,7 +1180,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         Statement stmt;
         try
         {
-            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+            stmt = (conn != null)
+                    ? conn.createStatement()
+                    : getConnection().createStatement();
         } catch (SQLException e)
         {
             throw translate(null, e);
@@ -1208,7 +1221,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         Statement stmt;
         try
         {
-            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+            stmt = (conn != null)
+                    ? conn.createStatement()
+                    : getConnection().createStatement();
         } catch (SQLException e)
         {
             throw translate(null, e);
@@ -1762,7 +1777,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         Statement stmt = null;
         try
         {
-            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+            stmt = (conn != null)
+                    ? conn.createStatement()
+                            : getConnection().createStatement();
             stmt.executeUpdate(sql);
         } catch(SQLException e)
         {

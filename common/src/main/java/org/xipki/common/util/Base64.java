@@ -277,7 +277,9 @@ public class Base64
         {
             this.output = output;
 
-            alphabet = ((flags & URL_SAFE) == 0) ? DECODE : DECODE_WEBSAFE;
+            alphabet = ((flags & URL_SAFE) == 0)
+                    ? DECODE
+                    : DECODE_WEBSAFE;
             state = 0;
             value = 0;
         }
@@ -333,11 +335,11 @@ public class Base64
                 // be the same, just slower.
                 if (state == 0)
                 {
-                    while (p+4 <= len &&
-                            (value = ((alphabet[input[p] & 0xff] << 18) |
-                                    (alphabet[input[p+1] & 0xff] << 12) |
-                                    (alphabet[input[p+2] & 0xff] << 6) |
-                                    (alphabet[input[p+3] & 0xff]))) >= 0)
+                    while (p+4 <= len
+                            && (value = ((alphabet[input[p] & 0xff] << 18)
+                                    | (alphabet[input[p+1] & 0xff] << 12)
+                                    | (alphabet[input[p+2] & 0xff] << 6)
+                                    | (alphabet[input[p+3] & 0xff]))) >= 0)
                     {
                         output[op+2] = (byte) value;
                         output[op+1] = (byte) (value >> 8);
@@ -598,7 +600,9 @@ public class Base64
         if (encoder.do_newline && len > 0)
         {
             output_len += (((len-1) / (3 * Encoder.LINE_GROUPS)) + 1) *
-                (encoder.do_cr ? 2 : 1);
+                (encoder.do_cr
+                        ? 2
+                        : 1);
         }
 
         encoder.output = new byte[output_len];
@@ -658,12 +662,16 @@ public class Base64
             do_padding = (flags & NO_PADDING) == 0;
             do_newline = (flags & NO_WRAP) == 0;
             do_cr = (flags & CRLF) != 0;
-            alphabet = ((flags & URL_SAFE) == 0) ? ENCODE : ENCODE_WEBSAFE;
+            alphabet = ((flags & URL_SAFE) == 0)
+                    ? ENCODE
+                    : ENCODE_WEBSAFE;
 
             tail = new byte[2];
             tailLen = 0;
 
-            count = do_newline ? LINE_GROUPS : -1;
+            count = do_newline
+                    ? LINE_GROUPS
+                    : -1;
         }
 
         /**
@@ -702,9 +710,9 @@ public class Base64
                     {
                         // A 1-byte tail with at least 2 bytes of
                         // input available now.
-                        v = ((tail[0] & 0xff) << 16) |
-                            ((input[p++] & 0xff) << 8) |
-                            (input[p++] & 0xff);
+                        v = ((tail[0] & 0xff) << 16)
+                            | ((input[p++] & 0xff) << 8)
+                            | (input[p++] & 0xff);
                         tailLen = 0;
                     };
                     break;
@@ -713,9 +721,9 @@ public class Base64
                     if (p+1 <= len)
                     {
                         // A 2-byte tail with at least 1 byte of input.
-                        v = ((tail[0] & 0xff) << 16) |
-                            ((tail[1] & 0xff) << 8) |
-                            (input[p++] & 0xff);
+                        v = ((tail[0] & 0xff) << 16)
+                            | ((tail[1] & 0xff) << 8)
+                            | (input[p++] & 0xff);
                         tailLen = 0;
                     }
                     break;
@@ -742,9 +750,9 @@ public class Base64
             // each iteration.
             while (p+3 <= len)
             {
-                v = ((input[p] & 0xff) << 16) |
-                    ((input[p+1] & 0xff) << 8) |
-                    (input[p+2] & 0xff);
+                v = ((input[p] & 0xff) << 16)
+                    | ((input[p+1] & 0xff) << 8)
+                    | (input[p+2] & 0xff);
                 output[op] = alphabet[(v >> 18) & 0x3f];
                 output[op+1] = alphabet[(v >> 12) & 0x3f];
                 output[op+2] = alphabet[(v >> 6) & 0x3f];
@@ -769,7 +777,9 @@ public class Base64
                 if (p-tailLen == len-1)
                 {
                     int t = 0;
-                    v = ((tailLen > 0 ? tail[t++] : input[p++]) & 0xff) << 4;
+                    v = ((tailLen > 0
+                            ? tail[t++]
+                            : input[p++]) & 0xff) << 4;
                     tailLen -= t;
                     output[op++] = alphabet[(v >> 6) & 0x3f];
                     output[op++] = alphabet[v & 0x3f];
@@ -786,8 +796,12 @@ public class Base64
                 } else if (p-tailLen == len-2)
                 {
                     int t = 0;
-                    v = (((tailLen > 1 ? tail[t++] : input[p++]) & 0xff) << 10) |
-                        (((tailLen > 0 ? tail[t++] : input[p++]) & 0xff) << 2);
+                    v = (((tailLen > 1
+                            ? tail[t++]
+                            : input[p++]) & 0xff) << 10)
+                        | (((tailLen > 0
+                                ? tail[t++]
+                                : input[p++]) & 0xff) << 2);
                     tailLen -= t;
                     output[op++] = alphabet[(v >> 12) & 0x3f];
                     output[op++] = alphabet[(v >> 6) & 0x3f];

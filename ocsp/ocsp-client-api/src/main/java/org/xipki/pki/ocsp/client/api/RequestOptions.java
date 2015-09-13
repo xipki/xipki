@@ -178,7 +178,8 @@ public class RequestOptions
 
             if(this.preferredSignatureAlgorithms == null)
             {
-                this.preferredSignatureAlgorithms = new ArrayList<>(preferredSignatureAlgorithmNames.size());
+                this.preferredSignatureAlgorithms = new ArrayList<>(
+                        preferredSignatureAlgorithmNames.size());
             }
             this.preferredSignatureAlgorithms.add(sigAlgId);
         }
@@ -231,10 +232,10 @@ public class RequestOptions
         {
             algOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
         }
-        else if("SHA1withRSAandMGF1".equalsIgnoreCase(algoName) ||
-                "SHA256withRSAandMGF1".equalsIgnoreCase(algoName) ||
-                "SHA384withRSAandMGF1".equalsIgnoreCase(algoName) ||
-                "SHA512withRSAandMGF1".equalsIgnoreCase(algoName))
+        else if("SHA1withRSAandMGF1".equalsIgnoreCase(algoName)
+                || "SHA256withRSAandMGF1".equalsIgnoreCase(algoName)
+                || "SHA384withRSAandMGF1".equalsIgnoreCase(algoName)
+                || "SHA512withRSAandMGF1".equalsIgnoreCase(algoName))
         {
             algOid = PKCSObjectIdentifiers.id_RSASSA_PSS;
         }

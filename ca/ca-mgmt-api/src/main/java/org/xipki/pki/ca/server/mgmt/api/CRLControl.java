@@ -294,7 +294,8 @@ public class CRLControl implements Serializable
                     this.intervalDayTime = new HourMinute(hour, minute);
                 }catch(IllegalArgumentException e)
                 {
-                    throw new InvalidConfException("invalid " + KEY_interval_time + ": '" + s + "'");
+                    throw new InvalidConfException("invalid " + KEY_interval_time + ": '"
+                            + s + "'");
                 }
             }
             else
@@ -302,8 +303,8 @@ public class CRLControl implements Serializable
                 int minutes = getInteger(props, KEY_interval_minutes, 0);
                 if(minutes < this.overlapMinutes + 30)
                 {
-                    throw new InvalidConfException("invalid " + KEY_interval_minutes + ": '" + minutes +
-                            " is less than than 30 + " + this.overlapMinutes);
+                    throw new InvalidConfException("invalid " + KEY_interval_minutes + ": '"
+                            + minutes + " is less than than 30 + " + this.overlapMinutes);
                 }
                 this.intervalMinutes = minutes;
             }
@@ -468,7 +469,8 @@ public class CRLControl implements Serializable
     {
         if(onlyContainsCACerts && onlyContainsUserCerts)
         {
-            throw new InvalidConfException("onlyContainsCACerts and onlyContainsUserCerts can not be both true");
+            throw new InvalidConfException(
+                    "onlyContainsCACerts and onlyContainsUserCerts can not be both true");
         }
 
         if(updateMode == UpdateMode.onDemand)
@@ -478,18 +480,21 @@ public class CRLControl implements Serializable
 
         if(fullCRLIntervals < deltaCRLIntervals)
         {
-            throw new InvalidConfException("fullCRLIntervals could not be less than deltaCRLIntervals " +
-                    fullCRLIntervals + " < " + deltaCRLIntervals);
+            throw new InvalidConfException(
+                    "fullCRLIntervals could not be less than deltaCRLIntervals "
+                    + fullCRLIntervals + " < " + deltaCRLIntervals);
         }
 
         if(fullCRLIntervals < 1)
         {
-            throw new InvalidConfException("fullCRLIntervals could not be less than 1: " + fullCRLIntervals);
+            throw new InvalidConfException(
+                    "fullCRLIntervals could not be less than 1: " + fullCRLIntervals);
         }
 
         if(deltaCRLIntervals < 0)
         {
-            throw new InvalidConfException("deltaCRLIntervals could not be less than 0: " + deltaCRLIntervals);
+            throw new InvalidConfException(
+                    "deltaCRLIntervals could not be less than 0: " + deltaCRLIntervals);
         }
     }
 
@@ -503,13 +508,13 @@ public class CRLControl implements Serializable
         }
 
         CRLControl b = (CRLControl) obj;
-        if(deltaCRLIntervals != b.deltaCRLIntervals ||
-                embedsCerts != b.embedsCerts ||
-                extendedNextUpdate != b.extendedNextUpdate ||
-                fullCRLIntervals != b.fullCRLIntervals ||
-                includeExpiredCerts != b.includeExpiredCerts ||
-                onlyContainsCACerts != b.onlyContainsCACerts ||
-                onlyContainsUserCerts != b.onlyContainsUserCerts)
+        if(deltaCRLIntervals != b.deltaCRLIntervals
+                || embedsCerts != b.embedsCerts
+                || extendedNextUpdate != b.extendedNextUpdate
+                || fullCRLIntervals != b.fullCRLIntervals
+                || includeExpiredCerts != b.includeExpiredCerts
+                || onlyContainsCACerts != b.onlyContainsCACerts
+                || onlyContainsUserCerts != b.onlyContainsUserCerts)
         {
             return false;
         }

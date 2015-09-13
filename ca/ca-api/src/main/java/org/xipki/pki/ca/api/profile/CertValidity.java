@@ -225,7 +225,9 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
                 return 0;
             }
 
-            return validity < o.validity ? -1 : 1;
+            return (validity < o.validity)
+                    ? -1
+                    : 1;
         }
         else
         {
@@ -237,7 +239,9 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
             }
             else
             {
-                return thisHours < thatHours ? -1 : 1;
+                return (thisHours < thatHours)
+                        ? -1
+                        : 1;
             }
         }
     }
