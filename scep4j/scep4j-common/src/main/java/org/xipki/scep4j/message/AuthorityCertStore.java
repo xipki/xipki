@@ -82,17 +82,19 @@ public class AuthorityCertStore
                 {
                     if(encryptionCert != null)
                     {
-                        throw new IllegalArgumentException("Could not determine RA certificate for encryption");
+                        throw new IllegalArgumentException(
+                                "Could not determine RA certificate for encryption");
                     }
                     encryptionCert = cert;
                 }
 
-                if(hasKeyusage(keyusage, KeyUsage.digitalSignature) ||
-                        hasKeyusage(keyusage, KeyUsage.contentCommitment))
+                if(hasKeyusage(keyusage, KeyUsage.digitalSignature)
+                        || hasKeyusage(keyusage, KeyUsage.contentCommitment))
                 {
                     if(signatureCert != null)
                     {
-                        throw new IllegalArgumentException("Could not determine RA certificate for signature");
+                        throw new IllegalArgumentException(
+                                "Could not determine RA certificate for signature");
                     }
                     signatureCert = cert;
                 }
@@ -100,12 +102,14 @@ public class AuthorityCertStore
 
             if(encryptionCert == null)
             {
-                throw new IllegalArgumentException("Could not determine RA certificate for encryption");
+                throw new IllegalArgumentException(
+                        "Could not determine RA certificate for encryption");
             }
 
             if(signatureCert == null)
             {
-                throw new IllegalArgumentException("Could not determine RA certificate for signature");
+                throw new IllegalArgumentException(
+                        "Could not determine RA certificate for signature");
             }
         }
 

@@ -144,7 +144,9 @@ public class HashCalculator
             final byte[] data)
     {
         byte[] bytes = hash(hashAlgoType, data);
-        return bytes == null ? null : Hex.toHexString(bytes).toUpperCase();
+        return (bytes == null)
+                ? null
+                : Hex.toHexString(bytes).toUpperCase();
     }
 
     public static String base64Hash(
@@ -152,7 +154,9 @@ public class HashCalculator
             final byte[] data)
     {
         byte[] bytes = hash(hashAlgoType, data);
-        return bytes == null ? null : Base64.encodeToString(bytes, Base64.NO_WRAP);
+        return (bytes == null)
+                ? null
+                : Base64.encodeToString(bytes, Base64.NO_WRAP);
     }
 
     public static byte[] hash(

@@ -187,21 +187,29 @@ public class DbPorter extends DbToolBase
 
     protected String getImportingText()
     {
-        return evaulateOnly ? "evaluating import " : "importing ";
+        return evaulateOnly
+                ? "evaluating import "
+                : "importing ";
     }
 
     protected String getImportedText()
     {
-        return evaulateOnly ? " evaluated import " : " imported ";
+        return evaulateOnly
+                ? " evaluated import "
+                : " imported ";
     }
 
     protected String getExportingText()
     {
-        return evaulateOnly ? "evaluating export " : "exporting ";
+        return evaulateOnly
+                ? "evaluating export "
+                : "exporting ";
     }
 
     protected String getExportedText()
     {
-        return evaulateOnly ? " evaluated export " : " exported ";
+        return evaulateOnly
+                ? " evaluated export "
+                : " exported ";
     }
 }

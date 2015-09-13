@@ -178,8 +178,8 @@ public abstract class Client
             }
         }
 
-        if(Operation.GetCACaps == operation || Operation.GetCACert == operation ||
-                Operation.GetNextCACert == operation)
+        if(Operation.GetCACaps == operation || Operation.GetCACert == operation
+                || Operation.GetNextCACert == operation)
         {
             String url = cAId.buildGetUrl(operation, cAId.getProfile());
             return httpGET(url);
@@ -659,13 +659,15 @@ public abstract class Client
             {
                 if(ScepUtil.issues(cACert, rAEncCert) == false)
                 {
-                    throw new ScepClientException("RA certificate '" + rAEncCert.getSubjectX500Principal() +
-                            " is not issued by the CA");
+                    throw new ScepClientException("RA certificate '"
+                            + rAEncCert.getSubjectX500Principal()
+                            + " is not issued by the CA");
                 }
                 if(rASignCert != rAEncCert && ScepUtil.issues(cACert, rASignCert))
                 {
-                    throw new ScepClientException("RA certificate '" + rASignCert.getSubjectX500Principal() +
-                            " is not issued by the CA");
+                    throw new ScepClientException("RA certificate '"
+                            + rASignCert.getSubjectX500Principal()
+                            + " is not issued by the CA");
                 }
             }catch(CertificateException e)
             {

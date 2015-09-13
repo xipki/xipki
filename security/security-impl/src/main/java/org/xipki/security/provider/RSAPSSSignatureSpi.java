@@ -220,8 +220,9 @@ class RSAPSSSignatureSpi
                     throw new InvalidParameterException("parameter must be using " + originalSpec.getDigestAlgorithm());
                 }
             }
-            if ((newParamSpec.getMGFAlgorithm().equalsIgnoreCase("MGF1") == false) &&
-                    (newParamSpec.getMGFAlgorithm().equals(PKCSObjectIdentifiers.id_mgf1.getId()) == false))
+            if ((newParamSpec.getMGFAlgorithm().equalsIgnoreCase("MGF1") == false)
+                    && (newParamSpec.getMGFAlgorithm().equals(
+                            PKCSObjectIdentifiers.id_mgf1.getId()) == false))
             {
                 throw new InvalidParameterException("unknown mask generation function specified");
             }

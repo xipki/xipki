@@ -169,8 +169,9 @@ public class PublicKeyChecker
                 curveOid = (ASN1ObjectIdentifier) algParam;
                 if(ecOption.allowsCurve(curveOid) == false)
                 {
-                    throw new BadCertTemplateException("EC curve " + SecurityUtil.getCurveName(curveOid) +
-                            " (OID: " + curveOid.getId() + ") is not allowed");
+                    throw new BadCertTemplateException("EC curve "
+                            + SecurityUtil.getCurveName(curveOid)
+                            + " (OID: " + curveOid.getId() + ") is not allowed");
                 }
             } else
             {
@@ -260,8 +261,10 @@ public class PublicKeyChecker
             }
         } else
         {
-            throw new RuntimeException("should not reach here, unknown keyParamsOption " +
-                    (keyParamsOption == null ? "null" : keyParamsOption.getClass().getName()));
+            String txt = (keyParamsOption == null)
+                    ? "null"
+                    : keyParamsOption.getClass().getName();
+            throw new RuntimeException("should not reach here, unknown keyParamsOption " + txt);
         }
 
         throw new BadCertTemplateException("the given publicKey is not permitted");

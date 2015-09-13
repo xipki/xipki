@@ -186,7 +186,9 @@ public class DbDigestEntry
             sb.append(serialNumber).append(";");
         }
         sb.append(base64Sha1).append(";");
-        sb.append(revoked ? "1" : "0").append(";");
+        sb.append(revoked
+                ? "1"
+                : "0").append(";");
 
         if(revReason != null)
         {

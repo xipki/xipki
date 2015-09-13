@@ -164,8 +164,10 @@ public class CAEmulator
                 pubKeyInfo);
 
         X509KeyUsage ku = new X509KeyUsage(
-                    X509KeyUsage.digitalSignature | X509KeyUsage.dataEncipherment |
-                    X509KeyUsage.keyAgreement | X509KeyUsage.keyEncipherment);
+                    X509KeyUsage.digitalSignature
+                    | X509KeyUsage.dataEncipherment
+                    | X509KeyUsage.keyAgreement
+                    | X509KeyUsage.keyEncipherment);
         certGenerator.addExtension(Extension.keyUsage, true, ku);
         BasicConstraints bc = new BasicConstraints(false);
         certGenerator.addExtension(Extension.basicConstraints, true, bc);

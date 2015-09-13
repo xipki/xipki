@@ -66,7 +66,6 @@ import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11ModuleConf;
 import org.xipki.security.api.p11.P11SlotIdentifier;
-import org.xipki.security.api.util.X509Util;
 
 import sun.security.pkcs11.wrapper.PKCS11Exception;
 
@@ -264,18 +263,18 @@ public final class SunP11CryptService implements P11CryptService
                             if(pubKey instanceof ECPublicKey == false)
                             {
                                 // reparse the certificate due to bug in bcprov version 1.49
-                                signatureCert = X509Util.parseCert(signatureCert.getEncoded());
+                                // signatureCert = X509Util.parseCert(signatureCert.getEncoded());
                                 pubKey = signatureCert.getPublicKey();
                             }
                         }
 
-                        SunP11Identity p11Identity = new SunP11Identity(provider, slotId, alias, signatureKey,
-                                x509Certchain, pubKey);
+                        SunP11Identity p11Identity = new SunP11Identity(provider, slotId, alias,
+                                signatureKey, x509Certchain, pubKey);
                         currentIdentifies.add(p11Identity);
                     }catch(SignerException e)
                     {
-                        String msg = "SignerException while constructing SunP11Identity for alias " + alias +
-                                " (slot: " + i + ", module: " + moduleConf.getName() + ")";
+                        String msg = "SignerException while constructing SunP11Identity for alias "
+                                + alias + " (slot: " + i + ", module: " + moduleConf.getName() + ")";
                         LOG.warn(msg + ", message: {}", e.getMessage());
                         LOG.debug(msg, e);
                         continue;
@@ -489,7 +488,9 @@ public final class SunP11CryptService implements P11CryptService
     throws SignerException
     {
         SunP11Identity identity = getIdentity(slotId, keyId);
-        return identity == null ? null : identity.getPublicKey();
+        return (identity == null)
+                ? null
+                : identity.getPublicKey();
     }
 
     @Override
@@ -499,7 +500,9 @@ public final class SunP11CryptService implements P11CryptService
     throws SignerException
     {
         SunP11Identity identity = getIdentity(slotId, keyId);
-        return identity == null ? null : identity.getCertificate();
+        return (identity == null)
+                ? null
+                : identity.getCertificate();
     }
 
     private SunP11Identity getIdentity(
@@ -536,7 +539,9 @@ public final class SunP11CryptService implements P11CryptService
     throws SignerException
     {
         SunP11Identity identity = getIdentity(slotId, keyId);
-        return identity == null ? null : identity.getCertificateChain();
+        return (identity == null)
+                ? null
+                : identity.getCertificateChain();
     }
 
     @Override

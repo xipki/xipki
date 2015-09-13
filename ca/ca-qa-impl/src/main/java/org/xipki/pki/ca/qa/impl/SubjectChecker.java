@@ -266,12 +266,14 @@ public class SubjectChecker
             maxOccurs = rdnControl.getMaxOccurs();
         }
         RDN[] rdns = subject.getRDNs(type);
-        int rdnsSize = rdns == null ? 0 : rdns.length;
+        int rdnsSize = (rdns == null)
+                ? 0
+                : rdns.length;
 
         if(rdnsSize < minOccurs || rdnsSize > maxOccurs)
         {
-            issue.setFailureMessage("number of RDNs '" + rdnsSize +
-                    "' is not within [" + minOccurs + ", " + maxOccurs + "]");
+            issue.setFailureMessage("number of RDNs '" + rdnsSize
+                    + "' is not within [" + minOccurs + ", " + maxOccurs + "]");
             return issue;
         }
 
@@ -362,7 +364,9 @@ public class SubjectChecker
         }
 
         RDN[] rdns = subject.getRDNs(type);
-        int rdnsSize = rdns == null ? 0 : rdns.length;
+        int rdnsSize = (rdns == null)
+                ? 0
+                : rdns.length;
 
         RDN[] requestedRdns = requestedSubject.getRDNs(type);
 
@@ -378,8 +382,7 @@ public class SubjectChecker
             }
             else
             {
-                issue.setFailureMessage("number of RDNs '" + rdnsSize +
-                        "' is not 1");
+                issue.setFailureMessage("number of RDNs '" + rdnsSize + "' is not 1");
             }
             return issue;
         }
@@ -398,7 +401,8 @@ public class SubjectChecker
             if(rdnControl != null && rdnControl.getPatterns() != null)
             {
                 // sort the requestedRDNs
-                requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues, rdnControl.getPatterns());
+                requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues,
+                        rdnControl.getPatterns());
             }
         }
 
@@ -417,15 +421,16 @@ public class SubjectChecker
         final int atvsSize = atvs.size();
         if(atvsSize < minOccurs || atvsSize > maxOccurs)
         {
-            issue.setFailureMessage("number of AttributeTypeAndValuess '" + atvsSize +
-                    "' is not within [" + minOccurs + ", " + maxOccurs + "]");
+            issue.setFailureMessage("number of AttributeTypeAndValuess '" + atvsSize
+                    + "' is not within [" + minOccurs + ", " + maxOccurs + "]");
             return issue;
         }
 
         for(int i = 0; i < atvsSize; i++)
         {
             AttributeTypeAndValue atv = atvs.get(i);
-            String atvTextValue = getAtvValueString("AttributeTypeAndValue[" + i + "]", atv, stringType, failureMsg);
+            String atvTextValue = getAtvValueString("AttributeTypeAndValue[" + i + "]",
+                    atv, stringType, failureMsg);
             if(atvTextValue == null)
             {
                 continue;
@@ -546,12 +551,13 @@ public class SubjectChecker
         if(attrName == null)
         {
             attrName = subjectAttrType.getId().replace('.', '_');
-            issue = new ValidationIssue("X509.SUBJECT." + attrName, "attribute " + subjectAttrType.getId());
+            issue = new ValidationIssue("X509.SUBJECT." + attrName, "attribute "
+                    + subjectAttrType.getId());
         }
         else
         {
-            issue = new ValidationIssue("X509.SUBJECT." + attrName, "extension " + attrName +
-                    " (" + subjectAttrType.getId() + ")");
+            issue = new ValidationIssue("X509.SUBJECT." + attrName, "extension " + attrName
+                    + " (" + subjectAttrType.getId() + ")");
         }
         return issue;
     }
@@ -702,9 +708,9 @@ public class SubjectChecker
         else
         {
             String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(index);
-            if(ObjectIdentifiers.DN_CN.equals(type) &&
-                    specialBehavior != null &&
-                    "gematik_gSMC_K".equals(specialBehavior))
+            if(ObjectIdentifiers.DN_CN.equals(type)
+                    && specialBehavior != null
+                    && "gematik_gSMC_K".equals(specialBehavior))
             {
                 if(atvTextValue.startsWith(requestedCoreAtvTextValue + "-") == false)
                 {

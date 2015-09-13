@@ -87,7 +87,9 @@ public class P11Control
     public P11ModuleConf getModuleConf(
             final String moduleName)
     {
-        return moduleConfs == null ? null : moduleConfs.get(moduleName);
+        return (moduleConfs == null)
+                ? null
+                : moduleConfs.get(moduleName);
     }
 
     public Set<String> getModuleNames()

@@ -102,7 +102,9 @@ abstract class PathCompleter
             dir = file.getParentFile();
         }
 
-        File[] entries = dir == null ? new File[0] : dir.listFiles(filenameFilter);
+        File[] entries = (dir == null)
+                ? new File[0]
+                : dir.listFiles(filenameFilter);
         if(isDirOnly() && entries.length > 0)
         {
             List<File> list = new LinkedList<File>();
@@ -159,7 +161,14 @@ abstract class PathCompleter
         {
             if (file.getAbsolutePath().startsWith(translated))
             {
-                CharSequence name = file.getName() + (matches == 1 && file.isDirectory() ? separator() : " ");
+                String name = file.getName();
+                if(matches == 1 && file.isDirectory())
+                {
+                    name += separator();
+                } else
+                {
+                    name += " ";
+                }
                 candidates.add(render(file, name).toString());
             }
         }

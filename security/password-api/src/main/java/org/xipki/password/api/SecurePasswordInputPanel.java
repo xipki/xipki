@@ -78,11 +78,13 @@ public class SecurePasswordInputPanel extends Panel
     {
         int i = 0;
         keysMap.put(i++, new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"});
-        keysMap.put(i++, new String[]{"!", "@", "§" , "#", "$", "%", "^", "&", "*", "(", ")", "{", "}"});
-        keysMap.put(i++, new String[]{"'", "\"", "=", "_", ":", ";", "?", "~", "|", ",", ".", "-", "/"});
+        keysMap.put(i++, new String[]{"!", "@", "§" , "#", "$", "%", "^", "&", "*",
+                "(", ")", "{", "}"});
+        keysMap.put(i++, new String[]{"'", "\"", "=", "_", ":", ";", "?", "~", "|", ",",
+                ".", "-", "/"});
         keysMap.put(i++, new String[]{"q", "w", "e", "r", "z", "y", "u", "i", "o", "p"});
         keysMap.put(i++, new String[]{"a", "s", "d", "f", "g", "h", "j", "k", "j", BACKSPACE});
-        keysMap.put(i++, new String[]{CAPS, "z", "x", "c", "v", "b", "n", "m", CLEAR});
+        keysMap.put(i++, new String[] {CAPS, "z", "x", "c", "v", "b", "n", "m", CLEAR});
     }
 
     private SecurePasswordInputPanel()
@@ -158,7 +160,9 @@ public class SecurePasswordInputPanel extends Panel
                 for(JButton button : buttons)
                 {
                     String text = button.getText();
-                    text = caps ? text.toLowerCase() : text.toUpperCase();
+                    text = caps
+                            ? text.toLowerCase()
+                            : text.toUpperCase();
                     button.setText(text);
                 }
                 caps = !caps;

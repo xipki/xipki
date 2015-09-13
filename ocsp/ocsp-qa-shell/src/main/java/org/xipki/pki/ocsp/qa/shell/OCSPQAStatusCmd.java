@@ -137,8 +137,9 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCmd
         {
             if(statusTexts.size() != serialNumbers.size())
             {
-                throw new IllegalArgumentException("number of expStatus is invalid: " + (statusTexts.size()) +
-                        ", it should be " + serialNumbers.size());
+                throw new IllegalArgumentException("number of expStatus is invalid: "
+                        + (statusTexts.size())
+                        + ", it should be " + serialNumbers.size());
             }
 
             expectedStatuses = new HashMap<>();
@@ -192,7 +193,10 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCmd
 
         StringBuilder sb = new StringBuilder(50);
         sb.append("OCSP response is ");
-        sb.append(result.isAllSuccessful()? "valid" : "invalid");
+        String txt = result.isAllSuccessful()
+                ? "valid"
+                : "invalid";
+        sb.append(txt);
 
         if(verbose.booleanValue())
         {
@@ -219,7 +223,11 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCmd
         sb.append(prefix);
         sb.append(issue.getCode());
         sb.append(", ").append(issue.getDescription());
-        sb.append(", ").append(issue.isFailed() ? "failed" : "successful");
+        sb.append(", ");
+        String txt = issue.isFailed()
+                ? "failed"
+                : "successful";
+        sb.append(txt);
         if(issue.getMessage() != null)
         {
             sb.append(", ").append(issue.getMessage());

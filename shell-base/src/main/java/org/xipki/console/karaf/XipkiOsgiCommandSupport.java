@@ -103,8 +103,8 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
                 {
                     if(b)
                     {
-                        out("A file named '" +
-                                saveTo.getPath() + "' already exists. Do you want to replace it [yes/no]? ");
+                        out("A file named '" + saveTo.getPath()
+                            + "' already exists. Do you want to replace it [yes/no]? ");
                     }
 
                     String answer = reader.readLine();

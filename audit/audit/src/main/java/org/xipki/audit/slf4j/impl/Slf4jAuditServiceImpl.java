@@ -84,7 +84,8 @@ public class Slf4jAuditServiceImpl implements AuditService
             } // end switch
         }catch(Throwable t)
         {
-            LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}", AuditLevel.ERROR.getAlignedText(), t.getMessage());
+            LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}",
+                    AuditLevel.ERROR.getAlignedText(), t.getMessage());
         }
     }
 
@@ -166,7 +167,8 @@ public class Slf4jAuditServiceImpl implements AuditService
             } // end switch
         }catch(Throwable t)
         {
-            LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}", AuditLevel.ERROR.getAlignedText(), t.getMessage());
+            LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}",
+                    AuditLevel.ERROR.getAlignedText(), t.getMessage());
         }
     }
 }

@@ -122,8 +122,8 @@ class CaConfigurationDbImporter extends DbPorter
 
         if(caconf.getVersion() > VERSION)
         {
-            throw new InvalidInputException("could not import CA configuration greater than " +
-                    VERSION + ": " + caconf.getVersion());
+            throw new InvalidInputException("could not import CA configuration greater than "
+                    + VERSION + ": " + caconf.getVersion());
         }
 
         System.out.println("importing CA configuration to database");
@@ -144,7 +144,8 @@ class CaConfigurationDbImporter extends DbPorter
             import_scep(caconf.getSceps());
         }catch(Exception e)
         {
-            System.err.println("error while importing CA configuration to database. message: " + e.getMessage());
+            System.err.println("error while importing CA configuration to database. message: "
+                    + e.getMessage());
             throw e;
         }
         System.out.println(" imported CA configuration to database");
@@ -265,8 +266,8 @@ class CaConfigurationDbImporter extends DbPorter
     throws DataAccessException, IOException
     {
         System.out.println("importing table CRLSIGNER");
-        final String sql = "INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CERT, CRL_CONTROL, SIGNER_CONF)" +
-                " VALUES (?, ?, ?, ?, ?)";
+        final String sql = "INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CERT, CRL_CONTROL, SIGNER_CONF)"
+                + " VALUES (?, ?, ?, ?, ?)";
         PreparedStatement ps = null;
         try
         {
@@ -378,7 +379,9 @@ class CaConfigurationDbImporter extends DbPorter
                 {
                     int idx = 1;
                     ps.setString(idx++, certprofile.getName());
-                    int art = certprofile.getArt() == null ? 1 : certprofile.getArt();
+                    int art = (certprofile.getArt() == null)
+                            ? 1
+                            : certprofile.getArt();
                     ps.setInt(idx++, art);
                     ps.setString(idx++, certprofile.getType());
 
@@ -425,7 +428,9 @@ class CaConfigurationDbImporter extends DbPorter
 
             for(CaType ca : cas.getCa())
             {
-                int art = ca.getArt() == null ? 1 : ca.getArt();
+                int art = (ca.getArt() == null)
+                        ? 1
+                        : ca.getArt();
 
                 try
                 {
@@ -454,7 +459,10 @@ class CaConfigurationDbImporter extends DbPorter
                     ps.setInt(idx++, ca.getDuplicateCN());
                     ps.setString(idx++, ca.getPermissions());
                     Integer numCrls = ca.getNumCrls();
-                    ps.setInt(idx++, numCrls == null ? 30 : numCrls.intValue());
+                    int tNumCrls = (numCrls == null)
+                            ? 30
+                            : numCrls.intValue();
+                    ps.setInt(idx++, tNumCrls);
                     ps.setInt(idx++, ca.getExpirationPeriod());
                     setBoolean(ps, idx++, ca.isRevoked());
                     setInt(ps, idx++, ca.getRevReason());
@@ -537,8 +545,9 @@ class CaConfigurationDbImporter extends DbPorter
                     ps.executeUpdate();
                 }catch(SQLException e)
                 {
-                    System.err.println("error while importing CA_HAS_REQUESTOR with CA_NAME=" + entry.getCaName() +
-                            " and requestor_name=" + entry.getRequestorName());
+                    System.err.println("error while importing CA_HAS_REQUESTOR with CA_NAME="
+                            + entry.getCaName()
+                            + " and requestor_name=" + entry.getRequestorName());
                     throw translate(sql, e);
                 }
             }
@@ -568,8 +577,9 @@ class CaConfigurationDbImporter extends DbPorter
                     ps.executeUpdate();
                 }catch(SQLException e)
                 {
-                    System.err.println("error while importing CA_HAS_PUBLISHER with CA_NAME=" + entry.getCaName() +
-                            " and publisher_name=" + entry.getPublisherName());
+                    System.err.println("error while importing CA_HAS_PUBLISHER with CA_NAME="
+                            + entry.getCaName()
+                            + " and publisher_name=" + entry.getPublisherName());
                     throw translate(sql, e);
                 }
             }
@@ -600,9 +610,10 @@ class CaConfigurationDbImporter extends DbPorter
                     ps.executeUpdate();
                 }catch(SQLException e)
                 {
-                    System.err.println("error while importing CA_HAS_PROFILE with CA_NAME=" + entry.getCaName() +
-                            ", profile_name=" + entry.getProfileName() +
-                            " and profile_localname=" + entry.getProfileLocalname());
+                    System.err.println("error while importing CA_HAS_PROFILE with CA_NAME="
+                            + entry.getCaName()
+                            + ", profile_name=" + entry.getProfileName()
+                            + " and profile_localname=" + entry.getProfileLocalname());
                     throw translate(sql, e);
                 }
             }

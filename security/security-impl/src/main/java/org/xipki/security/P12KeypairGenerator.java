@@ -144,8 +144,8 @@ public abstract class P12KeypairGenerator
         if(keyUsage == null)
         {
             ku = new X509KeyUsage(
-                    X509KeyUsage.nonRepudiation | X509KeyUsage.digitalSignature |
-                    X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
+                    X509KeyUsage.nonRepudiation | X509KeyUsage.digitalSignature
+                    | X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
         }
         else
         {

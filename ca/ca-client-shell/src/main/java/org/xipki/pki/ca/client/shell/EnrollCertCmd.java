@@ -216,7 +216,9 @@ public abstract class EnrollCertCmd extends ClientCmd
         ConcurrentContentSigner signer = getSigner(hashAlgo, new SignatureAlgoControl(rsaMgf1, dsaPlain));
         X509CertificateHolder ssCert = signer.getCertificateAsBCObject();
 
-        X500Name x500Subject = subject == null ? ssCert.getSubject() : getSubject(subject);
+        X500Name x500Subject = (subject == null)
+                ? ssCert.getSubject()
+                : getSubject(subject);
         certTemplateBuilder.setSubject(x500Subject);
         certTemplateBuilder.setPublicKey(ssCert.getSubjectPublicKeyInfo());
 

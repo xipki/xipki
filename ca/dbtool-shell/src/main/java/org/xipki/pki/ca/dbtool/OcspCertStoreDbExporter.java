@@ -488,8 +488,8 @@ class OcspCertStoreDbExporter extends DbPorter
         // all successful, delete the processLogFile
         processLogFile.delete();
 
-        System.out.println(getExportedText() + processLog.getNumProcessed() +
-                " certificates from tables CERT, CHASH and CRAW");
+        System.out.println(getExportedText() + processLog.getNumProcessed()
+                + " certificates from tables CERT, CHASH and CRAW");
     }
 
     private void finalizeZip(

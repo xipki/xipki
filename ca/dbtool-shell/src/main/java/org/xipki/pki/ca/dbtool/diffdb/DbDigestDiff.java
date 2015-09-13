@@ -169,15 +169,15 @@ public class DbDigestDiff
         }
 
         String coreSql =
-                col_revoked + "," +
-                col_revReason + "," +
-                col_revTime + "," +
-                col_revInvTime + "," +
-                col_certhash +
-                " FROM CERT INNER JOIN " + tbl_certhash +
-                " ON CERT." + col_caId + "=?" +
-                " AND CERT." + col_serialNumber + "=?" +
-                " AND CERT.ID=" + tbl_certhash + "." + col_certId;
+                col_revoked + ","
+                + col_revReason + ","
+                + col_revTime + ","
+                + col_revInvTime + ","
+                + col_certhash
+                + " FROM CERT INNER JOIN " + tbl_certhash
+                + " ON CERT." + col_caId + "=?"
+                + " AND CERT." + col_serialNumber + "=?"
+                + " AND CERT.ID=" + tbl_certhash + "." + col_certId;
         singleCertSql = datasourceB.createFetchFirstSelectSQL(coreSql, 1);
 
         StringBuilder sb = new StringBuilder("?");
@@ -187,16 +187,16 @@ public class DbDigestDiff
         }
 
         coreSql =
-                col_serialNumber + "," +
-                col_revoked + "," +
-                col_revReason + "," +
-                col_revTime + "," +
-                col_revInvTime + "," +
-                col_certhash +
-                " FROM CERT INNER JOIN " + tbl_certhash +
-                " ON CERT." + col_caId + "=?" +
-                " AND CERT." + col_serialNumber + " IN (" + sb.toString() + ")" +
-                " AND CERT.ID=" + tbl_certhash + "." + col_certId;
+                col_serialNumber + ","
+                + col_revoked + ","
+                + col_revReason + ","
+                + col_revTime + ","
+                + col_revInvTime + ","
+                + col_certhash
+                + " FROM CERT INNER JOIN " + tbl_certhash
+                + " ON CERT." + col_caId + "=?"
+                + " AND CERT." + col_serialNumber + " IN (" + sb.toString() + ")"
+                + " AND CERT.ID=" + tbl_certhash + "." + col_certId;
         batchCertsSql = datasourceB.createFetchFirstSelectSQL(coreSql, numPerSelect);
 
         this.conn = datasourceB.getConnection();

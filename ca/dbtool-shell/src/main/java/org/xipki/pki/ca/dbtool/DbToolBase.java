@@ -137,7 +137,10 @@ public class DbToolBase
             final boolean b)
     throws SQLException
     {
-        ps.setInt(index, b ? 1 : 0);
+        int i =  b
+                ? 1
+                : 0;
+        ps.setInt(index, i);
     }
 
     protected Statement createStatement()

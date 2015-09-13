@@ -236,7 +236,10 @@ public class CmpUtf8Pairs
             String value = pairs.get(name);
             sb.append(encodeNameOrValue(name));
             sb.append(NAME_TERM);
-            sb.append(value == null ? "" : encodeNameOrValue(value));
+            if(value != null)
+            {
+                sb.append(encodeNameOrValue(value));
+            }
             sb.append(TOKEN_TERM);
         }
 

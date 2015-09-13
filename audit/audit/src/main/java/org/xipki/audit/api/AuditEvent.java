@@ -83,7 +83,9 @@ public class AuditEvent
     public AuditEvent(
             final Date timestamp)
     {
-        this.timestamp = (timestamp == null) ? new Date() : timestamp;
+        this.timestamp = (timestamp == null)
+                ? new Date()
+                : timestamp;
         this.level = AuditLevel.INFO;
     }
 

@@ -232,7 +232,9 @@ public abstract class LoadExecutor
         sb.append(StringUtil.formatSpeed(speed, true));
 
         long t2 = now - startTime;
-        speed = t2 > 0 ? currentAccount * 1000 / t2 : 0;
+        speed = (t2 > 0)
+                ? currentAccount * 1000 / t2
+                : 0;
         sb.append(StringUtil.formatSpeed(speed, true));
 
         System.out.print(sb.toString());

@@ -54,9 +54,9 @@ public class P11DSAKeyGenLoadTest extends P11KeyGenLoadTest
     throws Exception
     {
         super(slot,
-                "PKCS#11 DSA key generation\n" +
-                "pLength: " + pLength + "\n" +
-                "qLength: " + qLength);
+                "PKCS#11 DSA key generation\n"
+                        + "pLength: " + pLength + "\n"
+                        + "qLength: " + qLength);
         this.pLength = pLength;
         this.qLength = qLength;
     }

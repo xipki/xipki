@@ -161,7 +161,9 @@ public class OcspQAImpl implements OcspQA
             ValidationIssue issue = new ValidationIssue("OCSP.RESPONSES.NUM", "number of single responses");
             resultIssues.add(issue);
 
-            int n = singleResponses == null ? 0 : singleResponses.length;
+            int n = (singleResponses == null)
+                    ? 0
+                    : singleResponses.length;
             if(n == 0)
             {
                 issue.setFailureMessage("received no status from server");
@@ -233,7 +235,8 @@ public class OcspQAImpl implements OcspQA
                 {
                     X509CertificateHolder respSigner = responderCerts[0];
 
-                    ValidationIssue issue = new ValidationIssue("OCSP.SIGNERCERT.TRUST", "signer certificate validation");
+                    ValidationIssue issue = new ValidationIssue("OCSP.SIGNERCERT.TRUST",
+                            "signer certificate validation");
                     resultIssues.add(issue);
 
                     for(int i = 0; i < singleResponses.length; i++)
@@ -241,8 +244,9 @@ public class OcspQAImpl implements OcspQA
                         SingleResp singleResp = singleResponses[i];
                         if(respSigner.isValidOn(singleResp.getThisUpdate()) == false)
                         {
-                            issue.setFailureMessage("responder certificate is not valid on the thisUpdate[ " + i + "]" +
-                                    singleResp.getThisUpdate());
+                            issue.setFailureMessage(
+                                    "responder certificate is not valid on the thisUpdate[ " + i
+                                    + "]" + singleResp.getThisUpdate());
                         }
                     }
 
@@ -254,7 +258,8 @@ public class OcspQAImpl implements OcspQA
                             X509Certificate jceRespSigner;
                             try
                             {
-                                jceRespSigner = new X509CertificateObject(respSigner.toASN1Structure());
+                                jceRespSigner = new X509CertificateObject(
+                                        respSigner.toASN1Structure());
                                 if(X509Util.issues(respIssuer, jceRespSigner))
                                 {
                                     jceRespSigner.verify(respIssuer.getPublicKey());
@@ -332,7 +337,8 @@ public class OcspQAImpl implements OcspQA
         List<ValidationIssue> issues = new LinkedList<>();
         {
             // status
-            ValidationIssue issue = new ValidationIssue("OCSP.RESPONSE." + index + ".STATUS", "certificate status");
+            ValidationIssue issue = new ValidationIssue("OCSP.RESPONSE." + index + ".STATUS",
+                    "certificate status");
             issues.add(issue);
 
             CertificateStatus singleCertStatus = singleResp.getCertStatus();
@@ -350,9 +356,9 @@ public class OcspQAImpl implements OcspQA
                 if(revStatus.hasRevocationReason())
                 {
                     int reason = revStatus.getRevocationReason();
-                    if(extendedRevoke &&
-                            reason == CRLReason.CERTIFICATE_HOLD.getCode() &&
-                            revTime.getTime() == 0)
+                    if(extendedRevoke
+                            && reason == CRLReason.CERTIFICATE_HOLD.getCode()
+                            && revTime.getTime() == 0)
                     {
                         status = OcspCertStatus.unknown;
                     }

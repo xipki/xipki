@@ -118,8 +118,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         if(dataSource.tableHasColumn(connection, "CertificateData", "id"))
         {
             tblCertHasId = true;
-            sql = "SELECT id, fingerprint, serialNumber, cAFingerprint, status, revocationReason, revocationDate" +
-                    " FROM CertificateData WHERE id >= ? AND id < ? ORDER BY id ASC";
+            sql = "SELECT id, fingerprint, serialNumber, cAFingerprint, status, revocationReason, revocationDate"
+                    + " FROM CertificateData WHERE id >= ? AND id < ? ORDER BY id ASC";
             certSql = "SELECT base64Cert FROM CertificateData WHERE id=?";
         } else
         {
@@ -143,9 +143,10 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
 
             tblCertHasId = false;
             String coreSql =
-                    "fingerprint, serialNumber, cAFingerprint, status, revocationReason, revocationDate" +
-                    " FROM CertificateData WHERE fingerprint > ?";
-            sql = dataSource.createFetchFirstSelectSQL(coreSql, numCertsPerSelect, "fingerprint ASC");
+                    "fingerprint, serialNumber, cAFingerprint, status, revocationReason, "
+                    + "revocationDate FROM CertificateData WHERE fingerprint > ?";
+            sql = dataSource.createFetchFirstSelectSQL(coreSql, numCertsPerSelect,
+                    "fingerprint ASC");
             certSql = "SELECT base64Cert FROM CertificateData WHERE fingerprint=?";
         }
     }

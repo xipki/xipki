@@ -108,7 +108,9 @@ public class DbDigestReader
             final boolean firstTime)
     throws IOException
     {
-        String line = firstTime ? null : certsReader.readLine();
+        String line = firstTime
+                ? null
+                : certsReader.readLine();
         if(line == null)
         {
             close(certsReader);
@@ -123,7 +125,9 @@ public class DbDigestReader
             line = certsReader.readLine();
         }
 
-        return line == null ? null : DbDigestEntry.decode(line);
+        return (line == null)
+                ? null
+                : DbDigestEntry.decode(line);
     }
 
     public void close()

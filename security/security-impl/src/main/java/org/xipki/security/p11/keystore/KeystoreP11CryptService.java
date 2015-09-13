@@ -287,7 +287,9 @@ public class KeystoreP11CryptService implements P11CryptService
     throws SignerException
     {
         KeystoreP11Identity identity = getIdentity(slotId, keyId);
-        return identity == null ? null : identity.getPublicKey();
+        return (identity == null)
+                ? null
+                : identity.getPublicKey();
     }
 
     @Override
@@ -297,7 +299,9 @@ public class KeystoreP11CryptService implements P11CryptService
     throws SignerException
     {
         KeystoreP11Identity identity = getIdentity(slotId, keyId);
-        return identity == null ? null : identity.getCertificate();
+        return (identity == null)
+                ? null
+                : identity.getCertificate();
     }
 
     @Override
@@ -307,7 +311,9 @@ public class KeystoreP11CryptService implements P11CryptService
     throws SignerException
     {
         KeystoreP11Identity identity = getIdentity(slotId, keyId);
-        return identity == null ? null : identity.getCertificateChain();
+        return (identity == null)
+                ? null
+                : identity.getCertificateChain();
     }
 
     @Override

@@ -127,7 +127,9 @@ public abstract class P12SignLoadTest extends LoadExecutor
     throws IOException
     {
         InputStream in = P12ECSignLoadTest.class.getResourceAsStream("/testkeys/" + filename);
-        return in == null ? null : IoUtil.read(in);
+        return (in == null)
+                ? null
+                : IoUtil.read(in);
     }
 
     class Testor implements Runnable

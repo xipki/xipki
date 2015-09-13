@@ -110,7 +110,9 @@ public enum HashAlgoType
             final byte[] content)
     {
         byte[] dgst = digest(content);
-        return dgst == null ? null : Hex.toHexString(dgst).toUpperCase();
+        return (dgst == null)
+                ? null
+                : Hex.toHexString(dgst).toUpperCase();
     }
 
     public byte[] digest(

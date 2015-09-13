@@ -91,7 +91,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
         super(dataSource, srcDir, stopMe, evaluateOnly);
         if(numCertsPerCommit < 1)
         {
-            throw new IllegalArgumentException("numCertsPerCommit could not be less than 1: " + numCertsPerCommit);
+            throw new IllegalArgumentException("numCertsPerCommit could not be less than 1: "
+                    + numCertsPerCommit);
         }
         ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         this.unmarshaller = unmarshaller;
@@ -108,8 +109,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
         {
             if(processLogFile.exists())
             {
-                throw new Exception("please either specify '--resume' option or delete the file " +
-                        processLogFile.getPath() + " first");
+                throw new Exception("please either specify '--resume' option or delete the file "
+                        + processLogFile.getPath() + " first");
             }
         }
         this.resume = resume;
@@ -307,8 +308,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
                     minId = lastId + 1;
                 }catch(Exception e)
                 {
-                    System.err.println("\nerror while importing certificates from file " + certsFile +
-                            ".\nplease continue with the option '--resume'");
+                    System.err.println("\nerror while importing certificates from file "
+                            + certsFile + ".\nplease continue with the option '--resume'");
                     LOG.error("Exception", e);
                     throw e;
                 }
@@ -503,8 +504,9 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
                     lastSuccessfulCertId = id;
                     processLog.addNumProcessed(numEntriesInBatch);
                     numEntriesInBatch = 0;
-                    echoToFile((processLog.getSumInLastProcess() + processLog.getNumProcessed()) + ":" +
-                            lastSuccessfulCertId, processLogFile);
+                    echoToFile((processLog.getSumInLastProcess() + processLog.getNumProcessed())
+                            + ":" + lastSuccessfulCertId,
+                            processLogFile);
 
                     processLog.printStatus(isLastBlock);
                 }

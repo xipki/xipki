@@ -99,11 +99,14 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
     {
         BasicOCSPResp basicResp = OCSPUtils.extractBasicOCSPResp(response);
 
-        boolean extendedRevoke = basicResp.getExtension(OCSPRequestor.id_pkix_ocsp_extendedRevoke) != null;
+        boolean extendedRevoke =
+                basicResp.getExtension(OCSPRequestor.id_pkix_ocsp_extendedRevoke) != null;
 
         SingleResp[] singleResponses = basicResp.getResponses();
 
-        int n = singleResponses == null ? 0 : singleResponses.length;
+        int n = (singleResponses == null)
+                ? 0
+                : singleResponses.length;
         if(n == 0)
         {
             throw new CmdFailure("received no status from server");
@@ -111,8 +114,9 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
 
         if(n != serialNumbers.size())
         {
-            throw new CmdFailure("received status with " + n +
-                    " single responses from server, but " + serialNumbers.size() + " were requested");
+            throw new CmdFailure("received status with " + n
+                    + " single responses from server, but " + serialNumbers.size()
+                    + " were requested");
         }
 
         Date[] thisUpdates = new Date[n];
@@ -220,9 +224,9 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
                 if(revStatus.hasRevocationReason())
                 {
                     int reason = revStatus.getRevocationReason();
-                    if(extendedRevoke &&
-                            reason == CRLReason.CERTIFICATE_HOLD.getCode() &&
-                            revTime.getTime() == 0)
+                    if(extendedRevoke
+                            && reason == CRLReason.CERTIFICATE_HOLD.getCode()
+                            && revTime.getTime() == 0)
                     {
                         status = "unknown (RFC6960)";
                     }
@@ -332,7 +336,13 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
                     {
                         ASN1ObjectIdentifier extensionOID = (ASN1ObjectIdentifier) extensionOIDs.get(j);
                         String name = extensionOidNameMap.get(extensionOID);
-                        msg.append(name == null ? extensionOID.getId() : name);
+                        if(name == null)
+                        {
+                            msg.append(extensionOID.getId());
+                        } else
+                        {
+                            msg.append(name);
+                        }
                         if(j != size - 1)
                         {
                             msg.append(", ");

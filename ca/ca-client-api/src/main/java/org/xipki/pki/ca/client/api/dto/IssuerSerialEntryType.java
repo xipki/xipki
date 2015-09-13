@@ -53,7 +53,8 @@ public class IssuerSerialEntryType extends ResultEntryType
             final String id,
             final X509Certificate cert)
     {
-        this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()), cert.getSerialNumber());
+        this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
+                cert.getSerialNumber());
     }
 
     public IssuerSerialEntryType(
