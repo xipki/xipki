@@ -63,7 +63,8 @@ public class CaRequestorRemoveCmd extends CaCmd
     throws Exception
     {
         boolean b = caManager.removeCmpRequestorFromCA(requestorName, caName);
-        output(b, "removed", "could not remove", "requestor " + requestorName + " from CA " + caName);
+        output(b, "removed", "could not remove",
+                "requestor " + requestorName + " from CA " + caName);
         return null;
     }
 }

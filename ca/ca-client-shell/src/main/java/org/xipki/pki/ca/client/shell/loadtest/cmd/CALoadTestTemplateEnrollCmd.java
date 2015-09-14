@@ -81,7 +81,8 @@ public class CALoadTestTemplateEnrollCmd extends CALoadTestCmd
             throw new IllegalCmdParamException("invalid duration " + durationInSecond);
         }
 
-        EnrollTemplateType template = CALoadTestTemplateEnroll.parse(new FileInputStream(templateFile));
+        EnrollTemplateType template = CALoadTestTemplateEnroll.parse(
+                new FileInputStream(templateFile));
         int n = template.getEnrollCert().size();
 
         StringBuilder description = new StringBuilder();
@@ -94,7 +95,8 @@ public class CALoadTestTemplateEnrollCmd extends CALoadTestCmd
         }
         description.append("\n");
 
-        CALoadTestTemplateEnroll loadTest = new CALoadTestTemplateEnroll(caClient, template, description.toString());
+        CALoadTestTemplateEnroll loadTest = new CALoadTestTemplateEnroll(caClient,
+                template, description.toString());
         loadTest.setDuration(durationInSecond);
         loadTest.setThreads(numThreads);
         loadTest.test();

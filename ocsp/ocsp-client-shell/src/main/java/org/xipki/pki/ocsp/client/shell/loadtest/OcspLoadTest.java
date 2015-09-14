@@ -139,7 +139,8 @@ public class OcspLoadTest extends LoadExecutor
             BasicOCSPResp basicResp;
             try
             {
-                OCSPResp response = requestor.ask(caCert, BigInteger.valueOf(sn), serverUrl, options, null);
+                OCSPResp response = requestor.ask(caCert, BigInteger.valueOf(sn), serverUrl,
+                        options, null);
                 basicResp = OCSPUtils.extractBasicOCSPResp(response);
             } catch (OCSPRequestorException e)
             {
@@ -168,7 +169,8 @@ public class OcspLoadTest extends LoadExecutor
             }
             else if(n != 1)
             {
-                LOG.warn("received status with {} single responses from server, but 1 was requested", n);
+                LOG.warn("received status with {} single responses from server, {}",
+                        n, "but 1 was requested");
                 return false;
             }
             else

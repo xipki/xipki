@@ -89,7 +89,8 @@ public class P11RSAContentSigner implements ContentSigner
 
         if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm()))
         {
-            throw new IllegalArgumentException("unsupported signature algorithm " + signatureAlgId.getAlgorithm());
+            throw new IllegalArgumentException("unsupported signature algorithm "
+                    + signatureAlgId.getAlgorithm());
         }
 
         this.slot = slot;
@@ -141,7 +142,8 @@ public class P11RSAContentSigner implements ContentSigner
             final String message = "SignerException";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
             throw new RuntimeCryptoException("SignerException: " + e.getMessage());

@@ -68,10 +68,14 @@ public class DbDigestReporter
 
         IoUtil.save(new File(dir, "ca.der"), caCertBytes);
 
-        this.onlyInAWriter = new BufferedWriter(new FileWriter(reportDirname + File.separator + "onlyInA"));
-        this.diffWriter = new BufferedWriter(new FileWriter(reportDirname + File.separator + "diff"));
-        this.sameWriter = new BufferedWriter(new FileWriter(reportDirname + File.separator + "same"));
-        this.errorWriter = new BufferedWriter(new FileWriter(reportDirname + File.separator + "error"));
+        this.onlyInAWriter = new BufferedWriter(
+                new FileWriter(reportDirname + File.separator + "onlyInA"));
+        this.diffWriter = new BufferedWriter(
+                new FileWriter(reportDirname + File.separator + "diff"));
+        this.sameWriter = new BufferedWriter(
+                new FileWriter(reportDirname + File.separator + "same"));
+        this.errorWriter = new BufferedWriter(
+                new FileWriter(reportDirname + File.separator + "error"));
     }
 
     public String getReportDirname()
@@ -138,7 +142,8 @@ public class DbDigestReporter
     public void setAccout(int account)
     throws IOException
     {
-        IoUtil.save(reportDirname + File.separator + "accout", Integer.toString(account).getBytes());
+        IoUtil.save(reportDirname + File.separator + "accout",
+                Integer.toString(account).getBytes());
     }
 
     public void close()

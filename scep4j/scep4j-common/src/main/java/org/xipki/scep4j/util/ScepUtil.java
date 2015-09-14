@@ -323,7 +323,8 @@ public class ScepUtil
             return hashAlgo.getName() + "withRSA";
         } else
         {
-            throw new UnsupportedOperationException("getSignatureAlgorithm() for non-RSA is not supported yet.");
+            throw new UnsupportedOperationException(
+                    "getSignatureAlgorithm() for non-RSA is not supported yet.");
         }
     }
 
@@ -385,7 +386,8 @@ public class ScepUtil
             return aki.getKeyIdentifier();
         } catch (IllegalArgumentException e)
         {
-            throw new CertificateEncodingException("invalid extension AuthorityKeyIdentifier: " + e.getMessage());
+            throw new CertificateEncodingException(
+                    "invalid extension AuthorityKeyIdentifier: " + e.getMessage());
         }
     }
 
@@ -416,7 +418,8 @@ public class ScepUtil
             return ASN1OctetString.getInstance(fullExtValue).getOctets();
         } catch (IllegalArgumentException e)
         {
-            throw new CertificateEncodingException("invalid extension " + type.getId() + ": " + e.getMessage());
+            throw new CertificateEncodingException("invalid extension " + type.getId()
+                    + ": " + e.getMessage());
         }
     }
 

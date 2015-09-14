@@ -113,7 +113,8 @@ public class CheckCertCmd extends XipkiOsgiCommandSupport
 
         if(issuerNames.contains(issuerName) == false)
         {
-            throw new IllegalCmdParamException("issuer " + issuerName + " is not within the configured issuers " + issuerNames);
+            throw new IllegalCmdParamException("issuer " + issuerName
+                    + " is not within the configured issuers " + issuerNames);
         }
 
         X509IssuerInfo issuerInfo = qaSystemManager.getIssuer(issuerName);
@@ -121,7 +122,8 @@ public class CheckCertCmd extends XipkiOsgiCommandSupport
         X509CertprofileQA qa = qaSystemManager.getCertprofile(profileName);
         if(qa == null)
         {
-            throw new IllegalCmdParamException("found no certificate profile named '" + profileName + "'");
+            throw new IllegalCmdParamException("found no certificate profile named '"
+                    + profileName + "'");
         }
 
         CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));
@@ -137,7 +139,8 @@ public class CheckCertCmd extends XipkiOsgiCommandSupport
         }
 
         byte[] certBytes = IoUtil.read(certFile);
-        ValidationResult result = qa.checkCert(certBytes, issuerInfo, p10Req.getCertificationRequestInfo().getSubject(),
+        ValidationResult result = qa.checkCert(certBytes, issuerInfo,
+                p10Req.getCertificationRequestInfo().getSubject(),
                 p10Req.getCertificationRequestInfo().getSubjectPublicKeyInfo(), extensions);
         StringBuilder sb = new StringBuilder();
 

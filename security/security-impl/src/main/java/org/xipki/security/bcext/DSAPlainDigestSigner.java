@@ -152,7 +152,8 @@ public class DSAPlainDigestSigner
     {
         if (!forSigning)
         {
-            throw new IllegalStateException("DSADigestSigner not initialised for signature generation.");
+            throw new IllegalStateException(
+                    "DSADigestSigner not initialised for signature generation.");
         }
 
         byte[] hash = new byte[digest.getDigestSize()];

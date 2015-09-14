@@ -662,7 +662,8 @@ public class CAManagerClient implements CAManager
             final byte[] encodedPkcs10Request)
     throws CAMgmtException
     {
-        byte[] encodedCert = client.generateCertificate(caName, profileName, user, encodedPkcs10Request);
+        byte[] encodedCert = client.generateCertificate(caName, profileName, user,
+                encodedPkcs10Request);
         try
         {
             return X509Util.parseCert(encodedCert);

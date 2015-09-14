@@ -125,7 +125,8 @@ public class KeystoreP11Slot implements P11WritableSlot
         }
         else if(password.size() != 1)
         {
-            throw new IllegalArgumentException("exactly 1 password must be specified, but not " + password.size());
+            throw new IllegalArgumentException("exactly 1 password must be specified, but not "
+                    + password.size());
         }
 
         this.slotDir = slotDir;
@@ -164,12 +165,14 @@ public class KeystoreP11Slot implements P11WritableSlot
                 String fn = file.getName();
                 String keyLabel = fn.substring(0, fn.length() - ".p12".length());
 
-                P11KeyIdentifier keyId = new P11KeyIdentifier(deriveKeyIdFromLabel(keyLabel), keyLabel);
+                P11KeyIdentifier keyId = new P11KeyIdentifier(deriveKeyIdFromLabel(keyLabel),
+                        keyLabel);
                 KeystoreP11Identity existingP11Identify = getIdentity(keyId);
 
                 byte[] contentBytes = IoUtil.read(file);
                 String sha1sum = HashCalculator.hexSha1(contentBytes);
-                if(existingP11Identify != null && existingP11Identify.getSha1Sum().equals(sha1sum))
+                if(existingP11Identify != null
+                        && existingP11Identify.getSha1Sum().equals(sha1sum))
                 {
                     currentIdentifies.add(existingP11Identify);
                     continue;
@@ -226,7 +229,8 @@ public class KeystoreP11Slot implements P11WritableSlot
                 final String message = "could not initialize key " + file.getPath();
                 if(LOG.isWarnEnabled())
                 {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                            t.getMessage());
                 }
                 LOG.debug(message, t);
             }
@@ -277,10 +281,12 @@ public class KeystoreP11Slot implements P11WritableSlot
         {
             return false;
         }
-        String commonName = X509Util.getCommonName(identity.getCertificate().getSubjectX500Principal());
+        String commonName = X509Util.getCommonName(
+                identity.getCertificate().getSubjectX500Principal());
         if(NOCERT_COMMON_NAME.equals(commonName) == false)
         {
-            throw new SignerException("could not delete only the key without deleting the certificate");
+            throw new SignerException(
+                    "could not delete only the key without deleting the certificate");
         }
 
         File file = new File(slotDir, identity.getKeyId().getKeyLabel() + ".p12");
@@ -432,7 +438,8 @@ public class KeystoreP11Slot implements P11WritableSlot
 
         if(labelExists(label))
         {
-            throw new IllegalArgumentException("label " + label + " exists, please specify another one");
+            throw new IllegalArgumentException("label " + label
+                    + " exists, please specify another one");
         }
 
         P12KeypairGenerator gen = new P12KeypairGenerator.RSAIdentityGenerator(
@@ -484,7 +491,8 @@ public class KeystoreP11Slot implements P11WritableSlot
 
         if(labelExists(label))
         {
-            throw new IllegalArgumentException("label " + label + " exists, please specify another one");
+            throw new IllegalArgumentException("label " + label
+                    + " exists, please specify another one");
         }
 
         P12KeypairGenerator gen = new P12KeypairGenerator.DSAIdentityGenerator(
@@ -525,7 +533,8 @@ public class KeystoreP11Slot implements P11WritableSlot
 
         if(labelExists(label))
         {
-            throw new IllegalArgumentException("label " + label + " exists, please specify another one");
+            throw new IllegalArgumentException("label " + label
+                    + " exists, please specify another one");
         }
 
         ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
@@ -611,7 +620,8 @@ public class KeystoreP11Slot implements P11WritableSlot
             return null;
         }
 
-        String commonName = X509Util.getCommonName(identity.getCertificate().getSubjectX500Principal());
+        String commonName = X509Util.getCommonName(
+                identity.getCertificate().getSubjectX500Principal());
         if(NOCERT_COMMON_NAME.equals(commonName))
         {
             return null;

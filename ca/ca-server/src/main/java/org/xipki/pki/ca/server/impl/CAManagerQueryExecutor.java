@@ -486,7 +486,8 @@ class CAManagerQueryExecutor
             final String name)
     throws CAMgmtException
     {
-        final String sql = "SIGNER_TYPE, SIGNER_CERT, CRL_CONTROL, SIGNER_CONF FROM CRLSIGNER WHERE NAME=?";
+        final String sql =
+                "SIGNER_TYPE, SIGNER_CERT, CRL_CONTROL, SIGNER_CONF FROM CRLSIGNER WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
@@ -502,7 +503,8 @@ class CAManagerQueryExecutor
                 String signer_conf = rs.getString("SIGNER_CONF");
                 String signer_cert = rs.getString("SIGNER_CERT");
                 String crlControlConf = rs.getString("CRL_CONTROL");
-                return new X509CrlSignerEntry(name, signer_type, signer_conf, signer_cert, crlControlConf);
+                return new X509CrlSignerEntry(name, signer_type, signer_conf, signer_cert,
+                        crlControlConf);
             }
         }catch(SQLException e)
         {
@@ -588,12 +590,12 @@ class CAManagerQueryExecutor
             final CertificateStore certstore)
     throws CAMgmtException
     {
-        final String sql = "NAME, ART, NEXT_SN, NEXT_CRLNO, STATUS, MAX_VALIDITY" +
-                ", CERT, SIGNER_TYPE, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME" +
-                ", DUPLICATE_KEY, DUPLICATE_SUBJECT, DUPLICATE_CN, PERMISSIONS, NUM_CRLS" +
-                ", EXPIRATION_PERIOD, REV, RR, RT, RIT, VALIDITY_MODE" +
-                ", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS, EXTRA_CONTROL, SIGNER_CONF" +
-                " FROM CA WHERE NAME=?";
+        final String sql = "NAME, ART, NEXT_SN, NEXT_CRLNO, STATUS, MAX_VALIDITY"
+                + ", CERT, SIGNER_TYPE, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME"
+                + ", DUPLICATE_KEY, DUPLICATE_SUBJECT, DUPLICATE_CN, PERMISSIONS, NUM_CRLS"
+                + ", EXPIRATION_PERIOD, REV, RR, RT, RIT, VALIDITY_MODE"
+                + ", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS, EXTRA_CONTROL, SIGNER_CONF"
+                + " FROM CA WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try
@@ -607,7 +609,8 @@ class CAManagerQueryExecutor
                 int artCode = rs.getInt("ART");
                 if(artCode != CertArt.X509PKC.getCode())
                 {
-                    throw new CAMgmtException("CA " + name + " is not X509CA, and is not supported");
+                    throw new CAMgmtException(
+                            "CA " + name + " is not X509CA, and is not supported");
                 }
 
                 long next_serial = rs.getLong("NEXT_SN");
@@ -639,8 +642,11 @@ class CAManagerQueryExecutor
                     int rev_reason = rs.getInt("RR");
                     long rev_time = rs.getInt("RT");
                     long rev_invalidity_time = rs.getInt("RIT");
+                    Date revInvTime = (rev_invalidity_time == 0)
+                            ? null
+                            : new Date(rev_invalidity_time * 1000);
                     revocationInfo = new CertRevocationInfo(rev_reason, new Date(rev_time * 1000),
-                            rev_invalidity_time == 0 ? null : new Date(rev_invalidity_time * 1000));
+                            revInvTime);
                 }
 
                 String s = rs.getString("PERMISSIONS");
@@ -670,8 +676,10 @@ class CAManagerQueryExecutor
                     lCacertUris = StringUtil.split(cacert_uris, " \t");
                 }
 
-                X509CAEntry entry = new X509CAEntry(name, next_serial, next_crlNo, signer_type, signer_conf,
-                        lCacertUris, lOcspUris, lCrlUris, lDeltaCrlUris, numCrls, expirationPeriod);
+                X509CAEntry entry = new X509CAEntry(name, next_serial, next_crlNo,
+                        signer_type, signer_conf,
+                        lCacertUris, lOcspUris, lCrlUris, lDeltaCrlUris,
+                        numCrls, expirationPeriod);
                 X509Certificate cert = generateCert(b64cert);
                 entry.setCertificate(cert);
 
@@ -752,8 +760,8 @@ class CAManagerQueryExecutor
             final String caName)
     throws CAMgmtException
     {
-        final String sql = "SELECT REQUESTOR_NAME, RA, PERMISSIONS, PROFILES FROM CA_HAS_REQUESTOR" +
-                " WHERE CA_NAME=?";
+        final String sql = "SELECT REQUESTOR_NAME, RA, PERMISSIONS, "
+                + "PROFILES FROM CA_HAS_REQUESTOR WHERE CA_NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try
@@ -772,7 +780,9 @@ class CAManagerQueryExecutor
 
                 s = rs.getString("PROFILES");
                 List<String> list = StringUtil.split(s, ",");
-                Set<String> profiles = (list == null)? null : new HashSet<>(list);
+                Set<String> profiles = (list == null)
+                        ? null
+                        : new HashSet<>(list);
                 CAHasRequestorEntry entry = new CAHasRequestorEntry(requestorName);
                 entry.setRa(ra);
                 entry.setPermissions(permissions);
@@ -796,7 +806,8 @@ class CAManagerQueryExecutor
             final String caName)
     throws CAMgmtException
     {
-        final String sql = new StringBuilder("SELECT PROFILE_NAME, PROFILE_LOCALNAME FROM CA_HAS_PROFILE")
+        final String sql = new StringBuilder("SELECT PROFILE_NAME, PROFILE_LOCALNAME")
+                .append(" FROM CA_HAS_PROFILE")
                 .append(" WHERE CA_NAME=?").toString();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -871,7 +882,9 @@ class CAManagerQueryExecutor
             final String table)
     throws CAMgmtException
     {
-        final String sql = new StringBuilder("DELETE FROM ").append(table).append(" WHERE NAME=?").toString();
+        final String sql = new StringBuilder("DELETE FROM ")
+                .append(table)
+                .append(" WHERE NAME=?").toString();
         PreparedStatement ps = null;
         try
         {
@@ -927,9 +940,11 @@ class CAManagerQueryExecutor
         sqlBuilder.append(", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS");
         sqlBuilder.append(", MAX_VALIDITY, CERT, SIGNER_TYPE");
         sqlBuilder.append(", CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME");
-        sqlBuilder.append(", DUPLICATE_KEY, DUPLICATE_SUBJECT, DUPLICATE_CN, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD");
+        sqlBuilder.append(", DUPLICATE_KEY, DUPLICATE_SUBJECT, DUPLICATE_CN, PERMISSIONS");
+        sqlBuilder.append(", NUM_CRLS, EXPIRATION_PERIOD");
         sqlBuilder.append(", VALIDITY_MODE, EXTRA_CONTROL, SIGNER_CONF");
-        sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
+        sqlBuilder.append(", ?, ?, ?, ?, ?, ?, ?)");
         final String sql = sqlBuilder.toString();
 
         // insert to table ca
@@ -1058,7 +1073,8 @@ class CAManagerQueryExecutor
             final String caName)
     throws CAMgmtException
     {
-        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME, PROFILE_LOCALNAME) VALUES (?, ?, ?)";
+        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME, PROFILE_LOCALNAME)"
+                + " VALUES (?, ?, ?)";
         PreparedStatement ps = null;
         try
         {
@@ -1067,7 +1083,8 @@ class CAManagerQueryExecutor
             ps.setString(2, profileName);
             ps.setString(3, profileLocalName);
             ps.executeUpdate();
-            LOG.info("added profile '{} (localname {})' to CA '{}'", profileName, profileLocalName, caName);
+            LOG.info("added profile '{} (localname {})' to CA '{}'", profileName,
+                    profileLocalName, caName);
         }catch(SQLException e)
         {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -1146,8 +1163,8 @@ class CAManagerQueryExecutor
         final String requestorName = requestor.getRequestorName();
 
         PreparedStatement ps = null;
-        final String sql =
-                "INSERT INTO CA_HAS_REQUESTOR (CA_NAME, REQUESTOR_NAME, RA, PERMISSIONS, PROFILES) VALUES (?, ?, ?, ?, ?)";
+        final String sql = "INSERT INTO CA_HAS_REQUESTOR (CA_NAME, REQUESTOR_NAME, RA,"
+                + " PERMISSIONS, PROFILES) VALUES (?, ?, ?, ?, ?)";
         try
         {
             boolean ra = requestor.isRa();
@@ -1196,7 +1213,8 @@ class CAManagerQueryExecutor
 
         String name = dbEntry.getName();
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CERT, CRL_CONTROL, SIGNER_CONF)");
+        sqlBuilder.append("INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CERT, CRL_CONTROL,");
+        sqlBuilder.append("SIGNER_CONF)");
         sqlBuilder.append(" VALUES (?, ?, ?, ?, ?)");
         final String sql = sqlBuilder.toString();
 
@@ -1207,8 +1225,10 @@ class CAManagerQueryExecutor
             int idx = 1;
             ps.setString(idx++, name);
             ps.setString(idx++, dbEntry.getType());
-            ps.setString(idx++, dbEntry.getCertificate() == null ? null :
-                    Base64.toBase64String(dbEntry.getCertificate().getEncoded()));
+            ps.setString(idx++,
+                    dbEntry.getCertificate() == null
+                        ? null
+                        : Base64.toBase64String(dbEntry.getCertificate().getEncoded()));
             ps.setString(idx++, crlControl);
             ps.setString(idx++, dbEntry.getConf());
 
@@ -1311,7 +1331,8 @@ class CAManagerQueryExecutor
     {
         if(changeCAEntry instanceof X509ChangeCAEntry == false)
         {
-            throw new CAMgmtException("unsupported ChangeCAEntry " + changeCAEntry.getClass().getName());
+            throw new CAMgmtException(
+                    "unsupported ChangeCAEntry " + changeCAEntry.getClass().getName());
         }
 
         X509ChangeCAEntry entry = (X509ChangeCAEntry) changeCAEntry;
@@ -1379,7 +1400,8 @@ class CAManagerQueryExecutor
                     } catch (CertificateException | IOException e)
                     {
                         throw new CAMgmtException(
-                                "could not parse the stored certificate for CA '" + name + "'" + e.getMessage(), e);
+                                "could not parse the stored certificate for CA '" + name + "'"
+                                + e.getMessage(), e);
                     }
                 }
 
@@ -1415,22 +1437,33 @@ class CAManagerQueryExecutor
         Integer iSubject = addToSqlIfNotNull(sqlBuilder, index, cert, "SUBJECT");
         Integer iCert = addToSqlIfNotNull(sqlBuilder, index, cert, "CERT");
         Integer iCrl_uris = addToSqlIfNotNull(sqlBuilder, index, crl_uris, "CRL_URIS");
-        Integer iDelta_crl_uris = addToSqlIfNotNull(sqlBuilder, index, delta_crl_uris, "DELTACRL_URIS");
+        Integer iDelta_crl_uris =
+                addToSqlIfNotNull(sqlBuilder, index, delta_crl_uris, "DELTACRL_URIS");
         Integer iOcsp_uris = addToSqlIfNotNull(sqlBuilder, index, ocsp_uris, "OCSP_URIS");
         Integer iCacert_uris = addToSqlIfNotNull(sqlBuilder, index, cacert_uris, "CACERT_URIS");
-        Integer iMax_validity = addToSqlIfNotNull(sqlBuilder, index, max_validity, "MAX_VALIDITY");
+        Integer iMax_validity =
+                addToSqlIfNotNull(sqlBuilder, index, max_validity, "MAX_VALIDITY");
         Integer iSigner_type = addToSqlIfNotNull(sqlBuilder, index, signer_type, "SIGNER_TYPE");
-        Integer iCrlsigner_name = addToSqlIfNotNull(sqlBuilder, index, crlsigner_name, "CRLSIGNER_NAME");
-        Integer iResponder_name = addToSqlIfNotNull(sqlBuilder, index, responder_name, "RESPONDER_NAME");
-        Integer iCmpcontrol_name = addToSqlIfNotNull(sqlBuilder, index, cmpcontrol_name, "CMPCONTROL_NAME");
-        Integer iDuplicate_key = addToSqlIfNotNull(sqlBuilder, index, duplicate_key, "DUPLICATE_KEY");
-        Integer iDuplicate_subject = addToSqlIfNotNull(sqlBuilder, index, duplicate_subject, "DUPLICATE_SUBJECT");
-        Integer iDuplicate_CN = addToSqlIfNotNull(sqlBuilder, index, duplicate_CN, "DUPLICATE_CN");
+        Integer iCrlsigner_name =
+                addToSqlIfNotNull(sqlBuilder, index, crlsigner_name, "CRLSIGNER_NAME");
+        Integer iResponder_name =
+                addToSqlIfNotNull(sqlBuilder, index, responder_name, "RESPONDER_NAME");
+        Integer iCmpcontrol_name =
+                addToSqlIfNotNull(sqlBuilder, index, cmpcontrol_name, "CMPCONTROL_NAME");
+        Integer iDuplicate_key =
+                addToSqlIfNotNull(sqlBuilder, index, duplicate_key, "DUPLICATE_KEY");
+        Integer iDuplicate_subject =
+                addToSqlIfNotNull(sqlBuilder, index, duplicate_subject, "DUPLICATE_SUBJECT");
+        Integer iDuplicate_CN =
+                addToSqlIfNotNull(sqlBuilder, index, duplicate_CN, "DUPLICATE_CN");
         Integer iPermissions = addToSqlIfNotNull(sqlBuilder, index, permissions, "PERMISSIONS");
         Integer iNum_crls = addToSqlIfNotNull(sqlBuilder, index, numCrls, "NUM_CRLS");
-        Integer iExpiration_period = addToSqlIfNotNull(sqlBuilder, index, expirationPeriod, "EXPIRATION_PERIOD");
-        Integer iValidity_mode = addToSqlIfNotNull(sqlBuilder, index, validityMode, "VALIDITY_MODE");
-        Integer iExtra_control = addToSqlIfNotNull(sqlBuilder, index, extraControl, "EXTRA_CONTROL");
+        Integer iExpiration_period =
+                addToSqlIfNotNull(sqlBuilder, index, expirationPeriod, "EXPIRATION_PERIOD");
+        Integer iValidity_mode =
+                addToSqlIfNotNull(sqlBuilder, index, validityMode, "VALIDITY_MODE");
+        Integer iExtra_control =
+                addToSqlIfNotNull(sqlBuilder, index, extraControl, "EXTRA_CONTROL");
         Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signer_conf, "SIGNER_CONF");
 
         // delete the last ','
@@ -1995,7 +2028,9 @@ class CAManagerQueryExecutor
             if(iSigner_conf != null)
             {
                 String txt = getRealString(signerConf);
-                m.append("signerConf: '").append(SecurityUtil.signerConfToString(txt, false, true)).append("'; ");
+                m.append("signerConf: '")
+                    .append(SecurityUtil.signerConfToString(txt, false, true))
+                    .append("'; ");
                 ps.setString(iSigner_conf, txt);
             }
 
@@ -2098,7 +2133,8 @@ class CAManagerQueryExecutor
         ScepEntry newDbEntry;
         try
         {
-            newDbEntry = new ScepEntry(caName, responderType, responderConf, responderBase64Cert, control);
+            newDbEntry = new ScepEntry(caName, responderType, responderConf,
+                    responderBase64Cert, control);
         } catch (InvalidConfException e)
         {
             throw new CAMgmtException(e);
@@ -2123,7 +2159,8 @@ class CAManagerQueryExecutor
             if(iConf != null)
             {
                 String txt = getRealString(responderConf);
-                m.append("responder conf: '").append(SecurityUtil.signerConfToString(txt, false, true));
+                m.append("responder conf: '")
+                    .append(SecurityUtil.signerConfToString(txt, false, true));
                 ps.setString(iConf, txt);
             }
 
@@ -2615,7 +2652,8 @@ class CAManagerQueryExecutor
     throws DataAccessException, CAMgmtException
     {
 
-        final String sql = "INSERT INTO USERNAME (ID, NAME, PASSWORD, CN_REGEX) VALUES (?, ?, ?, ?)";
+        final String sql =
+                "INSERT INTO USERNAME (ID, NAME, PASSWORD, CN_REGEX) VALUES (?, ?, ?, ?)";
 
         PreparedStatement ps = null;
 
@@ -2730,7 +2768,8 @@ class CAManagerQueryExecutor
             final String username)
     throws CAMgmtException
     {
-        final String sql = dataSource.createFetchFirstSelectSQL("PASSWORD, CN_REGEX FROM USERNAME WHERE NAME=?", 1);
+        final String sql = dataSource.createFetchFirstSelectSQL(
+                "PASSWORD, CN_REGEX FROM USERNAME WHERE NAME=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = null;
         try
@@ -2816,7 +2855,8 @@ class CAManagerQueryExecutor
     throws CAMgmtException
     {
         final String sql = dataSource.createFetchFirstSelectSQL(
-                "CONTROL, RESPONDER_TYPE, RESPONDER_CERT, RESPONDER_CONF FROM SCEP WHERE CA_NAME=?", 1);
+            "CONTROL, RESPONDER_TYPE, RESPONDER_CERT, RESPONDER_CONF FROM SCEP WHERE CA_NAME=?",
+            1);
         ResultSet rs = null;
         PreparedStatement ps = null;
         try
@@ -2861,7 +2901,10 @@ class CAManagerQueryExecutor
             final boolean b)
     throws SQLException
     {
-        ps.setInt(index, b ? 1 : 0);
+        int i = b
+                ? 1
+                : 0;
+        ps.setInt(index, i);
     }
 
     private static Integer addToSqlIfNotNull(
@@ -2919,7 +2962,9 @@ class CAManagerQueryExecutor
     private static String getRealString(
             final String s)
     {
-        return CAManager.NULL.equalsIgnoreCase(s) ? null : s;
+        return CAManager.NULL.equalsIgnoreCase(s)
+                ? null
+                : s;
     }
 
 }

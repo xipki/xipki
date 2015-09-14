@@ -82,7 +82,8 @@ public abstract class P11SecurityCmd extends SecurityCmd
         }
         else
         {
-            throw new IllegalCmdParamException("exactly one of keyId or keyLabel should be specified");
+            throw new IllegalCmdParamException(
+                    "exactly one of keyId or keyLabel should be specified");
         }
         return keyIdentifier;
     }

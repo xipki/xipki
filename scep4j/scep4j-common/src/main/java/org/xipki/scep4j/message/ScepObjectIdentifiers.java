@@ -43,7 +43,8 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
 public class ScepObjectIdentifiers
 {
-    public static final ASN1ObjectIdentifier id_VeriSign = new ASN1ObjectIdentifier("2.16.840.1.113733");
+    public static final ASN1ObjectIdentifier id_VeriSign
+            = new ASN1ObjectIdentifier("2.16.840.1.113733");
     public static final ASN1ObjectIdentifier id_pki = id_VeriSign.branch("1");
     public static final ASN1ObjectIdentifier id_attributes = id_pki.branch("9");
     public static final ASN1ObjectIdentifier id_transactionID = id_attributes.branch("7");

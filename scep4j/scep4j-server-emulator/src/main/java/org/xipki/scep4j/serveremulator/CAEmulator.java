@@ -80,8 +80,10 @@ public class CAEmulator
     private final byte[] cACertBytes;
     private final boolean generateCRL;
 
-    private final Map<BigInteger, Certificate> serialCertMap = new HashMap<BigInteger, Certificate>();
-    private final Map<X500Name, Certificate> reqSubjectCertMap = new HashMap<X500Name, Certificate>();
+    private final Map<BigInteger, Certificate> serialCertMap
+        = new HashMap<BigInteger, Certificate>();
+    private final Map<X500Name, Certificate> reqSubjectCertMap
+        = new HashMap<X500Name, Certificate>();
     private final AtomicLong serialNumber = new AtomicLong(2);
     private final AtomicLong crlNumber = new AtomicLong(2);
     private CertificateList crl;
@@ -226,7 +228,8 @@ public class CAEmulator
             revocationTime = cAStartTime;
         }
         crlBuilder.addCRLEntry(BigInteger.valueOf(2), revocationTime, CRLReason.keyCompromise);
-        crlBuilder.addExtension(Extension.cRLNumber, false, new ASN1Integer(crlNumber.getAndAdd(1)));
+        crlBuilder.addExtension(Extension.cRLNumber, false,
+                new ASN1Integer(crlNumber.getAndAdd(1)));
 
         String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(cAKey, HashAlgoType.SHA256);
         ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(cAKey);

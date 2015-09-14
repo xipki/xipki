@@ -156,7 +156,8 @@ public class DecodedNextCAMessage
         Collection<SignerInformation> signerInfos = signerStore.getSigners();
         if(signerInfos.size() != 1)
         {
-            throw new MessageDecodingException("number of signerInfos is not 1, but " + signerInfos.size());
+            throw new MessageDecodingException(
+                    "number of signerInfos is not 1, but " + signerInfos.size());
         }
 
         SignerInformation signerInfo = signerInfos.iterator().next();
@@ -176,7 +177,8 @@ public class DecodedNextCAMessage
 
         if(signedDataCerts == null || signedDataCerts.size() != 1)
         {
-            throw new MessageDecodingException("could not find embedded certificate to verify the signature");
+            throw new MessageDecodingException(
+                    "could not find embedded certificate to verify the signature");
         }
 
         AttributeTable signedAttrs = signerInfo.getSignedAttributes();
@@ -188,7 +190,8 @@ public class DecodedNextCAMessage
         Date signingTime = null;
         // signingTime
         {
-            ASN1Encodable attrValue = ScepUtil.getFirstAttrValue(signedAttrs, CMSAttributes.signingTime);
+            ASN1Encodable attrValue = ScepUtil.getFirstAttrValue(signedAttrs,
+                    CMSAttributes.signingTime);
             if(attrValue != null)
             {
                 signingTime = Time.getInstance(attrValue).getDate();
@@ -214,7 +217,9 @@ public class DecodedNextCAMessage
                         signerInfo.getEncryptionAlgOID(), signerInfo.getEncryptionAlgParams());
             } catch (Exception e)
             {
-                final String msg = "could not extract digest algorithm from signerInfo.signatureAlgorithm: " + e.getMessage();
+                final String msg =
+                        "could not extract digest algorithm from signerInfo.signatureAlgorithm: "
+                        + e.getMessage();
                 LOG.error(msg);
                 LOG.debug(msg, e);
                 ret.setFailureMessage(msg);
@@ -222,12 +227,14 @@ public class DecodedNextCAMessage
             }
             if(digestAlgOID.equals(_digestAlgOID) == false)
             {
-                ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use the same digestAlgorithm");
+                ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use"
+                        + " the same digestAlgorithm");
                 return ret;
             }
         }
 
-        X509CertificateHolder _signerCert = (X509CertificateHolder) signedDataCerts.iterator().next();
+        X509CertificateHolder _signerCert =
+                (X509CertificateHolder) signedDataCerts.iterator().next();
         X509Certificate signerCert;
         try
         {
@@ -318,7 +325,8 @@ public class DecodedNextCAMessage
             {
                 if(cACert != null)
                 {
-                    final String msg = "multiple CA certificates is returned, but exactly 1 is expected";
+                    final String msg =
+                            "multiple CA certificates is returned, but exactly 1 is expected";
                     LOG.error(msg);
                     ret.setFailureMessage(msg);
                     return ret;

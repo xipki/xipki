@@ -86,7 +86,8 @@ public class FileRmCmd extends XipkiOsgiCommandSupport
                 return null;
             }
 
-            if(force || FileUtils.confirm(reader, "Do you want to remove directory " + targetPath + " [yes/no]?"))
+            if(force || FileUtils.confirm(reader,
+                    "Do you want to remove directory " + targetPath + " [yes/no]?"))
             {
                 FileUtils.deleteDirectory(target);
                 out("removed directory " + targetPath);
@@ -94,7 +95,8 @@ public class FileRmCmd extends XipkiOsgiCommandSupport
         }
         else
         {
-            if(force || FileUtils.confirm(reader, "Do you want o remove file " + targetPath + " [yes/no]?"))
+            if(force || FileUtils.confirm(reader,
+                    "Do you want o remove file " + targetPath + " [yes/no]?"))
             {
                 target.delete();
                 out("removed file " + targetPath);

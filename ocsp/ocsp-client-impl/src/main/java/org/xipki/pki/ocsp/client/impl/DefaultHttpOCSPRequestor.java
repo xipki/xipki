@@ -97,7 +97,8 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
 
             httpUrlConnection.setRequestMethod("POST");
             httpUrlConnection.setRequestProperty("Content-Type", CT_REQUEST);
-            httpUrlConnection.setRequestProperty("Content-Length", java.lang.Integer.toString(size));
+            httpUrlConnection.setRequestProperty("Content-Length",
+                    java.lang.Integer.toString(size));
             OutputStream outputstream = httpUrlConnection.getOutputStream();
             outputstream.write(request);
             outputstream.flush();
@@ -123,7 +124,8 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
         if (isValidContentType == false)
         {
             inputstream.close();
-            throw new IOException("bad response: mime type " + responseContentType + " not supported!");
+            throw new IOException("bad response: mime type " + responseContentType
+                    + " not supported!");
         }
 
         return IoUtil.read(inputstream);

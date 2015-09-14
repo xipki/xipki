@@ -63,7 +63,8 @@ public class CaAliasAddCmd extends CaCmd
     throws Exception
     {
         boolean b = caManager.addCaAlias(caAlias, caName);
-        output(b, "added", "could not add", "CA alias " + caAlias + " associated with CA " + caName);
+        output(b, "added", "could not add",
+                "CA alias " + caAlias + " associated with CA " + caName);
         return null;
     }
 }

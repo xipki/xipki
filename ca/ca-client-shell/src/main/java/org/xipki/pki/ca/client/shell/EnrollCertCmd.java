@@ -182,13 +182,15 @@ public abstract class EnrollCertCmd extends ClientCmd
 
     @Option(name = "--need-extension",
             multiValued = true,
-            description = "type (OID or name) of extension that must be contaied in the certificate\n"
+            description = "type (OID or name) of extension that must be contaied in the"
+                    + " certificate\n"
                     + "(multi-valued)")
     private List<String> needExtensionTypes;
 
     @Option(name = "--want-extension",
             multiValued = true,
-            description = "type (OID or name) of extension that should be contaied in the certificate if possible\n"
+            description = "type (OID or name) of extension that should be contaied in the"
+                    + " certificate if possible\n"
                     + "(multi-valued)")
     private List<String> wantExtensionTypes;
 
@@ -209,11 +211,13 @@ public abstract class EnrollCertCmd extends ClientCmd
     protected Object _doExecute()
     throws Exception
     {
-        EnrollCertRequestType request = new EnrollCertRequestType(EnrollCertRequestType.Type.CERT_REQ);
+        EnrollCertRequestType request = new EnrollCertRequestType(
+                EnrollCertRequestType.Type.CERT_REQ);
 
         CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
 
-        ConcurrentContentSigner signer = getSigner(hashAlgo, new SignatureAlgoControl(rsaMgf1, dsaPlain));
+        ConcurrentContentSigner signer = getSigner(hashAlgo,
+                new SignatureAlgoControl(rsaMgf1, dsaPlain));
         X509CertificateHolder ssCert = signer.getCertificateAsBCObject();
 
         X500Name x500Subject = (subject == null)
@@ -231,14 +235,16 @@ public abstract class EnrollCertCmd extends ClientCmd
         List<Extension> extensions = new LinkedList<>();
         if(isNotEmpty(subjectAltNames))
         {
-            extensions.add(P10RequestGenerator.createExtensionSubjectAltName(subjectAltNames, false));
+            extensions.add(
+                    P10RequestGenerator.createExtensionSubjectAltName(subjectAltNames, false));
             needExtensionTypes.add(Extension.subjectAlternativeName.getId());
         }
 
         // SubjectInfoAccess
         if(isNotEmpty(subjectInfoAccesses))
         {
-            extensions.add(P10RequestGenerator.createExtensionSubjectInfoAccess(subjectInfoAccesses, false));
+            extensions.add(P10RequestGenerator.createExtensionSubjectInfoAccess(
+                    subjectInfoAccesses, false));
             needExtensionTypes.add(Extension.subjectInfoAccess.getId());
         }
 
@@ -294,7 +300,8 @@ public abstract class EnrollCertCmd extends ClientCmd
                     int exponent = Integer.parseInt(exponentS);
 
                     MonetaryValue monterayValue = new MonetaryValue(currency, amount, exponent);
-                    QCStatement statment = new QCStatement(ObjectIdentifiers.id_etsi_qcs_QcLimitValue, monterayValue);
+                    QCStatement statment = new QCStatement(
+                            ObjectIdentifiers.id_etsi_qcs_QcLimitValue, monterayValue);
                     v.add(statment);
                 }catch(Exception e)
                 {
@@ -357,10 +364,13 @@ public abstract class EnrollCertCmd extends ClientCmd
 
         if(isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes))
         {
-            ExtensionExistence ee = new ExtensionExistence(SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
+            ExtensionExistence ee = new ExtensionExistence(
+                    SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
                     SecurityUtil.textToASN1ObjectIdentifers(wantExtensionTypes));
             extensions.add(new Extension(
-                    ObjectIdentifiers.id_xipki_ext_cmRequestExtensions, false, ee.toASN1Primitive().getEncoded()));
+                    ObjectIdentifiers.id_xipki_ext_cmRequestExtensions,
+                    false,
+                    ee.toASN1Primitive().getEncoded()));
         }
 
         if(isNotEmpty(extensions))
@@ -371,7 +381,8 @@ public abstract class EnrollCertCmd extends ClientCmd
 
         CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(), null);
 
-        ProofOfPossessionSigningKeyBuilder popoBuilder = new ProofOfPossessionSigningKeyBuilder(certReq);
+        ProofOfPossessionSigningKeyBuilder popoBuilder
+                = new ProofOfPossessionSigningKeyBuilder(certReq);
         ContentSigner contentSigner = signer.borrowContentSigner();
         POPOSigningKey popoSk;
         try
@@ -384,7 +395,8 @@ public abstract class EnrollCertCmd extends ClientCmd
 
         ProofOfPossession popo = new ProofOfPossession(popoSk);
 
-        EnrollCertRequestEntryType reqEntry = new EnrollCertRequestEntryType("id-1", profile, certReq, popo);
+        EnrollCertRequestEntryType reqEntry = new EnrollCertRequestEntryType("id-1", profile,
+                certReq, popo);
         request.addRequestEntry(reqEntry);
 
         RequestResponseDebug debug = getRequestResponseDebug();

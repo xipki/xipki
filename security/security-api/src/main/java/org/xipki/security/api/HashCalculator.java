@@ -95,7 +95,8 @@ public class HashCalculator
                     md = new SHA512Digest();
                     break;
                 default:
-                    throw new RuntimeException("should not reach here, unknown HashAlgoType " + hashAlgo);
+                    throw new RuntimeException
+                    ("should not reach here, unknown HashAlgoType " + hashAlgo);
             }
             mds.addLast(md);
         }

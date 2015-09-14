@@ -93,10 +93,14 @@ public class OCSPCertPublisher extends X509CertPublisher
 
         ConfPairs utf8pairs = new ConfPairs(conf);
         String v = utf8pairs.getValue("publish.goodcerts");
-        this.publishsGoodCert = (v == null) ? true : Boolean.parseBoolean(v);
+        this.publishsGoodCert = (v == null)
+                ? true
+                : Boolean.parseBoolean(v);
 
         v = utf8pairs.getValue("asyn");
-        this.asyn = (v == null) ? false : Boolean.parseBoolean(v);
+        this.asyn = (v == null)
+                ? false
+                : Boolean.parseBoolean(v);
 
         String datasourceName = null;
         ConfPairs confPairs = null;
@@ -116,7 +120,8 @@ public class OCSPCertPublisher extends X509CertPublisher
 
         if(dataSource == null)
         {
-            throw new CertPublisherException("no datasource named '" + datasourceName + "' is specified");
+            throw new CertPublisherException(
+                    "no datasource named '" + datasourceName + "' is specified");
         }
 
         try
@@ -159,7 +164,8 @@ public class OCSPCertPublisher extends X509CertPublisher
 
         try
         {
-            queryExecutor.addCert(caCert, cert, certInfo.getProfileName(), certInfo.getRevocationInfo());
+            queryExecutor.addCert(caCert, cert, certInfo.getProfileName(),
+                    certInfo.getRevocationInfo());
             return true;
         } catch (Exception e)
         {
@@ -197,7 +203,8 @@ public class OCSPCertPublisher extends X509CertPublisher
             return true;
         } catch (Exception e)
         {
-            logAndAudit(caCert.getSubject(), cert, e, "could not publish unrevocation of certificate");
+            logAndAudit(caCert.getSubject(), cert, e,
+                    "could not publish unrevocation of certificate");
             return false;
         }
     }
@@ -216,8 +223,9 @@ public class OCSPCertPublisher extends X509CertPublisher
 
         LOG.debug("error", e);
 
-        AuditService auditService = auditServiceRegister == null ? null :
-            auditServiceRegister.getAuditService();
+        AuditService auditService = (auditServiceRegister == null)
+                ? null
+                : auditServiceRegister.getAuditService();
 
         if(auditService == null)
         {
@@ -288,7 +296,8 @@ public class OCSPCertPublisher extends X509CertPublisher
             return true;
         } catch (Exception e)
         {
-            String issuerText = X509Util.getRFC4519Name(caCert.getCert().getIssuerX500Principal());
+            String issuerText = X509Util.getRFC4519Name(
+                    caCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, caCert, e, "could not publish unrevocation of CA");
             return false;
         }
@@ -305,7 +314,8 @@ public class OCSPCertPublisher extends X509CertPublisher
             return true;
         } catch (Exception e)
         {
-            String issuerText = X509Util.getRFC4519Name(issuerCert.getCert().getIssuerX500Principal());
+            String issuerText = X509Util.getRFC4519Name(
+                    issuerCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, issuerCert, e, "could not publish removal of certificate");
             return false;
         }

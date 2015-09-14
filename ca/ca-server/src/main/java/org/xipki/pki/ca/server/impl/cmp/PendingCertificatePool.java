@@ -82,8 +82,8 @@ class PendingCertificatePool
             }
 
             MyEntry another = (MyEntry) b;
-            return certReqId.equals(another.certReqId) &&
-                    certInfo.equals(another.certInfo);
+            return certReqId.equals(another.certReqId)
+                    && certInfo.equals(another.certInfo);
         }
     }
 

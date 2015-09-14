@@ -378,7 +378,8 @@ public class CaAddFromFileCmd extends CaCmd
 
         if(required)
         {
-            throw new IllegalCmdParamException("Required property '" + propKey + "' is not defined");
+            throw new IllegalCmdParamException(
+                    "Required property '" + propKey + "' is not defined");
         }
         else
         {

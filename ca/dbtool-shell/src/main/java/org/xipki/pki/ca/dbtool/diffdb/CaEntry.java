@@ -143,7 +143,8 @@ public class CaEntry
     {
         csvOutputStream.close();
 
-        String zipFilename = DbToolBase.buildFilename("certs_", ".csv", minIdInCsvFile, maxIdInCsvFile, Integer.MAX_VALUE);
+        String zipFilename = DbToolBase.buildFilename("certs_", ".csv", minIdInCsvFile,
+                maxIdInCsvFile, Integer.MAX_VALUE);
         csvFile.renameTo(new File(caDir, "certs" + File.separator + zipFilename));
         certsManifestOs.write((zipFilename + "\n").getBytes());
         certsManifestOs.flush();
@@ -152,7 +153,8 @@ public class CaEntry
     private void createNewCsvFile()
     throws IOException
     {
-        this.csvFile = new File(caDir.getParentFile(), "tmp-ca-" + caId + "-" + System.currentTimeMillis() + ".csv");
+        this.csvFile = new File(caDir.getParentFile(),
+                "tmp-ca-" + caId + "-" + System.currentTimeMillis() + ".csv");
         csvOutputStream = new BufferedOutputStream(
                 new FileOutputStream(this.csvFile), STREAM_BUFFERSIZE);
     }

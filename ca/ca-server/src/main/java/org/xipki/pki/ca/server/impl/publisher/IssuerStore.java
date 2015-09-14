@@ -68,7 +68,8 @@ class IssuerStore
         {
             if(existingEntry.getId() == entry.getId())
             {
-                throw new IllegalArgumentException("issuer with the same id " + entry.getId() + " already available");
+                throw new IllegalArgumentException(
+                        "issuer with the same id " + entry.getId() + " already available");
             }
         }
 

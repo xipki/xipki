@@ -155,8 +155,10 @@ public class CALoadTestEnrollCmd extends CALoadTestCmd
             throw new IllegalCmdParamException("invalid keyType " + keyType);
         }
 
-        LoadTestEntry loadtestEntry = new LoadTestEntry(certprofile, keyEntry, subjectTemplate, randomDN);
-        CALoadTestEnroll loadTest = new CALoadTestEnroll(caClient, loadtestEntry, n, description.toString());
+        LoadTestEntry loadtestEntry = new LoadTestEntry(certprofile, keyEntry,
+                subjectTemplate, randomDN);
+        CALoadTestEnroll loadTest = new CALoadTestEnroll(caClient, loadtestEntry,
+                n, description.toString());
 
         loadTest.setDuration(durationInSecond);
         loadTest.setThreads(numThreads);

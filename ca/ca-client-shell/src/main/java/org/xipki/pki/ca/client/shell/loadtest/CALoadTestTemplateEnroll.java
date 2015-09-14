@@ -136,12 +136,14 @@ public class CALoadTestTemplateEnroll extends LoadExecutor
                 {
                     CertRequestWithProfile certRequest = certRequests.get(certId);
                     EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType
-                            ("id-" + certId, certRequest.certprofile, certRequest.certRequest, RA_VERIFIED);
+                            ("id-" + certId, certRequest.certprofile, certRequest.certRequest,
+                                    RA_VERIFIED);
 
                     request.addRequestEntry(requestEntry);
                 }
 
-                result = caClient.requestCerts(request, null, userPrefix + System.currentTimeMillis(), null);
+                result = caClient.requestCerts(request, null,
+                        userPrefix + System.currentTimeMillis(), null);
             } catch (CAClientException | PKIErrorException e)
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
@@ -313,10 +315,14 @@ public class CALoadTestTemplateEnroll extends LoadExecutor
             }
             catch(SAXException e)
             {
-                throw new InvalidConfException("parse profile failed, message: " + e.getMessage(), e);
+                throw new InvalidConfException(
+                        "parse profile failed, message: " + e.getMessage(),
+                        e);
             } catch(JAXBException e)
             {
-                throw new InvalidConfException("parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e), e);
+                throw new InvalidConfException(
+                        "parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e),
+                        e);
             }
 
             if(root instanceof JAXBElement)

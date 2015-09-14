@@ -89,7 +89,8 @@ public class KeystoreP11ModulePool
             final String message = "could not finalize the module " + moduleName;
             if(LOG.isWarnEnabled())
             {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message),
+                        t.getClass().getName(), t.getMessage());
             }
             LOG.debug(message, t);
         }

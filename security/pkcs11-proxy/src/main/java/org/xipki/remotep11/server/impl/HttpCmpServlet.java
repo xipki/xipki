@@ -108,7 +108,8 @@ public class HttpCmpServlet extends HttpServlet
                 final String message = "could not parse the request (PKIMessage)";
                 if(LOG.isErrorEnabled())
                 {
-                    LOG.error(message + ", class={}, message={}", e.getClass().getName(), e.getMessage());
+                    LOG.error(message + ", class={}, message={}", e.getClass().getName(),
+                            e.getMessage());
                 }
                 LOG.debug(message, e);
 
@@ -146,7 +147,8 @@ public class HttpCmpServlet extends HttpServlet
                         constructedPath : constructedPath.substring(0, moduleName_end_index);
             }
 
-            PKIMessage pkiResp = responder.processPKIMessage(localP11CryptServicePool, moduleName, pkiReq);
+            PKIMessage pkiResp = responder.processPKIMessage(localP11CryptServicePool,
+                    moduleName, pkiReq);
             byte[] pkiRespBytes = pkiResp.getEncoded("DER");
 
             response.setContentType(HttpCmpServlet.CT_RESPONSE);
@@ -162,7 +164,8 @@ public class HttpCmpServlet extends HttpServlet
             response.setContentLength(0);
         }catch(Throwable t)
         {
-            LOG.error("Throwable thrown, this should not happen. {}: {}", t.getClass().getName(), t.getMessage());
+            LOG.error("Throwable thrown, this should not happen. {}: {}",
+                    t.getClass().getName(), t.getMessage());
             LOG.debug("Throwable thrown, this should not happen.", t);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);

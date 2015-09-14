@@ -106,9 +106,13 @@ public abstract class UnRevRemoveCertCmd extends ClientCmd
         } catch(SignatureException e)
         {
             return "could not verify the signaure of given certificate by the issuer";
-        } catch (InvalidKeyException | CertificateException | NoSuchAlgorithmException | NoSuchProviderException e)
+        } catch (InvalidKeyException
+                | CertificateException
+                | NoSuchAlgorithmException
+                | NoSuchProviderException e)
         {
-            return "could not verify the signaure of given certificate by the issuer: " + e.getMessage();
+            return "could not verify the signaure of given certificate by the issuer: "
+                    + e.getMessage();
         }
 
         return null;

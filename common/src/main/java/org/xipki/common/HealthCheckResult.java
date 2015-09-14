@@ -305,10 +305,12 @@ public class HealthCheckResult
         }
 
         String checksBlock = getBlock(jsonMsg, endIdx + 1 + "\"checks\":".length());
-        Map<String, String> childBlocks = getChildBlocks(checksBlock.substring(1, checksBlock.length() - 1));
+        Map<String, String> childBlocks = getChildBlocks(
+                checksBlock.substring(1, checksBlock.length() - 1));
         for(String childBlockName : childBlocks.keySet())
         {
-            HealthCheckResult childResult = getInstanceFromJsonMessage(childBlockName, childBlocks.get(childBlockName));
+            HealthCheckResult childResult = getInstanceFromJsonMessage(childBlockName,
+                    childBlocks.get(childBlockName));
             result.addChildCheck(childResult);
         }
 
@@ -386,7 +388,8 @@ public class HealthCheckResult
     {
         String jm1 = "{\"healthy\":true}";
         String jm2 = "{\"healthy\":true,\"checks\":{\"childcheck\":{\"healthy\":false,"
-                + "\"checks\":{\"childChildCheck\":{\"healthy\":false}}},\"childcheck2\":{\"healthy\":false}}}";
+                + "\"checks\":{\"childChildCheck\":{\"healthy\":false}}},"
+                + "\"childcheck2\":{\"healthy\":false}}}";
         System.out.println(getBlock(jm1,0));
         System.out.println(getBlock(jm2, 25));
         getInstanceFromJsonMessage("default", jm1);

@@ -149,8 +149,10 @@ public class HttpsClientTestor
                 {
                     System.out.println("Cert Type : " + cert.getType());
                     System.out.println("Cert Hash Code : " + cert.hashCode());
-                    System.out.println("Cert Public Key Algorithm : " + cert.getPublicKey().getAlgorithm());
-                    System.out.println("Cert Public Key Format : " + cert.getPublicKey().getFormat());
+                    System.out.println("Cert Public Key Algorithm : "
+                            + cert.getPublicKey().getAlgorithm());
+                    System.out.println("Cert Public Key Format : "
+                            + cert.getPublicKey().getFormat());
                     System.out.println("\n");
                 }
 

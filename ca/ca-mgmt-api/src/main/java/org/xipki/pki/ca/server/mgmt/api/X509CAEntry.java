@@ -107,7 +107,9 @@ implements Serializable
 
         if(nextCRLNumber <= 0)
         {
-            throw new IllegalArgumentException("nextCRLNumber is not positive (" + nextCRLNumber + " < 1)");
+            throw new IllegalArgumentException(
+
+                    "nextCRLNumber is not positive (" + nextCRLNumber + " < 1)");
         }
 
         if(numCrls < 0)
@@ -287,8 +289,12 @@ implements Serializable
         sb.append("\n");
         if(revocationInfo != null)
         {
-            sb.append("\treason: ").append(revocationInfo.getReason().getDescription()).append("\n");
-            sb.append("\trevoked at ").append(revocationInfo.getRevocationTime()).append("\n");
+            sb.append("\treason: ")
+                .append(revocationInfo.getReason().getDescription())
+                .append("\n");
+            sb.append("\trevoked at ")
+                .append(revocationInfo.getRevocationTime())
+                .append("\n");
         }
 
         return sb.toString();

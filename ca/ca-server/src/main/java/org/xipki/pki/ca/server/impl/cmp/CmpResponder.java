@@ -113,7 +113,8 @@ abstract class CmpResponder
             final String msg = "error while getting responder signer";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(msg, e);
 
@@ -183,7 +184,8 @@ abstract class CmpResponder
                 final String msg = "tid=" + tidStr + ": could not parse messageDate";
                 if(LOG.isErrorEnabled())
                 {
-                    LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(), e.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(),
+                            e.getMessage());
                 }
                 LOG.debug(msg, e);
                 messageTime = null;
@@ -191,10 +193,13 @@ abstract class CmpResponder
         }
 
         GeneralName recipient = reqHeader.getRecipient();
-        boolean intentMe = (recipient == null) ? null : intendsMe(recipient);
+        boolean intentMe = (recipient == null)
+                ? null
+                : intendsMe(recipient);
         if(intentMe == false)
         {
-            LOG.warn("tid={}: I am not the intented recipient, but '{}'", tid, reqHeader.getRecipient());
+            LOG.warn("tid={}: I am not the intented recipient, but '{}'", tid,
+                    reqHeader.getRecipient());
             failureCode = PKIFailureInfo.badRequest;
             statusText = "I am not the intended recipient";
         }
@@ -249,7 +254,8 @@ abstract class CmpResponder
         {
             try
             {
-                ProtectionVerificationResult verificationResult = verifyProtection(tidStr, message, cmpControl);
+                ProtectionVerificationResult verificationResult = verifyProtection(tidStr,
+                        message, cmpControl);
                 ProtectionResult pr = verificationResult.getProtectionResult();
                 switch(pr)
                 {
@@ -263,13 +269,17 @@ abstract class CmpResponder
                     errorStatus = "request is not protected by signature";
                     break;
                 case SENDER_NOT_AUTHORIZED:
-                    errorStatus = "request is protected by signature but the requestor is not authorized";
+                    errorStatus =
+                        "request is protected by signature but the requestor is not authorized";
                     break;
                 case SIGALGO_FORBIDDEN:
-                    errorStatus = "request is protected by signature but the protection algorithm is forbidden";
+                    errorStatus =
+                        "request is protected by signature but the protection algorithm is"
+                        + " forbidden";
                     break;
                 default:
-                    throw new RuntimeException("should not reach here, unknown ProtectionResult " + pr);
+                    throw new RuntimeException(
+                        "should not reach here, unknown ProtectionResult " + pr);
                 } // end switch
                 requestor = (CmpRequestorInfo) verificationResult.getRequestor();
             } catch (Exception e)
@@ -277,7 +287,8 @@ abstract class CmpResponder
                 final String msg = "tid=" + tidStr + ": error while verifying the signature";
                 if(LOG.isErrorEnabled())
                 {
-                    LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(), e.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(),
+                            e.getMessage());
                 }
                 LOG.debug(msg, e);
                 errorStatus = "request has invalid signature based protection";
@@ -314,7 +325,9 @@ abstract class CmpResponder
         }
 
         CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
-        String username = keyvalues == null ? null : keyvalues.getValue(CmpUtf8Pairs.KEY_USER);
+        String username = (keyvalues == null)
+                ? null
+                : keyvalues.getValue(CmpUtf8Pairs.KEY_USER);
         if(username != null)
         {
             if(username.indexOf('*') != -1 || username.indexOf('%') != -1)
@@ -331,7 +344,8 @@ abstract class CmpResponder
                 auditEvent.setStatus(AuditStatus.FAILED);
                 auditEvent.addEventData(new AuditEventData("message", errorStatus));
             }
-            return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck, errorStatus);
+            return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck,
+                    errorStatus);
         }
 
         PKIMessage resp = intern_processPKIMessage(requestor, username, tid, message, auditEvent);
@@ -365,7 +379,8 @@ abstract class CmpResponder
 
         if(pMsg.hasPasswordBasedMacProtection())
         {
-            LOG.warn("NOT_SIGNAUTRE_BASED: " + pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
+            LOG.warn("NOT_SIGNAUTRE_BASED: {}",
+                    pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
             return new ProtectionVerificationResult(null, ProtectionResult.NOT_SIGNATURE_BASED);
         }
 
@@ -373,7 +388,8 @@ abstract class CmpResponder
         AlgorithmIdentifier protectionAlg = h.getProtectionAlg();
         if(cmpControl.isSigAlgoPermitted(protectionAlg) == false)
         {
-            LOG.warn("SIG_ALGO_FORBIDDEN: " + pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
+            LOG.warn("SIG_ALGO_FORBIDDEN: {}",
+                    pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
             return new ProtectionVerificationResult(null, ProtectionResult.SIGALGO_FORBIDDEN);
         }
 
@@ -389,12 +405,15 @@ abstract class CmpResponder
         if(verifierProvider == null)
         {
             LOG.warn("tid={}: not authorized requestor '{}'", tid, h.getSender());
-            return new ProtectionVerificationResult(requestor, ProtectionResult.SENDER_NOT_AUTHORIZED);
+            return new ProtectionVerificationResult(requestor,
+                    ProtectionResult.SENDER_NOT_AUTHORIZED);
         }
 
         boolean signatureValid = pMsg.verify(verifierProvider);
         return new ProtectionVerificationResult(requestor,
-                signatureValid ? ProtectionResult.VALID : ProtectionResult.INVALID);
+                signatureValid
+                    ? ProtectionResult.VALID
+                    : ProtectionResult.INVALID);
     }
 
     private PKIMessage addProtection(
@@ -403,13 +422,18 @@ abstract class CmpResponder
     {
         try
         {
-            return CmpUtil.addProtection(pkiMessage, getSigner(), getSender(), getCmpControl().isSendResponderCert());
+            return CmpUtil.addProtection(pkiMessage,
+                    getSigner(),
+                    getSender(),
+                    getCmpControl().isSendResponderCert());
         } catch (Exception e)
         {
             final String message = "error while add protection to the PKI message";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message),
+                        e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
 
@@ -421,7 +445,8 @@ abstract class CmpResponder
             {
                 auditEvent.setLevel(AuditLevel.ERROR);
                 auditEvent.setStatus(AuditStatus.FAILED);
-                auditEvent.addEventData(new AuditEventData("message", "could not sign the PKIMessage"));
+                auditEvent.addEventData(
+                        new AuditEventData("message", "could not sign the PKIMessage"));
             }
             return new PKIMessage(pkiMessage.getHeader(), body);
         }
@@ -436,7 +461,8 @@ abstract class CmpResponder
     {
         GeneralName respRecipient = requestHeader.getSender();
 
-        PKIHeaderBuilder respHeader = new PKIHeaderBuilder(requestHeader.getPvno().getValue().intValue(),
+        PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
+                requestHeader.getPvno().getValue().intValue(),
                 getSender(), respRecipient);
         respHeader.setMessageTime(new ASN1GeneralizedTime(new Date()));
         if(tid != null)
@@ -467,8 +493,12 @@ abstract class CmpResponder
             final Integer info,
             final String errorMessage)
     {
-        PKIFreeText statusMessage = (errorMessage == null) ? null : new PKIFreeText(errorMessage);
-        PKIFailureInfo failureInfo = (info == null) ? null : new PKIFailureInfo(info);
+        PKIFreeText statusMessage = (errorMessage == null)
+                ? null
+                : new PKIFreeText(errorMessage);
+        PKIFailureInfo failureInfo = (info == null)
+                ? null
+                : new PKIFailureInfo(info);
         return new PKIStatusInfo(PKIStatus.rejection, statusMessage, failureInfo);
     }
 
@@ -476,14 +506,18 @@ abstract class CmpResponder
     throws InvalidConfException
     {
         GeneralName sender = getSender();
-        return sender == null ? null : (X500Name) sender.getName();
+        return (sender == null)
+                ? null
+                : (X500Name) sender.getName();
     }
 
     public X509Certificate getResponderCert()
     throws InvalidConfException
     {
         ConcurrentContentSigner signer = getSigner();
-        return signer == null ? null : signer.getCertificate();
+        return (signer == null)
+                ? null
+                : signer.getCertificate();
     }
 
 }

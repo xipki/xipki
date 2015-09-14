@@ -90,7 +90,8 @@ abstract class AbstractP11DSAContentSigner implements ContentSigner
         this.keyId = keyId;
         this.cryptService = cryptService;
 
-        AlgorithmIdentifier digAlgId = AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId);
+        AlgorithmIdentifier digAlgId = AlgorithmUtil.extractDigesetAlgorithmIdentifier(
+                signatureAlgId);
 
         Digest digest = BcDefaultDigestProvider.INSTANCE.get(digAlgId);
 
@@ -127,7 +128,8 @@ abstract class AbstractP11DSAContentSigner implements ContentSigner
             final String message = "Throwable";
             if(LOG.isWarnEnabled())
             {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                        t.getMessage());
             }
             LOG.debug(message, t);
             throw new RuntimeCryptoException(t.getClass().getName() + ": " + t.getMessage());

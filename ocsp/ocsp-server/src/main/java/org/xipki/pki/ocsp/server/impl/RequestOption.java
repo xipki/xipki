@@ -214,7 +214,8 @@ class RequestOption
                 }
             }catch(Exception e)
             {
-                throw new InvalidConfException("error while initializing the trustAnchors: " + e.getMessage(), e);
+                throw new InvalidConfException(
+                        "error while initializing the trustAnchors: " + e.getMessage(), e);
             }
 
             CertCollectionType certsType = certpathConf.getCerts();
@@ -229,7 +230,8 @@ class RequestOption
                     this.certs = getCerts(certsType);
                 }catch(Exception e)
                 {
-                    throw new InvalidConfException("error while initializing the certs: " + e.getMessage(), e);
+                    throw new InvalidConfException(
+                            "error while initializing the certs: " + e.getMessage(), e);
                 }
             }
         }

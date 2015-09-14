@@ -164,7 +164,9 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
         }
         else
         {
-            final String msg = "signer has not been borrowed before or has been returned more than once: " + signer;
+            final String msg =
+                    "signer has not been borrowed before or has been returned more than once: "
+                    + signer;
             LOG.error(msg);
             throw new IllegalStateException(msg);
         }
@@ -265,7 +267,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
             final String message = "isHealthy()";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
             return false;

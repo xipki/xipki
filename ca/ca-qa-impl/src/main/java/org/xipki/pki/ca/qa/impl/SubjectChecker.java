@@ -186,7 +186,8 @@ public class SubjectChecker
 
                     if(rdns.length > 1)
                     {
-                        issue.setFailureMessage("AttributeTypeAndValues of group " + g + " is not in one RDN");
+                        issue.setFailureMessage("AttributeTypeAndValues of group " + g
+                                + " is not in one RDN");
                         toBreak = true;
                         break;
                     }
@@ -197,7 +198,8 @@ public class SubjectChecker
                     }
                     else if(rdn != rdns[0])
                     {
-                        issue.setFailureMessage("AttributeTypeAndValues of group " + g + " is not in one RDN");
+                        issue.setFailureMessage("AttributeTypeAndValues of group " + g
+                                + " is not in one RDN");
                         toBreak = true;
                         break;
                     }
@@ -306,7 +308,8 @@ public class SubjectChecker
             if(rdnControl != null && rdnControl.getPatterns() != null)
             {
                 // sort the requestedRDNs
-                requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues, rdnControl.getPatterns());
+                requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues,
+                        rdnControl.getPatterns());
             }
         }
 
@@ -316,12 +319,14 @@ public class SubjectChecker
             AttributeTypeAndValue[] atvs = rdn.getTypesAndValues();
             if(atvs.length > 1)
             {
-                failureMsg.append("size of RDN[" + i + "] is '" + atvs.length + "' but expected '1'");
+                failureMsg.append("size of RDN[" + i + "] is '" + atvs.length
+                        + "' but expected '1'");
                 failureMsg.append("; ");
                 continue;
             }
 
-            String atvTextValue = getAtvValueString("RDN[" + i + "]", atvs[0], stringType, failureMsg);
+            String atvTextValue = getAtvValueString("RDN[" + i + "]", atvs[0], stringType,
+                    failureMsg);
             if(atvTextValue == null)
             {
                 continue;
@@ -600,7 +605,11 @@ public class SubjectChecker
                 ASN1Encodable o = seq.getObjectAt(i);
                 if(matchStringType(o, stringType) == false)
                 {
-                    failureMsg.append(name).append(".[" + i + "] is not of type " + stringType.name());
+                    failureMsg.append(name)
+                        .append(".[")
+                        .append(i)
+                        .append("] is not of type ")
+                        .append(stringType.name());
                     failureMsg.append("; ");
                     validEncoding = false;
                     break;
@@ -645,7 +654,8 @@ public class SubjectChecker
         {
             if(SubjectDNSpec.p_dateOfBirth.matcher(atvTextValue).matches() == false)
             {
-                throw new BadCertTemplateException("Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
+                throw new BadCertTemplateException(
+                        "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
             }
         }
         else if(rdnControl != null)
@@ -672,13 +682,14 @@ public class SubjectChecker
                 if(atvTextValue.endsWith(suffix) == false)
                 {
                     failureMsg.append(name).append(" '").append(atvTextValue)
-                            .append("' does not end with suffx '").append(suffix).append("'");
+                        .append("' does not end with suffx '").append(suffix).append("'");
                     failureMsg.append("; ");
                     return;
                 }
                 else
                 {
-                    atvTextValue = atvTextValue.substring(0, atvTextValue.length() - suffix.length());
+                    atvTextValue = atvTextValue.substring(0,
+                            atvTextValue.length() - suffix.length());
                 }
             }
 
@@ -690,7 +701,8 @@ public class SubjectChecker
                 if(matches == false)
                 {
                     failureMsg.append(name).append(" '").append(atvTextValue)
-                            .append("' is not valid against regex '").append(pattern.pattern()).append("'");
+                        .append("' is not valid against regex '")
+                        .append(pattern.pattern()).append("'");
                     failureMsg.append("; ");
                     return;
                 }
@@ -714,8 +726,10 @@ public class SubjectChecker
             {
                 if(atvTextValue.startsWith(requestedCoreAtvTextValue + "-") == false)
                 {
-                    failureMsg.append("content '").append(atvTextValue).append("' does not start with '")
-                            .append(requestedCoreAtvTextValue).append("-'");
+                    failureMsg.append("content '")
+                        .append(atvTextValue)
+                        .append("' does not start with '")
+                        .append(requestedCoreAtvTextValue).append("-'");
                     failureMsg.append("; ");
                 }
             }
@@ -726,8 +740,10 @@ public class SubjectChecker
             {
                 if(atvTextValue.equals(requestedCoreAtvTextValue) == false)
                 {
-                    failureMsg.append("content '").append(atvTextValue).append("' but expected '")
-                            .append(requestedCoreAtvTextValue).append("'");
+                    failureMsg.append("content '")
+                        .append(atvTextValue)
+                        .append("' but expected '")
+                        .append(requestedCoreAtvTextValue).append("'");
                     failureMsg.append("; ");
                 }
             }

@@ -60,9 +60,11 @@ public class CAIdentifier
     {
         URL url = new URL(serverUrl);
         final String protocol = url.getProtocol();
-        if (protocol.equalsIgnoreCase("http") == false && protocol.equalsIgnoreCase("https") == false)
+        if (protocol.equalsIgnoreCase("http") == false
+                && protocol.equalsIgnoreCase("https") == false)
         {
-            throw new IllegalArgumentException("URL protocol should be HTTP or HTTPS, but not '" + protocol + "'");
+            throw new IllegalArgumentException(
+                    "URL protocol should be HTTP or HTTPS, but not '" + protocol + "'");
         }
 
         if (url.getQuery() != null)

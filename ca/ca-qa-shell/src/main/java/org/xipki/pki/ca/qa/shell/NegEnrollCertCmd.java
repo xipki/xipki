@@ -115,10 +115,12 @@ public abstract class NegEnrollCertCmd extends ClientCmd
     protected Object _doExecute()
     throws Exception
     {
-        EnrollCertRequestType request = new EnrollCertRequestType(EnrollCertRequestType.Type.CERT_REQ);
+        EnrollCertRequestType request = new EnrollCertRequestType(
+                EnrollCertRequestType.Type.CERT_REQ);
 
         CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
-        ConcurrentContentSigner signer = getSigner(hashAlgo, new SignatureAlgoControl(rsaMgf1, dsaPlain));
+        ConcurrentContentSigner signer = getSigner(hashAlgo,
+                new SignatureAlgoControl(rsaMgf1, dsaPlain));
         X509CertificateHolder ssCert = signer.getCertificateAsBCObject();
 
         X500Name x500Subject = (subject == null)
@@ -128,7 +130,8 @@ public abstract class NegEnrollCertCmd extends ClientCmd
         certTemplateBuilder.setPublicKey(ssCert.getSubjectPublicKeyInfo());
         CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(), null);
 
-        ProofOfPossessionSigningKeyBuilder popoBuilder = new ProofOfPossessionSigningKeyBuilder(certReq);
+        ProofOfPossessionSigningKeyBuilder popoBuilder =
+                new ProofOfPossessionSigningKeyBuilder(certReq);
         ContentSigner contentSigner = signer.borrowContentSigner();
         POPOSigningKey popoSk;
         try
@@ -141,7 +144,8 @@ public abstract class NegEnrollCertCmd extends ClientCmd
 
         ProofOfPossession popo = new ProofOfPossession(popoSk);
 
-        EnrollCertRequestEntryType reqEntry = new EnrollCertRequestEntryType("id-1", profile, certReq, popo);
+        EnrollCertRequestEntryType reqEntry = new EnrollCertRequestEntryType("id-1", profile,
+                certReq, popo);
         request.addRequestEntry(reqEntry);
 
         EnrollCertResult result;

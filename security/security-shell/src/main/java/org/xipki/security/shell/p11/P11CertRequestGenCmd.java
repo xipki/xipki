@@ -91,7 +91,8 @@ public class P11CertRequestGenCmd extends CertRequestGenCmd
         }
         else
         {
-            throw new IllegalCmdParamException("exactly one of keyId or keyLabel should be specified");
+            throw new IllegalCmdParamException(
+                    "exactly one of keyId or keyLabel should be specified");
         }
         return keyIdentifier;
     }

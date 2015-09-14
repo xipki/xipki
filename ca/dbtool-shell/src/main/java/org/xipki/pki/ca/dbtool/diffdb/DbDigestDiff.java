@@ -120,7 +120,8 @@ public class DbDigestDiff
 
         DbSchemaType datasourceType = DbDigestExportWorker.detectDbSchemaType(datasourceB);
 
-        if(datasourceType == DbSchemaType.XIPKI_CA_v1 || datasourceType == DbSchemaType.XIPKI_OCSP_v1)
+        if(datasourceType == DbSchemaType.XIPKI_CA_v1
+                || datasourceType == DbSchemaType.XIPKI_OCSP_v1)
         {
             if(datasourceType == DbSchemaType.XIPKI_CA_v1)
             { // CA
@@ -141,7 +142,8 @@ public class DbDigestDiff
             col_revReason = "REV_REASON";
             col_revTime = "REV_TIME";
             col_serialNumber = "SERIAL";
-        } else if(datasourceType == DbSchemaType.XIPKI_CA_v2 || datasourceType == DbSchemaType.XIPKI_OCSP_v2)
+        } else if(datasourceType == DbSchemaType.XIPKI_CA_v2
+                || datasourceType == DbSchemaType.XIPKI_OCSP_v2)
         {
             if(datasourceType == DbSchemaType.XIPKI_CA_v2)
             { // CA
@@ -286,7 +288,8 @@ public class DbDigestDiff
                 throw e;
             }catch(Exception e)
             {
-                reporter.addError("Exception thrown: " + e.getClass().getName() + ": " + e.getMessage());
+                reporter.addError("Exception thrown: " + e.getClass().getName() + ": "
+                        + e.getMessage());
             } finally
             {
                 reporter.close();
@@ -313,7 +316,8 @@ public class DbDigestDiff
             batchSelectStmt = datasourceB.prepareStatement(conn, batchCertsSql);
             batchSelectStmt.setInt(1, caIdB);
 
-            ProcessLog processLog = new ProcessLog(readerA.getTotalAccount(), System.currentTimeMillis(), 0);
+            ProcessLog processLog = new ProcessLog(readerA.getTotalAccount(),
+                    System.currentTimeMillis(), 0);
             System.out.println("Processing certifiates of CA \n\t'" + readerA.getCaDirname() + "'");
             ProcessLog.printHeader();
 
@@ -453,7 +457,8 @@ public class DbDigestDiff
         final int n = serialNumbers.size();
         if(n != numPerSelect)
         {
-            throw new IllegalArgumentException("size of serialNumbers is not '" + numPerSelect + "': " + n);
+            throw new IllegalArgumentException("size of serialNumbers is not '" + numPerSelect
+                    + "': " + n);
         }
 
         ResultSet rs = null;

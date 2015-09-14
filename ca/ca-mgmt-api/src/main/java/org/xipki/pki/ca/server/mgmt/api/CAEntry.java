@@ -75,7 +75,8 @@ public class CAEntry
 
         if(expirationPeriod < 0)
         {
-            throw new IllegalArgumentException("expirationPeriod is negative (" + expirationPeriod + " < 0)");
+            throw new IllegalArgumentException(
+                    "expirationPeriod is negative (" + expirationPeriod + " < 0)");
         }
         this.expirationPeriod = expirationPeriod;
 

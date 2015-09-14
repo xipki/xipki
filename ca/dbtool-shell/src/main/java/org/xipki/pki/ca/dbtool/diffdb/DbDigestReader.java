@@ -65,7 +65,9 @@ public class DbDigestReader
         this.caCert = IoUtil.read(new File(caDirname, "ca.der"));
         String s = new String(IoUtil.read(new File(caDirname, "account")));
         this.totalAccount = Integer.parseInt(s);
-        this.certsFilesReader = new BufferedReader(new FileReader(new File(caDirname, "certs-manifest")));
+        this.certsFilesReader = new BufferedReader(
+                new FileReader(
+                        new File(caDirname, "certs-manifest")));
         this.caDirname = caDirname;
         this.next = retrieveNext(true);
     }

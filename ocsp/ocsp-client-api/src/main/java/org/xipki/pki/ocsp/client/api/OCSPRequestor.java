@@ -50,8 +50,10 @@ import org.xipki.common.RequestResponseDebug;
 
 public interface OCSPRequestor
 {
-    public static final ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs = OCSPObjectIdentifiers.id_pkix_ocsp.branch("8");
-    public static final ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke = OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
+    public static final ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs
+            = OCSPObjectIdentifiers.id_pkix_ocsp.branch("8");
+    public static final ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke
+            = OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
 
     OCSPResp ask(
             X509Certificate issuerCert,

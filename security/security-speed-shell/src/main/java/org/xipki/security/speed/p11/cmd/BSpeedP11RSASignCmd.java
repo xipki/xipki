@@ -65,7 +65,8 @@ public class BSpeedP11RSASignCmd extends BSpeedP11SignCmd
         for(int keysize : keysizes)
         {
             ret.add(
-                    new P11RSASignLoadTest(securityFactory, slot, sigAlgo, keysize, new BigInteger("0x10001")));
+                    new P11RSASignLoadTest(securityFactory, slot, sigAlgo, keysize,
+                            new BigInteger("0x10001")));
         }
         return ret;
     }

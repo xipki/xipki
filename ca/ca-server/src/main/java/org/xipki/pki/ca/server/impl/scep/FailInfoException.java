@@ -48,7 +48,8 @@ public class FailInfoException extends Exception
 
     public static final FailInfoException badAlg = new FailInfoException(FailInfo.badAlg);
     public static final FailInfoException badCertId = new FailInfoException(FailInfo.badCertId);
-    public static final FailInfoException badMessageCheck = new FailInfoException(FailInfo.badMessageCheck);
+    public static final FailInfoException badMessageCheck
+            = new FailInfoException(FailInfo.badMessageCheck);
     public static final FailInfoException badRequest = new FailInfoException(FailInfo.badRequest);
     public static final FailInfoException badTime = new FailInfoException(FailInfo.badTime);
 

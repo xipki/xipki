@@ -100,7 +100,8 @@ public class CertStatusInfo
             final Date nextUpdate,
             final String certprofile)
     {
-        CertStatusInfo ret = new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate, certprofile);
+        CertStatusInfo ret = new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate,
+                certprofile);
         ret.certHashAlgo = certHashAlgo;
         ret.certHash = certHash;
         return ret;
@@ -118,7 +119,8 @@ public class CertStatusInfo
         {
             throw new IllegalArgumentException("revocationInfo could not be null");
         }
-        CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate, certprofile);
+        CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate,
+                certprofile);
         ret.revocationInfo = revocationInfo;
         ret.certHashAlgo = certHashAlgo;
         ret.certHash = certHash;

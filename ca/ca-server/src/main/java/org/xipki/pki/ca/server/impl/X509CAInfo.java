@@ -115,7 +115,8 @@ public class X509CAInfo
             bcCert = Certificate.getInstance(encodedCert);
         } catch (CertificateEncodingException e)
         {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "could not encode the CA certificate");
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                    "could not encode the CA certificate");
         }
         this.certInCMPFormat = new CMPCertificate(bcCert);
 
@@ -125,7 +126,8 @@ public class X509CAInfo
                 caEntry.getCrlUris(),
                 caEntry.getDeltaCrlUris());
 
-        this.noNewCertificateAfter = this.notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
+        this.noNewCertificateAfter =
+                this.notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
 
         this.useRandomSerialNumber = caEntry.getNextSerial() < 1;
         if(this.useRandomSerialNumber)
@@ -134,7 +136,8 @@ public class X509CAInfo
             return;
         }
 
-        Long greatestSerialNumber = certStore.getGreatestSerialNumber(this.publicCAInfo.getCaCertificate());
+        Long greatestSerialNumber = certStore.getGreatestSerialNumber(
+                this.publicCAInfo.getCaCertificate());
 
         if(greatestSerialNumber == null)
         {

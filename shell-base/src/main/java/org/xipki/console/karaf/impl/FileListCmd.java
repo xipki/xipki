@@ -68,7 +68,8 @@ public class FileListCmd extends XipkiOsgiCommandSupport
         File target = new File(expandFilepath(targetPath));
         if(target.exists() == false)
         {
-            throw new IllegalCmdParamException("could not access " + targetPath + ": no such file or directory");
+            throw new IllegalCmdParamException(
+                    "could not access " + targetPath + ": no such file or directory");
         }
 
         if(target.isDirectory() == false)

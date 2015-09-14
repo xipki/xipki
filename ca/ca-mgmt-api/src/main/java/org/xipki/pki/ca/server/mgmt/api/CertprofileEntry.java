@@ -61,7 +61,8 @@ public class CertprofileEntry implements Serializable
 
         if("all".equalsIgnoreCase(name) || "null".equalsIgnoreCase(name))
         {
-            throw new IllegalArgumentException("certificate profile name could not be 'all' and 'null'");
+            throw new IllegalArgumentException(
+                    "certificate profile name could not be 'all' and 'null'");
         }
         this.name = name;
         this.type = type;

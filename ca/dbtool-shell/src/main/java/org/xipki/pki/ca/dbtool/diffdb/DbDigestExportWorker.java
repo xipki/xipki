@@ -120,10 +120,12 @@ public class DbDigestExportWorker extends DbPortWorker
             DbDigestExporter digester;
             if(dbSchemaType == DbSchemaType.EJBCA_CA_v3)
             {
-                digester = new EjbcaDigestExporter(dataSource, destFolder, stopMe, numCertsPerSelect, dbSchemaType);
+                digester = new EjbcaDigestExporter(dataSource, destFolder, stopMe,
+                        numCertsPerSelect, dbSchemaType);
             } else
             {
-                digester = new XipkiDigestExporter(dataSource, destFolder, stopMe, numCertsPerSelect, dbSchemaType);
+                digester = new XipkiDigestExporter(dataSource, destFolder, stopMe,
+                        numCertsPerSelect, dbSchemaType);
             }
             digester.digest();
         } finally
@@ -147,21 +149,26 @@ public class DbDigestExportWorker extends DbPortWorker
         Connection conn = dataSource.getConnection();
         try
         {
-            if(dataSource.tableExists(conn, "CAINFO") && dataSource.tableExists(conn, "RAWCERT"))
+            if(dataSource.tableExists(conn, "CAINFO")
+                    && dataSource.tableExists(conn, "RAWCERT"))
             {
                 return DbSchemaType.XIPKI_CA_v1;
             }
-            else if(dataSource.tableExists(conn, "ISSUER") && dataSource.tableExists(conn, "CERTHASH"))
+            else if(dataSource.tableExists(conn, "ISSUER")
+                    && dataSource.tableExists(conn, "CERTHASH"))
             {
                 return DbSchemaType.XIPKI_OCSP_v1;
             }
-            else if(dataSource.tableExists(conn, "CS_CA") && dataSource.tableExists(conn, "CRAW"))
+            else if(dataSource.tableExists(conn, "CS_CA")
+                    && dataSource.tableExists(conn, "CRAW"))
             {
                 return DbSchemaType.XIPKI_CA_v2;
-            } else if( dataSource.tableExists(conn, "ISSUER") && dataSource.tableExists(conn, "CHASH"))
+            } else if( dataSource.tableExists(conn, "ISSUER")
+                    && dataSource.tableExists(conn, "CHASH"))
             {
                 return DbSchemaType.XIPKI_OCSP_v2;
-            } else if( dataSource.tableExists(conn, "CAData") && dataSource.tableExists(conn, "CertificateData"))
+            } else if( dataSource.tableExists(conn, "CAData")
+                    && dataSource.tableExists(conn, "CertificateData"))
             {
                 return DbSchemaType.EJBCA_CA_v3;
             } else

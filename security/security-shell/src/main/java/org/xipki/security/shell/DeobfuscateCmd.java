@@ -61,7 +61,8 @@ public class DeobfuscateCmd extends SecurityCmd
     {
         if(StringUtil.startsWithIgnoreCase(passwordHint, "PBE:") == false)
         {
-            throw new IllegalCmdParamException("encrypted password '" + passwordHint + "' does not start with OBF:");
+            throw new IllegalCmdParamException("encrypted password '" + passwordHint
+                    + "' does not start with OBF:");
         }
 
         String password = OBFPasswordResolver.deobfuscate(passwordHint);

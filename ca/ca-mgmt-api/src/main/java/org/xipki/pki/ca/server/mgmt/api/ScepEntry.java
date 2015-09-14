@@ -94,7 +94,8 @@ implements Serializable
                 this.cert = X509Util.parseBase64EncodedCert(base64Cert);
             }catch(Throwable t)
             {
-                LOG.debug("could not parse the certificate of SCEP responder for CA '" + caName + "'");
+                LOG.debug("could not parse the certificate of SCEP responder for CA '"
+                        + caName + "'");
                 certFaulty = true;
             }
         }

@@ -284,7 +284,8 @@ public class CRLControl implements Serializable
                 List<String> tokens = StringUtil.split(s.trim(), ":");
                 if(tokens.size() != 2)
                 {
-                    throw new InvalidConfException("invalid " + KEY_interval_time + ": '" + s + "'");
+                    throw new InvalidConfException(
+                            "invalid " + KEY_interval_time + ": '" + s + "'");
                 }
 
                 try

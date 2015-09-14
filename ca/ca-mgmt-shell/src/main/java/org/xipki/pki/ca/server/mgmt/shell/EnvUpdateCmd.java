@@ -64,7 +64,8 @@ public class EnvUpdateCmd extends CaCmd
     throws Exception
     {
         boolean b = caManager.changeEnvParam(name, value);
-        output(b, "updated", "could not update", "the environment " + name + "=" + getRealString(value));
+        output(b, "updated", "could not update",
+                "the environment " + name + "=" + getRealString(value));
         return null;
     }
 }

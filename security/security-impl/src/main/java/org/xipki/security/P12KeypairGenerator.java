@@ -138,7 +138,8 @@ public abstract class P12KeypairGenerator
 
         // Generate keystore
         X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
-                subjectDN, BigInteger.valueOf(serialNumber), notBefore, notAfter, subjectDN, subjectPublicKeyInfo);
+                subjectDN, BigInteger.valueOf(serialNumber), notBefore, notAfter, subjectDN,
+                subjectPublicKeyInfo);
 
         X509KeyUsage ku;
         if(keyUsage == null)
@@ -168,12 +169,14 @@ public abstract class P12KeypairGenerator
                     new ExtendedKeyUsage(kps));
         }
 
-        KeyAndCertPair identity = new KeyAndCertPair(certGenerator.build(contentSigner), kp.getKeypair().getPrivate());
+        KeyAndCertPair identity = new KeyAndCertPair(certGenerator.build(contentSigner),
+                kp.getKeypair().getPrivate());
 
         KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
         ks.load(null, password);
 
-        ks.setKeyEntry("main", identity.getKey(), password, new Certificate[]{identity.getJceCert()});
+        ks.setKeyEntry("main", identity.getKey(), password,
+                new Certificate[]{identity.getJceCert()});
 
         ByteArrayOutputStream ksStream = new ByteArrayOutputStream();
         try
@@ -184,7 +187,8 @@ public abstract class P12KeypairGenerator
             ksStream.flush();
         }
 
-        P12KeypairGenerationResult result = new P12KeypairGenerationResult(ksStream.toByteArray(), identity.getCert());
+        P12KeypairGenerationResult result = new P12KeypairGenerationResult(
+                ksStream.toByteArray(), identity.getCert());
         result.setKeystoreObject(ks);
         return result;
     }
@@ -207,7 +211,8 @@ public abstract class P12KeypairGenerator
         else if(key instanceof DSAPrivateKey)
         {
             ASN1ObjectIdentifier hashOid = X509ObjectIdentifiers.id_SHA1;
-            AlgorithmIdentifier sigId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa_with_sha1);
+            AlgorithmIdentifier sigId = new AlgorithmIdentifier(
+                    X9ObjectIdentifiers.id_dsa_with_sha1);
 
             builder = new BcDSAContentSignerBuilder(sigId, buildAlgId(hashOid));
         }
@@ -355,7 +360,8 @@ public abstract class P12KeypairGenerator
                 this.curveOid = KeyUtil.getCurveOID(this.curveName);
                 if(this.curveOid == null)
                 {
-                    throw new IllegalArgumentException("no OID is defined for the curve " + this.curveName);
+                    throw new IllegalArgumentException("no OID is defined for the curve "
+                            + this.curveName);
                 }
             }
         }
@@ -366,7 +372,8 @@ public abstract class P12KeypairGenerator
         {
             KeyPair kp = KeyUtil.generateECKeypair(this.curveOid);
 
-            AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, this.curveOid);
+            AlgorithmIdentifier algId = new AlgorithmIdentifier(
+                    X9ObjectIdentifiers.id_ecPublicKey, this.curveOid);
             BCECPublicKey pub = (BCECPublicKey) kp.getPublic();
             byte[] keyData = pub.getQ().getEncoded(false);
             SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo(algId, keyData);
@@ -407,7 +414,8 @@ public abstract class P12KeypairGenerator
         throws Exception
         {
             KeyPair kp = KeyUtil.generateRSAKeypair(keysize, publicExponent);
-            java.security.interfaces.RSAPublicKey rsaPubKey = (java.security.interfaces.RSAPublicKey) kp.getPublic();
+            java.security.interfaces.RSAPublicKey rsaPubKey =
+                    (java.security.interfaces.RSAPublicKey) kp.getPublic();
 
             SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo(
                     new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE),

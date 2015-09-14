@@ -69,7 +69,8 @@ public class BCRSAPrivateKey
     protected BigInteger modulus;
     protected BigInteger privateExponent;
 
-    private transient PKCS12BagAttributeCarrierImpl   attrCarrier = new PKCS12BagAttributeCarrierImpl();
+    private transient PKCS12BagAttributeCarrierImpl attrCarrier =
+            new PKCS12BagAttributeCarrierImpl();
 
     protected BCRSAPrivateKey()
     {

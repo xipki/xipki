@@ -86,7 +86,8 @@ public class PublicKeyChecker
             // KeyAlgorithms
             if(conf.getKeyAlgorithms() != null)
             {
-                this.keyAlgorithms = XmlX509CertprofileUtil.buildKeyAlgorithms(conf.getKeyAlgorithms());
+                this.keyAlgorithms = XmlX509CertprofileUtil.buildKeyAlgorithms(
+                        conf.getKeyAlgorithms());
             }
 
         }catch(RuntimeException e)
@@ -94,10 +95,12 @@ public class PublicKeyChecker
             final String message = "RuntimeException";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
-            throw new CertprofileException("RuntimeException thrown while initializing certprofile: " + e.getMessage());
+            throw new CertprofileException(
+                    "RuntimeException thrown while initializing certprofile: " + e.getMessage());
         }
     }
 
@@ -120,7 +123,8 @@ public class PublicKeyChecker
             }
         }
 
-        ValidationIssue issue = new ValidationIssue("X509.PUBKEY.REQ", "whether public key matches the request one");
+        ValidationIssue issue = new ValidationIssue(
+                "X509.PUBKEY.REQ", "whether public key matches the request one");
         resultIssues.add(issue);
         SubjectPublicKeyInfo c14nRequestedPublicKey;
         try
@@ -128,7 +132,8 @@ public class PublicKeyChecker
             c14nRequestedPublicKey = X509Util.toRfc3279Style(requestedPublicKey);
             if(c14nRequestedPublicKey.equals(publicKey) == false)
             {
-                issue.setFailureMessage("public key in the certificate does not equal the requested one");
+                issue.setFailureMessage(
+                        "public key in the certificate does not equal the requested one");
             }
         } catch (InvalidKeySpecException e)
         {
@@ -175,7 +180,8 @@ public class PublicKeyChecker
                 }
             } else
             {
-                throw new BadCertTemplateException("only namedCurve or implictCA EC public key is supported");
+                throw new BadCertTemplateException(
+                        "only namedCurve or implictCA EC public key is supported");
             }
 
             // point encoding
@@ -189,7 +195,8 @@ public class PublicKeyChecker
                 byte pointEncoding = keyData[0];
                 if(ecOption.getPointEncodings().contains(pointEncoding) == false)
                 {
-                    throw new BadCertTemplateException("unaccepted EC point encoding " + pointEncoding);
+                    throw new BadCertTemplateException(
+                            "unaccepted EC point encoding " + pointEncoding);
                 }
             }
 
@@ -213,7 +220,8 @@ public class PublicKeyChecker
             ASN1Integer modulus;
             try
             {
-                ASN1Sequence seq = ASN1Sequence.getInstance(publicKey.getPublicKeyData().getBytes());
+                ASN1Sequence seq = ASN1Sequence.getInstance(
+                        publicKey.getPublicKeyData().getBytes());
                 modulus = ASN1Integer.getInstance(seq.getObjectAt(0));
             }catch(IllegalArgumentException e)
             {
@@ -301,12 +309,14 @@ public class PublicKeyChecker
         {
             if (encoded.length != (2 * expectedLength + 1))
             {
-                throw new BadCertTemplateException("incorrect length for uncompressed/hybrid encoding");
+                throw new BadCertTemplateException(
+                        "incorrect length for uncompressed/hybrid encoding");
             }
             break;
         }
         default:
-            throw new BadCertTemplateException("invalid point encoding 0x" + Integer.toString(encoded[0], 16));
+            throw new BadCertTemplateException(
+                    "invalid point encoding 0x" + Integer.toString(encoded[0], 16));
         }// end switch
     }
 }

@@ -151,7 +151,8 @@ public final class ECParameters extends AlgorithmParametersSpi
             namedCurve = SunNamedCurveExtender.lookupCurve(name);
         } else
         {
-            throw new InvalidParameterSpecException("only ECParameterSpec and ECGenParameterSpec supported");
+            throw new InvalidParameterSpecException(
+                    "only ECParameterSpec and ECGenParameterSpec supported");
         }
 
         if (namedCurve == null)
@@ -168,7 +169,8 @@ public final class ECParameters extends AlgorithmParametersSpi
         {
             try
             {
-                ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier) ASN1ObjectIdentifier.fromByteArray(params);
+                ASN1ObjectIdentifier oid =
+                        (ASN1ObjectIdentifier) ASN1ObjectIdentifier.fromByteArray(params);
                 ECParameterSpec spec = SunNamedCurveExtender.lookupCurve(oid.getId());
                 if (spec == null)
                 {
@@ -229,7 +231,8 @@ public final class ECParameters extends AlgorithmParametersSpi
             return spec.cast(new ECGenParameterSpec(name));
         }
 
-        throw new InvalidParameterSpecException("only ECParameterSpec and ECGenParameterSpec supported");
+        throw new InvalidParameterSpecException(
+                "only ECParameterSpec and ECGenParameterSpec supported");
     }
 
     protected byte[] engineGetEncoded()

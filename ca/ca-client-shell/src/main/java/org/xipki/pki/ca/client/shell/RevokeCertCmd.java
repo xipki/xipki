@@ -115,7 +115,8 @@ public class RevokeCertCmd extends UnRevRemoveCertCmd
             RequestResponseDebug debug = getRequestResponseDebug();
             try
             {
-                certIdOrError = caClient.revokeCert(cert, crlReason.getCode(), invalidityDate, debug);
+                certIdOrError = caClient.revokeCert(cert, crlReason.getCode(), invalidityDate,
+                        debug);
             }finally
             {
                 saveRequestResponse(debug);

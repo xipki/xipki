@@ -55,7 +55,8 @@ public class P11ECDSAPlainSigner extends AbstractP11DSASigner
             final byte[] hashValue)
     throws SignerException
     {
-        return param.getP11CryptService().CKM_ECDSA_Plain(hashValue, param.getSlot(), param.getKeyId());
+        return param.getP11CryptService().CKM_ECDSA_Plain(hashValue, param.getSlot(),
+                param.getKeyId());
     }
 
 }

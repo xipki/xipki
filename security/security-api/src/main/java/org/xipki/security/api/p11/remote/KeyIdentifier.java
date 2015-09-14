@@ -107,7 +107,8 @@ public class KeyIdentifier extends ASN1Object
             throw new BadASN1ObjectException("unable to parse encoded KeyIdentifier");
         }
 
-        throw new BadASN1ObjectException("unknown object in KeyIdentifier.getInstance(): " + obj.getClass().getName());
+        throw new BadASN1ObjectException("unknown object in KeyIdentifier.getInstance(): "
+                + obj.getClass().getName());
     }
 
     @Override

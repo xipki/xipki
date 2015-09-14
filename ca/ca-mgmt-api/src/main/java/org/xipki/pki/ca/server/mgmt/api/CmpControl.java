@@ -108,7 +108,8 @@ public class CmpControl
             this.sigAlgos = canonicalizeAlgos(set);
             if(CollectionUtil.isNotEmpty(this.sigAlgos))
             {
-                pairs.putPair(KEY_PROTECTION_SIGALGO, StringUtil.collectionAsString(this.sigAlgos, ALGO_DELIMITER));
+                pairs.putPair(KEY_PROTECTION_SIGALGO,
+                        StringUtil.collectionAsString(this.sigAlgos, ALGO_DELIMITER));
             }
         }
 
@@ -283,7 +284,8 @@ public class CmpControl
         sb.append("messageTimeRequired: ").append(getYesNo(messageTimeRequired)).append("\n");
         sb.append("    messageTimeBias: ").append(messageTimeBias).append(" s").append('\n');
         sb.append("    confirmWaitTime: ").append(confirmWaitTime).append(" s").append('\n');
-        sb.append("    signature algos: ").append(StringUtil.collectionAsString(sigAlgos, ALGO_DELIMITER)).append('\n');
+        sb.append("    signature algos: ")
+            .append(StringUtil.collectionAsString(sigAlgos, ALGO_DELIMITER)).append('\n');
         sb.append("               conf: ").append(dbEntry.getConf());
 
         return sb.toString();

@@ -75,7 +75,8 @@ public class CmpRequestorEntry implements Serializable
             final String message = "could not parse the certificate for requestor '" + name + "'";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                        t.getMessage());
             }
             LOG.debug(message, t);
         }

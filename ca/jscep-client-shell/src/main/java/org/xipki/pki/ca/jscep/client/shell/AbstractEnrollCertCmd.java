@@ -81,7 +81,8 @@ public abstract class AbstractEnrollCertCmd extends ClientCmd
 
         PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(p10File));
 
-        EnrollmentResponse resp = requestCertificate(client, csr, getIdentityKey(), getIdentityCert());
+        EnrollmentResponse resp = requestCertificate(client, csr, getIdentityKey(),
+                getIdentityCert());
         if(resp.isFailure())
         {
             throw new CmdFailure("server returned 'failure'");

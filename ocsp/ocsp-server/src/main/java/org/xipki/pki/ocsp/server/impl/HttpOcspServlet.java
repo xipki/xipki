@@ -186,8 +186,8 @@ public class HttpOcspServlet extends HttpServlet
             {
                 String relativeUri = r.getRelativeUri();
 
-                // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by POST,
-                // we support GET for longer requests anyway.
+                // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by
+                // POST, we support GET for longer requests anyway.
                 if(relativeUri.length() > responder.getRequestOption().getMaxRequestSize())
                 {
                     response.setContentLength(0);
@@ -243,7 +243,8 @@ public class HttpOcspServlet extends HttpServlet
                 final String message = "could not parse the request (OCSPRequest)";
                 if(LOG.isErrorEnabled())
                 {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                            e.getMessage());
                 }
                 LOG.debug(message, e);
 
@@ -254,7 +255,8 @@ public class HttpOcspServlet extends HttpServlet
 
             response.setContentType(HttpOcspServlet.CT_RESPONSE);
 
-            OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder, ocspReq, auditEvent, getMethod);
+            OcspRespWithCacheInfo ocspRespWithCacheInfo =
+                    server.answer(responder, ocspReq, auditEvent, getMethod);
             if (ocspRespWithCacheInfo == null)
             {
                 auditMessage = "processRequest returned null, this should not happen";
@@ -276,20 +278,24 @@ public class HttpOcspServlet extends HttpServlet
                 if(getMethod && cacheInfo != null)
                 {
                     long now = System.currentTimeMillis();
-                    // RFC 5019 6.2: Date: The date and time at which the OCSP server generated the HTTP response.
+                    // RFC 5019 6.2: Date: The date and time at which the OCSP server generated
+                    // the HTTP response.
                     response.setDateHeader("Date", now);
-                    // RFC 5019 6.2: Last-Modified: date and time at which the OCSP responder last modified the response.
+                    // RFC 5019 6.2: Last-Modified: date and time at which the OCSP responder
+                    // last modified the response.
                     response.setDateHeader("Last-Modified", cacheInfo.getThisUpdate());
-                    // RFC 5019 6.2: Expires: This date and time will be the same as the nextUpdate time-stamp in the OCSP
+                    // RFC 5019 6.2: Expires: This date and time will be the same as the
+                    // nextUpdate time-stamp in the OCSP
                     // response itself.
                     // This is overridden by max-age on HTTP/1.1 compatible components
                     if(cacheInfo.getNextUpdate() != null)
                     {
                         response.setDateHeader("Expires", cacheInfo.getNextUpdate());
                     }
-                    // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the ASCII HEX representation of the
-                    // SHA1 hash of the OCSPResponse structure.
-                    response.setHeader("ETag", "\"" + HashCalculator.hexSha1(encodedOcspResp) + "\"");
+                    // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the ASCII
+                    // HEX representation of the SHA1 hash of the OCSPResponse structure.
+                    response.setHeader("ETag",
+                            "\"" + HashCalculator.hexSha1(encodedOcspResp) + "\"");
 
                     // Max age must be in seconds in the cache-control header
                     long maxAge;
@@ -304,10 +310,12 @@ public class HttpOcspServlet extends HttpServlet
 
                     if(cacheInfo.getNextUpdate() != null)
                     {
-                        maxAge = Math.min(maxAge, (cacheInfo.getNextUpdate() - cacheInfo.getThisUpdate()) / 1000);
+                        maxAge = Math.min(maxAge,
+                                (cacheInfo.getNextUpdate() - cacheInfo.getThisUpdate()) / 1000);
                     }
 
-                    response.setHeader("Cache-Control", "max-age=" + maxAge + ",public,no-transform,must-revalidate");
+                    response.setHeader("Cache-Control", "max-age=" + maxAge
+                            + ",public,no-transform,must-revalidate");
                 } // end if(getMethod && cacheInfo != null)
                 response.getOutputStream().write(encodedOcspResp);
             } // end if (ocspRespWithCacheInfo)
@@ -316,7 +324,8 @@ public class HttpOcspServlet extends HttpServlet
             final String message = "Connection reset by peer";
             if(LOG.isErrorEnabled())
             {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
 

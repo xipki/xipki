@@ -46,6 +46,7 @@ public class PermissionCompleter extends EnumCompleter
 
     public PermissionCompleter()
     {
-        setTokens("enroll, revoke, unrevoke, remove, key-update, gen-crl, get-crl, enroll-cross, all");
+        setTokens(
+            "enroll, revoke, unrevoke, remove, key-update, gen-crl, get-crl, enroll-cross, all");
     }
 }

@@ -171,7 +171,8 @@ public abstract class CertRequestGenCmd extends SecurityCmd
 
     @Option(name = "--want-extension",
             multiValued = true,
-            description = "types of extension that should be contaied in the certificate if possible\n"
+            description = "types of extension that should be contaied in the certificate if"
+                    + " possible\n"
                     + "(multi-valued)")
     private List<String> wantExtensionTypes;
 
@@ -202,14 +203,16 @@ public abstract class CertRequestGenCmd extends SecurityCmd
 
         if(isNotEmpty(subjectAltNames))
         {
-            extensions.add(P10RequestGenerator.createExtensionSubjectAltName(subjectAltNames, false));
+            extensions.add(P10RequestGenerator.createExtensionSubjectAltName(
+                    subjectAltNames, false));
             needExtensionTypes.add(Extension.subjectAlternativeName.getId());
         }
 
         // SubjectInfoAccess
         if(isNotEmpty(subjectInfoAccesses))
         {
-            extensions.add(P10RequestGenerator.createExtensionSubjectInfoAccess(subjectInfoAccesses, false));
+            extensions.add(P10RequestGenerator.createExtensionSubjectInfoAccess(
+                    subjectInfoAccesses, false));
             needExtensionTypes.add(Extension.subjectInfoAccess.getId());
         }
 
@@ -265,7 +268,8 @@ public abstract class CertRequestGenCmd extends SecurityCmd
                     int exponent = Integer.parseInt(exponentS);
 
                     MonetaryValue monterayValue = new MonetaryValue(currency, amount, exponent);
-                    QCStatement statment = new QCStatement(ObjectIdentifiers.id_etsi_qcs_QcLimitValue, monterayValue);
+                    QCStatement statment = new QCStatement(
+                            ObjectIdentifiers.id_etsi_qcs_QcLimitValue, monterayValue);
                     v.add(statment);
                 }catch(Exception e)
                 {
@@ -332,10 +336,12 @@ public abstract class CertRequestGenCmd extends SecurityCmd
                     SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
                     SecurityUtil.textToASN1ObjectIdentifers(wantExtensionTypes));
             extensions.add(new Extension(
-                    ObjectIdentifiers.id_xipki_ext_cmRequestExtensions, false, ee.toASN1Primitive().getEncoded()));
+                    ObjectIdentifiers.id_xipki_ext_cmRequestExtensions, false,
+                    ee.toASN1Primitive().getEncoded()));
         }
 
-        ConcurrentContentSigner identifiedSigner = getSigner(hashAlgo, new SignatureAlgoControl(rsaMgf1, dsaPlain));
+        ConcurrentContentSigner identifiedSigner = getSigner(hashAlgo,
+                new SignatureAlgoControl(rsaMgf1, dsaPlain));
         Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());
 
         X500Name subjectDN;

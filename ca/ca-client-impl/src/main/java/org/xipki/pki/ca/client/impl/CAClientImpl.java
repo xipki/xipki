@@ -240,7 +240,8 @@ public final class CAClientImpl implements CAClient
                 final String message = "could not retrieve CAInfo for CA " + name;
                 if(LOG.isWarnEnabled())
                 {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                            t.getMessage());
                 }
                 LOG.debug(message, t);
             }
@@ -308,7 +309,8 @@ public final class CAClientImpl implements CAClient
                 final String message = "could not configure responder " + m.getName();
                 if(LOG.isWarnEnabled())
                 {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                            e.getMessage());
                 }
                 LOG.debug(message, e);
 
@@ -336,9 +338,11 @@ public final class CAClientImpl implements CAClient
                 X509Certificate responder = responders.get(caType.getResponder());
                 if(responder == null)
                 {
-                    throw new InvalidConfException("no responder named " + caType.getResponder() + " is configured");
+                    throw new InvalidConfException("no responder named " + caType.getResponder()
+                            + " is configured");
                 }
-                CAConf ca = new CAConf(caName, caType.getUrl(), caType.getHealthUrl(), caType.getRequestor(), responder);
+                CAConf ca = new CAConf(caName, caType.getUrl(), caType.getHealthUrl(),
+                        caType.getRequestor(), responder);
 
                 // CA cert
                 if(caType.getCaCert().getAutoconf() != null)
@@ -374,7 +378,8 @@ public final class CAClientImpl implements CAClient
                                 conf = new String(IoUtil.read(m.getConf().getFile()));
                             }
                         }
-                        CertprofileInfo profile = new CertprofileInfo(m.getName(), m.getType(), conf);
+                        CertprofileInfo profile = new CertprofileInfo(m.getName(), m.getType(),
+                                conf);
                         profiles.add(profile);
                     }
                     ca.setCertprofiles(profiles);
@@ -387,7 +392,8 @@ public final class CAClientImpl implements CAClient
                 final String message = "could not configure CA " + caName;
                 if(LOG.isWarnEnabled())
                 {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                            e.getMessage());
                 }
                 LOG.debug(message, e);
 
@@ -427,7 +433,8 @@ public final class CAClientImpl implements CAClient
                 try
                 {
                     ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
-                            requestorConf.getSignerType(), requestorConf.getSignerConf(), requestorCert);
+                            requestorConf.getSignerType(), requestorConf.getSignerConf(),
+                            requestorCert);
                     requestorSigners.put(name, requestorSigner);
                 } catch (SignerException e)
                 {
@@ -440,7 +447,8 @@ public final class CAClientImpl implements CAClient
                     throw new InvalidConfException("signer of requestor must be configured");
                 } else if(requestorCert == null)
                 {
-                    throw new InvalidConfException("at least one of certificate and signer of requestor must be configured");
+                    throw new InvalidConfException(
+                        "at least one of certificate and signer of requestor must be configured");
                 }
             }
         }
@@ -572,7 +580,8 @@ public final class CAClientImpl implements CAClient
             caName = getCANameForProfile(profile);
             if(caName == null)
             {
-                throw new CAClientException("cert profile " + profile + " is not supported by any CA");
+                throw new CAClientException("cert profile " + profile
+                        + " is not supported by any CA");
             }
         }
 
@@ -620,7 +629,8 @@ public final class CAClientImpl implements CAClient
             caName = getCANameForProfile(profile);
             if(caName == null)
             {
-                throw new CAClientException("cert profile " + profile + " is not supported by any CA");
+                throw new CAClientException("cert profile " + profile
+                        + " is not supported by any CA");
             }
         }
 
@@ -668,7 +678,8 @@ public final class CAClientImpl implements CAClient
                 CAConf ca = casMap.get(caName);
                 if(ca.supportsProfile(certprofile) == false)
                 {
-                    throw new CAClientException("cert profile " + certprofile + " is not supported by the CA " + caName);
+                    throw new CAClientException("cert profile " + certprofile
+                            + " is not supported by the CA " + caName);
                 }
             }
             return;
@@ -967,7 +978,8 @@ public final class CAClientImpl implements CAClient
             caName = getCANameForProfile(profileName);
             if(caName == null)
             {
-                throw new CAClientException("cert profile " + profileName + " is not supported by any CA");
+                throw new CAClientException("cert profile " + profileName
+                        + " is not supported by any CA");
             }
         }
         else
@@ -1337,7 +1349,8 @@ public final class CAClientImpl implements CAClient
             HttpURLConnection httpUrlConnection = (HttpURLConnection) serverUrl.openConnection();
             InputStream inputStream = httpUrlConnection.getInputStream();
             int responseCode = httpUrlConnection.getResponseCode();
-            if (responseCode != HttpURLConnection.HTTP_OK && responseCode != HttpURLConnection.HTTP_INTERNAL_ERROR)
+            if (responseCode != HttpURLConnection.HTTP_OK
+                    && responseCode != HttpURLConnection.HTTP_INTERNAL_ERROR)
             {
                 inputStream.close();
                 throw new IOException("bad response: "
@@ -1357,7 +1370,8 @@ public final class CAClientImpl implements CAClient
             if (isValidContentType == false)
             {
                 inputStream.close();
-                throw new IOException("bad response: mime type " + responseContentType + " not supported!");
+                throw new IOException("bad response: mime type " + responseContentType
+                        + " not supported!");
             }
 
             byte[] responseBytes = IoUtil.read(inputStream);
@@ -1370,13 +1384,15 @@ public final class CAClientImpl implements CAClient
                 String response = new String(responseBytes);
                 try
                 {
-                    healthCheckResult = HealthCheckResult.getInstanceFromJsonMessage(name, response);
+                    healthCheckResult = HealthCheckResult.getInstanceFromJsonMessage(name,
+                            response);
                 }catch(IllegalArgumentException e)
                 {
                     final String message = "IOException while parsing the health json message";
                     if(LOG.isErrorEnabled())
                     {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                                e.getMessage());
                     }
                     if(LOG.isDebugEnabled())
                     {
@@ -1390,7 +1406,8 @@ public final class CAClientImpl implements CAClient
             final String message = "IOException while calling the URL " + healthUrlStr;
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
 
@@ -1424,10 +1441,12 @@ public final class CAClientImpl implements CAClient
             }
             catch(SAXException e)
             {
-                throw new InvalidConfException("parse profile failed, message: " + e.getMessage(), e);
+                throw new InvalidConfException("parse profile failed, message: " + e.getMessage(),
+                        e);
             } catch(JAXBException e)
             {
-                throw new InvalidConfException("parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e), e);
+                throw new InvalidConfException("parse profile failed, message: "
+                        + XMLUtil.getMessage((JAXBException) e), e);
             }
 
             if(root instanceof JAXBElement)
@@ -1460,7 +1479,8 @@ public final class CAClientImpl implements CAClient
                 } catch (CertificateException e)
                 {
                     throw new CAClientException(
-                            "CertificateParsingException for request (id=" + entry.getId()+"): " + e.getMessage());
+                            "CertificateParsingException for request (id=" + entry.getId()+"): "
+                            + e.getMessage());
                 }
             }
             else if(resultEntry instanceof ErrorResultEntryType)
@@ -1494,7 +1514,8 @@ public final class CAClientImpl implements CAClient
                 final String message = "could not extract the caPub from CMPCertificate";
                 if(LOG.isErrorEnabled())
                 {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                            e.getMessage());
                 }
                 LOG.debug(message, e);
             }
@@ -1539,7 +1560,8 @@ public final class CAClientImpl implements CAClient
 
             if(verify(caCert, cert) == false)
             {
-                LOG.warn("not all certificates are issued by CA embedded in caPubs, ignore the caPubs");
+                LOG.warn("not all certificates are issued by CA embedded in caPubs,"
+                        + " ignore the caPubs");
                 return new EnrollCertResult(null, certOrErrors);
             }
         }

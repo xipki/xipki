@@ -104,7 +104,8 @@ public class DecodedPkiMessage extends PkiMessage
         super(transactionId, messageType, senderNonce);
     }
 
-    private static final Set<ASN1ObjectIdentifier> scepAttrTypes = new HashSet<ASN1ObjectIdentifier>();
+    private static final Set<ASN1ObjectIdentifier> scepAttrTypes
+            = new HashSet<ASN1ObjectIdentifier>();
 
     static
     {
@@ -210,7 +211,8 @@ public class DecodedPkiMessage extends PkiMessage
         Collection<SignerInformation> signerInfos = signerStore.getSigners();
         if(signerInfos.size() != 1)
         {
-            throw new MessageDecodingException("number of signerInfos is not 1, but " + signerInfos.size());
+            throw new MessageDecodingException(
+                    "number of signerInfos is not 1, but " + signerInfos.size());
         }
 
         SignerInformation signerInfo = signerInfos.iterator().next();
@@ -229,7 +231,8 @@ public class DecodedPkiMessage extends PkiMessage
 
         if(signedDataCerts == null || signedDataCerts.size() != 1)
         {
-            throw new MessageDecodingException("could not find embedded certificate to verify the signature");
+            throw new MessageDecodingException(
+                    "could not find embedded certificate to verify the signature");
         }
 
         AttributeTable signedAttrs = signerInfo.getSignedAttributes();
@@ -241,7 +244,8 @@ public class DecodedPkiMessage extends PkiMessage
         Date signingTime = null;
         // signingTime
         {
-            ASN1Encodable attrValue = ScepUtil.getFirstAttrValue(signedAttrs, CMSAttributes.signingTime);
+            ASN1Encodable attrValue = ScepUtil.getFirstAttrValue(signedAttrs,
+                    CMSAttributes.signingTime);
             if(attrValue != null)
             {
                 signingTime = Time.getInstance(attrValue).getDate();
@@ -251,7 +255,8 @@ public class DecodedPkiMessage extends PkiMessage
         // transactionId
         TransactionId transactionId;
         {
-            String s = getPrintableStringAttrValue(signedAttrs, ScepObjectIdentifiers.id_transactionID);
+            String s = getPrintableStringAttrValue(signedAttrs,
+                    ScepObjectIdentifiers.id_transactionID);
             if(s == null || s.isEmpty())
             {
                 throw new MessageDecodingException("missing required SCEP attribute transactionId");
@@ -262,7 +267,8 @@ public class DecodedPkiMessage extends PkiMessage
         // messageType
         MessageType messageType;
         {
-            Integer i = getIntegerPrintStringAttrValue(signedAttrs, ScepObjectIdentifiers.id_messageType);
+            Integer i = getIntegerPrintStringAttrValue(signedAttrs,
+                    ScepObjectIdentifiers.id_messageType);
             if(i == null)
             {
                 throw new MessageDecodingException("tid " + transactionId.getId()
@@ -296,7 +302,8 @@ public class DecodedPkiMessage extends PkiMessage
         Nonce recipientNonce = null;
         try
         {
-            recipientNonce = getNonceAttrValue(signedAttrs, ScepObjectIdentifiers.id_recipientNonce);
+            recipientNonce = getNonceAttrValue(signedAttrs,
+                    ScepObjectIdentifiers.id_recipientNonce);
         } catch (MessageDecodingException e)
         {
             ret.setFailureMessage("could not parse recipientNonce: " + e.getMessage());
@@ -341,7 +348,8 @@ public class DecodedPkiMessage extends PkiMessage
             {
                 try
                 {
-                    i = getIntegerPrintStringAttrValue(signedAttrs, ScepObjectIdentifiers.id_failInfo);
+                    i = getIntegerPrintStringAttrValue(signedAttrs,
+                            ScepObjectIdentifiers.id_failInfo);
                 } catch (MessageDecodingException e)
                 {
                     ret.setFailureMessage("could not parse failInfo: " + e.getMessage());
@@ -402,7 +410,9 @@ public class DecodedPkiMessage extends PkiMessage
                         signerInfo.getEncryptionAlgOID(), signerInfo.getEncryptionAlgParams());
             } catch (Exception e)
             {
-                final String msg = "could not extract digest algorithm from signerInfo.signatureAlgorithm: " + e.getMessage();
+                final String msg =
+                        "could not extract digest algorithm from signerInfo.signatureAlgorithm: "
+                        + e.getMessage();
                 LOG.error(msg);
                 LOG.debug(msg, e);
                 ret.setFailureMessage(msg);
@@ -410,12 +420,14 @@ public class DecodedPkiMessage extends PkiMessage
             }
             if(digestAlgOID.equals(_digestAlgOID) == false)
             {
-                ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use the same digestAlgorithm");
+                ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use the"
+                        + " same digestAlgorithm");
                 return ret;
             }
         }
 
-        X509CertificateHolder _signerCert = (X509CertificateHolder) signedDataCerts.iterator().next();
+        X509CertificateHolder _signerCert =
+                (X509CertificateHolder) signedDataCerts.iterator().next();
         X509Certificate signerCert;
         try
         {

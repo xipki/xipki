@@ -79,7 +79,8 @@ public abstract class AbstractEnrollCertCmd extends ClientCmd
         ScepClient client = getScepClient();
 
         CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(p10File));
-        EnrolmentResponse resp = requestCertificate(client, csr, getIdentityKey(), getIdentityCert());
+        EnrolmentResponse resp = requestCertificate(client, csr, getIdentityKey(),
+                getIdentityCert());
         if(resp.isFailure())
         {
             throw new CmdFailure("server returned 'failure'");
