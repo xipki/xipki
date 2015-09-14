@@ -127,7 +127,8 @@ public class SoftTokenContentSignerBuilder
             final X509Certificate[] certificateChain)
     throws SignerException
     {
-        if(("PKCS12".equalsIgnoreCase(keystoreType) || "JKS".equalsIgnoreCase(keystoreType)) == false)
+        if(("PKCS12".equalsIgnoreCase(keystoreType)
+                || "JKS".equalsIgnoreCase(keystoreType)) == false)
         {
             throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
         }
@@ -172,7 +173,9 @@ public class SoftTokenContentSignerBuilder
 
             this.key = (PrivateKey) ks.getKey(keyname, keyPassword);
 
-            if( (key instanceof RSAPrivateKey || key instanceof DSAPrivateKey || key instanceof ECPrivateKey) == false)
+            if( (key instanceof RSAPrivateKey
+                    || key instanceof DSAPrivateKey
+                    || key instanceof ECPrivateKey) == false)
             {
                 throw new SignerException("unsupported key " + key.getClass().getName());
             }
@@ -302,7 +305,8 @@ public class SoftTokenContentSignerBuilder
                 }
                 else
                 {
-                    throw new OperatorCreationException("unsupported key " + key.getClass().getName());
+                    throw new OperatorCreationException("unsupported key "
+                            + key.getClass().getName());
                 }
             } catch (InvalidKeyException e)
             {
@@ -529,7 +533,8 @@ public class SoftTokenContentSignerBuilder
             } catch (InvalidKeyException e)
             {
                 e.printStackTrace();
-                throw new RuntimeCryptoException("could not initialize the cipher: " + e.getMessage());
+                throw new RuntimeCryptoException("could not initialize the cipher: "
+                        + e.getMessage());
             }
         }
 

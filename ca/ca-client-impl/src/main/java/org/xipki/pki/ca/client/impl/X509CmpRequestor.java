@@ -144,7 +144,8 @@ import org.xml.sax.SAXException;
 
 abstract class X509CmpRequestor extends CmpRequestor
 {
-    private final static DigestCalculatorProvider digesetCalculatorProvider = new BcDigestCalculatorProvider();
+    private final static DigestCalculatorProvider digesetCalculatorProvider
+            = new BcDigestCalculatorProvider();
     private static final BigInteger MINUS_ONE = BigInteger.valueOf(-1);
 
     private static final Logger LOG = LoggerFactory.getLogger(X509CmpRequestor.class);
@@ -311,7 +312,8 @@ abstract class X509CmpRequestor extends CmpRequestor
             final RequestResponseDebug debug)
     throws CmpRequestorException, PKIErrorException
     {
-        PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request, CRLReason.REMOVE_FROM_CRL.getCode());
+        PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request,
+                CRLReason.REMOVE_FROM_CRL.getCode());
         PKIResponse response = signAndSend(reqMessage, debug);
         return parse(response, request.getRequestEntries());
     }
@@ -321,7 +323,8 @@ abstract class X509CmpRequestor extends CmpRequestor
             final RequestResponseDebug debug)
     throws CmpRequestorException, PKIErrorException
     {
-        PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request, XipkiCmpConstants.CRL_REASON_REMOVE);
+        PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request,
+                XipkiCmpConstants.CRL_REASON_REMOVE);
         PKIResponse response = signAndSend(reqMessage, debug);
         return parse(response, request.getRequestEntries());
     }
@@ -550,8 +553,10 @@ abstract class X509CmpRequestor extends CmpRequestor
                         certHolder = new X509CertificateHolder(cmpCert.getEncoded());
                     }catch(IOException e)
                     {
-                        resultEntry = new ErrorResultEntryType(thisId, ClientErrorCode.PKIStatus_RESPONSE_ERROR,
-                                PKIFailureInfo.systemFailure, "error while decode the certificate");
+                        resultEntry = new ErrorResultEntryType(thisId,
+                                ClientErrorCode.PKIStatus_RESPONSE_ERROR,
+                                PKIFailureInfo.systemFailure,
+                                "error while decode the certificate");
                     }
 
                     if(certHolder != null)
@@ -577,7 +582,8 @@ abstract class X509CmpRequestor extends CmpRequestor
         {
             for(BigInteger reqId : reqIdIdMap.keySet())
             {
-                ErrorResultEntryType ere = new ErrorResultEntryType(reqIdIdMap.get(reqId), ClientErrorCode.PKIStatus_NO_ANSWER);
+                ErrorResultEntryType ere = new ErrorResultEntryType(reqIdIdMap.get(reqId),
+                        ClientErrorCode.PKIStatus_NO_ANSWER);
                 result.addResultEntry(ere);
             }
         }
@@ -587,7 +593,8 @@ abstract class X509CmpRequestor extends CmpRequestor
             return result;
         }
 
-        PKIMessage confirmRequest = buildCertConfirmRequest(response.getPkiMessage().getHeader().getTransactionID(),
+        PKIMessage confirmRequest = buildCertConfirmRequest(
+                response.getPkiMessage().getHeader().getTransactionID(),
                 certConfirmBuilder);
 
         response = signAndSend(confirmRequest, debug);
@@ -708,7 +715,8 @@ abstract class X509CmpRequestor extends CmpRequestor
             final P10EnrollCertRequestType p10Req,
             final String username)
     {
-        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, p10Req.getCertprofile());
+        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE,
+                p10Req.getCertprofile());
         if(StringUtil.isNotBlank(username))
         {
             utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_USER, username);
@@ -732,7 +740,8 @@ abstract class X509CmpRequestor extends CmpRequestor
         for(int i = 0; i < reqEntries.size(); i++)
         {
             EnrollCertRequestEntryType reqEntry = reqEntries.get(i);
-            CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, reqEntry.getCertprofile());
+            CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE,
+                    reqEntry.getCertprofile());
             AttributeTypeAndValue certprofileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
 
             AttributeTypeAndValue[] atvs = (certprofileInfo == null)
@@ -856,7 +865,8 @@ abstract class X509CmpRequestor extends CmpRequestor
             Set<String> profileNames = new HashSet<>();
             if(profilesElement != null)
             {
-                List<Element> profileElements = XMLUtil.getElementChilden(profilesElement, namespace, "certprofile");
+                List<Element> profileElements = XMLUtil.getElementChilden(
+                        profilesElement, namespace, "certprofile");
 
                 for(Element element : profileElements)
                 {
@@ -932,8 +942,9 @@ abstract class X509CmpRequestor extends CmpRequestor
 
         if(LOG.isDebugEnabled())
         {
-            LOG.debug("removeExpiredCertsResp for (profile={}, usernameLike={}, overlapSeconds={}): {}",
-                    new Object[]{certprofile, userLike, overlapSeconds, resultInfoStr});
+            LOG.debug(
+                "removeExpiredCertsResp for (profile={}, usernameLike={}, overlapSeconds={}): {}",
+                new Object[]{certprofile, userLike, overlapSeconds, resultInfoStr});
         }
         Document doc;
         try
@@ -941,13 +952,15 @@ abstract class X509CmpRequestor extends CmpRequestor
             doc = xmlDocBuilder.parse(new ByteArrayInputStream(resultInfoStr.getBytes("UTF-8")));
         } catch (SAXException | IOException e)
         {
-            throw new CmpRequestorException("could not parse the returned removeExpiredCertsResp", e);
+            throw new CmpRequestorException("could not parse the returned removeExpiredCertsResp",
+                    e);
         }
 
         String namespace = null;
 
         RemoveExpiredCertsResult result = new RemoveExpiredCertsResult();
-        String nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "numCerts");
+        String nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(),
+                namespace, "numCerts");
         if(nodeValue != null)
         {
             try
@@ -959,19 +972,22 @@ abstract class X509CmpRequestor extends CmpRequestor
             }
         }
 
-        nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "userLike");
+        nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace,
+                "userLike");
         if(nodeValue != null)
         {
             result.setUserLike(nodeValue);
         }
 
-        nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "profile");
+        nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace,
+                "profile");
         if(nodeValue != null)
         {
             result.setCertprofile(nodeValue);
         }
 
-        nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "expiredAt");
+        nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace,
+                "expiredAt");
         if(nodeValue != null)
         {
             try

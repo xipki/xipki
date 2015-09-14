@@ -50,7 +50,8 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier>
     {
         if(slotIndex == null && slotId == null)
         {
-            throw new IllegalArgumentException("at least one of slotIndex an slotId must be non-null");
+            throw new IllegalArgumentException(
+                    "at least one of slotIndex an slotId must be non-null");
         }
         this.slotIndex = slotIndex;
         this.slotId = slotId;

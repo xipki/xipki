@@ -92,8 +92,9 @@ public class SignerUtil
         {
             RSAPrivateCrtKey k = (RSAPrivateCrtKey)key;
 
-            return new RSAPrivateCrtKeyParameters(k.getModulus(), k.getPublicExponent(), k.getPrivateExponent(),
-                k.getPrimeP(), k.getPrimeQ(), k.getPrimeExponentP(), k.getPrimeExponentQ(), k.getCrtCoefficient());
+            return new RSAPrivateCrtKeyParameters(k.getModulus(), k.getPublicExponent(),
+                    k.getPrivateExponent(), k.getPrimeP(), k.getPrimeQ(),
+                    k.getPrimeExponentP(), k.getPrimeExponentQ(), k.getCrtCoefficient());
         }
         else
         {
@@ -117,7 +118,8 @@ public class SignerUtil
     {
         if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()) == false)
         {
-            throw new OperatorCreationException("signature algorithm " + sigAlgId.getAlgorithm() + " is not allowed");
+            throw new OperatorCreationException("signature algorithm " + sigAlgId.getAlgorithm()
+                + " is not allowed");
         }
 
         BcDigestProvider digestProvider = BcDefaultDigestProvider.INSTANCE;

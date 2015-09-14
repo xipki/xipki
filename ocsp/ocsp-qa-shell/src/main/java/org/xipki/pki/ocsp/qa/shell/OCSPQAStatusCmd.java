@@ -116,12 +116,14 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCmd
     {
         if(isBlank(errorText) && isEmpty(statusTexts))
         {
-            throw new IllegalArgumentException("neither expError nor expStatus is set, this is not permitted");
+            throw new IllegalArgumentException(
+                    "neither expError nor expStatus is set, this is not permitted");
         }
 
         if(isNotBlank(errorText) && isNotEmpty(statusTexts))
         {
-            throw new IllegalArgumentException("both expError and expStatus are set, this is not permitted");
+            throw new IllegalArgumentException(
+                    "both expError and expStatus are set, this is not permitted");
         }
 
         if(isNotBlank(errorText))
@@ -151,7 +153,8 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCmd
                 OcspCertStatus certStatus = OcspCertStatus.getInstance(expectedStatusText);
                 if(certStatus == null)
                 {
-                    throw new IllegalArgumentException("invalid cert status '" + expectedStatusText + "'");
+                    throw new IllegalArgumentException(
+                            "invalid cert status '" + expectedStatusText + "'");
                 }
                 expectedStatuses.put(serialNumbers.get(i), certStatus);
             }

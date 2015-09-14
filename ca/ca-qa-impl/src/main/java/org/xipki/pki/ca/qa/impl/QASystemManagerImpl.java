@@ -124,7 +124,8 @@ public class QASystemManagerImpl implements QASystemManager
             }
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), exceptionMessage);
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        exceptionMessage);
             }
             LOG.debug(message, e);
             return;
@@ -141,10 +142,12 @@ public class QASystemManagerImpl implements QASystemManager
                     certBytes = readData(issuerType.getCert());
                 } catch (IOException e)
                 {
-                    final String message = "could not read the certificate bytes of issuer " + issuerType.getName();
+                    final String message = "could not read the certificate bytes of issuer "
+                            + issuerType.getName();
                     if(LOG.isErrorEnabled())
                     {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                                e.getMessage());
                     }
                     LOG.debug(message, e);
                     continue;
@@ -153,14 +156,18 @@ public class QASystemManagerImpl implements QASystemManager
                 X509IssuerInfo issuerInfo;
                 try
                 {
-                    issuerInfo = new X509IssuerInfo(issuerType.getCaIssuerUrl(), issuerType.getOcspUrl(),
-                            issuerType.getCrlUrl(), issuerType.getDeltaCrlUrl(), certBytes);
+                    issuerInfo = new X509IssuerInfo(issuerType.getCaIssuerUrl(),
+                            issuerType.getOcspUrl(),
+                            issuerType.getCrlUrl(),
+                            issuerType.getDeltaCrlUrl(), certBytes);
                 } catch (CertificateException e)
                 {
-                    final String message = "could not parse certificate of issuer " + issuerType.getName();
+                    final String message =
+                            "could not parse certificate of issuer " + issuerType.getName();
                     if(LOG.isErrorEnabled())
                     {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        LOG.error(LogUtil.buildExceptionLogFormat(message),
+                                e.getClass().getName(), e.getMessage());
                     }
                     LOG.debug(message, e);
                     continue;
@@ -173,7 +180,8 @@ public class QASystemManagerImpl implements QASystemManager
 
         if(qaConf.getX509Certprofiles() != null)
         {
-            List<X509CertprofileType> certprofileTypes = qaConf.getX509Certprofiles().getX509Certprofile();
+            List<X509CertprofileType> certprofileTypes =
+                    qaConf.getX509Certprofiles().getX509Certprofile();
             for(X509CertprofileType type : certprofileTypes)
             {
                 String name = type.getName();
@@ -187,7 +195,8 @@ public class QASystemManagerImpl implements QASystemManager
                     final String message = "could not parse QA certificate profile " + name;
                     if(LOG.isErrorEnabled())
                     {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        LOG.error(LogUtil.buildExceptionLogFormat(message),
+                                e.getClass().getName(), e.getMessage());
                     }
                     LOG.debug(message, e);
                     continue;

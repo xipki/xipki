@@ -162,12 +162,14 @@ public class CALoadTestEnroll extends LoadExecutor
                 {
                     String id = "id-" + certId;
                     EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType
-                            (id, loadtestEntry.getCertprofile(), certRequests.get(certId), RA_VERIFIED);
+                            (id, loadtestEntry.getCertprofile(),
+                                    certRequests.get(certId), RA_VERIFIED);
 
                     request.addRequestEntry(requestEntry);
                 }
 
-                result = caClient.requestCerts(request, null, userPrefix + System.currentTimeMillis(), null);
+                result = caClient.requestCerts(request, null,
+                        userPrefix + System.currentTimeMillis(), null);
             } catch (CAClientException | PKIErrorException e)
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());

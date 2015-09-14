@@ -87,7 +87,8 @@ public class SimpleXPath
             {
                 if(stepNo != countTokens)
                 {
-                    throw new XPathExpressionException("attribute is only allowed in the last step");
+                    throw new XPathExpressionException(
+                            "attribute is only allowed in the last step");
                 }
                 else
                 {

@@ -162,7 +162,8 @@ public class P11ListSlotCmd extends SecurityCmd
                     .append(getKeyAlgorithm(pubKey))
                     .append("\n");
 
-                X509PublicKeyCertificate cert = removeCertificateObject(allCertObjects, keyId, keyLabel);
+                X509PublicKeyCertificate cert = removeCertificateObject(allCertObjects, keyId,
+                        keyLabel);
                 if(cert == null)
                 {
                     sb.append("\t\tCertificate: NONE\n");
@@ -387,7 +388,8 @@ public class P11ListSlotCmd extends SecurityCmd
             {
                 try
                 {
-                    ASN1ObjectIdentifier curveId = (ASN1ObjectIdentifier) ASN1ObjectIdentifier.fromByteArray(paramBytes);
+                    ASN1ObjectIdentifier curveId =
+                            (ASN1ObjectIdentifier) ASN1ObjectIdentifier.fromByteArray(paramBytes);
                     String curveName = getCurveName(curveId);
                     return "EC (named curve " + curveName + ")";
                 }catch(Exception e)

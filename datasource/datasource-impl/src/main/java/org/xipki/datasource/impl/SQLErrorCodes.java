@@ -162,9 +162,11 @@ public class SQLErrorCodes
         DB2()
         {
             super();
-            badSqlGrammarCodes = toSet(-7, -29, -97, -104, -109, -115, -128, -199, -204, -206, -301, -408, -441, -491);
+            badSqlGrammarCodes = toSet(-7, -29, -97, -104, -109, -115, -128, -199, -204, -206, -301,
+                    -408, -441, -491);
             duplicateKeyCodes = toSet(-803);
-            dataIntegrityViolationCodes = toSet(-407, -530, -531, -532, -543, -544, -545, -603, -667);
+            dataIntegrityViolationCodes = toSet(-407, -530, -531, -532, -543, -544, -545, -603,
+                    -667);
             dataAccessResourceFailureCodes = toSet(-904, -971);
             transientDataAccessResourceCodes = toSet(-1035, -1218, -30080, -30081);
             deadlockLoserCodes = toSet(-911, -913);
@@ -176,10 +178,11 @@ public class SQLErrorCodes
         H2()
         {
             super();
-            badSqlGrammarCodes = toSet(42000, 42001, 42101, 42102, 42111, 42112, 42121, 42122, 42132);
+            badSqlGrammarCodes = toSet(42000, 42001, 42101, 42102, 42111, 42112, 42121, 42122,
+                    42132);
             duplicateKeyCodes = toSet(23001, 23505);
-            dataIntegrityViolationCodes = toSet(22001, 22003, 22012, 22018, 22025, 23000, 23002, 23003,
-                    23502, 23503, 23506, 23507, 23513);
+            dataIntegrityViolationCodes = toSet(22001, 22003, 22012, 22018, 22025, 23000, 23002,
+                    23003, 23502, 23503, 23506, 23507, 23513);
             dataAccessResourceFailureCodes = toSet(90046,90100,90117,90121,90126);
             cannotAcquireLockCodes = toSet(50200);
         }
@@ -204,7 +207,8 @@ public class SQLErrorCodes
             super();
             badSqlGrammarCodes = toSet(1054, 1064, 1146);
             duplicateKeyCodes = toSet(1062);
-            dataIntegrityViolationCodes = toSet(630, 839, 840, 893, 1169, 1215, 1216, 1217, 1364, 1451, 1452, 1557);
+            dataIntegrityViolationCodes = toSet(630, 839, 840, 893, 1169, 1215, 1216, 1217, 1364,
+                    1451, 1452, 1557);
             dataAccessResourceFailureCodes = toSet(1);
             cannotAcquireLockCodes = toSet(1205);
             deadlockLoserCodes = toSet(1213);
@@ -233,7 +237,8 @@ public class SQLErrorCodes
         {
             super();
             useSqlStateForTranslation = true;
-            badSqlGrammarCodes = toSet("03000", "42000", "42601", "42602", "42622", "42804", "42P01");
+            badSqlGrammarCodes = toSet("03000", "42000", "42601", "42602", "42622", "42804",
+                    "42P01");
             duplicateKeyCodes = toSet(23505);
             dataIntegrityViolationCodes = toSet(23000, 23502, 23503, 23514);
             dataAccessResourceFailureCodes = toSet(53000, 53100, 53200, 53300);

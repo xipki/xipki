@@ -159,7 +159,8 @@ public class CaDbImportWorker extends DbPortWorker
 
             // CertStore
             CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(
-                    dataSource, unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe, evaluateOnly);
+                    dataSource, unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe,
+                    evaluateOnly);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
 

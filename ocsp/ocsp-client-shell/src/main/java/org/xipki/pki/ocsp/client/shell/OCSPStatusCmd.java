@@ -151,7 +151,8 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
 
             if(validOn)
             {
-                PublicKey responderPubKey = KeyUtil.generatePublicKey(respSigner.getSubjectPublicKeyInfo());
+                PublicKey responderPubKey = KeyUtil.generatePublicKey(
+                        respSigner.getSubjectPublicKeyInfo());
                 ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(responderPubKey);
                 boolean sigValid = basicResp.isSignatureValid(cvp);
 
@@ -164,7 +165,8 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
                 if(respIssuer != null)
                 {
                     boolean certValid = true;
-                    X509Certificate jceRespSigner = new X509CertificateObject(respSigner.toASN1Structure());
+                    X509Certificate jceRespSigner = new X509CertificateObject(
+                            respSigner.toASN1Structure());
                     if(X509Util.issues(respIssuer, jceRespSigner))
                     {
                         try
@@ -178,8 +180,8 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
 
                     if(certValid == false)
                     {
-                        throw new CmdFailure(
-                                "response is equipped with valid signature but the OCSP signer is not trusted");
+                        throw new CmdFailure("response is equipped with valid signature but the"
+                                + " OCSP signer is not trusted");
                     }
                 }
                 else
@@ -334,7 +336,8 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
                     int size = extensionOIDs.size();
                     for(int j = 0; j < size; j++)
                     {
-                        ASN1ObjectIdentifier extensionOID = (ASN1ObjectIdentifier) extensionOIDs.get(j);
+                        ASN1ObjectIdentifier extensionOID =
+                                (ASN1ObjectIdentifier) extensionOIDs.get(j);
                         String name = extensionOidNameMap.get(extensionOID);
                         if(name == null)
                         {

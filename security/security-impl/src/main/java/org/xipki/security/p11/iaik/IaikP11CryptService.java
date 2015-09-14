@@ -67,7 +67,8 @@ public final class IaikP11CryptService implements P11CryptService
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11CryptService.class);
     private static final long MIN_RECONNECT_INTERVAL = 60L * 1000;
 
-    private final ConcurrentSkipListSet<IaikP11Identity> identities = new ConcurrentSkipListSet<>();
+    private final ConcurrentSkipListSet<IaikP11Identity> identities =
+            new ConcurrentSkipListSet<>();
 
     private IaikP11Module extModule;
 
@@ -131,10 +132,12 @@ public final class IaikP11CryptService implements P11CryptService
             this.extModule = IaikP11ModulePool.getInstance().getModule(moduleConf);
         }catch(SignerException e)
         {
-            final String message = "could not initialize the PKCS#11 Module for " + moduleConf.getName();
+            final String message = "could not initialize the PKCS#11 Module for "
+                    + moduleConf.getName();
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
             throw e;
@@ -159,7 +162,8 @@ public final class IaikP11CryptService implements P11CryptService
                 final String message = "SignerException while initializing slot " + slotId;
                 if(LOG.isWarnEnabled())
                 {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                            e.getMessage());
                 }
                 LOG.debug(message, e);
                 continue;
@@ -168,7 +172,8 @@ public final class IaikP11CryptService implements P11CryptService
                 final String message = "unexpected error while initializing slot " + slotId;
                 if(LOG.isWarnEnabled())
                 {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                            t.getMessage());
                 }
                 LOG.debug(message, t);
                 continue;
@@ -222,7 +227,8 @@ public final class IaikP11CryptService implements P11CryptService
             final String message = "error while calling identity.CKM_RSA_PKCS()";
             if(LOG.isWarnEnabled())
             {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
             if(reconnect())
@@ -262,7 +268,8 @@ public final class IaikP11CryptService implements P11CryptService
             final String message = "error while calling identity.CKM_RSA_X_509()";
             if(LOG.isWarnEnabled())
             {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
             if(reconnect())
@@ -313,7 +320,8 @@ public final class IaikP11CryptService implements P11CryptService
             final String message = "error while calling identity.CKM_ECDSA()";
             if(LOG.isWarnEnabled())
             {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
             if(reconnect())
@@ -364,7 +372,8 @@ public final class IaikP11CryptService implements P11CryptService
             final String message = "error while calling identity.CKM_DSA()";
             if(LOG.isWarnEnabled())
             {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
             if(reconnect())

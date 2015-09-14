@@ -58,14 +58,17 @@ public class ProcessLog
 
     public static void printHeader()
     {
-        System.out.println("----------------------------------------------------------------------------");
-        System.out.println("    processed   percent       time       #/s        ETA   AVG-#/s    AVG-ETA");
+        System.out.println(
+                "----------------------------------------------------------------------------");
+        System.out.println(
+                "    processed   percent       time       #/s        ETA   AVG-#/s    AVG-ETA");
         System.out.flush();
     }
 
     public static void printTrailer()
     {
-        System.out.println("\n----------------------------------------------------------------------------");
+        System.out.println(
+                "\n----------------------------------------------------------------------------");
         System.out.flush();
     }
 

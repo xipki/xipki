@@ -106,7 +106,8 @@ public class SQLStateCodes
     private SQLStateCodes()
     {
         badSQLGrammarCodes = toSet(bge_dynamic_SQL_error, bge_cardinality_violation,
-                bge_syntax_error_directSQL,    bge_syntax_error_dynamicSQL, bge_general_SQL_syntax_error);
+                bge_syntax_error_directSQL, bge_syntax_error_dynamicSQL,
+                bge_general_SQL_syntax_error);
         dataIntegrityViolationCodes = toSet(div_data_truncation, div_integrity_constraint_violation,
                 div_no_data_found, div_triggered_data_change_violation,
                 div_value_outof_range, div_with_check_violation);

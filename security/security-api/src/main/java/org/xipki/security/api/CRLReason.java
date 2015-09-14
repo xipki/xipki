@@ -117,8 +117,9 @@ public enum CRLReason
             new CRLReason[]
             {
                 CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE,
-                CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED, CRLReason.CESSATION_OF_OPERATION,
-                CRLReason.CERTIFICATE_HOLD,    CRLReason.PRIVILEGE_WITHDRAWN}));
+                CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED,
+                CRLReason.CESSATION_OF_OPERATION,
+                CRLReason.CERTIFICATE_HOLD, CRLReason.PRIVILEGE_WITHDRAWN}));
 
     private final int code;
     private final String desription;

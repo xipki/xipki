@@ -143,7 +143,8 @@ class RSAPSSSignatureSpi
     {
         if(privateKey instanceof P11PrivateKey == false)
         {
-            throw new InvalidKeyException("privateKey is not instanceof " + P11PrivateKey.class.getName());
+            throw new InvalidKeyException("privateKey is not instanceof "
+                    + P11PrivateKey.class.getName());
         }
 
         String algo = privateKey.getAlgorithm();
@@ -157,7 +158,8 @@ class RSAPSSSignatureSpi
         pss = new org.bouncycastle.crypto.signers.PSSSigner(
                 signer, contentDigest, mgfDigest, saltLength, trailer);
 
-        P11RSAKeyParameter p11RSAKeyParam = P11RSAKeyParameter.getInstance(signingKey.getP11CryptService(),
+        P11RSAKeyParameter p11RSAKeyParam = P11RSAKeyParameter.getInstance(
+                signingKey.getP11CryptService(),
                 signingKey.getSlotId(), signingKey.getKeyId());
         pss.init(true, p11RSAKeyParam);
     }
@@ -215,9 +217,11 @@ class RSAPSSSignatureSpi
 
             if (originalSpec != null)
             {
-                if (DigestFactory.isSameDigest(originalSpec.getDigestAlgorithm(), newParamSpec.getDigestAlgorithm()) == false)
+                if (DigestFactory.isSameDigest(originalSpec.getDigestAlgorithm(),
+                        newParamSpec.getDigestAlgorithm()) == false)
                 {
-                    throw new InvalidParameterException("parameter must be using " + originalSpec.getDigestAlgorithm());
+                    throw new InvalidParameterException("parameter must be using "
+                + originalSpec.getDigestAlgorithm());
                 }
             }
             if ((newParamSpec.getMGFAlgorithm().equalsIgnoreCase("MGF1") == false)
@@ -234,16 +238,19 @@ class RSAPSSSignatureSpi
 
             MGF1ParameterSpec mgfParams = (MGF1ParameterSpec)newParamSpec.getMGFParameters();
 
-            if (DigestFactory.isSameDigest(mgfParams.getDigestAlgorithm(), newParamSpec.getDigestAlgorithm()) == false)
+            if (DigestFactory.isSameDigest(mgfParams.getDigestAlgorithm(),
+                    newParamSpec.getDigestAlgorithm()) == false)
             {
-                throw new InvalidParameterException("digest algorithm for MGF should be the same as for PSS parameters.");
+                throw new InvalidParameterException(
+                        "digest algorithm for MGF should be the same as for PSS parameters.");
             }
 
             Digest newDigest = DigestFactory.getDigest(mgfParams.getDigestAlgorithm());
 
             if (newDigest == null)
             {
-                throw new InvalidParameterException("no match on MGF digest algorithm: "+ mgfParams.getDigestAlgorithm());
+                throw new InvalidParameterException(
+                        "no match on MGF digest algorithm: "+ mgfParams.getDigestAlgorithm());
             }
 
             this.engineParams = null;
@@ -268,7 +275,8 @@ class RSAPSSSignatureSpi
             {
                 try
                 {
-                    engineParams = AlgorithmParameters.getInstance("PSS", BouncyCastleProvider.PROVIDER_NAME);
+                    engineParams = AlgorithmParameters.getInstance("PSS",
+                            BouncyCastleProvider.PROVIDER_NAME);
                     engineParams.init(paramSpec);
                 }
                 catch (Exception e)
@@ -282,7 +290,8 @@ class RSAPSSSignatureSpi
     }
 
     /**
-     * @deprecated replaced with <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
+     * @deprecated replaced with
+     * <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
      */
     protected void engineSetParameter(
             final String param,
@@ -333,7 +342,8 @@ class RSAPSSSignatureSpi
     {
         public SHA224withRSA()
         {
-            super(new PSSParameterSpec("SHA-224", "MGF1", new MGF1ParameterSpec("SHA-224"), 28, 1));
+            super(new PSSParameterSpec("SHA-224", "MGF1",
+                    new MGF1ParameterSpec("SHA-224"), 28, 1));
         }
     }
 
@@ -342,7 +352,8 @@ class RSAPSSSignatureSpi
     {
         public SHA256withRSA()
         {
-            super(new PSSParameterSpec("SHA-256", "MGF1", new MGF1ParameterSpec("SHA-256"), 32, 1));
+            super(new PSSParameterSpec("SHA-256", "MGF1",
+                    new MGF1ParameterSpec("SHA-256"), 32, 1));
         }
     }
 
@@ -351,7 +362,8 @@ class RSAPSSSignatureSpi
     {
         public SHA384withRSA()
         {
-            super(new PSSParameterSpec("SHA-384", "MGF1", new MGF1ParameterSpec("SHA-384"), 48, 1));
+            super(new PSSParameterSpec("SHA-384", "MGF1",
+                    new MGF1ParameterSpec("SHA-384"), 48, 1));
         }
     }
 
@@ -360,7 +372,8 @@ class RSAPSSSignatureSpi
     {
         public SHA512withRSA()
         {
-            super(new PSSParameterSpec("SHA-512", "MGF1", new MGF1ParameterSpec("SHA-512"), 64, 1));
+            super(new PSSParameterSpec("SHA-512", "MGF1",
+                    new MGF1ParameterSpec("SHA-512"), 64, 1));
         }
     }
 

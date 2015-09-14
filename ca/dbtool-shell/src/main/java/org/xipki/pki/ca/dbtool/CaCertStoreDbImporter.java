@@ -111,9 +111,10 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
 
     private static final String SQL_ADD_CRL =
             "INSERT INTO CRL (ID, CA_ID, CRL_NO, THISUPDATE, NEXTUPDATE, DELTACRL, BASECRL_NO, CRL)"
-                    + " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            + " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private static final String SQL_ADD_USER = "INSERT INTO USERNAME (ID, NAME, PASSWORD,CN_REGEX) VALUES (?, ?, ?, ?)";
+    private static final String SQL_ADD_USER =
+            "INSERT INTO USERNAME (ID, NAME, PASSWORD,CN_REGEX) VALUES (?, ?, ?, ?)";
 
     private final Unmarshaller unmarshaller;
     private final boolean resume;
@@ -180,7 +181,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
 
         if(certstore.getVersion() > VERSION)
         {
-            throw new Exception("could not import CertStore greater than " + VERSION + ": " + certstore.getVersion());
+            throw new Exception("could not import CertStore greater than " + VERSION + ": "
+                    + certstore.getVersion());
         }
 
         File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
@@ -242,11 +244,13 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     ps.execute();
                 }catch(SQLException e)
                 {
-                    System.err.println("error while importing CS_CA with ID=" + m.getId() + ", message: " + e.getMessage());
+                    System.err.println("error while importing CS_CA with ID=" + m.getId()
+                        + ", message: " + e.getMessage());
                     throw translate(sql, e);
                 }catch(IllegalArgumentException | IOException e)
                 {
-                    System.err.println("error while importing CS_CA with ID=" + m.getId() + ", message: " + e.getMessage());
+                    System.err.println("error while importing CS_CA with ID=" + m.getId()
+                        + ", message: " + e.getMessage());
                     throw e;
                 }
             }
@@ -376,7 +380,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
 
         PreparedStatement ps = prepareStatement(SQL_ADD_USER);
 
-        ProcessLog processLog = new ProcessLog(certstore.getCountUsers(), System.currentTimeMillis(), 0);
+        ProcessLog processLog = new ProcessLog(certstore.getCountUsers(),
+                System.currentTimeMillis(), 0);
         System.out.println(getImportingText() + "users from ID 1");
         ProcessLog.printHeader();
 
@@ -473,7 +478,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
 
                 boolean isLastBlock = users.hasNext() == false;
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || isLastBlock))
+                if(numEntriesInBatch > 0
+                        && (numEntriesInBatch % numEntriesPerCommit == 0 || isLastBlock))
                 {
                     if(evaulateOnly)
                     {
@@ -540,7 +546,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     ps.execute();
                 }catch(SQLException e)
                 {
-                    System.err.println("error while importing PUBLISHQUEUE with CID=" + tbp.getCertId()
+                    System.err.println("error while importing PUBLISHQUEUE with CID="
+                            + tbp.getCertId()
                             + " and PID=" + tbp.getPubId() + ", message: " + e.getMessage());
                     throw translate(sql, e);
                 }
@@ -600,7 +607,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
 
         PreparedStatement ps = prepareStatement(SQL_ADD_CRL);
 
-        ProcessLog processLog = new ProcessLog(certstore.getCountCrls(), System.currentTimeMillis(), 0);
+        ProcessLog processLog = new ProcessLog(
+                certstore.getCountCrls(), System.currentTimeMillis(), 0);
         System.out.println(getImportingText() + "CRLs from ID 1");
         ProcessLog.printHeader();
 
@@ -764,7 +772,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
 
                 boolean isLastBlock = crls.hasNext() == false;
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || isLastBlock))
+                if(numEntriesInBatch > 0
+                        && (numEntriesInBatch % numEntriesPerCommit == 0 || isLastBlock))
                 {
                     if(evaulateOnly)
                     {
@@ -838,7 +847,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
         deleteCertGreatherThan(minId - 1);
 
         final long total = certstore.getCountCerts() - numProcessedBefore;
-        final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore);
+        final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(),
+                numProcessedBefore);
 
         System.out.println(getImportingText() + "certificates from ID " + minId);
         ProcessLog.printHeader();
@@ -1036,7 +1046,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     setInt(ps_cert, idx++, cert.getRid());
                     ps_cert.setString(idx++, cert.getUser());
                     ps_cert.setLong(idx++, FpIdCalculator.hash(encodedKey));
-                    Extension extension = c.getExtensions().getExtension(Extension.basicConstraints);
+                    Extension extension =
+                            c.getExtensions().getExtension(Extension.basicConstraints);
                     boolean ee = true;
                     if(extension != null)
                     {
@@ -1048,7 +1059,12 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                         {
                         }
                     }
-                    ps_cert.setInt(idx++, ee ? 1 : 0);
+
+                    int i_ee = ee
+                            ? 1
+                            : 0;
+                    ps_cert.setInt(idx++, i_ee);
+
                     ps_cert.setInt(idx++, cert.getReqType());
                     String tidS = null;
                     if(cert.getTid() != null)
@@ -1076,7 +1092,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                 }
 
                 boolean isLastBlock = certs.hasNext() == false;
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % numEntriesPerCommit == 0 || isLastBlock))
+                if(numEntriesInBatch > 0
+                        && (numEntriesInBatch % numEntriesPerCommit == 0 || isLastBlock))
                 {
                     if(evaulateOnly)
                     {

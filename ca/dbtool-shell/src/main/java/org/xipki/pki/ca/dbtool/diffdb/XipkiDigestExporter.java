@@ -93,12 +93,14 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
         super(datasource, baseDir, stopMe);
         if(numCertsPerSelect < 1)
         {
-            throw new IllegalArgumentException("numCertsPerSelect could not be less than 1: " + numCertsPerSelect);
+            throw new IllegalArgumentException("numCertsPerSelect could not be less than 1: "
+                    + numCertsPerSelect);
         }
 
         this.numCertsPerSelect = numCertsPerSelect;
 
-        if(dbSchemaType == DbSchemaType.XIPKI_CA_v1 || dbSchemaType == DbSchemaType.XIPKI_OCSP_v1)
+        if(dbSchemaType == DbSchemaType.XIPKI_CA_v1
+                || dbSchemaType == DbSchemaType.XIPKI_OCSP_v1)
         {
             if(dbSchemaType == DbSchemaType.XIPKI_CA_v1)
             { // CA
@@ -119,7 +121,8 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
             col_revReason = "REV_REASON";
             col_revTime = "REV_TIME";
             col_serialNumber = "SERIAL";
-        } else if(dbSchemaType == DbSchemaType.XIPKI_CA_v2 || dbSchemaType == DbSchemaType.XIPKI_OCSP_v2)
+        } else if(dbSchemaType == DbSchemaType.XIPKI_CA_v2
+                || dbSchemaType == DbSchemaType.XIPKI_OCSP_v2)
         {
             if(dbSchemaType == DbSchemaType.XIPKI_CA_v2)
             { // CA
@@ -322,7 +325,8 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
                         }
                     }
 
-                    DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime, revInvTime, hash);
+                    DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime,
+                            revInvTime, hash);
                     caEntryContainer.addDigestEntry(caId, id, cert);
 
                     processLog.addNumProcessed(1);

@@ -109,7 +109,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
         super(dataSource, srcDir, stopMe, evaluateOnly);
         if(numCertsPerCommit < 1)
         {
-            throw new IllegalArgumentException("numCertsPerCommit could not be less than 1: " + numCertsPerCommit);
+            throw new IllegalArgumentException(
+                    "numCertsPerCommit could not be less than 1: " + numCertsPerCommit);
         }
         ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         ParamUtil.assertNotBlank("publisherName", publisherName);
@@ -201,7 +202,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
             }
 
             String type = publisherType.getType();
-            if("ocsp".equalsIgnoreCase(type) || "java:org.xipki.pki.ca.server.publisher.DefaultCertPublisher".equals(type))
+            if("ocsp".equalsIgnoreCase(type))
             {
             }
             else
@@ -361,20 +362,34 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
 
                     int idx = 1;
                     ps.setInt(idx++, issuer.getId());
-                    ps.setString(idx++, X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
-                    ps.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
-                    ps.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedName));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedKey));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA224, encodedName));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA224, encodedKey));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA256, encodedName));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA256, encodedKey));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA384, encodedName));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA384, encodedKey));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA512, encodedName));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA512, encodedKey));
-                    ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert));
+                    ps.setString(idx++,
+                            X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
+                    ps.setLong(idx++,
+                            c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
+                    ps.setLong(idx++,
+                            c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
+                    ps.setString(idx++,
+                            HashCalculator.base64Hash(HashAlgoType.SHA1, encodedName));
+                    ps.setString(idx++,
+                            HashCalculator.base64Hash(HashAlgoType.SHA1, encodedKey));
+                    ps.setString(idx++,
+                            HashCalculator.base64Hash(HashAlgoType.SHA224, encodedName));
+                    ps.setString(idx++,
+                            HashCalculator.base64Hash(HashAlgoType.SHA224, encodedKey));
+                    ps.setString(idx++,
+                            HashCalculator.base64Hash(HashAlgoType.SHA256, encodedName));
+                    ps.setString(idx++,
+                            HashCalculator.base64Hash(HashAlgoType.SHA256, encodedKey));
+                    ps.setString(idx++,
+                            HashCalculator.base64Hash(HashAlgoType.SHA384, encodedName));
+                    ps.setString(idx++,
+                            HashCalculator.base64Hash(HashAlgoType.SHA384, encodedKey));
+                    ps.setString(idx++,
+                            HashCalculator.base64Hash(HashAlgoType.SHA512, encodedName));
+                    ps.setString(idx++,
+                            HashCalculator.base64Hash(HashAlgoType.SHA512, encodedKey));
+                    ps.setString(idx++,
+                            HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert));
                     ps.setString(idx++, b64Cert);
 
                     setBoolean(ps, idx++, ca.isRevoked());
@@ -433,7 +448,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
         deleteCertGreatherThan(minId - 1, LOG);
 
         final long total = certstore.getCountCerts() - numProcessedBefore;
-        final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore);
+        final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(),
+                numProcessedBefore);
         // all initial values for importLog will be not evaluated, so just any number
         final ProcessLog importLog = new ProcessLog(total, System.currentTimeMillis(), 0);
 
@@ -626,11 +642,16 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                     {
                         int idx = 1;
                         ps_certhash.setInt(idx++, currentId);
-                        ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert));
-                        ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA224, encodedCert));
-                        ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA256, encodedCert));
-                        ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA384, encodedCert));
-                        ps_certhash.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA512, encodedCert));
+                        ps_certhash.setString(idx++,
+                                HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert));
+                        ps_certhash.setString(idx++,
+                                HashCalculator.base64Hash(HashAlgoType.SHA224, encodedCert));
+                        ps_certhash.setString(idx++,
+                                HashCalculator.base64Hash(HashAlgoType.SHA256, encodedCert));
+                        ps_certhash.setString(idx++,
+                                HashCalculator.base64Hash(HashAlgoType.SHA384, encodedCert));
+                        ps_certhash.setString(idx++,
+                                HashCalculator.base64Hash(HashAlgoType.SHA512, encodedCert));
                         ps_certhash.addBatch();
                     }catch(SQLException e)
                     {
@@ -642,7 +663,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                     {
                         int idx = 1;
                         ps_rawcert.setInt(idx++, currentId);
-                        ps_rawcert.setString(idx++, X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
+                        ps_rawcert.setString(idx++,
+                                X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
                         ps_rawcert.setString(idx++, Base64.toBase64String(encodedCert));
                         ps_rawcert.addBatch();
                     }catch(SQLException e)
@@ -653,7 +675,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
 
                 boolean isLastBlock = certs.hasNext() == false;
 
-                if(numImportedEntriesInBatch > 0 && (numImportedEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock))
+                if(numImportedEntriesInBatch > 0
+                        && (numImportedEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock))
                 {
                     if(evaulateOnly)
                     {

@@ -106,7 +106,8 @@ public class KeyUtil
     private static final DefaultDigestAlgorithmIdentifierFinder dfltDigesAlgIdentifierFinder =
             new DefaultDigestAlgorithmIdentifierFinder();
 
-    private static final Map<String, BcContentVerifierProviderBuilder> verifierProviderBuilders = new HashMap<>();
+    private static final Map<String, BcContentVerifierProviderBuilder> verifierProviderBuilders
+        = new HashMap<>();
 
     private static final Map<String, KeyFactory> keyFactories = new HashMap<>();
 
@@ -137,7 +138,8 @@ public class KeyUtil
             }
             else
             {
-                throw new OperatorCreationException("unknown key algorithm of the public key " + keyAlg);
+                throw new OperatorCreationException("unknown key algorithm of the public key "
+                        + keyAlg);
             }
             verifierProviderBuilders.put(keyAlg, builder);
         }
@@ -190,7 +192,8 @@ public class KeyUtil
         DSAParameters dsaParams = paramGen.generateParameters();
 
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("DSA", "BC");
-        DSAParameterSpec dsaParamSpec = new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(), dsaParams.getG());
+        DSAParameterSpec dsaParamSpec = new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(),
+                dsaParams.getG());
         kpGen.initialize(dsaParamSpec, new SecureRandom());
         return kpGen.generateKeyPair();
     }
@@ -222,7 +225,8 @@ public class KeyUtil
                 kf = KeyFactory.getInstance(algorithm, "BC");
             } catch (NoSuchAlgorithmException | NoSuchProviderException e)
             {
-                throw new InvalidKeySpecException("could not find KeyFactory for " + algorithm + ": " + e.getMessage());
+                throw new InvalidKeySpecException("could not find KeyFactory for " + algorithm
+                        + ": " + e.getMessage());
             }
             keyFactories.put(algorithm, kf);
             return kf;
@@ -297,7 +301,8 @@ public class KeyUtil
 
             return new RSAPrivateCrtKeyParameters(k.getModulus(),
                 k.getPublicExponent(), k.getPrivateExponent(),
-                k.getPrimeP(), k.getPrimeQ(), k.getPrimeExponentP(), k.getPrimeExponentQ(), k.getCrtCoefficient());
+                k.getPrimeP(), k.getPrimeQ(), k.getPrimeExponentP(),
+                k.getPrimeExponentQ(), k.getCrtCoefficient());
         }
         else if(key instanceof RSAPrivateKey)
         {

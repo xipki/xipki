@@ -39,8 +39,9 @@ import java.io.UnsupportedEncodingException;
 
 /**
  *
- * Copied from <a
- *  href="https://github.com/android/platform_frameworks_base/blob/master/core/java/android/util/Base64.java">Base64.java</a>
+ * Copied from
+ *  https://github.com/android/platform_frameworks_base/blob/master/
+ *  core/java/android/util/Base64.java
  *
  * Utilities for encoding and decoding the Base64 representation of
  * binary data.  See RFCs <a

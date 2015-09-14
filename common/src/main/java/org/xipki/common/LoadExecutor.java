@@ -189,7 +189,9 @@ public abstract class LoadExecutor
 
     protected boolean stop()
     {
-        return interrupted || errorAccount.get() > 0 || System.currentTimeMillis() - startTime >= duration * 1000L;
+        return interrupted
+                || errorAccount.get() > 0
+                || System.currentTimeMillis() - startTime >= duration * 1000L;
     }
 
     protected static void printHeader()

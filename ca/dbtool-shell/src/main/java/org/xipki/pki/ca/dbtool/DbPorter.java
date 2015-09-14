@@ -107,13 +107,16 @@ public class DbPorter extends DbToolBase
     throws JAXBException
     {
         URL schemaUrl = DbPorter.class.getResource(schemaPath);
-        final SchemaFactory schemaFact = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        final SchemaFactory schemaFact = SchemaFactory.newInstance(
+                javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
         try
         {
             return schemaFact.newSchema(schemaUrl);
         } catch (SAXException e)
         {
-            throw new JAXBException("error while loading schemas for the specified classes\nDetails:\n" + e.getMessage());
+            throw new JAXBException(
+                    "error while loading schemas for the specified classes\nDetails:\n"
+                    + e.getMessage());
         }
     }
 

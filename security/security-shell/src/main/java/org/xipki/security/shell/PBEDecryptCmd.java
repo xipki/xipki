@@ -61,7 +61,8 @@ public class PBEDecryptCmd extends SecurityCmd
     {
         if(StringUtil.startsWithIgnoreCase(passwordHint, "PBE:") == false)
         {
-            throw new IllegalCmdParamException("encrypted password '" + passwordHint + "' does not start with PBE:");
+            throw new IllegalCmdParamException("encrypted password '" + passwordHint
+                    + "' does not start with PBE:");
         }
 
         char[] masterPassword = readPassword("please enter the master password");

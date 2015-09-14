@@ -65,7 +65,8 @@ implements CertificateValidator
                 hash = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
             } catch (CertificateEncodingException e)
             {
-                throw new IllegalArgumentException("could not encode certificate: " + e.getMessage(), e);
+                throw new IllegalArgumentException(
+                        "could not encode certificate: " + e.getMessage(), e);
             }
             certHashes.add(hash);
         }
@@ -83,7 +84,8 @@ implements CertificateValidator
             hash = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
         } catch (CertificateEncodingException e)
         {
-            throw new IllegalArgumentException("could not encode certificate: " + e.getMessage(), e);
+            throw new IllegalArgumentException(
+                    "could not encode certificate: " + e.getMessage(), e);
         }
         certHashes.add(hash);
     }
@@ -101,7 +103,8 @@ implements CertificateValidator
             hash = HashAlgoType.SHA256.hexDigest(signerCert.getEncoded());
         } catch (CertificateEncodingException e)
         {
-            throw new IllegalArgumentException("could not encode certificate: " + e.getMessage(), e);
+            throw new IllegalArgumentException(
+                    "could not encode certificate: " + e.getMessage(), e);
         }
         return certHashes.contains(hash);
     }

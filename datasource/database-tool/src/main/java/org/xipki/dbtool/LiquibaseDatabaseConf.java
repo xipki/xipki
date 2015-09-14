@@ -117,7 +117,8 @@ public class LiquibaseDatabaseConf
                 urlBuilder.append("/");
                 urlBuilder.append(dbProps.getProperty("dataSource.databaseName"));
             }
-            else if(dataSourceClassName.contains("postgresql.") || dataSourceClassName.contains("impossibl.postgres."))
+            else if(dataSourceClassName.contains("postgresql.")
+                    || dataSourceClassName.contains("impossibl.postgres."))
             {
                 String serverName;
                 String portNumber;
@@ -136,7 +137,11 @@ public class LiquibaseDatabaseConf
                 }
                 driverClassName = "org.postgresql.Driver";
                 urlBuilder.append("jdbc:postgresql://");
-                urlBuilder.append(serverName).append(":").append(portNumber).append("/").append(databaseName);
+                urlBuilder.append(serverName)
+                    .append(":")
+                    .append(portNumber)
+                    .append("/")
+                    .append(databaseName);
             }
             else if(dataSourceClassName.contains("hsqldb."))
             {
@@ -145,7 +150,8 @@ public class LiquibaseDatabaseConf
             }
             else
             {
-                throw new IllegalArgumentException("unsupported datasbase type " + dataSourceClassName);
+                throw new IllegalArgumentException(
+                        "unsupported datasbase type " + dataSourceClassName);
             }
 
             url = urlBuilder.toString();

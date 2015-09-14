@@ -103,11 +103,13 @@ class OcspCertStoreDbExporter extends DbPorter
         ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         if(numCertsInBundle < 1)
         {
-            throw new IllegalArgumentException("numCertsInBundle could not be less than 1: " + numCertsInBundle);
+            throw new IllegalArgumentException("numCertsInBundle could not be less than 1: "
+                    + numCertsInBundle);
         }
         if(numCertsPerSelect < 1)
         {
-            throw new IllegalArgumentException("numCertsPerSelect could not be less than 1: " + numCertsPerSelect);
+            throw new IllegalArgumentException("numCertsPerSelect could not be less than 1: "
+                    + numCertsPerSelect);
         }
 
         this.numCertsInBundle = numCertsInBundle;
@@ -147,8 +149,8 @@ class OcspCertStoreDbExporter extends DbPorter
 
             if(certstore.getVersion() > VERSION)
             {
-                throw new Exception(
-                        "could not continue with CertStore greater than " + VERSION + ": " + certstore.getVersion());
+                throw new Exception("could not continue with CertStore greater than " + VERSION
+                        + ": " + certstore.getVersion());
             }
         }
         else
@@ -318,7 +320,8 @@ class OcspCertStoreDbExporter extends DbPorter
 
         final int n = numCertsPerSelect;
 
-        File currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
+        File currentCertsZipFile = new File(baseDir,
+                "tmp-certs-" + System.currentTimeMillis() + ".zip");
         ZipOutputStream currentCertsZip = getZipOutputStream(currentCertsZipFile);
 
         int minCertIdOfCurrentFile = -1;
@@ -443,7 +446,8 @@ class OcspCertStoreDbExporter extends DbPorter
                         numCertInCurrentFile = 0;
                         minCertIdOfCurrentFile = -1;
                         maxCertIdOfCurrentFile = -1;
-                        currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
+                        currentCertsZipFile = new File(baseDir,
+                                "tmp-certs-" + System.currentTimeMillis() + ".zip");
                         currentCertsZip = getZipOutputStream(currentCertsZipFile);
                     } // end if
                 } // end while(rs.next))

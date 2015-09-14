@@ -95,7 +95,8 @@ public class GetCRLCmd extends CRLCmd
 
         if(caName != null && ! caNames.contains(caName))
         {
-            throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs " + caNames);
+            throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs "
+                    + caNames);
         }
 
         if(caName == null)
@@ -106,7 +107,8 @@ public class GetCRLCmd extends CRLCmd
             }
             else
             {
-                throw new IllegalCmdParamException("no caname is specified, one of " + caNames + " is required");
+                throw new IllegalCmdParamException("no caname is specified, one of " + caNames
+                        + " is required");
             }
         }
 

@@ -95,7 +95,8 @@ public class IaikP11ModulePool
             final String message = "could not finalize the module " + moduleName;
             if(LOG.isWarnEnabled())
             {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                        t.getMessage());
             }
             LOG.debug(message, t);
         }
@@ -134,7 +135,8 @@ public class IaikP11ModulePool
             final String msg = "could not load the PKCS#11 module " + moduleConf.getName();
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(msg, e);
             throw new SignerException(msg);
@@ -151,7 +153,8 @@ public class IaikP11ModulePool
                 final String message = "PKCS11Exception";
                 if(LOG.isErrorEnabled())
                 {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                            e.getMessage());
                 }
                 LOG.debug(message, e);
                 close(module);
@@ -177,7 +180,8 @@ public class IaikP11ModulePool
             final String message = "unexpected Exception: ";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                        t.getMessage());
             }
             LOG.debug(message, t);
             close(module);
@@ -222,7 +226,8 @@ public class IaikP11ModulePool
                 final String message = "error while module.finalize()";
                 if(LOG.isErrorEnabled())
                 {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                            t.getMessage());
                 }
                 LOG.debug(message, t);
             }

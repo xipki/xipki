@@ -78,7 +78,8 @@ public class PSOTemplate extends ASN1Object
         }
 
         this.slotAndKeyIdentifier = SlotAndKeyIdentifer.getInstance(seq.getObjectAt(0));
-        DEROctetString octetString = (DEROctetString) DEROctetString.getInstance(seq.getObjectAt(1));
+        DEROctetString octetString = (DEROctetString) DEROctetString.getInstance(
+                seq.getObjectAt(1));
         this.message = octetString.getOctets();
     }
 
@@ -125,7 +126,8 @@ public class PSOTemplate extends ASN1Object
             throw new BadASN1ObjectException("unable to parse encoded PSOTemplate");
         }
 
-        throw new BadASN1ObjectException("unknown object in PSOTemplate.getInstance(): " + obj.getClass().getName());
+        throw new BadASN1ObjectException("unknown object in PSOTemplate.getInstance(): "
+                + obj.getClass().getName());
     }
 
     @Override

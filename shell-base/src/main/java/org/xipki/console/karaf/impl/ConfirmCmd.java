@@ -62,7 +62,8 @@ public class ConfirmCmd extends XipkiOsgiCommandSupport
     {
         ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
 
-        boolean toContinue = FileUtils.confirm(reader, prompt + "\nDo you want to contine [yes/no]?");
+        boolean toContinue = FileUtils.confirm(reader,
+                prompt + "\nDo you want to contine [yes/no]?");
         if(toContinue == false)
         {
             throw new CmdFailure("User cancelled");

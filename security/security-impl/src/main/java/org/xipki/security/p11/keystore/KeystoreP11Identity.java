@@ -92,7 +92,9 @@ public class KeystoreP11Identity extends P11Identity
         ParamUtil.assertNotNull("privateKey", privateKey);
         ParamUtil.assertNotBlank("sha1sum", sha1sum);
 
-        if(certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
+        if(certificateChain == null
+                || certificateChain.length < 1
+                || certificateChain[0] == null)
         {
             throw new IllegalArgumentException("no certificate is specified");
         }
@@ -102,7 +104,8 @@ public class KeystoreP11Identity extends P11Identity
         if(this.publicKey instanceof RSAPublicKey)
         {
             String providerName;
-            if(Security.getProvider(SoftTokenContentSignerBuilder.PROVIDER_XIPKI_NSS_CIPHER) != null)
+            if(Security.getProvider(SoftTokenContentSignerBuilder.PROVIDER_XIPKI_NSS_CIPHER)
+                    != null)
             {
                 providerName = SoftTokenContentSignerBuilder.PROVIDER_XIPKI_NSS_CIPHER;
             }
@@ -188,7 +191,8 @@ public class KeystoreP11Identity extends P11Identity
                     + publicKey.getAlgorithm() + " public key");
         }
 
-        byte[] padded = SignerUtil.pkcs1padding(encodedDigestInfo, (getSignatureKeyBitLength() + 7)/8);
+        byte[] padded = SignerUtil.pkcs1padding(encodedDigestInfo,
+                (getSignatureKeyBitLength() + 7)/8);
         return do_rsa_sign(padded);
     }
 
@@ -214,7 +218,8 @@ public class KeystoreP11Identity extends P11Identity
             cipher = rsaCiphers.takeFirst();
         } catch (InterruptedException e)
         {
-            throw new SignerException("InterruptedException occurs while retrieving idle signature");
+            throw new SignerException(
+                    "InterruptedException occurs while retrieving idle signature");
         }
 
         try
@@ -235,7 +240,8 @@ public class KeystoreP11Identity extends P11Identity
     {
         if(publicKey instanceof ECPublicKey == false)
         {
-            throw new SignerException("operation CKM_ECDSA is not allowed for " + publicKey.getAlgorithm() + " public key");
+            throw new SignerException("operation CKM_ECDSA is not allowed for "
+                    + publicKey.getAlgorithm() + " public key");
         }
 
         return do_dsa_x962_sign(hash);
@@ -254,7 +260,8 @@ public class KeystoreP11Identity extends P11Identity
     {
         if(publicKey instanceof DSAPublicKey == false)
         {
-            throw new SignerException("operation CKM_DSA is not allowed for " + publicKey.getAlgorithm() + " public key");
+            throw new SignerException("operation CKM_DSA is not allowed for "
+                    + publicKey.getAlgorithm() + " public key");
         }
         return do_dsa_x962_sign(hash);
     }
@@ -278,7 +285,8 @@ public class KeystoreP11Identity extends P11Identity
             sig = dsaSignatures.takeFirst();
         } catch (InterruptedException e)
         {
-            throw new SignerException("InterruptedException occurs while retrieving idle signature");
+            throw new SignerException(
+                    "InterruptedException occurs while retrieving idle signature");
         }
 
         try
