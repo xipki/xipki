@@ -128,11 +128,13 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         ParamUtil.assertNotNull("unmarshaller", unmarshaller);
         if(numCertsInBundle < 1)
         {
-            throw new IllegalArgumentException("numCertsInBundle could not be less than 1: " + numCertsInBundle);
+            throw new IllegalArgumentException(
+                    "numCertsInBundle could not be less than 1: " + numCertsInBundle);
         }
         if(numCertsPerSelect < 1)
         {
-            throw new IllegalArgumentException("numCertsPerSelect could not be less than 1: " + numCertsPerSelect);
+            throw new IllegalArgumentException(
+                    "numCertsPerSelect could not be less than 1: " + numCertsPerSelect);
         }
 
         this.numCertsInBundle = numCertsInBundle;
@@ -198,7 +200,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
             JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
             try
             {
-                marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_CertStore));
+                marshaller.marshal(root,
+                        new File(baseDir + File.separator + FILENAME_CA_CertStore));
             }catch(JAXBException e)
             {
                 throw XMLUtil.convert(e);
@@ -272,7 +275,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
             processLog = new ProcessLog(total, System.currentTimeMillis(), 0);
         }
 
-        final String sql = "SELECT ID, CA_ID, CRL FROM CRL WHERE ID >= ? AND ID < ? ORDER BY ID ASC";
+        final String sql = "SELECT ID, CA_ID, CRL FROM CRL WHERE ID >= ? AND ID < ?"
+                + " ORDER BY ID ASC";
         PreparedStatement ps = prepareStatement(sql);
 
         int numCrlsInCurrentFile = 0;
@@ -280,7 +284,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
         int sum = 0;
 
-        File currentCrlsZipFile = new File(baseDir, "tmp-crls-" + System.currentTimeMillis() + ".zip");
+        File currentCrlsZipFile = new File(baseDir,
+                "tmp-crls-" + System.currentTimeMillis() + ".zip");
         ZipOutputStream currentCrlsZip = getZipOutputStream(currentCrlsZipFile);
 
         int minIdOfCurrentFile = -1;
@@ -402,7 +407,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                         numCrlsInCurrentFile = 0;
                         minIdOfCurrentFile = -1;
                         maxIdOfCurrentFile = -1;
-                        currentCrlsZipFile = new File(baseDir, "tmp-crls-" + System.currentTimeMillis() + ".zip");
+                        currentCrlsZipFile = new File(baseDir,
+                                "tmp-crls-" + System.currentTimeMillis() + ".zip");
                         currentCrlsZip = getZipOutputStream(currentCrlsZipFile);
                     }
                 }  // end while(rs.next)
@@ -592,8 +598,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         final int numEntriesPerZip = numUsersInBundle;
         final String entriesDir = usersDir;
 
-        final String sql =
-                "SELECT ID, NAME, PASSWORD, CN_REGEX FROM USERNAME WHERE ID >= ? AND ID < ? ORDER BY ID ASC";
+        final String sql = "SELECT ID, NAME, PASSWORD, CN_REGEX FROM USERNAME"
+                + " WHERE ID >= ? AND ID < ? ORDER BY ID ASC";
 
         final int minId = (int) getMin("USERNAME", "ID");
         final int maxId = (int) getMax("USERNAME", "ID");
@@ -676,8 +682,10 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
                     if(numUsersInCurrentFile == numEntriesPerZip)
                     {
-                        String currentUsersFilename = "users_" + minIdOfCurrentFile + "_" + maxIdOfCurrentFile + ".zip";
-                        finalizeZip(entriesDir + File.separator + currentUsersFilename, usersInCurrentFile);
+                        String currentUsersFilename =
+                                "users_" + minIdOfCurrentFile + "_" + maxIdOfCurrentFile + ".zip";
+                        finalizeZip(entriesDir + File.separator + currentUsersFilename,
+                                usersInCurrentFile);
                         certstore.setCountUsers(sum);
                         writeLine(filenameListOs, currentUsersFilename);
 
@@ -702,7 +710,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
             if(numUsersInCurrentFile > 0)
             {
-                String currentUsersFilename = "users_" + minIdOfCurrentFile + "_" + maxIdOfCurrentFile + ".zip";
+                String currentUsersFilename =
+                        "users_" + minIdOfCurrentFile + "_" + maxIdOfCurrentFile + ".zip";
                 finalizeZip(entriesDir + File.separator + currentUsersFilename, usersInCurrentFile);
                 certstore.setCountUsers(sum);
                 writeLine(filenameListOs, currentUsersFilename);
@@ -759,7 +768,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
     /**
      *
-     * @return exception instanceof {{@link DataAccessException}, {@link IOException} or {@link JAXBException}.
+     * @return exception instanceof {{@link DataAccessException}, {@link IOException} or
+     * {@link JAXBException}.
      */
     private Exception export_cert(
             final CertStoreType certstore,
@@ -841,7 +851,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         CaCertsWriter certsInCurrentFile = new CaCertsWriter();
 
         int sum = 0;
-        File currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
+        File currentCertsZipFile = new File(baseDir,
+                "tmp-certs-" + System.currentTimeMillis() + ".zip");
         ZipOutputStream currentCertsZip = getZipOutputStream(currentCertsZipFile);
 
         int minIdOfCurrentFile = -1;
@@ -997,7 +1008,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                         numCertsInCurrentFile = 0;
                         minIdOfCurrentFile = -1;
                         maxIdOfCurrentFile = -1;
-                        currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
+                        currentCertsZipFile = new File(baseDir,
+                                "tmp-certs-" + System.currentTimeMillis() + ".zip");
                         currentCertsZip = getZipOutputStream(currentCertsZipFile);
                     }
                 }  // end while(rs.next)

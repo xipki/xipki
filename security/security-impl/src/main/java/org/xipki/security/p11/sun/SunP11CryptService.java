@@ -78,7 +78,8 @@ public final class SunP11CryptService implements P11CryptService
 {
     private static final Logger LOG = LoggerFactory.getLogger(SunP11CryptService.class);
 
-    private final ConcurrentSkipListSet<SunP11Identity> identities = new ConcurrentSkipListSet<>();
+    private final ConcurrentSkipListSet<SunP11Identity> identities =
+            new ConcurrentSkipListSet<>();
 
     private final P11ModuleConf moduleConf;
 
@@ -201,8 +202,8 @@ public final class SunP11CryptService implements P11CryptService
                 for(char[] singlePassword : password)
                 {
                     if(singlePassword == null)
-                    {
-                        singlePassword = "dummy".toCharArray(); // keystore does not allow empty password
+                    { // keystore does not allow empty password
+                        singlePassword = "dummy".toCharArray();
                     }
                     try
                     {
@@ -230,8 +231,8 @@ public final class SunP11CryptService implements P11CryptService
                             keyPwd = password.get(0);
                         }
                         if(keyPwd == null)
-                        {
-                            keyPwd = "dummy".toCharArray(); // keystore does not allow empty password
+                        { // keystore does not allow empty password
+                            keyPwd = "dummy".toCharArray();
                         }
 
                         Key key = keystore.getKey(alias, keyPwd);
@@ -240,7 +241,8 @@ public final class SunP11CryptService implements P11CryptService
                             continue;
                         }
 
-                        SunP11Identity oldIdentity = getIdentity(slotId, new P11KeyIdentifier(alias));
+                        SunP11Identity oldIdentity = getIdentity(slotId,
+                                new P11KeyIdentifier(alias));
                         if(oldIdentity != null)
                         {
                             currentIdentifies.add(oldIdentity);
@@ -248,7 +250,8 @@ public final class SunP11CryptService implements P11CryptService
                         }
 
                         PrivateKey signatureKey = (PrivateKey) key;
-                        X509Certificate signatureCert = (X509Certificate) keystore.getCertificate(alias);
+                        X509Certificate signatureCert =
+                                (X509Certificate) keystore.getCertificate(alias);
                         PublicKey pubKey = signatureCert.getPublicKey();
 
                         Certificate[] certchain = keystore.getCertificateChain(alias);
@@ -274,7 +277,8 @@ public final class SunP11CryptService implements P11CryptService
                     }catch(SignerException e)
                     {
                         String msg = "SignerException while constructing SunP11Identity for alias "
-                                + alias + " (slot: " + i + ", module: " + moduleConf.getName() + ")";
+                                + alias + " (slot: " + i + ", module: " + moduleConf.getName()
+                                + ")";
                         LOG.warn(msg + ", message: {}", e.getMessage());
                         LOG.debug(msg, e);
                         continue;
@@ -282,10 +286,12 @@ public final class SunP11CryptService implements P11CryptService
                 }
             }catch(Throwable t)
             {
-                final String message = "could not initialize PKCS11 slot " + i + " (module: " + moduleConf.getName() + ")";
+                final String message = "could not initialize PKCS11 slot " + i + " (module: "
+                        + moduleConf.getName() + ")";
                 if(LOG.isWarnEnabled())
                 {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                            t.getMessage());
                 }
                 LOG.debug(message, t);
                 continue;

@@ -120,7 +120,9 @@ public class IaikP11Module implements P11Module
                 for (int i = 0; i < slotList.length; i++)
                 {
                     Slot slot = slotList[i];
-                    msg.append("------------------------Slot ").append(i+1).append("-------------------------\n");
+                    msg.append("------------------------Slot ")
+                        .append(i + 1)
+                        .append("-------------------------\n");
                     msg.append(slot.getSlotID()).append("\n");
                     try
                     {
@@ -136,7 +138,8 @@ public class IaikP11Module implements P11Module
                 final String message = "unexpected error";
                 if(LOG.isErrorEnabled())
                 {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                            t.getMessage());
                 }
                 LOG.debug(message, t);
             }
@@ -231,7 +234,8 @@ public class IaikP11Module implements P11Module
             final String message = "error while module.finalize()";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                        t.getMessage());
             }
             LOG.debug(message, t);
         }

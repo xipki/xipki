@@ -124,11 +124,13 @@ public abstract class CmpRequestor
         this.securityFactory = securityFactory;
         this.signRequest = false;
 
-        X500Name x500Name = X500Name.getInstance(requestorCert.getSubjectX500Principal().getEncoded());
+        X500Name x500Name = X500Name.getInstance(
+                requestorCert.getSubjectX500Principal().getEncoded());
         this.sender = new GeneralName(x500Name);
 
         this.responderCert = responderCert;
-        X500Name subject = X500Name.getInstance(responderCert.getSubjectX500Principal().getEncoded());
+        X500Name subject = X500Name.getInstance(
+                responderCert.getSubjectX500Principal().getEncoded());
         this.recipient = new GeneralName(subject);
         this.c14nRecipientName = getSortedRFC4519Name(subject);
     }
@@ -154,11 +156,13 @@ public abstract class CmpRequestor
         this.securityFactory = securityFactory;
         this.signRequest = signRequest;
 
-        X500Name x500Name = X500Name.getInstance(requestor.getCertificate().getSubjectX500Principal().getEncoded());
+        X500Name x500Name = X500Name.getInstance(
+                requestor.getCertificate().getSubjectX500Principal().getEncoded());
         this.sender = new GeneralName(x500Name);
 
         this.responderCert = responderCert;
-        X500Name subject = X500Name.getInstance(responderCert.getSubjectX500Principal().getEncoded());
+        X500Name subject = X500Name.getInstance(
+                responderCert.getSubjectX500Principal().getEncoded());
         this.recipient = new GeneralName(subject);
         this.c14nRecipientName = getSortedRFC4519Name(subject);
     }
@@ -251,7 +255,8 @@ public abstract class CmpRequestor
         {
             if(LOG.isErrorEnabled())
             {
-                LOG.error("error while decode the received PKI message: {}", Hex.toHexString(encodedResponse));
+                LOG.error("error while decode the received PKI message: {}",
+                        Hex.toHexString(encodedResponse));
             }
             throw new CmpRequestorException(e.getMessage(), e);
         }
@@ -303,7 +308,8 @@ public abstract class CmpRequestor
             final int action)
     throws CmpRequestorException, PKIErrorException
     {
-        ASN1Encodable itvValue = extractGeneralRepContent(response, ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId(), true);
+        ASN1Encodable itvValue = extractGeneralRepContent(response,
+                ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId(), true);
         return extractXipkiActionContent(itvValue, action);
     }
 
@@ -499,9 +505,10 @@ public abstract class CmpRequestor
     protected PKIErrorException buildErrorResult(
             final ErrorMsgContent bodyContent)
     {
-        org.xipki.pki.ca.common.cmp.PKIStatusInfo statusInfo = new org.xipki.pki.ca.common.cmp.PKIStatusInfo(
-                bodyContent.getPKIStatusInfo());
-        return new PKIErrorException(statusInfo.getStatus(), statusInfo.getPkiFailureInfo(), statusInfo.getStatusMessage());
+        org.xipki.pki.ca.common.cmp.PKIStatusInfo statusInfo =
+                new org.xipki.pki.ca.common.cmp.PKIStatusInfo(bodyContent.getPKIStatusInfo());
+        return new PKIErrorException(statusInfo.getStatus(), statusInfo.getPkiFailureInfo(),
+                statusInfo.getStatusMessage());
     }
 
     private byte[] randomTransactionId()
@@ -521,7 +528,8 @@ public abstract class CmpRequestor
 
         if(pMsg.hasPasswordBasedMacProtection())
         {
-            LOG.warn("NOT_SIGNAUTRE_BASED: " + pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
+            LOG.warn("NOT_SIGNAUTRE_BASED: "
+                    + pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
             return new ProtectionVerificationResult(null, ProtectionResult.NOT_SIGNATURE_BASED);
         }
 
@@ -543,7 +551,8 @@ public abstract class CmpRequestor
             if(authorizedResponder == false)
             {
                 LOG.warn("tid={}: not authorized responder '{}'", tid, h.getSender());
-                return new ProtectionVerificationResult(null, ProtectionResult.SENDER_NOT_AUTHORIZED);
+                return new ProtectionVerificationResult(null,
+                        ProtectionResult.SENDER_NOT_AUTHORIZED);
             }
         }
 
@@ -575,7 +584,8 @@ public abstract class CmpRequestor
         {
             v.add(value);
         }
-        InfoTypeAndValue itv = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cm_cmpGenmsg, new DERSequence(v));
+        InfoTypeAndValue itv = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cm_cmpGenmsg,
+                new DERSequence(v));
         GenMsgContent genMsgContent = new GenMsgContent(itv);
         PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
 

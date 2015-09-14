@@ -79,7 +79,8 @@ public class ProfileExportCmd extends CaCmd
         }
         else
         {
-            saveVerbose("saved cert profile configuration to", new File(confFile), entry.getConf().getBytes("UTF-8"));
+            saveVerbose("saved cert profile configuration to", new File(confFile),
+                    entry.getConf().getBytes("UTF-8"));
         }
         return null;
     }

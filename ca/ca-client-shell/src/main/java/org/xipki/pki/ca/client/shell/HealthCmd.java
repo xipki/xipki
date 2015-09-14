@@ -72,7 +72,8 @@ public class HealthCmd extends ClientCmd
 
         if(caName != null && ! caNames.contains(caName))
         {
-            throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs " + caNames);
+            throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs "
+                    + caNames);
         }
 
         if(caName == null)
@@ -82,7 +83,8 @@ public class HealthCmd extends ClientCmd
                 caName = caNames.iterator().next();
             } else
             {
-                throw new IllegalCmdParamException("no caname is specified, one of " + caNames + " is required");
+                throw new IllegalCmdParamException("no caname is specified, one of " + caNames
+                        + " is required");
             }
         }
 

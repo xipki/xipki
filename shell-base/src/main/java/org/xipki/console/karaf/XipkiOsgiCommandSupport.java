@@ -230,11 +230,15 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
             final String enabledS,
             final String optionName)
     {
-        if("yes".equalsIgnoreCase(enabledS) || "enabled".equalsIgnoreCase(enabledS) || "true".equalsIgnoreCase(enabledS))
+        if("yes".equalsIgnoreCase(enabledS)
+                || "enabled".equalsIgnoreCase(enabledS)
+                || "true".equalsIgnoreCase(enabledS))
         {
             return true;
         }
-        else if("no".equalsIgnoreCase(enabledS) || "disabled".equalsIgnoreCase(enabledS) || "false".equalsIgnoreCase(enabledS))
+        else if("no".equalsIgnoreCase(enabledS)
+                || "disabled".equalsIgnoreCase(enabledS)
+                || "false".equalsIgnoreCase(enabledS))
         {
             return false;
         }

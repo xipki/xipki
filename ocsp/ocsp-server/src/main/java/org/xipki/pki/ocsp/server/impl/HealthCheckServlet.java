@@ -123,7 +123,8 @@ public class HealthCheckServlet extends HttpServlet
             final String message = "connection reset by peer";
             if(LOG.isErrorEnabled())
             {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
 
@@ -134,7 +135,8 @@ public class HealthCheckServlet extends HttpServlet
             final String message = "Throwable thrown, this should not happen";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                        t.getMessage());
             }
             LOG.debug(message, t);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

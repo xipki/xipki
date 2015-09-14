@@ -200,7 +200,12 @@ public class DbToolBase
             final Logger log)
     {
         StringBuilder sb = new StringBuilder(50);
-        sb.append("DELETE FROM ").append(tableName).append(" WHERE ").append(idColumn).append(" > ").append(id);
+        sb.append("DELETE FROM ")
+            .append(tableName)
+            .append(" WHERE ")
+            .append(idColumn)
+            .append(" > ")
+            .append(id);
 
         Statement stmt;
         try
@@ -216,7 +221,8 @@ public class DbToolBase
             stmt.execute(sb.toString());
         } catch(Throwable t)
         {
-            log.error("could not delete columns from table " + tableName + " with " + idColumn + " > " + id, t);
+            log.error("could not delete columns from table " + tableName + " with "
+                    + idColumn + " > " + id, t);
             return false;
         }
         finally

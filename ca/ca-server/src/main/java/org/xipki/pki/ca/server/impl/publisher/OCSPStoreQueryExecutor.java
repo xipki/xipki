@@ -73,6 +73,20 @@ import org.xipki.security.api.util.X509Util;
 
 class OCSPStoreQueryExecutor
 {
+    private static final String SQL_ADD_REVOKED_CERT =
+            "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN,RT,RIT,RR)"
+            + " VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+
+    private static final String SQL_ADD_CERT =
+            "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN)"
+            + " VALUES (?,?,?,?,?,?,?,?)";
+
+    private static final String SQL_ADD_CRAW =
+            "INSERT INTO CRAW (CID,SUBJECT,CERT) VALUES (?,?,?)";
+
+    private static final String SQL_ADD_CHASH =
+            "INSERT INTO CHASH (CID,S1,S224,S256,S384,S512) VALUES (?,?,?,?,?,?)";
+
     private static final Logger LOG = LoggerFactory.getLogger(OCSPStoreQueryExecutor.class);
 
     private final DataSourceWrapper dataSource;
@@ -177,7 +191,8 @@ class OCSPStoreQueryExecutor
 
         if(certRegistered)
         {
-            final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE IID=? AND SN=?";
+            final String sql =
+                "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE IID=? AND SN=?";
             PreparedStatement ps = borrowPreparedStatement(sql);
 
             try
@@ -216,19 +231,9 @@ class OCSPStoreQueryExecutor
             return;
         }
 
-        final String SQL_ADD_CERT;
-        if(revoked)
-        {
-            SQL_ADD_CERT =
-                "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN,RT,RIT,RR) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
-        } else
-        {
-            SQL_ADD_CERT =
-                "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN) VALUES (?,?,?,?,?,?,?,?)";
-        }
-
-        final String SQL_ADD_CRAW = "INSERT INTO CRAW (CID,SUBJECT,CERT) VALUES (?,?,?)";
-        final String SQL_ADD_CHASH = "INSERT INTO CHASH (CID,S1,S224,S256,S384,S512) VALUES (?,?,?,?,?,?)";
+        final String sql_addCert = revoked
+                ? SQL_ADD_REVOKED_CERT
+                : SQL_ADD_CERT;
 
         int certId = nextCertId();
         byte[] encodedCert = certificate.getEncodedCert();
@@ -239,7 +244,8 @@ class OCSPStoreQueryExecutor
         String sha384Fp = HashCalculator.base64Hash(HashAlgoType.SHA384, encodedCert);
         String sha512Fp = HashCalculator.base64Hash(HashAlgoType.SHA512, encodedCert);
 
-        PreparedStatement[] pss = borrowPreparedStatements(SQL_ADD_CERT, SQL_ADD_CRAW, SQL_ADD_CHASH);
+        PreparedStatement[] pss = borrowPreparedStatements(
+                sql_addCert, SQL_ADD_CRAW, SQL_ADD_CHASH);
         // all statements have the same connection
         Connection conn = null;
 
@@ -271,12 +277,16 @@ class OCSPStoreQueryExecutor
                 {
                     ps_addcert.setNull(idx++, Types.BIGINT);
                 }
-                ps_addcert.setInt(idx++, revInfo.getReason() == null? 0 : revInfo.getReason().getCode());
+                ps_addcert.setInt(idx++,
+                        (revInfo.getReason() == null)
+                            ? 0
+                            : revInfo.getReason().getCode());
             }
 
             // CRAW
             idx = 2;
-            ps_addRawcert.setString(idx++, X509Util.cutText(certificate.getSubject(), maxX500nameLen));
+            ps_addRawcert.setString(idx++,
+                    X509Util.cutText(certificate.getSubject(), maxX500nameLen));
             ps_addRawcert.setString(idx++, b64Cert);
 
             // CHASH
@@ -304,7 +314,7 @@ class OCSPStoreQueryExecutor
                 String sql = null;
                 try
                 {
-                    sql = SQL_ADD_CERT;
+                    sql = sql_addCert;
                     ps_addcert.executeUpdate();
 
                     sql = SQL_ADD_CHASH;
@@ -331,12 +341,14 @@ class OCSPStoreQueryExecutor
                         {
                             continue;
                         }
-                        LOG.error("datasource {} SQLException while adding certificate with id {}: {}",
-                                dataSource.getDatasourceName(), certId, t.getMessage());
+                        LOG.error(
+                            "datasource {} SQLException while adding certificate with id {}: {}",
+                            dataSource.getDatasourceName(), certId, t.getMessage());
                         throw e;
                     } else
                     {
-                        throw new OperationException(ErrorCode.SYSTEM_FAILURE, t.getClass().getName() + ": " + t.getMessage());
+                        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                                t.getClass().getName() + ": " + t.getMessage());
                     }
                 }
                 finally
@@ -397,7 +409,8 @@ class OCSPStoreQueryExecutor
 
         if(publishGoodCerts)
         {
-            final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE IID=? AND SN=?";
+            final String sql =
+                    "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE IID=? AND SN=?";
             PreparedStatement ps = borrowPreparedStatement(sql);
 
             try
@@ -568,8 +581,8 @@ class OCSPStoreQueryExecutor
         int id = (int) maxId + 1;
 
         final String sql =
-            "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1S,S1K,S224S,S224K,S256S,S256K,S384S,S384K,"
-            + "S512S,S512K,S1C,CERT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1S,S1K,S224S,S224K,S256S,S256K,"
+            + "S384S,S384K,S512S,S512K,S1C,CERT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try
@@ -667,7 +680,8 @@ class OCSPStoreQueryExecutor
                     LOG.warn("could not close connection", t);
                 }
 
-                throw new DataAccessException("could not create prepared statement for " + sqlQueries[i]);
+                throw new DataAccessException(
+                        "could not create prepared statement for " + sqlQueries[i]);
             }
         }
 
@@ -728,7 +742,8 @@ class OCSPStoreQueryExecutor
             final String message = "isHealthy()";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
             return false;
@@ -768,7 +783,10 @@ class OCSPStoreQueryExecutor
             final boolean b)
     throws SQLException
     {
-        ps.setInt(index, b ? 1 : 0);
+        int i = b
+                ? 1
+                : 0;
+        ps.setInt(index, i);
     }
 
 }

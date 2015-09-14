@@ -93,7 +93,8 @@ public class EnrollCertCmd extends CaCmd
 
         byte[] encodedP10Request = IoUtil.read(p10File);
 
-        X509Certificate cert = caManager.generateCertificate(caName, profileName, user, encodedP10Request);
+        X509Certificate cert = caManager.generateCertificate(caName, profileName, user,
+                encodedP10Request);
         saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
 
         return null;

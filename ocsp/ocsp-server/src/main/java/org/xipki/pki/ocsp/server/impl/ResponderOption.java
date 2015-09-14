@@ -99,11 +99,13 @@ class ResponderOption
                 int n = path.length();
                 if(n > 0 && path.charAt(0) == '/')
                 {
-                    throw new InvalidConfException("servlet path '" + path + "' must not start with '/'");
+                    throw new InvalidConfException(
+                            "servlet path '" + path + "' must not start with '/'");
                 }
                 if(n > 1 && path.charAt(n - 1) == '/')
                 {
-                    throw new InvalidConfException("servlet path '" + path + "' must not end with '/'");
+                    throw new InvalidConfException(
+                            "servlet path '" + path + "' must not end with '/'");
                 }
             }
             list = new ArrayList<>(paths);

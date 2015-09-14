@@ -171,7 +171,8 @@ public class Scep
 
     /**
      *
-     * @param ms signing time bias in milliseconds. non-positive value deactivate the check of signing time.
+     * @param ms signing time bias in milliseconds. non-positive value deactivate the check
+     *  of signing time.
      */
     public void setMaxSigningTimeBias(
             final long ms)
@@ -192,7 +193,8 @@ public class Scep
         try
         {
             privKeyAndCert = caManager.getSecurityFactory().createPrivateKeyAndCert(
-                    dbEntry.getResponderType(), dbEntry.getResponderConf(), dbEntry.getCertificate());
+                    dbEntry.getResponderType(), dbEntry.getResponderConf(),
+                    dbEntry.getCertificate());
         } catch (SignerException e)
         {
             throw new CAMgmtException(e);
@@ -203,7 +205,8 @@ public class Scep
 
         if(responderCert.getPublicKey() instanceof RSAPublicKey == false)
         {
-            throw new IllegalArgumentException("The responder key is not RSA key (CA=" + caName + ")");
+            throw new IllegalArgumentException(
+                    "The responder key is not RSA key (CA=" + caName + ")");
         }
 
         // CACaps
@@ -220,7 +223,8 @@ public class Scep
         X509CA ca = caManager.getX509CA(caName);
         try
         {
-            this.cACert = new X509CertificateHolder(ca.getCAInfo().getCertificate().getEncodedCert());
+            this.cACert = new X509CertificateHolder(
+                    ca.getCAInfo().getCertificate().getEncodedCert());
             this.cACertRespBytes = new CACertRespBytes(
                     ca.getCAInfo().getCertificate().getCert(), responderCert);
         } catch (CertificateException e)
@@ -234,7 +238,8 @@ public class Scep
             throw new CAMgmtException(e);
         }
 
-        EnvelopedDataDecryptorInstance di = new EnvelopedDataDecryptorInstance(responderCert, responderKey);
+        EnvelopedDataDecryptorInstance di = new EnvelopedDataDecryptorInstance(responderCert,
+                responderKey);
         this.envelopedDataDecryptor = new EnvelopedDataDecryptor(di);
     }
 
@@ -284,7 +289,8 @@ public class Scep
             final AuditEvent auditEvent)
     throws MessageDecodingException, OperationException
     {
-        DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, envelopedDataDecryptor, null);
+        DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent,
+                envelopedDataDecryptor, null);
 
         PkiMessage rep = doServicePkiOperation(req, certProfileName, auditEvent);
         if(auditEvent != null)
@@ -329,7 +335,8 @@ public class Scep
             }
         }
 
-        PkiMessage rep = new PkiMessage(req.getTransactionId(), MessageType.CertRep, Nonce.randomNonce());
+        PkiMessage rep = new PkiMessage(req.getTransactionId(), MessageType.CertRep,
+                Nonce.randomNonce());
         rep.setRecipientNonce(req.getSenderNonce());
 
         if(req.getFailureMessage() != null)
@@ -458,7 +465,8 @@ public class Scep
             final String message = tid + "=" + tid + ",could not get X509CA";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
@@ -531,7 +539,8 @@ public class Scep
                             }
                         } else
                         {
-                            LOG.warn("tid={}: ignore challengePassword since it does not has the format <user>:<password>",
+                            LOG.warn("tid={}: ignore challengePassword since it does not has the"
+                                    + " format <user>:<password>",
                                     tid);
                         }
                     }
@@ -540,13 +549,16 @@ public class Scep
                     {
                         if(MessageType.PKCSReq != mt)
                         {
-                            LOG.warn("tid={}: self-signed certificate is not permitted for messageType {}", tid, mt);
+                            LOG.warn("tid={}: self-signed certificate is not permitted for"
+                                    + " messageType {}", tid, mt);
                             throw FailInfoException.badRequest;
                         }
                         if(user == null)
                         {
-                            LOG.warn("tid={}: could not extract user and password from challengePassword, {}",
-                                    tid, "which are required for self-signed signature certificate");
+                            LOG.warn("tid={}: could not extract user and password from"
+                                    + " challengePassword, which are required for self-signed"
+                                    + " signature certificate",
+                                tid);
                             throw FailInfoException.badRequest;
                         }
                         checkCN(ca, user, cn);
@@ -554,21 +566,27 @@ public class Scep
                     {
                         if(user == null)
                         {
-                            // up to draft-nourse-scep-23 the client sends all messages to enroll certificate
-                            // via MessageType PKCSReq
+                            // up to draft-nourse-scep-23 the client sends all messages to enroll
+                            // certificate via MessageType PKCSReq
                             KnowCertResult knowCertRes = ca.knowsCertificate(reqSignatureCert);
                             if(knowCertRes.isKnown() == false)
                             {
-                                LOG.warn("tid={}: signature certiciate is not trusted by the CA", tid);
+                                LOG.warn("tid={}: signature certiciate is not trusted by the CA",
+                                        tid);
                                 throw FailInfoException.badRequest;
                             }
                             user = knowCertRes.getUser();
-                            audit(auditEvent, "user", user == null ? "null" : user);
+                            audit(auditEvent,
+                                    "user",
+                                    (user == null)
+                                        ? "null"
+                                        : user);
                         }
 
                         // only the same subject is permitted
                         String cnInSignatureCert = X509Util.getCommonName(
-                                X500Name.getInstance(reqSignatureCert.getSubjectX500Principal().getEncoded()));
+                                X500Name.getInstance(
+                                        reqSignatureCert.getSubjectX500Principal().getEncoded()));
                         boolean b2 = cn.equals(cnInSignatureCert);
                         if(b2 == false)
                         {
@@ -675,10 +693,12 @@ public class Scep
             cert = ca.getCertificate(serialNumber);
         } catch (CertificateException e)
         {
-            final String message = "could not get certificate (CA='" + caName + "' and serialNumber='" + serialNumber + "')";
+            final String message = "could not get certificate (CA='" + caName
+                    + "' and serialNumber='" + serialNumber + "')";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
@@ -710,8 +730,9 @@ public class Scep
 
         if(certs.size() > 1)
         {
-            LOG.warn("given certId (subject: {}) and transactionId {} match at least two certificates",
-                    X509Util.getRFC4519Name(subject), tid.getId());
+            LOG.warn(
+                "given certId (subject: {}) and transactionId {} match at least two certificates",
+                X509Util.getRFC4519Name(subject), tid.getId());
             throw FailInfoException.badCertId;
         }
 
@@ -738,7 +759,8 @@ public class Scep
             final String message = "error in buildSignedData";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
@@ -767,7 +789,8 @@ public class Scep
             final String message = "could not generate CMSSignedData";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
@@ -780,7 +803,8 @@ public class Scep
             final DecodedPkiMessage request)
     throws OperationException
     {
-        String signatureAlgorithm = getSignatureAlgorithm(responderKey, request.getDigestAlgorithm());
+        String signatureAlgorithm = getSignatureAlgorithm(responderKey,
+                request.getDigestAlgorithm());
         ContentInfo ci;
         try
         {
@@ -801,7 +825,8 @@ public class Scep
             final String message = "could not encode response";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
@@ -843,7 +868,8 @@ public class Scep
             return hashAlgo.getName() + "withRSA";
         } else
         {
-            throw new UnsupportedOperationException("getSignatureAlgorithm() for non-RSA is not supported yet.");
+            throw new UnsupportedOperationException(
+                    "getSignatureAlgorithm() for non-RSA is not supported yet.");
         }
     }
 
@@ -910,7 +936,11 @@ public class Scep
     {
         if(audit != null)
         {
-            audit.addEventData(new AuditEventData(name, value == null ? "null" : value));
+            audit.addEventData(
+                    new AuditEventData(name,
+                            (value == null)
+                                ? "null"
+                                : value));
         }
     }
 

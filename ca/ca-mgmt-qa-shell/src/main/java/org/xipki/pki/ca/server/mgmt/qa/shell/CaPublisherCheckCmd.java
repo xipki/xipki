@@ -80,7 +80,8 @@ public class CaPublisherCheckCmd extends CaCmd
         {
             if(m.getName().equals(publisherName))
             {
-                out(" checked CA publisher CA='" + caName +  "', publisher='" + publisherName + "'");
+                out(" checked CA publisher CA='" + caName
+                        + "', publisher='" + publisherName + "'");
                 return null;
             }
         }

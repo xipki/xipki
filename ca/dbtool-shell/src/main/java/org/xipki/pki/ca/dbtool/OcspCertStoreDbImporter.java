@@ -124,7 +124,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
         {
             @SuppressWarnings("unchecked")
             JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
-                    unmarshaller.unmarshal(new File(baseDir + File.separator + FILENAME_OCSP_CertStore));
+                    unmarshaller.unmarshal(
+                            new File(baseDir + File.separator + FILENAME_OCSP_CertStore));
             certstore = root.getValue();
         }catch(JAXBException e)
         {
@@ -133,7 +134,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
 
         if(certstore.getVersion() > VERSION)
         {
-            throw new Exception("could not import CertStore greater than " + VERSION + ": " + certstore.getVersion());
+            throw new Exception("could not import CertStore greater than " + VERSION + ": "
+                    + certstore.getVersion());
         }
 
         File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
@@ -198,8 +200,10 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
                     int idx = 1;
                     ps.setInt(idx++, issuer.getId());
                     ps.setString(idx++, X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
-                    ps.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
-                    ps.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
+                    ps.setLong(idx++,
+                            c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
+                    ps.setLong(idx++,
+                            c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
                     ps.setString(idx++, sha1(encodedName));
                     ps.setString(idx++, sha1(encodedKey));
                     ps.setString(idx++, sha224(encodedName));
@@ -263,7 +267,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
         deleteCertGreatherThan(minId - 1, LOG);
 
         final long total = certstore.getCountCerts() - numProcessedBefore;
-        final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore);
+        final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(),
+                numProcessedBefore);
 
         System.out.println(getImportingText() + "certificates from ID " + minId);
         ProcessLog.printHeader();
@@ -451,7 +456,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
                 {
                     int idx = 1;
                     ps_rawcert.setInt(idx++, cert.getId());
-                    ps_rawcert.setString(idx++, X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
+                    ps_rawcert.setString(idx++,
+                            X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
                     ps_rawcert.setString(idx++, Base64.toBase64String(encodedCert));
                     ps_rawcert.addBatch();
                 }catch(SQLException e)
@@ -461,7 +467,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
 
                 boolean isLastBlock = certs.hasNext() == false;
 
-                if(numEntriesInBatch > 0 && (numEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock))
+                if(numEntriesInBatch > 0
+                        && (numEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock))
                 {
                     if(evaulateOnly)
                     {

@@ -53,40 +53,40 @@ public class CanonicalizeCode
 {
 
     private final static String licenseText =
-            "/*\n" +
-            " *\n" +
-            " * This file is part of the XiPKI project.\n" +
-            " * Copyright (c) 2014 - 2015 Lijun Liao\n" +
-            " * Author: Lijun Liao\n" +
-            " *\n" +
-            " * This program is free software; you can redistribute it and/or modify\n" +
-            " * it under the terms of the GNU Affero General Public License version 3\n" +
-            " * as published by the Free Software Foundation with the addition of the\n" +
-            " * following permission added to Section 15 as permitted in Section 7(a):\n" +
-            " * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY\n" +
-            " * THE AUTHOR LIJUN LIAO. LIJUN LIAO DISCLAIMS THE WARRANTY OF NON INFRINGEMENT\n" +
-            " * OF THIRD PARTY RIGHTS.\n" +
-            " *\n" +
-            " * This program is distributed in the hope that it will be useful,\n" +
-            " * but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
-            " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n" +
-            " * GNU Affero General Public License for more details.\n" +
-            " *\n" +
-            " * You should have received a copy of the GNU Affero General Public License\n" +
-            " * along with this program.  If not, see <http://www.gnu.org/licenses/>.\n" +
-            " *\n" +
-            " * The interactive user interfaces in modified source and object code versions\n" +
-            " * of this program must display Appropriate Legal Notices, as required under\n" +
-            " * Section 5 of the GNU Affero General Public License.\n" +
-            " *\n" +
-            " * You can be released from the requirements of the license by purchasing\n" +
-            " * a commercial license. Buying such a license is mandatory as soon as you\n" +
-            " * develop commercial activities involving the XiPKI software without\n" +
-            " * disclosing the source code of your own applications.\n" +
-            " *\n" +
-            " * For more information, please contact Lijun Liao at this\n" +
-            " * address: lijun.liao@gmail.com\n" +
-            " */\n\n";
+            "/*\n"
+            + " *\n"
+            + " * This file is part of the XiPKI project.\n"
+            + " * Copyright (c) 2014 - 2015 Lijun Liao\n"
+            + " * Author: Lijun Liao\n"
+            + " *\n"
+            + " * This program is free software; you can redistribute it and/or modify\n"
+            + " * it under the terms of the GNU Affero General Public License version 3\n"
+            + " * as published by the Free Software Foundation with the addition of the\n"
+            + " * following permission added to Section 15 as permitted in Section 7(a):\n"
+            + " * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY\n"
+            + " * THE AUTHOR LIJUN LIAO. LIJUN LIAO DISCLAIMS THE WARRANTY OF NON INFRINGEMENT\n"
+            + " * OF THIRD PARTY RIGHTS.\n"
+            + " *\n"
+            + " * This program is distributed in the hope that it will be useful,\n"
+            + " * but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+            + " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n"
+            + " * GNU Affero General Public License for more details.\n"
+            + " *\n"
+            + " * You should have received a copy of the GNU Affero General Public License\n"
+            + " * along with this program.  If not, see <http://www.gnu.org/licenses/>.\n"
+            + " *\n"
+            + " * The interactive user interfaces in modified source and object code versions\n"
+            + " * of this program must display Appropriate Legal Notices, as required under\n"
+            + " * Section 5 of the GNU Affero General Public License.\n"
+            + " *\n"
+            + " * You can be released from the requirements of the license by purchasing\n"
+            + " * a commercial license. Buying such a license is mandatory as soon as you\n"
+            + " * develop commercial activities involving the XiPKI software without\n"
+            + " * disclosing the source code of your own applications.\n"
+            + " *\n"
+            + " * For more information, please contact Lijun Liao at this\n"
+            + " * address: lijun.liao@gmail.com\n"
+            + " */\n\n";
 
     private final static String THROWS_PREFIX = "    ";
 
@@ -116,7 +116,8 @@ public class CanonicalizeCode
         {
             if(file.isDirectory())
             {
-                if(file.getName().equals("target") == false && file.getName().equals("tbd") == false)
+                if(file.getName().equals("target") == false
+                        && file.getName().equals("tbd") == false)
                 {
                     canonicalizeDir(file);
                 }
@@ -303,7 +304,8 @@ public class CanonicalizeCode
         {
             if(file.isDirectory())
             {
-                if(file.getName().equals("target") == false && file.getName().equals("tbd") == false)
+                if(file.getName().equals("target") == false
+                        && file.getName().equals("tbd") == false)
                 {
                     checkWarningsInDir(file);
                 }
@@ -342,12 +344,13 @@ public class CanonicalizeCode
                 {
                     lastLine = line;
 
-                    if(line.length() > 128 || line.endsWith("+") || line.endsWith("|")
+                    if(line.length() > 100 || line.endsWith("+") || line.endsWith("|")
                             || line.endsWith("&"))
                     {
                         lineNumbers.add(lineNumber);
                         continue;
-                    } else if(line.contains("?") && line.contains(":"))
+                    } else if(line.contains("?")
+                            && line.contains(" :"))
                     {
                         lineNumbers.add(lineNumber);
                         continue;
@@ -400,7 +403,8 @@ public class CanonicalizeCode
                                 continue;
                             }
 
-                            if(idx2 == 4 * THROWS_PREFIX.length() && trimmedLastLine.startsWith("final "))
+                            if(idx2 == 4 * THROWS_PREFIX.length()
+                                    && trimmedLastLine.startsWith("final "))
                             {
                                 continue;
                             }
@@ -418,14 +422,14 @@ public class CanonicalizeCode
 
         if(lineNumbers.isEmpty() == false)
         {
-            System.out.println("Please check file " + file.getPath() +
-                ": lines " + Arrays.toString(lineNumbers.toArray(new Integer[0])));
+            System.out.println("Please check file " + file.getPath()
+                + ": lines " + Arrays.toString(lineNumbers.toArray(new Integer[0])));
         }
 
         if(authorsLineAvailable == false)
         {
-            System.out.println("Please check file " + file.getPath() +
-                    ": no authors line");
+            System.out.println("Please check file " + file.getPath()
+                    + ": no authors line");
         }
 
     }

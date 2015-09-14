@@ -885,14 +885,16 @@ implements HessianCAManager
     {
         try
         {
-            X509Certificate cert = caManager.generateCertificate(caName, profileName, user, encodedPkcs10Request);
+            X509Certificate cert = caManager.generateCertificate(caName, profileName, user,
+                    encodedPkcs10Request);
             return cert.getEncoded();
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
         } catch (CertificateEncodingException e)
         {
-            throw new HessianCAMgmtException("could not encode generated certificate: " + e.getMessage());
+            throw new HessianCAMgmtException("could not encode generated certificate: "
+                    + e.getMessage());
         }
     }
 
@@ -1113,7 +1115,8 @@ implements HessianCAManager
             }
             else
             {
-                password = securityFactory.getPasswordResolver().resolvePassword(truststorePassword);
+                password = securityFactory.getPasswordResolver().resolvePassword(
+                        truststorePassword);
             }
             keyStore.load(new FileInputStream(storePath), password);
             Enumeration<String> aliases = keyStore.aliases();
@@ -1128,7 +1131,8 @@ implements HessianCAManager
                     trustedUserCerts.add(x509Cert);
                     if(LOG.isInfoEnabled())
                     {
-                        LOG.info("added trusted user certificate with subject='{}', issuer='{}' and serialNumber={}",
+                        LOG.info("added trusted user certificate with subject='{}', issuer='{}'"
+                                + " and serialNumber={}",
                                 new Object[]{x509Cert.getSubjectX500Principal().getName(),
                                         x509Cert.getIssuerX500Principal().getName(),
                                         x509Cert.getSerialNumber()});
@@ -1140,7 +1144,8 @@ implements HessianCAManager
             final String message = "could not initialize CAManagerServlet";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
         }

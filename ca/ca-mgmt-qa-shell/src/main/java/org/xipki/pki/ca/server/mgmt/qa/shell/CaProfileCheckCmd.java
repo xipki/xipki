@@ -92,7 +92,8 @@ public class CaProfileCheckCmd extends CaCmd
         String name = entries.get(profileLocalname);
         if(profileName.equals(name) == false)
         {
-            throw new CmdFailure("Profile name is '" + name + "', but expected '" + profileName + "'");
+            throw new CmdFailure(
+                    "Profile name is '" + name + "', but expected '" + profileName + "'");
         }
         out(" checked CA profile CA='" + caName +  "', profile='" + profileName + "'");
         return null;

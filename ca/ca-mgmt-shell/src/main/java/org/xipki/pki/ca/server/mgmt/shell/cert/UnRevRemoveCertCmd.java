@@ -96,7 +96,8 @@ public abstract class UnRevRemoveCertCmd extends CaCmd
             X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
             if(X509Util.issues(caCert, cert) == false)
             {
-                throw new UnexpectedException("certificate '" + certFile + "' is not issued by CA " + caName);
+                throw new UnexpectedException(
+                        "certificate '" + certFile + "' is not issued by CA " + caName);
             }
             serialNumber = cert.getSerialNumber();
         }

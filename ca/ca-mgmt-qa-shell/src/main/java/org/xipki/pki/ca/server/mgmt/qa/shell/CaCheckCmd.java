@@ -140,7 +140,8 @@ public class CaCheckCmd extends CaUpdateCmd
             DuplicationMode is = ca.getDuplicateKeyMode();
             if(ex.equals(is) == false)
             {
-                throw new CmdFailure("Duplicate key mode: is '" + is + "', but expected '" + ex + "'");
+                throw new CmdFailure("Duplicate key mode: is '" + is
+                        + "', but expected '" + ex + "'");
             }
         }
 
@@ -151,7 +152,8 @@ public class CaCheckCmd extends CaUpdateCmd
             DuplicationMode is = ca.getDuplicateSubjectMode();
             if(ex.equals(is) == false)
             {
-                throw new CmdFailure("Duplicate subject mode: is '" + is + "', but expected '" + ex + "'");
+                throw new CmdFailure("Duplicate subject mode: is '" + is
+                        + "', but expected '" + ex + "'");
             }
         }
 
@@ -162,7 +164,8 @@ public class CaCheckCmd extends CaUpdateCmd
             Integer is = ca.getExpirationPeriod();
             if(ex.equals(is) == false)
             {
-                throw new CmdFailure("Expiration period: is '" + is + "', but expected '" + ex + "'");
+                throw new CmdFailure("Expiration period: is '" + is
+                        + "', but expected '" + ex + "'");
             }
         }
 

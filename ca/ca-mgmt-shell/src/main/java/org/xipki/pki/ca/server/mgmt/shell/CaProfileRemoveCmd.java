@@ -62,7 +62,8 @@ public class CaProfileRemoveCmd extends CaCmd
     throws Exception
     {
         boolean b = caManager.removeCertprofileFromCA(profileLocalname, caName);
-        output(b, "removed", "could not remove", "certificate with localname " + profileLocalname + " from CA " + caName);
+        output(b, "removed", "could not remove",
+                "certificate with localname " + profileLocalname + " from CA " + caName);
         return null;
     }
 }

@@ -202,7 +202,8 @@ public class CaUpdateCmd extends CaCmd
                 _signerType = caEntry.getSignerType();
             }
 
-            signerConf = ShellUtil.canonicalizeSignerConf(_signerType, signerConf, passwordResolver);
+            signerConf = ShellUtil.canonicalizeSignerConf(_signerType, signerConf,
+                    passwordResolver);
             entry.setSignerConf(signerConf);
         }
 

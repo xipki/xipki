@@ -112,7 +112,9 @@ public class CmpResponderEntryWrapper
 
     public boolean isHealthy()
     {
-        return signer == null ? false : signer.isHealthy();
+        return (signer == null)
+                ? false
+                : signer.isHealthy();
     }
 
     public GeneralName getSubjectAsGeneralName()

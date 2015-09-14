@@ -76,7 +76,8 @@ public class CaGenRootCAFromFileCmd extends CaAddFromFileCmd
         X509Certificate rcaCert = caManager.generateRootCA(caEntry, rcaProfile, p10Req);
         if(rcaCertOutFile != null)
         {
-            saveVerbose("saved root certificate to file", new File(rcaCertOutFile), rcaCert.getEncoded());
+            saveVerbose("saved root certificate to file", new File(rcaCertOutFile),
+                    rcaCert.getEncoded());
         }
         out("generated root CA " + caEntry.getName());
         return null;

@@ -81,7 +81,8 @@ public class CmpUtil
     {
         if(signerName == null)
         {
-            X500Name x500Name = X500Name.getInstance(signer.getCertificate().getSubjectX500Principal().getEncoded());
+            X500Name x500Name = X500Name.getInstance(
+                    signer.getCertificate().getSubjectX500Principal().getEncoded());
             signerName = new GeneralName(x500Name);
         }
         PKIHeader header = pkiMessage.getHeader();

@@ -51,7 +51,8 @@ public class QaPolicyConstraints extends QaExtension
     {
         if(jaxb.getRequireExplicitPolicy() == null && jaxb.getInhibitPolicyMapping() == null)
         {
-            throw new IllegalArgumentException("at least one of requireExplicitPolicy and inhibitPolicyMapping must be set");
+            throw new IllegalArgumentException(
+                    "at least one of requireExplicitPolicy and inhibitPolicyMapping must be set");
         }
 
         this.requireExplicitPolicy = jaxb.getRequireExplicitPolicy();

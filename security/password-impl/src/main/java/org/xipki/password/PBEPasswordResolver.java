@@ -67,9 +67,11 @@ public class PBEPasswordResolver implements SinglePasswordResolver
             {
                 if(masterPwdCallback == null)
                 {
-                    throw new PasswordResolverException("masterPasswordCallback is not initialized");
+                    throw new PasswordResolverException(
+                            "masterPasswordCallback is not initialized");
                 }
-                this.masterPassword = masterPwdCallback.getPassword("Please enter the master password");
+                this.masterPassword = masterPwdCallback.getPassword(
+                        "Please enter the master password");
             }
             return masterPassword;
         }
@@ -117,10 +119,12 @@ public class PBEPasswordResolver implements SinglePasswordResolver
         byte[] pwd;
         try
         {
-            pwd = PasswordBasedEncryption.decrypt(cipherText, masterPassword, iterationCount, salt);
+            pwd = PasswordBasedEncryption.decrypt(cipherText, masterPassword, iterationCount,
+                    salt);
         } catch (GeneralSecurityException e)
         {
-            throw new PasswordResolverException("could not decrypt the password: " + e.getMessage());
+            throw new PasswordResolverException("could not decrypt the password: "
+                    + e.getMessage());
         }
 
         char[] ret = new char[pwd.length];
@@ -147,7 +151,8 @@ public class PBEPasswordResolver implements SinglePasswordResolver
                     masterPassword, iterationCount, salt);
         } catch (GeneralSecurityException e)
         {
-            throw new PasswordResolverException("could not encrypt the password: " + e.getMessage());
+            throw new PasswordResolverException("could not encrypt the password: "
+                    + e.getMessage());
         }
 
         byte[] encryptedWithSalt = new byte[salt.length + encrypted.length];
@@ -196,12 +201,15 @@ public class PBEPasswordResolver implements SinglePasswordResolver
             }
             else
             {
-                throw new IllegalArgumentException("invalid masterPasswordCallback configuration " + masterPasswordCallback);
+                throw new IllegalArgumentException(
+                        "invalid masterPasswordCallback configuration "
+                        + masterPasswordCallback);
             }
 
         }catch(Exception e)
         {
-            throw new IllegalArgumentException("invalid masterPasswordCallback configuration " + masterPasswordCallback
+            throw new IllegalArgumentException("invalid masterPasswordCallback configuration "
+                    + masterPasswordCallback
                     + ", " + e.getClass().getName() + ": " + e.getMessage());
         }
     }

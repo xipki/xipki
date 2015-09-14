@@ -94,7 +94,8 @@ public class KeystoreP11Module implements P11Module
         {
             if((child.isDirectory() && child.canRead() && child.exists()) == false)
             {
-                LOG.warn("ignore path {}, it does not point to a readable exist directory", child.getPath());
+                LOG.warn("ignore path {}, it does not point to a readable exist directory",
+                        child.getPath());
                 continue;
             }
 
@@ -183,7 +184,8 @@ public class KeystoreP11Module implements P11Module
             throw new SignerException("PasswordResolverException: " + e.getMessage(), e);
         }
 
-        File slotDir = new File(moduleConf.getNativeLibrary(), _slotId.getSlotIndex() + "-" + _slotId.getSlotId());
+        File slotDir = new File(moduleConf.getNativeLibrary(), _slotId.getSlotIndex() + "-"
+                + _slotId.getSlotId());
 
         extSlot = new KeystoreP11Slot(slotDir, _slotId, pwd);
 

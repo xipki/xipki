@@ -84,7 +84,8 @@ public class P10RequestGenerator
     throws PasswordResolverException, SignerException
     {
         X500Name subjectDN = new X500Name(subject);
-        return generateRequest(securityFactory, signerType, signerConf, subjectPublicKeyInfo, subjectDN, attributes);
+        return generateRequest(securityFactory, signerType, signerConf, subjectPublicKeyInfo,
+                subjectDN, attributes);
     }
 
     public PKCS10CertificationRequest generateRequest(
@@ -206,13 +207,15 @@ public class P10RequestGenerator
             pairs = new ConfPairs(accessMethodAndLocation);
         }catch(IllegalArgumentException e)
         {
-            throw new BadInputException("invalid accessMethodAndLocation " + accessMethodAndLocation);
+            throw new BadInputException("invalid accessMethodAndLocation "
+                    + accessMethodAndLocation);
         }
 
         Set<String> oids = pairs.getNames();
         if(oids == null || oids.size() != 1)
         {
-            throw new BadInputException("invalid accessMethodAndLocation " + accessMethodAndLocation);
+            throw new BadInputException("invalid accessMethodAndLocation "
+                    + accessMethodAndLocation);
         }
 
         String accessMethodS = oids.iterator().next();
@@ -225,7 +228,8 @@ public class P10RequestGenerator
 
     /**
      *
-     * @param taggedValue [tag]value, and the value for tags otherName and ediPartyName is type=value.
+     * @param taggedValue [tag]value, and the value for tags otherName and ediPartyName is
+     *   type=value.
      * @param modes
      * @return
      * @throws BadInputException

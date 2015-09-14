@@ -146,7 +146,8 @@ public class HealthCheckServlet extends HttpServlet
             final String message = "connection reset by peer";
             if(LOG.isErrorEnabled())
             {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message),
+                        e.getClass().getName(), e.getMessage());
             }
             LOG.debug(message, e);
 

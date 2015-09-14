@@ -80,7 +80,8 @@ public class CaExportCmd extends CaCmd
 
         if(_entry instanceof X509CAEntry == false)
         {
-            throw new UnexpectedException("unsupported CAEntry type " + _entry.getClass().getName());
+            throw new UnexpectedException(
+                    "unsupported CAEntry type " + _entry.getClass().getName());
         }
 
         X509CAEntry entry = (X509CAEntry) _entry;

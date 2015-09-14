@@ -177,7 +177,8 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
                 String datasourceFile = props.getProperty(key);
                 String datasourceName = key.substring("datasource.".length());
                 Properties dbConf = getDbConfPoperties(datasourceFile);
-                LiquibaseDatabaseConf dbParams = LiquibaseDatabaseConf.getInstance(dbConf, passwordResolver);
+                LiquibaseDatabaseConf dbParams = LiquibaseDatabaseConf.getInstance(
+                        dbConf, passwordResolver);
                 ret.put(datasourceName, dbParams);
             }
         }

@@ -225,7 +225,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
     throws SignerException
     {
         checkSlotId(slotId);
-        byte[] certBytes = getCertOrKey(XipkiCmpConstants.ACTION_RP11_GET_CERTIFICATE, slotId, keyId);
+        byte[] certBytes = getCertOrKey(XipkiCmpConstants.ACTION_RP11_GET_CERTIFICATE, slotId,
+                keyId);
         if(certBytes == null)
         {
             throw new SignerException("received no certificate from server for " + keyId);
@@ -342,7 +343,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
         {
             v.add(content);
         }
-        InfoTypeAndValue itvReq = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cm_cmpGenmsg, new DERSequence(v));
+        InfoTypeAndValue itvReq = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cm_cmpGenmsg,
+                new DERSequence(v));
 
         GenMsgContent genMsgContent = new GenMsgContent(itvReq);
         PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
@@ -374,7 +376,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
             response = new GeneralPKIMessage(encodedResponse);
         } catch (IOException e)
         {
-            LOG.error("error while decode the received PKI message: {}", Hex.toHexString(encodedResponse));
+            LOG.error("error while decode the received PKI message: {}",
+                    Hex.toHexString(encodedResponse));
             throw new SignerException(e.getMessage(), e);
         }
 
@@ -401,7 +404,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
         {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
             PKIStatusInfo statusInfo = content.getPKIStatusInfo();
-            throw new SignerException("server answered with ERROR: " + SecurityUtil.formatPKIStatusInfo(statusInfo));
+            throw new SignerException("server answered with ERROR: "
+                    + SecurityUtil.formatPKIStatusInfo(statusInfo));
         }
         else if(PKIBody.TYPE_GEN_REP != bodyType)
         {
@@ -440,7 +444,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
         try
         {
             ASN1Sequence seq = ASN1Sequence.getInstance(itvValue);
-            int receivedAction = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue().intValue();
+            int receivedAction = ASN1Integer.getInstance(seq.getObjectAt(0))
+                    .getPositiveValue().intValue();
             if(receivedAction != action)
             {
                 throw new SignerException("xipki action '"
@@ -488,7 +493,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
             final byte[] encodedSubjectPublicKeyInfo)
     throws SignerException
     {
-        SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfo.getInstance(encodedSubjectPublicKeyInfo);
+        SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfo.getInstance(
+                encodedSubjectPublicKeyInfo);
 
         X509EncodedKeySpec keyspec = new X509EncodedKeySpec(encodedSubjectPublicKeyInfo);
         ASN1ObjectIdentifier aid = pkInfo.getAlgorithm().getAlgorithm();
@@ -534,7 +540,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
         ASN1Encodable resp = send(XipkiCmpConstants.ACTION_RP11_LIST_SLOTS, null);
         if(resp instanceof ASN1Sequence == false)
         {
-            throw new SignerException("response is not ASN1Sequence, but " + resp.getClass().getName());
+            throw new SignerException("response is not ASN1Sequence, but "
+                    + resp.getClass().getName());
         }
 
         ASN1Sequence seq = (ASN1Sequence) resp;
@@ -574,7 +581,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
                 _slotId);
         if(resp instanceof ASN1Sequence == false)
         {
-            throw new SignerException("response is not ASN1Sequence, but " + resp.getClass().getName());
+            throw new SignerException("response is not ASN1Sequence, but "
+                    + resp.getClass().getName());
         }
 
         ASN1Sequence seq = (ASN1Sequence) resp;
@@ -586,7 +594,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
             ASN1Encodable obj = seq.getObjectAt(i);
             if(obj instanceof ASN1String == false)
             {
-                throw new SignerException("object at index " + i + " is not ASN1String, but " + resp.getClass().getName());
+                throw new SignerException("object at index " + i + " is not ASN1String, but "
+                        + resp.getClass().getName());
             }
             keyLabels[i] = ((ASN1String) obj).getString();
         }

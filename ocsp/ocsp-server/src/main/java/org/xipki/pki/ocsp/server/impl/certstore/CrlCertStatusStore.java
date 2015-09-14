@@ -509,7 +509,8 @@ public class CrlCertStatusStore extends CertStatusStore
             {
                 if(extnValue != null)
                 {
-                    LOG.warn("ignore certsDir '{}', since certificates are included in CRL Extension certs", certsDirname);
+                    LOG.warn("ignore certsDir '{}', since certificates are included in {}",
+                            certsDirname, " CRL Extension certs");
                 }
                 else
                 {
@@ -650,7 +651,7 @@ public class CrlCertStatusStore extends CertStatusStore
 
                         if(cert == null)
                         {
-                            LOG.info("could not find certificate (issuer = '{}', serialNumber = '{}'",
+                            LOG.info("could not find certificate (issuer='{}', serialNumber='{}'",
                                     X509Util.getRFC4519Name(caName), serialNumber);
                         }
                         else
@@ -670,10 +671,11 @@ public class CrlCertStatusStore extends CertStatusStore
                             ? null
                             : cert.profileName;
 
-                    CrlCertStatusInfo crlCertStatusInfo = CrlCertStatusInfo.getRevokedCertStatusInfo(
-                            revocationInfo,
-                            profileName,
-                            certHashes);
+                    CrlCertStatusInfo crlCertStatusInfo =
+                            CrlCertStatusInfo.getRevokedCertStatusInfo(
+                                    revocationInfo,
+                                    profileName,
+                                    certHashes);
                     newCertStatusInfoMap.put(serialNumber, crlCertStatusInfo);
                 } // end while(it.hasNext())
             } // end if(it)
@@ -683,7 +685,8 @@ public class CrlCertStatusStore extends CertStatusStore
                 Map<HashAlgoType, byte[]> certHashes = getCertHashes(cert.cert);
                 CrlCertStatusInfo crlCertStatusInfo = CrlCertStatusInfo.getGoodCertStatusInfo(
                         cert.profileName, certHashes);
-                newCertStatusInfoMap.put(cert.cert.getSerialNumber().getPositiveValue(), crlCertStatusInfo);
+                newCertStatusInfoMap.put(cert.cert.getSerialNumber().getPositiveValue(),
+                        crlCertStatusInfo);
             }
 
             this.initialized = false;
@@ -709,7 +712,8 @@ public class CrlCertStatusStore extends CertStatusStore
             final String message = "could not execute initializeStore()";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
             initializationFailed = true;
@@ -845,7 +849,8 @@ public class CrlCertStatusStore extends CertStatusStore
             }
             else
             {
-                certStatusInfo = crlCertStatusInfo.getCertStatusInfo(certHashAlgo, thisUpdate, nextUpdate);
+                certStatusInfo = crlCertStatusInfo.getCertStatusInfo(certHashAlgo, thisUpdate,
+                        nextUpdate);
             }
         }
         else
@@ -1042,7 +1047,8 @@ public class CrlCertStatusStore extends CertStatusStore
                     final String message = "could not extract AuthorityKeyIdentifier";
                     if(LOG.isErrorEnabled())
                     {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        LOG.error(LogUtil.buildExceptionLogFormat(message),
+                                e.getClass().getName(), e.getMessage());
                     }
                     LOG.debug(message, e);
                 }

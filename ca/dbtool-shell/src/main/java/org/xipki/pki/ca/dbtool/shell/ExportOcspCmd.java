@@ -84,8 +84,8 @@ public class ExportOcspCmd extends DbPortCmd
     protected DbPortWorker getDbPortWorker()
     throws Exception
     {
-        return new OcspDbExportWorker(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume,
-                numCertsInBundle, numCertsPerSelect, testOnly);
+        return new OcspDbExportWorker(dataSourceFactory, passwordResolver, dbconfFile, outdir,
+                resume, numCertsInBundle, numCertsPerSelect, testOnly);
     }
 
     public void setDataSourceFactory(

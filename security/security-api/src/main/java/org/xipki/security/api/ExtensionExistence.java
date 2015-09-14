@@ -166,7 +166,8 @@ public class ExtensionExistence extends ASN1Object
             }
         }
 
-        throw new IllegalArgumentException("unknown object in getInstance: " + obj.getClass().getName());
+        throw new IllegalArgumentException("unknown object in getInstance: "
+                + obj.getClass().getName());
     }
 
     @Override

@@ -146,7 +146,9 @@ public class ScepServlet extends HttpServlet
         }
 
         AuditService auditService = auditServiceRegister.getAuditService();
-        AuditEvent auditEvent = (auditService != null) ? new AuditEvent(new Date()) : null;
+        AuditEvent auditEvent = (auditService != null)
+                ? new AuditEvent(new Date())
+                : null;
         if(auditEvent != null)
         {
             auditEvent.setApplicationName("SCEP");
@@ -180,8 +182,8 @@ public class ScepServlet extends HttpServlet
                 scepName = realScepName;
             }
             Scep responder = responderManager.getScep(scepName);
-            if(responder == null || responder.getStatus() != CAStatus.ACTIVE ||
-                    responder.supportsCertProfile(certProfileName) == false)
+            if(responder == null || responder.getStatus() != CAStatus.ACTIVE
+                    || responder.supportsCertProfile(certProfileName) == false)
             {
                 auditMessage = "unknown SCEP '" + scepName + "/" + certProfileName + "'";
                 LOG.warn(auditMessage);
@@ -218,7 +220,8 @@ public class ScepServlet extends HttpServlet
                     final String message = "invalid request";
                     if(LOG.isErrorEnabled())
                     {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                                e.getMessage());
                     }
                     LOG.debug(message, e);
 
@@ -239,7 +242,8 @@ public class ScepServlet extends HttpServlet
                     final String message = "could not decrypt and/or verify the request";
                     if(LOG.isErrorEnabled())
                     {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        LOG.error(LogUtil.buildExceptionLogFormat(message),
+                                e.getClass().getName(), e.getMessage());
                     }
                     LOG.debug(message, e);
 
@@ -254,7 +258,8 @@ public class ScepServlet extends HttpServlet
                     final String message = "system internal error";
                     if(LOG.isErrorEnabled())
                     {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        LOG.error(LogUtil.buildExceptionLogFormat(message),
+                                e.getClass().getName(), e.getMessage());
                     }
                     LOG.debug(message, e);
 
@@ -308,7 +313,8 @@ public class ScepServlet extends HttpServlet
             final String message = "connection reset by peer";
             if(LOG.isErrorEnabled())
             {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
 

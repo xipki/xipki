@@ -60,7 +60,8 @@ public class CaRevokeCmd extends CaCmd
             Arrays.asList(new CRLReason[]
             {
                 CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE, CRLReason.CA_COMPROMISE,
-                CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED, CRLReason.CESSATION_OF_OPERATION,
+                CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED,
+                CRLReason.CESSATION_OF_OPERATION,
                 CRLReason.CERTIFICATE_HOLD,    CRLReason.PRIVILEGE_WITHDRAWN}));
 
     @Argument(index = 0, name = "name", description = "CA name", required = true)
@@ -117,7 +118,8 @@ public class CaRevokeCmd extends CaCmd
             invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
         }
 
-        CertRevocationInfo revInfo = new CertRevocationInfo(crlReason, revocationDate, invalidityDate);
+        CertRevocationInfo revInfo = new CertRevocationInfo(crlReason, revocationDate,
+                invalidityDate);
         boolean b = caManager.revokeCa(caName, revInfo);
         output(b, "revoked", "could not revoke", "CA " + caName);
         return null;

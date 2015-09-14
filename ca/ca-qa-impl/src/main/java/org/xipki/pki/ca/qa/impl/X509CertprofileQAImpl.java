@@ -116,7 +116,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
     {
         try
         {
-            X509ProfileType conf = XmlX509CertprofileUtil.parse(new ByteArrayInputStream(dataBytes));
+            X509ProfileType conf = XmlX509CertprofileUtil.parse(
+                    new ByteArrayInputStream(dataBytes));
 
             this.version = X509CertVersion.getInstance(conf.getVersion());
             if(this.version == null)
@@ -155,10 +156,12 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             final String message = "RuntimeException";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
-            throw new CertprofileException("RuntimeException thrown while initializing certprofile: " + e.getMessage());
+            throw new CertprofileException(
+                    "RuntimeException thrown while initializing certprofile: " + e.getMessage());
         }
     }
 
@@ -202,7 +205,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             int versionNumber = cert.getVersion();
             if(versionNumber != version.getVersion())
             {
-                issue.setFailureMessage("is '" + versionNumber + "' but expected '" + version.getVersion() + "'");
+                issue.setFailureMessage("is '" + versionNumber
+                        + "' but expected '" + version.getVersion() + "'");
             }
         }
 
@@ -216,7 +220,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             AlgorithmIdentifier tbsSigAlgId = bcCert.getTBSCertificate().getSignature();
             if(tbsSigAlgId.equals(sigAlgId) == false)
             {
-                issue.setFailureMessage("Certificate.tbsCertificate.signature != Certificate.signatureAlgorithm");
+                issue.setFailureMessage(
+                        "Certificate.tbsCertificate.signature != Certificate.signatureAlgorithm");
             } else
             {
                 try
@@ -224,11 +229,13 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                     String sigAlgo = AlgorithmUtil.getSignatureAlgoName(sigAlgId);
                     if(signatureAlgorithms.contains(sigAlgo) == false)
                     {
-                        issue.setFailureMessage("signatureAlgorithm '" + sigAlgo + "' is not allowed");
+                        issue.setFailureMessage("signatureAlgorithm '" + sigAlgo
+                                + "' is not allowed");
                     }
                 } catch (NoSuchAlgorithmException e)
                 {
-                    issue.setFailureMessage("unsupported signature algorithm " + sigAlgId.getAlgorithm().getId());
+                    issue.setFailureMessage("unsupported signature algorithm "
+                            + sigAlgId.getAlgorithm().getId());
                 }
             }
         }
@@ -246,7 +253,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
             if(hourOfDay != 0 || minute != 0 || second != 0)
             {
-                issue.setFailureMessage(" '" + cert.getNotBefore() + "' is not midnight time (UTC)");
+                issue.setFailureMessage(" '" + cert.getNotBefore()
+                    + "' is not midnight time (UTC)");
             }
         }
 
@@ -268,11 +276,13 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
 
         // public key
-        resultIssues.addAll(publicKeyChecker.checkPublicKey(bcCert.getSubjectPublicKeyInfo(), requestedPublicKey));
+        resultIssues.addAll(publicKeyChecker.checkPublicKey(bcCert.getSubjectPublicKeyInfo(),
+                requestedPublicKey));
 
         // Signature
         {
-            ValidationIssue issue = new ValidationIssue("X509.SIG", "whether certificate is signed by CA");
+            ValidationIssue issue = new ValidationIssue("X509.SIG",
+                    "whether certificate is signed by CA");
             resultIssues.add(issue);
             try
             {
@@ -287,9 +297,11 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         {
             ValidationIssue issue = new ValidationIssue("X509.ISSUER", "certificate issuer");
             resultIssues.add(issue);
-            if(cert.getIssuerX500Principal().equals(issuerInfo.getCert().getSubjectX500Principal()) == false)
+            if(cert.getIssuerX500Principal().equals(
+                    issuerInfo.getCert().getSubjectX500Principal()) == false)
             {
-                issue.setFailureMessage("issue in certificate does not equal the subject of CA certificate");
+                issue.setFailureMessage(
+                        "issue in certificate does not equal the subject of CA certificate");
             }
         }
 

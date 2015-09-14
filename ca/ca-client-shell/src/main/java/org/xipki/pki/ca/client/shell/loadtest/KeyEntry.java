@@ -231,7 +231,8 @@ public abstract class KeyEntry
                 KeyPair kp =  KeyUtil.generateDSAKeypair(pLength, qLength, 10);
                 DSAPublicKey pk = (DSAPublicKey) kp.getPublic();
 
-                init(pk.getParams().getP(), pk.getParams().getQ(), pk.getParams().getG(), pk.getY());
+                init(pk.getParams().getP(), pk.getParams().getQ(), pk.getParams().getG(),
+                        pk.getY());
             }
         }
 
@@ -316,7 +317,8 @@ public abstract class KeyEntry
                 curveOid = KeyUtil.getCurveOID(curveName);
                 if(curveOid == null)
                 {
-                    throw new IllegalArgumentException("no OID is defined for the curve " + curveName);
+                    throw new IllegalArgumentException(
+                            "no OID is defined for the curve " + curveName);
                 }
             }
             algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey,

@@ -478,8 +478,9 @@ class CaConfigurationDbExporter extends DbPorter
         sqlBuilder.append("CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, ");
         sqlBuilder.append("PERMISSIONS, NUM_CRLS, ");
         sqlBuilder.append("EXPIRATION_PERIOD, REV, RR, RT, RIT, ");
-        sqlBuilder.append("DUPLICATE_KEY, DUPLICATE_SUBJECT, DUPLICATE_CN, DELTACRL_URIS, VALIDITY_MODE,");
-        sqlBuilder.append("CACERT_URIS, ART, NEXT_CRLNO, RESPONDER_NAME, CMPCONTROL_NAME, EXTRA_CONTROL");
+        sqlBuilder.append("DUPLICATE_KEY, DUPLICATE_SUBJECT, DUPLICATE_CN, DELTACRL_URIS, ");
+        sqlBuilder.append("VALIDITY_MODE,CACERT_URIS, ART, NEXT_CRLNO, RESPONDER_NAME, ");
+        sqlBuilder.append("CMPCONTROL_NAME, EXTRA_CONTROL");
         sqlBuilder.append(" FROM CA");
 
         final String sql = sqlBuilder.toString();
@@ -579,7 +580,8 @@ class CaConfigurationDbExporter extends DbPorter
     {
         System.out.println("exporting table CA_HAS_REQUESTOR");
         CaHasRequestors ca_has_requestors = new CaHasRequestors();
-        final String sql = "SELECT CA_NAME, REQUESTOR_NAME, RA, PERMISSIONS, PROFILES FROM CA_HAS_REQUESTOR";
+        final String sql = "SELECT CA_NAME, REQUESTOR_NAME, RA, PERMISSIONS, PROFILES"
+                + " FROM CA_HAS_REQUESTOR";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -663,7 +665,8 @@ class CaConfigurationDbExporter extends DbPorter
         Sceps sceps = new Sceps();
         caconf.setSceps(sceps);
 
-        final String sql = "SELECT CA_NAME, RESPONDER_TYPE, RESPONDER_CONF, RESPONDER_CERT, CONTROL FROM SCEP";
+        final String sql = "SELECT CA_NAME, RESPONDER_TYPE, RESPONDER_CONF, RESPONDER_CERT,"
+                + " CONTROL FROM SCEP";
 
         Statement stmt = null;
         ResultSet rs = null;

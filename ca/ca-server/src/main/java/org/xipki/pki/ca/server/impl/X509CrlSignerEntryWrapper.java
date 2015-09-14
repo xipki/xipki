@@ -151,7 +151,9 @@ class X509CrlSignerEntryWrapper
 
     public byte[] getSubjectKeyIdentifier()
     {
-        return subjectKeyIdentifier == null ? null : Arrays.clone(subjectKeyIdentifier);
+        return (subjectKeyIdentifier == null)
+                ? null
+                : Arrays.clone(subjectKeyIdentifier);
     }
 
     public ConcurrentContentSigner getSigner()

@@ -90,11 +90,16 @@ public class HttpCmpServlet extends HttpServlet
             final HttpServletResponse response)
     throws ServletException, IOException
     {
-        X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-        X509Certificate clientCert = (certs == null || certs.length < 1)? null : certs[0];
+        X509Certificate[] certs = (X509Certificate[]) request.getAttribute(
+                "javax.servlet.request.X509Certificate");
+        X509Certificate clientCert = (certs == null || certs.length < 1)
+                ? null
+                : certs[0];
 
         AuditService auditService = auditServiceRegister.getAuditService();
-        AuditEvent auditEvent = (auditService != null) ? new AuditEvent(new Date()) : null;
+        AuditEvent auditEvent = (auditService != null)
+                ? new AuditEvent(new Date())
+                : null;
         if(auditEvent != null)
         {
             auditEvent.setApplicationName("CA");
@@ -172,7 +177,8 @@ public class HttpCmpServlet extends HttpServlet
 
             if(auditEvent != null)
             {
-                auditEvent.addEventData(new AuditEventData("CA", responder.getCA().getCAInfo().getName()));
+                auditEvent.addEventData(new AuditEventData("CA",
+                        responder.getCA().getCAInfo().getName()));
             }
 
             PKIMessage pkiReq;
@@ -190,7 +196,9 @@ public class HttpCmpServlet extends HttpServlet
                 final String message = "could not parse the request (PKIMessage)";
                 if(LOG.isErrorEnabled())
                 {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(message),
+                            e.getClass().getName(),
+                            e.getMessage());
                 }
                 LOG.debug(message, e);
 
@@ -200,8 +208,10 @@ public class HttpCmpServlet extends HttpServlet
             PKIHeader reqHeader = pkiReq.getHeader();
             ASN1OctetString tid = reqHeader.getTransactionID();
 
-            PKIHeaderBuilder respHeader = new PKIHeaderBuilder(reqHeader.getPvno().getValue().intValue(),
-                    reqHeader.getRecipient(), reqHeader.getSender());
+            PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
+                    reqHeader.getPvno().getValue().intValue(),
+                    reqHeader.getRecipient(),
+                    reqHeader.getSender());
             respHeader.setTransactionID(tid);
 
             PKIMessage pkiResp = responder.processPKIMessage(pkiReq, clientCert, auditEvent);
@@ -216,7 +226,8 @@ public class HttpCmpServlet extends HttpServlet
             final String message = "connection reset by peer";
             if(LOG.isErrorEnabled())
             {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
 

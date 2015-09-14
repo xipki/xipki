@@ -207,7 +207,8 @@ public abstract class CaAddOrGenCmd extends CaCmd
                     passwordResolver);
         }
 
-        X509CAEntry entry = new X509CAEntry(caName, nextSerial, nextCrlNumber, signerType, signerConf,
+        X509CAEntry entry = new X509CAEntry(
+                caName, nextSerial, nextCrlNumber, signerType, signerConf,
                 caCertUris, ocspUris, crlUris, deltaCrlUris,
                 numCrls.intValue(), expirationPeriod.intValue());
 

@@ -105,7 +105,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         super(datasource, baseDir, stopMe);
         if(numCertsPerSelect < 1)
         {
-            throw new IllegalArgumentException("numCertsPerSelect could not be less than 1: " + numCertsPerSelect);
+            throw new IllegalArgumentException("numCertsPerSelect could not be less than 1: "
+                    + numCertsPerSelect);
         }
 
         if(dbSchemaType != DbSchemaType.EJBCA_CA_v3)
@@ -118,7 +119,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         if(dataSource.tableHasColumn(connection, "CertificateData", "id"))
         {
             tblCertHasId = true;
-            sql = "SELECT id, fingerprint, serialNumber, cAFingerprint, status, revocationReason, revocationDate"
+            sql = "SELECT id, fingerprint, serialNumber, cAFingerprint, status, revocationReason,"
+                    + " revocationDate"
                     + " FROM CertificateData WHERE id >= ? AND id < ? ORDER BY id ASC";
             certSql = "SELECT base64Cert FROM CertificateData WHERE id=?";
         } else
@@ -132,13 +134,16 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
             String lLang = lang.toLowerCase();
             if(lLang.startsWith("en_") == false || lLang.endsWith(".utf-8") == false)
             {
-                throw new Exception("The environment LANG does not satisfy the pattern  'en_*.UTF-8': '" + lang + "'");
+                throw new Exception(
+                        "The environment LANG does not satisfy the pattern  'en_*.UTF-8': '"
+                        + lang + "'");
             }
 
             String osName = System.getProperty("os.name");
             if(osName.toLowerCase().contains("linux") == false)
             {
-                throw new Exception("Exporting EJBCA database is only possible in Linux, but not '" + osName + "'");
+                throw new Exception("Exporting EJBCA database is only possible in Linux, but not '"
+                        + osName + "'");
             }
 
             tblCertHasId = false;
@@ -225,7 +230,9 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
 
                 XMLDocumentReader cadataReader = new XMLDocumentReader(
                         new ByteArrayInputStream(data.getBytes()), false);
-                final String XPATH_CERT = "/java/object/void[string[position()=1]='certificatechain']/object/void/string[1]";
+                final String XPATH_CERT =
+                        "/java/object/void[string[position()=1]='certificatechain']/object/void"
+                        + "/string[1]";
                 String b64Cert = cadataReader.getValue(XPATH_CERT);
                 if(b64Cert == null)
                 {
@@ -286,7 +293,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
             maxCertId = -1;
 
             lastProcessedHexCertFp = Hex.toHexString(new byte[20]); // 40 zeros
-            System.out.println("digesting certificates from fingerprint (exclusive)\n\t" + lastProcessedHexCertFp);
+            System.out.println("digesting certificates from fingerprint (exclusive)\n\t"
+                    + lastProcessedHexCertFp);
         }
 
         PreparedStatement ps = prepareStatement(sql);
@@ -407,7 +415,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                         revTime = rev_timeInMs / 1000;
                     }
 
-                    DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime, revInvTime, hash);
+                    DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime,
+                            revInvTime, hash);
 
                     caEntryContainer.addDigestEntry(caInfo.caId, id, cert);
 
@@ -449,10 +458,14 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         ProcessLog.printTrailer();
 
         StringBuilder sb = new StringBuilder(200);
-        sb.append(" digested ").append((processLog.getNumProcessed() - skippedAccount)).append(" certificates");
+        sb.append(" digested ")
+            .append((processLog.getNumProcessed() - skippedAccount))
+            .append(" certificates");
         if(skippedAccount > 0)
         {
-            sb.append(", ignored ").append(skippedAccount).append(" certificates (see log for details)");
+            sb.append(", ignored ")
+                .append(skippedAccount)
+                .append(" certificates (see log for details)");
         }
         System.out.println(sb.toString());
     }

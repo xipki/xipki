@@ -110,7 +110,8 @@ public abstract class SecurityCmd extends XipkiOsgiCommandSupport
         P11WritableSlot slot = module.getSlot(slotId);
         if(slot == null)
         {
-            throw new SignerException("could not get slot " + slotIndex + " of module " + moduleName);
+            throw new SignerException("could not get slot " + slotIndex + " of module "
+                    + moduleName);
         }
         return slot;
     }

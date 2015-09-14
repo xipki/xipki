@@ -100,7 +100,8 @@ class PublicCAInfo
         this.crlUris = CollectionUtil.unmodifiableList(crlUris, true, true);
         this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris, true, true);
 
-        byte[] encodedSubjectAltName = caCertificate.getExtensionValue(Extension.subjectAlternativeName.getId());
+        byte[] encodedSubjectAltName = caCertificate.getExtensionValue(
+                Extension.subjectAlternativeName.getId());
         if(encodedSubjectAltName == null)
         {
             subjectAltName = null;
@@ -109,10 +110,12 @@ class PublicCAInfo
         {
             try
             {
-                subjectAltName = GeneralNames.getInstance(X509ExtensionUtil.fromExtensionValue(encodedSubjectAltName));
+                subjectAltName = GeneralNames.getInstance(
+                        X509ExtensionUtil.fromExtensionValue(encodedSubjectAltName));
             } catch (IOException e)
             {
-                throw new OperationException(ErrorCode.INVALID_EXTENSION, "invalid SubjectAltName extension in CA certificate");
+                throw new OperationException(ErrorCode.INVALID_EXTENSION,
+                        "invalid SubjectAltName extension in CA certificate");
             }
         }
     }
@@ -139,7 +142,8 @@ class PublicCAInfo
             this.subject = new X500Principal(subject.getEncoded());
         } catch (IOException e)
         {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "invalid SubjectAltName extension in CA certificate");
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                    "invalid SubjectAltName extension in CA certificate");
         }
 
         if(subjectKeyIdentifier == null)
@@ -223,7 +227,9 @@ class PublicCAInfo
             return caCertificate.getSubjectKeyIdentifier();
         } else
         {
-            return subjectKeyIdentifier == null ? null : Arrays.clone(subjectKeyIdentifier);
+            return (subjectKeyIdentifier == null)
+                    ? null
+                    : Arrays.clone(subjectKeyIdentifier);
         }
     }
 

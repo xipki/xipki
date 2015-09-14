@@ -46,9 +46,11 @@ public class XipkiCmpConstants
     public static final int CRL_REASON_REMOVE = -1;
 
     public static final GeneralName remoteP11_cmp_server =
-            new GeneralName(GeneralName.uniformResourceIdentifier, "http://xipki.org/remotep11/server");
+            new GeneralName(GeneralName.uniformResourceIdentifier,
+                    "http://xipki.org/remotep11/server");
     public static final GeneralName remotep11_cmp_client =
-            new GeneralName(GeneralName.uniformResourceIdentifier, "http://xipki.org/remotep11/client");
+            new GeneralName(GeneralName.uniformResourceIdentifier,
+                    "http://xipki.org/remotep11/client");
 
     public static final int ACTION_GEN_CRL               = 1;
     public static final int ACTION_GET_CRL_WITH_SN       = 2;

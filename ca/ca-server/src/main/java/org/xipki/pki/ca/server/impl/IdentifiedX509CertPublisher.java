@@ -70,7 +70,9 @@ class IdentifiedX509CertPublisher
 
         this.entry = entry;
 
-        final String type = realType == null ? entry.getType() : realType;
+        final String type = (realType == null)
+                ? entry.getType()
+                : realType;
 
         X509CertPublisher realPublisher;
         if("ocsp".equalsIgnoreCase(type))

@@ -116,7 +116,8 @@ public class SunNamedCurveExtender
         {
             if(successfull)
             {
-                method_CurveDB_lookup_name = getMethod(class_CurveDB, "lookup", new Class<?>[]{String.class});
+                method_CurveDB_lookup_name = getMethod(class_CurveDB, "lookup",
+                        new Class<?>[]{String.class});
             }
             if(method_CurveDB_lookup_name == null)
             {
@@ -191,7 +192,8 @@ public class SunNamedCurveExtender
                 final String message = "uncatched Error";
                 if(LOG.isErrorEnabled())
                 {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                            t.getMessage());
                 }
                 LOG.debug(message, t);
             }
@@ -213,7 +215,8 @@ public class SunNamedCurveExtender
             return;
         }
 
-        Method method_getCurve = getMethod(class_NamedCurve, "getECParameterSpec", Param_getCurve);
+        Method method_getCurve = getMethod(class_NamedCurve, "getECParameterSpec",
+                Param_getCurve);
         if(method_getCurve == null)
         {
             return;
@@ -233,7 +236,8 @@ public class SunNamedCurveExtender
             final String message = "could not set Field SPLIT_PATTERN";
             if(LOG.isWarnEnabled())
             {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
             return;
@@ -303,7 +307,8 @@ public class SunNamedCurveExtender
             final String message = "could not set Field SPLIT_PATTERN";
             if(LOG.isWarnEnabled())
             {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
             return;
@@ -408,10 +413,12 @@ public class SunNamedCurveExtender
             field_specCollection.set(null, namedCurves);
         } catch (IllegalArgumentException | IllegalAccessException | ClassCastException e)
         {
-            final String message = "could not update change the value of field CurveDB.specCollection.";
+            final String message =
+                    "could not update change the value of field CurveDB.specCollection.";
             if(LOG.isWarnEnabled())
             {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
         }
@@ -473,7 +480,8 @@ public class SunNamedCurveExtender
     {
         try
         {
-            method_add.invoke(null, new Object[]{name, soid, type, sfield, a, b, x, y, n, h, SPLIT_PATTERN});
+            method_add.invoke(null, new Object[]{name, soid, type, sfield, a, b, x, y, n, h,
+                    SPLIT_PATTERN});
         } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
         {
             LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
@@ -533,7 +541,8 @@ public class SunNamedCurveExtender
             final String message = "could not get " + desc;
             if(LOG.isWarnEnabled())
             {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
         }
@@ -556,7 +565,8 @@ public class SunNamedCurveExtender
             final String message = "could not get " + desc;
             if(LOG.isWarnEnabled())
             {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
         }
@@ -624,7 +634,8 @@ public class SunNamedCurveExtender
     private static void logAddedCurves(
             final Map<String, String> addedCurves)
     {
-        StringBuilder sb = new StringBuilder("the following named curves are added to the SUN's list of named curves:\n");
+        StringBuilder sb = new StringBuilder(
+                "the following named curves are added to the SUN's list of named curves:\n");
 
         Set<String> tmp = addedCurves.keySet();
         List<String> names = new ArrayList<>(tmp);

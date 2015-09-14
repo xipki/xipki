@@ -90,7 +90,8 @@ import org.xipki.scep4j.util.ScepUtil;
 
 public class PkiMessage
 {
-    private static final Set<ASN1ObjectIdentifier> scepAttrTypes = new HashSet<ASN1ObjectIdentifier>();
+    private static final Set<ASN1ObjectIdentifier> scepAttrTypes
+            = new HashSet<ASN1ObjectIdentifier>();
 
     private final MessageType messageType;
     private final Nonce senderNonce;
@@ -209,7 +210,8 @@ public class PkiMessage
     {
         if(scepAttrTypes.contains(type))
         {
-            throw new IllegalArgumentException("Adding SCEP attribute via addSignedAttribute() method is not permitted");
+            throw new IllegalArgumentException(
+                    "Adding SCEP attribute via addSignedAttribute() method is not permitted");
         }
         return signedAttributes.put(type, value);
     }

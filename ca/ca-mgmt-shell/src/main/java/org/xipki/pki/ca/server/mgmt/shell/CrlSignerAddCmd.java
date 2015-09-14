@@ -108,7 +108,8 @@ public class CrlSignerAddCmd extends CaCmd
             }
         }
 
-        X509CrlSignerEntry entry = new X509CrlSignerEntry(name, signerType, signerConf, base64Cert, crlControl);
+        X509CrlSignerEntry entry = new X509CrlSignerEntry(name, signerType, signerConf,
+                base64Cert, crlControl);
         boolean b = caManager.addCrlSigner(entry);
         output(b, "added", "could not add", "CRL signer " + name);
         return null;

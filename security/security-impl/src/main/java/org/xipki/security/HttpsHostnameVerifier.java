@@ -73,7 +73,8 @@ public class HttpsHostnameVerifier implements HostnameVerifier
         if(enabled)
         {
             oldHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
-            LOG.info("Register me as DefaulHostnameVerifier, and backup the old one " + oldHostnameVerifier);
+            LOG.info("Register me as DefaulHostnameVerifier, and backup the old one {}",
+                    oldHostnameVerifier);
             HttpsURLConnection.setDefaultHostnameVerifier(this);
             meAsDefaultHostnameVerifier = true;
         }
@@ -83,7 +84,8 @@ public class HttpsHostnameVerifier implements HostnameVerifier
     {
         if(meAsDefaultHostnameVerifier && HttpsURLConnection.getDefaultHostnameVerifier() == this)
         {
-            LOG.info("Unregister me as DefaultHostnameVerifier, and reuse the old one " + oldHostnameVerifier);
+            LOG.info("Unregister me as DefaultHostnameVerifier, and reuse the old one {}",
+                    oldHostnameVerifier);
             HttpsURLConnection.setDefaultHostnameVerifier(oldHostnameVerifier);
             meAsDefaultHostnameVerifier = false;
         }

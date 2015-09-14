@@ -99,7 +99,8 @@ public enum HashAlgoType
                 nameOrOid = nameOrOid.replace("-", "");
             }
 
-            if(hashAlgo.name.equalsIgnoreCase(nameOrOid) || hashAlgo.shortName.equalsIgnoreCase(nameOrOid))
+            if(hashAlgo.name.equalsIgnoreCase(nameOrOid)
+                    || hashAlgo.shortName.equalsIgnoreCase(nameOrOid))
             {
                 return hashAlgo;
             }

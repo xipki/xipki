@@ -41,15 +41,24 @@ package org.xipki.security.api;
 
 public enum KeyUsage
 {
-    digitalSignature  (0, org.bouncycastle.asn1.x509.KeyUsage.digitalSignature, "digitalSignature"),
-    contentCommitment (1, org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation, "contentCommitment", "nonRepudiation"),
-    keyEncipherment   (2, org.bouncycastle.asn1.x509.KeyUsage.keyEncipherment, "keyEncipherment"),
-    dataEncipherment  (3, org.bouncycastle.asn1.x509.KeyUsage.dataEncipherment, "dataEncipherment"),
-    keyAgreement      (4, org.bouncycastle.asn1.x509.KeyUsage.keyAgreement, "keyAgreement"),
-    keyCertSign       (5, org.bouncycastle.asn1.x509.KeyUsage.keyCertSign, "keyCertSign"),
-    cRLSign           (6, org.bouncycastle.asn1.x509.KeyUsage.cRLSign, "cRLSign"),
-    encipherOnly      (7, org.bouncycastle.asn1.x509.KeyUsage.encipherOnly, "encipherOnly"),
-    decipherOnly      (8, org.bouncycastle.asn1.x509.KeyUsage.decipherOnly, "decipherOnly");
+    digitalSignature  (0, org.bouncycastle.asn1.x509.KeyUsage.digitalSignature,
+            "digitalSignature"),
+    contentCommitment (1, org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation,
+            "contentCommitment", "nonRepudiation"),
+    keyEncipherment   (2, org.bouncycastle.asn1.x509.KeyUsage.keyEncipherment,
+            "keyEncipherment"),
+    dataEncipherment  (3, org.bouncycastle.asn1.x509.KeyUsage.dataEncipherment,
+            "dataEncipherment"),
+    keyAgreement      (4, org.bouncycastle.asn1.x509.KeyUsage.keyAgreement,
+            "keyAgreement"),
+    keyCertSign       (5, org.bouncycastle.asn1.x509.KeyUsage.keyCertSign,
+            "keyCertSign"),
+    cRLSign           (6, org.bouncycastle.asn1.x509.KeyUsage.cRLSign,
+            "cRLSign"),
+    encipherOnly      (7, org.bouncycastle.asn1.x509.KeyUsage.encipherOnly,
+            "encipherOnly"),
+    decipherOnly      (8, org.bouncycastle.asn1.x509.KeyUsage.decipherOnly,
+            "decipherOnly");
 
     private int bit;
     private int bcUsage;

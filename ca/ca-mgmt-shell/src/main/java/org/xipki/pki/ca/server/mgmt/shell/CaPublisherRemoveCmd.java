@@ -63,7 +63,8 @@ public class CaPublisherRemoveCmd extends CaCmd
     throws Exception
     {
         boolean b = caManager.removePublisherFromCA(publisherName, caName);
-        output(b, "removed", "could not remove", "publisher " + publisherName + " from CA " + caName);
+        output(b, "removed", "could not remove",
+                "publisher " + publisherName + " from CA " + caName);
         return null;
     }
 }

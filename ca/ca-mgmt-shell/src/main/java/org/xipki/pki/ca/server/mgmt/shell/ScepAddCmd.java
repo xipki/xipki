@@ -97,10 +97,12 @@ public class ScepAddCmd extends CaCmd
 
         if("PKCS12".equalsIgnoreCase(responderType) || "JKS".equalsIgnoreCase(responderType))
         {
-            responderConf = ShellUtil.canonicalizeSignerConf(responderType, responderConf, passwordResolver);
+            responderConf = ShellUtil.canonicalizeSignerConf(responderType, responderConf,
+                    passwordResolver);
         }
 
-        ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert, scepControl);
+        ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert,
+                scepControl);
         if(entry.isFaulty())
         {
             throw new InvalidConfException("certificate is invalid");

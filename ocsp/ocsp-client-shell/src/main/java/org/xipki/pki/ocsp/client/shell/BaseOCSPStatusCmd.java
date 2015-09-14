@@ -141,7 +141,8 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
 
                 if(X509Util.issues(issuerCert, cert) == false)
                 {
-                    throw new IllegalCmdParamException("certificate " + certFile + " is not issued by the given issuer");
+                    throw new IllegalCmdParamException(
+                            "certificate " + certFile + " is not issued by the given issuer");
                 }
 
                 if(isBlank(serverURL))
@@ -152,8 +153,8 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
                         String url = ocspUrls.get(0);
                         if(ocspUrl != null && ocspUrl.equals(url) == false)
                         {
-                            throw new IllegalCmdParamException(
-                                    "given certificates have different OCSP responder URL in certificate");
+                            throw new IllegalCmdParamException("given certificates have different"
+                                    + " OCSP responder URL in certificate");
                         } else
                         {
                             ocspUrl = url;

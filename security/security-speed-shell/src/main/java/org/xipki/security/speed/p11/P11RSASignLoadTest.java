@@ -71,7 +71,8 @@ public class P11RSASignLoadTest extends P11SignLoadTest
     throws Exception
     {
         P11KeypairGenerationResult kpAndCert = slot.generateRSAKeypairAndCert(
-                keysize, publicExponent, "loadtest-" + System.currentTimeMillis(), null, null, null);
+                keysize, publicExponent, "loadtest-" + System.currentTimeMillis(),
+                null, null, null);
         return new P11KeyIdentifier(kpAndCert.getId(), kpAndCert.getLabel());
     }
 

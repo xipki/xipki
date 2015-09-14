@@ -92,7 +92,8 @@ public abstract class P12RawKeypairGenerator
                 this.curveOid =  KeyUtil.getCurveOID(this.curveName);
                 if(this.curveOid == null)
                 {
-                    throw new IllegalArgumentException("no OID is defined for the curve " + this.curveName);
+                    throw new IllegalArgumentException("no OID is defined for the curve "
+                            + this.curveName);
                 }
             }
         }

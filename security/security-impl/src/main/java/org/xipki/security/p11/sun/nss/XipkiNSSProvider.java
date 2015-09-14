@@ -120,7 +120,8 @@ extends Provider
         }
     }
 
-    // Map from mechanism to List of Descriptors that should be registered if the mechanism is supported
+    // Map from mechanism to List of Descriptors that should be registered if the mechanism
+    // is supported
     private final static Map<String, Descriptor> descriptors = new HashMap<>();
 
     private synchronized static void init()
@@ -146,7 +147,8 @@ extends Provider
                     sb.append("\nnssLibraryDirectory=").append(NSSLIB);
                 }
 
-                nssProvider = new sun.security.pkcs11.SunPKCS11(new ByteArrayInputStream(sb.toString().getBytes()));
+                nssProvider = new sun.security.pkcs11.SunPKCS11(
+                        new ByteArrayInputStream(sb.toString().getBytes()));
                 Security.addProvider(nssProvider);
             }
         }catch(Throwable t)

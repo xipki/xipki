@@ -69,7 +69,8 @@ public final class EnrolmentResponse
         MessageType messageType = pkcsRep.getMessageType();
         if(MessageType.CertRep != messageType)
         {
-            throw new ScepClientException("messageType could not be other than CertRep: " + messageType);
+            throw new ScepClientException(
+                    "messageType could not be other than CertRep: " + messageType);
         }
         this.pkcsRep = pkcsRep;
 

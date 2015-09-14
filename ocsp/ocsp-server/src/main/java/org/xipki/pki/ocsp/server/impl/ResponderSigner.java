@@ -95,7 +95,8 @@ class ResponderSigner
         this.bcCertificateChain = new X509CertificateHolder[this.certificateChain.length];
         for(int i = 0; i < certificateChain.length; i++)
         {
-            this.bcCertificateChain[i] = new X509CertificateHolder(this.certificateChain[i].getEncoded());
+            this.bcCertificateChain[i] = new X509CertificateHolder(
+                    this.certificateChain[i].getEncoded());
         }
 
         this.responderId = this.bcCertificate.getSubject();

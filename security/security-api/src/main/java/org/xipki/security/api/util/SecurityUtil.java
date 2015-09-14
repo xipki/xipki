@@ -70,14 +70,22 @@ public class SecurityUtil
     public static final Map<Integer, String> statusTextMap = new HashMap<>();
     public static final String[] failureInfoTexts = new String[]
     {
-        "incorrectData", "wrongAuthority", "badDataFormat", "badCertId", // 0 - 3
-        "badTime", "badRequest", "badMessageCheck", "badAlg", // 4 - 7
-        "unacceptedPolicy", "timeNotAvailable", "badRecipientNonce", "wrongIntegrity", // 8 - 11
-        "certConfirmed", "certRevoked", "badPOP", "missingTimeStamp", // 12 - 15
-        "notAuthorized", "unsupportedVersion", "transactionIdInUse", "signerNotTrusted", // 16 - 19
-        "badCertTemplate", "badSenderNonce", "addInfoNotAvailable", "unacceptedExtension", // 20 - 23
-        "-", "-", "-", "-", // 24 -27
-        "-", "duplicateCertReq", "systemFailure", "systemUnavail"}; // 28 - 31
+        // 0 - 3
+        "incorrectData", "wrongAuthority", "badDataFormat", "badCertId",
+        // 4 - 7
+        "badTime", "badRequest", "badMessageCheck", "badAlg",
+        // 8 - 11
+        "unacceptedPolicy", "timeNotAvailable", "badRecipientNonce", "wrongIntegrity",
+        // 12 - 15
+        "certConfirmed", "certRevoked", "badPOP", "missingTimeStamp",
+        // 16 - 19
+        "notAuthorized", "unsupportedVersion", "transactionIdInUse", "signerNotTrusted",
+        // 20 - 23
+        "badCertTemplate", "badSenderNonce", "addInfoNotAvailable", "unacceptedExtension",
+        // 24 -27
+        "-", "-", "-", "-",
+        // 28 - 31
+        "-", "duplicateCertReq", "systemFailure", "systemUnavail"};
 
     static
     {

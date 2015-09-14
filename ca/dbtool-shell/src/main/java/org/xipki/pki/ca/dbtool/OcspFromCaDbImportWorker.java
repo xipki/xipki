@@ -104,7 +104,8 @@ public class OcspFromCaDbImportWorker extends DbPortWorker
         try
         {
             OcspCertStoreFromCaDbImporter certStoreImporter = new OcspCertStoreFromCaDbImporter(
-                    dataSource, unmarshaller, srcFolder, publisherName, batchEntriesPerCommit, resume, stopMe, evaluateOnly);
+                    dataSource, unmarshaller, srcFolder, publisherName, batchEntriesPerCommit,
+                    resume, stopMe, evaluateOnly);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
         } finally

@@ -121,7 +121,8 @@ public class DbDigestDiffWorker extends DbPortWorker
 
         try
         {
-            DbDigestDiff diff = new DbDigestDiff(revokedOnly, dirnameA, dataSourceB, reportDir, stopMe, numCertsPerSelect);
+            DbDigestDiff diff = new DbDigestDiff(revokedOnly, dirnameA, dataSourceB, reportDir,
+                    stopMe, numCertsPerSelect);
             diff.diff();
         } finally
         {

@@ -97,7 +97,8 @@ public class ScepClient extends Client
                 {
                     conn.setRequestProperty("Content-Type", requestContentType);
                 }
-                conn.setRequestProperty("Content-Length", java.lang.Integer.toString(request.length));
+                conn.setRequestProperty("Content-Length",
+                        java.lang.Integer.toString(request.length));
                 OutputStream outputstream = conn.getOutputStream();
                 outputstream.write(request);
                 outputstream.flush();

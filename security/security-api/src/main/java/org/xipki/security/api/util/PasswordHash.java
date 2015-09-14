@@ -83,7 +83,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  */
 public class PasswordHash
 {
-    // TODO: see http://stackoverflow.com/questions/22580853/reliable-implementation-of-pbkdf2-hmac-sha256-for-java
+    // see 'http://stackoverflow.com/questions/22580853/\
+    //   reliable-implementation-of-pbkdf2-hmac-sha256-for-java'
     //public static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA1";
 
     // The following constants may be changed without breaking existing hashes.

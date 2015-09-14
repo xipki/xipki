@@ -62,7 +62,8 @@ public class SpeedP11RSASignCmd extends SpeedP11SignCmd
     throws Exception
     {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        return new P11RSASignLoadTest(securityFactory, slot, sigAlgo, keysize, toBigInt(publicExponent));
+        return new P11RSASignLoadTest(securityFactory, slot, sigAlgo, keysize,
+                toBigInt(publicExponent));
     }
 
 }

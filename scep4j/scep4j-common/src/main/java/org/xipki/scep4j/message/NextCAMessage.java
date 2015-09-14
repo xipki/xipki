@@ -121,11 +121,13 @@ public class NextCAMessage
                 {
                     for(X509Certificate m : raCerts)
                     {
-                        degenerateSignedData.addCertificate(new X509CertificateHolder(m.getEncoded()));
+                        degenerateSignedData.addCertificate(
+                                new X509CertificateHolder(m.getEncoded()));
                     }
                 }
 
-                degenratedSignedDataBytes = degenerateSignedData.generate(new CMSAbsentContent()).getEncoded();
+                degenratedSignedDataBytes = degenerateSignedData.generate(
+                        new CMSAbsentContent()).getEncoded();
             } catch(CertificateEncodingException e)
             {
                 throw new MessageEncodingException(e.getMessage(), e);
@@ -179,7 +181,8 @@ public class NextCAMessage
             return hashAlgo.getName() + "withRSA";
         } else
         {
-            throw new UnsupportedOperationException("getSignatureAlgorithm() for non-RSA is not supported yet.");
+            throw new UnsupportedOperationException(
+                    "getSignatureAlgorithm() for non-RSA is not supported yet.");
         }
     }
 

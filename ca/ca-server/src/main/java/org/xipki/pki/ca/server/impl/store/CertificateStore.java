@@ -219,7 +219,8 @@ public class CertificateStore
             }
             else
             {
-                LOG.info("revoked certificate issuer='{}', serialNumber={}", caCert.getSubject(), serialNumber);
+                LOG.info("revoked certificate issuer='{}', serialNumber={}",
+                    caCert.getSubject(), serialNumber);
             }
 
             return revokedCert;
@@ -251,7 +252,8 @@ public class CertificateStore
             }
             else
             {
-                LOG.info("unrevoked certificate issuer='{}', serialNumber={}", caCert.getSubject(), serialNumber);
+                LOG.info("unrevoked certificate issuer='{}', serialNumber={}",
+                        caCert.getSubject(), serialNumber);
             }
 
             return unrevokedCert;
@@ -431,7 +433,8 @@ public class CertificateStore
             return queryExecutor.getCertStatusForSubject(caCert, subject);
         } catch (DataAccessException e)
         {
-            LOG.error("queryExecutor.getCertStatusForSubject. DataAccessException: {}", e.getMessage());
+            LOG.error("queryExecutor.getCertStatusForSubject. DataAccessException: {}",
+                    e.getMessage());
             LOG.debug("queryExecutor.getCertStatusForSubject", e);
             return CertStatus.Unknown;
         }
@@ -449,7 +452,8 @@ public class CertificateStore
             final String message = "queryExecutor.getCertStatusForSubject";
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
             return CertStatus.Unknown;
@@ -478,8 +482,8 @@ public class CertificateStore
     {
         try
         {
-            return queryExecutor.getRevokedCertificates(caCert, notExpiredAt, startSerial, numEntries,
-                    onlyCACerts, onlyUserCerts);
+            return queryExecutor.getRevokedCertificates(caCert, notExpiredAt, startSerial,
+                    numEntries, onlyCACerts, onlyUserCerts);
         } catch (DataAccessException e)
         {
             LOG.debug("DataAccessException", e);
@@ -524,7 +528,8 @@ public class CertificateStore
     {
         try
         {
-            return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startSerial, numEntries, onlyRevoked,
+            return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startSerial,
+                    numEntries, onlyRevoked,
                     onlyCACerts, onlyUserCerts);
         } catch (DataAccessException e)
         {
@@ -546,7 +551,8 @@ public class CertificateStore
     {
         try
         {
-            return queryExecutor.getExpiredSerialNumbers(caCert, expiredAt, numEntries, certprofile, userLike);
+            return queryExecutor.getExpiredSerialNumbers(caCert, expiredAt, numEntries,
+                    certprofile, userLike);
         } catch (DataAccessException e)
         {
             LOG.debug("DataAccessException", e);
