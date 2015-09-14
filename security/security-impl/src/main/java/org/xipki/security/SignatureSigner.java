@@ -100,7 +100,8 @@ public class SignatureSigner implements ContentSigner
         }
         catch (SignatureException e)
         {
-            throw new RuntimeOperatorException("exception obtaining signature: " + e.getMessage(), e);
+            throw new RuntimeOperatorException(
+                    "exception obtaining signature: " + e.getMessage(), e);
         }
     }
 

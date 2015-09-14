@@ -204,14 +204,16 @@ class CmpResponder
                     {
                         PSOTemplate psoTemplate = PSOTemplate.getInstance(reqValue);
                         psoMessage = psoTemplate.getMessage();
-                        SlotAndKeyIdentifer slotAndKeyIdentifier = psoTemplate.getSlotAndKeyIdentifer();
+                        SlotAndKeyIdentifer slotAndKeyIdentifier =
+                                psoTemplate.getSlotAndKeyIdentifer();
                         slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
                         KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
                         keyId = keyIdentifier.getKeyId();
                     }catch(IllegalArgumentException e)
                     {
                         final String statusMessage = "invalid PSOTemplate";
-                        return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, statusMessage);
+                        return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest,
+                                statusMessage);
                     }
                 }
 
@@ -256,14 +258,16 @@ class CmpResponder
                 P11KeyIdentifier keyId = null;
                 try
                 {
-                    SlotAndKeyIdentifer slotAndKeyIdentifier = SlotAndKeyIdentifer.getInstance(reqValue);
+                    SlotAndKeyIdentifer slotAndKeyIdentifier =
+                            SlotAndKeyIdentifer.getInstance(reqValue);
                     slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
                     KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
                     keyId = keyIdentifier.getKeyId();
                 } catch(IllegalArgumentException e)
                 {
                     final String statusMessage = "invalid SlotAndKeyIdentifier";
-                    return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, statusMessage);
+                    return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest,
+                            statusMessage);
                 }
 
                 byte[] encodeCertOrKey;
@@ -311,7 +315,8 @@ class CmpResponder
             default:
             {
                 final String statusMessage = "unsupported XiPKI action code '" + action + "'";
-                return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, statusMessage);
+                return createRejectionPKIMessage(respHeader,
+                        PKIFailureInfo.badRequest, statusMessage);
             }
             } // end switch(code)
 
@@ -321,19 +326,23 @@ class CmpResponder
             {
                 v.add(respItvInfoValue);
             }
-            InfoTypeAndValue respItv = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cm_cmpGenmsg,
+            InfoTypeAndValue respItv = new InfoTypeAndValue(
+                    ObjectIdentifiers.id_xipki_cm_cmpGenmsg,
                     new DERSequence(v));
             GenRepContent genRepContent = new GenRepContent(respItv);
             PKIBody respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
             return new PKIMessage(respHeader, respBody);
         } catch (BadASN1ObjectException e)
         {
-            return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, e.getMessage());
+            return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest,
+                    e.getMessage());
         } catch (Throwable t)
         {
-            LOG.error("error while processing CMP message {}, message: {}", tidStr, t.getMessage());
+            LOG.error("error while processing CMP message {}, message: {}", tidStr,
+                    t.getMessage());
             LOG.debug("error while processing CMP message " + tidStr, t);
-            return createRejectionPKIMessage(respHeader, PKIFailureInfo.systemFailure, t.getMessage());
+            return createRejectionPKIMessage(respHeader, PKIFailureInfo.systemFailure,
+                    t.getMessage());
         }
     }
 
@@ -343,7 +352,8 @@ class CmpResponder
             final String statusMessage)
     {
         ErrorMsgContent emc = new ErrorMsgContent(
-                new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(statusMessage), new PKIFailureInfo(pkiFailureInfo)));
+                new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(statusMessage),
+                new PKIFailureInfo(pkiFailureInfo)));
         PKIBody respBody = new PKIBody(PKIBody.TYPE_ERROR, emc);
         return new PKIMessage(header, respBody);
     }

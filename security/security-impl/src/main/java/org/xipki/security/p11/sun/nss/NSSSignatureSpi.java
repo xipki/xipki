@@ -79,7 +79,8 @@ public class NSSSignatureSpi extends SignatureSpi
     private final MessageDigest md;
     private final Cipher cipher;
 
-    private static final String MSG_UNSUPPORTED_ALGO = "unsupported signature algorithm (digestAlgo: %s, encryptionAlgo: %s)";
+    private static final String MSG_UNSUPPORTED_ALGO =
+            "unsupported signature algorithm (digestAlgo: %s, encryptionAlgo: %s)";
 
     private NSSSignatureSpi(
             final String algorithm)
@@ -106,7 +107,8 @@ public class NSSSignatureSpi extends SignatureSpi
         }
         else
         {
-            throw new ProviderException(String.format(MSG_UNSUPPORTED_ALGO, HASHALGO, encrAlgorithmName));
+            throw new ProviderException(String.format(MSG_UNSUPPORTED_ALGO,
+                    HASHALGO, encrAlgorithmName));
         }
 
         if(SHA224.equals(HASHALGO))
@@ -458,7 +460,8 @@ public class NSSSignatureSpi extends SignatureSpi
             byte[] encodedHash;
             try
             {
-                encodedHash = decodePkcs11Block(cipher.doFinal(sigBytes), cipher.getOutputSize(1)-1);
+                encodedHash = decodePkcs11Block(cipher.doFinal(sigBytes),
+                        cipher.getOutputSize(1) - 1);
             } catch (Exception e)
             {
                 throw new SignatureException(e.getMessage(), e);

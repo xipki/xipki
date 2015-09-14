@@ -192,7 +192,8 @@ public class ScepServlet extends HttpServlet
                     final String message = "invalid request";
                     if(LOG.isErrorEnabled())
                     {
-                        LOG.error(ScepUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        LOG.error(ScepUtil.buildExceptionLogFormat(message),
+                                e.getClass().getName(), e.getMessage());
                     }
                     LOG.debug(message, e);
 
@@ -213,7 +214,8 @@ public class ScepServlet extends HttpServlet
                     final String message = "could not decrypt and/or verify the request";
                     if(LOG.isErrorEnabled())
                     {
-                        LOG.error(ScepUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        LOG.error(ScepUtil.buildExceptionLogFormat(message),
+                                e.getClass().getName(), e.getMessage());
                     }
                     LOG.debug(message, e);
 
@@ -228,7 +230,8 @@ public class ScepServlet extends HttpServlet
                     final String message = "system internal error";
                     if(LOG.isErrorEnabled())
                     {
-                        LOG.error(ScepUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        LOG.error(ScepUtil.buildExceptionLogFormat(message),
+                                e.getClass().getName(), e.getMessage());
                     }
                     LOG.debug(message, e);
 
@@ -268,17 +271,21 @@ public class ScepServlet extends HttpServlet
                     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
                     try
                     {
-                        cmsSignedDataGen.addCertificate(new X509CertificateHolder(responder.getCAEmulator().getCACert()));
+                        cmsSignedDataGen.addCertificate(new X509CertificateHolder(
+                                responder.getCAEmulator().getCACert()));
                         ct = ScepConstants.CT_x_x509_ca_ra_cert;
-                        cmsSignedDataGen.addCertificate(new X509CertificateHolder(responder.getRAEmulator().getRACert()));
-                        CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
+                        cmsSignedDataGen.addCertificate(new X509CertificateHolder(
+                                responder.getRAEmulator().getRACert()));
+                        CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(
+                                new CMSAbsentContent());
                         respBytes = degenerateSignedData.getEncoded();
                     } catch (CMSException e)
                     {
                         final String message = "system internal error";
                         if(LOG.isErrorEnabled())
                         {
-                            LOG.error(ScepUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                            LOG.error(ScepUtil.buildExceptionLogFormat(message),
+                                    e.getClass().getName(), e.getMessage());
                         }
                         LOG.debug(message, e);
 
@@ -313,7 +320,8 @@ public class ScepServlet extends HttpServlet
                             new X509CertificateObject(responder.getNextCAandRA().getCACert()));
                     if(responder.getNextCAandRA().getRACert() != null)
                     {
-                        X509Certificate raCert = new X509CertificateObject(responder.getNextCAandRA().getRACert());
+                        X509Certificate raCert = new X509CertificateObject(
+                                responder.getNextCAandRA().getRACert());
                         nextCAMsg.setRaCerts(Arrays.asList(raCert));
                     }
 
@@ -327,7 +335,9 @@ public class ScepServlet extends HttpServlet
                     final String message = "system internal error";
                     if(LOG.isErrorEnabled())
                     {
-                        LOG.error(ScepUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        LOG.error(ScepUtil.buildExceptionLogFormat(message),
+                                e.getClass().getName(),
+                                e.getMessage());
                     }
                     LOG.debug(message, e);
 
@@ -351,7 +361,8 @@ public class ScepServlet extends HttpServlet
             final String message = "connection reset by peer";
             if(LOG.isErrorEnabled())
             {
-                LOG.warn(ScepUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.warn(ScepUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
             }
             LOG.debug(message, e);
 

@@ -55,7 +55,8 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
     {
         if(keyId == null && keyLabel == null)
         {
-            throw new IllegalArgumentException("at least one of keyId an keyLabel must be non-null");
+            throw new IllegalArgumentException(
+                    "at least one of keyId an keyLabel must be non-null");
         }
         this.keyId = keyId;
         this.keyIdHex = (keyId == null)

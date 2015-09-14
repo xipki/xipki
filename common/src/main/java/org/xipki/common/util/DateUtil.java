@@ -66,7 +66,8 @@ public class DateUtil
             return sdf.parse(utcTime);
         }catch(ParseException e)
         {
-            throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': " + e.getMessage());
+            throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': "
+                    + e.getMessage());
         }
     }
 

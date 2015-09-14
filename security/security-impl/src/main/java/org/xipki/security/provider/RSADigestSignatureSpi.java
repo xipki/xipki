@@ -103,7 +103,8 @@ class RSADigestSignatureSpi
     {
         if(privateKey instanceof P11PrivateKey == false)
         {
-            throw new InvalidKeyException("privateKey is not instanceof " + P11PrivateKey.class.getName());
+            throw new InvalidKeyException("privateKey is not instanceof "
+                    + P11PrivateKey.class.getName());
         }
 
         String algo = privateKey.getAlgorithm();
@@ -169,7 +170,8 @@ class RSADigestSignatureSpi
     }
 
     /**
-     * @deprecated replaced with <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
+     * @deprecated replaced with
+     *  <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
      */
     protected void engineSetParameter(
             final String param,

@@ -381,14 +381,16 @@ public class X509Util
                     {
                         if(type.equals(atv.getType().getId()))
                         {
-                            String textValue = IETFUtils.valueToString(atv.getValue()).toLowerCase();
+                            String textValue =
+                                    IETFUtils.valueToString(atv.getValue()).toLowerCase();
                             values.add(textValue);
                         }
                     }
                 }
                 else
                 {
-                    String textValue = IETFUtils.valueToString(rdn.getFirst().getValue()).toLowerCase();
+                    String textValue =
+                            IETFUtils.valueToString(rdn.getFirst().getValue()).toLowerCase();
                     values.add(textValue);
                 }
             }
@@ -431,7 +433,8 @@ public class X509Util
             final org.bouncycastle.asn1.x509.Certificate cert)
     throws CertificateEncodingException
     {
-        Extension encodedSkiValue = cert.getTBSCertificate().getExtensions().getExtension(Extension.subjectKeyIdentifier);
+        Extension encodedSkiValue = cert.getTBSCertificate().getExtensions().getExtension(
+                Extension.subjectKeyIdentifier);
         if(encodedSkiValue == null)
         {
             return null;
@@ -442,7 +445,8 @@ public class X509Util
             return ASN1OctetString.getInstance(encodedSkiValue.getParsedValue()).getOctets();
         } catch (IllegalArgumentException e)
         {
-            throw new CertificateEncodingException("invalid extension SubjectKeyIdentifier: " + e.getMessage());
+            throw new CertificateEncodingException("invalid extension SubjectKeyIdentifier: "
+                    + e.getMessage());
         }
     }
 
@@ -462,7 +466,8 @@ public class X509Util
             return aki.getKeyIdentifier();
         } catch (IllegalArgumentException e)
         {
-            throw new CertificateEncodingException("invalid extension AuthorityKeyIdentifier: " + e.getMessage());
+            throw new CertificateEncodingException("invalid extension AuthorityKeyIdentifier: "
+                    + e.getMessage());
         }
     }
 
@@ -516,7 +521,8 @@ public class X509Util
                     : aki.getKeyIdentifier();
         } catch (IllegalArgumentException e)
         {
-            throw new CertificateEncodingException("invalid extension AuthorityKeyIdentifier: " + e.getMessage());
+            throw new CertificateEncodingException("invalid extension AuthorityKeyIdentifier: "
+                    + e.getMessage());
         }
     }
 
@@ -531,7 +537,8 @@ public class X509Util
         {
             try
             {
-                return "#" + bytesToString(Hex.encode(value.toASN1Primitive().getEncoded(ASN1Encoding.DER)));
+                return "#" + bytesToString(
+                        Hex.encode(value.toASN1Primitive().getEncoded(ASN1Encoding.DER)));
             }
             catch (IOException e)
             {
@@ -616,7 +623,8 @@ public class X509Util
             return ASN1OctetString.getInstance(fullExtValue).getOctets();
         } catch (IllegalArgumentException e)
         {
-            throw new CertificateEncodingException("invalid extension " + type.getId() + ": " + e.getMessage());
+            throw new CertificateEncodingException("invalid extension " + type.getId() + ": "
+                    + e.getMessage());
         }
     }
 
@@ -635,7 +643,8 @@ public class X509Util
             {
                 while(true)
                 {
-                    X509Certificate caCert = getCaCertOf(certChain.get(certChain.size() - 1), certs);
+                    X509Certificate caCert = getCaCertOf(certChain.get(certChain.size() - 1),
+                            certs);
                     if(caCert == null)
                     {
                         break;
@@ -758,7 +767,8 @@ public class X509Util
             return false;
         }
 
-        boolean issues = issuerCert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
+        boolean issues = issuerCert.getSubjectX500Principal().equals(
+                cert.getIssuerX500Principal());
         if(issues)
         {
             byte[] ski = X509Util.extractSKI(issuerCert);
@@ -797,7 +807,8 @@ public class X509Util
             else
             {
                 AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(algOid, DERNull.INSTANCE);
-                return new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
+                return new SubjectPublicKeyInfo(keyAlgId,
+                        publicKeyInfo.getPublicKeyData().getBytes());
             }
         } else
         {

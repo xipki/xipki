@@ -329,7 +329,8 @@ public abstract class Client
         ContentInfo messageData = (ContentInfo) response.getMessageData();
         try
         {
-            return ScepUtil.getCertsFromSignedData(SignedData.getInstance(messageData.getContent()));
+            return ScepUtil.getCertsFromSignedData(
+                    SignedData.getInstance(messageData.getContent()));
         } catch (CertificateException e)
         {
             throw new ScepClientException(e.getMessage(), e);
@@ -348,13 +349,15 @@ public abstract class Client
         TransactionId tid;
         try
         {
-            tid = TransactionId.sha1TransactionId(csr.getCertificationRequestInfo().getSubjectPublicKeyInfo());
+            tid = TransactionId.sha1TransactionId(
+                    csr.getCertificationRequestInfo().getSubjectPublicKeyInfo());
         } catch (InvalidKeySpecException e)
         {
             throw new ScepClientException(e.getMessage(), e);
         }
 
-        return scepCertPoll(identityKey, identityCert, tid, issuer, csr.getCertificationRequestInfo().getSubject());
+        return scepCertPoll(identityKey, identityCert, tid, issuer,
+                csr.getCertificationRequestInfo().getSubject());
     }
 
     public EnrolmentResponse scepCertPoll(
@@ -455,7 +458,8 @@ public abstract class Client
 
         if(cACaps.containsCapability(CACapability.Renewal) == false)
         {
-            throw new OperationNotSupportedException("unsupported messageType '" + MessageType.RenewalReq + "'");
+            throw new OperationNotSupportedException(
+                    "unsupported messageType '" + MessageType.RenewalReq + "'");
         }
         boolean selfSigned = ScepUtil.isSelfSigned(identityCert);
         if(selfSigned)
@@ -476,7 +480,8 @@ public abstract class Client
 
         if(cACaps.containsCapability(CACapability.Update) == false)
         {
-            throw new OperationNotSupportedException("unsupported messageType '" + MessageType.UpdateReq + "'");
+            throw new OperationNotSupportedException(
+                    "unsupported messageType '" + MessageType.UpdateReq + "'");
         }
         boolean selfSigned = ScepUtil.isSelfSigned(identityCert);
         if(selfSigned)
@@ -522,7 +527,8 @@ public abstract class Client
 
         if(this.cACaps.containsCapability(CACapability.GetNextCACert) == false)
         {
-            throw new OperationNotSupportedException("unsupported operation '" + Operation.GetNextCACert.getCode() + "'");
+            throw new OperationNotSupportedException(
+                    "unsupported operation '" + Operation.GetNextCACert.getCode() + "'");
         }
 
         ScepHttpResponse resp = httpSend(Operation.GetNextCACert);
@@ -538,7 +544,8 @@ public abstract class Client
         HashAlgoType hashAlgo = cACaps.getMostSecureHashAlgo();
         if(hashAlgo == HashAlgoType.MD5 && useInsecureAlgorithms == false)
         {
-            throw new ScepClientException("Scep server supports only MD5 but it not permitted in client");
+            throw new ScepClientException(
+                    "Scep server supports only MD5 but it not permitted in client");
         }
         String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(identityKey, hashAlgo);
         ASN1ObjectIdentifier encAlgId;
@@ -613,7 +620,8 @@ public abstract class Client
             final int n = certs.size();
             if(n < 2)
             {
-                throw new ScepClientException("at least 2 certificates are expected, but only " + n + " is available");
+                throw new ScepClientException(
+                        "at least 2 certificates are expected, but only " + n + " is available");
             }
 
             for(int i = 0; i < n; i++)
@@ -623,7 +631,8 @@ public abstract class Client
                 {
                     if(cACert != null)
                     {
-                        throw new ScepClientException("multiple CA certificates is returned, but exactly 1 is expected");
+                        throw new ScepClientException(
+                                "multiple CA certificates is returned, but exactly 1 is expected");
                     }
                     cACert = c;
                 }
@@ -644,7 +653,8 @@ public abstract class Client
 
         if(cAValidator.isTrusted(cACert) == false)
         {
-            throw new ScepClientException("CA certificate '" + cACert.getSubjectX500Principal() + "' is not trusted");
+            throw new ScepClientException(
+                    "CA certificate '" + cACert.getSubjectX500Principal() + "' is not trusted");
         }
 
         if(rACerts.isEmpty())
@@ -652,7 +662,8 @@ public abstract class Client
             return AuthorityCertStore.getInstance(cACert);
         } else
         {
-            AuthorityCertStore cs = AuthorityCertStore.getInstance(cACert, rACerts.toArray(new X509Certificate[0]));
+            AuthorityCertStore cs = AuthorityCertStore.getInstance(
+                    cACert, rACerts.toArray(new X509Certificate[0]));
             X509Certificate rAEncCert = cs.getEncryptionCert();
             X509Certificate rASignCert = cs.getSignatureCert();
             try
@@ -796,7 +807,8 @@ public abstract class Client
         DecodedPkiMessage resp;
         try
         {
-            resp = DecodedPkiMessage.decode(pkiMessage, recipientKey, recipientCert, responseSignerCerts);
+            resp = DecodedPkiMessage.decode(pkiMessage, recipientKey, recipientCert,
+                    responseSignerCerts);
         } catch (MessageDecodingException e)
         {
             throw new ScepClientException(e);
@@ -849,7 +861,8 @@ public abstract class Client
 
     private boolean isGutmannScep()
     {
-        return cACaps.containsCapability(CACapability.AES) || cACaps.containsCapability(CACapability.Update);
+        return cACaps.containsCapability(CACapability.AES)
+                || cACaps.containsCapability(CACapability.Update);
     }
 
     private static void assertSameNonce(
@@ -859,7 +872,8 @@ public abstract class Client
     {
         if(request.getSenderNonce().equals(response.getRecipientNonce()))
         {
-            throw new ScepClientException("SenderNonce of the request and RecipientNonce of response are not the same");
+            throw new ScepClientException(
+                    "SenderNonce of the request and RecipientNonce of response are not the same");
         }
     }
 }

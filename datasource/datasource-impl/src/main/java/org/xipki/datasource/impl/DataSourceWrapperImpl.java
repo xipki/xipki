@@ -76,7 +76,8 @@ import com.zaxxer.hikari.HikariDataSource;
 public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 {
     private static final Logger LOG = LoggerFactory.getLogger(DataSourceWrapperImpl.class);
-    private final ConcurrentHashMap<String, Long> lastUsedSeqValues = new ConcurrentHashMap<String, Long>();
+    private final ConcurrentHashMap<String, Long> lastUsedSeqValues
+            = new ConcurrentHashMap<String, Long>();
 
     private static class MySQL extends DataSourceWrapperImpl
     {
@@ -136,7 +137,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 final String sequenceName)
         {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 100);
-            sql.append("UPDATE SEQ_TBL SET SEQ_VALUE = (@cur_value := SEQ_VALUE) + 1 WHERE SEQ_NAME = '");
+            sql.append("UPDATE SEQ_TBL SET SEQ_VALUE=(@cur_value:=SEQ_VALUE)+1 WHERE SEQ_NAME = '");
             sql.append(sequenceName).append("'");
             return sql.toString();
         }
@@ -173,7 +174,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                     ret = rs.getLong(1);
                 } else
                 {
-                    throw new DataAccessException("could not increment the sequence " + sequenceName);
+                    throw new DataAccessException(
+                            "could not increment the sequence " + sequenceName);
                 }
             }catch(SQLException e)
             {
@@ -280,7 +282,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 final String sequenceName)
         {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 50);
-            sql.append("SELECT NEXT VALUE FOR ").append(sequenceName).append(" FROM sysibm.sysdummy1");
+            sql.append("SELECT NEXT VALUE FOR ")
+                .append(sequenceName)
+                .append(" FROM sysibm.sysdummy1");
             return sql.toString();
         }
 
@@ -1074,7 +1078,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final int id)
     {
         final StringBuilder sb = new StringBuilder(50);
-        sb.append("DELETE FROM ").append(table).append(" WHERE ").append(idColumn).append(" = ").append(id);
+        sb.append("DELETE FROM ")
+            .append(table)
+            .append(" WHERE ")
+            .append(idColumn)
+            .append(" = ")
+            .append(id);
         final String sql = sb.toString();
 
         Connection _conn = conn;
@@ -1102,7 +1111,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         {
             if(LOG.isWarnEnabled())
             {
-                LOG.warn("datasource {} could not deletefrom table {}: {}", name, table, t.getMessage());
+                LOG.warn("datasource {} could not deletefrom table {}: {}", name, table,
+                        t.getMessage());
             }
             return false;
         }
@@ -1129,7 +1139,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     throws DataAccessException
     {
         StringBuilder sb = new StringBuilder(50);
-        sb.append(column).append(" FROM ").append(table).append(" WHERE ").append(column).append("=?");
+        sb.append(column)
+            .append(" FROM ")
+            .append(table)
+            .append(" WHERE ")
+            .append(column)
+            .append("=?");
         String sql = createFetchFirstSelectSQL(sb.toString(), 1);
 
         PreparedStatement stmt = null;
@@ -1379,7 +1394,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                         }
                     } else
                     {
-                        throw new DataAccessException("could not increment the sequence " + sequenceName);
+                        throw new DataAccessException(
+                                "could not increment the sequence " + sequenceName);
                     }
                 }finally
                 {
@@ -1741,7 +1757,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             String codes;
             if (sqlErrorCodes != null && sqlErrorCodes.isUseSqlStateForTranslation())
             {
-                codes = "SQL state '" + sqlEx.getSQLState() + "', error code '" + sqlEx.getErrorCode();
+                codes = "SQL state '" + sqlEx.getSQLState() + "', error code '"
+                        + sqlEx.getErrorCode();
             }
             else
             {
@@ -1759,7 +1776,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     {
         if (LOG.isDebugEnabled())
         {
-            LOG.debug("Translating SQLException with SQL state '{}', error code '{}', message [{}]; SQL was [{}]",
+            LOG.debug("Translating SQLException with SQL state '{}', error code '{}',"
+                    + " message [{}]; SQL was [{}]",
                     sqlEx.getSQLState(), sqlEx.getErrorCode(), sqlEx.getMessage(), sql);
         }
     }

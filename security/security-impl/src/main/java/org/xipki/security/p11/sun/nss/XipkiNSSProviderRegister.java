@@ -61,7 +61,8 @@ public class XipkiNSSProviderRegister
                 final String message = "could not add provider " + XipkiNSSProvider.PROVIDER_NAME;
                 if(LOG.isWarnEnabled())
                 {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                            t.getMessage());
                 }
                 LOG.debug(message, t);
             }

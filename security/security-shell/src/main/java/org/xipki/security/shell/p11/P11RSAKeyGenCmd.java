@@ -70,7 +70,8 @@ public class P11RSAKeyGenCmd extends P11KeyGenCmd
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         if(noCert)
         {
-            P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent), label);
+            P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent),
+                    label);
             finalize(keyId);
         } else
         {

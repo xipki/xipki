@@ -144,7 +144,8 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
 
         try
         {
-            P11CryptService p11Servcie = securityFactory.getP11CryptService(SecurityFactory.DEFAULT_P11MODULE_NAME);
+            P11CryptService p11Servcie = securityFactory.getP11CryptService(
+                    SecurityFactory.DEFAULT_P11MODULE_NAME);
             P11SlotIdentifier[] slotIds = p11Servcie.getSlotIdentifiers();
 
             Map<P11SlotIdentifier, String[]> keyLabelsMap = new HashMap<>();

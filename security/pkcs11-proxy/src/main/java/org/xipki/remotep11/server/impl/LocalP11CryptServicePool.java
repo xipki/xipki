@@ -114,7 +114,8 @@ public class LocalP11CryptServicePool
     public P11CryptService getP11CryptService(
             String moduleName)
     {
-        if(moduleName == null || SecurityFactory.DEFAULT_P11MODULE_NAME.equalsIgnoreCase(moduleName))
+        if(moduleName == null
+                || SecurityFactory.DEFAULT_P11MODULE_NAME.equalsIgnoreCase(moduleName))
         {
             moduleName = defaultPkcs11ModuleName;
         }

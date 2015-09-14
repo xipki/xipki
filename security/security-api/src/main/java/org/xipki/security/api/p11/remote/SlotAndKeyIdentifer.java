@@ -124,7 +124,9 @@ public class SlotAndKeyIdentifer extends ASN1Object
             throw new BadASN1ObjectException("unable to parse encoded SlotAndKeyIdentifier");
         }
 
-        throw new BadASN1ObjectException("unknown object in SlotAndKeyIdentifier.getInstance(): " + obj.getClass().getName());
+        throw new BadASN1ObjectException(
+                "unknown object in SlotAndKeyIdentifier.getInstance(): "
+                + obj.getClass().getName());
     }
 
     @Override

@@ -61,7 +61,8 @@ public class BSpeedP12RSASignCmd extends BSpeedP12SignCmd
         for(int keysize : keysizes)
         {
             ret.add(
-                    new P12RSASignLoadTest(securityFactory, sigAlgo, keysize, new BigInteger("0x10001")));
+                    new P12RSASignLoadTest(securityFactory, sigAlgo, keysize,
+                            new BigInteger("0x10001")));
         }
         return ret;
     }

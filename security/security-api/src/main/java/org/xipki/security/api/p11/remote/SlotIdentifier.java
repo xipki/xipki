@@ -157,7 +157,8 @@ public class SlotIdentifier extends ASN1Object
             throw new BadASN1ObjectException("unable to parse encoded SlotIdentifier");
         }
 
-        throw new BadASN1ObjectException("unknown object in SlotIdentifier.getInstance(): " + obj.getClass().getName());
+        throw new BadASN1ObjectException("unknown object in SlotIdentifier.getInstance(): "
+                + obj.getClass().getName());
     }
 
     @Override
@@ -171,7 +172,8 @@ public class SlotIdentifier extends ASN1Object
 
         if(slotId.getSlotId() != null)
         {
-            DERTaggedObject taggedObj = new DERTaggedObject(true, 1, new ASN1Integer(slotId.getSlotId()));
+            DERTaggedObject taggedObj = new DERTaggedObject(true, 1,
+                    new ASN1Integer(slotId.getSlotId()));
             vector.add(taggedObj);
         }
 

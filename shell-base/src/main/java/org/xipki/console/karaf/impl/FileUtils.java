@@ -131,7 +131,8 @@ public class FileUtils
             fileInCanonicalDir = new File(canonicalDir, file.getName());
         }
 
-        return false == fileInCanonicalDir.getCanonicalFile().equals(fileInCanonicalDir.getAbsoluteFile());
+        return false == fileInCanonicalDir.getCanonicalFile().equals(
+                fileInCanonicalDir.getAbsoluteFile());
     }
 
     /**
@@ -226,16 +227,18 @@ public class FileUtils
      * This caches the original file length, and an IOException will be thrown
      * if the output file length is different from the current input file length.
      * So it may fail if the file changes size.
-     * It may also fail with "IllegalArgumentException: Negative size" if the input file is truncated part way
+     * It may also fail with "IllegalArgumentException: Negative size" if the
+     * input file is truncated part way
      * through copying the data and the new file size is less than the current position.
      *
      * @param srcFile          the validated source file, must not be {@code null}
      * @param destFile         the validated destination file, must not be {@code null}
      * @param preserveFileDate whether to preserve the file date
      * @throws IOException              if an error occurs
-     * @throws IOException              if the output file length is not the same as the input file length after the
-     * copy completes
-     * @throws IllegalArgumentException "Negative size" if the file is truncated so that the size is less than the
+     * @throws IOException              if the output file length is not the same as the input
+     *   file length after the copy completes
+     * @throws IllegalArgumentException "Negative size" if the file is truncated so that the size
+     *   is less than the
      * position
      */
     public static void copyFile(
@@ -269,7 +272,9 @@ public class FileUtils
                         ? FILE_COPY_BUFFER_SIZE
                         : remain;
                 final long bytesCopied = output.transferFrom(input, pos, count);
-                if (bytesCopied == 0) { // IO-385 - can happen if file is truncated after caching the size
+                if (bytesCopied == 0)
+                {
+                    // IO-385 - can happen if file is truncated after caching the size
                     break; // ensure we don't loop forever
                 }
                 pos += bytesCopied;
@@ -334,7 +339,8 @@ public class FileUtils
         {
             if (destDir.isDirectory() == false)
             {
-                throw new IOException("Destination '" + destDir + "' exists but is not a directory");
+                throw new IOException("Destination '" + destDir
+                        + "' exists but is not a directory");
             }
         } else
         {

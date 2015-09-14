@@ -903,7 +903,8 @@ public class AlgorithmUtil
         }
         else
         {
-            throw new NoSuchAlgorithmException("no signature algorithm for DSA with digest algorithm " + digAlgOid.getId());
+            throw new NoSuchAlgorithmException(
+                    "no signature algorithm for DSA with digest algorithm " + digAlgOid.getId());
         }
         return new AlgorithmIdentifier(sid);
     }

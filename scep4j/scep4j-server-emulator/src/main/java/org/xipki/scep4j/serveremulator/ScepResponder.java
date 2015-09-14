@@ -144,7 +144,8 @@ public class ScepResponder
 
     /**
     *
-    * @param ms signing time bias in milliseconds. non-positive value deactivate the check of signing time.
+    * @param ms signing time bias in milliseconds. non-positive value deactivate
+    *  the check of signing time.
     */
     public void setMaxSigningTimeBias(
             final long ms)
@@ -169,11 +170,12 @@ public class ScepResponder
             recipientX509Obj = new X509CertificateObject(recipientCert);
         } catch (CertificateParsingException e)
         {
-            throw new MessageDecodingException(
-                    "error while parsing recipintCert " + recipientCert.getTBSCertificate().getSubject());
+            throw new MessageDecodingException("error while parsing recipintCert "
+                    + recipientCert.getTBSCertificate().getSubject());
         }
 
-        EnvelopedDataDecryptorInstance decInstance = new EnvelopedDataDecryptorInstance(recipientX509Obj, recipientKey);
+        EnvelopedDataDecryptorInstance decInstance =
+                new EnvelopedDataDecryptorInstance(recipientX509Obj, recipientKey);
         EnvelopedDataDecryptor recipient = new EnvelopedDataDecryptor(decInstance);
 
         DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, recipient, null);
@@ -181,7 +183,8 @@ public class ScepResponder
         PkiMessage rep = doServicePkiOperation(req, auditEvent);
         if(auditEvent != null)
         {
-            AuditEventData eventData = new AuditEventData("pkiStatus", rep.getPkiStatus().toString());
+            AuditEventData eventData = new AuditEventData("pkiStatus",
+                    rep.getPkiStatus().toString());
             auditEvent.addEventData(eventData);
             if(rep.getPkiStatus() == PkiStatus.FAILURE)
             {
@@ -358,7 +361,8 @@ public class ScepResponder
         {
             if(cACaps.containsCapability(CACapability.AES) == false)
             {
-                LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid, encOid);
+                LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid,
+                        encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badAlg);
             }
@@ -366,7 +370,8 @@ public class ScepResponder
         {
             if(control.isUseInsecureAlg() == false)
             {
-                LOG.warn("tid={}: encryption with DES algorithm {} is not permitted", tid, encOid);
+                LOG.warn("tid={}: encryption with DES algorithm {} is not permitted", tid,
+                        encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badAlg);
             }
@@ -440,7 +445,8 @@ public class ScepResponder
         case GetCert:
         {
             IssuerAndSerialNumber isn = (IssuerAndSerialNumber) req.getMessageData();
-            Certificate cert = cAEmulator.getCert(isn.getName(), isn.getSerialNumber().getValue());
+            Certificate cert = cAEmulator.getCert(isn.getName(),
+                    isn.getSerialNumber().getValue());
             if(cert != null)
             {
                 rep.setMessageData(createSignedData(cert));

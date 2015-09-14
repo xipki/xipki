@@ -63,7 +63,8 @@ implements CACertValidator
             hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
         } catch (CertificateEncodingException e)
         {
-            throw new IllegalArgumentException("at least one of the certificate could not be encoded");
+            throw new IllegalArgumentException(
+                    "at least one of the certificate could not be encoded");
         }
         fpOfCerts.add(hexFp);
     }
@@ -81,7 +82,8 @@ implements CACertValidator
                 hexFp = HashAlgoType.SHA256.hexDigest(m.getEncoded());
             } catch (CertificateEncodingException e)
             {
-                throw new IllegalArgumentException("at least one of the certificate could not be encoded");
+                throw new IllegalArgumentException(
+                        "at least one of the certificate could not be encoded");
             }
             fpOfCerts.add(hexFp);
         }

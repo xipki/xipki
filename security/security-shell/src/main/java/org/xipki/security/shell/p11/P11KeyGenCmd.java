@@ -116,7 +116,8 @@ public abstract class P11KeyGenCmd extends KeyGenCmd
         if(outputFilename != null)
         {
             File certFile = new File(outputFilename);
-            saveVerbose("\tsaved self-signed certificate to file", certFile, keyAndCert.getCertificate().getEncoded());
+            saveVerbose("\tsaved self-signed certificate to file", certFile,
+                    keyAndCert.getCertificate().getEncoded());
         }
 
         securityFactory.getP11CryptService(moduleName).refresh();

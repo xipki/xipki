@@ -109,7 +109,8 @@ class IaikP11Identity extends P11Identity
     {
         if(publicKey instanceof ECPublicKey == false)
         {
-            throw new SignerException("operation CKM_ECDSA is not allowed for " + publicKey.getAlgorithm() + " public key");
+            throw new SignerException("operation CKM_ECDSA is not allowed for "
+                    + publicKey.getAlgorithm() + " public key");
         }
 
         IaikP11Slot slot = module.getSlot(slotId);
@@ -130,7 +131,8 @@ class IaikP11Identity extends P11Identity
     {
         if(publicKey instanceof DSAPublicKey == false)
         {
-            throw new SignerException("operation CKM_DSA is not allowed for " + publicKey.getAlgorithm() + " public key");
+            throw new SignerException("operation CKM_DSA is not allowed for "
+                    + publicKey.getAlgorithm() + " public key");
         }
 
         IaikP11Slot slot = module.getSlot(slotId);

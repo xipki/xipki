@@ -140,12 +140,14 @@ public class LiquibaseMain
             (String) null); // databaseChangeLogLockTableName
         try
         {
-            CompositeResourceAccessor fileOpener = new CompositeResourceAccessor(fsOpener, clOpener);
+            CompositeResourceAccessor fileOpener =
+                    new CompositeResourceAccessor(fsOpener, clOpener);
 
             boolean includeCatalog = false;
             boolean includeSchema = false;
             boolean includeTablespace = false;
-            DiffOutputControl diffOutputControl = new DiffOutputControl(includeCatalog, includeSchema, includeTablespace);
+            DiffOutputControl diffOutputControl =
+                    new DiffOutputControl(includeCatalog, includeSchema, includeTablespace);
 
             CompareControl.SchemaComparison[] finalSchemaComparisons;
             finalSchemaComparisons = new CompareControl.SchemaComparison[]

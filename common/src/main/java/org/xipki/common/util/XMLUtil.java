@@ -81,7 +81,8 @@ public class XMLUtil
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         } catch (ParserConfigurationException e)
         {
-            System.err.println("could not initialize the XMLDocumentBuilder. Message: " + e.getMessage());
+            System.err.println("could not initialize the XMLDocumentBuilder. Message: "
+                    + e.getMessage());
             System.err.println("could not initialize the XMLDocumentBuilder" + e.getMessage());
         }
         if(builder != null)
@@ -230,9 +231,11 @@ public class XMLUtil
     /**
      *
      * @param element context element.
-     * @param namespace namespace of the expected element. Set it to {@code null} if namespace will not be evaluated.
+     * @param namespace namespace of the expected element. Set it to {@code null} if namespace
+     *   will not be evaluated.
      * @param localname localname of the expected element.
-     * @return List of the expected children element. If no match children could be found, empty list will be returned.
+     * @return List of the expected children element. If no match children could be found, empty
+     *   list will be returned.
      */
     public static List<Element> getElementChilden(
             final Element element,

@@ -182,7 +182,8 @@ public class P11ContentSignerBuilder
         }
         else
         {
-            throw new OperatorCreationException("unsupported key " + publicKey.getClass().getName());
+            throw new OperatorCreationException("unsupported key "
+                    + publicKey.getClass().getName());
         }
 
         List<ContentSigner> signers = new ArrayList<>(parallelism);
@@ -196,38 +197,45 @@ public class P11ContentSignerBuilder
                 {
                     if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm()))
                     {
-                        signer = new P11RSAPSSContentSigner(cryptService, slot, keyId, signatureAlgId);
+                        signer = new P11RSAPSSContentSigner(cryptService, slot, keyId,
+                                signatureAlgId);
                     }
                     else
                     {
-                        signer = new P11RSAContentSigner(cryptService, slot, keyId, signatureAlgId);
+                        signer = new P11RSAContentSigner(cryptService, slot, keyId,
+                                signatureAlgId);
                     }
                 }
                 else if(publicKey instanceof ECPublicKey)
                 {
                     if(AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId))
                     {
-                        signer = new P11ECDSAPlainContentSigner(cryptService, slot, keyId, signatureAlgId);
+                        signer = new P11ECDSAPlainContentSigner(cryptService, slot, keyId,
+                                signatureAlgId);
                     }
                     else
                     {
-                        signer = new P11ECDSAX962ContentSigner(cryptService, slot, keyId, signatureAlgId);
+                        signer = new P11ECDSAX962ContentSigner(cryptService, slot, keyId,
+                                signatureAlgId);
                     }
                 }
                 else if(publicKey instanceof DSAPublicKey)
                 {
                     if(AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId))
                     {
-                        signer = new P11DSAPlainContentSigner(cryptService, slot, keyId, signatureAlgId);
+                        signer = new P11DSAPlainContentSigner(cryptService, slot, keyId,
+                                signatureAlgId);
                     }
                     else
                     {
-                        signer = new P11DSAX962ContentSigner(cryptService, slot, keyId, signatureAlgId);
+                        signer = new P11DSAX962ContentSigner(cryptService, slot, keyId,
+                                signatureAlgId);
                     }
                 }
                 else
                 {
-                    throw new OperatorCreationException("unsupported key " + publicKey.getClass().getName());
+                    throw new OperatorCreationException("unsupported key "
+                            + publicKey.getClass().getName());
                 }
                 signers.add(signer);
             }
@@ -242,10 +250,12 @@ public class P11ContentSignerBuilder
             privateKey = new P11PrivateKey(cryptService, slot, keyId);
         } catch (InvalidKeyException e)
         {
-            throw new OperatorCreationException("could not construct P11PrivateKey: " + e.getMessage(), e);
+            throw new OperatorCreationException(
+                    "could not construct P11PrivateKey: " + e.getMessage(), e);
         }
 
-        DefaultConcurrentContentSigner concurrentSigner = new DefaultConcurrentContentSigner(signers, privateKey);
+        DefaultConcurrentContentSigner concurrentSigner =
+                new DefaultConcurrentContentSigner(signers, privateKey);
         concurrentSigner.setCertificateChain(certificateChain);
 
         return concurrentSigner;
