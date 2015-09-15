@@ -574,106 +574,105 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
 
                 numProcessedEntriesInBatch++;
 
-                if(revokedOnly && cert.getRev() == false)
+                if(revokedOnly == false || cert.getRev().booleanValue())
                 {
-                    continue;
-                }
-
-                int caId = cert.getCaId();
-                if(caIds.contains(caId))
-                {
-                    numImportedEntriesInBatch++;
-
-                    String filename = cert.getFile();
-
-                    // rawcert
-                    ZipEntry certZipEnty = zipFile.getEntry(filename);
-                    // rawcert
-                    byte[] encodedCert = IoUtil.read(zipFile.getInputStream(certZipEnty));
-
-                    TBSCertificate c;
-                    try
+                    int caId = cert.getCaId();
+                    if(caIds.contains(caId))
                     {
-                        Certificate cc = Certificate.getInstance(encodedCert);
-                        c = cc.getTBSCertificate();
-                    } catch (Exception e)
-                    {
-                        LOG.error("could not parse certificate in file {}", filename);
-                        LOG.debug("could not parse certificate in file " + filename, e);
-                        if(e instanceof CertificateException)
+                        numImportedEntriesInBatch++;
+
+                        String filename = cert.getFile();
+
+                        // rawcert
+                        ZipEntry certZipEnty = zipFile.getEntry(filename);
+                        // rawcert
+                        byte[] encodedCert = IoUtil.read(zipFile.getInputStream(certZipEnty));
+
+                        TBSCertificate c;
+                        try
                         {
-                            throw (CertificateException) e;
-                        }
-                        else
+                            Certificate cc = Certificate.getInstance(encodedCert);
+                            c = cc.getTBSCertificate();
+                        } catch (Exception e)
                         {
-                            throw new CertificateException(e.getMessage(), e);
+                            LOG.error("could not parse certificate in file {}", filename);
+                            LOG.debug("could not parse certificate in file " + filename, e);
+                            if(e instanceof CertificateException)
+                            {
+                                throw (CertificateException) e;
+                            }
+                            else
+                            {
+                                throw new CertificateException(e.getMessage(), e);
+                            }
                         }
-                    }
 
-                    // cert
-                    String seqName = "CID";
-                    int currentId = (int) dataSource.nextSeqValue(null, seqName);
+                        // cert
+                        String seqName = "CID";
+                        int currentId = (int) dataSource.nextSeqValue(null, seqName);
 
-                    try
-                    {
-                        int idx = 1;
-                        ps_cert.setInt(idx++, currentId);
-                        ps_cert.setInt(idx++, caId);
-                        ps_cert.setLong(idx++, c.getSerialNumber().getPositiveValue().longValue());
-                        ps_cert.setLong(idx++, cert.getUpdate());
-                        ps_cert.setLong(idx++, c.getStartDate().getDate().getTime() / 1000);
-                        ps_cert.setLong(idx++, c.getEndDate().getDate().getTime() / 1000);
-                        setBoolean(ps_cert, idx++, cert.getRev());
-                        setInt(ps_cert, idx++, cert.getRr());
-                        setLong(ps_cert, idx++, cert.getRt());
-                        setLong(ps_cert, idx++, cert.getRit());
+                        try
+                        {
+                            int idx = 1;
+                            ps_cert.setInt(idx++, currentId);
+                            ps_cert.setInt(idx++, caId);
+                            ps_cert.setLong(idx++,
+                                    c.getSerialNumber().getPositiveValue().longValue());
+                            ps_cert.setLong(idx++, cert.getUpdate());
+                            ps_cert.setLong(idx++, c.getStartDate().getDate().getTime() / 1000);
+                            ps_cert.setLong(idx++, c.getEndDate().getDate().getTime() / 1000);
+                            setBoolean(ps_cert, idx++, cert.getRev());
+                            setInt(ps_cert, idx++, cert.getRr());
+                            setLong(ps_cert, idx++, cert.getRt());
+                            setLong(ps_cert, idx++, cert.getRit());
 
-                        int certprofileId = cert.getPid();
-                        String certprofileName = profileMap.get(certprofileId);
-                        ps_cert.setString(idx++, certprofileName);
-                        ps_cert.addBatch();
-                    }catch(SQLException e)
-                    {
-                        throw translate(SQL_ADD_CERT, e);
-                    }
+                            int certprofileId = cert.getPid();
+                            String certprofileName = profileMap.get(certprofileId);
+                            ps_cert.setString(idx++, certprofileName);
+                            ps_cert.addBatch();
+                        }catch(SQLException e)
+                        {
+                            throw translate(SQL_ADD_CERT, e);
+                        }
 
-                    // certhash
-                    try
-                    {
-                        int idx = 1;
-                        ps_certhash.setInt(idx++, currentId);
-                        ps_certhash.setString(idx++,
-                                HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert));
-                        ps_certhash.setString(idx++,
-                                HashCalculator.base64Hash(HashAlgoType.SHA224, encodedCert));
-                        ps_certhash.setString(idx++,
-                                HashCalculator.base64Hash(HashAlgoType.SHA256, encodedCert));
-                        ps_certhash.setString(idx++,
-                                HashCalculator.base64Hash(HashAlgoType.SHA384, encodedCert));
-                        ps_certhash.setString(idx++,
-                                HashCalculator.base64Hash(HashAlgoType.SHA512, encodedCert));
-                        ps_certhash.addBatch();
-                    }catch(SQLException e)
-                    {
-                        throw translate(SQL_ADD_CHASH, e);
-                    }
+                        // certhash
+                        try
+                        {
+                            int idx = 1;
+                            ps_certhash.setInt(idx++, currentId);
+                            ps_certhash.setString(idx++,
+                                    HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert));
+                            ps_certhash.setString(idx++,
+                                    HashCalculator.base64Hash(HashAlgoType.SHA224, encodedCert));
+                            ps_certhash.setString(idx++,
+                                    HashCalculator.base64Hash(HashAlgoType.SHA256, encodedCert));
+                            ps_certhash.setString(idx++,
+                                    HashCalculator.base64Hash(HashAlgoType.SHA384, encodedCert));
+                            ps_certhash.setString(idx++,
+                                    HashCalculator.base64Hash(HashAlgoType.SHA512, encodedCert));
+                            ps_certhash.addBatch();
+                        }catch(SQLException e)
+                        {
+                            throw translate(SQL_ADD_CHASH, e);
+                        }
 
-                    // rawcert
-                    try
-                    {
-                        int idx = 1;
-                        ps_rawcert.setInt(idx++, currentId);
-                        ps_rawcert.setString(idx++,
-                                X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
-                        ps_rawcert.setString(idx++, Base64.toBase64String(encodedCert));
-                        ps_rawcert.addBatch();
-                    }catch(SQLException e)
-                    {
-                        throw translate(SQL_ADD_CRAW, e);
-                    }
-                }
+                        // rawcert
+                        try
+                        {
+                            int idx = 1;
+                            ps_rawcert.setInt(idx++, currentId);
+                            ps_rawcert.setString(idx++,
+                                    X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
+                            ps_rawcert.setString(idx++, Base64.toBase64String(encodedCert));
+                            ps_rawcert.addBatch();
+                        }catch(SQLException e)
+                        {
+                            throw translate(SQL_ADD_CRAW, e);
+                        }
+                    } // end if(caIds.contains(caId))
+                } // end if(revokedOnly
 
-                boolean isLastBlock = certs.hasNext() == false;
+                boolean isLastBlock = (certs.hasNext() == false);
 
                 if(numImportedEntriesInBatch > 0
                         && (numImportedEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock))
@@ -725,9 +724,21 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                             (processLog.getSumInLastProcess() + processLog.getNumProcessed())
                             + ":" + lastSuccessfulCertId,
                             processLogFile);
-
                     processLog.printStatus(isLastBlock);
+                } else if(isLastBlock)
+                {
+                    lastSuccessfulCertId = id;
+                    processLog.addNumProcessed(numProcessedEntriesInBatch);
+                    importLog.addNumProcessed(numImportedEntriesInBatch);
+                    numProcessedEntriesInBatch = 0;
+                    numImportedEntriesInBatch = 0;
+                    echoToFile(
+                            (processLog.getSumInLastProcess() + processLog.getNumProcessed())
+                            + ":" + lastSuccessfulCertId,
+                            processLogFile);
+                    processLog.printStatus(true);
                 }
+                // if(numImportedEntriesInBatch
             } // end for
 
             return lastSuccessfulCertId;
