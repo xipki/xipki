@@ -68,19 +68,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
 
     private final int numCertsPerSelect;
 
-    private final String tbl_ca;
-    private final String tbl_certhash;
-    private final String col_caId;
-    private final String col_certId;
-    private final String col_certhash;
-    private final String col_revoked;
-    private final String col_revReason;
-    private final String col_revTime;
-    private final String col_revInvTime;
-    private final String col_serialNumber;
-
-    private final String caSql;
-    private final String certSql;
+    private final XipkiDbControl dbControl;
 
     public XipkiDigestExporter(
             final DataSourceWrapper datasource,
@@ -98,77 +86,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
         }
 
         this.numCertsPerSelect = numCertsPerSelect;
-
-        if(dbSchemaType == DbSchemaType.XIPKI_CA_v1
-                || dbSchemaType == DbSchemaType.XIPKI_OCSP_v1)
-        {
-            if(dbSchemaType == DbSchemaType.XIPKI_CA_v1)
-            { // CA
-                tbl_ca = "CAINFO";
-                tbl_certhash = "RAWCERT";
-                col_caId = "CAINFO_ID";
-            } else
-            { // OCSP
-                tbl_ca = "ISSUER";
-                tbl_certhash = "CERTHASH";
-                col_caId = "ISSUER_ID";
-            }
-
-            col_certhash = "SHA1_FP";
-            col_certId = "CERT_ID";
-            col_revInvTime = "REV_INVALIDITY_TIME";
-            col_revoked = "REVOKED";
-            col_revReason = "REV_REASON";
-            col_revTime = "REV_TIME";
-            col_serialNumber = "SERIAL";
-        } else if(dbSchemaType == DbSchemaType.XIPKI_CA_v2
-                || dbSchemaType == DbSchemaType.XIPKI_OCSP_v2)
-        {
-            if(dbSchemaType == DbSchemaType.XIPKI_CA_v2)
-            { // CA
-                tbl_ca = "CS_CA";
-                tbl_certhash = "CRAW";
-                col_caId = "CA_ID";
-                col_certhash = "SHA1";
-            } else
-            { // OCSP
-                tbl_ca = "ISSUER";
-                tbl_certhash = "CHASH";
-                col_caId = "IID";
-                col_certhash = "S1";
-            }
-
-            col_certId = "CID";
-            col_revInvTime = "RIT";
-            col_revoked = "REV";
-            col_revReason = "RR";
-            col_revTime = "RT";
-            col_serialNumber = "SN";
-        } else
-        {
-            throw new RuntimeException("unsupported DbSchemaType " + dbSchemaType);
-        }
-
-        // CA SQL
-        StringBuilder sb = new StringBuilder();
-        sb.append("SELECT ID, CERT FROM ").append(tbl_ca);
-        this.caSql = sb.toString();
-
-        // CERT SQL
-        sb.delete(0, sb.length());
-        sb.append("SELECT ID,");
-        sb.append(col_caId).append(",");
-        sb.append(col_serialNumber).append(",");
-        sb.append(col_revoked).append(",");
-        sb.append(col_revReason).append(",");
-        sb.append(col_revTime).append(",");
-        sb.append(col_revInvTime).append(",");
-        sb.append(col_certhash);
-        sb.append(" FROM CERT INNER JOIN ").append(tbl_certhash);
-        sb.append(" ON CERT.ID>=? AND CERT.ID<? AND CERT.ID=");
-        sb.append(tbl_certhash).append(".").append(col_certId);
-        sb.append(" ORDER BY CERT.ID ASC");
-        this.certSql = sb.toString();
+        this.dbControl = new XipkiDbControl(dbSchemaType);
     }
 
     @Override
@@ -226,7 +144,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
     throws DataAccessException, IOException
     {
         Map<Integer, String> caIdDirMap = new HashMap<>();
-        final String sql = caSql;
+        final String sql = dbControl.getCaSql();
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -278,11 +196,9 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
 
         final int maxCertId = (int) getMax("CERT", "ID");
 
-        PreparedStatement certPs = prepareStatement(certSql);
+        PreparedStatement certPs = prepareStatement(dbControl.getCertSql());
 
         ProcessLog.printHeader();
-
-        String sql = null;
 
         try
         {
@@ -296,7 +212,6 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
                     break;
                 }
 
-                sql = certSql;
                 certPs.setInt(1, i);
                 certPs.setInt(2, i + numCertsPerSelect);
 
@@ -304,11 +219,11 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
 
                 while(rs.next())
                 {
-                    int caId = rs.getInt(col_caId);
+                    int caId = rs.getInt(dbControl.getColCaId());
                     int id = rs.getInt("ID");
-                    String hash = rs.getString(col_certhash);
-                    long serial = rs.getLong(col_serialNumber);
-                    boolean revoked = rs.getBoolean(col_revoked);
+                    String hash = rs.getString(dbControl.getColCerthash());
+                    long serial = rs.getLong(dbControl.getColSerialNumber());
+                    boolean revoked = rs.getBoolean(dbControl.getColRevoked());
 
                     Integer revReason = null;
                     Long revTime = null;
@@ -316,9 +231,9 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
 
                     if(revoked)
                     {
-                        revReason = rs.getInt(col_revReason);
-                        revTime = rs.getLong(col_revTime);
-                        revInvTime = rs.getLong(col_revInvTime);
+                        revReason = rs.getInt(dbControl.getColRevReason());
+                        revTime = rs.getLong(dbControl.getColRevTime());
+                        revInvTime = rs.getLong(dbControl.getColRevInvTime());
                         if(revInvTime == 0)
                         {
                             revInvTime = null;
@@ -341,7 +256,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
             }
         }catch(SQLException e)
         {
-            throw translate(sql, e);
+            throw translate(dbControl.getCertSql(), e);
         }finally
         {
             releaseResources(certPs, null);

@@ -51,7 +51,7 @@ import org.xipki.common.util.ParamUtil;
 public class DbDigestReporter
 {
     private final String reportDirname;
-    private final BufferedWriter onlyInAWriter;
+    private final BufferedWriter missingWriter;
     private final BufferedWriter diffWriter;
     private final BufferedWriter sameWriter;
     private final BufferedWriter errorWriter;
@@ -68,8 +68,8 @@ public class DbDigestReporter
 
         IoUtil.save(new File(dir, "ca.der"), caCertBytes);
 
-        this.onlyInAWriter = new BufferedWriter(
-                new FileWriter(reportDirname + File.separator + "onlyInA"));
+        this.missingWriter = new BufferedWriter(
+                new FileWriter(reportDirname + File.separator + "missing"));
         this.diffWriter = new BufferedWriter(
                 new FileWriter(reportDirname + File.separator + "diff"));
         this.sameWriter = new BufferedWriter(
@@ -83,11 +83,11 @@ public class DbDigestReporter
         return reportDirname;
     }
 
-    public void addOnlyInA(
+    public void addMissing(
             final long serialNumber)
     throws IOException
     {
-        writeSerialNumberLine(onlyInAWriter, serialNumber);
+        writeSerialNumberLine(missingWriter, serialNumber);
     }
 
     public void addSame(
@@ -148,7 +148,7 @@ public class DbDigestReporter
 
     public void close()
     {
-        close(onlyInAWriter);
+        close(missingWriter);
         close(diffWriter);
         close(sameWriter);
         close(errorWriter);
