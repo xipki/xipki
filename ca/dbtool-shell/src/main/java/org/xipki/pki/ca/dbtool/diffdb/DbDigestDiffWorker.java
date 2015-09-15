@@ -63,8 +63,10 @@ public class DbDigestDiffWorker extends DbPortWorker
 {
     private static final Logger LOG = LoggerFactory.getLogger(DbDigestDiffWorker.class);
     private final boolean revokedOnly;
-    private final String dirnameA;
-    private final DataSourceWrapper dataSourceB;
+    private final String refDirname;
+    private final DataSourceWrapper refDatasource;
+
+    private final DataSourceWrapper dataSource;
     private final String reportDir;
     private final int numCertsPerSelect;
 
@@ -72,8 +74,8 @@ public class DbDigestDiffWorker extends DbPortWorker
             final DataSourceFactory dataSourceFactory,
             final PasswordResolver passwordResolver,
             final boolean revokedOnly,
-            final String dirnameA,
-            final String dbConfFileB,
+            final String refDirnameOrDbConf,
+            final String dbConfFile,
             final String reportDirName,
             final int numCertsPerSelect)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
@@ -103,11 +105,24 @@ public class DbDigestDiffWorker extends DbPortWorker
         }
 
         Properties props = DbPorter.getDbConfProperties(
-                new FileInputStream(IoUtil.expandFilepath(dbConfFileB)));
-        this.dataSourceB = dataSourceFactory.createDataSource(null, props, passwordResolver);
+                new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
+        this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
 
         this.revokedOnly = revokedOnly;
-        this.dirnameA = dirnameA;
+        File refFile = new File(refDirnameOrDbConf);
+        if(refFile.isDirectory())
+        {
+            this.refDatasource = null;
+            this.refDirname = refDirnameOrDbConf;
+        } else
+        {
+            this.refDirname = null;
+            Properties refProps = DbPorter.getDbConfProperties(
+                    new FileInputStream(IoUtil.expandFilepath(refDirnameOrDbConf)));
+            this.refDatasource = dataSourceFactory.createDataSource(
+                    null, refProps, passwordResolver);
+        }
+
         this.reportDir = reportDirName;
         this.numCertsPerSelect = numCertsPerSelect;
     }
@@ -121,14 +136,22 @@ public class DbDigestDiffWorker extends DbPortWorker
 
         try
         {
-            DbDigestDiff diff = new DbDigestDiff(revokedOnly, dirnameA, dataSourceB, reportDir,
-                    stopMe, numCertsPerSelect);
+            DbDigestDiff diff;
+            if(refDirname != null)
+            {
+                diff = DbDigestDiff.getInstanceForDirRef(
+                    revokedOnly, refDirname, dataSource, reportDir, stopMe, numCertsPerSelect);
+            } else
+            {
+                diff = DbDigestDiff.getInstanceForDbRef(
+                    revokedOnly, refDatasource, dataSource, reportDir, stopMe, numCertsPerSelect);
+            }
             diff.diff();
         } finally
         {
             try
             {
-                dataSourceB.shutdown();
+                dataSource.shutdown();
             }catch(Throwable e)
             {
                 LOG.error("dataSource.shutdown()", e);

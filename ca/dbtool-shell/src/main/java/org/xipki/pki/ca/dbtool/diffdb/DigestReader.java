@@ -33,54 +33,25 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool;
+package org.xipki.pki.ca.dbtool.diffdb;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.security.cert.X509Certificate;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class DbPortWorker implements Runnable
+public interface DigestReader
 {
-    private static final Logger LOG = LoggerFactory.getLogger(DbPorter.class);
+    X509Certificate getCaCert();
 
-    private Exception exception;
-    private final AtomicBoolean stopMe = new AtomicBoolean(false);
+    String getCaSubjectName();
 
-    public DbPortWorker()
-    {
-    }
+    int getTotalAccount();
 
-    public final Exception getException()
-    {
-        return exception;
-    }
+    boolean hasNext();
 
-    public void setStopMe(
-            final boolean b)
-    {
-        this.stopMe.set(b);
-    }
+    DbDigestEntry nextCert();
 
-    @Override
-    public void run()
-    {
-        try
-        {
-            doRun(stopMe);
-        } catch(Exception e)
-        {
-            LOG.error("exception thrown", e);
-            exception = e;
-        }
-    }
-
-    protected abstract void doRun(
-            AtomicBoolean stopMe)
-    throws Exception;
-
+    void close();
 }
