@@ -253,25 +253,25 @@ public class DbDigestDiff
         } else
         {
             List<Integer> refCaIds = new LinkedList<>();
-            stmt = datasource.createStatement(conn);
+            Statement refStmt = refDatasource.createStatement(refDatasource.getConnection());
             DbSchemaType refDbSchemaType = DbDigestExportWorker.detectDbSchemaType(refDatasource);
             XipkiDbControl refDbControl = new XipkiDbControl(refDbSchemaType);
             String refSql = "SELECT ID FROM " + refDbControl.getTblCa();
-            rs = null;
+            ResultSet refRs = null;
             try
             {
-                rs = stmt.executeQuery(refSql);
-                while(rs.next())
+                refRs = refStmt.executeQuery(refSql);
+                while(refRs.next())
                 {
-                    int id = rs.getInt("ID");
+                    int id = refRs.getInt("ID");
                     refCaIds.add(id);
                 }
             } catch (SQLException e)
             {
-                throw datasource.translate(sql, e);
+                throw datasource.translate(refSql, e);
             } finally
             {
-                releaseResources(stmt, rs);
+                refDatasource.releaseResources(refStmt, refRs);
             }
 
             for(Integer refCaId : refCaIds)
