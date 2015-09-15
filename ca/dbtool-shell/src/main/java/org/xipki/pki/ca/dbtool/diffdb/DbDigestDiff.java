@@ -334,6 +334,11 @@ public class DbDigestDiff
                 MyBundle myBundle = readNextLines(readerA);
 
                 int n = myBundle.serialNumbers.size();
+                if(n + myBundle.numSkipped == 0)
+                {
+                    break;
+                }
+
                 if(n > 0)
                 {
                     List<Long> cloneSerialNumbers = new ArrayList<>(myBundle.serialNumbers);
