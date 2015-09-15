@@ -157,7 +157,9 @@ public class DbDigestReader implements DigestReader
 
             if(revokedOnly)
             {
-                sql += " AND CERT." + dbControl.getColRevoked() + "=1";
+                sb.append(" AND CERT.")
+                    .append(dbControl.getColRevoked()).
+                    append("=1");
             }
 
             sb.append("AND CERT.ID=")

@@ -126,7 +126,7 @@ public class DbDigestReporter
     public void addNoCAMatch()
     throws IOException
     {
-        errorWriter.write("Cound not find corresponding CA in B to diff");
+        errorWriter.write("Cound not find corresponding CA in target to diff");
         errorWriter.write('\n');
     }
 
