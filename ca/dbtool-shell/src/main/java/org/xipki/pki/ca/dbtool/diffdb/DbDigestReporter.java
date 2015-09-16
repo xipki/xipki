@@ -53,7 +53,7 @@ public class DbDigestReporter
     private final String reportDirname;
     private final BufferedWriter missingWriter;
     private final BufferedWriter diffWriter;
-    private final BufferedWriter sameWriter;
+    private final BufferedWriter goodWriter;
     private final BufferedWriter errorWriter;
 
     public DbDigestReporter(
@@ -72,8 +72,8 @@ public class DbDigestReporter
                 new FileWriter(reportDirname + File.separator + "missing"));
         this.diffWriter = new BufferedWriter(
                 new FileWriter(reportDirname + File.separator + "diff"));
-        this.sameWriter = new BufferedWriter(
-                new FileWriter(reportDirname + File.separator + "same"));
+        this.goodWriter = new BufferedWriter(
+                new FileWriter(reportDirname + File.separator + "good"));
         this.errorWriter = new BufferedWriter(
                 new FileWriter(reportDirname + File.separator + "error"));
     }
@@ -90,11 +90,11 @@ public class DbDigestReporter
         writeSerialNumberLine(missingWriter, serialNumber);
     }
 
-    public void addSame(
+    public void addGood(
             final long serialNumber)
     throws IOException
     {
-        writeSerialNumberLine(sameWriter, serialNumber);
+        writeSerialNumberLine(goodWriter, serialNumber);
     }
 
     public void addDiff(
@@ -150,7 +150,7 @@ public class DbDigestReporter
     {
         close(missingWriter);
         close(diffWriter);
-        close(sameWriter);
+        close(goodWriter);
         close(errorWriter);
     }
 

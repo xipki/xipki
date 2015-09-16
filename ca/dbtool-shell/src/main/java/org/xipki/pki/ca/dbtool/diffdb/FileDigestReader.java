@@ -37,14 +37,20 @@ package org.xipki.pki.ca.dbtool.diffdb;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
-import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -58,20 +64,29 @@ public class FileDigestReader implements DigestReader
     private final String caSubjectName;
     private final X509Certificate caCert;
     private final BufferedReader certsFilesReader;
+    private final boolean revokedOnly;
     private BufferedReader certsReader;
     private DbDigestEntry next;
 
     public FileDigestReader(
-            final String caDirname)
+            final String caDirname,
+            final boolean revokedOnly)
     throws IOException, CertificateException
     {
         ParamUtil.assertNotBlank("caDirname", caDirname);
         this.caDirname = caDirname;
+        this.revokedOnly = revokedOnly;
 
         this.caCert = X509Util.parseCert(
                 new File(caDirname, "ca.der"));
-        String s = new String(IoUtil.read(new File(caDirname, "account")));
-        this.totalAccount = Integer.parseInt(s);
+        Properties props = new Properties();
+        props.load(new FileInputStream(new File(caDirname, CaEntry.FILENAME_OVERVIEW)));
+        String accoutPropKey = revokedOnly
+                ? CaEntry.PROPKEY_ACCOUNT_REVOKED
+                : CaEntry.PROPKEY_ACCOUNT;
+        String accoutS = props.getProperty(accoutPropKey);
+        this.totalAccount = Integer.parseInt(accoutS);
+
         this.certsFilesReader = new BufferedReader(
                 new FileReader(
                         new File(caDirname, "certs-manifest")));
@@ -98,13 +113,52 @@ public class FileDigestReader implements DigestReader
     }
 
     @Override
-    public boolean hasNext()
+    public CertsBundle nextCerts(
+            final int n)
+    throws DataAccessException
     {
-        return next != null;
+        if(hasNext() == false)
+        {
+            return null;
+        }
+
+        int numSkipped = 0;
+        List<Long> serialNumbers = new ArrayList<>(n);
+        Map<Long, DbDigestEntry> certs = new HashMap<>(n);
+
+        int k = 0;
+        while(hasNext())
+        {
+            DbDigestEntry line;
+            try
+            {
+                line = nextCert();
+            } catch (IOException e)
+            {
+                throw new DataAccessException("IOException: " + e.getMessage());
+            }
+            if(revokedOnly && line.isRevoked() == false)
+            {
+                numSkipped++;
+                continue;
+            }
+
+            serialNumbers.add(line.getSerialNumber());
+            certs.put(line.getSerialNumber(), line);
+            k++;
+            if(k >= n)
+            {
+                break;
+            }
+        }
+
+        return (k == 0)
+                ? null
+                : new CertsBundle(numSkipped, certs, serialNumbers);
     }
 
-    @Override
-    public DbDigestEntry nextCert()
+    private DbDigestEntry nextCert()
+    throws IOException
     {
         if(next == null)
         {
@@ -113,13 +167,7 @@ public class FileDigestReader implements DigestReader
 
         DbDigestEntry ret = next;
         next = null;
-        try
-        {
-            next = retrieveNext(false);
-        } catch (IOException e)
-        {
-            throw new IllegalStateException("error while retrieving next certificate");
-        }
+        next = retrieveNext(false);
         return ret;
     }
 
@@ -154,6 +202,11 @@ public class FileDigestReader implements DigestReader
     {
         close(certsFilesReader);
         close(certsReader);
+    }
+
+    private boolean hasNext()
+    {
+        return next != null;
     }
 
     private static void close(
