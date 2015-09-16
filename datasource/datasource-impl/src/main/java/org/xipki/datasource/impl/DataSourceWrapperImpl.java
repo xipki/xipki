@@ -1669,12 +1669,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             if (sqlErrorCodes.getBadSqlGrammarCodes().contains(errorCode))
             {
                 logTranslation(sql, sqlEx);
-                return new BadSqlGrammarException(sql, sqlEx);
+                return new BadSqlGrammarException(buildMessage(sql, sqlEx), sqlEx);
             }
             else if (sqlErrorCodes.getInvalidResultSetAccessCodes().contains(errorCode))
             {
                 logTranslation(sql, sqlEx);
-                return new InvalidResultSetAccessException(sql, sqlEx);
+                return new InvalidResultSetAccessException(buildMessage(sql, sqlEx), sqlEx);
             }
             else if (sqlErrorCodes.getDuplicateKeyCodes().contains(errorCode))
             {
@@ -1724,7 +1724,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             String classCode = sqlState.substring(0, 2);
             if (sqlStateCodes.getBadSQLGrammarCodes().contains(classCode))
             {
-                return new BadSqlGrammarException(sql, ex);
+                return new BadSqlGrammarException(buildMessage(sql, sqlEx), ex);
             }
             else if (sqlStateCodes.getDataIntegrityViolationCodes().contains(classCode))
             {
@@ -1767,7 +1767,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             LOG.debug("Unable to translate SQLException with " + codes);
         }
 
-        return new UncategorizedSQLException(sql, sqlEx);
+        return new UncategorizedSQLException(buildMessage(sql, sqlEx), sqlEx);
     }
 
     private void logTranslation(
