@@ -73,7 +73,11 @@ public class P11Identity implements Comparable<P11Identity>
 
         this.slotId = slotId;
         this.keyId = keyId;
-        this.certificateChain = certificateChain;
+        this.certificateChain =
+                (certificateChain != null && certificateChain.length > 0)
+                        ? certificateChain
+                        : null;
+
         this.publicKey = (publicKey == null)
                 ? certificateChain[0].getPublicKey()
                 : publicKey;
