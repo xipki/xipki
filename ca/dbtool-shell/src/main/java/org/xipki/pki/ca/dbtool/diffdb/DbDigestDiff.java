@@ -54,6 +54,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -68,13 +70,7 @@ import org.xipki.security.api.util.X509Util;
 
 public class DbDigestDiff
 {
-    private static class MyBundle
-    {
-        int numSkipped;
-        Map<Long, DbDigestEntry> certs;
-        List<Long> serialNumbers;
-    }
-
+    private static final Logger LOG = LoggerFactory.getLogger(DbDigestDiff.class);
     private final String refDirname;
     private final DataSourceWrapper refDatasource;
 
@@ -247,7 +243,7 @@ public class DbDigestDiff
                 }
 
                 String caDirPath = caDir.getPath();
-                DigestReader refReader = new FileDigestReader(caDirPath);
+                DigestReader refReader = new FileDigestReader(caDirPath, revokedOnly);
                 diffSingleCA(refReader, caIdCertMap);
             }
         } else
@@ -328,6 +324,7 @@ public class DbDigestDiff
             {
                 reporter.addError("Exception thrown: " + e.getClass().getName() + ": "
                         + e.getMessage());
+                LOG.error("exception on doDiff", e);
             } finally
             {
                 reporter.close();
@@ -359,6 +356,7 @@ public class DbDigestDiff
 
             ProcessLog processLog = new ProcessLog(readerA.getTotalAccount(),
                     System.currentTimeMillis(), 0);
+
             System.out.println("Processing certifiates of CA \n\t'"
                     + readerA.getCaSubjectName() + "'");
             ProcessLog.printHeader();
@@ -373,92 +371,99 @@ public class DbDigestDiff
                     break;
                 }
 
-                MyBundle myBundle = readNextLines(readerA);
-
-                int n = myBundle.serialNumbers.size();
-                if(n + myBundle.numSkipped == 0)
+                CertsBundle myBundle = readerA.nextCerts(numPerSelect);
+                if(myBundle == null)
                 {
                     break;
                 }
 
-                if(n > 0)
+                List<Long> serialNumbers = myBundle.getSerialNumbers();
+                int n = serialNumbers.size();
+
+                if(n < 1)
                 {
-                    List<Long> cloneSerialNumbers = new ArrayList<>(myBundle.serialNumbers);
-                    long minSerialNumber = 0;
-                    long maxSerialNumber = 0;
-                    for(Long m : cloneSerialNumbers)
+                    break;
+                }
+
+                int numSkipped = myBundle.getNumSkipped();
+                List<Long> cloneSerialNumbers = new ArrayList<>(serialNumbers);
+                long minSerialNumber = 0;
+                long maxSerialNumber = 0;
+                for(Long m : cloneSerialNumbers)
+                {
+                    if(minSerialNumber > m)
                     {
-                        if(minSerialNumber > m)
-                        {
-                            minSerialNumber = m;
-                        }
-                        if(maxSerialNumber < m)
-                        {
-                            maxSerialNumber = m;
-                        }
+                        minSerialNumber = m;
                     }
-
-                    Map<Long, DbDigestEntry> certsInB;
-
-                    if((int) (maxSerialNumber - minSerialNumber) < numPerSelect * 2)
+                    if(maxSerialNumber < m)
                     {
-                        ResultSet rs = null;
-                        try
-                        {
-                            rangeSelectStmt.setLong(2, minSerialNumber);
-                            rangeSelectStmt.setLong(3, maxSerialNumber);
-                            rs = rangeSelectStmt.executeQuery();
+                        maxSerialNumber = m;
+                    }
+                }
 
-                            certsInB = buildResult(rs, myBundle.serialNumbers);
-                        } catch(SQLException e)
+                Map<Long, DbDigestEntry> certsInB;
+
+                if((int) (maxSerialNumber - minSerialNumber) < (numSkipped + numPerSelect) * 2)
+                {
+                    ResultSet rs = null;
+                    try
+                    {
+                        rangeSelectStmt.setLong(2, minSerialNumber);
+                        rangeSelectStmt.setLong(3, maxSerialNumber);
+                        rs = rangeSelectStmt.executeQuery();
+
+                        certsInB = buildResult(rs, serialNumbers);
+                    } catch(SQLException e)
+                    {
+                        throw datasource.translate(inArrayCertsSql, e);
+                    }
+                    finally
+                    {
+                        releaseResources(null, rs);
+                    }
+                } else
+                {
+                    boolean batchSupported = datasource.getDatabaseType() != DatabaseType.H2;
+                    if(batchSupported && n == numPerSelect)
+                    {
+                        certsInB = getCertsViaInArraySelectInB(inArraySelectStmt,
+                                serialNumbers);
+                    } else
+                    {
+                        certsInB = getCertsViaSingleSelectInB(
+                                singleSelectStmt, serialNumbers);
+                    }
+                }
+
+                Map<Long, DbDigestEntry> certs = myBundle.getCerts();
+
+                for(Long serialNumber : serialNumbers)
+                {
+                    DbDigestEntry certB = certsInB.get(serialNumber);
+                    cloneSerialNumbers.remove(serialNumber);
+                    DbDigestEntry certA = certs.get(serialNumber);
+                    if(certB != null)
+                    {
+                        if(certA.contentEquals(certB))
                         {
-                            throw datasource.translate(inArrayCertsSql, e);
-                        }
-                        finally
+                            reporter.addGood(serialNumber);
+                        } else
                         {
-                            releaseResources(null, rs);
+                            reporter.addDiff(certA, certB);
                         }
                     } else
                     {
-                        boolean batchSupported = datasource.getDatabaseType() != DatabaseType.H2;
-                        if(batchSupported && myBundle.serialNumbers.size() == numPerSelect)
-                        {
-                            certsInB = getCertsViaInArraySelectInB(inArraySelectStmt,
-                                    myBundle.serialNumbers);
-                        } else
-                        {
-                            certsInB = getCertsViaSingleSelectInB(
-                                    singleSelectStmt, myBundle.serialNumbers);
-                        }
+                        reporter.addMissing(serialNumber);
                     }
+                } // end for
 
-                    for(Long serialNumber : myBundle.serialNumbers)
-                    {
-                        DbDigestEntry certB = certsInB.get(serialNumber);
-                        cloneSerialNumbers.remove(serialNumber);
-                        DbDigestEntry certA = myBundle.certs.get(serialNumber);
-                        if(certB != null)
-                        {
-                            if(certA.contentEquals(certB))
-                            {
-                                reporter.addSame(serialNumber);
-                            } else
-                            {
-                                reporter.addDiff(certA, certB);
-                            }
-                        } else
-                        {
-                            reporter.addMissing(serialNumber);
-                        }
-                    } // end for
-                } // end if (n > 0)
-
-                processLog.addNumProcessed(n + myBundle.numSkipped);
+                processLog.addNumProcessed(n);
                 processLog.printStatus();
 
                 numProcessed += n;
                 reporter.setAccout(numProcessed);
             }
+
             processLog.printStatus(true);
             ProcessLog.printTrailer();
 
@@ -605,37 +610,6 @@ public class DbDigestDiff
         {
             releaseResources(null, rs);
         }
-    }
-
-    private MyBundle readNextLines(
-            final DigestReader reader)
-    throws IOException
-    {
-        MyBundle ret = new MyBundle();
-        ret.numSkipped = 0;
-        ret.serialNumbers = new ArrayList<>(numPerSelect);
-        ret.certs = new HashMap<>(numPerSelect);
-
-        int k = 0;
-        while(reader.hasNext())
-        {
-            DbDigestEntry line = reader.nextCert();
-            if(revokedOnly && line.isRevoked() == false)
-            {
-                ret.numSkipped++;
-                continue;
-            }
-
-            ret.serialNumbers.add(line.getSerialNumber());
-            ret.certs.put(line.getSerialNumber(), line);
-            k++;
-            if(k >= numPerSelect)
-            {
-                break;
-            }
-        }
-
-        return ret;
     }
 
     private void releaseResources(

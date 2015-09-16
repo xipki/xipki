@@ -43,8 +43,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -57,19 +61,34 @@ import org.xipki.security.api.util.X509Util;
 
 public class DbDigestReader implements DigestReader
 {
+    private static class IdentifiedDbDigestEntry
+    {
+        final DbDigestEntry content;
+        final int id;
+
+        public IdentifiedDbDigestEntry(DbDigestEntry content, int id)
+        {
+            this.content = content;
+            this.id = id;
+        }
+    }
+
     private final int caId;
     private final DataSourceWrapper datasource;
     private final XipkiDbControl dbControl;
     private final Connection conn;
     private final String selectCertSql;
+    private final String numCertSql;
     private final PreparedStatement selectCertStmt;
+    private final PreparedStatement numCertStmt;
+    private final boolean revokedOnly;
 
     private final int totalAccount;
     private final String caSubjectName;
     private final X509Certificate caCert;
     private final int maxId;
 
-    private final Deque<DbDigestEntry> certs = new LinkedList<>();
+    private final Deque<IdentifiedDbDigestEntry> certs = new LinkedList<>();
     private int nextId;
 
     public DbDigestReader(
@@ -83,6 +102,7 @@ public class DbDigestReader implements DigestReader
         this.datasource = datasource;
         this.caId = caId;
         this.conn = datasource.getConnection();
+        this.revokedOnly = revokedOnly;
 
         this.dbControl = new XipkiDbControl(dbSchemaType);
 
@@ -118,10 +138,6 @@ public class DbDigestReader implements DigestReader
             rs.close();
 
             sql = "SELECT MAX(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
-            if(revokedOnly)
-            {
-                sql += " AND " + dbControl.getColRevoked() + "=1";
-            }
 
             rs = stmt.executeQuery(sql);
             this.maxId = rs.next()
@@ -130,15 +146,11 @@ public class DbDigestReader implements DigestReader
             rs.close();
 
             sql = "SELECT MIN(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
-            if(revokedOnly)
-            {
-                sql += " AND " + dbControl.getColRevoked() + "=1";
-            }
 
             rs = stmt.executeQuery(sql);
             this.nextId = rs.next()
                     ? rs.getInt(1)
-                    : 0;
+                    : 1;
 
             StringBuilder sb = new StringBuilder();
             sb.append("SELECT ID,");
@@ -152,7 +164,7 @@ public class DbDigestReader implements DigestReader
                 .append(dbControl.getTblCerthash());
             sb.append(" ON CERT.")
                 .append(dbControl.getColCaId())
-                .append("=?");
+                .append("=").append(caId);
             sb.append(" AND CERT.ID>=? AND CERT.ID<?");
 
             if(revokedOnly)
@@ -162,13 +174,15 @@ public class DbDigestReader implements DigestReader
                     append("=1");
             }
 
-            sb.append("AND CERT.ID=")
+            sb.append(" AND CERT.ID=")
                 .append(dbControl.getTblCerthash())
                 .append(".")
                 .append(dbControl.getColCertId());
-            sb.append(" ORDER BY CERT.ID ASC");
 
             this.selectCertSql = sb.toString();
+
+            this.numCertSql = "SELECT COUNT(*) FROM CERT WHERE CA_ID=" + caId
+                    + " AND ID>=? AND ID<=?";
         }catch(SQLException e)
         {
             throw datasource.translate(sql, e);
@@ -178,16 +192,7 @@ public class DbDigestReader implements DigestReader
         }
 
         this.selectCertStmt = datasource.prepareStatement(conn, this.selectCertSql);
-        try
-        {
-            this.selectCertStmt.setInt(1, caId);
-        } catch (SQLException e)
-        {
-            close();
-            throw datasource.translate(this.selectCertSql, e);
-        }
-
-        readNextCerts();
+        this.numCertStmt = datasource.prepareStatement(conn, this.numCertSql);
     }
 
     @Override
@@ -209,30 +214,90 @@ public class DbDigestReader implements DigestReader
     }
 
     @Override
-    public boolean hasNext()
+    public CertsBundle nextCerts(
+            final int n)
+    throws DataAccessException
     {
-        return certs.isEmpty() == false;
+        if(nextId > maxId && certs.isEmpty())
+        {
+            return null;
+        }
+
+        List<IdentifiedDbDigestEntry> entries = new ArrayList<>(n);
+        int k = 0;
+        while(true)
+        {
+            if(certs.isEmpty())
+            {
+                readNextCerts();
+            }
+
+            IdentifiedDbDigestEntry next = certs.poll();
+            if(next == null)
+            {
+                break;
+            }
+
+            entries.add(next);
+            k++;
+            if(k >= n)
+            {
+                break;
+            }
+        }
+
+        if(k == 0)
+        {
+            return null;
+        }
+
+        int numSkipped = 0;
+        if(revokedOnly)
+        {
+            int numCertsInThisRange = getNumCerts(entries.get(0).id,
+                    entries.get(k - 1).id);
+            numSkipped = numCertsInThisRange - k;
+        }
+
+        List<Long> serialNumbers = new ArrayList<>(k);
+        Map<Long, DbDigestEntry> certsMap = new HashMap<>(k);
+        for(IdentifiedDbDigestEntry m : entries)
+        {
+            long sn = m.content.getSerialNumber();
+            serialNumbers.add(sn);
+            certsMap.put(sn, m.content);
+        }
+
+        return new CertsBundle(numSkipped, certsMap, serialNumbers);
     }
 
-    @Override
-    public DbDigestEntry nextCert()
+    private int getNumCerts(
+            final int fromId,
+            final int toId)
+    throws DataAccessException
     {
-        DbDigestEntry next = certs.poll();
-        if(next == null)
+        if(fromId > toId)
         {
-            throw new IllegalStateException("reach end of the stream");
+            return 0;
         }
 
+        ResultSet rs = null;
         try
         {
-            readNextCerts();
-        } catch (DataAccessException e)
+            numCertStmt.setInt(1, fromId);
+            numCertStmt.setInt(2, toId);
+            rs = numCertStmt.executeQuery();
+            return rs.next()
+                    ? rs.getInt(1)
+                    : 0;
+        }catch(SQLException e)
         {
-            throw new IllegalStateException("error while retrieving next certificate: "
-                    + e.getMessage());
+            throw datasource.translate(numCertSql, e);
+        } finally
+        {
+            releaseResources(null, rs);
         }
 
-        return next;
     }
 
     private void readNextCerts()
@@ -244,10 +309,10 @@ public class DbDigestReader implements DigestReader
         {
             try
             {
-                selectCertStmt.setInt(2, nextId);
+                selectCertStmt.setInt(1, nextId);
 
                 this.nextId += 1000;
-                selectCertStmt.setInt(3, nextId);
+                selectCertStmt.setInt(2, nextId);
 
                 rs = selectCertStmt.executeQuery();
 
@@ -274,7 +339,8 @@ public class DbDigestReader implements DigestReader
 
                     DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime,
                             revInvTime, hash);
-                    certs.addLast(cert);
+                    int id = rs.getInt("ID");
+                    certs.addLast(new IdentifiedDbDigestEntry(cert, id));
                 }
             } catch(SQLException e)
             {
@@ -289,6 +355,7 @@ public class DbDigestReader implements DigestReader
 
     public void close()
     {
+        releaseResources(numCertStmt, null);
         releaseResources(selectCertStmt, null);
         datasource.returnConnection(conn);
     }
