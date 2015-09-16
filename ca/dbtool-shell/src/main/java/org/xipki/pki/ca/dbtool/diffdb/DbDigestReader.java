@@ -138,6 +138,10 @@ public class DbDigestReader implements DigestReader
             rs.close();
 
             sql = "SELECT MAX(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
+            if(revokedOnly)
+            {
+                sql += " AND " + dbControl.getColRevoked() + "=1";
+            }
 
             rs = stmt.executeQuery(sql);
             this.maxId = rs.next()
@@ -146,6 +150,10 @@ public class DbDigestReader implements DigestReader
             rs.close();
 
             sql = "SELECT MIN(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
+            if(revokedOnly)
+            {
+                sql += " AND " + dbControl.getColRevoked() + "=1";
+            }
 
             rs = stmt.executeQuery(sql);
             this.nextId = rs.next()
