@@ -105,7 +105,9 @@ abstract class PathCompleter
         File[] entries = (dir == null)
                 ? new File[0]
                 : dir.listFiles(filenameFilter);
-        if(isDirOnly() && entries.length > 0)
+        if(isDirOnly()
+                && entries != null
+                && entries.length > 0)
         {
             List<File> list = new LinkedList<File>();
             for(File f : entries)
