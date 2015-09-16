@@ -51,6 +51,10 @@ import org.xipki.pki.ca.dbtool.xmlio.InvalidDataObjectException;
 
 public class CaEntry
 {
+    public static final String FILENAME_OVERVIEW = "overview.properties";
+    public static final String PROPKEY_ACCOUNT = "account";
+    public static final String PROPKEY_ACCOUNT_REVOKED = "account-revoked";
+
     public static final int DFLT_NUM_CERTS_IN_BUNDLE = 100000;
     public static final int STREAM_BUFFERSIZE = 1024 * 1024; // 1M
 
@@ -60,6 +64,7 @@ public class CaEntry
     private final File certsDir;
 
     private int numProcessed;
+    private int numProcessedRevoked;
 
     private File csvFile;
     private BufferedOutputStream csvOutputStream;
@@ -125,14 +130,23 @@ public class CaEntry
             createNewCsvFile();
         }
         numProcessed++;
+        if(reportEntry.isRevoked())
+        {
+            numProcessedRevoked++;
+        }
     }
 
     public void close()
     throws IOException
     {
         // write the account
-        IoUtil.save(new File(caDir, "account"),
-                Integer.toString(numProcessed).getBytes());
+        StringBuilder sb = new StringBuilder(50);
+        sb.append(PROPKEY_ACCOUNT)
+            .append("=").append(numProcessed).append("\n");
+        sb.append(PROPKEY_ACCOUNT_REVOKED)
+            .append("=").append(numProcessedRevoked).append("\n");
+        IoUtil.save(new File(caDir, FILENAME_OVERVIEW),
+                sb.toString().getBytes());
 
         closeCurrentCsvFile();
         IoUtil.closeStream(certsManifestOs);

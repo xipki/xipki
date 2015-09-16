@@ -35,24 +35,51 @@
 
 package org.xipki.pki.ca.dbtool.diffdb;
 
-import java.security.cert.X509Certificate;
+import java.util.List;
+import java.util.Map;
 
-import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
  */
 
-public interface DigestReader
+public class CertsBundle
 {
-    X509Certificate getCaCert();
+    private int numSkipped;
+    private Map<Long, DbDigestEntry> certs;
+    private List<Long> serialNumbers;
 
-    String getCaSubjectName();
+    public CertsBundle(
+            final int numSkipped,
+            final Map<Long, DbDigestEntry> certs,
+            final List<Long> serialNumbers)
+    {
+        if(numSkipped < 0)
+        {
+            throw new IllegalArgumentException("numSkipped could not be negative: " + numSkipped);
+        }
 
-    int getTotalAccount();
+        ParamUtil.assertNotEmpty("certs", certs);
+        ParamUtil.assertNotEmpty("serialNumbers", serialNumbers);
 
-    CertsBundle nextCerts(int n)
-    throws DataAccessException;
+        this.certs = certs;
+        this.serialNumbers = serialNumbers;
+    }
 
-    void close();
+    public int getNumSkipped()
+    {
+        return numSkipped;
+    }
+
+    public Map<Long, DbDigestEntry> getCerts()
+    {
+        return certs;
+    }
+
+    public List<Long> getSerialNumbers()
+    {
+        return serialNumbers;
+    }
+
 }
