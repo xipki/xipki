@@ -2081,7 +2081,7 @@ class CertStoreQueryExecutor
 
                     Date invalidityTime = (rev_invalidity_time == 0)
                             ? null
-                            :  new Date(1000 * rev_invalidity_time);
+                            : new Date(1000 * rev_invalidity_time);
                     revInfo = new CertRevInfoWithSerial(
                             BigInteger.valueOf(serial),
                             rev_reason, new Date(1000 * rev_time), invalidityTime);
