@@ -48,17 +48,17 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
 /**
- *
+ *<pre>
  * Example configuration
  * updateMode=<'interval'|'onDemand'>
  *
  * # For all updateMode
  *
  * # Whether expired certificates are considered. Default is false
- * expiredCerts.included=<'true'|'false'>
+ * expiredCerts.included=&lt;'true'|'false'>
  *
  * # Whether certificates are embedded in CRL, XiPKI-customized extension. Default is false
- * certs.embedded=<'true'|'false'>
+ * certs.embedded=&lt;'true'|'false'>
  *
  * # List of OIDs of extensions to be embedded in CRL,
  * # Unspecified or empty extensions indicates that the CA decides.
@@ -68,35 +68,41 @@ import org.xipki.common.util.StringUtil;
  *
  * # Number of intervals to generate a full CRL. Default is 1
  * # Should be greater than 0
- * fullCRL.intervals=<integer>
+ * fullCRL.intervals=&lt;integer>
  *
  * # should be 0 or not greater than baseCRL.intervals. Default is 0.
  * # 0 indicates that no deltaCRL will be generated
- * deltaCRL.intervals=<integer>
+ * deltaCRL.intervals=&lt;integer>
  *
  * overlap.minutes=<minutes of overlap>
  *
  * # should be less than fullCRL.intervals.
  * # If activated, a deltaCRL will be generated only between two full CRLs
- * deltaCRL.intervals=<integer>
+ * deltaCRL.intervals=&lt;integer>
  *
  * # Exactly one of interval.minutes and interval.days should be specified
  * # Number of minutes of one interval. At least 60 minutes
  * interval.minutes=<minutes of one interval>
  *
  * # UTC time of generation of CRL, one interval covers 1 day.
- * interval.time=<updatet time (hh:mm of UTC time)>
+ * interval.time=&lt;updatet time (hh:mm of UTC time)>
  *
  * # Whether the nextUpdate of a fullCRL is the update time of the fullCRL
  * # Default is false
- * fullCRL.extendedNextUpdate=<'true'|'false'>
+ * fullCRL.extendedNextUpdate=&lt;'true'|'false'>
  *
  * # Whether only user certificates are considered in CRL
- * onlyContainsUserCerts=<'true'|'false'>
+ * # Default is false
+ * onlyContainsUserCerts=&lt;'true'|'false'>
  *
  * # Whether only CA certificates are considered in CRL
- * onlyContainsCACerts=<'true'|'false'>
+ * # Default if false
+ * onlyContainsCACerts=&lt;'true'|'false'>
  *
+ * # Whether Revocation reason is contained in CRL
+ * # Default is false
+ * excludeReason=&lt;'true'|'false'>
+ * </pre>
  * @author Lijun Liao
  */
 
@@ -116,6 +122,7 @@ public class CRLControl implements Serializable
     public static final String KEY_fullCRL_extendedNextUpdate = "fullCRL.extendedNextUpdate";
     public static final String KEY_onlyContainsUserCerts = "onlyContainsUserCerts";
     public static final String KEY_onlyContainsCACerts = "onlyContainsCACerts";
+    public static final String KEY_excludeReason = "excludeReason";
 
     public static enum UpdateMode implements Serializable
     {
@@ -213,6 +220,7 @@ public class CRLControl implements Serializable
     private HourMinute intervalDayTime;
     private boolean onlyContainsUserCerts = false;
     private boolean onlyContainsCACerts = false;
+    private boolean excludeReason = false;
 
     private final Set<String> extensionOIDs;
 
@@ -271,6 +279,7 @@ public class CRLControl implements Serializable
 
         this.onlyContainsCACerts = getBoolean(props, KEY_onlyContainsCACerts, false);
         this.onlyContainsUserCerts = getBoolean(props, KEY_onlyContainsUserCerts, false);
+        this.excludeReason = getBoolean(props, KEY_excludeReason, false);
 
         if(this.updateMode != UpdateMode.onDemand)
         {
@@ -368,6 +377,7 @@ public class CRLControl implements Serializable
         pairs.putPair(KEY_certs_embedded, Boolean.toString(embedsCerts));
         pairs.putPair(KEY_onlyContainsCACerts, Boolean.toString(onlyContainsCACerts));
         pairs.putPair(KEY_onlyContainsUserCerts, Boolean.toString(onlyContainsUserCerts));
+        pairs.putPair(KEY_excludeReason, Boolean.toString(excludeReason));
         if(updateMode != UpdateMode.onDemand)
         {
             pairs.putPair(KEY_fullCRL_intervals, Integer.toString(fullCRLIntervals));
@@ -463,6 +473,11 @@ public class CRLControl implements Serializable
     public boolean isOnlyContainsCACerts()
     {
         return onlyContainsCACerts;
+    }
+
+    public boolean isExcludeReason()
+    {
+        return excludeReason;
     }
 
     public void validate()

@@ -990,6 +990,11 @@ public class X509CA
                     }
 
                     CRLReason reason = revInfo.getReason();
+                    if(crlControl.isExcludeReason() && reason != CRLReason.REMOVE_FROM_CRL)
+                    {
+                        reason = CRLReason.UNSPECIFIED;
+                    }
+
                     Date revocationTime = revInfo.getRevocationTime();
                     Date invalidityTime = revInfo.getInvalidityTime();
                     if(invalidityTime != null && invalidityTime.equals(revocationTime))
