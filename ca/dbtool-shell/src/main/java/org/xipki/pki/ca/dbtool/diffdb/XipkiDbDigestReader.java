@@ -53,13 +53,17 @@ import java.util.Map;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.pki.ca.dbtool.diffdb.internal.CertsBundle;
+import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
+import org.xipki.pki.ca.dbtool.diffdb.internal.DbSchemaType;
+import org.xipki.pki.ca.dbtool.diffdb.internal.XipkiDbControl;
 import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
  */
 
-public class DbDigestReader implements DigestReader
+public class XipkiDbDigestReader implements DigestReader
 {
     private static class IdentifiedDbDigestEntry
     {
@@ -91,7 +95,7 @@ public class DbDigestReader implements DigestReader
     private final Deque<IdentifiedDbDigestEntry> certs = new LinkedList<>();
     private int nextId;
 
-    public DbDigestReader(
+    public XipkiDbDigestReader(
             final DataSourceWrapper datasource,
             final DbSchemaType dbSchemaType,
             final int caId,

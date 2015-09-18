@@ -39,29 +39,28 @@ import java.io.File;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.DatabaseType;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.dbtool.ProcessLog;
+import org.xipki.pki.ca.dbtool.diffdb.internal.CertsBundle;
+import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
+import org.xipki.pki.ca.dbtool.diffdb.internal.DbSchemaType;
+import org.xipki.pki.ca.dbtool.diffdb.internal.TargetDigestRetriever;
+import org.xipki.pki.ca.dbtool.diffdb.internal.XipkiDbControl;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -76,15 +75,12 @@ public class DbDigestDiff
 
     private final boolean revokedOnly;
 
-    private final XipkiDbControl dbControl;
-    private final DataSourceWrapper datasource;
     private final String reportDirName;
     private final AtomicBoolean stopMe;
     private final int numPerSelect;
-    private Connection conn;
-    private final String singleCertSql;
-    private final String inArrayCertsSql;
-    private final String rangeCertsSql;
+    private final int numThreads;
+
+    private final TargetDigestRetriever target;
 
     public static DbDigestDiff getInstanceForDirRef(
             final boolean revokedOnly,
@@ -92,7 +88,8 @@ public class DbDigestDiff
             final DataSourceWrapper datasource,
             final String reportDirName,
             final AtomicBoolean stopMe,
-            final int numPerSelect)
+            final int numPerSelect,
+            final int numThreads)
     throws IOException, DataAccessException
     {
         ParamUtil.assertNotBlank("refDirname", refDirname);
@@ -105,7 +102,7 @@ public class DbDigestDiff
         }
 
         return new DbDigestDiff(revokedOnly, refDirname, null,
-                datasource, reportDirName, stopMe, numPerSelect);
+                datasource, reportDirName, stopMe, numPerSelect, numThreads);
     }
 
     public static DbDigestDiff getInstanceForDbRef(
@@ -114,7 +111,8 @@ public class DbDigestDiff
             final DataSourceWrapper datasource,
             final String reportDirName,
             final AtomicBoolean stopMe,
-            final int numPerSelect)
+            final int numPerSelect,
+            final int numThreads)
     throws IOException, DataAccessException
     {
         ParamUtil.assertNotNull("refDatasource", refDatasource);
@@ -127,7 +125,7 @@ public class DbDigestDiff
         }
 
         return new DbDigestDiff(revokedOnly, null, refDatasource,
-                datasource, reportDirName, stopMe, numPerSelect);
+                datasource, reportDirName, stopMe, numPerSelect, numThreads);
     }
 
     private DbDigestDiff(
@@ -137,9 +135,15 @@ public class DbDigestDiff
             final DataSourceWrapper datasource,
             final String reportDirName,
             final AtomicBoolean stopMe,
-            final int numPerSelect)
+            final int numPerSelect,
+            final int numThreads)
     throws IOException, DataAccessException
     {
+        if(numThreads < 1)
+        {
+            throw new IllegalArgumentException("invalid numThreads: " + numThreads);
+        }
+
         this.revokedOnly = revokedOnly;
 
         this.refDirname = (refDir == null)
@@ -148,133 +152,101 @@ public class DbDigestDiff
 
         this.refDatasource = refDatasource;
 
-        this.datasource = datasource;
         this.reportDirName = reportDirName;
         this.stopMe = stopMe;
         this.numPerSelect = numPerSelect;
-
-        DbSchemaType dbSchemaType = DbDigestExportWorker.detectDbSchemaType(datasource);
-        this.dbControl = new XipkiDbControl(dbSchemaType);
-
-        String coreSql =
-                dbControl.getColRevoked() + ","
-                + dbControl.getColRevReason() + ","
-                + dbControl.getColRevTime() + ","
-                + dbControl.getColRevInvTime() + ","
-                + dbControl.getColCerthash()
-                + " FROM CERT INNER JOIN " + dbControl.getTblCerthash()
-                + " ON CERT." + dbControl.getColCaId() + "=?"
-                + " AND CERT." + dbControl.getColSerialNumber() + "=?"
-                + " AND CERT.ID=" + dbControl.getTblCerthash() + "."
-                + dbControl.getColCertId();
-        singleCertSql = datasource.createFetchFirstSelectSQL(coreSql, 1);
-
-        StringBuilder sb = new StringBuilder("?");
-        for(int i = 1; i < numPerSelect; i++)
-        {
-            sb.append(",?");
-        }
-
-        coreSql =
-                dbControl.getColSerialNumber() + ","
-                + dbControl.getColRevoked() + ","
-                + dbControl.getColRevReason() + ","
-                + dbControl.getColRevTime() + ","
-                + dbControl.getColRevInvTime() + ","
-                + dbControl.getColCerthash()
-                + " FROM CERT INNER JOIN " + dbControl.getTblCerthash()
-                + " ON CERT." + dbControl.getColCaId() + "=?"
-                + " AND CERT." + dbControl.getColSerialNumber() + " IN (" + sb.toString() + ")"
-                + " AND CERT.ID=" + dbControl.getTblCerthash() + "." + dbControl.getColCertId();
-        inArrayCertsSql = datasource.createFetchFirstSelectSQL(coreSql, numPerSelect);
-
-        rangeCertsSql = "SELECT "
-                + dbControl.getColSerialNumber() + ","
-                + dbControl.getColRevoked() + ","
-                + dbControl.getColRevReason() + ","
-                + dbControl.getColRevTime() + ","
-                + dbControl.getColRevInvTime() + ","
-                + dbControl.getColCerthash()
-                + " FROM CERT INNER JOIN " + dbControl.getTblCerthash()
-                + " ON CERT." + dbControl.getColCaId() + "=?"
-                + " AND CERT." + dbControl.getColSerialNumber() + ">=?"
-                + " AND CERT." + dbControl.getColSerialNumber() + "<=?"
-                + " AND CERT.ID=" + dbControl.getTblCerthash() + "."
-                + dbControl.getColCertId();
-
-        this.conn = datasource.getConnection();
+        this.numThreads = numThreads;
+        this.target = new TargetDigestRetriever(datasource, numPerSelect, numThreads);
     }
 
     public void diff()
-    throws DataAccessException, IOException, InterruptedException, CertificateException
+    throws Exception
     {
-        // get a list of available CAs in the target database
-        String sql = "SELECT ID, CERT FROM " + dbControl.getTblCa();
-        Statement stmt = datasource.createStatement(conn);
-        Map<Integer, byte[]> caIdCertMap = new HashMap<>(5);
-        ResultSet rs = null;
         try
         {
-            rs = stmt.executeQuery(sql);
-            while(rs.next())
-            {
-                int id = rs.getInt("ID");
-                String b64Cert = rs.getString("CERT");
-                caIdCertMap.put(id, Base64.decode(b64Cert));
-            }
-        } catch (SQLException e)
-        {
-            throw datasource.translate(sql, e);
-        } finally
-        {
-            releaseResources(stmt, rs);
-        }
+            Map<Integer, byte[]> caIdCertMap = target.getCAs();
 
-        if(refDirname != null)
-        {
-            File refDir = new File(this.refDirname);
-            File[] childFiles = refDir.listFiles();
-            for(File caDir : childFiles)
+            if(refDirname != null)
             {
-                if(caDir.isDirectory() == false
-                        ||  caDir.getName().startsWith("ca-") == false)
+                File refDir = new File(this.refDirname);
+                File[] childFiles = refDir.listFiles();
+                for(File caDir : childFiles)
                 {
-                    continue;
+                    if(caDir.isDirectory() == false
+                            ||  caDir.getName().startsWith("ca-") == false)
+                    {
+                        continue;
+                    }
+
+                    String caDirPath = caDir.getPath();
+                    DigestReader refReader = new FileDigestReader(caDirPath, revokedOnly);
+                    diffSingleCA(refReader, caIdCertMap);
+                }
+            } else
+            {
+                DbSchemaType refDbSchemaType = DbDigestExportWorker
+                        .detectDbSchemaType(refDatasource);
+                List<Integer> refCaIds = new LinkedList<>();
+
+                XipkiDbControl refDbControl = null;
+                String refSql;
+
+                if(refDbSchemaType == DbSchemaType.EJBCA_CA_v3)
+                {
+                    if(refDatasource.tableHasColumn(null, "CertificateData", "id") == false)
+                    {
+                        throw new RuntimeException(
+                                "EJBCA without column 'CertificateData.id' is not supported, "
+                                + "please call 'digest-db' first and then use the exported"
+                                + " folder as reference");
+                    }
+                    refSql = "SELECT cAId FROM CAData WHERE cAId != 0";
+                } else
+                {
+                    refDbControl = new XipkiDbControl(refDbSchemaType);
+                    refSql = "SELECT ID FROM " + refDbControl.getTblCa();
                 }
 
-                String caDirPath = caDir.getPath();
-                DigestReader refReader = new FileDigestReader(caDirPath, revokedOnly);
-                diffSingleCA(refReader, caIdCertMap);
-            }
-        } else
-        {
-            List<Integer> refCaIds = new LinkedList<>();
-            Statement refStmt = refDatasource.createStatement(refDatasource.getConnection());
-            DbSchemaType refDbSchemaType = DbDigestExportWorker.detectDbSchemaType(refDatasource);
-            XipkiDbControl refDbControl = new XipkiDbControl(refDbSchemaType);
-            String refSql = "SELECT ID FROM " + refDbControl.getTblCa();
-            ResultSet refRs = null;
-            try
-            {
-                refRs = refStmt.executeQuery(refSql);
-                while(refRs.next())
+                Statement refStmt = null;
+                try
                 {
-                    int id = refRs.getInt("ID");
-                    refCaIds.add(id);
+                    refStmt = refDatasource.createStatement(refDatasource.getConnection());
+                    ResultSet refRs = null;
+                    try
+                    {
+                        refRs = refStmt.executeQuery(refSql);
+                        while(refRs.next())
+                        {
+                            int id = refRs.getInt(1);
+                            refCaIds.add(id);
+                        }
+                    } catch (SQLException e)
+                    {
+                        throw refDatasource.translate(refSql, e);
+                    } finally
+                    {
+                        refDatasource.releaseResources(refStmt, refRs);
+                    }
+                } finally
+                {
+                    refDatasource.releaseResources(refStmt, null);
                 }
-            } catch (SQLException e)
-            {
-                throw datasource.translate(refSql, e);
-            } finally
-            {
-                refDatasource.releaseResources(refStmt, refRs);
-            }
 
-            for(Integer refCaId : refCaIds)
+                for(Integer refCaId : refCaIds)
+                {
+                    DigestReader refReader = (refDbSchemaType == DbSchemaType.EJBCA_CA_v3)
+                            ? new EjbcaDbDigestReader(refDatasource, refDbSchemaType,
+                                    refCaId, revokedOnly)
+                            : new XipkiDbDigestReader(refDatasource, refDbSchemaType,
+                                    refCaId, revokedOnly);
+                    diffSingleCA(refReader, caIdCertMap);
+                }
+            }
+        }finally
+        {
+            if(target != null)
             {
-                DigestReader refReader = new DbDigestReader(refDatasource, refDbSchemaType,
-                        refCaId, revokedOnly);
-                diffSingleCA(refReader, caIdCertMap);
+                target.close();
             }
         }
     }
@@ -337,109 +309,66 @@ public class DbDigestDiff
             final DigestReader readerA,
             final int caIdB,
             final DbDigestReporter reporter)
-    throws IOException, DataAccessException, InterruptedException
+    throws Exception
     {
-        PreparedStatement singleSelectStmt = null;
-        PreparedStatement inArraySelectStmt = null;
-        PreparedStatement rangeSelectStmt = null;
+        target.startCA(caIdB);
+        ProcessLog processLog = new ProcessLog(readerA.getTotalAccount(),
+                System.currentTimeMillis(), 0);
 
-        try
+        System.out.println("Processing certifiates of CA \n\t'"
+                + readerA.getCaSubjectName() + "'");
+        ProcessLog.printHeader();
+
+        boolean interrupted = false;
+        int numProcessed = 0;
+
+        while(true)
         {
-            singleSelectStmt = datasource.prepareStatement(conn, singleCertSql);
-            singleSelectStmt.setInt(1, caIdB);
-
-            inArraySelectStmt = datasource.prepareStatement(conn, inArrayCertsSql);
-            inArraySelectStmt.setInt(1, caIdB);
-
-            rangeSelectStmt = datasource.prepareStatement(conn, rangeCertsSql);
-            rangeSelectStmt.setInt(1, caIdB);
-
-            ProcessLog processLog = new ProcessLog(readerA.getTotalAccount(),
-                    System.currentTimeMillis(), 0);
-
-            System.out.println("Processing certifiates of CA \n\t'"
-                    + readerA.getCaSubjectName() + "'");
-            ProcessLog.printHeader();
-
-            boolean interrupted = false;
-            int numProcessed = 0;
-            while(true)
+            if(stopMe.get())
             {
-                if(stopMe.get())
-                {
-                    interrupted = true;
-                    break;
-                }
+                interrupted = true;
+                target.close();
+                break;
+            }
 
+            int numBundles = 0;
+            for(int i = 0; i < numThreads; i++)
+            {
                 CertsBundle myBundle = readerA.nextCerts(numPerSelect);
-                if(myBundle == null)
+                if(myBundle != null
+                        && myBundle.getSerialNumbers().isEmpty() == false)
                 {
-                    break;
-                }
-
-                List<Long> serialNumbers = myBundle.getSerialNumbers();
-                int n = serialNumbers.size();
-
-                if(n < 1)
-                {
-                    break;
-                }
-
-                int numSkipped = myBundle.getNumSkipped();
-                List<Long> cloneSerialNumbers = new ArrayList<>(serialNumbers);
-                long minSerialNumber = 0;
-                long maxSerialNumber = 0;
-                for(Long m : cloneSerialNumbers)
-                {
-                    if(minSerialNumber > m)
-                    {
-                        minSerialNumber = m;
-                    }
-                    if(maxSerialNumber < m)
-                    {
-                        maxSerialNumber = m;
-                    }
-                }
-
-                Map<Long, DbDigestEntry> certsInB;
-
-                if((int) (maxSerialNumber - minSerialNumber) < (numSkipped + numPerSelect) * 2)
-                {
-                    ResultSet rs = null;
-                    try
-                    {
-                        rangeSelectStmt.setLong(2, minSerialNumber);
-                        rangeSelectStmt.setLong(3, maxSerialNumber);
-                        rs = rangeSelectStmt.executeQuery();
-
-                        certsInB = buildResult(rs, serialNumbers);
-                    } catch(SQLException e)
-                    {
-                        throw datasource.translate(inArrayCertsSql, e);
-                    }
-                    finally
-                    {
-                        releaseResources(null, rs);
-                    }
+                    numBundles++;
+                    target.addIn(myBundle);
                 } else
                 {
-                    boolean batchSupported = datasource.getDatabaseType() != DatabaseType.H2;
-                    if(batchSupported && n == numPerSelect)
-                    {
-                        certsInB = getCertsViaInArraySelectInB(inArraySelectStmt,
-                                serialNumbers);
-                    } else
-                    {
-                        certsInB = getCertsViaSingleSelectInB(
-                                singleSelectStmt, serialNumbers);
-                    }
+                    break; // break for
+                }
+            }
+
+            if(numBundles == 0)
+            {
+                break; // break while(true)
+            }
+
+            for(int i = 0; i < numBundles; i++)
+            {
+                CertsBundle bundle = target.takeOut();
+                Exception targetException = bundle.getTargetException();
+                if(targetException != null)
+                {
+                    throw targetException;
                 }
 
-                Map<Long, DbDigestEntry> certs = myBundle.getCerts();
+                List<Long> serialNumbers = bundle.getSerialNumbers();
+                int n = serialNumbers.size();
+
+                List<Long> cloneSerialNumbers = new ArrayList<>(serialNumbers);
+                Map<Long, DbDigestEntry> certs = bundle.getCerts();
 
                 for(Long serialNumber : serialNumbers)
                 {
-                    DbDigestEntry certB = certsInB.get(serialNumber);
+                    DbDigestEntry certB = bundle.getTargetCert(serialNumber);
                     cloneSerialNumbers.remove(serialNumber);
                     DbDigestEntry certA = certs.get(serialNumber);
                     if(certB != null)
@@ -463,177 +392,14 @@ public class DbDigestDiff
                 numProcessed += n;
                 reporter.setAccout(numProcessed);
             }
-
-            processLog.printStatus(true);
-            ProcessLog.printTrailer();
-
-            if(interrupted)
-            {
-                throw new InterruptedException("interrupted by the user");
-            }
-        } catch (SQLException e)
-        {
-            throw datasource.translate(singleCertSql, e);
-        }finally
-        {
-            releaseResources(singleSelectStmt, null);
-        }
-    }
-
-    private Map<Long, DbDigestEntry> getCertsViaSingleSelectInB(
-            final PreparedStatement singleSelectStmt,
-            final List<Long> serialNumbers)
-    throws DataAccessException
-    {
-        Map<Long, DbDigestEntry> ret = new HashMap<>(serialNumbers.size());
-
-        for(Long serialNumber : serialNumbers)
-        {
-            DbDigestEntry certB = getSingleCert(singleSelectStmt, serialNumber);
-            if(certB != null)
-            {
-                ret.put(serialNumber, certB);
-            }
         }
 
-        return ret;
-    }
+        processLog.printStatus(true);
+        ProcessLog.printTrailer();
 
-    private Map<Long, DbDigestEntry> getCertsViaInArraySelectInB(
-            final PreparedStatement batchSelectStmt,
-            final List<Long> serialNumbers)
-    throws DataAccessException
-    {
-        final int n = serialNumbers.size();
-        if(n != numPerSelect)
+        if(interrupted)
         {
-            throw new IllegalArgumentException("size of serialNumbers is not '" + numPerSelect
-                    + "': " + n);
-        }
-
-        Collections.sort(serialNumbers);
-
-        ResultSet rs = null;
-
-        try
-        {
-            for(int i = 0; i < n; i++)
-            {
-                batchSelectStmt.setLong(i+2, serialNumbers.get(i));
-            }
-
-            rs = batchSelectStmt.executeQuery();
-            return buildResult(rs, serialNumbers);
-        } catch(SQLException e)
-        {
-            throw datasource.translate(inArrayCertsSql, e);
-        }
-        finally
-        {
-            releaseResources(null, rs);
-        }
-    }
-
-    private Map<Long, DbDigestEntry> buildResult(
-            final ResultSet rs,
-            final List<Long> serialNumbers)
-    throws SQLException
-    {
-        Map<Long, DbDigestEntry> ret = new HashMap<>(serialNumbers.size());
-
-        while(rs.next())
-        {
-            long serialNumber = rs.getLong(dbControl.getColSerialNumber());
-            if(serialNumbers.contains(serialNumber) == false)
-            {
-                continue;
-            }
-
-            boolean revoked = rs.getBoolean(dbControl.getColRevoked());
-            Integer revReason = null;
-            Long revTime = null;
-            Long revInvTime = null;
-            if(revoked)
-            {
-                revReason = rs.getInt(dbControl.getColRevReason());
-                revTime = rs.getLong(dbControl.getColRevTime());
-                revInvTime = rs.getLong(dbControl.getColRevInvTime());
-                if(revInvTime == 0)
-                {
-                    revInvTime = null;
-                }
-            }
-            String sha1Fp = rs.getString(dbControl.getColCerthash());
-            DbDigestEntry certB = new DbDigestEntry(serialNumber,
-                    revoked, revReason, revTime, revInvTime, sha1Fp);
-            ret.put(serialNumber, certB);
-        }
-
-        return ret;
-    }
-
-    private DbDigestEntry getSingleCert(
-            final PreparedStatement singleSelectStmt,
-            final long serialNumber)
-    throws DataAccessException
-    {
-        ResultSet rs = null;
-        try
-        {
-            singleSelectStmt.setLong(2, serialNumber);
-            rs = singleSelectStmt.executeQuery();
-            if(rs.next() == false)
-            {
-                return null;
-            }
-            boolean revoked = rs.getBoolean(dbControl.getColRevoked());
-            Integer revReason = null;
-            Long revTime = null;
-            Long revInvTime = null;
-            if(revoked)
-            {
-                revReason = rs.getInt(dbControl.getColRevReason());
-                revTime = rs.getLong(dbControl.getColRevTime());
-                revInvTime = rs.getLong(dbControl.getColRevInvTime());
-                if(revInvTime == 0)
-                {
-                    revInvTime = null;
-                }
-            }
-            String sha1Fp = rs.getString(dbControl.getColCerthash());
-            return new DbDigestEntry(serialNumber,
-                    revoked, revReason, revTime, revInvTime, sha1Fp);
-        } catch(SQLException e)
-        {
-            throw datasource.translate(singleCertSql, e);
-        } finally
-        {
-            releaseResources(null, rs);
-        }
-    }
-
-    private void releaseResources(
-            final Statement ps,
-            final ResultSet rs)
-    {
-        if(ps != null)
-        {
-            try
-            {
-                ps.close();
-            }catch(Exception e)
-            {
-            }
-        }
-
-        if(rs != null)
-        {
-            try
-            {
-                rs.close();
-            }catch(Exception e)
-            {
-            }
+            throw new InterruptedException("interrupted by the user");
         }
     }
 

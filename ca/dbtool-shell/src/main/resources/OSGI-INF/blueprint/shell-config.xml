@@ -81,7 +81,8 @@
       </action>
       <optional-completers>
         <entry key="--report-dir" value-ref="dirPathCompleter"/>
-        <entry key="--ref" value-ref="filePathCompleter"/>
+        <entry key="--ref-dir" value-ref="dirPathCompleter"/>
+        <entry key="--ref-db" value-ref="filePathCompleter"/>
         <entry key="--target" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>

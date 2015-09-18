@@ -33,17 +33,35 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.diffdb;
+package org.xipki.pki.ca.dbtool.diffdb.internal;
+
+import java.io.ByteArrayInputStream;
+import java.security.cert.X509Certificate;
+
+import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
  */
 
-public enum DbSchemaType
+public class EjbcaCACertExtractor
 {
-    XIPKI_CA_v1,
-    XIPKI_OCSP_v1,
-    XIPKI_CA_v2,
-    XIPKI_OCSP_v2,
-    EJBCA_CA_v3;
+
+    public static X509Certificate extractCACert(String caData)
+    throws Exception
+    {
+        XMLDocumentReader cadataReader = new XMLDocumentReader(
+                new ByteArrayInputStream(caData.getBytes()), false);
+        final String XPATH_CERT =
+                "/java/object/void[string[position()=1]='certificatechain']/object/void"
+                + "/string[1]";
+        String b64Cert = cadataReader.getValue(XPATH_CERT);
+        if(b64Cert == null)
+        {
+            throw new Exception("Could not extract CA certificate");
+        }
+
+        return X509Util.parseBase64EncodedCert(b64Cert);
+    }
+
 }
