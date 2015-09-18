@@ -186,7 +186,7 @@ public class StringUtil
                 : Long.toString(speed);
         for (int i = 0; i < minLen - speedS.length(); i++)
         {
-            sb.append(" ");
+            sb.append(' ');
         }
         sb.append(speed);
         return sb.toString();
@@ -216,7 +216,7 @@ public class StringUtil
             if(firstBlockLen != 0)
             {
                 sb.append(accountS.substring(0, firstBlockLen));
-                sb.append(",");
+                sb.append(',');
             }
 
             for(int i = 0; ;i++)
@@ -230,7 +230,7 @@ public class StringUtil
                 sb.append(accountS.substring(offset, offset + 3));
                 if(offset + 3 < n)
                 {
-                    sb.append(",");
+                    sb.append(',');
                 }
             }
             accountS = sb.toString();
@@ -260,36 +260,31 @@ public class StringUtil
             final long seconds,
             final int minLen)
     {
-        long h = seconds / 3600;
-        long m = (seconds - h * 3600) / 60;
-        long s = seconds - h * 3600 - m * 60;
+        long s = seconds % 60;
+        long minutes = seconds / 60;
+        long m = minutes % 60;
+        long h = minutes / 60;
 
         StringBuilder sb = new StringBuilder();
         // hours
         if(h > 0)
         {
-            sb.append(h + ":");
+            sb.append(h).append(':');
         }
 
         // minutes
         if(m < 10)
         {
-            sb.append("0" + m + ":");
+            sb.append('0');
         }
-        else
-        {
-            sb.append(m + ":");
-        }
+        sb.append(m).append(':');
 
         // seconds
         if(s < 10)
         {
-            sb.append("0" + s);
+            sb.append('0');
         }
-        else
-        {
-            sb.append(s);
-        }
+        sb.append(s);
 
         while(sb.length() < minLen)
         {

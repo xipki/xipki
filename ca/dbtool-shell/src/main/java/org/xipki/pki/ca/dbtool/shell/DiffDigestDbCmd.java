@@ -50,12 +50,15 @@ import org.xipki.pki.ca.dbtool.diffdb.DbDigestDiffWorker;
         description="diff digest XiPKI/EJBCA database")
 public class DiffDigestDbCmd extends DbPortCmd
 {
-    @Option(name = "--ref",
-            required = true,
-            description = "database configuration file or the directory of exported digest files"
-                    + " of the reference system\n"
-                    + "(required)")
-    private String refDirOrDbConf;
+    @Option(name = "--ref-db",
+            description = "database configuration file of the reference system\n"
+                    + "(one of --ref-db and --ref-dir must be specified)")
+    private String refDbConf;
+
+    @Option(name = "--ref-dir",
+            description = "directory of exported digest files of the reference system\n"
+                    + "(one of --ref-db and --ref-dir must be specified)")
+    private String refDir;
 
     @Option(name = "--target",
             required = true,
@@ -75,6 +78,10 @@ public class DiffDigestDbCmd extends DbPortCmd
             description = "number of certificates per SELECT")
     private Integer numCertsPerSelect = 1000;
 
+    @Option(name = "-n",
+            description = "number of threads to query the target database")
+    private Integer numThreads = 10;
+
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
 
@@ -85,10 +92,12 @@ public class DiffDigestDbCmd extends DbPortCmd
                 dataSourceFactory,
                 passwordResolver,
                 revokedOnly,
-                refDirOrDbConf,
+                refDir,
+                refDbConf,
                 dbconfFile,
                 reportDir,
-                numCertsPerSelect);
+                numCertsPerSelect,
+                numThreads);
     }
 
     public void setDataSourceFactory(

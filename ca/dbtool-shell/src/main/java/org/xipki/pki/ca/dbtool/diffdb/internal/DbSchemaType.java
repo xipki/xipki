@@ -33,53 +33,17 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.diffdb;
-
-import java.util.List;
-import java.util.Map;
-
-import org.xipki.common.util.ParamUtil;
+package org.xipki.pki.ca.dbtool.diffdb.internal;
 
 /**
  * @author Lijun Liao
  */
 
-public class CertsBundle
+public enum DbSchemaType
 {
-    private int numSkipped;
-    private Map<Long, DbDigestEntry> certs;
-    private List<Long> serialNumbers;
-
-    public CertsBundle(
-            final int numSkipped,
-            final Map<Long, DbDigestEntry> certs,
-            final List<Long> serialNumbers)
-    {
-        if(numSkipped < 0)
-        {
-            throw new IllegalArgumentException("numSkipped could not be negative: " + numSkipped);
-        }
-
-        ParamUtil.assertNotEmpty("certs", certs);
-        ParamUtil.assertNotEmpty("serialNumbers", serialNumbers);
-
-        this.certs = certs;
-        this.serialNumbers = serialNumbers;
-    }
-
-    public int getNumSkipped()
-    {
-        return numSkipped;
-    }
-
-    public Map<Long, DbDigestEntry> getCerts()
-    {
-        return certs;
-    }
-
-    public List<Long> getSerialNumbers()
-    {
-        return serialNumbers;
-    }
-
+    XIPKI_CA_v1,
+    XIPKI_OCSP_v1,
+    XIPKI_CA_v2,
+    XIPKI_OCSP_v2,
+    EJBCA_CA_v3;
 }

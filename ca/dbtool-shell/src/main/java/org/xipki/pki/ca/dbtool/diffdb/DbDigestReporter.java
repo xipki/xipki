@@ -43,6 +43,7 @@ import java.io.Writer;
 
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
 
 /**
  * @author Lijun Liao
