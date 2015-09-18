@@ -38,6 +38,7 @@ package org.xipki.pki.ca.dbtool.diffdb;
 import java.security.cert.X509Certificate;
 
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.pki.ca.dbtool.diffdb.internal.CertsBundle;
 
 /**
  * @author Lijun Liao

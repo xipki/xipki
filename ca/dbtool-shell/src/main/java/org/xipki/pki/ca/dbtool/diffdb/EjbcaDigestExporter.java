@@ -35,8 +35,8 @@
 
 package org.xipki.pki.ca.dbtool.diffdb;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -57,6 +57,11 @@ import org.xipki.common.util.IoUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.ProcessLog;
+import org.xipki.pki.ca.dbtool.diffdb.internal.CaEntry;
+import org.xipki.pki.ca.dbtool.diffdb.internal.CaEntryContainer;
+import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
+import org.xipki.pki.ca.dbtool.diffdb.internal.DbSchemaType;
+import org.xipki.pki.ca.dbtool.diffdb.internal.EjbcaCACertExtractor;
 import org.xipki.security.api.HashCalculator;
 import org.xipki.security.api.util.X509Util;
 
@@ -228,20 +233,10 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                     continue;
                 }
 
-                XMLDocumentReader cadataReader = new XMLDocumentReader(
-                        new ByteArrayInputStream(data.getBytes()), false);
-                final String XPATH_CERT =
-                        "/java/object/void[string[position()=1]='certificatechain']/object/void"
-                        + "/string[1]";
-                String b64Cert = cadataReader.getValue(XPATH_CERT);
-                if(b64Cert == null)
-                {
-                    throw new Exception("Could not extract CA certificate");
-                }
+                X509Certificate cert = EjbcaCACertExtractor.extractCACert(data);
+                byte[] certBytes = cert.getEncoded();
 
-                byte[] certBytes = Base64.decode(b64Cert);
-                Certificate cert = Certificate.getInstance(certBytes);
-                String commonName = X509Util.getCommonName(cert.getSubject());
+                String commonName = X509Util.getCommonName(cert.getSubjectX500Principal());
                 String fn = XipkiDigestExporter.toAsciiFilename("ca-" + commonName);
                 File caDir = new File(baseDir, fn);
                 int i = 2;
@@ -401,7 +396,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                     long serial = Long.parseLong(s);
 
                     int status = rs.getInt("status");
-                    boolean revoked = (status != 20);
+                    boolean revoked = (status == 40);
 
                     Integer revReason = null;
                     Long revTime = null;

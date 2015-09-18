@@ -55,6 +55,7 @@ import org.xipki.password.api.PasswordResolver;
 import org.xipki.password.api.PasswordResolverException;
 import org.xipki.pki.ca.dbtool.DbPortWorker;
 import org.xipki.pki.ca.dbtool.DbPorter;
+import org.xipki.pki.ca.dbtool.diffdb.internal.DbSchemaType;
 
 /**
  * @author Lijun Liao
@@ -142,7 +143,7 @@ public class DbDigestExportWorker extends DbPortWorker
         }
     }
 
-    static DbSchemaType detectDbSchemaType(
+    public static DbSchemaType detectDbSchemaType(
             final DataSourceWrapper dataSource)
     throws DataAccessException
     {

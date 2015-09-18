@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.diffdb;
+package org.xipki.pki.ca.dbtool.diffdb.internal;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

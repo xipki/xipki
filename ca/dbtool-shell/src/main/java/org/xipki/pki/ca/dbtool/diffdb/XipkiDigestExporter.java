@@ -56,6 +56,11 @@ import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.ProcessLog;
+import org.xipki.pki.ca.dbtool.diffdb.internal.CaEntry;
+import org.xipki.pki.ca.dbtool.diffdb.internal.CaEntryContainer;
+import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
+import org.xipki.pki.ca.dbtool.diffdb.internal.DbSchemaType;
+import org.xipki.pki.ca.dbtool.diffdb.internal.XipkiDbControl;
 import org.xipki.security.api.util.X509Util;
 
 /**
