@@ -35,93 +35,27 @@
 
 package org.xipki.pki.ca.api;
 
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-
-import javax.security.auth.x500.X500Principal;
-
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.util.Arrays;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
  */
 
-public class X509CertWithDBCertId
+public class X509CertWithDBCertId extends X509Cert
 {
     private Integer certId;
-    private final X509Certificate cert;
-    private final String subject;
-    private final byte[] encodedCert;
-    private final byte[] subjectKeyIdentifer;
-    private final X500Name subjectAsX500Name;
 
     public X509CertWithDBCertId(
             final X509Certificate cert)
     {
-        this(cert, null);
+        super(cert);
     }
 
     public X509CertWithDBCertId(
             final X509Certificate cert,
             final byte[] encodedCert)
     {
-        ParamUtil.assertNotNull("cert", cert);
-
-        this.cert = cert;
-        X500Principal x500Subject = cert.getSubjectX500Principal();
-        this.subject = X509Util.getRFC4519Name(x500Subject);
-        this.subjectAsX500Name = X500Name.getInstance(x500Subject.getEncoded());
-        try
-        {
-            this.subjectKeyIdentifer = X509Util.extractSKI(cert);
-        } catch(CertificateEncodingException e)
-        {
-            throw new RuntimeException("CertificateEncodingException: " + e.getMessage());
-        }
-
-        if(encodedCert == null)
-        {
-            try
-            {
-                this.encodedCert = cert.getEncoded();
-            } catch (CertificateEncodingException e)
-            {
-                throw new RuntimeException("CertificateEncodingException: " + e.getMessage());
-            }
-        }
-        else
-        {
-            this.encodedCert = encodedCert;
-        }
-    }
-
-    public X509Certificate getCert()
-    {
-        return cert;
-    }
-
-    public byte[] getEncodedCert()
-    {
-        return encodedCert;
-    }
-
-    public String getSubject()
-    {
-        return subject;
-    }
-
-    public X500Name getSubjectAsX500Name()
-    {
-        return subjectAsX500Name;
-    }
-
-    @Override
-    public String toString()
-    {
-        return cert.toString();
+        super(cert, encodedCert);
     }
 
     public Integer getCertId()
@@ -133,11 +67,6 @@ public class X509CertWithDBCertId
             final Integer certId)
     {
         this.certId = certId;
-    }
-
-    public byte[] getSubjectKeyIdentifier()
-    {
-        return Arrays.clone(subjectKeyIdentifer);
     }
 
 }

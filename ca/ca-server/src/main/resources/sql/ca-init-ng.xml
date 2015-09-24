@@ -129,16 +129,13 @@
           remarks="valid values: active, inactive">
         <constraints nullable="false"/>
       </column>
-      <column name="VALID_FROM" type="CHAR(8)"
-          remarks="UTC time in form YYYYMMDD. The CA instance with the latest VALID_FROM wins">
-        <constraints nullable="false"/>
-      </column>
-      <column name="CA_NAME" type="VARCHAR(45)">
+      <column name="CA_ID" type="INT">
         <constraints nullable="false"/>
       </column>
       <column name="SUBJECT" type="${x500name.type}">
         <constraints nullable="false"/>
       </column>
+      <column name="NEXT_CRLNO" type="INT"/>
       <column name="CRLSIGNER_NAME" type="VARCHAR(45)"/>
       <column name="PERMISSIONS" type="VARCHAR(200)">
         <constraints nullable="false"/>
@@ -163,6 +160,7 @@
       <column name="CERT" type="CLOB">
         <constraints nullable="false"/>
       </column>
+      <column name="EXTRA_CONTROL" type="VARCHAR(500)"/>
       <column name="SIGNER_CONF" type="CLOB">
         <constraints nullable="false"/>
       </column>
@@ -180,11 +178,6 @@
       </column>
       <column name="NEXT_SN" type="BIGINT"
           remarks="next serial number"/>
-      <column name="NEXT_CRLNO" type="INT"/>
-      <column name="STATUS" type="VARCHAR(10)"
-          remarks="valid values: active, inactive">
-        <constraints nullable="false"/>
-      </column>
       <column name="MAX_VALIDITY" type="VARCHAR(45)">
         <constraints nullable="false"/>
       </column>
@@ -205,13 +198,9 @@
         <constraints nullable="false"/>
       </column>
       <column name="VALIDITY_MODE" type="varchar(100)"/>
-      <column name="PERMISSIONS" type="VARCHAR(200)">
-        <constraints nullable="false"/>
-      </column>
-      <column name="NUM_CRLS" type="SMALLINT" defaultValueNumeric="30">
-        <constraints nullable="false"/>
-      </column>
       <column name="EXPIRATION_PERIOD" type="SMALLINT" defaultValueNumeric="365" />
+      <column name="KEEP_EXPIRED_CERTS" type="SMALLINT" defaultValueNumeric="-1" 
+          remarks="How long in days should certificates after the expiration be kept. Negative value for kept-for-ever"/>
       <column name="EXTRA_CONTROL" type="VARCHAR(500)"/>
     </createTable>
     <!-- table CA_HAS_REQUESTOR -->
@@ -251,8 +240,12 @@
     </createTable>
     <!-- table SCEP -->
     <createTable tableName="SCEP">
-      <column name="CA_NAME" type="VARCHAR(45)">
+      <column name="NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="CA_ID" type="INT"
+          remarks="CA id">
+        <constraints nullable="false"/>
       </column>
       <!-- CONTROL is reserved for future, will currently not be used -->
       <column name="CONTROL" type="VARCHAR(400)"/>
@@ -526,8 +519,8 @@
     <addForeignKeyConstraint  constraintName="FK_CAI_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="CA_NAME" baseTableName="CAI"
-      referencedColumnNames="NAME" referencedTableName="CA"/>
+      baseColumnNames="CA_ID" baseTableName="CAI"
+      referencedColumnNames="ID" referencedTableName="CA"/>
     <addForeignKeyConstraint  constraintName="FK_CA_CMPCONTROL1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
@@ -580,8 +573,8 @@
     <addForeignKeyConstraint constraintName="FK_SCEP_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="CA_NAME" baseTableName="SCEP"
-      referencedColumnNames="NAME" referencedTableName="CA"/>
+      baseColumnNames="CA_ID" baseTableName="SCEP"
+      referencedColumnNames="ID" referencedTableName="CA"/>
   </changeSet>
   <!-- CertStore :: foreigen key -->
   <changeSet author="xipki" id="6">

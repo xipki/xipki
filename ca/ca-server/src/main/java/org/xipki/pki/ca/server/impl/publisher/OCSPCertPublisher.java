@@ -55,6 +55,7 @@ import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.pki.ca.api.CertPublisherException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
+import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.X509CertWithDBCertId;
 import org.xipki.pki.ca.api.publisher.X509CertPublisher;
 import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
@@ -142,7 +143,7 @@ public class OCSPCertPublisher extends X509CertPublisher
 
     @Override
     public boolean issuerAdded(
-            final X509CertWithDBCertId issuer)
+            final X509Cert issuer)
     {
         try
         {
@@ -159,7 +160,7 @@ public class OCSPCertPublisher extends X509CertPublisher
     public boolean certificateAdded(
             final X509CertificateInfo certInfo)
     {
-        X509CertWithDBCertId caCert = certInfo.getIssuerCert();
+        X509Cert caCert = certInfo.getIssuerCert();
         X509CertWithDBCertId cert = certInfo.getCert();
 
         try
@@ -176,7 +177,7 @@ public class OCSPCertPublisher extends X509CertPublisher
 
     @Override
     public boolean certificateRevoked(
-            final X509CertWithDBCertId caCert,
+            final X509Cert caCert,
             final X509CertWithDBCertId cert,
             final String certprofile,
             final CertRevocationInfo revInfo)
@@ -194,7 +195,7 @@ public class OCSPCertPublisher extends X509CertPublisher
 
     @Override
     public boolean certificateUnrevoked(
-            final X509CertWithDBCertId caCert,
+            final X509Cert caCert,
             final X509CertWithDBCertId cert)
     {
         try
@@ -211,7 +212,7 @@ public class OCSPCertPublisher extends X509CertPublisher
 
     private void logAndAudit(
             final String issuer,
-            final X509CertWithDBCertId cert,
+            final X509Cert cert,
             final Exception e,
             final String messagePrefix)
     {
@@ -237,9 +238,13 @@ public class OCSPCertPublisher extends X509CertPublisher
         auditEvent.setName("SYSTEM");
         auditEvent.setLevel(AuditLevel.ERROR);
         auditEvent.setStatus(AuditStatus.FAILED);
-        if(cert.getCertId() != null)
+        if(cert instanceof X509CertWithDBCertId)
         {
-            auditEvent.addEventData(new AuditEventData("id", cert.getCertId().toString()));
+            Integer certId = ((X509CertWithDBCertId) cert).getCertId();
+            if(certId != null)
+            {
+                auditEvent.addEventData(new AuditEventData("id", certId.toString()));
+            }
         }
         auditEvent.addEventData(new AuditEventData("issuer", issuer));
         auditEvent.addEventData(new AuditEventData("subject", subjectText));
@@ -250,7 +255,7 @@ public class OCSPCertPublisher extends X509CertPublisher
 
     @Override
     public boolean crlAdded(
-            final X509CertWithDBCertId caCert,
+            final X509Cert caCert,
             final X509CRL crl)
     {
         return true;
@@ -271,7 +276,7 @@ public class OCSPCertPublisher extends X509CertPublisher
 
     @Override
     public boolean caRevoked(
-            final X509CertWithDBCertId caCert,
+            final X509Cert caCert,
             final CertRevocationInfo revocationInfo)
     {
         try
@@ -288,7 +293,7 @@ public class OCSPCertPublisher extends X509CertPublisher
 
     @Override
     public boolean caUnrevoked(
-            final X509CertWithDBCertId caCert)
+            final X509Cert caCert)
     {
         try
         {
@@ -305,7 +310,7 @@ public class OCSPCertPublisher extends X509CertPublisher
 
     @Override
     public boolean certificateRemoved(
-            final X509CertWithDBCertId issuerCert,
+            final X509Cert issuerCert,
             final X509CertWithDBCertId cert)
     {
         try

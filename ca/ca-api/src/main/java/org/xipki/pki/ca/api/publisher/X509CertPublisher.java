@@ -41,6 +41,7 @@ import java.util.Map;
 import org.xipki.audit.api.AuditServiceRegister;
 import org.xipki.pki.ca.api.CertPublisherException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
+import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.X509CertWithDBCertId;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.password.api.PasswordResolver;
@@ -70,35 +71,35 @@ public abstract class X509CertPublisher
             EnvParameterResolver parameterResolver);
 
     public abstract boolean issuerAdded(
-            X509CertWithDBCertId issuerCert);
+            X509Cert issuerCert);
 
     public abstract boolean certificateAdded(
             X509CertificateInfo certInfo);
 
     public abstract boolean certificateRevoked(
-            X509CertWithDBCertId issuerCert,
+            X509Cert issuerCert,
             X509CertWithDBCertId cert,
             String certprofile,
             CertRevocationInfo revInfo);
 
     public abstract boolean certificateUnrevoked(
-            X509CertWithDBCertId issuerCert,
+            X509Cert issuerCert,
             X509CertWithDBCertId cert);
 
     public abstract boolean certificateRemoved(
-            X509CertWithDBCertId issuerCert,
+            X509Cert issuerCert,
             X509CertWithDBCertId cert);
 
     public abstract boolean crlAdded(
-            X509CertWithDBCertId caCert,
+            X509Cert issuerCert,
             X509CRL crl);
 
     public abstract boolean caRevoked(
-            X509CertWithDBCertId caCert,
+            X509Cert caCert,
             CertRevocationInfo revocationInfo);
 
     public abstract boolean caUnrevoked(
-            X509CertWithDBCertId caCert);
+            X509Cert caCert);
 
     public abstract boolean isHealthy();
 

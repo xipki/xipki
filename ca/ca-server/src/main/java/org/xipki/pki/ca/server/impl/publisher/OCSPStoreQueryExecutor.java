@@ -54,14 +54,15 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pki.ca.api.OperationException;
-import org.xipki.pki.ca.api.X509CertWithDBCertId;
-import org.xipki.pki.ca.api.OperationException.ErrorCode;
-import org.xipki.pki.ca.server.impl.DbSchemaInfo;
 import org.xipki.common.util.LogUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.datasource.api.exception.DuplicateKeyException;
+import org.xipki.pki.ca.api.OperationException;
+import org.xipki.pki.ca.api.OperationException.ErrorCode;
+import org.xipki.pki.ca.api.X509Cert;
+import org.xipki.pki.ca.api.X509CertWithDBCertId;
+import org.xipki.pki.ca.server.impl.DbSchemaInfo;
 import org.xipki.security.api.CertRevocationInfo;
 import org.xipki.security.api.HashAlgoType;
 import org.xipki.security.api.HashCalculator;
@@ -153,7 +154,7 @@ class OCSPStoreQueryExecutor
      * @throws CertificateEncodingException
      */
     void addCert(
-            final X509CertWithDBCertId issuer,
+            final X509Cert issuer,
             final X509CertWithDBCertId certificate,
             final String certprofile)
     throws DataAccessException, CertificateEncodingException, OperationException
@@ -162,7 +163,7 @@ class OCSPStoreQueryExecutor
     }
 
     void addCert(
-            final X509CertWithDBCertId issuer,
+            final X509Cert issuer,
             final X509CertWithDBCertId certificate,
             final String certprofile,
             final CertRevocationInfo revInfo)
@@ -172,7 +173,7 @@ class OCSPStoreQueryExecutor
     }
 
     private void addOrUpdateCert(
-            final X509CertWithDBCertId issuer,
+            final X509Cert issuer,
             final X509CertWithDBCertId certificate,
             final String certprofile,
             final CertRevocationInfo revInfo)
@@ -379,7 +380,7 @@ class OCSPStoreQueryExecutor
     }
 
     void revokeCert(
-            final X509CertWithDBCertId caCert,
+            final X509Cert caCert,
             final X509CertWithDBCertId cert,
             final String certprofile,
             final CertRevocationInfo revInfo)
@@ -389,7 +390,7 @@ class OCSPStoreQueryExecutor
     }
 
     void unrevokeCert(
-            final X509CertWithDBCertId issuer,
+            final X509Cert issuer,
             final X509CertWithDBCertId cert)
     throws DataAccessException
     {
@@ -454,7 +455,7 @@ class OCSPStoreQueryExecutor
     }
 
     void removeCert(
-            final X509CertWithDBCertId issuer,
+            final X509Cert issuer,
             final X509CertWithDBCertId cert)
     throws DataAccessException
     {
@@ -483,7 +484,7 @@ class OCSPStoreQueryExecutor
     }
 
     void revokeCa(
-            final X509CertWithDBCertId caCert,
+            final X509Cert caCert,
             final CertRevocationInfo revocationInfo)
     throws DataAccessException, CertificateEncodingException
     {
@@ -517,7 +518,7 @@ class OCSPStoreQueryExecutor
     }
 
     void unrevokeCa(
-            final X509CertWithDBCertId caCert)
+            final X509Cert caCert)
     throws DataAccessException, CertificateEncodingException
     {
         int issuerId = getIssuerId(caCert);
@@ -543,7 +544,7 @@ class OCSPStoreQueryExecutor
     }
 
     private int getIssuerId(
-            final X509CertWithDBCertId issuerCert)
+            final X509Cert issuerCert)
     throws DataAccessException, CertificateEncodingException
     {
         Integer id = issuerStore.getIdForCert(issuerCert.getEncodedCert());
@@ -556,7 +557,7 @@ class OCSPStoreQueryExecutor
     }
 
     void addIssuer(
-            final X509CertWithDBCertId issuerCert)
+            final X509Cert issuerCert)
     throws CertificateEncodingException, DataAccessException
     {
         if(issuerStore.getIdForCert(issuerCert.getEncodedCert()) != null)
