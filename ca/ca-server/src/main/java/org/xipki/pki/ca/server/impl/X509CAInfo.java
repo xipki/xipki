@@ -49,9 +49,11 @@ import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
-import org.xipki.pki.ca.api.X509CertWithDBCertId;
+import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.impl.store.CertificateStore;
 import org.xipki.pki.ca.server.mgmt.api.CAStatus;
@@ -59,8 +61,6 @@ import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.CertRevocationInfo;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
@@ -270,7 +270,7 @@ public class X509CAInfo
         caEntry.setMaxValidity(maxValidity);
     }
 
-    public X509CertWithDBCertId getCertificate()
+    public X509Cert getCertificate()
     {
         return publicCAInfo.getCaCertificate();
     }

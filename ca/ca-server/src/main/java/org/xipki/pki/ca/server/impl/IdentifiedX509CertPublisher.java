@@ -39,17 +39,18 @@ import java.security.cert.X509CRL;
 import java.util.Map;
 
 import org.xipki.audit.api.AuditServiceRegister;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.password.api.PasswordResolver;
 import org.xipki.pki.ca.api.CertPublisherException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
+import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.X509CertWithDBCertId;
 import org.xipki.pki.ca.api.publisher.X509CertPublisher;
 import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.pki.ca.server.impl.publisher.OCSPCertPublisher;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.password.api.PasswordResolver;
 import org.xipki.security.api.CertRevocationInfo;
 
 /**
@@ -113,7 +114,7 @@ class IdentifiedX509CertPublisher
     }
 
     public boolean issuerAdded(
-            final X509CertWithDBCertId issuerCert)
+            final X509Cert issuerCert)
     {
         return certPublisher.issuerAdded(issuerCert);
     }
@@ -125,7 +126,7 @@ class IdentifiedX509CertPublisher
     }
 
     public boolean certificateRevoked(
-            final X509CertWithDBCertId issuerCert,
+            final X509Cert issuerCert,
             final X509CertWithDBCertId cert,
             final String certprofile,
             final CertRevocationInfo revInfo)
@@ -134,7 +135,7 @@ class IdentifiedX509CertPublisher
     }
 
     public boolean crlAdded(
-            final X509CertWithDBCertId caCert,
+            final X509Cert caCert,
             final X509CRL crl)
     {
         return certPublisher.crlAdded(caCert, crl);
@@ -162,27 +163,27 @@ class IdentifiedX509CertPublisher
     }
 
     public boolean caRevoked(
-            final X509CertWithDBCertId caCert,
+            final X509Cert caCert,
             final CertRevocationInfo revocationInfo)
     {
         return certPublisher.caRevoked(caCert, revocationInfo);
     }
 
     public boolean caUnrevoked(
-            final X509CertWithDBCertId caCert)
+            final X509Cert caCert)
     {
         return certPublisher.caUnrevoked(caCert);
     }
 
     public boolean certificateUnrevoked(
-            final X509CertWithDBCertId issuerCert,
+            final X509Cert issuerCert,
             final X509CertWithDBCertId cert)
     {
         return certPublisher.certificateUnrevoked(issuerCert, cert);
     }
 
     public boolean certificateRemoved(
-            final X509CertWithDBCertId issuerCert,
+            final X509Cert issuerCert,
             final X509CertWithDBCertId cert)
     {
         return certPublisher.certificateRemoved(issuerCert, cert);

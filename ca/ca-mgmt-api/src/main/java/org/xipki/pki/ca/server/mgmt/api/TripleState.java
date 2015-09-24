@@ -33,52 +33,40 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.impl.cmp;
-
-import org.xipki.common.util.ParamUtil;
-import org.xipki.pki.ca.api.RequestorInfo;
-import org.xipki.pki.ca.api.X509CertWithDBCertId;
-import org.xipki.pki.ca.server.mgmt.api.CAHasRequestorEntry;
+package org.xipki.pki.ca.server.mgmt.api;
 
 /**
  * @author Lijun Liao
  */
 
-public class CmpRequestorInfo implements RequestorInfo
+public enum TripleState
 {
-    private final CAHasRequestorEntry caHasRequestor;
-    private final X509CertWithDBCertId cert;
 
-    public CmpRequestorInfo(
-            final CAHasRequestorEntry caHasRequestor,
-            final X509CertWithDBCertId cert)
+    REQUIRED("required"),
+    OPTIONAL("optional"),
+    FORBIDDEN("forbidden");
+    private final String value;
+
+    TripleState(String v)
     {
-        ParamUtil.assertNotNull("caHasRequestor", caHasRequestor);
-        ParamUtil.assertNotNull("cert", cert);
-        this.caHasRequestor = caHasRequestor;
-        this.cert = cert;
+        value = v;
     }
 
-    public CAHasRequestorEntry getCaHasRequestor()
+    public String value()
     {
-        return caHasRequestor;
+        return value;
     }
 
-    public X509CertWithDBCertId getCert()
+    public static TripleState fromValue(String v)
     {
-        return cert;
-    }
-
-    @Override
-    public String getName()
-    {
-        return caHasRequestor.getRequestorName();
-    }
-
-    @Override
-    public boolean isRA()
-    {
-        return caHasRequestor.isRa();
+        for (TripleState c: TripleState.values())
+        {
+            if (c.value.equalsIgnoreCase(v))
+            {
+                return c;
+            }
+        }
+        throw new IllegalArgumentException(v);
     }
 
 }

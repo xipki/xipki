@@ -40,6 +40,7 @@ import java.security.cert.CertificateEncodingException;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.RequestorInfo;
+import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.X509CertWithDBCertId;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.api.CertRevocationInfo;
@@ -52,7 +53,7 @@ public class X509CertificateInfo
 {
     private final byte[] subjectPublicKey;
     private final X509CertWithDBCertId cert;
-    private final X509CertWithDBCertId issuerCert;
+    private final X509Cert issuerCert;
     private final String profileName;
     private RequestType reqType;
     private byte[] transactionId;
@@ -68,7 +69,7 @@ public class X509CertificateInfo
 
     public X509CertificateInfo(
             final X509CertWithDBCertId cert,
-            final X509CertWithDBCertId issuerCert,
+            final X509Cert issuerCert,
             final byte[] subjectPublicKey,
             final String profileName)
     throws CertificateEncodingException
@@ -95,7 +96,7 @@ public class X509CertificateInfo
         return cert;
     }
 
-    public X509CertWithDBCertId getIssuerCert()
+    public X509Cert getIssuerCert()
     {
         return issuerCert;
     }

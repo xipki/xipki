@@ -102,6 +102,11 @@ import org.xipki.common.util.StringUtil;
  * # Whether Revocation reason is contained in CRL
  * # Default is false
  * excludeReason=&lt;'true'|'false'>
+ *
+ * # How the CRL entry extension invalidityDate is considered in CRL
+ * # Default is false
+ * invalidityDate=&lt;'required'|'optional'|'forbidden'>
+ *
  * </pre>
  * @author Lijun Liao
  */
@@ -123,6 +128,7 @@ public class CRLControl implements Serializable
     public static final String KEY_onlyContainsUserCerts = "onlyContainsUserCerts";
     public static final String KEY_onlyContainsCACerts = "onlyContainsCACerts";
     public static final String KEY_excludeReason = "excludeReason";
+    public static final String KEY_invalidityDate = "invalidityDate";
 
     public static enum UpdateMode implements Serializable
     {
@@ -221,7 +227,7 @@ public class CRLControl implements Serializable
     private boolean onlyContainsUserCerts = false;
     private boolean onlyContainsCACerts = false;
     private boolean excludeReason = false;
-
+    private TripleState invalidityDateMode = TripleState.OPTIONAL;
     private final Set<String> extensionOIDs;
 
     public CRLControl(
@@ -250,6 +256,12 @@ public class CRLControl implements Serializable
             {
                 throw new InvalidConfException("invalid " + KEY_updateMode + ": " + s);
             }
+        }
+
+        s = props.getValue(KEY_invalidityDate);
+        if(s != null)
+        {
+            this.invalidityDateMode = TripleState.fromValue(s);
         }
 
         this.includeExpiredCerts = getBoolean(props, KEY_expiredCerts_included, false);
@@ -378,6 +390,7 @@ public class CRLControl implements Serializable
         pairs.putPair(KEY_onlyContainsCACerts, Boolean.toString(onlyContainsCACerts));
         pairs.putPair(KEY_onlyContainsUserCerts, Boolean.toString(onlyContainsUserCerts));
         pairs.putPair(KEY_excludeReason, Boolean.toString(excludeReason));
+        pairs.putPair(KEY_invalidityDate, invalidityDateMode.name());
         if(updateMode != UpdateMode.onDemand)
         {
             pairs.putPair(KEY_fullCRL_intervals, Integer.toString(fullCRLIntervals));
@@ -478,6 +491,11 @@ public class CRLControl implements Serializable
     public boolean isExcludeReason()
     {
         return excludeReason;
+    }
+
+    public TripleState getInvalidityDateMode()
+    {
+        return invalidityDateMode;
     }
 
     public void validate()

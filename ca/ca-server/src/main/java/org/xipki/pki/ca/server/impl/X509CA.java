@@ -117,6 +117,7 @@ import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.RequestorInfo;
+import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.X509CertWithDBCertId;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.api.profile.ExtensionValue;
@@ -140,8 +141,8 @@ import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.security.api.CRLReason;
 import org.xipki.security.api.CertRevocationInfo;
 import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.KeyUsage;
 import org.xipki.security.api.FpIdCalculator;
+import org.xipki.security.api.KeyUsage;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.ObjectIdentifiers;
 import org.xipki.security.api.SecurityFactory;
@@ -291,7 +292,7 @@ public class X509CA
             final String caName = caInfo.getName();
             final int numEntries = 100;
 
-            X509CertWithDBCertId caCert = caInfo.getCertificate();
+            X509Cert caCert = caInfo.getCertificate();
             long expiredAt = task.getExpiredAt();
 
             List<BigInteger> serials = certstore.getExpiredCertSerials(caCert, expiredAt,
@@ -630,7 +631,7 @@ public class X509CA
             }
         }
 
-        X509CertWithDBCertId caCert = caInfo.getCertificate();
+        X509Cert caCert = caInfo.getCertificate();
 
         X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
         if(crlSigner != null)
@@ -950,7 +951,7 @@ public class X509CA
             BigInteger startSerial = BigInteger.ONE;
             final int numEntries = 100;
 
-            X509CertWithDBCertId caCert = caInfo.getCertificate();
+            X509Cert caCert = caInfo.getCertificate();
             List<CertRevInfoWithSerial> revInfos;
             boolean isFirstCRLEntry = true;
 
@@ -997,9 +998,23 @@ public class X509CA
 
                     Date revocationTime = revInfo.getRevocationTime();
                     Date invalidityTime = revInfo.getInvalidityTime();
-                    if(invalidityTime != null && invalidityTime.equals(revocationTime))
+
+                    switch(crlControl.getInvalidityDateMode())
                     {
+                    case FORBIDDEN:
                         invalidityTime = null;
+                        break;
+                    case OPTIONAL:
+                        break;
+                    case REQUIRED:
+                        if(invalidityTime == null)
+                        {
+                            invalidityTime = revocationTime;
+                        }
+                        break;
+                    default:
+                        throw new RuntimeException("unknown TripleState: "
+                                + crlControl.getInvalidityDateMode());
                     }
 
                     if(directCRL || isFirstCRLEntry == false)
@@ -1546,7 +1561,7 @@ public class X509CA
         try
         {
             List<BigInteger> serials;
-            X509CertWithDBCertId caCert = caInfo.getCertificate();
+            X509Cert caCert = caInfo.getCertificate();
 
             Date notExpiredAt = null;
 
@@ -1696,7 +1711,7 @@ public class X509CA
     private boolean publishCertsInQueue(
             final IdentifiedX509CertPublisher publisher)
     {
-        X509CertWithDBCertId caCert = caInfo.getCertificate();
+        X509Cert caCert = caInfo.getCertificate();
 
         final int numEntries = 500;
 
@@ -1773,7 +1788,7 @@ public class X509CA
     private boolean publishCRL(
             final X509CRL crl)
     {
-        X509CertWithDBCertId caCert = caInfo.getCertificate();
+        X509Cert caCert = caInfo.getCertificate();
         if(certstore.addCRL(caCert, crl) == false)
         {
             return false;

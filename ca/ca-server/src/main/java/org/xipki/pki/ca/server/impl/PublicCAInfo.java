@@ -48,11 +48,11 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.util.Arrays;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
-import org.xipki.pki.ca.api.OperationException;
-import org.xipki.pki.ca.api.OperationException.ErrorCode;
-import org.xipki.pki.ca.api.X509CertWithDBCertId;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.pki.ca.api.OperationException;
+import org.xipki.pki.ca.api.OperationException.ErrorCode;
+import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -67,7 +67,7 @@ class PublicCAInfo
     private final byte[] subjectKeyIdentifier;
     private final GeneralNames  subjectAltName;
     private final BigInteger serialNumber;
-    private final X509CertWithDBCertId caCertificate;
+    private final X509Cert caCertificate;
     private X509Certificate crlSignerCertificate;
     private final List<String> caCertUris;
     private final List<String> ocspUris;
@@ -83,7 +83,7 @@ class PublicCAInfo
     throws OperationException
     {
         ParamUtil.assertNotNull("caCertificate", caCertificate);
-        this.caCertificate = new X509CertWithDBCertId(caCertificate);
+        this.caCertificate = new X509Cert(caCertificate);
         this.serialNumber = caCertificate.getSerialNumber();
         this.subject = caCertificate.getSubjectX500Principal();
         this.x500Subject = X500Name.getInstance(subject.getEncoded());
@@ -238,7 +238,7 @@ class PublicCAInfo
         return serialNumber;
     }
 
-    public X509CertWithDBCertId getCaCertificate()
+    public X509Cert getCaCertificate()
     {
         return caCertificate;
     }

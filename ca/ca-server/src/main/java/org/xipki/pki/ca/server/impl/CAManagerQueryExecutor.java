@@ -61,8 +61,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.InvalidConfException;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.api.OperationException;
-import org.xipki.pki.ca.api.X509CertWithDBCertId;
+import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.impl.cmp.CmpRequestorEntryWrapper;
 import org.xipki.pki.ca.server.impl.cmp.CmpResponderEntryWrapper;
@@ -91,11 +96,6 @@ import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509ChangeCAEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.security.api.CertRevocationInfo;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
@@ -734,7 +734,7 @@ class CAManagerQueryExecutor
                 {
                     if(masterMode)
                     {
-                        X509CertWithDBCertId cm = new X509CertWithDBCertId(entry.getCertificate());
+                        X509Cert cm = new X509Cert(entry.getCertificate());
                         certstore.addCa(cm);
                     }
 

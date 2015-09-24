@@ -95,6 +95,7 @@ import org.xipki.pki.ca.api.DfltEnvParameterResolver;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.RequestType;
+import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.X509CertWithDBCertId;
 import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.pki.ca.server.impl.X509SelfSignedCertBuilder.GenerateSelfSignedResult;
@@ -2559,7 +2560,9 @@ implements CAManager, CmpResponderManager, ScepManager
             throw new CAMgmtException("could not find CA named " + caName);
         }
 
-        X509CertWithDBCertId certInfo = ca.getCAInfo().getCertificate();
+        X509Cert certInfo = ca.getCAInfo().getCertificate();
+
+        X509CertWithDBCertId certInfoWithId = new X509CertWithDBCertId(certInfo.getCert());
         if(certInfo.getCert().getSubjectX500Principal().equals(
                 certInfo.getCert().getIssuerX500Principal()) == false)
         {
@@ -2571,7 +2574,7 @@ implements CAManager, CmpResponderManager, ScepManager
         try
         {
             ci = new X509CertificateInfo(
-                    certInfo, certInfo, encodedSubjectPublicKey,
+                    certInfoWithId, certInfoWithId, encodedSubjectPublicKey,
                     (certprofile == null)
                         ? "UNKNOWN"
                         : certprofile);
