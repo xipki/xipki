@@ -87,6 +87,14 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.HealthCheckResult;
+import org.xipki.common.InvalidConfException;
+import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.XMLUtil;
 import org.xipki.pki.ca.client.api.CAClient;
 import org.xipki.pki.ca.client.api.CAClientException;
 import org.xipki.pki.ca.client.api.CertIdOrError;
@@ -94,7 +102,6 @@ import org.xipki.pki.ca.client.api.CertOrError;
 import org.xipki.pki.ca.client.api.CertprofileInfo;
 import org.xipki.pki.ca.client.api.EnrollCertResult;
 import org.xipki.pki.ca.client.api.PKIErrorException;
-import org.xipki.pki.ca.client.api.RemoveExpiredCertsResult;
 import org.xipki.pki.ca.client.api.dto.CRLResultType;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType;
@@ -117,14 +124,6 @@ import org.xipki.pki.ca.client.impl.jaxb.FileOrValueType;
 import org.xipki.pki.ca.client.impl.jaxb.ObjectFactory;
 import org.xipki.pki.ca.client.impl.jaxb.RequestorType;
 import org.xipki.pki.ca.client.impl.jaxb.ResponderType;
-import org.xipki.common.HealthCheckResult;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.XMLUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
@@ -1290,32 +1289,6 @@ public final class CAClientImpl implements CAClient
             ret.add(ca.getProfile(m));
         }
         return ret;
-    }
-
-    @Override
-    public RemoveExpiredCertsResult removeExpiredCerts(
-            final String caName,
-            final String certprofile,
-            final String userLike,
-            final long overlapSeconds,
-            final RequestResponseDebug debug)
-    throws CAClientException, PKIErrorException
-    {
-        ParamUtil.assertNotNull("caName", caName);
-
-        if(casMap.containsKey(caName) == false)
-        {
-            throw new IllegalArgumentException("unknown CAConf " + caName);
-        }
-
-        X509CmpRequestor requestor = casMap.get(caName).getRequestor();
-        try
-        {
-            return requestor.removeExpiredCerts(certprofile, userLike, overlapSeconds, debug);
-        } catch (CmpRequestorException e)
-        {
-            throw new CAClientException(e.getMessage(), e);
-        }
     }
 
     @Override

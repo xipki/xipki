@@ -107,12 +107,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.pki.ca.client.api.CertprofileInfo;
 import org.xipki.pki.ca.client.api.PKIErrorException;
-import org.xipki.pki.ca.client.api.RemoveExpiredCertsResult;
 import org.xipki.pki.ca.client.api.dto.CRLResultType;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType;
@@ -894,112 +892,6 @@ abstract class X509CmpRequestor extends CmpRequestor
         {
             throw new CmpRequestorException("unknown CAInfo version " + version);
         }
-    }
-
-    public RemoveExpiredCertsResult removeExpiredCerts(
-            final String certprofile,
-            final String userLike,
-            final long overlapSeconds,
-            final RequestResponseDebug debug)
-    throws CmpRequestorException, PKIErrorException
-    {
-        ParamUtil.assertNotBlank("certprofile", certprofile);
-        if(overlapSeconds < 0)
-        {
-            throw new IllegalArgumentException("overlapSeconds could not be negative");
-        }
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
-        sb.append("<removeExpiredCertsReq version=\"1\">");
-        // Profile
-        sb.append("<certprofile>");
-        sb.append(certprofile);
-        sb.append("</certprofile>");
-
-        // Username
-        if(StringUtil.isNotBlank(userLike))
-        {
-            sb.append("<userLike>");
-            sb.append(userLike);
-            sb.append("</userLike>");
-        }
-
-        sb.append("<overlap>");
-        sb.append(overlapSeconds);
-        sb.append("</overlap>");
-
-        sb.append("</removeExpiredCertsReq>");
-
-        String requestInfo = sb.toString();
-        int action = XipkiCmpConstants.ACTION_REMOVE_EXPIRED_CERTS;
-        PKIMessage request = buildMessageWithXipkAction(action, new DERUTF8String(requestInfo));
-        PKIResponse response = signAndSend(request, debug);
-        ASN1Encodable itvValue = extractXipkiActionRepContent(response, action);
-        DERUTF8String utf8Str = DERUTF8String.getInstance(itvValue);
-        String resultInfoStr = utf8Str.getString();
-
-        if(LOG.isDebugEnabled())
-        {
-            LOG.debug(
-                "removeExpiredCertsResp for (profile={}, usernameLike={}, overlapSeconds={}): {}",
-                new Object[]{certprofile, userLike, overlapSeconds, resultInfoStr});
-        }
-        Document doc;
-        try
-        {
-            doc = xmlDocBuilder.parse(new ByteArrayInputStream(resultInfoStr.getBytes("UTF-8")));
-        } catch (SAXException | IOException e)
-        {
-            throw new CmpRequestorException("could not parse the returned removeExpiredCertsResp",
-                    e);
-        }
-
-        String namespace = null;
-
-        RemoveExpiredCertsResult result = new RemoveExpiredCertsResult();
-        String nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(),
-                namespace, "numCerts");
-        if(nodeValue != null)
-        {
-            try
-            {
-                result.setNumOfCerts(Integer.parseInt(nodeValue));
-            }catch(NumberFormatException e)
-            {
-                throw new CmpRequestorException("invalid numCerts '" + nodeValue + "'");
-            }
-        }
-
-        nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace,
-                "userLike");
-        if(nodeValue != null)
-        {
-            result.setUserLike(nodeValue);
-        }
-
-        nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace,
-                "profile");
-        if(nodeValue != null)
-        {
-            result.setCertprofile(nodeValue);
-        }
-
-        nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace,
-                "expiredAt");
-        if(nodeValue != null)
-        {
-            try
-            {
-                result.setExpiredAt(Long.parseLong(nodeValue));
-            }catch(NumberFormatException e)
-            {
-                throw new CmpRequestorException("invalid expiredAt '" + nodeValue + "'");
-            }
-        }
-
-        return result;
     }
 
 }
