@@ -55,7 +55,6 @@ public class XipkiCmpConstants
     public static final int ACTION_GEN_CRL               = 1;
     public static final int ACTION_GET_CRL_WITH_SN       = 2;
     public static final int ACTION_GET_CAINFO            = 3;
-    public static final int ACTION_REMOVE_EXPIRED_CERTS  = 4;
 
     public static final int ACTION_RP11_VERSION          = 80;
     public static final int ACTION_RP11_GET_PUBLICKEY    = 81;

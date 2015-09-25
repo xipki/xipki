@@ -111,6 +111,10 @@ public class CaUpdateCmd extends CaCmd
             description = "days before expiration time of CA to issue certificates")
     private Integer expirationPeriod;
 
+    @Option(name = "--keep-expired-certs",
+            description = "days to keep expired certificates")
+    private Integer keepExpiredCertInDays;
+
     @Option(name = "--crl-signer",
             description = "CRL signer name or 'NULL'")
     private String crlSignerName;
@@ -182,6 +186,11 @@ public class CaUpdateCmd extends CaCmd
         } else
         {
             entry.setExpirationPeriod(expirationPeriod);
+        }
+
+        if(keepExpiredCertInDays != null)
+        {
+            entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
         }
 
         if(certFile != null)

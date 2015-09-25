@@ -417,6 +417,16 @@ public class X509CAInfo
         return caEntry.getExpirationPeriod();
     }
 
+    public void setKeepExpiredCertInDays(int days)
+    {
+        caEntry.setKeepExpiredCertInDays(days);
+    }
+
+    public int getKeepExpiredCertInDays()
+    {
+        return caEntry.getKeepExpiredCertInDays();
+    }
+
     public Date getCrlBaseTime()
     {
         return caEntry.getCrlBaseTime();

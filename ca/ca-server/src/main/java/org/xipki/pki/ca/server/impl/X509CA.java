@@ -62,7 +62,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -211,6 +210,12 @@ public class X509CA
         @Override
         public void run()
         {
+            int keepDays = caInfo.getKeepExpiredCertInDays();
+            if(keepDays < 0)
+            {
+                return;
+            }
+
             if(inProcess)
             {
                 return;
@@ -219,25 +224,13 @@ public class X509CA
             inProcess = true;
             boolean allCertsRemoved = true;
             long startTime = System.currentTimeMillis();
-            RemoveExpiredCertsInfo task = null;
+            Date expiredAt = new Date(startTime - DAY_IN_MS * (keepDays + 1));
             try
             {
-                task = removeExpiredCertsQueue.poll();
-                if(task == null)
-                {
-                    return;
-                }
-
-                while(removeExpirtedCerts(task))
-                {
-                }
+                int n = removeExpirtedCerts(expiredAt);
+                LOG.info("removed {} certificates expired at {}", n, expiredAt.toString());
             } catch (Throwable t)
             {
-                if(allCertsRemoved == false && task != null)
-                {
-                    removeExpiredCertsQueue.add(task);
-                }
-
                 final String message = "could not remove expired certificates";
                 if(LOG.isErrorEnabled())
                 {
@@ -248,16 +241,12 @@ public class X509CA
             } finally
             {
                 AuditService audit = getAuditService();
-                if(audit != null && task != null);
+                if(audit != null);
                 {
                     AuditEvent auditEvent = newAuditEvent();
                     auditEvent.setDuration(System.currentTimeMillis() - startTime);
                     auditEvent.addEventData(new AuditEventData("CA", caInfo.getName()));
-                    auditEvent.addEventData(new AuditEventData("cerProfile",
-                            task.getCertprofile()));
-                    auditEvent.addEventData(new AuditEventData("user", task.getUserLike()));
-                    auditEvent.addEventData(new AuditEventData("expiredAt",
-                            new Date(task.getExpiredAt() * MS_PER_SECOND).toString()));
+                    auditEvent.addEventData(new AuditEventData("expiredAt", expiredAt.toString()));
                     auditEvent.addEventData(new AuditEventData("eventType",
                             "REMOVE_EXPIRED_CERTS"));
 
@@ -278,78 +267,6 @@ public class X509CA
             }
         }
 
-        /**
-         *
-         * @param task
-         * @param numEntries
-         * @return whether there this method should still be called.
-         * @throws OperationException
-         */
-        private boolean removeExpirtedCerts(
-                final RemoveExpiredCertsInfo task)
-        throws OperationException
-        {
-            final String caName = caInfo.getName();
-            final int numEntries = 100;
-
-            X509Cert caCert = caInfo.getCertificate();
-            long expiredAt = task.getExpiredAt();
-
-            List<BigInteger> serials = certstore.getExpiredCertSerials(caCert, expiredAt,
-                    numEntries,
-                    task.getCertprofile(), task.getUserLike());
-
-            for(BigInteger serial : serials)
-            {
-                if((caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serial)))
-                {
-                    continue;
-                }
-
-                boolean removed = false;
-                try
-                {
-                    removed = do_removeCertificate(serial) != null;
-                }catch(Throwable t)
-                {
-                    final String message = "could not remove expired certificate";
-                    if(LOG.isErrorEnabled())
-                    {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                t.getClass().getName(), t.getMessage());
-                    }
-                    removed = false;
-                } finally
-                {
-                    AuditService audit = getAuditService();
-                    if(audit != null);
-                    {
-                        AuditEvent auditEvent = newAuditEvent();
-                        auditEvent.setLevel(
-                                removed
-                                    ? AuditLevel.INFO
-                                    : AuditLevel.ERROR);
-                        auditEvent.setStatus(
-                                removed
-                                    ? AuditStatus.SUCCESSFUL
-                                    : AuditStatus.FAILED);
-                        auditEvent.addEventData(new AuditEventData("CA", caName));
-                        auditEvent.addEventData(
-                                new AuditEventData("serialNumber", serial.toString()));
-                        auditEvent.addEventData(
-                                new AuditEventData("eventType", "REMOVE_EXPIRED_CERT"));
-                        audit.logEvent(auditEvent);
-                    }// end if(audit != null)
-
-                    if(removed == false)
-                    {
-                        return false;
-                    }
-                } // end finally
-            } // end try
-
-            return serials.size() >= numEntries;
-        }
     } // class ScheduledExpiredCertsRemover
 
     private class ScheduledCRLGenerationService implements Runnable
@@ -569,7 +486,7 @@ public class X509CA
     private static final long MS_PER_SECOND = 1000L;
     private static final int SECOND_PER_MIN = 60;
     private static final int MIN_PER_DAY = 24 * 60;
-    private static final long DAY = MS_PER_SECOND * SECOND_PER_MIN * MIN_PER_DAY;
+    private static final long DAY_IN_MS = MS_PER_SECOND * SECOND_PER_MIN * MIN_PER_DAY;
     private static final long MAX_CERT_TIME_MS = 253402300799982L; //9999-12-31-23-59-59
 
     private static Logger LOG = LoggerFactory.getLogger(X509CA.class);
@@ -583,9 +500,6 @@ public class X509CA
     private final CAManagerImpl caManager;
     private Boolean tryXipkiNSStoVerify;
     private AtomicBoolean crlGenInProcess = new AtomicBoolean(false);
-
-    private final ConcurrentLinkedDeque<RemoveExpiredCertsInfo> removeExpiredCertsQueue =
-            new ConcurrentLinkedDeque<>();
 
     private ScheduledFuture<?> nextSerialCommitService;
     private ScheduledFuture<?> crlGenerationService;
@@ -674,7 +588,7 @@ public class X509CA
 
         expiredCertsRemover = caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
                 new ScheduledExpiredCertsRemover(),
-                10, 10, TimeUnit.MINUTES);
+                1, 1, TimeUnit.DAYS);
     }
 
     public X509CAInfo getCAInfo()
@@ -2273,7 +2187,7 @@ public class X509CA
             notBefore = caInfo.getNotBefore();
             if(certprofile.hasMidnightNotBefore())
             {
-                notBefore = setToMidnight(new Date(notBefore.getTime() + DAY),
+                notBefore = setToMidnight(new Date(notBefore.getTime() + DAY_IN_MS),
                         certprofile.getTimezone());
             }
         }
@@ -2638,8 +2552,8 @@ public class X509CA
                 String s = certprofile.getParameter(
                         SpecialX509CertprofileBehavior.PARAMETER_MAXLIFTIME);
                 long maxLifetimeInDays = Long.parseLong(s);
-                Date maxLifetime = new Date(
-                        gSMC_KFirstNotBefore.getTime() + maxLifetimeInDays * DAY - MS_PER_SECOND);
+                Date maxLifetime = new Date(gSMC_KFirstNotBefore.getTime()
+                        + maxLifetimeInDays * DAY_IN_MS - MS_PER_SECOND);
                 if(maxNotAfter.after(maxLifetime))
                 {
                     maxNotAfter = maxLifetime;
@@ -2685,7 +2599,7 @@ public class X509CA
             if(certprofile.hasMidnightNotBefore() && maxNotAfter.equals(origMaxNotAfter) == false)
             {
                 Calendar c = Calendar.getInstance(certprofile.getTimezone());
-                c.setTime(new Date(notAfter.getTime() - DAY));
+                c.setTime(new Date(notAfter.getTime() - DAY_IN_MS));
                 c.set(Calendar.HOUR_OF_DAY, 23);
                 c.set(Calendar.MINUTE, 59);
                 c.set(Calendar.SECOND, 59);
@@ -2890,64 +2804,6 @@ public class X509CA
         return caManager;
     }
 
-    public RemoveExpiredCertsInfo removeExpiredCerts(
-            final String certprofile,
-            String userLike,
-            Long overlapSeconds)
-    throws OperationException
-    {
-        if(masterMode == false)
-        {
-            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
-                    "CA could not remove expired certificates at slave mode");
-        }
-
-        if(userLike != null)
-        {
-            if(userLike.indexOf(' ') != -1
-                    || userLike.indexOf('\t') != -1
-                    || userLike.indexOf('\r') != -1
-                    || userLike.indexOf('\n') != -1)
-            {
-                throw new OperationException(ErrorCode.BAD_REQUEST,
-                        "invalid userLike '" + userLike + "'");
-            }
-
-            if(userLike.indexOf('*') != -1)
-            {
-                userLike = userLike.replace('*', '%');
-            }
-        }
-
-        RemoveExpiredCertsInfo info = new RemoveExpiredCertsInfo();
-        info.setUserLike(userLike);
-        info.setCertprofile(certprofile);
-
-        if(overlapSeconds == null || overlapSeconds < 0)
-        {
-            overlapSeconds = 24L * 60 * 60;
-        }
-        info.setOverlap(overlapSeconds);
-
-        long now = System.currentTimeMillis();
-        // remove the following DEBUG CODE
-        // now += DAY * 10 * 365;
-
-        long expiredAt = now / MS_PER_SECOND - overlapSeconds;
-        info.setExpiredAt(expiredAt);
-
-        int numOfCerts = certstore.getNumOfExpiredCerts(caInfo.getCertificate(), expiredAt,
-                certprofile, userLike);
-        info.setNumOfCerts(numOfCerts);
-
-        if(numOfCerts > 0)
-        {
-            removeExpiredCertsQueue.add(info);
-        }
-
-        return info;
-    }
-
     private Date getCRLNextUpdate(
             final Date thisUpdate)
     {
@@ -2998,6 +2854,82 @@ public class X509CA
 
         return nextUpdate;
     }
+
+    private int removeExpirtedCerts(Date expiredAtTime)
+    throws OperationException
+    {
+        if(masterMode == false)
+        {
+            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
+                    "CA could not remove expired certificates at slave mode");
+        }
+
+        final String caName = caInfo.getName();
+        final int numEntries = 100;
+
+        X509Cert caCert = caInfo.getCertificate();
+        final long expiredAt = expiredAtTime.getTime() / 1000;
+
+        int sum = 0;
+        while(true)
+        {
+            List<BigInteger> serials = certstore.getExpiredCertSerials(
+                    caCert, expiredAt, numEntries);
+            if(CollectionUtil.isEmpty(serials))
+            {
+                return sum;
+            }
+
+            for(BigInteger serial : serials)
+            {
+                // don'd delete CA's own certificate
+                if((caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serial)))
+                {
+                    continue;
+                }
+
+                boolean removed = false;
+                try
+                {
+                    removed = do_removeCertificate(serial) != null;
+                }catch(Throwable t)
+                {
+                    final String message = "could not remove expired certificate";
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message),
+                                t.getClass().getName(), t.getMessage());
+                    }
+
+                    if(removed == false)
+                    {
+                        return sum;
+                    }
+                } finally
+                {
+                    AuditService audit = getAuditService();
+                    if(audit != null);
+                    {
+                        AuditEvent auditEvent = newAuditEvent();
+                        auditEvent.setLevel(
+                                removed
+                                    ? AuditLevel.INFO
+                                    : AuditLevel.ERROR);
+                        auditEvent.setStatus(
+                                removed
+                                    ? AuditStatus.SUCCESSFUL
+                                    : AuditStatus.FAILED);
+                        auditEvent.addEventData(new AuditEventData("CA", caName));
+                        auditEvent.addEventData(
+                                new AuditEventData("serialNumber", serial.toString()));
+                        auditEvent.addEventData(
+                                new AuditEventData("eventType", "REMOVE_EXPIRED_CERT"));
+                        audit.logEvent(auditEvent);
+                    }// end if(audit != null)
+                } // end finally
+            } // end try
+        } // end while(true)
+    } // end method removeExpirtedCerts()
 
     public HealthCheckResult healthCheck()
     {
@@ -3247,4 +3179,4 @@ public class X509CA
             s.purge();
         }
     }
-    }
+}

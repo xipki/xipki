@@ -1210,14 +1210,10 @@ class CertStoreQueryExecutor
     List<BigInteger> getExpiredSerialNumbers(
             final X509Cert caCert,
             final long expiredAt,
-            final int numEntries,
-            final String certprofile,
-            String userLike)
+            final int numEntries)
     throws DataAccessException, OperationException
     {
         ParamUtil.assertNotNull("caCert", caCert);
-        ParamUtil.assertNotNull("expiredAt", expiredAt);
-        ParamUtil.assertNotBlank("certprofile", certprofile);
 
         if(numEntries < 1)
         {
@@ -1226,36 +1222,8 @@ class CertStoreQueryExecutor
 
         int caId = getCaId(caCert);
 
-        StringBuilder sqlBuilder = new StringBuilder(
-                "SN FROM CERT WHERE CA_ID=? AND NAFTER<? AND PID=?");
-
-        if(userLike != null)
-        {
-            userLike = userLike.trim();
-            if(StringUtil.isBlank(userLike) || "null".equalsIgnoreCase(userLike))
-            {
-                userLike = null;
-            }
-        }
-
-        Integer certprofileId = certprofileStore.getId(certprofile);
-        if(certprofileId == null)
-        {
-            return Collections.emptyList();
-        }
-
-        boolean considerUserLike = false;
-        if(userLike == null)
-        {
-            sqlBuilder.append(" AND UNAME IS NULL");
-        }
-        else if("all".equalsIgnoreCase(userLike) == false)
-        {
-            considerUserLike = true;
-            sqlBuilder.append(" AND UNAME LIKE ?");
-        }
-
-        final String sql = dataSource.createFetchFirstSelectSQL(sqlBuilder.toString(), numEntries);
+        final String coreSql = "SN FROM CERT WHERE CA_ID=? AND NAFTER<?";
+        final String sql = dataSource.createFetchFirstSelectSQL(coreSql, numEntries);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1264,12 +1232,6 @@ class CertStoreQueryExecutor
             int idx = 1;
             ps.setInt(idx++, caId);
             ps.setLong(idx++, expiredAt);
-            ps.setInt(idx++, certprofileId);
-
-            if(considerUserLike)
-            {
-                ps.setString(idx++, userLike);
-            }
 
             rs = ps.executeQuery();
 

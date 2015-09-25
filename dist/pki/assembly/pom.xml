@@ -185,7 +185,7 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki.pki</groupId>
-                  <artifactId>dbtool-shell</artifactId>
+                  <artifactId>ca-dbtool</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>

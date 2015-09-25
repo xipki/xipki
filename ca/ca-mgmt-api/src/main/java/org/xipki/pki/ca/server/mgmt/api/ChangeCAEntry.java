@@ -59,6 +59,7 @@ public class ChangeCAEntry implements Serializable
     private DuplicationMode duplicateSubjectMode;
     private ValidityMode validityMode;
     private Set<Permission> permissions;
+    private Integer keepExpiredCertInDays;
     private Integer expirationPeriod;
 
     public ChangeCAEntry(
@@ -193,6 +194,17 @@ public class ChangeCAEntry implements Serializable
             final Integer expirationPeriod)
     {
         this.expirationPeriod = expirationPeriod;
+    }
+
+    public Integer getKeepExpiredCertInDays()
+    {
+        return keepExpiredCertInDays;
+    }
+
+    public void setKeepExpiredCertInDays(
+            final Integer days)
+    {
+        this.keepExpiredCertInDays = days;
     }
 
 }

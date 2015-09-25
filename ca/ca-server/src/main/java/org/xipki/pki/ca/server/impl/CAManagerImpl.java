@@ -3079,6 +3079,7 @@ implements CAManager, CmpResponderManager, ScepManager
         entry.setDuplicateCNMode(caEntry.getDuplicateCNMode());
         entry.setExtraControl(caEntry.getExtraControl());
         entry.setMaxValidity(caEntry.getMaxValidity());
+        entry.setKeepExpiredCertInDays(caEntry.getKeepExpiredCertInDays());
         entry.setPermissions(caEntry.getPermissions());
         entry.setResponderName(caEntry.getResponderName());
         entry.setStatus(status);

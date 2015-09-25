@@ -114,6 +114,10 @@ public abstract class CaAddOrGenCmd extends CaCmd
                     + "(required)")
     private String maxValidity;
 
+    @Option(name = "--keep-expired-certs",
+            description = "days to keep expired certificates")
+    private Integer keepExpiredCertInDays = -1;
+
     @Option(name = "--crl-signer",
             description = "CRL signer name")
     private String crlSignerName;
@@ -212,6 +216,8 @@ public abstract class CaAddOrGenCmd extends CaCmd
                 caCertUris, ocspUris, crlUris, deltaCrlUris,
                 numCrls.intValue(), expirationPeriod.intValue());
 
+        entry.setKeepExpiredCertInDays(keepExpiredCertInDays.intValue());
+
         DuplicationMode duplicateKey = DuplicationMode.getInstance(duplicateKeyS);
         if(duplicateKey == null)
         {
@@ -253,6 +259,8 @@ public abstract class CaAddOrGenCmd extends CaCmd
 
         CertValidity _maxValidity = CertValidity.getInstance(maxValidity);
         entry.setMaxValidity(_maxValidity);
+
+        entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
 
         if(cmpControlName != null)
         {

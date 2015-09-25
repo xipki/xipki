@@ -35,8 +35,6 @@
 
 package org.xipki.pki.ca.server.impl.cmp;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
@@ -50,10 +48,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -112,7 +106,6 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 import org.xipki.audit.api.AuditChildEvent;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
@@ -122,7 +115,6 @@ import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.XMLUtil;
 import org.xipki.pki.ca.api.InsuffientPermissionException;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
@@ -132,7 +124,6 @@ import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.pki.ca.common.cmp.CmpUtf8Pairs;
 import org.xipki.pki.ca.common.cmp.CmpUtil;
 import org.xipki.pki.ca.server.impl.CAManagerImpl;
-import org.xipki.pki.ca.server.impl.RemoveExpiredCertsInfo;
 import org.xipki.pki.ca.server.impl.X509CA;
 import org.xipki.pki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CAStatus;
@@ -144,7 +135,6 @@ import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.ObjectIdentifiers;
 import org.xipki.security.api.XipkiCmpConstants;
 import org.xipki.security.api.util.X509Util;
-import org.xml.sax.SAXException;
 
 /**
  * @author Lijun Liao
@@ -161,7 +151,6 @@ public class X509CACmpResponder extends CmpResponder
 
     private final String caName;
     private final CAManagerImpl caManager;
-    private final DocumentBuilder xmlDocBuilder;
 
     static
     {
@@ -178,16 +167,6 @@ public class X509CACmpResponder extends CmpResponder
         this.caManager = caManager;
         this.pendingCertPool = new PendingCertificatePool();
         this.caName = caName;
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        try
-        {
-            xmlDocBuilder = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException e)
-        {
-            throw new RuntimeException("could not create XML document builder", e);
-        }
 
         PendingPoolCleaner pendingPoolCleaner = new PendingPoolCleaner();
         caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
@@ -1410,103 +1389,6 @@ public class X509CACmpResponder extends CmpResponder
         return sb.toString();
     }
 
-    private String removeExpiredCerts(
-            final CmpRequestorInfo requestor,
-            final ASN1Encodable asn1RequestInfo)
-    throws OperationException, InsuffientPermissionException
-    {
-        String requestInfo = null;
-        try
-        {
-            DERUTF8String asn1 = DERUTF8String.getInstance(asn1RequestInfo);
-            requestInfo = asn1.getString();
-        }catch(IllegalArgumentException e)
-        {
-            throw new OperationException(ErrorCode.BAD_REQUEST,
-                    "the content is not of UTF8 String");
-        }
-
-        final String namespace = null;
-        Document doc;
-        try
-        {
-            doc = xmlDocBuilder.parse(new ByteArrayInputStream(requestInfo.getBytes("UTF-8")));
-        } catch (SAXException | IOException e)
-        {
-            throw new OperationException(ErrorCode.BAD_REQUEST, "invalid request" + e.getMessage());
-        }
-
-        String certprofile = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(),
-                namespace, "certprofile");
-        if(certprofile == null)
-        {
-            throw new OperationException(ErrorCode.BAD_REQUEST, "certprofile is not specified");
-        }
-
-        // make sure that the requestor is permitted to remove the certificate profiles
-        checkPermission(requestor, certprofile);
-
-        String userLike = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(),
-                namespace, "userLike");
-
-        String nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(),
-                namespace, "overlap");
-
-        Long overlapSeconds = null;
-        if(nodeValue == null)
-        {
-            try
-            {
-                overlapSeconds = Long.parseLong(nodeValue);
-            }catch(NumberFormatException e)
-            {
-                throw new OperationException(ErrorCode.BAD_REQUEST,
-                        "invalid overlap '" + nodeValue + "'");
-            }
-        }
-
-        X509CA ca = getCA();
-        RemoveExpiredCertsInfo result = ca.removeExpiredCerts(
-                certprofile, userLike, overlapSeconds);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
-        sb.append("<removedExpiredCertsResp version=\"1\">");
-        // Profile
-        certprofile = result.getCertprofile();
-        sb.append("<certprofile>");
-        sb.append(certprofile);
-        sb.append("</certprofile>");
-
-        // Username
-        userLike = result.getUserLike();
-        if(StringUtil.isNotBlank(userLike))
-        {
-            sb.append("<userLike>");
-            sb.append(userLike);
-            sb.append("</userLike>");
-        }
-
-        // overlap
-        sb.append("<overlap>");
-        sb.append(result.getOverlap());
-        sb.append("</overlap>");
-
-        // expiredAt
-        sb.append("<expiredAt>");
-        sb.append(result.getExpiredAt());
-        sb.append("</expiredAt>");
-
-        // numCerts
-        sb.append("<numCerts>");
-        sb.append(result.getNumOfCerts());
-        sb.append("</numCerts>");
-
-        sb.append("</removedExpiredCertsResp>");
-
-        return sb.toString();
-    }
-
     @Override
     protected ConcurrentContentSigner getSigner()
     throws InvalidConfException
@@ -1869,12 +1751,6 @@ public class X509CACmpResponder extends CmpResponder
 
                     String systemInfo = getSystemInfo(requestor, acceptVersions);
                     respValue = new DERUTF8String(systemInfo);
-                    break;
-                case XipkiCmpConstants.ACTION_REMOVE_EXPIRED_CERTS:
-                    checkPermission(requestor, Permission.REMOVE_CERT);
-
-                    String info = removeExpiredCerts(requestor, itv.getInfoValue());
-                    respValue = new DERUTF8String(info);
                     break;
                 default:
                     String statusMessage = "unsupported XiPKI action code '" + action + "'";
