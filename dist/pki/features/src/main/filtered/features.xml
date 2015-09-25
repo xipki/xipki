@@ -155,7 +155,8 @@
     <bundle>mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
     <bundle>mvn:org.liquibase/liquibase-osgi/${liquibase.version}</bundle>
     <bundle>mvn:org.xipki.pki/database-tool/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/dbtool-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-dbtool/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-dbtool-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit" version="${project.version}" resolver="(obr)">
     <bundle>mvn:org.xipki.pki/audit/${project.version}</bundle>
