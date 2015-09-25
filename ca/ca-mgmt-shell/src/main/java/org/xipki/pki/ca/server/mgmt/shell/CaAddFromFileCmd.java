@@ -115,7 +115,7 @@ public class CaAddFromFileCmd extends CaCmd
         }
 
         // ART
-        String key = "ART";
+        String key = CaExportCmd.KEY_ART;
         String s = getStrProp(props, key, true);
         CertArt art = CertArt.valueOf(s);
         assertNotNull(art, key, s);
@@ -126,7 +126,7 @@ public class CaAddFromFileCmd extends CaCmd
         }
 
         // NEXT_SN
-        key = "NEXT_SN";
+        key = CaExportCmd.KEY_NEXT_SN;
         long nextSerial = getRequiredLongProp(props, key);
         if(nextSerial < 0)
         {
@@ -134,7 +134,7 @@ public class CaAddFromFileCmd extends CaCmd
         }
 
         // NEXT_CRLNO
-        key = "NEXT_CRLNO";
+        key = CaExportCmd.KEY_NEXT_CRLNO;
         int nextCrlNumber = getRequiredIntProp(props, key);
         if(nextCrlNumber < 1)
         {
@@ -142,7 +142,7 @@ public class CaAddFromFileCmd extends CaCmd
         }
 
         // NUM_CRLS
-        key = "NUM_CRLS";
+        key = CaExportCmd.KEY_NUM_CRLS;
         int numCrls = getRequiredIntProp(props, key);
         if(numCrls < 0)
         {
@@ -150,7 +150,7 @@ public class CaAddFromFileCmd extends CaCmd
         }
 
         // EXPIRATION_PERIOD
-        key = "EXPIRATION_PERIOD";
+        key = CaExportCmd.KEY_EXPIRATION_PERIOD;
         int expirationPeriod = getRequiredIntProp(props, key);
         if(expirationPeriod < 0)
         {
@@ -158,11 +158,11 @@ public class CaAddFromFileCmd extends CaCmd
         }
 
         // SIGNER_TYPE
-        key = "SIGNER_TYPE";
+        key = CaExportCmd.KEY_SIGNER_TYPE;
         String signerType = getStrProp(props, key, true);
 
         // SIGNER_CONF
-        key = "SIGNER_CONF";
+        key = CaExportCmd.KEY_SIGNER_CONF;
         String signerConf = getStrProp(props, key, true);
 
         if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
@@ -172,7 +172,7 @@ public class CaAddFromFileCmd extends CaCmd
         }
 
         // CRL_URIS
-        key = "CRL_URIS";
+        key = CaExportCmd.KEY_CRL_URIS;
         s = getStrProp(props, key, false);
         List<String> crlUris = null;
         if(s != null)
@@ -181,7 +181,7 @@ public class CaAddFromFileCmd extends CaCmd
         }
 
         // DELTACRL_URIS
-        key = "DELTACRL_URIS";
+        key = CaExportCmd.KEY_DELTACRL_URIS;
         s = getStrProp(props, key, false);
         List<String> deltaCrlUris = null;
         if(s != null)
@@ -190,7 +190,7 @@ public class CaAddFromFileCmd extends CaCmd
         }
 
         // OCSP_URIS
-        key = "OCSP_URIS";
+        key = CaExportCmd.KEY_OCSP_URIS;
         s = getStrProp(props, key, false);
         List<String> ocspUris = null;
         if(s != null)
@@ -199,7 +199,7 @@ public class CaAddFromFileCmd extends CaCmd
         }
 
         // CACERT_URIS
-        key = "CACERT_URIS";
+        key = CaExportCmd.KEY_CACERT_URIS;
         s = getStrProp(props, key, false);
         List<String> caCertUris = null;
         if(s != null)
@@ -213,35 +213,35 @@ public class CaAddFromFileCmd extends CaCmd
                 numCrls, expirationPeriod);
 
         // STATUS
-        key = "STATUS";
+        key = CaExportCmd.KEY_STATUS;
         s = getStrProp(props, key, true);
         CAStatus status = CAStatus.getCAStatus(s);
         assertNotNull(status, key, s);
         entry.setStatus(status);
 
         // DUPLICATE_KEY
-        key = "DUPLICATE_KEY";
+        key = CaExportCmd.KEY_DUPLICATE_KEY;
         s = getStrProp(props, key, true);
         DuplicationMode duplicateKey = DuplicationMode.valueOf(s);
         assertNotNull(duplicateKey, key, s);
         entry.setDuplicateKeyMode(duplicateKey);
 
         // DUPLICATE_SUBJECT
-        key = "DUPLICATE_SUBJECT";
+        key = CaExportCmd.KEY_DUPLICATE_SUBJECT;
         s = getStrProp(props, key, true);
         DuplicationMode duplicateSubject = DuplicationMode.valueOf(s);
         assertNotNull(duplicateSubject, key, s);
         entry.setDuplicateSubjectMode(duplicateSubject);
 
         // VALIDITY_MODE
-        key = "VALIDITY_MODE";
+        key = CaExportCmd.KEY_VALIDITY_MODE;
         s = getStrProp(props, key, true);
         ValidityMode validityMode = ValidityMode.valueOf(s);
         assertNotNull(validityMode, key, s);
         entry.setValidityMode(validityMode);
 
         // CRLSIGNER_NAME
-        key = "CRLSIGNER_NAME";
+        key = CaExportCmd.KEY_CRLSIGNER_NAME;
         s = getStrProp(props, key, false);
         if(s != null)
         {
@@ -249,7 +249,7 @@ public class CaAddFromFileCmd extends CaCmd
         }
 
         // CMPCONTROL_NAME
-        key = "CMPCONTROL_NAME";
+        key = CaExportCmd.KEY_CMPCONTROL_NAME;
         s = getStrProp(props, key, false);
         if(s != null)
         {
@@ -257,13 +257,18 @@ public class CaAddFromFileCmd extends CaCmd
         }
 
         // MAX_VALIDITY
-        key = "MAX_VALIDITY";
+        key = CaExportCmd.KEY_MAX_VALIDITY;
         s = getStrProp(props, key, true);
         CertValidity maxValidity = CertValidity.getInstance(s);
         entry.setMaxValidity(maxValidity);
 
+        // KEEP_EXPIRED_CERT_DAYS
+        key = CaExportCmd.KEY_KEEP_EXPIRED_CERT_DAYS;
+        int keepExpiredCertInDays = getIntProp(props, key, true);
+        entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
+
         // EXTRA_CONTROL
-        key = "EXTRA_CONTROL";
+        key = CaExportCmd.KEY_EXTRA_CONTROL;
         s = getStrProp(props, key, false);
         if(s != null)
         {
@@ -271,7 +276,7 @@ public class CaAddFromFileCmd extends CaCmd
         }
 
         // PERMISSIONS
-        key = "PERMISSIONS";
+        key = CaExportCmd.KEY_PERMISSIONS;
         s = getStrProp(props, key, true);
         Set<String> permissions = StringUtil.splitAsSet(s, ", ");
         Set<Permission> _permissions = new HashSet<>();
@@ -287,7 +292,7 @@ public class CaAddFromFileCmd extends CaCmd
         entry.setPermissions(_permissions);
 
         // REVOKED
-        key = "REV";
+        key = CaExportCmd.KEY_REVOKED;
         s = getStrProp(props, key, true);
         boolean revoked;
         if("true".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s))
@@ -306,15 +311,15 @@ public class CaAddFromFileCmd extends CaCmd
         if(revoked)
         {
             // REV_REASON
-            key = "RR";
+            key = CaExportCmd.KEY_REV_REASON;
             int reasonCode = getRequiredIntProp(props, key);
 
             // REV_TIME
-            key = "RT";
+            key = CaExportCmd.KEY_REV_TIME;
             Date revocationTime = new Date(getRequiredLongProp(props, key) * 1000);
 
             // REV_INV_TIME
-            key = "RIT";
+            key = CaExportCmd.KEY_REV_INV_TIME;
             Long t = getLongProp(props, key, false);
             Date invalidityTime = null;
             if(t != null)
@@ -329,7 +334,7 @@ public class CaAddFromFileCmd extends CaCmd
         // CERT
         if(ignoreCert == false)
         {
-            key = "CERT";
+            key = CaExportCmd.KEY_CERT;
             s = getStrProp(props, key, false);
             byte[] certBytes = null;
             if(s != null)

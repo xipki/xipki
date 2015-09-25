@@ -56,6 +56,58 @@ import org.xipki.security.api.CertRevocationInfo;
         description="export CA configuration")
 public class CaExportCmd extends CaCmd
 {
+    static final String KEY_ART = "ART";
+
+    static final String KEY_NEXT_SN = "NEXT_SN";
+
+    static final String KEY_NEXT_CRLNO = "NEXT_CRLNO";
+
+    static final String KEY_STATUS = "STATUS";
+
+    static final String KEY_CACERT_URIS = "CACERT_URIS";
+
+    static final String KEY_CRL_URIS = "CRL_URIS";
+
+    static final String KEY_DELTACRL_URIS = "DELTACRL_URIS";
+
+    static final String KEY_OCSP_URIS = "OCSP_URIS";
+
+    static final String KEY_MAX_VALIDITY = "MAX_VALIDITY";
+
+    static final String KEY_CRLSIGNER_NAME = "CRLSIGNER_NAME";
+
+    static final String KEY_CMPCONTROL_NAME = "CMPCONTROL_NAME";
+
+    static final String KEY_DUPLICATE_KEY = "DUPLICATE_KEY";
+
+    static final String KEY_DUPLICATE_SUBJECT = "DUPLICATE_SUBJECT";
+
+    static final String KEY_VALIDITY_MODE = "VALIDITY_MODE";
+
+    static final String KEY_PERMISSIONS = "PERMISSIONS";
+
+    static final String KEY_NUM_CRLS = "NUM_CRLS";
+
+    static final String KEY_EXPIRATION_PERIOD = "EXPIRATION_PERIOD";
+
+    static final String KEY_KEEP_EXPIRED_CERT_DAYS = "KEEP_EXPIRED_CERT_DAYS";
+
+    static final String KEY_REVOKED = "REVOKED";
+
+    static final String KEY_REV_REASON = "RR";
+
+    static final String KEY_REV_TIME = "RT";
+
+    static final String KEY_REV_INV_TIME = "RIT";
+
+    static final String KEY_SIGNER_TYPE = "SIGNER_TYPE";
+
+    static final String KEY_SIGNER_CONF = "SIGNER_CONF";
+
+    static final String KEY_CERT = "CERT";
+
+    static final String KEY_EXTRA_CONTROL = "EXTRA_CONTROL";
+
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CA name\n"
@@ -89,86 +141,92 @@ public class CaExportCmd extends CaCmd
         Properties props = new Properties();
 
         // ART
-        propsput(props, "ART", CertArt.X509PKC.name());
+        propsput(props, KEY_ART, CertArt.X509PKC.name());
 
         // NEXT_SN
-        propsput(props, "NEXT_SN", entry.getNextSerial());
+        propsput(props, KEY_NEXT_SN, entry.getNextSerial());
 
         // NEXT_CRLNO
-        propsput(props, "NEXT_CRLNO", entry.getNextCRLNumber());
+        propsput(props, KEY_NEXT_CRLNO, entry.getNextCRLNumber());
 
         // STATUS
-        propsput(props, "STATUS", entry.getStatus().name());
+        propsput(props, KEY_STATUS, entry.getStatus().name());
+
+        // CACERT_URIS
+        propsput(props, KEY_CACERT_URIS, entry.getCacertUris());
 
         // CRL_URIS
-        propsput(props, "CRL_URIS", entry.getCrlUrisAsString());
+        propsput(props, KEY_CRL_URIS, entry.getCrlUrisAsString());
 
         // DELTACRL_URIS
-        propsput(props, "DELTACRL_URIS", entry.getDeltaCrlUrisAsString());
+        propsput(props, KEY_DELTACRL_URIS, entry.getDeltaCrlUrisAsString());
 
         // OCSP_URIS
-        propsput(props, "OCSP_URIS", entry.getOcspUrisAsString());
+        propsput(props, KEY_OCSP_URIS, entry.getOcspUrisAsString());
 
         // MAX_VALIDITY
-        propsput(props, "MAX_VALIDITY", entry.getMaxValidity());
+        propsput(props, KEY_MAX_VALIDITY, entry.getMaxValidity());
 
         // CRLSIGNER_NAME
-        propsput(props, "CRLSIGNER_NAME", entry.getCrlSignerName());
+        propsput(props, KEY_CRLSIGNER_NAME, entry.getCrlSignerName());
 
         // CMPCONTROL_NAME
-        propsput(props, "CMPCONTROL_NAME", entry.getCmpControlName());
+        propsput(props, KEY_CMPCONTROL_NAME, entry.getCmpControlName());
 
         // DUPLICATE_KEY
-        propsput(props, "DUPLICATE_KEY", entry.getDuplicateKeyMode().name());
+        propsput(props, KEY_DUPLICATE_KEY, entry.getDuplicateKeyMode().name());
 
         // DUPLICATE_SUBJECT
-        propsput(props, "DUPLICATE_SUBJECT", entry.getDuplicateSubjectMode().name());
+        propsput(props, KEY_DUPLICATE_SUBJECT, entry.getDuplicateSubjectMode().name());
 
         // VALIDITY_MODE
-        propsput(props, "VALIDITY_MODE", entry.getValidityMode().name());
+        propsput(props, KEY_VALIDITY_MODE, entry.getValidityMode().name());
 
         // PERMISSIONS
-        propsput(props, "PERMISSIONS", entry.getPermissionsAsText());
+        propsput(props, KEY_PERMISSIONS, entry.getPermissionsAsText());
 
         // NUM_CRLS
-        propsput(props, "NUM_CRLS", entry.getNumCrls());
+        propsput(props, KEY_NUM_CRLS, entry.getNumCrls());
 
         // EXPIRATION_PERIOD
-        propsput(props, "EXPIRATION_PERIOD", entry.getExpirationPeriod());
+        propsput(props, KEY_EXPIRATION_PERIOD, entry.getExpirationPeriod());
+
+        // KEEP_EXPIRED_CERT_DAYS
+        propsput(props, KEY_KEEP_EXPIRED_CERT_DAYS, entry.getKeepExpiredCertInDays());
 
         // REVOKED
         CertRevocationInfo revInfo = entry.getRevocationInfo();
-        propsput(props, "REV", revInfo != null);
+        propsput(props, KEY_REVOKED, revInfo != null);
         if(revInfo != null)
         {
             if(revInfo.getReason() != null)
             {
-                propsput(props, "RR", revInfo.getReason().getCode());
+                propsput(props, KEY_REV_REASON, revInfo.getReason().getCode());
             }
 
             if(revInfo.getRevocationTime() != null)
             {
-                propsput(props, "RT", revInfo.getRevocationTime().getTime() / 1000);
+                propsput(props, KEY_REV_TIME, revInfo.getRevocationTime().getTime() / 1000);
             }
 
             if(revInfo.getInvalidityTime() != null)
             {
-                propsput(props, "RIT", revInfo.getInvalidityTime().getTime() / 1000);
+                propsput(props, KEY_REV_INV_TIME, revInfo.getInvalidityTime().getTime() / 1000);
             }
         }
 
         // SIGNER_TYPE
-        propsput(props, "SIGNER_TYPE", entry.getSignerType());
+        propsput(props, KEY_SIGNER_TYPE, entry.getSignerType());
 
         // SIGNER_CONF
-        propsput(props, "SIGNER_CONF", entry.getSignerConf());
+        propsput(props, KEY_SIGNER_CONF, entry.getSignerConf());
 
         // CERT
         byte[] bytes = entry.getCertificate().getEncoded();
-        propsput(props, "CERT", IoUtil.base64Encode(bytes, false));
+        propsput(props, KEY_CERT, IoUtil.base64Encode(bytes, false));
 
         // EXTRA_CONTROL
-        propsput(props, "EXTRA_CONTROL", entry.getExtraControl());
+        propsput(props, KEY_EXTRA_CONTROL, entry.getExtraControl());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         props.store(out, "CA configuration");
