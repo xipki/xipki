@@ -36,12 +36,16 @@
 package org.xipki.password;
 
 import java.security.GeneralSecurityException;
+import java.security.Security;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * @author Lijun Liao
@@ -51,6 +55,26 @@ public class PasswordBasedEncryption
 {
     private static final String CIPHER_ALGO = "PBEWITHSHA256AND256BITAES-CBC-BC";
 
+    private static AtomicBoolean initialized = new AtomicBoolean(false);
+
+    private static void init()
+    {
+        synchronized (initialized)
+        {
+            if(initialized.get())
+            {
+                return;
+            }
+
+            if(Security.getProperty("BC") == null)
+            {
+                Security.addProvider(new BouncyCastleProvider());
+            }
+
+            initialized.set(true);
+        }
+    }
+
     public static byte[] encrypt(
             final byte[] plaintext,
             final char[] password,
@@ -58,6 +82,7 @@ public class PasswordBasedEncryption
             final byte[] salt)
     throws GeneralSecurityException
     {
+        init();
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CIPHER_ALGO, "BC");
 
         PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
@@ -78,6 +103,7 @@ public class PasswordBasedEncryption
             byte[] salt)
     throws GeneralSecurityException
     {
+        init();
         PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
 
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CIPHER_ALGO, "BC");
