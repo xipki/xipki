@@ -108,16 +108,6 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.pki.ca.client.shell.RemoveExpiredCertsCmd">
-        <property name="caClient" ref="caClient"/>
-      </action>
-      <optional-completers>
-        <entry key="--ca" value-ref="caNameCompleter"/>
-        <entry key="--req-out" value-ref="filePathCompleter"/>
-        <entry key="--resp-out" value-ref="filePathCompleter"/>
-      </optional-completers>
-    </command>
-    <command>
       <action class="org.xipki.pki.ca.client.shell.GenCRLCmd">
         <property name="caClient" ref="caClient"/>
       </action>

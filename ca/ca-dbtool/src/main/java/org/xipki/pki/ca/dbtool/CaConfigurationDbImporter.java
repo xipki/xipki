@@ -423,10 +423,10 @@ class CaConfigurationDbImporter extends DbPorter
         sqlBuilder.append(" CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS, MAX_VALIDITY,");
         sqlBuilder.append(" CERT, SIGNER_TYPE, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME,");
         sqlBuilder.append(" DUPLICATE_KEY, DUPLICATE_SUBJECT, DUPLICATE_CN, PERMISSIONS,");
-        sqlBuilder.append(" NUM_CRLS, EXPIRATION_PERIOD, REV, RR, RT, RIT, VALIDITY_MODE,");
-        sqlBuilder.append(" EXTRA_CONTROL, SIGNER_CONF)");
-        sqlBuilder.append(" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,");
-        sqlBuilder.append(" ?, ?, ?, ?, ?, ?, ?, ?)");
+        sqlBuilder.append(" NUM_CRLS, EXPIRATION_PERIOD, KEEP_EXPIRED_CERT_DAYS,");
+        sqlBuilder.append(" REV, RR, RT, RIT, VALIDITY_MODE, EXTRA_CONTROL, SIGNER_CONF)");
+        sqlBuilder.append(" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,");
+        sqlBuilder.append(" ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         final String sql = sqlBuilder.toString();
 
         PreparedStatement ps = null;
@@ -473,6 +473,7 @@ class CaConfigurationDbImporter extends DbPorter
                             : numCrls.intValue();
                     ps.setInt(idx++, tNumCrls);
                     ps.setInt(idx++, ca.getExpirationPeriod());
+                    ps.setInt(idx++, ca.getKeepExpiredCertDays());
                     setBoolean(ps, idx++, ca.isRevoked());
                     setInt(ps, idx++, ca.getRevReason());
                     setLong(ps, idx++, ca.getRevTime());

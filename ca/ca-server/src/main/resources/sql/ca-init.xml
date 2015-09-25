@@ -188,6 +188,8 @@
       <column name="CERT" type="CLOB">
         <constraints nullable="false"/>
       </column>
+      <column name="KEEP_EXPIRED_CERT_DAYS" type="SMALLINT" defaultValueNumeric="-1" 
+          remarks="How long in days should certificates after the expiration be kept. Negative value for kept-for-ever"/>
       <column name="EXTRA_CONTROL" type="VARCHAR(500)"/>
       <column name="SIGNER_CONF" type="CLOB">
         <constraints nullable="false"/>

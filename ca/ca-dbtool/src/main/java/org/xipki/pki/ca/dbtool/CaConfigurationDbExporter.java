@@ -477,7 +477,7 @@ class CaConfigurationDbExporter extends DbPorter
         sqlBuilder.append("NEXT_SN, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, ");
         sqlBuilder.append("CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, ");
         sqlBuilder.append("PERMISSIONS, NUM_CRLS, ");
-        sqlBuilder.append("EXPIRATION_PERIOD, REV, RR, RT, RIT, ");
+        sqlBuilder.append("EXPIRATION_PERIOD, KEEP_EXPIRED_CERT_DAYS, REV, RR, RT, RIT, ");
         sqlBuilder.append("DUPLICATE_KEY, DUPLICATE_SUBJECT, DUPLICATE_CN, DELTACRL_URIS, ");
         sqlBuilder.append("VALIDITY_MODE,CACERT_URIS, ART, NEXT_CRLNO, RESPONDER_NAME, ");
         sqlBuilder.append("CMPCONTROL_NAME, EXTRA_CONTROL");
@@ -516,6 +516,7 @@ class CaConfigurationDbExporter extends DbPorter
                 int duplicateCN = rs.getInt("DUPLICATE_CN");
                 String permissions = rs.getString("PERMISSIONS");
                 int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
+                int keepExpiredCertDays = rs.getInt("KEEP_EXPIRED_CERT_DAYS");
                 String validityMode = rs.getString("VALIDITY_MODE");
 
                 CaType ca = new CaType();
@@ -542,6 +543,7 @@ class CaConfigurationDbExporter extends DbPorter
                 ca.setDuplicateCN(duplicateCN);
                 ca.setPermissions(permissions);
                 ca.setExpirationPeriod(expirationPeriod);
+                ca.setKeepExpiredCertDays(keepExpiredCertDays);
                 ca.setValidityMode(validityMode);
                 ca.setExtraControl(extraControl);
 

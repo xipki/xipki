@@ -61,6 +61,7 @@ public class CAEntry
     private ValidityMode validityMode = ValidityMode.STRICT;
     private Set<Permission> permissions;
     private int expirationPeriod;
+    private int keepExpiredCertInDays;
     private String extraControl;
 
     public CAEntry(
@@ -99,6 +100,17 @@ public class CAEntry
             final CertValidity maxValidity)
     {
         this.maxValidity = maxValidity;
+    }
+
+    public int getKeepExpiredCertInDays()
+    {
+        return keepExpiredCertInDays;
+    }
+
+    public void setKeepExpiredCertInDays(
+            final int days)
+    {
+        this.keepExpiredCertInDays = days;
     }
 
     public String getSignerConf()
@@ -263,6 +275,15 @@ public class CAEntry
         sb.append('\n');
         sb.append("validityMode: ").append(validityMode).append('\n');
         sb.append("permissions: ").append(Permission.toString(permissions)).append('\n');
+        sb.append("keepExpiredCerts: ");
+        if(keepExpiredCertInDays < 0)
+        {
+            sb.append("forever");
+        } else
+        {
+            sb.append(keepExpiredCertInDays).append(" days");
+        }
+        sb.append("\n");
         sb.append("extraControl: ").append(extraControl).append('\n');
 
         return sb.toString();

@@ -191,6 +191,18 @@ public class CaCheckCmd extends CaUpdateCmd
             }
         }
 
+        // Keep expired certificate
+        if(ey.getKeepExpiredCertInDays() != null)
+        {
+            Integer ex = ey.getKeepExpiredCertInDays();
+            int is = ca.getKeepExpiredCertInDays();
+            if(ex.intValue() != is)
+            {
+                throw new CmdFailure("KeepExiredCertInDays: is '" + is
+                        + "', but expected '" + ex + "'");
+            }
+        }
+
         // Num CRLs
         if(ey.getNumCrls() != null)
         {

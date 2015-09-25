@@ -301,7 +301,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
         final String certSql = "SELECT ID,SN,IID,LUPDATE,REV,RR,RT,RIT,PN,CERT "
                 + "FROM CERT INNER JOIN CRAW ON "
-                + "CERT.ID>=? AND CERT.ID<? AND CERT.ID=CRAW.ID ORDER BY CERT.ID ASC";
+                + "CERT.ID>=? AND CERT.ID<? AND CERT.ID=CRAW.CID ORDER BY CERT.ID ASC";
 
         final int maxCertId = (int) getMax("CERT", "ID");
 

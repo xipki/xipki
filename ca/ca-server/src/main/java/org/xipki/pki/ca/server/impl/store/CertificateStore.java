@@ -545,15 +545,12 @@ public class CertificateStore
     public List<BigInteger> getExpiredCertSerials(
             final X509Cert caCert,
             final long expiredAt,
-            final int numEntries,
-            final String certprofile,
-            final String userLike)
+            final int numEntries)
     throws OperationException
     {
         try
         {
-            return queryExecutor.getExpiredSerialNumbers(caCert, expiredAt, numEntries,
-                    certprofile, userLike);
+            return queryExecutor.getExpiredSerialNumbers(caCert, expiredAt, numEntries);
         } catch (DataAccessException e)
         {
             LOG.debug("DataAccessException", e);

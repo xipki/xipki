@@ -593,7 +593,7 @@ class CAManagerQueryExecutor
         final String sql = "NAME, ART, NEXT_SN, NEXT_CRLNO, STATUS, MAX_VALIDITY"
                 + ", CERT, SIGNER_TYPE, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME"
                 + ", DUPLICATE_KEY, DUPLICATE_SUBJECT, DUPLICATE_CN, PERMISSIONS, NUM_CRLS"
-                + ", EXPIRATION_PERIOD, REV, RR, RT, RIT, VALIDITY_MODE"
+                + ", KEEP_EXPIRED_CERT_DAYS, EXPIRATION_PERIOD, REV, RR, RT, RIT, VALIDITY_MODE"
                 + ", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS, EXTRA_CONTROL, SIGNER_CONF"
                 + " FROM CA WHERE NAME=?";
         PreparedStatement stmt = null;
@@ -633,6 +633,7 @@ class CAManagerQueryExecutor
                 int duplicateCNI = rs.getInt("DUPLICATE_CN");
                 int numCrls = rs.getInt("NUM_CRLS");
                 int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
+                int keepExpiredCertDays = rs.getInt("KEEP_EXPIRED_CERT_DAYS");
                 String extra_control = rs.getString("EXTRA_CONTROL");
 
                 CertRevocationInfo revocationInfo = null;
@@ -691,6 +692,7 @@ class CAManagerQueryExecutor
                 entry.setStatus(caStatus);
 
                 entry.setMaxValidity(max_validity);
+                entry.setKeepExpiredCertInDays(keepExpiredCertDays);
 
                 if(crlsigner_name != null)
                 {
@@ -941,10 +943,10 @@ class CAManagerQueryExecutor
         sqlBuilder.append(", MAX_VALIDITY, CERT, SIGNER_TYPE");
         sqlBuilder.append(", CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME");
         sqlBuilder.append(", DUPLICATE_KEY, DUPLICATE_SUBJECT, DUPLICATE_CN, PERMISSIONS");
-        sqlBuilder.append(", NUM_CRLS, EXPIRATION_PERIOD");
+        sqlBuilder.append(", NUM_CRLS, EXPIRATION_PERIOD, KEEP_EXPIRED_CERT_DAYS");
         sqlBuilder.append(", VALIDITY_MODE, EXTRA_CONTROL, SIGNER_CONF");
         sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
-        sqlBuilder.append(", ?, ?, ?, ?, ?, ?, ?)");
+        sqlBuilder.append(", ?, ?, ?, ?, ?, ?, ?, ?)");
         final String sql = sqlBuilder.toString();
 
         // insert to table ca
@@ -983,6 +985,7 @@ class CAManagerQueryExecutor
             ps.setString(idx++, Permission.toString(entry.getPermissions()));
             ps.setInt(idx++, entry.getNumCrls());
             ps.setInt(idx++, entry.getExpirationPeriod());
+            ps.setInt(idx++, entry.getKeepExpiredCertInDays());
             ps.setString(idx++, entry.getValidityMode().name());
             ps.setString(idx++, entry.getExtraControl());
             ps.setString(idx++, entry.getSignerConf());
@@ -1355,6 +1358,7 @@ class CAManagerQueryExecutor
         Set<Permission> permissions = entry.getPermissions();
         Integer numCrls = entry.getNumCrls();
         Integer expirationPeriod = entry.getExpirationPeriod();
+        Integer keepExpiredCertInDays = entry.getKeepExpiredCertInDays();
         ValidityMode validityMode = entry.getValidityMode();
         String extraControl = entry.getExtraControl();
 
@@ -1460,6 +1464,9 @@ class CAManagerQueryExecutor
         Integer iNum_crls = addToSqlIfNotNull(sqlBuilder, index, numCrls, "NUM_CRLS");
         Integer iExpiration_period =
                 addToSqlIfNotNull(sqlBuilder, index, expirationPeriod, "EXPIRATION_PERIOD");
+        Integer iExpiredCerts =
+                addToSqlIfNotNull(sqlBuilder, index, keepExpiredCertInDays,
+                        "KEEP_EXPIRED_CERT_DAYS");
         Integer iValidity_mode =
                 addToSqlIfNotNull(sqlBuilder, index, validityMode, "VALIDITY_MODE");
         Integer iExtra_control =
@@ -1605,8 +1612,14 @@ class CAManagerQueryExecutor
 
             if(iExpiration_period != null)
             {
-                m.append("expirationPeriod: '").append(numCrls).append("'; ");
+                m.append("expirationPeriod: '").append(expirationPeriod).append("'; ");
                 ps.setInt(iExpiration_period, expirationPeriod);
+            }
+
+            if(iExpiredCerts != null)
+            {
+                m.append("keepExpiredCertDays: '").append(keepExpiredCertInDays).append("'; ");
+                ps.setInt(iExpiredCerts, keepExpiredCertInDays);
             }
 
             if(iValidity_mode != null)
