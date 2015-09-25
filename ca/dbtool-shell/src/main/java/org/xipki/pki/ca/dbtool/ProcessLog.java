@@ -164,7 +164,7 @@ public class ProcessLog
         }
         sb.append(StringUtil.formatSpeed(speed, true));
 
-        if(speed > 0)
+        if(total > 0 && speed > 0)
         {
             long remaining = (total - numProcessed) / speed;
             sb.append("  ");
@@ -184,7 +184,7 @@ public class ProcessLog
         }
         sb.append(StringUtil.formatSpeed(speed, true));
 
-        if(speed > 0)
+        if(total > 0 && speed > 0)
         {
             long remaining = (total - numProcessed) / speed;
             sb.append("  ");

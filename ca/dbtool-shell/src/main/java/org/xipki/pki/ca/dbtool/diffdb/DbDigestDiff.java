@@ -232,11 +232,13 @@ public class DbDigestDiff
                     refDatasource.releaseResources(refStmt, null);
                 }
 
+                boolean dbContainsMultipleCAs = refCaIds.size() > 1;
+
                 for(Integer refCaId : refCaIds)
                 {
                     DigestReader refReader = (refDbSchemaType == DbSchemaType.EJBCA_CA_v3)
                             ? new EjbcaDbDigestReader(refDatasource, refDbSchemaType,
-                                    refCaId, revokedOnly)
+                                    refCaId, dbContainsMultipleCAs, revokedOnly)
                             : new XipkiDbDigestReader(refDatasource, refDbSchemaType,
                                     refCaId, revokedOnly);
                     diffSingleCA(refReader, caIdCertMap);
