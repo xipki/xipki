@@ -29,7 +29,8 @@
     <module>certprofile-demo</module>
     <module>scep-client-shell</module>
     <module>jscep-client-shell</module>
-    <module>dbtool-shell</module>
+    <module>ca-dbtool</module>
+    <module>ca-dbtool-shell</module>
     <module>ncm-common</module>
     <module>ncm-client</module>
     <module>ncm-server</module>
