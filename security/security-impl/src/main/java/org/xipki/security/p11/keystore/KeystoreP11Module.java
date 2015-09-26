@@ -202,7 +202,7 @@ public class KeystoreP11Module implements P11Module
     public void close()
     {
         slots.clear();
-        LOG.info( "close", "close pkcs11 module: {}", moduleConf.getName());
+        LOG.info("close", "close pkcs11 module: {}", moduleConf.getName());
     }
 
     @Override

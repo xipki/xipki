@@ -139,7 +139,7 @@
         <!--module name="EmptyBlock"/-->
         <!--module name="LeftCurly"/-->
         <module name="NeedBraces"/>
-        <module name="RightCurly"/>
+        <!--module name="RightCurly"/-->
 
 
         <!-- Checks for common coding problems               -->
@@ -149,7 +149,7 @@
         <module name="EqualsHashCode"/>
         <!--module name="HiddenField"/-->
         <module name="IllegalInstantiation"/>
-        <module name="InnerAssignment"/>
+        <!--module name="InnerAssignment"/-->
         <!--module name="MagicNumber"/-->
         <module name="MissingSwitchDefault"/>
         <!--module name="SimplifyBooleanExpression"/-->

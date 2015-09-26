@@ -216,7 +216,7 @@ public class IaikP11ModulePool
     {
         if (module != null)
         {
-            LOG.info( "close", "close pkcs11 module: {}", module );
+            LOG.info("close", "close pkcs11 module: {}", module );
             try
             {
                 module.finalize(null);

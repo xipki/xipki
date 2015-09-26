@@ -2775,7 +2775,7 @@ public class ExtensionsChecker
             if (is.getStatementInfo() == null)
             {
                 failureMsg.append("statmentInfo[").append(i)
-                    .append( "] is 'absent' but expected 'present'");
+                    .append("] is 'absent' but expected 'present'");
                 failureMsg.append("; ");
                 continue;
             }
