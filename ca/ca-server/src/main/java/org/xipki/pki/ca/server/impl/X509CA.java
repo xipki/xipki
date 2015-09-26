@@ -222,15 +222,18 @@ public class X509CA
             }
 
             inProcess = true;
-            boolean allCertsRemoved = true;
-            long startTime = System.currentTimeMillis();
-            Date expiredAt = new Date(startTime - DAY_IN_MS * (keepDays + 1));
+            boolean successful = true;
+            final long startTime = System.currentTimeMillis();
+            final Date expiredAt = new Date(startTime - DAY_IN_MS * (keepDays + 1));
+
+            int n = 0;
             try
             {
-                int n = removeExpirtedCerts(expiredAt);
+                n = removeExpirtedCerts(expiredAt);
                 LOG.info("removed {} certificates expired at {}", n, expiredAt.toString());
             } catch (Throwable t)
             {
+                successful = false;
                 final String message = "could not remove expired certificates";
                 if(LOG.isErrorEnabled())
                 {
@@ -249,8 +252,9 @@ public class X509CA
                     auditEvent.addEventData(new AuditEventData("expiredAt", expiredAt.toString()));
                     auditEvent.addEventData(new AuditEventData("eventType",
                             "REMOVE_EXPIRED_CERTS"));
+                    auditEvent.addEventData(new AuditEventData("numCerts", Integer.toString(n)));
 
-                    if(allCertsRemoved)
+                    if(successful)
                     {
                         auditEvent.setLevel(AuditLevel.INFO);
                         auditEvent.setStatus(AuditStatus.SUCCESSFUL);
