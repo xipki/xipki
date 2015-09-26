@@ -100,10 +100,10 @@ public class SecurePasswordInputPanel extends Panel
         int n = rows.size();
 
         SecureRandom random = new SecureRandom();
-        while(rows.isEmpty() == false)
+        while (rows.isEmpty() == false)
         {
             int row = random.nextInt() % n;
-            if(rows.contains(row) == false)
+            if (rows.contains(row) == false)
             {
                 continue;
             }
@@ -117,10 +117,10 @@ public class SecurePasswordInputPanel extends Panel
                 String text = keys[column];
                 JButton button = new JButton(text);
                 button.setFont(button.getFont().deriveFont(Font.TRUETYPE_FONT));
-                if(CLEAR.equalsIgnoreCase(text))
+                if (CLEAR.equalsIgnoreCase(text))
                 {
                     button.setBackground(Color.red);
-                } else if(CAPS.equalsIgnoreCase(text) || BACKSPACE.equalsIgnoreCase(text))
+                } else if (CAPS.equalsIgnoreCase(text) || BACKSPACE.equalsIgnoreCase(text))
                 {
                     button.setBackground(Color.lightGray);
                 } else
@@ -155,9 +155,9 @@ public class SecurePasswordInputPanel extends Panel
             JButton btn = (JButton) e.getSource();
             String pressedKey = (String) btn.getClientProperty("key");
 
-            if(CAPS.equals(pressedKey))
+            if (CAPS.equals(pressedKey))
             {
-                for(JButton button : buttons)
+                for (JButton button : buttons)
                 {
                     String text = button.getText();
                     text = caps
@@ -169,14 +169,14 @@ public class SecurePasswordInputPanel extends Panel
                 return;
             }
 
-            if(BACKSPACE.equals(pressedKey))
+            if (BACKSPACE.equals(pressedKey))
             {
-                if(password.length() > 0)
+                if (password.length() > 0)
                 {
                     password = password.substring(0, password.length() - 1);
                 }
             }
-            else if(CLEAR.equals(pressedKey))
+            else if (CLEAR.equals(pressedKey))
             {
                 password = "";
             }
@@ -205,7 +205,7 @@ public class SecurePasswordInputPanel extends Panel
         {
             UIManager.setLookAndFeel(
                 UIManager.getSystemLookAndFeelClassName());
-        } catch(Exception e)
+        } catch (Exception e)
         {
         }
 
@@ -213,7 +213,7 @@ public class SecurePasswordInputPanel extends Panel
         {
             SecurePasswordInputPanel gui = new SecurePasswordInputPanel();
             String[] options = new String[]{OK};
-            if(prompt == null || prompt.isEmpty())
+            if (prompt == null || prompt.isEmpty())
             {
                 prompt = "Password required";
             }
@@ -222,7 +222,7 @@ public class SecurePasswordInputPanel extends Panel
                     JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
                     null, options, options[0]);
 
-            if(option == 0) // pressing OK button
+            if (option == 0) // pressing OK button
             {
                 return gui.getPassword();
             }

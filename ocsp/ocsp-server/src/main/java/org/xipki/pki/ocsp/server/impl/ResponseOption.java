@@ -64,7 +64,7 @@ class ResponseOption
         this.embedCertsMode = conf.getEmbedCertsMode();
         this.includeCerthash = getBoolean(conf.isIncludeCertHash(), false);
         CacheType cacheConf = conf.getCache();
-        if(cacheConf != null && cacheConf.getCacheMaxAge() != null)
+        if (cacheConf != null && cacheConf.getCacheMaxAge() != null)
         {
             this.cacheMaxAge = cacheConf.getCacheMaxAge().longValue();
         }
@@ -75,13 +75,13 @@ class ResponseOption
 
         HashAlgoType _certHashAlgo = null;
         String s = conf.getCerthashAlgorithm();
-        if(s != null)
+        if (s != null)
         {
             String token = s.trim();
-            if(StringUtil.isNotBlank(token))
+            if (StringUtil.isNotBlank(token))
             {
                 HashAlgoType algo = HashAlgoType.getHashAlgoType(token);
-                if(algo != null && RequestOption.supportedHashAlgorithms.contains(algo))
+                if (algo != null && RequestOption.supportedHashAlgorithms.contains(algo))
                 {
                     _certHashAlgo = algo;
                 }

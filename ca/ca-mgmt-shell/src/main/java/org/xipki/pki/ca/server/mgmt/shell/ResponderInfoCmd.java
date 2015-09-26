@@ -68,12 +68,12 @@ public class ResponderInfoCmd extends CaCmd
     {
         StringBuilder sb = new StringBuilder();
 
-        if(name == null)
+        if (name == null)
         {
             Set<String> names = caManager.getCmpResponderNames();
             int n = names.size();
 
-            if(n == 0 || n == 1)
+            if (n == 0 || n == 1)
             {
                 sb.append((n == 0)
                         ? "no"
@@ -88,7 +88,7 @@ public class ResponderInfoCmd extends CaCmd
             List<String> sorted = new ArrayList<>(names);
             Collections.sort(sorted);
 
-            for(String name : sorted)
+            for (String name : sorted)
             {
                 sb.append("\t").append(name).append("\n");
             }
@@ -96,7 +96,7 @@ public class ResponderInfoCmd extends CaCmd
         else
         {
             CmpResponderEntry entry = caManager.getCmpResponder(name);
-            if(entry == null)
+            if (entry == null)
             {
                 throw new UnexpectedException("could not find CMP responder '" + name + "'");
             }

@@ -68,7 +68,7 @@ public class SimpleXPath
             final Map<String, String> nsPrefixURIMap)
     throws XPathExpressionException
     {
-        if(relativeXPath.startsWith("/"))
+        if (relativeXPath.startsWith("/"))
         {
             throw new XPathExpressionException(relativeXPath + " is no a relative xpath");
         }
@@ -79,20 +79,20 @@ public class SimpleXPath
         int countTokens = st.countTokens();
 
         int stepNo = 1;
-        while(st.hasMoreTokens())
+        while (st.hasMoreTokens())
         {
             String step = st.nextToken();
             int idx = step.indexOf('@');
-            if(idx != -1)
+            if (idx != -1)
             {
-                if(stepNo != countTokens)
+                if (stepNo != countTokens)
                 {
                     throw new XPathExpressionException(
                             "attribute is only allowed in the last step");
                 }
                 else
                 {
-                    if(idx > 0)
+                    if (idx > 0)
                     {
                         steps.add(new SimpleXPathStep(step.substring(0, idx), nsPrefixURIMap));
                     }
@@ -133,17 +133,17 @@ public class SimpleXPath
             final int stepIndex,
             final boolean onlyFirst)
     {
-        if(onlyFirst && CollectionUtil.isNotEmpty(results))
+        if (onlyFirst && CollectionUtil.isNotEmpty(results))
         {
             return;
         }
 
         SimpleXPathStep step = steps.get(stepIndex);
-        if(step.isElement)
+        if (step.isElement)
         {
             List<Element> children = XMLUtil.getElementChilden(
                     context, step.namespaceURI, step.localPart);
-            if(steps.size() == stepIndex + 1)
+            if (steps.size() == stepIndex + 1)
             {
                 results.addAll(children);
             }
@@ -158,11 +158,11 @@ public class SimpleXPath
         else
         {
             Attr attr = context.getAttributeNodeNS(step.namespaceURI, step.localPart);
-            if(attr == null && step.namespaceURI == null)
+            if (attr == null && step.namespaceURI == null)
             {
                 attr = context.getAttributeNode(step.localPart);
             }
-            if(attr != null)
+            if (attr != null)
             {
                 results.add(attr);
             }
@@ -185,7 +185,7 @@ public class SimpleXPath
                 final Map<String, String> nsPrefixURIMap)
         throws XPathExpressionException
         {
-            if(step.charAt(0) == '@')
+            if (step.charAt(0) == '@')
             {
                 isElement = false;
                 step = step.substring(1);
@@ -193,7 +193,7 @@ public class SimpleXPath
 
             int idx = step.indexOf(':');
             String prefix;
-            if(idx != -1)
+            if (idx != -1)
             {
                 prefix = step.substring(0, idx);
                 this.localPart = step.substring(idx+1);
@@ -206,10 +206,10 @@ public class SimpleXPath
                 this.localPart = step;
             }
 
-            if(nsPrefixURIMap != null && prefix != null)
+            if (nsPrefixURIMap != null && prefix != null)
             {
                 this.namespaceURI = nsPrefixURIMap.get(prefix);
-                if(this.namespaceURI == null)
+                if (this.namespaceURI == null)
                 {
                     throw new XPathExpressionException(
                             "could not find namespace for the prefix '" + prefix + "'");

@@ -120,7 +120,7 @@ public class XipkiDbDigestReader implements DigestReader
 
             sql = "SELECT CERT FROM " + dbControl.getTblCa() + " WHERE ID=" + caId;
             rs = stmt.executeQuery(sql);
-            if(rs.next() == false)
+            if (rs.next() == false)
             {
                 throw new IllegalArgumentException("no CA with id '" + caId + "' is available");
             }
@@ -130,7 +130,7 @@ public class XipkiDbDigestReader implements DigestReader
             rs.close();
 
             sql = "SELECT COUNT(*) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
-            if(revokedOnly)
+            if (revokedOnly)
             {
                 sql += " AND " + dbControl.getColRevoked() + "=1";
             }
@@ -142,7 +142,7 @@ public class XipkiDbDigestReader implements DigestReader
             rs.close();
 
             sql = "SELECT MAX(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
-            if(revokedOnly)
+            if (revokedOnly)
             {
                 sql += " AND " + dbControl.getColRevoked() + "=1";
             }
@@ -154,7 +154,7 @@ public class XipkiDbDigestReader implements DigestReader
             rs.close();
 
             sql = "SELECT MIN(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
-            if(revokedOnly)
+            if (revokedOnly)
             {
                 sql += " AND " + dbControl.getColRevoked() + "=1";
             }
@@ -179,7 +179,7 @@ public class XipkiDbDigestReader implements DigestReader
                 .append("=").append(caId);
             sb.append(" AND CERT.ID>=? AND CERT.ID<?");
 
-            if(revokedOnly)
+            if (revokedOnly)
             {
                 sb.append(" AND CERT.")
                     .append(dbControl.getColRevoked()).
@@ -195,7 +195,7 @@ public class XipkiDbDigestReader implements DigestReader
 
             this.numCertSql = "SELECT COUNT(*) FROM CERT WHERE CA_ID=" + caId
                     + " AND ID>=? AND ID<=?";
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw datasource.translate(sql, e);
         }finally
@@ -230,41 +230,41 @@ public class XipkiDbDigestReader implements DigestReader
             final int n)
     throws DataAccessException
     {
-        if(nextId > maxId && certs.isEmpty())
+        if (nextId > maxId && certs.isEmpty())
         {
             return null;
         }
 
         List<IdentifiedDbDigestEntry> entries = new ArrayList<>(n);
         int k = 0;
-        while(true)
+        while (true)
         {
-            if(certs.isEmpty())
+            if (certs.isEmpty())
             {
                 readNextCerts();
             }
 
             IdentifiedDbDigestEntry next = certs.poll();
-            if(next == null)
+            if (next == null)
             {
                 break;
             }
 
             entries.add(next);
             k++;
-            if(k >= n)
+            if (k >= n)
             {
                 break;
             }
         }
 
-        if(k == 0)
+        if (k == 0)
         {
             return null;
         }
 
         int numSkipped = 0;
-        if(revokedOnly)
+        if (revokedOnly)
         {
             int numCertsInThisRange = getNumCerts(entries.get(0).id,
                     entries.get(k - 1).id);
@@ -273,7 +273,7 @@ public class XipkiDbDigestReader implements DigestReader
 
         List<Long> serialNumbers = new ArrayList<>(k);
         Map<Long, DbDigestEntry> certsMap = new HashMap<>(k);
-        for(IdentifiedDbDigestEntry m : entries)
+        for (IdentifiedDbDigestEntry m : entries)
         {
             long sn = m.content.getSerialNumber();
             serialNumbers.add(sn);
@@ -288,7 +288,7 @@ public class XipkiDbDigestReader implements DigestReader
             final int toId)
     throws DataAccessException
     {
-        if(fromId > toId)
+        if (fromId > toId)
         {
             return 0;
         }
@@ -302,7 +302,7 @@ public class XipkiDbDigestReader implements DigestReader
             return rs.next()
                     ? rs.getInt(1)
                     : 0;
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw datasource.translate(numCertSql, e);
         } finally
@@ -317,7 +317,7 @@ public class XipkiDbDigestReader implements DigestReader
     {
         ResultSet rs = null;
 
-        while(certs.isEmpty() && nextId <= maxId)
+        while (certs.isEmpty() && nextId <= maxId)
         {
             try
             {
@@ -328,7 +328,7 @@ public class XipkiDbDigestReader implements DigestReader
 
                 rs = selectCertStmt.executeQuery();
 
-                while(rs.next())
+                while (rs.next())
                 {
                     String hash = rs.getString(dbControl.getColCerthash());
                     long serial = rs.getLong(dbControl.getColSerialNumber());
@@ -338,12 +338,12 @@ public class XipkiDbDigestReader implements DigestReader
                     Long revTime = null;
                     Long revInvTime = null;
 
-                    if(revoked)
+                    if (revoked)
                     {
                         revReason = rs.getInt(dbControl.getColRevReason());
                         revTime = rs.getLong(dbControl.getColRevTime());
                         revInvTime = rs.getLong(dbControl.getColRevInvTime());
-                        if(revInvTime == 0)
+                        if (revInvTime == 0)
                         {
                             revInvTime = null;
                         }
@@ -354,7 +354,7 @@ public class XipkiDbDigestReader implements DigestReader
                     int id = rs.getInt("ID");
                     certs.addLast(new IdentifiedDbDigestEntry(cert, id));
                 }
-            } catch(SQLException e)
+            } catch (SQLException e)
             {
                 throw datasource.translate(dbControl.getCertSql(), e);
             }
@@ -376,22 +376,22 @@ public class XipkiDbDigestReader implements DigestReader
             final Statement ps,
             final ResultSet rs)
     {
-        if(ps != null)
+        if (ps != null)
         {
             try
             {
                 ps.close();
-            }catch(SQLException e)
+            } catch (SQLException e)
             {
             }
         }
 
-        if(rs != null)
+        if (rs != null)
         {
             try
             {
                 rs.close();
-            }catch(SQLException e)
+            } catch (SQLException e)
             {
             }
         }

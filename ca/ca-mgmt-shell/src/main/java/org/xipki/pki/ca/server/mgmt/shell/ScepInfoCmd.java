@@ -60,7 +60,7 @@ public class ScepInfoCmd extends CaCmd
     throws Exception
     {
         ScepEntry scep = caManager.getScepEntry(name);
-        if(scep == null)
+        if (scep == null)
         {
             throw new UnexpectedException("could not find SCEP '" + name + "'");
         }

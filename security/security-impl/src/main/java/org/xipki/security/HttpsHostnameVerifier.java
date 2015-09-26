@@ -70,7 +70,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier
     {
         LOG.info("enabled: {}", enabled);
         LOG.info("trustAll: {}", trustAll);
-        if(enabled)
+        if (enabled)
         {
             oldHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
             LOG.info("Register me as DefaulHostnameVerifier, and backup the old one {}",
@@ -82,7 +82,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier
 
     public void shutdown()
     {
-        if(meAsDefaultHostnameVerifier && HttpsURLConnection.getDefaultHostnameVerifier() == this)
+        if (meAsDefaultHostnameVerifier && HttpsURLConnection.getDefaultHostnameVerifier() == this)
         {
             LOG.info("Unregister me as DefaultHostnameVerifier, and reuse the old one {}",
                     oldHostnameVerifier);
@@ -104,7 +104,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier
             final String hostname,
             final SSLSession session)
     {
-        if(trustAll)
+        if (trustAll)
         {
             return true;
         }
@@ -114,13 +114,13 @@ public class HttpsHostnameVerifier implements HostnameVerifier
         try
         {
             Principal peerPrincipal = session.getPeerPrincipal();
-            if(peerPrincipal == null)
+            if (peerPrincipal == null)
             {
                 return false;
             }
             commonName = X509Util.getCommonName(new X500Name(peerPrincipal.getName()));
             LOG.info("commonName: {}", commonName);
-        }catch(Exception e)
+        } catch (Exception e)
         {
             LOG.error("Error: {}", e.getMessage());
             return false;
@@ -136,14 +136,14 @@ public class HttpsHostnameVerifier implements HostnameVerifier
             final String commonnameHostMap)
     {
         hostnameMap.clear();
-        if(StringUtil.isBlank(commonnameHostMap))
+        if (StringUtil.isBlank(commonnameHostMap))
         {
             return;
         }
 
         ConfPairs pairs = new ConfPairs(commonnameHostMap);
         Set<String> commonNames = pairs.getNames();
-        for(String commonName :commonNames)
+        for (String commonName :commonNames)
         {
             String v = pairs.getValue(commonName);
             Set<String> hosts = StringUtil.splitAsSet(v, ",; \t");

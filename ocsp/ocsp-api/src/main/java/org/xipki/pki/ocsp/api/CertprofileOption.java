@@ -55,7 +55,7 @@ public class CertprofileOption
             final Collection<String> includes,
             final Collection<String> excludes)
     {
-        if(CollectionUtil.isEmpty(includes))
+        if (CollectionUtil.isEmpty(includes))
         {
             this.includes = null;
         }
@@ -65,7 +65,7 @@ public class CertprofileOption
                     new HashSet<>(includes));
         }
 
-        if(CollectionUtil.isEmpty(excludes))
+        if (CollectionUtil.isEmpty(excludes))
         {
             this.excludes = null;
         }
@@ -89,14 +89,14 @@ public class CertprofileOption
     public boolean include(
             final String certprofile)
     {
-        if(includes == null)
+        if (includes == null)
         {
             return (excludes == null)
                     ? true
                     : excludes.contains(certprofile) == false;
         }
 
-        if(includes.contains(certprofile) == false)
+        if (includes.contains(certprofile) == false)
         {
             return false;
         }

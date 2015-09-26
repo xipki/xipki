@@ -100,19 +100,19 @@ implements Serializable
             final int numCrls)
     throws CAMgmtException
     {
-        if(nextSerial < 0)
+        if (nextSerial < 0)
         {
             throw new IllegalArgumentException("nextSerial is negative (" + nextSerial + " < 0)");
         }
 
-        if(nextCRLNumber <= 0)
+        if (nextCRLNumber <= 0)
         {
             throw new IllegalArgumentException(
 
                     "nextCRLNumber is not positive (" + nextCRLNumber + " < 1)");
         }
 
-        if(numCrls < 0)
+        if (numCrls < 0)
         {
             throw new IllegalArgumentException("numCrls could not be negative");
         }
@@ -132,14 +132,14 @@ implements Serializable
             final X509Certificate cert)
     throws CAMgmtException
     {
-        if(cert == null)
+        if (cert == null)
         {
             this.cert = null;
             this.subject = null;
         }
         else
         {
-            if(X509Util.hasKeyusage(cert, KeyUsage.keyCertSign) == false)
+            if (X509Util.hasKeyusage(cert, KeyUsage.keyCertSign) == false)
             {
                 throw new CAMgmtException("CA certificate does not have keyusage keyCertSign");
             }
@@ -237,7 +237,7 @@ implements Serializable
     {
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString(verbose, ignoreSensitiveInfo));
-        if(sb.charAt(sb.length() - 1) != '\n')
+        if (sb.charAt(sb.length() - 1) != '\n')
         {
             sb.append('\n');
         }
@@ -254,7 +254,7 @@ implements Serializable
         sb.append("ocspUris: ").append(getOcspUrisAsString()).append('\n');
         sb.append("caCertUris: ").append(getCacertUrisAsString()).append('\n');
         sb.append("cert: ").append("\n");
-        if(cert == null)
+        if (cert == null)
         {
             sb.append("\tnull").append("\n");
         }
@@ -266,7 +266,7 @@ implements Serializable
             sb.append("\tsubject: ").append(subject).append("\n");
             sb.append("\tnotBefore: ").append(cert.getNotBefore()).append("\n");
             sb.append("\tnotAfter: ").append(cert.getNotAfter()).append("\n");
-            if(verbose)
+            if (verbose)
             {
                 String b64EncodedCert = null;
                 try
@@ -287,7 +287,7 @@ implements Serializable
                         ? "not revoked"
                         : "revoked");
         sb.append("\n");
-        if(revocationInfo != null)
+        if (revocationInfo != null)
         {
             sb.append("\treason: ")
                 .append(revocationInfo.getReason().getDescription())

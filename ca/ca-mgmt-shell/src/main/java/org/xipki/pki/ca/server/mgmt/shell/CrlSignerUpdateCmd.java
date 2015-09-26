@@ -90,24 +90,24 @@ public class CrlSignerUpdateCmd extends CaCmd
     throws Exception
     {
         String signerCertConf = null;
-        if(CAManager.NULL.equalsIgnoreCase(signerCert))
+        if (CAManager.NULL.equalsIgnoreCase(signerCert))
         {
             signerCertConf = CAManager.NULL;
         }
-        else if(signerCert != null)
+        else if (signerCert != null)
         {
             byte[] certBytes = IoUtil.read(signerCert);
             X509Util.parseCert(new ByteArrayInputStream(certBytes));
             signerCertConf = Base64.toBase64String(certBytes);
         }
 
-        if(signerConf !=null)
+        if (signerConf !=null)
         {
             String _signerType = signerType;
-            if(_signerType == null)
+            if (_signerType == null)
             {
                 X509CrlSignerEntry entry = caManager.getCrlSigner(name);
-                if(entry == null)
+                if (entry == null)
                 {
                     throw new IllegalCmdParamException("please specify the signerType");
                 }

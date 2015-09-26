@@ -56,7 +56,7 @@ public class Nonce
             final boolean cloneBytes)
     {
         ParamUtil.assertNotNull("bytes", bytes);
-        if(bytes.length != 16)
+        if (bytes.length != 16)
         {
             throw new IllegalArgumentException("bytes.len is not 16: " + bytes.length);
         }

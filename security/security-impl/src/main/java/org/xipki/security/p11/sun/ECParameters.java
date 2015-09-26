@@ -165,7 +165,7 @@ public final class ECParameters extends AlgorithmParametersSpi
             final byte[] params)
     throws IOException
     {
-        if(params.length < 30)
+        if (params.length < 30)
         {
             try
             {
@@ -179,7 +179,7 @@ public final class ECParameters extends AlgorithmParametersSpi
 
                 namedCurve = spec;
                 return;
-            }catch(IllegalArgumentException e)
+            } catch (IllegalArgumentException e)
             {
             }
         }

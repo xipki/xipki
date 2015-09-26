@@ -75,26 +75,26 @@ public abstract class UnRevRemoveCertCmd extends CaCmd
     throws UnexpectedException, IllegalCmdParamException, CertificateException, IOException
     {
         CAEntry ca =caManager.getCA(caName);
-        if(ca == null)
+        if (ca == null)
         {
             throw new UnexpectedException("CA " + caName + " not available");
         }
 
-        if(ca instanceof X509CAEntry == false)
+        if (ca instanceof X509CAEntry == false)
         {
             throw new UnexpectedException("CA " + caName + " is not an X.509-CA");
         }
 
         BigInteger serialNumber;
-        if(serialNumberS != null)
+        if (serialNumberS != null)
         {
             serialNumber = toBigInt(serialNumberS);
         }
-        else if(certFile != null)
+        else if (certFile != null)
         {
             X509Certificate caCert = ((X509CAEntry) ca).getCertificate();
             X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
-            if(X509Util.issues(caCert, cert) == false)
+            if (X509Util.issues(caCert, cert) == false)
             {
                 throw new UnexpectedException(
                         "certificate '" + certFile + "' is not issued by CA " + caName);

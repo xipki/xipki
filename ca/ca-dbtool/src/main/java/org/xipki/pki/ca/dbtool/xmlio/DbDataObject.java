@@ -53,7 +53,7 @@ public abstract class DbDataObject
             final String value)
     throws InvalidDataObjectException
     {
-        if(value == null || value.isEmpty())
+        if (value == null || value.isEmpty())
         {
             throw new InvalidDataObjectException(name + " could not be blank");
         }
@@ -64,7 +64,7 @@ public abstract class DbDataObject
             final Object value)
     throws InvalidDataObjectException
     {
-        if(value == null)
+        if (value == null)
         {
             throw new InvalidDataObjectException(name + " could not be null");
         }
@@ -76,19 +76,19 @@ public abstract class DbDataObject
             final Object value)
     throws XMLStreamException, InvalidDataObjectException
     {
-        if(value == null)
+        if (value == null)
         {
             return;
         }
 
         String valueS;
-        if(value instanceof String)
+        if (value instanceof String)
         {
             valueS = (String) value;
-        } else if(value instanceof Number)
+        } else if (value instanceof Number)
         {
             valueS = value.toString();
-        } else if(value instanceof Boolean)
+        } else if (value instanceof Boolean)
         {
             valueS = value.toString();
         }

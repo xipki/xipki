@@ -66,7 +66,7 @@ public abstract class CaCmd extends XipkiOsgiCommandSupport
     protected static String toString(
             final Collection<? extends Object> c)
     {
-        if(c == null)
+        if (c == null)
         {
             return "null";
         }
@@ -76,10 +76,10 @@ public abstract class CaCmd extends XipkiOsgiCommandSupport
         int n = c.size();
 
         int i = 0;
-        for(Object o : c)
+        for (Object o : c)
         {
             sb.append(o);
-            if(i < n - 1)
+            if (i < n - 1)
             {
                 sb.append(", ");
             }
@@ -96,7 +96,7 @@ public abstract class CaCmd extends XipkiOsgiCommandSupport
             final String message)
     throws CmdFailure
     {
-        if(successful)
+        if (successful)
         {
             out(posPrefix + " " + message);
         }

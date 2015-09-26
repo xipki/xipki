@@ -54,7 +54,7 @@ class ShellUtil
             final PasswordResolver passwordResolver)
     throws Exception
     {
-        if(signerConf.contains("file:") == false && signerConf.contains("base64:") == false
+        if (signerConf.contains("file:") == false && signerConf.contains("base64:") == false
                 && signerConf.contains("FILE:") == false && signerConf.contains("BASE64:") == false)
         {
             return signerConf;
@@ -65,18 +65,18 @@ class ShellUtil
         String passwordHint = pairs.getValue("password");
         String keyLabel     = pairs.getValue("key-label");
 
-        if(passwordHint == null)
+        if (passwordHint == null)
         {
             throw new IllegalArgumentException("password is not set in " + signerConf);
         }
 
         byte[] keystoreBytes;
-        if(StringUtil.startsWithIgnoreCase(keystoreConf, "file:"))
+        if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:"))
         {
             String keystoreFile = keystoreConf.substring("file:".length());
             keystoreBytes = IoUtil.read(keystoreFile);
         }
-        else if(StringUtil.startsWithIgnoreCase(keystoreConf, "base64:"))
+        else if (StringUtil.startsWithIgnoreCase(keystoreConf, "base64:"))
         {
             keystoreBytes = Base64.decode(keystoreConf.substring("base64:".length()));
         }
@@ -86,7 +86,7 @@ class ShellUtil
         }
 
         char[] password;
-        if(passwordResolver == null)
+        if (passwordResolver == null)
         {
             password = passwordHint.toCharArray();
         }

@@ -107,7 +107,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
     throws Exception
     {
         super(dataSource, srcDir, stopMe, evaluateOnly);
-        if(numCertsPerCommit < 1)
+        if (numCertsPerCommit < 1)
         {
             throw new IllegalArgumentException(
                     "numCertsPerCommit could not be less than 1: " + numCertsPerCommit);
@@ -119,16 +119,16 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
         this.numCertsPerCommit = numCertsPerCommit;
 
         File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);
-        if(resume)
+        if (resume)
         {
-            if(processLogFile.exists() == false)
+            if (processLogFile.exists() == false)
             {
                 throw new InvalidInputException("could not process with '--resume' option");
             }
         }
         else
         {
-            if(processLogFile.exists())
+            if (processLogFile.exists())
             {
                 throw new InvalidInputException(
                         "please either specify '--resume' option or delete the file "
@@ -148,12 +148,12 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
             JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
                     unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_CertStore));
             certstore = root.getValue();
-        }catch(JAXBException e)
+        } catch (JAXBException e)
         {
             throw XMLUtil.convert(e);
         }
 
-        if(certstore.getVersion() > VERSION)
+        if (certstore.getVersion() > VERSION)
         {
             throw new InvalidInputException(
                     "could not import CertStore greater than " + VERSION + ": "
@@ -168,12 +168,12 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                     unmarshaller.unmarshal(
                             new File(baseDir + File.separator + FILENAME_CA_Configuration));
             caConf = rootCaConf.getValue();
-        }catch(JAXBException e)
+        } catch (JAXBException e)
         {
             throw XMLUtil.convert(e);
         }
 
-        if(caConf.getVersion() > VERSION)
+        if (caConf.getVersion() > VERSION)
         {
             throw new InvalidInputException("could not import CA Configuration greater than "
                     + VERSION + ": " + certstore.getVersion());
@@ -182,27 +182,27 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
         System.out.println("importing CA certstore to OCSP database");
         try
         {
-            if(resume == false)
+            if (resume == false)
             {
                 dropIndexes();
             }
             PublisherType publisherType = null;
-            for(PublisherType type : caConf.getPublishers().getPublisher())
+            for (PublisherType type : caConf.getPublishers().getPublisher())
             {
-                if(publisherName.equals(type.getName()))
+                if (publisherName.equals(type.getName()))
                 {
                     publisherType = type;
                     break;
                 }
             }
 
-            if(publisherType == null)
+            if (publisherType == null)
             {
                 throw new InvalidInputException("unknown publisher " + publisherName);
             }
 
             String type = publisherType.getType();
-            if("ocsp".equalsIgnoreCase(type))
+            if ("ocsp".equalsIgnoreCase(type))
             {
             }
             else
@@ -213,43 +213,43 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
             ConfPairs confPairs = new ConfPairs(getValue(publisherType.getConf()));
             String v = confPairs.getValue("publish.goodcerts");
             boolean revokedOnly = false;
-            if(v != null)
+            if (v != null)
             {
                 revokedOnly = (Boolean.parseBoolean(v) == false);
             }
 
             Set<String> relatedCaNames = new HashSet<>();
-            for(CaHasPublisherType ctype : caConf.getCaHasPublishers().getCaHasPublisher())
+            for (CaHasPublisherType ctype : caConf.getCaHasPublishers().getCaHasPublisher())
             {
-                if(ctype.getPublisherName().equals(publisherName))
+                if (ctype.getPublisherName().equals(publisherName))
                 {
                     relatedCaNames.add(ctype.getCaName());
                 }
             }
 
             List<CaType> relatedCas = new LinkedList<>();
-            for(CaType cType : caConf.getCas().getCa())
+            for (CaType cType : caConf.getCas().getCa())
             {
-                if(relatedCaNames.contains(cType.getName()))
+                if (relatedCaNames.contains(cType.getName()))
                 {
                     relatedCas.add(cType);
                 }
             }
 
-            if(relatedCas.isEmpty())
+            if (relatedCas.isEmpty())
             {
                 System.out.println("No CA has publisher " + publisherName);
                 return;
             }
 
             Map<Integer, String> profileMap = new HashMap<Integer, String>();
-            for(NameIdType ni : certstore.getProfiles().getProfile())
+            for (NameIdType ni : certstore.getProfiles().getProfile())
             {
                 profileMap.put(ni.getId(), ni.getName());
             }
 
             List<Integer> relatedCaIds;
-            if(resume)
+            if (resume)
             {
                 relatedCaIds = getIssuerIds(certstore.getCas(), relatedCas);
             }
@@ -262,7 +262,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
             import_cert(certstore, profileMap, revokedOnly, relatedCaIds, processLogFile);
             recoverIndexes();
             processLogFile.delete();
-        }catch(Exception e)
+        } catch (Exception e)
         {
             System.err.println("error while importing OCSP certstore to database");
             throw e;
@@ -276,23 +276,23 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
     throws IOException
     {
         List<Integer> relatedCaIds = new LinkedList<>();
-        for(CertstoreCaType issuer : issuers.getCa())
+        for (CertstoreCaType issuer : issuers.getCa())
         {
             String b64Cert = getValue(issuer.getCert());
             byte[] encodedCert = Base64.decode(b64Cert);
 
             // retrieve the revocation information of the CA, if possible
             CaType ca = null;
-            for(CaType caType : cas)
+            for (CaType caType : cas)
             {
-                if(Arrays.equals(encodedCert, Base64.decode(getValue(caType.getCert()))))
+                if (Arrays.equals(encodedCert, Base64.decode(getValue(caType.getCert()))))
                 {
                     ca = caType;
                     break;
                 }
             }
 
-            if(ca == null)
+            if (ca == null)
             {
                 continue;
             }
@@ -314,7 +314,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
 
         try
         {
-            for(CertstoreCaType issuer : issuers.getCa())
+            for (CertstoreCaType issuer : issuers.getCa())
             {
                 try
                 {
@@ -323,16 +323,16 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
 
                     // retrieve the revocation information of the CA, if possible
                     CaType ca = null;
-                    for(CaType caType : cas)
+                    for (CaType caType : cas)
                     {
-                        if(Arrays.equals(encodedCert, Base64.decode(getValue(caType.getCert()))))
+                        if (Arrays.equals(encodedCert, Base64.decode(getValue(caType.getCert()))))
                         {
                             ca = caType;
                             break;
                         }
                     }
 
-                    if(ca == null)
+                    if (ca == null)
                     {
                         continue;
                     }
@@ -349,7 +349,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                     {
                         LOG.error("could not parse certificate of issuer {}", issuer.getId());
                         LOG.debug("could not parse certificate of issuer " + issuer.getId(), e);
-                        if(e instanceof CertificateException)
+                        if (e instanceof CertificateException)
                         {
                             throw (CertificateException) e;
                         }
@@ -398,11 +398,11 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                     setLong(ps, idx++, ca.getRevInvTime());
 
                     ps.execute();
-                }catch(SQLException e)
+                } catch (SQLException e)
                 {
                     System.err.println("error while importing issuer with id=" + issuer.getId());
                     throw translate(sql, e);
-                }catch(CertificateException e)
+                } catch (CertificateException e)
                 {
                     System.err.println("error while importing issuer with id=" + issuer.getId());
                     throw e;
@@ -427,13 +427,13 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
     {
         int numProcessedBefore = 0;
         int minId = 1;
-        if(processLogFile.exists())
+        if (processLogFile.exists())
         {
             byte[] content = IoUtil.read(processLogFile);
-            if(content != null && content.length > 2)
+            if (content != null && content.length > 2)
             {
                 String str = new String(content);
-                if(str.trim().equalsIgnoreCase(MSG_CERTS_FINISHED))
+                if (str.trim().equalsIgnoreCase(MSG_CERTS_FINISHED))
                 {
                     return;
                 }
@@ -463,23 +463,23 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
         DbPortFileNameIterator certsFileIterator = new DbPortFileNameIterator(certsListFile);
         try
         {
-            while(certsFileIterator.hasNext())
+            while (certsFileIterator.hasNext())
             {
                 String certsFile = certsDir + File.separator + certsFileIterator.next();
                 // extract the toId from the filename
                 int fromIdx = certsFile.indexOf('-');
                 int toIdx = certsFile.indexOf(".zip");
-                if(fromIdx != -1 && toIdx != -1)
+                if (fromIdx != -1 && toIdx != -1)
                 {
                     try
                     {
                         long toId = Integer.parseInt(certsFile.substring(fromIdx + 1, toIdx));
-                        if(toId < minId)
+                        if (toId < minId)
                         {
                             // try next file
                             continue;
                         }
-                    }catch(Exception e)
+                    } catch (Exception e)
                     {
                         LOG.warn("invalid file name '{}', but will still be processed", certsFile);
                     }
@@ -494,7 +494,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                             certsFile, profileMap, revokedOnly, caIds, minId,
                             processLogFile, processLog, importLog);
                     minId = lastId + 1;
-                }catch(Exception e)
+                } catch (Exception e)
                 {
                     System.err.println("\nerror while importing certificates from file "
                             + certsFile + ".\nplease continue with the option '--resume'");
@@ -537,12 +537,12 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
         try
         {
             certs = new CaCertsReader(zipFile.getInputStream(certsXmlEntry));
-        }catch(Exception e)
+        } catch (Exception e)
         {
             try
             {
                 zipFile.close();
-            }catch(Exception e2)
+            } catch (Exception e2)
             {
             }
             throw e;
@@ -556,9 +556,9 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
             int numImportedEntriesInBatch = 0;
             int lastSuccessfulCertId = 0;
 
-            while(certs.hasNext())
+            while (certs.hasNext())
             {
-                if(stopMe.get())
+                if (stopMe.get())
                 {
                     throw new InterruptedException("interrupted by the user");
                 }
@@ -567,17 +567,17 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
 
                 int id = cert.getId();
                 lastSuccessfulCertId = id;
-                if(id < minId)
+                if (id < minId)
                 {
                     continue;
                 }
 
                 numProcessedEntriesInBatch++;
 
-                if(revokedOnly == false || cert.getRev().booleanValue())
+                if (revokedOnly == false || cert.getRev().booleanValue())
                 {
                     int caId = cert.getCaId();
-                    if(caIds.contains(caId))
+                    if (caIds.contains(caId))
                     {
                         numImportedEntriesInBatch++;
 
@@ -597,7 +597,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                         {
                             LOG.error("could not parse certificate in file {}", filename);
                             LOG.debug("could not parse certificate in file " + filename, e);
-                            if(e instanceof CertificateException)
+                            if (e instanceof CertificateException)
                             {
                                 throw (CertificateException) e;
                             }
@@ -630,7 +630,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                             String certprofileName = profileMap.get(certprofileId);
                             ps_cert.setString(idx++, certprofileName);
                             ps_cert.addBatch();
-                        }catch(SQLException e)
+                        } catch (SQLException e)
                         {
                             throw translate(SQL_ADD_CERT, e);
                         }
@@ -651,7 +651,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                             ps_certhash.setString(idx++,
                                     HashCalculator.base64Hash(HashAlgoType.SHA512, encodedCert));
                             ps_certhash.addBatch();
-                        }catch(SQLException e)
+                        } catch (SQLException e)
                         {
                             throw translate(SQL_ADD_CHASH, e);
                         }
@@ -665,19 +665,19 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                                     X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
                             ps_rawcert.setString(idx++, Base64.toBase64String(encodedCert));
                             ps_rawcert.addBatch();
-                        }catch(SQLException e)
+                        } catch (SQLException e)
                         {
                             throw translate(SQL_ADD_CRAW, e);
                         }
-                    } // end if(caIds.contains(caId))
-                } // end if(revokedOnly
+                    } // end if (caIds.contains(caId))
+                } // end if (revokedOnly
 
                 boolean isLastBlock = (certs.hasNext() == false);
 
-                if(numImportedEntriesInBatch > 0
+                if (numImportedEntriesInBatch > 0
                         && (numImportedEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock))
                 {
-                    if(evaulateOnly)
+                    if (evaulateOnly)
                     {
                         ps_cert.clearBatch();
                         ps_certhash.clearBatch();
@@ -698,14 +698,14 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
 
                             sql = null;
                             commit("(commit import cert to OCSP)");
-                        } catch(Throwable t)
+                        } catch (Throwable t)
                         {
                             rollback();
                             deleteCertGreatherThan(lastSuccessfulCertId, LOG);
-                            if(t instanceof SQLException)
+                            if (t instanceof SQLException)
                             {
                                 throw translate(sql, (SQLException) t);
-                            } else if(t instanceof Exception)
+                            } else if (t instanceof Exception)
                             {
                                 throw (Exception) t;
                             } else
@@ -725,7 +725,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                             + ":" + lastSuccessfulCertId,
                             processLogFile);
                     processLog.printStatus(isLastBlock);
-                } else if(isLastBlock)
+                } else if (isLastBlock)
                 {
                     lastSuccessfulCertId = id;
                     processLog.addNumProcessed(numProcessedEntriesInBatch);
@@ -738,7 +738,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                             processLogFile);
                     processLog.printStatus(true);
                 }
-                // if(numImportedEntriesInBatch
+                // if (numImportedEntriesInBatch
             } // end for
 
             return lastSuccessfulCertId;
@@ -748,7 +748,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
             try
             {
                 recoverAutoCommit();
-            }catch(DataAccessException e)
+            } catch (DataAccessException e)
             {
             }
             zipFile.close();

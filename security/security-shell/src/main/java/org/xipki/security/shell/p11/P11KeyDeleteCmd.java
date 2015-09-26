@@ -54,7 +54,7 @@ public class P11KeyDeleteCmd extends P11SecurityCmd
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
         boolean deleted = slot.removeKeyAndCerts(keyIdentifier);
-        if(deleted)
+        if (deleted)
         {
             securityFactory.getP11CryptService(moduleName).refresh();
             out("deleted key and certificates");

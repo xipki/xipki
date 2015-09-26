@@ -48,7 +48,7 @@ public class OcspErrorCompleter extends EnumCompleter
     {
         StringBuilder enums = new StringBuilder();
 
-        for(OcspError entry : OcspError.values())
+        for (OcspError entry : OcspError.values())
         {
             enums.append(entry.name()).append(",");
         }

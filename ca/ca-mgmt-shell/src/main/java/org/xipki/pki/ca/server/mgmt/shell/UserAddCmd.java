@@ -67,7 +67,7 @@ public class UserAddCmd extends CaCmd
     protected Object _doExecute()
     throws Exception
     {
-        if(password == null)
+        if (password == null)
         {
             password = new String(readPassword());
         }

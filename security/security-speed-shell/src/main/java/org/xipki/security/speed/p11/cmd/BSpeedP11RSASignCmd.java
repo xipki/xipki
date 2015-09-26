@@ -62,7 +62,7 @@ public class BSpeedP11RSASignCmd extends BSpeedP11SignCmd
 
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
 
-        for(int keysize : keysizes)
+        for (int keysize : keysizes)
         {
             ret.add(
                     new P11RSASignLoadTest(securityFactory, slot, sigAlgo, keysize,

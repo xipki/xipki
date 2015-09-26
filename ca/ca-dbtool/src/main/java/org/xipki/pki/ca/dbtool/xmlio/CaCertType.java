@@ -316,14 +316,14 @@ public class CaCertType extends DbDataObject
         assertNotNull("pid", pid);
         assertNotNull("update", update);
         assertNotNull("rev", rev);
-        if(rev)
+        if (rev)
         {
             assertNotNull("rr", rr);
             assertNotNull("rt", rt);
         }
 
         assertNotNull("reqType", reqType);
-        if(rs != null)
+        if (rs != null)
         {
             assertNotNull("fpRs", fpRs);
             assertNotBlank("rs", rs);

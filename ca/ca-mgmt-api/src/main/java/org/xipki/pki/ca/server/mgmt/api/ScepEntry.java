@@ -87,12 +87,12 @@ implements Serializable
         this.responderConf = responderConf;
         this.control = control;
 
-        if(this.base64Cert != null)
+        if (this.base64Cert != null)
         {
             try
             {
                 this.cert = X509Util.parseBase64EncodedCert(base64Cert);
-            }catch(Throwable t)
+            } catch (Throwable t)
             {
                 LOG.debug("could not parse the certificate of SCEP responder for CA '"
                         + caName + "'");
@@ -145,7 +145,7 @@ implements Serializable
     public void setCertificate(
             final X509Certificate cert)
     {
-        if(base64Cert != null)
+        if (base64Cert != null)
         {
             throw new IllegalStateException("certificate is already by specified by base64Cert");
         }
@@ -173,7 +173,7 @@ implements Serializable
         sb.append("faulty: ").append(isFaulty()).append('\n');
         sb.append("responderType: ").append(responderType).append('\n');
         sb.append("responderConf: ");
-        if(responderConf == null)
+        if (responderConf == null)
         {
             sb.append("null");
         } else
@@ -182,7 +182,7 @@ implements Serializable
         }
         sb.append('\n');
         sb.append("control: ").append(control).append("\n");
-        if(cert != null)
+        if (cert != null)
         {
             sb.append("cert: ").append("\n");
             sb.append("\tissuer: ").append(
@@ -191,7 +191,7 @@ implements Serializable
             sb.append("\tsubject: ").append(
                     X509Util.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
 
-            if(verbose)
+            if (verbose)
             {
                 sb.append("\tencoded: ");
                 try

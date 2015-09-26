@@ -188,12 +188,12 @@ public abstract class CertRequestGenCmd extends SecurityCmd
         P10RequestGenerator p10Gen = new P10RequestGenerator();
 
         hashAlgo = hashAlgo.trim().toUpperCase();
-        if(hashAlgo.indexOf('-') != -1)
+        if (hashAlgo.indexOf('-') != -1)
         {
             hashAlgo = hashAlgo.replaceAll("-", "");
         }
 
-        if(needExtensionTypes == null)
+        if (needExtensionTypes == null)
         {
             needExtensionTypes = new LinkedList<>();
         }
@@ -201,7 +201,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd
         // SubjectAltNames
         List<Extension> extensions = new LinkedList<>();
 
-        if(isNotEmpty(subjectAltNames))
+        if (isNotEmpty(subjectAltNames))
         {
             extensions.add(P10RequestGenerator.createExtensionSubjectAltName(
                     subjectAltNames, false));
@@ -209,7 +209,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd
         }
 
         // SubjectInfoAccess
-        if(isNotEmpty(subjectInfoAccesses))
+        if (isNotEmpty(subjectInfoAccesses))
         {
             extensions.add(P10RequestGenerator.createExtensionSubjectInfoAccess(
                     subjectInfoAccesses, false));
@@ -217,10 +217,10 @@ public abstract class CertRequestGenCmd extends SecurityCmd
         }
 
         // Keyusage
-        if(isNotEmpty(keyusages))
+        if (isNotEmpty(keyusages))
         {
             Set<KeyUsage> usages = new HashSet<>();
-            for(String usage : keyusages)
+            for (String usage : keyusages)
             {
                 usages.add(KeyUsage.getKeyUsage(usage));
             }
@@ -231,7 +231,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd
         }
 
         // ExtendedKeyusage
-        if(isNotEmpty(extkeyusages))
+        if (isNotEmpty(extkeyusages))
         {
             Set<ASN1ObjectIdentifier> oids = new HashSet<>(
                     SecurityUtil.textToASN1ObjectIdentifers(extkeyusages));
@@ -242,10 +242,10 @@ public abstract class CertRequestGenCmd extends SecurityCmd
         }
 
         // QcEuLimitValue
-        if(isNotEmpty(qcEuLimits))
+        if (isNotEmpty(qcEuLimits))
         {
             ASN1EncodableVector v = new ASN1EncodableVector();
-            for(String m : qcEuLimits)
+            for (String m : qcEuLimits)
             {
                 StringTokenizer st = new StringTokenizer(m, ":");
                 try
@@ -259,7 +259,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd
                     {
                         int intValue = Integer.parseInt(currencyS);
                         currency = new Iso4217CurrencyCode(intValue);
-                    }catch(NumberFormatException e)
+                    } catch (NumberFormatException e)
                     {
                         currency = new Iso4217CurrencyCode(currencyS);
                     }
@@ -271,7 +271,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd
                     QCStatement statment = new QCStatement(
                             ObjectIdentifiers.id_etsi_qcs_QcLimitValue, monterayValue);
                     v.add(statment);
-                }catch(Exception e)
+                } catch (Exception e)
                 {
                     throw new Exception("invalid qc-eu-limit '" + m + "'");
                 }
@@ -284,10 +284,10 @@ public abstract class CertRequestGenCmd extends SecurityCmd
         }
 
         // biometricInfo
-        if(biometricType != null && biometricHashAlgo != null && biometricFile != null)
+        if (biometricType != null && biometricHashAlgo != null && biometricFile != null)
         {
             TypeOfBiometricData _biometricType;
-            if(StringUtil.isNumber(biometricType))
+            if (StringUtil.isNumber(biometricType))
             {
                 _biometricType = new TypeOfBiometricData(Integer.parseInt(biometricType));
             }
@@ -303,7 +303,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd
             byte[] _biometricDataHash = md.digest(biometricBytes);
 
             DERIA5String _sourceDataUri = null;
-            if(biometricUri != null)
+            if (biometricUri != null)
             {
                 _sourceDataUri = new DERIA5String(biometricUri);
             }
@@ -320,7 +320,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd
             extensions.add(new Extension(extType, false, extValue.getEncoded()));
             needExtensionTypes.add(extType.getId());
         }
-        else if(biometricType == null && biometricHashAlgo == null && biometricFile == null)
+        else if (biometricType == null && biometricHashAlgo == null && biometricFile == null)
         {
             // Do nothing
         }
@@ -330,7 +330,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd
                     + " must be set or none of them should be set");
         }
 
-        if(isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes))
+        if (isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes))
         {
             ExtensionExistence ee = new ExtensionExistence(
                     SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
@@ -345,7 +345,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd
         Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());
 
         X500Name subjectDN;
-        if(subject != null)
+        if (subject != null)
         {
             subjectDN = getSubject(subject);
         }
@@ -355,13 +355,13 @@ public abstract class CertRequestGenCmd extends SecurityCmd
         }
 
         Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
-        if(CollectionUtil.isNotEmpty(extensions))
+        if (CollectionUtil.isNotEmpty(extensions))
         {
             attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest,
                     new Extensions(extensions.toArray(new Extension[0])));
         }
 
-        if(StringUtil.isNotBlank(challengePassword))
+        if (StringUtil.isNotBlank(challengePassword))
         {
             attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword,
                     new DERPrintableString(challengePassword));

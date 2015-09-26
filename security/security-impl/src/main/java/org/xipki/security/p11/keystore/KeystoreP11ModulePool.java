@@ -68,13 +68,13 @@ public class KeystoreP11ModulePool
             final String moduleName)
     {
         KeystoreP11Module module = modules.remove(moduleName);
-        if(module == null && defaultModuleName != null
+        if (module == null && defaultModuleName != null
                 && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
         {
             module = modules.remove(defaultModuleName);
         }
 
-        if(module == null)
+        if (module == null)
         {
             return;
         }
@@ -84,10 +84,10 @@ public class KeystoreP11ModulePool
             LOG.info("removed module {}", moduleName);
             module.close();
             LOG.info("finalized module {}", moduleName);
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
             final String message = "could not finalize the module " + moduleName;
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message),
                         t.getClass().getName(), t.getMessage());
@@ -101,7 +101,7 @@ public class KeystoreP11ModulePool
     throws SignerException
     {
         KeystoreP11Module module = modules.get(moduleName);
-        if(module == null && defaultModuleName != null
+        if (module == null && defaultModuleName != null
                 && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
         {
             module = modules.get(defaultModuleName);
@@ -114,7 +114,7 @@ public class KeystoreP11ModulePool
     throws SignerException
     {
         KeystoreP11Module extModule = modules.get(moduleConf.getName());
-        if(extModule == null)
+        if (extModule == null)
         {
             extModule = new KeystoreP11Module(moduleConf);
             modules.put(moduleConf.getName(), extModule);
@@ -133,7 +133,7 @@ public class KeystoreP11ModulePool
 
     public synchronized void shutdown()
     {
-        for(String pk11Lib : modules.keySet())
+        for (String pk11Lib : modules.keySet())
         {
             modules.get(pk11Lib).close();
         }

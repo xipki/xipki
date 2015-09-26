@@ -60,23 +60,23 @@ public class CaProfileInfoCmd extends CaCmd
     protected Object _doExecute()
     throws Exception
     {
-        if(caManager.getCA(caName) == null)
+        if (caManager.getCA(caName) == null)
         {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
 
         StringBuilder sb = new StringBuilder();
         Map<String, String> entries = caManager.getCertprofilesForCA(caName);
-        if(CollectionUtil.isNotEmpty(entries))
+        if (CollectionUtil.isNotEmpty(entries))
         {
             sb.append("certificate Profiles supported by CA " + caName).append("\n");
 
-            for(String localname  : entries.keySet())
+            for (String localname  : entries.keySet())
             {
                 String name = entries.get(localname);
                 sb.append("\t");
                 sb.append(name);
-                if(name.equals(localname) == false)
+                if (name.equals(localname) == false)
                 {
                     sb.append(" (localname ").append(localname).append(")");
                 }

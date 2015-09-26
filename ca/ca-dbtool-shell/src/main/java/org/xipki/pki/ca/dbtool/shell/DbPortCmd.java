@@ -65,12 +65,12 @@ public abstract class DbPortCmd extends XipkiOsgiCommandSupport
         executor.execute(myRun);
 
         executor.shutdown();
-        while(true)
+        while (true)
         {
             try
             {
                 boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
-                if(terminated)
+                if (terminated)
                 {
                     break;
                 }
@@ -81,10 +81,10 @@ public abstract class DbPortCmd extends XipkiOsgiCommandSupport
         }
 
         Exception e = myRun.getException();
-        if(e != null)
+        if (e != null)
         {
             String errMsg = e.getMessage();
-            if(StringUtil.isBlank(errMsg))
+            if (StringUtil.isBlank(errMsg))
             {
                 errMsg = "ERROR";
             }

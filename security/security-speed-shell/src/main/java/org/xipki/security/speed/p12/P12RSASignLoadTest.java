@@ -67,7 +67,7 @@ public class P12RSASignLoadTest extends P12SignLoadTest
     throws Exception
     {
         byte[] keystoreBytes = getPrecomputedRSAKeystore(keysize, publicExponent);
-        if(keystoreBytes == null)
+        if (keystoreBytes == null)
         {
             P12KeypairGenerator kpGen = new P12KeypairGenerator.RSAIdentityGenerator(
                     keysize, publicExponent, password.toCharArray(), "CN=dummy", null, null);

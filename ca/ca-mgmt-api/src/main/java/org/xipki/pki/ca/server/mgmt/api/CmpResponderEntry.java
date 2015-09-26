@@ -73,7 +73,7 @@ public class CmpResponderEntry implements Serializable
         this.conf = conf;
         this.base64Cert = base64Cert;
 
-        if(base64Cert == null)
+        if (base64Cert == null)
         {
             return;
         }
@@ -81,7 +81,7 @@ public class CmpResponderEntry implements Serializable
         try
         {
             this.cert = X509Util.parseBase64EncodedCert(base64Cert);
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
             this.certFaulty = true;
         }
@@ -110,7 +110,7 @@ public class CmpResponderEntry implements Serializable
     public void setCertificate(
             final X509Certificate cert)
     {
-        if(base64Cert != null)
+        if (base64Cert != null)
         {
             throw new IllegalStateException("certificate is already specified by base64Cert");
         }
@@ -154,7 +154,7 @@ public class CmpResponderEntry implements Serializable
         sb.append("faulty: ").append(isFaulty()).append('\n');
         sb.append("type: ").append(type).append('\n');
         sb.append("conf: ");
-        if(conf == null)
+        if (conf == null)
         {
             sb.append("null");
         } else
@@ -163,9 +163,9 @@ public class CmpResponderEntry implements Serializable
         }
         sb.append('\n');
         sb.append("cert: ").append("\n");
-        if(cert != null || base64Cert != null)
+        if (cert != null || base64Cert != null)
         {
-            if(cert != null)
+            if (cert != null)
             {
                 sb.append("\tissuer: ").append(
                         X509Util.getRFC4519Name(cert.getIssuerX500Principal())).append('\n');
@@ -173,7 +173,7 @@ public class CmpResponderEntry implements Serializable
                 sb.append("\tsubject: ").append(
                         X509Util.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
             }
-            if(verbose)
+            if (verbose)
             {
                 sb.append("\tencoded: ");
                 try

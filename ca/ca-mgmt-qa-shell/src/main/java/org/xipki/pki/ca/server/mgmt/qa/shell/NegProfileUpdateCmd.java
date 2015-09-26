@@ -57,7 +57,7 @@ public class NegProfileUpdateCmd extends ProfileUpdateCmd
         try
         {
             super._doExecute();
-        }catch(Exception e)
+        } catch (Exception e)
         {
             return null;
         }

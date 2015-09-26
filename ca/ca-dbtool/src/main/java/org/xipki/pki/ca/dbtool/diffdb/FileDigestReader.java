@@ -120,7 +120,7 @@ public class FileDigestReader implements DigestReader
             final int n)
     throws DataAccessException
     {
-        if(hasNext() == false)
+        if (hasNext() == false)
         {
             return null;
         }
@@ -130,7 +130,7 @@ public class FileDigestReader implements DigestReader
         Map<Long, DbDigestEntry> certs = new HashMap<>(n);
 
         int k = 0;
-        while(hasNext())
+        while (hasNext())
         {
             DbDigestEntry line;
             try
@@ -140,7 +140,7 @@ public class FileDigestReader implements DigestReader
             {
                 throw new DataAccessException("IOException: " + e.getMessage());
             }
-            if(revokedOnly && line.isRevoked() == false)
+            if (revokedOnly && line.isRevoked() == false)
             {
                 numSkipped++;
                 continue;
@@ -149,7 +149,7 @@ public class FileDigestReader implements DigestReader
             serialNumbers.add(line.getSerialNumber());
             certs.put(line.getSerialNumber(), line);
             k++;
-            if(k >= n)
+            if (k >= n)
             {
                 break;
             }
@@ -163,7 +163,7 @@ public class FileDigestReader implements DigestReader
     private DbDigestEntry nextCert()
     throws IOException
     {
-        if(next == null)
+        if (next == null)
         {
             throw new IllegalStateException("reach end of the stream");
         }
@@ -181,11 +181,11 @@ public class FileDigestReader implements DigestReader
         String line = firstTime
                 ? null
                 : certsReader.readLine();
-        if(line == null)
+        if (line == null)
         {
             close(certsReader);
             String nextFileName = certsFilesReader.readLine();
-            if(nextFileName == null)
+            if (nextFileName == null)
             {
                 return null;
             }
@@ -215,7 +215,7 @@ public class FileDigestReader implements DigestReader
     private static void close(
             final Reader reader)
     {
-        if(reader == null)
+        if (reader == null)
         {
             return;
         }
@@ -223,7 +223,7 @@ public class FileDigestReader implements DigestReader
         try
         {
             reader.close();
-        } catch(Exception e)
+        } catch (Exception e)
         {
         }
     }

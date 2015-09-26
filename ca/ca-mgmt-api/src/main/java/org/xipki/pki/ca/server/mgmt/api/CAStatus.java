@@ -60,9 +60,9 @@ public enum CAStatus
     public static CAStatus getCAStatus(
             final String status)
     {
-        for(CAStatus value : values())
+        for (CAStatus value : values())
         {
-            if(value.status.equalsIgnoreCase(status))
+            if (value.status.equalsIgnoreCase(status))
             {
                 return value;
             }

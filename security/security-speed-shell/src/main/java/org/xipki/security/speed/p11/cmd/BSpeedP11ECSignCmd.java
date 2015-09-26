@@ -64,7 +64,7 @@ public class BSpeedP11ECSignCmd extends BSpeedP11SignCmd
 
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
 
-        for(String curveName : curveNameOidMap.keySet())
+        for (String curveName : curveNameOidMap.keySet())
         {
             ret.add(new P11ECSignLoadTest(securityFactory, slot, sigAlgo, curveName));
         }

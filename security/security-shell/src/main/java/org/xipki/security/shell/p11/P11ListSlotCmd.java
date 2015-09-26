@@ -98,14 +98,14 @@ public class P11ListSlotCmd extends SecurityCmd
     throws Exception
     {
         P11Module module = getP11Module(moduleName);
-        if(module == null)
+        if (module == null)
         {
             throw new IllegalCmdParamException("undefined module " + moduleName);
         }
 
         out("module: " + moduleName);
         List<P11SlotIdentifier> slots = module.getSlotIdentifiers();
-        if(slotIndex == null)
+        if (slotIndex == null)
         {
             output(slots);
             return null;
@@ -113,23 +113,23 @@ public class P11ListSlotCmd extends SecurityCmd
 
         P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
         P11WritableSlot p11slot = module.getSlot(slotId);
-        if(p11slot == null)
+        if (p11slot == null)
         {
             throw new IllegalCmdParamException("slot with index " + slotIndex + " does not exist");
         }
 
-        if(p11slot instanceof IaikP11Slot)
+        if (p11slot instanceof IaikP11Slot)
         {
             IaikP11Slot slot = (IaikP11Slot) p11slot;
             List<PrivateKey> allPrivateObjects = slot.getAllPrivateObjects(null, null);
             int size = allPrivateObjects.size();
 
             List<ComparableIaikPrivateKey> privateKeys = new ArrayList<>(size);
-            for(int i = 0; i < size; i++)
+            for (int i = 0; i < size; i++)
             {
                 PrivateKey key = allPrivateObjects.get(i);
                 byte[] id = key.getId().getByteArrayValue();
-                if(id != null)
+                if (id != null)
                 {
                     char[] label = key.getLabel().getCharArrayValue();
                     ComparableIaikPrivateKey privKey = new ComparableIaikPrivateKey(id, label);
@@ -143,7 +143,7 @@ public class P11ListSlotCmd extends SecurityCmd
             List<X509PublicKeyCertificate> allCertObjects = slot.getAllCertificateObjects();
 
             StringBuilder sb = new StringBuilder();
-            for(int i = 0; i < size; i++)
+            for (int i = 0; i < size; i++)
             {
                 ComparableIaikPrivateKey privKey = privateKeys.get(i);
                 byte[] keyId = privKey.getKeyId();
@@ -164,7 +164,7 @@ public class P11ListSlotCmd extends SecurityCmd
 
                 X509PublicKeyCertificate cert = removeCertificateObject(allCertObjects, keyId,
                         keyLabel);
-                if(cert == null)
+                if (cert == null)
                 {
                     sb.append("\t\tCertificate: NONE\n");
                 }
@@ -174,7 +174,7 @@ public class P11ListSlotCmd extends SecurityCmd
                 }
             }
 
-            for(int i = 0; i < allCertObjects.size(); i++)
+            for (int i = 0; i < allCertObjects.size(); i++)
             {
                 X509PublicKeyCertificate certObj = allCertObjects.get(i);
                 sb.append("\tCert-")
@@ -188,18 +188,18 @@ public class P11ListSlotCmd extends SecurityCmd
                 formatString(sb, certObj);
             }
 
-            if(sb.length() > 0)
+            if (sb.length() > 0)
             {
                 out(sb.toString());
             }
-        } else if(p11slot instanceof KeystoreP11Slot)
+        } else if (p11slot instanceof KeystoreP11Slot)
         {
             KeystoreP11Slot slot = (KeystoreP11Slot) p11slot;
 
             List<? extends P11Identity> identities = slot.getP11Identities();
 
             StringBuilder sb = new StringBuilder();
-            for(int i = 0; i < identities.size(); i++)
+            for (int i = 0; i < identities.size(); i++)
             {
                 P11Identity identity = identities.get(i);
                 P11KeyIdentifier p11KeyId = identity.getKeyId();
@@ -219,7 +219,7 @@ public class P11ListSlotCmd extends SecurityCmd
                 formatString(sb, identity.getCertificate());
             }
 
-            if(sb.length() > 0)
+            if (sb.length() > 0)
             {
                 out(sb.toString());
             }
@@ -240,15 +240,15 @@ public class P11ListSlotCmd extends SecurityCmd
             final char[] keyLabel)
     {
         X509PublicKeyCertificate cert = null;
-        for(X509PublicKeyCertificate certObj : certificateObjects)
+        for (X509PublicKeyCertificate certObj : certificateObjects)
         {
-            if(keyId != null
+            if (keyId != null
                     && (Arrays.equals(keyId, certObj.getId().getByteArrayValue()) == false))
             {
                 continue;
             }
 
-            if(keyLabel != null
+            if (keyLabel != null
                     && (Arrays.equals(keyLabel, certObj.getLabel().getCharArrayValue()) == false))
             {
                 continue;
@@ -258,7 +258,7 @@ public class P11ListSlotCmd extends SecurityCmd
             break;
         }
 
-        if(cert != null)
+        if (cert != null)
         {
             certificateObjects.remove(cert);
         }
@@ -276,12 +276,12 @@ public class P11ListSlotCmd extends SecurityCmd
         {
             X500Principal x500Prin = new X500Principal(bytes);
             subject = X509Util.getRFC4519Name(x500Prin);
-        }catch(Exception e)
+        } catch (Exception e)
         {
             subject = new String(bytes);
         }
 
-        if(verbose.booleanValue() == false)
+        if (verbose.booleanValue() == false)
         {
             sb.append("\t\tCertificate: ").append(subject).append("\n");
             return;
@@ -298,7 +298,7 @@ public class P11ListSlotCmd extends SecurityCmd
         {
             X500Principal x500Prin = new X500Principal(bytes);
             issuer = X509Util.getRFC4519Name(x500Prin);
-        }catch(Exception e)
+        } catch (Exception e)
         {
             issuer = new String(bytes);
         }
@@ -338,7 +338,7 @@ public class P11ListSlotCmd extends SecurityCmd
     {
         String subject = X509Util.getRFC4519Name(cert.getSubjectX500Principal());
 
-        if(verbose.booleanValue() == false)
+        if (verbose.booleanValue() == false)
         {
             sb.append("\t\tCertificate: ").append(subject).append("\n");
             return;
@@ -377,14 +377,14 @@ public class P11ListSlotCmd extends SecurityCmd
     private static String getKeyAlgorithm(
             final PublicKey key)
     {
-        if(key instanceof RSAPublicKey)
+        if (key instanceof RSAPublicKey)
         {
             return "RSA";
         }
-        else if(key instanceof ECDSAPublicKey)
+        else if (key instanceof ECDSAPublicKey)
         {
             byte[] paramBytes = ((ECDSAPublicKey) key).getEcdsaParams().getByteArrayValue();
-            if(paramBytes.length < 50)
+            if (paramBytes.length < 50)
             {
                 try
                 {
@@ -392,7 +392,7 @@ public class P11ListSlotCmd extends SecurityCmd
                             (ASN1ObjectIdentifier) ASN1ObjectIdentifier.fromByteArray(paramBytes);
                     String curveName = getCurveName(curveId);
                     return "EC (named curve " + curveName + ")";
-                }catch(Exception e)
+                } catch (Exception e)
                 {
                     return "EC";
                 }
@@ -402,7 +402,7 @@ public class P11ListSlotCmd extends SecurityCmd
                 return "EC (specified curve)";
             }
         }
-        else if(key instanceof DSAPublicKey)
+        else if (key instanceof DSAPublicKey)
         {
             return "DSA";
         }
@@ -452,9 +452,9 @@ public class P11ListSlotCmd extends SecurityCmd
         public int compareTo(
                 final ComparableIaikPrivateKey o)
         {
-            if(keyLabel == null)
+            if (keyLabel == null)
             {
-                if(o.keyLabel == null)
+                if (o.keyLabel == null)
                 {
                     return 0;
                 }
@@ -465,7 +465,7 @@ public class P11ListSlotCmd extends SecurityCmd
             }
             else
             {
-                if(o.keyLabel == null)
+                if (o.keyLabel == null)
                 {
                     return -1;
                 }
@@ -500,7 +500,7 @@ public class P11ListSlotCmd extends SecurityCmd
         // list all slots
         int n = slots.size();
 
-        if(n == 0 || n == 1)
+        if (n == 0 || n == 1)
         {
             String numText = (n == 0)
                     ? "no"
@@ -512,7 +512,7 @@ public class P11ListSlotCmd extends SecurityCmd
             out(n + " slots are configured");
         }
 
-        for(P11SlotIdentifier slotId : slots)
+        for (P11SlotIdentifier slotId : slots)
         {
             out("\tslot[" + slotId.getSlotIndex() + "]: " + slotId.getSlotId());
         }

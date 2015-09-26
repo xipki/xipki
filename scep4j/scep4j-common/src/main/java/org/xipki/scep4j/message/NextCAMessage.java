@@ -94,7 +94,7 @@ public class NextCAMessage
     public void setRaCerts(
             final List<X509Certificate> raCerts)
     {
-        if(raCerts == null || raCerts.isEmpty())
+        if (raCerts == null || raCerts.isEmpty())
         {
             this.raCerts = null;
         } else
@@ -117,9 +117,9 @@ public class NextCAMessage
             {
                 CMSSignedDataGenerator degenerateSignedData = new CMSSignedDataGenerator();
                 degenerateSignedData.addCertificate(new X509CertificateHolder(caCert.getEncoded()));
-                if(raCerts != null && raCerts.isEmpty() == false)
+                if (raCerts != null && raCerts.isEmpty() == false)
                 {
-                    for(X509Certificate m : raCerts)
+                    for (X509Certificate m : raCerts)
                     {
                         degenerateSignedData.addCertificate(
                                 new X509CertificateHolder(m.getEncoded()));
@@ -128,7 +128,7 @@ public class NextCAMessage
 
                 degenratedSignedDataBytes = degenerateSignedData.generate(
                         new CMSAbsentContent()).getEncoded();
-            } catch(CertificateEncodingException e)
+            } catch (CertificateEncodingException e)
             {
                 throw new MessageEncodingException(e.getMessage(), e);
             }
@@ -156,16 +156,16 @@ public class NextCAMessage
             // certificateSet
             ScepUtil.addCmsCertSet(generator, cmsCertSet);
             return generator.generate(cmsContent, true).toASN1Structure();
-        }catch(CMSException e)
+        } catch (CMSException e)
         {
             throw new MessageEncodingException(e);
-        }catch(CertificateEncodingException e)
+        } catch (CertificateEncodingException e)
         {
             throw new MessageEncodingException(e);
-        }catch(IOException e)
+        } catch (IOException e)
         {
             throw new MessageEncodingException(e);
-        }catch(OperatorCreationException e)
+        } catch (OperatorCreationException e)
         {
             throw new MessageEncodingException(e);
         }
@@ -176,7 +176,7 @@ public class NextCAMessage
             final HashAlgoType hashAlgo)
     {
         String algorithm = key.getAlgorithm();
-        if("RSA".equalsIgnoreCase(algorithm))
+        if ("RSA".equalsIgnoreCase(algorithm))
         {
             return hashAlgo.getName() + "withRSA";
         } else

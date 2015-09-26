@@ -52,7 +52,7 @@ public class DummyPBEPasswordResolver extends PBEPasswordResolver
     protected char[] getMasterPassword()
     throws PasswordResolverException
     {
-        if(masterPassword != null)
+        if (masterPassword != null)
         {
             return masterPassword;
         }

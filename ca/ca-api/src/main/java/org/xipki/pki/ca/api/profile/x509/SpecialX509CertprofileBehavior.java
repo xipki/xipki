@@ -48,9 +48,9 @@ public enum SpecialX509CertprofileBehavior
     public static SpecialX509CertprofileBehavior getInstance(
             final String behavior)
     {
-        for(SpecialX509CertprofileBehavior b : values())
+        for (SpecialX509CertprofileBehavior b : values())
         {
-            if(b.name().equalsIgnoreCase(behavior))
+            if (b.name().equalsIgnoreCase(behavior))
             {
                 return b;
             }

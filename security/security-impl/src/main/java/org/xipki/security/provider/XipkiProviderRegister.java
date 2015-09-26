@@ -47,7 +47,7 @@ public class XipkiProviderRegister
 {
     public void regist()
     {
-        if(Security.getProperty(XipkiProvider.PROVIDER_NAME) == null)
+        if (Security.getProperty(XipkiProvider.PROVIDER_NAME) == null)
         {
             Security.addProvider(new XipkiProvider());
         }
@@ -55,7 +55,7 @@ public class XipkiProviderRegister
 
     public void unregist()
     {
-        if(Security.getProperty(XipkiProvider.PROVIDER_NAME) != null)
+        if (Security.getProperty(XipkiProvider.PROVIDER_NAME) != null)
         {
             Security.removeProvider(XipkiProvider.PROVIDER_NAME);
         }

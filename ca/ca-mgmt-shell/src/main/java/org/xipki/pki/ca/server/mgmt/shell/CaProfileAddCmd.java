@@ -68,7 +68,7 @@ public class CaProfileAddCmd extends CaCmd
     protected Object _doExecute()
     throws Exception
     {
-        if(StringUtil.isBlank(profileLocalname))
+        if (StringUtil.isBlank(profileLocalname))
         {
             profileLocalname = profileName;
         }
@@ -76,7 +76,7 @@ public class CaProfileAddCmd extends CaCmd
         boolean b = caManager.addCertprofileToCA(profileName, profileLocalname, caName);
         StringBuilder sb = new StringBuilder();
         sb.append("certificate profile ").append(profileName);
-        if(profileLocalname.equals(profileName) == false)
+        if (profileLocalname.equals(profileName) == false)
         {
             sb.append(" (localname ").append(profileLocalname).append(")");
         }

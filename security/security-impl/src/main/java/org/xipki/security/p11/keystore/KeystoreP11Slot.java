@@ -119,11 +119,11 @@ public class KeystoreP11Slot implements P11WritableSlot
     {
         ParamUtil.assertNotNull("slotDir", slotDir);
         ParamUtil.assertNotNull("slotId", slotId);
-        if(password == null)
+        if (password == null)
         {
             throw new IllegalArgumentException("no password is configured");
         }
-        else if(password.size() != 1)
+        else if (password.size() != 1)
         {
             throw new IllegalArgumentException("exactly 1 password must be specified, but not "
                     + password.size());
@@ -149,7 +149,7 @@ public class KeystoreP11Slot implements P11WritableSlot
             }
         });
 
-        if(keystoreFiles == null || keystoreFiles.length == 0)
+        if (keystoreFiles == null || keystoreFiles.length == 0)
         {
             LOG.info("no key found in directory {}", slotDir);
             return;
@@ -157,7 +157,7 @@ public class KeystoreP11Slot implements P11WritableSlot
 
         Set<KeystoreP11Identity> currentIdentifies = new HashSet<>();
 
-        for(File file : keystoreFiles)
+        for (File file : keystoreFiles)
         {
             try
             {
@@ -171,7 +171,7 @@ public class KeystoreP11Slot implements P11WritableSlot
 
                 byte[] contentBytes = IoUtil.read(file);
                 String sha1sum = HashCalculator.hexSha1(contentBytes);
-                if(existingP11Identify != null
+                if (existingP11Identify != null
                         && existingP11Identify.getSha1Sum().equals(sha1sum))
                 {
                     currentIdentifies.add(existingP11Identify);
@@ -183,17 +183,17 @@ public class KeystoreP11Slot implements P11WritableSlot
 
                 String keyname = null;
                 Enumeration<String> aliases = ks.aliases();
-                while(aliases.hasMoreElements())
+                while (aliases.hasMoreElements())
                 {
                     String alias = aliases.nextElement();
-                    if(ks.isKeyEntry(alias))
+                    if (ks.isKeyEntry(alias))
                     {
                         keyname = alias;
                         break;
                     }
                 }
 
-                if(keyname == null)
+                if (keyname == null)
                 {
                     LOG.info("no key is contained in file {}, ignore it", fn);
                     continue;
@@ -201,7 +201,7 @@ public class KeystoreP11Slot implements P11WritableSlot
 
                 PrivateKey privKey = (PrivateKey) ks.getKey(keyname, password);
 
-                if( (privKey instanceof RSAPrivateKey || privKey instanceof DSAPrivateKey
+                if ( (privKey instanceof RSAPrivateKey || privKey instanceof DSAPrivateKey
                         || privKey instanceof ECPrivateKey) == false)
                 {
                     throw new SignerException("unsupported key " + privKey.getClass().getName());
@@ -211,9 +211,9 @@ public class KeystoreP11Slot implements P11WritableSlot
 
                 X509Certificate cert = (X509Certificate) ks.getCertificate(keyname);
                 Certificate[] certsInKeystore = ks.getCertificateChain(keyname);
-                if(certsInKeystore.length > 1)
+                if (certsInKeystore.length > 1)
                 {
-                    for(int i = 1; i < certsInKeystore.length; i++)
+                    for (int i = 1; i < certsInKeystore.length; i++)
                     {
                         caCerts.add(certsInKeystore[i]);
                     }
@@ -224,10 +224,10 @@ public class KeystoreP11Slot implements P11WritableSlot
                         sha1sum, slotId,
                         keyId, privKey, certificateChain, 20);
                 currentIdentifies.add(p11Identity);
-            }catch(Throwable t)
+            } catch (Throwable t)
             {
                 final String message = "could not initialize key " + file.getPath();
-                if(LOG.isWarnEnabled())
+                if (LOG.isWarnEnabled())
                 {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                             t.getMessage());
@@ -259,9 +259,9 @@ public class KeystoreP11Slot implements P11WritableSlot
 
     public boolean labelExists(String label)
     {
-        for(KeystoreP11Identity id : identities)
+        for (KeystoreP11Identity id : identities)
         {
-            if(id.getKeyId().getKeyLabel().equals(label))
+            if (id.getKeyId().getKeyLabel().equals(label))
             {
                 return true;
             }
@@ -277,13 +277,13 @@ public class KeystoreP11Slot implements P11WritableSlot
         ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
 
         KeystoreP11Identity identity = getIdentity(keyIdentifier);
-        if(identity == null)
+        if (identity == null)
         {
             return false;
         }
         String commonName = X509Util.getCommonName(
                 identity.getCertificate().getSubjectX500Principal());
-        if(NOCERT_COMMON_NAME.equals(commonName) == false)
+        if (NOCERT_COMMON_NAME.equals(commonName) == false)
         {
             throw new SignerException(
                     "could not delete only the key without deleting the certificate");
@@ -303,7 +303,7 @@ public class KeystoreP11Slot implements P11WritableSlot
         ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
 
         KeystoreP11Identity identity = getIdentity(keyIdentifier);
-        if(identity == null)
+        if (identity == null)
         {
             return false;
         }
@@ -325,7 +325,7 @@ public class KeystoreP11Slot implements P11WritableSlot
         ParamUtil.assertNotNull("newCert", newCert);
 
         KeystoreP11Identity identity = getIdentity(keyIdentifier);
-        if(identity == null)
+        if (identity == null)
         {
             throw new SignerException("could not find identity " + keyIdentifier);
         }
@@ -343,7 +343,7 @@ public class KeystoreP11Slot implements P11WritableSlot
             ks.load(fIn, password);
         }finally
         {
-            if(fIn != null)
+            if (fIn != null)
             {
                 fIn.close();
             }
@@ -351,17 +351,17 @@ public class KeystoreP11Slot implements P11WritableSlot
 
         String keyname = null;
         Enumeration<String> aliases = ks.aliases();
-        while(aliases.hasMoreElements())
+        while (aliases.hasMoreElements())
         {
             String alias = aliases.nextElement();
-            if(ks.isKeyEntry(alias))
+            if (ks.isKeyEntry(alias))
             {
                 keyname = alias;
                 break;
             }
         }
 
-        if(keyname == null)
+        if (keyname == null)
         {
             throw new SignerException("could not find private key");
         }
@@ -378,7 +378,7 @@ public class KeystoreP11Slot implements P11WritableSlot
             ks.store(fOut, password);
         }finally
         {
-            if(fOut != null)
+            if (fOut != null)
             {
                 fOut.close();
             }
@@ -431,12 +431,12 @@ public class KeystoreP11Slot implements P11WritableSlot
             throw new IllegalArgumentException("keysize not allowed: " + keySize);
         }
 
-        if(keySize % 1024 != 0)
+        if (keySize % 1024 != 0)
         {
             throw new IllegalArgumentException("key size is not multiple of 1024: " + keySize);
         }
 
-        if(labelExists(label))
+        if (labelExists(label))
         {
             throw new IllegalArgumentException("label " + label
                     + " exists, please specify another one");
@@ -484,12 +484,12 @@ public class KeystoreP11Slot implements P11WritableSlot
             throw new IllegalArgumentException("keysize not allowed: " + pLength);
         }
 
-        if(pLength % 1024 != 0)
+        if (pLength % 1024 != 0)
         {
             throw new IllegalArgumentException("key size is not multiple of 1024: " + pLength);
         }
 
-        if(labelExists(label))
+        if (labelExists(label))
         {
             throw new IllegalArgumentException("label " + label
                     + " exists, please specify another one");
@@ -531,7 +531,7 @@ public class KeystoreP11Slot implements P11WritableSlot
         ParamUtil.assertNotBlank("curveNameOrOid", curveNameOrOid);
         ParamUtil.assertNotBlank("label", label);
 
-        if(labelExists(label))
+        if (labelExists(label))
         {
             throw new IllegalArgumentException("label " + label
                     + " exists, please specify another one");
@@ -554,20 +554,20 @@ public class KeystoreP11Slot implements P11WritableSlot
         byte[] keyId = keyIdentifier.getKeyId();
         String keyLabel = keyIdentifier.getKeyLabel();
 
-        if(keyId == null)
+        if (keyId == null)
         {
-            for(KeystoreP11Identity p11Identity : identities)
+            for (KeystoreP11Identity p11Identity : identities)
             {
-                if(p11Identity.getKeyId().getKeyLabel().equals(keyLabel))
+                if (p11Identity.getKeyId().getKeyLabel().equals(keyLabel))
                 {
                     return p11Identity;
                 }
             }
-        }else if(keyLabel == null)
+        }else if (keyLabel == null)
         {
-            for(KeystoreP11Identity p11Identity : identities)
+            for (KeystoreP11Identity p11Identity : identities)
             {
-                if(Arrays.equals(p11Identity.getKeyId().getKeyId(), keyId))
+                if (Arrays.equals(p11Identity.getKeyId().getKeyId(), keyId))
                 {
                     return p11Identity;
                 }
@@ -575,11 +575,11 @@ public class KeystoreP11Slot implements P11WritableSlot
         }
         else
         {
-            for(KeystoreP11Identity p11Identity : identities)
+            for (KeystoreP11Identity p11Identity : identities)
             {
-                if(p11Identity.getKeyId().getKeyLabel().equals(keyLabel))
+                if (p11Identity.getKeyId().getKeyLabel().equals(keyLabel))
                 {
-                    if(Arrays.equals(p11Identity.getKeyId().getKeyId(), keyId))
+                    if (Arrays.equals(p11Identity.getKeyId().getKeyId(), keyId))
                     {
                         return p11Identity;
                     }
@@ -597,11 +597,11 @@ public class KeystoreP11Slot implements P11WritableSlot
     throws SignerException, PasswordResolverException
     {
         ConfPairs pairs = new ConfPairs("slot", Integer.toString(slotId.getSlotIndex()));
-        if(keyId.getKeyId() != null)
+        if (keyId.getKeyId() != null)
         {
             pairs.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
         }
-        if(keyId.getKeyLabel() != null)
+        if (keyId.getKeyLabel() != null)
         {
             pairs.putPair("key-label", keyId.getKeyLabel());
         }
@@ -615,14 +615,14 @@ public class KeystoreP11Slot implements P11WritableSlot
     throws Exception
     {
         KeystoreP11Identity identity = getIdentity(keyIdentifier);
-        if(identity == null)
+        if (identity == null)
         {
             return null;
         }
 
         String commonName = X509Util.getCommonName(
                 identity.getCertificate().getSubjectX500Principal());
-        if(NOCERT_COMMON_NAME.equals(commonName))
+        if (NOCERT_COMMON_NAME.equals(commonName))
         {
             return null;
         }

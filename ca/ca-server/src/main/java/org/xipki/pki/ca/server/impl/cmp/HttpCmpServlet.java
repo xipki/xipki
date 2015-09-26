@@ -100,7 +100,7 @@ public class HttpCmpServlet extends HttpServlet
         AuditEvent auditEvent = (auditService != null)
                 ? new AuditEvent(new Date())
                 : null;
-        if(auditEvent != null)
+        if (auditEvent != null)
         {
             auditEvent.setApplicationName("CA");
             auditEvent.setName("PERF");
@@ -111,7 +111,7 @@ public class HttpCmpServlet extends HttpServlet
         String auditMessage = null;
         try
         {
-            if(responderManager == null)
+            if (responderManager == null)
             {
                 String message = "responderManager in servlet not configured";
                 LOG.error(message);
@@ -140,11 +140,11 @@ public class HttpCmpServlet extends HttpServlet
             String caName = null;
             X509CACmpResponder responder = null;
             int n = servletPath.length();
-            if(requestURI.length() > n + 1)
+            if (requestURI.length() > n + 1)
             {
                 String caAlias = URLDecoder.decode(requestURI.substring(n + 1), "UTF-8");
                 caName = responderManager.getCaNameForAlias(caAlias);
-                if(caName == null)
+                if (caName == null)
                 {
                     caName = caAlias;
                 }
@@ -152,13 +152,13 @@ public class HttpCmpServlet extends HttpServlet
                 responder = responderManager.getX509CACmpResponder(caName);
             }
 
-            if(caName == null || responder == null || responder.isInService() == false)
+            if (caName == null || responder == null || responder.isInService() == false)
             {
-                if(caName == null)
+                if (caName == null)
                 {
                     auditMessage = "no CA is specified";
                 }
-                else if(responder == null)
+                else if (responder == null)
                 {
                     auditMessage = "unknown CA '" + caName + "'";
                 }
@@ -175,7 +175,7 @@ public class HttpCmpServlet extends HttpServlet
                 return;
             }
 
-            if(auditEvent != null)
+            if (auditEvent != null)
             {
                 auditEvent.addEventData(new AuditEventData("CA",
                         responder.getCA().getCAInfo().getName()));
@@ -185,7 +185,7 @@ public class HttpCmpServlet extends HttpServlet
             try
             {
                 pkiReq = generatePKIMessage(request.getInputStream());
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -194,7 +194,7 @@ public class HttpCmpServlet extends HttpServlet
                 auditMessage = "bad request";
 
                 final String message = "could not parse the request (PKIMessage)";
-                if(LOG.isErrorEnabled())
+                if (LOG.isErrorEnabled())
                 {
                     LOG.error(LogUtil.buildExceptionLogFormat(message),
                             e.getClass().getName(),
@@ -221,10 +221,10 @@ public class HttpCmpServlet extends HttpServlet
             response.setStatus(HttpServletResponse.SC_OK);
             response.setContentLength(pkiRespBytes.length);
             response.getOutputStream().write(pkiRespBytes);
-        }catch(EOFException e)
+        } catch (EOFException e)
         {
             final String message = "connection reset by peer";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -233,7 +233,7 @@ public class HttpCmpServlet extends HttpServlet
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
             final String message = "Throwable thrown, this should not happen!";
             LOG.error(message, t);
@@ -251,7 +251,7 @@ public class HttpCmpServlet extends HttpServlet
                 response.flushBuffer();
             }finally
             {
-                if(auditEvent != null)
+                if (auditEvent != null)
                 {
                     audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
                 }
@@ -273,7 +273,7 @@ public class HttpCmpServlet extends HttpServlet
             try
             {
                 asn1Stream.close();
-            }catch(Exception e){}
+            } catch (Exception e){}
         }
     }
 
@@ -296,31 +296,31 @@ public class HttpCmpServlet extends HttpServlet
             final AuditStatus auditStatus,
             final String auditMessage)
     {
-        if(auditLevel != null)
+        if (auditLevel != null)
         {
             auditEvent.setLevel(auditLevel);
         }
 
-        if(auditStatus != null)
+        if (auditStatus != null)
         {
             auditEvent.setStatus(auditStatus);
         }
 
-        if(auditMessage != null)
+        if (auditMessage != null)
         {
             auditEvent.addEventData(new AuditEventData("message", auditMessage));
         }
 
         auditEvent.setDuration(System.currentTimeMillis() - auditEvent.getTimestamp().getTime());
 
-        if(auditEvent.containsChildAuditEvents() == false)
+        if (auditEvent.containsChildAuditEvents() == false)
         {
             auditService.logEvent(auditEvent);
         }
         else
         {
             List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
-            for(AuditEvent event : expandedAuditEvents)
+            for (AuditEvent event : expandedAuditEvents)
             {
                 auditService.logEvent(event);
             }

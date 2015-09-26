@@ -55,7 +55,7 @@ implements KeyusageCompleter
     static
     {
         Set<String> set = new HashSet<>();
-        for(KeyUsage usage : KeyUsage.values())
+        for (KeyUsage usage : KeyUsage.values())
         {
             set.add(usage.getName());
         }

@@ -101,18 +101,18 @@ public class CaEntry
             final DbDigestEntry reportEntry)
     throws IOException, InvalidDataObjectException
     {
-        if(minIdInCsvFile == 0)
+        if (minIdInCsvFile == 0)
         {
             minIdInCsvFile = id;
-        } else if(minIdInCsvFile > id)
+        } else if (minIdInCsvFile > id)
         {
             minIdInCsvFile = id;
         }
 
-        if(maxIdInCsvFile == 0)
+        if (maxIdInCsvFile == 0)
         {
             maxIdInCsvFile = id;
-        } else if(maxIdInCsvFile < id)
+        } else if (maxIdInCsvFile < id)
         {
             maxIdInCsvFile = id;
         }
@@ -121,7 +121,7 @@ public class CaEntry
         csvOutputStream.write(reportEntry.getEncoded().getBytes());
         csvOutputStream.write('\n');
 
-        if(numInCsvFile == DFLT_NUM_CERTS_IN_BUNDLE)
+        if (numInCsvFile == DFLT_NUM_CERTS_IN_BUNDLE)
         {
             closeCurrentCsvFile();
             numInCsvFile = 0;
@@ -130,7 +130,7 @@ public class CaEntry
             createNewCsvFile();
         }
         numProcessed++;
-        if(reportEntry.isRevoked())
+        if (reportEntry.isRevoked())
         {
             numProcessedRevoked++;
         }

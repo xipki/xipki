@@ -74,7 +74,7 @@ public class HashCalculator
             final HashAlgoType hashAlgo)
     {
         BlockingDeque<Digest> mds = new LinkedBlockingDeque<>();
-        for(int i = 0; i < parallelism; i++)
+        for (int i = 0; i < parallelism; i++)
         {
             Digest md;
             switch(hashAlgo)
@@ -166,7 +166,7 @@ public class HashCalculator
     {
         ParamUtil.assertNotNull("hashAlgoType", hashAlgoType);
         ParamUtil.assertNotNull("data", data);
-        if(mdsMap.containsKey(hashAlgoType) == false)
+        if (mdsMap.containsKey(hashAlgoType) == false)
         {
             throw new IllegalArgumentException("unknown hash algo " + hashAlgoType);
         }
@@ -174,7 +174,7 @@ public class HashCalculator
         BlockingDeque<Digest> mds = mdsMap.get(hashAlgoType);
 
         Digest md = null;
-        for(int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
             try
             {
@@ -185,7 +185,7 @@ public class HashCalculator
             }
         }
 
-        if(md == null)
+        if (md == null)
         {
             throw new RuntimeOperatorException("could not get idle MessageDigest");
         }

@@ -122,7 +122,7 @@ public abstract class AbstractCATest
     @Before
     public void init()
     {
-        if(Security.getProvider("BC") == null)
+        if (Security.getProvider("BC") == null)
         {
             Security.addProvider(new BouncyCastleProvider());
         }
@@ -143,7 +143,7 @@ public abstract class AbstractCATest
     public synchronized void startScepServer()
     throws Exception
     {
-        if(scepServerContainer == null)
+        if (scepServerContainer == null)
         {
             CACaps caCaps = getExpectedCACaps();
 
@@ -167,7 +167,7 @@ public abstract class AbstractCATest
     public synchronized void stopScepServer()
     throws Exception
     {
-        if(this.scepServerContainer != null)
+        if (this.scepServerContainer != null)
         {
             this.scepServerContainer.stop();
         }
@@ -198,7 +198,7 @@ public abstract class AbstractCATest
         {
             Certificate expCACert = scepServer.getCACert();
             cACert = client.getAuthorityCertStore().getCACert();
-            if(equals(expCACert, cACert) == false)
+            if (equals(expCACert, cACert) == false)
             {
                 Assert.fail("Configured and received CA certificate not the same");
             }
@@ -206,39 +206,39 @@ public abstract class AbstractCATest
 
         boolean withRA = isWithRA();
         // RA
-        if(withRA)
+        if (withRA)
         {
             Certificate expRACert = scepServer.getRACert();
             X509Certificate rASigCert = client.getAuthorityCertStore().getSignatureCert();
             X509Certificate rAEncCert = client.getAuthorityCertStore().getEncryptionCert();
             Assert.assertEquals("RA certificate", rASigCert, rAEncCert);
 
-            if(equals(expRACert, rASigCert) == false)
+            if (equals(expRACert, rASigCert) == false)
             {
                 Assert.fail("Configured and received RA certificate not the same");
             }
         }
 
         // getNextCA
-        if(isWithNextCA())
+        if (isWithNextCA())
         {
             AuthorityCertStore nextCA = client.scepNextCACert();
 
             Certificate expNextCACert = scepServer.getNextCACert();
             X509Certificate nextCACert = nextCA.getCACert();
-            if(equals(expNextCACert, nextCACert) == false)
+            if (equals(expNextCACert, nextCACert) == false)
             {
                 Assert.fail("Configured and received next CA certificate not the same");
             }
 
-            if(withRA)
+            if (withRA)
             {
                 Certificate expNextRACert = scepServer.getNextRACert();
                 X509Certificate nextRASigCert = nextCA.getSignatureCert();
                 X509Certificate nextRAEncCert = nextCA.getEncryptionCert();
                 Assert.assertEquals("Next RA certificate", nextRASigCert, nextRAEncCert);
 
-                if(equals(expNextRACert, nextRASigCert) == false)
+                if (equals(expNextRACert, nextRASigCert) == false)
                 {
                     Assert.fail("Configured and received next RA certificate not the same");
                 }
@@ -340,16 +340,16 @@ public abstract class AbstractCATest
     {
         CACaps caCaps = getDefaultCACaps();
         CACapability[] excludedCACaps = getExcludedCACaps();
-        if(excludedCACaps != null)
+        if (excludedCACaps != null)
         {
-            for(CACapability m : excludedCACaps)
+            for (CACapability m : excludedCACaps)
             {
                 caCaps.removeCapability(m);
             }
         }
-        if(isWithNextCA())
+        if (isWithNextCA())
         {
-            if(caCaps.containsCapability(CACapability.GetNextCACert) == false)
+            if (caCaps.containsCapability(CACapability.GetNextCACert) == false)
             {
                 caCaps.addCapability(CACapability.GetNextCACert);
             }

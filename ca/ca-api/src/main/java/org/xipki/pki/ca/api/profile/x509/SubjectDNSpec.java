@@ -318,11 +318,11 @@ public class SubjectDNSpec
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-        for(ASN1ObjectIdentifier type : ids)
+        for (ASN1ObjectIdentifier type : ids)
         {
             Pattern pattern = patterns.get(type);
             StringType stringType = defaultStringTypes.get(type);
-            if(stringType == null)
+            if (stringType == null)
             {
                 stringType = StringType.utf8String;
             }
@@ -332,7 +332,7 @@ public class SubjectDNSpec
                     );
             control.setStringType(stringType);
             control.setStringLengthRange(ranges.get(type));
-            if(pattern != null)
+            if (pattern != null)
             {
                 control.setPatterns(Arrays.asList(pattern));
             }
@@ -362,7 +362,7 @@ public class SubjectDNSpec
             final ASN1ObjectIdentifier rdnType)
     {
         RDNControl control = controls.get(rdnType);
-        if(control == null)
+        if (control == null)
         {
             control = new RDNControl(rdnType,
                     0, // minOccurs
@@ -380,9 +380,9 @@ public class SubjectDNSpec
         ASN1ObjectIdentifier type = control.getType();
 
         StringType stringType = control.getStringType();
-        if(stringType != null)
+        if (stringType != null)
         {
-            if(stringTypeSets.containsKey(type)
+            if (stringTypeSets.containsKey(type)
                     && stringTypeSets.get(type).contains(stringType) == false)
             {
                 throw new CertprofileException(stringType.name() + " is not allowed "
@@ -392,22 +392,22 @@ public class SubjectDNSpec
         else
         {
             StringType specStrType = defaultStringTypes.get(type);
-            if(specStrType != null)
+            if (specStrType != null)
             {
                 control.setStringType(specStrType);
             }
         }
 
-        if(control.getPatterns() == null && patterns.containsKey(type))
+        if (control.getPatterns() == null && patterns.containsKey(type))
         {
             control.setPatterns(Arrays.asList(patterns.get(type)));
         }
 
         Range specRange = ranges.get(type);
-        if(specRange != null)
+        if (specRange != null)
         {
             Range isRange = control.getStringLengthRange();
-            if(isRange == null)
+            if (isRange == null)
             {
                 control.setStringLengthRange(specRange);
             }
@@ -416,12 +416,12 @@ public class SubjectDNSpec
                 boolean changed = false;
                 Integer specMin = specRange.getMin();
                 Integer min = isRange.getMin();
-                if(min == null)
+                if (min == null)
                 {
                     changed = true;
                     min = specMin;
                 }
-                else if(specMin != null && specMin > min)
+                else if (specMin != null && specMin > min)
                 {
                     changed = true;
                     min = specMin;
@@ -429,18 +429,18 @@ public class SubjectDNSpec
 
                 Integer specMax = specRange.getMax();
                 Integer max = isRange.getMax();
-                if(max == null)
+                if (max == null)
                 {
                     changed = true;
                     max = specMax;
                 }
-                else if(specMax != null && specMax < max)
+                else if (specMax != null && specMax < max)
                 {
                     changed = true;
                     max = specMax;
                 }
 
-                if(changed)
+                if (changed)
                 {
                     isRange.setRange(min, max);
                 }

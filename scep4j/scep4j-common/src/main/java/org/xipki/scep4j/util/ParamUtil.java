@@ -49,7 +49,7 @@ public class ParamUtil
             final String parameterName,
             final Object parameter)
     {
-        if(parameter == null)
+        if (parameter == null)
         {
             throw new IllegalArgumentException(parameterName + " could not be null");
         }
@@ -59,12 +59,12 @@ public class ParamUtil
             final String parameterName,
             final String parameter)
     {
-        if(parameter == null)
+        if (parameter == null)
         {
             throw new IllegalArgumentException(parameterName + " could not be null");
         }
 
-        if(parameter.isEmpty())
+        if (parameter.isEmpty())
         {
             throw new IllegalArgumentException(parameterName + " could not be blank");
         }
@@ -74,12 +74,12 @@ public class ParamUtil
             final String parameterName,
             final Collection<?> parameter)
     {
-        if(parameter == null)
+        if (parameter == null)
         {
             throw new IllegalArgumentException(parameterName + " could not be null");
         }
 
-        if(parameter.isEmpty())
+        if (parameter.isEmpty())
         {
             throw new IllegalArgumentException(parameterName + " could not be empty");
         }
@@ -89,12 +89,12 @@ public class ParamUtil
             final String parameterName,
             final Map<?, ?> parameter)
     {
-        if(parameter == null)
+        if (parameter == null)
         {
             throw new IllegalArgumentException(parameterName + " could not be null");
         }
 
-        if(parameter.isEmpty())
+        if (parameter.isEmpty())
         {
             throw new IllegalArgumentException(parameterName + " could not be empty");
         }

@@ -54,7 +54,7 @@ public class EnumCompleter implements XipkiCompleter
     {
         enums.clear();
         StringTokenizer st = new StringTokenizer(tokens, ", ");
-        while(st.hasMoreTokens())
+        while (st.hasMoreTokens())
         {
             enums.add(st.nextToken());
         }
@@ -67,7 +67,7 @@ public class EnumCompleter implements XipkiCompleter
             final List<String> candidates)
     {
         StringsCompleter delegate = new StringsCompleter();
-        for(String entry : enums)
+        for (String entry : enums)
         {
             delegate.getStrings().add(entry);
         }

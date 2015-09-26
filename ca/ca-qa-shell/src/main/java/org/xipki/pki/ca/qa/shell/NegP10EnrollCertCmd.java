@@ -94,14 +94,14 @@ public class NegP10EnrollCertCmd extends ClientCmd
         }
 
         X509Certificate cert = null;
-        if(result != null)
+        if (result != null)
         {
             String id = result.getAllIds().iterator().next();
             CertOrError certOrError = result.getCertificateOrError(id);
             cert = (X509Certificate) certOrError.getCertificate();
         }
 
-        if(cert != null)
+        if (cert != null)
         {
             throw new CmdFailure("no certificate is excepted, but received one");
         }

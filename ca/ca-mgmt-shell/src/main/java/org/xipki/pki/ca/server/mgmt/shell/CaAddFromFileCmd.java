@@ -120,7 +120,7 @@ public class CaAddFromFileCmd extends CaCmd
         CertArt art = CertArt.valueOf(s);
         assertNotNull(art, key, s);
 
-        if(art != CertArt.X509PKC)
+        if (art != CertArt.X509PKC)
         {
             throw new IllegalCmdParamException("unsupported " + key + ": '" + s + "'");
         }
@@ -128,7 +128,7 @@ public class CaAddFromFileCmd extends CaCmd
         // NEXT_SN
         key = CaExportCmd.KEY_NEXT_SN;
         long nextSerial = getRequiredLongProp(props, key);
-        if(nextSerial < 0)
+        if (nextSerial < 0)
         {
             throw new IllegalCmdParamException("invalid " + key + ": " + nextSerial);
         }
@@ -136,7 +136,7 @@ public class CaAddFromFileCmd extends CaCmd
         // NEXT_CRLNO
         key = CaExportCmd.KEY_NEXT_CRLNO;
         int nextCrlNumber = getRequiredIntProp(props, key);
-        if(nextCrlNumber < 1)
+        if (nextCrlNumber < 1)
         {
             throw new IllegalCmdParamException("invalid " + key + ": " + nextCrlNumber);
         }
@@ -144,7 +144,7 @@ public class CaAddFromFileCmd extends CaCmd
         // NUM_CRLS
         key = CaExportCmd.KEY_NUM_CRLS;
         int numCrls = getRequiredIntProp(props, key);
-        if(numCrls < 0)
+        if (numCrls < 0)
         {
             throw new IllegalCmdParamException("invalid " + key + ": " + numCrls);
         }
@@ -152,7 +152,7 @@ public class CaAddFromFileCmd extends CaCmd
         // EXPIRATION_PERIOD
         key = CaExportCmd.KEY_EXPIRATION_PERIOD;
         int expirationPeriod = getRequiredIntProp(props, key);
-        if(expirationPeriod < 0)
+        if (expirationPeriod < 0)
         {
             throw new IllegalCmdParamException("invalid " + key + ": " + expirationPeriod);
         }
@@ -165,7 +165,7 @@ public class CaAddFromFileCmd extends CaCmd
         key = CaExportCmd.KEY_SIGNER_CONF;
         String signerConf = getStrProp(props, key, true);
 
-        if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
+        if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
         {
             signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf,
                     passwordResolver);
@@ -175,7 +175,7 @@ public class CaAddFromFileCmd extends CaCmd
         key = CaExportCmd.KEY_CRL_URIS;
         s = getStrProp(props, key, false);
         List<String> crlUris = null;
-        if(s != null)
+        if (s != null)
         {
             crlUris = StringUtil.split(s, ", ");
         }
@@ -184,7 +184,7 @@ public class CaAddFromFileCmd extends CaCmd
         key = CaExportCmd.KEY_DELTACRL_URIS;
         s = getStrProp(props, key, false);
         List<String> deltaCrlUris = null;
-        if(s != null)
+        if (s != null)
         {
             deltaCrlUris = StringUtil.split(s, ", ");
         }
@@ -193,7 +193,7 @@ public class CaAddFromFileCmd extends CaCmd
         key = CaExportCmd.KEY_OCSP_URIS;
         s = getStrProp(props, key, false);
         List<String> ocspUris = null;
-        if(s != null)
+        if (s != null)
         {
             ocspUris = StringUtil.split(s, ", ");
         }
@@ -202,7 +202,7 @@ public class CaAddFromFileCmd extends CaCmd
         key = CaExportCmd.KEY_CACERT_URIS;
         s = getStrProp(props, key, false);
         List<String> caCertUris = null;
-        if(s != null)
+        if (s != null)
         {
             ocspUris = StringUtil.split(s, ", ");
         }
@@ -243,7 +243,7 @@ public class CaAddFromFileCmd extends CaCmd
         // CRLSIGNER_NAME
         key = CaExportCmd.KEY_CRLSIGNER_NAME;
         s = getStrProp(props, key, false);
-        if(s != null)
+        if (s != null)
         {
             entry.setCrlSignerName(s);
         }
@@ -251,7 +251,7 @@ public class CaAddFromFileCmd extends CaCmd
         // CMPCONTROL_NAME
         key = CaExportCmd.KEY_CMPCONTROL_NAME;
         s = getStrProp(props, key, false);
-        if(s != null)
+        if (s != null)
         {
             entry.setCmpControlName(s);
         }
@@ -270,7 +270,7 @@ public class CaAddFromFileCmd extends CaCmd
         // EXTRA_CONTROL
         key = CaExportCmd.KEY_EXTRA_CONTROL;
         s = getStrProp(props, key, false);
-        if(s != null)
+        if (s != null)
         {
             entry.setExtraControl(s);
         }
@@ -280,10 +280,10 @@ public class CaAddFromFileCmd extends CaCmd
         s = getStrProp(props, key, true);
         Set<String> permissions = StringUtil.splitAsSet(s, ", ");
         Set<Permission> _permissions = new HashSet<>();
-        for(String permission : permissions)
+        for (String permission : permissions)
         {
             Permission _permission = Permission.getPermission(permission);
-            if(_permission == null)
+            if (_permission == null)
             {
                 throw new IllegalCmdParamException("invalid permission: " + permission);
             }
@@ -295,11 +295,11 @@ public class CaAddFromFileCmd extends CaCmd
         key = CaExportCmd.KEY_REVOKED;
         s = getStrProp(props, key, true);
         boolean revoked;
-        if("true".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s))
+        if ("true".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s))
         {
             revoked = true;
         }
-        else if("false".equalsIgnoreCase(s) || "no".equalsIgnoreCase(s))
+        else if ("false".equalsIgnoreCase(s) || "no".equalsIgnoreCase(s))
         {
             revoked = false;
         }
@@ -308,7 +308,7 @@ public class CaAddFromFileCmd extends CaCmd
             throw new IllegalCmdParamException("invalid " + key + ": '" + s + "'");
         }
 
-        if(revoked)
+        if (revoked)
         {
             // REV_REASON
             key = CaExportCmd.KEY_REV_REASON;
@@ -322,7 +322,7 @@ public class CaAddFromFileCmd extends CaCmd
             key = CaExportCmd.KEY_REV_INV_TIME;
             Long t = getLongProp(props, key, false);
             Date invalidityTime = null;
-            if(t != null)
+            if (t != null)
             {
                 invalidityTime = new Date(t.longValue() * 1000);
             }
@@ -332,14 +332,14 @@ public class CaAddFromFileCmd extends CaCmd
         }
 
         // CERT
-        if(ignoreCert == false)
+        if (ignoreCert == false)
         {
             key = CaExportCmd.KEY_CERT;
             s = getStrProp(props, key, false);
             byte[] certBytes = null;
-            if(s != null)
+            if (s != null)
             {
-                if(StringUtil.startsWithIgnoreCase(s, "file:"))
+                if (StringUtil.startsWithIgnoreCase(s, "file:"))
                 {
                     certBytes = IoUtil.read(s.substring("file:".length()));
                 }
@@ -350,7 +350,7 @@ public class CaAddFromFileCmd extends CaCmd
             }
 
             X509Certificate caCert = null;
-            if(certBytes != null)
+            if (certBytes != null)
             {
                 caCert = X509Util.parseCert(certBytes);
             }
@@ -367,7 +367,7 @@ public class CaAddFromFileCmd extends CaCmd
     throws IllegalCmdParamException
     {
         String s = props.getProperty(propKey);
-        if(StringUtil.isBlank(s))
+        if (StringUtil.isBlank(s))
         {
             s = "";
         }
@@ -376,12 +376,12 @@ public class CaAddFromFileCmd extends CaCmd
             s = s.trim();
         }
 
-        if(s.isEmpty() == false)
+        if (s.isEmpty() == false)
         {
             return s;
         }
 
-        if(required)
+        if (required)
         {
             throw new IllegalCmdParamException(
                     "Required property '" + propKey + "' is not defined");
@@ -438,7 +438,7 @@ public class CaAddFromFileCmd extends CaCmd
             final String value)
     throws IllegalCmdParamException
     {
-        if(obj == null)
+        if (obj == null)
         {
             throw new IllegalCmdParamException("invalid " + key + ": '" + value + "'");
         }

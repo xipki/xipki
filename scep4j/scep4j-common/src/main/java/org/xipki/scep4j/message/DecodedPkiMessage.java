@@ -209,7 +209,7 @@ public class DecodedPkiMessage extends PkiMessage
 
         SignerInformationStore signerStore = pkiMessage.getSignerInfos();
         Collection<SignerInformation> signerInfos = signerStore.getSigners();
-        if(signerInfos.size() != 1)
+        if (signerInfos.size() != 1)
         {
             throw new MessageDecodingException(
                     "number of signerInfos is not 1, but " + signerInfos.size());
@@ -219,24 +219,24 @@ public class DecodedPkiMessage extends PkiMessage
         SignerId sid = signerInfo.getSID();
 
         Collection<?> signedDataCerts = null;
-        if(certStore != null)
+        if (certStore != null)
         {
             signedDataCerts = certStore.getMatches(sid);
         }
 
-        if(signedDataCerts == null || signedDataCerts.isEmpty())
+        if (signedDataCerts == null || signedDataCerts.isEmpty())
         {
             signedDataCerts = pkiMessage.getCertificates().getMatches(signerInfo.getSID());
         }
 
-        if(signedDataCerts == null || signedDataCerts.size() != 1)
+        if (signedDataCerts == null || signedDataCerts.size() != 1)
         {
             throw new MessageDecodingException(
                     "could not find embedded certificate to verify the signature");
         }
 
         AttributeTable signedAttrs = signerInfo.getSignedAttributes();
-        if(signedAttrs == null)
+        if (signedAttrs == null)
         {
             throw new MessageDecodingException("missing SCEP attributes");
         }
@@ -246,7 +246,7 @@ public class DecodedPkiMessage extends PkiMessage
         {
             ASN1Encodable attrValue = ScepUtil.getFirstAttrValue(signedAttrs,
                     CMSAttributes.signingTime);
-            if(attrValue != null)
+            if (attrValue != null)
             {
                 signingTime = Time.getInstance(attrValue).getDate();
             }
@@ -257,7 +257,7 @@ public class DecodedPkiMessage extends PkiMessage
         {
             String s = getPrintableStringAttrValue(signedAttrs,
                     ScepObjectIdentifiers.id_transactionID);
-            if(s == null || s.isEmpty())
+            if (s == null || s.isEmpty())
             {
                 throw new MessageDecodingException("missing required SCEP attribute transactionId");
             }
@@ -269,13 +269,13 @@ public class DecodedPkiMessage extends PkiMessage
         {
             Integer i = getIntegerPrintStringAttrValue(signedAttrs,
                     ScepObjectIdentifiers.id_messageType);
-            if(i == null)
+            if (i == null)
             {
                 throw new MessageDecodingException("tid " + transactionId.getId()
                         + ": missing required SCEP attribute messageType");
             }
             messageType = MessageType.valueForCode(i);
-            if(messageType == null)
+            if (messageType == null)
             {
                 throw new MessageDecodingException("tid " + transactionId.getId()
                         + ": invalid messageType '" + i + "'");
@@ -286,7 +286,7 @@ public class DecodedPkiMessage extends PkiMessage
         Nonce senderNonce;
         {
             senderNonce = getNonceAttrValue(signedAttrs, ScepObjectIdentifiers.id_senderNonce);
-            if(senderNonce == null)
+            if (senderNonce == null)
             {
                 throw new MessageDecodingException("tid " + transactionId.getId()
                         + ": missing required SCEP attribute senderNonce");
@@ -294,7 +294,7 @@ public class DecodedPkiMessage extends PkiMessage
         }
 
         DecodedPkiMessage ret = new DecodedPkiMessage(transactionId, messageType, senderNonce);
-        if(signingTime != null)
+        if (signingTime != null)
         {
             ret.setSigningTime(signingTime);
         }
@@ -309,14 +309,14 @@ public class DecodedPkiMessage extends PkiMessage
             ret.setFailureMessage("could not parse recipientNonce: " + e.getMessage());
         }
 
-        if(recipientNonce != null)
+        if (recipientNonce != null)
         {
             ret.setRecipientNonce(recipientNonce);
         }
 
         PkiStatus pkiStatus = null;
         FailInfo failInfo = null;
-        if(MessageType.CertRep == messageType)
+        if (MessageType.CertRep == messageType)
         {
             // pkiStatus
             Integer i;
@@ -329,14 +329,14 @@ public class DecodedPkiMessage extends PkiMessage
                 return ret;
             }
 
-            if(i == null)
+            if (i == null)
             {
                 ret.setFailureMessage("missing required SCEP attribute pkiStatus");
                 return ret;
             }
 
             pkiStatus = PkiStatus.valueForCode(i);
-            if(pkiStatus == null)
+            if (pkiStatus == null)
             {
                 ret.setFailureMessage("invalid pkiStatus '" + i + "'");
                 return ret;
@@ -344,7 +344,7 @@ public class DecodedPkiMessage extends PkiMessage
             ret.setPkiStatus(pkiStatus);
 
             // failureInfo
-            if(pkiStatus == PkiStatus.FAILURE)
+            if (pkiStatus == PkiStatus.FAILURE)
             {
                 try
                 {
@@ -356,14 +356,14 @@ public class DecodedPkiMessage extends PkiMessage
                     return ret;
                 }
 
-                if(i == null)
+                if (i == null)
                 {
                     ret.setFailureMessage("missing required SCEP attribute failureInfo");
                     return ret;
                 }
 
                 failInfo = FailInfo.valueForCode(i);
-                if(failInfo == null)
+                if (failInfo == null)
                 {
                     ret.setFailureMessage("invalid failureInfo '" + i + "'");
                     return ret;
@@ -374,10 +374,10 @@ public class DecodedPkiMessage extends PkiMessage
 
         // other signedAttributes
         Attribute[] attrs = signedAttrs.toASN1Structure().getAttributes();
-        for(Attribute attr : attrs)
+        for (Attribute attr : attrs)
         {
             ASN1ObjectIdentifier type = attr.getAttrType();
-            if(scepAttrTypes.contains(type) == false)
+            if (scepAttrTypes.contains(type) == false)
             {
                 ret.addSignendAttribute(type, attr.getAttrValues().getObjectAt(0));
             }
@@ -388,9 +388,9 @@ public class DecodedPkiMessage extends PkiMessage
         attrs = (unsignedAttrs == null)
                 ? null
                 : unsignedAttrs.toASN1Structure().getAttributes();
-        if(attrs != null)
+        if (attrs != null)
         {
-            for(Attribute attr : attrs)
+            for (Attribute attr : attrs)
             {
                 ASN1ObjectIdentifier type = attr.getAttrType();
                 ret.addUnsignendAttribute(type, attr.getAttrValues().getObjectAt(0));
@@ -401,7 +401,7 @@ public class DecodedPkiMessage extends PkiMessage
         ret.setDigestAlgorithm(digestAlgOID);
 
         String sigAlgOID = signerInfo.getEncryptionAlgOID();
-        if(PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOID) == false)
+        if (PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOID) == false)
         {
             ASN1ObjectIdentifier _digestAlgOID;
             try
@@ -418,7 +418,7 @@ public class DecodedPkiMessage extends PkiMessage
                 ret.setFailureMessage(msg);
                 return ret;
             }
-            if(digestAlgOID.equals(_digestAlgOID) == false)
+            if (digestAlgOID.equals(_digestAlgOID) == false)
             {
                 ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use the"
                         + " same digestAlgorithm");
@@ -471,12 +471,12 @@ public class DecodedPkiMessage extends PkiMessage
         }
 
         ret.setSignatureValid(signatureValid);
-        if(signatureValid == false)
+        if (signatureValid == false)
         {
             return ret;
         }
 
-        if(MessageType.CertRep == messageType
+        if (MessageType.CertRep == messageType
                 && (pkiStatus == PkiStatus.FAILURE | pkiStatus == PkiStatus.PENDING))
         {
             return ret;
@@ -485,10 +485,10 @@ public class DecodedPkiMessage extends PkiMessage
         // MessageData
         CMSTypedData signedContent = pkiMessage.getSignedContent();
         ASN1ObjectIdentifier signedContentType = signedContent.getContentType();
-        if(CMSObjectIdentifiers.envelopedData.equals(signedContentType) == false)
+        if (CMSObjectIdentifiers.envelopedData.equals(signedContentType) == false)
         {
             // fall back: some SCEP client, such as JSCEP use id-data
-            if(CMSObjectIdentifiers.data.equals(signedContentType) == false)
+            if (CMSObjectIdentifiers.data.equals(signedContentType) == false)
             {
                 ret.setFailureMessage("either id-envelopedData or id-data is excepted, but not '"
                         + signedContentType.getId());
@@ -529,23 +529,23 @@ public class DecodedPkiMessage extends PkiMessage
 
         try
         {
-            if(MessageType.PKCSReq == messageType || MessageType.RenewalReq == messageType
+            if (MessageType.PKCSReq == messageType || MessageType.RenewalReq == messageType
                     || MessageType.UpdateReq == messageType)
             {
                 CertificationRequest messageData =
                         CertificationRequest.getInstance(encodedMessageData);
                 ret.setMessageData(messageData);
-            } else if(MessageType.CertPoll == messageType)
+            } else if (MessageType.CertPoll == messageType)
             {
                 IssuerAndSubject messageData = IssuerAndSubject.getInstance(encodedMessageData);
                 ret.setMessageData(messageData);
-            } else if(MessageType.GetCert == messageType || MessageType.GetCRL == messageType)
+            } else if (MessageType.GetCert == messageType || MessageType.GetCRL == messageType)
             {
                 IssuerAndSerialNumber messageData =
                         IssuerAndSerialNumber.getInstance(encodedMessageData);
                 ret.setMessageData(messageData);
                 ret.setMessageData(messageData);
-            } else if(MessageType.CertRep == messageType)
+            } else if (MessageType.CertRep == messageType)
             {
                 ContentInfo ci = ContentInfo.getInstance(encodedMessageData);
                 ret.setMessageData(ci);
@@ -554,7 +554,7 @@ public class DecodedPkiMessage extends PkiMessage
                 throw new RuntimeException("should not reach here, unknown messageType "
                         + messageType);
             }
-        }catch(Exception e)
+        } catch (Exception e)
         {
             final String msg = "error while trying to parse the messageData: " + e.getMessage();
             LOG.error(msg);
@@ -572,11 +572,11 @@ public class DecodedPkiMessage extends PkiMessage
     throws MessageDecodingException
     {
         ASN1Encodable value = ScepUtil.getFirstAttrValue(attrs, type);
-        if(value instanceof DERPrintableString)
+        if (value instanceof DERPrintableString)
         {
             return ((DERPrintableString) value).getString();
         }
-        else if(value != null)
+        else if (value != null)
         {
             throw new MessageDecodingException("the value of attribute " + type.getId()
                     + " is not PrintableString");
@@ -593,7 +593,7 @@ public class DecodedPkiMessage extends PkiMessage
     throws MessageDecodingException
     {
         String s = getPrintableStringAttrValue(attrs, type);
-        if(s == null)
+        if (s == null)
         {
             return null;
         }
@@ -601,7 +601,7 @@ public class DecodedPkiMessage extends PkiMessage
         try
         {
             return Integer.parseInt(s);
-        }catch(NumberFormatException e)
+        } catch (NumberFormatException e)
         {
             throw new MessageDecodingException("invalid integer '" + s + "'");
         }
@@ -613,12 +613,12 @@ public class DecodedPkiMessage extends PkiMessage
     throws MessageDecodingException
     {
         ASN1Encodable value = ScepUtil.getFirstAttrValue(attrs, type);
-        if(value instanceof ASN1OctetString)
+        if (value instanceof ASN1OctetString)
         {
             byte[] bytes = ((ASN1OctetString) value).getOctets();
             return new Nonce(bytes);
         }
-        else if(value != null)
+        else if (value != null)
         {
             throw new MessageDecodingException("the value of attribute " + type.getId()
                     + " is not OctetString");

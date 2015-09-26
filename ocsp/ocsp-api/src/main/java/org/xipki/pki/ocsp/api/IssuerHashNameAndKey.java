@@ -58,12 +58,12 @@ public class IssuerHashNameAndKey
         ParamUtil.assertNotNull("algo", algo);
 
         int len = algo.getLength();
-        if(issuerNameHash == null || issuerNameHash.length != len)
+        if (issuerNameHash == null || issuerNameHash.length != len)
         {
             throw new IllegalArgumentException("issuerNameash is invalid");
         }
 
-        if(issuerKeyHash == null || issuerKeyHash.length != len)
+        if (issuerKeyHash == null || issuerKeyHash.length != len)
         {
             throw new IllegalArgumentException("issuerKeyHash is invalid");
         }

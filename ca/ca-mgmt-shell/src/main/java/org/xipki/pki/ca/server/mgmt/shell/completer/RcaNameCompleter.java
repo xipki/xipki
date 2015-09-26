@@ -53,16 +53,16 @@ public class RcaNameCompleter extends MgmtNameCompleter
     protected Set<String> getEnums()
     {
         Set<String> ret = new HashSet<>();
-        for(String name : caManager.getCaNames())
+        for (String name : caManager.getCaNames())
         {
             CAEntry caEntry = caManager.getCA(name);
-            if(caEntry instanceof X509CAEntry == false)
+            if (caEntry instanceof X509CAEntry == false)
             {
                 continue;
             }
 
             X509Certificate cert = ((X509CAEntry) caEntry).getCertificate();
-            if(cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal()))
+            if (cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal()))
             {
                 ret.add(name);
             }

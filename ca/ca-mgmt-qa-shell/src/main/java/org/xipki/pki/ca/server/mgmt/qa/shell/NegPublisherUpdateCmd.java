@@ -57,7 +57,7 @@ public class NegPublisherUpdateCmd extends PublisherUpdateCmd
         try
         {
             super._doExecute();
-        }catch(Exception e)
+        } catch (Exception e)
         {
             return null;
         }

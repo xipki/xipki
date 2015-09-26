@@ -77,25 +77,25 @@ public class DbDigestExportWorker extends DbPortWorker
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         File f = new File(destFolder);
-        if(f.exists() == false)
+        if (f.exists() == false)
         {
             f.mkdirs();
         }
         else
         {
-            if(f.isDirectory() == false)
+            if (f.isDirectory() == false)
             {
                 throw new IOException(destFolder + " is not a folder");
             }
 
-            if(f.canWrite() == false)
+            if (f.canWrite() == false)
             {
                 throw new IOException(destFolder + " is not writable");
             }
         }
 
         String[] children = f.list();
-        if(children != null && children.length > 0)
+        if (children != null && children.length > 0)
         {
             throw new IOException(destFolder + " is not empty");
         }
@@ -119,7 +119,7 @@ public class DbDigestExportWorker extends DbPortWorker
             DbSchemaType dbSchemaType = detectDbSchemaType(dataSource);
             System.out.println("database schema: " + dbSchemaType);
             DbDigestExporter digester;
-            if(dbSchemaType == DbSchemaType.EJBCA_CA_v3)
+            if (dbSchemaType == DbSchemaType.EJBCA_CA_v3)
             {
                 digester = new EjbcaDigestExporter(dataSource, destFolder, stopMe,
                         numCertsPerSelect, dbSchemaType);
@@ -134,7 +134,7 @@ public class DbDigestExportWorker extends DbPortWorker
             try
             {
                 dataSource.shutdown();
-            }catch(Throwable e)
+            } catch (Throwable e)
             {
                 LOG.error("dataSource.shutdown()", e);
             }
@@ -150,25 +150,25 @@ public class DbDigestExportWorker extends DbPortWorker
         Connection conn = dataSource.getConnection();
         try
         {
-            if(dataSource.tableExists(conn, "CAINFO")
+            if (dataSource.tableExists(conn, "CAINFO")
                     && dataSource.tableExists(conn, "RAWCERT"))
             {
                 return DbSchemaType.XIPKI_CA_v1;
             }
-            else if(dataSource.tableExists(conn, "ISSUER")
+            else if (dataSource.tableExists(conn, "ISSUER")
                     && dataSource.tableExists(conn, "CERTHASH"))
             {
                 return DbSchemaType.XIPKI_OCSP_v1;
             }
-            else if(dataSource.tableExists(conn, "CS_CA")
+            else if (dataSource.tableExists(conn, "CS_CA")
                     && dataSource.tableExists(conn, "CRAW"))
             {
                 return DbSchemaType.XIPKI_CA_v2;
-            } else if( dataSource.tableExists(conn, "ISSUER")
+            } else if ( dataSource.tableExists(conn, "ISSUER")
                     && dataSource.tableExists(conn, "CHASH"))
             {
                 return DbSchemaType.XIPKI_OCSP_v2;
-            } else if( dataSource.tableExists(conn, "CAData")
+            } else if ( dataSource.tableExists(conn, "CAData")
                     && dataSource.tableExists(conn, "CertificateData"))
             {
                 return DbSchemaType.EJBCA_CA_v3;

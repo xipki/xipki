@@ -56,7 +56,7 @@ public class NegCaGenRootCACmd extends CaGenRootCACmd
         try
         {
             super._doExecute();
-        }catch(Exception e)
+        } catch (Exception e)
         {
             return null;
         }

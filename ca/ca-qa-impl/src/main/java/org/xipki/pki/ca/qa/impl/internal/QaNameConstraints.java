@@ -55,12 +55,12 @@ public class QaNameConstraints extends QaExtension
     public QaNameConstraints(
             final NameConstraints jaxb)
     {
-        if(jaxb.getPermittedSubtrees() != null
+        if (jaxb.getPermittedSubtrees() != null
                 && CollectionUtil.isNotEmpty(jaxb.getPermittedSubtrees().getBase()))
         {
             List<QaGeneralSubtree> list = new LinkedList<>();
             List<GeneralSubtreeBaseType> bases =  jaxb.getPermittedSubtrees().getBase();
-            for(GeneralSubtreeBaseType base : bases)
+            for (GeneralSubtreeBaseType base : bases)
             {
                 list.add(new QaGeneralSubtree(base));
             }
@@ -70,12 +70,12 @@ public class QaNameConstraints extends QaExtension
             permittedSubtrees = null;
         }
 
-        if(jaxb.getExcludedSubtrees() != null
+        if (jaxb.getExcludedSubtrees() != null
                 && CollectionUtil.isNotEmpty(jaxb.getExcludedSubtrees().getBase()))
         {
             List<QaGeneralSubtree> list = new LinkedList<>();
             List<GeneralSubtreeBaseType> bases =  jaxb.getExcludedSubtrees().getBase();
-            for(GeneralSubtreeBaseType base : bases)
+            for (GeneralSubtreeBaseType base : bases)
             {
                 list.add(new QaGeneralSubtree(base));
             }
@@ -85,7 +85,7 @@ public class QaNameConstraints extends QaExtension
             excludedSubtrees = null;
         }
 
-        if(permittedSubtrees == null && excludedSubtrees == null)
+        if (permittedSubtrees == null && excludedSubtrees == null)
         {
             throw new IllegalArgumentException(
                     "at least one of permittedSubtrees and excludesSubtrees should be non-null");

@@ -88,20 +88,20 @@ public class GetCRLCmd extends CRLCmd
     throws Exception
     {
         Set<String> caNames = caClient.getCaNames();
-        if(isEmpty(caNames))
+        if (isEmpty(caNames))
         {
             throw new IllegalCmdParamException("no CA is configured");
         }
 
-        if(caName != null && ! caNames.contains(caName))
+        if (caName != null && ! caNames.contains(caName))
         {
             throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs "
                     + caNames);
         }
 
-        if(caName == null)
+        if (caName == null)
         {
-            if(caNames.size() == 1)
+            if (caNames.size() == 1)
             {
                 caName = caNames.iterator().next();
             }
@@ -116,24 +116,24 @@ public class GetCRLCmd extends CRLCmd
         try
         {
             crl = retrieveCRL(caName);
-        }catch(PKIErrorException e)
+        } catch (PKIErrorException e)
         {
             throw new CmdFailure("received no CRL from server: " + e.getMessage());
         }
 
-        if(crl == null)
+        if (crl == null)
         {
             throw new CmdFailure("received no CRL from server");
         }
 
         saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
 
-        if(withBaseCRL.booleanValue())
+        if (withBaseCRL.booleanValue())
         {
             byte[] octetString = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
-            if(octetString != null)
+            if (octetString != null)
             {
-                if(baseCRLOut == null)
+                if (baseCRLOut == null)
                 {
                     baseCRLOut = outFile + "-baseCRL";
                 }
@@ -145,7 +145,7 @@ public class GetCRLCmd extends CRLCmd
                 try
                 {
                     crl = caClient.downloadCRL(caName, baseCrlNumber, debug);
-                }catch(PKIErrorException e)
+                } catch (PKIErrorException e)
                 {
                     throw new CmdFailure("received no baseCRL from server: " + e.getMessage());
                 } finally
@@ -153,7 +153,7 @@ public class GetCRLCmd extends CRLCmd
                     saveRequestResponse(debug);
                 }
 
-                if(crl == null)
+                if (crl == null)
                 {
                     throw new CmdFailure("received no baseCRL from server");
                 }

@@ -73,7 +73,7 @@ public class ProfileAddCmd extends CaCmd
     protected Object _doExecute()
     throws Exception
     {
-        if(conf == null && confFile != null)
+        if (conf == null && confFile != null)
         {
             conf = new String(IoUtil.read(confFile));
         }

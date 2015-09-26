@@ -58,7 +58,7 @@ public class CertsBundle
             final Map<Long, DbDigestEntry> certs,
             final List<Long> serialNumbers)
     {
-        if(numSkipped < 0)
+        if (numSkipped < 0)
         {
             throw new IllegalArgumentException("numSkipped could not be negative: " + numSkipped);
         }

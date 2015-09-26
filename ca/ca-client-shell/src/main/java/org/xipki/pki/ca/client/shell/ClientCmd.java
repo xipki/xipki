@@ -70,7 +70,7 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
     {
         boolean saveReq = isNotBlank(reqout);
         boolean saveResp = isNotBlank(respout);
-        if(saveReq || saveResp)
+        if (saveReq || saveResp)
         {
             return new RequestResponseDebug();
         }
@@ -82,24 +82,24 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
     {
         boolean saveReq = isNotBlank(reqout);
         boolean saveResp = isNotBlank(respout);
-        if(saveReq == false && saveResp == false)
+        if (saveReq == false && saveResp == false)
         {
             return;
         }
 
-        if(debug == null || debug.size() == 0)
+        if (debug == null || debug.size() == 0)
         {
             return;
         }
 
         final int n = debug.size();
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             RequestResponsePair reqResp = debug.get(i);
-            if(saveReq)
+            if (saveReq)
             {
                 byte[] bytes = reqResp.getRequest();
-                if(bytes != null)
+                if (bytes != null)
                 {
                     String fn = (n == 1)
                             ? reqout
@@ -114,10 +114,10 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
                 }
             }
 
-            if(saveResp)
+            if (saveResp)
             {
                 byte[] bytes = reqResp.getResponse();
-                if(bytes != null)
+                if (bytes != null)
                 {
                     String fn = (n == 1)
                             ? respout
@@ -125,7 +125,7 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
                     try
                     {
                         IoUtil.save(fn, bytes);
-                    }catch(IOException e)
+                    } catch (IOException e)
                     {
                         System.err.println("IOException: " + e.getMessage());
                     }
@@ -139,7 +139,7 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
             final int index)
     {
         int idx = filename.lastIndexOf('.');
-        if(idx == -1 || idx == filename.length() - 1)
+        if (idx == -1 || idx == filename.length() - 1)
         {
             return filename + "-" + index;
         }

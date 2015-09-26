@@ -109,17 +109,17 @@ public class OCSPCertPublisher extends X509CertPublisher
         {
             confPairs = new ConfPairs(conf);
             datasourceName = confPairs.getValue("datasource");
-        }catch(Exception e)
+        } catch (Exception e)
         {
         }
 
         DataSourceWrapper dataSource = null;
-        if(datasourceName != null)
+        if (datasourceName != null)
         {
             dataSource = dataSources.get(datasourceName);
         }
 
-        if(dataSource == null)
+        if (dataSource == null)
         {
             throw new CertPublisherException(
                     "no datasource named '" + datasourceName + "' is specified");
@@ -228,7 +228,7 @@ public class OCSPCertPublisher extends X509CertPublisher
                 ? null
                 : auditServiceRegister.getAuditService();
 
-        if(auditService == null)
+        if (auditService == null)
         {
             return;
         }
@@ -238,10 +238,10 @@ public class OCSPCertPublisher extends X509CertPublisher
         auditEvent.setName("SYSTEM");
         auditEvent.setLevel(AuditLevel.ERROR);
         auditEvent.setStatus(AuditStatus.FAILED);
-        if(cert instanceof X509CertWithDBCertId)
+        if (cert instanceof X509CertWithDBCertId)
         {
             Integer certId = ((X509CertWithDBCertId) cert).getCertId();
-            if(certId != null)
+            if (certId != null)
             {
                 auditEvent.addEventData(new AuditEventData("id", certId.toString()));
             }

@@ -60,7 +60,7 @@ public abstract class P12SecurityCmd extends SecurityCmd
     protected char[] getPassword()
     {
         char[] pwdInChar = readPasswordIfNotSet(password);
-        if(pwdInChar != null)
+        if (pwdInChar != null)
         {
             password = new String(pwdInChar);
         }
@@ -80,7 +80,7 @@ public abstract class P12SecurityCmd extends SecurityCmd
             ks.load(fIn, getPassword());
         }finally
         {
-            if(fIn != null)
+            if (fIn != null)
             {
                 fIn.close();
             }

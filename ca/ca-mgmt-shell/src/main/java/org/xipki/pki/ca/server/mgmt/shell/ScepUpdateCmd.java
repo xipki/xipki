@@ -89,15 +89,15 @@ public class ScepUpdateCmd extends CaCmd
     private String getResponderConf()
     throws Exception
     {
-        if(responderConf == null)
+        if (responderConf == null)
         {
             return responderConf;
         }
         String _respType = responderType;
-        if(_respType == null)
+        if (_respType == null)
         {
             ScepEntry entry = caManager.getScepEntry(caName);
-            if(entry == null)
+            if (entry == null)
             {
                 throw new IllegalCmdParamException("please specify the responderType");
             }
@@ -112,11 +112,11 @@ public class ScepUpdateCmd extends CaCmd
     throws Exception
     {
         String certConf = null;
-        if(CAManager.NULL.equalsIgnoreCase(certFile))
+        if (CAManager.NULL.equalsIgnoreCase(certFile))
         {
             certConf = CAManager.NULL;
         }
-        else if(certFile != null)
+        else if (certFile != null)
         {
             byte[] certBytes = IoUtil.read(certFile);
             X509Util.parseCert(new ByteArrayInputStream(certBytes));
@@ -124,23 +124,23 @@ public class ScepUpdateCmd extends CaCmd
         }
 
         ChangeScepEntry entry = new ChangeScepEntry(caName);
-        if(responderType != null)
+        if (responderType != null)
         {
             entry.setResponderType(responderType);
         }
 
         String conf = getResponderConf();
-        if(conf != null)
+        if (conf != null)
         {
             entry.setResponderConf(conf);
         }
 
-        if(certConf != null)
+        if (certConf != null)
         {
             entry.setBase64Cert(certConf);
         }
 
-        if(control != null)
+        if (control != null)
         {
             entry.setControl(control);
         }

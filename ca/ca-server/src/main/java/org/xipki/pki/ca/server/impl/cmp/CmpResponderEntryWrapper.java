@@ -64,7 +64,7 @@ public class CmpResponderEntryWrapper
     {
         this.dbEntry = dbEntry;
         signer = null;
-        if(dbEntry.getCertificate() != null)
+        if (dbEntry.getCertificate() != null)
         {
             subjectAsX500Name = X500Name.getInstance(
                     dbEntry.getCertificate().getSubjectX500Principal().getEncoded());
@@ -81,12 +81,12 @@ public class CmpResponderEntryWrapper
             final SecurityFactory securityFactory)
     throws SignerException
     {
-        if(signer != null)
+        if (signer != null)
         {
             return;
         }
 
-        if(dbEntry == null)
+        if (dbEntry == null)
         {
             throw new SignerException("dbEntry is null");
         }
@@ -96,7 +96,7 @@ public class CmpResponderEntryWrapper
         signer = securityFactory.createSigner(
                 dbEntry.getType(), dbEntry.getConf(), responderCert);
         dbEntry.setConfFaulty(false);
-        if(dbEntry.getBase64Cert() == null)
+        if (dbEntry.getBase64Cert() == null)
         {
             dbEntry.setCertificate(signer.getCertificate());
             subjectAsX500Name = X500Name.getInstance(

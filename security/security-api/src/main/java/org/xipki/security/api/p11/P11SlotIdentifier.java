@@ -48,7 +48,7 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier>
             final Integer slotIndex,
             final Long slotId)
     {
-        if(slotIndex == null && slotId == null)
+        if (slotIndex == null && slotId == null)
         {
             throw new IllegalArgumentException(
                     "at least one of slotIndex an slotId must be non-null");
@@ -71,17 +71,17 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier>
     public boolean equals(
             final Object b)
     {
-        if(this == b)
+        if (this == b)
         {
             return true;
         }
 
-        if(b instanceof P11SlotIdentifier == false)
+        if (b instanceof P11SlotIdentifier == false)
         {
             return false;
         }
 
-        if(this == b)
+        if (this == b)
         {
             return true;
         }
@@ -94,15 +94,15 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier>
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        if(slotIndex != null)
+        if (slotIndex != null)
         {
             sb.append("slot-index: ").append(slotIndex);
-            if(slotId != null)
+            if (slotId != null)
             {
                 sb.append(", ");
             }
         }
-        if(slotId != null)
+        if (slotId != null)
         {
             sb.append("slot-id: ").append(slotId);
         }
@@ -113,21 +113,21 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier>
     public int compareTo(
             final P11SlotIdentifier o)
     {
-        if(this == o)
+        if (this == o)
         {
             return 0;
         }
 
-        if(slotIndex != null)
+        if (slotIndex != null)
         {
-            if(o.slotIndex != null)
+            if (o.slotIndex != null)
             {
                 int sign = slotIndex - o.slotIndex;
-                if(sign > 0)
+                if (sign > 0)
                 {
                     return 1;
                 }
-                else if(sign < 0)
+                else if (sign < 0)
                 {
                     return -1;
                 }

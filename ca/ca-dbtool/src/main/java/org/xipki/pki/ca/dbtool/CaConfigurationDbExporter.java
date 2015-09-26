@@ -127,7 +127,7 @@ class CaConfigurationDbExporter extends DbPorter
         try
         {
             marshaller.marshal(root, new File(baseDir, FILENAME_CA_Configuration));
-        }catch(JAXBException e)
+        } catch (JAXBException e)
         {
             throw XMLUtil.convert(e);
         }
@@ -152,7 +152,7 @@ class CaConfigurationDbExporter extends DbPorter
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
 
-            while(rs.next())
+            while (rs.next())
             {
                 String name = rs.getString("NAME");
                 String conf = rs.getString("CONF");
@@ -162,7 +162,7 @@ class CaConfigurationDbExporter extends DbPorter
                 cmpcontrol.setName(name);
                 cmpcontrol.setConf(conf);
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
@@ -189,7 +189,7 @@ class CaConfigurationDbExporter extends DbPorter
 
             rs = stmt.executeQuery(sql);
 
-            while(rs.next())
+            while (rs.next())
             {
                 String name = rs.getString("NAME");
                 String value = rs.getString("VALUE2");
@@ -199,7 +199,7 @@ class CaConfigurationDbExporter extends DbPorter
                 environment.setValue(value);
                 environments.getEnvironment().add(environment);
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
@@ -229,7 +229,7 @@ class CaConfigurationDbExporter extends DbPorter
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
 
-            while(rs.next())
+            while (rs.next())
             {
                 String name = rs.getString("NAME");
                 String signer_type = rs.getString("SIGNER_TYPE");
@@ -248,7 +248,7 @@ class CaConfigurationDbExporter extends DbPorter
 
                 crlsigners.getCrlsigner().add(crlsigner);
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
@@ -275,7 +275,7 @@ class CaConfigurationDbExporter extends DbPorter
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
 
-            while(rs.next())
+            while (rs.next())
             {
                 String name = rs.getString("NAME");
                 String caName = rs.getString("CA_NAME");
@@ -286,7 +286,7 @@ class CaConfigurationDbExporter extends DbPorter
 
                 caaliases.getCaalias().add(caalias);
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
@@ -313,7 +313,7 @@ class CaConfigurationDbExporter extends DbPorter
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
 
-            while(rs.next())
+            while (rs.next())
             {
                 String name = rs.getString("NAME");
                 String cert = rs.getString("CERT");
@@ -325,7 +325,7 @@ class CaConfigurationDbExporter extends DbPorter
 
                 requestors.getRequestor().add(requestor);
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
@@ -354,7 +354,7 @@ class CaConfigurationDbExporter extends DbPorter
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
 
-            while(rs.next())
+            while (rs.next())
             {
                 String name = rs.getString("NAME");
                 String type = rs.getString("TYPE");
@@ -370,7 +370,7 @@ class CaConfigurationDbExporter extends DbPorter
                         buildFileOrValue(cert, "ca-conf/cert-responder-" + name));
                 responders.getResponder().add(responder);
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
@@ -397,7 +397,7 @@ class CaConfigurationDbExporter extends DbPorter
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
 
-            while(rs.next())
+            while (rs.next())
             {
                 String name = rs.getString("NAME");
                 String type = rs.getString("TYPE");
@@ -411,7 +411,7 @@ class CaConfigurationDbExporter extends DbPorter
 
                 publishers.getPublisher().add(publisher);
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
@@ -438,7 +438,7 @@ class CaConfigurationDbExporter extends DbPorter
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
 
-            while(rs.next())
+            while (rs.next())
             {
                 String name = rs.getString("NAME");
                 int art = rs.getInt("ART");
@@ -454,7 +454,7 @@ class CaConfigurationDbExporter extends DbPorter
 
                 profiles.getProfile().add(profile);
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
@@ -492,7 +492,7 @@ class CaConfigurationDbExporter extends DbPorter
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
 
-            while(rs.next())
+            while (rs.next())
             {
                 String name = rs.getString("NAME");
                 int art = rs.getInt("ART");
@@ -552,7 +552,7 @@ class CaConfigurationDbExporter extends DbPorter
 
                 boolean revoked = rs.getBoolean("REV");
                 ca.setRevoked(revoked);
-                if(revoked)
+                if (revoked)
                 {
                     int reason = rs.getInt("RR");
                     long rev_time = rs.getLong("RT");
@@ -564,7 +564,7 @@ class CaConfigurationDbExporter extends DbPorter
 
                 cas.getCa().add(ca);
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
@@ -592,7 +592,7 @@ class CaConfigurationDbExporter extends DbPorter
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
 
-            while(rs.next())
+            while (rs.next())
             {
                 String ca_name = rs.getString("CA_NAME");
                 String requestor_name = rs.getString("REQUESTOR_NAME");
@@ -609,7 +609,7 @@ class CaConfigurationDbExporter extends DbPorter
 
                 ca_has_requestors.getCaHasRequestor().add(ca_has_requestor);
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
@@ -636,7 +636,7 @@ class CaConfigurationDbExporter extends DbPorter
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
 
-            while(rs.next())
+            while (rs.next())
             {
                 String ca_name = rs.getString("CA_NAME");
                 String publisher_name = rs.getString("PUBLISHER_NAME");
@@ -647,7 +647,7 @@ class CaConfigurationDbExporter extends DbPorter
 
                 ca_has_publishers.getCaHasPublisher().add(ca_has_publisher);
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
@@ -677,7 +677,7 @@ class CaConfigurationDbExporter extends DbPorter
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
 
-            while(rs.next())
+            while (rs.next())
             {
                 String ca_name = rs.getString("CA_NAME");
                 String resp_type = rs.getString("RESPONDER_TYPE");
@@ -695,7 +695,7 @@ class CaConfigurationDbExporter extends DbPorter
                 scep.setControl(control);
                 sceps.getScep().add(scep);
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
@@ -723,7 +723,7 @@ class CaConfigurationDbExporter extends DbPorter
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
 
-            while(rs.next())
+            while (rs.next())
             {
                 String ca_name = rs.getString("CA_NAME");
                 String profile_name = rs.getString("PROFILE_NAME");
@@ -736,7 +736,7 @@ class CaConfigurationDbExporter extends DbPorter
 
                 ca_has_profiles.getCaHasProfile().add(ca_has_profile);
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally

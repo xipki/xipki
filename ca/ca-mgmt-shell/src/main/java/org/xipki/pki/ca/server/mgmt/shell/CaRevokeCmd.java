@@ -87,23 +87,23 @@ public class CaRevokeCmd extends CaCmd
     throws Exception
     {
         CRLReason crlReason = CRLReason.getInstance(reason);
-        if(crlReason == null)
+        if (crlReason == null)
         {
             throw new IllegalCmdParamException("invalid reason " + reason);
         }
 
-        if(permitted_reasons.contains(crlReason) == false)
+        if (permitted_reasons.contains(crlReason) == false)
         {
             throw new IllegalCmdParamException("reason " + reason + " is not permitted");
         }
 
-        if(caManager.getCaNames().contains(caName) == false)
+        if (caManager.getCaNames().contains(caName) == false)
         {
             throw new IllegalCmdParamException("invalid CA name " + caName);
         }
 
         Date revocationDate = null;
-        if(isNotBlank(revocationDateS))
+        if (isNotBlank(revocationDateS))
         {
             revocationDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(revocationDateS);
         }
@@ -113,7 +113,7 @@ public class CaRevokeCmd extends CaCmd
         }
 
         Date invalidityDate = null;
-        if(isNotBlank(invalidityDateS))
+        if (isNotBlank(invalidityDateS))
         {
             invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
         }

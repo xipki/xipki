@@ -59,7 +59,7 @@ public class CaAddCmd extends CaAddOrGenCmd
     throws Exception
     {
         X509CAEntry caEntry = getCAEntry();
-        if(certFile != null)
+        if (certFile != null)
         {
             X509Certificate caCert = X509Util.parseCert(certFile);
             caEntry.setCertificate(caCert);

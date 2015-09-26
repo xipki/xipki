@@ -59,11 +59,11 @@ public class IssuerStore
         this.entries = new ArrayList<>(entries.size());
         Set<Integer> ids = new HashSet<>(entries.size());
 
-        for(IssuerEntry entry : entries)
+        for (IssuerEntry entry : entries)
         {
-            for(IssuerEntry existingEntry : this.entries)
+            for (IssuerEntry existingEntry : this.entries)
             {
-                if(existingEntry.getId() == entry.getId())
+                if (existingEntry.getId() == entry.getId())
                 {
                     throw new IllegalArgumentException(
                             "issuer with the same id " + entry.getId() + " already available");
@@ -95,9 +95,9 @@ public class IssuerStore
     public IssuerEntry getIssuerForId(
             final int id)
     {
-        for(IssuerEntry entry : entries)
+        for (IssuerEntry entry : entries)
         {
-            if(entry.getId() == id)
+            if (entry.getId() == id)
             {
                 return entry;
             }
@@ -111,9 +111,9 @@ public class IssuerStore
             final byte[] issuerNameHash,
             final byte[] issuerKeyHash)
     {
-        for(IssuerEntry entry : entries)
+        for (IssuerEntry entry : entries)
         {
-            if(entry.matchHash(hashAlgo, issuerNameHash, issuerKeyHash))
+            if (entry.matchHash(hashAlgo, issuerNameHash, issuerKeyHash))
             {
                 return entry;
             }
@@ -125,7 +125,7 @@ public class IssuerStore
     public Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys()
     {
         Set<IssuerHashNameAndKey> ret = new HashSet<>();
-        for(IssuerEntry issuerEntry : entries)
+        for (IssuerEntry issuerEntry : entries)
         {
             ret.addAll(issuerEntry.getIssuerHashNameAndKeys());
         }

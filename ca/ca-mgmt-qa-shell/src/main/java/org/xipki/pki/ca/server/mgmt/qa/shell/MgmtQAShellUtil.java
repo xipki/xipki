@@ -53,13 +53,13 @@ public class MgmtQAShellUtil
             final String is)
     throws CmdFailure
     {
-        if(CAManager.NULL.equals(ex))
+        if (CAManager.NULL.equals(ex))
         {
             ex = null;
         }
 
         boolean b;
-        if(ex == null)
+        if (ex == null)
         {
             b = (is == null);
         }
@@ -68,7 +68,7 @@ public class MgmtQAShellUtil
             b = ex.equals(is);
         }
 
-        if(b == false)
+        if (b == false)
         {
             throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
         }
@@ -80,7 +80,7 @@ public class MgmtQAShellUtil
     throws CmdFailure
     {
         boolean b;
-        if(ex == null)
+        if (ex == null)
         {
             b = (is == null);
         }
@@ -89,7 +89,7 @@ public class MgmtQAShellUtil
             b = ex.equals(is);
         }
 
-        if(b == false)
+        if (b == false)
         {
             throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
         }

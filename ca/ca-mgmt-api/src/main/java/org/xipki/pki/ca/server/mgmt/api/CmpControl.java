@@ -98,7 +98,7 @@ public class CmpControl
         this.confirmWaitTime = getInt(pairs, KEY_CONFIRM_WAITTIME, DFLT_confirmWaitTime);
         String s = pairs.getValue(KEY_PROTECTION_SIGALGO);
 
-        if(s == null)
+        if (s == null)
         {
             this.sigAlgos = null;
         }
@@ -106,7 +106,7 @@ public class CmpControl
         {
             Set<String> set = StringUtil.splitAsSet(s, ALGO_DELIMITER);
             this.sigAlgos = canonicalizeAlgos(set);
-            if(CollectionUtil.isNotEmpty(this.sigAlgos))
+            if (CollectionUtil.isNotEmpty(this.sigAlgos))
             {
                 pairs.putPair(KEY_PROTECTION_SIGALGO,
                         StringUtil.collectionAsString(this.sigAlgos, ALGO_DELIMITER));
@@ -160,7 +160,7 @@ public class CmpControl
                 : confirmWaitTime;
         pairs.putPair(KEY_CONFIRM_WAITTIME, Integer.toString(this.confirmWaitTime));
 
-        if(CollectionUtil.isEmpty(sigAlgos))
+        if (CollectionUtil.isEmpty(sigAlgos))
         {
             this.sigAlgos = null;
         }
@@ -179,7 +179,7 @@ public class CmpControl
     throws InvalidConfException
     {
         Set<String> ret = new HashSet<String>();
-        for(String m : algos)
+        for (String m : algos)
         {
             try
             {
@@ -251,7 +251,7 @@ public class CmpControl
     public boolean isSigAlgoPermitted(
             final AlgorithmIdentifier algId)
     {
-        if(sigAlgos == null)
+        if (sigAlgos == null)
         {
             return true;
         }

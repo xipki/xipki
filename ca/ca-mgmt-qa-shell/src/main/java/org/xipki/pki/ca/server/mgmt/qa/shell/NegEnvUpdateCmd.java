@@ -57,7 +57,7 @@ public class NegEnvUpdateCmd extends EnvUpdateCmd
         try
         {
             super._doExecute();
-        }catch(Exception e)
+        } catch (Exception e)
         {
             return null;
         }

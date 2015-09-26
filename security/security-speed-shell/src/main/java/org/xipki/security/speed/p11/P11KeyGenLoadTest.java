@@ -80,13 +80,13 @@ public abstract class P11KeyGenLoadTest extends LoadExecutor
         @Override
         public void run()
         {
-            while(stop() == false && getErrorAccout() < 1)
+            while (stop() == false && getErrorAccout() < 1)
             {
                 try
                 {
                     genKeypair();
                     account(1, 0);
-                }catch(Exception e)
+                } catch (Exception e)
                 {
                     account(1, 1);
                 }

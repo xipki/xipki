@@ -68,12 +68,12 @@ public class ProfileExportCmd extends CaCmd
     throws Exception
     {
         CertprofileEntry entry = caManager.getCertprofile(name);
-        if(entry == null)
+        if (entry == null)
         {
             throw new IllegalCmdParamException("no cert profile named " + name + " is defined");
         }
 
-        if(StringUtil.isBlank(entry.getConf()))
+        if (StringUtil.isBlank(entry.getConf()))
         {
             out("cert profile does not have conf");
         }

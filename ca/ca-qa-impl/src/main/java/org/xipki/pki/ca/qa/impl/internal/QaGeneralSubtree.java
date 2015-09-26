@@ -51,13 +51,13 @@ public class QaGeneralSubtree
     {
         ParamUtil.assertNotNull("jaxb", jaxb);
         Integer i = jaxb.getMinimum();
-        if(i != null && i < 0)
+        if (i != null && i < 0)
         {
             throw new IllegalArgumentException("negative minimum is not allowed: " + i);
         }
 
         i = jaxb.getMaximum();
-        if(i != null && i < 0)
+        if (i != null && i < 0)
         {
             throw new IllegalArgumentException("negative maximum is not allowed: " + i);
         }

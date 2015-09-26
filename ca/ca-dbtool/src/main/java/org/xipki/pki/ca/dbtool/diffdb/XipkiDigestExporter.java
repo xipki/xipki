@@ -84,7 +84,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
     throws DataAccessException, IOException
     {
         super(datasource, baseDir, stopMe);
-        if(numCertsPerSelect < 1)
+        if (numCertsPerSelect < 1)
         {
             throw new IllegalArgumentException("numCertsPerSelect could not be less than 1: "
                     + numCertsPerSelect);
@@ -111,7 +111,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
         Map<Integer, String> caIdDirMap = getCaIds();
         Set<CaEntry> caEntries = new HashSet<>(caIdDirMap.size());
 
-        for(Integer caId : caIdDirMap.keySet())
+        for (Integer caId : caIdDirMap.keySet())
         {
             CaEntry caEntry = new CaEntry(caId, baseDir + File.separator + caIdDirMap.get(caId));
             caEntries.add(caEntry);
@@ -123,7 +123,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
         try
         {
             doDigest(minCertId, processLog, caEntryContainer);
-        }catch(Exception e)
+        } catch (Exception e)
         {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-");
@@ -135,7 +135,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
             caEntryContainer.close();
         }
 
-        if(exception == null)
+        if (exception == null)
         {
             System.out.println(" digested database");
         }
@@ -157,7 +157,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
         {
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
-            while(rs.next())
+            while (rs.next())
             {
                 int id = rs.getInt("ID");
                 String b64Cert = rs.getString("CERT");
@@ -169,7 +169,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
                 String fn = toAsciiFilename("ca-" + commonName);
                 File caDir = new File(baseDir, fn);
                 int i = 2;
-                while(caDir.exists())
+                while (caDir.exists())
                 {
                     caDir = new File(baseDir, fn + "." + (i++));
                 }
@@ -180,7 +180,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
 
                 caIdDirMap.put(id, caDir.getName());
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
@@ -209,9 +209,9 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
         {
             boolean interrupted = false;
 
-            for(int i = minCertId; i <= maxCertId; i += numCertsPerSelect)
+            for (int i = minCertId; i <= maxCertId; i += numCertsPerSelect)
             {
-                if(stopMe.get())
+                if (stopMe.get())
                 {
                     interrupted = true;
                     break;
@@ -222,7 +222,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
 
                 ResultSet rs = certPs.executeQuery();
 
-                while(rs.next())
+                while (rs.next())
                 {
                     int caId = rs.getInt(dbControl.getColCaId());
                     int id = rs.getInt("ID");
@@ -234,12 +234,12 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
                     Long revTime = null;
                     Long revInvTime = null;
 
-                    if(revoked)
+                    if (revoked)
                     {
                         revReason = rs.getInt(dbControl.getColRevReason());
                         revTime = rs.getLong(dbControl.getColRevTime());
                         revInvTime = rs.getLong(dbControl.getColRevInvTime());
-                        if(revInvTime == 0)
+                        if (revInvTime == 0)
                         {
                             revInvTime = null;
                         }
@@ -255,11 +255,11 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
                 rs.close();
             } // end for
 
-            if(interrupted)
+            if (interrupted)
             {
                 throw new InterruptedException("interrupted by the user");
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(dbControl.getCertSql(), e);
         }finally
@@ -278,10 +278,10 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
     {
         final int n = filename.length();
         StringBuilder sb = new StringBuilder(n);
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             char c = filename.charAt(i);
-            if((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')
+            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')
                     || c == '.' || c == '_' || c == '-' || c == ' ')
             {
                 sb.append(c);

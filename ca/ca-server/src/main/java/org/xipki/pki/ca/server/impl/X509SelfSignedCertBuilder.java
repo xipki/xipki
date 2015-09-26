@@ -131,16 +131,16 @@ class X509SelfSignedCertBuilder
             final List<String> deltaCrlUris)
     throws OperationException, InvalidConfException
     {
-        if(securityFactory.verifyPOPO(p10Request) == false)
+        if (securityFactory.verifyPOPO(p10Request) == false)
         {
             throw new InvalidConfException("could not validate POP for the pkcs#10 requst");
         }
 
-        if("pkcs12".equalsIgnoreCase(signerType) || "jks".equalsIgnoreCase(signerType))
+        if ("pkcs12".equalsIgnoreCase(signerType) || "jks".equalsIgnoreCase(signerType))
         {
             ConfPairs keyValues = new ConfPairs(signerConf);
             String keystoreConf = keyValues.getValue("keystore");
-            if(keystoreConf == null)
+            if (keystoreConf == null)
             {
                 throw new InvalidConfException(
                     "required parameter 'keystore' for types PKCS12 and JKS, is not specified");
@@ -154,31 +154,31 @@ class X509SelfSignedCertBuilder
             List<String> restrictedSigAlgos = certprofile.getSignatureAlgorithms();
 
             String thisSignerConf = null;
-            if(CollectionUtil.isEmpty(restrictedSigAlgos))
+            if (CollectionUtil.isEmpty(restrictedSigAlgos))
             {
                 thisSignerConf = signerConfs.get(0)[1];
             }
             else
             {
-                for(String algo : restrictedSigAlgos)
+                for (String algo : restrictedSigAlgos)
                 {
-                    for(String[] m : signerConfs)
+                    for (String[] m : signerConfs)
                     {
-                        if(m[0].equals(algo))
+                        if (m[0].equals(algo))
                         {
                             thisSignerConf = m[1];
                             break;
                         }
                     }
 
-                    if(thisSignerConf != null)
+                    if (thisSignerConf != null)
                     {
                         break;
                     }
                 }
             }
 
-            if(thisSignerConf == null)
+            if (thisSignerConf == null)
             {
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "CA does not support any signature algorithm restricted by the cert profile");
@@ -248,7 +248,7 @@ class X509SelfSignedCertBuilder
         try
         {
             subjectInfo = certprofile.getSubject(requestedSubject);
-        }catch(CertprofileException e)
+        } catch (CertprofileException e)
         {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "exception in cert profile " + certprofile.getName());
@@ -259,13 +259,13 @@ class X509SelfSignedCertBuilder
         }
 
         Date notBefore = certprofile.getNotBefore(null);
-        if(notBefore == null)
+        if (notBefore == null)
         {
             notBefore = new Date();
         }
 
         CertValidity validity = certprofile.getValidity();
-        if(validity == null)
+        if (validity == null)
         {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
                     "no validity specified in the profile " + certprofile.getName());
@@ -290,10 +290,10 @@ class X509SelfSignedCertBuilder
 
         Extensions extensions = null;
         ASN1Set attrs = p10Request.getCertificationRequestInfo().getAttributes();
-        for(int i = 0; i < attrs.size(); i++)
+        for (int i = 0; i < attrs.size(); i++)
         {
             Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-            if(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
+            if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
             {
                 extensions = Extensions.getInstance(attr.getAttributeValues()[0]);
             }
@@ -351,12 +351,12 @@ class X509SelfSignedCertBuilder
         ExtensionValues extensionTuples = profile.getExtensions(
                 requestedSubject, extensions, requestedPublicKeyInfo,
                 publicCaInfo, null, notBefore, notAfter);
-        if(extensionTuples == null)
+        if (extensionTuples == null)
         {
             return;
         }
 
-        for(ASN1ObjectIdentifier extType : extensionTuples.getExtensionTypes())
+        for (ASN1ObjectIdentifier extType : extensionTuples.getExtensionTypes())
         {
             ExtensionValue extValue = extensionTuples.getExtensionValue(extType);
             certBuilder.addExtension(extType, extValue.isCritical(), extValue.getValue());
@@ -372,11 +372,11 @@ class X509SelfSignedCertBuilder
             RSAPublicKey k = (RSAPublicKey)key;
             return new RSAKeyParameters(false, k.getModulus(), k.getPublicExponent());
         }
-        else if(key instanceof ECPublicKey)
+        else if (key instanceof ECPublicKey)
         {
             return ECUtil.generatePublicKeyParameter(key);
         }
-        else if(key instanceof DSAPublicKey)
+        else if (key instanceof DSAPublicKey)
         {
             return DSAUtil.generatePublicKeyParameter(key);
         }

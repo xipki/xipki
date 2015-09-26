@@ -57,7 +57,7 @@ public class NegCaPublisherRemoveCmd extends CaPublisherRemoveCmd
         try
         {
             super._doExecute();
-        }catch(Exception e)
+        } catch (Exception e)
         {
             return null;
         }

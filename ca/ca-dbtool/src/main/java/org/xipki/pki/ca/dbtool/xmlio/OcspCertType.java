@@ -218,7 +218,7 @@ public class OcspCertType extends DbDataObject
         assertNotBlank("sn", sn);
         assertNotNull("update", update);
         assertNotNull("rev", rev);
-        if(rev)
+        if (rev)
         {
             assertNotNull("rr", rr);
             assertNotNull("rt", rt);

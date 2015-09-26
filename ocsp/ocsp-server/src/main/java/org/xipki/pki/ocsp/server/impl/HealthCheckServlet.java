@@ -82,7 +82,7 @@ public class HealthCheckServlet extends HttpServlet
         response.setHeader("Access-Control-Allow-Origin", "*");
         try
         {
-            if(server == null)
+            if (server == null)
             {
                 LOG.error("server in servlet not configured");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -91,13 +91,13 @@ public class HealthCheckServlet extends HttpServlet
             }
 
             ResponderAndRelativeUri r = server.getResponderAndRelativeUri(request);
-            if(r == null)
+            if (r == null)
             {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
 
-            if(StringUtil.isNotBlank(r.getRelativeUri()))
+            if (StringUtil.isNotBlank(r.getRelativeUri()))
             {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
@@ -118,10 +118,10 @@ public class HealthCheckServlet extends HttpServlet
             byte[] respBytes = healthResult.toJsonMessage(true).getBytes();
             response.setContentLength(respBytes.length);
             response.getOutputStream().write(respBytes);
-        }catch(EOFException e)
+        } catch (EOFException e)
         {
             final String message = "connection reset by peer";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -130,10 +130,10 @@ public class HealthCheckServlet extends HttpServlet
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
             final String message = "Throwable thrown, this should not happen";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                         t.getMessage());

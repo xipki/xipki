@@ -72,9 +72,9 @@ public enum PkiStatus
     public static PkiStatus valueForCode(
             final int code)
     {
-        for(PkiStatus m : values())
+        for (PkiStatus m : values())
         {
-            if(m.code == code)
+            if (m.code == code)
             {
                 return m;
             }

@@ -65,7 +65,7 @@ public class UserUpdateCmd extends CaCmd
     protected Object _doExecute()
     throws Exception
     {
-        if("CONSOLE".equalsIgnoreCase(password))
+        if ("CONSOLE".equalsIgnoreCase(password))
         {
             password = new String(readPassword());
         }

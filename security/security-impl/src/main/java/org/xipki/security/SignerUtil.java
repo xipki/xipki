@@ -116,7 +116,7 @@ public class SignerUtil
             AsymmetricBlockCipher cipher)
     throws OperatorCreationException
     {
-        if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()) == false)
+        if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()) == false)
         {
             throw new OperatorCreationException("signature algorithm " + sigAlgId.getAlgorithm()
                 + " is not allowed");
@@ -132,7 +132,7 @@ public class SignerUtil
             throw new OperatorCreationException(e.getMessage(), e);
         }
         Digest dig = digestProvider.get(digAlgId);
-        if(cipher == null)
+        if (cipher == null)
         {
             cipher = new RSABlindedEngine();
         }
@@ -242,7 +242,7 @@ public class SignerUtil
     {
         final int blockSize = (keyBitLen + 7) / 8;
         ASN1Sequence seq = ASN1Sequence.getInstance(x962Signature);
-        if(seq.size() != 2)
+        if (seq.size() != 2)
         {
             throw new IllegalArgumentException("invalid X962Signature");
         }
@@ -251,7 +251,7 @@ public class SignerUtil
         int rBitLen = r.bitLength();
         int sBitLen = s.bitLength();
         int bitLen = Math.max(rBitLen, sBitLen);
-        if((bitLen + 7) / 8 > blockSize)
+        if ((bitLen + 7) / 8 > blockSize)
         {
             throw new SignerException("signature is too large");
         }

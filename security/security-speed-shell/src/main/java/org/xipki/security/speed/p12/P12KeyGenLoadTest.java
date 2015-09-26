@@ -65,13 +65,13 @@ public abstract class P12KeyGenLoadTest extends LoadExecutor
         public void run()
         {
             P12RawKeypairGenerator kpGen = getKeypairGenerator();
-            while(stop() == false && getErrorAccout() < 1)
+            while (stop() == false && getErrorAccout() < 1)
             {
                 try
                 {
                     kpGen.genKeypair();
                     account(1, 0);
-                }catch(Exception e)
+                } catch (Exception e)
                 {
                     account(1, 1);
                 }

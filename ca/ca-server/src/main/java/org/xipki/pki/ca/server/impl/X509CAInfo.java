@@ -130,7 +130,7 @@ public class X509CAInfo
                 this.notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
 
         this.useRandomSerialNumber = caEntry.getNextSerial() < 1;
-        if(this.useRandomSerialNumber)
+        if (this.useRandomSerialNumber)
         {
             randomSNGenerator = RandomSerialNumberGenerator.getInstance();
             return;
@@ -139,19 +139,19 @@ public class X509CAInfo
         Long greatestSerialNumber = certStore.getGreatestSerialNumber(
                 this.publicCAInfo.getCaCertificate());
 
-        if(greatestSerialNumber == null)
+        if (greatestSerialNumber == null)
         {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "could not retrieve the greatest serial number for ca " + caEntry.getName());
         }
 
         long nextSerial = greatestSerialNumber + 1;
-        if(nextSerial < 2)
+        if (nextSerial < 2)
         {
             nextSerial = 2;
         }
 
-        if(caEntry.getNextSerial() < nextSerial)
+        if (caEntry.getNextSerial() < nextSerial)
         {
             LOG.info("corrected the next_serial of {} from {} to {}",
                     new Object[]{caEntry.getName(), caEntry.getNextSerial(), nextSerial});
@@ -167,7 +167,7 @@ public class X509CAInfo
     public void commitNextSerial()
     throws OperationException
     {
-        if(useRandomSerialNumber == false)
+        if (useRandomSerialNumber == false)
         {
             certStore.commitNextSerialIfLess(caEntry.getName(), caEntry.getNextSerial());
         }
@@ -435,7 +435,7 @@ public class X509CAInfo
     public BigInteger nextSerial()
     throws OperationException
     {
-        if(useRandomSerialNumber)
+        if (useRandomSerialNumber)
         {
             return randomSNGenerator.getSerialNumber();
         }
@@ -448,7 +448,7 @@ public class X509CAInfo
     public void markMaxSerial()
     throws OperationException
     {
-        if(useRandomSerialNumber == false)
+        if (useRandomSerialNumber == false)
         {
             certStore.markMaxSerial(getCertificate(), caEntry.getSerialSeqName());
         }
@@ -459,7 +459,7 @@ public class X509CAInfo
     {
         int crlNo = caEntry.getNextCRLNumber();
         int currentMaxNo = certStore.getMaxCRLNumber(getCertificate());
-        if(crlNo <= currentMaxNo)
+        if (crlNo <= currentMaxNo)
         {
             crlNo = currentMaxNo + 1;
         }
@@ -475,14 +475,14 @@ public class X509CAInfo
     public ConcurrentContentSigner getSigner(
             final List<String> algoNames)
     {
-        if(CollectionUtil.isEmpty(algoNames))
+        if (CollectionUtil.isEmpty(algoNames))
         {
             return dfltSigner;
         }
 
-        for(String name : algoNames)
+        for (String name : algoNames)
         {
-            if(signers.containsKey(name))
+            if (signers.containsKey(name))
             {
                 return signers.get(name);
             }
@@ -495,7 +495,7 @@ public class X509CAInfo
             final SecurityFactory securityFactory)
     throws SignerException
     {
-        if(signers != null)
+        if (signers != null)
         {
             return true;
         }
@@ -504,7 +504,7 @@ public class X509CAInfo
         List<String[]> signerConfs = CAManagerImpl.splitCASignerConfs(caEntry.getSignerConf());
 
         Map<String, ConcurrentContentSigner> tSigners = new HashMap<>();
-        for(String[] m : signerConfs)
+        for (String[] m : signerConfs)
         {
             String algo = m[0];
             String signerConf = m[1];
@@ -513,14 +513,14 @@ public class X509CAInfo
             {
                 signer = securityFactory.createSigner(
                     caEntry.getSignerType(), signerConf, caEntry.getCertificate());
-                if(dfltSigner == null)
+                if (dfltSigner == null)
                 {
                     dfltSigner = signer;
                 }
                 tSigners.put(algo, signer);
-            }catch(Throwable t)
+            } catch (Throwable t)
             {
-                for(ConcurrentContentSigner tSigner : tSigners.values())
+                for (ConcurrentContentSigner tSigner : tSigners.values())
                 {
                     tSigner.shutdown();
                 }
@@ -536,13 +536,13 @@ public class X509CAInfo
     public boolean isSignerRequired()
     {
         Set<Permission> permissions = caEntry.getPermissions();
-        if(permissions == null)
+        if (permissions == null)
         {
             return true;
         }
 
         boolean signerRequired = false;
-        for(Permission permission : permissions)
+        for (Permission permission : permissions)
         {
             switch(permission)
             {
@@ -555,7 +555,7 @@ public class X509CAInfo
                 break;
             } // end switch(permission)
 
-            if(signerRequired)
+            if (signerRequired)
             {
                 break;
             }

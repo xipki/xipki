@@ -47,7 +47,7 @@ public class ValidityModeCompleter extends EnumCompleter
     public ValidityModeCompleter()
     {
         StringBuilder enums = new StringBuilder();
-        for(ValidityMode mode : ValidityMode.values())
+        for (ValidityMode mode : ValidityMode.values())
         {
             enums.append(mode.name()).append(",");
         }

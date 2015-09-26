@@ -53,7 +53,7 @@ class IssuerStore
     {
         this.entries = new ArrayList<>(entries.size());
 
-        for(IssuerEntry entry : entries)
+        for (IssuerEntry entry : entries)
         {
             addIdentityEntry(entry);
         }
@@ -64,9 +64,9 @@ class IssuerStore
     {
         ParamUtil.assertNotNull("entry", entry);
 
-        for(IssuerEntry existingEntry : entries)
+        for (IssuerEntry existingEntry : entries)
         {
-            if(existingEntry.getId() == entry.getId())
+            if (existingEntry.getId() == entry.getId())
             {
                 throw new IllegalArgumentException(
                         "issuer with the same id " + entry.getId() + " already available");
@@ -79,9 +79,9 @@ class IssuerStore
     Integer getIdForSubject(
             final String subject)
     {
-        for(IssuerEntry entry : entries)
+        for (IssuerEntry entry : entries)
         {
-            if(entry.getSubject().equals(subject))
+            if (entry.getSubject().equals(subject))
             {
                 return entry.getId();
             }
@@ -93,9 +93,9 @@ class IssuerStore
     Integer getIdForSha1Fp(
             final byte[] sha1Fp_cert)
     {
-        for(IssuerEntry entry : entries)
+        for (IssuerEntry entry : entries)
         {
-            if(entry.matchSha1Fp(sha1Fp_cert))
+            if (entry.matchSha1Fp(sha1Fp_cert))
             {
                 return entry.getId();
             }
@@ -107,9 +107,9 @@ class IssuerStore
     Integer getIdForCert(
             final byte[] encodedCert)
     {
-        for(IssuerEntry entry : entries)
+        for (IssuerEntry entry : entries)
         {
-            if(entry.matchCert(encodedCert))
+            if (entry.matchCert(encodedCert))
             {
                 return entry.getId();
             }

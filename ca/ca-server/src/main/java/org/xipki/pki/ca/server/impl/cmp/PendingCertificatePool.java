@@ -76,7 +76,7 @@ class PendingCertificatePool
         public boolean equals(
                 final Object b)
         {
-            if(b instanceof MyEntry == false)
+            if (b instanceof MyEntry == false)
             {
                 return false;
             }
@@ -99,14 +99,14 @@ class PendingCertificatePool
             final X509CertificateInfo certInfo,
             final long waitForConfirmTill)
     {
-        if(certInfo.isAlreadyIssued())
+        if (certInfo.isAlreadyIssued())
         {
             return;
         }
 
         String hexTid = Hex.toHexString(tid);
         Set<MyEntry> entries = map.get(hexTid);
-        if(entries == null)
+        if (entries == null)
         {
             entries = new HashSet<>();
             map.put(hexTid, entries);
@@ -123,27 +123,27 @@ class PendingCertificatePool
     {
         String hexTid = Hex.toHexString(transactionId);
         Set<MyEntry> entries = map.get(hexTid);
-        if(entries == null)
+        if (entries == null)
         {
             return null;
         }
 
         MyEntry retEntry = null;
-        for(MyEntry entry : entries)
+        for (MyEntry entry : entries)
         {
-            if(certReqId.equals(entry.certReqId))
+            if (certReqId.equals(entry.certReqId))
             {
                 retEntry = entry;
                 break;
             }
         }
 
-        if(retEntry != null)
+        if (retEntry != null)
         {
             entries.remove(retEntry);
         }
 
-        if(CollectionUtil.isEmpty(entries))
+        if (CollectionUtil.isEmpty(entries))
         {
             map.remove(hexTid);
         }
@@ -155,13 +155,13 @@ class PendingCertificatePool
             final byte[] transactionId)
     {
         Set<MyEntry> entries = map.remove(Hex.toHexString(transactionId));
-        if(entries == null)
+        if (entries == null)
         {
             return null;
         }
 
         Set<X509CertificateInfo> ret = new HashSet<>();
-        for(MyEntry myEntry :entries)
+        for (MyEntry myEntry :entries)
         {
             ret.add(myEntry.certInfo);
         }
@@ -170,7 +170,7 @@ class PendingCertificatePool
 
     synchronized Set<X509CertificateInfo> removeConfirmTimeoutedCertificates()
     {
-        if(CollectionUtil.isEmpty(map))
+        if (CollectionUtil.isEmpty(map))
         {
             return null;
         }
@@ -179,12 +179,12 @@ class PendingCertificatePool
 
         Set<X509CertificateInfo> ret = new HashSet<>();
 
-        for(String tid : map.keySet())
+        for (String tid : map.keySet())
         {
             Set<MyEntry> entries = map.get(tid);
-            for(MyEntry entry : entries)
+            for (MyEntry entry : entries)
             {
-                if(entry.waitForConfirmTill < now)
+                if (entry.waitForConfirmTill < now)
                 {
                     ret.add(entry.certInfo);
                 }

@@ -48,7 +48,7 @@ public class OccurrenceCompleter extends EnumCompleter
     {
         StringBuilder enums = new StringBuilder();
 
-        for(Occurrence entry : Occurrence.values())
+        for (Occurrence entry : Occurrence.values())
         {
             enums.append(entry.name()).append(",");
         }

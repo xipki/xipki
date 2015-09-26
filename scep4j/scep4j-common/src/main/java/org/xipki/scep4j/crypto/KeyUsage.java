@@ -77,16 +77,16 @@ public enum KeyUsage
     public static KeyUsage getKeyUsage(
             final String usage)
     {
-        if(usage == null)
+        if (usage == null)
         {
             return null;
         }
 
-        for(KeyUsage ku : KeyUsage.values())
+        for (KeyUsage ku : KeyUsage.values())
         {
-            for(String name : ku.names)
+            for (String name : ku.names)
             {
-                if(name.equals(usage))
+                if (name.equals(usage))
                 {
                     return ku;
                 }
@@ -99,9 +99,9 @@ public enum KeyUsage
     public static KeyUsage getKeyUsage(
             final int bit)
     {
-        for(KeyUsage ku : KeyUsage.values())
+        for (KeyUsage ku : KeyUsage.values())
         {
-            if(ku.bit == bit)
+            if (ku.bit == bit)
             {
                 return ku;
             }
@@ -113,9 +113,9 @@ public enum KeyUsage
     public static KeyUsage getKeyUsageFromBcUsage(
             final int bcUsage)
     {
-        for(KeyUsage ku : KeyUsage.values())
+        for (KeyUsage ku : KeyUsage.values())
         {
-            if(ku.bcUsage == bcUsage)
+            if (ku.bcUsage == bcUsage)
             {
                 return ku;
             }

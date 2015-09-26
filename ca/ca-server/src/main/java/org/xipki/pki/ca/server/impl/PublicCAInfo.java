@@ -102,7 +102,7 @@ class PublicCAInfo
 
         byte[] encodedSubjectAltName = caCertificate.getExtensionValue(
                 Extension.subjectAlternativeName.getId());
-        if(encodedSubjectAltName == null)
+        if (encodedSubjectAltName == null)
         {
             subjectAltName = null;
         }
@@ -146,7 +146,7 @@ class PublicCAInfo
                     "invalid SubjectAltName extension in CA certificate");
         }
 
-        if(subjectKeyIdentifier == null)
+        if (subjectKeyIdentifier == null)
         {
             this.subjectKeyIdentifier = null;
         } else
@@ -190,7 +190,7 @@ class PublicCAInfo
     public void setCrlSignerCertificate(
             final X509Certificate crlSignerCert)
     {
-        if(caCertificate.equals(crlSignerCert))
+        if (caCertificate.equals(crlSignerCert))
         {
             this.crlSignerCertificate = null;
         }
@@ -222,7 +222,7 @@ class PublicCAInfo
 
     public byte[] getSubjectKeyIdentifer()
     {
-        if(caCertificate != null)
+        if (caCertificate != null)
         {
             return caCertificate.getSubjectKeyIdentifier();
         } else

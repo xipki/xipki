@@ -59,7 +59,7 @@ public class UserInfoCmd extends CaCmd
         StringBuilder sb = new StringBuilder();
 
         UserEntry userEntry = caManager.getUser(name);
-        if(userEntry == null)
+        if (userEntry == null)
         {
             throw new UnexpectedException("\tno user named '" + name + "' is configured");
         }

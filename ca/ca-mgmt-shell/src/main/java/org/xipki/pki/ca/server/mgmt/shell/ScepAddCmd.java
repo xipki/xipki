@@ -90,12 +90,12 @@ public class ScepAddCmd extends CaCmd
     throws Exception
     {
         String base64Cert = null;
-        if(certFile != null)
+        if (certFile != null)
         {
             base64Cert= IoUtil.base64Encode(IoUtil.read(certFile), false);
         }
 
-        if("PKCS12".equalsIgnoreCase(responderType) || "JKS".equalsIgnoreCase(responderType))
+        if ("PKCS12".equalsIgnoreCase(responderType) || "JKS".equalsIgnoreCase(responderType))
         {
             responderConf = ShellUtil.canonicalizeSignerConf(responderType, responderConf,
                     passwordResolver);
@@ -103,7 +103,7 @@ public class ScepAddCmd extends CaCmd
 
         ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert,
                 scepControl);
-        if(entry.isFaulty())
+        if (entry.isFaulty())
         {
             throw new InvalidConfException("certificate is invalid");
         }

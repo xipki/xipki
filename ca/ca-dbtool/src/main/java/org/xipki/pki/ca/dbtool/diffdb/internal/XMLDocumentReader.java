@@ -113,7 +113,7 @@ public class XMLDocumentReader
         XPath xpath = xpathfactory.newXPath();
         XPathExpression xpathE = xpath.compile(xpathExpression);
         NodeList nl = (NodeList) xpathE.evaluate(doc.getDocumentElement(), XPathConstants.NODESET);
-        if(nl != null && nl.getLength() > 0)
+        if (nl != null && nl.getLength() > 0)
         {
             return nl.item(0);
         }

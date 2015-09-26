@@ -86,13 +86,13 @@ public class ResponderAddCmd extends CaCmd
     {
         String base64Cert = null;
         X509Certificate signerCert = null;
-        if(certFile != null)
+        if (certFile != null)
         {
             signerCert = X509Util.parseCert(certFile);
             base64Cert = IoUtil.base64Encode(signerCert.getEncoded(), false);
         }
 
-        if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
+        if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
         {
             signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
         }

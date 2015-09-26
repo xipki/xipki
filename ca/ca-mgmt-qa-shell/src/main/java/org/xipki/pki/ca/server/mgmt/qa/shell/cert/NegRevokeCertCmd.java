@@ -57,7 +57,7 @@ public class NegRevokeCertCmd extends RevokeCertCmd
         try
         {
             super._doExecute();
-        }catch(Exception e)
+        } catch (Exception e)
         {
             return null;
         }

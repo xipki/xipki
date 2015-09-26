@@ -47,7 +47,7 @@ public class DuplicationModeCompleter extends EnumCompleter
     public DuplicationModeCompleter()
     {
         StringBuilder enums = new StringBuilder();
-        for(DuplicationMode mode : DuplicationMode.values())
+        for (DuplicationMode mode : DuplicationMode.values())
         {
             enums.append(mode.getDescription()).append(",");
         }

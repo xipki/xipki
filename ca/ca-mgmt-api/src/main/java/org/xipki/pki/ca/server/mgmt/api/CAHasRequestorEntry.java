@@ -92,7 +92,7 @@ public class CAHasRequestorEntry implements Serializable
     public void setProfiles(
             final Set<String> profiles)
     {
-        if(profiles == null)
+        if (profiles == null)
         {
             this.profiles = Collections.emptySet();
         }

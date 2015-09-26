@@ -85,7 +85,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
             try
             {
                 conf.close();
-            }catch(Exception e)
+            } catch (Exception e)
             {
             }
         }
@@ -104,7 +104,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
 
         DatabaseType databaseType;
         String className = conf.getProperty("dataSourceClassName");
-        if(className != null)
+        if (className != null)
         {
             databaseType = DatabaseType.getDataSourceForDataSource(className);
 
@@ -116,9 +116,9 @@ public class DataSourceFactoryImpl implements DataSourceFactory
         }
 
         String password = conf.getProperty("password");
-        if(password != null)
+        if (password != null)
         {
-            if(passwordResolver != null)
+            if (passwordResolver != null)
             {
                 password = new String(passwordResolver.resolvePassword(password));
             }
@@ -126,9 +126,9 @@ public class DataSourceFactoryImpl implements DataSourceFactory
         }
 
         password = conf.getProperty("dataSource.password");
-        if(password != null)
+        if (password != null)
         {
-            if(passwordResolver != null)
+            if (passwordResolver != null)
             {
                 password = new String(passwordResolver.resolvePassword(password));
             }
@@ -142,7 +142,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
             final String parameterName,
             final Object parameter)
     {
-        if(parameter == null)
+        if (parameter == null)
         {
             throw new IllegalArgumentException(parameterName + " could not be null");
         }

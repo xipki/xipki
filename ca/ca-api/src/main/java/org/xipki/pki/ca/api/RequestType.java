@@ -60,9 +60,9 @@ public enum RequestType
     public static RequestType getInstance(
             final int code)
     {
-        for(RequestType value : values())
+        for (RequestType value : values())
         {
-            if(code == value.code)
+            if (code == value.code)
             {
                 return value;
             }

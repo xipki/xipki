@@ -65,7 +65,7 @@ public class HttpsClientTestor
         try
         {
             prepare();
-        }catch (Exception e)
+        } catch (Exception e)
         {
             e.printStackTrace();
             return;
@@ -136,7 +136,7 @@ public class HttpsClientTestor
     private void print_https_cert(
             final HttpsURLConnection con)
     {
-        if(con!=null)
+        if (con!=null)
         {
             try
             {
@@ -145,7 +145,7 @@ public class HttpsClientTestor
                 System.out.println("\n");
 
                 Certificate[] certs = con.getServerCertificates();
-                for(Certificate cert : certs)
+                for (Certificate cert : certs)
                 {
                     System.out.println("Cert Type : " + cert.getType());
                     System.out.println("Cert Hash Code : " + cert.hashCode());
@@ -172,7 +172,7 @@ public class HttpsClientTestor
     private void print_content(
             final HttpsURLConnection con)
     {
-        if(con!=null)
+        if (con!=null)
         {
             try
             {

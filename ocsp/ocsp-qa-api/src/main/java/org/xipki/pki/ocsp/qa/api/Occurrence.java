@@ -48,9 +48,9 @@ public enum Occurrence
     public static Occurrence getInstance(
             final String name)
     {
-        for(Occurrence entry : values())
+        for (Occurrence entry : values())
         {
-            if(entry.name().equals(name))
+            if (entry.name().equals(name))
             {
                 return entry;
             }

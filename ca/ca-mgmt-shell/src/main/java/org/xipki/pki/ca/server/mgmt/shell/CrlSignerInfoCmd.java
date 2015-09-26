@@ -67,12 +67,12 @@ public class CrlSignerInfoCmd extends CaCmd
     {
         StringBuilder sb = new StringBuilder();
 
-        if(name == null)
+        if (name == null)
         {
             Set<String> names = caManager.getCrlSignerNames();
             int n = names.size();
 
-            if(n == 0 || n == 1)
+            if (n == 0 || n == 1)
             {
                 sb.append((n == 0)
                         ? "no"
@@ -87,7 +87,7 @@ public class CrlSignerInfoCmd extends CaCmd
             List<String> sorted = new ArrayList<>(names);
             Collections.sort(sorted);
 
-            for(String name : sorted)
+            for (String name : sorted)
             {
                 sb.append("\t").append(name).append("\n");
             }
@@ -95,7 +95,7 @@ public class CrlSignerInfoCmd extends CaCmd
         else
         {
             X509CrlSignerEntry entry = caManager.getCrlSigner(name);
-            if(entry == null)
+            if (entry == null)
             {
                 throw new UnexpectedException("\tno CRL signer named '" + name + " is configured");
             }

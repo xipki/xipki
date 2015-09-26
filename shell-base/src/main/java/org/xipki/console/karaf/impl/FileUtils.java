@@ -382,20 +382,20 @@ public class FileUtils
     {
         System.out.println(prompt);
         String answer = reader.readLine();
-        if(answer == null)
+        if (answer == null)
         {
             throw new IOException("interrupted");
         }
 
         int tries = 0;
 
-        while(tries < 3)
+        while (tries < 3)
         {
-            if("yes".equalsIgnoreCase(answer))
+            if ("yes".equalsIgnoreCase(answer))
             {
                 return true;
             }
-            else if("no".equalsIgnoreCase(answer))
+            else if ("no".equalsIgnoreCase(answer))
             {
                 return false;
             }
@@ -430,7 +430,7 @@ public class FileUtils
     private static void doCloseQuietly(
             final Closeable closable)
     {
-        if(closable == null)
+        if (closable == null)
         {
             return;
         }
@@ -438,7 +438,7 @@ public class FileUtils
         try
         {
             closable.close();
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
         }
     }

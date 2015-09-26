@@ -95,9 +95,9 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
     throws Exception
     {
         printDatabaseInfo(dbConf, schemaFile);
-        if(quiet == false)
+        if (quiet == false)
         {
-            if(confirm("reset and initialize") == false)
+            if (confirm("reset and initialize") == false)
             {
                 out("cancelled");
                 return;
@@ -110,13 +110,13 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
             liquibase.init(logLevel, logFile);
             liquibase.releaseLocks();
 
-            if(LiquibaseMain.loglevelIsSevereOrOff(logLevel) == false)
+            if (LiquibaseMain.loglevelIsSevereOrOff(logLevel) == false)
             {
                 liquibase.init("severe", logFile);
             }
             liquibase.dropAll();
 
-            if(LiquibaseMain.loglevelIsSevereOrOff(logLevel) == false)
+            if (LiquibaseMain.loglevelIsSevereOrOff(logLevel) == false)
             {
                 liquibase.init(logLevel, logFile);
             }
@@ -134,9 +134,9 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
     throws Exception
     {
         printDatabaseInfo(dbConf, schemaFile);
-        if(quiet == false)
+        if (quiet == false)
         {
-            if(confirm("update") == false)
+            if (confirm("update") == false)
             {
                 out("cancelled");
                 return;
@@ -169,10 +169,10 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
     {
         Map<String, LiquibaseDatabaseConf> ret = new HashMap<>();
         Properties props = getPropertiesFromFile(caconfFile);
-        for(Object objKey : props.keySet())
+        for (Object objKey : props.keySet())
         {
             String key = (String) objKey;
-            if(key.startsWith("datasource."))
+            if (key.startsWith("datasource."))
             {
                 String datasourceFile = props.getProperty(key);
                 String datasourceName = key.substring("datasource.".length());
@@ -204,7 +204,7 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
         msg.append("driver      = ").append(dbParams.getDriver()).append("\n");
         msg.append("user        = ").append(dbParams.getUsername()).append("\n");
         msg.append("url         = ").append(dbParams.getUrl()).append("\n");
-        if(dbParams.getSchema() != null)
+        if (dbParams.getSchema() != null)
         {
             msg.append("schema      = ").append(dbParams.getSchema()).append("\n");
         }
@@ -226,22 +226,22 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
             List<String> validValues)
     throws IOException
     {
-        if(validValues == null)
+        if (validValues == null)
         {
             validValues = Collections.emptyList();
         }
 
-        if(prompt == null)
+        if (prompt == null)
         {
             prompt = "Please enter";
         }
 
-        if(isNotEmpty(validValues))
+        if (isNotEmpty(validValues))
         {
             StringBuilder promptBuilder = new StringBuilder(prompt);
             promptBuilder.append(" [");
 
-            for(String validValue : validValues)
+            for (String validValue : validValues)
             {
                 promptBuilder.append(validValue).append("/");
             }
@@ -254,22 +254,22 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
         ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
 
         out(prompt);
-        while(true)
+        while (true)
         {
             String answer = reader.readLine();
-            if(answer == null)
+            if (answer == null)
             {
                 throw new IOException("interrupted");
             }
 
-            if(isEmpty(validValues) || validValues.contains(answer))
+            if (isEmpty(validValues) || validValues.contains(answer))
             {
                 return answer;
             }
             else
             {
                 StringBuilder retryPromptBuilder = new StringBuilder("Please answer with ");
-                for(String validValue : validValues)
+                for (String validValue : validValues)
                 {
                     retryPromptBuilder.append(validValue).append("/");
                 }

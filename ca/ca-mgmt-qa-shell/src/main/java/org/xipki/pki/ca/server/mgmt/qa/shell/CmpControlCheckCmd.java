@@ -56,7 +56,7 @@ public class CmpControlCheckCmd extends CmpControlUpdateCmd
         out("checking CMP control " + name);
 
         CmpControlEntry c = caManager.getCmpControl(name);
-        if(c == null)
+        if (c == null)
         {
             throw new CmdFailure("no CMP control named '" + name + "' is configured");
         }

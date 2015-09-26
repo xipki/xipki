@@ -68,7 +68,7 @@ public class RequestorAddCmd extends CaCmd
         CmpRequestorEntry entry = new CmpRequestorEntry(name, base64Cert);
 
         boolean b;
-        if(entry.getCert() == null)
+        if (entry.getCert() == null)
         {
             b = false;
         }

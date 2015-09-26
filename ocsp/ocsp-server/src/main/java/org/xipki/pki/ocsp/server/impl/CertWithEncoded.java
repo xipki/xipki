@@ -69,16 +69,16 @@ public class CertWithEncoded
     public boolean equalsCert(
             final X509Certificate cert)
     {
-        if(certificate == cert)
+        if (certificate == cert)
         {
             return true;
         }
 
-        if(className.equals(cert.getClass().getName()))
+        if (className.equals(cert.getClass().getName()))
         {
             return certificate.equals(cert);
         }
-        else if(certificate.equals(cert))
+        else if (certificate.equals(cert))
         {
             return true;
         }

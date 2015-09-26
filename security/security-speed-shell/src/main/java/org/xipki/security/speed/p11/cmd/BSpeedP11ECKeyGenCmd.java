@@ -64,7 +64,7 @@ public class BSpeedP11ECKeyGenCmd extends BSpeedP11Cmd
 
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
 
-        for(String curveName : curveNameOidMap.keySet())
+        for (String curveName : curveNameOidMap.keySet())
         {
             ret.add(new P11ECKeyGenLoadTest(slot, curveName));
         }

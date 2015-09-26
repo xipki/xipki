@@ -119,14 +119,14 @@ public abstract class P11SignLoadTest extends LoadExecutor
                 return;
             }
 
-            while(stop() == false && getErrorAccout() < 1)
+            while (stop() == false && getErrorAccout() < 1)
             {
                 try
                 {
                     singleSigner.getOutputStream().write(new byte[]{1, 2, 3, 4});
                     singleSigner.getSignature();
                     account(1, 0);
-                }catch(Exception e)
+                } catch (Exception e)
                 {
                     account(1, 1);
                 }

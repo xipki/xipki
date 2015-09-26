@@ -61,11 +61,11 @@ public class BSpeedP11DSASignCmd extends BSpeedP11SignCmd
 
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
 
-        for(int i = 0; i < pqLens.length; i += 2)
+        for (int i = 0; i < pqLens.length; i += 2)
         {
             int pLen = pqLens[i];
             int qLen = pqLens[i+1];
-            if(pLen == 1024)
+            if (pLen == 1024)
             {
                 sigAlgo = "SHA1withDSA";
             }

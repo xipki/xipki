@@ -107,15 +107,15 @@ class RequestOption
         int minLen = 4;
         int maxLen = 32;
         // Request nonce
-        if(nonceConf != null)
+        if (nonceConf != null)
         {
             nonceRequired = nonceConf.isRequired();
-            if(nonceConf.getMinLen() != null)
+            if (nonceConf.getMinLen() != null)
             {
                 minLen = nonceConf.getMinLen();
             }
 
-            if(nonceConf.getMaxLen() != null)
+            if (nonceConf.getMaxLen() != null)
             {
                 maxLen = nonceConf.getMaxLen();
             }
@@ -126,12 +126,12 @@ class RequestOption
         }
 
         int _maxSize = 0;
-        if(conf.getMaxRequestSize() != null)
+        if (conf.getMaxRequestSize() != null)
         {
             _maxSize = conf.getMaxRequestSize().intValue();
         }
 
-        if(_maxSize < 255)
+        if (_maxSize < 255)
         {
             _maxSize = 4 * 1024; // 4 KB
         }
@@ -143,7 +143,7 @@ class RequestOption
         // Request versions
 
         VersionsType versionsConf = conf.getVersions();
-        if(versionsConf == null)
+        if (versionsConf == null)
         {
             this.versions = null;
         }
@@ -157,12 +157,12 @@ class RequestOption
         hashAlgos = new HashSet<>();
 
         HashAlgorithms reqHashAlgosConf = conf.getHashAlgorithms();
-        if(reqHashAlgosConf != null)
+        if (reqHashAlgosConf != null)
         {
-            for(String token : reqHashAlgosConf.getAlgorithm())
+            for (String token : reqHashAlgosConf.getAlgorithm())
             {
                 HashAlgoType algo = HashAlgoType.getHashAlgoType(token);
-                if(algo != null && supportedHashAlgorithms.contains(algo))
+                if (algo != null && supportedHashAlgorithms.contains(algo))
                 {
                     hashAlgos.add(algo);
                 }
@@ -179,9 +179,9 @@ class RequestOption
 
         // certpath validiation
         CertpathValidation certpathConf = conf.getCertpathValidation();
-        if(certpathConf == null)
+        if (certpathConf == null)
         {
-            if(validateSignature)
+            if (validateSignature)
             {
                 throw new InvalidConfException("certpathValidation is not specified");
             }
@@ -208,18 +208,18 @@ class RequestOption
             {
                 Set<X509Certificate> tmpCerts = getCerts(certpathConf.getTrustAnchors());
                 trustAnchors = new HashSet<>(tmpCerts.size());
-                for(X509Certificate m : tmpCerts)
+                for (X509Certificate m : tmpCerts)
                 {
                     trustAnchors.add(new CertWithEncoded(m));
                 }
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 throw new InvalidConfException(
                         "error while initializing the trustAnchors: " + e.getMessage(), e);
             }
 
             CertCollectionType certsType = certpathConf.getCerts();
-            if(certsType == null)
+            if (certsType == null)
             {
                 this.certs = null;
             }
@@ -228,7 +228,7 @@ class RequestOption
                 try
                 {
                     this.certs = getCerts(certsType);
-                }catch(Exception e)
+                } catch (Exception e)
                 {
                     throw new InvalidConfException(
                             "error while initializing the certs: " + e.getMessage(), e);
@@ -311,14 +311,14 @@ class RequestOption
     {
         Set<X509Certificate> certs = new HashSet<>();
 
-        if(conf.getKeystore() != null)
+        if (conf.getKeystore() != null)
         {
             Keystore ksConf = conf.getKeystore();
             KeyStore trustStore = KeyStore.getInstance(ksConf.getType());
             InputStream is = null;
 
             String fileName = ksConf.getKeystore().getFile();
-            if(fileName != null)
+            if (fileName != null)
             {
                 is = new FileInputStream(IoUtil.expandFilepath(fileName));
             }
@@ -332,22 +332,22 @@ class RequestOption
             trustStore.load(is, password);
 
             Enumeration<String> aliases = trustStore.aliases();
-            while(aliases.hasMoreElements())
+            while (aliases.hasMoreElements())
             {
                 String alias = aliases.nextElement();
-                if(trustStore.isCertificateEntry(alias))
+                if (trustStore.isCertificateEntry(alias))
                 {
                     certs.add((X509Certificate) trustStore.getCertificate(alias));
                 }
             }
         }
-        else if(conf.getDir() != null)
+        else if (conf.getDir() != null)
         {
             File dir = new File(conf.getDir());
             File[] files = dir.listFiles();
-            for(File file : files)
+            for (File file : files)
             {
-                if(file.exists() && file.isFile())
+                if (file.exists() && file.isFile())
                 {
                     certs.add(X509Util.parseCert(file));
                 }

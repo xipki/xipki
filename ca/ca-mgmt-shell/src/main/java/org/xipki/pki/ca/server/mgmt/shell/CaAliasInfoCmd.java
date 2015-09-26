@@ -63,11 +63,11 @@ public class CaAliasInfoCmd extends CaCmd
 
         StringBuilder sb = new StringBuilder();
 
-        if(caAlias == null)
+        if (caAlias == null)
         {
             int n = aliasNames.size();
 
-            if(n == 0 || n == 1)
+            if (n == 0 || n == 1)
             {
                 sb.append((n == 0)
                         ? "no"
@@ -82,14 +82,14 @@ public class CaAliasInfoCmd extends CaCmd
             List<String> sorted = new ArrayList<>(aliasNames);
             Collections.sort(sorted);
 
-            for(String aliasName : sorted)
+            for (String aliasName : sorted)
             {
                 sb.append("\t").append(aliasName).append("\n");
             }
         }
         else
         {
-            if(aliasNames.contains(caAlias))
+            if (aliasNames.contains(caAlias))
             {
                 String paramValue = caManager.getCaNameForAlias(caAlias);
                 sb.append(caAlias).append("\n\t").append(paramValue);

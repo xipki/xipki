@@ -53,7 +53,7 @@ public class CaSystemStatusCmd extends CaCmd
     throws Exception
     {
         CASystemStatus status = caManager.getCASystemStatus();
-        if(status != null)
+        if (status != null)
         {
             out(status.toString());
         }

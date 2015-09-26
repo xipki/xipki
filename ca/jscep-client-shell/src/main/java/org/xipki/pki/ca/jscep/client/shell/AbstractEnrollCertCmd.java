@@ -83,19 +83,19 @@ public abstract class AbstractEnrollCertCmd extends ClientCmd
 
         EnrollmentResponse resp = requestCertificate(client, csr, getIdentityKey(),
                 getIdentityCert());
-        if(resp.isFailure())
+        if (resp.isFailure())
         {
             throw new CmdFailure("server returned 'failure'");
         }
 
-        if(resp.isPending())
+        if (resp.isPending())
         {
             throw new CmdFailure("server returned 'pending'");
         }
 
         X509Certificate cert = extractEECerts(resp.getCertStore());
 
-        if(cert == null)
+        if (cert == null)
         {
             throw new Exception("received no certificate");
         }

@@ -58,14 +58,14 @@ public class RevokeCertResultType
     {
         ParamUtil.assertNotNull("resultEntry", resultEntry);
 
-        if((resultEntry instanceof RevokeCertResultEntryType
+        if ((resultEntry instanceof RevokeCertResultEntryType
                 || resultEntry instanceof ErrorResultEntryType) == false)
         {
             throw new IllegalArgumentException("unaccepted parameter of class "
                     + resultEntry.getClass().getName());
         }
 
-        if(resultEntries == null)
+        if (resultEntries == null)
         {
             resultEntries = new ArrayList<>(1);
         }

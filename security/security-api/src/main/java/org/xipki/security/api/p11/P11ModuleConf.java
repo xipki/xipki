@@ -79,14 +79,14 @@ public class P11ModuleConf
                 : passwordRetriever;
 
         Set<P11SlotIdentifier> set = new HashSet<>();
-        if(includeSlots != null)
+        if (includeSlots != null)
         {
             set.addAll(includeSlots);
         }
         this.includeSlots = Collections.unmodifiableSet(set);
 
         set = new HashSet<>();
-        if(excludeSlots != null)
+        if (excludeSlots != null)
         {
             set.addAll(excludeSlots);
         }
@@ -122,16 +122,16 @@ public class P11ModuleConf
             final P11SlotIdentifier slot)
     {
         boolean included;
-        if(CollectionUtil.isEmpty(includeSlots))
+        if (CollectionUtil.isEmpty(includeSlots))
         {
             included = true;
         }
         else
         {
             included = false;
-            for(P11SlotIdentifier _slot : includeSlots)
+            for (P11SlotIdentifier _slot : includeSlots)
             {
-                if(_slot.equals(slot))
+                if (_slot.equals(slot))
                 {
                     included = true;
                     break;
@@ -139,19 +139,19 @@ public class P11ModuleConf
             }
         }
 
-        if(included == false)
+        if (included == false)
         {
             return false;
         }
 
-        if(CollectionUtil.isEmpty(excludeSlots))
+        if (CollectionUtil.isEmpty(excludeSlots))
         {
             return included;
         }
 
-        for(P11SlotIdentifier _slot : excludeSlots)
+        for (P11SlotIdentifier _slot : excludeSlots)
         {
-            if(_slot.equals(slot))
+            if (_slot.equals(slot))
             {
                 return false;
             }

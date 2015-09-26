@@ -85,17 +85,17 @@ class X509CrlSignerEntryWrapper
             final SecurityFactory securityFactory)
     throws SignerException, OperationException, InvalidConfException
     {
-        if(signer != null)
+        if (signer != null)
         {
             return;
         }
 
-        if(dbEntry == null)
+        if (dbEntry == null)
         {
             throw new SignerException("dbEntry is null");
         }
 
-        if("CA".equals(dbEntry.getType()))
+        if ("CA".equals(dbEntry.getType()))
         {
             return;
         }
@@ -103,14 +103,14 @@ class X509CrlSignerEntryWrapper
         X509Certificate responderCert = dbEntry.getCertificate();
         signer = securityFactory.createSigner(
                 dbEntry.getType(), dbEntry.getConf(), responderCert);
-        if(dbEntry.getBase64Cert() == null)
+        if (dbEntry.getBase64Cert() == null)
         {
             dbEntry.setCertificate(signer.getCertificate());
         }
 
         byte[] encodedSkiValue = signer.getCertificate().getExtensionValue(
                 Extension.subjectKeyIdentifier.getId());
-        if(encodedSkiValue == null)
+        if (encodedSkiValue == null)
         {
             throw new OperationException(ErrorCode.INVALID_EXTENSION,
                     "CA certificate does not have required extension SubjectKeyIdentifier");
@@ -126,7 +126,7 @@ class X509CrlSignerEntryWrapper
         }
         this.subjectKeyIdentifier = ski.getOctets();
 
-        if(X509Util.hasKeyusage(signer.getCertificate(), KeyUsage.cRLSign) == false)
+        if (X509Util.hasKeyusage(signer.getCertificate(), KeyUsage.cRLSign) == false)
         {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "CRL signer does not have keyusage cRLSign");
@@ -140,7 +140,7 @@ class X509CrlSignerEntryWrapper
 
     public X509Certificate getCert()
     {
-        if(signer == null)
+        if (signer == null)
         {
             return dbEntry.getCertificate();
         } else

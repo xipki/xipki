@@ -56,7 +56,7 @@ public class NegCaUpdateCmd extends CaUpdateCmd
         try
         {
             super._doExecute();
-        }catch(Exception e)
+        } catch (Exception e)
         {
             return null;
         }

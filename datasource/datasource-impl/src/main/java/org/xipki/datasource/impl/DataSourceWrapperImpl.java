@@ -103,7 +103,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             StringBuilder sql = new StringBuilder(coreSql.length() + 50);
             sql.append("SELECT ").append(coreSql);
 
-            if(StringUtil.isNotBlank(orderBy))
+            if (StringUtil.isNotBlank(orderBy))
             {
                 sql.append(" ORDER BY ").append(orderBy);
             }
@@ -153,7 +153,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             String sql = null;
 
             boolean newConn = conn == null;
-            if(newConn)
+            if (newConn)
             {
                 conn = getConnection();
             }
@@ -169,7 +169,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
                 sql = SQL_SELECT;
                 rs = stmt.executeQuery(sql);
-                if(rs.next())
+                if (rs.next())
                 {
                     ret = rs.getLong(1);
                 } else
@@ -177,12 +177,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                     throw new DataAccessException(
                             "could not increment the sequence " + sequenceName);
                 }
-            }catch(SQLException e)
+            } catch (SQLException e)
             {
                 throw translate(sqlUpdate, e);
             }finally
             {
-                if(newConn)
+                if (newConn)
                 {
                     releaseResources(stmt, rs);
                 }
@@ -247,7 +247,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             StringBuilder sql = new StringBuilder(coreSql.length() + 50);
             sql.append("SELECT ").append(coreSql);
 
-            if(StringUtil.isNotBlank(orderBy))
+            if (StringUtil.isNotBlank(orderBy))
             {
                 sql.append(" ORDER BY ").append(orderBy);
             }
@@ -314,7 +314,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             StringBuilder sql = new StringBuilder(coreSql.length() + 50);
             sql.append("SELECT ").append(coreSql);
 
-            if(StringUtil.isNotBlank(orderBy))
+            if (StringUtil.isNotBlank(orderBy))
             {
                 sql.append(" ORDER BY ").append(orderBy);
             }
@@ -407,10 +407,10 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         {
             StringBuilder sql = new StringBuilder(coreSql.length() + 50);
 
-            if(StringUtil.isBlank(orderBy))
+            if (StringUtil.isBlank(orderBy))
             {
                 sql.append("SELECT ").append(coreSql);
-                if(coreSql.contains(" WHERE"))
+                if (coreSql.contains(" WHERE"))
                 {
                     sql.append(" AND");
                 } else
@@ -505,9 +505,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             sb.append(" ADD CONSTRAINT ").append(primaryKeyName);
             sb.append(" PRIMARY KEY(");
             final int n = columns.length;
-            for(int i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
-                if(i != 0)
+                if (i != 0)
                 {
                     sb.append(",");
                 }
@@ -543,7 +543,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             StringBuilder sql = new StringBuilder(coreSql.length() + 50);
             sql.append("SELECT ").append(coreSql);
 
-            if(StringUtil.isNotBlank(orderBy))
+            if (StringUtil.isNotBlank(orderBy))
             {
                 sql.append(" ORDER BY ").append(orderBy);
             }
@@ -608,7 +608,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             StringBuilder sql = new StringBuilder(coreSql.length() + 80);
             sql.append("SELECT ").append(coreSql);
 
-            if(StringUtil.isNotBlank(orderBy))
+            if (StringUtil.isNotBlank(orderBy))
             {
                 sql.append(" ORDER BY ").append(orderBy);
             }
@@ -682,16 +682,16 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
         // The DB2 schema name is case-sensitive, and must be specified in uppercase characters
         String dataSourceClassName = props.getProperty("dataSourceClassName");
-        if(dataSourceClassName != null)
+        if (dataSourceClassName != null)
         {
-            if(dataSourceClassName.contains(".db2."))
+            if (dataSourceClassName.contains(".db2."))
             {
                 String propName = "dataSource.currentSchema";
                 String schema = props.getProperty(propName);
-                if(schema != null)
+                if (schema != null)
                 {
                     String upperCaseSchema = schema.toUpperCase();
-                    if(schema.equals(upperCaseSchema) == false)
+                    if (schema.equals(upperCaseSchema) == false)
                     {
                         props.setProperty(propName, upperCaseSchema);
                     }
@@ -702,20 +702,20 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         {
             String propName = "jdbcUrl";
             final String url = props.getProperty(propName);
-            if(StringUtil.startsWithIgnoreCase(url, "jdbc:db2:"))
+            if (StringUtil.startsWithIgnoreCase(url, "jdbc:db2:"))
             {
                 String sep = ":currentSchema=";
                 int idx = url.indexOf(sep);
-                if(idx != 1)
+                if (idx != 1)
                 {
                     String schema = url.substring(idx + sep.length());
-                    if(schema.endsWith(";"))
+                    if (schema.endsWith(";"))
                     {
                         schema = schema.substring(0, schema.length() - 1);
                     }
 
                     String upperCaseSchema = schema.toUpperCase();
-                    if(schema.equals(upperCaseSchema) == false)
+                    if (schema.equals(upperCaseSchema) == false)
                     {
                         String newUrl = url.replace(sep + schema, sep + upperCaseSchema);
                         props.setProperty(propName, newUrl);
@@ -724,7 +724,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             }
         }
 
-        if(databaseType == DatabaseType.DB2
+        if (databaseType == DatabaseType.DB2
                 || databaseType == DatabaseType.H2
                 || databaseType == DatabaseType.HSQL
                 || databaseType == DatabaseType.MYSQL
@@ -767,10 +767,10 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         try
         {
             return service.getConnection();
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             Throwable cause = e.getCause();
-            if(cause instanceof SQLException)
+            if (cause instanceof SQLException)
             {
                 e = (SQLException) cause;
             }
@@ -784,7 +784,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     public void returnConnection(
             final Connection conn)
     {
-        if(conn == null)
+        if (conn == null)
         {
             return;
         }
@@ -795,7 +795,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         } catch (SQLException e)
         {
             Throwable cause = e.getCause();
-            if(cause instanceof SQLException)
+            if (cause instanceof SQLException)
             {
                 e = (SQLException) cause;
             }
@@ -831,7 +831,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         try
         {
             return conn.createStatement();
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(null, e);
         }
@@ -846,7 +846,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         try
         {
             return conn.prepareStatement(sqlQuery);
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sqlQuery, e);
         }
@@ -857,36 +857,36 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final Statement ps,
             final ResultSet rs)
     {
-        if(rs != null)
+        if (rs != null)
         {
             try
             {
                 rs.close();
-            }catch(Throwable t)
+            } catch (Throwable t)
             {
                 LOG.warn("could not close ResultSet", t);
             }
         }
 
-        if(ps != null)
+        if (ps != null)
         {
             Connection conn = null;
             try
             {
                 conn = ps.getConnection();
-            }catch(SQLException e)
+            } catch (SQLException e)
             {
             }
 
             try
             {
                 ps.close();
-            }catch(Throwable t)
+            } catch (Throwable t)
             {
                 LOG.warn("could not close statement", t);
             }finally
             {
-                if(conn != null)
+                if (conn != null)
                 {
                     returnConnection(conn);
                 }
@@ -898,23 +898,23 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final Statement ps,
             final ResultSet rs)
     {
-        if(rs != null)
+        if (rs != null)
         {
             try
             {
                 rs.close();
-            }catch(Throwable t)
+            } catch (Throwable t)
             {
                 LOG.warn("could not close ResultSet", t);
             }
         }
 
-        if(ps != null)
+        if (ps != null)
         {
             try
             {
                 ps.close();
-            }catch(Throwable t)
+            } catch (Throwable t)
             {
                 LOG.warn("could not close statement", t);
             }
@@ -949,7 +949,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     {
         StringBuilder sqlBuilder = new StringBuilder(column.length() + table.length() + 20);
         sqlBuilder.append("SELECT MIN(").append(column).append(") FROM ").append(table);
-        if(StringUtil.isNotBlank(condition))
+        if (StringUtil.isNotBlank(condition))
         {
             sqlBuilder.append(" WHERE ").append(condition);
         }
@@ -966,12 +966,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getLong(1);
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         } finally
         {
-            if(conn == null)
+            if (conn == null)
             {
                 releaseResources(stmt, rs);
             }
@@ -1002,12 +1002,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getInt(1);
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
         {
-            if(conn == null)
+            if (conn == null)
             {
                 releaseResources(stmt, rs);
             }
@@ -1038,7 +1038,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     {
         StringBuilder sqlBuilder = new StringBuilder(column.length() + table.length() + 20);
         sqlBuilder.append("SELECT MAX(").append(column).append(") FROM ").append(table);
-        if(StringUtil.isNotBlank(condition))
+        if (StringUtil.isNotBlank(condition))
         {
             sqlBuilder.append(" WHERE ").append(condition);
         }
@@ -1054,12 +1054,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getLong(1);
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
         {
-            if(conn == null)
+            if (conn == null)
             {
                 releaseResources(stmt, rs);
             }
@@ -1087,14 +1087,14 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         final String sql = sb.toString();
 
         Connection _conn = conn;
-        if(_conn == null)
+        if (_conn == null)
         {
             try
             {
                 _conn = getConnection();
             } catch (Throwable t)
             {
-                if(LOG.isWarnEnabled())
+                if (LOG.isWarnEnabled())
                 {
                     LOG.warn("datasource {} could not get connection: {}", name, t.getMessage());
                 }
@@ -1107,9 +1107,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         {
             stmt = conn.createStatement();
             stmt.execute(sql);
-        } catch(Throwable t)
+        } catch (Throwable t)
         {
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn("datasource {} could not deletefrom table {}: {}", name, table,
                         t.getMessage());
@@ -1118,7 +1118,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         }
         finally
         {
-            if(conn == null)
+            if (conn == null)
             {
                 releaseResources(stmt, null);
             } else
@@ -1154,13 +1154,13 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             stmt = (conn != null)
                     ? conn.prepareStatement(sql)
                     : getConnection().prepareStatement(sql);
-            if(value instanceof Integer)
+            if (value instanceof Integer)
             {
                 stmt.setInt(1, (Integer) value);
-            } else if(value instanceof Long)
+            } else if (value instanceof Long)
             {
                 stmt.setLong(1, (Long) value);
-            } else if(value instanceof String)
+            } else if (value instanceof String)
             {
                 stmt.setString(1, (String) value);
             } else
@@ -1169,12 +1169,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             }
             rs = stmt.executeQuery();
             return rs.next();
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
         {
-            if(conn == null)
+            if (conn == null)
             {
                 releaseResources(stmt, rs);
             }
@@ -1211,12 +1211,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         {
             stmt.execute(sql);
             return true;
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             return false;
         } finally
         {
-            if(conn == null)
+            if (conn == null)
             {
                 releaseResources(stmt, null);
             }
@@ -1252,12 +1252,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         {
             stmt.execute(sql);
             return true;
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             return false;
         } finally
         {
-            if(conn == null)
+            if (conn == null)
             {
                 releaseResources(stmt, null);
             }
@@ -1292,7 +1292,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         try
         {
             dropSequence(sequenceName);
-        }catch(DataAccessException e)
+        } catch (DataAccessException e)
         {
         }
 
@@ -1313,7 +1313,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             stmt = conn.createStatement();
             stmt.execute(sql);
             LOG.info("datasource {} CREATESEQ {} START {}", name, sequenceName, startValue);
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }
@@ -1338,7 +1338,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             stmt = conn.createStatement();
             stmt.execute(sql);
             LOG.info("datasource {} DROPSEQ {}", name, sequenceName);
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }
@@ -1364,7 +1364,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     {
         final String sql = buildNextSeqValueSql(sequenceName);
         boolean newConn = conn == null;
-        if(newConn)
+        if (newConn)
         {
             conn = getConnection();
         }
@@ -1375,18 +1375,18 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         {
             stmt = conn.createStatement();
 
-            while(true)
+            while (true)
             {
                 ResultSet rs = stmt.executeQuery(sql);
                 try
                 {
-                    if(rs.next())
+                    if (rs.next())
                     {
                         next = rs.getLong(1);
                         synchronized (lastUsedSeqValues)
                         {
                             Long lastValue = lastUsedSeqValues.get(sequenceName);
-                            if(lastValue == null || next > lastValue)
+                            if (lastValue == null || next > lastValue)
                             {
                                 lastUsedSeqValues.put(sequenceName, next);
                                 break;
@@ -1402,12 +1402,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                     releaseStatementAndResultSet(null, rs);
                 }
             }
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
         {
-            if(newConn)
+            if (newConn)
             {
                 releaseResources(stmt, null);
             }
@@ -1448,9 +1448,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         sb.append(" ADD CONSTRAINT ").append(primaryKeyName);
         sb.append(" PRIMARY KEY (");
         final int n = columns.length;
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
-            if(i != 0)
+            if (i != 0)
             {
                 sb.append(",");
             }
@@ -1596,9 +1596,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         sb.append(" ADD CONSTRAINT ").append(constraintName);
         sb.append(" UNIQUE (");
         final int n = columns.length;
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
-            if(i != 0)
+            if (i != 0)
             {
                 sb.append(",");
             }
@@ -1625,7 +1625,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final SQLException ex)
     {
         ParamUtil.assertNotNull("ex", ex);
-        if(sql == null)
+        if (sql == null)
         {
             sql = "";
         }
@@ -1799,12 +1799,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                     ? conn.createStatement()
                             : getConnection().createStatement();
             stmt.executeUpdate(sql);
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
         {
-            if(conn == null)
+            if (conn == null)
             {
                 releaseResources(stmt, null);
             }

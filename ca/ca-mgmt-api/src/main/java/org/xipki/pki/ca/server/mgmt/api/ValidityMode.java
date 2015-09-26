@@ -48,9 +48,9 @@ public enum ValidityMode
     public static ValidityMode getInstance(
             final String text)
     {
-        for(ValidityMode value : values())
+        for (ValidityMode value : values())
         {
-            if(value.name().equalsIgnoreCase(text))
+            if (value.name().equalsIgnoreCase(text))
             {
                 return value;
             }

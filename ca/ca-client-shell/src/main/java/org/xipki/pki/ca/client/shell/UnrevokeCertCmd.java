@@ -58,25 +58,25 @@ public class UnrevokeCertCmd extends UnRevRemoveCertCmd
     protected Object _doExecute()
     throws Exception
     {
-        if(certFile == null && (issuerCertFile == null || getSerialNumber() == null))
+        if (certFile == null && (issuerCertFile == null || getSerialNumber() == null))
         {
             throw new IllegalCmdParamException("either cert or (issuer, serial) must be specified");
         }
 
         X509Certificate caCert = null;
-        if(issuerCertFile != null)
+        if (issuerCertFile != null)
         {
             caCert = X509Util.parseCert(issuerCertFile);
         }
 
         CertIdOrError certIdOrError;
-        if(certFile != null)
+        if (certFile != null)
         {
             X509Certificate cert = X509Util.parseCert(certFile);
-            if(caCert != null)
+            if (caCert != null)
             {
                 String errorMsg = checkCertificate(cert, caCert);
-                if(errorMsg != null)
+                if (errorMsg != null)
                 {
                     throw new CmdFailure(errorMsg);
                 }
@@ -103,7 +103,7 @@ public class UnrevokeCertCmd extends UnRevRemoveCertCmd
             }
         }
 
-        if(certIdOrError.getError() != null)
+        if (certIdOrError.getError() != null)
         {
             PKIStatusInfo error = certIdOrError.getError();
             throw new CmdFailure("releasing revocation failed: " + error);

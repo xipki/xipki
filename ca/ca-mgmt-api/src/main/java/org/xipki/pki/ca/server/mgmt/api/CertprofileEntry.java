@@ -59,7 +59,7 @@ public class CertprofileEntry implements Serializable
         ParamUtil.assertNotBlank("name", name);
         ParamUtil.assertNotBlank("type", type);
 
-        if("all".equalsIgnoreCase(name) || "null".equalsIgnoreCase(name))
+        if ("all".equalsIgnoreCase(name) || "null".equalsIgnoreCase(name))
         {
             throw new IllegalArgumentException(
                     "certificate profile name could not be 'all' and 'null'");
@@ -109,7 +109,7 @@ public class CertprofileEntry implements Serializable
         sb.append("faulty: ").append(faulty).append('\n');
         sb.append("type: ").append(type).append('\n');
         sb.append("conf: ");
-        if(verbose || conf == null || conf.length() < 301)
+        if (verbose || conf == null || conf.length() < 301)
         {
             sb.append(conf);
         } else

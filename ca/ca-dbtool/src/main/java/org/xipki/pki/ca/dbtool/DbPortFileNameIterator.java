@@ -91,7 +91,7 @@ class DbPortFileNameIterator implements Iterator<String>
         try
         {
             reader.close();
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
         }
     }
@@ -100,10 +100,10 @@ class DbPortFileNameIterator implements Iterator<String>
     throws IOException
     {
         String line;
-        while((line = reader.readLine()) != null)
+        while ((line = reader.readLine()) != null)
         {
             line = line.trim();
-            if(StringUtil.isBlank(line) || line.startsWith("#") || line.endsWith(".zip") == false)
+            if (StringUtil.isBlank(line) || line.startsWith("#") || line.endsWith(".zip") == false)
             {
                 continue;
             }

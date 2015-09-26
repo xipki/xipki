@@ -74,7 +74,7 @@ public class BcRSAContentVerifierProviderBuilder
         AlgorithmIdentifier digAlgId = digestAlgorithmFinder.find(sigAlgId);
         Digest dig = digestProvider.get(digAlgId);
 
-        if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()))
+        if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()))
         {
             return SignerUtil.createPSSRSASigner(sigAlgId);
         }

@@ -81,12 +81,12 @@ public abstract class AbstractEnrollCertCmd extends ClientCmd
         CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(p10File));
         EnrolmentResponse resp = requestCertificate(client, csr, getIdentityKey(),
                 getIdentityCert());
-        if(resp.isFailure())
+        if (resp.isFailure())
         {
             throw new CmdFailure("server returned 'failure'");
         }
 
-        if(resp.isPending())
+        if (resp.isPending())
         {
             throw new CmdFailure("server returned 'pending'");
         }

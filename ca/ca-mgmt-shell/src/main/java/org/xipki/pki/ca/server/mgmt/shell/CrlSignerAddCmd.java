@@ -89,18 +89,18 @@ public class CrlSignerAddCmd extends CaCmd
     throws Exception
     {
         String base64Cert = null;
-        if("CA".equalsIgnoreCase(signerType) == false)
+        if ("CA".equalsIgnoreCase(signerType) == false)
         {
-            if(signerCertFile != null)
+            if (signerCertFile != null)
             {
                 byte[] encodedCert = IoUtil.read(signerCertFile);
                 base64Cert = IoUtil.base64Encode(encodedCert, false);
                 X509Util.parseCert(encodedCert);
             }
 
-            if(signerConf != null)
+            if (signerConf != null)
             {
-                if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
+                if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
                 {
                     signerConf = ShellUtil.canonicalizeSignerConf(signerType,
                             signerConf, passwordResolver);

@@ -110,7 +110,7 @@ public class OcspDbImportWorker extends DbPortWorker
             try
             {
                 dataSource.shutdown();
-            }catch(Throwable e)
+            } catch (Throwable e)
             {
                 LOG.error("dataSource.shutdown()", e);
             }

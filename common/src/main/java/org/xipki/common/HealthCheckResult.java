@@ -125,67 +125,67 @@ public class HealthCheckResult
     {
         // Non root check requires always a name
         StringBuilder sb = new StringBuilder();
-        if(pretty)
+        if (pretty)
         {
             sb.append(getIndent(level));
         }
-        if(level > 0)
+        if (level > 0)
         {
             sb.append("\"").append(name).append("\":");
         }
         sb.append("{");
 
         boolean lastElement = true;
-        if(lastElement && CollectionUtil.isNotEmpty(statuses))
+        if (lastElement && CollectionUtil.isNotEmpty(statuses))
         {
             lastElement = false;
         }
-        if(lastElement && CollectionUtil.isNotEmpty(childChecks))
+        if (lastElement && CollectionUtil.isNotEmpty(childChecks))
         {
             lastElement = false;
         }
-        append(sb, "healthy", healthy, level + 1,pretty, lastElement);
+        append(sb, "healthy", healthy, level + 1, pretty, lastElement);
 
         Set<String> names = statuses.keySet();
         int size = names.size();
         int count = 0;
-        for(String name : names)
+        for (String name : names)
         {
             count++;
             append(sb, name, statuses.get(name), level + 1, pretty,
                     CollectionUtil.isEmpty(childChecks) && count == size);
         }
 
-        if(CollectionUtil.isNotEmpty(childChecks))
+        if (CollectionUtil.isNotEmpty(childChecks))
         {
-            if(pretty)
+            if (pretty)
             {
                 sb.append("\n");
                 sb.append(getIndent(level + 1));
             }
 
             sb.append("\"checks\":{");
-            if(pretty)
+            if (pretty)
             {
                 sb.append("\n");
             }
 
             int n = childChecks.size();
-            for(int i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
                 HealthCheckResult childCheck = childChecks.get(i);
-                if(i > 0)
+                if (i > 0)
                 {
                     sb.append("\n");
                 }
                 sb.append(childCheck.toJsonMessage(level + 2, pretty));
-                if(i < n - 1)
+                if (i < n - 1)
                 {
                     sb.append(",");
                 }
             }
 
-            if(pretty)
+            if (pretty)
             {
                 sb.append("\n");
                 sb.append(getIndent(level + 1));
@@ -193,7 +193,7 @@ public class HealthCheckResult
             sb.append("}");
         }
 
-        if(pretty)
+        if (pretty)
         {
             sb.append("\n");
             sb.append(getIndent(level));
@@ -210,29 +210,28 @@ public class HealthCheckResult
             final boolean pretty,
             final boolean lastElement)
     {
-        if(pretty)
+        if (pretty)
         {
             sb.append("\n");
             sb.append(getIndent(level));
         }
         sb.append("\"").append(name).append("\":");
-        if(value == null)
+
+        if (value == null)
         {
             sb.append("null");
-        }
-        else if(value instanceof Number)
+        } else if (value instanceof Number)
         {
             sb.append(value);
-        }
-        else if(value instanceof Boolean)
+        } else if (value instanceof Boolean)
         {
             sb.append(value);
-        }
-        else
+        } else
         {
             sb.append("\"").append(value).append("\"");
         }
-        if(lastElement == false)
+
+        if (lastElement == false)
         {
             sb.append(",");
         }
@@ -241,13 +240,13 @@ public class HealthCheckResult
     private static String getIndent(
             final int level)
     {
-        if(level == 0)
+        if (level == 0)
         {
             return "";
         }
 
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < level; i++)
+        for (int i = 0; i < level; i++)
         {
             sb.append("  ");
         }
@@ -260,7 +259,7 @@ public class HealthCheckResult
     {
         // remove white spaces and line breaks
         String jsonMsg = jsonMessage.replaceAll(" |\t|\r|\n", "");
-        if(jsonMsg.startsWith("{\"healthy\":") == false)
+        if (jsonMsg.startsWith("{\"healthy\":") == false)
         {
             throw new IllegalArgumentException("invalid healthcheck message");
         }
@@ -268,13 +267,13 @@ public class HealthCheckResult
         int startIdx = "{\"healthy\":".length();
         int endIdx = jsonMsg.indexOf(',', startIdx);
         boolean containsChildChecks = true;
-        if(endIdx == -1)
+        if (endIdx == -1)
         {
             endIdx = jsonMsg.indexOf('}', startIdx);
             containsChildChecks = false;
         }
 
-        if(endIdx == -1)
+        if (endIdx == -1)
         {
             throw new IllegalArgumentException("invalid healthcheck message");
         }
@@ -282,11 +281,10 @@ public class HealthCheckResult
         String s = jsonMsg.substring(startIdx, endIdx);
 
         boolean healthy;
-        if(s.equalsIgnoreCase("true") || s.equalsIgnoreCase("false"))
+        if (s.equalsIgnoreCase("true") || s.equalsIgnoreCase("false"))
         {
             healthy = Boolean.parseBoolean(s);
-        }
-        else
+        } else
         {
             throw new IllegalArgumentException("invalid healthcheck message");
         }
@@ -294,12 +292,12 @@ public class HealthCheckResult
         HealthCheckResult result = new HealthCheckResult(name);
         result.setHealthy(healthy);
 
-        if(containsChildChecks == false)
+        if (containsChildChecks == false)
         {
             return result;
         }
 
-        if(jsonMsg.startsWith("\"checks\":", endIdx + 1) == false)
+        if (jsonMsg.startsWith("\"checks\":", endIdx + 1) == false)
         {
             return result;
         }
@@ -307,7 +305,7 @@ public class HealthCheckResult
         String checksBlock = getBlock(jsonMsg, endIdx + 1 + "\"checks\":".length());
         Map<String, String> childBlocks = getChildBlocks(
                 checksBlock.substring(1, checksBlock.length() - 1));
-        for(String childBlockName : childBlocks.keySet())
+        for (String childBlockName : childBlocks.keySet())
         {
             HealthCheckResult childResult = getInstanceFromJsonMessage(childBlockName,
                     childBlocks.get(childBlockName));
@@ -323,7 +321,7 @@ public class HealthCheckResult
         Map<String, String> childBlocks = new HashMap<>();
 
         int offset = 0;
-        while(true)
+        while (true)
         {
             int idx = block.indexOf('"', offset + 1);
             String blockName = block.substring(offset + 1, idx);
@@ -331,7 +329,7 @@ public class HealthCheckResult
             childBlocks.put(blockName, blockValue);
 
             offset += blockName.length() + 4 + blockValue.length();
-            if(offset >=  block.length() - 1)
+            if (offset >=  block.length() - 1)
             {
                 break;
             }
@@ -344,36 +342,34 @@ public class HealthCheckResult
             final String text,
             final int offset)
     {
-        if(text.startsWith("{", offset) == false)
+        if (text.startsWith("{", offset) == false)
         {
             throw new IllegalArgumentException("invalid text: '" + text + "'");
         }
 
         StringBuilder sb = new StringBuilder("{");
         final int n = text.length();
-        if(n < 2)
+        if (n < 2)
         {
             throw new IllegalArgumentException("invalid text: '" + text + "'");
         }
 
         char c;
         int m = 0;
-        for(int i = offset + 1; i < n; i++)
+        for (int i = offset + 1; i < n; i++)
         {
             c = text.charAt(i);
             sb.append(c);
 
-            if(c == '{')
+            if (c == '{')
             {
                 m++;
-            }
-            else if(c == '}')
+            } else if (c == '}')
             {
-                if(m == 0)
+                if (m == 0)
                 {
                     return sb.toString();
-                }
-                else
+                } else
                 {
                     m--;
                 }
@@ -390,7 +386,7 @@ public class HealthCheckResult
         String jm2 = "{\"healthy\":true,\"checks\":{\"childcheck\":{\"healthy\":false,"
                 + "\"checks\":{\"childChildCheck\":{\"healthy\":false}}},"
                 + "\"childcheck2\":{\"healthy\":false}}}";
-        System.out.println(getBlock(jm1,0));
+        System.out.println(getBlock(jm1, 0));
         System.out.println(getBlock(jm2, 25));
         getInstanceFromJsonMessage("default", jm1);
         getInstanceFromJsonMessage("default", jm2);

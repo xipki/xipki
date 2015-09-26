@@ -111,7 +111,7 @@ public abstract class P12KeypairGenerator
             final List<ASN1ObjectIdentifier> extendedKeyUsage)
     throws Exception
     {
-        if(Security.getProvider("BC") == null)
+        if (Security.getProvider("BC") == null)
         {
             Security.addProvider(new BouncyCastleProvider());
         }
@@ -142,7 +142,7 @@ public abstract class P12KeypairGenerator
                 subjectPublicKeyInfo);
 
         X509KeyUsage ku;
-        if(keyUsage == null)
+        if (keyUsage == null)
         {
             ku = new X509KeyUsage(
                     X509KeyUsage.nonRepudiation | X509KeyUsage.digitalSignature
@@ -155,7 +155,7 @@ public abstract class P12KeypairGenerator
 
         certGenerator.addExtension(Extension.keyUsage, true, ku);
 
-        if(CollectionUtil.isNotEmpty(extendedKeyUsage))
+        if (CollectionUtil.isNotEmpty(extendedKeyUsage))
         {
             KeyPurposeId[] kps = new KeyPurposeId[extendedKeyUsage.size()];
 
@@ -199,7 +199,7 @@ public abstract class P12KeypairGenerator
     {
         BcContentSignerBuilder builder;
 
-        if(key instanceof RSAPrivateKey)
+        if (key instanceof RSAPrivateKey)
         {
             ASN1ObjectIdentifier hashOid = X509ObjectIdentifiers.id_SHA1;
             ASN1ObjectIdentifier sigOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
@@ -208,7 +208,7 @@ public abstract class P12KeypairGenerator
                     buildAlgId(sigOid),
                     buildAlgId(hashOid));
         }
-        else if(key instanceof DSAPrivateKey)
+        else if (key instanceof DSAPrivateKey)
         {
             ASN1ObjectIdentifier hashOid = X509ObjectIdentifiers.id_SHA1;
             AlgorithmIdentifier sigId = new AlgorithmIdentifier(
@@ -216,28 +216,28 @@ public abstract class P12KeypairGenerator
 
             builder = new BcDSAContentSignerBuilder(sigId, buildAlgId(hashOid));
         }
-        else if(key instanceof ECPrivateKey)
+        else if (key instanceof ECPrivateKey)
         {
             ASN1ObjectIdentifier hashOid;
             ASN1ObjectIdentifier sigOid;
 
             int keySize = ((ECPrivateKey) key).getParams().getOrder().bitLength();
-            if(keySize > 384)
+            if (keySize > 384)
             {
                 hashOid = NISTObjectIdentifiers.id_sha512;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
             }
-            else if(keySize > 256)
+            else if (keySize > 256)
             {
                 hashOid = NISTObjectIdentifiers.id_sha384;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
             }
-            else if(keySize > 224)
+            else if (keySize > 224)
             {
                 hashOid = NISTObjectIdentifiers.id_sha224;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
             }
-            else if(keySize > 160)
+            else if (keySize > 160)
             {
                 hashOid = NISTObjectIdentifiers.id_sha256;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
@@ -344,12 +344,12 @@ public abstract class P12KeypairGenerator
             {
                 new ASN1ObjectIdentifier(curveNameOrOid);
                 isOid = true;
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 isOid = false;
             }
 
-            if(isOid)
+            if (isOid)
             {
                 this.curveOid = new ASN1ObjectIdentifier(curveNameOrOid);
                 this.curveName = KeyUtil.getCurveName(this.curveOid);
@@ -358,7 +358,7 @@ public abstract class P12KeypairGenerator
             {
                 this.curveName = curveNameOrOid;
                 this.curveOid = KeyUtil.getCurveOID(this.curveName);
-                if(this.curveOid == null)
+                if (this.curveOid == null)
                 {
                     throw new IllegalArgumentException("no OID is defined for the curve "
                             + this.curveName);

@@ -49,16 +49,21 @@ import java.util.StringTokenizer;
 
 public class StringUtil
 {
+
+    private StringUtil()
+    {
+    }
+
     public static List<String> split(
             final String str,
             final String delim)
     {
-        if(str == null)
+        if (str == null)
         {
             return null;
         }
 
-        if(str.isEmpty())
+        if (str.isEmpty())
         {
             return Collections.emptyList();
         }
@@ -66,7 +71,7 @@ public class StringUtil
         StringTokenizer st = new StringTokenizer(str, delim);
         List<String> ret = new ArrayList<String>(st.countTokens());
 
-        while(st.hasMoreTokens())
+        while (st.hasMoreTokens())
         {
             ret.add(st.nextToken());
         }
@@ -90,12 +95,12 @@ public class StringUtil
             final String str,
             final String delim)
     {
-        if(str == null)
+        if (str == null)
         {
             return null;
         }
 
-        if(str.isEmpty())
+        if (str.isEmpty())
         {
             return Collections.emptySet();
         }
@@ -103,7 +108,7 @@ public class StringUtil
         StringTokenizer st = new StringTokenizer(str, delim);
         Set<String> ret = new HashSet<String>(st.countTokens());
 
-        while(st.hasMoreTokens())
+        while (st.hasMoreTokens())
         {
             ret.add(st.nextToken());
         }
@@ -115,18 +120,18 @@ public class StringUtil
             final Collection<String> set,
             final String delim)
     {
-        if(set == null)
+        if (set == null)
         {
             return null;
         }
 
         StringBuilder sb = new StringBuilder();
-        for(String m : set)
+        for (String m : set)
         {
             sb.append(m).append(delim);
         }
         int n = sb.length();
-        if(n > 0)
+        if (n > 0)
         {
             sb.delete(n - delim.length(), n);
         }
@@ -137,7 +142,7 @@ public class StringUtil
             final String s,
             final String prefix)
     {
-        if(s.length() < prefix.length())
+        if (s.length() < prefix.length())
         {
             return false;
         }
@@ -159,7 +164,7 @@ public class StringUtil
         {
             Integer.parseInt(s, radix);
             return true;
-        }catch(NumberFormatException e)
+        } catch (NumberFormatException e)
         {
             return false;
         }
@@ -209,26 +214,26 @@ public class StringUtil
         String accountS = Long.toString(account);
 
         final int n = accountS.length();
-        if(n > 3)
+        if (n > 3)
         {
             StringBuilder sb = new StringBuilder(n + 3);
             int firstBlockLen = n % 3;
-            if(firstBlockLen != 0)
+            if (firstBlockLen != 0)
             {
                 sb.append(accountS.substring(0, firstBlockLen));
                 sb.append(',');
             }
 
-            for(int i = 0; ;i++)
+            for (int i = 0; ;i++)
             {
                 int offset = firstBlockLen + i * 3;
-                if(offset >= n)
+                if (offset >= n)
                 {
                     break;
                 }
 
                 sb.append(accountS.substring(offset, offset + 3));
-                if(offset + 3 < n)
+                if (offset + 3 < n)
                 {
                     sb.append(',');
                 }
@@ -267,26 +272,26 @@ public class StringUtil
 
         StringBuilder sb = new StringBuilder();
         // hours
-        if(h > 0)
+        if (h > 0)
         {
             sb.append(h).append(':');
         }
 
         // minutes
-        if(m < 10)
+        if (m < 10)
         {
             sb.append('0');
         }
         sb.append(m).append(':');
 
         // seconds
-        if(s < 10)
+        if (s < 10)
         {
             sb.append('0');
         }
         sb.append(s);
 
-        while(sb.length() < minLen)
+        while (sb.length() < minLen)
         {
             sb.insert(0, ' ');
         }

@@ -56,7 +56,7 @@ class CertBasedIdentityStore
         this.table = table;
         this.entries = new ArrayList<>(entries.size());
 
-        for(CertBasedIdentityEntry entry : entries)
+        for (CertBasedIdentityEntry entry : entries)
         {
             addIdentityEntry(entry);
         }
@@ -67,9 +67,9 @@ class CertBasedIdentityStore
     {
         ParamUtil.assertNotNull("entry", entry);
 
-        for(CertBasedIdentityEntry existingEntry : entries)
+        for (CertBasedIdentityEntry existingEntry : entries)
         {
-            if(existingEntry.getId() == entry.getId())
+            if (existingEntry.getId() == entry.getId())
             {
                 throw new IllegalArgumentException(
                         table + " with the same id " + entry.getId() + " already available");
@@ -82,9 +82,9 @@ class CertBasedIdentityStore
     Integer getCaIdForSubject(
             final String subject)
     {
-        for(CertBasedIdentityEntry entry : entries)
+        for (CertBasedIdentityEntry entry : entries)
         {
-            if(entry.getSubject().equals(subject))
+            if (entry.getSubject().equals(subject))
             {
                 return entry.getId();
             }
@@ -96,9 +96,9 @@ class CertBasedIdentityStore
     Integer getCaIdForSha1Fp(
             final byte[] sha1Fp_cert)
     {
-        for(CertBasedIdentityEntry entry : entries)
+        for (CertBasedIdentityEntry entry : entries)
         {
-            if(entry.matchSha1Fp(sha1Fp_cert))
+            if (entry.matchSha1Fp(sha1Fp_cert))
             {
                 return entry.getId();
             }
@@ -110,9 +110,9 @@ class CertBasedIdentityStore
     Integer getCaIdForCert(
             final byte[] encodedCert)
     {
-        for(CertBasedIdentityEntry entry : entries)
+        for (CertBasedIdentityEntry entry : entries)
         {
-            if(entry.matchCert(encodedCert))
+            if (entry.matchCert(encodedCert))
             {
                 return entry.getId();
             }

@@ -76,7 +76,7 @@ public class GetCertCmd extends ClientCmd
         X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
         List<X509Certificate> certs = client.scepGetCert(getIdentityKey(), getIdentityCert(),
                 caSubject, serial);
-        if(certs == null || certs.isEmpty())
+        if (certs == null || certs.isEmpty())
         {
             throw new CmdFailure("received no certficate from server");
         }

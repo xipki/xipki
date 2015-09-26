@@ -69,18 +69,18 @@ public abstract class DbiXmlReader
         }
 
         String thisRootElement = null;
-        while(reader.hasNext())
+        while (reader.hasNext())
         {
             int event = reader.next();
 
-            if(event == XMLStreamConstants.START_ELEMENT)
+            if (event == XMLStreamConstants.START_ELEMENT)
             {
                 thisRootElement = reader.getLocalName();
                 break;
             }
         }
 
-        if(this.rootElementName.equals(thisRootElement) == false)
+        if (this.rootElementName.equals(thisRootElement) == false)
         {
             throw new InvalidDataObjectException("the given XML stream does not have root element '"
                     + rootElementName + "', but '" + thisRootElement + "'");
@@ -102,7 +102,7 @@ public abstract class DbiXmlReader
     public DbDataObject next()
     throws InvalidDataObjectException, XMLStreamException
     {
-        if(next == null)
+        if (next == null)
         {
             throw new IllegalStateException("no more next element exists");
         }

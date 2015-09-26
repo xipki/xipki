@@ -56,7 +56,7 @@ class NameIdStore
         this.table = table;
         this.entries = new HashMap<>();
 
-        for(String name : entries.keySet())
+        for (String name : entries.keySet())
         {
             addEntry(name, entries.get(name));
         }
@@ -69,13 +69,13 @@ class NameIdStore
         ParamUtil.assertNotBlank("name", name);
         ParamUtil.assertNotNull("id", id);
 
-        if(entries.containsKey(name))
+        if (entries.containsKey(name))
         {
             throw new IllegalArgumentException(
                     "entry with the same name " + name + " already available");
         }
 
-        if(entries.containsValue(id))
+        if (entries.containsValue(id))
         {
             throw new IllegalArgumentException(
                     "entry with the same id " + id + " already available");
@@ -87,9 +87,9 @@ class NameIdStore
     String getName(
             final Integer id)
     {
-        for(String name : entries.keySet())
+        for (String name : entries.keySet())
         {
-            if(id == entries.get(name))
+            if (id == entries.get(name))
             {
                 return name;
             }

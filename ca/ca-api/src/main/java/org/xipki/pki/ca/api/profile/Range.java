@@ -65,11 +65,11 @@ public class Range
             final Integer min,
             final Integer max)
     {
-        if(min == null && max == null)
+        if (min == null && max == null)
         {
             throw new IllegalArgumentException("min and max cannot be both null");
         }
-        if(min != null && max != null && min > max)
+        if (min != null && max != null && min > max)
         {
             throw new IllegalArgumentException("min cannot be greater than max: "
                     + min + " > " + max);
@@ -81,11 +81,11 @@ public class Range
     public boolean match(
             final int i)
     {
-        if(min != null && i < min)
+        if (min != null && i < min)
         {
             return false;
         }
-        if(max != null && i > max)
+        if (max != null && i > max)
         {
             return false;
         }
@@ -100,12 +100,12 @@ public class Range
     {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
-        if(min != null)
+        if (min != null)
         {
             sb.append(min);
         }
         sb.append(", ");
-        if(max != null)
+        if (max != null)
         {
             sb.append(max);
         }

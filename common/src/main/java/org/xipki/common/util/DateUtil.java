@@ -54,17 +54,21 @@ public class DateUtil
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
+    private DateUtil()
+    {
+    }
+
     public static Date parseUTCTimeyyyyMMddhhmmss(
             final String utcTime)
     {
-        if(utcTime == null || utcTime.length() != 14)
+        if (utcTime == null || utcTime.length() != 14)
         {
             throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
         }
         try
         {
             return sdf.parse(utcTime);
-        }catch(ParseException e)
+        } catch (ParseException e)
         {
             throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': "
                     + e.getMessage());

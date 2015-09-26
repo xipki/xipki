@@ -115,7 +115,7 @@ public class CertStatusInfo
             final Date nextUpdate,
             final String certprofile)
     {
-        if(revocationInfo == null)
+        if (revocationInfo == null)
         {
             throw new IllegalArgumentException("revocationInfo could not be null");
         }

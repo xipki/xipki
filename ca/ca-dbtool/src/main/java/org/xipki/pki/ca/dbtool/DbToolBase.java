@@ -105,7 +105,7 @@ public class DbToolBase
             final Long i)
     throws SQLException
     {
-        if(i != null)
+        if (i != null)
         {
             ps.setLong(index, i.longValue());
         }
@@ -121,7 +121,7 @@ public class DbToolBase
             final Integer i)
     throws SQLException
     {
-        if(i != null)
+        if (i != null)
         {
             ps.setInt(index, i.intValue());
         }
@@ -149,7 +149,7 @@ public class DbToolBase
         try
         {
             return connection.createStatement();
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw dataSource.translate(null, e);
         }
@@ -162,7 +162,7 @@ public class DbToolBase
         try
         {
             return connection.prepareStatement(sql);
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
         }
@@ -172,22 +172,22 @@ public class DbToolBase
             final Statement ps,
             final ResultSet rs)
     {
-        if(ps != null)
+        if (ps != null)
         {
             try
             {
                 ps.close();
-            }catch(SQLException e)
+            } catch (SQLException e)
             {
             }
         }
 
-        if(rs != null)
+        if (rs != null)
         {
             try
             {
                 rs.close();
-            }catch(SQLException e)
+            } catch (SQLException e)
             {
             }
         }
@@ -219,7 +219,7 @@ public class DbToolBase
         try
         {
             stmt.execute(sb.toString());
-        } catch(Throwable t)
+        } catch (Throwable t)
         {
             log.error("could not delete columns from table " + tableName + " with "
                     + idColumn + " > " + id, t);
@@ -301,7 +301,7 @@ public class DbToolBase
         try
         {
             return connection.setSavepoint();
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw dataSource.translate(null, e);
         }
@@ -313,7 +313,7 @@ public class DbToolBase
         try
         {
             connection.rollback();
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw dataSource.translate(null, e);
         }
@@ -332,7 +332,7 @@ public class DbToolBase
         try
         {
             connection.setAutoCommit(false);
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw dataSource.translate(null, e);
         }
@@ -344,7 +344,7 @@ public class DbToolBase
         try
         {
             connection.setAutoCommit(connectionAutoCommit);
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw dataSource.translate(null, e);
         }
@@ -357,7 +357,7 @@ public class DbToolBase
         try
         {
             connection.commit();
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw dataSource.translate(task, e);
         }
@@ -376,18 +376,18 @@ public class DbToolBase
             try
             {
                 is.close();
-            }catch(IOException e)
+            } catch (IOException e)
             {
             }
         }
 
         // adapt the configuration
-        if(props.getProperty("minimumIdle") != null)
+        if (props.getProperty("minimumIdle") != null)
         {
             props.setProperty("minimumIdle", "1");
         }
 
-        if(props.getProperty("db.minIdle") != null)
+        if (props.getProperty("db.minIdle") != null)
         {
             props.setProperty("db.minIdle", "1");
         }
@@ -402,11 +402,11 @@ public class DbToolBase
         // delete the temporary files
         File dir = new File(dirName);
         File[] children = dir.listFiles();
-        if(children != null && children.length > 0)
+        if (children != null && children.length > 0)
         {
-            for(File child : children)
+            for (File child : children)
             {
-                if(child.getName().startsWith(prefix))
+                if (child.getName().startsWith(prefix))
                 {
                     child.delete();
                 }
@@ -435,7 +435,7 @@ public class DbToolBase
 
         int len = Integer.toString(maxId).length();
         String a = Integer.toString(minIdOfCurrentFile);
-        for(int i = 0; i < len - a.length(); i++)
+        for (int i = 0; i < len - a.length(); i++)
         {
             sb.append('0');
         }
@@ -443,7 +443,7 @@ public class DbToolBase
         sb.append("-");
 
         String b = Integer.toString(maxIdOfCurrentFile);
-        for(int i = 0; i < len - b.length(); i++)
+        for (int i = 0; i < len - b.length(); i++)
         {
             sb.append('0');
         }

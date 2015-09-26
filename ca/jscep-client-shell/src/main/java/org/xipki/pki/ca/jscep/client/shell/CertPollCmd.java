@@ -84,19 +84,19 @@ public class CertPollCmd extends ClientCmd
                 getIdentityKey(),
                 new X500Principal(csr.getSubject().getEncoded()),
                 transId);
-        if(resp.isFailure())
+        if (resp.isFailure())
         {
             throw new CmdFailure("server returned 'failure'");
         }
 
-        if(resp.isPending())
+        if (resp.isPending())
         {
             throw new CmdFailure("server returned 'pending'");
         }
 
         X509Certificate cert = extractEECerts(resp.getCertStore());
 
-        if(cert == null)
+        if (cert == null)
         {
             throw new Exception("received no certificate");
         }

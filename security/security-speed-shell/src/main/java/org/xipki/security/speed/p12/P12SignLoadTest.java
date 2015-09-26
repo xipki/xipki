@@ -111,11 +111,11 @@ public abstract class P12SignLoadTest extends LoadExecutor
         try
         {
             new ASN1ObjectIdentifier(curveNamOrOid);
-        }catch(Exception e)
+        } catch (Exception e)
         {
             oid = KeyUtil.getCurveOID(curveNamOrOid);
         }
-        if(oid == null)
+        if (oid == null)
         {
             return null;
         }
@@ -148,14 +148,14 @@ public abstract class P12SignLoadTest extends LoadExecutor
                 return;
             }
 
-            while(stop() == false && getErrorAccout() < 1)
+            while (stop() == false && getErrorAccout() < 1)
             {
                 try
                 {
                     singleSigner.getOutputStream().write(new byte[]{1, 2, 3, 4});
                     singleSigner.getSignature();
                     account(1, 0);
-                }catch(Exception e)
+                } catch (Exception e)
                 {
                     account(1, 1);
                 }
