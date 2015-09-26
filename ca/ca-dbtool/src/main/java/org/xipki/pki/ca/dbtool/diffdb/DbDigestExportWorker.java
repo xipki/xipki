@@ -164,11 +164,11 @@ public class DbDigestExportWorker extends DbPortWorker
                     && dataSource.tableExists(conn, "CRAW"))
             {
                 return DbSchemaType.XIPKI_CA_v2;
-            } else if ( dataSource.tableExists(conn, "ISSUER")
+            } else if (dataSource.tableExists(conn, "ISSUER")
                     && dataSource.tableExists(conn, "CHASH"))
             {
                 return DbSchemaType.XIPKI_OCSP_v2;
-            } else if ( dataSource.tableExists(conn, "CAData")
+            } else if (dataSource.tableExists(conn, "CAData")
                     && dataSource.tableExists(conn, "CertificateData"))
             {
                 return DbSchemaType.EJBCA_CA_v3;
