@@ -69,9 +69,9 @@ public enum DuplicationMode
     public static DuplicationMode getInstance(
             final String text)
     {
-        for(DuplicationMode value : values())
+        for (DuplicationMode value : values())
         {
-            if(value.description.equalsIgnoreCase(text)
+            if (value.description.equalsIgnoreCase(text)
                     || value.name().equalsIgnoreCase(text)
                     || Integer.toString(value.mode).equalsIgnoreCase(text))
             {
@@ -85,9 +85,9 @@ public enum DuplicationMode
     public static DuplicationMode getInstance(
             final int mode)
     {
-        for(DuplicationMode value : values())
+        for (DuplicationMode value : values())
         {
-            if(mode == value.mode)
+            if (mode == value.mode)
             {
                 return value;
             }

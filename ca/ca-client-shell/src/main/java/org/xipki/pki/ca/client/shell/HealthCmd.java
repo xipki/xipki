@@ -65,20 +65,20 @@ public class HealthCmd extends ClientCmd
     throws Exception
     {
         Set<String> caNames = caClient.getCaNames();
-        if(isEmpty(caNames))
+        if (isEmpty(caNames))
         {
             throw new IllegalCmdParamException("no CA is configured");
         }
 
-        if(caName != null && ! caNames.contains(caName))
+        if (caName != null && ! caNames.contains(caName))
         {
             throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs "
                     + caNames);
         }
 
-        if(caName == null)
+        if (caName == null)
         {
-            if(caNames.size() == 1)
+            if (caNames.size() == 1)
             {
                 caName = caNames.iterator().next();
             } else
@@ -97,7 +97,7 @@ public class HealthCmd extends ClientCmd
                 ? "healthy"
                 : "not healthy";
         sb.append(healthyText);
-        if(verbose.booleanValue())
+        if (verbose.booleanValue())
         {
             sb.append("\n").append(healthResult.toJsonMessage(true));
         }

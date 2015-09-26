@@ -64,16 +64,16 @@ public class CaCertsReader extends DbiXmlReader
         StringBuilder buffer = new StringBuilder();
         int lastEvent = -1;
 
-        while(reader.hasNext())
+        while (reader.hasNext())
         {
             int event = reader.next();
             String tagContent = null;
 
-            if(event != XMLStreamConstants.CHARACTERS)
+            if (event != XMLStreamConstants.CHARACTERS)
             {
                 tagContent = buffer.toString();
 
-                if(lastEvent == XMLStreamConstants.CHARACTERS)
+                if (lastEvent == XMLStreamConstants.CHARACTERS)
                 {
                     buffer.delete(0, buffer.length());
                 }
@@ -93,7 +93,7 @@ public class CaCertsReader extends DbiXmlReader
                 buffer.append(reader.getText());
                 break;
             case XMLStreamConstants.END_ELEMENT:
-                if(ret == null)
+                if (ret == null)
                 {
                     break;
                 }

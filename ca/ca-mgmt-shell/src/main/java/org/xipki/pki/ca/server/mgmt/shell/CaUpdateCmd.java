@@ -175,12 +175,12 @@ public class CaUpdateCmd extends CaCmd
     throws Exception
     {
         X509ChangeCAEntry entry = new X509ChangeCAEntry(caName);
-        if(caStatus != null)
+        if (caStatus != null)
         {
             entry.setStatus(CAStatus.getCAStatus(caStatus));
         }
 
-        if(expirationPeriod != null && expirationPeriod < 0)
+        if (expirationPeriod != null && expirationPeriod < 0)
         {
             throw new IllegalCmdParamException("invalid expirationPeriod: " + expirationPeriod);
         } else
@@ -188,23 +188,23 @@ public class CaUpdateCmd extends CaCmd
             entry.setExpirationPeriod(expirationPeriod);
         }
 
-        if(keepExpiredCertInDays != null)
+        if (keepExpiredCertInDays != null)
         {
             entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
         }
 
-        if(certFile != null)
+        if (certFile != null)
         {
             entry.setCert(X509Util.parseCert(certFile));
         }
 
-        if(signerConf != null)
+        if (signerConf != null)
         {
             String _signerType = signerType;
-            if(_signerType == null)
+            if (_signerType == null)
             {
                 CAEntry caEntry = caManager.getCA(caName);
-                if(caEntry == null)
+                if (caEntry == null)
                 {
                     throw new IllegalCmdParamException("please specify the signerType");
                 }
@@ -216,30 +216,30 @@ public class CaUpdateCmd extends CaCmd
             entry.setSignerConf(signerConf);
         }
 
-        if(duplicateKeyS != null)
+        if (duplicateKeyS != null)
         {
             DuplicationMode duplicateMode = DuplicationMode.getInstance(duplicateKeyS);
-            if(duplicateMode == null)
+            if (duplicateMode == null)
             {
                 throw new IllegalCmdParamException("invalid duplication mode " + duplicateKeyS);
             }
             entry.setDuplicateKeyMode(duplicateMode);
         }
 
-        if(duplicateSubjectS != null)
+        if (duplicateSubjectS != null)
         {
             DuplicationMode duplicateMode = DuplicationMode.getInstance(duplicateSubjectS);
-            if(duplicateMode == null)
+            if (duplicateMode == null)
             {
                 throw new IllegalCmdParamException("invalid duplication mode " + duplicateSubjectS);
             }
             entry.setDuplicateSubjectMode(duplicateMode);
         }
 
-        if(duplicateCNS != null)
+        if (duplicateCNS != null)
         {
             DuplicationMode duplicateMode = DuplicationMode.getInstance(duplicateCNS);
-            if(duplicateMode == null)
+            if (duplicateMode == null)
             {
                 throw new IllegalCmdParamException("invalid duplication mode " + duplicateCNS);
             }
@@ -249,10 +249,10 @@ public class CaUpdateCmd extends CaCmd
         if (permissions != null && permissions.size() > 0)
         {
             Set<Permission> _permissions = new HashSet<>();
-            for(String permission : permissions)
+            for (String permission : permissions)
             {
                 Permission _permission = Permission.getPermission(permission);
-                if(_permission == null)
+                if (_permission == null)
                 {
                     throw new IllegalCmdParamException("invalid permission: " + permission);
                 }
@@ -266,42 +266,42 @@ public class CaUpdateCmd extends CaCmd
         entry.setOcspUris(getUris(ocspUris));
         entry.setCacertUris(getUris(caCertUris));
 
-        if(validityModeS != null)
+        if (validityModeS != null)
         {
             ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
-            if(validityMode == null)
+            if (validityMode == null)
             {
                 throw new IllegalCmdParamException("invalid validity mode: " + validityModeS);
             }
             entry.setValidityMode(validityMode);
         }
 
-        if(maxValidity != null)
+        if (maxValidity != null)
         {
             entry.setMaxValidity(CertValidity.getInstance(maxValidity));
         }
 
-        if(crlSignerName != null)
+        if (crlSignerName != null)
         {
             entry.setCrlSignerName(crlSignerName);
         }
 
-        if(cmpControlName != null)
+        if (cmpControlName != null)
         {
             entry.setCmpControlName(cmpControlName);
         }
 
-        if(responderName != null)
+        if (responderName != null)
         {
             entry.setResponderName(responderName);
         }
 
-        if(extraControl != null)
+        if (extraControl != null)
         {
             entry.setExtraControl(extraControl);
         }
 
-        if(numCrls != null)
+        if (numCrls != null)
         {
             entry.setNumCrls(numCrls);
         }
@@ -321,17 +321,17 @@ public class CaUpdateCmd extends CaCmd
     private static List<String> getUris(
             final List<String> uris)
     {
-        if(uris == null)
+        if (uris == null)
         {
             return null;
         }
 
         boolean clearUris = false;
-        if(uris != null)
+        if (uris != null)
         {
-            for(String uri : uris)
+            for (String uri : uris)
             {
-                if(CAManager.NULL.equalsIgnoreCase(uri))
+                if (CAManager.NULL.equalsIgnoreCase(uri))
                 {
                     clearUris = true;
                     break;
@@ -339,7 +339,7 @@ public class CaUpdateCmd extends CaCmd
             }
         }
 
-        if(clearUris)
+        if (clearUris)
         {
             return Collections.emptyList();
         }

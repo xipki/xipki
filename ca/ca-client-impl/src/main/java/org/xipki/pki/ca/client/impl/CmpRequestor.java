@@ -175,12 +175,12 @@ public abstract class CmpRequestor
             final PKIMessage request)
     throws CmpRequestorException
     {
-        if(requestor == null)
+        if (requestor == null)
         {
             throw new CmpRequestorException("no request signer is configured");
         }
 
-        if(responderCert == null)
+        if (responderCert == null)
         {
             throw new CmpRequestorException("CMP responder is not configured");
         }
@@ -200,7 +200,7 @@ public abstract class CmpRequestor
     throws CmpRequestorException
     {
         PKIMessage _request;
-        if(signRequest)
+        if (signRequest)
         {
             _request = sign(request);
         }
@@ -209,7 +209,7 @@ public abstract class CmpRequestor
             _request = request;
         }
 
-        if(responderCert == null)
+        if (responderCert == null)
         {
             throw new CmpRequestorException("CMP responder is not configured");
         }
@@ -225,7 +225,7 @@ public abstract class CmpRequestor
         }
 
         RequestResponsePair reqResp = null;
-        if(debug != null)
+        if (debug != null)
         {
             reqResp = new RequestResponsePair();
             debug.add(reqResp);
@@ -242,7 +242,7 @@ public abstract class CmpRequestor
             throw new CmpRequestorException("TRANSPORT_ERROR", e);
         }
 
-        if(reqResp != null)
+        if (reqResp != null)
         {
             reqResp.setResponse(encodedResponse);
         }
@@ -253,7 +253,7 @@ public abstract class CmpRequestor
             response = new GeneralPKIMessage(encodedResponse);
         } catch (IOException e)
         {
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error("error while decode the received PKI message: {}",
                         Hex.toHexString(encodedResponse));
@@ -264,13 +264,13 @@ public abstract class CmpRequestor
         PKIHeader respHeader = response.getHeader();
         ASN1OctetString tid = respHeader.getTransactionID();
         GeneralName recipient = respHeader.getRecipient();
-        if(sender.equals(recipient) == false)
+        if (sender.equals(recipient) == false)
         {
             LOG.warn("tid={}: unknown CMP requestor '{}'", tid, recipient);
         }
 
         PKIResponse ret = new PKIResponse(response);
-        if(response.hasProtection())
+        if (response.hasProtection())
         {
             try
             {
@@ -282,11 +282,11 @@ public abstract class CmpRequestor
                 throw new CmpRequestorException(e.getMessage(), e);
             }
         }
-        else if(signRequest)
+        else if (signRequest)
         {
             PKIBody respBody = response.getBody();
             int bodyType = respBody.getType();
-            if(bodyType != PKIBody.TYPE_ERROR)
+            if (bodyType != PKIBody.TYPE_ERROR)
             {
                 throw new CmpRequestorException("response is not signed");
             }
@@ -322,12 +322,12 @@ public abstract class CmpRequestor
         try
         {
             seq = ASN1Sequence.getInstance(itvValue);
-        }catch(IllegalArgumentException e)
+        } catch (IllegalArgumentException e)
         {
             throw new CmpRequestorException("invalid syntax of the response");
         }
         int n = seq.size();
-        if(n != 1 && n != 2)
+        if (n != 1 && n != 2)
         {
             throw new CmpRequestorException("invalid syntax of the response");
         }
@@ -336,12 +336,12 @@ public abstract class CmpRequestor
         try
         {
             _action = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue().intValue();
-        }catch(IllegalArgumentException e)
+        } catch (IllegalArgumentException e)
         {
             throw new CmpRequestorException("invalid syntax of the response");
         }
 
-        if(action != _action)
+        if (action != _action)
         {
             throw new CmpRequestorException("received XiPKI action '" + _action
                     + "' instead the exceptected '" + action  + "'");
@@ -358,7 +358,7 @@ public abstract class CmpRequestor
             final boolean requireProtectionCheck)
     throws CmpRequestorException, PKIErrorException
     {
-        if(requireProtectionCheck)
+        if (requireProtectionCheck)
         {
             checkProtection(response);
         }
@@ -366,13 +366,13 @@ public abstract class CmpRequestor
         PKIBody respBody = response.getPkiMessage().getBody();
         int bodyType = respBody.getType();
 
-        if(PKIBody.TYPE_ERROR == bodyType)
+        if (PKIBody.TYPE_ERROR == bodyType)
         {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
             throw new CmpRequestorException(SecurityUtil.formatPKIStatusInfo(
                     content.getPKIStatusInfo()));
         }
-        else if(PKIBody.TYPE_GEN_REP != bodyType)
+        else if (PKIBody.TYPE_GEN_REP != bodyType)
         {
             throw new CmpRequestorException("unknown PKI body type " + bodyType
                     + " instead the exceptected [" + PKIBody.TYPE_GEN_REP  + ", "
@@ -383,18 +383,18 @@ public abstract class CmpRequestor
 
         InfoTypeAndValue[] itvs = genRep.toInfoTypeAndValueArray();
         InfoTypeAndValue itv = null;
-        if(itvs != null && itvs.length > 0)
+        if (itvs != null && itvs.length > 0)
         {
-            for(InfoTypeAndValue _itv : itvs)
+            for (InfoTypeAndValue _itv : itvs)
             {
-                if(exepectedType.equals(_itv.getInfoType().getId()))
+                if (exepectedType.equals(_itv.getInfoType().getId()))
                 {
                     itv = _itv;
                     break;
                 }
             }
         }
-        if(itv == null)
+        if (itv == null)
         {
             throw new CmpRequestorException("the response does not contain InfoTypeAndValue "
                     + exepectedType);
@@ -422,7 +422,7 @@ public abstract class CmpRequestor
             final String username)
     {
         CmpUtf8Pairs utf8Pairs = null;
-        if(StringUtil.isNotBlank(username))
+        if (StringUtil.isNotBlank(username))
         {
             utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_USER, username);
         }
@@ -435,18 +435,18 @@ public abstract class CmpRequestor
             final CmpUtf8Pairs utf8Pairs,
             final InfoTypeAndValue... additionalGeneralInfos)
     {
-        if(additionalGeneralInfos != null)
+        if (additionalGeneralInfos != null)
         {
-            for(InfoTypeAndValue itv : additionalGeneralInfos)
+            for (InfoTypeAndValue itv : additionalGeneralInfos)
             {
                 ASN1ObjectIdentifier type = itv.getInfoType();
-                if(CMPObjectIdentifiers.it_implicitConfirm.equals(type))
+                if (CMPObjectIdentifiers.it_implicitConfirm.equals(type))
                 {
                     throw new IllegalArgumentException(""
                             + "additionGeneralInfos contains unpermitted ITV implicitConfirm");
                 }
 
-                if(CMPObjectIdentifiers.regInfo_utf8Pairs.equals(type))
+                if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(type))
                 {
                     throw new IllegalArgumentException(""
                             + "additionGeneralInfos contains unpermitted ITV utf8Pairs");
@@ -461,7 +461,7 @@ public abstract class CmpRequestor
         hBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));
 
         ASN1OctetString _tid;
-        if(tid == null)
+        if (tid == null)
         {
             _tid = new DEROctetString(randomTransactionId());
         }
@@ -473,28 +473,28 @@ public abstract class CmpRequestor
         hBuilder.setTransactionID(_tid);
 
         List<InfoTypeAndValue> itvs = new ArrayList<>(2);
-        if(addImplictConfirm)
+        if (addImplictConfirm)
         {
             itvs.add(CmpUtil.getImplictConfirmGeneralInfo());
         }
 
-        if(utf8Pairs != null)
+        if (utf8Pairs != null)
         {
             itvs.add(CmpUtil.buildInfoTypeAndValue(utf8Pairs));
         }
 
-        if(additionalGeneralInfos != null)
+        if (additionalGeneralInfos != null)
         {
-            for(InfoTypeAndValue itv : additionalGeneralInfos)
+            for (InfoTypeAndValue itv : additionalGeneralInfos)
             {
-                if(itv != null)
+                if (itv != null)
                 {
                     itvs.add(itv);
                 }
             }
         }
 
-        if(CollectionUtil.isNotEmpty(itvs))
+        if (CollectionUtil.isNotEmpty(itvs))
         {
             hBuilder.setGeneralInfo(itvs.toArray(new InfoTypeAndValue[0]));
         }
@@ -526,7 +526,7 @@ public abstract class CmpRequestor
     {
         ProtectedPKIMessage pMsg = new ProtectedPKIMessage(pkiMessage);
 
-        if(pMsg.hasPasswordBasedMacProtection())
+        if (pMsg.hasPasswordBasedMacProtection())
         {
             LOG.warn("NOT_SIGNAUTRE_BASED: "
                     + pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
@@ -535,10 +535,10 @@ public abstract class CmpRequestor
 
         PKIHeader h = pMsg.getHeader();
 
-        if(c14nRecipientName != null)
+        if (c14nRecipientName != null)
         {
             boolean authorizedResponder = true;
-            if(h.getSender().getTagNo() != GeneralName.directoryName)
+            if (h.getSender().getTagNo() != GeneralName.directoryName)
             {
                 authorizedResponder = false;
             }
@@ -548,7 +548,7 @@ public abstract class CmpRequestor
                 authorizedResponder = c14nRecipientName.equalsIgnoreCase(c14nMsgSender);
             }
 
-            if(authorizedResponder == false)
+            if (authorizedResponder == false)
             {
                 LOG.warn("tid={}: not authorized responder '{}'", tid, h.getSender());
                 return new ProtectionVerificationResult(null,
@@ -558,7 +558,7 @@ public abstract class CmpRequestor
 
         ContentVerifierProvider verifierProvider =
                 securityFactory.getContentVerifierProvider(cert);
-        if(verifierProvider == null)
+        if (verifierProvider == null)
         {
             LOG.warn("tid={}: not authorized responder '{}'", tid, h.getSender());
             return new ProtectionVerificationResult(cert, ProtectionResult.SENDER_NOT_AUTHORIZED);
@@ -580,7 +580,7 @@ public abstract class CmpRequestor
 
         ASN1EncodableVector v = new ASN1EncodableVector();
         v.add(new ASN1Integer(action));
-        if(value != null)
+        if (value != null)
         {
             v.add(value);
         }
@@ -600,7 +600,7 @@ public abstract class CmpRequestor
     {
         PKIHeader header = buildPKIHeader(null);
         InfoTypeAndValue itv;
-        if(value != null)
+        if (value != null)
         {
             itv = new InfoTypeAndValue(type, value);
         }
@@ -621,9 +621,9 @@ public abstract class CmpRequestor
     {
         ProtectionVerificationResult protectionVerificationResult =
                 response.getProtectionVerificationResult();
-        if(response.hasProtection())
+        if (response.hasProtection())
         {
-            if(protectionVerificationResult == null
+            if (protectionVerificationResult == null
                     || protectionVerificationResult.getProtectionResult() != ProtectionResult.VALID)
             {
                 throw new PKIErrorException(ClientErrorCode.PKIStatus_RESPONSE_ERROR,

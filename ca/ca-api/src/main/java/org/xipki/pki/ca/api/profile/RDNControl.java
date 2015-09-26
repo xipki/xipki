@@ -69,7 +69,7 @@ public class RDNControl
             final int maxOccurs)
     {
         ParamUtil.assertNotNull("type", type);
-        if(minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs)
+        if (minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs)
         {
             throw new IllegalArgumentException("illegal minOccurs=" + minOccurs
                     + ", maxOccurs=" + maxOccurs);

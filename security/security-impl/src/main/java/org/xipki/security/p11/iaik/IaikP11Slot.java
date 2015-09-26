@@ -218,7 +218,7 @@ public class IaikP11Slot implements P11WritableSlot
         } catch (TokenException e)
         {
             final String message = "openSession";
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -234,7 +234,7 @@ public class IaikP11Slot implements P11WritableSlot
         } catch (TokenException e)
         {
             final String message = "firstLogin";
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -251,7 +251,7 @@ public class IaikP11Slot implements P11WritableSlot
         } catch (TokenException e)
         {
             final String message = "getToken";
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -259,7 +259,7 @@ public class IaikP11Slot implements P11WritableSlot
             LOG.debug(message, e);
         }
 
-        if(maxSessionCount2 == 0)
+        if (maxSessionCount2 == 0)
         {
             maxSessionCount2 = DEFAULT_MAX_COUNT_SESSION;
         }
@@ -286,10 +286,10 @@ public class IaikP11Slot implements P11WritableSlot
         Set<IaikP11Identity> currentIdentifies = new HashSet<>();
 
         List<PrivateKey> signatureKeys = getAllPrivateObjects(Boolean.TRUE, null);
-        for(PrivateKey signatureKey : signatureKeys)
+        for (PrivateKey signatureKey : signatureKeys)
         {
             byte[] keyId = signatureKey.getId().getByteArrayValue();
-            if(keyId == null || keyId.length == 0)
+            if (keyId == null || keyId.length == 0)
             {
                 continue;
             }
@@ -301,7 +301,7 @@ public class IaikP11Slot implements P11WritableSlot
                 X509Certificate signatureCert = null;
                 java.security.PublicKey signaturePublicKey = null;
 
-                if(certificateObject != null)
+                if (certificateObject != null)
                 {
                     byte[] encoded = certificateObject.getValue().getByteArrayValue();
                     try
@@ -312,7 +312,7 @@ public class IaikP11Slot implements P11WritableSlot
                     {
                         String keyIdStr = hex(keyId);
                         final String message = "could not parse certificate with id " + keyIdStr;
-                        if(LOG.isWarnEnabled())
+                        if (LOG.isWarnEnabled())
                         {
                             LOG.warn(LogUtil.buildExceptionLogFormat(message),
                                     e.getClass().getName(), e.getMessage());
@@ -327,7 +327,7 @@ public class IaikP11Slot implements P11WritableSlot
                     signatureCert = null;
                     PublicKey publicKeyObject = getPublicKeyObject(
                             Boolean.TRUE, null, keyId, null);
-                    if(publicKeyObject == null)
+                    if (publicKeyObject == null)
                     {
                         String msg =
                                 "neither certificate nor public key for signing is available";
@@ -341,52 +341,52 @@ public class IaikP11Slot implements P11WritableSlot
                 Map<String, Set<X509Certificate>> allCerts = new HashMap<>();
                 List<X509Certificate> certChain = new LinkedList<>();
 
-                if(signatureCert != null)
+                if (signatureCert != null)
                 {
                     certChain.add(signatureCert);
-                    while(true)
+                    while (true)
                     {
                         X509Certificate context = certChain.get(certChain.size() - 1);
-                        if(X509Util.isSelfSigned(context))
+                        if (X509Util.isSelfSigned(context))
                         {
                             break;
                         }
 
                         String issuerSubject = signatureCert.getIssuerX500Principal().getName();
                         Set<X509Certificate> issuerCerts = allCerts.get(issuerSubject);
-                        if(issuerCerts == null)
+                        if (issuerCerts == null)
                         {
                             issuerCerts = new HashSet<>();
                             X509PublicKeyCertificate[] certObjects = getCertificateObjects(
                                     signatureCert.getIssuerX500Principal());
-                            if(certObjects != null && certObjects.length > 0)
+                            if (certObjects != null && certObjects.length > 0)
                             {
-                                for(X509PublicKeyCertificate certObject : certObjects)
+                                for (X509PublicKeyCertificate certObject : certObjects)
                                 {
                                     issuerCerts.add(X509Util.parseCert(
                                             certObject.getValue().getByteArrayValue()));
                                 }
                             }
 
-                            if(CollectionUtil.isNotEmpty(issuerCerts))
+                            if (CollectionUtil.isNotEmpty(issuerCerts))
                             {
                                 allCerts.put(issuerSubject, issuerCerts);
                             }
                         }
 
-                        if(CollectionUtil.isEmpty(issuerCerts))
+                        if (CollectionUtil.isEmpty(issuerCerts))
                         {
                             break;
                         }
 
                         // find the certificate
-                        for(X509Certificate issuerCert : issuerCerts)
+                        for (X509Certificate issuerCert : issuerCerts)
                         {
                             try
                             {
                                 context.verify(issuerCert.getPublicKey());
                                 certChain.add(issuerCert);
-                            }catch(Exception e)
+                            } catch (Exception e)
                             {
                             }
                         }
@@ -405,7 +405,7 @@ public class IaikP11Slot implements P11WritableSlot
                 String keyIdStr = hex(keyId);
                 final String message = "SignerException while initializing key with key-id "
                         + keyIdStr;
-                if(LOG.isWarnEnabled())
+                if (LOG.isWarnEnabled())
                 {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                             e.getMessage());
@@ -417,7 +417,7 @@ public class IaikP11Slot implements P11WritableSlot
                 String keyIdStr = hex(keyId);
                 final String message =
                         "unexpected exception while initializing key with key-id " + keyIdStr;
-                if(LOG.isWarnEnabled())
+                if (LOG.isWarnEnabled())
                 {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                             t.getMessage());
@@ -473,7 +473,7 @@ public class IaikP11Slot implements P11WritableSlot
         PrivateKey signingKey;
         synchronized (keyId)
         {
-            if(keyId.getKeyId() != null)
+            if (keyId.getKeyId() != null)
             {
                 signingKey = signingKeysById.get(keyId.getKeyIdHex());
             }
@@ -482,12 +482,12 @@ public class IaikP11Slot implements P11WritableSlot
                 signingKey = signingKeysByLabel.get(keyId.getKeyLabel());
             }
 
-            if(signingKey == null)
+            if (signingKey == null)
             {
                 LOG.info("try to retieve private key " + keyId);
                 signingKey = getPrivateObject(Boolean.TRUE, null, keyId);
 
-                if(signingKey != null)
+                if (signingKey != null)
                 {
                     LOG.info("found private key " + keyId);
                     cacheSigningKey(signingKey);
@@ -501,7 +501,7 @@ public class IaikP11Slot implements P11WritableSlot
         }
 
         Session session = borrowIdleSession();
-        if(session == null)
+        if (session == null)
         {
             throw new SignerException("no idle session available");
         }
@@ -510,7 +510,7 @@ public class IaikP11Slot implements P11WritableSlot
         {
             Mechanism algorithmId = Mechanism.get(mech);
 
-            if(LOG.isTraceEnabled())
+            if (LOG.isTraceEnabled())
             {
                 LOG.debug("sign with private key:\n{}", signingKey);
             }
@@ -567,7 +567,7 @@ public class IaikP11Slot implements P11WritableSlot
     private synchronized Session borrowWritableSession()
     throws SignerException
     {
-        if(writableSession == null)
+        if (writableSession == null)
         {
             try
             {
@@ -578,7 +578,7 @@ public class IaikP11Slot implements P11WritableSlot
             }
         }
 
-        if(writableSessionInUse)
+        if (writableSessionInUse)
         {
             throw new SignerException("no idle writable session available");
         }
@@ -591,7 +591,7 @@ public class IaikP11Slot implements P11WritableSlot
             final Session session)
     throws SignerException
     {
-        if(session != writableSession)
+        if (session != writableSession)
         {
             throw new SignerException("the returned session does not belong to me");
         }
@@ -601,10 +601,10 @@ public class IaikP11Slot implements P11WritableSlot
     public Session borrowIdleSession()
     throws SignerException
     {
-        if(countSessions.get() < maxSessionCount)
+        if (countSessions.get() < maxSessionCount)
         {
             Session session = idleSessions.poll();
-            if(session == null)
+            if (session == null)
             {
                 // create new session
                 try
@@ -617,7 +617,7 @@ public class IaikP11Slot implements P11WritableSlot
                 }
             }
 
-            if(session != null) return session;
+            if (session != null) return session;
         }
 
         try
@@ -633,9 +633,9 @@ public class IaikP11Slot implements P11WritableSlot
     public void returnIdleSession(
             final Session session)
     {
-        if(session == null) return;
+        if (session == null) return;
 
-        for(int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
             try
             {
@@ -649,7 +649,7 @@ public class IaikP11Slot implements P11WritableSlot
         try
         {
             closeSession(session);
-        }catch(TokenException e)
+        } catch (TokenException e)
         {
             LOG.error("closeSession.{}: {}", e.getClass().getName(), e.getMessage());
             LOG.debug("closeSession", e);
@@ -677,7 +677,7 @@ public class IaikP11Slot implements P11WritableSlot
             {
                 LOG.info("verify on PKCS11Module with PIN");
 
-                for(char[] singlePwd : password)
+                for (char[] singlePwd : password)
                 {
                     session.login( Session.UserType.USER, singlePwd);
                 }
@@ -686,7 +686,7 @@ public class IaikP11Slot implements P11WritableSlot
         }
         catch (PKCS11Exception p11e)
         {
-            if(p11e.getErrorCode() != 0x100)// 0x100: user already logged in
+            if (p11e.getErrorCode() != 0x100)// 0x100: user already logged in
             {
                 throw p11e;
             }
@@ -725,13 +725,13 @@ public class IaikP11Slot implements P11WritableSlot
                 return;
             }
 
-            if(CollectionUtil.isEmpty(password))
+            if (CollectionUtil.isEmpty(password))
             {
                 session.login(Session.UserType.USER, null);
             }
             else
             {
-                for(char[] singlePwd : password)
+                for (char[] singlePwd : password)
                 {
                     session.login( Session.UserType.USER, singlePwd);
                 }
@@ -754,7 +754,7 @@ public class IaikP11Slot implements P11WritableSlot
         {
             throw new SignerException(e.getMessage(), e);
         }
-        if(LOG.isTraceEnabled())
+        if (LOG.isTraceEnabled())
         {
             LOG.debug("SessionInfo: {}", info);
         }
@@ -775,7 +775,7 @@ public class IaikP11Slot implements P11WritableSlot
 
     public void close()
     {
-        if(slot != null)
+        if (slot != null)
         {
             try
             {
@@ -785,7 +785,7 @@ public class IaikP11Slot implements P11WritableSlot
             catch (Throwable t)
             {
                 final String message = "error while slot.getToken().closeAllSessions()";
-                if(LOG.isWarnEnabled())
+                if (LOG.isWarnEnabled())
                 {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                             t.getMessage());
@@ -810,24 +810,24 @@ public class IaikP11Slot implements P11WritableSlot
 
         try
         {
-            if(LOG.isTraceEnabled())
+            if (LOG.isTraceEnabled())
             {
                 String info = listPrivateKeyObjects(session, forSigning, forDecrypting);
                 LOG.debug(info);
             }
 
             PrivateKey template = new PrivateKey();
-            if(forSigning != null)
+            if (forSigning != null)
             {
                 template.getSign().setBooleanValue(forSigning);
             }
-            if(forDecrypting != null)
+            if (forDecrypting != null)
             {
                 template.getDecrypt().setBooleanValue(forDecrypting);
             }
 
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if(CollectionUtil.isEmpty(tmpObjects))
+            if (CollectionUtil.isEmpty(tmpObjects))
             {
                 return Collections.emptyList();
             }
@@ -836,7 +836,7 @@ public class IaikP11Slot implements P11WritableSlot
             LOG.info("found {} private keys", n);
 
             List<PrivateKey> privateKeys = new ArrayList<>(n);
-            for(iaik.pkcs.pkcs11.objects.Object tmpObject : tmpObjects)
+            for (iaik.pkcs.pkcs11.objects.Object tmpObject : tmpObjects)
             {
                 PrivateKey privateKey = (PrivateKey) tmpObject;
                 privateKeys.add(privateKey);
@@ -856,7 +856,7 @@ public class IaikP11Slot implements P11WritableSlot
         Session session = borrowIdleSession();
         try
         {
-            if(LOG.isTraceEnabled())
+            if (LOG.isTraceEnabled())
             {
                 String info = listCertificateObjects(session);
                 LOG.debug(info);
@@ -865,7 +865,7 @@ public class IaikP11Slot implements P11WritableSlot
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
             int n = tmpObjects.size();
             List<X509PublicKeyCertificate> certs = new ArrayList<>(n);
-            for(iaik.pkcs.pkcs11.objects.Object tmpObject : tmpObjects)
+            for (iaik.pkcs.pkcs11.objects.Object tmpObject : tmpObjects)
             {
                 X509PublicKeyCertificate cert = (X509PublicKeyCertificate) tmpObject;
                 certs.add(cert);
@@ -887,19 +887,19 @@ public class IaikP11Slot implements P11WritableSlot
                 ? null
                 : new String(_label);
 
-        if(b == null || b.booleanValue() == false)
+        if (b == null || b.booleanValue() == false)
         {
             LOG.warn("key {} is not for signing", new P11KeyIdentifier(id, label));
             return;
         }
 
-        if(b != null && b.booleanValue())
+        if (b != null && b.booleanValue())
         {
-            if(id != null)
+            if (id != null)
             {
                 signingKeysById.put(Hex.toHexString(id).toUpperCase(), privateKey);
             }
-            if(label != null)
+            if (label != null)
             {
                 signingKeysByLabel.put(label, privateKey);
             }
@@ -921,38 +921,38 @@ public class IaikP11Slot implements P11WritableSlot
 
         try
         {
-            if(LOG.isTraceEnabled())
+            if (LOG.isTraceEnabled())
             {
                 String info = listPrivateKeyObjects(session, forSigning, forDecrypting);
                 LOG.debug(info);
             }
 
             PrivateKey template = new PrivateKey();
-            if(forSigning != null)
+            if (forSigning != null)
             {
                 template.getSign().setBooleanValue(forSigning);
             }
-            if(forDecrypting != null)
+            if (forDecrypting != null)
             {
                 template.getDecrypt().setBooleanValue(forDecrypting);
             }
-            if(keyId != null)
+            if (keyId != null)
             {
                 template.getId().setByteArrayValue(keyId);
             }
-            if(keyLabel != null)
+            if (keyLabel != null)
             {
                 template.getLabel().setCharArrayValue(keyLabel);
             }
 
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if(CollectionUtil.isEmpty(tmpObjects))
+            if (CollectionUtil.isEmpty(tmpObjects))
             {
                 return null;
             }
 
             int size = tmpObjects.size();
-            if(size > 1)
+            if (size > 1)
             {
                 LOG.warn("found {} private key identified by {}, use the first one",
                         size, getDescription(keyId, keyLabel));
@@ -977,20 +977,20 @@ public class IaikP11Slot implements P11WritableSlot
             msg.append(", forDecrypting: ").append(forDecrypting).append("\n");
 
             PrivateKey template = new PrivateKey();
-            if(forSigning != null)
+            if (forSigning != null)
             {
                 template.getSign().setBooleanValue(forSigning);
             }
-            if(forDecrypting != null)
+            if (forDecrypting != null)
             {
                 template.getDecrypt().setBooleanValue(forDecrypting);
             }
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if(CollectionUtil.isEmpty(tmpObjects))
+            if (CollectionUtil.isEmpty(tmpObjects))
             {
                 msg.append(" empty");
             }
-            for(int i = 0; i < tmpObjects.size(); i++)
+            for (int i = 0; i < tmpObjects.size(); i++)
             {
                 PrivateKey privKey = (PrivateKey) tmpObjects.get(i);
                 msg.append("------------------------PrivateKey ")
@@ -1000,11 +1000,11 @@ public class IaikP11Slot implements P11WritableSlot
                 ByteArrayAttribute id = privKey.getId();
 
                 byte[] bytes = null;
-                if(id != null)
+                if (id != null)
                 {
                     bytes = id.getByteArrayValue();
                 }
-                if(bytes == null)
+                if (bytes == null)
                 {
                     msg.append("null");
                 } else
@@ -1016,14 +1016,14 @@ public class IaikP11Slot implements P11WritableSlot
                 msg.append("\tlabel:   ");
                 CharArrayAttribute label = privKey.getLabel();
                 char[] chars = null;
-                if(label != null)
+                if (label != null)
                 {
                     chars = label.getCharArrayValue();
                 }
                 msg.append(chars).append("\n");
             }
             return msg.toString();
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
             return "Exception while calling listPrivateKeyObjects(): " + t.getMessage();
         }
@@ -1040,7 +1040,7 @@ public class IaikP11Slot implements P11WritableSlot
 
         try
         {
-            if(LOG.isTraceEnabled())
+            if (LOG.isTraceEnabled())
             {
                 String info = listPublicKeyObjects(session, forSignature, forCipher);
                 LOG.debug(info);
@@ -1048,32 +1048,32 @@ public class IaikP11Slot implements P11WritableSlot
 
             iaik.pkcs.pkcs11.objects.PublicKey template =
                     new iaik.pkcs.pkcs11.objects.PublicKey();
-            if(keyId != null)
+            if (keyId != null)
             {
                 template.getId().setByteArrayValue(keyId);
             }
-            if(keyLabel != null)
+            if (keyLabel != null)
             {
                 template.getLabel().setCharArrayValue(keyLabel);
             }
 
-            if(forSignature != null)
+            if (forSignature != null)
             {
                 template.getVerify().setBooleanValue(forSignature);
             }
-            if(forCipher != null)
+            if (forCipher != null)
             {
                 template.getEncrypt().setBooleanValue(forCipher);
             }
 
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if(CollectionUtil.isEmpty(tmpObjects))
+            if (CollectionUtil.isEmpty(tmpObjects))
             {
                 return null;
             }
 
             int size = tmpObjects.size();
-            if(size > 1)
+            if (size > 1)
             {
                 LOG.warn("found {} public key identified by {}, use the first one",
                         size, getDescription(keyId, keyLabel));
@@ -1099,17 +1099,17 @@ public class IaikP11Slot implements P11WritableSlot
         {
             session.findObjectsInit(template);
 
-            while(true)
+            while (true)
             {
                 iaik.pkcs.pkcs11.objects.Object[] foundObjects = session.findObjects(1);
-                if(foundObjects == null || foundObjects.length == 0)
+                if (foundObjects == null || foundObjects.length == 0)
                 {
                     break;
                 }
 
                 for (iaik.pkcs.pkcs11.objects.Object object : foundObjects)
                 {
-                    if(LOG.isTraceEnabled())
+                    if (LOG.isTraceEnabled())
                     {
                         LOG.debug("foundObject: {}", object);
                     }
@@ -1125,7 +1125,7 @@ public class IaikP11Slot implements P11WritableSlot
             try
             {
                 session.findObjectsFinal();
-            }catch(Exception e){}
+            } catch (Exception e){}
         }
 
         return objList;
@@ -1139,7 +1139,7 @@ public class IaikP11Slot implements P11WritableSlot
 
         try
         {
-            if(LOG.isTraceEnabled())
+            if (LOG.isTraceEnabled())
             {
                 String info = listCertificateObjects(session);
                 LOG.debug(info);
@@ -1154,7 +1154,7 @@ public class IaikP11Slot implements P11WritableSlot
                     ? 0
                     : tmpObjects.size();
 
-            if(n == 0)
+            if (n == 0)
             {
                 LOG.warn("found no certificate with subject {}",
                         X509Util.getRFC4519Name(subject));
@@ -1162,7 +1162,7 @@ public class IaikP11Slot implements P11WritableSlot
             }
 
             X509PublicKeyCertificate[] certs = new X509PublicKeyCertificate[n];
-            for(int i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
                 certs[i] = (X509PublicKeyCertificate) tmpObjects.get(i);
             }
@@ -1179,11 +1179,11 @@ public class IaikP11Slot implements P11WritableSlot
     throws SignerException
     {
         X509PublicKeyCertificate[] certs = getCertificateObjects(keyId, keyLabel);
-        if(certs == null)
+        if (certs == null)
         {
             return null;
         }
-        if(certs.length > 1)
+        if (certs.length > 1)
         {
             LOG.warn("found {} public key identified by {}, use the first one",
                     certs.length, getDescription(keyId, keyLabel));
@@ -1200,24 +1200,24 @@ public class IaikP11Slot implements P11WritableSlot
 
         try
         {
-            if(LOG.isTraceEnabled())
+            if (LOG.isTraceEnabled())
             {
                 String info = listCertificateObjects(session);
                 LOG.debug(info);
             }
 
             X509PublicKeyCertificate template = new X509PublicKeyCertificate();
-            if(keyId != null)
+            if (keyId != null)
             {
                 template.getId().setByteArrayValue(keyId);
             }
-            if(keyLabel != null)
+            if (keyLabel != null)
             {
                 template.getLabel().setCharArrayValue(keyLabel);
             }
 
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if(CollectionUtil.isEmpty(tmpObjects))
+            if (CollectionUtil.isEmpty(tmpObjects))
             {
                 LOG.info("found no certificate identified by {}",
                         getDescription(keyId, keyLabel));
@@ -1226,7 +1226,7 @@ public class IaikP11Slot implements P11WritableSlot
 
             int size = tmpObjects.size();
             X509PublicKeyCertificate[] certs = new X509PublicKeyCertificate[size];
-            for(int i = 0; i < size; i++)
+            for (int i = 0; i < size; i++)
             {
                 certs[i] = (X509PublicKeyCertificate) tmpObjects.get(i);
             }
@@ -1248,11 +1248,11 @@ public class IaikP11Slot implements P11WritableSlot
             X509PublicKeyCertificate template = new X509PublicKeyCertificate();
 
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if(CollectionUtil.isEmpty(tmpObjects))
+            if (CollectionUtil.isEmpty(tmpObjects))
             {
                 msg.append(" empty");
             }
-            for(int i = 0; i<tmpObjects.size(); i++)
+            for (int i = 0; i<tmpObjects.size(); i++)
             {
                 X509PublicKeyCertificate cert = (X509PublicKeyCertificate) tmpObjects.get(i);
                 msg.append("------------------------Certificate ")
@@ -1262,12 +1262,12 @@ public class IaikP11Slot implements P11WritableSlot
                 msg.append("\tid(hex): ");
                 ByteArrayAttribute id = cert.getId();
                 byte[] bytes = null;
-                if(id != null)
+                if (id != null)
                 {
                     bytes = id.getByteArrayValue();
                 }
 
-                if(bytes == null)
+                if (bytes == null)
                 {
                     msg.append("null");
                 } else
@@ -1279,14 +1279,14 @@ public class IaikP11Slot implements P11WritableSlot
                 msg.append("\tlabel:   ");
                 CharArrayAttribute label = cert.getLabel();
                 char[] chars = null;
-                if(label != null)
+                if (label != null)
                 {
                     chars = label.getCharArrayValue();
                 }
                 msg.append(chars).append("\n");
             }
             return msg.toString();
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
             return "Exception while calling listCertificateObjects(): " + t.getMessage();
         }
@@ -1305,7 +1305,7 @@ public class IaikP11Slot implements P11WritableSlot
 
         PrivateKey privKey = getPrivateObject(null, null, keyIdentifier);
 
-        if(privKey == null)
+        if (privKey == null)
         {
             throw new SignerException("could not find private key " + keyIdentifier);
         }
@@ -1323,9 +1323,9 @@ public class IaikP11Slot implements P11WritableSlot
             X509PublicKeyCertificate newCertTemp = createPkcs11Template(newCert, null, keyId,
                     privKey.getLabel().getCharArrayValue());
             // delete existing signer certificate objects
-            if(existingCerts != null && existingCerts.length > 0)
+            if (existingCerts != null && existingCerts.length > 0)
             {
-                for(X509PublicKeyCertificate existingCert : existingCerts)
+                for (X509PublicKeyCertificate existingCert : existingCerts)
                 {
                     session.destroyObject(existingCert);
                 }
@@ -1336,9 +1336,9 @@ public class IaikP11Slot implements P11WritableSlot
             session.createObject(newCertTemp);
 
             // craete CA certificate objects
-            if(certChain.length > 1)
+            if (certChain.length > 1)
             {
-                for(int i = 1; i < certChain.length; i++)
+                for (int i = 1; i < certChain.length; i++)
                 {
                     X509Certificate caCert = certChain[i];
                     byte[] encodedCaCert = caCert.getEncoded();
@@ -1346,11 +1346,11 @@ public class IaikP11Slot implements P11WritableSlot
                     boolean alreadyExists = false;
                     X509PublicKeyCertificate[] certObjs = getCertificateObjects(
                             caCert.getSubjectX500Principal());
-                    if(certObjs != null)
+                    if (certObjs != null)
                     {
-                        for(X509PublicKeyCertificate certObj : certObjs)
+                        for (X509PublicKeyCertificate certObj : certObjs)
                         {
-                            if(Arrays.equals(encodedCaCert,
+                            if (Arrays.equals(encodedCaCert,
                                     certObj.getValue().getByteArrayValue()))
                             {
                                 alreadyExists = true;
@@ -1359,7 +1359,7 @@ public class IaikP11Slot implements P11WritableSlot
                         }
                     }
 
-                    if(alreadyExists)
+                    if (alreadyExists)
                     {
                         continue;
                     }
@@ -1399,7 +1399,7 @@ public class IaikP11Slot implements P11WritableSlot
         ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
 
         PrivateKey privKey = getPrivateObject(null, null, keyIdentifier);
-        if(privKey == null)
+        if (privKey == null)
         {
             return false;
         }
@@ -1411,43 +1411,43 @@ public class IaikP11Slot implements P11WritableSlot
             try
             {
                 session.destroyObject(privKey);
-            }catch(TokenException e)
+            } catch (TokenException e)
             {
                 msgBuilder.append("could not delete private key, ");
             }
 
             PublicKey pubKey = getPublicKeyObject(null, null,
                     privKey.getId().getByteArrayValue(), null);
-            if(pubKey != null)
+            if (pubKey != null)
             {
                 try
                 {
                     session.destroyObject(pubKey);
-                }catch(TokenException e)
+                } catch (TokenException e)
                 {
                     msgBuilder.append("could not delete public key, ");
                 }
             }
 
-            if(removeCerts)
+            if (removeCerts)
             {
                 X509PublicKeyCertificate[] certs = getCertificateObjects(
                         privKey.getId().getByteArrayValue(), null);
-                if(certs != null && certs.length > 0)
+                if (certs != null && certs.length > 0)
                 {
-                    for(int i = 0; i < certs.length; i++)
+                    for (int i = 0; i < certs.length; i++)
                     {
                         try
                         {
                             session.destroyObject(certs[i]);
-                        }catch(TokenException e)
+                        } catch (TokenException e)
                         {
                             msgBuilder.append("could not delete certificate at index ")
                                 .append(i)
                                 .append(", ");
                         }
                     } // end for
-                } // end if(certs)
+                } // end if (certs)
             } // end removeCerts
         }finally
         {
@@ -1455,7 +1455,7 @@ public class IaikP11Slot implements P11WritableSlot
         }
 
         int n = msgBuilder.length();
-        if(n > 2)
+        if (n > 2)
         {
             throw new SignerException(msgBuilder.substring(0, n - 2));
         }
@@ -1477,7 +1477,7 @@ public class IaikP11Slot implements P11WritableSlot
         X509PublicKeyCertificate[] existingCerts = getCertificateObjects(
                 keyIdentifier.getKeyId(), keyLabelChars);
 
-        if(existingCerts == null || existingCerts.length == 0)
+        if (existingCerts == null || existingCerts.length == 0)
         {
             throw new SignerException("could not find certificates with id " + keyIdentifier);
         }
@@ -1485,7 +1485,7 @@ public class IaikP11Slot implements P11WritableSlot
         Session session = borrowWritableSession();
         try
         {
-            for(X509PublicKeyCertificate cert : existingCerts)
+            for (X509PublicKeyCertificate cert : existingCerts)
             {
                 session.destroyObject(cert);
             }
@@ -1509,21 +1509,21 @@ public class IaikP11Slot implements P11WritableSlot
 
             iaik.pkcs.pkcs11.objects.PublicKey template =
                     new iaik.pkcs.pkcs11.objects.PublicKey();
-            if(forSignature != null)
+            if (forSignature != null)
             {
                 template.getVerify().setBooleanValue(forSignature);
             }
-            if(forCipher != null)
+            if (forCipher != null)
             {
                 template.getEncrypt().setBooleanValue(forCipher);
             }
 
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if(CollectionUtil.isEmpty(tmpObjects))
+            if (CollectionUtil.isEmpty(tmpObjects))
             {
                 msg.append(" empty");
             }
-            for(int i = 0; i < tmpObjects.size(); i++)
+            for (int i = 0; i < tmpObjects.size(); i++)
             {
                 iaik.pkcs.pkcs11.objects.PublicKey pubKey =
                         (iaik.pkcs.pkcs11.objects.PublicKey) tmpObjects.get(i);
@@ -1533,12 +1533,12 @@ public class IaikP11Slot implements P11WritableSlot
                 msg.append("\tid(hex): ");
                 ByteArrayAttribute id = pubKey.getId();
                 byte[] bytes = null;
-                if(id != null)
+                if (id != null)
                 {
                     bytes = id.getByteArrayValue();
                 }
 
-                if(bytes == null)
+                if (bytes == null)
                 {
                     msg.append("null");
                 } else
@@ -1550,14 +1550,14 @@ public class IaikP11Slot implements P11WritableSlot
                 msg.append("\tlabel:   ");
                 CharArrayAttribute label = pubKey.getLabel();
                 char[] chars = null;
-                if(label != null)
+                if (label != null)
                 {
                     chars = label.getCharArrayValue();
                 }
                 msg.append(chars).append("\n");
             }
             return msg.toString();
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
             return "Exception while calling listPublicKeyObjects(): " + t.getMessage();
         }
@@ -1569,7 +1569,7 @@ public class IaikP11Slot implements P11WritableSlot
     {
         StringBuilder sb = new StringBuilder();
         sb.append("id ");
-        if(keyId == null)
+        if (keyId == null)
         {
             sb.append("null");
         } else
@@ -1578,7 +1578,7 @@ public class IaikP11Slot implements P11WritableSlot
         }
 
         sb.append(" and label ");
-        if(keyLabel == null)
+        if (keyLabel == null)
         {
             sb.append("null");
         }else
@@ -1595,12 +1595,12 @@ public class IaikP11Slot implements P11WritableSlot
             char[] label)
     throws Exception
     {
-        if(encodedCert == null)
+        if (encodedCert == null)
         {
             encodedCert = cert.getEncoded();
         }
 
-        if(label == null)
+        if (label == null)
         {
             X500Name x500Name = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
             label = X509Util.getCommonName(x500Name).toCharArray();
@@ -1630,11 +1630,11 @@ public class IaikP11Slot implements P11WritableSlot
     throws SignerException, PasswordResolverException
     {
         ConfPairs pairs = new ConfPairs("slot-id", Long.toString(slot.getSlotID()));
-        if(keyId.getKeyId() != null)
+        if (keyId.getKeyId() != null)
         {
             pairs.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
         }
-        if(keyId.getKeyLabel() != null)
+        if (keyId.getKeyLabel() != null)
         {
             pairs.putPair("key-label", keyId.getKeyLabel());
         }
@@ -1654,11 +1654,11 @@ public class IaikP11Slot implements P11WritableSlot
 
             X509PublicKeyCertificate[] certObjs = getCertificateObjects(
                     cert.getSubjectX500Principal());
-            if(certObjs != null)
+            if (certObjs != null)
             {
-                for(X509PublicKeyCertificate certObj : certObjs)
+                for (X509PublicKeyCertificate certObj : certObjs)
                 {
-                    if(Arrays.equals(encodedCert, certObj.getValue().getByteArrayValue()))
+                    if (Arrays.equals(encodedCert, certObj.getValue().getByteArrayValue()))
                     {
                         P11KeyIdentifier p11KeyId = new P11KeyIdentifier(
                                 certObj.getId().getByteArrayValue(),
@@ -1696,7 +1696,7 @@ public class IaikP11Slot implements P11WritableSlot
             throw new IllegalArgumentException("keysize not allowed: " + keySize);
         }
 
-        if(keySize % 1024 != 0)
+        if (keySize % 1024 != 0)
         {
             throw new IllegalArgumentException("key size is not multiple of 1024: " + keySize);
         }
@@ -1704,7 +1704,7 @@ public class IaikP11Slot implements P11WritableSlot
         Session session = borrowWritableSession();
         try
         {
-            if(IaikP11Util.labelExists(session, label))
+            if (IaikP11Util.labelExists(session, label))
             {
                 throw new IllegalArgumentException(
                         "label " + label + " exists, please specify another one");
@@ -1741,7 +1741,7 @@ public class IaikP11Slot implements P11WritableSlot
             throw new IllegalArgumentException("keysize not allowed: " + keySize);
         }
 
-        if(keySize % 1024 != 0)
+        if (keySize % 1024 != 0)
         {
             throw new IllegalArgumentException("key size is not multiple of 1024: " + keySize);
         }
@@ -1749,7 +1749,7 @@ public class IaikP11Slot implements P11WritableSlot
         Session session = borrowWritableSession();
         try
         {
-            if(IaikP11Util.labelExists(session, label))
+            if (IaikP11Util.labelExists(session, label))
             {
                 throw new IllegalArgumentException(
                         "label " + label + " exists, please specify another one");
@@ -1790,7 +1790,7 @@ public class IaikP11Slot implements P11WritableSlot
             throw new IllegalArgumentException("keysize not allowed: " + pLength);
         }
 
-        if(pLength % 1024 != 0)
+        if (pLength % 1024 != 0)
         {
             throw new IllegalArgumentException("key size is not multiple of 1024: " + pLength);
         }
@@ -1798,7 +1798,7 @@ public class IaikP11Slot implements P11WritableSlot
         Session session = borrowWritableSession();
         try
         {
-            if(IaikP11Util.labelExists(session, label))
+            if (IaikP11Util.labelExists(session, label))
             {
                 throw new IllegalArgumentException(
                         "label " + label + " exists, please specify another one");
@@ -1831,7 +1831,7 @@ public class IaikP11Slot implements P11WritableSlot
             throw new IllegalArgumentException("keysize not allowed: " + pLength);
         }
 
-        if(pLength % 1024 != 0)
+        if (pLength % 1024 != 0)
         {
             throw new IllegalArgumentException("key size is not multiple of 1024: " + pLength);
         }
@@ -1839,7 +1839,7 @@ public class IaikP11Slot implements P11WritableSlot
         Session session = borrowWritableSession();
         try
         {
-            if(IaikP11Util.labelExists(session, label))
+            if (IaikP11Util.labelExists(session, label))
             {
                 throw new IllegalArgumentException(
                         "label " + label + " exists, please specify another one");
@@ -1874,13 +1874,13 @@ public class IaikP11Slot implements P11WritableSlot
         ParamUtil.assertNotBlank("label", label);
 
         ASN1ObjectIdentifier curveId = getCurveId(curveNameOrOid);
-        if(curveId == null)
+        if (curveId == null)
         {
             throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
         }
 
         X9ECParameters ecParams =  ECNamedCurveTable.getByOID(curveId);
-        if(ecParams == null)
+        if (ecParams == null)
         {
             throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
         }
@@ -1888,7 +1888,7 @@ public class IaikP11Slot implements P11WritableSlot
         Session session = borrowWritableSession();
         try
         {
-            if(IaikP11Util.labelExists(session, label))
+            if (IaikP11Util.labelExists(session, label))
             {
                 throw new IllegalArgumentException(
                         "label " + label + " exists, please specify another one");
@@ -1919,13 +1919,13 @@ public class IaikP11Slot implements P11WritableSlot
         ParamUtil.assertNotBlank("label", label);
 
         ASN1ObjectIdentifier curveId = getCurveId(curveNameOrOid);
-        if(curveId == null)
+        if (curveId == null)
         {
             throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
         }
 
         X9ECParameters ecParams =  ECNamedCurveTable.getByOID(curveId);
-        if(ecParams == null)
+        if (ecParams == null)
         {
             throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
         }
@@ -1933,7 +1933,7 @@ public class IaikP11Slot implements P11WritableSlot
         Session session = borrowWritableSession();
         try
         {
-            if(IaikP11Util.labelExists(session, label))
+            if (IaikP11Util.labelExists(session, label))
             {
                 throw new IllegalArgumentException(
                         "label " + label + " exists, please specify another one");
@@ -1947,19 +1947,19 @@ public class IaikP11Slot implements P11WritableSlot
             int keyBitLength = ecParams.getN().bitLength();
 
             ASN1ObjectIdentifier sigAlgOid;
-            if(keyBitLength > 384)
+            if (keyBitLength > 384)
             {
                 sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
             }
-            else if(keyBitLength > 256)
+            else if (keyBitLength > 256)
             {
                 sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
             }
-            else if(keyBitLength > 224)
+            else if (keyBitLength > 224)
             {
                 sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
             }
-            else if(keyBitLength > 160)
+            else if (keyBitLength > 160)
             {
                 sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
             }
@@ -2052,7 +2052,7 @@ public class IaikP11Slot implements P11WritableSlot
         tbsGen.setSubjectPublicKeyInfo(privateKeyAndPkInfo.getPublicKeyInfo());
 
         List<Extension> extensions = new ArrayList<>(2);
-        if(keyUsage == null)
+        if (keyUsage == null)
         {
             keyUsage = KeyUsage.keyCertSign | KeyUsage.cRLSign
                     | KeyUsage.digitalSignature | KeyUsage.keyEncipherment;
@@ -2060,7 +2060,7 @@ public class IaikP11Slot implements P11WritableSlot
         extensions.add(new Extension(Extension.keyUsage, true,
                 new DEROctetString(new KeyUsage(keyUsage))));
 
-        if(CollectionUtil.isNotEmpty(extendedKeyUsage))
+        if (CollectionUtil.isNotEmpty(extendedKeyUsage))
         {
             KeyPurposeId[] kps = new KeyPurposeId[extendedKeyUsage.size()];
 
@@ -2182,7 +2182,7 @@ public class IaikP11Slot implements P11WritableSlot
             final PrivateKey privateKey,
             final PublicKey publicKey)
     {
-        if(privateKey != null)
+        if (privateKey != null)
         {
             privateKey.getId().setByteArrayValue(id);
             privateKey.getToken().setBooleanValue(true);
@@ -2193,7 +2193,7 @@ public class IaikP11Slot implements P11WritableSlot
             privateKey.getSensitive().setBooleanValue(true);
         }
 
-        if(publicKey != null)
+        if (publicKey != null)
         {
             publicKey.getId().setByteArrayValue(id);
             publicKey.getToken().setBooleanValue(true);
@@ -2212,7 +2212,7 @@ public class IaikP11Slot implements P11WritableSlot
             final String label)
     throws Exception
     {
-        if(publicExponent == null)
+        if (publicExponent == null)
         {
             publicExponent = BigInteger.valueOf(65537);
         }
@@ -2248,7 +2248,7 @@ public class IaikP11Slot implements P11WritableSlot
         {
             curveId = new ASN1ObjectIdentifier(curveNameOrOid);
             return curveId;
-        } catch(Exception e)
+        } catch (Exception e)
         {
         }
 
@@ -2285,7 +2285,7 @@ public class IaikP11Slot implements P11WritableSlot
         try
         {
             kp = generateNamedECDSAKeyPair(session, curveId, id, label);
-        }catch(TokenException e)
+        } catch (TokenException e)
         {
             kp = generateSpecifiedECDSAKeyPair(session, curveId, ecParams, id, label);
         }
@@ -2351,7 +2351,7 @@ public class IaikP11Slot implements P11WritableSlot
             final PublicKey p11Key)
     throws SignerException
     {
-        if(p11Key instanceof RSAPublicKey)
+        if (p11Key instanceof RSAPublicKey)
         {
             RSAPublicKey rsaP11Key = (RSAPublicKey) p11Key;
             byte[] expBytes = rsaP11Key.getPublicExponent().getByteArrayValue();
@@ -2360,7 +2360,7 @@ public class IaikP11Slot implements P11WritableSlot
             byte[] modBytes = rsaP11Key.getModulus().getByteArrayValue();
             BigInteger mod = new BigInteger(1,modBytes);
 
-            if(LOG.isDebugEnabled())
+            if (LOG.isDebugEnabled())
             {
                 LOG.debug("modulus:\n {}", Hex.toHexString(modBytes));
             }
@@ -2369,12 +2369,12 @@ public class IaikP11Slot implements P11WritableSlot
             {
                 KeyFactory keyFactory=KeyFactory.getInstance("RSA");
                 return keyFactory.generatePublic(keySpec);
-            }catch(NoSuchAlgorithmException | InvalidKeySpecException e)
+            } catch (NoSuchAlgorithmException | InvalidKeySpecException e)
             {
                 throw new SignerException(e.getMessage(), e);
             }
         }
-        else if(p11Key instanceof DSAPublicKey)
+        else if (p11Key instanceof DSAPublicKey)
         {
             DSAPublicKey dsaP11Key = (DSAPublicKey) p11Key;
 
@@ -2389,12 +2389,12 @@ public class IaikP11Slot implements P11WritableSlot
             {
                 KeyFactory keyFactory=KeyFactory.getInstance("DSA");
                 return keyFactory.generatePublic(keySpec);
-            }catch(NoSuchAlgorithmException | InvalidKeySpecException e)
+            } catch (NoSuchAlgorithmException | InvalidKeySpecException e)
             {
                 throw new SignerException(e.getMessage(), e);
             }
         }
-        else if(p11Key instanceof ECDSAPublicKey)
+        else if (p11Key instanceof ECDSAPublicKey)
         {
             // FIXME: implement me
             return null;
@@ -2417,7 +2417,7 @@ public class IaikP11Slot implements P11WritableSlot
     throws Exception
     {
         PrivateKey privKey = getPrivateObject(null, null, keyIdentifier);
-        if(privKey == null)
+        if (privKey == null)
         {
             return null;
         }

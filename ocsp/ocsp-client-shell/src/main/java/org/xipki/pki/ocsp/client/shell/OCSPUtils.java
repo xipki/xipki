@@ -52,7 +52,7 @@ public class OCSPUtils
     throws OCSPResponseException
     {
         int status = response.getStatus();
-        if(status == 0)
+        if (status == 0)
         {
             BasicOCSPResp basicOCSPResp;
             try

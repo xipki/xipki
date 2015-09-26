@@ -56,7 +56,7 @@ public class EjbcaCACertExtractor
                 "/java/object/void[string[position()=1]='certificatechain']/object/void"
                 + "/string[1]";
         String b64Cert = cadataReader.getValue(XPATH_CERT);
-        if(b64Cert == null)
+        if (b64Cert == null)
         {
             throw new Exception("Could not extract CA certificate");
         }

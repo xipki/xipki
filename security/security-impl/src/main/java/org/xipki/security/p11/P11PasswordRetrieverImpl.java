@@ -62,7 +62,7 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever
                 final List<String> singlePasswords)
         {
             this.slots = slots;
-            if(CollectionUtil.isEmpty(singlePasswords))
+            if (CollectionUtil.isEmpty(singlePasswords))
             {
                 this.singlePasswords = null;
             }
@@ -75,13 +75,13 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever
         public boolean match(
                 final P11SlotIdentifier pSlot)
         {
-            if(slots == null)
+            if (slots == null)
             {
                 return true;
             }
-            for(P11SlotIdentifier slot : slots)
+            for (P11SlotIdentifier slot : slots)
             {
-                if(slot.equals(pSlot))
+                if (slot.equals(pSlot))
                 {
                     return true;
                 }
@@ -94,15 +94,15 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever
                 final PasswordResolver passwordResolver)
         throws PasswordResolverException
         {
-            if(singlePasswords == null)
+            if (singlePasswords == null)
             {
                 return null;
             }
 
             List<char[]> ret = new ArrayList<char[]>(singlePasswords.size());
-            for(String singlePassword : singlePasswords)
+            for (String singlePassword : singlePasswords)
             {
-                if(passwordResolver ==null)
+                if (passwordResolver ==null)
                 {
                     ret.add(singlePassword.toCharArray());
                 }
@@ -137,14 +137,14 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever
             final P11SlotIdentifier slotId)
     throws PasswordResolverException
     {
-        if(CollectionUtil.isEmpty(singleRetrievers))
+        if (CollectionUtil.isEmpty(singleRetrievers))
         {
             return null;
         }
 
-        for(SingleRetriever sr : singleRetrievers)
+        for (SingleRetriever sr : singleRetrievers)
         {
-            if(sr.match(slotId))
+            if (sr.match(slotId))
             {
                 return sr.getPasswords(passwordResolver);
             }

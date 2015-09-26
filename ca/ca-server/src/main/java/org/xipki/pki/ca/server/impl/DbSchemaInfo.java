@@ -60,7 +60,7 @@ public class DbSchemaInfo
     {
         final String sql = "SELECT NAME, VALUE2 FROM DBSCHEMA";
         Connection c = dataSource.getConnection();
-        if(c == null)
+        if (c == null)
         {
             throw new DataAccessException("could not get connection");
         }
@@ -71,19 +71,19 @@ public class DbSchemaInfo
         try
         {
             stmt = dataSource.createStatement(c);
-            if(stmt == null)
+            if (stmt == null)
             {
                 throw new DataAccessException("could not create statement");
             }
 
             rs = stmt.executeQuery(sql);
-            while(rs.next())
+            while (rs.next())
             {
                 String name = rs.getString("NAME");
                 String value = rs.getString("VALUE2");
                 variables.put(name, value);
             }
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
         } finally

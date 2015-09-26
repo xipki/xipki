@@ -67,14 +67,14 @@ class IaikP11Identity extends P11Identity
             final byte[] encodedDigestInfo)
     throws SignerException
     {
-        if(publicKey instanceof RSAPublicKey == false)
+        if (publicKey instanceof RSAPublicKey == false)
         {
             throw new SignerException("operation CKM_RSA_PKCS is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
 
         IaikP11Slot slot = module.getSlot(slotId);
-        if(slot == null)
+        if (slot == null)
         {
             throw new SignerException("could not find slot " + slotId);
         }
@@ -87,14 +87,14 @@ class IaikP11Identity extends P11Identity
             final byte[] hash)
     throws SignerException
     {
-        if(publicKey instanceof RSAPublicKey == false)
+        if (publicKey instanceof RSAPublicKey == false)
         {
             throw new SignerException("operation CKM_RSA_X509 is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
 
         IaikP11Slot slot = module.getSlot(slotId);
-        if(slot == null)
+        if (slot == null)
         {
             throw new SignerException("could not find slot " + slotId);
         }
@@ -107,14 +107,14 @@ class IaikP11Identity extends P11Identity
             final byte[] hash)
     throws SignerException
     {
-        if(publicKey instanceof ECPublicKey == false)
+        if (publicKey instanceof ECPublicKey == false)
         {
             throw new SignerException("operation CKM_ECDSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
 
         IaikP11Slot slot = module.getSlot(slotId);
-        if(slot == null)
+        if (slot == null)
         {
             throw new SignerException("could not find slot " + slotId);
         }
@@ -129,14 +129,14 @@ class IaikP11Identity extends P11Identity
             final byte[] hash)
     throws SignerException
     {
-        if(publicKey instanceof DSAPublicKey == false)
+        if (publicKey instanceof DSAPublicKey == false)
         {
             throw new SignerException("operation CKM_DSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
 
         IaikP11Slot slot = module.getSlot(slotId);
-        if(slot == null)
+        if (slot == null)
         {
             throw new SignerException("could not find slot " + slotId);
         }

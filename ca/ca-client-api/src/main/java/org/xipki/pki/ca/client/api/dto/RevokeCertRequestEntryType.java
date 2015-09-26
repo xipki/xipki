@@ -69,7 +69,7 @@ public class RevokeCertRequestEntryType extends IssuerSerialEntryType
     {
         super(id, issuer, serialNumber);
 
-        if((reason >= 0 && reason <= 10 && reason != 7) == false)
+        if ((reason >= 0 && reason <= 10 && reason != 7) == false)
         {
             throw new IllegalArgumentException("invalid reason: " + reason);
         }

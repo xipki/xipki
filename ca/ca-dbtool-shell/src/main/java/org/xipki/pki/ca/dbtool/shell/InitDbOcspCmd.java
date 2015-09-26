@@ -56,9 +56,9 @@ public class InitDbOcspCmd extends LiquibaseCmd
     {
         Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
-        for(String dbName : dbConfs.keySet())
+        for (String dbName : dbConfs.keySet())
         {
-            if(dbName.toLowerCase().contains("ocsp") == false)
+            if (dbName.toLowerCase().contains("ocsp") == false)
             {
                 continue;
             }

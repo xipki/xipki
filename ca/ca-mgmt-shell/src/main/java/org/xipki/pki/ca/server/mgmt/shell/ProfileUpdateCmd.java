@@ -71,12 +71,12 @@ public class ProfileUpdateCmd extends CaCmd
     protected Object _doExecute()
     throws Exception
     {
-        if(type == null && conf == null && confFile == null)
+        if (type == null && conf == null && confFile == null)
         {
             throw new IllegalCmdParamException("nothing to update");
         }
 
-        if(conf == null && confFile != null)
+        if (conf == null && confFile != null)
         {
             conf = new String(IoUtil.read(confFile));
         }

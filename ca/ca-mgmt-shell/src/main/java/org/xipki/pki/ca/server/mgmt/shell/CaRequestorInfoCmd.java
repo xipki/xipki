@@ -60,7 +60,7 @@ public class CaRequestorInfoCmd extends CaCmd
     protected Object _doExecute()
     throws Exception
     {
-        if(caManager.getCA(caName) == null)
+        if (caManager.getCA(caName) == null)
         {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
@@ -68,10 +68,10 @@ public class CaRequestorInfoCmd extends CaCmd
         StringBuilder sb = new StringBuilder();
 
         Set<CAHasRequestorEntry> entries = caManager.getCmpRequestorsForCA(caName);
-        if(isNotEmpty(entries))
+        if (isNotEmpty(entries))
         {
             sb.append("requestors trusted by CA " + caName).append("\n");
-            for(CAHasRequestorEntry entry  : entries)
+            for (CAHasRequestorEntry entry  : entries)
             {
                 sb.append("\t").append(entry).append("\n");
             }

@@ -58,7 +58,7 @@ public class FpIdCalculator
     private static BlockingDeque<Digest> getMD5MessageDigests()
     {
         BlockingDeque<Digest> mds = new LinkedBlockingDeque<>();
-        for(int i = 0; i < parallelism; i++)
+        for (int i = 0; i < parallelism; i++)
         {
             Digest md = new SHA1Digest();
             mds.addLast(md);
@@ -93,7 +93,7 @@ public class FpIdCalculator
         ParamUtil.assertNotNull("data", data);
 
         Digest md = null;
-        for(int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
             try
             {
@@ -104,7 +104,7 @@ public class FpIdCalculator
             }
         }
 
-        if(md == null)
+        if (md == null)
         {
             throw new RuntimeOperatorException("could not get idle MessageDigest");
         }

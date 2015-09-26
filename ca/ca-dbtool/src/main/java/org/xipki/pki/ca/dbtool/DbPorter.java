@@ -132,7 +132,7 @@ public class DbPorter extends DbToolBase
             out.write(content.getBytes());
         } finally
         {
-            if(out != null)
+            if (out != null)
             {
                 out.flush();
                 out.close();
@@ -145,13 +145,13 @@ public class DbPorter extends DbToolBase
             final String fileName)
     throws IOException
     {
-        if(content == null)
+        if (content == null)
         {
             return null;
         }
 
         FileOrValueType ret = new FileOrValueType();
-        if(content.length() < 256)
+        if (content.length() < 256)
         {
             ret.setValue(content);
             return ret;
@@ -159,7 +159,7 @@ public class DbPorter extends DbToolBase
 
         File file = new File(baseDir, fileName);
         File parent = file.getParentFile();
-        if(parent != null && parent.exists() == false)
+        if (parent != null && parent.exists() == false)
         {
             parent.mkdirs();
         }
@@ -174,12 +174,12 @@ public class DbPorter extends DbToolBase
             final FileOrValueType fileOrValue)
     throws IOException
     {
-        if(fileOrValue == null)
+        if (fileOrValue == null)
         {
             return null;
         }
 
-        if(fileOrValue.getValue() != null)
+        if (fileOrValue.getValue() != null)
         {
             return fileOrValue.getValue();
         }

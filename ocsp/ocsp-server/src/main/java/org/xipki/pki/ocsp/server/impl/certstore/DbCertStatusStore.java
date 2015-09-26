@@ -80,7 +80,7 @@ public class DbCertStatusStore extends CertStatusStore
 
     static
     {
-        for(HashAlgoType h : HashAlgoType.values())
+        for (HashAlgoType h : HashAlgoType.values())
         {
             StringBuilder sb = new StringBuilder();
             sb.append("ID,REV,RR,RT,RIT,PN,");
@@ -107,17 +107,17 @@ public class DbCertStatusStore extends CertStatusStore
         public boolean match(
                 final IssuerEntry issuer)
         {
-            if(id != issuer.getId())
+            if (id != issuer.getId())
             {
                 return false;
             }
 
-            if(revocationTimeMs == null)
+            if (revocationTimeMs == null)
             {
                 return issuer.getRevocationInfo() == null;
             }
 
-            if(issuer.getRevocationInfo() == null)
+            if (issuer.getRevocationInfo() == null)
             {
                 return false;
             }
@@ -158,7 +158,7 @@ public class DbCertStatusStore extends CertStatusStore
     {
         try
         {
-            if(initialized)
+            if (initialized)
             {
                 final String sql = "SELECT ID,REV,RT,S1C FROM ISSUER";
                 PreparedStatement ps = borrowPreparedStatement(sql);
@@ -169,10 +169,10 @@ public class DbCertStatusStore extends CertStatusStore
                     Map<Integer, SimpleIssuerEntry> newIssuers = new HashMap<>();
 
                     rs = ps.executeQuery();
-                    while(rs.next())
+                    while (rs.next())
                     {
                         String sha1Fp = rs.getString("S1C");
-                        if(issuerFilter.includeIssuerWithSha1Fp(sha1Fp) == false)
+                        if (issuerFilter.includeIssuerWithSha1Fp(sha1Fp) == false)
                         {
                                 continue;
                         }
@@ -180,7 +180,7 @@ public class DbCertStatusStore extends CertStatusStore
                         int id = rs.getInt("ID");
                         boolean revoked = rs.getBoolean("REV");
                         Long revTimeMs = null;
-                        if(revoked)
+                        if (revoked)
                         {
                             revTimeMs = rs.getLong("RT") * 1000;
                         }
@@ -193,7 +193,7 @@ public class DbCertStatusStore extends CertStatusStore
                     Set<Integer> newIds = newIssuers.keySet();
 
                     Set<Integer> ids;
-                    if(issuerStore != null)
+                    if (issuerStore != null)
                     {
                         ids = issuerStore.getIds();
                     }
@@ -207,13 +207,13 @@ public class DbCertStatusStore extends CertStatusStore
                             && ids.containsAll(newIds)
                             && newIds.containsAll(ids);
 
-                    if(issuersUnchanged)
+                    if (issuersUnchanged)
                     {
-                        for(Integer id : newIds)
+                        for (Integer id : newIds)
                         {
                             IssuerEntry entry = issuerStore.getIssuerForId(id);
                             SimpleIssuerEntry newEntry = newIssuers.get(id);
-                            if(newEntry.match(entry))
+                            if (newEntry.match(entry))
                             {
                                 issuersUnchanged = false;
                                 break;
@@ -221,7 +221,7 @@ public class DbCertStatusStore extends CertStatusStore
                         }
                     }
 
-                    if(issuersUnchanged)
+                    if (issuersUnchanged)
                     {
                         return;
                     }
@@ -243,10 +243,10 @@ public class DbCertStatusStore extends CertStatusStore
             {
                 rs = ps.executeQuery();
                 List<IssuerEntry> caInfos = new LinkedList<>();
-                while(rs.next())
+                while (rs.next())
                 {
                     String sha1Fp = rs.getString("S1C");
-                    if(issuerFilter.includeIssuerWithSha1Fp(sha1Fp) == false)
+                    if (issuerFilter.includeIssuerWithSha1Fp(sha1Fp) == false)
                     {
                         continue;
                     }
@@ -255,7 +255,7 @@ public class DbCertStatusStore extends CertStatusStore
                     long notBeforeInSecond = rs.getLong("NBEFORE");
 
                     Map<HashAlgoType, IssuerHashNameAndKey> hashes = new HashMap<>();
-                    for(HashAlgoType h : hashAlgoTypes)
+                    for (HashAlgoType h : hashAlgoTypes)
                     {
                         String hash_name = rs.getString(h.getShortName() + "S");
                         String hash_key = rs.getString(h.getShortName() + "K");
@@ -264,11 +264,11 @@ public class DbCertStatusStore extends CertStatusStore
                         IssuerHashNameAndKey hash = new IssuerHashNameAndKey(
                                 h, hashNameBytes, hashKeyBytes);
 
-                        if(h == HashAlgoType.SHA1)
+                        if (h == HashAlgoType.SHA1)
                         {
-                            for(IssuerEntry existingIssuer : caInfos)
+                            for (IssuerEntry existingIssuer : caInfos)
                             {
-                                if(existingIssuer.matchHash(h, hashNameBytes, hashKeyBytes))
+                                if (existingIssuer.matchHash(h, hashNameBytes, hashKeyBytes))
                                 {
                                     throw new Exception("found at least two issuers with the"
                                             + " same subject and key");
@@ -281,7 +281,7 @@ public class DbCertStatusStore extends CertStatusStore
                     IssuerEntry caInfoEntry = new IssuerEntry(id, hashes,
                             new Date(notBeforeInSecond * 1000));
                     boolean revoked = rs.getBoolean("REV");
-                    if(revoked)
+                    if (revoked)
                     {
                         long l = rs.getLong("RT");
                         caInfoEntry.setRevocationInfo(new Date(l * 1000));
@@ -299,10 +299,10 @@ public class DbCertStatusStore extends CertStatusStore
             {
                 releaseDbResources(ps, rs);
             }
-        }catch(Exception e)
+        } catch (Exception e)
         {
             final String message = "could not executing initializeStore()";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -326,29 +326,29 @@ public class DbCertStatusStore extends CertStatusStore
     {
         // wait for max. 0.5 second
         int n = 5;
-        while(initialized == false && (n-- > 0))
+        while (initialized == false && (n-- > 0))
         {
             try
             {
                 Thread.sleep(100);
-            }catch(InterruptedException e)
+            } catch (InterruptedException e)
             {
             }
         }
 
-        if(initialized == false)
+        if (initialized == false)
         {
             throw new CertStatusStoreException("initialization of CertStore is still in process");
         }
 
-        if(initializationFailed)
+        if (initializationFailed)
         {
             throw new CertStatusStoreException("initialization of CertStore failed");
         }
 
         String coreSql;
         HashAlgoType certHashAlgo = null;
-        if(includeCertHash)
+        if (includeCertHash)
         {
             certHashAlgo = (certHashAlg == null)
                     ? hashAlgo
@@ -365,13 +365,13 @@ public class DbCertStatusStore extends CertStatusStore
 
             IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, issuerNameHash,
                     issuerKeyHash);
-            if(issuer == null)
+            if (issuer == null)
             {
                 return CertStatusInfo.getIssuerUnknownCertStatusInfo(thisUpdate, null);
             }
 
             // our database supports up to 63 bit (8 byte positive) serialNumber
-            if(serialNumber.bitLength() > 63)
+            if (serialNumber.bitLength() > 63)
             {
                 return CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
             }
@@ -389,33 +389,33 @@ public class DbCertStatusStore extends CertStatusStore
 
                 rs = ps.executeQuery();
 
-                if(rs.next())
+                if (rs.next())
                 {
                     String certprofile = rs.getString("PN");
                     boolean ignore = certprofile != null
                             && certprofileOption != null
                             && certprofileOption.include(certprofile) == false;
-                    if(ignore)
+                    if (ignore)
                     {
                         certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, null);
                     }
                     else
                     {
                         byte[] certHash = null;
-                        if(includeCertHash)
+                        if (includeCertHash)
                         {
                             certHash = Base64.decode(rs.getString(certHashAlgo.getShortName()));
                         }
 
                         boolean revoked = rs.getBoolean("REV");
-                        if(revoked)
+                        if (revoked)
                         {
                             int reason = rs.getInt("RR");
                             long revocationTime = rs.getLong("RT");
                             long invalidatityTime = rs.getLong("RIT");
 
                             Date invTime = null;
-                            if(invalidatityTime != 0 && invalidatityTime != revocationTime)
+                            if (invalidatityTime != 0 && invalidatityTime != revocationTime)
                             {
                                 invTime = new Date(invalidatityTime * 1000);
                             }
@@ -432,11 +432,11 @@ public class DbCertStatusStore extends CertStatusStore
                                     certHash, thisUpdate,
                                     null, certprofile);
                         }
-                    } // end if(ignore)
+                    } // end if (ignore)
                 }
                 else
                 {
-                    if(unknownSerialAsGood)
+                    if (unknownSerialAsGood)
                     {
                         certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null,
                                 thisUpdate, null, null);
@@ -445,8 +445,8 @@ public class DbCertStatusStore extends CertStatusStore
                     {
                         certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
                     }
-                } // end if(rs.next())
-            } catch(SQLException e)
+                } // end if (rs.next())
+            } catch (SQLException e)
             {
                 throw dataSource.translate(coreSql, e);
             } finally
@@ -454,13 +454,13 @@ public class DbCertStatusStore extends CertStatusStore
                 releaseDbResources(ps, rs);
             }
 
-            if(includeArchiveCutoff)
+            if (includeArchiveCutoff)
             {
                 Date t;
-                if(retentionInterval != 0)
+                if (retentionInterval != 0)
                 {
                     // expired certificate remains in status store for ever
-                    if(retentionInterval < 0)
+                    if (retentionInterval < 0)
                     {
                         t = issuer.getNotBefore();
                     }
@@ -477,7 +477,7 @@ public class DbCertStatusStore extends CertStatusStore
             }
 
             return certStatusInfo;
-        }catch(DataAccessException e)
+        } catch (DataAccessException e)
         {
             throw new CertStatusStoreException(e.getMessage(), e);
         }
@@ -495,11 +495,11 @@ public class DbCertStatusStore extends CertStatusStore
     {
         PreparedStatement ps = null;
         Connection c = dataSource.getConnection();
-        if(c != null)
+        if (c != null)
         {
             ps = dataSource.prepareStatement(c, sqlQuery);
         }
-        if(ps == null)
+        if (ps == null)
         {
             throw new DataAccessException("could not create prepared statement for " + sqlQuery);
         }
@@ -523,10 +523,10 @@ public class DbCertStatusStore extends CertStatusStore
             {
                 releaseDbResources(ps, rs);
             }
-        }catch(Exception e)
+        } catch (Exception e)
         {
             final String message = "isHealthy()";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -563,7 +563,7 @@ public class DbCertStatusStore extends CertStatusStore
     public void shutdown()
     throws CertStatusStoreException
     {
-        if(scheduledThreadPoolExecutor != null)
+        if (scheduledThreadPoolExecutor != null)
         {
             scheduledThreadPoolExecutor.shutdown();
             scheduledThreadPoolExecutor = null;

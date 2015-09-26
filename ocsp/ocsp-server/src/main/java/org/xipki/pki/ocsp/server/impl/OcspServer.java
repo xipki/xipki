@@ -200,7 +200,7 @@ public class OcspServer
                 final ServletPathResponderName o)
         {
             int d = o.path.length() - path.length();
-            if(d == 0)
+            if (d == 0)
             {
                 return 0;
             }
@@ -261,33 +261,33 @@ public class OcspServer
 
         String path = "";
         int n = servletPath.length();
-        if(requestURI.length() > n + 1)
+        if (requestURI.length() > n + 1)
         {
             path = requestURI.substring(n + 1);
         }
 
         ServletPathResponderName entry = null;
-        for(ServletPathResponderName m : servletPaths)
+        for (ServletPathResponderName m : servletPaths)
         {
-            if(path.startsWith(m.getPath()))
+            if (path.startsWith(m.getPath()))
             {
                 entry = m;
                 break;
             }
         }
 
-        if(entry == null)
+        if (entry == null)
         {
             return null;
         }
 
         String relativeUri = "";
-        if(entry.getPath().length() > 0)
+        if (entry.getPath().length() > 0)
         {
             n += 1 + entry.getPath().length();
         }
 
-        if(requestURI.length() > n + 1)
+        if (requestURI.length() > n + 1)
         {
             relativeUri = requestURI.substring(n + 1);
             relativeUri = URLDecoder.decode(relativeUri, "UTF-8");
@@ -313,7 +313,7 @@ public class OcspServer
             successfull = true;
         }finally
         {
-            if(successfull)
+            if (successfull)
             {
                 LOG.info("started OCSPResponder server");
             }
@@ -328,20 +328,20 @@ public class OcspServer
     private void do_init()
     throws InvalidConfException, DataAccessException, PasswordResolverException
     {
-        if(confFile == null)
+        if (confFile == null)
         {
             throw new IllegalStateException("confFile is not set");
         }
-        if(dataSourceFactory == null)
+        if (dataSourceFactory == null)
         {
             throw new IllegalStateException("dataSourceFactory is not set");
         }
-        if(securityFactory == null)
+        if (securityFactory == null)
         {
             throw new IllegalStateException("securityFactory is not set");
         }
 
-        if(Security.getProvider("BC") == null)
+        if (Security.getProvider("BC") == null)
         {
             Security.addProvider(new BouncyCastleProvider());
         }
@@ -352,24 +352,24 @@ public class OcspServer
         Set<String> c = new HashSet<>();
 
         // Duplication name check: responder
-        for(ResponderType m : conf.getResponders().getResponder())
+        for (ResponderType m : conf.getResponders().getResponder())
         {
             String name = m.getName();
-            if(c.contains(m))
+            if (c.contains(m))
             {
                 throw new InvalidConfException(
                         "responder named '" + name + "' defined duplicatedly");
             }
 
-            if(StringUtil.isBlank(name))
+            if (StringUtil.isBlank(name))
             {
                 throw new InvalidConfException("responder name could not be empty");
             }
 
-            for(int i = 0; i < name.length(); i++)
+            for (int i = 0; i < name.length(); i++)
             {
                 char ch = name.charAt(i);
-                if(((ch >= '0' && ch <= '9')
+                if (((ch >= '0' && ch <= '9')
                         || (ch >= 'A' && ch <= 'Z')
                         || (ch >= 'a' && ch <= 'z')) == false)
                 {
@@ -380,10 +380,10 @@ public class OcspServer
 
         // Duplication name check: signer
         c.clear();
-        for(SignerType m : conf.getSigners().getSigner())
+        for (SignerType m : conf.getSigners().getSigner())
         {
             String name = m.getName();
-            if(c.contains(m))
+            if (c.contains(m))
             {
                 throw new InvalidConfException(
                         "signer option named '" + name + "' defined duplicatedly");
@@ -392,10 +392,10 @@ public class OcspServer
 
         // Duplication name check: requests
         c.clear();
-        for(RequestOptionType m : conf.getRequestOptions().getRequestOption())
+        for (RequestOptionType m : conf.getRequestOptions().getRequestOption())
         {
             String name = m.getName();
-            if(c.contains(m))
+            if (c.contains(m))
             {
                 throw new InvalidConfException(
                         "request option named '" + name + "' defined duplicatedly");
@@ -404,10 +404,10 @@ public class OcspServer
 
         // Duplication name check: response
         c.clear();
-        for(ResponseOptionType m : conf.getResponseOptions().getResponseOption())
+        for (ResponseOptionType m : conf.getResponseOptions().getResponseOption())
         {
             String name = m.getName();
-            if(c.contains(m))
+            if (c.contains(m))
             {
                 throw new InvalidConfException(
                         "response option named '" + name + "' defined duplicatedly");
@@ -416,12 +416,12 @@ public class OcspServer
 
         // Duplication name check: audit
         c.clear();
-        if(conf.getAuditOptions() != null)
+        if (conf.getAuditOptions() != null)
         {
-            for(AuditOptionType m : conf.getAuditOptions().getAuditOption())
+            for (AuditOptionType m : conf.getAuditOptions().getAuditOption())
             {
                 String name = m.getName();
-                if(c.contains(m))
+                if (c.contains(m))
                 {
                     throw new InvalidConfException(
                             "audit option named '" + name + "' defined duplicatedly");
@@ -431,10 +431,10 @@ public class OcspServer
 
         // Duplication name check: store
         c.clear();
-        for(StoreType m : conf.getStores().getStore())
+        for (StoreType m : conf.getStores().getStore())
         {
             String name = m.getName();
-            if(c.contains(m))
+            if (c.contains(m))
             {
                 throw new InvalidConfException("store named '" + name + "' defined duplicatedly");
             }
@@ -442,12 +442,12 @@ public class OcspServer
 
         // Duplication name check: certprofile
         c.clear();
-        if(conf.getCertprofileOptions() != null)
+        if (conf.getCertprofileOptions() != null)
         {
-            for(CertprofileOptionType m : conf.getCertprofileOptions().getCertprofileOption())
+            for (CertprofileOptionType m : conf.getCertprofileOptions().getCertprofileOption())
             {
                 String name = m.getName();
-                if(c.contains(m))
+                if (c.contains(m))
                 {
                     throw new InvalidConfException(
                             "certprofile option named '" + name + "' defined duplicatedly");
@@ -457,12 +457,12 @@ public class OcspServer
 
         // Duplication name check: datasource
         c.clear();
-        if(conf.getDatasources() != null)
+        if (conf.getDatasources() != null)
         {
-            for(DatasourceType m : conf.getDatasources().getDatasource())
+            for (DatasourceType m : conf.getDatasources().getDatasource())
             {
                 String name = m.getName();
-                if(c.contains(m))
+                if (c.contains(m))
                 {
                     throw new InvalidConfException(
                             "datasource named '" + name + "' defined duplicatedly");
@@ -472,30 +472,30 @@ public class OcspServer
 
         // -- initializes the responders
         // signers
-        for(SignerType m : conf.getSigners().getSigner())
+        for (SignerType m : conf.getSigners().getSigner())
         {
             ResponderSigner signer = initSigner(m);
             signers.put(m.getName(), signer);
         }
 
         // requests
-        for(RequestOptionType m : conf.getRequestOptions().getRequestOption())
+        for (RequestOptionType m : conf.getRequestOptions().getRequestOption())
         {
             RequestOption option = new RequestOption(m);
             requestOptions.put(m.getName(), option);
         }
 
         // responses
-        for(ResponseOptionType m : conf.getResponseOptions().getResponseOption())
+        for (ResponseOptionType m : conf.getResponseOptions().getResponseOption())
         {
             ResponseOption option = new ResponseOption(m);
             responseOptions.put(m.getName(), option);
         }
 
         // audits
-        if(conf.getAuditOptions() != null)
+        if (conf.getAuditOptions() != null)
         {
-            for(AuditOptionType m : conf.getAuditOptions().getAuditOption())
+            for (AuditOptionType m : conf.getAuditOptions().getAuditOption())
             {
                 AuditOption option = new AuditOption(m);
                 auditOptions.put(m.getName(), option);
@@ -503,9 +503,9 @@ public class OcspServer
         }
 
         // certprofiles
-        if(conf.getCertprofileOptions() != null)
+        if (conf.getCertprofileOptions() != null)
         {
-            for(CertprofileOptionType m : conf.getCertprofileOptions().getCertprofileOption())
+            for (CertprofileOptionType m : conf.getCertprofileOptions().getCertprofileOption())
             {
                 CertprofileOption option = new CertprofileOption(
                         m.getIncludes().getInclude(), m.getExcludes().getExclude());
@@ -515,9 +515,9 @@ public class OcspServer
 
         // datasources
         Map<String, DataSourceWrapper> datasources = new HashMap<>();
-        if(conf.getDatasources() != null)
+        if (conf.getDatasources() != null)
         {
-            for(DatasourceType m : conf.getDatasources().getDatasource())
+            for (DatasourceType m : conf.getDatasources().getDatasource())
             {
                 String name = m.getName();
                 DataSourceWrapper datasource;
@@ -527,7 +527,7 @@ public class OcspServer
                     dsStream = getInputStream(m.getConf());
                     datasource  = dataSourceFactory.createDataSource(name,
                                 dsStream, securityFactory.getPasswordResolver());
-                } catch(IOException e)
+                } catch (IOException e)
                 {
                     throw new InvalidConfException(e.getMessage(), e);
                 }
@@ -540,7 +540,7 @@ public class OcspServer
         }
 
         // stores
-        for(StoreType m : conf.getStores().getStore())
+        for (StoreType m : conf.getStores().getStore())
         {
             CertStatusStore store = initStore(m, datasources);
             stores.put(m.getName(), store);
@@ -548,43 +548,43 @@ public class OcspServer
 
         Map<String, ResponderOption> responderOptions = new HashMap<>();
         // responders
-        for(ResponderType m : conf.getResponders().getResponder())
+        for (ResponderType m : conf.getResponders().getResponder())
         {
             ResponderOption option = new ResponderOption(m);
             String n = option.getAuditOptionName();
-            if(n != null && auditOptions.containsKey(n) == false)
+            if (n != null && auditOptions.containsKey(n) == false)
             {
                 throw new InvalidConfException("no auditOption named '" + n + "' is defined");
             }
 
             n = option.getCertprofileOptionName();
-            if(n != null && certprofileOptions.containsKey(n) == false)
+            if (n != null && certprofileOptions.containsKey(n) == false)
             {
                 throw new InvalidConfException("no certprofileOption named '" + n + "' is defined");
             }
 
             n = option.getRequestOptionName();
-            if(requestOptions.containsKey(n) == false)
+            if (requestOptions.containsKey(n) == false)
             {
                 throw new InvalidConfException("no requestOption named '" + n + "' is defined");
             }
 
             n = option.getResponseOptionName();
-            if(responseOptions.containsKey(n) == false)
+            if (responseOptions.containsKey(n) == false)
             {
                 throw new InvalidConfException("no responseOption named '" + n + "' is defined");
             }
 
             n = option.getSignerName();
-            if(signers.containsKey(n) == false)
+            if (signers.containsKey(n) == false)
             {
                 throw new InvalidConfException("no signer named '" + n + "' is defined");
             }
 
             List<String> names = option.getStoreNames();
-            for(String name : names)
+            for (String name : names)
             {
-                if(stores.containsKey(name) == false)
+                if (stores.containsKey(name) == false)
                 {
                     throw new InvalidConfException("no store named '" + name + "' is defined");
                 }
@@ -594,7 +594,7 @@ public class OcspServer
 
         // sort the servlet paths
         Set<String> pathTexts = new HashSet<>();
-        for(String responderName : responderOptions.keySet())
+        for (String responderName : responderOptions.keySet())
         {
             ServletPathResponderName path = new ServletPathResponderName(
                     responderName, responderName);
@@ -602,13 +602,13 @@ public class OcspServer
             this.servletPaths.add(path);
         }
 
-        for(String name : responderOptions.keySet())
+        for (String name : responderOptions.keySet())
         {
             ResponderOption option = responderOptions.get(name);
             List<String> paths = option.getServletPaths();
-            for(String path : paths)
+            for (String path : paths)
             {
-                if(pathTexts.contains(path))
+                if (pathTexts.contains(path))
                 {
                     throw new InvalidConfException(
                             "duplicated definition of servlet path '" + path + "'");
@@ -620,14 +620,14 @@ public class OcspServer
         Collections.sort(this.servletPaths);
 
         // responders
-        for(String name : responderOptions.keySet())
+        for (String name : responderOptions.keySet())
         {
             ResponderOption option = responderOptions.get(name);
             String aoName = option.getAuditOptionName();
             String cfoName = option.getCertprofileOptionName();
 
             List<CertStatusStore> _stores = new ArrayList<>(option.getStoreNames().size());
-            for(String storeName : option.getStoreNames())
+            for (String storeName : option.getStoreNames())
             {
                 _stores.add(stores.get(storeName));
             }
@@ -655,15 +655,15 @@ public class OcspServer
     public void shutdown()
     {
         LOG.info("stopped OCSP Responder");
-        for(CertStatusStore store : stores.values())
+        for (CertStatusStore store : stores.values())
         {
             try
             {
                 store.shutdown();
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 final String message =  "shutdown store " + store.getName();
-                if(LOG.isWarnEnabled())
+                if (LOG.isWarnEnabled())
                 {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                             e.getMessage());
@@ -689,11 +689,11 @@ public class OcspServer
         CertprofileOption certprofileOption = responder.getCertprofileOption();
 
         int version = request.getVersionNumber();
-        if(requestOption.isVersionAllowed(version) == false)
+        if (requestOption.isVersionAllowed(version) == false)
         {
             String message = "invalid request version " + version;
             LOG.warn(message);
-            if(auditEvent != null)
+            if (auditEvent != null)
             {
                 fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
             }
@@ -703,7 +703,7 @@ public class OcspServer
         try
         {
             OcspRespWithCacheInfo resp = checkSignature(request, requestOption, auditEvent);
-            if(resp != null)
+            if (resp != null)
             {
                 return resp;
             }
@@ -717,9 +717,9 @@ public class OcspServer
 
             Set<ASN1ObjectIdentifier> criticalExtensionOIDs = new HashSet<>();
             Set<?> tmp = request.getCriticalExtensionOIDs();
-            if(tmp != null)
+            if (tmp != null)
             {
-                for(Object oid : tmp)
+                for (Object oid : tmp)
                 {
                     criticalExtensionOIDs.add((ASN1ObjectIdentifier) oid);
                 }
@@ -730,17 +730,17 @@ public class OcspServer
             ASN1ObjectIdentifier extensionType = OCSPObjectIdentifiers.id_pkix_ocsp_nonce;
             criticalExtensionOIDs.remove(extensionType);
             Extension nonceExtn = request.getExtension(extensionType);
-            if(nonceExtn != null)
+            if (nonceExtn != null)
             {
                 byte[] nonce = nonceExtn.getExtnValue().getOctets();
                 int len = nonce.length;
                 int min = requestOption.getNonceMinLen();
                 int max = requestOption.getNonceMaxLen();
 
-                if(len < min || len > max)
+                if (len < min || len > max)
                 {
                     LOG.warn("length of nonce {} not within [{},{}]", new Object[]{len, min, max});
-                    if(auditEvent != null)
+                    if (auditEvent != null)
                     {
                         StringBuilder sb = new StringBuilder();
                         sb.append("length of nonce ").append(len);
@@ -754,11 +754,11 @@ public class OcspServer
                 couldCacheInfo = false;
                 responseExtensions.add(nonceExtn);
             }
-            else if(requestOption.isNonceRequired())
+            else if (requestOption.isNonceRequired())
             {
                 String message = "nonce required, but is not present in the request";
                 LOG.warn(message);
-                if(auditEvent != null)
+                if (auditEvent != null)
                 {
                     fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
                 }
@@ -769,10 +769,10 @@ public class OcspServer
 
             long cacheThisUpdate = 0;
             long cacheNextUpdate = Long.MAX_VALUE;
-            for(int i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
                 AuditChildEvent childAuditEvent = null;
-                if(auditEvent != null)
+                if (auditEvent != null)
                 {
                     childAuditEvent = new AuditChildEvent();
                     auditEvent.addChildAuditEvent(childAuditEvent);
@@ -782,20 +782,20 @@ public class OcspServer
                 CertificateID certID =  req.getCertID();
                 String certIdHashAlgo = certID.getHashAlgOID().getId();
                 HashAlgoType reqHashAlgo = HashAlgoType.getHashAlgoType(certIdHashAlgo);
-                if(reqHashAlgo == null)
+                if (reqHashAlgo == null)
                 {
                     LOG.warn("unknown CertID.hashAlgorithm {}", certIdHashAlgo);
-                    if(childAuditEvent != null)
+                    if (childAuditEvent != null)
                     {
                         fillAuditEvent(childAuditEvent, AuditLevel.INFO, AuditStatus.FAILED,
                                 "unknown CertID.hashAlgorithm " + certIdHashAlgo);
                     }
                     return createUnsuccessfullOCSPResp(OcspResponseStatus.malformedRequest);
                 }
-                else if(requestOption.allows(reqHashAlgo) == false)
+                else if (requestOption.allows(reqHashAlgo) == false)
                 {
                     LOG.warn("CertID.hashAlgorithm {} not allowed", certIdHashAlgo);
-                    if(childAuditEvent != null)
+                    if (childAuditEvent != null)
                     {
                         fillAuditEvent(childAuditEvent, AuditLevel.INFO, AuditStatus.FAILED,
                                 "CertID.hashAlgorithm " + certIdHashAlgo + " not allowed");
@@ -807,7 +807,7 @@ public class OcspServer
                 CertStatusStore answeredStore = null;
                 boolean exceptionOccurs = false;
 
-                for(CertStatusStore store : responder.getStores())
+                for (CertStatusStore store : responder.getStores())
                 {
                     try
                     {
@@ -819,7 +819,7 @@ public class OcspServer
                                 responseOption.isIncludeCerthash(),
                                 responseOption.getCertHashAlgo(),
                                 certprofileOption);
-                        if(certStatusInfo.getCertStatus() != CertStatus.ISSUER_UNKNOWN)
+                        if (certStatusInfo.getCertStatus() != CertStatus.ISSUER_UNKNOWN)
                         {
                             answeredStore = store;
                             break;
@@ -829,7 +829,7 @@ public class OcspServer
                         exceptionOccurs = true;
                         final String message =
                                 "getCertStatus() of CertStatusStore " + store.getName();
-                        if(LOG.isErrorEnabled())
+                        if (LOG.isErrorEnabled())
                         {
                             LOG.error(LogUtil.buildExceptionLogFormat(message),
                                     e.getClass().getName(), e.getMessage());
@@ -838,14 +838,14 @@ public class OcspServer
                     }
                 }
 
-                if(certStatusInfo == null)
+                if (certStatusInfo == null)
                 {
-                    if(childAuditEvent != null)
+                    if (childAuditEvent != null)
                     {
                         fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                                 "no CertStatusStore can answer the request");
                     }
-                    if(exceptionOccurs)
+                    if (exceptionOccurs)
                     {
                         return createUnsuccessfullOCSPResp(OcspResponseStatus.tryLater);
                     }
@@ -854,33 +854,33 @@ public class OcspServer
                         certStatusInfo = CertStatusInfo.getIssuerUnknownCertStatusInfo(
                                 new Date(), null);
                     }
-                } else if(answeredStore != null)
+                } else if (answeredStore != null)
                 {
-                    if(responderOption.isInheritCaRevocation())
+                    if (responderOption.isInheritCaRevocation())
                     {
                         CertRevocationInfo caRevInfo = answeredStore.getCARevocationInfo(
                                 reqHashAlgo, certID.getIssuerNameHash(), certID.getIssuerKeyHash());
-                        if(caRevInfo != null)
+                        if (caRevInfo != null)
                         {
                             CertStatus certStatus = certStatusInfo.getCertStatus();
                             boolean replaced = false;
-                            if(certStatus == CertStatus.GOOD || certStatus == CertStatus.UNKNOWN)
+                            if (certStatus == CertStatus.GOOD || certStatus == CertStatus.UNKNOWN)
                             {
                                 replaced = true;
                             }
-                            else if(certStatus == CertStatus.REVOKED)
+                            else if (certStatus == CertStatus.REVOKED)
                             {
-                                if(certStatusInfo.getRevocationInfo().getRevocationTime().after(
+                                if (certStatusInfo.getRevocationInfo().getRevocationTime().after(
                                         caRevInfo.getRevocationTime()))
                                 {
                                     replaced = true;
                                 }
                             }
 
-                            if(replaced)
+                            if (replaced)
                             {
                                 CertRevocationInfo newRevInfo;
-                                if(caRevInfo.getReason() == CRLReason.CA_COMPROMISE)
+                                if (caRevInfo.getReason() == CRLReason.CA_COMPROMISE)
                                 {
                                     newRevInfo = caRevInfo;
                                 }
@@ -903,14 +903,14 @@ public class OcspServer
                     }
                 }
 
-                if(childAuditEvent != null)
+                if (childAuditEvent != null)
                 {
                     String certprofile = certStatusInfo.getCertprofile();
                     String auditCertType;
-                    if(certprofile != null)
+                    if (certprofile != null)
                     {
                         auditCertType = auditOption.getCertprofileMapping().get(certprofile);
-                        if(auditCertType == null)
+                        if (auditCertType == null)
                         {
                             auditCertType = certprofile;
                         }
@@ -926,7 +926,7 @@ public class OcspServer
                 // certStatusInfo could not be null in any case, since at least one store
                 // is configured
                 Date thisUpdate = certStatusInfo.getThisUpdate();
-                if(thisUpdate == null)
+                if (thisUpdate == null)
                 {
                     thisUpdate = new Date();
                 }
@@ -949,7 +949,7 @@ public class OcspServer
                     case UNKNOWN:
                     case IGNORE:
                         couldCacheInfo = false;
-                        if(responderOption.getMode() == OCSPMode.RFC2560)
+                        if (responderOption.getMode() == OCSPMode.RFC2560)
                         {
                             bcCertStatus = new UnknownStatus();
                         }
@@ -966,7 +966,7 @@ public class OcspServer
                         ASN1GeneralizedTime revTime = new ASN1GeneralizedTime(
                                 revInfo.getRevocationTime());
                         org.bouncycastle.asn1.x509.CRLReason _reason = null;
-                        if(responseOption.isIncludeRevReason())
+                        if (responseOption.isIncludeRevReason())
                         {
                             _reason = org.bouncycastle.asn1.x509.CRLReason.lookup(
                                     revInfo.getReason().getCode());
@@ -975,7 +975,7 @@ public class OcspServer
                         bcCertStatus = new RevokedStatus(_revInfo);
 
                         Date invalidityDate = revInfo.getInvalidityTime();
-                        if(responseOption.isIncludeInvalidityDate()
+                        if (responseOption.isIncludeInvalidityDate()
                                 && invalidityDate != null
                                 && invalidityDate.equals(revTime) == false)
                         {
@@ -987,7 +987,7 @@ public class OcspServer
                 }
 
                 byte[] certHash = certStatusInfo.getCertHash();
-                if(certHash != null)
+                if (certHash != null)
                 {
                     ASN1ObjectIdentifier hashAlgoOid =
                             new ASN1ObjectIdentifier(certStatusInfo.getCertHashAlgo().getOid());
@@ -1002,13 +1002,13 @@ public class OcspServer
                     } catch (IOException e)
                     {
                         final String message = "answer() bcCertHash.getEncoded";
-                        if(LOG.isErrorEnabled())
+                        if (LOG.isErrorEnabled())
                         {
                             LOG.error(LogUtil.buildExceptionLogFormat(message),
                                     e.getClass().getName(), e.getMessage());
                         }
                         LOG.debug(message, e);
-                        if(childAuditEvent != null)
+                        if (childAuditEvent != null)
                         {
                             fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                                     "CertHash.getEncoded() with IOException");
@@ -1023,7 +1023,7 @@ public class OcspServer
                     extensions.add(extension);
                 }
 
-                if(certStatusInfo.getArchiveCutOff() != null)
+                if (certStatusInfo.getArchiveCutOff() != null)
                 {
                     Extension extension = new Extension(
                             OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff,
@@ -1034,17 +1034,17 @@ public class OcspServer
                 }
 
                 String certStatusText;
-                if(bcCertStatus instanceof UnknownStatus)
+                if (bcCertStatus instanceof UnknownStatus)
                 {
                     certStatusText = "unknown";
                 }
-                else if(bcCertStatus instanceof RevokedStatus)
+                else if (bcCertStatus instanceof RevokedStatus)
                 {
                     certStatusText = unknownAsRevoked
                             ? "unknown_as_revoked"
                             : "revoked";
                 }
-                else if(bcCertStatus == null)
+                else if (bcCertStatus == null)
                 {
                     certStatusText = "good";
                 }
@@ -1053,20 +1053,20 @@ public class OcspServer
                     certStatusText = "should-not-happen";
                 }
 
-                if(childAuditEvent != null)
+                if (childAuditEvent != null)
                 {
                     childAuditEvent.setLevel(AuditLevel.INFO);
                     childAuditEvent.setStatus(AuditStatus.SUCCESSFUL);
                     childAuditEvent.addEventData(new AuditEventData("certStatus", certStatusText));
                 }
 
-                if(LOG.isDebugEnabled())
+                if (LOG.isDebugEnabled())
                 {
                     StringBuilder sb = new StringBuilder();
                     sb.append("certHashAlgo: ").append(certID.getHashAlgOID().getId()).append(", ");
 
                     String hexCertHash = null;
-                    if(certHash != null)
+                    if (certHash != null)
                     {
                         hexCertHash = Hex.toHexString(certHash).toUpperCase();
                     }
@@ -1084,38 +1084,38 @@ public class OcspServer
                 }
 
                 Extensions extns = null;
-                if(CollectionUtil.isNotEmpty(extensions))
+                if (CollectionUtil.isNotEmpty(extensions))
                 {
                     extns = new Extensions(extensions.toArray(new Extension[0]));
                 }
                 basicOcspBuilder.addResponse(certID, bcCertStatus, thisUpdate, nextUpdate, extns);
                 cacheThisUpdate = Math.max(cacheThisUpdate, thisUpdate.getTime());
-                if(nextUpdate != null)
+                if (nextUpdate != null)
                 {
                     cacheNextUpdate = Math.min(cacheNextUpdate, nextUpdate.getTime());
                 }
             }
 
-            if(includeExtendedRevokeExtension)
+            if (includeExtendedRevokeExtension)
             {
                 responseExtensions.add(
                         new Extension(ObjectIdentifiers.id_pkix_ocsp_extendedRevoke, true,
                                 DERNull.INSTANCE.getEncoded()));
             }
 
-            if(CollectionUtil.isNotEmpty(responseExtensions))
+            if (CollectionUtil.isNotEmpty(responseExtensions))
             {
                 basicOcspBuilder.setResponseExtensions(
                         new Extensions(responseExtensions.toArray(new Extension[0])));
             }
 
             ConcurrentContentSigner concurrentSigner = null;
-            if(responderOption.getMode() != OCSPMode.RFC2560)
+            if (responderOption.getMode() != OCSPMode.RFC2560)
             {
                 extensionType = ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs;
                 criticalExtensionOIDs.remove(extensionType);
                 Extension ext = request.getExtension(extensionType);
-                if(ext != null)
+                if (ext != null)
                 {
                     ASN1Sequence preferredSigAlgs =
                             ASN1Sequence.getInstance(ext.getParsedValue());
@@ -1123,12 +1123,12 @@ public class OcspServer
                 }
             }
 
-            if(CollectionUtil.isNotEmpty(criticalExtensionOIDs))
+            if (CollectionUtil.isNotEmpty(criticalExtensionOIDs))
             {
                 return createUnsuccessfullOCSPResp(OcspResponseStatus.malformedRequest);
             }
 
-            if(concurrentSigner == null)
+            if (concurrentSigner == null)
             {
                 concurrentSigner = signer.getFirstSigner();
             }
@@ -1137,18 +1137,18 @@ public class OcspServer
             try
             {
                 singleSigner = concurrentSigner.borrowContentSigner();
-            }catch(NoIdleSignerException e)
+            } catch (NoIdleSignerException e)
             {
                 return createUnsuccessfullOCSPResp(OcspResponseStatus.tryLater);
             }
 
             X509CertificateHolder[] certsInResp;
             EmbedCertsMode certsMode = responseOption.getEmbedCertsMode();
-            if(certsMode == null || certsMode == EmbedCertsMode.SIGNER)
+            if (certsMode == null || certsMode == EmbedCertsMode.SIGNER)
             {
                 certsInResp = new X509CertificateHolder[]{signer.getBcCertificate()};
             }
-            else if(certsMode == EmbedCertsMode.SIGNER_AND_CA)
+            else if (certsMode == EmbedCertsMode.SIGNER_AND_CA)
             {
                 certsInResp = signer.getBcCertificateChain();
             }
@@ -1165,13 +1165,13 @@ public class OcspServer
             } catch (OCSPException e)
             {
                 final String message = "answer() basicOcspBuilder.build";
-                if(LOG.isErrorEnabled())
+                if (LOG.isErrorEnabled())
                 {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                             e.getMessage());
                 }
                 LOG.debug(message, e);
-                if(auditEvent != null)
+                if (auditEvent != null)
                 {
                     fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                             "BasicOCSPRespBuilder.build() with OCSPException");
@@ -1188,10 +1188,10 @@ public class OcspServer
                 OCSPResp ocspResp = ocspRespBuilder.build(
                         OcspResponseStatus.successfull.getStatus(), basicOcspResp);
 
-                if(couldCacheInfo)
+                if (couldCacheInfo)
                 {
                     ResponseCacheInfo cacheInfo = new ResponseCacheInfo(cacheThisUpdate);
-                    if(cacheNextUpdate != Long.MAX_VALUE)
+                    if (cacheNextUpdate != Long.MAX_VALUE)
                     {
                         cacheInfo.setNextUpdate(cacheNextUpdate);
                     }
@@ -1204,13 +1204,13 @@ public class OcspServer
             } catch (OCSPException e)
             {
                 final String message = "answer() ocspRespBuilder.build";
-                if(LOG.isErrorEnabled())
+                if (LOG.isErrorEnabled())
                 {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                             e.getMessage());
                 }
                 LOG.debug(message, e);
-                if(auditEvent != null)
+                if (auditEvent != null)
                 {
                     fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                             "OCSPRespBuilder.build() with OCSPException");
@@ -1218,17 +1218,17 @@ public class OcspServer
                 return createUnsuccessfullOCSPResp(OcspResponseStatus.internalError);
             }
 
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
             final String message = "Throwable";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                         t.getMessage());
             }
             LOG.debug(message, t);
 
-            if(auditEvent != null)
+            if (auditEvent != null)
             {
                 fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                         "internal error");
@@ -1252,7 +1252,7 @@ public class OcspServer
         HealthCheckResult result = new HealthCheckResult("OCSPResponder");
         boolean healthy = true;
 
-        for(CertStatusStore store : responder.getStores())
+        for (CertStatusStore store : responder.getStores())
         {
             boolean storeHealthy = store.isHealthy();
             healthy &= storeHealthy;
@@ -1280,17 +1280,17 @@ public class OcspServer
             final AuditStatus status,
             final String message)
     {
-        if(level != null)
+        if (level != null)
         {
             auditEvent.setLevel(level);
         }
 
-        if(status != null)
+        if (status != null)
         {
             auditEvent.setStatus(status);
         }
 
-        if(message != null)
+        if (message != null)
         {
             auditEvent.addEventData(new AuditEventData("messsage", message));
         }
@@ -1302,17 +1302,17 @@ public class OcspServer
             final AuditStatus status,
             final String message)
     {
-        if(level != null)
+        if (level != null)
         {
             auditEvent.setLevel(level);
         }
 
-        if(status != null)
+        if (status != null)
         {
             auditEvent.setStatus(status);
         }
 
-        if(message != null)
+        if (message != null)
         {
             auditEvent.addEventData(new AuditEventData("messsage", message));
         }
@@ -1322,7 +1322,7 @@ public class OcspServer
             final AuditServiceRegister auditServiceRegister)
     {
         this.auditServiceRegister = auditServiceRegister;
-        for(CertStatusStore store : stores.values())
+        for (CertStatusStore store : stores.values())
         {
             store.setAuditServiceRegister(auditServiceRegister);
         }
@@ -1335,13 +1335,13 @@ public class OcspServer
         AuditService auditService = (auditServiceRegister == null)
                 ? null
                 : auditServiceRegister.getAuditService();
-        if(auditService != null)
+        if (auditService != null)
         {
             PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());
             auditEvent.setUserId("OCSP-SYSTEM");
             auditEvent.setEventType(eventType);
             auditEvent.setAffectedResource("CORE");
-            if(successfull)
+            if (successfull)
             {
                 auditEvent.setStatus(AuditStatus.SUCCESSFUL.name());
                 auditEvent.setLevel(AuditLevel.INFO);
@@ -1362,19 +1362,19 @@ public class OcspServer
         X509Certificate[] explicitCertificateChain = null;
 
         X509Certificate explicitResponderCert = null;
-        if(m.getCert() != null)
+        if (m.getCert() != null)
         {
             explicitResponderCert = parseCert(m.getCert());
         }
 
-        if(explicitResponderCert != null)
+        if (explicitResponderCert != null)
         {
             Set<X509Certificate> caCerts = null;
-            if(m.getCaCerts() != null)
+            if (m.getCaCerts() != null)
             {
                 caCerts = new HashSet<>();
 
-                for(FileOrValueType certConf : m.getCaCerts().getCaCert())
+                for (FileOrValueType certConf : m.getCaCerts().getCaCert())
                 {
                     caCerts.add(parseCert(certConf));
                 }
@@ -1388,7 +1388,7 @@ public class OcspServer
 
         List<String> sigAlgos = m.getAlgorithms().getAlgorithm();
         List<ConcurrentContentSigner> singleSigners = new ArrayList<>(sigAlgos.size());
-        for(String sigAlgo : sigAlgos)
+        for (String sigAlgo : sigAlgos)
         {
             try
             {
@@ -1425,7 +1425,7 @@ public class OcspServer
 
         Source source = conf.getSource();
         CertStatusStore store;
-        if(source.getDbStore() != null)
+        if (source.getDbStore() != null)
         {
             DbStoreType dbStoreConf = source.getDbStore();
             datasourceName = dbStoreConf.getDatasource();
@@ -1436,16 +1436,16 @@ public class OcspServer
                 Set<X509Certificate> includeIssuers = null;
                 Set<X509Certificate> excludeIssuers = null;
 
-                if(dbStoreConf.getCacerts() != null)
+                if (dbStoreConf.getCacerts() != null)
                 {
                     IncludesFileOrValueType includes = dbStoreConf.getCacerts().getIncludes();
-                    if(includes != null)
+                    if (includes != null)
                     {
                         includeIssuers = parseCerts(includes.getInclude());
                     }
 
                     ExcludesFileOrValueType excludes = dbStoreConf.getCacerts().getExcludes();
-                    if(excludes != null)
+                    if (excludes != null)
                     {
                         excludeIssuers = parseCerts(excludes.getExclude());
                     }
@@ -1466,12 +1466,12 @@ public class OcspServer
             store.setUnknownSerialAsGood(
                     getBoolean(conf.isUnknownSerialAsGood(), false));
         }
-        else if(source.getCrlStore() != null)
+        else if (source.getCrlStore() != null)
         {
             CrlStoreType crlStoreConf = source.getCrlStore();
             X509Certificate caCert = parseCert(crlStoreConf.getCaCert());
             X509Certificate crlIssuerCert = null;
-            if(crlStoreConf.getIssuerCert() != null)
+            if (crlStoreConf.getIssuerCert() != null)
             {
                 crlIssuerCert = parseCert(crlStoreConf.getIssuerCert());
             }
@@ -1485,10 +1485,10 @@ public class OcspServer
             crlStore.setUseUpdateDatesFromCRL(
                     getBoolean(crlStoreConf.isUseUpdateDatesFromCRL(), true));
             boolean caRevoked = getBoolean(crlStoreConf.isCaRevoked(), false);
-            if(caRevoked)
+            if (caRevoked)
             {
                 XMLGregorianCalendar caRevTime = crlStoreConf.getCaRevocationTime();
-                if(caRevTime == null)
+                if (caRevTime == null)
                 {
                     throw new InvalidConfException("caRevocationTime is not specified");
                 }
@@ -1503,7 +1503,7 @@ public class OcspServer
             store.setUnknownSerialAsGood(
                     getBoolean(conf.isUnknownSerialAsGood(), true));
         }
-        else if(source.getCustomStore() != null)
+        else if (source.getCustomStore() != null)
         {
             CustomStoreType customStoreConf = source.getCustomStore();
             String className = customStoreConf.getClassName();
@@ -1515,12 +1515,12 @@ public class OcspServer
             {
                 Class<?> clazz = Class.forName(className);
                 instance = clazz.newInstance();
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 throw new InvalidConfException(e.getMessage(), e);
             }
 
-            if(instance instanceof CertStatusStore)
+            if (instance instanceof CertStatusStore)
             {
                 store = (CertStatusStore) instance;
             }
@@ -1540,10 +1540,10 @@ public class OcspServer
                 getBoolean(conf.isIncludeCrlID(), true));
 
         DataSourceWrapper datasource = null;
-        if(datasourceName != null)
+        if (datasourceName != null)
         {
             datasource = datasources.get(datasourceName);
-            if(datasource == null)
+            if (datasource == null)
             {
                 throw new InvalidConfException("datasource named '" + datasourceName
                         + "'  not definied");
@@ -1552,7 +1552,7 @@ public class OcspServer
         try
         {
             store.init(statusStoreConf, datasource);
-        }catch(CertStatusStoreException e)
+        } catch (CertStatusStoreException e)
         {
             throw new InvalidConfException("CertStatusStoreException of store " + conf.getName()
                     + ":" + e.getMessage(), e);
@@ -1568,33 +1568,33 @@ public class OcspServer
     throws OCSPException, CertificateParsingException, InvalidAlgorithmParameterException,
     OcspResponderException
     {
-        if(request.isSigned() == false)
+        if (request.isSigned() == false)
         {
-            if(requestOption.isSignatureRequired() == false)
+            if (requestOption.isSignatureRequired() == false)
             {
                 return null;
             }
 
             String message = "signature in request required";
             LOG.warn(message);
-            if(auditEvent != null)
+            if (auditEvent != null)
             {
                 fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
             }
             return createUnsuccessfullOCSPResp(OcspResponseStatus.sigRequired);
         }
 
-        if(requestOption.isValidateSignature() == false)
+        if (requestOption.isValidateSignature() == false)
         {
             return null;
         }
 
         X509CertificateHolder[] certs = request.getCerts();
-        if(certs == null || certs.length < 1)
+        if (certs == null || certs.length < 1)
         {
             String message = "no certificate found in request to verify the signature";
             LOG.warn(message);
-            if(auditEvent != null)
+            if (auditEvent != null)
             {
                 fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
             }
@@ -1605,11 +1605,11 @@ public class OcspServer
         try
         {
             cvp = securityFactory.getContentVerifierProvider(certs[0]);
-        }catch(InvalidKeyException e)
+        } catch (InvalidKeyException e)
         {
             LOG.warn("securityFactory.getContentVerifierProvider, InvalidKeyException: {}",
                     e.getMessage());
-            if(auditEvent != null)
+            if (auditEvent != null)
             {
                 fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED, e.getMessage());
             }
@@ -1617,11 +1617,11 @@ public class OcspServer
         }
 
         boolean sigValid = request.isSignatureValid(cvp);
-        if(sigValid == false)
+        if (sigValid == false)
         {
             String message = "request signature is invalid";
             LOG.warn(message);
-            if(auditEvent != null)
+            if (auditEvent != null)
             {
                 fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
             }
@@ -1630,14 +1630,14 @@ public class OcspServer
 
         // validate the certPath
         Date referenceTime = new Date();
-        if(canBuildCertpath(certs, requestOption, referenceTime))
+        if (canBuildCertpath(certs, requestOption, referenceTime))
         {
             return null;
         }
 
         String message = "could not build certpath for the request's signer certifcate";
         LOG.warn(message);
-        if(auditEvent != null)
+        if (auditEvent != null)
         {
             fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
         }
@@ -1661,15 +1661,15 @@ public class OcspServer
         Set<Certificate> certstore = new HashSet<>();
 
         Set<CertWithEncoded> trustAnchors = requestOption.getTrustAnchors();
-        for(CertWithEncoded m : trustAnchors)
+        for (CertWithEncoded m : trustAnchors)
         {
             certstore.add(m.getCertificate());
         }
 
         final int n = certsInReq.length;
-        if(n > 1)
+        if (n > 1)
         {
-            for(int i = 1; i < n; i++)
+            for (int i = 1; i < n; i++)
             {
                 Certificate c;
                 try
@@ -1684,7 +1684,7 @@ public class OcspServer
         }
 
         Set<X509Certificate> configuredCerts = requestOption.getCerts();
-        if(CollectionUtil.isNotEmpty(configuredCerts))
+        if (CollectionUtil.isNotEmpty(configuredCerts))
         {
             certstore.addAll(requestOption.getCerts());
         }
@@ -1693,17 +1693,17 @@ public class OcspServer
         CertpathValidationModel model = requestOption.getCertpathValidationModel();
 
         Date now = new Date();
-        if(model == null || model == CertpathValidationModel.PKIX )
+        if (model == null || model == CertpathValidationModel.PKIX )
         {
-            for(X509Certificate m : certpath)
+            for (X509Certificate m : certpath)
             {
-                if(m.getNotBefore().after(now) || m.getNotAfter().before(now))
+                if (m.getNotBefore().after(now) || m.getNotAfter().before(now))
                 {
                     return false;
                 }
             }
         }
-        else if(model == CertpathValidationModel.CHAIN)
+        else if (model == CertpathValidationModel.CHAIN)
         {
             // do nothing
         }
@@ -1712,12 +1712,12 @@ public class OcspServer
             throw new RuntimeException("invalid CertpathValidationModel " + model.name());
         }
 
-        for(int i = certpath.length - 1; i >= 0; i--)
+        for (int i = certpath.length - 1; i >= 0; i--)
         {
             X509Certificate targetCert = certpath[i];
-            for(CertWithEncoded m : trustAnchors)
+            for (CertWithEncoded m : trustAnchors)
             {
-                if(m.equalsCert(targetCert))
+                if (m.equalsCert(targetCert))
                 {
                     return true;
                 }
@@ -1741,7 +1741,7 @@ public class OcspServer
     throws InvalidConfException
     {
         Set<X509Certificate> certs = new HashSet<>(certConfs.size());
-        for(FileOrValueType m : certConfs)
+        for (FileOrValueType m : certConfs)
         {
             certs.add(parseCert(m));
         }
@@ -1752,7 +1752,7 @@ public class OcspServer
             final FileOrValueType conf)
     throws IOException
     {
-        if(conf.getFile() != null)
+        if (conf.getFile() != null)
         {
             return new FileInputStream(IoUtil.expandFilepath(conf.getFile()));
         }
@@ -1766,7 +1766,7 @@ public class OcspServer
             final FileOrPlainValueType conf)
     throws IOException
     {
-        if(conf.getFile() != null)
+        if (conf.getFile() != null)
         {
             return new FileInputStream(IoUtil.expandFilepath(conf.getFile()));
         }
@@ -1779,12 +1779,12 @@ public class OcspServer
     private static void close(
             final InputStream stream)
     {
-        if(stream != null)
+        if (stream != null)
         {
             try
             {
                 stream.close();
-            }catch(IOException e)
+            } catch (IOException e)
             {
             }
         }
@@ -1802,7 +1802,7 @@ public class OcspServer
         } catch (IOException | CertificateException e)
         {
             String msg = "could not parse certificate";
-            if(certConf.getFile() != null)
+            if (certConf.getFile() != null)
             {
                 msg += " from file " + certConf.getFile();
             }
@@ -1828,11 +1828,11 @@ public class OcspServer
             unmarshaller.setSchema(schema);
             return (OCSPServer) unmarshaller.unmarshal(
                     new File(IoUtil.expandFilepath(confFilename)));
-        } catch(SAXException e)
+        } catch (SAXException e)
         {
             throw new InvalidConfException(
                     "parse profile failed, message: " + e.getMessage(), e);
-        } catch(JAXBException e)
+        } catch (JAXBException e)
         {
             throw new InvalidConfException(
                     "parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e), e);

@@ -73,14 +73,14 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi
             final PrivateKey privateKey)
     throws InvalidKeyException
     {
-        if(privateKey instanceof P11PrivateKey == false)
+        if (privateKey instanceof P11PrivateKey == false)
         {
             throw new InvalidKeyException("privateKey is not instanceof "
                     + P11PrivateKey.class.getName());
         }
 
         String algo = privateKey.getAlgorithm();
-        if(("EC".equals(algo) || "ECDSA".equals(algo)) == false)
+        if (("EC".equals(algo) || "ECDSA".equals(algo)) == false)
         {
             throw new InvalidKeyException("privateKey is not a EC private key: " + algo);
         }
@@ -114,7 +114,7 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi
 
         try
         {
-            if(x962)
+            if (x962)
             {
                 return signingKey.CKM_ECDSA_X962(hash);
             }
@@ -123,7 +123,7 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi
                 return signingKey.CKM_ECDSA_Plain(hash);
             }
         }
-        catch(SignatureException e)
+        catch (SignatureException e)
         {
             throw e;
         }

@@ -56,7 +56,7 @@ public abstract class DynamicEnumCompleter implements XipkiCompleter
     {
         StringsCompleter delegate = new StringsCompleter();
 
-        for(String s : getEnums())
+        for (String s : getEnums())
         {
             delegate.getStrings().add(s);
         }

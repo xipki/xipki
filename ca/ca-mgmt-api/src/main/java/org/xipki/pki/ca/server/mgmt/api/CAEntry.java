@@ -74,7 +74,7 @@ public class CAEntry
         ParamUtil.assertNotBlank("name", name);
         ParamUtil.assertNotBlank("signerType", signerType);
 
-        if(expirationPeriod < 0)
+        if (expirationPeriod < 0)
         {
             throw new IllegalArgumentException(
                     "expirationPeriod is negative (" + expirationPeriod + " < 0)");
@@ -251,7 +251,7 @@ public class CAEntry
         sb.append("expirationPeriod: ").append(expirationPeriod).append(" days\n");
         sb.append("signerType: ").append(signerType).append('\n');
         sb.append("signerConf: ");
-        if(signerConf == null)
+        if (signerConf == null)
         {
             sb.append("null");
         } else
@@ -276,7 +276,7 @@ public class CAEntry
         sb.append("validityMode: ").append(validityMode).append('\n');
         sb.append("permissions: ").append(Permission.toString(permissions)).append('\n');
         sb.append("keepExpiredCerts: ");
-        if(keepExpiredCertInDays < 0)
+        if (keepExpiredCertInDays < 0)
         {
             sb.append("forever");
         } else
@@ -292,7 +292,7 @@ public class CAEntry
     protected static String toString(
             final Collection<? extends Object> tokens)
     {
-        if(CollectionUtil.isEmpty(tokens))
+        if (CollectionUtil.isEmpty(tokens))
         {
             return null;
         }
@@ -301,10 +301,10 @@ public class CAEntry
 
         int size = tokens.size();
         int idx = 0;
-        for(Object token : tokens)
+        for (Object token : tokens)
         {
             sb.append(token);
-            if(idx++ < size - 1)
+            if (idx++ < size - 1)
             {
                 sb.append(", ");
             }

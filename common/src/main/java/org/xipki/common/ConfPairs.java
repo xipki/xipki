@@ -69,7 +69,7 @@ public class ConfPairs
     public ConfPairs(
             String string)
     {
-        if(string == null || string.length() < 2)
+        if (string == null || string.length() < 2)
         {
             return;
         }
@@ -79,12 +79,12 @@ public class ConfPairs
 
         StringBuilder tokenBuilder = new StringBuilder();
 
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             char c = string.charAt(i);
-            if('\\' == c)
+            if ('\\' == c)
             {
-                if(i == n - 1)
+                if (i == n - 1)
                 {
                     throw new IllegalArgumentException("invalid ConfPairs '" + string + "'");
                 } else
@@ -92,10 +92,9 @@ public class ConfPairs
                     tokenBuilder.append(c);
                     c = string.charAt(++i);
                 }
-            }
-            else if(TOKEN_TERM == c)
+            } else if (TOKEN_TERM == c)
             {
-                if(tokenBuilder.length() > 0)
+                if (tokenBuilder.length() > 0)
                 {
                     tokens.add(tokenBuilder.toString());
                 }
@@ -107,21 +106,21 @@ public class ConfPairs
             tokenBuilder.append(c);
         }
 
-        if(tokenBuilder.length() > 0)
+        if (tokenBuilder.length() > 0)
         {
             tokens.add(tokenBuilder.toString());
         }
 
-        for(String token : tokens)
+        for (String token : tokens)
         {
             int termPosition = -1;
             n = token.length();
-            for(int i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
                 char c = token.charAt(i);
-                if('\\' == c)
+                if ('\\' == c)
                 {
-                    if(i == n - 1)
+                    if (i == n - 1)
                     {
                         throw new IllegalArgumentException("invalid ConfPairs '" + string + "'");
                     } else
@@ -129,25 +128,25 @@ public class ConfPairs
                         i++;
                     }
                 }
-                if(c == NAME_TERM)
+                if (c == NAME_TERM)
                 {
                     termPosition = i;
                     break;
                 }
             }
 
-            if(termPosition < 1)
+            if (termPosition < 1)
             {
                 throw new IllegalArgumentException("invalid ConfPair '" + token + "'");
             }
 
             tokenBuilder = new StringBuilder();
-            for(int i = 0; i < termPosition; i++)
+            for (int i = 0; i < termPosition; i++)
             {
                 char c = token.charAt(i);
-                if('\\' == c)
+                if ('\\' == c)
                 {
-                    if(i == termPosition - 1)
+                    if (i == termPosition - 1)
                     {
                         throw new IllegalArgumentException("invalid ConfPair '" + string + "'");
                     } else
@@ -163,12 +162,12 @@ public class ConfPairs
             String name = tokenBuilder.toString();
 
             tokenBuilder = new StringBuilder();
-            for(int i = termPosition + 1; i < n; i++)
+            for (int i = termPosition + 1; i < n; i++)
             {
                 char c = token.charAt(i);
-                if('\\' == c)
+                if ('\\' == c)
                 {
-                    if(i == n - 1)
+                    if (i == n - 1)
                     {
                         throw new IllegalArgumentException("invalid ConfPair '" + string + "'");
                     } else
@@ -188,17 +187,17 @@ public class ConfPairs
     private static String encodeNameOrValue(
             String s)
     {
-        if(s.indexOf(NAME_TERM) == -1 && s.indexOf(TOKEN_TERM) == -1)
+        if (s.indexOf(NAME_TERM) == -1 && s.indexOf(TOKEN_TERM) == -1)
         {
             return s;
         }
 
         final int n = s.length();
         StringBuilder sb = new StringBuilder(n + 1);
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             char c = s.charAt(i);
-            if(c == NAME_TERM || c == TOKEN_TERM)
+            if (c == NAME_TERM || c == TOKEN_TERM)
             {
                 sb.append('\\');
             }
@@ -215,8 +214,10 @@ public class ConfPairs
         ParamUtil.assertNotNull("value", value);
 
         char c = name.charAt(0);
-        if(c >= '0' && c <= '9')
+        if (c >= '0' && c <= '9')
+        {
             throw new IllegalArgumentException("name begin with " + c);
+        }
         pairs.put(name, value);
     }
 
@@ -241,25 +242,25 @@ public class ConfPairs
     {
         StringBuilder sb = new StringBuilder();
         List<String> names = new LinkedList<>();
-        for(String name : pairs.keySet())
+        for (String name : pairs.keySet())
         {
             String value = pairs.get(name);
-            if(value.length() <= 100)
+            if (value.length() <= 100)
             {
                 names.add(name);
             }
         }
         Collections.sort(names);
 
-        for(String name : pairs.keySet())
+        for (String name : pairs.keySet())
         {
-            if(names.contains(name) == false)
+            if (names.contains(name) == false)
             {
                 names.add(name);
             }
         }
 
-        for(String name : names)
+        for (String name : names)
         {
             String value = pairs.get(name);
             sb.append(encodeNameOrValue(name));
@@ -270,7 +271,7 @@ public class ConfPairs
             sb.append(TOKEN_TERM);
         }
 
-        if(sb.length() > 0)
+        if (sb.length() > 0)
         {
             sb.deleteCharAt(sb.length() - 1);
         }
@@ -293,7 +294,7 @@ public class ConfPairs
     public boolean equals(
             final Object obj)
     {
-        if(obj instanceof ConfPairs == false)
+        if (obj instanceof ConfPairs == false)
         {
             return false;
         }
@@ -302,7 +303,8 @@ public class ConfPairs
         return pairs.equals(b.pairs);
     }
 
-    public static void main(String[] args)
+    public static void main(
+            final String[] args)
     {
         try
         {
@@ -312,7 +314,7 @@ public class ConfPairs
             String encoded = pairs.getEncoded();
             System.out.println(encoded);
             pairs = new ConfPairs(encoded);
-            for(String name : pairs.getNames())
+            for (String name : pairs.getNames())
             {
                 System.out.println(name + ": " + pairs.getValue(name));
             }
@@ -321,7 +323,7 @@ public class ConfPairs
             System.out.println("--------------: '" + str + "'");
             pairs = new ConfPairs(str);
             System.out.println(pairs.getEncoded());
-            for(String name : pairs.getNames())
+            for (String name : pairs.getNames())
             {
                 System.out.println(name + ": " + pairs.getValue(name));
             }
@@ -330,7 +332,7 @@ public class ConfPairs
             System.out.println("--------------: '" + str + "'");
             pairs = new ConfPairs(str);
             System.out.println(pairs.getEncoded());
-            for(String name : pairs.getNames())
+            for (String name : pairs.getNames())
             {
                 System.out.println(name + ": " + pairs.getValue(name));
             }
@@ -339,7 +341,7 @@ public class ConfPairs
             System.out.println("--------------: '" + str + "'");
             pairs = new ConfPairs(str);
             System.out.println(pairs.getEncoded());
-            for(String name : pairs.getNames())
+            for (String name : pairs.getNames())
             {
                 System.out.println(name + ": " + pairs.getValue(name));
             }
@@ -348,7 +350,7 @@ public class ConfPairs
             System.out.println("--------------: '" + str + "'");
             pairs = new ConfPairs(str);
             System.out.println(pairs.getEncoded());
-            for(String name : pairs.getNames())
+            for (String name : pairs.getNames())
             {
                 System.out.println(name + ": " + pairs.getValue(name));
             }
@@ -357,7 +359,7 @@ public class ConfPairs
             System.out.println("--------------: '" + str + "'");
             pairs = new ConfPairs(str);
             System.out.println(pairs.getEncoded());
-            for(String name : pairs.getNames())
+            for (String name : pairs.getNames())
             {
                 System.out.println(name + ": " + pairs.getValue(name));
             }
@@ -366,11 +368,11 @@ public class ConfPairs
             System.out.println("--------------: '" + str + "'");
             pairs = new ConfPairs(str);
             System.out.println(pairs.getEncoded());
-            for(String name : pairs.getNames())
+            for (String name : pairs.getNames())
             {
                 System.out.println(name + ": " + pairs.getValue(name));
             }
-        }catch(Exception e)
+        } catch (Exception e)
         {
             e.printStackTrace();
         }

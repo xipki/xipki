@@ -116,25 +116,25 @@ public class SyslogAuditServiceImpl implements AuditService
     public void logEvent(
             final AuditEvent event)
     {
-        if(event == null)
+        if (event == null)
         {
             return;
         }
 
-        if(initialized == false)
+        if (initialized == false)
         {
             LOG.error("Syslog audit not initialiazed");
             return;
         }
 
         CharArrayWriter sb = new CharArrayWriter();
-        if(notEmpty(prefix))
+        if (notEmpty(prefix))
         {
             sb.append(prefix);
         }
 
         AuditStatus status = event.getStatus();
-        if(status == null)
+        if (status == null)
         {
             status = AuditStatus.UNDEFINED;
         }
@@ -142,7 +142,7 @@ public class SyslogAuditServiceImpl implements AuditService
         sb.append("\tstatus: ").append(status.name());
 
         long duration = event.getDuration();
-        if(duration >= 0)
+        if (duration >= 0)
         {
             sb.append("\tduration: ").append(Long.toString(duration));
         }
@@ -150,7 +150,7 @@ public class SyslogAuditServiceImpl implements AuditService
         List<AuditEventData> eventDataArray = event.getEventDatas();
         for (AuditEventData m : eventDataArray)
         {
-            if(duration >= 0 && "duration".equalsIgnoreCase(m.getName()))
+            if (duration >= 0 && "duration".equalsIgnoreCase(m.getName()))
             {
                 continue;
             }
@@ -158,7 +158,7 @@ public class SyslogAuditServiceImpl implements AuditService
         }
 
         final int n = sb.size();
-        if(n > maxMessageLength)
+        if (n > maxMessageLength)
         {
             LOG.warn("syslog message exceeds the maximal allowed length: {} > {}, ignore it",
                     n, maxMessageLength);
@@ -167,7 +167,7 @@ public class SyslogAuditServiceImpl implements AuditService
 
         SyslogMessage sm = new SyslogMessage();
         sm.setFacility(syslog.getDefaultFacility());
-        if(notEmpty(localname))
+        if (notEmpty(localname))
         {
             sm.setHostname(localname);
         }
@@ -175,7 +175,7 @@ public class SyslogAuditServiceImpl implements AuditService
         sm.setSeverity(getSeverity(event.getLevel()));
 
         Date timestamp = event.getTimestamp();
-        if(timestamp != null)
+        if (timestamp != null)
         {
             sm.setTimestamp(timestamp);
         }
@@ -197,12 +197,12 @@ public class SyslogAuditServiceImpl implements AuditService
     public void logEvent(
             final PCIAuditEvent event)
     {
-        if(event == null)
+        if (event == null)
         {
             return;
         }
 
-        if(initialized == false)
+        if (initialized == false)
         {
             LOG.error("Syslog audit not initialiazed");
             return;
@@ -210,7 +210,7 @@ public class SyslogAuditServiceImpl implements AuditService
 
         CharArrayWriter msg = event.toCharArrayWriter(prefix);
         final int n = msg.size();
-        if(n > maxMessageLength)
+        if (n > maxMessageLength)
         {
             LOG.warn("syslog message exceeds the maximal allowed length: {} > {}, ignore it",
                     n, maxMessageLength);
@@ -219,7 +219,7 @@ public class SyslogAuditServiceImpl implements AuditService
 
         SyslogMessage sm = new SyslogMessage();
         sm.setFacility(syslog.getDefaultFacility());
-        if(notEmpty(localname))
+        if (notEmpty(localname))
         {
             sm.setHostname(localname);
         }
@@ -239,7 +239,7 @@ public class SyslogAuditServiceImpl implements AuditService
 
     public void init()
     {
-        if(initialized)
+        if (initialized)
         {
             return;
         }
@@ -249,12 +249,12 @@ public class SyslogAuditServiceImpl implements AuditService
         try
         {
             MessageFormat _messageFormat;
-            if("rfc3164".equalsIgnoreCase(messageFormat)
+            if ("rfc3164".equalsIgnoreCase(messageFormat)
                     || "rfc_3164".equalsIgnoreCase(messageFormat))
             {
                 _messageFormat = MessageFormat.RFC_3164;
             }
-            else if("rfc5424".equalsIgnoreCase(messageFormat)
+            else if ("rfc5424".equalsIgnoreCase(messageFormat)
                     || "rfc_5424".equalsIgnoreCase(messageFormat))
             {
                 _messageFormat = MessageFormat.RFC_5424;
@@ -266,12 +266,12 @@ public class SyslogAuditServiceImpl implements AuditService
                 _messageFormat = MessageFormat.RFC_5424;
             }
 
-            if("udp".equalsIgnoreCase(protocol))
+            if ("udp".equalsIgnoreCase(protocol))
             {
                 syslog = new UdpSyslogMessageSender();
                 ((UdpSyslogMessageSender) syslog).setSyslogServerPort(port);
             }
-            else if("tcp".equalsIgnoreCase(protocol))
+            else if ("tcp".equalsIgnoreCase(protocol))
             {
                 syslog = new TcpSyslogMessageSender();
                 ((TcpSyslogMessageSender) syslog).setSyslogServerPort(port);
@@ -298,13 +298,13 @@ public class SyslogAuditServiceImpl implements AuditService
                 sysFacility = Facility.fromLabel(facility.toUpperCase());
             }
 
-            if(sysFacility == null)
+            if (sysFacility == null)
             {
                 LOG.warn("unknown facility, use the default one '" + DFLT_SYSLOG_FACILITY);
                 sysFacility = Facility.fromLabel(DFLT_SYSLOG_FACILITY.toUpperCase());
             }
 
-            if(sysFacility == null)
+            if (sysFacility == null)
             {
                 throw new RuntimeException("should not reach here, sysFacility is null");
             }
@@ -372,9 +372,9 @@ public class SyslogAuditServiceImpl implements AuditService
     public void setPrefix(
             final String prefix)
     {
-        if(notEmpty(prefix))
+        if (notEmpty(prefix))
         {
-            if(prefix.charAt(prefix.length() - 1) != ' ')
+            if (prefix.charAt(prefix.length() - 1) != ' ')
             this.prefix = prefix + " ";
         }
         else
@@ -411,7 +411,7 @@ public class SyslogAuditServiceImpl implements AuditService
     private Severity getSeverity(
             final AuditLevel auditLevel)
     {
-        if(auditLevel == null)
+        if (auditLevel == null)
         {
             return Severity.INFORMATIONAL;
         }

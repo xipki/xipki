@@ -82,15 +82,15 @@ public class AuditChildEvent
             final String eventDataName)
     {
         AuditEventData tbr = null;
-        for(AuditEventData ed : eventDatas)
+        for (AuditEventData ed : eventDatas)
         {
-            if(ed.getName().equals(eventDataName))
+            if (ed.getName().equals(eventDataName))
             {
                 tbr = ed;
             }
         }
 
-        if(tbr != null)
+        if (tbr != null)
         {
             eventDatas.remove(tbr);
         }
@@ -102,10 +102,10 @@ public class AuditChildEvent
             final AuditEventData eventData)
     {
         int idx = -1;
-        for(int i = 0; i < eventDatas.size(); i++)
+        for (int i = 0; i < eventDatas.size(); i++)
         {
             AuditEventData ed = eventDatas.get(i);
-            if(ed.getName().equals(eventData.getName()))
+            if (ed.getName().equals(eventData.getName()))
             {
                 idx = i;
                 break;
@@ -113,7 +113,7 @@ public class AuditChildEvent
         }
 
         AuditEventData ret = null;
-        if(idx != -1)
+        if (idx != -1)
         {
             ret = eventDatas.get(idx);
         }

@@ -100,7 +100,7 @@ public class QASystemManagerImpl implements QASystemManager
 
     public void init()
     {
-        if(StringUtil.isBlank(confFile))
+        if (StringUtil.isBlank(confFile))
         {
             LOG.error("confFile could not be null and empty");
             return;
@@ -111,18 +111,18 @@ public class QASystemManagerImpl implements QASystemManager
         {
             FileInputStream issuerConfStream = new FileInputStream(confFile);
             qaConf = parseQAConf(issuerConfStream);
-        }catch(IOException | JAXBException | SAXException e)
+        } catch (IOException | JAXBException | SAXException e)
         {
             final String message = "could not parse the QA configuration";
             String exceptionMessage;
-            if(e instanceof JAXBException)
+            if (e instanceof JAXBException)
             {
                 exceptionMessage = XMLUtil.getMessage((JAXBException) e);
             } else
             {
                 exceptionMessage = e.getMessage();
             }
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         exceptionMessage);
@@ -131,10 +131,10 @@ public class QASystemManagerImpl implements QASystemManager
             return;
         }
 
-        if(qaConf.getX509Issuers() != null)
+        if (qaConf.getX509Issuers() != null)
         {
             List<X509IssuerType> x509IssuerTypes = qaConf.getX509Issuers().getX509Issuer();
-            for(X509IssuerType issuerType : x509IssuerTypes)
+            for (X509IssuerType issuerType : x509IssuerTypes)
             {
                 byte[] certBytes;
                 try
@@ -144,7 +144,7 @@ public class QASystemManagerImpl implements QASystemManager
                 {
                     final String message = "could not read the certificate bytes of issuer "
                             + issuerType.getName();
-                    if(LOG.isErrorEnabled())
+                    if (LOG.isErrorEnabled())
                     {
                         LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                                 e.getMessage());
@@ -164,7 +164,7 @@ public class QASystemManagerImpl implements QASystemManager
                 {
                     final String message =
                             "could not parse certificate of issuer " + issuerType.getName();
-                    if(LOG.isErrorEnabled())
+                    if (LOG.isErrorEnabled())
                     {
                         LOG.error(LogUtil.buildExceptionLogFormat(message),
                                 e.getClass().getName(), e.getMessage());
@@ -178,11 +178,11 @@ public class QASystemManagerImpl implements QASystemManager
             }
         }
 
-        if(qaConf.getX509Certprofiles() != null)
+        if (qaConf.getX509Certprofiles() != null)
         {
             List<X509CertprofileType> certprofileTypes =
                     qaConf.getX509Certprofiles().getX509Certprofile();
-            for(X509CertprofileType type : certprofileTypes)
+            for (X509CertprofileType type : certprofileTypes)
             {
                 String name = type.getName();
                 try
@@ -190,10 +190,10 @@ public class QASystemManagerImpl implements QASystemManager
                     byte[] content = readData(type);
                     x509ProfileMap.put(name, new X509CertprofileQAImpl(content));
                     LOG.info("configured X509 certificate profile {}", name);
-                }catch(IOException | CertprofileException e)
+                } catch (IOException | CertprofileException e)
                 {
                     final String message = "could not parse QA certificate profile " + name;
-                    if(LOG.isErrorEnabled())
+                    if (LOG.isErrorEnabled())
                     {
                         LOG.error(LogUtil.buildExceptionLogFormat(message),
                                 e.getClass().getName(), e.getMessage());
@@ -242,7 +242,7 @@ public class QASystemManagerImpl implements QASystemManager
         JAXBElement<?> rootElement;
         try
         {
-            if(jaxbUnmarshaller == null)
+            if (jaxbUnmarshaller == null)
             {
                 JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
                 jaxbUnmarshaller = context.createUnmarshaller();
@@ -260,7 +260,7 @@ public class QASystemManagerImpl implements QASystemManager
         }
 
         Object rootType = rootElement.getValue();
-        if(rootType instanceof QAConfType)
+        if (rootType instanceof QAConfType)
         {
             return (QAConfType) rootElement.getValue();
         }
@@ -275,7 +275,7 @@ public class QASystemManagerImpl implements QASystemManager
     throws IOException
     {
         byte[] data = fileOrValue.getValue();
-        if(data == null)
+        if (data == null)
         {
             data = IoUtil.read(fileOrValue.getFile());
         }

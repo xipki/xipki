@@ -75,14 +75,14 @@ public class EnrollCertRequestType
     {
         String id = requestEntry.getId();
         ASN1Integer certReqId = requestEntry.getCertReq().getCertReqId();
-        for(EnrollCertRequestEntryType re : requestEntries)
+        for (EnrollCertRequestEntryType re : requestEntries)
         {
-            if(re.getId().equals(id))
+            if (re.getId().equals(id))
             {
                 return false;
             }
 
-            if(re.getCertReq().getCertReqId().equals(certReqId))
+            if (re.getCertReq().getCertReqId().equals(certReqId))
             {
                 return false;
             }

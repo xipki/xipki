@@ -95,12 +95,12 @@ public class TargetDigestRetriever
                 singleSelectStmt.setInt(1, caId);
                 inArraySelectStmt.setInt(1, caId);
                 rangeSelectStmt.setInt(1, caId);
-            }catch(SQLException e)
+            } catch (SQLException e)
             {
                 try
                 {
                     closeCA();
-                }catch(Throwable t)
+                } catch (Throwable t)
                 {
                 }
                 throw datasource.translate(null, e);
@@ -120,7 +120,7 @@ public class TargetDigestRetriever
         @Override
         public void run()
         {
-            while(stop == false)
+            while (stop == false)
             {
                 try
                 {
@@ -128,7 +128,7 @@ public class TargetDigestRetriever
                     try
                     {
                         Map<Long, DbDigestEntry> resp = query(bundle);
-                        for(Long serialNumber : resp.keySet())
+                        for (Long serialNumber : resp.keySet())
                         {
                             bundle.addTargetCert(serialNumber, resp.get(serialNumber));
                         }
@@ -155,13 +155,13 @@ public class TargetDigestRetriever
             int numSkipped = bundle.getNumSkipped();
             long minSerialNumber = 0;
             long maxSerialNumber = 0;
-            for(Long m : serialNumbers)
+            for (Long m : serialNumbers)
             {
-                if(minSerialNumber > m)
+                if (minSerialNumber > m)
                 {
                     minSerialNumber = m;
                 }
-                if(maxSerialNumber < m)
+                if (maxSerialNumber < m)
                 {
                     maxSerialNumber = m;
                 }
@@ -170,7 +170,7 @@ public class TargetDigestRetriever
             Map<Long, DbDigestEntry> certsInB;
             long serialDiff = maxSerialNumber - minSerialNumber;
 
-            if(serialDiff < (numSkipped + numPerSelect) * 2)
+            if (serialDiff < (numSkipped + numPerSelect) * 2)
             {
                 ResultSet rs = null;
                 try
@@ -180,7 +180,7 @@ public class TargetDigestRetriever
                     rs = rangeSelectStmt.executeQuery();
 
                     certsInB = buildResult(rs, serialNumbers);
-                } catch(SQLException e)
+                } catch (SQLException e)
                 {
                     throw datasource.translate(inArrayCertsSql, e);
                 }
@@ -191,7 +191,7 @@ public class TargetDigestRetriever
             } else
             {
                 boolean batchSupported = datasource.getDatabaseType() != DatabaseType.H2;
-                if(batchSupported && n == numPerSelect)
+                if (batchSupported && n == numPerSelect)
                 {
                     certsInB = getCertsViaInArraySelectInB(inArraySelectStmt,
                             serialNumbers);
@@ -250,7 +250,7 @@ public class TargetDigestRetriever
         singleCertSql = datasource.createFetchFirstSelectSQL(coreSql, 1);
 
         StringBuilder sb = new StringBuilder("?");
-        for(int i = 1; i < numPerSelect; i++)
+        for (int i = 1; i < numPerSelect; i++)
         {
             sb.append(",?");
         }
@@ -286,18 +286,18 @@ public class TargetDigestRetriever
 
         try
         {
-            for(int i = 0; i < numThreads; i++)
+            for (int i = 0; i < numThreads; i++)
             {
                 Retriever retriever = new Retriever(datasource.getConnection());
                 retrievers.add(retriever);
             }
 
             executor = Executors.newFixedThreadPool(numThreads);
-            for(Runnable runnable : retrievers)
+            for (Runnable runnable : retrievers)
             {
                 executor.execute(runnable);
             }
-        } catch(Exception e)
+        } catch (Exception e)
         {
             close();
         }
@@ -315,7 +315,7 @@ public class TargetDigestRetriever
         try
         {
             rs = stmt.executeQuery(sql);
-            while(rs.next())
+            while (rs.next())
             {
                 int id = rs.getInt("ID");
                 String b64Cert = rs.getString("CERT");
@@ -362,10 +362,10 @@ public class TargetDigestRetriever
     {
         Map<Long, DbDigestEntry> ret = new HashMap<>(serialNumbers.size());
 
-        for(Long serialNumber : serialNumbers)
+        for (Long serialNumber : serialNumbers)
         {
             DbDigestEntry certB = getSingleCert(singleSelectStmt, serialNumber);
-            if(certB != null)
+            if (certB != null)
             {
                 ret.put(serialNumber, certB);
             }
@@ -380,7 +380,7 @@ public class TargetDigestRetriever
     throws DataAccessException
     {
         final int n = serialNumbers.size();
-        if(n != numPerSelect)
+        if (n != numPerSelect)
         {
             throw new IllegalArgumentException("size of serialNumbers is not '" + numPerSelect
                     + "': " + n);
@@ -392,14 +392,14 @@ public class TargetDigestRetriever
 
         try
         {
-            for(int i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
                 batchSelectStmt.setLong(i+2, serialNumbers.get(i));
             }
 
             rs = batchSelectStmt.executeQuery();
             return buildResult(rs, serialNumbers);
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw datasource.translate(inArrayCertsSql, e);
         }
@@ -416,10 +416,10 @@ public class TargetDigestRetriever
     {
         Map<Long, DbDigestEntry> ret = new HashMap<>(serialNumbers.size());
 
-        while(rs.next())
+        while (rs.next())
         {
             long serialNumber = rs.getLong(dbControl.getColSerialNumber());
-            if(serialNumbers.contains(serialNumber) == false)
+            if (serialNumbers.contains(serialNumber) == false)
             {
                 continue;
             }
@@ -428,12 +428,12 @@ public class TargetDigestRetriever
             Integer revReason = null;
             Long revTime = null;
             Long revInvTime = null;
-            if(revoked)
+            if (revoked)
             {
                 revReason = rs.getInt(dbControl.getColRevReason());
                 revTime = rs.getLong(dbControl.getColRevTime());
                 revInvTime = rs.getLong(dbControl.getColRevInvTime());
-                if(revInvTime == 0)
+                if (revInvTime == 0)
                 {
                     revInvTime = null;
                 }
@@ -457,7 +457,7 @@ public class TargetDigestRetriever
         {
             singleSelectStmt.setLong(2, serialNumber);
             rs = singleSelectStmt.executeQuery();
-            if(rs.next() == false)
+            if (rs.next() == false)
             {
                 return null;
             }
@@ -465,12 +465,12 @@ public class TargetDigestRetriever
             Integer revReason = null;
             Long revTime = null;
             Long revInvTime = null;
-            if(revoked)
+            if (revoked)
             {
                 revReason = rs.getInt(dbControl.getColRevReason());
                 revTime = rs.getLong(dbControl.getColRevTime());
                 revInvTime = rs.getLong(dbControl.getColRevInvTime());
-                if(revInvTime == 0)
+                if (revInvTime == 0)
                 {
                     revInvTime = null;
                 }
@@ -478,7 +478,7 @@ public class TargetDigestRetriever
             String sha1Fp = rs.getString(dbControl.getColCerthash());
             return new DbDigestEntry(serialNumber,
                     revoked, revReason, revTime, revInvTime, sha1Fp);
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw datasource.translate(singleCertSql, e);
         } finally
@@ -490,7 +490,7 @@ public class TargetDigestRetriever
     public void startCA(int caId)
     throws DataAccessException
     {
-        for(Retriever m : retrievers)
+        for (Retriever m : retrievers)
         {
             m.startCA(caId);
         }
@@ -498,7 +498,7 @@ public class TargetDigestRetriever
 
     public void closeCA()
     {
-        for(Retriever m : retrievers)
+        for (Retriever m : retrievers)
         {
             m.closeCA();
         }
@@ -508,22 +508,22 @@ public class TargetDigestRetriever
             final Statement ps,
             final ResultSet rs)
     {
-        if(ps != null)
+        if (ps != null)
         {
             try
             {
                 ps.close();
-            }catch(Exception e)
+            } catch (Exception e)
             {
             }
         }
 
-        if(rs != null)
+        if (rs != null)
         {
             try
             {
                 rs.close();
-            }catch(Exception e)
+            } catch (Exception e)
             {
             }
         }

@@ -108,7 +108,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
         {
             ParamUtil.assertNotNull("key", key);
             ParamUtil.assertNotNull("chain", chain);
-            if(chain.length < 1)
+            if (chain.length < 1)
             {
                 throw new IllegalArgumentException("chain does not contain any certificate");
             }
@@ -153,12 +153,12 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
             Set<String> allKeyLabels = new HashSet<>();
             Set<String> duplicatedKeyLabels = new HashSet<>();
 
-            for(P11SlotIdentifier slotId: slotIds)
+            for (P11SlotIdentifier slotId: slotIds)
             {
                 String[] keyLabels = p11Servcie.getKeyLabels(slotId);
-                for(String keyLabel : keyLabels)
+                for (String keyLabel : keyLabels)
                 {
-                    if(allKeyLabels.contains(keyLabel))
+                    if (allKeyLabels.contains(keyLabel))
                     {
                         duplicatedKeyLabels.add(keyLabel);
                     }
@@ -168,20 +168,20 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
                 keyLabelsMap.put(slotId, keyLabels);
             }
 
-            for(P11SlotIdentifier slotId: slotIds)
+            for (P11SlotIdentifier slotId: slotIds)
             {
                 String[] keyLabels = keyLabelsMap.get(slotId);
-                for(String keyLabel : keyLabels)
+                for (String keyLabel : keyLabels)
                 {
                     String alias = keyLabel;
-                    if(duplicatedKeyLabels.contains(keyLabel))
+                    if (duplicatedKeyLabels.contains(keyLabel))
                     {
                         alias += "-slot" + slotId.getSlotIndex();
                     }
 
                     P11KeyIdentifier keyId = new P11KeyIdentifier(keyLabel);
                     X509Certificate[] chain = p11Servcie.getCertificates(slotId, keyId);
-                    if(chain != null && chain.length > 0)
+                    if (chain != null && chain.length > 0)
                     {
                         P11PrivateKey key = new P11PrivateKey(p11Servcie, slotId, keyId);
 
@@ -210,7 +210,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
             final char[] password)
     throws NoSuchAlgorithmException, UnrecoverableKeyException
     {
-        if(keyCerts.containsKey(alias) == false)
+        if (keyCerts.containsKey(alias) == false)
         {
             return null;
         }
@@ -222,7 +222,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
     public Certificate[] engineGetCertificateChain(
             final String alias)
     {
-        if(keyCerts.containsKey(alias) == false)
+        if (keyCerts.containsKey(alias) == false)
         {
             return null;
         }
@@ -234,7 +234,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
     public Certificate engineGetCertificate(
             final String alias)
     {
-        if(keyCerts.containsKey(alias) == false)
+        if (keyCerts.containsKey(alias) == false)
         {
             return null;
         }
@@ -246,7 +246,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
     public Date engineGetCreationDate(
             final String alias)
     {
-        if(keyCerts.containsKey(alias) == false)
+        if (keyCerts.containsKey(alias) == false)
         {
             return null;
         }
@@ -314,7 +314,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
     public boolean engineIsKeyEntry(
             final String alias)
     {
-        if(keyCerts.containsKey(alias) == false)
+        if (keyCerts.containsKey(alias) == false)
         {
             return false;
         }
@@ -326,7 +326,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
     public boolean engineIsCertificateEntry(
             final String alias)
     {
-        if(keyCerts.containsKey(alias) == false)
+        if (keyCerts.containsKey(alias) == false)
         {
             return false;
         }
@@ -338,9 +338,9 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
     public String engineGetCertificateAlias(
             final Certificate cert)
     {
-        for(String alias : keyCerts.keySet())
+        for (String alias : keyCerts.keySet())
         {
-            if(keyCerts.get(alias).getCertificate().equals(cert))
+            if (keyCerts.get(alias).getCertificate().equals(cert))
             {
                 return alias;
             }

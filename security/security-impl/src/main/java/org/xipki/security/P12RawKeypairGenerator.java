@@ -54,7 +54,7 @@ public abstract class P12RawKeypairGenerator
     public P12RawKeypairGenerator()
     throws Exception
     {
-        if(Security.getProvider("BC") == null)
+        if (Security.getProvider("BC") == null)
         {
             Security.addProvider(new BouncyCastleProvider());
         }
@@ -76,12 +76,12 @@ public abstract class P12RawKeypairGenerator
             {
                 new ASN1ObjectIdentifier(curveNameOrOid);
                 isOid = true;
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 isOid = false;
             }
 
-            if(isOid)
+            if (isOid)
             {
                 this.curveOid = new ASN1ObjectIdentifier(curveNameOrOid);
                 this.curveName =  KeyUtil.getCurveName(this.curveOid);
@@ -90,7 +90,7 @@ public abstract class P12RawKeypairGenerator
             {
                 this.curveName = curveNameOrOid;
                 this.curveOid =  KeyUtil.getCurveOID(this.curveName);
-                if(this.curveOid == null)
+                if (this.curveOid == null)
                 {
                     throw new IllegalArgumentException("no OID is defined for the curve "
                             + this.curveName);

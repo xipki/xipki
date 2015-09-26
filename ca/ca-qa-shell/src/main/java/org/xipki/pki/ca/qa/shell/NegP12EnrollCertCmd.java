@@ -69,7 +69,7 @@ public class NegP12EnrollCertCmd extends NegEnrollCertCmd
             final SignatureAlgoControl signatureAlgoControl)
     throws SignerException
     {
-        if(password == null)
+        if (password == null)
         {
             password = new String(readPassword());
         }

@@ -99,7 +99,7 @@ class CmpResponder
         PKIHeader reqHeader = message.getHeader();
         ASN1OctetString tid = reqHeader.getTransactionID();
 
-        if(tid == null)
+        if (tid == null)
         {
             byte[] randomBytes = randomTransactionId();
             tid = new DEROctetString(randomBytes);
@@ -117,7 +117,7 @@ class CmpResponder
 
         PKIHeader respHeader = respHeaderBuilder.build();
 
-        if(type != PKIBody.TYPE_GEN_MSG)
+        if (type != PKIBody.TYPE_GEN_MSG)
         {
             ErrorMsgContent emc = new ErrorMsgContent(
                     new PKIStatusInfo(PKIStatus.rejection,
@@ -133,12 +133,12 @@ class CmpResponder
         InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
 
         InfoTypeAndValue itv = null;
-        if(itvs != null && itvs.length > 0)
+        if (itvs != null && itvs.length > 0)
         {
-            for(InfoTypeAndValue m : itvs)
+            for (InfoTypeAndValue m : itvs)
             {
                 ASN1ObjectIdentifier itvType = m.getInfoType();
-                if(ObjectIdentifiers.id_xipki_cm_cmpGenmsg.equals(itvType))
+                if (ObjectIdentifiers.id_xipki_cm_cmpGenmsg.equals(itvType))
                 {
                     itv = m;
                     break;
@@ -146,7 +146,7 @@ class CmpResponder
             }
         }
 
-        if(itv == null)
+        if (itv == null)
         {
             final String statusMessage = String.format(
                     "PKIBody type %s is only supported with the sub-knownTypes",
@@ -164,11 +164,11 @@ class CmpResponder
             {
                 ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
                 asn1Code = ASN1Integer.getInstance(seq.getObjectAt(0));
-                if(seq.size() > 1)
+                if (seq.size() > 1)
                 {
                     reqValue = seq.getObjectAt(1);
                 }
-            }catch(IllegalArgumentException e)
+            } catch (IllegalArgumentException e)
             {
                 final String statusMessage = "invalid value of the InfoTypeAndValue for "
                         + ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId();
@@ -209,7 +209,7 @@ class CmpResponder
                         slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
                         KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
                         keyId = keyIdentifier.getKeyId();
-                    }catch(IllegalArgumentException e)
+                    } catch (IllegalArgumentException e)
                     {
                         final String statusMessage = "invalid PSOTemplate";
                         return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest,
@@ -219,27 +219,27 @@ class CmpResponder
 
                 byte[] signature;
 
-                if(XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_PLAIN == action)
+                if (XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_PLAIN == action)
                 {
                     signature = p11CryptService.CKM_ECDSA_Plain(psoMessage, slot, keyId);
                 }
-                else if(XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_X962 == action)
+                else if (XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_X962 == action)
                 {
                     signature = p11CryptService.CKM_ECDSA_X962(psoMessage, slot, keyId);
                 }
-                else if(XipkiCmpConstants.ACTION_RP11_PSO_DSA_PLAIN == action)
+                else if (XipkiCmpConstants.ACTION_RP11_PSO_DSA_PLAIN == action)
                 {
                     signature = p11CryptService.CKM_DSA_Plain(psoMessage, slot, keyId);
                 }
-                else if(XipkiCmpConstants.ACTION_RP11_PSO_DSA_X962 == action)
+                else if (XipkiCmpConstants.ACTION_RP11_PSO_DSA_X962 == action)
                 {
                     signature = p11CryptService.CKM_DSA_X962(psoMessage, slot, keyId);
                 }
-                else if(XipkiCmpConstants.ACTION_RP11_PSO_RSA_X509 == action)
+                else if (XipkiCmpConstants.ACTION_RP11_PSO_RSA_X509 == action)
                 {
                     signature = p11CryptService.CKM_RSA_X509(psoMessage, slot, keyId);
                 }
-                else if(XipkiCmpConstants.ACTION_RP11_PSO_RSA_PKCS == action)
+                else if (XipkiCmpConstants.ACTION_RP11_PSO_RSA_PKCS == action)
                 {
                     signature = p11CryptService.CKM_RSA_PKCS(psoMessage, slot, keyId);
                 }
@@ -263,7 +263,7 @@ class CmpResponder
                     slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
                     KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
                     keyId = keyIdentifier.getKeyId();
-                } catch(IllegalArgumentException e)
+                } catch (IllegalArgumentException e)
                 {
                     final String statusMessage = "invalid SlotAndKeyIdentifier";
                     return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest,
@@ -271,11 +271,11 @@ class CmpResponder
                 }
 
                 byte[] encodeCertOrKey;
-                if(XipkiCmpConstants.ACTION_RP11_GET_CERTIFICATE == action)
+                if (XipkiCmpConstants.ACTION_RP11_GET_CERTIFICATE == action)
                 {
                     encodeCertOrKey = p11CryptService.getCertificate(slot, keyId).getEncoded();
                 }
-                else if(XipkiCmpConstants.ACTION_RP11_GET_PUBLICKEY== action)
+                else if (XipkiCmpConstants.ACTION_RP11_GET_PUBLICKEY== action)
                 {
                     encodeCertOrKey = p11CryptService.getPublicKey(slot, keyId).getEncoded();
                 }
@@ -292,7 +292,7 @@ class CmpResponder
                 P11SlotIdentifier[] slotIds = p11CryptService.getSlotIdentifiers();
 
                 ASN1EncodableVector vector = new ASN1EncodableVector();
-                for(P11SlotIdentifier slotId : slotIds)
+                for (P11SlotIdentifier slotId : slotIds)
                 {
                     vector.add(new SlotIdentifier(slotId));
                 }
@@ -305,7 +305,7 @@ class CmpResponder
                 String[] keyLabels = p11CryptService.getKeyLabels(slotId.getSlotId());
 
                 ASN1EncodableVector vector = new ASN1EncodableVector();
-                for(String keyLabel : keyLabels)
+                for (String keyLabel : keyLabels)
                 {
                     vector.add(new DERUTF8String(keyLabel));
                 }
@@ -322,7 +322,7 @@ class CmpResponder
 
             ASN1EncodableVector v = new ASN1EncodableVector();
             v.add(new ASN1Integer(action));
-            if(respItvInfoValue != null)
+            if (respItvInfoValue != null)
             {
                 v.add(respItvInfoValue);
             }

@@ -50,15 +50,15 @@ class MyFilenameFilter implements FilenameFilter
     static
     {
         String ignoreRegex = System.getProperty("org.xipki.console.ignore.regex");
-        if(ignoreRegex == null)
+        if (ignoreRegex == null)
         {
-            if(Configuration.isWindows() == false)
+            if (Configuration.isWindows() == false)
             {
                 ignoreRegex = "\\..*";
             }
         }
 
-        if(ignoreRegex == null || ignoreRegex.isEmpty())
+        if (ignoreRegex == null || ignoreRegex.isEmpty())
         {
             ignorePattern = null;
         }
@@ -73,7 +73,7 @@ class MyFilenameFilter implements FilenameFilter
             final File dir,
             final String name)
     {
-        if(ignorePattern == null)
+        if (ignorePattern == null)
         {
             return true;
         }

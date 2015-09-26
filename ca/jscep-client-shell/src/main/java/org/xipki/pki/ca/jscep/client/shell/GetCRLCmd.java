@@ -75,7 +75,7 @@ public class GetCRLCmd extends ClientCmd
                 getIdentityKey(),
                 cert.getIssuerX500Principal(),
                 cert.getSerialNumber());
-        if(crl == null)
+        if (crl == null)
         {
             throw new CmdFailure("received no CRL from server");
         }

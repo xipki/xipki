@@ -87,11 +87,11 @@ public class PSOTemplate extends ASN1Object
             final SlotAndKeyIdentifer slotAndKeyIdentifier,
             final byte[] message)
     {
-        if(slotAndKeyIdentifier == null)
+        if (slotAndKeyIdentifier == null)
         {
             throw new IllegalArgumentException("slotAndKeyIdentifier could not be null");
         }
-        if(message == null)
+        if (message == null)
         {
             throw new IllegalArgumentException("message could not be null");
         }

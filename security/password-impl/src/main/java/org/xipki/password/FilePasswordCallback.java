@@ -57,7 +57,7 @@ public class FilePasswordCallback implements PasswordCallback
             final String prompt)
     throws PasswordResolverException
     {
-        if(passwordFile == null)
+        if (passwordFile == null)
         {
             throw new PasswordResolverException("please initialize me first");
         }
@@ -68,37 +68,37 @@ public class FilePasswordCallback implements PasswordCallback
         {
             reader = new BufferedReader(new FileReader(expandFilepath(passwordFile)));
             String line;
-            while((line = reader.readLine()) != null)
+            while ((line = reader.readLine()) != null)
             {
                 line = line.trim();
-                if(StringUtil.isNotBlank(line) && line.startsWith("#") == false)
+                if (StringUtil.isNotBlank(line) && line.startsWith("#") == false)
                 {
                     passwordHint = line;
                     break;
                 }
             }
-        }catch(IOException e)
+        } catch (IOException e)
         {
             throw new PasswordResolverException("could not read file " + passwordFile, e);
         }finally
         {
-            if(reader != null)
+            if (reader != null)
             {
                 try
                 {
                     reader.close();
-                }catch(IOException e)
+                } catch (IOException e)
                 {
                 }
             }
         }
 
-        if(passwordHint == null)
+        if (passwordHint == null)
         {
             throw new PasswordResolverException("no password is specified in file " + passwordFile);
         }
 
-        if(StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordResolver.__OBFUSCATE))
+        if (StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordResolver.__OBFUSCATE))
         {
             return OBFPasswordResolver.deobfuscate(passwordHint).toCharArray();
         }
@@ -113,7 +113,7 @@ public class FilePasswordCallback implements PasswordCallback
             final String conf)
     throws PasswordResolverException
     {
-        if(StringUtil.isBlank(conf))
+        if (StringUtil.isBlank(conf))
         {
             throw new PasswordResolverException("conf could not be null or empty");
         }

@@ -90,7 +90,7 @@ public abstract class AbstractOCSPStatusCmd extends XipkiOsgiCommandSupport
         ASN1ObjectIdentifier hashAlgoOid = AlgorithmUtil.getHashAlg(hashAlgo);
         RequestOptions options = new RequestOptions();
         options.setUseNonce(usenonce.booleanValue());
-        if(nonceLen != null)
+        if (nonceLen != null)
         {
             options.setNonceLen(nonceLen);
         }
@@ -98,7 +98,7 @@ public abstract class AbstractOCSPStatusCmd extends XipkiOsgiCommandSupport
         options.setSignRequest(signRequest.booleanValue());
         options.setUseHttpGetForRequest(useHttpGetForSmallRequest.booleanValue());
 
-        if(isNotEmpty(prefSigAlgs))
+        if (isNotEmpty(prefSigAlgs))
         {
             options.setPreferredSignatureAlgorithms2(prefSigAlgs);
         }

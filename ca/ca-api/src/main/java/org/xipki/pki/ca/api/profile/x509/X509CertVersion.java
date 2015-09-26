@@ -61,9 +61,9 @@ public enum X509CertVersion
     public static X509CertVersion getInstance(
             final int version)
     {
-        for(X509CertVersion m : values())
+        for (X509CertVersion m : values())
         {
-            if(m.version == version)
+            if (m.version == version)
             {
                 return m;
             }

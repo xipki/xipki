@@ -918,7 +918,7 @@ implements HessianCAManager
     public String getAttribute(
             final String attributeKey)
     {
-        if("version".equalsIgnoreCase(attributeKey))
+        if ("version".equalsIgnoreCase(attributeKey))
         {
             return "1";
         }
@@ -1057,17 +1057,17 @@ implements HessianCAManager
                 ? null
                 : certs[0];
 
-        if(clientCert == null)
+        if (clientCert == null)
         {
             String msg = "not authorizated (not in TLS session)";
             LOG.info(msg);
             throw new ServletException(msg);
         }
 
-        if(trustedUserCerts.contains(clientCert) == false)
+        if (trustedUserCerts.contains(clientCert) == false)
         {
             String msg = "untrusted TLS client certificate ";
-            if(LOG.isInfoEnabled())
+            if (LOG.isInfoEnabled())
             {
                 LOG.info(msg + "with subject='{}', issuer='{}' and serialNumber={}",
                         new Object[]{clientCert.getSubjectX500Principal().getName(),
@@ -1082,13 +1082,13 @@ implements HessianCAManager
 
     public void initialize()
     {
-        if(truststoreFile == null)
+        if (truststoreFile == null)
         {
             LOG.error("truststoreFile is not set");
             return;
         }
 
-        if(truststorePassword == null)
+        if (truststorePassword == null)
         {
             LOG.error("truststorePassword is not set");
             return;
@@ -1099,7 +1099,7 @@ implements HessianCAManager
             String storePath = IoUtil.expandFilepath(truststoreFile);
 
             KeyStore keyStore;
-            if(truststoreProvider == null || truststoreProvider.trim().length() == 0)
+            if (truststoreProvider == null || truststoreProvider.trim().length() == 0)
             {
                 keyStore = KeyStore.getInstance(truststoreType);
             }
@@ -1109,7 +1109,7 @@ implements HessianCAManager
             }
 
             char[] password;
-            if(securityFactory.getPasswordResolver() == null)
+            if (securityFactory.getPasswordResolver() == null)
             {
                 password = truststorePassword.toCharArray();
             }
@@ -1121,15 +1121,15 @@ implements HessianCAManager
             keyStore.load(new FileInputStream(storePath), password);
             Enumeration<String> aliases = keyStore.aliases();
 
-            while(aliases.hasMoreElements())
+            while (aliases.hasMoreElements())
             {
                 String alias = aliases.nextElement();
                 Certificate cert = keyStore.getCertificate(alias);
-                if(cert instanceof X509Certificate)
+                if (cert instanceof X509Certificate)
                 {
                     X509Certificate x509Cert = (X509Certificate) cert;
                     trustedUserCerts.add(x509Cert);
-                    if(LOG.isInfoEnabled())
+                    if (LOG.isInfoEnabled())
                     {
                         LOG.info("added trusted user certificate with subject='{}', issuer='{}'"
                                 + " and serialNumber={}",
@@ -1139,10 +1139,10 @@ implements HessianCAManager
                     }
                 }
             }
-        }catch(Exception e)
+        } catch (Exception e)
         {
             final String message = "could not initialize CAManagerServlet";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());

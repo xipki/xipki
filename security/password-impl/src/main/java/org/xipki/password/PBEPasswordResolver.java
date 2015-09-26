@@ -63,9 +63,9 @@ public class PBEPasswordResolver implements SinglePasswordResolver
     {
         synchronized (masterPasswordLock)
         {
-            if(masterPassword == null)
+            if (masterPassword == null)
             {
-                if(masterPwdCallback == null)
+                if (masterPwdCallback == null)
                 {
                     throw new PasswordResolverException(
                             "masterPasswordCallback is not initialized");
@@ -108,7 +108,7 @@ public class PBEPasswordResolver implements SinglePasswordResolver
     {
         byte[] bytes = Base64.decode(passwordHint.substring("PBE:".length()), Base64.DEFAULT);
         int n = bytes.length;
-        if(n <= 16 && n != 0)
+        if (n <= 16 && n != 0)
         {
             throw new PasswordResolverException("invalid length of the encrypted password");
         }
@@ -128,7 +128,7 @@ public class PBEPasswordResolver implements SinglePasswordResolver
         }
 
         char[] ret = new char[pwd.length];
-        for(int i = 0; i < pwd.length; i++)
+        for (int i = 0; i < pwd.length; i++)
         {
             ret[i] = (char) pwd[i];
         }
@@ -165,13 +165,13 @@ public class PBEPasswordResolver implements SinglePasswordResolver
     public void setMasterPasswordCallback(
             String masterPasswordCallback)
     {
-        if(masterPasswordCallback == null)
+        if (masterPasswordCallback == null)
         {
             return;
         }
 
         masterPasswordCallback = masterPasswordCallback.trim();
-        if(StringUtil.isBlank(masterPasswordCallback))
+        if (StringUtil.isBlank(masterPasswordCallback))
         {
             return;
         }
@@ -180,7 +180,7 @@ public class PBEPasswordResolver implements SinglePasswordResolver
         String conf = null;
 
         int delimIndex = masterPasswordCallback.indexOf(' ');
-        if(delimIndex == -1)
+        if (delimIndex == -1)
         {
             className = masterPasswordCallback;
         }
@@ -194,7 +194,7 @@ public class PBEPasswordResolver implements SinglePasswordResolver
         {
             Class<?> clazz = Class.forName(className);
             Object obj = clazz.newInstance();
-            if(obj instanceof PasswordCallback)
+            if (obj instanceof PasswordCallback)
             {
                 ((PasswordCallback) obj).init(conf);
                 this.masterPwdCallback = (PasswordCallback) obj;
@@ -206,7 +206,7 @@ public class PBEPasswordResolver implements SinglePasswordResolver
                         + masterPasswordCallback);
             }
 
-        }catch(Exception e)
+        } catch (Exception e)
         {
             throw new IllegalArgumentException("invalid masterPasswordCallback configuration "
                     + masterPasswordCallback

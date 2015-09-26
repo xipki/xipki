@@ -134,7 +134,7 @@ public class XmlX509CertprofileUtil
             JAXBElement<?> rootElement;
             try
             {
-                if(jaxbUnmarshaller == null)
+                if (jaxbUnmarshaller == null)
                 {
                     JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
                     jaxbUnmarshaller = context.createUnmarshaller();
@@ -153,11 +153,11 @@ public class XmlX509CertprofileUtil
                 {
                 }
             }
-            catch(SAXException e)
+            catch (SAXException e)
             {
                 throw new CertprofileException(
                         "parse profile failed, message: " + e.getMessage(), e);
-            } catch(JAXBException e)
+            } catch (JAXBException e)
             {
                 throw new CertprofileException(
                         "parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e),
@@ -165,7 +165,7 @@ public class XmlX509CertprofileUtil
             }
 
             Object rootType = rootElement.getValue();
-            if(rootType instanceof X509ProfileType)
+            if (rootType instanceof X509ProfileType)
             {
                 return (X509ProfileType) rootElement.getValue();
             }
@@ -181,30 +181,30 @@ public class XmlX509CertprofileUtil
     {
         List<CertificatePolicyInformationType> policyPairs =
                 type.getCertificatePolicyInformation();
-        if(CollectionUtil.isEmpty(policyPairs))
+        if (CollectionUtil.isEmpty(policyPairs))
         {
             return null;
         }
 
         List<CertificatePolicyInformation> policies =
                 new ArrayList<CertificatePolicyInformation>(policyPairs.size());
-        for(CertificatePolicyInformationType policyPair : policyPairs)
+        for (CertificatePolicyInformationType policyPair : policyPairs)
         {
             List<CertificatePolicyQualifier> qualifiers = null;
 
             PolicyQualifiers policyQualifiers = policyPair.getPolicyQualifiers();
-            if(policyQualifiers != null)
+            if (policyQualifiers != null)
             {
                 List<JAXBElement<String>> cpsUriOrUserNotice =
                         policyQualifiers.getCpsUriOrUserNotice();
 
                 qualifiers = new ArrayList<CertificatePolicyQualifier>(cpsUriOrUserNotice.size());
-                for(JAXBElement<String> element : cpsUriOrUserNotice)
+                for (JAXBElement<String> element : cpsUriOrUserNotice)
                 {
                     String elementValue = element.getValue();
                     CertificatePolicyQualifier qualifier = null;
                     String elementName = element.getName().getLocalPart();
-                    if("cpsUri".equals(elementName))
+                    if ("cpsUri".equals(elementName))
                     {
                         qualifier = CertificatePolicyQualifier.getInstanceForCpsUri(elementValue);
                     }
@@ -235,7 +235,7 @@ public class XmlX509CertprofileUtil
         CertPolicyId[] issuerDomainPolicy = new CertPolicyId[n];
         CertPolicyId[] subjectDomainPolicy = new CertPolicyId[n];
 
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             PolicyIdMappingType mapping = mappings.get(i);
             ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(
@@ -255,7 +255,7 @@ public class XmlX509CertprofileUtil
     {
         GeneralSubtree[] permitted = buildGeneralSubtrees(type.getPermittedSubtrees());
         GeneralSubtree[] excluded = buildGeneralSubtrees(type.getExcludedSubtrees());
-        if(permitted == null && excluded == null)
+        if (permitted == null && excluded == null)
         {
             return null;
         }
@@ -266,7 +266,7 @@ public class XmlX509CertprofileUtil
             final GeneralSubtreesType subtrees)
     throws CertprofileException
     {
-        if(subtrees == null || CollectionUtil.isEmpty(subtrees.getBase()))
+        if (subtrees == null || CollectionUtil.isEmpty(subtrees.getBase()))
         {
             return null;
         }
@@ -274,7 +274,7 @@ public class XmlX509CertprofileUtil
         List<GeneralSubtreeBaseType> list = subtrees.getBase();
         final int n = list.size();
         GeneralSubtree[] ret = new GeneralSubtree[n];
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             ret[i] = buildGeneralSubtree(list.get(i));
         }
@@ -287,24 +287,24 @@ public class XmlX509CertprofileUtil
     throws CertprofileException
     {
         GeneralName base = null;
-        if(type.getDirectoryName() != null)
+        if (type.getDirectoryName() != null)
         {
             base = new GeneralName(X509Util.reverse(
                     new X500Name(type.getDirectoryName())));
         }
-        else if(type.getDNSName() != null)
+        else if (type.getDNSName() != null)
         {
             base = new GeneralName(GeneralName.dNSName, type.getDNSName());
         }
-        else if(type.getIpAddress() != null)
+        else if (type.getIpAddress() != null)
         {
             base = new GeneralName(GeneralName.iPAddress, type.getIpAddress());
         }
-        else if(type.getRfc822Name() != null)
+        else if (type.getRfc822Name() != null)
         {
             base = new GeneralName(GeneralName.rfc822Name, type.getRfc822Name());
         }
-        else if(type.getUri() != null)
+        else if (type.getUri() != null)
         {
             base = new GeneralName(GeneralName.uniformResourceIdentifier, type.getUri());
         }
@@ -315,7 +315,7 @@ public class XmlX509CertprofileUtil
         }
 
         Integer i = type.getMinimum();
-        if(i != null && i < 0)
+        if (i != null && i < 0)
         {
             throw new CertprofileException("negative minimum is not allowed: " + i);
         }
@@ -325,7 +325,7 @@ public class XmlX509CertprofileUtil
                 : BigInteger.valueOf(i.intValue());
 
         i = type.getMaximum();
-        if(i != null && i < 0)
+        if (i != null && i < 0)
         {
             throw new CertprofileException("negative maximum is not allowed: " + i);
         }
@@ -342,20 +342,20 @@ public class XmlX509CertprofileUtil
     throws CertprofileException
     {
         Integer requireExplicitPolicy = type.getRequireExplicitPolicy();
-        if(requireExplicitPolicy != null && requireExplicitPolicy < 0)
+        if (requireExplicitPolicy != null && requireExplicitPolicy < 0)
         {
             throw new CertprofileException(
                     "negative requireExplicitPolicy is not allowed: " + requireExplicitPolicy);
         }
 
         Integer inhibitPolicyMapping = type.getInhibitPolicyMapping();
-        if(inhibitPolicyMapping != null && inhibitPolicyMapping < 0)
+        if (inhibitPolicyMapping != null && inhibitPolicyMapping < 0)
         {
             throw new CertprofileException(
                     "negative inhibitPolicyMapping is not allowed: " + inhibitPolicyMapping);
         }
 
-        if(requireExplicitPolicy == null && inhibitPolicyMapping == null)
+        if (requireExplicitPolicy == null && inhibitPolicyMapping == null)
         {
             return null;
         }
@@ -381,48 +381,48 @@ public class XmlX509CertprofileUtil
             final GeneralNameType name)
     {
         Set<GeneralNameMode> ret = new HashSet<>();
-        if(name.getOtherName() != null)
+        if (name.getOtherName() != null)
         {
             List<OidWithDescType> list = name.getOtherName().getType();
             Set<ASN1ObjectIdentifier> set = new HashSet<>();
-            for(OidWithDescType entry : list)
+            for (OidWithDescType entry : list)
             {
                 set.add(new ASN1ObjectIdentifier(entry.getValue()));
             }
             ret.add(new GeneralNameMode(GeneralNameTag.otherName, set));
         }
 
-        if(name.getRfc822Name() != null)
+        if (name.getRfc822Name() != null)
         {
             ret.add(new GeneralNameMode(GeneralNameTag.rfc822Name));
         }
 
-        if(name.getDNSName() != null)
+        if (name.getDNSName() != null)
         {
             ret.add(new GeneralNameMode(GeneralNameTag.dNSName));
         }
 
-        if(name.getDirectoryName() != null)
+        if (name.getDirectoryName() != null)
         {
             ret.add(new GeneralNameMode(GeneralNameTag.directoryName));
         }
 
-        if(name.getEdiPartyName() != null)
+        if (name.getEdiPartyName() != null)
         {
             ret.add(new GeneralNameMode(GeneralNameTag.ediPartyName));
         }
 
-        if(name.getUniformResourceIdentifier() != null)
+        if (name.getUniformResourceIdentifier() != null)
         {
             ret.add(new GeneralNameMode(GeneralNameTag.uniformResourceIdentifier));
         }
 
-        if(name.getIPAddress() != null)
+        if (name.getIPAddress() != null)
         {
             ret.add(new GeneralNameMode(GeneralNameTag.iPAddress));
         }
 
-        if(name.getRegisteredID() != null)
+        if (name.getRegisteredID() != null)
         {
             ret.add(new GeneralNameMode(GeneralNameTag.registeredID));
         }
@@ -433,15 +433,15 @@ public class XmlX509CertprofileUtil
     private static Set<Range> buildParametersMap(
             final RangesType ranges)
     {
-        if(ranges == null)
+        if (ranges == null)
         {
             return null;
         }
 
         Set<Range> ret = new HashSet<>();
-        for(RangeType range : ranges.getRange())
+        for (RangeType range : ranges.getRange())
         {
-            if(range.getMin() != null || range.getMax() != null)
+            if (range.getMin() != null || range.getMax() != null)
             {
                 ret.add(new Range(range.getMin(), range.getMax()));
             }
@@ -454,14 +454,14 @@ public class XmlX509CertprofileUtil
     throws CertprofileException
     {
         Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = new HashMap<>();
-        for(AlgorithmType type : keyAlgos.getAlgorithm())
+        for (AlgorithmType type : keyAlgos.getAlgorithm())
         {
             List<OidWithDescType> algIds = type.getAlgorithm();
             List<ASN1ObjectIdentifier> oids = new ArrayList<>(algIds.size());
-            for(OidWithDescType algId : algIds)
+            for (OidWithDescType algId : algIds)
             {
                 ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(algId.getValue());
-                if(keyAlgorithms.containsKey(oid))
+                if (keyAlgorithms.containsKey(oid))
                 {
                     throw new CertprofileException(
                             "duplicate definition of keyAlgorithm " + oid.getId());
@@ -470,7 +470,7 @@ public class XmlX509CertprofileUtil
             }
 
             KeyParametersOption keyParamsOption = convertKeyParametersOption(type);
-            for(ASN1ObjectIdentifier oid : oids)
+            for (ASN1ObjectIdentifier oid : oids)
             {
                 keyAlgorithms.put(oid, keyParamsOption);
             }
@@ -484,10 +484,10 @@ public class XmlX509CertprofileUtil
     {
         // Extension controls
         Map<ASN1ObjectIdentifier, ExtensionControl> controls = new HashMap<>();
-        for(ExtensionType m : extensionsType.getExtension())
+        for (ExtensionType m : extensionsType.getExtension())
         {
             ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
-            if(controls.containsKey(oid))
+            if (controls.containsKey(oid))
             {
                 throw new CertprofileException(
                         "duplicated definition of extension " + oid.getId());
@@ -503,13 +503,13 @@ public class XmlX509CertprofileUtil
     public static List<ASN1ObjectIdentifier> toOIDList(
             final List<OidWithDescType> oidWithDescTypes)
     {
-        if(CollectionUtil.isEmpty(oidWithDescTypes))
+        if (CollectionUtil.isEmpty(oidWithDescTypes))
         {
             return null;
         }
 
         List<ASN1ObjectIdentifier> oids = new LinkedList<>();
-        for(OidWithDescType type : oidWithDescTypes)
+        for (OidWithDescType type : oidWithDescTypes)
         {
             oids.add(new ASN1ObjectIdentifier(type.getValue()));
         }
@@ -522,7 +522,7 @@ public class XmlX509CertprofileUtil
         List<UsageType> usages = extConf.getUsage();
         Set<KeyUsageControl> controls = new HashSet<>();
 
-        for(UsageType m : usages)
+        for (UsageType m : usages)
         {
             boolean required = m.isRequired();
             switch(m.getValue())
@@ -569,7 +569,7 @@ public class XmlX509CertprofileUtil
         List<Usage> usages = extConf.getUsage();
         Set<ExtKeyUsageControl> controls = new HashSet<>();
 
-        for(Usage m : usages)
+        for (Usage m : usages)
         {
             ExtKeyUsageControl usage = new ExtKeyUsageControl(
                     new ASN1ObjectIdentifier(m.getValue()), m.isRequired());
@@ -583,22 +583,22 @@ public class XmlX509CertprofileUtil
             final ExtensionsType extensionsType)
     throws CertprofileException
     {
-        if(extensionsType == null)
+        if (extensionsType == null)
         {
             return null;
         }
 
         Map<ASN1ObjectIdentifier, ExtensionValue> map = new HashMap<>();
 
-        for(ExtensionType m : extensionsType.getExtension())
+        for (ExtensionType m : extensionsType.getExtension())
         {
-            if(m.getValue() == null || m.getValue().getAny() instanceof ConstantExtValue == false)
+            if (m.getValue() == null || m.getValue().getAny() instanceof ConstantExtValue == false)
             {
                 continue;
             }
 
             ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
-            if(Extension.subjectAlternativeName.equals(oid)
+            if (Extension.subjectAlternativeName.equals(oid)
                     || Extension.subjectInfoAccess.equals(oid)
                     || Extension.biometricInfo.equals(oid))
             {
@@ -620,7 +620,7 @@ public class XmlX509CertprofileUtil
             map.put(oid, extension);
         }
 
-        if(CollectionUtil.isEmpty(map))
+        if (CollectionUtil.isEmpty(map))
         {
             return null;
         }
@@ -631,13 +631,13 @@ public class XmlX509CertprofileUtil
     public static Set<ASN1ObjectIdentifier> toOIDSet(
             final List<OidWithDescType> oidWithDescTypes)
     {
-        if(CollectionUtil.isEmpty(oidWithDescTypes))
+        if (CollectionUtil.isEmpty(oidWithDescTypes))
         {
             return null;
         }
 
         Set<ASN1ObjectIdentifier> oids = new HashSet<>();
-        for(OidWithDescType type : oidWithDescTypes)
+        for (OidWithDescType type : oidWithDescTypes)
         {
             oids.add(new ASN1ObjectIdentifier(type.getValue()));
         }
@@ -648,26 +648,26 @@ public class XmlX509CertprofileUtil
             final AlgorithmType type)
     throws CertprofileException
     {
-        if(type.getParameters() == null || type.getParameters().getAny() == null)
+        if (type.getParameters() == null || type.getParameters().getAny() == null)
         {
             return KeyParametersOption.allowAll;
         }
 
         Object paramsObj = type.getParameters().getAny();
-        if(paramsObj instanceof ECParameters)
+        if (paramsObj instanceof ECParameters)
         {
             ECParameters params = (ECParameters) paramsObj;
             KeyParametersOption.ECParamatersOption option =
                     new KeyParametersOption.ECParamatersOption();
 
-            if(params.getCurves() != null)
+            if (params.getCurves() != null)
             {
                 Curves curves = params.getCurves();
                 Set<ASN1ObjectIdentifier> curveOids = toOIDSet(curves.getCurve());
                 option.setCurveOids(curveOids);
             }
 
-            if(params.getPointEncodings() != null)
+            if (params.getPointEncodings() != null)
             {
                 List<Byte> bytes = params.getPointEncodings().getPointEncoding();
                 Set<Byte> pointEncodings = new HashSet<>(bytes);
@@ -676,7 +676,7 @@ public class XmlX509CertprofileUtil
 
             return option;
         }
-        else if(paramsObj instanceof RSAParameters)
+        else if (paramsObj instanceof RSAParameters)
         {
             RSAParameters params = (RSAParameters) paramsObj;
             KeyParametersOption.RSAParametersOption option =
@@ -687,7 +687,7 @@ public class XmlX509CertprofileUtil
 
             return option;
         }
-        else if(paramsObj instanceof RSAPSSParameters)
+        else if (paramsObj instanceof RSAPSSParameters)
         {
             RSAPSSParameters params = (RSAPSSParameters) paramsObj;
             KeyParametersOption.RSAPSSParametersOption option =
@@ -698,7 +698,7 @@ public class XmlX509CertprofileUtil
 
             return option;
         }
-        else if(paramsObj instanceof DSAParameters)
+        else if (paramsObj instanceof DSAParameters)
         {
             DSAParameters params = (DSAParameters) paramsObj;
             KeyParametersOption.DSAParametersOption option =
@@ -712,7 +712,7 @@ public class XmlX509CertprofileUtil
 
             return option;
         }
-        else if(paramsObj instanceof DHParameters)
+        else if (paramsObj instanceof DHParameters)
         {
             DHParameters params = (DHParameters) paramsObj;
             KeyParametersOption.DHParametersOption option =
@@ -726,7 +726,7 @@ public class XmlX509CertprofileUtil
 
             return option;
         }
-        else if(paramsObj instanceof GostParameters)
+        else if (paramsObj instanceof GostParameters)
         {
             GostParameters params = (GostParameters) paramsObj;
             KeyParametersOption.GostParametersOption option =
@@ -753,7 +753,7 @@ public class XmlX509CertprofileUtil
     public static final DirectoryStringType convertDirectoryStringType(
             final org.xipki.pki.ca.certprofile.x509.jaxb.DirectoryStringType jaxbType)
     {
-        if(jaxbType == null)
+        if (jaxbType == null)
         {
             return null;
         }
@@ -776,7 +776,7 @@ public class XmlX509CertprofileUtil
     public static final StringType convertStringType(
             final org.xipki.pki.ca.certprofile.x509.jaxb.StringType jaxbType)
     {
-        if(jaxbType == null)
+        if (jaxbType == null)
         {
             return null;
         }

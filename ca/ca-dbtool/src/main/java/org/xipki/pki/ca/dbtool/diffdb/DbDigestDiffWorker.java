@@ -84,7 +84,7 @@ public class DbDigestDiffWorker extends DbPortWorker
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         boolean validRef = false;
-        if(refDirname == null)
+        if (refDirname == null)
         {
             validRef = (refDbConfFile != null);
         } else
@@ -92,32 +92,32 @@ public class DbDigestDiffWorker extends DbPortWorker
             validRef = (refDbConfFile == null);
         }
 
-        if(validRef == false)
+        if (validRef == false)
         {
             throw new IllegalArgumentException(
                     "Exactly one of refDirname and refDbConffile must be not null");
         }
 
         File f = new File(reportDirName);
-        if(f.exists() == false)
+        if (f.exists() == false)
         {
             f.mkdirs();
         }
         else
         {
-            if(f.isDirectory() == false)
+            if (f.isDirectory() == false)
             {
                 throw new IOException(reportDirName + " is not a folder");
             }
 
-            if(f.canWrite() == false)
+            if (f.canWrite() == false)
             {
                 throw new IOException(reportDirName + " is not writable");
             }
         }
 
         String[] children = f.list();
-        if(children != null && children.length > 0)
+        if (children != null && children.length > 0)
         {
             throw new IOException(reportDirName + " is not empty");
         }
@@ -127,7 +127,7 @@ public class DbDigestDiffWorker extends DbPortWorker
         this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
 
         this.revokedOnly = revokedOnly;
-        if(refDirname != null)
+        if (refDirname != null)
         {
             this.refDirname = refDirname;
             this.refDatasource = null;
@@ -155,7 +155,7 @@ public class DbDigestDiffWorker extends DbPortWorker
         try
         {
             DbDigestDiff diff;
-            if(refDirname != null)
+            if (refDirname != null)
             {
                 diff = DbDigestDiff.getInstanceForDirRef(
                     revokedOnly, refDirname, dataSource, reportDir, stopMe,
@@ -172,7 +172,7 @@ public class DbDigestDiffWorker extends DbPortWorker
             try
             {
                 dataSource.shutdown();
-            }catch(Throwable e)
+            } catch (Throwable e)
             {
                 LOG.error("dataSource.shutdown()", e);
             }

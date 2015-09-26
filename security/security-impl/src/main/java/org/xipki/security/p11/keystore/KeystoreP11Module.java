@@ -78,7 +78,7 @@ public class KeystoreP11Module implements P11Module
         File baseDir = new File(IoUtil.expandFilepath(nativeLib));
         File[] children = baseDir.listFiles();
 
-        if(children == null || children.length == 0)
+        if (children == null || children.length == 0)
         {
             LOG.error("found no slots");
             this.slotIds = Collections.emptyList();
@@ -90,9 +90,9 @@ public class KeystoreP11Module implements P11Module
 
         List<P11SlotIdentifier> allSlotIds = new LinkedList<>();
 
-        for(File child : children)
+        for (File child : children)
         {
-            if((child.isDirectory() && child.canRead() && child.exists()) == false)
+            if ((child.isDirectory() && child.canRead() && child.exists()) == false)
             {
                 LOG.warn("ignore path {}, it does not point to a readable exist directory",
                         child.getPath());
@@ -101,7 +101,7 @@ public class KeystoreP11Module implements P11Module
 
             String filename = child.getName();
             String[] tokens = filename.split("-");
-            if(tokens == null || tokens.length != 2)
+            if (tokens == null || tokens.length != 2)
             {
                 LOG.warn("ignore dir {}, invalid filename syntax", child.getPath());
                 continue;
@@ -113,19 +113,19 @@ public class KeystoreP11Module implements P11Module
             {
                 slotIndex = Integer.parseInt(tokens[0]);
                 slotId = Long.parseLong(tokens[1]);
-            }catch(NumberFormatException e)
+            } catch (NumberFormatException e)
             {
                 LOG.warn("ignore dir {}, invalid filename syntax", child.getPath());
                 continue;
             }
 
-            if(allSlotIndexes.contains(slotIndex))
+            if (allSlotIndexes.contains(slotIndex))
             {
                 LOG.error("ignore slot dir, the same slot index has been assigned", filename);
                 continue;
             }
 
-            if(allSlotIdentifiers.contains(slotId))
+            if (allSlotIdentifiers.contains(slotId))
             {
                 LOG.error("ignore slot dir, the same slot identifier has been assigned", filename);
                 continue;
@@ -140,7 +140,7 @@ public class KeystoreP11Module implements P11Module
         List<P11SlotIdentifier> tmpSlotIds = new LinkedList<>();
         for (P11SlotIdentifier slotId : allSlotIds)
         {
-            if(moduleConf.isSlotIncluded(slotId))
+            if (moduleConf.isSlotIncluded(slotId))
             {
                 tmpSlotIds.add(slotId);
             }
@@ -155,22 +155,22 @@ public class KeystoreP11Module implements P11Module
     throws SignerException
     {
         KeystoreP11Slot extSlot = slots.get(slotId);
-        if(extSlot != null)
+        if (extSlot != null)
         {
             return extSlot;
         }
 
         P11SlotIdentifier _slotId = null;
-        for(P11SlotIdentifier s : slotIds)
+        for (P11SlotIdentifier s : slotIds)
         {
-            if(s.getSlotIndex() == slotId.getSlotIndex() || s.getSlotId() == slotId.getSlotId())
+            if (s.getSlotIndex() == slotId.getSlotIndex() || s.getSlotId() == slotId.getSlotId())
             {
                 _slotId = s;
                 break;
             }
         }
 
-        if(_slotId == null)
+        if (_slotId == null)
         {
             throw new SignerException("could not find slot identified by " + slotId);
         }

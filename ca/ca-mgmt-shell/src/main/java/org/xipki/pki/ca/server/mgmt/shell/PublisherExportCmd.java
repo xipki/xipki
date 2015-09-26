@@ -68,12 +68,12 @@ public class PublisherExportCmd extends CaCmd
     throws Exception
     {
         PublisherEntry entry = caManager.getPublisher(name);
-        if(entry == null)
+        if (entry == null)
         {
             throw new IllegalCmdParamException("no publisher named " + name + " is defined");
         }
 
-        if(StringUtil.isBlank(entry.getConf()))
+        if (StringUtil.isBlank(entry.getConf()))
         {
             out("publisher does not have conf");
         }

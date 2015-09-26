@@ -120,7 +120,7 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
     protected final Object _doExecute()
     throws Exception
     {
-        if(isEmpty(serialNumbers) && isEmpty(certFiles))
+        if (isEmpty(serialNumbers) && isEmpty(certFiles))
         {
             throw new IllegalCmdParamException("Neither serialNumbers nor certFiles is set");
         }
@@ -129,29 +129,29 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
 
         Map<BigInteger, byte[]> encodedCerts = null;
         List<BigInteger> sns = new LinkedList<>();
-        if(isNotEmpty(certFiles))
+        if (isNotEmpty(certFiles))
         {
             encodedCerts = new HashMap<>(certFiles.size());
 
             String ocspUrl = null;
-            for(String certFile : certFiles)
+            for (String certFile : certFiles)
             {
                 byte[] encodedCert = IoUtil.read(certFile);
                 X509Certificate cert = X509Util.parseCert(certFile);
 
-                if(X509Util.issues(issuerCert, cert) == false)
+                if (X509Util.issues(issuerCert, cert) == false)
                 {
                     throw new IllegalCmdParamException(
                             "certificate " + certFile + " is not issued by the given issuer");
                 }
 
-                if(isBlank(serverURL))
+                if (isBlank(serverURL))
                 {
                     List<String> ocspUrls = X509Util.extractOCSPUrls(cert);
-                    if(ocspUrls.size() > 0)
+                    if (ocspUrls.size() > 0)
                     {
                         String url = ocspUrls.get(0);
-                        if(ocspUrl != null && ocspUrl.equals(url) == false)
+                        if (ocspUrl != null && ocspUrl.equals(url) == false)
                         {
                             throw new IllegalCmdParamException("given certificates have different"
                                     + " OCSP responder URL in certificate");
@@ -167,27 +167,27 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
                 encodedCerts.put(sn, encodedCert);
             }
 
-            if(isBlank(serverURL))
+            if (isBlank(serverURL))
             {
                 serverURL = ocspUrl;
             }
         }
         else
         {
-            for(String serialNumber : serialNumbers)
+            for (String serialNumber : serialNumbers)
             {
                 BigInteger sn = toBigInt(serialNumber);
                 sns.add(sn);
             }
         }
 
-        if(isBlank(serverURL))
+        if (isBlank(serverURL))
         {
             throw new IllegalCmdParamException("could not get URL for the OCSP responder");
         }
 
         X509Certificate respIssuer  = null;
-        if(respIssuerFile != null)
+        if (respIssuerFile != null)
         {
             respIssuer = X509Util.parseCert(IoUtil.expandFilepath(respIssuerFile));
         }
@@ -201,7 +201,7 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
         boolean saveReq = isNotBlank(reqout);
         boolean saveResp = isNotBlank(respout);
         RequestResponseDebug debug = null;
-        if(saveReq || saveResp)
+        if (saveReq || saveResp)
         {
             debug = new RequestResponseDebug();
         }
@@ -213,22 +213,22 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
                 options, debug);
         }finally
         {
-            if(debug != null && debug.size() > 0)
+            if (debug != null && debug.size() > 0)
             {
                 RequestResponsePair reqResp = debug.get(0);
-                if(saveReq)
+                if (saveReq)
                 {
                     byte[] bytes = reqResp.getRequest();
-                    if(bytes != null)
+                    if (bytes != null)
                     {
                         IoUtil.save(reqout, bytes);
                     }
                 }
 
-                if(saveResp)
+                if (saveResp)
                 {
                     byte[] bytes = reqResp.getResponse();
-                    if(bytes != null)
+                    if (bytes != null)
                     {
                         IoUtil.save(respout, bytes);
                     }

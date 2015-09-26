@@ -97,7 +97,7 @@ public class CertificateStore
                     certInfo.getRequestedSubject());
         } catch (Exception e)
         {
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error("could not save certificate {}: {}. Message: {}",
                         new Object[]{certInfo.getCert().getSubject(),
@@ -213,7 +213,7 @@ public class CertificateStore
         {
             X509CertWithRevocationInfo revokedCert = queryExecutor.revokeCert(
                     caCert, serialNumber, revInfo, force, publishToDeltaCRLCache);
-            if(revokedCert == null)
+            if (revokedCert == null)
             {
                 LOG.info("could not revoke non-existing certificate issuer='{}', serialNumber={}",
                     caCert.getSubject(), serialNumber);
@@ -246,7 +246,7 @@ public class CertificateStore
         {
             X509CertWithDBCertId unrevokedCert = queryExecutor.unrevokeCert(
                     caCert, serialNumber, force, publishToDeltaCRLCache);
-            if(unrevokedCert == null)
+            if (unrevokedCert == null)
             {
                 LOG.info("could not unrevoke non-existing certificate issuer='{}', serialNumber={}",
                     caCert.getSubject(), serialNumber);
@@ -451,7 +451,7 @@ public class CertificateStore
         } catch (DataAccessException e)
         {
             final String message = "queryExecutor.getCertStatusForSubject";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());

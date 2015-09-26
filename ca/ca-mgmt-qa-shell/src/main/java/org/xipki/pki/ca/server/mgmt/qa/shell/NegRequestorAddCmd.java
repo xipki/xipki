@@ -57,7 +57,7 @@ public class NegRequestorAddCmd extends RequestorAddCmd
         try
         {
             super._doExecute();
-        }catch(Exception e)
+        } catch (Exception e)
         {
             return null;
         }

@@ -84,15 +84,15 @@ public class ResponderUpdateCmd extends CaCmd
     protected String getSignerConf()
     throws Exception
     {
-        if(signerConf == null)
+        if (signerConf == null)
         {
             return signerConf;
         }
         String _signerType = signerType;
-        if(_signerType == null)
+        if (_signerType == null)
         {
             CmpResponderEntry entry = caManager.getCmpResponder(name);
-            if(entry == null)
+            if (entry == null)
             {
                 throw new IllegalCmdParamException("please specify the signerType");
             }
@@ -107,11 +107,11 @@ public class ResponderUpdateCmd extends CaCmd
     throws Exception
     {
         String cert = null;
-        if(CAManager.NULL.equalsIgnoreCase(certFile))
+        if (CAManager.NULL.equalsIgnoreCase(certFile))
         {
             cert = CAManager.NULL;
         }
-        else if(certFile != null)
+        else if (certFile != null)
         {
             byte[] certBytes = IoUtil.read(certFile);
             X509Util.parseCert(new ByteArrayInputStream(certBytes));

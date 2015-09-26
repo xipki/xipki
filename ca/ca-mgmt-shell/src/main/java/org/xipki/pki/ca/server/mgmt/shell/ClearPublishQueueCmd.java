@@ -65,21 +65,21 @@ public class ClearPublishQueueCmd extends CaCmd
     throws Exception
     {
         boolean allPublishers = false;
-        for(String publisherName : publisherNames)
+        for (String publisherName : publisherNames)
         {
-            if("all".equalsIgnoreCase(publisherName))
+            if ("all".equalsIgnoreCase(publisherName))
             {
                 allPublishers = true;
                 break;
             }
         }
 
-        if(allPublishers)
+        if (allPublishers)
         {
             publisherNames = null;
         }
 
-        if("all".equalsIgnoreCase(caName))
+        if ("all".equalsIgnoreCase(caName))
         {
             caName = null;
         }

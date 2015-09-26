@@ -108,20 +108,20 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
     throws Exception
     {
         super(datasource, baseDir, stopMe);
-        if(numCertsPerSelect < 1)
+        if (numCertsPerSelect < 1)
         {
             throw new IllegalArgumentException("numCertsPerSelect could not be less than 1: "
                     + numCertsPerSelect);
         }
 
-        if(dbSchemaType != DbSchemaType.EJBCA_CA_v3)
+        if (dbSchemaType != DbSchemaType.EJBCA_CA_v3)
         {
             throw new RuntimeException("unsupported DbSchemaType " + dbSchemaType);
         }
         this.numCertsPerSelect = numCertsPerSelect;
 
         // detect whether the table CertificateData has the column id
-        if(dataSource.tableHasColumn(connection, "CertificateData", "id"))
+        if (dataSource.tableHasColumn(connection, "CertificateData", "id"))
         {
             tblCertHasId = true;
             sql = "SELECT id, fingerprint, serialNumber, cAFingerprint, status, revocationReason,"
@@ -131,13 +131,13 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         } else
         {
             String lang = System.getenv("LANG");
-            if(lang == null)
+            if (lang == null)
             {
                 throw new Exception("no environment LANG is set");
             }
 
             String lLang = lang.toLowerCase();
-            if(lLang.startsWith("en_") == false || lLang.endsWith(".utf-8") == false)
+            if (lLang.startsWith("en_") == false || lLang.endsWith(".utf-8") == false)
             {
                 throw new Exception(
                         "The environment LANG does not satisfy the pattern  'en_*.UTF-8': '"
@@ -145,7 +145,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
             }
 
             String osName = System.getProperty("os.name");
-            if(osName.toLowerCase().contains("linux") == false)
+            if (osName.toLowerCase().contains("linux") == false)
             {
                 throw new Exception("Exporting EJBCA database is only possible in Linux, but not '"
                         + osName + "'");
@@ -176,7 +176,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         Map<String, CaInfo> cas = getCas();
         Set<CaEntry> caEntries = new HashSet<>(cas.size());
 
-        for(CaInfo caInfo : cas.values())
+        for (CaInfo caInfo : cas.values())
         {
             CaEntry caEntry = new CaEntry(caInfo.caId, baseDir + File.separator + caInfo.caDirname);
             caEntries.add(caEntry);
@@ -188,7 +188,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         try
         {
             doDigest(processLog, caEntryContainer, cas);
-        }catch(Exception e)
+        } catch (Exception e)
         {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-");
@@ -200,7 +200,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
             caEntryContainer.close();
         }
 
-        if(exception == null)
+        if (exception == null)
         {
             System.out.println(" digested database");
         }
@@ -224,11 +224,11 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
             rs = stmt.executeQuery(sql);
             int caId = 0;
 
-            while(rs.next())
+            while (rs.next())
             {
                 String name = rs.getString("NAME");
                 String data = rs.getString("DATA");
-                if(name == null || name.isEmpty())
+                if (name == null || name.isEmpty())
                 {
                     continue;
                 }
@@ -240,7 +240,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                 String fn = XipkiDigestExporter.toAsciiFilename("ca-" + commonName);
                 File caDir = new File(baseDir, fn);
                 int i = 2;
-                while(caDir.exists())
+                while (caDir.exists())
                 {
                     caDir = new File(baseDir, fn + "." + (i++));
                 }
@@ -254,7 +254,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                 CaInfo caInfo = new CaInfo(caId, certBytes, caDir.getName());
                 cas.put(caInfo.hexSha1, caInfo);
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
@@ -276,7 +276,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         final int maxCertId;
         String lastProcessedHexCertFp;
 
-        if(tblCertHasId)
+        if (tblCertHasId)
         {
             minCertId = (int) getMin("CertificateData", "id");
             maxCertId = (int) getMax("CertificateData", "id");
@@ -306,15 +306,15 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
             int i = minCertId;
             String hexCertFp = lastProcessedHexCertFp;
 
-            while(true)
+            while (true)
             {
-                if(stopMe.get())
+                if (stopMe.get())
                 {
                     interrupted = true;
                     break;
                 }
 
-                if(tblCertHasId)
+                if (tblCertHasId)
                 {
                     ps.setInt(1, i);
                     ps.setInt(2, i + numCertsPerSelect);
@@ -326,9 +326,9 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                 ResultSet rs = ps.executeQuery();
 
                 int countEntriesInResultSet = 0;
-                while(rs.next())
+                while (rs.next())
                 {
-                    if(tblCertHasId)
+                    if (tblCertHasId)
                     {
                         id = rs.getInt("id");
                     } else
@@ -342,7 +342,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
 
                     CaInfo caInfo = null;
 
-                    if(hexCaFp.equals(hexCertFp) == false)
+                    if (hexCaFp.equals(hexCertFp) == false)
                     {
                         caInfo = caInfos.get(hexCaFp);
                     }
@@ -350,7 +350,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                     if ( caInfo == null)
                     {
                         LOG.debug("Found no CA by caFingerprint, try to resolve by issuer");
-                        if(tblCertHasId)
+                        if (tblCertHasId)
                         {
                             rawCertPs.setInt(1, id);
                         } else
@@ -360,13 +360,13 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
 
                         ResultSet certRs = rawCertPs.executeQuery();
 
-                        if(certRs.next())
+                        if (certRs.next())
                         {
                             String b64Cert = certRs.getString("base64Cert");
                             Certificate cert = Certificate.getInstance(Base64.decode(b64Cert));
-                            for(CaInfo entry : caInfos.values())
+                            for (CaInfo entry : caInfos.values())
                             {
-                                if(entry.subject.equals(cert.getIssuer()))
+                                if (entry.subject.equals(cert.getIssuer()))
                                 {
                                     caInfo = entry;
                                     break;
@@ -376,9 +376,9 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                         certRs.close();
                     }
 
-                    if(caInfo == null)
+                    if (caInfo == null)
                     {
-                        if(tblCertHasId)
+                        if (tblCertHasId)
                         {
                             LOG.error("FOUND no CA for Cert with id '{}'", id);
                         } else
@@ -402,7 +402,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                     Long revTime = null;
                     Long revInvTime = null;
 
-                    if(revoked)
+                    if (revoked)
                     {
                         revReason = rs.getInt("revocationReason");
                         long rev_timeInMs = rs.getLong("revocationDate");
@@ -417,30 +417,30 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
 
                     processLog.addNumProcessed(1);
                     processLog.printStatus();
-                } // end while(rs.next())
+                } // end while (rs.next())
                 rs.close();
 
-                if(tblCertHasId)
+                if (tblCertHasId)
                 {
                     i += numCertsPerSelect;
-                    if(i > maxCertId)
+                    if (i > maxCertId)
                     {
                         break;
                     }
                 } else
                 {
-                    if(countEntriesInResultSet == 0)
+                    if (countEntriesInResultSet == 0)
                     {
                         break;
                     }
                 }
-            } // end while(true)
+            } // end while (true)
 
-            if(interrupted)
+            if (interrupted)
             {
                 throw new InterruptedException("interrupted by the user");
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw translate(sql, e);
         }finally
@@ -456,7 +456,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         sb.append(" digested ")
             .append((processLog.getNumProcessed() - skippedAccount))
             .append(" certificates");
-        if(skippedAccount > 0)
+        if (skippedAccount > 0)
         {
             sb.append(", ignored ")
                 .append(skippedAccount)

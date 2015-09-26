@@ -71,14 +71,14 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
     {
         int size = request.length;
         HttpURLConnection httpUrlConnection;
-        if(size <= MAX_LEN_GET && requestOptions.isUseHttpGetForRequest())
+        if (size <= MAX_LEN_GET && requestOptions.isUseHttpGetForRequest())
         {
             String b64Request = Base64.toBase64String(request);
             String urlEncodedReq = URLEncoder.encode(b64Request, "UTF-8");
             StringBuilder urlBuilder = new StringBuilder();
             String baseUrl = responderURL.toString();
             urlBuilder.append(baseUrl);
-            if(baseUrl.endsWith("/") == false)
+            if (baseUrl.endsWith("/") == false)
             {
                 urlBuilder.append('/');
             }

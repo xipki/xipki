@@ -71,9 +71,9 @@ public enum Permission
     public static Permission getPermission(
             final String permission)
     {
-        for(Permission p : values())
+        for (Permission p : values())
         {
-            if(p.permission.equalsIgnoreCase(permission))
+            if (p.permission.equalsIgnoreCase(permission))
             {
                 return p;
             }
@@ -85,13 +85,13 @@ public enum Permission
     public static String toString(
             final Set<Permission> permissions)
     {
-        if(CollectionUtil.isEmpty(permissions))
+        if (CollectionUtil.isEmpty(permissions))
         {
             return null;
         }
 
         StringBuilder sb = new StringBuilder();
-        for(Permission p : permissions)
+        for (Permission p : permissions)
         {
             sb.append(",");
             sb.append(p.getPermission());

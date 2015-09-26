@@ -79,7 +79,7 @@ public class CmpUtil
             final boolean addSignerCert)
     throws CMPException, NoIdleSignerException
     {
-        if(signerName == null)
+        if (signerName == null)
         {
             X500Name x500Name = X500Name.getInstance(
                     signer.getCertificate().getSubjectX500Principal().getEncoded());
@@ -89,57 +89,57 @@ public class CmpUtil
         ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
                 signerName, header.getRecipient());
         PKIFreeText freeText = header.getFreeText();
-        if(freeText != null)
+        if (freeText != null)
         {
             builder.setFreeText(freeText);
         }
 
         InfoTypeAndValue[] generalInfo = header.getGeneralInfo();
-        if(generalInfo != null)
+        if (generalInfo != null)
         {
-            for(InfoTypeAndValue gi : generalInfo)
+            for (InfoTypeAndValue gi : generalInfo)
             {
                 builder.addGeneralInfo(gi);
             }
         }
 
         ASN1OctetString octet = header.getRecipKID();
-        if(octet != null)
+        if (octet != null)
         {
             builder.setRecipKID(octet.getOctets());
         }
 
         octet = header.getRecipNonce();
-        if(octet != null)
+        if (octet != null)
         {
             builder.setRecipNonce(octet.getOctets());
         }
 
         octet = header.getSenderKID();
-        if(octet != null)
+        if (octet != null)
         {
             builder.setSenderKID(octet.getOctets());
         }
 
         octet = header.getSenderNonce();
-        if(octet != null)
+        if (octet != null)
         {
             builder.setSenderNonce(octet.getOctets());
         }
 
         octet = header.getTransactionID();
-        if(octet != null)
+        if (octet != null)
         {
             builder.setTransactionID(octet.getOctets());
         }
 
-        if(header.getMessageTime() != null)
+        if (header.getMessageTime() != null)
         {
             builder.setMessageTime(new Date());
         }
         builder.setBody(pkiMessage.getBody());
 
-        if(addSignerCert)
+        if (addSignerCert)
         {
             X509CertificateHolder signerCert = signer.getCertificateAsBCObject();
             builder.addCMPCertificate(signerCert);
@@ -160,11 +160,11 @@ public class CmpUtil
             final PKIHeader header)
     {
         InfoTypeAndValue[] regInfos = header.getGeneralInfo();
-        if(regInfos != null)
+        if (regInfos != null)
         {
             for (InfoTypeAndValue regInfo : regInfos)
             {
-                if(CMPObjectIdentifiers.it_implicitConfirm.equals(regInfo.getInfoType()))
+                if (CMPObjectIdentifiers.it_implicitConfirm.equals(regInfo.getInfoType()))
                 {
                     return true;
                 }
@@ -181,11 +181,11 @@ public class CmpUtil
     public static CmpUtf8Pairs extract(
             final InfoTypeAndValue[] regInfos)
     {
-        if(regInfos != null)
+        if (regInfos != null)
         {
             for (InfoTypeAndValue regInfo : regInfos)
             {
-                if(CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getInfoType()))
+                if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getInfoType()))
                 {
                     String regInfoValue = ((ASN1String) regInfo.getInfoValue()).getString();
                     return new CmpUtf8Pairs(regInfoValue);
@@ -199,14 +199,14 @@ public class CmpUtil
     public static CmpUtf8Pairs extract(
             final AttributeTypeAndValue[] atvs)
     {
-        if(atvs == null)
+        if (atvs == null)
         {
             return null;
         }
 
         for (AttributeTypeAndValue atv : atvs)
         {
-            if(CMPObjectIdentifiers.regInfo_utf8Pairs.equals(atv.getType()))
+            if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(atv.getType()))
             {
                 String regInfoValue = ((ASN1String) atv.getValue()).getString();
                 return new CmpUtf8Pairs(regInfoValue);

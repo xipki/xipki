@@ -74,9 +74,9 @@ public class P11CertUpdateCmd extends P11SecurityCmd
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
         X509Certificate newCert = X509Util.parseCert(certFile);
         Set<X509Certificate> caCerts = new HashSet<>();
-        if(isNotEmpty(caCertFiles))
+        if (isNotEmpty(caCertFiles))
         {
-            for(String caCertFile : caCertFiles)
+            for (String caCertFile : caCertFiles)
             {
                 caCerts.add(X509Util.parseCert(caCertFile));
             }

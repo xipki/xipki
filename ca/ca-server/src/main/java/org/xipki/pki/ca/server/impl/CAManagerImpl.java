@@ -149,7 +149,7 @@ implements CAManager, CmpResponderManager, ScepManager
         @Override
         public void run()
         {
-            if(inProcess || caSystemSetuped == false)
+            if (inProcess || caSystemSetuped == false)
             {
                 return;
             }
@@ -158,11 +158,11 @@ implements CAManager, CmpResponderManager, ScepManager
             try
             {
                 LOG.debug("publishing certificates in PUBLISHQUEUE");
-                for(String name : x509cas.keySet())
+                for (String name : x509cas.keySet())
                 {
                     X509CA ca = x509cas.get(name);
                     boolean b = ca.publishCertsInQueue();
-                    if(b)
+                    if (b)
                     {
                         LOG.debug(" published certificates of CA '{}' in PUBLISHQUEUE", name);
                     }
@@ -172,7 +172,7 @@ implements CAManager, CmpResponderManager, ScepManager
                                 name);
                     }
                 }
-            }catch(Throwable t)
+            } catch (Throwable t)
             {
             }finally
             {
@@ -187,7 +187,7 @@ implements CAManager, CmpResponderManager, ScepManager
         @Override
         public void run()
         {
-            if(inProcess)
+            if (inProcess)
             {
                 return;
             }
@@ -204,7 +204,7 @@ implements CAManager, CmpResponderManager, ScepManager
                 {
                     final String message =
                             "could not call certstore.deleteCertsInProcessOlderThan";
-                    if(LOG.isErrorEnabled())
+                    if (LOG.isErrorEnabled())
                     {
                         LOG.error(LogUtil.buildExceptionLogFormat(message),
                                 t.getClass().getName(), t.getMessage());
@@ -226,7 +226,7 @@ implements CAManager, CmpResponderManager, ScepManager
         @Override
         public void run()
         {
-            if(inProcess)
+            if (inProcess)
             {
                 return;
             }
@@ -239,14 +239,14 @@ implements CAManager, CmpResponderManager, ScepManager
                         ? 0
                         : event.getEventTime();
 
-                if(LOG.isDebugEnabled())
+                if (LOG.isDebugEnabled())
                 {
                     LOG.debug(
                         "check the restart CA system event: CA changed at={}, lastStartTime={}",
                         new Date(caChangedTime * 1000L), lastStartTime);
                 }
 
-                if(caChangedTime > lastStartTime.getTime() / 1000L)
+                if (caChangedTime > lastStartTime.getTime() / 1000L)
                 {
                     LOG.info("received event to restart CA");
                     restartCaSystem();
@@ -254,7 +254,7 @@ implements CAManager, CmpResponderManager, ScepManager
                 {
                     LOG.debug("received no event to restart CA");
                 }
-            }catch(Throwable t)
+            } catch (Throwable t)
             {
                 LOG.error("ScheduledCArestarter: " + t.getMessage(), t);
             }finally
@@ -338,14 +338,14 @@ implements CAManager, CmpResponderManager, ScepManager
     public CAManagerImpl()
     throws InvalidConfException
     {
-        if(Security.getProvider("BC") == null)
+        if (Security.getProvider("BC") == null)
         {
             Security.addProvider(new BouncyCastleProvider());
         }
 
         String calockId = null;
         File caLockFile = new File("calock");
-        if(caLockFile.exists())
+        if (caLockFile.exists())
         {
             try
             {
@@ -355,7 +355,7 @@ implements CAManager, CmpResponderManager, ScepManager
             }
         }
 
-        if(calockId == null)
+        if (calockId == null)
         {
             calockId = UUID.randomUUID().toString();
             try
@@ -404,15 +404,15 @@ implements CAManager, CmpResponderManager, ScepManager
     private void init()
     throws CAMgmtException
     {
-        if(securityFactory == null)
+        if (securityFactory == null)
         {
             throw new IllegalStateException("securityFactory is not set");
         }
-        if(dataSourceFactory == null)
+        if (dataSourceFactory == null)
         {
             throw new IllegalStateException("dataSourceFactory is not set");
         }
-        if(caConfFile == null)
+        if (caConfFile == null)
         {
             throw new IllegalStateException("caConfFile is not set");
         }
@@ -427,13 +427,13 @@ implements CAManager, CmpResponderManager, ScepManager
         }
 
         String caModeStr = caConfProps.getProperty("ca.mode");
-        if(caModeStr != null)
+        if (caModeStr != null)
         {
-            if(caModeStr.equalsIgnoreCase("slave"))
+            if (caModeStr.equalsIgnoreCase("slave"))
             {
                 masterMode = false;
             }
-            else if(caModeStr.equalsIgnoreCase("master"))
+            else if (caModeStr.equalsIgnoreCase("master"))
             {
                 masterMode = true;
             }
@@ -447,13 +447,13 @@ implements CAManager, CmpResponderManager, ScepManager
             masterMode = true;
         }
 
-        if(this.dataSources == null)
+        if (this.dataSources == null)
         {
             this.dataSources = new ConcurrentHashMap<>();
-            for(Object objKey : caConfProps.keySet())
+            for (Object objKey : caConfProps.keySet())
             {
                 String key = (String) objKey;
-                if(StringUtil.startsWithIgnoreCase(key, "datasource.") == false)
+                if (StringUtil.startsWithIgnoreCase(key, "datasource.") == false)
                 {
                     continue;
                 }
@@ -480,25 +480,25 @@ implements CAManager, CmpResponderManager, ScepManager
             this.dataSource = this.dataSources.get("ca");
         }
 
-        if(this.dataSource == null)
+        if (this.dataSource == null)
         {
             throw new CAMgmtException("no datasource configured with name 'ca'");
         }
 
         this.queryExecutor = new CAManagerQueryExecutor(this.dataSource);
 
-        if(masterMode)
+        if (masterMode)
         {
             boolean lockedSuccessfull;
             try
             {
                 lockedSuccessfull = lockCA(true);
-            }catch(DataAccessException e)
+            } catch (DataAccessException e)
             {
                 throw new CAMgmtException("DataAccessException while locking CA", e);
             }
 
-            if(lockedSuccessfull == false)
+            if (lockedSuccessfull == false)
             {
                 final String msg =
                     "could not lock the CA database. In general this indicates that another"
@@ -522,17 +522,17 @@ implements CAManager, CmpResponderManager, ScepManager
     @Override
     public CASystemStatus getCASystemStatus()
     {
-        if(caSystemSetuped)
+        if (caSystemSetuped)
         {
             return masterMode
                     ? CASystemStatus.STARTED_AS_MASTER
                     : CASystemStatus.STARTED_AS_SLAVE;
         }
-        else if(initializing)
+        else if (initializing)
         {
             return CASystemStatus.INITIALIZING;
         }
-        else if(caLockedByMe == false)
+        else if (caLockedByMe == false)
         {
             return CASystemStatus.LOCK_FAILED;
         }
@@ -548,19 +548,19 @@ implements CAManager, CmpResponderManager, ScepManager
     {
         SystemEvent lockInfo = queryExecutor.getSystemEvent(EVENT_LOCK);
 
-        if(lockInfo != null)
+        if (lockInfo != null)
         {
             String lockedBy = lockInfo.getOwner();
             Date lockedAt = new Date(lockInfo.getEventTime() * 1000L);
 
-            if(this.lockInstanceId.equals(lockedBy) == false)
+            if (this.lockInstanceId.equals(lockedBy) == false)
             {
                 LOG.error("could not lock CA, it has been locked by {} since {}", lockedBy,
                         lockedAt);
                 return false;
             }
 
-            if(forceRelock == false)
+            if (forceRelock == false)
             {
                 return true;
             } else
@@ -577,7 +577,7 @@ implements CAManager, CmpResponderManager, ScepManager
     @Override
     public boolean unlockCA()
     {
-        if(masterMode == false)
+        if (masterMode == false)
         {
             LOG.error("could not unlock CA in slave mode");
             return false;
@@ -590,10 +590,10 @@ implements CAManager, CmpResponderManager, ScepManager
         {
             queryExecutor.unlockCA();
             successfull = true;
-        }catch(DataAccessException | CAMgmtException e)
+        } catch (DataAccessException | CAMgmtException e)
         {
             final String message = "error in unlockCA()";
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -601,7 +601,7 @@ implements CAManager, CmpResponderManager, ScepManager
             LOG.debug(message, e);
         }
 
-        if(successfull)
+        if (successfull)
         {
             LOG.info("unlocked CA");
         }
@@ -652,7 +652,7 @@ implements CAManager, CmpResponderManager, ScepManager
         reset();
         boolean caSystemStarted = do_startCaSystem();
 
-        if(caSystemStarted == false)
+        if (caSystemStarted == false)
         {
             String msg = "could not restart CA system";
             LOG.error(msg);
@@ -673,10 +673,10 @@ implements CAManager, CmpResponderManager, ScepManager
             queryExecutor.changeSystemEvent(systemEvent);
             LOG.info("notified the change of CA system");
             return true;
-        }catch(CAMgmtException e)
+        } catch (CAMgmtException e)
         {
             final String message = "error while notifying Slave CAs to restart";
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -692,10 +692,10 @@ implements CAManager, CmpResponderManager, ScepManager
         try
         {
             caSystemStarted = do_startCaSystem();
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
             final String message = "do_startCaSystem()";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                         t.getMessage());
@@ -704,7 +704,7 @@ implements CAManager, CmpResponderManager, ScepManager
             LOG.error(message);
         }
 
-        if(caSystemStarted == false)
+        if (caSystemStarted == false)
         {
             String msg = "could not start CA system";
             LOG.error(msg);
@@ -716,7 +716,7 @@ implements CAManager, CmpResponderManager, ScepManager
     private boolean initializing = false;
     private boolean do_startCaSystem()
     {
-        if(caSystemSetuped)
+        if (caSystemSetuped)
         {
             return true;
         }
@@ -730,10 +730,10 @@ implements CAManager, CmpResponderManager, ScepManager
             try
             {
                 init();
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 final String message = "do_startCaSystem().init()";
-                if(LOG.isErrorEnabled())
+                if (LOG.isErrorEnabled())
                 {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                             e.getMessage());
@@ -751,9 +751,9 @@ implements CAManager, CmpResponderManager, ScepManager
             scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
 
             // Add the CAs to the store
-            for(String caName : caInfos.keySet())
+            for (String caName : caInfos.keySet())
             {
-                if(startCA(caName) == false)
+                if (startCA(caName) == false)
                 {
                     return false;
                 }
@@ -764,18 +764,18 @@ implements CAManager, CmpResponderManager, ScepManager
             sb.append("started CA system");
             Set<String> names = new HashSet<>(getCaNames());
 
-            if(names.size() > 0)
+            if (names.size() > 0)
             {
                 sb.append(" with following CAs: ");
                 Set<String> caAliasNames = getCaAliasNames();
-                for(String aliasName : caAliasNames)
+                for (String aliasName : caAliasNames)
                 {
                     String name = getCaNameForAlias(aliasName);
                     names.remove(name);
                     sb.append(name).append(" (alias ").append(aliasName).append(")").append(", ");
                 }
 
-                for(String name : names)
+                for (String name : names)
                 {
                     sb.append(name).append(", ");
                 }
@@ -797,7 +797,7 @@ implements CAManager, CmpResponderManager, ScepManager
         } finally
         {
             initializing = false;
-            if(masterMode == false && persistentScheduledThreadPoolExecutor == null)
+            if (masterMode == false && persistentScheduledThreadPoolExecutor == null)
             {
                 persistentScheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
                 persistentScheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
@@ -819,7 +819,7 @@ implements CAManager, CmpResponderManager, ScepManager
         X509CrlSignerEntryWrapper crlSignerEntry = null;
         String crlSignerName = caEntry.getCrlSignerName();
         // CRL will be generated only in master mode
-        if(signerRequired && masterMode && crlSignerName != null)
+        if (signerRequired && masterMode && crlSignerName != null)
         {
             crlSignerEntry = crlSigners.get(crlSignerName);
             try
@@ -831,7 +831,7 @@ implements CAManager, CmpResponderManager, ScepManager
             {
                 final String message = "X09CrlSignerEntryWrapper.initSigner (name="
                         + crlSignerName + ")";
-                if(LOG.isErrorEnabled())
+                if (LOG.isErrorEnabled())
                 {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                             e.getMessage());
@@ -845,14 +845,14 @@ implements CAManager, CmpResponderManager, ScepManager
         try
         {
             ca = new X509CA(this, caEntry, certstore, securityFactory, masterMode);
-            if(auditServiceRegister != null)
+            if (auditServiceRegister != null)
             {
                 ca.setAuditServiceRegister(auditServiceRegister);
             }
         } catch (OperationException e)
         {
             final String message = "X509CA.<init> (ca=" + caName + ")";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -867,7 +867,7 @@ implements CAManager, CmpResponderManager, ScepManager
         x509Responders.put(caName, caResponder);
 
         // referesh the SCEP
-        if(sceps.containsKey(caName))
+        if (sceps.containsKey(caName))
         {
             try
             {
@@ -875,7 +875,7 @@ implements CAManager, CmpResponderManager, ScepManager
             } catch (CAMgmtException e)
             {
                 final String message = "X509CA.SCEP (ca=" + caName + ")";
-                if(LOG.isErrorEnabled())
+                if (LOG.isErrorEnabled())
                 {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                             e.getMessage());
@@ -892,22 +892,22 @@ implements CAManager, CmpResponderManager, ScepManager
         LOG.info("stopping CA system");
         shutdownScheduledThreadPoolExecutor();
 
-        if(persistentScheduledThreadPoolExecutor != null)
+        if (persistentScheduledThreadPoolExecutor != null)
         {
             persistentScheduledThreadPoolExecutor.shutdown();
-            while(persistentScheduledThreadPoolExecutor.isTerminated() == false)
+            while (persistentScheduledThreadPoolExecutor.isTerminated() == false)
             {
                 try
                 {
                     Thread.sleep(100);
-                }catch(InterruptedException e)
+                } catch (InterruptedException e)
                 {
                 }
             }
             persistentScheduledThreadPoolExecutor = null;
         }
 
-        for(String caName : x509cas.keySet())
+        for (String caName : x509cas.keySet())
         {
             X509CA ca = x509cas.get(caName);
             try
@@ -920,27 +920,27 @@ implements CAManager, CmpResponderManager, ScepManager
             }
         }
 
-        if(caLockedByMe)
+        if (caLockedByMe)
         {
             unlockCA();
         }
 
         File caLockFile = new File("calock");
-        if(caLockFile.exists())
+        if (caLockFile.exists())
         {
             caLockFile.delete();
         }
 
-        for(String dsName :dataSources.keySet())
+        for (String dsName :dataSources.keySet())
         {
             DataSourceWrapper ds = dataSources.get(dsName);
             try
             {
                 ds.shutdown();
-            } catch(Exception e)
+            } catch (Exception e)
             {
                 final String message = "could not shutdown datasource " + dsName;
-                if(LOG.isWarnEnabled())
+                if (LOG.isWarnEnabled())
                 {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                             e.getMessage());
@@ -1011,7 +1011,7 @@ implements CAManager, CmpResponderManager, ScepManager
     private void initRequestors()
     throws CAMgmtException
     {
-        if(requestorsInitialized)
+        if (requestorsInitialized)
         {
             return;
         }
@@ -1020,12 +1020,12 @@ implements CAManager, CmpResponderManager, ScepManager
         requestors.clear();
         List<String> names = queryExecutor.getNamesFromTable("REQUESTOR");
 
-        if(CollectionUtil.isNotEmpty(names))
+        if (CollectionUtil.isNotEmpty(names))
         {
-            for(String name : names)
+            for (String name : names)
             {
                 CmpRequestorEntry requestorDbEntry = queryExecutor.createRequestor(name);
-                if(requestorDbEntry == null)
+                if (requestorDbEntry == null)
                 {
                     continue;
                 }
@@ -1043,7 +1043,7 @@ implements CAManager, CmpResponderManager, ScepManager
     private void initResponders()
     throws CAMgmtException
     {
-        if(responderInitialized)
+        if (responderInitialized)
         {
             return;
         }
@@ -1053,12 +1053,12 @@ implements CAManager, CmpResponderManager, ScepManager
 
         List<String> names = queryExecutor.getNamesFromTable("RESPONDER");
 
-        if(CollectionUtil.isNotEmpty(names))
+        if (CollectionUtil.isNotEmpty(names))
         {
-            for(String name : names)
+            for (String name : names)
             {
                 CmpResponderEntry dbEntry = queryExecutor.createResponder(name);
-                if(dbEntry == null)
+                if (dbEntry == null)
                 {
                     continue;
                 }
@@ -1067,7 +1067,7 @@ implements CAManager, CmpResponderManager, ScepManager
                 responderDbEntries.put(name, dbEntry);
 
                 CmpResponderEntryWrapper responder = createCmpResponder(dbEntry);
-                if(responder != null)
+                if (responder != null)
                 {
                     dbEntry.setConfFaulty(false);
                     responders.put(name, responder);
@@ -1081,14 +1081,14 @@ implements CAManager, CmpResponderManager, ScepManager
     private void initEnvironemtParamters()
     throws CAMgmtException
     {
-        if(environmentParametersInitialized)
+        if (environmentParametersInitialized)
         {
             return;
         }
 
         Map<String, String> map = queryExecutor.createEnvParameters();
         envParameterResolver.clear();
-        for(String name : map.keySet())
+        for (String name : map.keySet())
         {
             envParameterResolver.addEnvParam(name, map.get(name));
         }
@@ -1099,14 +1099,14 @@ implements CAManager, CmpResponderManager, ScepManager
     private void initCaAliases()
     throws CAMgmtException
     {
-        if(caAliasesInitialized)
+        if (caAliasesInitialized)
         {
             return;
         }
 
         Map<String, String> map = queryExecutor.createCaAliases();
         caAliases.clear();
-        for(String aliasName : map.keySet())
+        for (String aliasName : map.keySet())
         {
             caAliases.put(aliasName, map.get(aliasName));
         }
@@ -1117,12 +1117,12 @@ implements CAManager, CmpResponderManager, ScepManager
     private void initCertprofiles()
     throws CAMgmtException
     {
-        if(certprofilesInitialized)
+        if (certprofilesInitialized)
         {
             return;
         }
 
-        for(String name : certprofiles.keySet())
+        for (String name : certprofiles.keySet())
         {
             shutdownCertprofile(certprofiles.get(name));
         }
@@ -1131,19 +1131,19 @@ implements CAManager, CmpResponderManager, ScepManager
 
         List<String> names = queryExecutor.getNamesFromTable("PROFILE");
 
-        if(CollectionUtil.isNotEmpty(names))
+        if (CollectionUtil.isNotEmpty(names))
         {
-            for(String name : names)
+            for (String name : names)
             {
                 CertprofileEntry dbEntry = queryExecutor.createCertprofile(name);
-                if(dbEntry != null)
+                if (dbEntry != null)
                 {
                     dbEntry.setFaulty(true);
                     certprofileDbEntries.put(name, dbEntry);
                 }
 
                 IdentifiedX509Certprofile profile = createCertprofile(dbEntry);
-                if(profile != null)
+                if (profile != null)
                 {
                     dbEntry.setFaulty(false);
                     certprofiles.put(name, profile);
@@ -1157,12 +1157,12 @@ implements CAManager, CmpResponderManager, ScepManager
     private void initPublishers()
     throws CAMgmtException
     {
-        if(publishersInitialized)
+        if (publishersInitialized)
         {
             return;
         }
 
-        for(String name : publishers.keySet())
+        for (String name : publishers.keySet())
         {
             shutdownPublisher(publishers.get(name));
         }
@@ -1171,12 +1171,12 @@ implements CAManager, CmpResponderManager, ScepManager
 
         List<String> names = queryExecutor.getNamesFromTable("PUBLISHER");
 
-        if(CollectionUtil.isNotEmpty(names))
+        if (CollectionUtil.isNotEmpty(names))
         {
-            for(String name : names)
+            for (String name : names)
             {
                 PublisherEntry dbEntry = queryExecutor.createPublisher(name);
-                if(dbEntry == null)
+                if (dbEntry == null)
                 {
                     continue;
                 }
@@ -1185,7 +1185,7 @@ implements CAManager, CmpResponderManager, ScepManager
                 publisherDbEntries.put(name, dbEntry);
 
                 IdentifiedX509CertPublisher publisher = createPublisher(dbEntry);
-                if(publisher != null)
+                if (publisher != null)
                 {
                     dbEntry.setFaulty(false);
                     publishers.put(name, publisher);
@@ -1199,7 +1199,7 @@ implements CAManager, CmpResponderManager, ScepManager
     private void initCrlSigners()
     throws CAMgmtException
     {
-        if(crlSignersInitialized)
+        if (crlSignersInitialized)
         {
             return;
         }
@@ -1208,12 +1208,12 @@ implements CAManager, CmpResponderManager, ScepManager
 
         List<String> names = queryExecutor.getNamesFromTable("CRLSIGNER");
 
-        if(CollectionUtil.isNotEmpty(names))
+        if (CollectionUtil.isNotEmpty(names))
         {
-            for(String name : names)
+            for (String name : names)
             {
                 X509CrlSignerEntry dbEntry = queryExecutor.createCrlSigner(name);
-                if(dbEntry == null)
+                if (dbEntry == null)
                 {
                     continue;
                 }
@@ -1230,7 +1230,7 @@ implements CAManager, CmpResponderManager, ScepManager
     private void initCmpControls()
     throws CAMgmtException
     {
-        if(cmpControlInitialized)
+        if (cmpControlInitialized)
         {
             return;
         }
@@ -1240,12 +1240,12 @@ implements CAManager, CmpResponderManager, ScepManager
 
         List<String> names = queryExecutor.getNamesFromTable("CMPCONTROL");
 
-        if(CollectionUtil.isNotEmpty(names))
+        if (CollectionUtil.isNotEmpty(names))
         {
-            for(String name : names)
+            for (String name : names)
             {
                 CmpControlEntry cmpControlDb = queryExecutor.createCmpControl(name);
-                if(cmpControlDb == null)
+                if (cmpControlDb == null)
                 {
                     continue;
                 }
@@ -1259,11 +1259,11 @@ implements CAManager, CmpResponderManager, ScepManager
                     cmpControl = new CmpControl(cmpControlDb);
                     cmpControlDb.setFaulty(false);
                     cmpControls.put(name, cmpControl);
-                }catch(InvalidConfException e)
+                } catch (InvalidConfException e)
                 {
                     final String message = "could not initialize CMP control " + name
                             + ", ignore it";
-                    if(LOG.isErrorEnabled())
+                    if (LOG.isErrorEnabled())
                     {
                         LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                                 e.getMessage());
@@ -1279,7 +1279,7 @@ implements CAManager, CmpResponderManager, ScepManager
     private void initSceps()
     throws CAMgmtException
     {
-        if(scepsInitialized)
+        if (scepsInitialized)
         {
             return;
         }
@@ -1289,12 +1289,12 @@ implements CAManager, CmpResponderManager, ScepManager
 
         List<String> names = queryExecutor.getNamesFromTable("SCEP", "CA_NAME");
 
-        if(CollectionUtil.isNotEmpty(names))
+        if (CollectionUtil.isNotEmpty(names))
         {
-            for(String name : names)
+            for (String name : names)
             {
                 ScepEntry scepDb = queryExecutor.getScep(name);
-                if(scepDb == null)
+                if (scepDb == null)
                 {
                     continue;
                 }
@@ -1307,11 +1307,11 @@ implements CAManager, CmpResponderManager, ScepManager
                     Scep scep = new Scep(scepDb, this);
                     scepDb.setConfFaulty(false);
                     sceps.put(name, scep);
-                }catch(CAMgmtException e)
+                } catch (CAMgmtException e)
                 {
                     final String message = "could not initialize SCEP entry " + name
                             + ", ignore it";
-                    if(LOG.isErrorEnabled())
+                    if (LOG.isErrorEnabled())
                     {
                         LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                                 e.getMessage());
@@ -1327,7 +1327,7 @@ implements CAManager, CmpResponderManager, ScepManager
     private void initCAs()
     throws CAMgmtException
     {
-        if(cAsInitialized)
+        if (cAsInitialized)
         {
             return;
         }
@@ -1338,9 +1338,9 @@ implements CAManager, CmpResponderManager, ScepManager
         ca_has_profiles.clear();
 
         List<String> names = queryExecutor.getNamesFromTable("CA");
-        if(CollectionUtil.isNotEmpty(names))
+        if (CollectionUtil.isNotEmpty(names))
         {
-            for(String name : names)
+            for (String name : names)
             {
                 createCA(name);
             }
@@ -1359,7 +1359,7 @@ implements CAManager, CmpResponderManager, ScepManager
         ca_has_requestors.remove(name);
         X509CA oldCa = x509cas.remove(name);
         x509Responders.remove(name);
-        if(oldCa != null)
+        if (oldCa != null)
         {
             oldCa.shutdown();
         }
@@ -1368,7 +1368,7 @@ implements CAManager, CmpResponderManager, ScepManager
         try
         {
             ca.markMaxSerial();
-        }catch(OperationException e)
+        } catch (OperationException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
         }
@@ -1398,7 +1398,7 @@ implements CAManager, CmpResponderManager, ScepManager
             // sequence CID
             maxId = dataSource.getMax(null, "CERT", "ID");
             dataSource.setLastUsedSeqValue("CID", maxId);
-        }catch(DataAccessException e)
+        } catch (DataAccessException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
         }
@@ -1413,12 +1413,12 @@ implements CAManager, CmpResponderManager, ScepManager
         asssertMasterMode();
         String name = caEntry.getName();
 
-        if(caInfos.containsKey(name))
+        if (caInfos.containsKey(name))
         {
             throw new CAMgmtException("CA named " + name + " exists");
         }
 
-        if(caEntry instanceof X509CAEntry)
+        if (caEntry instanceof X509CAEntry)
         {
             X509CAEntry xEntry = (X509CAEntry) caEntry;
 
@@ -1426,12 +1426,12 @@ implements CAManager, CmpResponderManager, ScepManager
             try
             {
                 List<String[]> signerConfs = splitCASignerConfs(xEntry.getSignerConf());
-                for(String[] m : signerConfs)
+                for (String[] m : signerConfs)
                 {
                     String signerConf = m[1];
                     signer = securityFactory.createSigner(
                             xEntry.getSignerType(), signerConf, xEntry.getCertificate());
-                    if(xEntry.getCertificate() == null)
+                    if (xEntry.getCertificate() == null)
                     {
                         xEntry.setCertificate(signer.getCertificate());
                     }
@@ -1470,7 +1470,7 @@ implements CAManager, CmpResponderManager, ScepManager
         String name = entry.getName();
 
         boolean changed = queryExecutor.changeCA(entry, securityFactory);
-        if(changed == false)
+        if (changed == false)
         {
             LOG.info("no change of CA '{}' is processed", name);
         }
@@ -1494,15 +1494,15 @@ implements CAManager, CmpResponderManager, ScepManager
         asssertMasterMode();
         caName = caName.toUpperCase();
         boolean b = queryExecutor.removeCertprofileFromCA(profileLocalname, caName);
-        if(b == false)
+        if (b == false)
         {
             return false;
         }
 
-        if(ca_has_profiles.containsKey(caName))
+        if (ca_has_profiles.containsKey(caName))
         {
             Map<String, String> map = ca_has_profiles.get(caName);
-            if(map != null)
+            if (map != null)
             {
                 map.remove(profileLocalname);
             }
@@ -1520,27 +1520,27 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamUtil.assertNotBlank("profileName", profileName);
         ParamUtil.assertNotBlank("caName", caName);
         asssertMasterMode();
-        if(StringUtil.isBlank(profileLocalname))
+        if (StringUtil.isBlank(profileLocalname))
         {
             profileLocalname = profileName;
         }
         caName = caName.toUpperCase();
 
         Map<String, String> map = ca_has_profiles.get(caName);
-        if(map == null)
+        if (map == null)
         {
             map = new HashMap<>();
             ca_has_profiles.put(caName, map);
         }
         else
         {
-            if(map.containsKey(profileLocalname))
+            if (map.containsKey(profileLocalname))
             {
                 return false;
             }
         }
 
-        if(certprofiles.containsKey(profileName) == false)
+        if (certprofiles.containsKey(profileName) == false)
         {
             throw new CAMgmtException("certprofile '" + profileName + "' is faulty");
         }
@@ -1561,13 +1561,13 @@ implements CAManager, CmpResponderManager, ScepManager
         asssertMasterMode();
         caName = caName.toUpperCase();
         boolean b = queryExecutor.removePublisherFromCA(publisherName, caName);
-        if(b == false)
+        if (b == false)
         {
             return false;
         }
 
         Set<String> publisherNames = ca_has_publishers.get(caName);
-        if(publisherNames != null)
+        if (publisherNames != null)
         {
             publisherNames.remove(publisherName);
         }
@@ -1585,21 +1585,21 @@ implements CAManager, CmpResponderManager, ScepManager
         asssertMasterMode();
         caName = caName.toUpperCase();
         Set<String> publisherNames = ca_has_publishers.get(caName);
-        if(publisherNames == null)
+        if (publisherNames == null)
         {
             publisherNames = new HashSet<>();
             ca_has_publishers.put(caName, publisherNames);
         }
         else
         {
-            if(publisherNames.contains(publisherName))
+            if (publisherNames.contains(publisherName))
             {
                 return false;
             }
         }
 
         IdentifiedX509CertPublisher publisher = publishers.get(publisherName);
-        if(publisher == null)
+        if (publisher == null)
         {
             throw new CAMgmtException("publisher '" + publisherName + "' is faulty");
         }
@@ -1651,7 +1651,7 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamUtil.assertNotNull("dbEntry", dbEntry);
         asssertMasterMode();
         String name = dbEntry.getName();
-        if(requestorDbEntries.containsKey(name))
+        if (requestorDbEntries.containsKey(name))
         {
             return false;
         }
@@ -1667,10 +1667,10 @@ implements CAManager, CmpResponderManager, ScepManager
         try
         {
             certstore.addRequestorName(name);
-        }catch(OperationException e)
+        } catch (OperationException e)
         {
             final String message = "exception while publishing requestor name to certStore";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -1689,13 +1689,13 @@ implements CAManager, CmpResponderManager, ScepManager
     {
         ParamUtil.assertNotBlank("requestorName", requestorName);
         asssertMasterMode();
-        for(String caName : ca_has_requestors.keySet())
+        for (String caName : ca_has_requestors.keySet())
         {
             removeCmpRequestorFromCA(requestorName, caName);
         }
 
         boolean b = queryExecutor.deleteRowWithName(requestorName, "REQUESTOR");
-        if(b == false)
+        if (b == false)
         {
             return false;
         }
@@ -1714,13 +1714,13 @@ implements CAManager, CmpResponderManager, ScepManager
     {
         ParamUtil.assertNotBlank("name", name);
         asssertMasterMode();
-        if(base64Cert == null)
+        if (base64Cert == null)
         {
             return false;
         }
 
         CmpRequestorEntryWrapper requestor = queryExecutor.changeCmpRequestor(name, base64Cert);
-        if(requestor == null)
+        if (requestor == null)
         {
             return false;
         }
@@ -1744,13 +1744,13 @@ implements CAManager, CmpResponderManager, ScepManager
         asssertMasterMode();
         caName = caName.toUpperCase();
         boolean b = queryExecutor.removeCmpRequestorFromCA(requestorName, caName);
-        if(b && ca_has_requestors.containsKey(caName))
+        if (b && ca_has_requestors.containsKey(caName))
         {
             Set<CAHasRequestorEntry> entries = ca_has_requestors.get(caName);
             CAHasRequestorEntry entry = null;
-            for(CAHasRequestorEntry m : entries)
+            for (CAHasRequestorEntry m : entries)
             {
-                if(m.getRequestorName().equals(requestorName))
+                if (m.getRequestorName().equals(requestorName))
                 {
                     entry = m;
                 }
@@ -1772,7 +1772,7 @@ implements CAManager, CmpResponderManager, ScepManager
         caName = caName.toUpperCase();
         String requestorName = requestor.getRequestorName();
         Set<CAHasRequestorEntry> cmpRequestors = ca_has_requestors.get(caName);
-        if(cmpRequestors == null)
+        if (cmpRequestors == null)
         {
             cmpRequestors = new HashSet<>();
             ca_has_requestors.put(caName, cmpRequestors);
@@ -1780,9 +1780,9 @@ implements CAManager, CmpResponderManager, ScepManager
         else
         {
             boolean foundEntry = false;
-            for(CAHasRequestorEntry entry : cmpRequestors)
+            for (CAHasRequestorEntry entry : cmpRequestors)
             {
-                if(entry.getRequestorName().equals(requestorName))
+                if (entry.getRequestorName().equals(requestorName))
                 {
                     foundEntry = true;
                     break;
@@ -1790,7 +1790,7 @@ implements CAManager, CmpResponderManager, ScepManager
             }
 
             // already added
-            if(foundEntry)
+            if (foundEntry)
             {
                 return false;
             }
@@ -1816,13 +1816,13 @@ implements CAManager, CmpResponderManager, ScepManager
     {
         ParamUtil.assertNotBlank("profileName", profileName);
         asssertMasterMode();
-        for(String caName : ca_has_profiles.keySet())
+        for (String caName : ca_has_profiles.keySet())
         {
             removeCertprofileFromCA(profileName, caName);
         }
 
         boolean b = queryExecutor.deleteRowWithName(profileName, "PROFILE");
-        if(b == false)
+        if (b == false)
         {
             return false;
         }
@@ -1842,7 +1842,7 @@ implements CAManager, CmpResponderManager, ScepManager
     throws CAMgmtException
     {
         ParamUtil.assertNotBlank("name", name);
-        if(type == null && conf == null)
+        if (type == null && conf == null)
         {
             return false;
         }
@@ -1850,7 +1850,7 @@ implements CAManager, CmpResponderManager, ScepManager
         asssertMasterMode();
         IdentifiedX509Certprofile profile = queryExecutor.changeCertprofile(
                 name, type, conf, this);
-        if(profile == null)
+        if (profile == null)
         {
             return false;
         }
@@ -1860,7 +1860,7 @@ implements CAManager, CmpResponderManager, ScepManager
         certprofileDbEntries.put(name, profile.getDbEntry());
         certprofiles.put(name, profile);
 
-        if(oldProfile != null)
+        if (oldProfile != null)
         {
             shutdownCertprofile(oldProfile);
         }
@@ -1876,14 +1876,14 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamUtil.assertNotNull("dbEntry", dbEntry);
         asssertMasterMode();
         String name = dbEntry.getName();
-        if(certprofileDbEntries.containsKey(name))
+        if (certprofileDbEntries.containsKey(name))
         {
             return false;
         }
 
         dbEntry.setFaulty(true);
         IdentifiedX509Certprofile profile = createCertprofile(dbEntry);
-        if(profile == null)
+        if (profile == null)
         {
             return false;
         }
@@ -1897,10 +1897,10 @@ implements CAManager, CmpResponderManager, ScepManager
         try
         {
             certstore.addCertprofileName(name);
-        }catch(OperationException e)
+        } catch (OperationException e)
         {
             final String message = "exception while publishing certprofile name to certStore";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -1919,7 +1919,7 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamUtil.assertNotNull("dbEntry", dbEntry);
         asssertMasterMode();
         String name = dbEntry.getName();
-        if(crlSigners.containsKey(name))
+        if (crlSigners.containsKey(name))
         {
             return false;
         }
@@ -1939,14 +1939,14 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamUtil.assertNotBlank("name", name);
         asssertMasterMode();
         boolean b = queryExecutor.deleteRowWithName(name, "RESPONDER");
-        if(b == false)
+        if (b == false)
         {
             return false;
         }
-        for(String caName : caInfos.keySet())
+        for (String caName : caInfos.keySet())
         {
             X509CAInfo caInfo = caInfos.get(caName);
-            if(name.equals(caInfo.getResponderName()))
+            if (name.equals(caInfo.getResponderName()))
             {
                 caInfo.setResponderName(null);
             }
@@ -1968,14 +1968,14 @@ implements CAManager, CmpResponderManager, ScepManager
     {
         ParamUtil.assertNotBlank("name", name);
         asssertMasterMode();
-        if(type == null && conf == null && base64Cert == null)
+        if (type == null && conf == null && base64Cert == null)
         {
             return false;
         }
 
         CmpResponderEntryWrapper newResponder = queryExecutor.changeCmpResponder(
                 name, type, conf, base64Cert, this);
-        if(newResponder == null)
+        if (newResponder == null)
         {
             return false;
         }
@@ -2008,7 +2008,7 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamUtil.assertNotNull("dbEntry", dbEntry);
         asssertMasterMode();
         String name = dbEntry.getName();
-        if(crlSigners.containsKey(name))
+        if (crlSigners.containsKey(name))
         {
             return false;
         }
@@ -2029,14 +2029,14 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamUtil.assertNotBlank("name", name);
         asssertMasterMode();
         boolean b = queryExecutor.deleteRowWithName(name, "CRLSIGNER");
-        if(b == false)
+        if (b == false)
         {
             return false;
         }
-        for(String caName : caInfos.keySet())
+        for (String caName : caInfos.keySet())
         {
             X509CAInfo caInfo = caInfos.get(caName);
-            if(name.equals(caInfo.getCrlSignerName()))
+            if (name.equals(caInfo.getCrlSignerName()))
             {
                 caInfo.setCrlSignerName(null);
             }
@@ -2064,7 +2064,7 @@ implements CAManager, CmpResponderManager, ScepManager
 
         X509CrlSignerEntryWrapper crlSigner = queryExecutor.changeCrlSigner(
                 name, signer_type, signer_conf, signer_cert, crlControl, this);
-        if(crlSigner == null)
+        if (crlSigner == null)
         {
             return false;
         }
@@ -2098,14 +2098,14 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamUtil.assertNotNull("dbEntry", dbEntry);
         asssertMasterMode();
         String name = dbEntry.getName();
-        if(publisherDbEntries.containsKey(name))
+        if (publisherDbEntries.containsKey(name))
         {
             return false;
         }
 
         dbEntry.setFaulty(true);
         IdentifiedX509CertPublisher publisher = createPublisher(dbEntry);
-        if(publisher == null)
+        if (publisher == null)
         {
             return false;
         }
@@ -2119,10 +2119,10 @@ implements CAManager, CmpResponderManager, ScepManager
         try
         {
             certstore.addPublisherName(name);
-        }catch(OperationException e)
+        } catch (OperationException e)
         {
             final String message = "exception while publishing publisher nameto certStore";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -2139,13 +2139,13 @@ implements CAManager, CmpResponderManager, ScepManager
     {
         ParamUtil.assertNotBlank("caName", caName);
         Set<String> publisherNames = ca_has_publishers.get(caName.toUpperCase());
-        if(publisherNames == null)
+        if (publisherNames == null)
         {
             return Collections.emptyList();
         }
 
         List<PublisherEntry> ret = new ArrayList<>(publisherNames.size());
-        for(String publisherName : publisherNames)
+        for (String publisherName : publisherNames)
         {
             ret.add(publisherDbEntries.get(publisherName));
         }
@@ -2168,13 +2168,13 @@ implements CAManager, CmpResponderManager, ScepManager
     {
         ParamUtil.assertNotBlank("name", name);
         asssertMasterMode();
-        for(String caName : ca_has_publishers.keySet())
+        for (String caName : ca_has_publishers.keySet())
         {
             removePublisherFromCA(name, caName);
         }
 
         boolean b = queryExecutor.deleteRowWithName(name, "PUBLISHER");
-        if(b == false)
+        if (b == false)
         {
             return false;
         }
@@ -2195,20 +2195,20 @@ implements CAManager, CmpResponderManager, ScepManager
     {
         ParamUtil.assertNotBlank("name", name);
         asssertMasterMode();
-        if(type == null && conf == null)
+        if (type == null && conf == null)
         {
             return false;
         }
 
         IdentifiedX509CertPublisher publisher = queryExecutor.changePublisher(name, type,
                 conf, this);
-        if(publisher == null)
+        if (publisher == null)
         {
             return false;
         }
 
         IdentifiedX509CertPublisher oldPublisher = publishers.remove(name);
-        if(publisher != null)
+        if (publisher != null)
         {
             shutdownPublisher(oldPublisher);
         }
@@ -2242,7 +2242,7 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamUtil.assertNotNull("dbEntry", dbEntry);
         asssertMasterMode();
         final String name = dbEntry.getName();
-        if(cmpControlDbEntries.containsKey(name))
+        if (cmpControlDbEntries.containsKey(name))
         {
             return false;
         }
@@ -2254,7 +2254,7 @@ implements CAManager, CmpResponderManager, ScepManager
         } catch (InvalidConfException e)
         {
             final String message = "exception while adding CMP requestor to certStore";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -2280,15 +2280,15 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamUtil.assertNotBlank("name", name);
         asssertMasterMode();
         boolean b = queryExecutor.deleteRowWithName(name, "CMPCONTROL");
-        if(b == false)
+        if (b == false)
         {
             return false;
         }
 
-        for(String caName : caInfos.keySet())
+        for (String caName : caInfos.keySet())
         {
             X509CAInfo caInfo = caInfos.get(caName);
-            if(name.equals(caInfo.getCmpControlName()))
+            if (name.equals(caInfo.getCmpControlName()))
             {
                 caInfo.setCmpControlName(null);
             }
@@ -2311,7 +2311,7 @@ implements CAManager, CmpResponderManager, ScepManager
         asssertMasterMode();
 
         CmpControl newCmpControl = queryExecutor.changeCmpControl(name, conf);
-        if(newCmpControl == null)
+        if (newCmpControl == null)
         {
             return false;
         }
@@ -2349,7 +2349,7 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamUtil.assertNotBlank("name", name);
         ParamUtil.assertNotBlank("value", value);
         asssertMasterMode();
-        if(envParameterResolver.getEnvParam(name) != null)
+        if (envParameterResolver.getEnvParam(name) != null)
         {
             return false;
         }
@@ -2366,7 +2366,7 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamUtil.assertNotBlank("name", name);
         asssertMasterMode();
         boolean b = queryExecutor.deleteRowWithName(name, "ENVIRONMENT");
-        if(b == false)
+        if (b == false)
         {
             return false;
         }
@@ -2387,13 +2387,13 @@ implements CAManager, CmpResponderManager, ScepManager
         asssertMasterMode();
         assertNotNULL("value", value);
 
-        if(envParameterResolver.getEnvParam(name) == null)
+        if (envParameterResolver.getEnvParam(name) == null)
         {
             throw new CAMgmtException("could not find environment paramter " + name);
         }
 
         boolean changed = queryExecutor.changeEnvParam(name, value);
-        if(changed == false)
+        if (changed == false)
         {
             return false;
         }
@@ -2423,7 +2423,7 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamUtil.assertNotBlank("caName", caName);
         asssertMasterMode();
         caName = caName.toUpperCase();
-        if(caAliases.get(aliasName) != null)
+        if (caAliases.get(aliasName) != null)
         {
             return false;
         }
@@ -2441,7 +2441,7 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamUtil.assertNotBlank("name", name);
         asssertMasterMode();
         boolean b = queryExecutor.removeCaAlias(name);
-        if(b == false)
+        if (b == false)
         {
             return false;
         }
@@ -2466,10 +2466,10 @@ implements CAManager, CmpResponderManager, ScepManager
         caName = caName.toUpperCase();
 
         Set<String> aliases = new HashSet<>();
-        for(String alias : caAliases.keySet())
+        for (String alias : caAliases.keySet())
         {
             String thisCaName = caAliases.get(alias);
-            if(thisCaName.equals(caName))
+            if (thisCaName.equals(caName))
             {
                 aliases.add(alias);
             }
@@ -2494,7 +2494,7 @@ implements CAManager, CmpResponderManager, ScepManager
         name = name.toUpperCase();
 
         boolean b = queryExecutor.removeCA(name);
-        if(b == false)
+        if (b == false)
         {
             return false;
         }
@@ -2502,23 +2502,23 @@ implements CAManager, CmpResponderManager, ScepManager
         CAMgmtException exception = null;
 
         X509CAInfo caInfo = caInfos.get(name);
-        if(caInfo != null && caInfo.getCaEntry().getNextSerial() > 0)
+        if (caInfo != null && caInfo.getCaEntry().getNextSerial() > 0)
         {
             // drop the serial number sequence
             final String sequenceName = caInfo.getCaEntry().getSerialSeqName();
             try
             {
                 dataSource.dropSequence(sequenceName);
-            }catch(DataAccessException e)
+            } catch (DataAccessException e)
             {
                 final String message = "error in dropSequence " + sequenceName;
-                if(LOG.isWarnEnabled())
+                if (LOG.isWarnEnabled())
                 {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                             e.getMessage());
                 }
                 LOG.debug(message, e);
-                if(exception == null)
+                if (exception == null)
                 {
                     exception = new CAMgmtException(e.getMessage(), e);
                 }
@@ -2532,12 +2532,12 @@ implements CAManager, CmpResponderManager, ScepManager
         ca_has_requestors.remove(name);
         X509CA ca = x509cas.remove(name);
         x509Responders.remove(name);
-        if(ca != null)
+        if (ca != null)
         {
             ca.shutdown();
         }
 
-        if(exception != null)
+        if (exception != null)
         {
             throw exception;
         }
@@ -2555,7 +2555,7 @@ implements CAManager, CmpResponderManager, ScepManager
         asssertMasterMode();
         caName = caName.toUpperCase();
         X509CA ca = x509cas.get(caName);
-        if(ca == null)
+        if (ca == null)
         {
             throw new CAMgmtException("could not find CA named " + caName);
         }
@@ -2563,7 +2563,7 @@ implements CAManager, CmpResponderManager, ScepManager
         X509Cert certInfo = ca.getCAInfo().getCertificate();
 
         X509CertWithDBCertId certInfoWithId = new X509CertWithDBCertId(certInfo.getCert());
-        if(certInfo.getCert().getSubjectX500Principal().equals(
+        if (certInfo.getCert().getSubjectX500Principal().equals(
                 certInfo.getCert().getIssuerX500Principal()) == false)
         {
             throw new CAMgmtException("CA named " + caName + " is not a self-signed CA");
@@ -2598,7 +2598,7 @@ implements CAManager, CmpResponderManager, ScepManager
         asssertMasterMode();
 
         Set<String> caNames;
-        if(caName == null)
+        if (caName == null)
         {
             caNames = x509cas.keySet();
         }
@@ -2609,16 +2609,16 @@ implements CAManager, CmpResponderManager, ScepManager
             caNames.add(caName);
         }
 
-        for(String name : caNames)
+        for (String name : caNames)
         {
             X509CA ca = x509cas.get(name);
-            if(ca == null)
+            if (ca == null)
             {
                 throw new CAMgmtException("could not find CA named " + name);
             }
 
             boolean successfull = ca.republishCertificates(publisherNames);
-            if(successfull == false)
+            if (successfull == false)
             {
                 throw new CAMgmtException("republishing certificates of CA " + name + " failed");
             }
@@ -2640,7 +2640,7 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamUtil.assertNotNull("revocationInfo", revocationInfo);
 
         name = name.toUpperCase();
-        if(x509cas.containsKey(name) == false)
+        if (x509cas.containsKey(name) == false)
         {
             return false;
         }
@@ -2649,10 +2649,10 @@ implements CAManager, CmpResponderManager, ScepManager
         X509CA ca = x509cas.get(name);
 
         CertRevocationInfo currentRevInfo = ca.getCAInfo().getRevocationInfo();
-        if(currentRevInfo != null)
+        if (currentRevInfo != null)
         {
             CRLReason currentReason = currentRevInfo.getReason();
-            if(currentReason != CRLReason.CERTIFICATE_HOLD)
+            if (currentReason != CRLReason.CERTIFICATE_HOLD)
             {
                 throw new CAMgmtException("CA " + name + " has been revoked with reason "
                         + currentReason.name());
@@ -2660,7 +2660,7 @@ implements CAManager, CmpResponderManager, ScepManager
         }
 
         boolean b = queryExecutor.revokeCa(name, revocationInfo);
-        if(b == false)
+        if (b == false)
         {
             return false;
         }
@@ -2685,7 +2685,7 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamUtil.assertNotBlank("caName", name);
         asssertMasterMode();
         name = name.toUpperCase();
-        if(x509cas.containsKey(name) == false)
+        if (x509cas.containsKey(name) == false)
         {
             throw new CAMgmtException("could not find CA named " + name);
         }
@@ -2693,7 +2693,7 @@ implements CAManager, CmpResponderManager, ScepManager
         LOG.info("unrevoking of CA '{}'", name);
 
         boolean b = queryExecutor.unrevokeCa(name);
-        if(b == false)
+        if (b == false)
         {
             return false;
         }
@@ -2717,13 +2717,13 @@ implements CAManager, CmpResponderManager, ScepManager
     {
         this.auditServiceRegister = serviceRegister;
 
-        for(String name : publishers.keySet())
+        for (String name : publishers.keySet())
         {
             IdentifiedX509CertPublisher publisherEntry = publishers.get(name);
             publisherEntry.setAuditServiceRegister(auditServiceRegister);
         }
 
-        for(String name : x509cas.keySet())
+        for (String name : x509cas.keySet())
         {
             X509CA ca = x509cas.get(name);
             ca.setAuditServiceRegister(serviceRegister);
@@ -2737,7 +2737,7 @@ implements CAManager, CmpResponderManager, ScepManager
         AuditService auditService = (auditServiceRegister == null)
                 ? null
                 : auditServiceRegister.getAuditService();
-        if(auditService == null)
+        if (auditService == null)
         {
             return;
         }
@@ -2746,7 +2746,7 @@ implements CAManager, CmpResponderManager, ScepManager
         auditEvent.setUserId("CA-SYSTEM");
         auditEvent.setEventType(eventType);
         auditEvent.setAffectedResource("CORE");
-        if(successfull)
+        if (successfull)
         {
             auditEvent.setStatus(AuditStatus.SUCCESSFUL.name());
             auditEvent.setLevel(AuditLevel.INFO);
@@ -2767,7 +2767,7 @@ implements CAManager, CmpResponderManager, ScepManager
     {
         asssertMasterMode();
 
-        if(caName == null)
+        if (caName == null)
         {
             try
             {
@@ -2781,7 +2781,7 @@ implements CAManager, CmpResponderManager, ScepManager
 
         caName = caName.toUpperCase();
         X509CA ca = x509cas.get(caName);
-        if(ca == null)
+        if (ca == null)
         {
             throw new CAMgmtException("could not find CA named " + caName);
         }
@@ -2790,18 +2790,18 @@ implements CAManager, CmpResponderManager, ScepManager
 
     private void shutdownScheduledThreadPoolExecutor()
     {
-        if(scheduledThreadPoolExecutor == null)
+        if (scheduledThreadPoolExecutor == null)
         {
             return;
         }
 
         scheduledThreadPoolExecutor.shutdown();
-        while(scheduledThreadPoolExecutor.isTerminated() == false)
+        while (scheduledThreadPoolExecutor.isTerminated() == false)
         {
             try
             {
                 Thread.sleep(100);
-            }catch(InterruptedException e)
+            } catch (InterruptedException e)
             {
             }
         }
@@ -2856,7 +2856,7 @@ implements CAManager, CmpResponderManager, ScepManager
         ParamUtil.assertNotNull("serialNumber", serialNumber);
         asssertMasterMode();
         X509CA ca = getX509CA(caName);
-        if(ca == null)
+        if (ca == null)
         {
             return false;
         }
@@ -2887,12 +2887,12 @@ implements CAManager, CmpResponderManager, ScepManager
         try
         {
             p10cr = CertificationRequest.getInstance(encodedPkcs10Request);
-        }catch(Exception e)
+        } catch (Exception e)
         {
             throw new CAMgmtException("invalid PKCS#10 request. ERROR: " + e.getMessage());
         }
 
-        if(securityFactory.verifyPOPO(p10cr) == false)
+        if (securityFactory.verifyPOPO(p10cr) == false)
         {
             throw new CAMgmtException("could not validate POP for the pkcs#10 requst");
         }
@@ -2900,10 +2900,10 @@ implements CAManager, CmpResponderManager, ScepManager
         CertificationRequestInfo certTemp = p10cr.getCertificationRequestInfo();
         Extensions extensions = null;
         ASN1Set attrs = certTemp.getAttributes();
-        for(int i = 0; i < attrs.size(); i++)
+        for (int i = 0; i < attrs.size(); i++)
         {
             Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-            if(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
+            if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
             {
                 extensions = Extensions.getInstance(attr.getAttributeValues()[0]);
             }
@@ -2930,7 +2930,7 @@ implements CAManager, CmpResponderManager, ScepManager
     throws CAMgmtException
     {
         X509CA ca = x509cas.get(name.toUpperCase());
-        if(ca == null)
+        if (ca == null)
         {
             throw new CAMgmtException("unknown CA " + name);
         }
@@ -2950,12 +2950,12 @@ implements CAManager, CmpResponderManager, ScepManager
         caName = caName.toUpperCase();
         List<IdentifiedX509CertPublisher> ret = new LinkedList<>();
         Set<String> publisherNames = ca_has_publishers.get(caName);
-        if(publisherNames == null)
+        if (publisherNames == null)
         {
             return ret;
         }
 
-        for(String publisherName : publisherNames)
+        for (String publisherName : publisherNames)
         {
             IdentifiedX509CertPublisher publisher = publishers.get(publisherName);
             ret.add(publisher);
@@ -2987,26 +2987,26 @@ implements CAManager, CmpResponderManager, ScepManager
         String signer_conf = caEntry.getSignerConf();
 
         asssertMasterMode();
-        if(nextSerial < 0)
+        if (nextSerial < 0)
         {
             System.err.println("invalid serial number: " + nextSerial);
             return null;
         }
 
-        if(numCrls < 0)
+        if (numCrls < 0)
         {
             System.err.println("invalid numCrls: " + numCrls);
             return null;
         }
 
-        if(expirationPeriod < 0)
+        if (expirationPeriod < 0)
         {
             System.err.println("invalid expirationPeriod: " + expirationPeriod);
             return null;
         }
 
         CertificationRequest p10Request;
-        if(p10Req == null)
+        if (p10Req == null)
         {
             System.err.println("p10Req is null");
             return null;
@@ -3022,13 +3022,13 @@ implements CAManager, CmpResponderManager, ScepManager
         }
 
         IdentifiedX509Certprofile certprofile = getIdentifiedCertprofile(certprofileName);
-        if(certprofile == null)
+        if (certprofile == null)
         {
             throw new CAMgmtException("unknown cert profile " + certprofileName);
         }
 
         long serialOfThisCert;
-        if(nextSerial > 0)
+        if (nextSerial > 0)
         {
             serialOfThisCert = nextSerial;
             nextSerial ++;
@@ -3054,7 +3054,7 @@ implements CAManager, CmpResponderManager, ScepManager
         String signerConf = result.getSignerConf();
         X509Certificate caCert = result.getCert();
 
-        if("PKCS12".equalsIgnoreCase(signer_type) || "JKS".equalsIgnoreCase(signer_type))
+        if ("PKCS12".equalsIgnoreCase(signer_type) || "JKS".equalsIgnoreCase(signer_type))
         {
             try
             {
@@ -3092,7 +3092,7 @@ implements CAManager, CmpResponderManager, ScepManager
     private void asssertMasterMode()
     throws CAMgmtException
     {
-        if(masterMode == false)
+        if (masterMode == false)
         {
             throw new CAMgmtException("operation not allowed in slave mode");
         }
@@ -3102,7 +3102,7 @@ implements CAManager, CmpResponderManager, ScepManager
             final String parameterName,
             final String parameterValue)
     {
-        if(CAManager.NULL.equalsIgnoreCase(parameterValue))
+        if (CAManager.NULL.equalsIgnoreCase(parameterValue))
         {
             throw new IllegalArgumentException(parameterName + " could not be " + CAManager.NULL);
         }
@@ -3115,7 +3115,7 @@ implements CAManager, CmpResponderManager, ScepManager
             final X509Certificate[] certChain)
     throws Exception
     {
-        if(signerConf.contains("file:") == false && signerConf.contains("base64:") == false )
+        if (signerConf.contains("file:") == false && signerConf.contains("base64:") == false )
         {
             return signerConf;
         }
@@ -3126,12 +3126,12 @@ implements CAManager, CmpResponderManager, ScepManager
         String keyLabel     = pairs.getValue("key-label");
 
         byte[] keystoreBytes;
-        if(StringUtil.startsWithIgnoreCase(keystoreConf, "file:"))
+        if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:"))
         {
             String keystoreFile = keystoreConf.substring("file:".length());
             keystoreBytes = IoUtil.read(keystoreFile);
         }
-        else if(StringUtil.startsWithIgnoreCase(keystoreConf, "base64:"))
+        else if (StringUtil.startsWithIgnoreCase(keystoreConf, "base64:"))
         {
             keystoreBytes = Base64.decode(keystoreConf.substring("base64:".length()));
         }
@@ -3151,7 +3151,7 @@ implements CAManager, CmpResponderManager, ScepManager
     void shutdownCertprofile(
             final IdentifiedX509Certprofile profile)
     {
-        if(profile == null)
+        if (profile == null)
         {
             return;
         }
@@ -3159,10 +3159,10 @@ implements CAManager, CmpResponderManager, ScepManager
         try
         {
             profile.shutdown();
-        } catch(Exception e)
+        } catch (Exception e)
         {
             final String message = "could not shutdown Certprofile " + profile.getName();
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -3174,7 +3174,7 @@ implements CAManager, CmpResponderManager, ScepManager
     void shutdownPublisher(
             final IdentifiedX509CertPublisher publisher)
     {
-        if(publisher == null)
+        if (publisher == null)
         {
             return;
         }
@@ -3182,10 +3182,10 @@ implements CAManager, CmpResponderManager, ScepManager
         try
         {
             publisher.shutdown();
-        } catch(Exception e)
+        } catch (Exception e)
         {
             final String message = "could not shutdown CertPublisher " + publisher.getName();
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -3204,7 +3204,7 @@ implements CAManager, CmpResponderManager, ScepManager
         try
         {
             ret.initSigner(securityFactory);
-        }catch(SignerException e)
+        } catch (SignerException e)
         {
             final String message = "createCmpResponder";
             LOG.debug(message, e);
@@ -3232,14 +3232,14 @@ implements CAManager, CmpResponderManager, ScepManager
         } catch (SignerException | OperationException | InvalidConfException e)
         {
             final String message = "exception while creating CRL signer " + dbEntry.getName();
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
             }
             LOG.debug(message, e);
 
-            if(e instanceof OperationException)
+            if (e instanceof OperationException)
             {
                 throw new CAMgmtException(message + ": "
                         + ((OperationException) e).getErrorCode() + ", " + e.getMessage());
@@ -3264,11 +3264,11 @@ implements CAManager, CmpResponderManager, ScepManager
             ret.setEnvParameterResolver(envParameterResolver);
             ret.validate();
             return ret;
-        }catch(CertprofileException e)
+        } catch (CertprofileException e)
         {
             final String message = "could not initialize Certprofile " + dbEntry.getName()
                 + ", ignore it";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -3293,10 +3293,10 @@ implements CAManager, CmpResponderManager, ScepManager
             ret = new IdentifiedX509CertPublisher(dbEntry, realType);
             ret.initialize(securityFactory.getPasswordResolver(), dataSources);
             return ret;
-        } catch(CertPublisherException | RuntimeException e)
+        } catch (CertPublisherException | RuntimeException e)
         {
             final String message = "invalid configuration for the certPublisher " + name;
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message),
                         e.getClass().getName(), e.getMessage());
@@ -3324,13 +3324,13 @@ implements CAManager, CmpResponderManager, ScepManager
             String typeMap,
             final String type)
     {
-        if(typeMap == null)
+        if (typeMap == null)
         {
             return null;
         }
 
         typeMap = typeMap.trim();
-        if(StringUtil.isBlank(typeMap))
+        if (StringUtil.isBlank(typeMap))
         {
             return null;
         }
@@ -3339,7 +3339,7 @@ implements CAManager, CmpResponderManager, ScepManager
         try
         {
             pairs = new ConfPairs(typeMap);
-        }catch(IllegalArgumentException e)
+        } catch (IllegalArgumentException e)
         {
             LOG.error("CA environment {}: '{}"
                     + ""
@@ -3356,13 +3356,13 @@ implements CAManager, CmpResponderManager, ScepManager
         ConfPairs pairs = new ConfPairs(conf);
         String str = pairs.getValue("algo");
         List<String> list = StringUtil.split(str, ":");
-        if(list == null)
+        if (list == null)
         {
             throw new SignerException("no algo is defined in CA signerConf");
         }
 
         List<String[]> signerConfs = new ArrayList<>(list.size());
-        for(String n : list)
+        for (String n : list)
         {
             String c14nAlgo;
             try
@@ -3423,7 +3423,7 @@ implements CAManager, CmpResponderManager, ScepManager
 
         Scep scep = new Scep(dbEntry, this);
         boolean b = queryExecutor.addScep(dbEntry);
-        if(b)
+        if (b)
         {
             final String caName = dbEntry.getCaName();
             scep.refreshCA();
@@ -3443,7 +3443,7 @@ implements CAManager, CmpResponderManager, ScepManager
 
         name = name.toUpperCase();
         boolean b = queryExecutor.removeScep(name);
-        if(b)
+        if (b)
         {
             scepDbEntries.remove(name);
             sceps.remove(name);
@@ -3463,13 +3463,13 @@ implements CAManager, CmpResponderManager, ScepManager
         String conf = scepEntry.getResponderConf();
         String base64Cert = scepEntry.getBase64Cert();
         String control = scepEntry.getControl();
-        if(type == null && conf == null && base64Cert == null && control == null)
+        if (type == null && conf == null && base64Cert == null && control == null)
         {
             return false;
         }
 
         Scep scep = queryExecutor.changeScep(caName, type, conf, base64Cert, control, this);
-        if(scep == null)
+        if (scep == null)
         {
             return false;
         }

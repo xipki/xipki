@@ -59,10 +59,10 @@ public class XipkiDbControl
     public XipkiDbControl(
             final DbSchemaType dbSchemaType)
     {
-        if(dbSchemaType == DbSchemaType.XIPKI_CA_v1
+        if (dbSchemaType == DbSchemaType.XIPKI_CA_v1
                 || dbSchemaType == DbSchemaType.XIPKI_OCSP_v1)
         {
-            if(dbSchemaType == DbSchemaType.XIPKI_CA_v1)
+            if (dbSchemaType == DbSchemaType.XIPKI_CA_v1)
             { // CA
                 tblCa = "CAINFO";
                 tblCerthash = "RAWCERT";
@@ -81,10 +81,10 @@ public class XipkiDbControl
             colRevReason = "REV_REASON";
             colRevTime = "REV_TIME";
             colSerialNumber = "SERIAL";
-        } else if(dbSchemaType == DbSchemaType.XIPKI_CA_v2
+        } else if (dbSchemaType == DbSchemaType.XIPKI_CA_v2
                 || dbSchemaType == DbSchemaType.XIPKI_OCSP_v2)
         {
-            if(dbSchemaType == DbSchemaType.XIPKI_CA_v2)
+            if (dbSchemaType == DbSchemaType.XIPKI_CA_v2)
             { // CA
                 tblCa = "CS_CA";
                 tblCerthash = "CRAW";

@@ -62,13 +62,13 @@ public class P11RSAKeyGenCmd extends P11KeyGenCmd
     protected Object _doExecute()
     throws Exception
     {
-        if(keysize % 1024 != 0)
+        if (keysize % 1024 != 0)
         {
             throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
         }
 
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        if(noCert)
+        if (noCert)
         {
             P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent),
                     label);

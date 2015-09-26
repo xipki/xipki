@@ -85,19 +85,19 @@ public enum HashAlgoType
     public static HashAlgoType getHashAlgoType(
             String nameOrOid)
     {
-        for(HashAlgoType hashAlgo : values())
+        for (HashAlgoType hashAlgo : values())
         {
-            if(hashAlgo.oid.equals(nameOrOid))
+            if (hashAlgo.oid.equals(nameOrOid))
             {
                 return hashAlgo;
             }
 
-            if(nameOrOid.indexOf('-') != -1)
+            if (nameOrOid.indexOf('-') != -1)
             {
                 nameOrOid = nameOrOid.replace("-", "");
             }
 
-            if(hashAlgo.name.equalsIgnoreCase(nameOrOid))
+            if (hashAlgo.name.equalsIgnoreCase(nameOrOid))
             {
                 return hashAlgo;
             }
@@ -119,16 +119,16 @@ public enum HashAlgoType
             final byte[] content)
     {
         Digest digest;
-        if(this == SHA1)
+        if (this == SHA1)
         {
             digest = new SHA1Digest();
-        }else if(this == SHA256)
+        }else if (this == SHA256)
         {
             digest = new SHA256Digest();
-        }else if(this == SHA512)
+        }else if (this == SHA512)
         {
             digest = new SHA512Digest();
-        }else if(this == MD5)
+        }else if (this == MD5)
         {
             digest = new MD5Digest();
         } else

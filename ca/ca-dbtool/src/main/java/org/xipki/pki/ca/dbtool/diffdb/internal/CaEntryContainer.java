@@ -56,7 +56,7 @@ public class CaEntryContainer
     {
         ParamUtil.assertNotEmpty("caEntries", caEntries);
         caEntryMap = new HashMap<>(caEntries.size());
-        for(CaEntry m : caEntries)
+        for (CaEntry m : caEntries)
         {
             caEntryMap.put(m.getCaId(), m);
         }
@@ -69,7 +69,7 @@ public class CaEntryContainer
     throws IOException, InvalidDataObjectException
     {
         CaEntry m = caEntryMap.get(caId);
-        if(m == null)
+        if (m == null)
         {
             throw new IllegalArgumentException("unknown caId '" + caId + "'");
         }
@@ -81,7 +81,7 @@ public class CaEntryContainer
     {
         StringBuilder sb = new StringBuilder();
 
-        for(CaEntry m : caEntryMap.values())
+        for (CaEntry m : caEntryMap.values())
         {
             try
             {
@@ -94,7 +94,7 @@ public class CaEntryContainer
         }
 
         int n = sb.length();
-        if(n > 0)
+        if (n > 0)
         {
             sb.delete(n - 2, n);
             throw new IOException(sb.toString());

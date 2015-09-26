@@ -61,33 +61,33 @@ public class ResponderCheckCmd extends ResponderUpdateCmd
         out("checking responder " + name);
 
         CmpResponderEntry cr = caManager.getCmpResponder(name);
-        if(cr == null)
+        if (cr == null)
         {
             throw new CmdFailure("CMP responder named '" + name + "' is not configured");
         }
 
-        if(CAManager.NULL.equalsIgnoreCase(certFile))
+        if (CAManager.NULL.equalsIgnoreCase(certFile))
         {
-            if(cr.getBase64Cert() != null)
+            if (cr.getBase64Cert() != null)
             {
                 throw new CmdFailure("Cert: is configured but expected is none");
             }
         }
-        else if(certFile != null)
+        else if (certFile != null)
         {
             byte[] ex = IoUtil.read(certFile);
-            if(cr.getBase64Cert() == null)
+            if (cr.getBase64Cert() == null)
             {
                 throw new CmdFailure("Cert: is not configured explicitly as expected");
             }
-            if(Arrays.equals(ex, Base64.decode(cr.getBase64Cert())) == false)
+            if (Arrays.equals(ex, Base64.decode(cr.getBase64Cert())) == false)
             {
                 throw new CmdFailure("Cert: the expected one and the actual one differ");
             }
         }
 
         String signerConf = getSignerConf();
-        if(signerConf != null)
+        if (signerConf != null)
         {
             MgmtQAShellUtil.assertEquals("conf", signerConf, cr.getConf());
         }

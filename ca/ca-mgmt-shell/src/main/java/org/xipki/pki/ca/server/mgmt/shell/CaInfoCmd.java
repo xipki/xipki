@@ -68,11 +68,11 @@ public class CaInfoCmd extends CaCmd
     {
         StringBuilder sb = new StringBuilder();
 
-        if(caName == null)
+        if (caName == null)
         {
             Set<String> names = caManager.getCaNames();
             int n = names.size();
-            if(n == 0 || n == 1)
+            if (n == 0 || n == 1)
             {
                 sb.append((n == 0)
                         ? "no"
@@ -86,11 +86,11 @@ public class CaInfoCmd extends CaCmd
 
             List<String> sorted = new ArrayList<>(names);
             Collections.sort(sorted);
-            for(String paramName : sorted)
+            for (String paramName : sorted)
             {
                 sb.append("\t").append(paramName);
                 Set<String> aliases = caManager.getAliasesForCA(paramName);
-                if(CollectionUtil.isNotEmpty(aliases))
+                if (CollectionUtil.isNotEmpty(aliases))
                 {
                     sb.append(" (aliases: ").append(toString(aliases)).append(")");
                 }
@@ -100,7 +100,7 @@ public class CaInfoCmd extends CaCmd
         else
         {
             CAEntry entry = caManager.getCA(caName);
-            if(entry == null)
+            if (entry == null)
             {
                 throw new UnexpectedException("could not find CA '" + caName + "'");
             }

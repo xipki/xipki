@@ -61,7 +61,7 @@ public class P11Control
         ParamUtil.assertNotBlank("defaultModuleName", defaultModuleName);
 
         this.defaultModuleName = defaultModuleName;
-        if(CollectionUtil.isEmpty(moduleConfs))
+        if (CollectionUtil.isEmpty(moduleConfs))
         {
             this.moduleConfs = Collections.emptyMap();
             this.moduleNames = Collections.emptySet();
@@ -70,7 +70,7 @@ public class P11Control
         {
             this.moduleConfs = new HashMap<>(moduleConfs.size());
             Set<String> _moduleNames = new HashSet<>();
-            for(P11ModuleConf conf : moduleConfs)
+            for (P11ModuleConf conf : moduleConfs)
             {
                 this.moduleConfs.put(conf.getName(), conf);
                 _moduleNames.add(conf.getName());

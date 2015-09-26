@@ -54,7 +54,7 @@ public class CaUnrevokeCmd extends CaCmd
     protected Object _doExecute()
     throws Exception
     {
-        if(caManager.getCaNames().contains(caName) == false)
+        if (caManager.getCaNames().contains(caName) == false)
         {
             throw new IllegalCmdParamException("invalid CA name " + caName);
         }

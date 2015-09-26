@@ -67,7 +67,7 @@ public class P12CertRequestGenCmd extends CertRequestGenCmd
     private char[] getPassword()
     {
         char[] pwdInChar = readPasswordIfNotSet(password);
-        if(pwdInChar != null)
+        if (pwdInChar != null)
         {
             password = new String(pwdInChar);
         }
@@ -87,7 +87,7 @@ public class P12CertRequestGenCmd extends CertRequestGenCmd
             ks.load(fIn, getPassword());
         }finally
         {
-            if(fIn != null)
+            if (fIn != null)
             {
                 fIn.close();
             }

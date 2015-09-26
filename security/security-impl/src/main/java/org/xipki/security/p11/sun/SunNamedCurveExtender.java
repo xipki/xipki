@@ -94,7 +94,7 @@ public class SunNamedCurveExtender
         {
             class_CurveDB = Class.forName("sun.security.ec.CurveDB");
             _jdk18On = true;
-        }catch(ClassNotFoundException e)
+        } catch (ClassNotFoundException e)
         {
             _jdk18On = false;
         }
@@ -105,49 +105,49 @@ public class SunNamedCurveExtender
         try
         {
             class_NamedCurve = Class.forName(classname_NamedCurve);
-        }catch(ClassNotFoundException e)
+        } catch (ClassNotFoundException e)
         {
             LOG.warn("could not load class {}", classname_NamedCurve);
             LOG.debug("could not load class " + classname_NamedCurve, e);
             successfull = false;
         }
 
-        if(jdk18on)
+        if (jdk18on)
         {
-            if(successfull)
+            if (successfull)
             {
                 method_CurveDB_lookup_name = getMethod(class_CurveDB, "lookup",
                         new Class<?>[]{String.class});
             }
-            if(method_CurveDB_lookup_name == null)
+            if (method_CurveDB_lookup_name == null)
             {
                 successfull = false;
             }
 
-            if(successfull)
+            if (successfull)
             {
                 method_CurveDB_lookup_paramSpec = getMethod(class_CurveDB, "lookup",
                         new Class<?>[]{ECParameterSpec.class});
             }
-            if(method_CurveDB_lookup_paramSpec == null)
+            if (method_CurveDB_lookup_paramSpec == null)
             {
                 successfull = false;
             }
 
-            if(successfull)
+            if (successfull)
             {
                 method_NamedCurve_getObjectId = getMethod(class_NamedCurve, "getObjectId", null);
             }
-            if(method_NamedCurve_getObjectId == null)
+            if (method_NamedCurve_getObjectId == null)
             {
                 successfull = false;
             }
 
-            if(successfull)
+            if (successfull)
             {
                 method_NamedCurve_getEncoded = getMethod(class_NamedCurve, "getEncoded", null);
             }
-            if(method_NamedCurve_getEncoded == null)
+            if (method_NamedCurve_getEncoded == null)
             {
                 successfull = false;
             }
@@ -164,13 +164,13 @@ public class SunNamedCurveExtender
     {
         synchronized (EXECUTED)
         {
-            if(successfull == false)
+            if (successfull == false)
             {
                 LOG.warn("could not initialize");
                 return;
             }
 
-            if(EXECUTED)
+            if (EXECUTED)
             {
                 return;
             }
@@ -178,7 +178,7 @@ public class SunNamedCurveExtender
 
             try
             {
-                if(jdk18on)
+                if (jdk18on)
                 {
                     addNamedCurves_jdk18on();
                 }
@@ -187,10 +187,10 @@ public class SunNamedCurveExtender
                     addNamedCurves_jdk17();
                 }
 
-            }catch(Throwable t)
+            } catch (Throwable t)
             {
                 final String message = "uncatched Error";
-                if(LOG.isErrorEnabled())
+                if (LOG.isErrorEnabled())
                 {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                             t.getMessage());
@@ -210,20 +210,20 @@ public class SunNamedCurveExtender
         final Class<?>[] Param_getCurve = new Class[]{String.class};
 
         Method method_add = getMethod(class_NamedCurve, "add", Param_NamedCurve_add);
-        if(method_add == null)
+        if (method_add == null)
         {
             return;
         }
 
         Method method_getCurve = getMethod(class_NamedCurve, "getECParameterSpec",
                 Param_getCurve);
-        if(method_getCurve == null)
+        if (method_getCurve == null)
         {
             return;
         }
 
         Field field_SPLIT_PATTERN = getField(class_NamedCurve, "SPLIT_PATTERN");
-        if(field_SPLIT_PATTERN == null)
+        if (field_SPLIT_PATTERN == null)
         {
             return;
         }
@@ -234,7 +234,7 @@ public class SunNamedCurveExtender
         } catch (IllegalArgumentException | IllegalAccessException e)
         {
             final String message = "could not set Field SPLIT_PATTERN";
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -247,12 +247,12 @@ public class SunNamedCurveExtender
         Map<String, String> addedCurves = new HashMap<>();
 
         Enumeration<?> curveNames = ECNamedCurveTable.getNames();
-        while(curveNames.hasMoreElements())
+        while (curveNames.hasMoreElements())
         {
             String curveName = (String) curveNames.nextElement();
             ASN1ObjectIdentifier curveId = getCurveId(curveName);
 
-            if(curveId == null)
+            if (curveId == null)
             {
                 LOG.info("cound not find curve OID for curve {}, ignore it", curveName);
                 continue;
@@ -260,7 +260,7 @@ public class SunNamedCurveExtender
 
             String curveDesc = "named curve " + curveName + " (" + curveId + ")";
 
-            if(processedCurveOids.contains(curveId.getId()))
+            if (processedCurveOids.contains(curveId.getId()))
             {
                 LOG.debug("{} is already processed, ignore it", curveDesc);
                 continue;
@@ -268,7 +268,7 @@ public class SunNamedCurveExtender
 
             processedCurveOids.add(curveId.getId());
 
-            if(curve_isRegistered(method_getCurve, curveId))
+            if (curve_isRegistered(method_getCurve, curveId))
             {
                 LOG.debug("{} is already registered, ignore it", curveDesc);
                 continue;
@@ -277,13 +277,13 @@ public class SunNamedCurveExtender
             X9ECParameters params = ECNamedCurveTable.getByOID(curveId);
             ECCurve curve = params.getCurve();
 
-            if(curve instanceof ECCurve.Fp || curve instanceof ECCurve.F2m)
+            if (curve instanceof ECCurve.Fp || curve instanceof ECCurve.F2m)
             {
                 CurveData c = new CurveData(params);
                 boolean added = NamedCurve_add(method_add, curveName, curveId.getId(), c.type,
                         c.sfield, c.a, c.b, c.x, c.y, c.n, c.h);
 
-                if(added)
+                if (added)
                 {
                     LOG.debug("added {}", curveDesc);
                     addedCurves.put(curveName, curveId.getId());
@@ -305,7 +305,7 @@ public class SunNamedCurveExtender
         } catch (IllegalArgumentException | IllegalAccessException e)
         {
             final String message = "could not set Field SPLIT_PATTERN";
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -328,25 +328,25 @@ public class SunNamedCurveExtender
         final Class<?>[] Param_getCurve = new Class[]{String.class};
 
         Method method_add = getMethod(class_CurveDB, "add", Param_CurveDB_add);
-        if(method_add == null)
+        if (method_add == null)
         {
             return;
         }
 
         Method method_getCurve = getMethod(class_CurveDB, "lookup", Param_getCurve);
-        if(method_getCurve == null)
+        if (method_getCurve == null)
         {
             return;
         }
 
         Field field_oidMap = getField(class_CurveDB, "oidMap");
-        if(field_oidMap == null)
+        if (field_oidMap == null)
         {
             return;
         }
 
         Field field_specCollection = getField(class_CurveDB, "specCollection");
-        if(field_specCollection == null)
+        if (field_specCollection == null)
         {
             return;
         }
@@ -355,11 +355,11 @@ public class SunNamedCurveExtender
         Map<String, String> addedCurves = new HashMap<>();
 
         Enumeration<?> curveNames = ECNamedCurveTable.getNames();
-        while(curveNames.hasMoreElements())
+        while (curveNames.hasMoreElements())
         {
             String curveName = (String) curveNames.nextElement();
             ASN1ObjectIdentifier curveId = getCurveId(curveName);
-            if(curveId == null)
+            if (curveId == null)
             {
                 LOG.debug("cound not find curve OID for curve {}, ignore it", curveName);
                 continue;
@@ -367,7 +367,7 @@ public class SunNamedCurveExtender
 
             String curveDesc = "named curve " + curveName + " (" + curveId + ")";
 
-            if(processedCurveOids.contains(curveId.getId()))
+            if (processedCurveOids.contains(curveId.getId()))
             {
                 LOG.debug("{} is already processed, ignore it", curveDesc);
                 continue;
@@ -375,7 +375,7 @@ public class SunNamedCurveExtender
 
             processedCurveOids.add(curveId.getId());
 
-            if(curve_isRegistered(method_getCurve, curveId))
+            if (curve_isRegistered(method_getCurve, curveId))
             {
                 LOG.info("{} is already registered, ignore it", curveDesc);
                 continue;
@@ -383,13 +383,13 @@ public class SunNamedCurveExtender
 
             X9ECParameters params = ECNamedCurveTable.getByOID(curveId);
             ECCurve curve = params.getCurve();
-            if(curve instanceof ECCurve.Fp || curve instanceof ECCurve.F2m)
+            if (curve instanceof ECCurve.Fp || curve instanceof ECCurve.F2m)
             {
                 CurveData c = new CurveData(params);
                 boolean added = CurveDB_add(method_add, curveName, curveId.getId(), c.type,
                         c.sfield, c.a, c.b, c.x, c.y, c.n, c.h);
 
-                if(added)
+                if (added)
                 {
                     LOG.debug("added {}", curveDesc);
                     addedCurves.put(curveName, curveId.getId());
@@ -415,7 +415,7 @@ public class SunNamedCurveExtender
         {
             final String message =
                     "could not update change the value of field CurveDB.specCollection.";
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -526,7 +526,7 @@ public class SunNamedCurveExtender
 
         try
         {
-            if(params == null)
+            if (params == null)
             {
                 serviceMethod = clz.getDeclaredMethod(methodName);
             }
@@ -539,7 +539,7 @@ public class SunNamedCurveExtender
         } catch (SecurityException | NoSuchMethodException e)
         {
             final String message = "could not get " + desc;
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -563,7 +563,7 @@ public class SunNamedCurveExtender
         } catch (NoSuchFieldException e)
         {
             final String message = "could not get " + desc;
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -597,14 +597,14 @@ public class SunNamedCurveExtender
             this.n = params.getN().toString(16);
             this.h = params.getH().intValue();
 
-            if(curve instanceof ECCurve.Fp)
+            if (curve instanceof ECCurve.Fp)
             {
                 this.type = P;
 
                 ECCurve.Fp c = (ECCurve.Fp) curve;
                 this.sfield = c.getQ().toString(16);
             }
-            else // if(curve instanceof ECCurve.F2m)
+            else // if (curve instanceof ECCurve.F2m)
             {
                 this.type = B;
 
@@ -621,7 +621,7 @@ public class SunNamedCurveExtender
 
                 for (int j = 0; j < ks.length; j++)
                 {
-                    if(ks[j] > 0)
+                    if (ks[j] > 0)
                     {
                         rp = rp.setBit(ks[j]);
                     }
@@ -641,7 +641,7 @@ public class SunNamedCurveExtender
         List<String> names = new ArrayList<>(tmp);
         Collections.sort(names);
 
-        for(String name : names)
+        for (String name : names)
         {
             String oid = addedCurves.get(name);
             sb.append("\t");

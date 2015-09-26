@@ -116,7 +116,7 @@ public class DbiXmlWriter
     public void flush()
     throws IOException, XMLStreamException
     {
-        if(flushed)
+        if (flushed)
         {
             return;
         }

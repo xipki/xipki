@@ -57,7 +57,7 @@ public class OCSPNonceUnmatchedException extends OCSPResponseException
     {
         StringBuilder sb = new StringBuilder(100);
         sb.append("nonce unmatch (received ");
-        if(is == null || is.length == 0)
+        if (is == null || is.length == 0)
         {
             sb.append("none");
         }
@@ -66,7 +66,7 @@ public class OCSPNonceUnmatchedException extends OCSPResponseException
             sb.append(Hex.toHexString(is));
         }
         sb.append(", but expected ");
-        if(expected == null || expected.length == 0)
+        if (expected == null || expected.length == 0)
         {
             sb.append("nonce");
         }

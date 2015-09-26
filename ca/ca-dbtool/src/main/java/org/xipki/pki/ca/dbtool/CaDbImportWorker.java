@@ -129,16 +129,16 @@ public class CaDbImportWorker extends DbPortWorker
     throws Exception
     {
         File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
-        if(resume)
+        if (resume)
         {
-            if(processLogFile.exists() == false)
+            if (processLogFile.exists() == false)
             {
                 throw new Exception("could not process with '--resume' option");
             }
         }
         else
         {
-            if(processLogFile.exists())
+            if (processLogFile.exists())
             {
                 throw new Exception("please either specify '--resume' option or delete the file "
                         + processLogFile.getPath() + " first");
@@ -148,7 +148,7 @@ public class CaDbImportWorker extends DbPortWorker
         long start = System.currentTimeMillis();
         try
         {
-            if(resume == false)
+            if (resume == false)
             {
                 // CAConfiguration
                 CaConfigurationDbImporter caConfImporter = new CaConfigurationDbImporter(
@@ -171,7 +171,7 @@ public class CaDbImportWorker extends DbPortWorker
             try
             {
                 dataSource.shutdown();
-            }catch(Throwable e)
+            } catch (Throwable e)
             {
                 LOG.error("dataSource.shutdown()", e);
             }
@@ -194,10 +194,10 @@ public class CaDbImportWorker extends DbPortWorker
             sql = "SELECT NAME, NEXT_SN, CERT FROM CA";
             ResultSet rs = st.executeQuery(sql);
 
-            while(rs.next())
+            while (rs.next())
             {
                 long nextSerial = rs.getLong("NEXT_SN");
-                if(nextSerial < 1)
+                if (nextSerial < 1)
                 {
                     // random serial number assignment
                     continue;
@@ -211,7 +211,7 @@ public class CaDbImportWorker extends DbPortWorker
 
             rs.close();
 
-            if(CollectionUtil.isEmpty(CAInfoBundles))
+            if (CollectionUtil.isEmpty(CAInfoBundles))
             {
                 return;
             }
@@ -219,13 +219,13 @@ public class CaDbImportWorker extends DbPortWorker
             // get the CAINFO.ID
             sql = "SELECT ID, CERT FROM CS_CA";
             rs = st.executeQuery(sql);
-            while(rs.next())
+            while (rs.next())
             {
                 byte[] cert = Base64.decode(rs.getString("CERT"));
                 int id = rs.getInt("ID");
-                for(CAInfoBundle entry : CAInfoBundles)
+                for (CAInfoBundle entry : CAInfoBundles)
                 {
-                    if(Arrays.equals(cert, entry.cert))
+                    if (Arrays.equals(cert, entry.cert))
                     {
                         entry.CA_id = id;
                         break;
@@ -239,17 +239,17 @@ public class CaDbImportWorker extends DbPortWorker
             // get the maximal serial number
             sql = "SELECT MAX(SN) FROM CERT WHERE CA_ID=?";
             PreparedStatement ps = conn.prepareStatement(sql);
-            for(CAInfoBundle entry : CAInfoBundles)
+            for (CAInfoBundle entry : CAInfoBundles)
             {
                 ps.setInt(1, entry.CA_id);
                 rs = ps.executeQuery();
-                if(rs.next() == false)
+                if (rs.next() == false)
                 {
                     continue;
                 }
 
                 long maxSerial = rs.getLong(1);
-                if(maxSerial + 1 > entry.CA_nextSerial)
+                if (maxSerial + 1 > entry.CA_nextSerial)
                 {
                     entry.should_CA_nextSerial = maxSerial + 1;
                 }
@@ -259,16 +259,16 @@ public class CaDbImportWorker extends DbPortWorker
 
             sql = "UPDATE CA SET NEXT_SN=? WHERE NAME=?";
             ps = conn.prepareStatement(sql);
-            for(CAInfoBundle entry : CAInfoBundles)
+            for (CAInfoBundle entry : CAInfoBundles)
             {
-                if(entry.CA_nextSerial != entry.should_CA_nextSerial)
+                if (entry.CA_nextSerial != entry.should_CA_nextSerial)
                 {
                     ps.setLong(1, entry.should_CA_nextSerial);
                     ps.setString(2, entry.CA_name);
                     ps.executeUpdate();
                 }
             }
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
         }finally
@@ -277,7 +277,7 @@ public class CaDbImportWorker extends DbPortWorker
         }
 
         // create the sequences
-        for(CAInfoBundle entry : CAInfoBundles)
+        for (CAInfoBundle entry : CAInfoBundles)
         {
             long nextSerial = Math.max(entry.CA_nextSerial, entry.should_CA_nextSerial);
             String seqName = IoUtil.convertSequenceName("SN_" + entry.CA_name);

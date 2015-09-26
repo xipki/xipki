@@ -132,7 +132,7 @@ public class ScepResponder
         this.nextCAandRA = nextCAandRA;
         this.control = control;
         CACaps caps = cACaps;
-        if(nextCAandRA == null)
+        if (nextCAandRA == null)
         {
             caps.removeCapability(CACapability.GetNextCACert);
         } else
@@ -181,16 +181,16 @@ public class ScepResponder
         DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, recipient, null);
 
         PkiMessage rep = doServicePkiOperation(req, auditEvent);
-        if(auditEvent != null)
+        if (auditEvent != null)
         {
             AuditEventData eventData = new AuditEventData("pkiStatus",
                     rep.getPkiStatus().toString());
             auditEvent.addEventData(eventData);
-            if(rep.getPkiStatus() == PkiStatus.FAILURE)
+            if (rep.getPkiStatus() == PkiStatus.FAILURE)
             {
                 auditEvent.setStatus(AuditStatus.FAILED);
             }
-            if(rep.getFailInfo() != null)
+            if (rep.getFailInfo() != null)
             {
                 eventData = new AuditEventData("failInfo", rep.getFailInfo().toString());
                 auditEvent.addEventData(eventData);
@@ -253,31 +253,31 @@ public class ScepResponder
 
         rep.setRecipientNonce(req.getSenderNonce());
 
-        if(req.getFailureMessage() != null)
+        if (req.getFailureMessage() != null)
         {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badRequest);
         }
 
         Boolean b = req.isSignatureValid();
-        if(b != null && b.booleanValue() == false)
+        if (b != null && b.booleanValue() == false)
         {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badMessageCheck);
         }
 
         b = req.isDecryptionSuccessful();
-        if(b != null && b.booleanValue() == false)
+        if (b != null && b.booleanValue() == false)
         {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badRequest);
         }
 
         Date signingTime = req.getSigningTime();
-        if(maxSigningTimeBiasInMs > 0)
+        if (maxSigningTimeBiasInMs > 0)
         {
             boolean isTimeBad = false;
-            if(signingTime == null)
+            if (signingTime == null)
             {
                 isTimeBad = true;
             }
@@ -285,14 +285,14 @@ public class ScepResponder
             {
                 long now = System.currentTimeMillis();
                 long diff = now - signingTime.getTime();
-                if(diff < 0)
+                if (diff < 0)
                 {
                     diff = -1 * diff;
                 }
                 isTimeBad = diff > maxSigningTimeBiasInMs;
             }
 
-            if(isTimeBad)
+            if (isTimeBad)
             {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badTime);
@@ -302,7 +302,7 @@ public class ScepResponder
         // check the digest algorithm
         String oid = req.getDigestAlgorithm().getId();
         HashAlgoType hashAlgoType = HashAlgoType.getHashAlgoType(oid);
-        if(hashAlgoType == null)
+        if (hashAlgoType == null)
         {
             LOG.warn("tid={}: unknown digest algorithm {}", tid, oid);
             rep.setPkiStatus(PkiStatus.FAILURE);
@@ -310,36 +310,36 @@ public class ScepResponder
         } else
         {
             boolean supported = false;
-            if(hashAlgoType == HashAlgoType.SHA1)
+            if (hashAlgoType == HashAlgoType.SHA1)
             {
-                if(cACaps.containsCapability(CACapability.SHA1))
+                if (cACaps.containsCapability(CACapability.SHA1))
                 {
                     supported = true;
                 }
             }
-            else if(hashAlgoType == HashAlgoType.SHA256)
+            else if (hashAlgoType == HashAlgoType.SHA256)
             {
-                if(cACaps.containsCapability(CACapability.SHA256))
+                if (cACaps.containsCapability(CACapability.SHA256))
                 {
                     supported = true;
                 }
             }
-            else if(hashAlgoType == HashAlgoType.SHA512)
+            else if (hashAlgoType == HashAlgoType.SHA512)
             {
-                if(cACaps.containsCapability(CACapability.SHA512))
+                if (cACaps.containsCapability(CACapability.SHA512))
                 {
                     supported = true;
                 }
             }
-            else if(hashAlgoType == HashAlgoType.MD5)
+            else if (hashAlgoType == HashAlgoType.MD5)
             {
-                if(control.isUseInsecureAlg())
+                if (control.isUseInsecureAlg())
                 {
                     supported = true;
                 }
             }
 
-            if(supported == false)
+            if (supported == false)
             {
                 LOG.warn("tid={}: unsupported digest algorithm {}", tid, oid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
@@ -349,26 +349,26 @@ public class ScepResponder
 
         // check the content encryption algorithm
         ASN1ObjectIdentifier encOid = req.getContentEncryptionAlgorithm();
-        if(CMSAlgorithm.DES_EDE3_CBC.equals(encOid))
+        if (CMSAlgorithm.DES_EDE3_CBC.equals(encOid))
         {
-            if(cACaps.containsCapability(CACapability.DES3) == false)
+            if (cACaps.containsCapability(CACapability.DES3) == false)
             {
                 LOG.warn("tid={}: encryption with DES3 algorithm is not permitted", tid, encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badAlg);
             }
-        } else if(aesEncAlgs.contains(encOid))
+        } else if (aesEncAlgs.contains(encOid))
         {
-            if(cACaps.containsCapability(CACapability.AES) == false)
+            if (cACaps.containsCapability(CACapability.AES) == false)
             {
                 LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid,
                         encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badAlg);
             }
-        } else if(CMSAlgorithm.DES_CBC.equals(encOid))
+        } else if (CMSAlgorithm.DES_CBC.equals(encOid))
         {
-            if(control.isUseInsecureAlg() == false)
+            if (control.isUseInsecureAlg() == false)
             {
                 LOG.warn("tid={}: encryption with DES algorithm {} is not permitted", tid,
                         encOid);
@@ -382,7 +382,7 @@ public class ScepResponder
             rep.setFailInfo(FailInfo.badAlg);
         }
 
-        if(rep.getPkiStatus() == PkiStatus.FAILURE)
+        if (rep.getPkiStatus() == PkiStatus.FAILURE)
         {
             return rep;
         }
@@ -396,7 +396,7 @@ public class ScepResponder
             CertificationRequest p10ReqInfo = (CertificationRequest) req.getMessageData();
 
             String challengePwd = getChallengePassword(p10ReqInfo.getCertificationRequestInfo());
-            if(challengePwd == null || control.getSecret().equals(challengePwd) == false)
+            if (challengePwd == null || control.getSecret().equals(challengePwd) == false)
             {
                 LOG.warn("challengePassword is not trusted");
                 rep.setPkiStatus(PkiStatus.FAILURE);
@@ -412,10 +412,10 @@ public class ScepResponder
                 throw new CAException("system failure: " + e.getMessage(), e);
             }
 
-            if(cert != null && control.isPendingCert())
+            if (cert != null && control.isPendingCert())
             {
                 rep.setPkiStatus(PkiStatus.PENDING);
-            }else if(cert != null)
+            }else if (cert != null)
             {
                 ContentInfo messageData = createSignedData(cert);
                 rep.setMessageData(messageData);
@@ -431,7 +431,7 @@ public class ScepResponder
         {
             IssuerAndSubject is = (IssuerAndSubject) req.getMessageData();
             Certificate cert = cAEmulator.pollCert(is.getIssuer(), is.getSubject());
-            if(cert != null)
+            if (cert != null)
             {
                 rep.setMessageData(createSignedData(cert));
             } else
@@ -447,7 +447,7 @@ public class ScepResponder
             IssuerAndSerialNumber isn = (IssuerAndSerialNumber) req.getMessageData();
             Certificate cert = cAEmulator.getCert(isn.getName(),
                     isn.getSerialNumber().getValue());
-            if(cert != null)
+            if (cert != null)
             {
                 rep.setMessageData(createSignedData(cert));
             } else
@@ -460,7 +460,7 @@ public class ScepResponder
         }
         case RenewalReq:
         {
-            if(cACaps.containsCapability(CACapability.Renewal) == false)
+            if (cACaps.containsCapability(CACapability.Renewal) == false)
             {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badRequest);
@@ -475,7 +475,7 @@ public class ScepResponder
                 {
                     throw new CAException("system failure: " + e.getMessage(), e);
                 }
-                if(cert != null)
+                if (cert != null)
                 {
                     rep.setMessageData(createSignedData(cert));
                 } else
@@ -488,7 +488,7 @@ public class ScepResponder
         }
         case UpdateReq:
         {
-            if(cACaps.containsCapability(CACapability.Update) == false)
+            if (cACaps.containsCapability(CACapability.Update) == false)
             {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badRequest);
@@ -503,7 +503,7 @@ public class ScepResponder
                 {
                     throw new CAException("system failure: " + e.getMessage(), e);
                 }
-                if(cert != null)
+                if (cert != null)
                 {
                     rep.setMessageData(createSignedData(cert));
                 } else
@@ -525,7 +525,7 @@ public class ScepResponder
             {
                 throw new CAException("system failure: " + e.getMessage(), e);
             }
-            if(crl != null)
+            if (crl != null)
             {
                 rep.setMessageData(createSignedData(crl));
             } else
@@ -575,7 +575,7 @@ public class ScepResponder
         try
         {
             cmsSignedDataGen.addCertificate(new X509CertificateHolder(cert));
-            if(control.isSendCACert())
+            if (control.isSendCACert())
             {
                 cmsSignedDataGen.addCertificate(new X509CertificateHolder(cAEmulator.getCACert()));
             }
@@ -627,10 +627,10 @@ public class ScepResponder
             final CertificationRequestInfo p10Req)
     {
         ASN1Set attrs = p10Req.getAttributes();
-        for(int i = 0; i < attrs.size(); i++)
+        for (int i = 0; i < attrs.size(); i++)
         {
             Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-            if(PKCSObjectIdentifiers.pkcs_9_at_challengePassword.equals(attr.getAttrType()))
+            if (PKCSObjectIdentifiers.pkcs_9_at_challengePassword.equals(attr.getAttrType()))
             {
                 ASN1String str = (ASN1String) attr.getAttributeValues()[0];
                 return str.getString();

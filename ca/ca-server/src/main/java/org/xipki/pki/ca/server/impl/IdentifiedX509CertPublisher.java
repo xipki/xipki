@@ -76,18 +76,18 @@ class IdentifiedX509CertPublisher
                 : realType;
 
         X509CertPublisher realPublisher;
-        if("ocsp".equalsIgnoreCase(type))
+        if ("ocsp".equalsIgnoreCase(type))
         {
             realPublisher = new OCSPCertPublisher();
         }
-        else if(StringUtil.startsWithIgnoreCase(type, "java:"))
+        else if (StringUtil.startsWithIgnoreCase(type, "java:"))
         {
             String className = type.substring("java:".length());
             try
             {
                 Class<?> clazz = Class.forName(className);
                 realPublisher = (X509CertPublisher) clazz.newInstance();
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 throw new CertPublisherException("invalid type " + type + ", " + e.getMessage());
             }

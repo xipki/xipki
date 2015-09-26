@@ -127,7 +127,7 @@ class OCSPStoreQueryExecutor
         {
             rs = ps.executeQuery();
             List<IssuerEntry> caInfos = new LinkedList<>();
-            while(rs.next())
+            while (rs.next())
             {
                 int id = rs.getInt("ID");
                 String subject = rs.getString("SUBJECT");
@@ -139,7 +139,7 @@ class OCSPStoreQueryExecutor
             }
 
             return new IssuerStore(caInfos);
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
         } finally
@@ -185,12 +185,12 @@ class OCSPStoreQueryExecutor
         BigInteger serialNumber = certificate.getCert().getSerialNumber();
         boolean certRegistered = certRegistered(issuerId, serialNumber);
 
-        if(publishGoodCerts == false && revoked == false && certRegistered == false )
+        if (publishGoodCerts == false && revoked == false && certRegistered == false )
         {
             return;
         }
 
-        if(certRegistered)
+        if (certRegistered)
         {
             final String sql =
                 "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE IID=? AND SN=?";
@@ -201,10 +201,10 @@ class OCSPStoreQueryExecutor
                 int idx = 1;
                 ps.setLong(idx++, new Date().getTime()/1000);
                 setBoolean(ps, idx++, revoked);
-                if(revoked)
+                if (revoked)
                 {
                     ps.setLong(idx++, revInfo.getRevocationTime().getTime()/1000);
-                    if(revInfo.getInvalidityTime() != null)
+                    if (revInfo.getInvalidityTime() != null)
                     {
                         ps.setLong(idx++, revInfo.getInvalidityTime().getTime()/1000);
                     }else
@@ -222,7 +222,7 @@ class OCSPStoreQueryExecutor
                 ps.setInt(idx++, issuerId);
                 ps.setLong(idx++, serialNumber.longValue());
                 ps.executeUpdate();
-            } catch(SQLException e)
+            } catch (SQLException e)
             {
                 throw dataSource.translate(sql, e);
             }finally
@@ -268,10 +268,10 @@ class OCSPStoreQueryExecutor
             ps_addcert.setInt(idx++, issuerId);
             ps_addcert.setString(idx++, certprofile);
 
-            if(revoked)
+            if (revoked)
             {
                 ps_addcert.setLong(idx++, revInfo.getRevocationTime().getTime()/1000);
-                if(revInfo.getInvalidityTime() != null)
+                if (revInfo.getInvalidityTime() != null)
                 {
                     ps_addcert.setLong(idx++, revInfo.getInvalidityTime().getTime()/1000);
                 }else
@@ -299,9 +299,9 @@ class OCSPStoreQueryExecutor
             ps_addCerthash.setString(idx++, sha512Fp);
 
             final int tries = 3;
-            for(int i = 0; i < tries; i++)
+            for (int i = 0; i < tries; i++)
             {
-                if(i > 0)
+                if (i > 0)
                 {
                     certId = nextCertId();
                 }
@@ -326,7 +326,7 @@ class OCSPStoreQueryExecutor
 
                     sql = "(commit add cert to OCSP)";
                     conn.commit();
-                }catch(Throwable t)
+                } catch (Throwable t)
                 {
                     conn.rollback();
                     // more secure
@@ -334,11 +334,11 @@ class OCSPStoreQueryExecutor
                     dataSource.deleteFromTable(null, "CHASH", "CID", certId);
                     dataSource.deleteFromTable(null, "CERT", "ID", certId);
 
-                    if(t instanceof SQLException)
+                    if (t instanceof SQLException)
                     {
                         SQLException e = (SQLException) t;
                         DataAccessException tEx = dataSource.translate(sql, e);
-                        if(tEx instanceof DuplicateKeyException && i < tries - 1)
+                        if (tEx instanceof DuplicateKeyException && i < tries - 1)
                         {
                             continue;
                         }
@@ -359,17 +359,17 @@ class OCSPStoreQueryExecutor
 
                 break;
             }
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw dataSource.translate(null, e);
         } finally
         {
-            for(PreparedStatement ps : pss)
+            for (PreparedStatement ps : pss)
             {
                 try
                 {
                     ps.close();
-                }catch(Throwable t)
+                } catch (Throwable t)
                 {
                     LOG.warn("could not close PreparedStatement", t);
                 }
@@ -395,7 +395,7 @@ class OCSPStoreQueryExecutor
     throws DataAccessException
     {
         Integer issuerId =  issuerStore.getIdForCert(issuer.getEncodedCert());
-        if(issuerId == null)
+        if (issuerId == null)
         {
             return;
         }
@@ -403,12 +403,12 @@ class OCSPStoreQueryExecutor
         BigInteger serialNumber = cert.getCert().getSerialNumber();
         boolean certRegistered = certRegistered(issuerId, serialNumber);
 
-        if(certRegistered == false)
+        if (certRegistered == false)
         {
             return;
         }
 
-        if(publishGoodCerts)
+        if (publishGoodCerts)
         {
             final String sql =
                     "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE IID=? AND SN=?";
@@ -425,7 +425,7 @@ class OCSPStoreQueryExecutor
                 ps.setInt(idx++, issuerId);
                 ps.setLong(idx++, serialNumber.longValue());
                 ps.executeUpdate();
-            } catch(SQLException e)
+            } catch (SQLException e)
             {
                 throw dataSource.translate(sql, e);
             }finally
@@ -443,7 +443,7 @@ class OCSPStoreQueryExecutor
                 ps.setInt(idx++, issuerId);
                 ps.setLong(idx++, serialNumber.longValue());
                 ps.executeUpdate();
-            } catch(SQLException e)
+            } catch (SQLException e)
             {
                 throw dataSource.translate(sql, e);
             }finally
@@ -460,7 +460,7 @@ class OCSPStoreQueryExecutor
     throws DataAccessException
     {
         Integer issuerId =  issuerStore.getIdForCert(issuer.getEncodedCert());
-        if(issuerId == null)
+        if (issuerId == null)
         {
             return;
         }
@@ -474,7 +474,7 @@ class OCSPStoreQueryExecutor
             ps.setInt(idx++, issuerId);
             ps.setLong(idx++, cert.getCert().getSerialNumber().longValue());
             ps.executeUpdate();
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
         }finally
@@ -490,7 +490,7 @@ class OCSPStoreQueryExecutor
     {
         Date revocationTime = revocationInfo.getRevocationTime();
         Date invalidityTime = revocationInfo.getInvalidityTime();
-        if(invalidityTime == null)
+        if (invalidityTime == null)
         {
             invalidityTime = revocationTime;
         }
@@ -508,7 +508,7 @@ class OCSPStoreQueryExecutor
             ps.setInt(idx++, revocationInfo.getReason().getCode());
             ps.setInt(idx++, issuerId);
             ps.executeUpdate();
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
         }finally
@@ -534,7 +534,7 @@ class OCSPStoreQueryExecutor
             ps.setNull(idx++, Types.INTEGER);
             ps.setInt(idx++, issuerId);
             ps.executeUpdate();
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
         }finally
@@ -548,7 +548,7 @@ class OCSPStoreQueryExecutor
     throws DataAccessException, CertificateEncodingException
     {
         Integer id = issuerStore.getIdForCert(issuerCert.getEncodedCert());
-        if(id == null)
+        if (id == null)
         {
             throw new IllegalStateException("could not find issuer, "
                     + "please start XiPKI in master mode first the restart this XiPKI system");
@@ -560,7 +560,7 @@ class OCSPStoreQueryExecutor
             final X509Cert issuerCert)
     throws CertificateEncodingException, DataAccessException
     {
-        if(issuerStore.getIdForCert(issuerCert.getEncodedCert()) != null)
+        if (issuerStore.getIdForCert(issuerCert.getEncodedCert()) != null)
         {
             return;
         }
@@ -612,7 +612,7 @@ class OCSPStoreQueryExecutor
 
             IssuerEntry newInfo = new IssuerEntry(id, subject, sha1FpCert, b64Cert);
             issuerStore.addIdentityEntry(newInfo);
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
         }finally
@@ -633,11 +633,11 @@ class OCSPStoreQueryExecutor
     {
         PreparedStatement ps = null;
         Connection c = dataSource.getConnection();
-        if(c != null)
+        if (c != null)
         {
             ps = dataSource.prepareStatement(c, sqlQuery);
         }
-        if(ps == null)
+        if (ps == null)
         {
             throw new DataAccessException("could not create prepared statement for " + sqlQuery);
         }
@@ -651,23 +651,23 @@ class OCSPStoreQueryExecutor
         PreparedStatement[] pss = new PreparedStatement[sqlQueries.length];
 
         Connection c = dataSource.getConnection();
-        if(c != null)
+        if (c != null)
         {
             final int n = sqlQueries.length;
-            for(int i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
                 pss[i] = dataSource.prepareStatement(c, sqlQueries[i]);
-                if(pss[i] != null)
+                if (pss[i] != null)
                 {
                     continue;
                 }
 
-                for(int j = 0; j < i; j++)
+                for (int j = 0; j < i; j++)
                 {
                     try
                     {
                         pss[j].close();
-                    }catch(Throwable t)
+                    } catch (Throwable t)
                     {
                         LOG.warn("could not close preparedStatement", t);
                     }
@@ -676,7 +676,7 @@ class OCSPStoreQueryExecutor
                 try
                 {
                     c.close();
-                }catch(Throwable t)
+                } catch (Throwable t)
                 {
                     LOG.warn("could not close connection", t);
                 }
@@ -706,11 +706,11 @@ class OCSPStoreQueryExecutor
             ps.setLong(idx++, serialNumber.longValue());
 
             rs = ps.executeQuery();
-            if(rs.next())
+            if (rs.next())
             {
                 return rs.getInt(1) > 0;
             }
-        } catch(SQLException e)
+        } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
         }finally
@@ -738,10 +738,10 @@ class OCSPStoreQueryExecutor
                 releaseDbResources(ps, rs);
             }
             return true;
-        }catch(Exception e)
+        } catch (Exception e)
         {
             final String message = "isHealthy()";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -764,10 +764,10 @@ class OCSPStoreQueryExecutor
         Connection conn = dataSource.getConnection();
         try
         {
-            while(true)
+            while (true)
             {
                 int certId = (int) dataSource.nextSeqValue(conn, "CID");
-                if(dataSource.columnExists(conn, "CERT", "ID", certId) == false)
+                if (dataSource.columnExists(conn, "CERT", "ID", certId) == false)
                 {
                     return certId;
                 }

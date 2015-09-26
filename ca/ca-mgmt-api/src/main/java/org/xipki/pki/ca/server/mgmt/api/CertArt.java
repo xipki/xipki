@@ -61,9 +61,9 @@ public enum CertArt
     public static CertArt getInstance(
             final int code)
     {
-        for(CertArt value : values())
+        for (CertArt value : values())
         {
-            if(value.code == code)
+            if (value.code == code)
             {
                 return value;
             }

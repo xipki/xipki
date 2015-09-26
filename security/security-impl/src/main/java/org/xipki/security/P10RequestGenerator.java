@@ -124,9 +124,9 @@ public class P10RequestGenerator
     {
         PKCS10CertificationRequestBuilder p10ReqBuilder =
                 new PKCS10CertificationRequestBuilder(subjectDN, subjectPublicKeyInfo);
-        if(CollectionUtil.isNotEmpty(attributes))
+        if (CollectionUtil.isNotEmpty(attributes))
         {
-            for(ASN1ObjectIdentifier attrType : attributes.keySet())
+            for (ASN1ObjectIdentifier attrType : attributes.keySet())
             {
                 p10ReqBuilder.addAttribute(attrType, attributes.get(attrType));
             }
@@ -140,7 +140,7 @@ public class P10RequestGenerator
     throws BadInputException
     {
         GeneralNames names = createGeneralNames(taggedValues);
-        if(names == null)
+        if (names == null)
         {
             return null;
         }
@@ -158,14 +158,14 @@ public class P10RequestGenerator
             final List<String> taggedValues)
     throws BadInputException
     {
-        if(CollectionUtil.isEmpty(taggedValues))
+        if (CollectionUtil.isEmpty(taggedValues))
         {
             return null;
         }
 
         int n = taggedValues.size();
         GeneralName[] names = new GeneralName[n];
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             names[i] = createGeneralName(taggedValues.get(i));
         }
@@ -177,13 +177,13 @@ public class P10RequestGenerator
             final boolean critical)
     throws BadInputException
     {
-        if(CollectionUtil.isEmpty(accessMethodAndLocations))
+        if (CollectionUtil.isEmpty(accessMethodAndLocations))
         {
             return null;
         }
 
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        for(String accessMethodAndLocation : accessMethodAndLocations)
+        for (String accessMethodAndLocation : accessMethodAndLocations)
         {
             vector.add(createAccessDescription(accessMethodAndLocation));
         }
@@ -205,14 +205,14 @@ public class P10RequestGenerator
         try
         {
             pairs = new ConfPairs(accessMethodAndLocation);
-        }catch(IllegalArgumentException e)
+        } catch (IllegalArgumentException e)
         {
             throw new BadInputException("invalid accessMethodAndLocation "
                     + accessMethodAndLocation);
         }
 
         Set<String> oids = pairs.getNames();
-        if(oids == null || oids.size() != 1)
+        if (oids == null || oids.size() != 1)
         {
             throw new BadInputException("invalid accessMethodAndLocation "
                     + accessMethodAndLocation);
@@ -240,23 +240,23 @@ public class P10RequestGenerator
     {
         int tag = -1;
         String value = null;
-        if(taggedValue.charAt(0) == '[')
+        if (taggedValue.charAt(0) == '[')
         {
             int idx = taggedValue.indexOf(']', 1);
-            if(idx > 1 && idx < taggedValue.length() - 1)
+            if (idx > 1 && idx < taggedValue.length() - 1)
             {
                 String tagS = taggedValue.substring(1, idx);
                 try
                 {
                     tag = Integer.parseInt(tagS);
                     value = taggedValue.substring(idx + 1);
-                }catch(NumberFormatException e)
+                } catch (NumberFormatException e)
                 {
                 }
             }
         }
 
-        if(tag == -1)
+        if (tag == -1)
         {
             throw new BadInputException("invalid taggedValue " + taggedValue);
         }
@@ -266,7 +266,7 @@ public class P10RequestGenerator
         case GeneralName.otherName:
         {
             int idxSep = value.indexOf("=");
-            if(idxSep == -1 || idxSep == 0 || idxSep == value.length() - 1)
+            if (idxSep == -1 || idxSep == 0 || idxSep == value.length() - 1)
             {
                 throw new BadInputException("invalid otherName " + value);
             }
@@ -291,7 +291,7 @@ public class P10RequestGenerator
         case GeneralName.ediPartyName:
         {
             int idxSep = value.indexOf("=");
-            if(idxSep == -1 || idxSep == value.length() - 1)
+            if (idxSep == -1 || idxSep == value.length() - 1)
             {
                 throw new BadInputException("invalid ediPartyName " + value);
             }
@@ -300,7 +300,7 @@ public class P10RequestGenerator
                     : value.substring(0, idxSep);
             String partyName = value.substring(idxSep + 1);
             ASN1EncodableVector vector = new ASN1EncodableVector();
-            if(nameAssigner != null)
+            if (nameAssigner != null)
             {
                 vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
             }

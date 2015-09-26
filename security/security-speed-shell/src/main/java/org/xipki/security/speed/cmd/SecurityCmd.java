@@ -73,18 +73,18 @@ public abstract class SecurityCmd extends XipkiOsgiCommandSupport
     {
         // this call initialization method
         P11CryptService p11CryptService = securityFactory.getP11CryptService(moduleName);
-        if(p11CryptService == null)
+        if (p11CryptService == null)
         {
             throw new SignerException("could not initialize P11CryptService " + moduleName);
         }
 
         P11Module module;
         String pkcs11Provider = securityFactory.getPkcs11Provider();
-        if(IaikP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
+        if (IaikP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
         {
             // the returned object could not be null
             module = IaikP11ModulePool.getInstance().getModule(moduleName);
-        } else if(KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
+        } else if (KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
         {
             module = KeystoreP11ModulePool.getInstance().getModule(moduleName);
         } else
@@ -103,12 +103,12 @@ public abstract class SecurityCmd extends XipkiOsgiCommandSupport
     {
         P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
         P11Module module = getP11Module(moduleName);
-        if(module == null)
+        if (module == null)
         {
             throw new SignerException("module " + moduleName + " does not exist");
         }
         P11WritableSlot slot = module.getSlot(slotId);
-        if(slot == null)
+        if (slot == null)
         {
             throw new SignerException("could not get slot " + slotIndex + " of module "
                     + moduleName);

@@ -68,7 +68,7 @@ public class P12EnrollCertCmd extends EnrollCertCmd
             final SignatureAlgoControl signatureAlgoControl)
     throws SignerException
     {
-        if(password == null)
+        if (password == null)
         {
             password = new String(readPassword());
         }

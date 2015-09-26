@@ -74,7 +74,7 @@ public class CaGenRootCACmd extends CaAddOrGenCmd
         X509CAEntry caEntry = getCAEntry();
         byte[] p10Req = IoUtil.read(p10ReqFile);
         X509Certificate rcaCert = caManager.generateRootCA(caEntry, rcaProfile, p10Req);
-        if(rcaCertOutFile != null)
+        if (rcaCertOutFile != null)
         {
             saveVerbose("saved root certificate to file", new File(rcaCertOutFile),
                     rcaCert.getEncoded());

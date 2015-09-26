@@ -57,16 +57,20 @@ import java.util.List;
 
 public class IoUtil
 {
+    private IoUtil()
+    {
+    }
+
     public static void closeStream(OutputStream stream)
     {
-        if(stream == null)
+        if (stream == null)
         {
             return;
         }
         try
         {
             stream.close();
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
         }
     }
@@ -160,15 +164,15 @@ public class IoUtil
 
         if (bitCount % 8 > 0) // shift the bits to the right
         {
-            int shiftBits = 8-(bitCount%8);
+            int shiftBits = 8 - (bitCount % 8);
 
-            for(int i = byteLenKey - 1; i > 0; i--)
+            for (int i = byteLenKey - 1; i > 0; i--)
             {
                 truncatedBytes[i] = (byte) (
                         (byte2int(truncatedBytes[i]) >>> shiftBits)
                         | ((byte2int(truncatedBytes[i- 1]) << (8 - shiftBits)) & 0xFF));
             }
-            truncatedBytes[0] = (byte)(byte2int(truncatedBytes[0]) >>> shiftBits);
+            truncatedBytes[0] = (byte) (byte2int(truncatedBytes[0]) >>> shiftBits);
         }
 
         return truncatedBytes;
@@ -188,41 +192,40 @@ public class IoUtil
         List<String> addresses = new LinkedList<>();
 
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-        while(interfaces.hasMoreElements())
+        while (interfaces.hasMoreElements())
         {
             NetworkInterface n = (NetworkInterface) interfaces.nextElement();
             Enumeration<InetAddress> ee = n.getInetAddresses();
             while (ee.hasMoreElements())
             {
                 InetAddress i = (InetAddress) ee.nextElement();
-                if(i instanceof Inet4Address)
+                if (i instanceof Inet4Address)
                 {
                     addresses.add(((Inet4Address) i).getHostAddress());
                 }
             }
         }
 
-        for(String addr : addresses)
+        for (String addr : addresses)
         {
-            if(addr.startsWith("192.") == false && addr.startsWith("127.") == false)
+            if (addr.startsWith("192.") == false && addr.startsWith("127.") == false)
             {
                 return addr;
             }
         }
 
-        for(String addr : addresses)
+        for (String addr : addresses)
         {
-            if(addr.startsWith("127.") == false)
+            if (addr.startsWith("127.") == false)
             {
                 return addr;
             }
         }
 
-        if(addresses.size() > 0)
+        if (addresses.size() > 0)
         {
             return addresses.get(0);
-        }
-        else
+        } else
         {
             try
             {
@@ -240,8 +243,7 @@ public class IoUtil
         if (path.startsWith("~" + File.separator))
         {
             return System.getProperty("user.home") + path.substring(1);
-        }
-        else
+        } else
         {
             return path;
         }
@@ -252,11 +254,10 @@ public class IoUtil
     {
         String path = file.getPath();
         String expandedPath = expandFilepath(path);
-        if(path.equals(expandedPath))
+        if (path.equals(expandedPath))
         {
             return file;
-        }
-        else
+        } else
         {
             return new File(expandedPath);
         }
@@ -267,14 +268,13 @@ public class IoUtil
     {
         StringBuilder sb = new StringBuilder();
         int n = sequenceName.length();
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             char c = sequenceName.charAt(i);
-            if((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+            if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
             {
                 sb.append(c);
-            }
-            else
+            } else
             {
                 sb.append("_");
             }
@@ -288,12 +288,12 @@ public class IoUtil
     {
 
         String b64Str = Base64.encodeToString(data, Base64.NO_WRAP);
-        if(withLineBreak == false)
+        if (withLineBreak == false)
         {
             return b64Str;
         }
 
-        if(b64Str.length() < 64)
+        if (b64Str.length() < 64)
         {
             return b64Str;
         }
@@ -304,13 +304,13 @@ public class IoUtil
 
         final int nFullBlock = size / blockSize;
 
-        for(int i = 0; i < nFullBlock; i++)
+        for (int i = 0; i < nFullBlock; i++)
         {
             int offset = i * blockSize;
             sb.append(b64Str.subSequence(offset, offset + blockSize)).append("\n");
         }
 
-        if(size % blockSize != 0)
+        if (size % blockSize != 0)
         {
             sb.append(b64Str.substring(nFullBlock * blockSize)).append("\n");
         }

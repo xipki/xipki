@@ -55,24 +55,24 @@ public class ProfileCheckCmd extends ProfileUpdateCmd
     {
         out("checking profile " + name);
 
-        if(type == null && conf == null && confFile == null)
+        if (type == null && conf == null && confFile == null)
         {
             System.out.println("nothing to update");
             return null;
         }
 
-        if(conf == null && confFile != null)
+        if (conf == null && confFile != null)
         {
             conf = new String(IoUtil.read(confFile));
         }
 
         CertprofileEntry cp = caManager.getCertprofile(name);
-        if(cp == null)
+        if (cp == null)
         {
             throw new CmdFailure("certificate profile named '" +name + "' is not configured");
         }
 
-        if(cp.getType() != null)
+        if (cp.getType() != null)
         {
             String ex = type;
             String is = cp.getType();

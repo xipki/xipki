@@ -101,17 +101,17 @@ public class CALoadTestEnrollCmd extends CALoadTestCmd
     protected Object _doExecute()
     throws Exception
     {
-        if(numThreads < 1)
+        if (numThreads < 1)
         {
             throw new IllegalCmdParamException("invalid number of threads " + numThreads);
         }
 
-        if(durationInSecond < 1)
+        if (durationInSecond < 1)
         {
             throw new IllegalCmdParamException("invalid duration " + durationInSecond);
         }
 
-        if("EC".equalsIgnoreCase(keyType) && StringUtil.isBlank(curveName))
+        if ("EC".equalsIgnoreCase(keyType) && StringUtil.isBlank(curveName))
         {
             throw new IllegalCmdParamException("curveName is not specified");
         }
@@ -122,31 +122,31 @@ public class CALoadTestEnrollCmd extends CALoadTestCmd
         description.append("keyType: ").append(keyType).append("\n");
         description.append("#certs/req: ").append(n).append("\n");
         description.append("unit: ").append(n).append(" certificate");
-        if(n > 1)
+        if (n > 1)
         {
             description.append("s");
         }
 
         RandomDN randomDN = null;
-        if(randomDNStr != null)
+        if (randomDNStr != null)
         {
             randomDN = RandomDN.getInstance(randomDNStr);
-            if(randomDN == null)
+            if (randomDN == null)
             {
                 throw new IllegalCmdParamException("invalid randomDN " + randomDNStr);
             }
         }
 
         KeyEntry keyEntry;
-        if("EC".equalsIgnoreCase(keyType))
+        if ("EC".equalsIgnoreCase(keyType))
         {
             keyEntry = new ECKeyEntry(curveName);
         }
-        else if("RSA".equalsIgnoreCase(keyType))
+        else if ("RSA".equalsIgnoreCase(keyType))
         {
             keyEntry = new RSAKeyEntry(keysize.intValue());
         }
-        else if("DSA".equalsIgnoreCase(keyType))
+        else if ("DSA".equalsIgnoreCase(keyType))
         {
             keyEntry = new DSAKeyEntry(keysize.intValue());
         }

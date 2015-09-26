@@ -71,7 +71,7 @@ public class ECDSAContentVerifierProviderBuilder
     throws OperatorCreationException
     {
         AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
-        if(digAlg == null)
+        if (digAlg == null)
         {
             throw new OperatorCreationException(
                     "could not retrieve digest algorithm from the signature algorithm "

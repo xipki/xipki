@@ -119,7 +119,7 @@ public class ProcessLog
             final boolean forcePrint)
     {
         final long now = System.currentTimeMillis();
-        if(forcePrint == false && now - lastPrintTime < MS_800)
+        if (forcePrint == false && now - lastPrintTime < MS_800)
         {
             return;
         }
@@ -147,7 +147,7 @@ public class ProcessLog
 
         MeasurePoint referenceMeasurePoint;
         int numMeasurePoints = measureDeque.size();
-        if(numMeasurePoints > 10)
+        if (numMeasurePoints > 10)
         {
             referenceMeasurePoint = measureDeque.removeFirst();
         }
@@ -158,13 +158,13 @@ public class ProcessLog
 
         long speed = 0;
         long t2inms = now - referenceMeasurePoint.getMeasureTime(); // in ms
-        if(t2inms > 0)
+        if (t2inms > 0)
         {
             speed = (numProcessed - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
         }
         sb.append(StringUtil.formatSpeed(speed, true));
 
-        if(total > 0 && speed > 0)
+        if (total > 0 && speed > 0)
         {
             long remaining = (total - numProcessed) / speed;
             sb.append("  ");
@@ -178,13 +178,13 @@ public class ProcessLog
 
         speed = 0;
         long t2 = now - startTime;
-        if(t2 > 0)
+        if (t2 > 0)
         {
             speed = numProcessed * 1000 / t2;
         }
         sb.append(StringUtil.formatSpeed(speed, true));
 
-        if(total > 0 && speed > 0)
+        if (total > 0 && speed > 0)
         {
             long remaining = (total - numProcessed) / speed;
             sb.append("  ");

@@ -72,9 +72,9 @@ public class X509CertUtil
             final Integer pathLen)
     {
         BasicConstraints basicConstraints;
-        if(isCa)
+        if (isCa)
         {
-            if(pathLen != null)
+            if (pathLen != null)
             {
                 basicConstraints = new BasicConstraints(pathLen);
             }
@@ -94,16 +94,16 @@ public class X509CertUtil
             final List<String> caIssuerUris,
             final List<String> ocspUris)
     {
-        if(CollectionUtil.isEmpty(ocspUris) && CollectionUtil.isEmpty(ocspUris))
+        if (CollectionUtil.isEmpty(ocspUris) && CollectionUtil.isEmpty(ocspUris))
         {
             return null;
         }
 
         List<AccessDescription> accessDescriptions = new ArrayList<>(ocspUris.size());
 
-        if(CollectionUtil.isNotEmpty(caIssuerUris))
+        if (CollectionUtil.isNotEmpty(caIssuerUris))
         {
-            for(String uri : caIssuerUris)
+            for (String uri : caIssuerUris)
             {
                 GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
                 accessDescriptions.add(
@@ -111,9 +111,9 @@ public class X509CertUtil
             }
         }
 
-        if(CollectionUtil.isNotEmpty(ocspUris))
+        if (CollectionUtil.isNotEmpty(ocspUris))
         {
-            for(String uri : ocspUris)
+            for (String uri : ocspUris)
             {
                 GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
                 accessDescriptions.add(new AccessDescription(X509ObjectIdentifiers.id_ad_ocsp, gn));
@@ -130,7 +130,7 @@ public class X509CertUtil
             final X500Name crlSignerSubject)
     throws IOException, CertprofileException
     {
-        if(CollectionUtil.isEmpty(crlUris))
+        if (CollectionUtil.isEmpty(crlUris))
         {
             return null;
         }
@@ -139,7 +139,7 @@ public class X509CertUtil
         DistributionPoint[] points = new DistributionPoint[1];
 
         GeneralName[] names = new GeneralName[n];
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             names[i] = new GeneralName(GeneralName.uniformResourceIdentifier, crlUris.get(i));
         }
@@ -148,7 +148,7 @@ public class X509CertUtil
         DistributionPointName pointName = new DistributionPointName(gns);
 
         GeneralNames crlIssuer = null;
-        if(crlSignerSubject != null && crlSignerSubject.equals(caSubject) == false)
+        if (crlSignerSubject != null && crlSignerSubject.equals(caSubject) == false)
         {
             GeneralName crlIssuerName = new GeneralName(crlSignerSubject);
             crlIssuer = new GeneralNames(crlIssuerName);
@@ -163,7 +163,7 @@ public class X509CertUtil
             final List<CertificatePolicyInformation> policyInfos)
     throws CertprofileException
     {
-        if(CollectionUtil.isEmpty(policyInfos))
+        if (CollectionUtil.isEmpty(policyInfos))
         {
             return null;
         }
@@ -172,19 +172,19 @@ public class X509CertUtil
         PolicyInformation[] pInfos = new PolicyInformation[n];
 
         int i = 0;
-        for(CertificatePolicyInformation policyInfo : policyInfos)
+        for (CertificatePolicyInformation policyInfo : policyInfos)
         {
             String policyId = policyInfo.getCertPolicyId();
             List<CertificatePolicyQualifier> qualifiers = policyInfo.getQualifiers();
 
             ASN1Sequence policyQualifiers = null;
-            if(CollectionUtil.isNotEmpty(qualifiers))
+            if (CollectionUtil.isNotEmpty(qualifiers))
             {
                 policyQualifiers = createPolicyQualifiers(qualifiers);
             }
 
             ASN1ObjectIdentifier policyOid = new ASN1ObjectIdentifier(policyId);
-            if(policyQualifiers == null)
+            if (policyQualifiers == null)
             {
                 pInfos[i] = new PolicyInformation(policyOid);
             }
@@ -202,14 +202,14 @@ public class X509CertUtil
             final List<CertificatePolicyQualifier> qualifiers)
     {
         List<PolicyQualifierInfo> qualifierInfos = new ArrayList<>(qualifiers.size());
-        for(CertificatePolicyQualifier qualifier : qualifiers)
+        for (CertificatePolicyQualifier qualifier : qualifiers)
         {
             PolicyQualifierInfo qualifierInfo ;
-            if(qualifier.getCpsUri() != null)
+            if (qualifier.getCpsUri() != null)
             {
                 qualifierInfo = new PolicyQualifierInfo(qualifier.getCpsUri());
             }
-            else if(qualifier.getUserNotice() != null)
+            else if (qualifier.getUserNotice() != null)
             {
                 UserNotice userNotice = new UserNotice(null, qualifier.getUserNotice());
                 qualifierInfo = new PolicyQualifierInfo(PKCSObjectIdentifiers.id_spq_ets_unotice,
@@ -220,7 +220,7 @@ public class X509CertUtil
                 qualifierInfo = null;
             }
 
-            if(qualifierInfo != null)
+            if (qualifierInfo != null)
             {
                 qualifierInfos.add(qualifierInfo);
             }

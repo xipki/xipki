@@ -70,10 +70,10 @@ public class CmpRequestorEntry implements Serializable
         try
         {
             this.cert = X509Util.parseBase64EncodedCert(base64Cert);
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
             final String message = "could not parse the certificate for requestor '" + name + "'";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                         t.getMessage());
@@ -110,7 +110,7 @@ public class CmpRequestorEntry implements Serializable
         sb.append("name: ").append(name).append('\n');
         sb.append("faulty: ").append(cert == null).append('\n');
 
-        if(cert != null)
+        if (cert != null)
         {
             sb.append("cert: ").append("\n");
             sb.append("\tissuer: ").append(
@@ -119,7 +119,7 @@ public class CmpRequestorEntry implements Serializable
             sb.append("\tsubject: ").append(
                     X509Util.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
 
-            if(verbose)
+            if (verbose)
             {
                 sb.append("\tencoded: ");
                 try

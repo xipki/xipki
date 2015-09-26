@@ -57,7 +57,7 @@ public class NegCaRevokeCmd extends CaRevokeCmd
         try
         {
             super._doExecute();
-        }catch(Exception e)
+        } catch (Exception e)
         {
             return null;
         }

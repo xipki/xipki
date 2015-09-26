@@ -101,7 +101,7 @@ public class CanonicalizeCode
             canonicalizeDir(dir);
 
             checkWarningsInDir(dir);
-        }catch(Exception e)
+        } catch (Exception e)
         {
             e.printStackTrace();
         }
@@ -112,17 +112,17 @@ public class CanonicalizeCode
     throws Exception
     {
         File[] files = dir.listFiles();
-        for(File file : files)
+        for (File file : files)
         {
-            if(file.isDirectory())
+            if (file.isDirectory())
             {
-                if(file.getName().equals("target") == false
+                if (file.getName().equals("target") == false
                         && file.getName().equals("tbd") == false)
                 {
                     canonicalizeDir(file);
                 }
             }
-            else if(file.isFile() && file.getName().endsWith(".java"))
+            else if (file.isFile() && file.getName().endsWith(".java"))
             {
                 canonicalizeFile(file);
             }
@@ -143,11 +143,11 @@ public class CanonicalizeCode
             boolean skip = true;
             boolean lastLineEmpty = false;
             boolean licenseTextAdded = false;
-            while((line = reader.readLine()) != null)
+            while ((line = reader.readLine()) != null)
             {
-                if(line.trim().startsWith("package ") || line.trim().startsWith("import "))
+                if (line.trim().startsWith("package ") || line.trim().startsWith("import "))
                 {
-                    if(licenseTextAdded == false)
+                    if (licenseTextAdded == false)
                     {
                         writer.write(licenseText.getBytes());
                         licenseTextAdded = true;
@@ -155,16 +155,16 @@ public class CanonicalizeCode
                     skip = false;
                 }
 
-                if(skip)
+                if (skip)
                 {
                     continue;
                 }
 
                 String canonicalizedLine = canonicalizeLine(line);
                 boolean addThisLine = true;
-                if(canonicalizedLine.isEmpty())
+                if (canonicalizedLine.isEmpty())
                 {
-                    if(lastLineEmpty == false)
+                    if (lastLineEmpty == false)
                     {
                         lastLineEmpty = true;
                     }
@@ -178,7 +178,7 @@ public class CanonicalizeCode
                     lastLineEmpty = false;
                 }
 
-                if(addThisLine)
+                if (addThisLine)
                 {
                     writer.write(canonicalizedLine.getBytes());
                     writer.write('\n');
@@ -192,7 +192,7 @@ public class CanonicalizeCode
 
         byte[] oldBytes = IoUtil.read(file);
         byte[] newBytes = writer.toByteArray();
-        if(Arrays.equals(oldBytes, newBytes) == false)
+        if (Arrays.equals(oldBytes, newBytes) == false)
         {
             File newFile = new File(file.getPath() + "-new");
             IoUtil.save(file, newBytes);
@@ -209,7 +209,7 @@ public class CanonicalizeCode
     private static String canonicalizeLine(
             final String line)
     {
-        if(line.trim().startsWith("//"))
+        if (line.trim().startsWith("//"))
         {
             // comments
             String nline = line.replace("\t", "    ");
@@ -221,15 +221,15 @@ public class CanonicalizeCode
 
         int lastNonSpaceCharIndex = 0;
         int index = 0;
-        for(int i = 0; i < len; i++)
+        for (int i = 0; i < len; i++)
         {
             char c = line.charAt(i);
-            if(c == '\t')
+            if (c == '\t')
             {
                 sb.append("    ");
                 index += 4;
             }
-            else if(c == ' ')
+            else if (c == ' ')
             {
                 sb.append(c);
                 index++;
@@ -243,7 +243,7 @@ public class CanonicalizeCode
         }
 
         int numSpacesAtEnd = sb.length() - lastNonSpaceCharIndex;
-        if(numSpacesAtEnd > 0)
+        if (numSpacesAtEnd > 0)
         {
             sb.delete(lastNonSpaceCharIndex, sb.length());
         }
@@ -253,25 +253,31 @@ public class CanonicalizeCode
         len = sb.length();
         boolean isCommentLine = sb.toString().trim().startsWith("*");
 
-        if(isCommentLine == false && len > 0 && sb.charAt(len-1) == '{')
+        if (isCommentLine == false && len > 0 && sb.charAt(len - 1) == '{')
         {
-            for(int i = 0; i < len - 1; i++)
+            if(sb.indexOf("[]") != -1)
             {
-                if(sb.charAt(i) != ' ')
+                addNewLine = false;
+            } else
+            {
+                for (int i = 0; i < len - 1; i++)
                 {
-                    addNewLine = true;
-                    break;
+                    if (sb.charAt(i) != ' ')
+                    {
+                        addNewLine = true;
+                        break;
+                    }
                 }
             }
         }
 
-        if(addNewLine == false)
+        if (addNewLine == false)
         {
             return sb.toString();
         }
 
         sb.deleteCharAt(sb.length() - 1);
-        while(sb.length() > 0 && sb.charAt(sb.length() - 1) == ' ')
+        while (sb.length() > 0 && sb.charAt(sb.length() - 1) == ' ')
         {
             sb.deleteCharAt(sb.length() - 1);
         }
@@ -279,9 +285,9 @@ public class CanonicalizeCode
         sb.append('\n');
 
         len = sb.length();
-        for(int i = 0; i < len; i++)
+        for (int i = 0; i < len; i++)
         {
-            if(sb.charAt(i) == ' ')
+            if (sb.charAt(i) == ' ')
             {
                 sb.append(' ');
             }
@@ -300,17 +306,17 @@ public class CanonicalizeCode
     throws Exception
     {
         File[] files = dir.listFiles();
-        for(File file : files)
+        for (File file : files)
         {
-            if(file.isDirectory())
+            if (file.isDirectory())
             {
-                if(file.getName().equals("target") == false
+                if (file.getName().equals("target") == false
                         && file.getName().equals("tbd") == false)
                 {
                     checkWarningsInDir(file);
                 }
             }
-            else if(file.isFile() && file.getName().endsWith(".java"))
+            else if (file.isFile() && file.getName().endsWith(".java"))
             {
                 checkWarningsInFile(file);
             }
@@ -321,6 +327,11 @@ public class CanonicalizeCode
             final File file)
     throws Exception
     {
+        if(file.getName().equals("package-info.java"))
+        {
+            return;
+        }
+
         BufferedReader reader = new BufferedReader(new FileReader(file));
 
         boolean authorsLineAvailable = false;
@@ -331,25 +342,25 @@ public class CanonicalizeCode
         {
             String lastLine = null;
             String line;
-            while((line = reader.readLine()) != null)
+            while ((line = reader.readLine()) != null)
             {
-                if(authorsLineAvailable == false && line.contains("* @author"))
+                if (authorsLineAvailable == false && line.contains("* @author"))
                 {
                     authorsLineAvailable = true;
                 }
 
                 lineNumber++;
                 int idx = line.indexOf("throws");
-                if(idx == -1)
+                if (idx == -1)
                 {
                     lastLine = line;
 
-                    if(line.length() > 100 || line.endsWith("+") || line.endsWith("|")
+                    if (line.length() > 100 || line.endsWith("+") || line.endsWith("|")
                             || line.endsWith("&"))
                     {
                         lineNumbers.add(lineNumber);
                         continue;
-                    } else if(line.contains("?")
+                    } else if (line.contains("?")
                             && line.contains(" :"))
                     {
                         lineNumbers.add(lineNumber);
@@ -360,9 +371,9 @@ public class CanonicalizeCode
                         // check whether the number of leading spaces is multiple of 4
                         int numLeadingSpaces = 0;
                         char c = 'Z';
-                        for(int i = 0; i < line.length(); i++)
+                        for (int i = 0; i < line.length(); i++)
                         {
-                            if(line.charAt(i) == ' ')
+                            if (line.charAt(i) == ' ')
                             {
                                 numLeadingSpaces++;
                             }
@@ -373,7 +384,7 @@ public class CanonicalizeCode
                             }
                         }
 
-                        if(c != '*' && numLeadingSpaces % 4 != 0)
+                        if (c != '*' && numLeadingSpaces % 4 != 0)
                         {
                             lineNumbers.add(lineNumber);
                         }
@@ -381,7 +392,7 @@ public class CanonicalizeCode
                     continue;
                 }
 
-                if(idx > 0 && line.charAt(idx - 1) == '@' || line.charAt(idx - 1) == '"' )
+                if (idx > 0 && line.charAt(idx - 1) == '@' || line.charAt(idx - 1) == '"' )
                 {
                     lastLine = line;
                     continue;
@@ -389,21 +400,21 @@ public class CanonicalizeCode
 
                 String prefix = line.substring(0, idx);
 
-                if(prefix.equals(THROWS_PREFIX) == false)
+                if (prefix.equals(THROWS_PREFIX) == false)
                 {
                     // consider inner-class
-                    if(prefix.equals(THROWS_PREFIX + THROWS_PREFIX))
+                    if (prefix.equals(THROWS_PREFIX + THROWS_PREFIX))
                     {
-                        if(lastLine != null)
+                        if (lastLine != null)
                         {
                             String trimmedLastLine = lastLine.trim();
                             int idx2 = lastLine.indexOf(trimmedLastLine);
-                            if(idx2 == 2 * THROWS_PREFIX.length())
+                            if (idx2 == 2 * THROWS_PREFIX.length())
                             {
                                 continue;
                             }
 
-                            if(idx2 == 4 * THROWS_PREFIX.length()
+                            if (idx2 == 4 * THROWS_PREFIX.length()
                                     && trimmedLastLine.startsWith("final "))
                             {
                                 continue;
@@ -420,13 +431,13 @@ public class CanonicalizeCode
             reader.close();
         }
 
-        if(lineNumbers.isEmpty() == false)
+        if (lineNumbers.isEmpty() == false)
         {
             System.out.println("Please check file " + file.getPath()
                 + ": lines " + Arrays.toString(lineNumbers.toArray(new Integer[0])));
         }
 
-        if(authorsLineAvailable == false)
+        if (authorsLineAvailable == false)
         {
             System.out.println("Please check file " + file.getPath()
                     + ": no authors line");
@@ -439,15 +450,15 @@ public class CanonicalizeCode
     {
         final int n = line.length();
         int i;
-        for(i = n - 1; i >= 0; i--)
+        for (i = n - 1; i >= 0; i--)
         {
             char c = line.charAt(i);
-            if(c != ' ')
+            if (c != ' ')
             {
                 break;
             }
         }
-        if(i == n - 1)
+        if (i == n - 1)
         {
             return line;
         }

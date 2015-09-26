@@ -85,24 +85,24 @@ public class OCSPStatusLoadTestCmd extends AbstractOCSPStatusCmd
         try
         {
             List<String> tokens = split(this.serialNumbers, ",");
-            for(String token : tokens)
+            for (String token : tokens)
             {
                 List<String> subtokens = split(token.trim(), "- ");
                 int countTokens = subtokens.size();
-                if(countTokens == 1)
+                if (countTokens == 1)
                 {
                     serialNumbers.add(Long.parseLong(subtokens.get(0)));
                 }
-                else if(countTokens == 2)
+                else if (countTokens == 2)
                 {
                     int startSerial = Integer.parseInt(subtokens.get(0).trim());
                     int endSerial = Integer.parseInt(subtokens.get(1).trim());
-                    if(startSerial < 1 || endSerial < 1 || startSerial > endSerial)
+                    if (startSerial < 1 || endSerial < 1 || startSerial > endSerial)
                     {
                         throw new IllegalCmdParamException(
                                 "invalid serial number " + this.serialNumbers);
                     }
-                    for(long i = startSerial; i <= endSerial; i++)
+                    for (long i = startSerial; i <= endSerial; i++)
                     {
                         serialNumbers.add(i);
                     }
@@ -113,12 +113,12 @@ public class OCSPStatusLoadTestCmd extends AbstractOCSPStatusCmd
                             "invalid serial number " + this.serialNumbers);
                 }
             }
-        }catch(Exception e)
+        } catch (Exception e)
         {
             throw new IllegalCmdParamException("invalid serial numbers " + this.serialNumbers);
         }
 
-        if(numThreads < 1)
+        if (numThreads < 1)
         {
             throw new IllegalCmdParamException("invalid number of threads " + numThreads);
         }
@@ -127,7 +127,7 @@ public class OCSPStatusLoadTestCmd extends AbstractOCSPStatusCmd
         try
         {
             serverUrl = new URL(serverURL);
-        } catch(MalformedURLException e)
+        } catch (MalformedURLException e)
         {
             throw new RuntimeException("invalid URL: " + serverURL);
         }

@@ -49,7 +49,7 @@ public class CACRLReasonCompleter extends EnumCompleter
     {
         StringBuilder enums = new StringBuilder();
 
-        for(CRLReason reason : CaRevokeCmd.permitted_reasons)
+        for (CRLReason reason : CaRevokeCmd.permitted_reasons)
         {
             enums.append(reason.getDescription()).append(",");
         }

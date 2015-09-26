@@ -96,7 +96,7 @@ public class DbDigestDiff
         ParamUtil.assertNotBlank("reportDirName", reportDirName);
         ParamUtil.assertNotNull("datasource", datasource);
         ParamUtil.assertNotNull("stopMe", stopMe);
-        if(numPerSelect < 1)
+        if (numPerSelect < 1)
         {
             throw new IllegalArgumentException("invalid numPerSelect: " + numPerSelect);
         }
@@ -119,7 +119,7 @@ public class DbDigestDiff
         ParamUtil.assertNotBlank("reportDirName", reportDirName);
         ParamUtil.assertNotNull("datasource", datasource);
         ParamUtil.assertNotNull("stopMe", stopMe);
-        if(numPerSelect < 1)
+        if (numPerSelect < 1)
         {
             throw new IllegalArgumentException("invalid numPerSelect: " + numPerSelect);
         }
@@ -139,7 +139,7 @@ public class DbDigestDiff
             final int numThreads)
     throws IOException, DataAccessException
     {
-        if(numThreads < 1)
+        if (numThreads < 1)
         {
             throw new IllegalArgumentException("invalid numThreads: " + numThreads);
         }
@@ -166,13 +166,13 @@ public class DbDigestDiff
         {
             Map<Integer, byte[]> caIdCertMap = target.getCAs();
 
-            if(refDirname != null)
+            if (refDirname != null)
             {
                 File refDir = new File(this.refDirname);
                 File[] childFiles = refDir.listFiles();
-                for(File caDir : childFiles)
+                for (File caDir : childFiles)
                 {
-                    if(caDir.isDirectory() == false
+                    if (caDir.isDirectory() == false
                             ||  caDir.getName().startsWith("ca-") == false)
                     {
                         continue;
@@ -191,9 +191,9 @@ public class DbDigestDiff
                 XipkiDbControl refDbControl = null;
                 String refSql;
 
-                if(refDbSchemaType == DbSchemaType.EJBCA_CA_v3)
+                if (refDbSchemaType == DbSchemaType.EJBCA_CA_v3)
                 {
-                    if(refDatasource.tableHasColumn(null, "CertificateData", "id") == false)
+                    if (refDatasource.tableHasColumn(null, "CertificateData", "id") == false)
                     {
                         throw new RuntimeException(
                                 "EJBCA without column 'CertificateData.id' is not supported, "
@@ -215,7 +215,7 @@ public class DbDigestDiff
                     try
                     {
                         refRs = refStmt.executeQuery(refSql);
-                        while(refRs.next())
+                        while (refRs.next())
                         {
                             int id = refRs.getInt(1);
                             refCaIds.add(id);
@@ -234,7 +234,7 @@ public class DbDigestDiff
 
                 boolean dbContainsMultipleCAs = refCaIds.size() > 1;
 
-                for(Integer refCaId : refCaIds)
+                for (Integer refCaId : refCaIds)
                 {
                     DigestReader refReader = (refDbSchemaType == DbSchemaType.EJBCA_CA_v3)
                             ? new EjbcaDbDigestReader(refDatasource, refDbSchemaType,
@@ -246,7 +246,7 @@ public class DbDigestDiff
             }
         }finally
         {
-            if(target != null)
+            if (target != null)
             {
                 target.close();
             }
@@ -264,7 +264,7 @@ public class DbDigestDiff
         File caReportDir = new File(reportDirName, "ca-" + commonName);
 
         int idx = 2;
-        while(caReportDir.exists())
+        while (caReportDir.exists())
         {
             caReportDir = new File(reportDirName, "ca-" + commonName + "-" + (idx++));
         }
@@ -273,15 +273,15 @@ public class DbDigestDiff
                 caReportDir.getPath(), caCertBytes);
 
         Integer caId = null;
-        for(Integer i : caIdCertBytesMap.keySet())
+        for (Integer i : caIdCertBytesMap.keySet())
         {
-            if(Arrays.equals(caCertBytes, caIdCertBytesMap.get(i)))
+            if (Arrays.equals(caCertBytes, caIdCertBytesMap.get(i)))
             {
                 caId = i;
             }
         }
 
-        if(caId == null)
+        if (caId == null)
         {
             reporter.addNoCAMatch();
             refReader.close();
@@ -291,10 +291,10 @@ public class DbDigestDiff
             try
             {
                 doDiff(refReader, caId.intValue(), reporter);
-            }catch(InterruptedException e)
+            } catch (InterruptedException e)
             {
                 throw e;
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 reporter.addError("Exception thrown: " + e.getClass().getName() + ": "
                         + e.getMessage());
@@ -324,9 +324,9 @@ public class DbDigestDiff
         boolean interrupted = false;
         int numProcessed = 0;
 
-        while(true)
+        while (true)
         {
-            if(stopMe.get())
+            if (stopMe.get())
             {
                 interrupted = true;
                 target.close();
@@ -334,10 +334,10 @@ public class DbDigestDiff
             }
 
             int numBundles = 0;
-            for(int i = 0; i < numThreads; i++)
+            for (int i = 0; i < numThreads; i++)
             {
                 CertsBundle myBundle = readerA.nextCerts(numPerSelect);
-                if(myBundle != null
+                if (myBundle != null
                         && myBundle.getSerialNumbers().isEmpty() == false)
                 {
                     numBundles++;
@@ -348,16 +348,16 @@ public class DbDigestDiff
                 }
             }
 
-            if(numBundles == 0)
+            if (numBundles == 0)
             {
-                break; // break while(true)
+                break; // break while (true)
             }
 
-            for(int i = 0; i < numBundles; i++)
+            for (int i = 0; i < numBundles; i++)
             {
                 CertsBundle bundle = target.takeOut();
                 Exception targetException = bundle.getTargetException();
-                if(targetException != null)
+                if (targetException != null)
                 {
                     throw targetException;
                 }
@@ -368,14 +368,14 @@ public class DbDigestDiff
                 List<Long> cloneSerialNumbers = new ArrayList<>(serialNumbers);
                 Map<Long, DbDigestEntry> certs = bundle.getCerts();
 
-                for(Long serialNumber : serialNumbers)
+                for (Long serialNumber : serialNumbers)
                 {
                     DbDigestEntry certB = bundle.getTargetCert(serialNumber);
                     cloneSerialNumbers.remove(serialNumber);
                     DbDigestEntry certA = certs.get(serialNumber);
-                    if(certB != null)
+                    if (certB != null)
                     {
-                        if(certA.contentEquals(certB))
+                        if (certA.contentEquals(certB))
                         {
                             reporter.addGood(serialNumber);
                         } else
@@ -399,7 +399,7 @@ public class DbDigestDiff
         processLog.printStatus(true);
         ProcessLog.printTrailer();
 
-        if(interrupted)
+        if (interrupted)
         {
             throw new InterruptedException("interrupted by the user");
         }

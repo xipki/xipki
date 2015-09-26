@@ -62,7 +62,7 @@ public class P12ECSignLoadTest extends P12SignLoadTest
     throws Exception
     {
         byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
-        if(keystoreBytes == null)
+        if (keystoreBytes == null)
         {
             P12KeypairGenerator kpGen = new P12KeypairGenerator.ECDSAIdentityGenerator(
                 curveNameOrOid, password.toCharArray(), "CN=dummy", null, null);

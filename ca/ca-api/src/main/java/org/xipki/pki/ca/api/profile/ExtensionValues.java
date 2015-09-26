@@ -59,7 +59,7 @@ public class ExtensionValues
     {
         ParamUtil.assertNotNull("type", type);
         ParamUtil.assertNotNull("value", value);
-        if(extensions.containsKey(type))
+        if (extensions.containsKey(type))
         {
             return false;
         }
@@ -73,7 +73,7 @@ public class ExtensionValues
     {
         ParamUtil.assertNotNull("type", type);
         ParamUtil.assertNotNull("value", value);
-        if(extensions.containsKey(type))
+        if (extensions.containsKey(type))
         {
             return false;
         }

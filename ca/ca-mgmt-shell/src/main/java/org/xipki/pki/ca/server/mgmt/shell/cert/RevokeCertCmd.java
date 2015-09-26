@@ -66,18 +66,18 @@ public class RevokeCertCmd extends UnRevRemoveCertCmd
     throws Exception
     {
         CRLReason crlReason = CRLReason.getInstance(reason);
-        if(crlReason == null)
+        if (crlReason == null)
         {
             throw new InvalidConfException("invalid reason " + reason);
         }
 
-        if(CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason) == false)
+        if (CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason) == false)
         {
             throw new InvalidConfException("reason " + reason + " is not permitted");
         }
 
         Date invalidityDate = null;
-        if(isNotBlank(invalidityDateS))
+        if (isNotBlank(invalidityDateS))
         {
             invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
         }

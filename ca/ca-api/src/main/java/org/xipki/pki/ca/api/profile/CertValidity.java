@@ -83,22 +83,22 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
         final char suffix = validityS.charAt(len - 1);
         Unit unit;
         String numValdityS;
-        if(suffix == 'y' || suffix == 'Y')
+        if (suffix == 'y' || suffix == 'Y')
         {
             unit = Unit.YEAR;
             numValdityS = validityS.substring(0, len - 1);
         }
-        else if(suffix == 'd' || suffix == 'd')
+        else if (suffix == 'd' || suffix == 'd')
         {
             unit = Unit.DAY;
             numValdityS = validityS.substring(0, len - 1);
         }
-        else if(suffix == 'h' || suffix == 'h')
+        else if (suffix == 'h' || suffix == 'h')
         {
             unit = Unit.HOUR;
             numValdityS = validityS.substring(0, len - 1);
         }
-        else if(suffix >= '0' && suffix <= '9')
+        else if (suffix >= '0' && suffix <= '9')
         {
             unit = Unit.DAY;
             numValdityS = validityS;
@@ -112,7 +112,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
         try
         {
             validity = Integer.parseInt(numValdityS);
-        }catch(NumberFormatException e)
+        } catch (NumberFormatException e)
         {
             throw new IllegalArgumentException("invalid validityS: " + validityS);
         }
@@ -123,7 +123,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
             final int validity,
             final Unit unit)
     {
-        if(validity < 1)
+        if (validity < 1)
         {
             throw new IllegalArgumentException("validity could not be less than 1");
         }
@@ -159,13 +159,13 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
 
             int month = c.get(Calendar.MONTH);
             // february
-            if(month == 1)
+            if (month == 1)
             {
                 int day = c.get(Calendar.DAY_OF_MONTH);
-                if(day > 28)
+                if (day > 28)
                 {
                     int year = c.get(Calendar.YEAR);
-                    if(isLeapYear(year))
+                    if (isLeapYear(year))
                     {
                         day = 29;
                     }
@@ -185,11 +185,11 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
     private static boolean isLeapYear(
             final int year)
     {
-        if(year % 4 != 0)
+        if (year % 4 != 0)
         {
             return false;
         }
-        else if(year % 100 != 0)
+        else if (year % 100 != 0)
         {
             return true;
         }
@@ -218,9 +218,9 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
     public int compareTo(
             final CertValidity o)
     {
-        if(unit == o.unit)
+        if (unit == o.unit)
         {
-            if(validity == o.validity)
+            if (validity == o.validity)
             {
                 return 0;
             }
@@ -233,7 +233,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
         {
             int thisHours = getApproxHours();
             int thatHours = o.getApproxHours();
-            if(thisHours == thatHours)
+            if (thisHours == thatHours)
             {
                 return 0;
             }
@@ -250,7 +250,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
     public boolean equals(
             final Object obj)
     {
-        if(obj instanceof CertValidity == false)
+        if (obj instanceof CertValidity == false)
         {
             return false;
         }

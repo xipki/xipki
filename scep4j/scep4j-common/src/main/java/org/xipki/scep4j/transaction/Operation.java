@@ -62,9 +62,9 @@ public enum Operation
     public static Operation valueForCode(
             final String code)
     {
-        for(Operation m : values())
+        for (Operation m : values())
         {
-            if(code.equalsIgnoreCase(m.code))
+            if (code.equalsIgnoreCase(m.code))
             {
                 return m;
             }

@@ -57,19 +57,19 @@ public enum StringType
     public ASN1Encodable createString(
             final String text)
     {
-        if(teletexString == this)
+        if (teletexString == this)
         {
             return new DERT61String(text);
-        } else if(printableString == this)
+        } else if (printableString == this)
         {
             return new DERPrintableString(text);
-        } else if(utf8String == this)
+        } else if (utf8String == this)
         {
             return new DERUTF8String(text);
-        } else if(bmpString == this)
+        } else if (bmpString == this)
         {
             return new DERBMPString(text);
-        } else if(ia5String == this)
+        } else if (ia5String == this)
         {
             return new DERIA5String(text, true);
         }

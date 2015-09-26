@@ -56,28 +56,28 @@ public class IssuerFilter
             final Set<X509Certificate> excludes)
     throws CertificateEncodingException
     {
-        if(includes == null)
+        if (includes == null)
         {
             includeSha1Fps = null;
         }
         else
         {
             includeSha1Fps = new HashSet<>(includes.size());
-            for(X509Certificate include : includes)
+            for (X509Certificate include : includes)
             {
                 String sha1Fp = HashCalculator.base64Sha1(include.getEncoded());
                 includeSha1Fps.add(sha1Fp);
             }
         }
 
-        if(excludes == null)
+        if (excludes == null)
         {
             excludeSha1Fps = null;
         }
         else
         {
             excludeSha1Fps = new HashSet<>(excludes.size());
-            for(X509Certificate exclude : excludes)
+            for (X509Certificate exclude : excludes)
             {
                 String sha1Fp = HashCalculator.base64Sha1(exclude.getEncoded());
                 excludeSha1Fps.add(sha1Fp);
@@ -88,9 +88,9 @@ public class IssuerFilter
     public boolean includeIssuerWithSha1Fp(
             final String sha1Fp)
     {
-        if(includeSha1Fps == null || includeSha1Fps.contains(sha1Fp))
+        if (includeSha1Fps == null || includeSha1Fps.contains(sha1Fp))
         {
-            if(excludeSha1Fps == null)
+            if (excludeSha1Fps == null)
             {
                 return true;
             }

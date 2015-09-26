@@ -64,7 +64,7 @@ public class KeyParametersOption
         public void setModulusLengths(
                 final Set<Range> modulusLengths)
         {
-            if(CollectionUtil.isEmpty(modulusLengths))
+            if (CollectionUtil.isEmpty(modulusLengths))
             {
                 this.modulusLengths = null;
             } else
@@ -76,14 +76,14 @@ public class KeyParametersOption
         public boolean allowsModulusLength(
                 final int modulusLength)
         {
-            if(modulusLengths == null)
+            if (modulusLengths == null)
             {
                 return true;
             }
 
-            for(Range range : modulusLengths)
+            for (Range range : modulusLengths)
             {
-                if(range.match(modulusLength))
+                if (range.match(modulusLength))
                 {
                     return true;
                 }
@@ -106,7 +106,7 @@ public class KeyParametersOption
         public void setHashAlgs(
                 final Set<ASN1ObjectIdentifier> hashAlgs)
         {
-            if(CollectionUtil.isEmpty(hashAlgs))
+            if (CollectionUtil.isEmpty(hashAlgs))
             {
                 this.hashAlgs = null;
             } else
@@ -118,7 +118,7 @@ public class KeyParametersOption
         public void setMaskGenAlgs(
                 final Set<ASN1ObjectIdentifier> maskGenAlgs)
         {
-            if(CollectionUtil.isEmpty(maskGenAlgs))
+            if (CollectionUtil.isEmpty(maskGenAlgs))
             {
                 this.maskGenAlgs = null;
             } else
@@ -130,7 +130,7 @@ public class KeyParametersOption
         public void setSaltLengths(
                 final Set<Integer> saltLengths)
         {
-            if(CollectionUtil.isEmpty(saltLengths))
+            if (CollectionUtil.isEmpty(saltLengths))
             {
                 this.saltLengths = null;
             } else
@@ -142,7 +142,7 @@ public class KeyParametersOption
         public void setTrailerFields(
                 final Set<Integer> trailerFields)
         {
-            if(CollectionUtil.isEmpty(trailerFields))
+            if (CollectionUtil.isEmpty(trailerFields))
             {
                 this.trailerFields = null;
             } else
@@ -154,7 +154,7 @@ public class KeyParametersOption
         public boolean allowsHashAlg(
                 final ASN1ObjectIdentifier hashAlg)
         {
-            if(hashAlgs == null)
+            if (hashAlgs == null)
             {
                 return true;
             }
@@ -165,7 +165,7 @@ public class KeyParametersOption
         public boolean allowsMaskGenAlg(
                 final ASN1ObjectIdentifier maskGenAlg)
         {
-            if(maskGenAlgs == null)
+            if (maskGenAlgs == null)
             {
                 return true;
             }
@@ -176,7 +176,7 @@ public class KeyParametersOption
         public boolean allowsSaltLength(
                 final int saltLength)
         {
-            if(saltLengths == null)
+            if (saltLengths == null)
             {
                 return true;
             }
@@ -187,7 +187,7 @@ public class KeyParametersOption
         public boolean allowsTrailerField(
                 final int trailerField)
         {
-            if(trailerFields == null)
+            if (trailerFields == null)
             {
                 return true;
             }
@@ -209,7 +209,7 @@ public class KeyParametersOption
         public void setPLengths(
                 final Set<Range> pLengths)
         {
-            if(CollectionUtil.isEmpty(pLengths))
+            if (CollectionUtil.isEmpty(pLengths))
             {
                 this.pLengths = null;
             } else
@@ -221,7 +221,7 @@ public class KeyParametersOption
         public void setQLengths(
                 final Set<Range> qLengths)
         {
-            if(CollectionUtil.isEmpty(qLengths))
+            if (CollectionUtil.isEmpty(qLengths))
             {
                 this.qLengths = null;
             } else
@@ -233,14 +233,14 @@ public class KeyParametersOption
         public boolean allowsPLength(
                 final int pLength)
         {
-            if(pLengths == null)
+            if (pLengths == null)
             {
                 return true;
             }
 
-            for(Range range : pLengths)
+            for (Range range : pLengths)
             {
-                if(range.match(pLength))
+                if (range.match(pLength))
                 {
                     return true;
                 }
@@ -252,14 +252,14 @@ public class KeyParametersOption
         public boolean allowsQLength(
                 final int qLength)
         {
-            if(qLengths == null)
+            if (qLengths == null)
             {
                 return true;
             }
 
-            for(Range range : qLengths)
+            for (Range range : qLengths)
             {
-                if(range.match(qLength))
+                if (range.match(qLength))
                 {
                     return true;
                 }
@@ -330,7 +330,7 @@ public class KeyParametersOption
         public void setPublicKeyParamSets(
                 final Set<ASN1ObjectIdentifier> publicKeyParamSets)
         {
-            if(CollectionUtil.isEmpty(publicKeyParamSets))
+            if (CollectionUtil.isEmpty(publicKeyParamSets))
             {
                 this.publicKeyParamSets = null;
             } else
@@ -342,7 +342,7 @@ public class KeyParametersOption
         public void setDigestParamSets(
                 final Set<ASN1ObjectIdentifier> digestParamSets)
         {
-            if(CollectionUtil.isEmpty(digestParamSets))
+            if (CollectionUtil.isEmpty(digestParamSets))
             {
                 this.digestParamSets = null;
             } else
@@ -354,7 +354,7 @@ public class KeyParametersOption
         public void setEncryptionParamSets(
                 final Set<ASN1ObjectIdentifier> encryptionParamSets)
         {
-            if(CollectionUtil.isEmpty(encryptionParamSets))
+            if (CollectionUtil.isEmpty(encryptionParamSets))
             {
                 this.encryptionParamSets = null;
             } else
@@ -366,7 +366,7 @@ public class KeyParametersOption
         public boolean allowsPublicKeyParamSet(
                 final ASN1ObjectIdentifier oid)
         {
-            if(publicKeyParamSets == null)
+            if (publicKeyParamSets == null)
             {
                 return true;
             }
@@ -376,7 +376,7 @@ public class KeyParametersOption
         public boolean allowsDigestParamSet(
                 final ASN1ObjectIdentifier oid)
         {
-            if(digestParamSets == null)
+            if (digestParamSets == null)
             {
                 return true;
             }
@@ -386,7 +386,7 @@ public class KeyParametersOption
         public boolean allowsEncryptionParamSet(
                 final ASN1ObjectIdentifier oid)
         {
-            if(encryptionParamSets == null)
+            if (encryptionParamSets == null)
             {
                 return true;
             }

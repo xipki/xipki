@@ -55,7 +55,7 @@ public class CertprofileInfo
     {
         ParamUtil.assertNotBlank("name", name);
         this.name = name;
-        if(StringUtil.isBlank(type))
+        if (StringUtil.isBlank(type))
         {
             this.type = null;
         } else
@@ -63,7 +63,7 @@ public class CertprofileInfo
             this.type = type;
         }
 
-        if(StringUtil.isBlank(conf))
+        if (StringUtil.isBlank(conf))
         {
             this.conf = null;
         } else

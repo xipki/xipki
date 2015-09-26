@@ -66,7 +66,7 @@ public class CaAliasCheckCmd extends CaCmd
     {
         out("checking CA alias='" + aliasName + "', CA='" + caName + "'");
         String _caName = caManager.getCaNameForAlias(aliasName);
-        if(_caName == null)
+        if (_caName == null)
         {
             throw new CmdFailure("alias '" + aliasName + "' is not configured");
         }

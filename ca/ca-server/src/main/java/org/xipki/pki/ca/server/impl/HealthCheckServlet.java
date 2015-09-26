@@ -78,7 +78,7 @@ public class HealthCheckServlet extends HttpServlet
         response.setHeader("Access-Control-Allow-Origin", "*");
         try
         {
-            if(responderManager == null)
+            if (responderManager == null)
             {
                 LOG.error("responderManager in servlet not configured");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -92,11 +92,11 @@ public class HealthCheckServlet extends HttpServlet
             String caName = null;
             X509CACmpResponder responder = null;
             int n = servletPath.length();
-            if(requestURI.length() > n + 1)
+            if (requestURI.length() > n + 1)
             {
                 String caAlias = URLDecoder.decode(requestURI.substring(n + 1), "UTF-8");
                 caName = responderManager.getCaNameForAlias(caAlias);
-                if(caName == null)
+                if (caName == null)
                 {
                     caName = caAlias;
                 }
@@ -104,14 +104,14 @@ public class HealthCheckServlet extends HttpServlet
                 responder = responderManager.getX509CACmpResponder(caName);
             }
 
-            if(caName == null || responder == null || responder.isInService() == false)
+            if (caName == null || responder == null || responder.isInService() == false)
             {
                 String auditMessage;
-                if(caName == null)
+                if (caName == null)
                 {
                     auditMessage = "n CA is specified";
                 }
-                else if(responder == null)
+                else if (responder == null)
                 {
                     auditMessage = "unknown CA '" + caName + "'";
                 }
@@ -141,10 +141,10 @@ public class HealthCheckServlet extends HttpServlet
             response.setContentLength(respBytes.length);
             response.getOutputStream().write(respBytes);
         }
-        catch(EOFException e)
+        catch (EOFException e)
         {
             final String message = "connection reset by peer";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message),
                         e.getClass().getName(), e.getMessage());
@@ -154,7 +154,7 @@ public class HealthCheckServlet extends HttpServlet
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         }
-        catch(Throwable t)
+        catch (Throwable t)
         {
             final String message = "Throwable thrown, this should not happen!";
             LOG.warn(message, t);

@@ -66,7 +66,7 @@ public class KeyIdentifier extends ASN1Object
     public KeyIdentifier(
             final P11KeyIdentifier keyId)
     {
-        if(keyId == null)
+        if (keyId == null)
         {
             throw new IllegalArgumentException("keyId could not be null");
         }
@@ -91,7 +91,7 @@ public class KeyIdentifier extends ASN1Object
                 P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(keyIdBytes);
                 return new KeyIdentifier(keyIdentifier);
             }
-            else if(obj instanceof ASN1String)
+            else if (obj instanceof ASN1String)
             {
                 String keyLabel = ((ASN1String) obj).getString();
                 P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(keyLabel);
@@ -102,7 +102,7 @@ public class KeyIdentifier extends ASN1Object
             {
                 return getInstance(ASN1Primitive.fromByteArray((byte[])obj));
             }
-        }catch(IllegalArgumentException | IOException e)
+        } catch (IllegalArgumentException | IOException e)
         {
             throw new BadASN1ObjectException("unable to parse encoded KeyIdentifier");
         }

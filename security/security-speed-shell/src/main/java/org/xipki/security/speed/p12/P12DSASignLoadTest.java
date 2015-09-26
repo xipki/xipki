@@ -65,7 +65,7 @@ public class P12DSASignLoadTest extends P12SignLoadTest
     throws Exception
     {
         byte[] keystoreBytes = getPrecomputedDSAKeystore(pLength, qLength);
-        if(keystoreBytes == null)
+        if (keystoreBytes == null)
         {
             P12KeypairGenerator kpGen = new P12KeypairGenerator.DSAIdentityGenerator(
                     pLength, qLength, password.toCharArray(), "CN=dummy", null, null);

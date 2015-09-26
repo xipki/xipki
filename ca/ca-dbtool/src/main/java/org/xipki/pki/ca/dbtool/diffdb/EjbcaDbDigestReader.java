@@ -114,7 +114,7 @@ public class EjbcaDbDigestReader implements DigestReader
 
             sql = "SELECT data FROM CAData WHERE cAId=" + caId;
             rs = stmt.executeQuery(sql);
-            if(rs.next() == false)
+            if (rs.next() == false)
             {
                 throw new IllegalArgumentException("no CA with id '" + caId + "' is available");
             }
@@ -129,14 +129,14 @@ public class EjbcaDbDigestReader implements DigestReader
             this.selectBase64CertSql = "SELECT base64Cert FROM CertificateData WHERE id=?";
 
             // account
-            if(dbContainsOtherCA)
+            if (dbContainsOtherCA)
             {
                 // ignore it due to performance
                 totalAccount = -1;
             } else
             {
                 sql = "SELECT COUNT(*) FROM CertificateData";
-                if(revokedOnly)
+                if (revokedOnly)
                 {
                     sql += " WHERE status=40";
                 }
@@ -149,7 +149,7 @@ public class EjbcaDbDigestReader implements DigestReader
 
             // maxId
             sql = "SELECT MAX(id) FROM CertificateData";
-            if(revokedOnly)
+            if (revokedOnly)
             {
                 sql += " WHERE status=40";
             }
@@ -160,7 +160,7 @@ public class EjbcaDbDigestReader implements DigestReader
             rs.close();
 
             sql = "SELECT MIN(id) FROM CertificateData";
-            if(revokedOnly)
+            if (revokedOnly)
             {
                 sql += " WHERE status=40";
             }
@@ -173,12 +173,12 @@ public class EjbcaDbDigestReader implements DigestReader
             sb.append("SELECT id,serialNumber,cAFingerprint,fingerprint");
             sb.append(",status,revocationDate,revocationReason");
             sb.append(" FROM CertificateData WHERE id>=? AND id<?");
-            if(revokedOnly)
+            if (revokedOnly)
             {
                 sb.append(" AND status=40");
             }
             this.selectCertSql = sb.toString();
-        }catch(SQLException e)
+        } catch (SQLException e)
         {
             throw datasource.translate(sql, e);
         }finally
@@ -213,35 +213,35 @@ public class EjbcaDbDigestReader implements DigestReader
             final int n)
     throws DataAccessException
     {
-        if(nextId > maxId && certs.isEmpty())
+        if (nextId > maxId && certs.isEmpty())
         {
             return null;
         }
 
         List<IdentifiedDbDigestEntry> entries = new ArrayList<>(n);
         int k = 0;
-        while(true)
+        while (true)
         {
-            if(certs.isEmpty())
+            if (certs.isEmpty())
             {
                 readNextCerts();
             }
 
             IdentifiedDbDigestEntry next = certs.poll();
-            if(next == null)
+            if (next == null)
             {
                 break;
             }
 
             entries.add(next);
             k++;
-            if(k >= n)
+            if (k >= n)
             {
                 break;
             }
         }
 
-        if(k == 0)
+        if (k == 0)
         {
             return null;
         }
@@ -250,7 +250,7 @@ public class EjbcaDbDigestReader implements DigestReader
 
         List<Long> serialNumbers = new ArrayList<>(k);
         Map<Long, DbDigestEntry> certsMap = new HashMap<>(k);
-        for(IdentifiedDbDigestEntry m : entries)
+        for (IdentifiedDbDigestEntry m : entries)
         {
             long sn = m.content.getSerialNumber();
             serialNumbers.add(sn);
@@ -265,7 +265,7 @@ public class EjbcaDbDigestReader implements DigestReader
     {
         ResultSet rs = null;
 
-        while(certs.isEmpty() && nextId <= maxId)
+        while (certs.isEmpty() && nextId <= maxId)
         {
             try
             {
@@ -276,14 +276,14 @@ public class EjbcaDbDigestReader implements DigestReader
 
                 rs = selectCertStmt.executeQuery();
 
-                while(rs.next())
+                while (rs.next())
                 {
                     int id = rs.getInt("id");
                     String caHash = rs.getString("cAFingerprint");
                     String hash = rs.getString("fingerprint");
 
                     boolean ofThisCA = caFingerprint.equals(caHash);
-                    if(ofThisCA == false && caHash.equals(hash))
+                    if (ofThisCA == false && caHash.equals(hash))
                     {
                         // special case
                         try
@@ -301,18 +301,18 @@ public class EjbcaDbDigestReader implements DigestReader
                             {
                                 throw new DataAccessException("IOException", e);
                             }
-                            if(jceCert.getIssuerX500Principal()
+                            if (jceCert.getIssuerX500Principal()
                                     .equals(caCert.getSubjectX500Principal()))
                             {
                                 ofThisCA = true;
                             }
-                        }catch(SQLException e)
+                        } catch (SQLException e)
                         {
                             throw datasource.translate(selectBase64CertSql, e);
                         }
                     }
 
-                    if(ofThisCA == false)
+                    if (ofThisCA == false)
                     {
                         continue;
                     }
@@ -325,7 +325,7 @@ public class EjbcaDbDigestReader implements DigestReader
                     Long revTime = null;
                     Long revInvTime = null;
 
-                    if(revoked)
+                    if (revoked)
                     {
                         revReason = rs.getInt("revocationReason");
                         long rev_timeInMs = rs.getLong("revocationDate");
@@ -337,7 +337,7 @@ public class EjbcaDbDigestReader implements DigestReader
                             revInvTime, hash);
                     certs.addLast(new IdentifiedDbDigestEntry(cert, id));
                 }
-            } catch(SQLException e)
+            } catch (SQLException e)
             {
                 throw datasource.translate(selectCertSql, e);
             }
@@ -359,22 +359,22 @@ public class EjbcaDbDigestReader implements DigestReader
             final Statement ps,
             final ResultSet rs)
     {
-        if(ps != null)
+        if (ps != null)
         {
             try
             {
                 ps.close();
-            }catch(SQLException e)
+            } catch (SQLException e)
             {
             }
         }
 
-        if(rs != null)
+        if (rs != null)
         {
             try
             {
                 rs.close();
-            }catch(SQLException e)
+            } catch (SQLException e)
             {
             }
         }

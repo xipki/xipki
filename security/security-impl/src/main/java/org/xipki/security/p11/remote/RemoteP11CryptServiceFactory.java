@@ -75,18 +75,18 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
     throws SignerException
     {
         ParamUtil.assertNotNull("moduleName", moduleName);
-        if(p11Control == null)
+        if (p11Control == null)
         {
             throw new IllegalStateException("please call init() first");
         }
 
-        if(SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
+        if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
         {
             moduleName = p11Control.getDefaultModuleName();
         }
 
         P11ModuleConf moduleConf = p11Control.getModuleConf(moduleName);
-        if(moduleConf == null)
+        if (moduleConf == null)
         {
             throw new SignerException("PKCS#11 module " + moduleName + " is not defined");
         }
@@ -94,7 +94,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
         synchronized (services)
         {
             RemoteP11CryptService service = services.get(moduleName);
-            if(service == null)
+            if (service == null)
             {
                 try
                 {
@@ -102,7 +102,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
                     String url = ((DefaultRemoteP11CryptService) service).getServerUrl();
                     logServiceInfo(url, service);
                     services.put(moduleConf.getName(), service);
-                }catch(Exception e)
+                } catch (Exception e)
                 {
                     LOG.error("could not createP11CryptService: {}", e.getMessage());
                     LOG.debug("could not createP11CryptService", e);
@@ -134,14 +134,14 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
             return;
         }
 
-        if(slotIds == null || slotIds.length == 0)
+        if (slotIds == null || slotIds.length == 0)
         {
             sb.append("\tno slot is available");
             LOG.warn("{}", sb);
             return;
         }
 
-        for(P11SlotIdentifier slotId : slotIds)
+        for (P11SlotIdentifier slotId : slotIds)
         {
             String[] keyLabels;
             try
@@ -156,9 +156,9 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
                 continue;
             }
 
-            if(keyLabels != null && keyLabels.length > 0)
+            if (keyLabels != null && keyLabels.length > 0)
             {
-                for(String keyLabel : keyLabels)
+                for (String keyLabel : keyLabels)
                 {
                     sb.append("\t(slot ").append(slotId);
                     sb.append(", label=").append(keyLabel).append(")\n");

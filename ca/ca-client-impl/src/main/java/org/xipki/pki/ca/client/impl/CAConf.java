@@ -82,7 +82,7 @@ class CAConf
         this.url = url;
         this.requestorName = requestorName;
         this.responder = responder;
-        if(StringUtil.isBlank(healthUrl))
+        if (StringUtil.isBlank(healthUrl))
         {
             this.healthUrl = url.replace("cmp", "health");
         }
@@ -111,7 +111,7 @@ class CAConf
             final X509Certificate cert)
     {
         this.cert = cert;
-        if(cert != null)
+        if (cert != null)
         {
             this.subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
         }
@@ -124,14 +124,14 @@ class CAConf
     public void setCertprofiles(
             final Set<CertprofileInfo> profiles)
     {
-        if(profiles == null)
+        if (profiles == null)
         {
             this.profiles = Collections.emptyMap();
         }
         else
         {
             this.profiles = new HashMap<>();
-            for(CertprofileInfo m : profiles)
+            for (CertprofileInfo m : profiles)
             {
                 this.profiles.put(m.getName(), m);
             }

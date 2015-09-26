@@ -86,7 +86,7 @@ public class EnrollCertCmd extends CaCmd
     throws Exception
     {
         CAEntry ca = caManager.getCA(caName);
-        if(ca == null)
+        if (ca == null)
         {
             throw new UnexpectedException("CA " + caName + " not available");
         }

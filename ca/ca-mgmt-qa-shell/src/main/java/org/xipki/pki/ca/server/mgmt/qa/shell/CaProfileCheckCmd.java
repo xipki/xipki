@@ -74,23 +74,23 @@ public class CaProfileCheckCmd extends CaCmd
     {
         out("checking CA profile CA='" + caName +  "', profile='" + profileName + "'");
 
-        if(caManager.getCA(caName) == null)
+        if (caManager.getCA(caName) == null)
         {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
 
-        if(profileLocalname == null)
+        if (profileLocalname == null)
         {
             profileLocalname = profileName;
         }
         Map<String, String> entries = caManager.getCertprofilesForCA(caName);
-        if(entries.containsKey(profileLocalname) == false)
+        if (entries.containsKey(profileLocalname) == false)
         {
             throw new CmdFailure("CA is not associated with profile '" + profileLocalname + "'");
         }
 
         String name = entries.get(profileLocalname);
-        if(profileName.equals(name) == false)
+        if (profileName.equals(name) == false)
         {
             throw new CmdFailure(
                     "Profile name is '" + name + "', but expected '" + profileName + "'");

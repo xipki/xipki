@@ -75,17 +75,17 @@ public class SubjectControl
             List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
             List<ASN1ObjectIdentifier> _oids = backwardsSubject ?
                     ObjectIdentifiers.getBackwardDNs() : ObjectIdentifiers.getForwardDNs();
-            for(ASN1ObjectIdentifier oid : _oids)
+            for (ASN1ObjectIdentifier oid : _oids)
             {
-                if(oids.contains(oid))
+                if (oids.contains(oid))
                 {
                     sortedOids.add(oid);
                 }
             }
 
-            for(ASN1ObjectIdentifier oid : oids)
+            for (ASN1ObjectIdentifier oid : oids)
             {
-                if(sortedOids.contains(oid) == false)
+                if (sortedOids.contains(oid) == false)
                 {
                     sortedOids.add(oid);
                 }
@@ -97,10 +97,10 @@ public class SubjectControl
         Set<String> groups = new HashSet<>();
         this.groupTypes = new HashMap<>();
 
-        for(ASN1ObjectIdentifier type : controls.keySet())
+        for (ASN1ObjectIdentifier type : controls.keySet())
         {
             String group = controls.get(type).getGroup();
-            if(StringUtil.isBlank(group))
+            if (StringUtil.isBlank(group))
             {
                 continue;
             }
@@ -108,7 +108,7 @@ public class SubjectControl
             groups.add(group);
             typeGroups.put(type, group);
             Set<ASN1ObjectIdentifier> types = groupTypes.get(group);
-            if(types == null)
+            if (types == null)
             {
                 types = new HashSet<>();
                 groupTypes.put(group, types);

@@ -79,7 +79,7 @@ public class X509CrlSignerEntry implements Serializable
         ParamUtil.assertNotBlank("type", signerType);
         ParamUtil.assertNotNull("crlControl", crlControl);
 
-        if("CA".equalsIgnoreCase(name))
+        if ("CA".equalsIgnoreCase(name))
         {
             this.base64Cert = null;
         }
@@ -93,12 +93,12 @@ public class X509CrlSignerEntry implements Serializable
         this.signerConf = signerConf;
         this.crlControl = crlControl;
 
-        if(this.base64Cert != null)
+        if (this.base64Cert != null)
         {
             try
             {
                 this.cert = X509Util.parseBase64EncodedCert(base64Cert);
-            }catch(Throwable t)
+            } catch (Throwable t)
             {
                 LOG.debug("could not parse the certificate of CRL signer '" + name + "'");
                 certFaulty = true;
@@ -145,7 +145,7 @@ public class X509CrlSignerEntry implements Serializable
     public void setCertificate(
             final X509Certificate cert)
     {
-        if(base64Cert != null)
+        if (base64Cert != null)
         {
             throw new IllegalStateException("certificate is already by specified by base64Cert");
         }
@@ -178,7 +178,7 @@ public class X509CrlSignerEntry implements Serializable
         sb.append("faulty: ").append(isFaulty()).append('\n');
         sb.append("signerType: ").append(signerType).append('\n');
         sb.append("signerConf: ");
-        if(signerConf == null)
+        if (signerConf == null)
         {
             sb.append("null");
         } else
@@ -187,7 +187,7 @@ public class X509CrlSignerEntry implements Serializable
         }
         sb.append('\n');
         sb.append("crlControl: ").append(crlControl).append("\n");
-        if(cert != null)
+        if (cert != null)
         {
             sb.append("cert: ").append("\n");
             sb.append("\tissuer: ").append(
@@ -196,7 +196,7 @@ public class X509CrlSignerEntry implements Serializable
             sb.append("\tsubject: ").append(
                     X509Util.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
 
-            if(verbose)
+            if (verbose)
             {
                 sb.append("\tencoded: ");
                 try

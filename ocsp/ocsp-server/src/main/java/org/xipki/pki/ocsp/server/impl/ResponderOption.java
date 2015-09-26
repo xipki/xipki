@@ -64,11 +64,11 @@ class ResponderOption
     throws InvalidConfException
     {
         String s = conf.getMode();
-        if(s == null || "RFC6960".equalsIgnoreCase(s))
+        if (s == null || "RFC6960".equalsIgnoreCase(s))
         {
             this.mode = OCSPMode.RFC6960;
         }
-        else if("RFC2560".equalsIgnoreCase(s))
+        else if ("RFC2560".equalsIgnoreCase(s))
         {
             this.mode = OCSPMode.RFC2560;
         }
@@ -87,22 +87,22 @@ class ResponderOption
         List<String> list = new ArrayList<>(conf.getStores().getStore());
         this.storeNames = Collections.unmodifiableList(list);
 
-        if(conf.getServletPaths() == null)
+        if (conf.getServletPaths() == null)
         {
             this.servletPaths = Collections.emptyList();
         }
         else
         {
             List<String> paths = conf.getServletPaths().getServletPath();
-            for(String path : paths)
+            for (String path : paths)
             {
                 int n = path.length();
-                if(n > 0 && path.charAt(0) == '/')
+                if (n > 0 && path.charAt(0) == '/')
                 {
                     throw new InvalidConfException(
                             "servlet path '" + path + "' must not start with '/'");
                 }
-                if(n > 1 && path.charAt(n - 1) == '/')
+                if (n > 1 && path.charAt(n - 1) == '/')
                 {
                     throw new InvalidConfException(
                             "servlet path '" + path + "' must not end with '/'");

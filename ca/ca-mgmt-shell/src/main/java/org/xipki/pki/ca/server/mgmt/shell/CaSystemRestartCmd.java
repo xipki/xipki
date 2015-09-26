@@ -55,7 +55,7 @@ public class CaSystemRestartCmd extends CaCmd
     throws Exception
     {
         boolean successfull = caManager.restartCaSystem();
-        if(successfull == false)
+        if (successfull == false)
         {
             throw new CmdFailure("could not restart CA system");
         }
@@ -63,11 +63,11 @@ public class CaSystemRestartCmd extends CaCmd
         StringBuilder sb = new StringBuilder("restarted CA system");
         Set<String> names = new HashSet<>(caManager.getCaNames());
 
-        if(names.size() > 0)
+        if (names.size() > 0)
         {
             sb.append(" with following CAs: ");
             Set<String> caAliasNames = caManager.getCaAliasNames();
-            for(String aliasName : caAliasNames)
+            for (String aliasName : caAliasNames)
             {
                 String name = caManager.getCaNameForAlias(aliasName);
                 names.remove(name);
@@ -75,7 +75,7 @@ public class CaSystemRestartCmd extends CaCmd
                 sb.append(name).append(" (alias ").append(aliasName).append(")").append(", ");
             }
 
-            for(String name : names)
+            for (String name : names)
             {
                 sb.append(name).append(", ");
             }

@@ -124,14 +124,14 @@ public class ScepServlet extends HttpServlet
 
         String scepName = null;
         String certProfileName = null;
-        if(requestURI.length() > n + 1)
+        if (requestURI.length() > n + 1)
         {
             String scepPath = URLDecoder.decode(requestURI.substring(n + 1), "UTF-8");
-            if(scepPath.endsWith(CGI_PROGRAM))
+            if (scepPath.endsWith(CGI_PROGRAM))
             {
                 String path = scepPath.substring(0, scepPath.length() - CGI_PROGRAM_LEN);
                 String[] tokens = path.split("/");
-                if(tokens.length == 2)
+                if (tokens.length == 2)
                 {
                     scepName = tokens[0];
                     certProfileName = tokens[1];
@@ -139,7 +139,7 @@ public class ScepServlet extends HttpServlet
             }
         }
 
-        if(scepName == null)
+        if (scepName == null)
         {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -149,7 +149,7 @@ public class ScepServlet extends HttpServlet
         AuditEvent auditEvent = (auditService != null)
                 ? new AuditEvent(new Date())
                 : null;
-        if(auditEvent != null)
+        if (auditEvent != null)
         {
             auditEvent.setApplicationName("SCEP");
             auditEvent.setName("PERF");
@@ -164,7 +164,7 @@ public class ScepServlet extends HttpServlet
 
         try
         {
-            if(responderManager == null)
+            if (responderManager == null)
             {
                 auditMessage = "responderManager in servlet not configured";
                 LOG.error(auditMessage);
@@ -177,12 +177,12 @@ public class ScepServlet extends HttpServlet
             }
 
             String realScepName = responderManager.getCaNameForAlias(scepName);
-            if(realScepName != null)
+            if (realScepName != null)
             {
                 scepName = realScepName;
             }
             Scep responder = responderManager.getScep(scepName);
-            if(responder == null || responder.getStatus() != CAStatus.ACTIVE
+            if (responder == null || responder.getStatus() != CAStatus.ACTIVE
                     || responder.supportsCertProfile(certProfileName) == false)
             {
                 auditMessage = "unknown SCEP '" + scepName + "/" + certProfileName + "'";
@@ -198,14 +198,14 @@ public class ScepServlet extends HttpServlet
             String operation = request.getParameter("operation");
             auditEvent.addEventData(new AuditEventData("operation", operation));
 
-            if("PKIOperation".equalsIgnoreCase(operation))
+            if ("PKIOperation".equalsIgnoreCase(operation))
             {
                 CMSSignedData reqMessage;
                 // parse the request
                 try
                 {
                     byte[] content;
-                    if(post)
+                    if (post)
                     {
                         content = IoUtil.read(request.getInputStream());
                     } else
@@ -215,10 +215,10 @@ public class ScepServlet extends HttpServlet
                     }
 
                     reqMessage = new CMSSignedData(content);
-                }catch(Exception e)
+                } catch (Exception e)
                 {
                     final String message = "invalid request";
-                    if(LOG.isErrorEnabled())
+                    if (LOG.isErrorEnabled())
                     {
                         LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                                 e.getMessage());
@@ -240,7 +240,7 @@ public class ScepServlet extends HttpServlet
                 } catch (MessageDecodingException e)
                 {
                     final String message = "could not decrypt and/or verify the request";
-                    if(LOG.isErrorEnabled())
+                    if (LOG.isErrorEnabled())
                     {
                         LOG.error(LogUtil.buildExceptionLogFormat(message),
                                 e.getClass().getName(), e.getMessage());
@@ -256,7 +256,7 @@ public class ScepServlet extends HttpServlet
                 } catch (OperationException e)
                 {
                     final String message = "system internal error";
-                    if(LOG.isErrorEnabled())
+                    if (LOG.isErrorEnabled())
                     {
                         LOG.error(LogUtil.buildExceptionLogFormat(message),
                                 e.getClass().getName(), e.getMessage());
@@ -275,14 +275,14 @@ public class ScepServlet extends HttpServlet
                 response.setContentLength(respBytes.length);
                 respStream.write(respBytes);
             }
-            else if(Operation.GetCACaps.getCode().equalsIgnoreCase(operation))
+            else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation))
             {
                 // CA-Ident is ignored
                 response.setContentType(ScepConstants.CT_text_palin);
                 byte[] caCapsBytes = responder.getCaCaps().getBytes();
                 respStream.write(caCapsBytes);
             }
-            else if(Operation.GetCACert.getCode().equalsIgnoreCase(operation))
+            else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation))
             {
                 // CA-Ident is ignored
                 byte[] respBytes = responder.getCACertResp().getBytes();
@@ -290,7 +290,7 @@ public class ScepServlet extends HttpServlet
                 response.setContentLength(respBytes.length);
                 respStream.write(respBytes);
             }
-            else if(Operation.GetNextCACert.getCode().equalsIgnoreCase(operation))
+            else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation))
             {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.setContentLength(0);
@@ -308,10 +308,10 @@ public class ScepServlet extends HttpServlet
                 auditStatus = AuditStatus.FAILED;
                 return;
             }
-        }catch(EOFException e)
+        } catch (EOFException e)
         {
             final String message = "connection reset by peer";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -320,7 +320,7 @@ public class ScepServlet extends HttpServlet
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
             final String message = "Throwable thrown, this should not happen!";
             LOG.error(message, t);
@@ -338,7 +338,7 @@ public class ScepServlet extends HttpServlet
                 response.flushBuffer();
             }finally
             {
-                if(auditEvent != null)
+                if (auditEvent != null)
                 {
                     audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
                 }
@@ -360,7 +360,7 @@ public class ScepServlet extends HttpServlet
             try
             {
                 asn1Stream.close();
-            }catch(Exception e){}
+            } catch (Exception e){}
         }
     }
 
@@ -383,31 +383,31 @@ public class ScepServlet extends HttpServlet
             final AuditStatus auditStatus,
             final String auditMessage)
     {
-        if(auditLevel != null)
+        if (auditLevel != null)
         {
             auditEvent.setLevel(auditLevel);
         }
 
-        if(auditStatus != null)
+        if (auditStatus != null)
         {
             auditEvent.setStatus(auditStatus);
         }
 
-        if(auditMessage != null)
+        if (auditMessage != null)
         {
             auditEvent.addEventData(new AuditEventData("message", auditMessage));
         }
 
         auditEvent.setDuration(System.currentTimeMillis() - auditEvent.getTimestamp().getTime());
 
-        if(auditEvent.containsChildAuditEvents() == false)
+        if (auditEvent.containsChildAuditEvents() == false)
         {
             auditService.logEvent(auditEvent);
         }
         else
         {
             List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
-            for(AuditEvent event : expandedAuditEvents)
+            for (AuditEvent event : expandedAuditEvents)
             {
                 auditService.logEvent(event);
             }

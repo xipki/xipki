@@ -54,9 +54,9 @@ class AuditOption
             final AuditOptionType conf)
     {
         Map<String, String> map = new ConcurrentHashMap<>();
-        if(conf.getCertprofileMappings() != null)
+        if (conf.getCertprofileMappings() != null)
         {
-            for(MappingType m : conf.getCertprofileMappings().getMapping())
+            for (MappingType m : conf.getCertprofileMappings().getMapping())
             {
                 map.put(m.getFrom(), m.getTo());
             }

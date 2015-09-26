@@ -49,7 +49,7 @@ public class RandomDNCompleter extends EnumCompleter
     {
         StringBuilder enums = new StringBuilder();
 
-        for(RandomDN dn : RandomDN.values())
+        for (RandomDN dn : RandomDN.values())
         {
             enums.append(dn.name()).append(",");
         }

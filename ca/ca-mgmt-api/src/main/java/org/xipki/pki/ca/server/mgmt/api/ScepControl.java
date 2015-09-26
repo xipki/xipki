@@ -70,7 +70,7 @@ public class ScepControl implements Serializable
             final String conf)
     throws InvalidConfException
     {
-        if(StringUtil.isBlank(conf))
+        if (StringUtil.isBlank(conf))
         {
             return;
         }
@@ -79,7 +79,7 @@ public class ScepControl implements Serializable
         try
         {
             props = new ConfPairs(conf);
-        }catch(RuntimeException e)
+        } catch (RuntimeException e)
         {
             throw new InvalidConfException(e.getClass().getName() + ": " + e.getMessage(), e);
         }
@@ -95,14 +95,14 @@ public class ScepControl implements Serializable
     throws InvalidConfException
     {
         String s = props.getValue(propKey);
-        if(s != null)
+        if (s != null)
         {
             s = s.trim();
-            if("true".equalsIgnoreCase(s))
+            if ("true".equalsIgnoreCase(s))
             {
                 return Boolean.TRUE;
             }
-            else if("false".equalsIgnoreCase(s))
+            else if ("false".equalsIgnoreCase(s))
             {
                 return Boolean.FALSE;
             }
@@ -155,13 +155,13 @@ public class ScepControl implements Serializable
     public boolean equals(
             final Object obj)
     {
-        if(obj instanceof ScepControl == false)
+        if (obj instanceof ScepControl == false)
         {
             return false;
         }
 
         ScepControl b = (ScepControl) obj;
-        if(includeCACert != b.includeCACert
+        if (includeCACert != b.includeCACert
                 || includeSignerCert != b.includeSignerCert)
         {
             return false;

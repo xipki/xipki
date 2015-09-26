@@ -50,7 +50,7 @@ implements ClientCRLReasonCompleter
     {
         StringBuilder enums = new StringBuilder();
 
-        for(CRLReason reason : CRLReason.PERMITTED_CLIENT_CRLREASONS)
+        for (CRLReason reason : CRLReason.PERMITTED_CLIENT_CRLREASONS)
         {
             enums.append(reason.getDescription()).append(",");
         }

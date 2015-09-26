@@ -65,17 +65,17 @@ public class DbDigestEntry
     {
         ParamUtil.assertNotBlank("sha1Fp", sha1Fp);
 
-        if(sha1Fp.length() == 28)
+        if (sha1Fp.length() == 28)
         {
             this.base64Sha1 = sha1Fp;
-        } else if(sha1Fp.length() == 40)
+        } else if (sha1Fp.length() == 40)
         {
             this.base64Sha1 = Base64.toBase64String(Hex.decode(sha1Fp));
         } else
         {
             throw new IllegalArgumentException("invalid sha1Fp '" + sha1Fp + "'");
         }
-        if(revoked)
+        if (revoked)
         {
             ParamUtil.assertNotNull("revReason", revReason);
             ParamUtil.assertNotNull("revTime", revTime);
@@ -92,7 +92,7 @@ public class DbDigestEntry
             final String encoded)
     {
         List<Integer> indexes = getIndexes(encoded);
-        if(indexes.size() != 5)
+        if (indexes.size() != 5)
         {
             throw new IllegalArgumentException("invalid DbDigestEntry: " + encoded);
         }
@@ -110,7 +110,7 @@ public class DbDigestEntry
         Integer revReason = null;
         Long revTime = null;
         Long revInvTime = null;
-        if(revoked)
+        if (revoked)
         {
             i++;
             s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
@@ -122,7 +122,7 @@ public class DbDigestEntry
 
             i++;
             s = encoded.substring(indexes.get(i) + 1);
-            if(s.length() != 0)
+            if (s.length() != 0)
             {
                 revInvTime = Long.parseLong(s);
             }
@@ -181,7 +181,7 @@ public class DbDigestEntry
             final boolean withSerialNumber)
     {
         StringBuilder sb = new StringBuilder();
-        if(withSerialNumber)
+        if (withSerialNumber)
         {
             sb.append(serialNumber).append(";");
         }
@@ -190,19 +190,19 @@ public class DbDigestEntry
                 ? "1"
                 : "0").append(";");
 
-        if(revReason != null)
+        if (revReason != null)
         {
             sb.append(revReason);
         }
         sb.append(";");
 
-        if(revTime != null)
+        if (revTime != null)
         {
             sb.append(revTime);
         }
         sb.append(";");
 
-        if(revInvTime != null)
+        if (revInvTime != null)
         {
             sb.append(revInvTime);
         }
@@ -213,37 +213,37 @@ public class DbDigestEntry
     public boolean contentEquals(
             final DbDigestEntry b)
     {
-        if(b == null)
+        if (b == null)
         {
             return false;
         }
 
-        if(serialNumber != b.serialNumber)
+        if (serialNumber != b.serialNumber)
         {
             return false;
         }
 
-        if(revoked != b.revoked)
+        if (revoked != b.revoked)
         {
             return false;
         }
 
-        if(equals(revReason, b.revReason) == false)
+        if (equals(revReason, b.revReason) == false)
         {
             return false;
         }
 
-        if(equals(revTime, b.revTime) == false)
+        if (equals(revTime, b.revTime) == false)
         {
             return false;
         }
 
-        if(equals(revInvTime, b.revInvTime) == false)
+        if (equals(revInvTime, b.revInvTime) == false)
         {
             return false;
         }
 
-        if(equals(base64Sha1, b.base64Sha1) == false)
+        if (equals(base64Sha1, b.base64Sha1) == false)
         {
             return false;
         }
@@ -255,9 +255,9 @@ public class DbDigestEntry
             final String encoded)
     {
         List<Integer> ret = new ArrayList<>(6);
-        for(int i = 0; i < encoded.length(); i++)
+        for (int i = 0; i < encoded.length(); i++)
         {
-            if(encoded.charAt(i) == ';')
+            if (encoded.charAt(i) == ';')
             {
                 ret.add(i);
             }
@@ -269,7 +269,7 @@ public class DbDigestEntry
             final Object a,
             final Object b)
     {
-        if(a == null)
+        if (a == null)
         {
             return b == null;
         } else

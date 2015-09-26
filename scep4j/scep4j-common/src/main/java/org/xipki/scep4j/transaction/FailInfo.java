@@ -82,9 +82,9 @@ public enum FailInfo
     public static FailInfo valueForCode(
             final int code)
     {
-        for(FailInfo m : values())
+        for (FailInfo m : values())
         {
-            if(m.code == code)
+            if (m.code == code)
             {
                 return m;
             }

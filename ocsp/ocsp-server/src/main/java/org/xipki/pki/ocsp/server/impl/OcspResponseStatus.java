@@ -58,9 +58,9 @@ public enum OcspResponseStatus
     public static OcspResponseStatus getOCSPResponseStatus(
             final int status)
     {
-        for(OcspResponseStatus entry : values())
+        for (OcspResponseStatus entry : values())
         {
-            if(entry.status == status)
+            if (entry.status == status)
             {
                 return entry;
             }

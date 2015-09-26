@@ -62,12 +62,12 @@ public class CmpControlInfoCmd extends CaCmd
     {
         StringBuilder sb = new StringBuilder();
 
-        if(name == null)
+        if (name == null)
         {
             Set<String> names = caManager.getCmpControlNames();
             int n = names.size();
 
-            if(n == 0 || n == 1)
+            if (n == 0 || n == 1)
             {
                 sb.append((n == 0)
                         ? "no"
@@ -82,7 +82,7 @@ public class CmpControlInfoCmd extends CaCmd
             List<String> sorted = new ArrayList<>(names);
             Collections.sort(sorted);
 
-            for(String m : sorted)
+            for (String m : sorted)
             {
                 sb.append("\t").append(m).append("\n");
             }
@@ -90,7 +90,7 @@ public class CmpControlInfoCmd extends CaCmd
         else
         {
             CmpControlEntry entry = caManager.getCmpControl(name);
-            if(entry == null)
+            if (entry == null)
             {
                 throw new UnexpectedException("\tno CMP control named '" + name + " is configured");
             }

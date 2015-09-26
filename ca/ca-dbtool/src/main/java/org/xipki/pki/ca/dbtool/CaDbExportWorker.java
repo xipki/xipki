@@ -139,27 +139,27 @@ public class CaDbExportWorker extends DbPortWorker
     throws IOException
     {
         File f = new File(destFolder);
-        if(f.exists() == false)
+        if (f.exists() == false)
         {
             f.mkdirs();
         }
         else
         {
-            if(f.isDirectory() == false)
+            if (f.isDirectory() == false)
             {
                 throw new IOException(destFolder + " is not a folder");
             }
 
-            if(f.canWrite() == false)
+            if (f.canWrite() == false)
             {
                 throw new IOException(destFolder + " is not writable");
             }
         }
 
         File processLogFile = new File(destFolder, DbPorter.EXPORT_PROCESS_LOG_FILENAME);
-        if(resume)
+        if (resume)
         {
-            if(processLogFile.exists() == false)
+            if (processLogFile.exists() == false)
             {
                 throw new IOException("could not process with '--resume' option");
             }
@@ -167,7 +167,7 @@ public class CaDbExportWorker extends DbPortWorker
         else
         {
             String[] children = f.list();
-            if(children != null && children.length > 0)
+            if (children != null && children.length > 0)
             {
                 throw new IOException(destFolder + " is not empty");
             }
@@ -182,7 +182,7 @@ public class CaDbExportWorker extends DbPortWorker
         long start = System.currentTimeMillis();
         try
         {
-            if(resume == false)
+            if (resume == false)
             {
                 // CAConfiguration
                 CaConfigurationDbExporter caConfExporter = new CaConfigurationDbExporter(
@@ -202,7 +202,7 @@ public class CaDbExportWorker extends DbPortWorker
             try
             {
                 dataSource.shutdown();
-            }catch(Throwable e)
+            } catch (Throwable e)
             {
                 LOG.error("dataSource.shutdown()", e);
             }

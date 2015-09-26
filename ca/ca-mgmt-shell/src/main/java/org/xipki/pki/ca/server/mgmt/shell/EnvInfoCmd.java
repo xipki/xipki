@@ -61,12 +61,12 @@ public class EnvInfoCmd extends CaCmd
     {
         StringBuilder sb = new StringBuilder();
 
-        if(name == null)
+        if (name == null)
         {
             Set<String> paramNames = caManager.getEnvParamNames();
             int n = paramNames.size();
 
-            if(n == 0 || n == 1)
+            if (n == 0 || n == 1)
             {
                 sb.append((n == 0)
                         ? "no"
@@ -81,7 +81,7 @@ public class EnvInfoCmd extends CaCmd
             List<String> sorted = new ArrayList<>(paramNames);
             Collections.sort(sorted);
 
-            for(String paramName : sorted)
+            for (String paramName : sorted)
             {
                 sb.append("\t").append(paramName).append("\n");
             }
@@ -89,7 +89,7 @@ public class EnvInfoCmd extends CaCmd
         else
         {
             String paramValue = caManager.getEnvParam(name);
-            if(paramValue == null)
+            if (paramValue == null)
             {
                 throw new UnexpectedException("\tno environment named '" + name + " is configured");
             }

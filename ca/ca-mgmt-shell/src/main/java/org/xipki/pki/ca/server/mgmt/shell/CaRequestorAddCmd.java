@@ -90,10 +90,10 @@ public class CaRequestorAddCmd extends CaCmd
         entry.setRa(ra);
         entry.setProfiles(profiles);
         Set<Permission> _permissions = new HashSet<>();
-        for(String permission : permissions)
+        for (String permission : permissions)
         {
             Permission _permission = Permission.getPermission(permission);
-            if(_permission == null)
+            if (_permission == null)
             {
                 throw new IllegalCmdParamException("invalid permission: " + permission);
             }

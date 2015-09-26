@@ -101,27 +101,27 @@ public class OcspDbExportWorker extends DbPortWorker
         this.evaluateOnly = evaluateOnly;
 
         File f = new File(destFolder);
-        if(f.exists() == false)
+        if (f.exists() == false)
         {
             f.mkdirs();
         }
         else
         {
-            if(f.isDirectory() == false)
+            if (f.isDirectory() == false)
             {
                 throw new IOException(destFolder + " is not a folder");
             }
 
-            if(f.canWrite() == false)
+            if (f.canWrite() == false)
             {
                 throw new IOException(destFolder + " is not writable");
             }
         }
 
-        if(resume == false)
+        if (resume == false)
         {
             String[] children = f.list();
-            if(children != null && children.length > 0)
+            if (children != null && children.length > 0)
             {
                 throw new IOException(destFolder + " is not empty");
             }
@@ -151,7 +151,7 @@ public class OcspDbExportWorker extends DbPortWorker
             try
             {
                 dataSource.shutdown();
-            }catch(Throwable e)
+            } catch (Throwable e)
             {
                 LOG.error("dataSource.shutdown()", e);
             }

@@ -62,7 +62,7 @@ public class QaAdmission extends QaExtension
         this.addProfessionInfo = jaxb.getAddProfessionInfo();
 
         List<String> items = jaxb.getProfessionItem();
-        if(CollectionUtil.isEmpty(items))
+        if (CollectionUtil.isEmpty(items))
         {
             professionItems = null;
         } else
@@ -71,13 +71,13 @@ public class QaAdmission extends QaExtension
         }
 
         List<OidWithDescType> oids = jaxb.getProfessionOid();
-        if(oids == null)
+        if (oids == null)
         {
             this.professionOIDs = null;
         } else
         {
             List<String> list = new LinkedList<>();
-            for(OidWithDescType oid : oids)
+            for (OidWithDescType oid : oids)
             {
                 list.add(oid.getValue());
             }

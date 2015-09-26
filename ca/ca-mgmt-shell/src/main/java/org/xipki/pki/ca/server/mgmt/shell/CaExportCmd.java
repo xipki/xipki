@@ -125,12 +125,12 @@ public class CaExportCmd extends CaCmd
     throws Exception
     {
         CAEntry _entry = caManager.getCA(name);
-        if(_entry == null)
+        if (_entry == null)
         {
             throw new UnexpectedException("no CA named " + name + " is defined");
         }
 
-        if(_entry instanceof X509CAEntry == false)
+        if (_entry instanceof X509CAEntry == false)
         {
             throw new UnexpectedException(
                     "unsupported CAEntry type " + _entry.getClass().getName());
@@ -197,19 +197,19 @@ public class CaExportCmd extends CaCmd
         // REVOKED
         CertRevocationInfo revInfo = entry.getRevocationInfo();
         propsput(props, KEY_REVOKED, revInfo != null);
-        if(revInfo != null)
+        if (revInfo != null)
         {
-            if(revInfo.getReason() != null)
+            if (revInfo.getReason() != null)
             {
                 propsput(props, KEY_REV_REASON, revInfo.getReason().getCode());
             }
 
-            if(revInfo.getRevocationTime() != null)
+            if (revInfo.getRevocationTime() != null)
             {
                 propsput(props, KEY_REV_TIME, revInfo.getRevocationTime().getTime() / 1000);
             }
 
-            if(revInfo.getInvalidityTime() != null)
+            if (revInfo.getInvalidityTime() != null)
             {
                 propsput(props, KEY_REV_INV_TIME, revInfo.getInvalidityTime().getTime() / 1000);
             }
@@ -239,11 +239,11 @@ public class CaExportCmd extends CaCmd
             final String key,
             final Object value)
     {
-        if(value instanceof String)
+        if (value instanceof String)
         {
             props.put(key, (String) value);
         }
-        else if(value != null)
+        else if (value != null)
         {
             props.put(key, value.toString());
         }

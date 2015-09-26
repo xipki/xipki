@@ -57,7 +57,7 @@ implements CertificateValidator
     {
         ParamUtil.assertNotEmpty("certs", certs);
         certHashes = new HashSet<String>(certs.size());
-        for(X509Certificate cert : certs)
+        for (X509Certificate cert : certs)
         {
             String hash;
             try

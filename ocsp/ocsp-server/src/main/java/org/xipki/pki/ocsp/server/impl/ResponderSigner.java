@@ -78,10 +78,10 @@ class ResponderSigner
         this.signers = signers;
         X509Certificate[] _certificateChain = signers.get(0).getCertificateChain();
         int n = _certificateChain.length;
-        if(n > 1)
+        if (n > 1)
         {
             X509Certificate c = _certificateChain[n - 1];
-            if(c.getIssuerX500Principal().equals(c.getSubjectX500Principal()))
+            if (c.getIssuerX500Principal().equals(c.getSubjectX500Principal()))
             {
                 n--;
             }
@@ -93,7 +93,7 @@ class ResponderSigner
 
         this.bcCertificate = new X509CertificateHolder(this.certificate.getEncoded());
         this.bcCertificateChain = new X509CertificateHolder[this.certificateChain.length];
-        for(int i = 0; i < certificateChain.length; i++)
+        for (int i = 0; i < certificateChain.length; i++)
         {
             this.bcCertificateChain[i] = new X509CertificateHolder(
                     this.certificateChain[i].getEncoded());
@@ -101,7 +101,7 @@ class ResponderSigner
 
         this.responderId = this.bcCertificate.getSubject();
         algoSignerMap = new HashMap<>();
-        for(ConcurrentContentSigner signer : signers)
+        for (ConcurrentContentSigner signer : signers)
         {
             String algoName = getSignatureAlgorithmName(signer.getAlgorithmIdentifier());
             algoSignerMap.put(algoName, signer);
@@ -116,18 +116,18 @@ class ResponderSigner
     public ConcurrentContentSigner getSignerForPreferredSigAlgs(
             final ASN1Sequence preferredSigAlgs)
     {
-        if(preferredSigAlgs == null)
+        if (preferredSigAlgs == null)
         {
             return signers.get(0);
         }
 
         int size = preferredSigAlgs.size();
-        for(int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++)
         {
             ASN1Sequence algObj = (ASN1Sequence) preferredSigAlgs.getObjectAt(i);
             AlgorithmIdentifier sigAlgId = AlgorithmIdentifier.getInstance(algObj.getObjectAt(0));
             String algoName = getSignatureAlgorithmName(sigAlgId);
-            if(algoSignerMap.containsKey(algoName))
+            if (algoSignerMap.containsKey(algoName))
             {
                 return algoSignerMap.get(algoName);
             }
@@ -139,7 +139,7 @@ class ResponderSigner
             final AlgorithmIdentifier sigAlgId)
     {
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
-        if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid) == false)
+        if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid) == false)
         {
             return algOid.getId();
         }
@@ -177,9 +177,9 @@ class ResponderSigner
 
     public boolean isHealthy()
     {
-        for(ConcurrentContentSigner signer : signers)
+        for (ConcurrentContentSigner signer : signers)
         {
-            if(signer.isHealthy() == false)
+            if (signer.isHealthy() == false)
             {
                 return false;
             }

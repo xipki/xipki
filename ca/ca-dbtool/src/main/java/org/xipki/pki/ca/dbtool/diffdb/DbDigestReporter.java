@@ -103,7 +103,7 @@ public class DbDigestReporter
             final DbDigestEntry certB)
     throws IOException
     {
-        if(certA.getSerialNumber() != certB.getSerialNumber())
+        if (certA.getSerialNumber() != certB.getSerialNumber())
         {
             throw new IllegalArgumentException("certA and certB do not have the same serialNumber");
         }
@@ -161,7 +161,7 @@ public class DbDigestReporter
         try
         {
             writer.close();
-        } catch(Exception e)
+        } catch (Exception e)
         {
         }
     }

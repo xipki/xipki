@@ -92,7 +92,7 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
     protected Client getScepClient()
     throws CertificateException, IOException
     {
-        if(scepClient == null)
+        if (scepClient == null)
         {
             X509Certificate caCert = X509Util.parseCert(caCertFile);
             URL _url = new URL(url);
@@ -104,7 +104,7 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
     protected PrivateKey getIdentityKey()
     throws Exception
     {
-        if(identityKey == null)
+        if (identityKey == null)
         {
             readIdentity();
         }
@@ -114,7 +114,7 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
     protected X509Certificate getIdentityCert()
     throws Exception
     {
-        if(identityCert == null)
+        if (identityCert == null)
         {
             readIdentity();
         }
@@ -132,17 +132,17 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
 
         String keyname = null;
         Enumeration<String> aliases = ks.aliases();
-        while(aliases.hasMoreElements())
+        while (aliases.hasMoreElements())
         {
             String alias = aliases.nextElement();
-            if(ks.isKeyEntry(alias))
+            if (ks.isKeyEntry(alias))
             {
                 keyname = alias;
                 break;
             }
         }
 
-        if(keyname == null)
+        if (keyname == null)
         {
             throw new Exception("no key entry is contained in the keystore");
         }
@@ -156,10 +156,10 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
     throws CertStoreException
     {
         Iterator<?> it = certstore.getCertificates(null).iterator();
-        while(it.hasNext())
+        while (it.hasNext())
         {
             X509Certificate m = (X509Certificate) it.next();
-            if(-1 == m.getBasicConstraints())
+            if (-1 == m.getBasicConstraints())
             {
                 return m;
             }

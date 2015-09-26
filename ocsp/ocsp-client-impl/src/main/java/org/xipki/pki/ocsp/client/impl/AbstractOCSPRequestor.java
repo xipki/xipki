@@ -121,7 +121,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
     {
         try
         {
-            if(X509Util.issues(issuerCert, cert) == false)
+            if (X509Util.issues(issuerCert, cert) == false)
             {
                 throw new IllegalArgumentException("cert and issuerCert do not match");
             }
@@ -144,12 +144,12 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
     throws OCSPResponseException, OCSPRequestorException
     {
         BigInteger[] serialNumbers = new BigInteger[certs.length];
-        for(int i = 0; i < certs.length; i++)
+        for (int i = 0; i < certs.length; i++)
         {
             X509Certificate cert = certs[i];
             try
             {
-                if(X509Util.issues(issuerCert, cert) == false)
+                if (X509Util.issues(issuerCert, cert) == false)
                 {
                     throw new IllegalArgumentException(
                             "cert at index " + i + " and issuerCert do not match");
@@ -185,13 +185,13 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             final RequestResponseDebug debug)
     throws OCSPResponseException, OCSPRequestorException
     {
-        if(requestOptions == null)
+        if (requestOptions == null)
         {
             throw new IllegalArgumentException("requestOptions could not be null");
         }
 
         byte[] nonce = null;
-        if(requestOptions.isUseNonce())
+        if (requestOptions.isUseNonce())
         {
             nonce = nextNonce(requestOptions.getNonceLen());
         }
@@ -207,7 +207,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         }
 
         RequestResponsePair msgPair = null;
-        if(debug != null)
+        if (debug != null)
         {
             msgPair = new RequestResponsePair();
             debug.add(msgPair);
@@ -223,7 +223,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             throw new ResponderUnreachableException("IOException: " + e.getMessage(), e);
         }
 
-        if(debug != null)
+        if (debug != null)
         {
             msgPair.setRequest(encodedResp);
         }
@@ -246,28 +246,28 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             throw new InvalidOCSPResponseException("responseObject is invalid");
         }
 
-        if(ocspResp.getStatus() != 0)
+        if (ocspResp.getStatus() != 0)
         {
             return ocspResp;
         }
 
-        if(respObject instanceof BasicOCSPResp == false)
+        if (respObject instanceof BasicOCSPResp == false)
         {
             return ocspResp;
         }
 
         BasicOCSPResp basicOCSPResp = (BasicOCSPResp) respObject;
 
-        if(nonce != null)
+        if (nonce != null)
         {
             Extension nonceExtn = basicOCSPResp.getExtension(
                     OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
-            if(nonceExtn == null)
+            if (nonceExtn == null)
             {
                 throw new OCSPNonceUnmatchedException(nonce, null);
             }
             byte[] receivedNonce = nonceExtn.getExtnValue().getOctets();
-            if(Arrays.equals(nonce, receivedNonce) == false)
+            if (Arrays.equals(nonce, receivedNonce) == false)
             {
                 throw new OCSPNonceUnmatchedException(nonce, receivedNonce);
             }
@@ -278,11 +278,11 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                 ? 0
                 : singleResponses.length;
 
-        if(countSingleResponses != serialNumbers.length)
+        if (countSingleResponses != serialNumbers.length)
         {
             StringBuilder sb = new StringBuilder(100);
             sb.append("response with ").append(countSingleResponses).append(" singleRessponse");
-            if(countSingleResponses > 1)
+            if (countSingleResponses > 1)
             {
                 sb.append("s");
             }
@@ -295,7 +295,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         byte[] issuerKeyHash = certID.getIssuerKeyHash();
         byte[] issuerNameHash = certID.getIssuerNameHash();
 
-        if(serialNumbers.length == 1)
+        if (serialNumbers.length == 1)
         {
             SingleResp m = singleResponses[0];
             CertificateID cid = m.getCertID();
@@ -303,13 +303,13 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                     && Arrays.equals(issuerKeyHash, cid.getIssuerKeyHash())
                     && Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
 
-            if(issuerMatch == false)
+            if (issuerMatch == false)
             {
                 throw new OCSPTargetUnmatchedException("the issuer is not requested");
             }
 
             BigInteger serialNumber = cid.getSerialNumber();
-            if(serialNumbers[0].equals(serialNumber) == false)
+            if (serialNumbers[0].equals(serialNumber) == false)
             {
                 throw new OCSPTargetUnmatchedException("the serialNumber is not requested");
             }
@@ -319,7 +319,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             List<BigInteger> tmpSerials1 = Arrays.asList(serialNumbers);
             List<BigInteger> tmpSerials2 = new ArrayList<>(tmpSerials1);
 
-            for(int i = 0; i < singleResponses.length; i++)
+            for (int i = 0; i < singleResponses.length; i++)
             {
                 SingleResp m = singleResponses[i];
                 CertificateID cid = m.getCertID();
@@ -327,16 +327,16 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                         && Arrays.equals(issuerKeyHash, cid.getIssuerKeyHash())
                         && Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
 
-                if(issuerMatch == false)
+                if (issuerMatch == false)
                 {
                     throw new OCSPTargetUnmatchedException(
                             "the issuer specified in singleResponse[" + i + "] is not requested");
                 }
 
                 BigInteger serialNumber = cid.getSerialNumber();
-                if(tmpSerials2.remove(serialNumber) == false)
+                if (tmpSerials2.remove(serialNumber) == false)
                 {
-                    if(tmpSerials1.contains(serialNumber))
+                    if (tmpSerials1.contains(serialNumber))
                     {
                         throw new OCSPTargetUnmatchedException("serialNumber " + serialNumber
                                 + "is contained in at least two singleResponses");
@@ -365,19 +365,19 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         List<AlgorithmIdentifier> prefSigAlgs = requestOptions.getPreferredSignatureAlgorithms();
 
         DigestCalculator digestCalculator;
-        if(NISTObjectIdentifiers.id_sha224.equals(hashAlgId))
+        if (NISTObjectIdentifiers.id_sha224.equals(hashAlgId))
         {
             digestCalculator = new SHA224DigestCalculator();
         }
-        else if(NISTObjectIdentifiers.id_sha256.equals(hashAlgId))
+        else if (NISTObjectIdentifiers.id_sha256.equals(hashAlgId))
         {
             digestCalculator = new SHA256DigestCalculator();
         }
-        else if(NISTObjectIdentifiers.id_sha384.equals(hashAlgId))
+        else if (NISTObjectIdentifiers.id_sha384.equals(hashAlgId))
         {
             digestCalculator = new SHA384DigestCalculator();
         }
-        else if(NISTObjectIdentifiers.id_sha512.equals(hashAlgId))
+        else if (NISTObjectIdentifiers.id_sha512.equals(hashAlgId))
         {
             digestCalculator = new SHA512DigestCalculator();
         }
@@ -388,17 +388,17 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
 
         OCSPReqBuilder reqBuilder = new OCSPReqBuilder();
         List<Extension> extensions = new LinkedList<>();
-        if(nonce != null)
+        if (nonce != null)
         {
             Extension extn = new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
                     new DEROctetString(nonce));
             extensions.add(extn);
         }
 
-        if(prefSigAlgs != null && prefSigAlgs.size() > 0)
+        if (prefSigAlgs != null && prefSigAlgs.size() > 0)
         {
             ASN1EncodableVector v = new ASN1EncodableVector();
-            for(AlgorithmIdentifier algId : prefSigAlgs)
+            for (AlgorithmIdentifier algId : prefSigAlgs)
             {
                 ASN1Sequence prefSigAlgObj = new DERSequence(algId);
                 v.add(prefSigAlgObj);
@@ -417,7 +417,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             extensions.add(extn);
         }
 
-        if(CollectionUtil.isNotEmpty(extensions))
+        if (CollectionUtil.isNotEmpty(extensions))
         {
             reqBuilder.setRequestExtensions(
                     new Extensions(extensions.toArray(new Extension[0])));
@@ -425,7 +425,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
 
         try
         {
-            for(BigInteger serialNumber : serialNumbers)
+            for (BigInteger serialNumber : serialNumbers)
             {
                 CertificateID certID = new CertificateID(
                         digestCalculator,
@@ -435,24 +435,24 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                 reqBuilder.addRequest(certID);
             }
 
-            if(requestOptions.isSignRequest())
+            if (requestOptions.isSignRequest())
             {
                 synchronized (signerLock)
                 {
-                    if(signer == null)
+                    if (signer == null)
                     {
-                        if(StringUtil.isBlank(signerType))
+                        if (StringUtil.isBlank(signerType))
                         {
                             throw new OCSPRequestorException("signerType is not configured");
                         }
 
-                        if(StringUtil.isBlank(signerConf))
+                        if (StringUtil.isBlank(signerConf))
                         {
                             throw new OCSPRequestorException("signerConf is not configured");
                         }
 
                         X509Certificate cert = null;
-                        if(StringUtil.isNotBlank(signerCertFile))
+                        if (StringUtil.isNotBlank(signerCertFile))
                         {
                             try
                             {
