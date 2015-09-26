@@ -121,7 +121,7 @@ public class XMLUtil
     public static Calendar getCalendar(
             final Date dateAndTime)
     {
-        if ( null == dateAndTime )
+        if (null == dateAndTime )
         {
             return null;
         }

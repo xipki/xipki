@@ -262,7 +262,7 @@ public class SecurityUtil
             for (int i = byteLenKey - 1; i > 0; i--)
             {
                 truncatedBytes[i] = (byte)
-                        ( (byte2int(truncatedBytes[i]) >>> shiftBits)
+                        ((byte2int(truncatedBytes[i]) >>> shiftBits)
                         | ((byte2int(truncatedBytes[i- 1]) << (8 - shiftBits)) & 0xFF));
             }
             truncatedBytes[0] = (byte)(byte2int(truncatedBytes[0]) >>> shiftBits);

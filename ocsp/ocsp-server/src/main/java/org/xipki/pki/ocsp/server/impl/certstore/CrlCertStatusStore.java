@@ -1137,7 +1137,7 @@ public class CrlCertStatusStore extends CertStatusStore
             final byte[] issuerNameHash,
             final byte[] issuerKeyHash)
     {
-        if ( ! canResolveIssuer(hashAlgo, issuerNameHash, issuerKeyHash))
+        if (! canResolveIssuer(hashAlgo, issuerNameHash, issuerKeyHash))
         {
             return null;
         }

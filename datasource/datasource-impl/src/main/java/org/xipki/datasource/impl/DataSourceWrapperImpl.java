@@ -419,7 +419,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 }
             } else
             {
-                sql.append("SELECT * FROM ( SELECT ");
+                sql.append("SELECT * FROM (SELECT ");
                 sql.append(coreSql);
                 sql.append(" ORDER BY ").append(orderBy).append(" ) WHERE");
             }

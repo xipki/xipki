@@ -173,7 +173,7 @@ public class SoftTokenContentSignerBuilder
 
             this.key = (PrivateKey) ks.getKey(keyname, keyPassword);
 
-            if ( (key instanceof RSAPrivateKey
+            if ((key instanceof RSAPrivateKey
                     || key instanceof DSAPrivateKey
                     || key instanceof ECPrivateKey) == false)
             {

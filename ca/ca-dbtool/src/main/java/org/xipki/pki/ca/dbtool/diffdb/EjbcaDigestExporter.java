@@ -347,7 +347,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                         caInfo = caInfos.get(hexCaFp);
                     }
 
-                    if ( caInfo == null)
+                    if (caInfo == null)
                     {
                         LOG.debug("Found no CA by caFingerprint, try to resolve by issuer");
                         if (tblCertHasId)
