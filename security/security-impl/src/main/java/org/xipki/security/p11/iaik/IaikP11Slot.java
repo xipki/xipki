@@ -679,7 +679,7 @@ public class IaikP11Slot implements P11WritableSlot
 
                 for (char[] singlePwd : password)
                 {
-                    session.login( Session.UserType.USER, singlePwd);
+                    session.login(Session.UserType.USER, singlePwd);
                 }
                 this.password = password;
             }
@@ -733,7 +733,7 @@ public class IaikP11Slot implements P11WritableSlot
             {
                 for (char[] singlePwd : password)
                 {
-                    session.login( Session.UserType.USER, singlePwd);
+                    session.login(Session.UserType.USER, singlePwd);
                 }
             }
         } catch (TokenException e)
