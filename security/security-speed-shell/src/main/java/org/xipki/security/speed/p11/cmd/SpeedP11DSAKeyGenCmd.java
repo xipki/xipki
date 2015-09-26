@@ -61,9 +61,9 @@ public class SpeedP11DSAKeyGenCmd extends SpeedP11Cmd
     protected LoadExecutor getTester()
     throws Exception
     {
-        if(qLen == null)
+        if (qLen == null)
         {
-            if(pLen >= 2048)
+            if (pLen >= 2048)
             {
                 qLen = 256;
             }

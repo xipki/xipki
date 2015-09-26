@@ -50,6 +50,10 @@ import java.util.Set;
 
 public class CollectionUtil
 {
+    private CollectionUtil()
+    {
+    }
+
     public static boolean isEmpty(
             final Collection<?> c)
     {
@@ -77,7 +81,7 @@ public class CollectionUtil
     public static <K, V> Map<K, V> unmodifiableMap(
             final Map<? extends K, ? extends V> m)
     {
-        if(m == null)
+        if (m == null)
         {
             return null;
         }
@@ -90,26 +94,26 @@ public class CollectionUtil
             final boolean newMap,
             final boolean emptyAsNull)
     {
-        if(m == null)
+        if (m == null)
         {
             return null;
         }
 
-        if(emptyAsNull && m.isEmpty())
+        if (emptyAsNull && m.isEmpty())
         {
             return null;
         }
 
         return Collections.unmodifiableMap(
                 newMap
-                        ? new HashMap<K,V>(m)
+                        ? new HashMap<K, V>(m)
                         : m);
     }
 
     public static <T> Set<T> unmodifiableSet(
             final Set<? extends T> s)
     {
-        if(s == null)
+        if (s == null)
         {
             return null;
         }
@@ -122,12 +126,12 @@ public class CollectionUtil
             final boolean newSet,
             final boolean emptyAsNull)
     {
-        if(s == null)
+        if (s == null)
         {
             return null;
         }
 
-        if(emptyAsNull && s.isEmpty())
+        if (emptyAsNull && s.isEmpty())
         {
             return null;
         }
@@ -141,7 +145,7 @@ public class CollectionUtil
     public static <T> Collection<T> unmodifiableCollection(
             final Collection<? extends T> c)
     {
-        if(c == null)
+        if (c == null)
         {
             return null;
         }
@@ -153,12 +157,12 @@ public class CollectionUtil
             final Collection<? extends T> c,
             final boolean emptyAsNull)
     {
-        if(c == null)
+        if (c == null)
         {
             return null;
         }
 
-        if(emptyAsNull && c.isEmpty())
+        if (emptyAsNull && c.isEmpty())
         {
             return null;
         }
@@ -169,7 +173,7 @@ public class CollectionUtil
     public static <T> List<T> unmodifiableList(
             final List<? extends T> l)
     {
-        if(l == null)
+        if (l == null)
         {
             return null;
         }
@@ -182,12 +186,12 @@ public class CollectionUtil
             final boolean newList,
             final boolean emptyAsNull)
     {
-        if(l == null)
+        if (l == null)
         {
             return null;
         }
 
-        if(emptyAsNull && l.isEmpty())
+        if (emptyAsNull && l.isEmpty())
         {
             return null;
         }

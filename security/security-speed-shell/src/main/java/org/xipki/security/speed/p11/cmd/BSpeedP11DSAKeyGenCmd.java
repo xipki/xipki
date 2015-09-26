@@ -61,7 +61,7 @@ public class BSpeedP11DSAKeyGenCmd extends BSpeedP11Cmd
 
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
 
-        for(int i = 0; i < pqLens.length; i += 2)
+        for (int i = 0; i < pqLens.length; i += 2)
         {
             int pLen = pqLens[i];
             int qLen = pqLens[i+1];

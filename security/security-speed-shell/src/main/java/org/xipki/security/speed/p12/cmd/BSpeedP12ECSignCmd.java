@@ -60,7 +60,7 @@ public class BSpeedP12ECSignCmd extends BSpeedP12SignCmd
     {
         List<LoadExecutor> ret = new LinkedList<>();
         Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOIDMap();
-        for(String curveName : curveNameOidMap.keySet())
+        for (String curveName : curveNameOidMap.keySet())
         {
             ret.add(new P12ECSignLoadTest(securityFactory, sigAlgo, curveName));
         }

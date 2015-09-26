@@ -65,7 +65,7 @@ public enum AuditLevel
     public static final AuditLevel forName(
             final String name)
     {
-        if(name == null)
+        if (name == null)
         {
             return null;
         }

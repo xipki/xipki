@@ -114,30 +114,30 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCmd
             final Map<BigInteger, byte[]> encodedCerts)
     throws Exception
     {
-        if(isBlank(errorText) && isEmpty(statusTexts))
+        if (isBlank(errorText) && isEmpty(statusTexts))
         {
             throw new IllegalArgumentException(
                     "neither expError nor expStatus is set, this is not permitted");
         }
 
-        if(isNotBlank(errorText) && isNotEmpty(statusTexts))
+        if (isNotBlank(errorText) && isNotEmpty(statusTexts))
         {
             throw new IllegalArgumentException(
                     "both expError and expStatus are set, this is not permitted");
         }
 
-        if(isNotBlank(errorText))
+        if (isNotBlank(errorText))
         {
             expectedOcspError = OcspError.getInstance(errorText);
-            if(expectedOcspError == null)
+            if (expectedOcspError == null)
             {
                 throw new IllegalArgumentException("invalid OCSP error status '" + errorText + "'");
             }
         }
 
-        if(isNotEmpty(statusTexts))
+        if (isNotEmpty(statusTexts))
         {
-            if(statusTexts.size() != serialNumbers.size())
+            if (statusTexts.size() != serialNumbers.size())
             {
                 throw new IllegalArgumentException("number of expStatus is invalid: "
                         + (statusTexts.size())
@@ -147,11 +147,11 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCmd
             expectedStatuses = new HashMap<>();
             final int n = serialNumbers.size();
 
-            for(int i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
                 String expectedStatusText = statusTexts.get(i);
                 OcspCertStatus certStatus = OcspCertStatus.getInstance(expectedStatusText);
-                if(certStatus == null)
+                if (certStatus == null)
                 {
                     throw new IllegalArgumentException(
                             "invalid cert status '" + expectedStatusText + "'");
@@ -181,7 +181,7 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCmd
         responseOption.setNonceOccurrence(expectedNonceOccurrence);
         responseOption.setRespIssuer(respIssuer);
         responseOption.setSignatureAlgName(sigAlg);
-        if(isNotBlank(certhashAlg))
+        if (isNotBlank(certhashAlg))
         {
             responseOption.setCerthashAlgId(AlgorithmUtil.getHashAlg(certhashAlg));
         }
@@ -201,9 +201,9 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCmd
                 : "invalid";
         sb.append(txt);
 
-        if(verbose.booleanValue())
+        if (verbose.booleanValue())
         {
-            for(ValidationIssue issue : result.getValidationIssues())
+            for (ValidationIssue issue : result.getValidationIssues())
             {
                 sb.append("\n");
                 format(issue, "    ", sb);
@@ -211,7 +211,7 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCmd
         }
 
         out(sb.toString());
-        if(result.isAllSuccessful() == false)
+        if (result.isAllSuccessful() == false)
         {
             throw new CmdFailure("OCSP response is invalid");
         }
@@ -231,7 +231,7 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCmd
                 ? "failed"
                 : "successful";
         sb.append(txt);
-        if(issue.getMessage() != null)
+        if (issue.getMessage() != null)
         {
             sb.append(", ").append(issue.getMessage());
         }
@@ -242,7 +242,7 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCmd
     throws IllegalCmdParamException
     {
         Occurrence ret = Occurrence.getInstance(text);
-        if(ret == null)
+        if (ret == null)
         {
             throw new IllegalCmdParamException("invalid occurrence '" + text + "'");
         }

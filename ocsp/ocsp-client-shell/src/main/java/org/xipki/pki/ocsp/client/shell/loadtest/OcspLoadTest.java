@@ -109,7 +109,7 @@ public class OcspLoadTest extends LoadExecutor
     private synchronized long nextSerialNumber()
     {
         serialIndex++;
-        if(serialIndex >= numSerials)
+        if (serialIndex >= numSerials)
         {
             serialIndex = 0;
         }
@@ -122,7 +122,7 @@ public class OcspLoadTest extends LoadExecutor
         @Override
         public void run()
         {
-            while(stop() == false && getErrorAccout() < 10)
+            while (stop() == false && getErrorAccout() < 10)
             {
                 long sn = nextSerialNumber();
                 int numFailed = testNext(sn)
@@ -162,12 +162,12 @@ public class OcspLoadTest extends LoadExecutor
                     ? 0
                     : singleResponses.length;
 
-            if(n == 0)
+            if (n == 0)
             {
                 LOG.warn("received no status from server");
                 return false;
             }
-            else if(n != 1)
+            else if (n != 1)
             {
                 LOG.warn("received status with {} single responses from server, {}",
                         n, "but 1 was requested");
@@ -179,16 +179,16 @@ public class OcspLoadTest extends LoadExecutor
                 CertificateStatus singleCertStatus = singleResp.getCertStatus();
 
                 String status ;
-                if(singleCertStatus == null)
+                if (singleCertStatus == null)
                 {
                     status = "good";
                 }
-                else if(singleCertStatus instanceof RevokedStatus)
+                else if (singleCertStatus instanceof RevokedStatus)
                 {
                     RevokedStatus revStatus = (RevokedStatus) singleCertStatus;
                     Date revTime = revStatus.getRevocationTime();
 
-                    if(revStatus.hasRevocationReason())
+                    if (revStatus.hasRevocationReason())
                     {
                         int reason = revStatus.getRevocationReason();
                         status = "revoked, reason = "+ reason + ", revocationTime = " + revTime;
@@ -198,7 +198,7 @@ public class OcspLoadTest extends LoadExecutor
                         status = "revoked, no reason, revocationTime = " + revTime;
                     }
                 }
-                else if(singleCertStatus instanceof UnknownStatus)
+                else if (singleCertStatus instanceof UnknownStatus)
                 {
                     status = "unknown";
                 }

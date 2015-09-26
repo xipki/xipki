@@ -111,15 +111,15 @@ public class X509Util
             final X500Name name)
     {
         RDN[] rdns = name.getRDNs(ObjectIdentifiers.DN_CN);
-        if(rdns != null && rdns.length > 0)
+        if (rdns != null && rdns.length > 0)
         {
             RDN rdn = rdns[0];
             AttributeTypeAndValue atv = null;
-            if(rdn.isMultiValued())
+            if (rdn.isMultiValued())
             {
-                for(AttributeTypeAndValue m : rdn.getTypesAndValues())
+                for (AttributeTypeAndValue m : rdn.getTypesAndValues())
                 {
-                    if(m.getType().equals(ObjectIdentifiers.DN_CN))
+                    if (m.getType().equals(ObjectIdentifiers.DN_CN))
                     {
                         atv = m;
                         break;
@@ -143,7 +143,7 @@ public class X509Util
         RDN[] orig = name.getRDNs();
         int n = orig.length;
         RDN[] _new = new RDN[n];
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             _new[i] = orig[n - 1 - i];
         }
@@ -173,19 +173,19 @@ public class X509Util
         List<ASN1ObjectIdentifier> sortedDNs = backwards ?
                 ObjectIdentifiers.getBackwardDNs() : ObjectIdentifiers.getForwardDNs();
         int size = sortedDNs.size();
-        for(int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++)
         {
             ASN1ObjectIdentifier type = sortedDNs.get(i);
             RDN[] thisRDNs = getRDNs(requstedRDNs, type);
             int n = (thisRDNs == null)
                     ? 0
                     : thisRDNs.length;
-            if(n == 0)
+            if (n == 0)
             {
                 continue;
             }
 
-            for(RDN thisRDN : thisRDNs)
+            for (RDN thisRDN : thisRDNs)
             {
                 rdns.add(thisRDN);
             }
@@ -199,16 +199,16 @@ public class X509Util
             final ASN1ObjectIdentifier type)
     {
         List<RDN> ret = new ArrayList<>(1);
-        for(int i = 0; i < rdns.length; i++)
+        for (int i = 0; i < rdns.length; i++)
         {
             RDN rdn = rdns[i];
-            if(rdn.getFirst().getType().equals(type))
+            if (rdn.getFirst().getType().equals(type))
             {
                 ret.add(rdn);
             }
         }
 
-        if(CollectionUtil.isEmpty(ret))
+        if (CollectionUtil.isEmpty(ret))
         {
             return null;
         }
@@ -290,7 +290,7 @@ public class X509Util
     {
         try
         {
-            if(certFact == null)
+            if (certFact == null)
             {
                 certFact = CertificateFactory.getInstance("X.509", "BC");
             }
@@ -352,7 +352,7 @@ public class X509Util
         ASN1ObjectIdentifier[] _types = name.getAttributeTypes();
         int n = _types.length;
         List<String> types = new ArrayList<>(n);
-        for(ASN1ObjectIdentifier type : _types)
+        for (ASN1ObjectIdentifier type : _types)
         {
             types.add(type.getId());
         }
@@ -360,10 +360,10 @@ public class X509Util
         Collections.sort(types);
 
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             String type = types.get(i);
-            if(i > 0)
+            if (i > 0)
             {
                 sb.append(",");
             }
@@ -371,15 +371,15 @@ public class X509Util
             RDN[] rdns = name.getRDNs(new ASN1ObjectIdentifier(type));
 
             List<String> values = new ArrayList<>(1);
-            for(int j = 0; j < rdns.length; j++)
+            for (int j = 0; j < rdns.length; j++)
             {
                 RDN rdn = rdns[j];
-                if(rdn.isMultiValued())
+                if (rdn.isMultiValued())
                 {
                     AttributeTypeAndValue[] atvs = rdn.getTypesAndValues();
-                    for(AttributeTypeAndValue atv : atvs)
+                    for (AttributeTypeAndValue atv : atvs)
                     {
-                        if(type.equals(atv.getType().getId()))
+                        if (type.equals(atv.getType().getId()))
                         {
                             String textValue =
                                     IETFUtils.valueToString(atv.getValue()).toLowerCase();
@@ -398,9 +398,9 @@ public class X509Util
             sb.append(values.get(0));
 
             final int n2 = values.size();
-            if(n2 > 1)
+            if (n2 > 1)
             {
-                for(int j = 1; j < n2; j++)
+                for (int j = 1; j < n2; j++)
                 {
                     sb.append(";").append(values.get(j));
                 }
@@ -415,7 +415,7 @@ public class X509Util
     throws CertificateEncodingException
     {
         byte[] extValue = getCoreExtValue(cert, Extension.subjectKeyIdentifier);
-        if(extValue == null)
+        if (extValue == null)
         {
             return null;
         }
@@ -423,7 +423,7 @@ public class X509Util
         try
         {
             return ASN1OctetString.getInstance(extValue).getOctets();
-        }catch(IllegalArgumentException e)
+        } catch (IllegalArgumentException e)
         {
             throw new CertificateEncodingException(e.getMessage());
         }
@@ -435,7 +435,7 @@ public class X509Util
     {
         Extension encodedSkiValue = cert.getTBSCertificate().getExtensions().getExtension(
                 Extension.subjectKeyIdentifier);
-        if(encodedSkiValue == null)
+        if (encodedSkiValue == null)
         {
             return null;
         }
@@ -455,7 +455,7 @@ public class X509Util
     throws CertificateEncodingException
     {
         byte[] extValue = getCoreExtValue(cert, Extension.authorityKeyIdentifier);
-        if(extValue == null)
+        if (extValue == null)
         {
             return null;
         }
@@ -476,7 +476,7 @@ public class X509Util
     throws CertificateEncodingException
     {
         byte[] extValue = getCoreExtValue(cert, Extension.authorityInfoAccess);
-        if(extValue == null)
+        if (extValue == null)
         {
             return Collections.emptyList();
         }
@@ -485,9 +485,9 @@ public class X509Util
 
         AccessDescription[] iAccessDescriptions = iAIA.getAccessDescriptions();
         List<AccessDescription> iOCSPAccessDescriptions = new LinkedList<>();
-        for(AccessDescription iAccessDescription : iAccessDescriptions)
+        for (AccessDescription iAccessDescription : iAccessDescriptions)
         {
-            if(iAccessDescription.getAccessMethod().equals(X509ObjectIdentifiers.id_ad_ocsp))
+            if (iAccessDescription.getAccessMethod().equals(X509ObjectIdentifiers.id_ad_ocsp))
             {
                 iOCSPAccessDescriptions.add(iAccessDescription);
             }
@@ -495,10 +495,10 @@ public class X509Util
 
         int n = iOCSPAccessDescriptions.size();
         List<String> OCSPUris = new ArrayList<>(n);
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             GeneralName iAccessLocation = iOCSPAccessDescriptions.get(i).getAccessLocation();
-            if(iAccessLocation.getTagNo() == GeneralName.uniformResourceIdentifier)
+            if (iAccessLocation.getTagNo() == GeneralName.uniformResourceIdentifier)
             {
                 String iOCSPUri = ((ASN1String) iAccessLocation.getName()).getString();
                 OCSPUris.add(iOCSPUri);
@@ -563,7 +563,7 @@ public class X509Util
     public static org.bouncycastle.asn1.x509.KeyUsage createKeyUsage(
             final Set<KeyUsage> usages)
     {
-        if(CollectionUtil.isEmpty(usages))
+        if (CollectionUtil.isEmpty(usages))
         {
             return null;
         }
@@ -580,7 +580,7 @@ public class X509Util
     public static ExtendedKeyUsage createExtendedUsage(
             final Set<ASN1ObjectIdentifier> usages)
     {
-        if(CollectionUtil.isEmpty(usages))
+        if (CollectionUtil.isEmpty(usages))
         {
             return null;
         }
@@ -601,7 +601,7 @@ public class X509Util
             final KeyUsage usage)
     {
         boolean[] keyusage = cert.getKeyUsage();
-        if(keyusage != null && keyusage.length > usage.getBit())
+        if (keyusage != null && keyusage.length > usage.getBit())
         {
             return keyusage[usage.getBit()];
         }
@@ -614,7 +614,7 @@ public class X509Util
     throws CertificateEncodingException
     {
         byte[] fullExtValue = cert.getExtensionValue(type.getId());
-        if(fullExtValue == null)
+        if (fullExtValue == null)
         {
             return null;
         }
@@ -639,36 +639,36 @@ public class X509Util
         certChain.add(cert);
         try
         {
-            if(certs != null && isSelfSigned(cert) == false)
+            if (certs != null && isSelfSigned(cert) == false)
             {
-                while(true)
+                while (true)
                 {
                     X509Certificate caCert = getCaCertOf(certChain.get(certChain.size() - 1),
                             certs);
-                    if(caCert == null)
+                    if (caCert == null)
                     {
                         break;
                     }
                     certChain.add(caCert);
-                    if(isSelfSigned(caCert))
+                    if (isSelfSigned(caCert))
                     {
                         // reaches root self-signed certificate
                         break;
                     }
                 }
             }
-        }catch(CertificateEncodingException e)
+        } catch (CertificateEncodingException e)
         {
         }
 
         final int n = certChain.size();
         int len = n;
-        if(n > 1)
+        if (n > 1)
         {
-            for(int i = 1; i < n; i++)
+            for (int i = 1; i < n; i++)
             {
                 int pathLen = certChain.get(i).getBasicConstraints();
-                if(pathLen < 0 || pathLen < i)
+                if (pathLen < 0 || pathLen < i)
                 {
                     len = i;
                     break;
@@ -676,14 +676,14 @@ public class X509Util
             }
         }
 
-        if(len == n)
+        if (len == n)
         {
             return certChain.toArray(new X509Certificate[0]);
         }
         else
         {
             X509Certificate[] ret = new X509Certificate[len];
-            for(int i = 0; i < len; i++)
+            for (int i = 0; i < len; i++)
             {
                 ret[i] = certChain.get(i);
             }
@@ -696,7 +696,7 @@ public class X509Util
             final Certificate[] certs)
     {
         Set<Certificate> setOfCerts = new HashSet<>();
-        for(Certificate m : certs)
+        for (Certificate m : certs)
         {
             setOfCerts.add(m);
         }
@@ -709,20 +709,20 @@ public class X509Util
             final Set<? extends Certificate> caCerts)
     throws CertificateEncodingException
     {
-        if(isSelfSigned(cert))
+        if (isSelfSigned(cert))
         {
             return null;
         }
 
-        for(Certificate caCert : caCerts)
+        for (Certificate caCert : caCerts)
         {
-            if(caCert instanceof X509Certificate == false)
+            if (caCert instanceof X509Certificate == false)
             {
                 continue;
             }
 
             X509Certificate x509CaCert = (X509Certificate) caCert;
-            if(issues(x509CaCert, cert) == false)
+            if (issues(x509CaCert, cert) == false)
             {
                 continue;
             }
@@ -744,11 +744,11 @@ public class X509Util
     throws CertificateEncodingException
     {
         boolean equals = cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
-        if(equals)
+        if (equals)
         {
             byte[] ski = X509Util.extractSKI(cert);
             byte[] aki = X509Util.extractAKI(cert);
-            if(ski != null && aki != null)
+            if (ski != null && aki != null)
             {
                 equals = Arrays.equals(ski, aki);
             }
@@ -762,24 +762,24 @@ public class X509Util
     throws CertificateEncodingException
     {
         boolean isCA = issuerCert.getBasicConstraints() >= 0;
-        if(isCA == false)
+        if (isCA == false)
         {
             return false;
         }
 
         boolean issues = issuerCert.getSubjectX500Principal().equals(
                 cert.getIssuerX500Principal());
-        if(issues)
+        if (issues)
         {
             byte[] ski = X509Util.extractSKI(issuerCert);
             byte[] aki = X509Util.extractAKI(cert);
-            if(ski != null)
+            if (ski != null)
             {
                 issues = Arrays.equals(ski, aki);
             }
         }
 
-        if(issues)
+        if (issues)
         {
             long issuerNotBefore = issuerCert.getNotBefore().getTime();
             long issuerNotAfter = issuerCert.getNotAfter().getTime();
@@ -798,9 +798,9 @@ public class X509Util
         ASN1ObjectIdentifier algOid = publicKeyInfo.getAlgorithm().getAlgorithm();
         ASN1Encodable keyParameters = publicKeyInfo.getAlgorithm().getParameters();
 
-        if(PKCSObjectIdentifiers.rsaEncryption.equals(algOid))
+        if (PKCSObjectIdentifiers.rsaEncryption.equals(algOid))
         {
-            if(DERNull.INSTANCE.equals(keyParameters))
+            if (DERNull.INSTANCE.equals(keyParameters))
             {
                 return publicKeyInfo;
             }
@@ -820,10 +820,10 @@ public class X509Util
             final CertificationRequestInfo p10Req)
     {
         ASN1Set attrs = p10Req.getAttributes();
-        for(int i = 0; i < attrs.size(); i++)
+        for (int i = 0; i < attrs.size(); i++)
         {
             Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-            if(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
+            if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
             {
                 return Extensions.getInstance(attr.getAttributeValues()[0]);
             }
@@ -835,10 +835,10 @@ public class X509Util
             final CertificationRequestInfo p10Req)
     {
         ASN1Set attrs = p10Req.getAttributes();
-        for(int i = 0; i < attrs.size(); i++)
+        for (int i = 0; i < attrs.size(); i++)
         {
             Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-            if(PKCSObjectIdentifiers.pkcs_9_at_challengePassword.equals(attr.getAttrType()))
+            if (PKCSObjectIdentifiers.pkcs_9_at_challengePassword.equals(attr.getAttrType()))
             {
                 ASN1String str = (ASN1String) attr.getAttributeValues()[0];
                 return str.getString();
@@ -849,7 +849,7 @@ public class X509Util
 
     public static String cutText(String text, int maxLen)
     {
-        if(text.length() <= maxLen)
+        if (text.length() <= maxLen)
         {
             return text;
         }

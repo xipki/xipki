@@ -92,7 +92,7 @@ public class CAManagerClient implements CAManager
     public void init()
     throws Exception
     {
-        if(serverURL == null)
+        if (serverURL == null)
         {
             throw new IllegalStateException("serverURL is not set");
         }
@@ -119,7 +119,7 @@ public class CAManagerClient implements CAManager
     private void determineServerVersion()
     {
         String versionS = client.getAttribute("version");
-        if(versionS == null)
+        if (versionS == null)
         {
             version = 0;
         }
@@ -128,7 +128,7 @@ public class CAManagerClient implements CAManager
             try
             {
                 version = Integer.parseInt(versionS);
-            }catch(NumberFormatException e)
+            } catch (NumberFormatException e)
             {
                 LOG.info("invalid version {}, reset it to 0", versionS);
             }
@@ -768,7 +768,7 @@ public class CAManagerClient implements CAManager
 
             CAEntry caEntry = c.getCA("RCA1");
             System.out.println(caEntry);
-        }catch(Exception e)
+        } catch (Exception e)
         {
             e.printStackTrace();
         }

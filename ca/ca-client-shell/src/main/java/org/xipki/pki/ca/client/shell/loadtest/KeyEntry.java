@@ -77,14 +77,14 @@ public abstract class KeyEntry
                 final int keysize)
         throws Exception
         {
-            if(keysize % 1024 != 0)
+            if (keysize % 1024 != 0)
             {
                 throw new IllegalArgumentException("invalid RSA keysize " + keysize);
             }
 
             BigInteger _baseN = BigInteger.valueOf(0);
             _baseN = _baseN.setBit(keysize - 1);
-            for(int i = 32; i < keysize - 1; i += 2)
+            for (int i = 32; i < keysize - 1; i += 2)
             {
             _baseN = _baseN.setBit(i);
             }
@@ -202,24 +202,24 @@ public abstract class KeyEntry
                 final int pLength)
         throws Exception
         {
-            if(pLength == 1024)
+            if (pLength == 1024)
             {
                 init(P_1024, Q_1024, G_1024, Y_1024);
-            } else if(pLength == 2048)
+            } else if (pLength == 2048)
             {
                 init(P_2048, Q_2048, G_2048, Y_2048);
-            } else if(pLength == 3072)
+            } else if (pLength == 3072)
             {
                 init(P_3072, Q_3072, G_3072, Y_3072);
             } else
             {
-                if(pLength % 1024 != 0)
+                if (pLength % 1024 != 0)
                 {
                     throw new IllegalArgumentException("invalid DSA pLength " + pLength);
                 }
 
                 int qLength;
-                if(pLength >= 2048)
+                if (pLength >= 2048)
                 {
                     qLength = 256;
                 }
@@ -299,14 +299,14 @@ public abstract class KeyEntry
             {
                 new ASN1ObjectIdentifier(curveNameOrOid);
                 isOid = true;
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 isOid = false;
             }
 
             ASN1ObjectIdentifier curveOid;
             String curveName;
-            if(isOid)
+            if (isOid)
             {
                 curveOid = new ASN1ObjectIdentifier(curveNameOrOid);
                 curveName = KeyUtil.getCurveName(curveOid);
@@ -315,7 +315,7 @@ public abstract class KeyEntry
             {
                 curveName = curveNameOrOid;
                 curveOid = KeyUtil.getCurveOID(curveName);
-                if(curveOid == null)
+                if (curveOid == null)
                 {
                     throw new IllegalArgumentException(
                             "no OID is defined for the curve " + curveName);

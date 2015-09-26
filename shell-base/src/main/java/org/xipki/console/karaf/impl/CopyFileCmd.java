@@ -73,22 +73,22 @@ public class CopyFileCmd extends XipkiOsgiCommandSupport
     throws Exception
     {
         File sourceFile = new File(expandFilepath(source));
-        if(sourceFile.exists() == false)
+        if (sourceFile.exists() == false)
         {
             System.err.println(source + " does not exist");
             return null;
         }
 
-        if(sourceFile.isFile() == false)
+        if (sourceFile.isFile() == false)
         {
             System.err.println(source + " is not a file");
             return null;
         }
 
         File destFile = new File(dest);
-        if(destFile.exists())
+        if (destFile.exists())
         {
-            if(destFile.isFile() == false)
+            if (destFile.isFile() == false)
             {
                 System.err.println("cannot override an existing directory by a file");
                 return null;
@@ -96,7 +96,7 @@ public class CopyFileCmd extends XipkiOsgiCommandSupport
             else
             {
                 ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
-                if(false == FileUtils.confirm(reader, "Do you want to override the file " + dest))
+                if (false == FileUtils.confirm(reader, "Do you want to override the file " + dest))
                 {
                     return null;
                 }
@@ -104,7 +104,7 @@ public class CopyFileCmd extends XipkiOsgiCommandSupport
         } else
         {
             File parent = destFile.getParentFile();
-            if(parent != null)
+            if (parent != null)
             {
                 parent.mkdirs();
             }

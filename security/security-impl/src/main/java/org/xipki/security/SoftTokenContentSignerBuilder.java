@@ -127,7 +127,7 @@ public class SoftTokenContentSignerBuilder
             final X509Certificate[] certificateChain)
     throws SignerException
     {
-        if(("PKCS12".equalsIgnoreCase(keystoreType)
+        if (("PKCS12".equalsIgnoreCase(keystoreType)
                 || "JKS".equalsIgnoreCase(keystoreType)) == false)
         {
             throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
@@ -140,7 +140,7 @@ public class SoftTokenContentSignerBuilder
         try
         {
             KeyStore ks;
-            if("JKS".equalsIgnoreCase(keystoreType))
+            if ("JKS".equalsIgnoreCase(keystoreType))
             {
                 ks = KeyStore.getInstance(keystoreType);
             }
@@ -150,13 +150,13 @@ public class SoftTokenContentSignerBuilder
             }
             ks.load(keystoreStream, keystorePassword);
 
-            if(keyname == null)
+            if (keyname == null)
             {
                 Enumeration<String> aliases = ks.aliases();
-                while(aliases.hasMoreElements())
+                while (aliases.hasMoreElements())
                 {
                     String alias = aliases.nextElement();
-                    if(ks.isKeyEntry(alias))
+                    if (ks.isKeyEntry(alias))
                     {
                         keyname = alias;
                         break;
@@ -165,7 +165,7 @@ public class SoftTokenContentSignerBuilder
             }
             else
             {
-                if(ks.isKeyEntry(keyname) == false)
+                if (ks.isKeyEntry(keyname) == false)
                 {
                     throw new SignerException("unknown key named " + keyname);
                 }
@@ -173,7 +173,7 @@ public class SoftTokenContentSignerBuilder
 
             this.key = (PrivateKey) ks.getKey(keyname, keyPassword);
 
-            if( (key instanceof RSAPrivateKey
+            if ( (key instanceof RSAPrivateKey
                     || key instanceof DSAPrivateKey
                     || key instanceof ECPrivateKey) == false)
             {
@@ -186,12 +186,12 @@ public class SoftTokenContentSignerBuilder
             int n = (certificateChain == null)
                     ? 0
                     : certificateChain.length;
-            if(n > 0)
+            if (n > 0)
             {
                 cert = certificateChain[0];
-                if(n > 1)
+                if (n > 1)
                 {
-                    for(int i = 1; i < n; i++)
+                    for (int i = 1; i < n; i++)
                     {
                         caCerts.add(certificateChain[i]);
                     }
@@ -203,16 +203,16 @@ public class SoftTokenContentSignerBuilder
             }
 
             Certificate[] certsInKeystore = ks.getCertificateChain(keyname);
-            if(certsInKeystore.length > 1)
+            if (certsInKeystore.length > 1)
             {
-                for(int i = 1; i < certsInKeystore.length; i++)
+                for (int i = 1; i < certsInKeystore.length; i++)
                 {
                     caCerts.add(certsInKeystore[i]);
                 }
             }
 
             this.certificateChain = X509Util.buildCertPath(cert, caCerts);
-        }catch(KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException
+        } catch (KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException
                 | CertificateException | IOException | UnrecoverableKeyException
                 | ClassCastException e)
         {
@@ -225,7 +225,7 @@ public class SoftTokenContentSignerBuilder
             final int parallelism)
     throws OperatorCreationException, NoSuchPaddingException
     {
-        if(parallelism < 1)
+        if (parallelism < 1)
         {
             throw new IllegalArgumentException("non-positive parallelism is not allowed: "
                     + parallelism);
@@ -235,7 +235,7 @@ public class SoftTokenContentSignerBuilder
 
         ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
 
-        if(Security.getProvider(PROVIDER_XIPKI_NSS) != null
+        if (Security.getProvider(PROVIDER_XIPKI_NSS) != null
                 && algOid.equals(PKCSObjectIdentifiers.id_RSASSA_PSS) == false
                 && key instanceof ECPrivateKey == false)
         {
@@ -249,13 +249,13 @@ public class SoftTokenContentSignerBuilder
             }
 
             boolean useGivenProvider = true;
-            for(int i = 0; i < parallelism; i++)
+            for (int i = 0; i < parallelism; i++)
             {
                 try
                 {
                     Signature signature = Signature.getInstance(algoName, PROVIDER_XIPKI_NSS);
                     signature.initSign(key);
-                    if(i == 0)
+                    if (i == 0)
                     {
                         signature.update(new byte[]{1,2,3,4});
                         signature.sign();
@@ -270,7 +270,7 @@ public class SoftTokenContentSignerBuilder
                 }
             }
 
-            if(useGivenProvider)
+            if (useGivenProvider)
             {
                 LOG.info("use {} to sign {} signature", PROVIDER_XIPKI_NSS, algoName);
             }
@@ -280,24 +280,24 @@ public class SoftTokenContentSignerBuilder
             }
         }
 
-        if(CollectionUtil.isEmpty(signers))
+        if (CollectionUtil.isEmpty(signers))
         {
             BcContentSignerBuilder signerBuilder;
             AsymmetricKeyParameter keyparam;
             try
             {
-                if(key instanceof RSAPrivateKey)
+                if (key instanceof RSAPrivateKey)
                 {
                     keyparam = SignerUtil.generateRSAPrivateKeyParameter((RSAPrivateKey) key);
                     signerBuilder = new RSAContentSignerBuilder(signatureAlgId);
                 }
-                else if(key instanceof DSAPrivateKey)
+                else if (key instanceof DSAPrivateKey)
                 {
                     keyparam = DSAUtil.generatePrivateKeyParameter(key);
                     signerBuilder = new DSAContentSignerBuilder(signatureAlgId,
                             AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
                 }
-                else if(key instanceof ECPrivateKey)
+                else if (key instanceof ECPrivateKey)
                 {
                     keyparam = ECUtil.generatePrivateKeyParameter(key);
                     signerBuilder = new ECDSAContentSignerBuilder(signatureAlgId,
@@ -316,7 +316,7 @@ public class SoftTokenContentSignerBuilder
                 throw new OperatorCreationException("no such algorithm", e);
             }
 
-            for(int i = 0; i < parallelism; i++)
+            for (int i = 0; i < parallelism; i++)
             {
                 ContentSigner signer = signerBuilder.build(keyparam);
                 signers.add(signer);
@@ -324,7 +324,7 @@ public class SoftTokenContentSignerBuilder
         }
 
         ConcurrentContentSigner concurrentSigner = new DefaultConcurrentContentSigner(signers, key);
-        if(certificateChain != null)
+        if (certificateChain != null)
         {
             concurrentSigner.setCertificateChain(certificateChain);
         }
@@ -333,7 +333,7 @@ public class SoftTokenContentSignerBuilder
 
     public X509Certificate getCert()
     {
-        if(certificateChain != null && certificateChain.length > 0)
+        if (certificateChain != null && certificateChain.length > 0)
         {
             return certificateChain[0];
         }
@@ -367,16 +367,16 @@ public class SoftTokenContentSignerBuilder
                 final AlgorithmIdentifier digAlgId)
         throws OperatorCreationException
         {
-            if(AlgorithmUtil.isRSASignatureAlgoId(sigAlgId) == false)
+            if (AlgorithmUtil.isRSASignatureAlgoId(sigAlgId) == false)
             {
                 throw new OperatorCreationException(
                         "the given algorithm is not a valid RSA signature algirthm '"
                         + sigAlgId.getAlgorithm().getId() + "'");
             }
 
-            if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()))
+            if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()))
             {
-                if(Security.getProvider(PROVIDER_XIPKI_NSS_CIPHER) != null)
+                if (Security.getProvider(PROVIDER_XIPKI_NSS_CIPHER) != null)
                 {
                     NssPlainRSASigner plainRSASigner;
                     try
@@ -425,7 +425,7 @@ public class SoftTokenContentSignerBuilder
                 final AlgorithmIdentifier digAlgId)
         throws OperatorCreationException
         {
-            if(AlgorithmUtil.isDSASigAlg(sigAlgId) == false)
+            if (AlgorithmUtil.isDSASigAlg(sigAlgId) == false)
             {
                 throw new OperatorCreationException(
                         "the given algorithm is not a valid DSA signature algirthm '"
@@ -434,7 +434,7 @@ public class SoftTokenContentSignerBuilder
 
             Digest dig = digestProvider.get(digAlgId);
             DSASigner dsaSigner = new DSASigner();
-            if(plain)
+            if (plain)
             {
                 return new DSAPlainDigestSigner(dsaSigner, dig);
             }
@@ -463,7 +463,7 @@ public class SoftTokenContentSignerBuilder
                 final AlgorithmIdentifier digAlgId)
         throws OperatorCreationException
         {
-            if(AlgorithmUtil.isECSigAlg(sigAlgId) == false)
+            if (AlgorithmUtil.isECSigAlg(sigAlgId) == false)
             {
                 throw new OperatorCreationException(
                         "the given algorithm is not a valid EC signature algirthm '"
@@ -473,7 +473,7 @@ public class SoftTokenContentSignerBuilder
             Digest dig = digestProvider.get(digAlgId);
             ECDSASigner dsaSigner = new ECDSASigner();
 
-            if(plain)
+            if (plain)
             {
                 return new DSAPlainDigestSigner(dsaSigner, dig);
             }
@@ -501,7 +501,7 @@ public class SoftTokenContentSignerBuilder
                 final boolean forEncryption,
                 final CipherParameters param)
         {
-            if(forEncryption == false)
+            if (forEncryption == false)
             {
                 throw new RuntimeCryptoException("verification mode not supported.");
             }
@@ -518,7 +518,7 @@ public class SoftTokenContentSignerBuilder
             }
 
             RSAPrivateKey signingKey;
-            if(key instanceof RSAPrivateCrtKeyParameters)
+            if (key instanceof RSAPrivateCrtKeyParameters)
             {
                 signingKey = new BCRSAPrivateCrtKey((RSAPrivateCrtKeyParameters) key);
             }

@@ -59,7 +59,7 @@ public class BSpeedP12DSAKeyGenCmd extends BatchSpeedCmd
         List<LoadExecutor> ret = new LinkedList<>();
         int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
 
-        for(int i = 0; i < pqLens.length; i += 2)
+        for (int i = 0; i < pqLens.length; i += 2)
         {
             int pLen = pqLens[i];
             int qLen = pqLens[i+1];

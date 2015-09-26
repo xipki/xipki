@@ -187,7 +187,7 @@ public class CAEmulator
             final X500Name issuer,
             final BigInteger serialNumber)
     {
-        if(cASubject.equals(issuer) == false)
+        if (cASubject.equals(issuer) == false)
         {
             return null;
         }
@@ -199,7 +199,7 @@ public class CAEmulator
             final X500Name issuer,
             final X500Name subject)
     {
-        if(cASubject.equals(issuer) == false)
+        if (cASubject.equals(issuer) == false)
         {
             return null;
         }
@@ -212,7 +212,7 @@ public class CAEmulator
             final BigInteger serialNumber)
     throws Exception
     {
-        if(crl != null)
+        if (crl != null)
         {
             return crl;
         }
@@ -223,7 +223,7 @@ public class CAEmulator
         crlBuilder.setNextUpdate(nextUpdate);
         Date cAStartTime = cACert.getTBSCertificate().getStartDate().getDate();
         Date revocationTime = new Date(cAStartTime.getTime() + 1);
-        if(revocationTime.after(thisUpdate))
+        if (revocationTime.after(thisUpdate))
         {
             revocationTime = cAStartTime;
         }

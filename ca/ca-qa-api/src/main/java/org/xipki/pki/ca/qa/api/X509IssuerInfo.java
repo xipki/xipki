@@ -73,7 +73,7 @@ public class X509IssuerInfo
     {
         ParamUtil.assertNotNull("certBytes", certBytes);
 
-        if(CollectionUtil.isEmpty(caIssuerURLs))
+        if (CollectionUtil.isEmpty(caIssuerURLs))
         {
             this.caIssuerURLs = null;
         }else
@@ -83,7 +83,7 @@ public class X509IssuerInfo
             this.caIssuerURLs = Collections.unmodifiableSet(set);
         }
 
-        if(CollectionUtil.isEmpty(ocspURLs))
+        if (CollectionUtil.isEmpty(ocspURLs))
         {
             this.ocspURLs = null;
         }else
@@ -93,7 +93,7 @@ public class X509IssuerInfo
             this.ocspURLs = Collections.unmodifiableSet(set);
         }
 
-        if(CollectionUtil.isEmpty(crlURLs))
+        if (CollectionUtil.isEmpty(crlURLs))
         {
             this.crlURLs = null;
         }else
@@ -103,7 +103,7 @@ public class X509IssuerInfo
             this.crlURLs = Collections.unmodifiableSet(set);
         }
 
-        if(CollectionUtil.isEmpty(deltaCrlURLs))
+        if (CollectionUtil.isEmpty(deltaCrlURLs))
         {
             this.deltaCrlURLs = null;
         }else

@@ -50,9 +50,9 @@ public class RevokeCertRequestType
     public boolean addRequestEntry(
             final RevokeCertRequestEntryType requestEntry)
     {
-        for(RevokeCertRequestEntryType re : requestEntries)
+        for (RevokeCertRequestEntryType re : requestEntries)
         {
-            if(re.getId().equals(requestEntry.getId()))
+            if (re.getId().equals(requestEntry.getId()))
             {
                 return false;
             }

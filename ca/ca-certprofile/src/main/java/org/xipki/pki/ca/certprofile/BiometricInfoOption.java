@@ -66,20 +66,20 @@ public class BiometricInfoOption
         this.sourceDataUriOccurrence = jaxb.getIncludeSourceDataUri();
         this.hashAlgorithms = XmlX509CertprofileUtil.toOIDSet(jaxb.getHashAlgorithm());
 
-        for(ASN1ObjectIdentifier m : hashAlgorithms)
+        for (ASN1ObjectIdentifier m : hashAlgorithms)
         {
             AlgorithmUtil.getHashOutputSizeInOctets(m);
         }
 
         this.predefinedTypes = new HashSet<>();
         this.idTypes = new HashSet<>();
-        for(BiometricTypeType m : jaxb.getType())
+        for (BiometricTypeType m : jaxb.getType())
         {
-            if(m.getPredefined() != null)
+            if (m.getPredefined() != null)
             {
                 predefinedTypes.add(m.getPredefined().getValue());
             }
-            else if(m.getOid() != null)
+            else if (m.getOid() != null)
             {
                 idTypes.add(new ASN1ObjectIdentifier(m.getOid().getValue()));
             }
@@ -93,7 +93,7 @@ public class BiometricInfoOption
     public boolean isTypePermitted(
             final TypeOfBiometricData type)
     {
-        if(type.isPredefined())
+        if (type.isPredefined())
         {
             return predefinedTypes.contains(type.getPredefinedBiometricType());
         }

@@ -69,7 +69,7 @@ public class ScepServerContainer
         context.setContextPath("/");
         server.setHandler(context);
 
-        for(ScepServer m : scepServers)
+        for (ScepServer m : scepServers)
         {
             String servletPattern = "/" + m.getName() + "/pkiclient.exe/*";
             ScepServlet servlet = m.getServlet();
@@ -85,7 +85,7 @@ public class ScepServerContainer
         try
         {
             server.start();
-        }catch(Exception e)
+        } catch (Exception e)
         {
             server.stop();
             throw e;

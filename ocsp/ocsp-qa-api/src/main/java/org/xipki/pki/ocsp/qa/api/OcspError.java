@@ -62,9 +62,9 @@ public enum OcspError
     public static OcspError getInstance(
             final String name)
     {
-        for(OcspError entry : values())
+        for (OcspError entry : values())
         {
-            if(entry.name().equals(name))
+            if (entry.name().equals(name))
             {
                 return entry;
             }
@@ -76,9 +76,9 @@ public enum OcspError
     public static OcspError getInstanceForCode(
             final int status)
     {
-        for(OcspError entry : values())
+        for (OcspError entry : values())
         {
-            if(entry.status == status)
+            if (entry.status == status)
             {
                 return entry;
             }

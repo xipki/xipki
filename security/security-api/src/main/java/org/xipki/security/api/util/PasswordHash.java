@@ -207,7 +207,7 @@ public class PasswordHash
             final byte[] b)
     {
         int diff = a.length ^ b.length;
-        for(int i = 0; i < a.length && i < b.length; i++)
+        for (int i = 0; i < a.length && i < b.length; i++)
         {
             diff |= a[i] ^ b[i];
         }
@@ -256,7 +256,7 @@ public class PasswordHash
             final String hex)
     {
         byte[] binary = new byte[hex.length() / 2];
-        for(int i = 0; i < binary.length; i++)
+        for (int i = 0; i < binary.length; i++)
         {
             binary[i] = (byte)Integer.parseInt(hex.substring(2*i, 2*i+2), 16);
         }
@@ -275,7 +275,7 @@ public class PasswordHash
         BigInteger bi = new BigInteger(1, array);
         String hex = bi.toString(16);
         int paddingLength = (array.length * 2) - hex.length();
-        if(paddingLength > 0)
+        if (paddingLength > 0)
             return String.format("%0" + paddingLength + "d", 0) + hex;
         else
             return hex;
@@ -293,40 +293,40 @@ public class PasswordHash
         {
             Security.addProvider(new BouncyCastleProvider());
             // Print out 10 hashes
-            for(int i = 0; i < 10; i++)
+            for (int i = 0; i < 10; i++)
                 System.out.println(PasswordHash.createHash("p\r\nassw0Rd!"));
 
             // Test password validation
             boolean failure = false;
             System.out.println("Running tests...");
-            for(int i = 0; i < 100; i++)
+            for (int i = 0; i < 100; i++)
             {
                 String password = ""+i;
                 String hash = createHash(password);
                 String secondHash = createHash(password);
-                if(hash.equals(secondHash))
+                if (hash.equals(secondHash))
                 {
                     System.out.println("FAILURE: TWO HASHES ARE EQUAL!");
                     failure = true;
                 }
                 String wrongPassword = ""+(i+1);
-                if(validatePassword(wrongPassword, hash))
+                if (validatePassword(wrongPassword, hash))
                 {
                     System.out.println("FAILURE: WRONG PASSWORD ACCEPTED!");
                     failure = true;
                 }
-                if(!validatePassword(password, hash))
+                if (!validatePassword(password, hash))
                 {
                     System.out.println("FAILURE: GOOD PASSWORD NOT ACCEPTED!");
                     failure = true;
                 }
             }
-            if(failure)
+            if (failure)
                 System.out.println("TESTS FAILED!");
             else
                 System.out.println("TESTS PASSED!");
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             System.out.println("ERROR: " + ex);
         }

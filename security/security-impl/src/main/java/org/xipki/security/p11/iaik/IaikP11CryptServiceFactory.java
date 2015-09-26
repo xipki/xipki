@@ -65,20 +65,20 @@ public class IaikP11CryptServiceFactory implements P11CryptServiceFactory
             String moduleName)
     throws SignerException
     {
-        if(p11Control == null)
+        if (p11Control == null)
         {
             throw new IllegalStateException("please call init() first");
         }
 
         ParamUtil.assertNotNull("moduleName", moduleName);
 
-        if(SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
+        if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
         {
             moduleName = p11Control.getDefaultModuleName();
         }
 
         P11ModuleConf conf = p11Control.getModuleConf(moduleName);
-        if(conf == null)
+        if (conf == null)
         {
             throw new SignerException("PKCS#11 module " + moduleName + " is not defined");
         }

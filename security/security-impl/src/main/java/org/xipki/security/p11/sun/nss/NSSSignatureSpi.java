@@ -97,7 +97,7 @@ public class NSSSignatureSpi extends SignatureSpi
     {
         String HASHALGO = digestAlgorithmName.toUpperCase();
         String ENCALGO = encrAlgorithmName.toUpperCase();
-        if(RSA.equalsIgnoreCase(ENCALGO) || ECDSA.equals(ENCALGO))
+        if (RSA.equalsIgnoreCase(ENCALGO) || ECDSA.equals(ENCALGO))
         {
             if (! (SHA1.equals(HASHALGO) || SHA224.equals(HASHALGO) || SHA256.equals(HASHALGO)
                     || SHA384.equals(HASHALGO) || SHA512.equals(HASHALGO)))
@@ -111,9 +111,9 @@ public class NSSSignatureSpi extends SignatureSpi
                     HASHALGO, encrAlgorithmName));
         }
 
-        if(SHA224.equals(HASHALGO))
+        if (SHA224.equals(HASHALGO))
         {
-            if(RSA.equals(ENCALGO))
+            if (RSA.equals(ENCALGO))
             {
                 this.service = null;
                 this.cipher = getCipherService("RSA/ECB/NoPadding");
@@ -140,7 +140,7 @@ public class NSSSignatureSpi extends SignatureSpi
             final String algorithm)
     {
         Signature service = null;
-        if(XipkiNSSProvider.nssProvider != null)
+        if (XipkiNSSProvider.nssProvider != null)
         {
             try
             {
@@ -157,7 +157,7 @@ public class NSSSignatureSpi extends SignatureSpi
             }
         }
 
-        if(service == null)
+        if (service == null)
         {
             final String errorMsg = "unsupported algorithm " + algorithm;
             throw new ProviderException(errorMsg);
@@ -170,7 +170,7 @@ public class NSSSignatureSpi extends SignatureSpi
             final String algorithm)
     {
         Cipher service = null;
-        if(XipkiNSSProvider.nssProvider != null)
+        if (XipkiNSSProvider.nssProvider != null)
         {
             try
             {
@@ -183,7 +183,7 @@ public class NSSSignatureSpi extends SignatureSpi
                 throw new ProviderException("cipher " + algorithm + " not supported");
             }
         }
-        if(service == null)
+        if (service == null)
         {
             final String errorMsg = "unsupported algorithm " + algorithm;
             throw new ProviderException(errorMsg);
@@ -196,7 +196,7 @@ public class NSSSignatureSpi extends SignatureSpi
             final String algorithm)
     {
         MessageDigest service = null;
-        if(XipkiNSSProvider.nssProvider != null)
+        if (XipkiNSSProvider.nssProvider != null)
         {
             try
             {
@@ -206,7 +206,7 @@ public class NSSSignatureSpi extends SignatureSpi
             }
         }
 
-        if(service == null)
+        if (service == null)
         {
             final String errorMsg = "could not find any provider for algorithm " + algorithm;
             try
@@ -227,7 +227,7 @@ public class NSSSignatureSpi extends SignatureSpi
             final String param)
     throws InvalidParameterException
     {
-        if(service != null)
+        if (service != null)
         {
             return service.getParameter(param);
         }
@@ -242,15 +242,15 @@ public class NSSSignatureSpi extends SignatureSpi
             final PrivateKey privateKey)
     throws InvalidKeyException
     {
-        if(service != null)
+        if (service != null)
         {
             service.initSign(privateKey);
         }
-        if(cipher != null)
+        if (cipher != null)
         {
             cipher.init(Cipher.ENCRYPT_MODE, privateKey);
         }
-        if(md != null)
+        if (md != null)
         {
             md.reset();
         }
@@ -262,15 +262,15 @@ public class NSSSignatureSpi extends SignatureSpi
             final SecureRandom random)
     throws InvalidKeyException
     {
-        if(service != null)
+        if (service != null)
         {
             service.initSign(privateKey, random);
         }
-        if(cipher != null)
+        if (cipher != null)
         {
             cipher.init(Cipher.ENCRYPT_MODE, privateKey, random);
         }
-        if(md != null)
+        if (md != null)
         {
             md.reset();
         }
@@ -281,16 +281,16 @@ public class NSSSignatureSpi extends SignatureSpi
             final PublicKey publicKey)
     throws InvalidKeyException
     {
-        if(service != null)
+        if (service != null)
         {
             service.initVerify(publicKey);
         }
-        if(cipher != null)
+        if (cipher != null)
         {
             cipher.init(Cipher.DECRYPT_MODE, publicKey);
         }
 
-        if(md != null)
+        if (md != null)
         {
             md.reset();
         }
@@ -301,7 +301,7 @@ public class NSSSignatureSpi extends SignatureSpi
             final AlgorithmParameterSpec params)
     throws InvalidAlgorithmParameterException
     {
-        if(service != null)
+        if (service != null)
         {
             service.setParameter(params);
         }
@@ -318,7 +318,7 @@ public class NSSSignatureSpi extends SignatureSpi
             final Object value)
     throws InvalidParameterException
     {
-        if(service != null)
+        if (service != null)
         {
             service.setParameter(param, value);
         }
@@ -332,13 +332,13 @@ public class NSSSignatureSpi extends SignatureSpi
     protected byte[] engineSign()
     throws SignatureException
     {
-        if(md != null && service != null)
+        if (md != null && service != null)
         {
             byte[] digest = md.digest();
             service.update(digest);
             return service.sign();
         }
-        else if(service != null)
+        else if (service != null)
         {
             return service.sign();
         }
@@ -355,24 +355,24 @@ public class NSSSignatureSpi extends SignatureSpi
             final int len)
     throws SignatureException
     {
-        if(md != null && service != null)
+        if (md != null && service != null)
         {
             byte[] digest = md.digest();
             service.update(digest);
             return service.sign(outbuf, offset, len);
         }
-        else if(service != null)
+        else if (service != null)
         {
             return service.sign(outbuf, offset, len);
         }
         else
         {
             int sigLen = cipher.getOutputSize(1);
-            if(sigLen > len)
+            if (sigLen > len)
             {
                 throw new SignatureException("len is less than signature output size");
             }
-            if(outbuf.length - offset < sigLen)
+            if (outbuf.length - offset < sigLen)
             {
                 throw new SignatureException("not enough buffer to save signature");
             }
@@ -413,7 +413,7 @@ public class NSSSignatureSpi extends SignatureSpi
             final byte b)
     throws SignatureException
     {
-        if(md != null)
+        if (md != null)
         {
             md.update(b);
         }
@@ -430,7 +430,7 @@ public class NSSSignatureSpi extends SignatureSpi
             final int len)
     throws SignatureException
     {
-        if(md != null)
+        if (md != null)
         {
             md.update(b, off, len);
         }
@@ -445,13 +445,13 @@ public class NSSSignatureSpi extends SignatureSpi
             final byte[] sigBytes)
     throws SignatureException
     {
-        if(md != null && service != null)
+        if (md != null && service != null)
         {
             byte[] digest = md.digest();
             service.update(digest);
             return service.verify(sigBytes);
         }
-        else if(service != null)
+        else if (service != null)
         {
             return service.verify(sigBytes);
         }
@@ -474,13 +474,13 @@ public class NSSSignatureSpi extends SignatureSpi
             {
                 ain = new ASN1InputStream(encodedHash);
                 ASN1Encodable obj = ain.readObject();
-                if(obj instanceof ASN1Sequence)
+                if (obj instanceof ASN1Sequence)
                 {
                     DigestInfo di = new DigestInfo((ASN1Sequence) obj);
-                    if(di.getAlgorithmId().getAlgorithm().equals(hashAlgOid))
+                    if (di.getAlgorithmId().getAlgorithm().equals(hashAlgOid))
                     {
                         ASN1Encodable params = di.getAlgorithmId().getParameters();
-                        if(params == null || params.equals(DERNull.INSTANCE))
+                        if (params == null || params.equals(DERNull.INSTANCE))
                         {
                             return Arrays.equals(hash, di.getDigest());
                         }
@@ -491,12 +491,12 @@ public class NSSSignatureSpi extends SignatureSpi
                 throw new SignatureException(e.getMessage(), e);
             } finally
             {
-                if(ain != null)
+                if (ain != null)
                 {
                     try
                     {
                         ain.close();
-                    }catch(IOException e)
+                    } catch (IOException e)
                     {
                     }
                 }
@@ -535,7 +535,7 @@ public class NSSSignatureSpi extends SignatureSpi
     throws InvalidCipherTextException
     {
         int offset = 0;
-        while(block[offset] == 0)
+        while (block[offset] == 0)
         {
             offset++;
         }

@@ -100,7 +100,7 @@ public class CAIdentifier
     {
         StringBuilder ub = new StringBuilder(url);
         ub.append('?').append("operation=").append(operation.getCode());
-        if(ScepUtil.isBlank(message) == false)
+        if (ScepUtil.isBlank(message) == false)
         {
             String _urlMessage;
             try
@@ -128,7 +128,7 @@ public class CAIdentifier
     {
         StringBuilder sb = new StringBuilder();
         sb.append("URL: ").append(url);
-        if(ScepUtil.isNotBlank(profile))
+        if (ScepUtil.isNotBlank(profile))
         {
             sb.append(", CA-Ident: ").append(profile);
         }
@@ -139,7 +139,7 @@ public class CAIdentifier
     public boolean equals(
             final Object object)
     {
-        if(object instanceof CAIdentifier)
+        if (object instanceof CAIdentifier)
         {
             CAIdentifier b = (CAIdentifier) object;
             return url == b.url && profile == b.profile;

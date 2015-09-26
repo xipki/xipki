@@ -89,11 +89,11 @@ extends Provider
             public Object run()
             {
                 Iterator<Descriptor> it = descriptors.values().iterator();
-                while(it.hasNext())
+                while (it.hasNext())
                 {
                     Descriptor d = it.next();
                     put(d.service.type + "." + d.algorithm, d.getClassName());
-                    if(d.aliases != null)
+                    if (d.aliases != null)
                     {
                         List<String> aliases = d.getAliases();
                         for (String alias : aliases)
@@ -114,7 +114,7 @@ extends Provider
         {
             Object o = Class.forName(d.getClassName()).newInstance();
             return (o != null);
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
             return false;
         }
@@ -126,7 +126,7 @@ extends Provider
 
     private synchronized static void init()
     {
-        if(nssProvider != null)
+        if (nssProvider != null)
         {
             return;
         }
@@ -135,14 +135,14 @@ extends Provider
         {
             // check whether there exists an NSS provider registered by OpenJDK
             nssProvider = Security.getProvider("SunPKCS11-NSS");
-            if(nssProvider == null)
+            if (nssProvider == null)
             {
                 StringBuilder sb = new StringBuilder();
                 sb.append("name=").append(PROVIDER_NAME).append("\n");
                 sb.append("nssDbMode=noDb\n");
                 sb.append("attributes=compatibility\n");
                 String NSSLIB = System.getProperty("NSSLIB");
-                if(NSSLIB != null)
+                if (NSSLIB != null)
                 {
                     sb.append("\nnssLibraryDirectory=").append(NSSLIB);
                 }
@@ -151,7 +151,7 @@ extends Provider
                         new ByteArrayInputStream(sb.toString().getBytes()));
                 Security.addProvider(nssProvider);
             }
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
             throw new ProviderException("could not initialize SunPKCS11 NSS provider", t);
         }
@@ -180,7 +180,7 @@ extends Provider
             final String... aliases)
     {
         Descriptor d = new Descriptor(service, algorithm, className, oid, aliases);
-        if(support(d))
+        if (support(d))
         {
             descriptors.put(d.toString(), d);
         }
@@ -211,17 +211,17 @@ extends Provider
         private List<String> aliasesWithOid;
         List<String> getAliases()
         {
-            if(aliasesWithOid == null)
+            if (aliasesWithOid == null)
             {
                 aliasesWithOid = new ArrayList<>();
-                if(aliases != null)
+                if (aliases != null)
                 {
                     for (String alias : aliases)
                     {
                         aliasesWithOid.add(alias);
                     }
                 }
-                if(oid != null)
+                if (oid != null)
                 {
                     aliasesWithOid.add(oid);
                     aliasesWithOid.add("OID." + oid);

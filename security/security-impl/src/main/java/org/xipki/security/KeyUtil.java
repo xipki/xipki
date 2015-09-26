@@ -116,23 +116,23 @@ public class KeyUtil
     throws OperatorCreationException, InvalidKeyException
     {
         String keyAlg = publicKey.getAlgorithm().toUpperCase();
-        if(keyAlg.equals("EC"))
+        if (keyAlg.equals("EC"))
         {
             keyAlg = "ECDSA";
         }
 
         BcContentVerifierProviderBuilder builder = verifierProviderBuilders.get(keyAlg);
-        if(builder == null)
+        if (builder == null)
         {
-            if("RSA".equals(keyAlg))
+            if ("RSA".equals(keyAlg))
             {
                 builder = new BcRSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
             }
-            else if("DSA".equals(keyAlg))
+            else if ("DSA".equals(keyAlg))
             {
                 builder = new BcDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
             }
-            else if("ECDSA".equals(keyAlg))
+            else if ("ECDSA".equals(keyAlg))
             {
                 builder = new ECDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
             }
@@ -162,7 +162,7 @@ public class KeyUtil
     {
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
 
-        if(publicExponent == null)
+        if (publicExponent == null)
         {
             publicExponent = RSAKeyGenParameterSpec.F4;
         }
@@ -215,7 +215,7 @@ public class KeyUtil
         synchronized (keyFactories)
         {
             KeyFactory kf = keyFactories.get(algorithm);
-            if(kf != null)
+            if (kf != null)
             {
                 return kf;
             }
@@ -248,15 +248,15 @@ public class KeyUtil
         ASN1ObjectIdentifier aid = pkInfo.getAlgorithm().getAlgorithm();
 
         KeyFactory kf;
-        if(PKCSObjectIdentifiers.rsaEncryption.equals(aid))
+        if (PKCSObjectIdentifiers.rsaEncryption.equals(aid))
         {
             kf = KeyFactory.getInstance("RSA");
         }
-        else if(X9ObjectIdentifiers.id_dsa.equals(aid))
+        else if (X9ObjectIdentifiers.id_dsa.equals(aid))
         {
             kf = KeyFactory.getInstance("DSA");
         }
-        else if(X9ObjectIdentifiers.id_ecPublicKey.equals(aid))
+        else if (X9ObjectIdentifiers.id_ecPublicKey.equals(aid))
         {
             kf = KeyFactory.getInstance("ECDSA");
         }
@@ -304,17 +304,17 @@ public class KeyUtil
                 k.getPrimeP(), k.getPrimeQ(), k.getPrimeExponentP(),
                 k.getPrimeExponentQ(), k.getCrtCoefficient());
         }
-        else if(key instanceof RSAPrivateKey)
+        else if (key instanceof RSAPrivateKey)
         {
             RSAPrivateKey k = (RSAPrivateKey) key;
 
             return new RSAKeyParameters(true, k.getModulus(), k.getPrivateExponent());
         }
-        else if(key instanceof ECPrivateKey)
+        else if (key instanceof ECPrivateKey)
         {
             return ECUtil.generatePrivateKeyParameter(key);
         }
-        else if(key instanceof DSAPrivateKey)
+        else if (key instanceof DSAPrivateKey)
         {
             return DSAUtil.generatePrivateKeyParameter(key);
         }
@@ -333,11 +333,11 @@ public class KeyUtil
             RSAPublicKey k = (RSAPublicKey)key;
             return new RSAKeyParameters(false, k.getModulus(), k.getPublicExponent());
         }
-        else if(key instanceof ECPublicKey)
+        else if (key instanceof ECPublicKey)
         {
             return ECUtil.generatePublicKeyParameter(key);
         }
-        else if(key instanceof DSAPublicKey)
+        else if (key instanceof DSAPublicKey)
         {
             return DSAUtil.generatePublicKeyParameter(key);
         }
@@ -373,15 +373,15 @@ public class KeyUtil
             final String curveName)
     {
         ASN1ObjectIdentifier curveOID = X962NamedCurves.getOID(curveName);
-        if(curveOID == null)
+        if (curveOID == null)
         {
             curveOID = SECNamedCurves.getOID(curveName);
         }
-        if(curveOID == null)
+        if (curveOID == null)
         {
             curveOID = TeleTrusTNamedCurves.getOID(curveName);
         }
-        if(curveOID == null)
+        if (curveOID == null)
         {
             curveOID = NISTNamedCurves.getOID(curveName);
         }
@@ -393,15 +393,15 @@ public class KeyUtil
             final ASN1ObjectIdentifier curveOID)
     {
         String curveName = X962NamedCurves.getName(curveOID);
-        if(curveName == null)
+        if (curveName == null)
         {
             curveName = SECNamedCurves.getName(curveOID);
         }
-        if(curveName == null)
+        if (curveName == null)
         {
             curveName = TeleTrusTNamedCurves.getName(curveOID);
         }
-        if(curveName == null)
+        if (curveName == null)
         {
             curveName = NISTNamedCurves.getName(curveOID);
         }
@@ -413,11 +413,11 @@ public class KeyUtil
     {
         Map<String, ASN1ObjectIdentifier> map = new HashMap<>();
         Enumeration<?> names = X962NamedCurves.getNames();
-        while(names.hasMoreElements())
+        while (names.hasMoreElements())
         {
             String name = (String) names.nextElement();
             ASN1ObjectIdentifier oid = X962NamedCurves.getOID(name);
-            if(oid != null)
+            if (oid != null)
             {
                 map.put(name, oid);
             }
@@ -425,33 +425,33 @@ public class KeyUtil
 
         names = SECNamedCurves.getNames();
 
-        while(names.hasMoreElements())
+        while (names.hasMoreElements())
         {
             String name = (String) names.nextElement();
             ASN1ObjectIdentifier oid = SECNamedCurves.getOID(name);
-            if(oid != null)
+            if (oid != null)
             {
                 map.put(name, oid);
             }
         }
 
         names = TeleTrusTNamedCurves.getNames();
-        while(names.hasMoreElements())
+        while (names.hasMoreElements())
         {
             String name = (String) names.nextElement();
             ASN1ObjectIdentifier oid = TeleTrusTNamedCurves.getOID(name);
-            if(oid != null)
+            if (oid != null)
             {
                 map.put(name, oid);
             }
         }
 
         names = NISTNamedCurves.getNames();
-        while(names.hasMoreElements())
+        while (names.hasMoreElements())
         {
             String name = (String) names.nextElement();
             ASN1ObjectIdentifier oid = NISTNamedCurves.getOID(name);
-            if(oid != null)
+            if (oid != null)
             {
                 map.put(name, oid);
             }

@@ -64,9 +64,9 @@ public class LoadTestEntry
                 final String text)
         {
             ParamUtil.assertNotNull("text", text);
-            for(RandomDN value : values())
+            for (RandomDN value : values())
             {
-                if(value.name().equalsIgnoreCase(text))
+                if (value.name().equalsIgnoreCase(text))
                 {
                     return value;
                 }
@@ -114,7 +114,7 @@ public class LoadTestEntry
                             + randomDN);
             }
 
-            if(this.subjectRDNForIncrement != null
+            if (this.subjectRDNForIncrement != null
                     && this.subjectTemplate.getRDNs(this.subjectRDNForIncrement).length == 0)
             {
                 throw new IllegalArgumentException("subjectTemplate does not contain DN field "
@@ -131,12 +131,12 @@ public class LoadTestEntry
             RDN[] newRDNS = new RDN[n];
 
             boolean incremented = false;
-            for(int i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
                 RDN rdn = baseRDNs[i];
-                if(incremented == false)
+                if (incremented == false)
                 {
-                    if(rdn.getFirst().getType().equals(subjectRDNForIncrement))
+                    if (rdn.getFirst().getType().equals(subjectRDNForIncrement))
                     {
                         String text = X509Util.rdnValueToString(rdn.getFirst().getValue());
                         rdn = new RDN(subjectRDNForIncrement, new DERUTF8String(text + index));

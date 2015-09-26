@@ -54,7 +54,7 @@ public class QaPolicyMappingsOption extends QaExtension
             final PolicyMappings jaxb)
     {
         this.policyMappings = new HashMap<>();
-        for(PolicyIdMappingType type : jaxb.getMapping())
+        for (PolicyIdMappingType type : jaxb.getMapping())
         {
             String issuerDomainPolicy = type.getIssuerDomainPolicy().getValue();
             String subjectDomainPolicy = type.getSubjectDomainPolicy().getValue();

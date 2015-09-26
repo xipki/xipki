@@ -50,9 +50,9 @@ public class UnrevokeOrRemoveCertRequestType
     public boolean addRequestEntry(
             final IssuerSerialEntryType requestEntry)
     {
-        for(IssuerSerialEntryType re : requestEntries)
+        for (IssuerSerialEntryType re : requestEntries)
         {
-            if(re.getId().equals(requestEntry.getId()))
+            if (re.getId().equals(requestEntry.getId()))
             {
                 return false;
             }

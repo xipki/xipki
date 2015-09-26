@@ -120,19 +120,19 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                     new ByteArrayInputStream(dataBytes));
 
             this.version = X509CertVersion.getInstance(conf.getVersion());
-            if(this.version == null)
+            if (this.version == null)
             {
                 throw new CertprofileException("invalid version " + conf.getVersion());
             }
 
-            if(conf.getSignatureAlgorithms() == null)
+            if (conf.getSignatureAlgorithms() == null)
             {
                 this.signatureAlgorithms = null;
             }
             else
             {
                 this.signatureAlgorithms = new HashSet<>();
-                for(String algo :conf.getSignatureAlgorithms().getAlgorithm())
+                for (String algo :conf.getSignatureAlgorithms().getAlgorithm())
                 {
                     String c14nAlgo;
                     try
@@ -151,10 +151,10 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             this.publicKeyChecker = new PublicKeyChecker(conf);
             this.subjectChecker = new SubjectChecker(conf);
             this.extensionsChecker = new ExtensionsChecker(conf);
-        }catch(RuntimeException e)
+        } catch (RuntimeException e)
         {
             final String message = "RuntimeException";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -203,7 +203,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             ValidationIssue issue = new ValidationIssue("X509.VERSION", "certificate version");
             resultIssues.add(issue);
             int versionNumber = cert.getVersion();
-            if(versionNumber != version.getVersion())
+            if (versionNumber != version.getVersion())
             {
                 issue.setFailureMessage("is '" + versionNumber
                         + "' but expected '" + version.getVersion() + "'");
@@ -211,14 +211,14 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
 
         // signatureAlgorithm
-        if(CollectionUtil.isNotEmpty(signatureAlgorithms))
+        if (CollectionUtil.isNotEmpty(signatureAlgorithms))
         {
             ValidationIssue issue = new ValidationIssue("X509.SIGALG", "signature algorithm");
             resultIssues.add(issue);
 
             AlgorithmIdentifier sigAlgId = bcCert.getSignatureAlgorithm();
             AlgorithmIdentifier tbsSigAlgId = bcCert.getTBSCertificate().getSignature();
-            if(tbsSigAlgId.equals(sigAlgId) == false)
+            if (tbsSigAlgId.equals(sigAlgId) == false)
             {
                 issue.setFailureMessage(
                         "Certificate.tbsCertificate.signature != Certificate.signatureAlgorithm");
@@ -227,7 +227,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 try
                 {
                     String sigAlgo = AlgorithmUtil.getSignatureAlgoName(sigAlgId);
-                    if(signatureAlgorithms.contains(sigAlgo) == false)
+                    if (signatureAlgorithms.contains(sigAlgo) == false)
                     {
                         issue.setFailureMessage("signatureAlgorithm '" + sigAlgo
                                 + "' is not allowed");
@@ -241,7 +241,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
 
         // notBefore
-        if(notBeforeMidnight)
+        if (notBeforeMidnight)
         {
             ValidationIssue issue = new ValidationIssue("X509.NOTBEFORE", "not before midnight");
             resultIssues.add(issue);
@@ -251,7 +251,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             int minute = c.get(Calendar.MINUTE);
             int second = c.get(Calendar.SECOND);
 
-            if(hourOfDay != 0 || minute != 0 || second != 0)
+            if (hourOfDay != 0 || minute != 0 || second != 0)
             {
                 issue.setFailureMessage(" '" + cert.getNotBefore()
                     + "' is not midnight time (UTC)");
@@ -264,12 +264,12 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             resultIssues.add(issue);
 
             Date expectedNotAfter = validity.add(cert.getNotBefore());
-            if(expectedNotAfter.getTime() > MAX_CERT_TIME_MS)
+            if (expectedNotAfter.getTime() > MAX_CERT_TIME_MS)
             {
                 expectedNotAfter = new Date(MAX_CERT_TIME_MS);
             }
 
-            if(Math.abs(expectedNotAfter.getTime() - cert.getNotAfter().getTime()) > 60 * SECOND)
+            if (Math.abs(expectedNotAfter.getTime() - cert.getNotAfter().getTime()) > 60 * SECOND)
             {
                 issue.setFailureMessage("cert validity is not within " + validity.toString());
             }
@@ -287,7 +287,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             try
             {
                 cert.verify(issuerInfo.getCert().getPublicKey(), "BC");
-            }catch(Exception e)
+            } catch (Exception e)
             {
                 issue.setFailureMessage("invalid signature");
             }
@@ -297,7 +297,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         {
             ValidationIssue issue = new ValidationIssue("X509.ISSUER", "certificate issuer");
             resultIssues.add(issue);
-            if(cert.getIssuerX500Principal().equals(
+            if (cert.getIssuerX500Principal().equals(
                     issuerInfo.getCert().getSubjectX500Principal()) == false)
             {
                 issue.setFailureMessage(
@@ -321,15 +321,15 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
     static Set<Range> buildParametersMap(
             final RangesType ranges)
     {
-        if(ranges == null)
+        if (ranges == null)
         {
             return null;
         }
 
         Set<Range> ret = new HashSet<>();
-        for(RangeType range : ranges.getRange())
+        for (RangeType range : ranges.getRange())
         {
-            if(range.getMin() != null || range.getMax() != null)
+            if (range.getMin() != null || range.getMax() != null)
             {
                 ret.add(new Range(range.getMin(), range.getMax()));
             }
@@ -341,22 +341,22 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             final ExtensionsType extensionsType)
     throws CertprofileException
     {
-        if(extensionsType == null)
+        if (extensionsType == null)
         {
             return null;
         }
 
         Map<ASN1ObjectIdentifier, QaExtensionValue> map = new HashMap<>();
 
-        for(ExtensionType m : extensionsType.getExtension())
+        for (ExtensionType m : extensionsType.getExtension())
         {
-            if(m.getValue() == null || m.getValue().getAny() instanceof ConstantExtValue == false)
+            if (m.getValue() == null || m.getValue().getAny() instanceof ConstantExtValue == false)
             {
                 continue;
             }
 
             ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
-            if(Extension.subjectAlternativeName.equals(oid)
+            if (Extension.subjectAlternativeName.equals(oid)
                     || Extension.subjectInfoAccess.equals(oid)
                     || Extension.biometricInfo.equals(oid))
             {
@@ -377,7 +377,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             map.put(oid, extension);
         }
 
-        if(CollectionUtil.isEmpty(map))
+        if (CollectionUtil.isEmpty(map))
         {
             return null;
         }

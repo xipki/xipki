@@ -208,7 +208,7 @@ public class PkiMessage
             final ASN1ObjectIdentifier type,
             final ASN1Encodable value)
     {
-        if(scepAttrTypes.contains(type))
+        if (scepAttrTypes.contains(type))
         {
             throw new IllegalArgumentException(
                     "Adding SCEP attribute via addSignedAttribute() method is not permitted");
@@ -264,7 +264,7 @@ public class PkiMessage
                 new DERPrintableString(transactionId.getId()));
 
         // failInfo
-        if(failInfo != null)
+        if (failInfo != null)
         {
             addAttribute(v, ScepObjectIdentifiers.id_failInfo,
                     new DERPrintableString(
@@ -272,7 +272,7 @@ public class PkiMessage
         }
 
         // pkiStatus
-        if(pkiStatus != null)
+        if (pkiStatus != null)
         {
             addAttribute(v, ScepObjectIdentifiers.id_pkiStatus,
                     new DERPrintableString(
@@ -280,13 +280,13 @@ public class PkiMessage
         }
 
         // recipientNonce
-        if(recipientNonce != null)
+        if (recipientNonce != null)
         {
             addAttribute(v, ScepObjectIdentifiers.id_recipientNonce,
                     new DEROctetString(recipientNonce.getBytes()));
         }
 
-        for(ASN1ObjectIdentifier type : signedAttributes.keySet())
+        for (ASN1ObjectIdentifier type : signedAttributes.keySet())
         {
             addAttribute(v, type, signedAttributes.get(type));
         }
@@ -295,13 +295,13 @@ public class PkiMessage
 
     private AttributeTable getUnsignedAttributes()
     {
-        if(unsignedAttributes.isEmpty())
+        if (unsignedAttributes.isEmpty())
         {
             return null;
         }
         ASN1EncodableVector v = new ASN1EncodableVector();
 
-        for(ASN1ObjectIdentifier type : unsignedAttributes.keySet())
+        for (ASN1ObjectIdentifier type : unsignedAttributes.keySet())
         {
             addAttribute(v, type, unsignedAttributes.get(type));
         }
@@ -337,7 +337,7 @@ public class PkiMessage
     throws MessageEncodingException
     {
         CMSTypedData content;
-        if(messageData == null)
+        if (messageData == null)
         {
             content = new CMSAbsentContent();
         }
@@ -368,7 +368,7 @@ public class PkiMessage
                     new DefaultSignedAttributeTableGenerator(getSignedAttributes()));
 
             AttributeTable attrTable = getUnsignedAttributes();
-            if(attrTable != null)
+            if (attrTable != null)
             {
                 signerInfoBuilder.setUnsignedAttributeGenerator(
                         new SimpleAttributeTableGenerator(attrTable));

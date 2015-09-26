@@ -251,13 +251,13 @@ public class SQLErrorCodes
     private static Set<String> toSet(
             final String... strs)
     {
-        if(strs == null || strs.length == 0)
+        if (strs == null || strs.length == 0)
         {
             return Collections.emptySet();
         }
 
         Set<String> set = new HashSet<String>();
-        for(String str : strs)
+        for (String str : strs)
         {
             set.add(str);
         }
@@ -267,13 +267,13 @@ public class SQLErrorCodes
     private static Set<String> toSet(
             final int... ints)
     {
-        if(ints == null || ints.length == 0)
+        if (ints == null || ints.length == 0)
         {
             return Collections.emptySet();
         }
 
         Set<String> set = new HashSet<String>();
-        for(int i : ints)
+        for (int i : ints)
         {
             set.add(Integer.toString(i));
         }

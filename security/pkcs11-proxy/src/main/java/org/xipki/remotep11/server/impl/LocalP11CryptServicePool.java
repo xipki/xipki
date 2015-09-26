@@ -74,36 +74,36 @@ public class LocalP11CryptServicePool
     public void init()
     throws Exception
     {
-        if(initialized)
+        if (initialized)
         {
             return;
         }
 
-        if(Security.getProvider("BC") == null)
+        if (Security.getProvider("BC") == null)
         {
             Security.addProvider(new BouncyCastleProvider());
         }
 
         try
         {
-            if(securityFactory == null)
+            if (securityFactory == null)
             {
                 throw new IllegalStateException("securityFactory is not configured");
             }
 
             this.defaultPkcs11ModuleName = securityFactory.getDefaultPkcs11ModuleName();
             Set<String> moduleNames = securityFactory.getPkcs11ModuleNames();
-            for(String moduleName : moduleNames)
+            for (String moduleName : moduleNames)
             {
                 P11CryptService p11Service = securityFactory.getP11CryptService(moduleName);
-                if(p11Service != null)
+                if (p11Service != null)
                 {
                     p11CryptServices.put(moduleName, p11Service);
                 }
             }
 
             initialized = true;
-        }catch(Exception e)
+        } catch (Exception e)
         {
             LOG.error("exception thrown. {}: {}", e.getClass().getName(), e.getMessage());
             LOG.debug("exception thrown", e);
@@ -114,7 +114,7 @@ public class LocalP11CryptServicePool
     public P11CryptService getP11CryptService(
             String moduleName)
     {
-        if(moduleName == null
+        if (moduleName == null
                 || SecurityFactory.DEFAULT_P11MODULE_NAME.equalsIgnoreCase(moduleName))
         {
             moduleName = defaultPkcs11ModuleName;

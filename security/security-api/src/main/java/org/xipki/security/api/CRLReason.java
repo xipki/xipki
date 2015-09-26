@@ -145,7 +145,7 @@ public enum CRLReason
     private static Map<Integer, CRLReason> reasons = new HashMap<>();
     static
     {
-        for(CRLReason value : CRLReason.values())
+        for (CRLReason value : CRLReason.values())
         {
             reasons.put(value.code, value);
         }
@@ -160,9 +160,9 @@ public enum CRLReason
     public static CRLReason getInstance(
             final String text)
     {
-        for(CRLReason value : values())
+        for (CRLReason value : values())
         {
-            if(value.desription.equalsIgnoreCase(text)
+            if (value.desription.equalsIgnoreCase(text)
                     || value.name().equalsIgnoreCase(text)
                     || Integer.toString(value.code).equals(text))
             {

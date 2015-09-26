@@ -71,7 +71,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         try
         {
             return _doExecute();
-        } catch(Exception e)
+        } catch (Exception e)
         {
             LOG.debug("Exception caught while executing command", e);
             throw new Exception(e.getClass().getName() + ": " + e.getMessage());
@@ -94,37 +94,37 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         File saveTo = expandFilepath(file);
 
         boolean randomSaveTo = false;
-        if(saveTo.exists())
+        if (saveTo.exists())
         {
             try
             {
                 boolean b = true;
-                while(saveTo.exists())
+                while (saveTo.exists())
                 {
-                    if(b)
+                    if (b)
                     {
                         out("A file named '" + saveTo.getPath()
                             + "' already exists. Do you want to replace it [yes/no]? ");
                     }
 
                     String answer = reader.readLine();
-                    if(answer == null)
+                    if (answer == null)
                     {
                         throw new IOException("interrupted");
                     }
 
-                    if("yes".equalsIgnoreCase(answer))
+                    if ("yes".equalsIgnoreCase(answer))
                     {
                         break;
                     }
-                    else if("no".equalsIgnoreCase(answer))
+                    else if ("no".equalsIgnoreCase(answer))
                     {
                         out("Enter name of file to save to ... ");
                         String newFn = null;
-                        while(true)
+                        while (true)
                         {
                             newFn = reader.readLine();
-                            if(newFn.trim().isEmpty() == false)
+                            if (newFn.trim().isEmpty() == false)
                             {
                                 break;
                             }
@@ -138,7 +138,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
                         b = false;
                     }
                 }
-            } catch(IOException e)
+            } catch (IOException e)
             {
                 saveTo = new File("tmp-" + randomHex(6));
                 randomSaveTo = true;
@@ -154,16 +154,16 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         try
         {
             save(saveTo, encoded);
-        } catch(IOException e)
+        } catch (IOException e)
         {
-            if(randomSaveTo == false)
+            if (randomSaveTo == false)
             {
                 saveTo = new File("tmp-" + randomHex(6));
                 save(saveTo, encoded);
             }
         }
 
-        if(promptPrefix == null || promptPrefix.isEmpty())
+        if (promptPrefix == null || promptPrefix.isEmpty())
         {
             promptPrefix = "saved to file";
         }
@@ -206,7 +206,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
             final String enabledS,
             final String optionName)
     {
-        if(enabledS == null)
+        if (enabledS == null)
         {
             return null;
         }
@@ -218,7 +218,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
             final boolean defaultEnabled,
             final String optionName)
     {
-        if(enabledS == null)
+        if (enabledS == null)
         {
             return defaultEnabled;
         }
@@ -230,13 +230,13 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
             final String enabledS,
             final String optionName)
     {
-        if("yes".equalsIgnoreCase(enabledS)
+        if ("yes".equalsIgnoreCase(enabledS)
                 || "enabled".equalsIgnoreCase(enabledS)
                 || "true".equalsIgnoreCase(enabledS))
         {
             return true;
         }
-        else if("no".equalsIgnoreCase(enabledS)
+        else if ("no".equalsIgnoreCase(enabledS)
                 || "disabled".equalsIgnoreCase(enabledS)
                 || "false".equalsIgnoreCase(enabledS))
         {
@@ -251,7 +251,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
     protected char[] readPasswordIfNotSet(
             final String password)
     {
-        if(password != null)
+        if (password != null)
         {
             return password.toCharArray();
         }
@@ -268,7 +268,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
             final String prompt)
     {
         String passwordUi = System.getProperty("org.xipki.console.passwordui");
-        if("gui".equalsIgnoreCase(passwordUi))
+        if ("gui".equalsIgnoreCase(passwordUi))
         {
             return SecurePasswordInputPanel.readPassword(prompt);
         }
@@ -280,7 +280,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
             {
                 String pwd = reader.readLine('*');
                 return pwd.toCharArray();
-            }catch(IOException e)
+            } catch (IOException e)
             {
                 return new char[0];
             }
@@ -340,9 +340,9 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
             String s)
     {
         s = s.trim();
-        if(s.startsWith("0x") || s.startsWith("0X"))
+        if (s.startsWith("0x") || s.startsWith("0X"))
         {
-            if(s.length() > 2)
+            if (s.length() > 2)
             {
                 return new BigInteger(s.substring(2), 16);
             }

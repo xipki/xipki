@@ -119,7 +119,7 @@ public class SecurityUtil
     throws Exception
     {
         KeyStore ks;
-        if("JKS".equalsIgnoreCase(keystoreType))
+        if ("JKS".equalsIgnoreCase(keystoreType))
         {
             ks = KeyStore.getInstance(keystoreType);
         }
@@ -129,13 +129,13 @@ public class SecurityUtil
         }
         ks.load(new ByteArrayInputStream(keystoreBytes), password);
 
-        if(keyname == null)
+        if (keyname == null)
         {
             Enumeration<String> aliases = ks.aliases();
-            while(aliases.hasMoreElements())
+            while (aliases.hasMoreElements())
             {
                 String alias = aliases.nextElement();
-                if(ks.isKeyEntry(alias))
+                if (ks.isKeyEntry(alias))
                 {
                     keyname = alias;
                     break;
@@ -144,7 +144,7 @@ public class SecurityUtil
         }
         else
         {
-            if(ks.isKeyEntry(keyname) == false)
+            if (ks.isKeyEntry(keyname) == false)
             {
                 throw new KeyStoreException("unknown key named " + keyname);
             }
@@ -152,16 +152,16 @@ public class SecurityUtil
 
         Enumeration<String> aliases = ks.aliases();
         int numAliases = 0;
-        while(aliases.hasMoreElements())
+        while (aliases.hasMoreElements())
         {
             aliases.nextElement();
             numAliases++;
         }
 
         Certificate[] certs;
-        if(newCertChain == null || newCertChain.length < 1)
+        if (newCertChain == null || newCertChain.length < 1)
         {
-            if(numAliases == 1)
+            if (numAliases == 1)
             {
                 return keystoreBytes;
             }
@@ -175,7 +175,7 @@ public class SecurityUtil
         PrivateKey key = (PrivateKey) ks.getKey(keyname, password);
         ks = null;
 
-        if("JKS".equalsIgnoreCase(keystoreType))
+        if ("JKS".equalsIgnoreCase(keystoreType))
         {
             ks = KeyStore.getInstance(keystoreType);
         }
@@ -228,9 +228,9 @@ public class SecurityUtil
         final int n = Math.min(b.bitLength(), failureInfoTexts.length);
 
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
-            if(b.testBit(i))
+            if (b.testBit(i))
             {
                 sb.append(", ").append(failureInfoTexts[i]);
             }
@@ -259,7 +259,7 @@ public class SecurityUtil
         {
             int shiftBits = 8-(bitCount%8);
 
-            for(int i = byteLenKey - 1; i > 0; i--)
+            for (int i = byteLenKey - 1; i > 0; i--)
             {
                 truncatedBytes[i] = (byte)
                         ( (byte2int(truncatedBytes[i]) >>> shiftBits)
@@ -306,21 +306,21 @@ public class SecurityUtil
             final List<String> oidTexts)
     throws InvalidOIDorNameException
     {
-        if(oidTexts == null)
+        if (oidTexts == null)
         {
             return null;
         }
 
         List<ASN1ObjectIdentifier> ret = new ArrayList<>(oidTexts.size());
-        for(String oidText : oidTexts)
+        for (String oidText : oidTexts)
         {
-            if(oidText.isEmpty())
+            if (oidText.isEmpty())
             {
                 continue;
             }
 
             ASN1ObjectIdentifier oid = toOID(oidText);
-            if(ret.contains(oid) == false)
+            if (ret.contains(oid) == false)
             {
                 ret.add(oid);
             }
@@ -334,27 +334,27 @@ public class SecurityUtil
     {
         final int n = s.length();
         boolean isName = false;
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             char c = s.charAt(i);
-            if(((c >= '0' && c <= '1') || c == '.') == false)
+            if (((c >= '0' && c <= '1') || c == '.') == false)
             {
                 isName = true;
             }
         }
 
-        if(isName == false)
+        if (isName == false)
         {
             try
             {
                 return new ASN1ObjectIdentifier(s);
-            }catch(IllegalArgumentException e)
+            } catch (IllegalArgumentException e)
             {
             }
         }
 
         ASN1ObjectIdentifier oid = ObjectIdentifiers.nameToOID(s);
-        if(oid == null)
+        if (oid == null)
         {
             throw new InvalidOIDorNameException(s);
         }
@@ -366,12 +366,12 @@ public class SecurityUtil
             final boolean verbose,
             final boolean ignoreSensitiveInfo)
     {
-        if(ignoreSensitiveInfo)
+        if (ignoreSensitiveInfo)
         {
             signerConf = SecurityUtil.eraseSensitiveData(signerConf);
         }
 
-        if(verbose || signerConf.length() < 101)
+        if (verbose || signerConf.length() < 101)
         {
             return signerConf;
         }
@@ -384,7 +384,7 @@ public class SecurityUtil
     private static String eraseSensitiveData(
             final String conf)
     {
-        if(conf == null || conf.contains("password?") == false)
+        if (conf == null || conf.contains("password?") == false)
         {
             return conf;
         }
@@ -393,12 +393,12 @@ public class SecurityUtil
         {
             ConfPairs pairs = new ConfPairs(conf);
             String value = pairs.getValue("password");
-            if(value != null && StringUtil.startsWithIgnoreCase(value, "PBE:") == false)
+            if (value != null && StringUtil.startsWithIgnoreCase(value, "PBE:") == false)
             {
                 pairs.putPair("password", "<sensitve>");
             }
             return pairs.getEncoded();
-        }catch(Exception e)
+        } catch (Exception e)
         {
             return conf;
         }

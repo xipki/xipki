@@ -74,7 +74,7 @@ public class GetCertCmd extends ClientCmd
         CertStore certs = client.getCertificate(getIdentityCert(), getIdentityKey(), serial, null);
         X509Certificate cert = extractEECerts(certs);
 
-        if(cert == null)
+        if (cert == null)
         {
             throw new CmdFailure("received no certficate from server");
         }

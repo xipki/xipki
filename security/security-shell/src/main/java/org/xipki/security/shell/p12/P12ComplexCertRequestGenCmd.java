@@ -79,7 +79,7 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd
     private char[] getPassword()
     {
         char[] pwdInChar = readPasswordIfNotSet(password);
-        if(pwdInChar != null)
+        if (pwdInChar != null)
         {
             password = new String(pwdInChar);
         }
@@ -99,7 +99,7 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd
             ks.load(fIn, getPassword());
         }finally
         {
-            if(fIn != null)
+            if (fIn != null)
             {
                 fIn.close();
             }
@@ -129,7 +129,7 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd
         X500Name name = new X500Name(subject);
         List<RDN> l = new LinkedList<>();
         RDN[] rs = name.getRDNs();
-        for(RDN m : rs)
+        for (RDN m : rs)
         {
             l.add(m);
         }
@@ -140,7 +140,7 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd
         id = ObjectIdentifiers.DN_DATE_OF_BIRTH;
         RDN[] rdns = name.getRDNs(id);
 
-        if(rdns == null || rdns.length == 0)
+        if (rdns == null || rdns.length == 0)
         {
             ASN1Encodable atvValue = new DERGeneralizedTime("19950102000000Z");
             RDN rdn = new RDN(id, atvValue);
@@ -151,7 +151,7 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd
         id = ObjectIdentifiers.DN_POSTAL_ADDRESS;
         rdns = name.getRDNs(id);
 
-        if(rdns == null || rdns.length == 0)
+        if (rdns == null || rdns.length == 0)
         {
             ASN1EncodableVector v = new ASN1EncodableVector();
             v.add(new DERUTF8String("my street 1"));
@@ -166,7 +166,7 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd
         id = ObjectIdentifiers.DN_UNIQUE_IDENTIFIER;
         rdns = name.getRDNs(id);
 
-        if(rdns == null || rdns.length == 0)
+        if (rdns == null || rdns.length == 0)
         {
             DERUTF8String atvValue = new DERUTF8String("abc-def-ghi");
             RDN rdn = new RDN(id, atvValue);

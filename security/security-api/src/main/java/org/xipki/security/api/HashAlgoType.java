@@ -87,19 +87,19 @@ public enum HashAlgoType
     public static HashAlgoType getHashAlgoType(
             String nameOrOid)
     {
-        for(HashAlgoType hashAlgo : values())
+        for (HashAlgoType hashAlgo : values())
         {
-            if(hashAlgo.oid.equals(nameOrOid))
+            if (hashAlgo.oid.equals(nameOrOid))
             {
                 return hashAlgo;
             }
 
-            if(nameOrOid.indexOf('-') != -1)
+            if (nameOrOid.indexOf('-') != -1)
             {
                 nameOrOid = nameOrOid.replace("-", "");
             }
 
-            if(hashAlgo.name.equalsIgnoreCase(nameOrOid)
+            if (hashAlgo.name.equalsIgnoreCase(nameOrOid)
                     || hashAlgo.shortName.equalsIgnoreCase(nameOrOid))
             {
                 return hashAlgo;

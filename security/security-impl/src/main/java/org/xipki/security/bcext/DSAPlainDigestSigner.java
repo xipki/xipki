@@ -88,19 +88,19 @@ public class DSAPlainDigestSigner
         }
 
         ParamUtil.assertNotNull("k", k);
-        if(k instanceof ECPublicKeyParameters)
+        if (k instanceof ECPublicKeyParameters)
         {
             keyBitLen = ((ECPublicKeyParameters) k).getParameters().getCurve().getFieldSize();
         }
-        else if(k instanceof ECPrivateKeyParameters)
+        else if (k instanceof ECPrivateKeyParameters)
         {
             keyBitLen = ((ECPrivateKeyParameters) k).getParameters().getCurve().getFieldSize();
         }
-        else if(k instanceof DSAPublicKeyParameters)
+        else if (k instanceof DSAPublicKeyParameters)
         {
             keyBitLen = ((DSAPublicKeyParameters) k).getParameters().getQ().bitLength();
         }
-        else if(k instanceof DSAPrivateKeyParameters)
+        else if (k instanceof DSAPrivateKeyParameters)
         {
             keyBitLen = ((DSAPrivateKeyParameters) k).getParameters().getQ().bitLength();
         }
@@ -204,12 +204,12 @@ public class DSAPlainDigestSigner
     throws IOException
     {
         int blockSize = (keyBitLen + 7) / 8;;
-        if((r.bitLength() + 7) / 8 > blockSize)
+        if ((r.bitLength() + 7) / 8 > blockSize)
         {
             throw new IOException("r is too long");
         }
 
-        if((s.bitLength() + 7) / 8 > blockSize)
+        if ((s.bitLength() + 7) / 8 > blockSize)
         {
             throw new IOException("s is too long");
         }
@@ -231,7 +231,7 @@ public class DSAPlainDigestSigner
     throws IOException
     {
         int blockSize = (keyBitLen + 7) / 8;
-        if(encoding.length != 2 * blockSize)
+        if (encoding.length != 2 * blockSize)
         {
             throw new IOException("invalid length of signature");
         }

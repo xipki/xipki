@@ -92,7 +92,7 @@ public class KeystoreP11Identity extends P11Identity
         ParamUtil.assertNotNull("privateKey", privateKey);
         ParamUtil.assertNotBlank("sha1sum", sha1sum);
 
-        if(certificateChain == null
+        if (certificateChain == null
                 || certificateChain.length < 1
                 || certificateChain[0] == null)
         {
@@ -101,10 +101,10 @@ public class KeystoreP11Identity extends P11Identity
 
         this.privateKey = privateKey;
         this.sha1sum = sha1sum;
-        if(this.publicKey instanceof RSAPublicKey)
+        if (this.publicKey instanceof RSAPublicKey)
         {
             String providerName;
-            if(Security.getProvider(SoftTokenContentSignerBuilder.PROVIDER_XIPKI_NSS_CIPHER)
+            if (Security.getProvider(SoftTokenContentSignerBuilder.PROVIDER_XIPKI_NSS_CIPHER)
                     != null)
             {
                 providerName = SoftTokenContentSignerBuilder.PROVIDER_XIPKI_NSS_CIPHER;
@@ -116,7 +116,7 @@ public class KeystoreP11Identity extends P11Identity
 
             LOG.info("use provider {}", providerName);
 
-            for(int i = 0; i < maxSessions; i++)
+            for (int i = 0; i < maxSessions; i++)
             {
                 Cipher rsaCipher;
                 try
@@ -124,10 +124,10 @@ public class KeystoreP11Identity extends P11Identity
                     final String algo = "RSA/ECB/NoPadding";
                     rsaCipher = Cipher.getInstance(algo, providerName);
                     LOG.info("use cipher algorithm {}", algo);
-                }catch(NoSuchPaddingException e)
+                } catch (NoSuchPaddingException e)
                 {
                     throw new NoSuchAlgorithmException("NoSuchPadding", e);
-                }catch(NoSuchAlgorithmException e)
+                } catch (NoSuchAlgorithmException e)
                 {
                     final String algo = "RSA/NONE/NoPadding";
                     try
@@ -146,11 +146,11 @@ public class KeystoreP11Identity extends P11Identity
         else
         {
             String algorithm;
-            if(this.publicKey instanceof ECPublicKey)
+            if (this.publicKey instanceof ECPublicKey)
             {
                 algorithm = "NONEwithECDSA";
             }
-            else if(this.publicKey instanceof DSAPublicKey)
+            else if (this.publicKey instanceof DSAPublicKey)
             {
                 algorithm = "NONEwithDSA";
             }
@@ -162,7 +162,7 @@ public class KeystoreP11Identity extends P11Identity
                         + " (class: " + this.publicKey.getClass().getName() + ")");
             }
 
-            for(int i = 0; i < maxSessions; i++)
+            for (int i = 0; i < maxSessions; i++)
             {
                 Signature dsaSignature = Signature.getInstance(algorithm, "BC");
                 dsaSignature.initSign(privateKey);
@@ -174,7 +174,7 @@ public class KeystoreP11Identity extends P11Identity
     private static PublicKey getPublicKeyOfFirstCert(
             final X509Certificate[] certificateChain)
     {
-        if(certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
+        if (certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
         {
             throw new IllegalArgumentException("no certificate is specified");
         }
@@ -185,7 +185,7 @@ public class KeystoreP11Identity extends P11Identity
             final byte[] encodedDigestInfo)
     throws SignerException
     {
-        if(publicKey instanceof RSAPublicKey == false)
+        if (publicKey instanceof RSAPublicKey == false)
         {
             throw new SignerException("operation CKM_RSA_PKCS is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -200,7 +200,7 @@ public class KeystoreP11Identity extends P11Identity
             final byte[] hash)
     throws SignerException
     {
-        if(publicKey instanceof RSAPublicKey == false)
+        if (publicKey instanceof RSAPublicKey == false)
         {
             throw new SignerException("operation CKM_RSA_X509 is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -238,7 +238,7 @@ public class KeystoreP11Identity extends P11Identity
             final byte[] hash)
     throws SignerException
     {
-        if(publicKey instanceof ECPublicKey == false)
+        if (publicKey instanceof ECPublicKey == false)
         {
             throw new SignerException("operation CKM_ECDSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -258,7 +258,7 @@ public class KeystoreP11Identity extends P11Identity
             final byte[] hash)
     throws SignerException
     {
-        if(publicKey instanceof DSAPublicKey == false)
+        if (publicKey instanceof DSAPublicKey == false)
         {
             throw new SignerException("operation CKM_DSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");

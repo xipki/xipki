@@ -48,7 +48,7 @@ public enum AuditStatus
     public static final AuditStatus getAuditStatus(
             final String name)
     {
-        if(name == null)
+        if (name == null)
         {
             return null;
         }

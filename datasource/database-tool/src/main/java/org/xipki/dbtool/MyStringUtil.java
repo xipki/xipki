@@ -57,7 +57,7 @@ class MyStringUtil
             final String s,
             final String prefix)
     {
-        if(s.length() < prefix.length())
+        if (s.length() < prefix.length())
         {
             return false;
         }

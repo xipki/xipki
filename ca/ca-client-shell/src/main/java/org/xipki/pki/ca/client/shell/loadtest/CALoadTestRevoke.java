@@ -115,7 +115,7 @@ public class CALoadTestRevoke extends LoadExecutor
         ParamUtil.assertNotNull("caClient", caClient);
         ParamUtil.assertNotNull("caCert", caCert);
         ParamUtil.assertNotNull("caDataSource", caDataSource);
-        if(n < 1)
+        if (n < 1)
         {
             throw new IllegalArgumentException("non-positive n " + n + " is not allowed");
         }
@@ -125,7 +125,7 @@ public class CALoadTestRevoke extends LoadExecutor
         this.caDataSource = caDataSource;
         this.caSubject = caCert.getSubject();
         this.maxCerts = maxCerts;
-        if(caCert.getIssuer().equals(caCert.getSubject()))
+        if (caCert.getIssuer().equals(caCert.getSubject()))
         {
             this.excludeSerials.add(caCert.getSerialNumber().getPositiveValue().longValue());
         }
@@ -136,7 +136,7 @@ public class CALoadTestRevoke extends LoadExecutor
         try
         {
             ResultSet rs = stmt.executeQuery(sql);
-            if(rs.next())
+            if (rs.next())
             {
                 caInfoId = rs.getInt("ID");
             }
@@ -166,10 +166,10 @@ public class CALoadTestRevoke extends LoadExecutor
     throws DataAccessException
     {
         List<Long> ret = new ArrayList<>(n);
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             Long serial = nextSerial();
-            if(serial != null)
+            if (serial != null)
             {
                 ret.add(serial);
             }
@@ -186,22 +186,22 @@ public class CALoadTestRevoke extends LoadExecutor
     {
         synchronized (caDataSource)
         {
-            if(maxCerts > 0)
+            if (maxCerts > 0)
             {
                 int num = processedCerts.getAndAdd(1);
-                if(num >= maxCerts)
+                if (num >= maxCerts)
                 {
                     return null;
                 }
             }
 
             Long firstSerial = serials.pollFirst();
-            if(firstSerial != null)
+            if (firstSerial != null)
             {
                 return firstSerial;
             }
 
-            if(noUnrevokedCerts == false)
+            if (noUnrevokedCerts == false)
             {
                 String sql = "SN FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId
                         + " AND SN > " + (nextStartSerial - 1)
@@ -215,20 +215,20 @@ public class CALoadTestRevoke extends LoadExecutor
                 {
                     stmt = caDataSource.getConnection().prepareStatement(sql);
                     rs = stmt.executeQuery();
-                    while(rs.next())
+                    while (rs.next())
                     {
                         n++;
                         long serial = rs.getLong("SN");
-                        if(serial + 1 > nextStartSerial)
+                        if (serial + 1 > nextStartSerial)
                         {
                             nextStartSerial = serial + 1;
                         }
-                        if(excludeSerials.contains(serial) == false)
+                        if (excludeSerials.contains(serial) == false)
                         {
                             serials.addLast(serial);
                         }
                     }
-                } catch(SQLException e)
+                } catch (SQLException e)
                 {
                     throw caDataSource.translate(sql, e);
                 } finally
@@ -236,13 +236,13 @@ public class CALoadTestRevoke extends LoadExecutor
                     caDataSource.releaseResources(stmt, rs);
                 }
 
-                if(n == 0)
+                if (n == 0)
                 {
                     System.out.println("no unrevoked certificate");
                     System.out.flush();
                 }
 
-                if(n < 1000)
+                if (n < 1000)
                 {
                     noUnrevokedCerts = true;
                 }
@@ -258,7 +258,7 @@ public class CALoadTestRevoke extends LoadExecutor
         @Override
         public void run()
         {
-            while(stop() == false && getErrorAccout() < 1)
+            while (stop() == false && getErrorAccout() < 1)
             {
                 List<Long> serialNumbers;
                 try
@@ -270,7 +270,7 @@ public class CALoadTestRevoke extends LoadExecutor
                     break;
                 }
 
-                if(CollectionUtil.isEmpty(serialNumbers))
+                if (CollectionUtil.isEmpty(serialNumbers))
                 {
                     break;
                 }
@@ -288,7 +288,7 @@ public class CALoadTestRevoke extends LoadExecutor
         {
             RevokeCertRequestType request = new RevokeCertRequestType();
             int id = 1;
-            for(Long serialNumber : serialNumbers)
+            for (Long serialNumber : serialNumbers)
             {
                 CRLReason reason = reasons[(int) (serialNumber % reasons.length)];
                 RevokeCertRequestEntryType entry = new RevokeCertRequestEntryType(
@@ -311,15 +311,15 @@ public class CALoadTestRevoke extends LoadExecutor
                 return false;
             }
 
-            if(result == null)
+            if (result == null)
             {
                 return false;
             }
 
             int nSuccess = 0;
-            for(CertIdOrError entry : result.values())
+            for (CertIdOrError entry : result.values())
             {
-                if(entry.getCertId() != null)
+                if (entry.getCertId() != null)
                 {
                     nSuccess++;
                 }

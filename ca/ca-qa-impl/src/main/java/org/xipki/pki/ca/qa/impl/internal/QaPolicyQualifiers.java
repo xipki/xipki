@@ -62,16 +62,16 @@ public class QaPolicyQualifiers
         List<QaPolicyQualifierInfo> list = new LinkedList<>();
 
         List<JAXBElement<String>> elements = jaxb.getCpsUriOrUserNotice();
-        for(JAXBElement<String> element : elements)
+        for (JAXBElement<String> element : elements)
         {
             String value = element.getValue();
             String localPart = element.getName().getLocalPart();
 
             QaPolicyQualifierInfo info;
-            if("cpsUri".equals(localPart))
+            if ("cpsUri".equals(localPart))
             {
                 info = new QaCPSUriPolicyQualifier(value);
-            } else if("userNotice".equals(localPart))
+            } else if ("userNotice".equals(localPart))
             {
                 info = new QaUserNoticePolicyQualifierInfo(value);
             } else

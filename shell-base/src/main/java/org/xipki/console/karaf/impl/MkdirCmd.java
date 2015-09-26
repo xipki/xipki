@@ -60,9 +60,9 @@ public class MkdirCmd extends XipkiOsgiCommandSupport
     throws Exception
     {
         File target = new File(expandFilepath(dirName));
-        if(target.exists())
+        if (target.exists())
         {
-            if(target.isDirectory() == false)
+            if (target.isDirectory() == false)
             {
                 System.err.println(dirName + " exists but is not a directory, cannot override it");
                 return null;

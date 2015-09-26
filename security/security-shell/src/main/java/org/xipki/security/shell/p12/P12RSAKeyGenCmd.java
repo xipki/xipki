@@ -61,7 +61,7 @@ public class P12RSAKeyGenCmd extends P12KeyGenCmd
     protected Object _doExecute()
     throws Exception
     {
-        if(keysize % 1024 != 0)
+        if (keysize % 1024 != 0)
         {
             throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
         }

@@ -58,7 +58,7 @@ public class BSpeedP12RSASignCmd extends BSpeedP12SignCmd
     {
         List<LoadExecutor> ret = new LinkedList<>();
         int[] keysizes = new int[]{1024, 2048, 3072, 4096};
-        for(int keysize : keysizes)
+        for (int keysize : keysizes)
         {
             ret.add(
                     new P12RSASignLoadTest(securityFactory, sigAlgo, keysize,

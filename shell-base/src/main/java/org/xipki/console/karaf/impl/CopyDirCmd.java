@@ -66,22 +66,22 @@ public class CopyDirCmd extends XipkiOsgiCommandSupport
     throws Exception
     {
         File sourceDir = new File(expandFilepath(source));
-        if(sourceDir.exists() == false)
+        if (sourceDir.exists() == false)
         {
             System.err.println(source + " does not exist");
             return null;
         }
 
-        if(sourceDir.isDirectory() == false)
+        if (sourceDir.isDirectory() == false)
         {
             System.err.println(source + " is not a directory");
             return null;
         }
 
         File destDir = new File(dest);
-        if(destDir.exists())
+        if (destDir.exists())
         {
-            if(destDir.isFile())
+            if (destDir.isFile())
             {
                 System.err.println(dest + " is not a directory");
                 return null;

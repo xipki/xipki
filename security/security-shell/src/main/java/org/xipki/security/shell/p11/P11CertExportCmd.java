@@ -66,7 +66,7 @@ public class P11CertExportCmd extends P11SecurityCmd
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
         X509Certificate cert = slot.exportCert(keyIdentifier);
-        if(cert == null)
+        if (cert == null)
         {
             throw new CmdFailure("could not export certificate " + keyIdentifier);
         }

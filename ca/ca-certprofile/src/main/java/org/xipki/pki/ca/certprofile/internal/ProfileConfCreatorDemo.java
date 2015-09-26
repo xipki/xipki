@@ -227,7 +227,7 @@ public class ProfileConfCreatorDemo
             //NOTAFTER = 9999-12-31-59-59
             profile = Certprofile_MaxTime();
             marshall(m, profile, "Certprofile_MaxTime.xml");
-        }catch(Exception e)
+        } catch (Exception e)
         {
             e.printStackTrace();
         }
@@ -246,7 +246,7 @@ public class ProfileConfCreatorDemo
         try
         {
             m.marshal(root, out);
-        } catch(JAXBException e)
+        } catch (JAXBException e)
         {
             throw XMLUtil.convert(e);
         } finally
@@ -877,7 +877,7 @@ public class ProfileConfCreatorDemo
         {
                 id_gematik.branch("79"), id_gematik.branch("163")
         };
-        for(ASN1ObjectIdentifier id : policyIds)
+        for (ASN1ObjectIdentifier id : policyIds)
         {
             CertificatePolicyInformationType policyInfo = new CertificatePolicyInformationType();
             policies.getCertificatePolicyInformation().add(policyInfo);
@@ -1043,30 +1043,30 @@ public class ProfileConfCreatorDemo
         ret.setMinOccurs(min);
         ret.setMaxOccurs(max);
 
-        if(regexArrays != null)
+        if (regexArrays != null)
         {
-            if(regexArrays.length != max)
+            if (regexArrays.length != max)
             {
                 throw new IllegalArgumentException("regexArrays.length "
                         + regexArrays.length + " != max " + max);
             }
-            for(String regex : regexArrays)
+            for (String regex : regexArrays)
             {
                 ret.getRegex().add(regex);
             }
         }
 
-        if(StringUtil.isNotBlank(prefix))
+        if (StringUtil.isNotBlank(prefix))
         {
             ret.setPrefix(prefix);
         }
 
-        if(StringUtil.isNotBlank(suffix))
+        if (StringUtil.isNotBlank(suffix))
         {
             ret.setSuffix(suffix);
         }
 
-        if(StringUtil.isNotBlank(group))
+        if (StringUtil.isNotBlank(group))
         {
             ret.setGroup(group);
         }
@@ -1106,9 +1106,9 @@ public class ProfileConfCreatorDemo
             final KeyUsageEnum[] optionalUsages)
     {
         KeyUsage extValue = new KeyUsage();
-        if(requiredUsages != null)
+        if (requiredUsages != null)
         {
-            for(KeyUsageEnum m : requiredUsages)
+            for (KeyUsageEnum m : requiredUsages)
             {
                 UsageType usage = new UsageType();
                 usage.setValue(m);
@@ -1116,9 +1116,9 @@ public class ProfileConfCreatorDemo
                 extValue.getUsage().add(usage);
             }
         }
-        if(optionalUsages != null)
+        if (optionalUsages != null)
         {
-            for(KeyUsageEnum m : optionalUsages)
+            for (KeyUsageEnum m : optionalUsages)
             {
                 UsageType usage = new UsageType();
                 usage.setValue(m);
@@ -1161,17 +1161,17 @@ public class ProfileConfCreatorDemo
             final ASN1ObjectIdentifier[] optionalUsages)
     {
         ExtendedKeyUsage extValue = new ExtendedKeyUsage();
-        if(requiredUsages != null)
+        if (requiredUsages != null)
         {
-            for(ASN1ObjectIdentifier usage : requiredUsages)
+            for (ASN1ObjectIdentifier usage : requiredUsages)
             {
                 extValue.getUsage().add(createSingleExtKeyUsage(usage, true));
             }
         }
 
-        if(optionalUsages != null)
+        if (optionalUsages != null)
         {
-            for(ASN1ObjectIdentifier usage : optionalUsages)
+            for (ASN1ObjectIdentifier usage : optionalUsages)
             {
                 extValue.getUsage().add(createSingleExtKeyUsage(usage, false));
             }
@@ -1188,7 +1188,7 @@ public class ProfileConfCreatorDemo
         type.setValue(usage.getId());
         type.setRequired(required);
         String desc = getDescription(usage);
-        if(desc != null)
+        if (desc != null)
         {
             type.setDescription(desc);
         }
@@ -1366,14 +1366,14 @@ public class ProfileConfCreatorDemo
     private static ExtensionValueType createCertificatePolicies(
             final ASN1ObjectIdentifier... policyOids)
     {
-        if(policyOids == null || policyOids.length == 0)
+        if (policyOids == null || policyOids.length == 0)
         {
             return null;
         }
 
         CertificatePolicies extValue = new CertificatePolicies();
         List<CertificatePolicyInformationType> l = extValue.getCertificatePolicyInformation();
-        for(ASN1ObjectIdentifier oid : policyOids)
+        for (ASN1ObjectIdentifier oid : policyOids)
         {
             CertificatePolicyInformationType single = new CertificatePolicyInformationType();
             l.add(single);
@@ -1405,12 +1405,12 @@ public class ProfileConfCreatorDemo
             final Integer requireExplicitPolicy)
     {
         PolicyConstraints ret = new PolicyConstraints();
-        if(inhibitPolicyMapping != null)
+        if (inhibitPolicyMapping != null)
         {
             ret.setInhibitPolicyMapping(inhibitPolicyMapping);
         }
 
-        if(requireExplicitPolicy != null)
+        if (requireExplicitPolicy != null)
         {
             ret.setRequireExplicitPolicy(requireExplicitPolicy);
         }
@@ -1459,7 +1459,7 @@ public class ProfileConfCreatorDemo
         String desc = (description == null)
                 ? getDescription(oid)
                 : description;
-        if(desc != null)
+        if (desc != null)
         {
             ret.setDescription(desc);
         }
@@ -1472,7 +1472,7 @@ public class ProfileConfCreatorDemo
     {
         ConstantExtValue extValue = new ConstantExtValue();
         extValue.setValue(bytes);
-        if(StringUtil.isNotBlank(desc))
+        if (StringUtil.isNotBlank(desc))
         {
             extValue.setDescription(desc);
         }
@@ -1500,7 +1500,7 @@ public class ProfileConfCreatorDemo
         profile.setSerialNumberInReq(false);
 
         // SignatureAlgorithms
-        if(sigHashAlgos != null && sigHashAlgos.length > 0)
+        if (sigHashAlgos != null && sigHashAlgos.length > 0)
         {
             SignatureAlgorithms sigAlgosType = new SignatureAlgorithms();
             profile.setSignatureAlgorithms(sigAlgosType);
@@ -1508,9 +1508,9 @@ public class ProfileConfCreatorDemo
             List<String> l = sigAlgosType.getAlgorithm();
             String[] algoPart2s = new String[]{"withRSA", "withDSA", "withECDSA",
                     "withPlainECDSA", "withRSAandMGF1"};
-            for(String part2 : algoPart2s)
+            for (String part2 : algoPart2s)
             {
-                for(String hashAlgo : sigHashAlgos)
+                for (String hashAlgo : sigHashAlgos)
                 {
                     l.add(hashAlgo + part2);
                 }
@@ -1598,7 +1598,7 @@ public class ProfileConfCreatorDemo
                 SECObjectIdentifiers.secp256r1, TeleTrusTObjectIdentifiers.brainpoolP256r1
             };
 
-            for(ASN1ObjectIdentifier curveId : curveIds)
+            for (ASN1ObjectIdentifier curveId : curveIds)
             {
                 String name = SecurityUtil.getCurveName(curveId);
                 curves.getCurve().add(createOidType(curveId, name));
@@ -1647,17 +1647,17 @@ public class ProfileConfCreatorDemo
             final Integer min,
             final Integer max)
     {
-        if(min == null && max == null)
+        if (min == null && max == null)
         {
             throw new IllegalArgumentException("min and max can not be both null");
         }
 
         RangeType range = new RangeType();
-        if(min != null)
+        if (min != null)
         {
             range.setMin(min);
         }
-        if(max != null)
+        if (max != null)
         {
             range.setMax(max);
         }

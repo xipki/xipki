@@ -76,12 +76,12 @@ public class LiquibaseMain
             final LiquibaseDatabaseConf dbConf,
             final String changeLogFile)
     {
-        if(dbConf == null)
+        if (dbConf == null)
         {
             throw new IllegalArgumentException("dbConf could not be null");
         }
 
-        if(MyStringUtil.isBlank(changeLogFile))
+        if (MyStringUtil.isBlank(changeLogFile))
         {
             throw new IllegalArgumentException("changeLogFile could not be empty");
         }
@@ -97,7 +97,7 @@ public class LiquibaseMain
         try
         {
             Logger log = LogFactory.getInstance().getLog();
-            if(logFile != null && logFile.length() > 0)
+            if (logFile != null && logFile.length() > 0)
             {
                 log.setLogLevel(logLevel, logFile);
             } else
@@ -164,7 +164,7 @@ public class LiquibaseMain
             }
 
             this.liquibase = new Liquibase(changeLogFile, fileOpener, database);
-        } catch(Exception e)
+        } catch (Exception e)
         {
             try
             {
@@ -205,7 +205,7 @@ public class LiquibaseMain
     {
         try
         {
-            if(database != null)
+            if (database != null)
             {
                 database.rollback();
                 database.close();

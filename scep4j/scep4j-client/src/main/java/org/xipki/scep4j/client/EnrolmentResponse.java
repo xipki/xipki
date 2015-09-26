@@ -67,20 +67,20 @@ public final class EnrolmentResponse
     {
         ParamUtil.assertNotNull("pkcsRep", pkcsRep);
         MessageType messageType = pkcsRep.getMessageType();
-        if(MessageType.CertRep != messageType)
+        if (MessageType.CertRep != messageType)
         {
             throw new ScepClientException(
                     "messageType could not be other than CertRep: " + messageType);
         }
         this.pkcsRep = pkcsRep;
 
-        if(PkiStatus.SUCCESS != pkcsRep.getPkiStatus())
+        if (PkiStatus.SUCCESS != pkcsRep.getPkiStatus())
         {
             return;
         }
 
         ASN1Encodable messageData = pkcsRep.getMessageData();
-        if(messageData instanceof ContentInfo == false)
+        if (messageData instanceof ContentInfo == false)
         {
             throw new ScepClientException("pkcsRep is not a ContentInfo");
         }
@@ -88,7 +88,7 @@ public final class EnrolmentResponse
         ContentInfo ci = (ContentInfo) messageData;
         SignedData sd = SignedData.getInstance(ci.getContent());
         ASN1Set asn1Certs = sd.getCertificates();
-        if(asn1Certs == null | asn1Certs.size() == 0)
+        if (asn1Certs == null | asn1Certs.size() == 0)
         {
             throw new ScepClientException("no certificate is embedded in pkcsRep");
         }

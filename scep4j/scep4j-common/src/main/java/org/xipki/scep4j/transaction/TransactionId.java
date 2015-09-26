@@ -65,7 +65,7 @@ public class TransactionId
             final byte[] bytes)
     {
         ParamUtil.assertNotNull("bytes", bytes);
-        if(bytes.length < 1)
+        if (bytes.length < 1)
         {
             throw new IllegalArgumentException("bytes could not be null");
         }

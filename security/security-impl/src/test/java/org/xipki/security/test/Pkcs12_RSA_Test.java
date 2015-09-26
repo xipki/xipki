@@ -62,7 +62,7 @@ public abstract class Pkcs12_RSA_Test
 
     protected Pkcs12_RSA_Test()
     {
-        if(Security.getProvider("BC") == null)
+        if (Security.getProvider("BC") == null)
         {
             Security.addProvider(new BouncyCastleProvider());
         }
@@ -96,7 +96,7 @@ public abstract class Pkcs12_RSA_Test
     private ConcurrentContentSigner getSigner()
     throws Exception
     {
-        if(signer == null)
+        if (signer == null)
         {
             String certFile = getCertificateFile();
             X509Certificate cert = X509Util.parseCert(certFile);
@@ -112,7 +112,7 @@ public abstract class Pkcs12_RSA_Test
     throws Exception
     {
         byte[] data = new byte[1234];
-        for(int i = 0; i < data.length; i++)
+        for (int i = 0; i < data.length; i++)
         {
             data[i] = (byte) (i & 0xFF);
         }

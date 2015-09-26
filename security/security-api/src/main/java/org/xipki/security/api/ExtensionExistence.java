@@ -77,13 +77,13 @@ public class ExtensionExistence extends ASN1Object
         this.needExtensions = needExtensions;
         this.wantExtensions = wantExtensions;
 
-        if(this.needExtensions == null)
+        if (this.needExtensions == null)
         {
             List<ASN1ObjectIdentifier> list = Collections.emptyList();
             this.needExtensions = Collections.unmodifiableList(list);
         }
 
-        if(this.wantExtensions == null)
+        if (this.wantExtensions == null)
         {
             List<ASN1ObjectIdentifier> list = Collections.emptyList();
             this.wantExtensions = Collections.unmodifiableList(list);
@@ -100,21 +100,21 @@ public class ExtensionExistence extends ASN1Object
             throw new IllegalArgumentException("wrong number of elements in sequence");
         }
 
-        for(int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++)
         {
             ASN1TaggedObject tagObject = ASN1TaggedObject.getInstance(seq.getObjectAt(i));
             int tag = tagObject.getTagNo();
-            if(tag == 0 || tag == 1)
+            if (tag == 0 || tag == 1)
             {
                 ASN1Sequence subSeq = ASN1Sequence.getInstance(tagObject.getObject());
                 List<ASN1ObjectIdentifier> oids = new LinkedList<>();
                 int subSize = subSeq.size();
-                for(int j = 0; j < subSize; j++)
+                for (int j = 0; j < subSize; j++)
                 {
                     oids.add(ASN1ObjectIdentifier.getInstance(subSeq.getObjectAt(j)));
                 }
 
-                if(tag == 0)
+                if (tag == 0)
                 {
                     needExtensions = Collections.unmodifiableList(oids);
                 } else
@@ -127,13 +127,13 @@ public class ExtensionExistence extends ASN1Object
             }
         }
 
-        if(needExtensions == null)
+        if (needExtensions == null)
         {
             List<ASN1ObjectIdentifier> list = Collections.emptyList();
             needExtensions = Collections.unmodifiableList(list);
         }
 
-        if(wantExtensions == null)
+        if (wantExtensions == null)
         {
             List<ASN1ObjectIdentifier> list = Collections.emptyList();
             wantExtensions = Collections.unmodifiableList(list);
@@ -174,20 +174,20 @@ public class ExtensionExistence extends ASN1Object
     public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        if(CollectionUtil.isNotEmpty(needExtensions))
+        if (CollectionUtil.isNotEmpty(needExtensions))
         {
             ASN1EncodableVector v = new ASN1EncodableVector();
-            for(ASN1ObjectIdentifier m : needExtensions)
+            for (ASN1ObjectIdentifier m : needExtensions)
             {
                 v.add(m);
             }
             vector.add(new DERTaggedObject(true, 0, new DERSequence(v)));
         }
 
-        if(CollectionUtil.isNotEmpty(wantExtensions))
+        if (CollectionUtil.isNotEmpty(wantExtensions))
         {
             ASN1EncodableVector v = new ASN1EncodableVector();
-            for(ASN1ObjectIdentifier m : wantExtensions)
+            for (ASN1ObjectIdentifier m : wantExtensions)
             {
                 v.add(m);
             }

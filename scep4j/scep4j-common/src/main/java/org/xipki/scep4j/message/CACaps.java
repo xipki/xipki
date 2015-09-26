@@ -65,7 +65,7 @@ public class CACaps
     public CACaps(
             final Set<CACapability> capabilities)
     {
-        if(capabilities == null)
+        if (capabilities == null)
         {
             this.capabilities = new HashSet<CACapability>();
         }else
@@ -90,7 +90,7 @@ public class CACaps
     public void addCapability(
             final CACapability cap)
     {
-        if(cap != null)
+        if (cap != null)
         {
             capabilities.add(cap);
             refresh();
@@ -100,7 +100,7 @@ public class CACaps
     public void removeCapability(
             final CACapability cap)
     {
-        if(cap != null)
+        if (cap != null)
         {
             capabilities.remove(cap);
             refresh();
@@ -117,18 +117,18 @@ public class CACaps
             final String scepMessage)
     {
         CACaps ret = new CACaps();
-        if(scepMessage == null || scepMessage.isEmpty())
+        if (scepMessage == null || scepMessage.isEmpty())
         {
             return ret;
         }
 
         StringTokenizer st = new StringTokenizer(scepMessage, "\r\n");
 
-        while(st.hasMoreTokens())
+        while (st.hasMoreTokens())
         {
             String m = st.nextToken();
             CACapability cap = CACapability.valueForText(m);
-            if(cap == null)
+            if (cap == null)
             {
                 LOG.warn("ignore unknown CACap '{}'", m);
             } else
@@ -147,13 +147,13 @@ public class CACaps
 
     public String toScepMessage()
     {
-        if(capabilities.isEmpty())
+        if (capabilities.isEmpty())
         {
             return "";
         }
 
         StringBuilder sb = new StringBuilder();
-        for(CACapability cap : capabilities)
+        for (CACapability cap : capabilities)
         {
             sb.append(cap.getText()).append("\n");
         }
@@ -168,13 +168,13 @@ public class CACaps
 
     public HashAlgoType getMostSecureHashAlgo()
     {
-        if(capabilities.contains(CACapability.SHA512))
+        if (capabilities.contains(CACapability.SHA512))
         {
             return HashAlgoType.SHA512;
-        } else if(capabilities.contains(CACapability.SHA256))
+        } else if (capabilities.contains(CACapability.SHA256))
         {
             return HashAlgoType.SHA256;
-        } else if(capabilities.contains(CACapability.SHA1))
+        } else if (capabilities.contains(CACapability.SHA1))
         {
             return HashAlgoType.SHA1;
         } else
@@ -185,7 +185,7 @@ public class CACaps
 
     private void refresh()
     {
-        if(capabilities != null)
+        if (capabilities != null)
         {
             this.bytes = toString().getBytes();
         }
@@ -195,7 +195,7 @@ public class CACaps
     public boolean equals(
             final Object other)
     {
-        if(other instanceof CACaps == false)
+        if (other instanceof CACaps == false)
         {
             return false;
         }

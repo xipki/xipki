@@ -75,17 +75,17 @@ public final class EnvelopedDataDecryptor
         final RecipientInformationStore recipientInfos = envData.getRecipientInfos();
         RecipientInformation recipientInfo = null;
         EnvelopedDataDecryptorInstance decryptor = null;
-        for(EnvelopedDataDecryptorInstance m : decryptors)
+        for (EnvelopedDataDecryptorInstance m : decryptors)
         {
             recipientInfo = recipientInfos.get(m.getRecipientId());
-            if(recipientInfo != null)
+            if (recipientInfo != null)
             {
                 decryptor = m;
                 break;
             }
         }
 
-        if(recipientInfo == null)
+        if (recipientInfo == null)
         {
             throw new MessageDecodingException(
                     "missing expected key transfer recipient");
@@ -94,7 +94,7 @@ public final class EnvelopedDataDecryptor
         try
         {
             return recipientInfo.getContent(decryptor.getRecipient());
-        }catch(CMSException e)
+        } catch (CMSException e)
         {
             throw new MessageDecodingException("could not decrypt the envelopedData");
         }

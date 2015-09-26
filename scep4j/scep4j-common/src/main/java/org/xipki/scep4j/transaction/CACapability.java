@@ -66,9 +66,9 @@ public enum CACapability
     public static CACapability valueForText(
             final String text)
     {
-        for(CACapability m : values())
+        for (CACapability m : values())
         {
-            if(m.text.equalsIgnoreCase(text))
+            if (m.text.equalsIgnoreCase(text))
             {
                 return m;
             }

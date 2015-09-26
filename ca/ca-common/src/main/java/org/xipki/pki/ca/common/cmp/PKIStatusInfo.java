@@ -70,7 +70,7 @@ public class PKIStatusInfo
             final org.bouncycastle.asn1.cmp.PKIStatusInfo bcPKIStatusInfo)
     {
         this.status = bcPKIStatusInfo.getStatus().intValue();
-        if(bcPKIStatusInfo.getFailInfo() != null)
+        if (bcPKIStatusInfo.getFailInfo() != null)
         {
             this.pkiFailureInfo = bcPKIStatusInfo.getFailInfo().intValue();
         }

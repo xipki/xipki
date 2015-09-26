@@ -78,11 +78,11 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     static
     {
         String v = System.getProperty("org.xipki.signservice.timeout");
-        if(v != null)
+        if (v != null)
         {
             int vi = Integer.parseInt(v);
             // valid value is between 0 and 60 seconds
-            if(vi < 0 || vi > 60 * 1000)
+            if (vi < 0 || vi > 60 * 1000)
             {
                 LOG.error("invalid org.xipki.signservice.timeout: {}", vi);
             }
@@ -107,7 +107,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
         ParamUtil.assertNotEmpty("signers", signers);
 
         this.algorithmIdentifier = signers.get(0).getAlgorithmIdentifier();
-        for(ContentSigner signer : signers)
+        for (ContentSigner signer : signers)
         {
             idleSigners.addLast(signer);
         }
@@ -129,7 +129,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
         ContentSigner signer = null;
         try
         {
-            if(soTimeout == 0)
+            if (soTimeout == 0)
             {
                 signer = idleSigners.takeFirst();
             }
@@ -142,7 +142,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
             LOG.info("interrupted");
         }
 
-        if(signer == null)
+        if (signer == null)
         {
             throw new NoIdleSignerException("no idle signer available");
         }
@@ -158,7 +158,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
         ParamUtil.assertNotNull("signer", signer);
 
         boolean isBusySigner = busySigners.remove(signer);
-        if(isBusySigner)
+        if (isBusySigner)
         {
             idleSigners.addLast(signer);
         }
@@ -191,7 +191,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
             final X509Certificate[] certificateChain)
     {
         this.certificateChain = certificateChain;
-        if(this.certificateChain == null)
+        if (this.certificateChain == null)
         {
             this.certificateChainAsBCObjects = null;
             return;
@@ -199,7 +199,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
 
         final int n = certificateChain.length;
         this.certificateChainAsBCObjects = new X509CertificateHolder[n];
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             X509Certificate cert = this.certificateChain[i];
             try
@@ -216,7 +216,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     @Override
     public X509Certificate getCertificate()
     {
-        if(certificateChain != null && certificateChain.length > 0)
+        if (certificateChain != null && certificateChain.length > 0)
         {
             return certificateChain[0];
         }
@@ -229,7 +229,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     @Override
     public X509CertificateHolder getCertificateAsBCObject()
     {
-        if(certificateChainAsBCObjects != null && certificateChainAsBCObjects.length > 0)
+        if (certificateChainAsBCObjects != null && certificateChainAsBCObjects.length > 0)
         {
             return certificateChainAsBCObjects[0];
         }
@@ -262,10 +262,10 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
             stream.write(new byte[]{1,2,3,4});
             byte[] signature = signer.getSignature();
             return signature != null && signature.length > 0;
-        } catch(Exception e)
+        } catch (Exception e)
         {
             final String message = "isHealthy()";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -275,7 +275,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
         }
         finally
         {
-            if(signer != null)
+            if (signer != null)
             {
                 returnContentSigner(signer);
             }

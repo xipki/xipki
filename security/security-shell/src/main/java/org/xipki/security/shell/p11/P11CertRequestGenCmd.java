@@ -81,11 +81,11 @@ public class P11CertRequestGenCmd extends CertRequestGenCmd
     throws Exception
     {
         P11KeyIdentifier keyIdentifier;
-        if(keyId != null && keyLabel == null)
+        if (keyId != null && keyLabel == null)
         {
             keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
         }
-        else if(keyId == null && keyLabel != null)
+        else if (keyId == null && keyLabel != null)
         {
             keyIdentifier = new P11KeyIdentifier(keyLabel);
         }

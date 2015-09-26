@@ -73,7 +73,7 @@ public class GetCRLCmd extends ClientCmd
         ScepClient client = getScepClient();
         X509CRL crl = client.scepGetCRL(getIdentityKey(), getIdentityCert(),
                 cert.getIssuer(), cert.getSerialNumber().getPositiveValue());
-        if(crl == null)
+        if (crl == null)
         {
             throw new CmdFailure("received no CRL from server");
         }

@@ -72,20 +72,20 @@ public abstract class CRLCmd extends ClientCmd
     throws Exception
     {
         Set<String> caNames = caClient.getCaNames();
-        if(isEmpty(caNames))
+        if (isEmpty(caNames))
         {
             throw new CmdFailure("no CA is configured");
         }
 
-        if(caName != null && ! caNames.contains(caName))
+        if (caName != null && ! caNames.contains(caName))
         {
             throw new IllegalCmdParamException("CA " + caName
                     + " is not within the configured CAs " + caNames);
         }
 
-        if(caName == null)
+        if (caName == null)
         {
-            if(caNames.size() == 1)
+            if (caNames.size() == 1)
             {
                 caName = caNames.iterator().next();
             }
@@ -100,12 +100,12 @@ public abstract class CRLCmd extends ClientCmd
         try
         {
             crl = retrieveCRL(caName);
-        }catch(PKIErrorException e)
+        } catch (PKIErrorException e)
         {
             throw new CmdFailure("received no CRL from server: " + e.getMessage());
         }
 
-        if(crl == null)
+        if (crl == null)
         {
             throw new CmdFailure("received no CRL from server");
         }

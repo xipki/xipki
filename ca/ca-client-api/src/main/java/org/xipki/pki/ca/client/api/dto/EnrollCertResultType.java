@@ -57,7 +57,7 @@ public class EnrollCertResultType
     public void addCACertificate(
             final CMPCertificate cACertificate)
     {
-        if(cACertificates == null)
+        if (cACertificates == null)
         {
             cACertificates = new ArrayList<>(1);
         }
@@ -69,14 +69,14 @@ public class EnrollCertResultType
     {
         ParamUtil.assertNotNull("resultEntry", resultEntry);
 
-        if((resultEntry instanceof EnrollCertResultEntryType
+        if ((resultEntry instanceof EnrollCertResultEntryType
                 || resultEntry instanceof ErrorResultEntryType) == false)
         {
             throw new IllegalArgumentException(
                     "Unaccepted parameter of class " + resultEntry.getClass().getName());
         }
 
-        if(resultEntries == null)
+        if (resultEntries == null)
         {
             resultEntries = new ArrayList<>(1);
         }

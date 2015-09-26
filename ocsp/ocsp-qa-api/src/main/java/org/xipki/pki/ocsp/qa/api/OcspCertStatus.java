@@ -64,9 +64,9 @@ public enum OcspCertStatus
     public static OcspCertStatus getInstance(
             final String name)
     {
-        for(OcspCertStatus entry : values())
+        for (OcspCertStatus entry : values())
         {
-            if(entry.name().equals(name))
+            if (entry.name().equals(name))
             {
                 return entry;
             }

@@ -57,7 +57,7 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister
     @Override
     public AuditService getAuditService()
     {
-        if(auditEnabled)
+        if (auditEnabled)
         {
             return services.isEmpty()
                     ? defaultAuditService
@@ -100,7 +100,7 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister
 
         try
         {
-            if(services.remove(service))
+            if (services.remove(service))
             {
                 LOG.debug("removed AuditService binding for {}", service);
             }

@@ -226,14 +226,14 @@ public abstract class EnrollCertCmd extends ClientCmd
         certTemplateBuilder.setSubject(x500Subject);
         certTemplateBuilder.setPublicKey(ssCert.getSubjectPublicKeyInfo());
 
-        if(needExtensionTypes == null)
+        if (needExtensionTypes == null)
         {
             needExtensionTypes = new LinkedList<>();
         }
 
         // SubjectAltNames
         List<Extension> extensions = new LinkedList<>();
-        if(isNotEmpty(subjectAltNames))
+        if (isNotEmpty(subjectAltNames))
         {
             extensions.add(
                     P10RequestGenerator.createExtensionSubjectAltName(subjectAltNames, false));
@@ -241,7 +241,7 @@ public abstract class EnrollCertCmd extends ClientCmd
         }
 
         // SubjectInfoAccess
-        if(isNotEmpty(subjectInfoAccesses))
+        if (isNotEmpty(subjectInfoAccesses))
         {
             extensions.add(P10RequestGenerator.createExtensionSubjectInfoAccess(
                     subjectInfoAccesses, false));
@@ -249,10 +249,10 @@ public abstract class EnrollCertCmd extends ClientCmd
         }
 
         // Keyusage
-        if(isNotEmpty(keyusages))
+        if (isNotEmpty(keyusages))
         {
             Set<KeyUsage> usages = new HashSet<>();
-            for(String usage : keyusages)
+            for (String usage : keyusages)
             {
                 usages.add(KeyUsage.getKeyUsage(usage));
             }
@@ -263,7 +263,7 @@ public abstract class EnrollCertCmd extends ClientCmd
         }
 
         // ExtendedKeyusage
-        if(isNotEmpty(extkeyusages))
+        if (isNotEmpty(extkeyusages))
         {
             Set<ASN1ObjectIdentifier> oids = new HashSet<>(
                     SecurityUtil.textToASN1ObjectIdentifers(extkeyusages));
@@ -274,10 +274,10 @@ public abstract class EnrollCertCmd extends ClientCmd
         }
 
         // QcEuLimitValue
-        if(isNotEmpty(qcEuLimits))
+        if (isNotEmpty(qcEuLimits))
         {
             ASN1EncodableVector v = new ASN1EncodableVector();
-            for(String m : qcEuLimits)
+            for (String m : qcEuLimits)
             {
                 StringTokenizer st = new StringTokenizer(m, ":");
                 try
@@ -291,7 +291,7 @@ public abstract class EnrollCertCmd extends ClientCmd
                     {
                         int intValue = Integer.parseInt(currencyS);
                         currency = new Iso4217CurrencyCode(intValue);
-                    }catch(NumberFormatException e)
+                    } catch (NumberFormatException e)
                     {
                         currency = new Iso4217CurrencyCode(currencyS);
                     }
@@ -303,7 +303,7 @@ public abstract class EnrollCertCmd extends ClientCmd
                     QCStatement statment = new QCStatement(
                             ObjectIdentifiers.id_etsi_qcs_QcLimitValue, monterayValue);
                     v.add(statment);
-                }catch(Exception e)
+                } catch (Exception e)
                 {
                     throw new Exception("invalid qc-eu-limit '" + m + "'");
                 }
@@ -316,10 +316,10 @@ public abstract class EnrollCertCmd extends ClientCmd
         }
 
         // biometricInfo
-        if(biometricType != null && biometricHashAlgo != null && biometricFile != null)
+        if (biometricType != null && biometricHashAlgo != null && biometricFile != null)
         {
             TypeOfBiometricData _biometricType;
-            if(StringUtil.isNumber(biometricType))
+            if (StringUtil.isNumber(biometricType))
             {
                 _biometricType = new TypeOfBiometricData(Integer.parseInt(biometricType));
             }
@@ -335,7 +335,7 @@ public abstract class EnrollCertCmd extends ClientCmd
             byte[] _biometricDataHash = md.digest(biometricBytes);
 
             DERIA5String _sourceDataUri = null;
-            if(biometricUri != null)
+            if (biometricUri != null)
             {
                 _sourceDataUri = new DERIA5String(biometricUri);
             }
@@ -352,7 +352,7 @@ public abstract class EnrollCertCmd extends ClientCmd
             extensions.add(new Extension(extType, false, extValue.getEncoded()));
             needExtensionTypes.add(extType.getId());
         }
-        else if(biometricType == null && biometricHashAlgo == null && biometricFile == null)
+        else if (biometricType == null && biometricHashAlgo == null && biometricFile == null)
         {
             // Do nothing
         }
@@ -362,7 +362,7 @@ public abstract class EnrollCertCmd extends ClientCmd
                     + " must be set or none of them should be set");
         }
 
-        if(isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes))
+        if (isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes))
         {
             ExtensionExistence ee = new ExtensionExistence(
                     SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
@@ -373,7 +373,7 @@ public abstract class EnrollCertCmd extends ClientCmd
                     ee.toASN1Primitive().getEncoded()));
         }
 
-        if(isNotEmpty(extensions))
+        if (isNotEmpty(extensions))
         {
             Extensions asn1Extensions = new Extensions(extensions.toArray(new Extension[0]));
             certTemplateBuilder.setExtensions(asn1Extensions);
@@ -410,14 +410,14 @@ public abstract class EnrollCertCmd extends ClientCmd
         }
 
         X509Certificate cert = null;
-        if(result != null)
+        if (result != null)
         {
             String id = result.getAllIds().iterator().next();
             CertOrError certOrError = result.getCertificateOrError(id);
             cert = (X509Certificate) certOrError.getCertificate();
         }
 
-        if(cert == null)
+        if (cert == null)
         {
             throw new CmdFailure("no certificate received from the server");
         }

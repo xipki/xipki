@@ -48,7 +48,7 @@ public class CertStatusCompleter extends EnumCompleter
     {
         StringBuilder enums = new StringBuilder();
 
-        for(OcspCertStatus entry : OcspCertStatus.values())
+        for (OcspCertStatus entry : OcspCertStatus.values())
         {
             enums.append(entry.name()).append(",");
         }

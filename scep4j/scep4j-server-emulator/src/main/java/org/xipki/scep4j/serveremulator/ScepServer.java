@@ -111,7 +111,7 @@ public class ScepServer
     public ScepServlet getServlet()
     throws Exception
     {
-        if(servlet != null)
+        if (servlet != null)
         {
             return servlet;
         }
@@ -146,7 +146,7 @@ public class ScepServer
         }
 
         RAEmulator ra = null;
-        if(withRA)
+        if (withRA)
         {
             kpGen.initialize(2048);
             KeyPair keypair = kpGen.generateKeyPair();
@@ -158,7 +158,7 @@ public class ScepServer
         }
 
         NextCAandRA nextCAandRA = null;
-        if(withNextCA)
+        if (withNextCA)
         {
             kpGen.initialize(2048);
             KeyPair keypair = kpGen.generateKeyPair();
@@ -176,7 +176,7 @@ public class ScepServer
                     startTime);
             CAEmulator tmpCA = new CAEmulator(keypair.getPrivate(), this.nextCACert, generateCRL);
 
-            if(withRA)
+            if (withRA)
             {
                 kpGen.initialize(2048);
                 keypair = kpGen.generateKeyPair();
@@ -191,7 +191,7 @@ public class ScepServer
         }
 
         ScepResponder scepResponder = new ScepResponder(caCaps, ca, ra, nextCAandRA, control);
-        if(maxSigningTimeBiasInMs != null)
+        if (maxSigningTimeBiasInMs != null)
         {
             scepResponder.setMaxSigningTimeBias(maxSigningTimeBiasInMs);
         }

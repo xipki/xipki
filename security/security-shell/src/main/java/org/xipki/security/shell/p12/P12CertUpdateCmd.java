@@ -83,26 +83,26 @@ public class P12CertUpdateCmd extends P12SecurityCmd
 
         String keyname = null;
         Enumeration<String> aliases = ks.aliases();
-        while(aliases.hasMoreElements())
+        while (aliases.hasMoreElements())
         {
             String alias = aliases.nextElement();
-            if(ks.isKeyEntry(alias))
+            if (ks.isKeyEntry(alias))
             {
                 keyname = alias;
                 break;
             }
         }
 
-        if(keyname == null)
+        if (keyname == null)
         {
             throw new SignerException("could not find private key");
         }
 
         Key key = ks.getKey(keyname, pwd);
         Set<X509Certificate> caCerts = new HashSet<>();
-        if(isNotEmpty(caCertFiles))
+        if (isNotEmpty(caCertFiles))
         {
-            for(String caCertFile : caCertFiles)
+            for (String caCertFile : caCertFiles)
             {
                 caCerts.add(X509Util.parseCert(caCertFile));
             }
@@ -120,7 +120,7 @@ public class P12CertUpdateCmd extends P12SecurityCmd
             return null;
         }finally
         {
-            if(fOut != null)
+            if (fOut != null)
             {
                 fOut.close();
             }
@@ -133,7 +133,7 @@ public class P12CertUpdateCmd extends P12SecurityCmd
     throws SignerException, PasswordResolverException
     {
         ConfPairs pairs = new ConfPairs("keystore", "file:" + p12File);
-        if(password != null)
+        if (password != null)
         {
             pairs.putPair("password", new String(password));
         }

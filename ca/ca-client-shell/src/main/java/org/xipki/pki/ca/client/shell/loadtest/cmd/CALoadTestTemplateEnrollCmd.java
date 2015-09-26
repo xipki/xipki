@@ -71,12 +71,12 @@ public class CALoadTestTemplateEnrollCmd extends CALoadTestCmd
     protected Object _doExecute()
     throws Exception
     {
-        if(numThreads < 1)
+        if (numThreads < 1)
         {
             throw new IllegalCmdParamException("invalid number of threads " + numThreads);
         }
 
-        if(durationInSecond < 1)
+        if (durationInSecond < 1)
         {
             throw new IllegalCmdParamException("invalid duration " + durationInSecond);
         }
@@ -89,7 +89,7 @@ public class CALoadTestTemplateEnrollCmd extends CALoadTestCmd
         description.append("template: ").append(templateFile).append("\n");
         description.append("#certs/req: ").append(n).append("\n");
         description.append("unit: ").append(n).append(" certificate");
-        if(n > 1)
+        if (n > 1)
         {
             description.append("s");
         }

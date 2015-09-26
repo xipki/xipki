@@ -126,7 +126,7 @@ abstract class AbstractP11DSAContentSigner implements ContentSigner
         } catch (Throwable t)
         {
             final String message = "Throwable";
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                         t.getMessage());

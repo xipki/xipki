@@ -80,18 +80,18 @@ public class CertPollCmd extends ClientCmd
 
         EnrolmentResponse resp = client.scepCertPoll(getIdentityKey(), getIdentityCert(),
                 csr, caSubject);
-        if(resp.isFailure())
+        if (resp.isFailure())
         {
             throw new CmdFailure("server returned 'failure'");
         }
 
-        if(resp.isPending())
+        if (resp.isPending())
         {
             throw new CmdFailure("server returned 'pending'");
         }
 
         List<X509Certificate> certs = resp.getCertificates();
-        if(certs == null || certs.isEmpty())
+        if (certs == null || certs.isEmpty())
         {
             throw new CmdFailure("received no certficate from server");
         }
