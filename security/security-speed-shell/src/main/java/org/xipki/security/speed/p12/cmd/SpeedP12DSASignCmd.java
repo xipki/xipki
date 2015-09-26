@@ -60,9 +60,9 @@ public class SpeedP12DSASignCmd extends SpeedP12SignCmd
     protected LoadExecutor getTester()
     throws Exception
     {
-        if(qLen == null)
+        if (qLen == null)
         {
-            if(pLen >= 2048)
+            if (pLen >= 2048)
             {
                 qLen = 256;
             }

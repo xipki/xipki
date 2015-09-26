@@ -109,7 +109,7 @@ public class ScepUtil
             final PublicKey publicKey)
     throws IOException
     {
-        if(publicKey instanceof java.security.interfaces.RSAPublicKey)
+        if (publicKey instanceof java.security.interfaces.RSAPublicKey)
         {
             java.security.interfaces.RSAPublicKey rsaPubKey =
                     (java.security.interfaces.RSAPublicKey) publicKey;
@@ -134,9 +134,9 @@ public class ScepUtil
         PKCS10CertificationRequestBuilder p10ReqBuilder =
                 new PKCS10CertificationRequestBuilder(subjectDN, subjectPublicKeyInfo);
 
-        if(attributes != null)
+        if (attributes != null)
         {
-            for(ASN1ObjectIdentifier attrType : attributes.keySet())
+            for (ASN1ObjectIdentifier attrType : attributes.keySet())
             {
                 p10ReqBuilder.addAttribute(attrType, attributes.get(attrType));
             }
@@ -158,13 +158,13 @@ public class ScepUtil
         Map<ASN1ObjectIdentifier, ASN1Encodable> attributes =
                 new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
 
-        if(challengePassword != null && challengePassword.isEmpty() == false)
+        if (challengePassword != null && challengePassword.isEmpty() == false)
         {
             DERPrintableString asn1Pwd = new DERPrintableString(challengePassword);
             attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword, asn1Pwd);
         }
 
-        if(extensions != null && extensions.isEmpty() == false)
+        if (extensions != null && extensions.isEmpty() == false)
         {
             Extensions asn1Extensions = new Extensions(extensions.toArray(new Extension[0]));
             attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest, asn1Extensions);
@@ -223,7 +223,7 @@ public class ScepUtil
         try
         {
             certGenerator.addExtension(Extension.keyUsage, true, ku);
-        }catch(CertIOException e)
+        } catch (CertIOException e)
         {
             throw new CertificateException(
                     "error while generating self-signed certificate: " + e.getMessage(), e);
@@ -255,7 +255,7 @@ public class ScepUtil
     {
         ASN1Set set = signedData.getCertificates();
         int n;
-        if(set == null || (n = set.size()) == 0)
+        if (set == null || (n = set.size()) == 0)
         {
             return Collections.emptyList();
         }
@@ -263,7 +263,7 @@ public class ScepUtil
         List<X509Certificate> certs = new LinkedList<X509Certificate>();
 
         X509Certificate eeCert = null;
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             X509Certificate cert;
             try
@@ -275,7 +275,7 @@ public class ScepUtil
                 throw new CertificateException(e);
             }
 
-            if(eeCert == null && cert.getBasicConstraints() == -1)
+            if (eeCert == null && cert.getBasicConstraints() == -1)
             {
                 eeCert = cert;
             }
@@ -285,7 +285,7 @@ public class ScepUtil
             }
         }
 
-        if(eeCert != null)
+        if (eeCert != null)
         {
             certs.add(0, eeCert);
         }
@@ -298,7 +298,7 @@ public class ScepUtil
     throws CRLException
     {
         ASN1Set set = signedData.getCRLs();
-        if(set == null || set.size() == 0)
+        if (set == null || set.size() == 0)
         {
             return null;
         }
@@ -318,7 +318,7 @@ public class ScepUtil
             final HashAlgoType hashAlgo)
     {
         String algorithm = key.getAlgorithm();
-        if("RSA".equalsIgnoreCase(algorithm))
+        if ("RSA".equalsIgnoreCase(algorithm))
         {
             return hashAlgo.getName() + "withRSA";
         } else
@@ -356,7 +356,7 @@ public class ScepUtil
     throws CertificateEncodingException
     {
         byte[] extValue = getCoreExtValue(cert, Extension.subjectKeyIdentifier);
-        if(extValue == null)
+        if (extValue == null)
         {
             return null;
         }
@@ -364,7 +364,7 @@ public class ScepUtil
         try
         {
             return ASN1OctetString.getInstance(extValue).getOctets();
-        }catch(IllegalArgumentException e)
+        } catch (IllegalArgumentException e)
         {
             throw new CertificateEncodingException(e.getMessage());
         }
@@ -375,7 +375,7 @@ public class ScepUtil
     throws CertificateEncodingException
     {
         byte[] extValue = getCoreExtValue(cert, Extension.authorityKeyIdentifier);
-        if(extValue == null)
+        if (extValue == null)
         {
             return null;
         }
@@ -396,7 +396,7 @@ public class ScepUtil
             final KeyUsage usage)
     {
         boolean[] keyusage = cert.getKeyUsage();
-        if(keyusage != null && keyusage.length > usage.getBit())
+        if (keyusage != null && keyusage.length > usage.getBit())
         {
             return keyusage[usage.getBit()];
         }
@@ -409,7 +409,7 @@ public class ScepUtil
     throws CertificateEncodingException
     {
         byte[] fullExtValue = cert.getExtensionValue(type.getId());
-        if(fullExtValue == null)
+        if (fullExtValue == null)
         {
             return null;
         }
@@ -427,7 +427,7 @@ public class ScepUtil
             final X509Certificate cert)
     {
         boolean equals = cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
-        if(equals == false)
+        if (equals == false)
         {
             return false;
         }
@@ -437,7 +437,7 @@ public class ScepUtil
             byte[] ski = extractSKI(cert);
             byte[] aki = extractAKI(cert);
 
-            if(ski != null && aki != null)
+            if (ski != null && aki != null)
             {
                 return Arrays.equals(ski, aki);
             } else
@@ -456,23 +456,23 @@ public class ScepUtil
     throws CertificateEncodingException
     {
         boolean isCA = issuerCert.getBasicConstraints() >= 0;
-        if(isCA == false)
+        if (isCA == false)
         {
             return false;
         }
 
         boolean issues = issuerCert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
-        if(issues)
+        if (issues)
         {
             byte[] ski = extractSKI(issuerCert);
             byte[] aki = extractAKI(cert);
-            if(ski != null)
+            if (ski != null)
             {
                 issues = Arrays.equals(ski, aki);
             }
         }
 
-        if(issues)
+        if (issues)
         {
             long issuerNotBefore = issuerCert.getNotBefore().getTime();
             long issuerNotAfter = issuerCert.getNotAfter().getTime();
@@ -499,31 +499,31 @@ public class ScepUtil
         ASN1ObjectIdentifier algOid = new ASN1ObjectIdentifier(sigOid);
 
         ASN1ObjectIdentifier digestAlgOid;
-        if(PKCSObjectIdentifiers.md5WithRSAEncryption.equals(algOid))
+        if (PKCSObjectIdentifiers.md5WithRSAEncryption.equals(algOid))
         {
             digestAlgOid = PKCSObjectIdentifiers.md5;
         }
-        else if(PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(algOid))
+        else if (PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(algOid))
         {
             digestAlgOid = X509ObjectIdentifiers.id_SHA1;
         }
-        else if(PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(algOid))
+        else if (PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(algOid))
         {
             digestAlgOid = NISTObjectIdentifiers.id_sha224;
         }
-        else if(PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(algOid))
+        else if (PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(algOid))
         {
             digestAlgOid = NISTObjectIdentifiers.id_sha256;
         }
-        else if(PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(algOid))
+        else if (PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(algOid))
         {
             digestAlgOid = NISTObjectIdentifiers.id_sha384;
         }
-        else if(PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid))
+        else if (PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid))
         {
             digestAlgOid = NISTObjectIdentifiers.id_sha512;
         }
-        else if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid))
+        else if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid))
         {
             RSASSAPSSparams param = RSASSAPSSparams.getInstance(sigParams);
             digestAlgOid = param.getHashAlgorithm().getAlgorithm();
@@ -541,7 +541,7 @@ public class ScepUtil
             final ASN1ObjectIdentifier type)
     {
         Attribute attr = attrs.get(type);
-        if(attr == null)
+        if (attr == null)
         {
             return null;
         }
@@ -585,7 +585,7 @@ public class ScepUtil
             final X509Certificate[] cmsCertSet)
     throws CertificateEncodingException, CMSException
     {
-        if(cmsCertSet == null || cmsCertSet.length == 0)
+        if (cmsCertSet == null || cmsCertSet.length == 0)
         {
             return;
         }

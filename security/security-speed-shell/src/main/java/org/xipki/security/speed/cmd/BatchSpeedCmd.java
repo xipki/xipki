@@ -63,13 +63,13 @@ public abstract class BatchSpeedCmd extends SecurityCmd
     throws Exception
     {
         List<LoadExecutor> testers = getTesters();
-        for(LoadExecutor tester : testers)
+        for (LoadExecutor tester : testers)
         {
             tester.setDuration(durationInSecond);
             tester.setThreads(Math.min(20, numThreads));
             System.out.println("============================================");
             tester.test();
-            if(tester.isInterrupted())
+            if (tester.isInterrupted())
             {
                 throw new InterruptedException("cancelled by the user");
             }

@@ -136,10 +136,10 @@ public class AuditEvent
             final AuditEventData eventData)
     {
         int idx = -1;
-        for(int i = 0; i < eventDatas.size(); i++)
+        for (int i = 0; i < eventDatas.size(); i++)
         {
             AuditEventData ed = eventDatas.get(i);
-            if(ed.getName().equals(eventData.getName()))
+            if (ed.getName().equals(eventData.getName()))
             {
                 idx = i;
                 break;
@@ -147,13 +147,13 @@ public class AuditEvent
         }
 
         AuditEventData ret = null;
-        if(idx != -1)
+        if (idx != -1)
         {
             ret = eventDatas.get(idx);
         }
         eventDatas.add(eventData);
 
-        for(AuditChildEvent cae : childAuditEvents)
+        for (AuditChildEvent cae : childAuditEvents)
         {
             cae.removeEventData(eventData.getName());
         }
@@ -186,19 +186,19 @@ public class AuditEvent
     public List<AuditEvent> expandAuditEvents()
     {
         int size = childAuditEvents.size();
-        if(size == 0)
+        if (size == 0)
         {
             return Arrays.asList(this);
         }
 
         List<AuditEvent> expandedEvents = new ArrayList<>(size);
-        for(AuditChildEvent child : childAuditEvents)
+        for (AuditChildEvent child : childAuditEvents)
         {
             AuditEvent event = new AuditEvent(timestamp);
             event.setApplicationName(applicationName);
             event.setName(name);
 
-            if(child.getLevel() != null)
+            if (child.getLevel() != null)
             {
                 event.setLevel(child.getLevel());
             }
@@ -207,7 +207,7 @@ public class AuditEvent
                 event.setLevel(level);
             }
 
-            if(child.getStatus() != null)
+            if (child.getStatus() != null)
             {
                 event.setStatus(child.getStatus());
             }
@@ -216,12 +216,12 @@ public class AuditEvent
                 event.setStatus(status);
             }
 
-            for(AuditEventData eventData : eventDatas)
+            for (AuditEventData eventData : eventDatas)
             {
                 event.addEventData(eventData);
             }
 
-            for(AuditEventData eventData : child.getEventDatas())
+            for (AuditEventData eventData : child.getEventDatas())
             {
                 event.addEventData(eventData);
             }

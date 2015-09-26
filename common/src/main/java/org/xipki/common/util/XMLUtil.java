@@ -85,10 +85,14 @@ public class XMLUtil
                     + e.getMessage());
             System.err.println("could not initialize the XMLDocumentBuilder" + e.getMessage());
         }
-        if(builder != null)
+        if (builder != null)
         {
             document = builder.newDocument();
         }
+    }
+
+    private XMLUtil()
+    {
     }
 
     public static Element createElement(
@@ -96,7 +100,7 @@ public class XMLUtil
             final String localPart,
             final String value)
     {
-        if(document == null)
+        if (document == null)
         {
             throw new RuntimeException("XMLDocumentBuilder could not be initialized");
         }
@@ -135,7 +139,7 @@ public class XMLUtil
             final Calendar calendar)
     {
         GregorianCalendar c;
-        if(calendar instanceof GregorianCalendar)
+        if (calendar instanceof GregorianCalendar)
         {
             c = (GregorianCalendar) calendar;
         }
@@ -189,18 +193,18 @@ public class XMLUtil
     public static String getNodeValue(
             final Node node)
     {
-        if(node.getNodeType() == Node.ELEMENT_NODE)
+        if (node.getNodeType() == Node.ELEMENT_NODE)
         {
             Node n = node.getFirstChild();
-            if(n != null)
+            if (n != null)
             {
                 do
                 {
-                    if(n.getNodeType() == Node.TEXT_NODE)
+                    if (n.getNodeType() == Node.TEXT_NODE)
                     {
                         return n.getNodeValue();
                     }
-                }while((n = n.getNextSibling()) != null);
+                }while ((n = n.getNextSibling()) != null);
             }
         }
 
@@ -213,18 +217,18 @@ public class XMLUtil
             final String localname)
     {
         Node node = element.getFirstChild();
-        if(node == null)
+        if (node == null)
         {
             return null;
         }
 
         do
         {
-            if(match(node, namespace, localname))
+            if (match(node, namespace, localname))
             {
                 return (Element) node;
             }
-        } while((node = node.getNextSibling()) != null);
+        } while ((node = node.getNextSibling()) != null);
         return null;
     }
 
@@ -248,7 +252,7 @@ public class XMLUtil
         for (int i = 0; i < children.getLength(); i++)
         {
             Node child = children.item(i);
-            if(match(child, namespace, localname))
+            if (match(child, namespace, localname))
             {
                 rv.add((Element) child);
             }
@@ -262,7 +266,7 @@ public class XMLUtil
             final String namespace)
     {
         List<Element> list = new LinkedList<Element>();
-        if(elementHasId(element, namespace))
+        if (elementHasId(element, namespace))
         {
             list.add(element);
         }
@@ -271,7 +275,7 @@ public class XMLUtil
         for (int i = 0; i < children.getLength(); i++)
         {
             Node child = children.item(i);
-            if(child instanceof Element == false)
+            if (child instanceof Element == false)
             {
                 continue;
             }
@@ -287,7 +291,7 @@ public class XMLUtil
             final Element element,
             final String namespace)
     {
-        if(elementHasId(element, namespace))
+        if (elementHasId(element, namespace))
         {
             list.add(element);
         }
@@ -296,13 +300,13 @@ public class XMLUtil
         for (int i = 0; i < children.getLength(); i++)
         {
             Node child = children.item(i);
-            if(child instanceof Element == false)
+            if (child instanceof Element == false)
             {
                 continue;
             }
 
             Element childElement = (Element) child;
-            if(elementHasId(childElement, namespace))
+            if (elementHasId(childElement, namespace))
             {
                 list.add(childElement);
             }
@@ -323,17 +327,17 @@ public class XMLUtil
             final String namespace,
             final String localname)
     {
-        if(node instanceof Element)
+        if (node instanceof Element)
         {
             Element element = (Element) node;
             String ln = element.getLocalName();
-            if(ln == null)
+            if (ln == null)
             {
                 ln = element.getTagName();
             }
-            if(ln.equals(localname))
+            if (ln.equals(localname))
             {
-                if(namespace == null || namespace.equals(element.getNamespaceURI()))
+                if (namespace == null || namespace.equals(element.getNamespaceURI()))
                 {
                     return true;
                 }
@@ -382,10 +386,10 @@ public class XMLUtil
         try
         {
             SimpleXPath sXPath = new SimpleXPath(relativeXPath, nsPrefixURIMap);
-            if(onlyFirstMatch)
+            if (onlyFirstMatch)
             {
                 Node node = sXPath.selectFirstMatch(contextNode);
-                if(node == null)
+                if (node == null)
                 {
                     return Collections.emptyList();
                 }
@@ -414,7 +418,7 @@ public class XMLUtil
         List<Element> elements = new ArrayList<Element>(nodes.size());
         for (Node node : nodes)
         {
-            if(node instanceof Element)
+            if (node instanceof Element)
             {
                 elements.add((Element) node);
             }
@@ -426,7 +430,7 @@ public class XMLUtil
             final JAXBException e)
     {
         String ret = e.getMessage();
-        if(ret == null && e.getLinkedException() != null)
+        if (ret == null && e.getLinkedException() != null)
         {
             ret = e.getLinkedException().getMessage();
         }

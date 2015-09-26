@@ -91,12 +91,12 @@ public class P11ContentSignerBuilder
 
         X509Certificate signerCertInP11 = cryptService.getCertificate(slot, keyId);
         boolean keyExists = (signerCertInP11 != null);
-        if(keyExists == false)
+        if (keyExists == false)
         {
             keyExists = (cryptService.getPublicKey(slot, keyId) != null);
         }
 
-        if(keyExists == false)
+        if (keyExists == false)
         {
             throw new SignerException("key with " + keyId + " does not exist");
         }
@@ -112,12 +112,12 @@ public class P11ContentSignerBuilder
                 ? 0
                 : certificateChain.length;
 
-        if(n > 0)
+        if (n > 0)
         {
             cert = certificateChain[0];
-            if(n > 1)
+            if (n > 1)
             {
-                for(int i = 1; i < n; i++)
+                for (int i = 1; i < n; i++)
                 {
                     caCerts.add(certificateChain[i]);
                 }
@@ -129,9 +129,9 @@ public class P11ContentSignerBuilder
         }
 
         Certificate[] certsInKeystore = cryptService.getCertificates(slot, keyId);
-        if(certsInKeystore.length > 1)
+        if (certsInKeystore.length > 1)
         {
-            for(int i = 1; i < certsInKeystore.length; i++)
+            for (int i = 1; i < certsInKeystore.length; i++)
             {
                 caCerts.add(certsInKeystore[i]);
             }
@@ -145,7 +145,7 @@ public class P11ContentSignerBuilder
             final int parallelism)
     throws OperatorCreationException, NoSuchPaddingException
     {
-        if(parallelism < 1)
+        if (parallelism < 1)
         {
             throw new IllegalArgumentException("non-positive parallelism is not allowed: "
                     + parallelism);
@@ -153,27 +153,27 @@ public class P11ContentSignerBuilder
 
         PublicKey publicKey = certificateChain[0].getPublicKey();
 
-        if(publicKey instanceof RSAPublicKey)
+        if (publicKey instanceof RSAPublicKey)
         {
-            if(AlgorithmUtil.isRSASignatureAlgoId(signatureAlgId) == false)
+            if (AlgorithmUtil.isRSASignatureAlgoId(signatureAlgId) == false)
             {
                 throw new OperatorCreationException(
                         "the given algorithm is not a valid RSA signature algorithm '"
                         + signatureAlgId.getAlgorithm().getId() + "'");
             }
         }
-        else if(publicKey instanceof ECPublicKey)
+        else if (publicKey instanceof ECPublicKey)
         {
-            if(AlgorithmUtil.isECSigAlg(signatureAlgId) == false)
+            if (AlgorithmUtil.isECSigAlg(signatureAlgId) == false)
             {
                 throw new OperatorCreationException(
                         "the given algorithm is not a valid EC signature algirthm '"
                         + signatureAlgId.getAlgorithm().getId() + "'");
             }
         }
-        else if(publicKey instanceof DSAPublicKey)
+        else if (publicKey instanceof DSAPublicKey)
         {
-            if(AlgorithmUtil.isDSASigAlg(signatureAlgId) == false)
+            if (AlgorithmUtil.isDSASigAlg(signatureAlgId) == false)
             {
                 throw new OperatorCreationException(
                         "the given algorithm is not a valid DSA signature algirthm '"
@@ -190,12 +190,12 @@ public class P11ContentSignerBuilder
 
         try
         {
-            for(int i = 0; i < parallelism; i++)
+            for (int i = 0; i < parallelism; i++)
             {
                 ContentSigner signer;
-                if(publicKey instanceof RSAPublicKey)
+                if (publicKey instanceof RSAPublicKey)
                 {
-                    if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm()))
+                    if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm()))
                     {
                         signer = new P11RSAPSSContentSigner(cryptService, slot, keyId,
                                 signatureAlgId);
@@ -206,9 +206,9 @@ public class P11ContentSignerBuilder
                                 signatureAlgId);
                     }
                 }
-                else if(publicKey instanceof ECPublicKey)
+                else if (publicKey instanceof ECPublicKey)
                 {
-                    if(AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId))
+                    if (AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId))
                     {
                         signer = new P11ECDSAPlainContentSigner(cryptService, slot, keyId,
                                 signatureAlgId);
@@ -219,9 +219,9 @@ public class P11ContentSignerBuilder
                                 signatureAlgId);
                     }
                 }
-                else if(publicKey instanceof DSAPublicKey)
+                else if (publicKey instanceof DSAPublicKey)
                 {
-                    if(AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId))
+                    if (AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId))
                     {
                         signer = new P11DSAPlainContentSigner(cryptService, slot, keyId,
                                 signatureAlgId);

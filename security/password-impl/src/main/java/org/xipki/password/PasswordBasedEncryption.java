@@ -61,12 +61,12 @@ public class PasswordBasedEncryption
     {
         synchronized (initialized)
         {
-            if(initialized.get())
+            if (initialized.get())
             {
                 return;
             }
 
-            if(Security.getProperty("BC") == null)
+            if (Security.getProperty("BC") == null)
             {
                 Security.addProvider(new BouncyCastleProvider());
             }

@@ -83,7 +83,7 @@ public abstract class P11KeyGenCmd extends KeyGenCmd
 
     protected String getSubject()
     {
-        if(isBlank(subject))
+        if (isBlank(subject))
         {
             return "CN=" + label;
         }
@@ -113,7 +113,7 @@ public abstract class P11KeyGenCmd extends KeyGenCmd
         out("generate PKCS#11 key");
         out("\tkey id: " + Hex.toHexString(keyAndCert.getId()));
         out("\tkey label: " + keyAndCert.getLabel());
-        if(outputFilename != null)
+        if (outputFilename != null)
         {
             File certFile = new File(outputFilename);
             saveVerbose("\tsaved self-signed certificate to file", certFile,

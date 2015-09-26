@@ -69,18 +69,18 @@ public class AuthorityCertStore
         X509Certificate encryptionCert = null;
         X509Certificate signatureCert = null;
 
-        if(rACerts == null || rACerts.length == 0)
+        if (rACerts == null || rACerts.length == 0)
         {
             signatureCert = cACert;
             encryptionCert = cACert;
         } else
         {
-            for(X509Certificate cert : rACerts)
+            for (X509Certificate cert : rACerts)
             {
                 boolean[] keyusage = cert.getKeyUsage();
-                if(hasKeyusage(keyusage, KeyUsage.keyEncipherment))
+                if (hasKeyusage(keyusage, KeyUsage.keyEncipherment))
                 {
-                    if(encryptionCert != null)
+                    if (encryptionCert != null)
                     {
                         throw new IllegalArgumentException(
                                 "Could not determine RA certificate for encryption");
@@ -88,10 +88,10 @@ public class AuthorityCertStore
                     encryptionCert = cert;
                 }
 
-                if(hasKeyusage(keyusage, KeyUsage.digitalSignature)
+                if (hasKeyusage(keyusage, KeyUsage.digitalSignature)
                         || hasKeyusage(keyusage, KeyUsage.contentCommitment))
                 {
-                    if(signatureCert != null)
+                    if (signatureCert != null)
                     {
                         throw new IllegalArgumentException(
                                 "Could not determine RA certificate for signature");
@@ -100,13 +100,13 @@ public class AuthorityCertStore
                 }
             }
 
-            if(encryptionCert == null)
+            if (encryptionCert == null)
             {
                 throw new IllegalArgumentException(
                         "Could not determine RA certificate for encryption");
             }
 
-            if(signatureCert == null)
+            if (signatureCert == null)
             {
                 throw new IllegalArgumentException(
                         "Could not determine RA certificate for signature");
@@ -135,7 +135,7 @@ public class AuthorityCertStore
             final boolean[] keyusage,
             final KeyUsage usage)
     {
-        if(keyusage != null && keyusage.length > usage.getBit())
+        if (keyusage != null && keyusage.length > usage.getBit())
         {
             return keyusage[usage.getBit()];
         }

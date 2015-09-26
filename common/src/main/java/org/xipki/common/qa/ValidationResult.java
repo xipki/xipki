@@ -65,9 +65,9 @@ public class ValidationResult
 
         List<ValidationIssue> failedIssues = new LinkedList<>();
         List<ValidationIssue> successfulIssues = new LinkedList<>();
-        for(ValidationIssue issue : validationIssues)
+        for (ValidationIssue issue : validationIssues)
         {
-            if(issue.isFailed())
+            if (issue.isFailed())
             {
                 failedIssues.add(issue);
             } else

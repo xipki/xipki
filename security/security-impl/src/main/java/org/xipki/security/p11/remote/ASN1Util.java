@@ -62,7 +62,7 @@ public class ASN1Util
             final String desc)
     throws BadASN1ObjectException
     {
-        if(obj instanceof ASN1OctetString == false)
+        if (obj instanceof ASN1OctetString == false)
         {
             throw new BadASN1ObjectException(desc + " is not an octet string");
         }
@@ -75,7 +75,7 @@ public class ASN1Util
             final String desc)
     throws BadASN1ObjectException
     {
-        if(obj instanceof ASN1Boolean == false)
+        if (obj instanceof ASN1Boolean == false)
         {
             throw new BadASN1ObjectException(desc + " is not a boolean");
         }
@@ -87,13 +87,13 @@ public class ASN1Util
             final String desc)
     throws BadASN1ObjectException
     {
-        if(obj instanceof ASN1Integer == false)
+        if (obj instanceof ASN1Integer == false)
         {
             throw new BadASN1ObjectException(desc + " is not an integer");
         }
 
         BigInteger bi = ((ASN1Integer) obj).getValue();
-        if(bi.compareTo(MAX_BYTE) > 0 || bi.compareTo(MIN_BYTE) < 0)
+        if (bi.compareTo(MAX_BYTE) > 0 || bi.compareTo(MIN_BYTE) < 0)
         {
             throw new BadASN1ObjectException(desc + " is not in the range of byte");
         }
@@ -105,13 +105,13 @@ public class ASN1Util
             final String desc)
     throws BadASN1ObjectException
     {
-        if(obj instanceof ASN1Integer == false)
+        if (obj instanceof ASN1Integer == false)
         {
             throw new BadASN1ObjectException(desc + " is not an integer");
         }
 
         BigInteger bi = ((ASN1Integer) obj).getValue();
-        if(bi.compareTo(MAX_INT) > 0 || bi.compareTo(MIN_INT) < 0)
+        if (bi.compareTo(MAX_INT) > 0 || bi.compareTo(MIN_INT) < 0)
         {
             throw new BadASN1ObjectException(desc + " is not in the range of integer");
         }
@@ -123,7 +123,7 @@ public class ASN1Util
             final String desc)
     throws BadASN1ObjectException
     {
-        if(obj instanceof ASN1String == false)
+        if (obj instanceof ASN1String == false)
         {
             throw new BadASN1ObjectException(desc + " is not a string");
         }
@@ -142,7 +142,7 @@ public class ASN1Util
         {
             StringBuilder sb = new StringBuilder(100);
             sb.append("wrong number of elements in sequence");
-            if(desc != null && desc.isEmpty() == false)
+            if (desc != null && desc.isEmpty() == false)
             {
                 sb.append("'").append(desc).append("'");
             }

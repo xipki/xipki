@@ -141,7 +141,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
 
     public SecurityFactoryImpl()
     {
-        if(Security.getProvider("BC") == null)
+        if (Security.getProvider("BC") == null)
         {
             Security.addProvider(new BouncyCastleProvider());
         }
@@ -183,7 +183,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
     throws SignerException
     {
         X509Certificate cert = signer.getCertificate();
-        if(certificateChain == null)
+        if (certificateChain == null)
         {
             return;
         }
@@ -219,7 +219,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             verifier.initVerify(cert.getPublicKey());
             verifier.update(dummyContent);
             boolean valid = verifier.verify(signatureValue);
-            if(valid == false)
+            if (valid == false)
             {
                 String subject = X509Util.getRFC4519Name(cert.getSubjectX500Principal());
 
@@ -229,7 +229,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
 
                 ConfPairs keyValues = new ConfPairs(signerConf);
                 String pwd = keyValues.getValue("password");
-                if(pwd != null)
+                if (pwd != null)
                 {
                     keyValues.putPair("password", "****");
                 }
@@ -246,7 +246,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         }
         finally
         {
-            if(csigner != null)
+            if (csigner != null)
             {
                 signer.returnContentSigner(csigner);
             }
@@ -265,12 +265,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             final X509Certificate[] certificateChain)
     throws SignerException
     {
-        if(signerTypeMapping.containsKey(type))
+        if (signerTypeMapping.containsKey(type))
         {
             type = signerTypeMapping.get(type);
         }
 
-        if("PKCS11".equalsIgnoreCase(type)
+        if ("PKCS11".equalsIgnoreCase(type)
                 || "PKCS12".equalsIgnoreCase(type)
                 || "JKS".equalsIgnoreCase(type))
         {
@@ -278,26 +278,26 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
 
             String s = keyValues.getValue("parallelism");
             int parallelism = defaultParallelism;
-            if(s != null)
+            if (s != null)
             {
                 try
                 {
                     parallelism = Integer.parseInt(s);
-                }catch(NumberFormatException e)
+                } catch (NumberFormatException e)
                 {
                     throw new SignerException("invalid parallelism " + s);
                 }
 
-                if(parallelism < 1)
+                if (parallelism < 1)
                 {
                     throw new SignerException("invalid parallelism " + s);
                 }
             }
 
-            if("PKCS11".equalsIgnoreCase(type))
+            if ("PKCS11".equalsIgnoreCase(type))
             {
                 String pkcs11Module = keyValues.getValue("module");
-                if(pkcs11Module == null)
+                if (pkcs11Module == null)
                 {
                     pkcs11Module = DEFAULT_P11MODULE_NAME;
                 }
@@ -312,7 +312,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                         ? null
                         : Long.parseLong(s);
 
-                if((slotIndex == null && slotId == null)
+                if ((slotIndex == null && slotId == null)
                         || (slotIndex != null && slotId != null))
                 {
                     throw new SignerException(
@@ -323,12 +323,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 String keyLabel = keyValues.getValue("key-label");
                 s = keyValues.getValue("key-id");
                 byte[] keyId = null;
-                if(s != null)
+                if (s != null)
                 {
                     keyId = Hex.decode(s);
                 }
 
-                if((keyId == null && keyLabel == null)
+                if ((keyId == null && keyLabel == null)
                         || (keyId != null && keyLabel != null))
                 {
                     throw new SignerException(
@@ -336,7 +336,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 }
 
                 P11KeyIdentifier keyIdentifier;
-                if(keyId != null)
+                if (keyId != null)
                 {
                     keyIdentifier = new P11KeyIdentifier(keyId);
                 }
@@ -352,7 +352,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 try
                 {
                     AlgorithmIdentifier signatureAlgId;
-                    if(hashAlgo == null)
+                    if (hashAlgo == null)
                     {
                         signatureAlgId = getSignatureAlgoId(conf);
                     }
@@ -382,13 +382,13 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             {
                 String passwordHint = keyValues.getValue("password");
                 char[] password;
-                if(passwordHint == null)
+                if (passwordHint == null)
                 {
                     password = null;
                 }
                 else
                 {
-                    if(passwordResolver == null)
+                    if (passwordResolver == null)
                     {
                         password = passwordHint.toCharArray();
                     }
@@ -397,7 +397,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                         try
                         {
                             password = passwordResolver.resolvePassword(passwordHint);
-                        }catch(PasswordResolverException e)
+                        } catch (PasswordResolverException e)
                         {
                             throw new SignerException(
                                     "could not resolve password. Message: " + e.getMessage());
@@ -409,12 +409,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 String keyLabel = keyValues.getValue("key-label");
 
                 InputStream keystoreStream;
-                if(StringUtil.startsWithIgnoreCase(s, "base64:"))
+                if (StringUtil.startsWithIgnoreCase(s, "base64:"))
                 {
                     keystoreStream = new ByteArrayInputStream(
                             Base64.decode(s.substring("base64:".length())));
                 }
-                else if(StringUtil.startsWithIgnoreCase(s, "file:"))
+                else if (StringUtil.startsWithIgnoreCase(s, "file:"))
                 {
                     String fn = s.substring("file:".length());
                     try
@@ -436,7 +436,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 try
                 {
                     AlgorithmIdentifier signatureAlgId;
-                    if(hashAlgo == null)
+                    if (hashAlgo == null)
                     {
                         signatureAlgId = getSignatureAlgoId(conf);
                     }
@@ -456,9 +456,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 }
             }
         }
-        else if(StringUtil.startsWithIgnoreCase(type, "java:"))
+        else if (StringUtil.startsWithIgnoreCase(type, "java:"))
         {
-            if(hashAlgo == null)
+            if (hashAlgo == null)
             {
                 ConcurrentContentSigner contentSigner;
                 String classname = type.substring("java:".length());
@@ -466,13 +466,13 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 {
                     Class<?> clazz = Class.forName(classname);
                     contentSigner = (ConcurrentContentSigner) clazz.newInstance();
-                }catch(Exception e)
+                } catch (Exception e)
                 {
                     throw new SignerException(e.getMessage(), e);
                 }
                 contentSigner.initialize(conf, passwordResolver);
 
-                if(certificateChain != null)
+                if (certificateChain != null)
                 {
                     contentSigner.setCertificateChain(certificateChain);
                 }
@@ -496,7 +496,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
     {
         ConfPairs keyValues = new ConfPairs(signerConf);
         String algoS = keyValues.getValue("algo");
-        if(algoS == null)
+        if (algoS == null)
         {
             throw new SignerException("algo is not specified");
         }
@@ -559,7 +559,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
     public void setDefaultParallelism(
             final int defaultParallelism)
     {
-        if(defaultParallelism > 0)
+        if (defaultParallelism > 0)
         {
             this.defaultParallelism = defaultParallelism;
         }
@@ -600,7 +600,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         ConfPairs conf = new ConfPairs("password", password);
         conf.putPair("algo", signatureAlgorithm);
         conf.putPair("parallelism", Integer.toString(parallelism));
-        if(keyLabel != null)
+        if (keyLabel != null)
         {
             conf.putPair("key-label", keyLabel);
         }
@@ -624,7 +624,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         ConfPairs conf = new ConfPairs("password", password);
         conf.putPair("algo", signatureAlgorithm);
         conf.putPair("parallelism", Integer.toString(parallelism));
-        if(keyLabel != null)
+        if (keyLabel != null)
         {
             conf.putPair("key-label", keyLabel);
         }
@@ -663,7 +663,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
 
         ConfPairs conf = new ConfPairs("password", password);
         conf.putPair("parallelism", Integer.toString(parallelism));
-        if(keyLabel != null)
+        if (keyLabel != null)
         {
             conf.putPair("key-label", keyLabel);
         }
@@ -684,7 +684,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
 
         ConfPairs conf = new ConfPairs("password", password);
         conf.putPair("parallelism", Integer.toString(parallelism));
-        if(keyLabel != null)
+        if (keyLabel != null)
         {
             conf.putPair("key-label", keyLabel);
         }
@@ -708,12 +708,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         ConfPairs conf = new ConfPairs("algo", signatureAlgorithm);
         conf.putPair("parallelism", Integer.toString(parallelism));
 
-        if(pkcs11ModuleName != null && pkcs11ModuleName.length() > 0)
+        if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0)
         {
             conf.putPair("module", pkcs11ModuleName);
         }
 
-        if(slotId.getSlotId() != null)
+        if (slotId.getSlotId() != null)
         {
             conf.putPair("slot-id", slotId.getSlotId().toString());
         }
@@ -722,12 +722,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             conf.putPair("slot", slotId.getSlotIndex().toString());
         }
 
-        if(keyId.getKeyId() != null)
+        if (keyId.getKeyId() != null)
         {
             conf.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
         }
 
-        if(keyId.getKeyLabel() != null)
+        if (keyId.getKeyLabel() != null)
         {
             conf.putPair("key-label", keyId.getKeyLabel());
         }
@@ -746,12 +746,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         ConfPairs conf = new ConfPairs();
         conf.putPair("parallelism", Integer.toString(parallelism));
 
-        if(pkcs11ModuleName != null && pkcs11ModuleName.length() > 0)
+        if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0)
         {
             conf.putPair("module", pkcs11ModuleName);
         }
 
-        if(slotId.getSlotId() != null)
+        if (slotId.getSlotId() != null)
         {
             conf.putPair("slot-id", slotId.getSlotId().toString());
         }
@@ -760,12 +760,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             conf.putPair("slot", slotId.getSlotIndex().toString());
         }
 
-        if(keyId.getKeyId() != null)
+        if (keyId.getKeyId() != null)
         {
             conf.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
         }
 
-        if(keyId.getKeyLabel() != null)
+        if (keyId.getKeyLabel() != null)
         {
             conf.putPair("key-label", keyId.getKeyLabel());
         }
@@ -794,12 +794,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
     private synchronized void initP11CryptServiceFactory()
     throws SignerException
     {
-        if(p11CryptServiceFactory != null)
+        if (p11CryptServiceFactory != null)
         {
             return;
         }
 
-        if(p11CryptServiciceFactoryInitialized)
+        if (p11CryptServiciceFactoryInitialized)
         {
             throw new SignerException("initialization of P11CryptServiceFactory has been"
                     + " processed and failed, no retry");
@@ -811,15 +811,15 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
 
             Object p11Provider;
 
-            if(IaikP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
+            if (IaikP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
             {
                 p11Provider = new IaikP11CryptServiceFactory();
             }
-            else if(KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
+            else if (KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
             {
                 p11Provider = new KeystoreP11CryptServiceFactory();
             }
-            else if(RemoteP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
+            else if (RemoteP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
             {
                 p11Provider = new RemoteP11CryptServiceFactory();
             }
@@ -829,13 +829,13 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 {
                     Class<?> clazz = Class.forName(pkcs11Provider);
                     p11Provider = clazz.newInstance();
-                }catch(Exception e)
+                } catch (Exception e)
                 {
                     throw new SignerException(e.getMessage(), e);
                 }
             }
 
-            if(p11Provider instanceof P11CryptServiceFactory)
+            if (p11Provider instanceof P11CryptServiceFactory)
             {
                 P11CryptServiceFactory p11CryptServiceFact =
                         (P11CryptServiceFactory) p11Provider;
@@ -855,12 +855,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
 
     private void initPkcs11ModuleConf()
     {
-        if(p11Control != null)
+        if (p11Control != null)
         {
             return;
         }
 
-        if(StringUtil.isBlank(pkcs11ConfFile))
+        if (StringUtil.isBlank(pkcs11ConfFile))
         {
             throw new IllegalStateException("pkcs11ConfFile is not set");
         }
@@ -881,16 +881,16 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             ModulesType modulesType = pkcs11Conf.getModules();
 
             Map<String, P11ModuleConf> confs = new HashMap<>();
-            for(ModuleType moduleType : modulesType.getModule())
+            for (ModuleType moduleType : modulesType.getModule())
             {
                 String name = moduleType.getName();
-                if(DEFAULT_P11MODULE_NAME.equals(name))
+                if (DEFAULT_P11MODULE_NAME.equals(name))
                 {
                     throw new InvalidConfException("invald module name "
                             + DEFAULT_P11MODULE_NAME + ", it is reserved");
                 }
 
-                if(confs.containsKey(name))
+                if (confs.containsKey(name))
                 {
                     throw new InvalidConfException(
                             "multiple modules with the same module name is not permitted");
@@ -899,7 +899,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 P11PasswordRetriever pwdRetriever;
 
                 PasswordsType passwordsType = moduleType.getPasswords();
-                if(passwordsType == null || CollectionUtil.isEmpty(passwordsType.getPassword()))
+                if (passwordsType == null || CollectionUtil.isEmpty(passwordsType.getPassword()))
                 {
                     pwdRetriever = P11NullPasswordRetriever.INSTANCE;
                 }
@@ -909,7 +909,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                     ((P11PasswordRetrieverImpl) pwdRetriever).setPasswordResolver(
                             passwordResolver);
 
-                    for(PasswordType passwordType : passwordsType.getPassword())
+                    for (PasswordType passwordType : passwordsType.getPassword())
                     {
                         Set<P11SlotIdentifier> slots = getSlots(passwordType.getSlots());
                         ((P11PasswordRetrieverImpl) pwdRetriever).addPasswordEntry(
@@ -922,19 +922,19 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
 
                 final String osName = System.getProperty("os.name").toLowerCase();
                 String nativeLibraryPath = null;
-                for(NativeLibraryType library
+                for (NativeLibraryType library
                         : moduleType.getNativeLibraries().getNativeLibrary())
                 {
                     List<String> osNames = library.getOs();
-                    if(CollectionUtil.isEmpty(osNames))
+                    if (CollectionUtil.isEmpty(osNames))
                     {
                         nativeLibraryPath = library.getPath();
                     }
                     else
                     {
-                        for(String entry : osNames)
+                        for (String entry : osNames)
                         {
-                            if(osName.contains(entry.toLowerCase()))
+                            if (osName.contains(entry.toLowerCase()))
                             {
                                 nativeLibraryPath = library.getPath();
                                 break;
@@ -942,13 +942,13 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                         }
                     }
 
-                    if(nativeLibraryPath != null)
+                    if (nativeLibraryPath != null)
                     {
                         break;
                     }
                 }
 
-                if(nativeLibraryPath == null)
+                if (nativeLibraryPath == null)
                 {
                     throw new InvalidConfException("could not find PKCS#11 library for OS "
                             + osName);
@@ -960,7 +960,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             }
 
             final String defaultModuleName = modulesType.getDefaultModule();
-            if(confs.containsKey(defaultModuleName) == false)
+            if (confs.containsKey(defaultModuleName) == false)
             {
                 throw new InvalidConfException("default module " + defaultModuleName
                         + " is not defined");
@@ -970,10 +970,10 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         } catch (JAXBException | SAXException | InvalidConfException e)
         {
             final String message = "invalid configuration file " + pkcs11ConfFile;
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 final String exceptionMessage;
-                if(e instanceof JAXBException)
+                if (e instanceof JAXBException)
                 {
                     exceptionMessage = getMessage((JAXBException) e);
                 } else
@@ -992,7 +992,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
     public void setPkcs11ConfFile(
             final String confFile)
     {
-        if(StringUtil.isBlank(confFile))
+        if (StringUtil.isBlank(confFile))
         {
             this.pkcs11ConfFile = null;
         }
@@ -1006,21 +1006,21 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             final SlotsType type)
     throws InvalidConfException
     {
-        if(type == null || CollectionUtil.isEmpty(type.getSlot()))
+        if (type == null || CollectionUtil.isEmpty(type.getSlot()))
         {
             return null;
         }
 
         Set<P11SlotIdentifier> slots = new HashSet<>();
-        for(SlotType slotType : type.getSlot())
+        for (SlotType slotType : type.getSlot())
         {
             Long slotId = null;
-            if(slotType.getId() != null)
+            if (slotType.getId() != null)
             {
                 String str = slotType.getId().trim();
                 try
                 {
-                    if(StringUtil.startsWithIgnoreCase(str, "0X"))
+                    if (StringUtil.startsWithIgnoreCase(str, "0X"))
                     {
                         slotId = Long.parseLong(str.substring(2), 16);
                     }
@@ -1028,7 +1028,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                     {
                         slotId = Long.parseLong(str);
                     }
-                }catch(NumberFormatException e)
+                } catch (NumberFormatException e)
                 {
                     String message = "invalid slotId '" + str + "'";
                     LOG.error(message);
@@ -1044,7 +1044,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
     private String getRealPkcs11ModuleName(
             final String moduleName)
     {
-        if(moduleName == null || DEFAULT_P11MODULE_NAME.equals(moduleName))
+        if (moduleName == null || DEFAULT_P11MODULE_NAME.equals(moduleName))
         {
             return getDefaultPkcs11ModuleName();
         }
@@ -1097,32 +1097,32 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
     public void setSignerTypeMap(
             String signerTypeMap)
     {
-        if(signerTypeMap == null)
+        if (signerTypeMap == null)
         {
             LOG.debug("signerTypeMap is null");
             return;
         }
 
         signerTypeMap = signerTypeMap.trim();
-        if(StringUtil.isBlank(signerTypeMap))
+        if (StringUtil.isBlank(signerTypeMap))
         {
             LOG.debug("signerTypeMap is empty");
             return;
         }
 
         StringTokenizer st = new StringTokenizer(signerTypeMap, " \t");
-        while(st.hasMoreTokens())
+        while (st.hasMoreTokens())
         {
             String token = st.nextToken();
             StringTokenizer st2 = new StringTokenizer(token, "=");
-            if(st2.countTokens() != 2)
+            if (st2.countTokens() != 2)
             {
                 LOG.warn("invalid signerTypeMap entry '" + token + "'");
                 continue;
             }
 
             String alias = st2.nextToken();
-            if(signerTypeMapping.containsKey(alias))
+            if (signerTypeMapping.containsKey(alias))
             {
                 LOG.warn("signerType alias '{}' already defined, ignore map '{}'",
                         alias, token);
@@ -1141,7 +1141,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             final X509Certificate cert)
     throws SignerException
     {
-        if("PKCS11".equalsIgnoreCase(type) == false && "PKCS12".equalsIgnoreCase(type) == false)
+        if ("PKCS11".equalsIgnoreCase(type) == false && "PKCS12".equalsIgnoreCase(type) == false)
         {
             throw new SignerException("unsupported SCEP responder type '" + type + "'");
         }
@@ -1150,13 +1150,13 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
 
         String passwordHint = keyValues.getValue("password");
         char[] password;
-        if(passwordHint == null)
+        if (passwordHint == null)
         {
             password = null;
         }
         else
         {
-            if(passwordResolver == null)
+            if (passwordResolver == null)
             {
                 password = passwordHint.toCharArray();
             }
@@ -1165,7 +1165,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 try
                 {
                     password = passwordResolver.resolvePassword(passwordHint);
-                }catch(PasswordResolverException e)
+                } catch (PasswordResolverException e)
                 {
                     throw new SignerException("could not resolve password. Message: "
                             + e.getMessage());
@@ -1177,12 +1177,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         String keyLabel = keyValues.getValue("key-label");
 
         InputStream keystoreStream;
-        if(StringUtil.startsWithIgnoreCase(s, "base64:"))
+        if (StringUtil.startsWithIgnoreCase(s, "base64:"))
         {
             keystoreStream = new ByteArrayInputStream(
                     Base64.decode(s.substring("base64:".length())));
         }
-        else if(StringUtil.startsWithIgnoreCase(s, "file:"))
+        else if (StringUtil.startsWithIgnoreCase(s, "file:"))
         {
             String fn = s.substring("file:".length());
             try
@@ -1215,7 +1215,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             final JAXBException e)
     {
         String ret = e.getMessage();
-        if(ret == null && e.getLinkedException() != null)
+        if (ret == null && e.getLinkedException() != null)
         {
             ret = e.getLinkedException().getMessage();
         }

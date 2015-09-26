@@ -94,9 +94,9 @@ public enum MessageType
     public static MessageType valueForCode(
             final int code)
     {
-        for(MessageType m : values())
+        for (MessageType m : values())
         {
-            if(m.code == code)
+            if (m.code == code)
             {
                 return m;
             }

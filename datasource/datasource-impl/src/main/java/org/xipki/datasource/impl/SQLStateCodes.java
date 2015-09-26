@@ -205,13 +205,13 @@ public class SQLStateCodes
     private static Set<String> toSet(
             final String... strs)
     {
-        if(strs == null || strs.length == 0)
+        if (strs == null || strs.length == 0)
         {
             return Collections.emptySet();
         }
 
         Set<String> set = new HashSet<String>();
-        for(String str : strs)
+        for (String str : strs)
         {
             set.add(str);
         }
@@ -222,13 +222,13 @@ public class SQLStateCodes
             final Set<String> baseSet,
             final String... strs)
     {
-        if(strs == null || strs.length == 0)
+        if (strs == null || strs.length == 0)
         {
             return baseSet;
         }
         Set<String> newSet = new HashSet<String>(baseSet.size() + strs.length);
         newSet.addAll(baseSet);
-        for(String str : strs)
+        for (String str : strs)
         {
             newSet.add(str);
         }

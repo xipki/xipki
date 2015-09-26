@@ -70,7 +70,7 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
 
         ConfPairs conf = new ConfPairs(moduleConf.getNativeLibrary());
         serverUrl = conf.getValue("url");
-        if(StringUtil.isBlank(serverUrl))
+        if (StringUtil.isBlank(serverUrl))
         {
             throw new IllegalArgumentException("url is not specified");
         }
@@ -106,10 +106,10 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
         try
         {
             inputstream = httpUrlConnection.getInputStream();
-        }catch(IOException e)
+        } catch (IOException e)
         {
             InputStream errStream = httpUrlConnection.getErrorStream();
-            if(errStream != null)
+            if (errStream != null)
             {
                 errStream.close();
             }

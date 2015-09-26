@@ -138,7 +138,7 @@ public class ScepServlet extends HttpServlet
         AuditEvent auditEvent = (auditService != null)
                 ? new AuditEvent(new Date())
                 : null;
-        if(auditEvent != null)
+        if (auditEvent != null)
         {
             auditEvent.setApplicationName("SCEP");
             auditEvent.setName("PERF");
@@ -154,7 +154,7 @@ public class ScepServlet extends HttpServlet
         try
         {
             CACaps cACaps = responder.getCACaps();
-            if(post && cACaps.containsCapability(CACapability.POSTPKIOperation) == false)
+            if (post && cACaps.containsCapability(CACapability.POSTPKIOperation) == false)
             {
                 final String message = "HTTP POST is not supported";
                 LOG.error(message);
@@ -170,14 +170,14 @@ public class ScepServlet extends HttpServlet
             String operation = request.getParameter("operation");
             auditEvent.addEventData(new AuditEventData("operation", operation));
 
-            if("PKIOperation".equalsIgnoreCase(operation))
+            if ("PKIOperation".equalsIgnoreCase(operation))
             {
                 CMSSignedData reqMessage;
                 // parse the request
                 try
                 {
                     byte[] content;
-                    if(post)
+                    if (post)
                     {
                         content = ScepUtil.read(request.getInputStream());
                     } else
@@ -187,10 +187,10 @@ public class ScepServlet extends HttpServlet
                     }
 
                     reqMessage = new CMSSignedData(content);
-                }catch(Exception e)
+                } catch (Exception e)
                 {
                     final String message = "invalid request";
-                    if(LOG.isErrorEnabled())
+                    if (LOG.isErrorEnabled())
                     {
                         LOG.error(ScepUtil.buildExceptionLogFormat(message),
                                 e.getClass().getName(), e.getMessage());
@@ -212,7 +212,7 @@ public class ScepServlet extends HttpServlet
                 } catch (MessageDecodingException e)
                 {
                     final String message = "could not decrypt and/or verify the request";
-                    if(LOG.isErrorEnabled())
+                    if (LOG.isErrorEnabled())
                     {
                         LOG.error(ScepUtil.buildExceptionLogFormat(message),
                                 e.getClass().getName(), e.getMessage());
@@ -228,7 +228,7 @@ public class ScepServlet extends HttpServlet
                 } catch (CAException e)
                 {
                     final String message = "system internal error";
-                    if(LOG.isErrorEnabled())
+                    if (LOG.isErrorEnabled())
                     {
                         LOG.error(ScepUtil.buildExceptionLogFormat(message),
                                 e.getClass().getName(), e.getMessage());
@@ -247,7 +247,7 @@ public class ScepServlet extends HttpServlet
                 response.setContentLength(respBytes.length);
                 respStream.write(respBytes);
             }
-            else if(Operation.GetCACaps.getCode().equalsIgnoreCase(operation))
+            else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation))
             {
                 // CA-Ident is ignored
                 response.setContentType(ScepConstants.CT_text_palin);
@@ -255,12 +255,12 @@ public class ScepServlet extends HttpServlet
                 respStream.write(caCapsBytes);
                 response.setContentLength(caCapsBytes.length);
             }
-            else if(Operation.GetCACert.getCode().equalsIgnoreCase(operation))
+            else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation))
             {
                 // CA-Ident is ignored
                 byte[] respBytes;
                 String ct;
-                if(responder.getRAEmulator() == null)
+                if (responder.getRAEmulator() == null)
                 {
                     ct = ScepConstants.CT_x_x509_ca_cert;
                     respBytes = responder.getCAEmulator().getCACertBytes();
@@ -282,7 +282,7 @@ public class ScepServlet extends HttpServlet
                     } catch (CMSException e)
                     {
                         final String message = "system internal error";
-                        if(LOG.isErrorEnabled())
+                        if (LOG.isErrorEnabled())
                         {
                             LOG.error(ScepUtil.buildExceptionLogFormat(message),
                                     e.getClass().getName(), e.getMessage());
@@ -301,9 +301,9 @@ public class ScepServlet extends HttpServlet
                 response.setContentLength(respBytes.length);
                 respStream.write(respBytes);
             }
-            else if(Operation.GetNextCACert.getCode().equalsIgnoreCase(operation))
+            else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation))
             {
-                if(responder.getNextCAandRA() == null)
+                if (responder.getNextCAandRA() == null)
                 {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.setContentLength(0);
@@ -318,7 +318,7 @@ public class ScepServlet extends HttpServlet
                     NextCAMessage nextCAMsg = new NextCAMessage();
                     nextCAMsg.setCaCert(
                             new X509CertificateObject(responder.getNextCAandRA().getCACert()));
-                    if(responder.getNextCAandRA().getRACert() != null)
+                    if (responder.getNextCAandRA().getRACert() != null)
                     {
                         X509Certificate raCert = new X509CertificateObject(
                                 responder.getNextCAandRA().getRACert());
@@ -330,10 +330,10 @@ public class ScepServlet extends HttpServlet
                     response.setContentType(ScepConstants.CT_x_x509_next_ca_cert);
                     response.setContentLength(respBytes.length);
                     response.getOutputStream().write(respBytes);
-                }catch(Exception e)
+                } catch (Exception e)
                 {
                     final String message = "system internal error";
-                    if(LOG.isErrorEnabled())
+                    if (LOG.isErrorEnabled())
                     {
                         LOG.error(ScepUtil.buildExceptionLogFormat(message),
                                 e.getClass().getName(),
@@ -356,10 +356,10 @@ public class ScepServlet extends HttpServlet
                 auditMessage = "unknown SCEP operation '" + operation + "'";
                 auditStatus = AuditStatus.FAILED;
             }
-        }catch(EOFException e)
+        } catch (EOFException e)
         {
             final String message = "connection reset by peer";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.warn(ScepUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -368,7 +368,7 @@ public class ScepServlet extends HttpServlet
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
             final String message = "Throwable thrown, this should not happen!";
             LOG.error(message, t);
@@ -386,7 +386,7 @@ public class ScepServlet extends HttpServlet
                 response.flushBuffer();
             }finally
             {
-                if(auditEvent != null)
+                if (auditEvent != null)
                 {
                     audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
                 }
@@ -408,7 +408,7 @@ public class ScepServlet extends HttpServlet
             try
             {
                 asn1Stream.close();
-            }catch(Exception e){}
+            } catch (Exception e){}
         }
     }
 
@@ -419,17 +419,17 @@ public class ScepServlet extends HttpServlet
             final AuditStatus auditStatus,
             final String auditMessage)
     {
-        if(auditLevel != null)
+        if (auditLevel != null)
         {
             auditEvent.setLevel(auditLevel);
         }
 
-        if(auditStatus != null)
+        if (auditStatus != null)
         {
             auditEvent.setStatus(auditStatus);
         }
 
-        if(auditMessage != null)
+        if (auditMessage != null)
         {
             auditEvent.addEventData(new AuditEventData("message", auditMessage));
         }

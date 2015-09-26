@@ -66,17 +66,17 @@ public class P12CertExportCmd extends P12SecurityCmd
 
         String keyname = null;
         Enumeration<String> aliases = ks.aliases();
-        while(aliases.hasMoreElements())
+        while (aliases.hasMoreElements())
         {
             String alias = aliases.nextElement();
-            if(ks.isKeyEntry(alias))
+            if (ks.isKeyEntry(alias))
             {
                 keyname = alias;
                 break;
             }
         }
 
-        if(keyname == null)
+        if (keyname == null)
         {
             throw new CmdFailure("could not find private key");
         }

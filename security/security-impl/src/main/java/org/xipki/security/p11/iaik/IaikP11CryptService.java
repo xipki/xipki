@@ -84,7 +84,7 @@ public final class IaikP11CryptService implements P11CryptService
         {
             final String name = moduleConf.getName();
             IaikP11CryptService instance = instances.get(name);
-            if(instance == null)
+            if (instance == null)
             {
                 instance = new IaikP11CryptService(moduleConf);
                 instances.put(name, instance);
@@ -108,7 +108,7 @@ public final class IaikP11CryptService implements P11CryptService
     private synchronized boolean reconnect()
     throws SignerException
     {
-        if(System.currentTimeMillis() - lastRefresh < MIN_RECONNECT_INTERVAL)
+        if (System.currentTimeMillis() - lastRefresh < MIN_RECONNECT_INTERVAL)
         {
             LOG.info("just refreshed within one minute, skip this reconnect()");
             return lastRefreshSuccessfull;
@@ -130,11 +130,11 @@ public final class IaikP11CryptService implements P11CryptService
         try
         {
             this.extModule = IaikP11ModulePool.getInstance().getModule(moduleConf);
-        }catch(SignerException e)
+        } catch (SignerException e)
         {
             final String message = "could not initialize the PKCS#11 Module for "
                     + moduleConf.getName();
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
@@ -146,13 +146,13 @@ public final class IaikP11CryptService implements P11CryptService
         Set<IaikP11Identity> currentIdentifies = new HashSet<>();
 
         List<P11SlotIdentifier> slotIds = extModule.getSlotIdentifiers();
-        for(P11SlotIdentifier slotId : slotIds)
+        for (P11SlotIdentifier slotId : slotIds)
         {
             IaikP11Slot slot;
             try
             {
                 slot = extModule.getSlot(slotId);
-                if(slot == null)
+                if (slot == null)
                 {
                     LOG.warn("could not initialize slot " + slotId);
                     continue;
@@ -160,7 +160,7 @@ public final class IaikP11CryptService implements P11CryptService
             } catch (SignerException e)
             {
                 final String message = "SignerException while initializing slot " + slotId;
-                if(LOG.isWarnEnabled())
+                if (LOG.isWarnEnabled())
                 {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                             e.getMessage());
@@ -170,7 +170,7 @@ public final class IaikP11CryptService implements P11CryptService
             } catch (Throwable t)
             {
                 final String message = "unexpected error while initializing slot " + slotId;
-                if(LOG.isWarnEnabled())
+                if (LOG.isWarnEnabled())
                 {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                             t.getMessage());
@@ -180,7 +180,7 @@ public final class IaikP11CryptService implements P11CryptService
             }
 
             slot.refresh();
-            for(P11Identity identity : slot.getP11Identities())
+            for (P11Identity identity : slot.getP11Identities())
             {
                 currentIdentifies.add((IaikP11Identity) identity);
             }
@@ -193,11 +193,11 @@ public final class IaikP11CryptService implements P11CryptService
 
         lastRefreshSuccessfull = true;
 
-        if(LOG.isInfoEnabled())
+        if (LOG.isInfoEnabled())
         {
             StringBuilder sb = new StringBuilder();
             sb.append("initialized ").append(this.identities.size()).append(" PKCS#11 Keys:\n");
-            for(IaikP11Identity identity : this.identities)
+            for (IaikP11Identity identity : this.identities)
             {
                 sb.append("\t(slot ").append(identity.getSlotId());
                 sb.append(", algo=").append(identity.getPublicKey().getAlgorithm());
@@ -222,16 +222,16 @@ public final class IaikP11CryptService implements P11CryptService
         try
         {
             return getIdentity(slotId, keyId).CKM_RSA_PKCS(extModule, encodedDigestInfo);
-        }catch(PKCS11RuntimeException e)
+        } catch (PKCS11RuntimeException e)
         {
             final String message = "error while calling identity.CKM_RSA_PKCS()";
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
             }
             LOG.debug(message, e);
-            if(reconnect())
+            if (reconnect())
             {
                 return CKM_RSA_PKCS_noReconnect(encodedDigestInfo, slotId, keyId);
             }
@@ -263,16 +263,16 @@ public final class IaikP11CryptService implements P11CryptService
         try
         {
             return getIdentity(slotId, keyId).CKM_RSA_X509(extModule, hash);
-        }catch(PKCS11RuntimeException e)
+        } catch (PKCS11RuntimeException e)
         {
             final String message = "error while calling identity.CKM_RSA_X_509()";
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
             }
             LOG.debug(message, e);
-            if(reconnect())
+            if (reconnect())
             {
                 return CKM_RSA_X509_noReconnect(hash, slotId, keyId);
             }
@@ -315,16 +315,16 @@ public final class IaikP11CryptService implements P11CryptService
         try
         {
             return getIdentity(slotId, keyId).CKM_ECDSA(extModule, hash);
-        }catch(PKCS11RuntimeException e)
+        } catch (PKCS11RuntimeException e)
         {
             final String message = "error while calling identity.CKM_ECDSA()";
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
             }
             LOG.debug(message, e);
-            if(reconnect())
+            if (reconnect())
             {
                 return CKM_ECDSAPlain_noReconnect(hash, slotId, keyId);
             }
@@ -367,16 +367,16 @@ public final class IaikP11CryptService implements P11CryptService
         try
         {
             return getIdentity(slotId, keyId).CKM_DSA(extModule, hash);
-        }catch(PKCS11RuntimeException e)
+        } catch (PKCS11RuntimeException e)
         {
             final String message = "error while calling identity.CKM_DSA()";
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
             }
             LOG.debug(message, e);
-            if(reconnect())
+            if (reconnect())
             {
                 return CKM_DSA_noReconnect(hash, slotId, keyId);
             }
@@ -426,7 +426,7 @@ public final class IaikP11CryptService implements P11CryptService
     throws SignerException
     {
         IaikP11Identity identity = getIdentity2(slotId, keyId);
-        if(identity == null)
+        if (identity == null)
         {
             throw new SignerException("found no identity with " + keyId + " in slot " + slotId);
         }
@@ -437,9 +437,9 @@ public final class IaikP11CryptService implements P11CryptService
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     {
-        for(IaikP11Identity identity : identities)
+        for (IaikP11Identity identity : identities)
         {
-            if(identity.match(slotId, keyId))
+            if (identity.match(slotId, keyId))
             {
                 return identity;
             }
@@ -451,15 +451,15 @@ public final class IaikP11CryptService implements P11CryptService
     private synchronized void checkState()
     throws SignerException
     {
-        if(lastRefreshSuccessfull == false)
+        if (lastRefreshSuccessfull == false)
         {
-            if(System.currentTimeMillis() - lastRefresh >= MIN_RECONNECT_INTERVAL)
+            if (System.currentTimeMillis() - lastRefresh >= MIN_RECONNECT_INTERVAL)
             {
                 reconnect();
             }
         }
 
-        if(lastRefreshSuccessfull == false)
+        if (lastRefreshSuccessfull == false)
         {
             throw new SignerException("PKCS#11 module is not initialized");
         }
@@ -488,10 +488,10 @@ public final class IaikP11CryptService implements P11CryptService
     throws SignerException
     {
         List<P11SlotIdentifier> slotIds = new LinkedList<>();
-        for(IaikP11Identity identity : identities)
+        for (IaikP11Identity identity : identities)
         {
             P11SlotIdentifier slotId = identity.getSlotId();
-            if(slotIds.contains(slotId) == false)
+            if (slotIds.contains(slotId) == false)
             {
                 slotIds.add(slotId);
             }
@@ -506,9 +506,9 @@ public final class IaikP11CryptService implements P11CryptService
     throws SignerException
     {
         List<String> keyLabels = new LinkedList<>();
-        for(IaikP11Identity identity : identities)
+        for (IaikP11Identity identity : identities)
         {
-            if(slotId.equals(identity.getSlotId()))
+            if (slotId.equals(identity.getSlotId()))
             {
                 keyLabels.add(identity.getKeyId().getKeyLabel());
             }

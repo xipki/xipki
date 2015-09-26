@@ -70,7 +70,7 @@ public class ScepClient extends Client
             HttpURLConnection conn = (HttpURLConnection) _url.openConnection();
             conn.setRequestMethod("GET");
             return parseResponse(conn);
-        }catch(IOException e)
+        } catch (IOException e)
         {
             throw new ScepClientException(e);
         }
@@ -91,9 +91,9 @@ public class ScepClient extends Client
             conn.setUseCaches(false);
 
             conn.setRequestMethod("POST");
-            if(request != null)
+            if (request != null)
             {
-                if(requestContentType != null)
+                if (requestContentType != null)
                 {
                     conn.setRequestProperty("Content-Type", requestContentType);
                 }
@@ -105,7 +105,7 @@ public class ScepClient extends Client
             }
 
             return parseResponse(conn);
-        }catch(IOException e)
+        } catch (IOException e)
         {
             throw new ScepClientException(e.getMessage(), e);
         }
@@ -131,12 +131,12 @@ public class ScepClient extends Client
 
             ScepHttpResponse resp = new ScepHttpResponse(contentType, contentLength, inputstream);
             String contentEncoding = conn.getContentEncoding();
-            if(contentEncoding != null && contentEncoding.isEmpty() == false)
+            if (contentEncoding != null && contentEncoding.isEmpty() == false)
             {
                 resp.setContentEncoding(contentEncoding);
             }
             return resp;
-        }catch(IOException e)
+        } catch (IOException e)
         {
             throw new ScepClientException(e);
         }

@@ -399,7 +399,7 @@ public class ObjectIdentifiers
 
         List<ASN1ObjectIdentifier> _backwardDNs = new ArrayList<>(25);
         int size = _forwardDNs.size();
-        for(int i = size - 1; i >= 0; i--)
+        for (int i = size - 1; i >= 0; i--)
         {
             _backwardDNs.add(_forwardDNs.get(i));
         }
@@ -495,12 +495,12 @@ public class ObjectIdentifiers
     {
         String name = oidNameMap.get(type);
 
-        if(StringUtil.isBlank(name))
+        if (StringUtil.isBlank(name))
         {
             try
             {
                 name = RFC4519Style.INSTANCE.oidToDisplayName(type);
-            }catch(IllegalArgumentException e)
+            } catch (IllegalArgumentException e)
             {
             }
         }
@@ -510,9 +510,9 @@ public class ObjectIdentifiers
     public static ASN1ObjectIdentifier nameToOID(
             final String name)
     {
-        for(ASN1ObjectIdentifier oid : oidNameMap.keySet())
+        for (ASN1ObjectIdentifier oid : oidNameMap.keySet())
         {
-            if(oidNameMap.get(oid).equalsIgnoreCase(name))
+            if (oidNameMap.get(oid).equalsIgnoreCase(name))
             {
                 return oid;
             }
@@ -521,7 +521,7 @@ public class ObjectIdentifiers
         try
         {
             return RFC4519Style.INSTANCE.attrNameToOID(name);
-        }catch(IllegalArgumentException e)
+        } catch (IllegalArgumentException e)
         {
             return null;
         }

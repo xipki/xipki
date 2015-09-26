@@ -65,7 +65,7 @@ public class P11Identity implements Comparable<P11Identity>
         ParamUtil.assertNotNull("slotId", slotId);
         ParamUtil.assertNotNull("keyId", keyId);
 
-        if((certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
+        if ((certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
                 && publicKey == null)
         {
             throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
@@ -82,16 +82,16 @@ public class P11Identity implements Comparable<P11Identity>
                 ? certificateChain[0].getPublicKey()
                 : publicKey;
 
-        if(this.publicKey instanceof RSAPublicKey)
+        if (this.publicKey instanceof RSAPublicKey)
         {
             signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();
         }
-        else if(this.publicKey instanceof ECPublicKey)
+        else if (this.publicKey instanceof ECPublicKey)
         {
             signatureKeyBitLength = ((ECPublicKey) this.publicKey)
                     .getParams().getCurve().getField().getFieldSize();
         }
-        else if(this.publicKey instanceof DSAPublicKey)
+        else if (this.publicKey instanceof DSAPublicKey)
         {
             signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getQ().bitLength();
         }
@@ -139,7 +139,7 @@ public class P11Identity implements Comparable<P11Identity>
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     {
-        if(this.slotId.equals(slotId) == false)
+        if (this.slotId.equals(slotId) == false)
         {
             return false;
         }
@@ -151,7 +151,7 @@ public class P11Identity implements Comparable<P11Identity>
             final P11SlotIdentifier slotId,
             final String keyLabel)
     {
-        if(keyLabel == null)
+        if (keyLabel == null)
         {
             return false;
         }

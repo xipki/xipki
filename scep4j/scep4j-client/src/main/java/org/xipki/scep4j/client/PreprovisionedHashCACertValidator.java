@@ -63,9 +63,9 @@ implements CACertValidator
         ParamUtil.assertNotEmpty("hashValues", hashValues);
 
         final int hLen = hashAlgo.getLength();
-        for(byte[] m : hashValues)
+        for (byte[] m : hashValues)
         {
-            if(m.length != hLen)
+            if (m.length != hLen)
             {
                 throw new IllegalArgumentException("invalid the length of hashValue: "
                         + m.length + " != " + hLen);
@@ -74,7 +74,7 @@ implements CACertValidator
 
         this.hashAlgo = hashAlgo;
         this.hashValues = new HashSet<byte[]>(hashValues.size());
-        for(byte[] m : hashValues)
+        for (byte[] m : hashValues)
         {
             this.hashValues.add(Arrays.copyOf(m, m.length));
         }
@@ -93,9 +93,9 @@ implements CACertValidator
             return false;
         }
 
-        for(byte[] m : hashValues)
+        for (byte[] m : hashValues)
         {
-            if(Arrays.equals(actual, m))
+            if (Arrays.equals(actual, m))
             {
                 return true;
             }

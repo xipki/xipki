@@ -56,7 +56,7 @@ abstract class PathCompleter
             final int cursor,
             final List<String> candidates)
     {
-        if(candidates == null)
+        if (candidates == null)
         {
             throw new IllegalArgumentException("candidates could not be null");
         }
@@ -105,14 +105,14 @@ abstract class PathCompleter
         File[] entries = (dir == null)
                 ? new File[0]
                 : dir.listFiles(filenameFilter);
-        if(isDirOnly()
+        if (isDirOnly()
                 && entries != null
                 && entries.length > 0)
         {
             List<File> list = new LinkedList<File>();
-            for(File f : entries)
+            for (File f : entries)
             {
-                if(f.isDirectory())
+                if (f.isDirectory())
                 {
                     list.add(f);
                 }
@@ -164,7 +164,7 @@ abstract class PathCompleter
             if (file.getAbsolutePath().startsWith(translated))
             {
                 String name = file.getName();
-                if(matches == 1 && file.isDirectory())
+                if (matches == 1 && file.isDirectory())
                 {
                     name += separator();
                 } else

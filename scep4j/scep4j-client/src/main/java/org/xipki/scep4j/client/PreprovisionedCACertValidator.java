@@ -74,7 +74,7 @@ implements CACertValidator
     {
         ParamUtil.assertNotEmpty("certs", certs);
         fpOfCerts = new HashSet<String>(certs.size());
-        for(X509Certificate m : certs)
+        for (X509Certificate m : certs)
         {
             String hexFp;
             try

@@ -86,7 +86,7 @@ public class CertRevocationInfo implements Serializable
         ParamUtil.assertNotNull("revocationTime", revocationTime);
 
         this.reason = CRLReason.forReasonCode(reasonCode);
-        if(this.reason == null)
+        if (this.reason == null)
         {
             throw new IllegalArgumentException("invalid reason " + reasonCode);
         }
@@ -119,7 +119,7 @@ public class CertRevocationInfo implements Serializable
      */
     public Date getRevocationTime()
     {
-        if(revocationTime == null)
+        if (revocationTime == null)
         {
             revocationTime = new Date();
         }

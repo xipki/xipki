@@ -87,7 +87,7 @@ public class P11RSAContentSigner implements ContentSigner
         ParamUtil.assertNotNull("keyId", keyId);
         ParamUtil.assertNotNull("signatureAlgId", signatureAlgId);
 
-        if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm()))
+        if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm()))
         {
             throw new IllegalArgumentException("unsupported signature algorithm "
                     + signatureAlgId.getAlgorithm());
@@ -140,7 +140,7 @@ public class P11RSAContentSigner implements ContentSigner
         } catch (SignerException e)
         {
             final String message = "SignerException";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());

@@ -50,9 +50,9 @@ implements SigAlgCompleter
         String[] encAlgs = new String[]{"RSA", "RSAandMGF1", "ECDSA", "DSA"};
         String[] hashAlgs = new String[]{"SHA1", "SHA224", "SHA256", "SHA384", "SHA512"};
         StringBuilder enums = new StringBuilder(200);
-        for(String encAlg : encAlgs)
+        for (String encAlg : encAlgs)
         {
-            for(String hashAlg : hashAlgs)
+            for (String hashAlg : hashAlgs)
             {
                 enums.append(hashAlg).append("with").append(encAlg).append(",");
             }

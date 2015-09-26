@@ -58,7 +58,7 @@ public class IaikP11Util
         {
             keyID = new byte[8];
             random.nextBytes(keyID);
-        } while(idExists(session, keyID));
+        } while (idExists(session, keyID));
 
         return keyID;
     }
@@ -118,12 +118,12 @@ public class IaikP11Util
             final String data)
     {
         int index = data.indexOf("password");
-        if(index == -1)
+        if (index == -1)
         {
             return data;
         }
 
-        if(index > 1 && data.charAt(index - 1) == '%')
+        if (index > 1 && data.charAt(index - 1) == '%')
         {
             return data.substring(0, index - 1);
         }

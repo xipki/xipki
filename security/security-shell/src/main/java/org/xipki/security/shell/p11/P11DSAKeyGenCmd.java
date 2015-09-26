@@ -62,14 +62,14 @@ public class P11DSAKeyGenCmd extends P11KeyGenCmd
     protected Object _doExecute()
     throws Exception
     {
-        if(pLen % 1024 != 0)
+        if (pLen % 1024 != 0)
         {
             throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
         }
 
-        if(qLen == null)
+        if (qLen == null)
         {
-            if(pLen >= 2048)
+            if (pLen >= 2048)
             {
                 qLen = 256;
             }
@@ -80,7 +80,7 @@ public class P11DSAKeyGenCmd extends P11KeyGenCmd
         }
 
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        if(noCert)
+        if (noCert)
         {
             P11KeyIdentifier keyId = slot.generateDSAKeypair(pLen, qLen, label);
             finalize(keyId);

@@ -69,7 +69,7 @@ public class SlotIdentifier extends ASN1Object
     public SlotIdentifier(
             final P11SlotIdentifier slotId)
     {
-        if(slotId == null)
+        if (slotId == null)
         {
             throw new IllegalArgumentException("slotId could not be null");
         }
@@ -93,10 +93,10 @@ public class SlotIdentifier extends ASN1Object
 
             ASN1Encodable slotIdASN1Obj = null;
             ASN1Encodable obj = seq.getObjectAt(0);
-            if(obj instanceof ASN1Integer)
+            if (obj instanceof ASN1Integer)
             {
                 slotIndex = ((ASN1Integer) obj).getPositiveValue().intValue();
-                if(size > 1)
+                if (size > 1)
                 {
                     slotIdASN1Obj = seq.getObjectAt(1);
                 }
@@ -113,7 +113,7 @@ public class SlotIdentifier extends ASN1Object
                 ASN1TaggedObject tagObj = (ASN1TaggedObject) slotIdASN1Obj;
 
                 int tagNo = tagObj.getTagNo();
-                if(tagNo == 1)
+                if (tagNo == 1)
                 {
                     ASN1Integer i = ASN1Integer.getInstance(tagObj.getObject());
                     slotId = i.getPositiveValue().longValue();
@@ -125,7 +125,7 @@ public class SlotIdentifier extends ASN1Object
             }
 
             this.slotId = new P11SlotIdentifier(slotIndex, slotId);
-        }catch(IllegalArgumentException e)
+        } catch (IllegalArgumentException e)
         {
             throw new BadASN1ObjectException(e.getMessage(), e);
         }
@@ -165,12 +165,12 @@ public class SlotIdentifier extends ASN1Object
     public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        if(slotId.getSlotIndex() != null)
+        if (slotId.getSlotIndex() != null)
         {
             vector.add(new ASN1Integer(slotId.getSlotIndex()));
         }
 
-        if(slotId.getSlotId() != null)
+        if (slotId.getSlotId() != null)
         {
             DERTaggedObject taggedObj = new DERTaggedObject(true, 1,
                     new ASN1Integer(slotId.getSlotId()));

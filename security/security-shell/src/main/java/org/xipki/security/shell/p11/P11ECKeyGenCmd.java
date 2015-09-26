@@ -60,7 +60,7 @@ public class P11ECKeyGenCmd extends P11KeyGenCmd
     throws Exception
     {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        if(noCert)
+        if (noCert)
         {
             P11KeyIdentifier keyId = slot.generateECKeypair(curveName, label);
             finalize(keyId);

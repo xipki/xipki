@@ -90,11 +90,11 @@ public abstract class LoadExecutor
         }
 
         StringBuilder sb = new StringBuilder();
-        if(StringUtil.isNotBlank(description))
+        if (StringUtil.isNotBlank(description))
         {
             sb.append(description);
             char c = description.charAt(description.length() - 1);
-            if(c != '\n')
+            if (c != '\n')
             {
                 sb.append('\n');
             }
@@ -106,20 +106,20 @@ public abstract class LoadExecutor
         resetStartTime();
 
         ExecutorService executor = Executors.newFixedThreadPool(threads);
-        for(Runnable runnable : runnables)
+        for (Runnable runnable : runnables)
         {
             executor.execute(runnable);
         }
 
         executor.shutdown();
         printHeader();
-        while(true)
+        while (true)
         {
             printStatus();
             try
             {
                 boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
-                if(terminated)
+                if (terminated)
                 {
                     break;
                 }
@@ -147,7 +147,7 @@ public abstract class LoadExecutor
     public void setDuration(
             final int duration)
     {
-        if(duration > 0)
+        if (duration > 0)
         {
             this.duration = duration;
         }
@@ -158,7 +158,7 @@ public abstract class LoadExecutor
     public void setThreads(
             final int threads)
     {
-        if(threads > 0)
+        if (threads > 0)
         {
             this.threads = threads;
         }
@@ -209,25 +209,24 @@ public abstract class LoadExecutor
 
         sb.append(StringUtil.formatAccount(currentAccount, true));
 
-        long t = (now - startTime)/1000;  // in s
+        long t = (now - startTime) / 1000;  // in s
         String time = StringUtil.formatTime(t, true);
         sb.append("  ");
         sb.append(time);
 
         MeasurePoint referenceMeasurePoint;
         int numMeasurePoints = measureDeque.size();
-        if(numMeasurePoints > 5)
+        if (numMeasurePoints > 5)
         {
             referenceMeasurePoint = measureDeque.removeFirst();
-        }
-        else
+        } else
         {
             referenceMeasurePoint = measureDeque.getFirst();
         }
 
         long speed = 0;
         long t2inms = now - referenceMeasurePoint.getMeasureTime(); // in ms
-        if(t2inms > 0)
+        if (t2inms > 0)
         {
             speed = (currentAccount - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
         }
@@ -247,7 +246,7 @@ public abstract class LoadExecutor
     public void setUnit(
             final String unit)
     {
-        if(unit != null)
+        if (unit != null)
         {
             this.unit = unit;
         }
@@ -256,10 +255,10 @@ public abstract class LoadExecutor
     protected static long getSecureIndex()
     {
         SecureRandom random = new SecureRandom();
-        while(true)
+        while (true)
         {
             long l = random.nextLong();
-            if(l > 0)
+            if (l > 0)
             {
                 return l;
             }
@@ -270,7 +269,7 @@ public abstract class LoadExecutor
     {
         StringBuilder sb = new StringBuilder();
         long ms = (System.currentTimeMillis() - startTime);
-        sb.append("\nfinished in " + StringUtil.formatTime(ms/1000, false) + "\n");
+        sb.append("\nfinished in " + StringUtil.formatTime(ms / 1000, false) + "\n");
         sb.append("account: " + account.get() + " " + unit + "\n");
         sb.append(" failed: " + errorAccount.get() + " " + unit + "\n");
         sb.append("average: " + (account.get() * 1000 / ms) + " " + unit + "/s\n");

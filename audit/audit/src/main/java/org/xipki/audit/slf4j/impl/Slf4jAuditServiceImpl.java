@@ -63,7 +63,7 @@ public class Slf4jAuditServiceImpl implements AuditService
     public void logEvent(
             final AuditEvent event)
     {
-        if(event == null)
+        if (event == null)
         {
             return;
         }
@@ -73,7 +73,7 @@ public class Slf4jAuditServiceImpl implements AuditService
             switch(event.getLevel())
             {
             case DEBUG:
-                if(LOG.isDebugEnabled())
+                if (LOG.isDebugEnabled())
                 {
                     LOG.debug("{}", createMessage(event));
                 }
@@ -82,7 +82,7 @@ public class Slf4jAuditServiceImpl implements AuditService
                 LOG.info("{}", createMessage(event));
                 break;
             } // end switch
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
             LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}",
                     AuditLevel.ERROR.getAlignedText(), t.getMessage());
@@ -97,13 +97,13 @@ public class Slf4jAuditServiceImpl implements AuditService
         sb.append(event.getLevel().getAlignedText()).append(" | ");
 
         String applicationName = event.getApplicationName();
-        if(applicationName == null)
+        if (applicationName == null)
         {
             applicationName = "undefined";
         }
 
         String name = event.getName();
-        if(name == null)
+        if (name == null)
         {
             name = "undefined";
         }
@@ -111,7 +111,7 @@ public class Slf4jAuditServiceImpl implements AuditService
         sb.append(applicationName).append(" - ").append(name);
 
         AuditStatus status = event.getStatus();
-        if(status == null)
+        if (status == null)
         {
             status = AuditStatus.UNDEFINED;
         }
@@ -119,7 +119,7 @@ public class Slf4jAuditServiceImpl implements AuditService
         List<AuditEventData> eventDataArray = event.getEventDatas();
 
         long duration = event.getDuration();
-        if(duration >= 0)
+        if (duration >= 0)
         {
             sb.append("\tduration: ").append(duration);
         }
@@ -128,7 +128,7 @@ public class Slf4jAuditServiceImpl implements AuditService
         {
             for (AuditEventData m : eventDataArray)
             {
-                if(duration >= 0 && "duration".equalsIgnoreCase(m.getName()))
+                if (duration >= 0 && "duration".equalsIgnoreCase(m.getName()))
                 {
                     continue;
                 }
@@ -144,7 +144,7 @@ public class Slf4jAuditServiceImpl implements AuditService
     public void logEvent(
             final PCIAuditEvent event)
     {
-        if(event == null)
+        if (event == null)
         {
             return;
         }
@@ -156,7 +156,7 @@ public class Slf4jAuditServiceImpl implements AuditService
             switch(al)
             {
             case DEBUG:
-                if(LOG.isDebugEnabled())
+                if (LOG.isDebugEnabled())
                 {
                     LOG.debug("{} | {}", al.getAlignedText(), msg);
                 }
@@ -165,7 +165,7 @@ public class Slf4jAuditServiceImpl implements AuditService
                 LOG.info("{} | {}", al.getAlignedText(), msg);
                 break;
             } // end switch
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
             LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}",
                     AuditLevel.ERROR.getAlignedText(), t.getMessage());

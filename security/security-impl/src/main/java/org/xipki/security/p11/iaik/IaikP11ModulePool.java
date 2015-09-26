@@ -74,13 +74,13 @@ public class IaikP11ModulePool
             final String moduleName)
     {
         IaikP11Module module = modules.remove(moduleName);
-        if(module == null && defaultModuleName != null
+        if (module == null && defaultModuleName != null
                 && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
         {
             module = modules.remove(defaultModuleName);
         }
 
-        if(module == null)
+        if (module == null)
         {
             return;
         }
@@ -90,10 +90,10 @@ public class IaikP11ModulePool
             LOG.info("removed module {}", moduleName);
             module.close();
             LOG.info("finalized module {}", moduleName);
-        }catch(Throwable t)
+        } catch (Throwable t)
         {
             final String message = "could not finalize the module " + moduleName;
-            if(LOG.isWarnEnabled())
+            if (LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                         t.getMessage());
@@ -107,7 +107,7 @@ public class IaikP11ModulePool
     throws SignerException
     {
         IaikP11Module module = modules.get(moduleName);
-        if(module == null && defaultModuleName != null
+        if (module == null && defaultModuleName != null
                 && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
         {
             module = modules.get(defaultModuleName);
@@ -120,7 +120,7 @@ public class IaikP11ModulePool
     throws SignerException
     {
         IaikP11Module extModule = modules.get(moduleConf.getName());
-        if(extModule != null)
+        if (extModule != null)
         {
             return extModule;
         }
@@ -130,10 +130,10 @@ public class IaikP11ModulePool
         try
         {
             module = Module.getInstance(moduleConf.getNativeLibrary());
-        }catch(IOException e)
+        } catch (IOException e)
         {
             final String msg = "could not load the PKCS#11 module " + moduleConf.getName();
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(),
                         e.getMessage());
@@ -151,7 +151,7 @@ public class IaikP11ModulePool
             if (e.getErrorCode() != PKCS11Constants.CKR_CRYPTOKI_ALREADY_INITIALIZED)
             {
                 final String message = "PKCS11Exception";
-                if(LOG.isErrorEnabled())
+                if (LOG.isErrorEnabled())
                 {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                             e.getMessage());
@@ -163,7 +163,7 @@ public class IaikP11ModulePool
             else
             {
                 LOG.info("PKCS#11 module already initialized");
-                if(LOG.isInfoEnabled())
+                if (LOG.isInfoEnabled())
                 {
                     try
                     {
@@ -178,7 +178,7 @@ public class IaikP11ModulePool
         catch (Throwable t)
         {
             final String message = "unexpected Exception: ";
-            if(LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                         t.getMessage());
@@ -204,7 +204,7 @@ public class IaikP11ModulePool
 
     public synchronized void shutdown()
     {
-        for(String pk11Lib : modules.keySet())
+        for (String pk11Lib : modules.keySet())
         {
             modules.get(pk11Lib).close();
         }
@@ -224,7 +224,7 @@ public class IaikP11ModulePool
             catch (Throwable t)
             {
                 final String message = "error while module.finalize()";
-                if(LOG.isErrorEnabled())
+                if (LOG.isErrorEnabled())
                 {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                             t.getMessage());

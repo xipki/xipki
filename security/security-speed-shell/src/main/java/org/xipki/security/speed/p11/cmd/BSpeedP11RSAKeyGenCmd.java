@@ -62,7 +62,7 @@ public class BSpeedP11RSAKeyGenCmd extends BSpeedP11Cmd
 
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
 
-        for(int keysize : keysizes)
+        for (int keysize : keysizes)
         {
             ret.add(
                     new P11RSAKeyGenLoadTest(slot, keysize, new BigInteger("0x10001")));

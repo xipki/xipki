@@ -89,7 +89,7 @@ public class PasswordResolverImpl implements PasswordResolver
 
         try
         {
-            if(resolvers.remove(service))
+            if (resolvers.remove(service))
             {
                 LOG.debug("removed SinglePasswordResolver binding for {}", service);
             }
@@ -109,16 +109,16 @@ public class PasswordResolverImpl implements PasswordResolver
     throws PasswordResolverException
     {
         int index = passwordHint.indexOf(':');
-        if(index == -1)
+        if (index == -1)
         {
             return passwordHint.toCharArray();
         }
 
         String protocol = passwordHint.substring(0, index);
 
-        for(SinglePasswordResolver resolver : resolvers)
+        for (SinglePasswordResolver resolver : resolvers)
         {
-            if(resolver.canResolveProtocol(protocol))
+            if (resolver.canResolveProtocol(protocol))
             {
                 return resolver.resolvePassword(passwordHint);
             }

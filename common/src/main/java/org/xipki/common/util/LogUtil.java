@@ -41,6 +41,9 @@ package org.xipki.common.util;
 
 public class LogUtil
 {
+    private LogUtil()
+    {
+    }
 
     public static String buildExceptionLogFormat(
             final String message)

@@ -181,7 +181,7 @@ public class PCIAuditEvent
 
     public String getOrigination()
     {
-        if(isBlank(origination))
+        if (isBlank(origination))
         {
             origination = getHostAddress();
         }
@@ -219,7 +219,7 @@ public class PCIAuditEvent
         final char delimiter = DEFAULT_DELIMITER;
         final String replaceDelimiter = DEFAULT_REPLACE_DELIMITER;
 
-        if(prefix != null && prefix.isEmpty() == false)
+        if (prefix != null && prefix.isEmpty() == false)
         {
             buffer.append(prefix);
         }
@@ -285,37 +285,37 @@ public class PCIAuditEvent
         {
             return "UNKNOWN";
         }
-        while(interfaces.hasMoreElements())
+        while (interfaces.hasMoreElements())
         {
             NetworkInterface n = (NetworkInterface) interfaces.nextElement();
             Enumeration<InetAddress> ee = n.getInetAddresses();
             while (ee.hasMoreElements())
             {
                 InetAddress i = (InetAddress) ee.nextElement();
-                if(i instanceof Inet4Address)
+                if (i instanceof Inet4Address)
                 {
                     addresses.add(((Inet4Address) i).getHostAddress());
                 }
             }
         }
 
-        for(String addr : addresses)
+        for (String addr : addresses)
         {
-            if(addr.startsWith("192.") == false && addr.startsWith("127.") == false)
+            if (addr.startsWith("192.") == false && addr.startsWith("127.") == false)
             {
                 return addr;
             }
         }
 
-        for(String addr : addresses)
+        for (String addr : addresses)
         {
-            if(addr.startsWith("127.") == false)
+            if (addr.startsWith("127.") == false)
             {
                 return addr;
             }
         }
 
-        if(addresses.size() > 0)
+        if (addresses.size() > 0)
         {
             return addresses.get(0);
         }

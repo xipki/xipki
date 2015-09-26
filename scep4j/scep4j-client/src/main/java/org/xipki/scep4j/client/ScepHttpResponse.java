@@ -102,7 +102,7 @@ public class ScepHttpResponse
     public byte[] getContentBytes()
     throws ScepClientException
     {
-        if(content == null)
+        if (content == null)
         {
             return null;
         }
@@ -118,7 +118,7 @@ public class ScepHttpResponse
             }
 
             return bout.toByteArray();
-        } catch(IOException e)
+        } catch (IOException e)
         {
             throw new ScepClientException(e);
         } finally
