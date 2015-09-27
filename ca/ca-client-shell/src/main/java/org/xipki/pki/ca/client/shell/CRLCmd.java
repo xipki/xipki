@@ -77,7 +77,7 @@ public abstract class CRLCmd extends ClientCmd
             throw new CmdFailure("no CA is configured");
         }
 
-        if (caName != null && ! caNames.contains(caName))
+        if (caName != null && !caNames.contains(caName))
         {
             throw new IllegalCmdParamException("CA " + caName
                     + " is not within the configured CAs " + caNames);

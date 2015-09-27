@@ -52,7 +52,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 @Command(scope = "xipki-cli", name = "remove-cert",
-        description="remove certificate")
+        description = "remove certificate")
 public class RemoveCertCmd extends UnRevRemoveCertCmd
 {
 
@@ -87,7 +87,7 @@ public class RemoveCertCmd extends UnRevRemoveCertCmd
             try
             {
                 certIdOrError = caClient.removeCert(cert, debug);
-            }finally
+            } finally
             {
                 saveRequestResponse(debug);
             }
@@ -99,7 +99,7 @@ public class RemoveCertCmd extends UnRevRemoveCertCmd
             try
             {
                 certIdOrError = caClient.removeCert(issuer, getSerialNumber(), debug);
-            }finally
+            } finally
             {
                 saveRequestResponse(debug);
             }

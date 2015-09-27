@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-env-rm",
-        description="remove environment parameter (negative, QA)")
+        description = "remove environment parameter (negative, QA)")
 public class NegEnvRemoveCmd extends EnvRemoveCmd
 {
 

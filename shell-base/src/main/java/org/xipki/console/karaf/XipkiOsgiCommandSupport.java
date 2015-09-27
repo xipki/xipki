@@ -193,7 +193,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         }
     }
 
-    private static final String randomHex(
+    private static String randomHex(
             final int n)
     {
         SecureRandom r = new SecureRandom();

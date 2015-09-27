@@ -165,7 +165,7 @@ class CaConfigurationDbExporter extends DbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -202,7 +202,7 @@ class CaConfigurationDbExporter extends DbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -251,7 +251,7 @@ class CaConfigurationDbExporter extends DbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -289,7 +289,7 @@ class CaConfigurationDbExporter extends DbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -328,7 +328,7 @@ class CaConfigurationDbExporter extends DbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -373,7 +373,7 @@ class CaConfigurationDbExporter extends DbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -414,7 +414,7 @@ class CaConfigurationDbExporter extends DbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -457,7 +457,7 @@ class CaConfigurationDbExporter extends DbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -567,7 +567,7 @@ class CaConfigurationDbExporter extends DbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -612,7 +612,7 @@ class CaConfigurationDbExporter extends DbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -643,14 +643,14 @@ class CaConfigurationDbExporter extends DbPorter
 
                 CaHasPublisherType ca_has_publisher = new CaHasPublisherType();
                 ca_has_publisher.setCaName(ca_name);
-                ca_has_publisher.setPublisherName(publisher_name);;
+                ca_has_publisher.setPublisherName(publisher_name);
 
                 ca_has_publishers.getCaHasPublisher().add(ca_has_publisher);
             }
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -698,7 +698,7 @@ class CaConfigurationDbExporter extends DbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -739,7 +739,7 @@ class CaConfigurationDbExporter extends DbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }

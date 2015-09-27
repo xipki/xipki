@@ -74,7 +74,7 @@ public abstract class UnRevRemoveCertCmd extends CaCmd
     protected BigInteger getSerialNumber()
     throws UnexpectedException, IllegalCmdParamException, CertificateException, IOException
     {
-        CAEntry ca =caManager.getCA(caName);
+        CAEntry ca = caManager.getCA(caName);
         if (ca == null)
         {
             throw new UnexpectedException("CA " + caName + " not available");

@@ -118,6 +118,10 @@ class X509SelfSignedCertBuilder
         }
     }
 
+    private X509SelfSignedCertBuilder()
+    {
+    }
+
     public static GenerateSelfSignedResult generateSelfSigned(
             final SecurityFactory securityFactory,
             final String signerType,
@@ -317,7 +321,7 @@ class X509SelfSignedCertBuilder
             try
             {
                 bcCert = certBuilder.build(contentSigner).toASN1Structure();
-            }finally
+            } finally
             {
                 signer.returnContentSigner(contentSigner);
             }
@@ -369,7 +373,7 @@ class X509SelfSignedCertBuilder
     {
         if (key instanceof RSAPublicKey)
         {
-            RSAPublicKey k = (RSAPublicKey)key;
+            RSAPublicKey k = (RSAPublicKey) key;
             return new RSAKeyParameters(false, k.getModulus(), k.getPublicExponent());
         }
         else if (key instanceof ECPublicKey)

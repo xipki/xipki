@@ -225,7 +225,7 @@ public class DbCertStatusStore extends CertStatusStore
                     {
                         return;
                     }
-                }finally
+                } finally
                 {
                     releaseDbResources(ps, rs);
                 }
@@ -293,9 +293,9 @@ public class DbCertStatusStore extends CertStatusStore
                 initialized = false;
                 this.issuerStore = new IssuerStore(caInfos);
                 LOG.info("Updated CertStore: {}", getName());
-                initializationFailed =false;
+                initializationFailed = false;
                 initialized = true;
-            }finally
+            } finally
             {
                 releaseDbResources(ps, rs);
             }
@@ -519,7 +519,7 @@ public class DbCertStatusStore extends CertStatusStore
             {
                 rs = ps.executeQuery();
                 return true;
-            }finally
+            } finally
             {
                 releaseDbResources(ps, rs);
             }

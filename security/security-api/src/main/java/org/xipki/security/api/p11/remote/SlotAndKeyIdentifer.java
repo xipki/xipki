@@ -104,7 +104,7 @@ public class SlotAndKeyIdentifer extends ASN1Object
     {
         if (obj == null || obj instanceof SlotAndKeyIdentifer)
         {
-            return (SlotAndKeyIdentifer)obj;
+            return (SlotAndKeyIdentifer) obj;
         }
 
         try
@@ -116,7 +116,7 @@ public class SlotAndKeyIdentifer extends ASN1Object
 
             if (obj instanceof byte[])
             {
-                return getInstance(ASN1Primitive.fromByteArray((byte[])obj));
+                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
         }
         catch (IOException | IllegalArgumentException e)

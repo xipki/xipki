@@ -54,7 +54,7 @@ import org.xipki.security.api.SecurityFactory;
  */
 
 @Command(scope = "xipki-cli", name = "loadtest-revoke",
-        description="CA Client Revoke Load test")
+        description = "CA Client Revoke Load test")
 public class CALoadTestRevokeCmd extends CALoadTestCmd
 {
     @Option(name = "--issuer",
@@ -133,7 +133,7 @@ public class CALoadTestRevokeCmd extends CALoadTestCmd
             loadTest.setDuration(durationInSecond);
             loadTest.setThreads(numThreads);
             loadTest.test();
-        }finally
+        } finally
         {
             caDataSource.shutdown();
         }

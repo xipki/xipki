@@ -217,7 +217,8 @@ class SunP11Identity implements Comparable<SunP11Identity>
             final byte[] encodedDigestInfo)
     throws SignerException
     {
-        byte[] padded = SignerUtil.pkcs1padding(encodedDigestInfo, (signatureKeyBitLength + 7)/8);
+        byte[] padded = SignerUtil.pkcs1padding(encodedDigestInfo,
+                (signatureKeyBitLength + 7) / 8);
         return CKM_RSA_X509(padded);
     }
 

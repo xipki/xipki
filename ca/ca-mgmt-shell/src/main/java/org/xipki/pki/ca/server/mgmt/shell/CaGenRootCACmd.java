@@ -48,7 +48,7 @@ import org.xipki.common.util.IoUtil;
  */
 
 @Command(scope = "xipki-ca", name = "gen-rca",
-        description="generate selfsigned CA")
+        description = "generate selfsigned CA")
 public class CaGenRootCACmd extends CaAddOrGenCmd
 {
     @Option(name = "--p10",

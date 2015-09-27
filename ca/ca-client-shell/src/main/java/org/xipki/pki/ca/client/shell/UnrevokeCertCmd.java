@@ -51,7 +51,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 @Command(scope = "xipki-cli", name = "unrevoke",
-        description="unrevoke certificate")
+        description = "unrevoke certificate")
 public class UnrevokeCertCmd extends UnRevRemoveCertCmd
 {
     @Override
@@ -85,7 +85,7 @@ public class UnrevokeCertCmd extends UnRevRemoveCertCmd
             try
             {
                 certIdOrError = caClient.unrevokeCert(cert, debug);
-            }finally
+            } finally
             {
                 saveRequestResponse(debug);
             }
@@ -97,7 +97,7 @@ public class UnrevokeCertCmd extends UnRevRemoveCertCmd
             try
             {
                 certIdOrError = caClient.unrevokeCert(issuer, getSerialNumber(), debug);
-            }finally
+            } finally
             {
                 saveRequestResponse(debug);
             }

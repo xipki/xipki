@@ -46,7 +46,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "cmpcontrol-check",
-        description="show information of CMP control (QA)")
+        description = "show information of CMP control (QA)")
 public class CmpControlCheckCmd extends CmpControlUpdateCmd
 {
     @Override

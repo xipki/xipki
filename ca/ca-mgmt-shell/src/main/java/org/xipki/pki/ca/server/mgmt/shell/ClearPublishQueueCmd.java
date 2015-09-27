@@ -45,7 +45,7 @@ import org.apache.karaf.shell.commands.Option;
  */
 
 @Command(scope = "xipki-ca", name = "clear-publishqueue",
-        description="clear publish queue")
+        description = "clear publish queue")
 public class ClearPublishQueueCmd extends CaCmd
 {
     @Option(name = "--ca",

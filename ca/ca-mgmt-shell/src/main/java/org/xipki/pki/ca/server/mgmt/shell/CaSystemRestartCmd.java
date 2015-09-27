@@ -46,7 +46,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-ca", name = "restart",
-        description="restart CA system")
+        description = "restart CA system")
 public class CaSystemRestartCmd extends CaCmd
 {
 
@@ -81,7 +81,7 @@ public class CaSystemRestartCmd extends CaCmd
             }
 
             int len = sb.length();
-            sb.delete(len-2, len);
+            sb.delete(len - 2, len);
         }
         else
         {

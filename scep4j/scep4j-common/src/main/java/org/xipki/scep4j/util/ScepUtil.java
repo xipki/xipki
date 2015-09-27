@@ -97,7 +97,6 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.xipki.scep4j.crypto.HashAlgoType;
 import org.xipki.scep4j.crypto.KeyUsage;
-import org.xipki.scep4j.exception.MessageDecodingException;
 
 /**
  * @author Lijun Liao
@@ -105,6 +104,10 @@ import org.xipki.scep4j.exception.MessageDecodingException;
 
 public class ScepUtil
 {
+    private ScepUtil()
+    {
+    }
+
     public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(
             final PublicKey publicKey)
     throws IOException

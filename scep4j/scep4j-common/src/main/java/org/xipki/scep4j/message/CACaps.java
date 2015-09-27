@@ -68,7 +68,7 @@ public class CACaps
         if (capabilities == null)
         {
             this.capabilities = new HashSet<CACapability>();
-        }else
+        } else
         {
             this.capabilities = new HashSet<CACapability>(capabilities);
         }

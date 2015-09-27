@@ -237,7 +237,7 @@ class OcspCertStoreDbExporter extends DbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -305,11 +305,9 @@ class OcspCertStoreDbExporter extends DbPorter
 
         final int maxCertId = (int) getMax("CERT", "ID");
 
-        ProcessLog processLog;
-        {
-            final long total = getCount("CERT") - numProcessedBefore;
-            processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore);
-        }
+        final long total = getCount("CERT") - numProcessedBefore;
+        ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(),
+                numProcessedBefore);
 
         PreparedStatement certPs = prepareStatement(certSql);
 
@@ -383,7 +381,7 @@ class OcspCertStoreDbExporter extends DbPorter
                         try
                         {
                             currentCertsZip.write(certBytes);
-                        }finally
+                        } finally
                         {
                             currentCertsZip.closeEntry();
                         }
@@ -423,7 +421,7 @@ class OcspCertStoreDbExporter extends DbPorter
                     cert.setProfile(profile);
 
                     certsInCurrentFile.add(cert);
-                    numCertInCurrentFile ++;
+                    numCertInCurrentFile++;
                     sum++;
 
                     if (numCertInCurrentFile == numCertsInBundle)
@@ -483,7 +481,7 @@ class OcspCertStoreDbExporter extends DbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(certPs, null);
         }
@@ -506,7 +504,7 @@ class OcspCertStoreDbExporter extends DbPorter
         try
         {
             certsType.rewriteToZipStream(zipOutStream);
-        }finally
+        } finally
         {
             zipOutStream.closeEntry();
         }

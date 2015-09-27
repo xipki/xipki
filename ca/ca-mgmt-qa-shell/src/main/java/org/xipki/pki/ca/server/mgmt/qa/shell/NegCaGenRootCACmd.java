@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-gen-rca",
-        description="generate selfsigned CA (negative, QA)")
+        description = "generate selfsigned CA (negative, QA)")
 public class NegCaGenRootCACmd extends CaGenRootCACmd
 {
     @Override

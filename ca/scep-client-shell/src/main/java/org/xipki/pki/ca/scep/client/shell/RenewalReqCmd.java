@@ -49,7 +49,7 @@ import org.xipki.scep4j.client.exception.ScepClientException;
  */
 
 @Command(scope = "scep", name = "renewal-req",
-        description="enroll certificate via messageType RenewalReq")
+        description = "enroll certificate via messageType RenewalReq")
 public class RenewalReqCmd extends AbstractEnrollCertCmd
 {
 

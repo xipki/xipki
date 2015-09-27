@@ -53,4 +53,8 @@ public class ScepObjectIdentifiers
     public static final ASN1ObjectIdentifier id_failInfo = id_attributes.branch("4");
     public static final ASN1ObjectIdentifier id_senderNonce = id_attributes.branch("5");
     public static final ASN1ObjectIdentifier id_recipientNonce = id_attributes.branch("6");
+
+    private ScepObjectIdentifiers()
+    {
+    }
 }

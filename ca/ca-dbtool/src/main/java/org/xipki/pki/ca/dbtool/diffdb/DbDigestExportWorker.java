@@ -176,7 +176,7 @@ public class DbDigestExportWorker extends DbPortWorker
             {
                 throw new IllegalArgumentException("unknown database schema");
             }
-        }finally
+        } finally
         {
             dataSource.returnConnection(conn);
         }

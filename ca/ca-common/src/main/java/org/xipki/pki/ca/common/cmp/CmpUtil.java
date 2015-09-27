@@ -63,6 +63,10 @@ import org.xipki.security.api.NoIdleSignerException;
 
 public class CmpUtil
 {
+    private CmpUtil()
+    {
+    }
+
     public static PKIMessage addProtection(
             final PKIMessage pkiMessage,
             final ConcurrentContentSigner signer,
@@ -150,7 +154,7 @@ public class CmpUtil
         {
             ProtectedPKIMessage signedMessage = builder.build(realSigner);
             return signedMessage.toASN1Structure();
-        }finally
+        } finally
         {
             signer.returnContentSigner(realSigner);
         }

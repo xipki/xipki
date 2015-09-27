@@ -147,7 +147,7 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
             } while (true);
 
             return bytearrayoutputstream.toByteArray();
-        }finally
+        } finally
         {
             inputstream.close();
         }

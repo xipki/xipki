@@ -165,7 +165,7 @@ public final class CAClientImpl implements CAClient
                 }
 
                 autoConfCAs(null);
-            }finally
+            } finally
             {
                 lastUpdate = System.currentTimeMillis();
                 inProcess.set(false);
@@ -426,7 +426,7 @@ public final class CAClientImpl implements CAClient
                 }
             }
 
-            // ------------------------------------------------
+            //------------------------------------------------
             if (requestorConf.getSignerType() != null)
             {
                 try
@@ -719,7 +719,7 @@ public final class CAClientImpl implements CAClient
     throws CAClientException, PKIErrorException
     {
         X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
-        return revokeCert(issuer, cert.getSerialNumber(), reason, invalidityDate,debug);
+        return revokeCert(issuer, cert.getSerialNumber(), reason, invalidityDate, debug);
     }
 
     @Override
@@ -884,8 +884,7 @@ public final class CAClientImpl implements CAClient
             final X500Name issuer)
     throws CAClientException
     {
-
-        if (issuer == null )
+        if (issuer == null)
         {
             throw new CAClientException("invalid issuer");
         }
@@ -1424,7 +1423,7 @@ public final class CAClientImpl implements CAClient
 
             if (root instanceof JAXBElement)
             {
-                return (CAClientType) ((JAXBElement<?>)root).getValue();
+                return (CAClientType) ((JAXBElement<?>) root).getValue();
             }
             else
             {
@@ -1452,7 +1451,7 @@ public final class CAClientImpl implements CAClient
                 } catch (CertificateException e)
                 {
                     throw new CAClientException(
-                            "CertificateParsingException for request (id=" + entry.getId()+"): "
+                            "CertificateParsingException for request (id=" + entry.getId() + "): "
                             + e.getMessage());
                 }
             }

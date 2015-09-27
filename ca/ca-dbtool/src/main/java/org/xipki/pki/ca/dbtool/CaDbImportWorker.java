@@ -271,7 +271,7 @@ public class CaDbImportWorker extends DbPortWorker
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             dataSource.returnConnection(conn);
         }

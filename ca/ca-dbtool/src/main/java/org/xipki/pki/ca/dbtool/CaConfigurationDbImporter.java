@@ -180,7 +180,7 @@ class CaConfigurationDbImporter extends DbPorter
                         throw translate(sql, e);
                     }
                 }
-            }finally
+            } finally
             {
                 releaseResources(ps, null);
             }
@@ -223,7 +223,7 @@ class CaConfigurationDbImporter extends DbPorter
                     throw translate(sql, e);
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -256,7 +256,7 @@ class CaConfigurationDbImporter extends DbPorter
                     throw translate(sql, e);
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -293,7 +293,7 @@ class CaConfigurationDbImporter extends DbPorter
                     throw translate(sql, e);
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -327,7 +327,7 @@ class CaConfigurationDbImporter extends DbPorter
                     throw translate(sql, e);
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -361,7 +361,7 @@ class CaConfigurationDbImporter extends DbPorter
                     throw translate(sql, e);
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -406,7 +406,7 @@ class CaConfigurationDbImporter extends DbPorter
                     throw e;
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -493,7 +493,7 @@ class CaConfigurationDbImporter extends DbPorter
                     throw e;
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -507,7 +507,7 @@ class CaConfigurationDbImporter extends DbPorter
     {
         System.out.println("importing table CAALIAS");
         final String sql = "INSERT INTO CAALIAS (NAME, CA_NAME) VALUES (?, ?)";
-        PreparedStatement ps = prepareStatement(sql);;
+        PreparedStatement ps = prepareStatement(sql);
         try
         {
             for (CaaliasType caalias : caaliases.getCaalias())
@@ -525,7 +525,7 @@ class CaConfigurationDbImporter extends DbPorter
                     throw translate(sql, e);
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -563,7 +563,7 @@ class CaConfigurationDbImporter extends DbPorter
                     throw translate(sql, e);
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -595,7 +595,7 @@ class CaConfigurationDbImporter extends DbPorter
                     throw translate(sql, e);
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -630,7 +630,7 @@ class CaConfigurationDbImporter extends DbPorter
                     throw translate(sql, e);
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -664,7 +664,7 @@ class CaConfigurationDbImporter extends DbPorter
                     throw translate(sql, e);
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }

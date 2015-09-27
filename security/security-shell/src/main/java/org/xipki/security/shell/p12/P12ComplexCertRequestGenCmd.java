@@ -63,7 +63,7 @@ import org.xipki.security.shell.CertRequestGenCmd;
  */
 
 @Command(scope = "xipki-tk", name = "req-p12-complex",
-        description="generate complex PKCS#10 request with PKCS#12 keystore")
+        description = "generate complex PKCS#10 request with PKCS#12 keystore")
 public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd
 {
     @Option(name = "--p12",
@@ -97,7 +97,7 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd
             fIn = new FileInputStream(expandFilepath(p12File));
             ks = KeyStore.getInstance("PKCS12", "BC");
             ks.load(fIn, getPassword());
-        }finally
+        } finally
         {
             if (fIn != null)
             {

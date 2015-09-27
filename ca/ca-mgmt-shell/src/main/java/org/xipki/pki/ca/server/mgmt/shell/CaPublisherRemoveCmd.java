@@ -43,7 +43,7 @@ import org.apache.karaf.shell.commands.Option;
  */
 
 @Command(scope = "xipki-ca", name = "capub-rm",
-        description="remove publisher from CA")
+        description = "remove publisher from CA")
 public class CaPublisherRemoveCmd extends CaCmd
 {
     @Option(name = "--ca",

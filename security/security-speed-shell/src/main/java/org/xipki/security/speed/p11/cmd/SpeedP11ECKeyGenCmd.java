@@ -46,7 +46,7 @@ import org.xipki.security.speed.p11.P11ECKeyGenLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "speed-ec-gen",
-        description="performance test of PKCS#11 EC key generation")
+        description = "performance test of PKCS#11 EC key generation")
 public class SpeedP11ECKeyGenCmd extends SpeedP11Cmd
 {
     @Option(name = "--curve",

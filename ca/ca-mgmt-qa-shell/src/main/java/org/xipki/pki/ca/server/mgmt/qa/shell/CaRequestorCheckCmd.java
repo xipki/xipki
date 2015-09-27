@@ -54,7 +54,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  */
 
 @Command(scope = "xipki-caqa", name = "careq-check",
-        description="check information of requestors in CA (QA)")
+        description = "check information of requestors in CA (QA)")
 public class CaRequestorCheckCmd extends CaCmd
 {
     @Option(name = "--ca",

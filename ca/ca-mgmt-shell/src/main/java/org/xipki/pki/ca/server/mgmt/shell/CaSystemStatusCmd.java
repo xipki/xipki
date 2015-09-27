@@ -45,7 +45,7 @@ import org.xipki.pki.ca.server.mgmt.api.CASystemStatus;
  */
 
 @Command(scope = "xipki-ca", name = "system-status",
-        description="show CA system status")
+        description = "show CA system status")
 public class CaSystemStatusCmd extends CaCmd
 {
     @Override

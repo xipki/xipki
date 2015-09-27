@@ -49,7 +49,7 @@ import org.apache.karaf.shell.commands.Command;
  */
 
 @Command(scope = "xipki-ca", name = "caalias-info",
-        description="show information of CA alias")
+        description = "show information of CA alias")
 public class CaAliasInfoCmd extends CaCmd
 {
     @Argument(index = 0, name = "alias", description = "CA alias")

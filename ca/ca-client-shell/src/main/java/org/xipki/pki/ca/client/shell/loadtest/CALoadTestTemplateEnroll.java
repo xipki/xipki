@@ -135,9 +135,11 @@ public class CALoadTestTemplateEnroll extends LoadExecutor
                 for (Integer certId : certRequests.keySet())
                 {
                     CertRequestWithProfile certRequest = certRequests.get(certId);
-                    EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType
-                            ("id-" + certId, certRequest.certprofile, certRequest.certRequest,
-                                    RA_VERIFIED);
+                    EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType(
+                            "id-" + certId,
+                            certRequest.certprofile,
+                            certRequest.certRequest,
+                            RA_VERIFIED);
 
                     request.addRequestEntry(requestEntry);
                 }
@@ -327,7 +329,7 @@ public class CALoadTestTemplateEnroll extends LoadExecutor
 
             if (root instanceof JAXBElement)
             {
-                return (EnrollTemplateType) ((JAXBElement<?>)root).getValue();
+                return (EnrollTemplateType) ((JAXBElement<?>) root).getValue();
             }
             else
             {

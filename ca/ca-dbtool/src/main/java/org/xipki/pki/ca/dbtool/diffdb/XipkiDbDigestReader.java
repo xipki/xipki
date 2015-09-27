@@ -198,7 +198,7 @@ public class XipkiDbDigestReader implements DigestReader
         } catch (SQLException e)
         {
             throw datasource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }

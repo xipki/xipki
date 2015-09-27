@@ -56,7 +56,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  */
 
 @Command(scope = "xipki-cli", name = "getcrl",
-        description="download CRL")
+        description = "download CRL")
 public class GetCRLCmd extends CRLCmd
 {
     @Option(name = "--with-basecrl",
@@ -77,7 +77,7 @@ public class GetCRLCmd extends CRLCmd
         try
         {
             return caClient.downloadCRL(caName, debug);
-        }finally
+        } finally
         {
             saveRequestResponse(debug);
         }
@@ -93,7 +93,7 @@ public class GetCRLCmd extends CRLCmd
             throw new IllegalCmdParamException("no CA is configured");
         }
 
-        if (caName != null && ! caNames.contains(caName))
+        if (caName != null && !caNames.contains(caName))
         {
             throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs "
                     + caNames);

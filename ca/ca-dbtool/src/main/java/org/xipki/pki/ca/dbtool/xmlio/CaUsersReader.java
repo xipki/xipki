@@ -80,7 +80,7 @@ public class CaUsersReader extends DbiXmlReader
 
             lastEvent = event;
 
-            switch(event)
+            switch (event)
             {
             case XMLStreamConstants.START_ELEMENT:
                 if (CaUserType.TAG_ROOT.equals(reader.getLocalName()))
@@ -97,7 +97,7 @@ public class CaUsersReader extends DbiXmlReader
                     break;
                 }
 
-                switch(reader.getLocalName())
+                switch (reader.getLocalName())
                 {
                 case CaUserType.TAG_ROOT:
                     ret.validate();
@@ -114,8 +114,12 @@ public class CaUsersReader extends DbiXmlReader
                 case CaUserType.TAG_password:
                     ret.setPassword(tagContent);
                     break;
-                } // end switch(reader.getLocalName())
-            } // end switch(event)
+                default:
+                    break;
+                } // end switch (reader.getLocalName())
+            default:
+                break;
+            } // end switch (event)
         } // end while
 
         return null;

@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CRLException;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
@@ -164,7 +163,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -194,7 +193,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -283,7 +282,7 @@ class CertStoreQueryExecutor
             // cert
             int idx = 2;
             ps_addcert.setInt(idx++, CertArt.X509PKC.getCode());
-            ps_addcert.setLong(idx++, System.currentTimeMillis()/1000);
+            ps_addcert.setLong(idx++, System.currentTimeMillis() / 1000);
             ps_addcert.setLong(idx++, cert.getSerialNumber().longValue());
             ps_addcert.setString(idx++, subjectText);
             if (fpCn != 0)
@@ -302,8 +301,8 @@ class CertStoreQueryExecutor
                 ps_addcert.setNull(idx++, Types.BIGINT);
             }
 
-            ps_addcert.setLong(idx++, cert.getNotBefore().getTime()/1000);
-            ps_addcert.setLong(idx++, cert.getNotAfter().getTime()/1000);
+            ps_addcert.setLong(idx++, cert.getNotBefore().getTime() / 1000);
+            ps_addcert.setLong(idx++, cert.getNotAfter().getTime() / 1000);
             setBoolean(ps_addcert, idx++, false);
             ps_addcert.setInt(idx++, certprofileId);
             ps_addcert.setInt(idx++, caId);
@@ -411,7 +410,7 @@ class CertStoreQueryExecutor
                         LOG.warn("could not close PreparedStatement", t);
                     }
                 }
-            }finally
+            } finally
             {
                 dataSource.returnConnection(conn);
             }
@@ -438,7 +437,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -461,7 +460,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -491,7 +490,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -514,7 +513,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -565,7 +564,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -599,7 +598,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -629,7 +628,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -663,7 +662,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -715,11 +714,11 @@ class CertStoreQueryExecutor
                 ps.setNull(idx++, Types.INTEGER);
             }
             Date d = crl.getThisUpdate();
-            ps.setLong(idx++, d.getTime()/1000);
+            ps.setLong(idx++, d.getTime() / 1000);
             d = crl.getNextUpdate();
             if (d != null)
             {
-                ps.setLong(idx++, d.getTime()/1000);
+                ps.setLong(idx++, d.getTime() / 1000);
             }
             else
             {
@@ -748,7 +747,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -804,13 +803,13 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setLong(idx++, new Date().getTime()/1000);
+            ps.setLong(idx++, new Date().getTime() / 1000);
             setBoolean(ps, idx++, true);
-            ps.setLong(idx++, revInfo.getRevocationTime().getTime()/1000);
+            ps.setLong(idx++, revInfo.getRevocationTime().getTime() / 1000);
             if (revInfo.getInvalidityTime() != null)
             {
-                ps.setLong(idx++, revInfo.getInvalidityTime().getTime()/1000);
-            }else
+                ps.setLong(idx++, revInfo.getInvalidityTime().getTime() / 1000);
+            } else
             {
                 ps.setNull(idx++, Types.BIGINT);
             }
@@ -835,7 +834,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(SQL_REVOKE_CERT, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -891,7 +890,7 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setLong(idx++, new Date().getTime()/1000);
+            ps.setLong(idx++, new Date().getTime() / 1000);
             setBoolean(ps, idx++, false);
             ps.setNull(idx++, Types.INTEGER);
             ps.setNull(idx++, Types.INTEGER);
@@ -915,7 +914,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -950,7 +949,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -1003,7 +1002,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -1088,7 +1087,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -1128,7 +1127,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -1186,7 +1185,7 @@ class CertStoreQueryExecutor
                             : startSerial.longValue() - 1);
             if (notExpiredAt != null)
             {
-                ps.setLong(idx++, notExpiredAt.getTime()/1000 + 1);
+                ps.setLong(idx++, notExpiredAt.getTime() / 1000 + 1);
             }
             rs = ps.executeQuery();
 
@@ -1201,7 +1200,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -1246,7 +1245,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -1315,7 +1314,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -1372,7 +1371,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -1412,7 +1411,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -1439,7 +1438,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -1492,8 +1491,9 @@ class CertStoreQueryExecutor
                 long rev_time = rs.getLong("RT");
                 long invalidity_time = rs.getLong("RIT");
 
-                Date invalidityTime = (invalidity_time == 0 || invalidity_time == rev_time) ?
-                        null : new Date(invalidity_time * 1000);
+                Date invalidityTime = (invalidity_time == 0 || invalidity_time == rev_time)
+                        ? null
+                        : new Date(invalidity_time * 1000);
                 CertRevocationInfo revInfo = new CertRevocationInfo(rev_reason,
                         new Date(rev_time * 1000), invalidityTime);
                 certInfo.setRevocationInfo(revInfo);
@@ -1506,7 +1506,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -1554,7 +1554,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -1633,7 +1633,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -1708,7 +1708,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -1779,7 +1779,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -1821,7 +1821,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -1848,7 +1848,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -1884,7 +1884,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -1956,7 +1956,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -2000,7 +2000,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -2059,7 +2059,7 @@ class CertStoreQueryExecutor
             } catch (SQLException e)
             {
                 throw dataSource.translate(sql, e);
-            }finally
+            } finally
             {
                 releaseDbResources(null, rs);
             }
@@ -2123,7 +2123,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -2162,7 +2162,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -2218,7 +2218,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -2303,7 +2303,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -2461,7 +2461,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -2552,7 +2552,7 @@ class CertStoreQueryExecutor
             try
             {
                 rs = ps.executeQuery();
-            }finally
+            } finally
             {
                 releaseDbResources(ps, rs);
             }
@@ -2619,7 +2619,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -2664,7 +2664,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -2701,7 +2701,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, rs);
         }
@@ -2734,7 +2734,7 @@ class CertStoreQueryExecutor
             } catch (SQLException e)
             {
                 throw dataSource.translate(sql, e);
-            }finally
+            } finally
             {
                 try
                 {
@@ -2768,7 +2768,7 @@ class CertStoreQueryExecutor
                     throw dataSource.translate(sql, e);
                 }
             }
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2797,7 +2797,7 @@ class CertStoreQueryExecutor
             } catch (SQLException e)
             {
                 throw dataSource.translate(sql, e);
-            }finally
+            } finally
             {
                 try
                 {
@@ -2831,7 +2831,7 @@ class CertStoreQueryExecutor
                     throw dataSource.translate(updateSql, e);
                 }
             }
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2930,7 +2930,7 @@ class CertStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, rs);
         }

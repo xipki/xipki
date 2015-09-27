@@ -50,7 +50,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "responder-check",
-        description="check information of responder (QA)")
+        description = "check information of responder (QA)")
 public class ResponderCheckCmd extends ResponderUpdateCmd
 {
 

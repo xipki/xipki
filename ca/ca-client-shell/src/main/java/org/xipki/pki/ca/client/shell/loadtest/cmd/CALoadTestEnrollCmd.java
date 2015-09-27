@@ -53,7 +53,7 @@ import org.xipki.pki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
  */
 
 @Command(scope = "xipki-cli", name = "loadtest-enroll",
-        description="CA Client Enroll Load test")
+        description = "CA Client Enroll Load test")
 public class CALoadTestEnrollCmd extends CALoadTestCmd
 {
 
@@ -81,11 +81,11 @@ public class CALoadTestEnrollCmd extends CALoadTestCmd
             description = "number of threads")
     private Integer numThreads = 5;
 
-    @Option(name="--key-type",
+    @Option(name = "--key-type",
             description = "key type to be requested")
     private String keyType = "RSA";
 
-    @Option(name="--key-size",
+    @Option(name = "--key-size",
             description = "modulus length of RSA key or p length of DSA key")
     private Integer keysize = 2048;
 

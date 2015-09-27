@@ -43,7 +43,7 @@ import org.apache.karaf.shell.commands.Option;
  */
 
 @Command(scope = "xipki-ca", name = "caprofile-rm",
-        description="remove certificate profile from CA")
+        description = "remove certificate profile from CA")
 public class CaProfileRemoveCmd extends CaCmd
 {
     @Option(name = "--ca",

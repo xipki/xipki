@@ -70,7 +70,7 @@ public class Slf4jAuditServiceImpl implements AuditService
 
         try
         {
-            switch(event.getLevel())
+            switch (event.getLevel())
             {
             case DEBUG:
                 if (LOG.isDebugEnabled())
@@ -153,7 +153,7 @@ public class Slf4jAuditServiceImpl implements AuditService
         {
             CharArrayWriter msg = event.toCharArrayWriter("");
             AuditLevel al = event.getLevel();
-            switch(al)
+            switch (al)
             {
             case DEBUG:
                 if (LOG.isDebugEnabled())

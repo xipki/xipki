@@ -52,7 +52,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-cli", name = "p10-enroll",
-        description="enroll certificate via PKCS#10 request")
+        description = "enroll certificate via PKCS#10 request")
 public class P10EnrollCertCmd extends ClientCmd
 {
 
@@ -95,7 +95,7 @@ public class P10EnrollCertCmd extends ClientCmd
         try
         {
             result = caClient.requestCert(p10Req, profile, caName, user, debug);
-        }finally
+        } finally
         {
             saveRequestResponse(debug);
         }

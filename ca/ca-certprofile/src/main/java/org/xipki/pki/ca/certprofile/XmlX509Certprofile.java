@@ -447,12 +447,14 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             if (extConf != null)
             {
                 Boolean b = extConf.isIncludeCaIssuers();
-                boolean includesCaIssuers = b == null ?
-                        true : b.booleanValue();
+                boolean includesCaIssuers = (b == null)
+                        ? true
+                        : b.booleanValue();
 
                 b = extConf.isIncludeOcsp();
-                boolean includesOcsp = b == null ?
-                        true : b.booleanValue();
+                boolean includesOcsp = (b == null)
+                        ? true
+                        : b.booleanValue();
 
                 this.aIAControl = new AuthorityInfoAccessControl(includesCaIssuers, includesOcsp);
             }
@@ -1161,7 +1163,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                 }
 
                 DERIA5String sourceDataUri = m.getSourceDataUri();
-                switch(biometricDataOption.getSourceDataUriOccurrence())
+                switch (biometricDataOption.getSourceDataUriOccurrence())
                 {
                 case FORBIDDEN:
                     sourceDataUri = null;

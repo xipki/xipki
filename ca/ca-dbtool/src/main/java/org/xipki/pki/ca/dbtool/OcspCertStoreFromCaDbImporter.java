@@ -408,7 +408,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                     throw e;
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }

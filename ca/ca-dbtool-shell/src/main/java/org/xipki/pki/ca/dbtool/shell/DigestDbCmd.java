@@ -47,7 +47,7 @@ import org.xipki.pki.ca.dbtool.diffdb.DbDigestExportWorker;
  */
 
 @Command(scope = "xipki-db", name = "digest-db",
-        description="digest XiPKI/EJBCA database")
+        description = "digest XiPKI/EJBCA database")
 public class DigestDbCmd extends DbPortCmd
 {
     @Option(name = "--db-conf",

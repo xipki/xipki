@@ -60,7 +60,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 @Command(scope = "xipki-ca", name = "ca-up",
-        description="update CA")
+        description = "update CA")
 public class CaUpdateCmd extends CaCmd
 {
     @Option(name = "--name", aliases = "-n",

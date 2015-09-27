@@ -49,7 +49,7 @@ import jline.console.ConsoleReader;
  */
 
 @Command(scope = "xipki-cmd", name = "copy-file",
-        description="copy file")
+        description = "copy file")
 public class CopyFileCmd extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "source file",
@@ -64,7 +64,7 @@ public class CopyFileCmd extends XipkiOsgiCommandSupport
                     + "(required)")
     private String dest;
 
-    @Option(name = "--recursive", aliases="-r",
+    @Option(name = "--recursive", aliases = "-r",
             description = "copy directories and their contents recursively")
     private Boolean recursive = Boolean.FALSE;
 

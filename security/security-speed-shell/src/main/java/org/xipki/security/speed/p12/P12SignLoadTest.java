@@ -75,7 +75,7 @@ public abstract class P12SignLoadTest extends LoadExecutor
         ParamUtil.assertNotNull("keystore", keystore);
 
         String signerConf = SecurityFactoryImpl.getKeystoreSignerConf(
-                new ByteArrayInputStream(keystore), password, signatureAlgorithm, 20);;
+                new ByteArrayInputStream(keystore), password, signatureAlgorithm, 20);
         this.signer = securityFactory.createSigner("PKCS12", signerConf, (X509Certificate) null);
     }
 

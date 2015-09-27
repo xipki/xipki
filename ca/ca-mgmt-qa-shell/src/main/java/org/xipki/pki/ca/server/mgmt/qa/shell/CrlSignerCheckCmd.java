@@ -47,7 +47,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "crlsigner-check",
-        description="check information of CRL signers (QA)")
+        description = "check information of CRL signers (QA)")
 public class CrlSignerCheckCmd extends CrlSignerUpdateCmd
 {
     @Override
@@ -61,7 +61,7 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd
         X509CrlSignerEntry cs = caManager.getCrlSigner(name);
         if (cs == null)
         {
-            throw new CmdFailure("CRL signer named '" +name + "' is not configured");
+            throw new CmdFailure("CRL signer named '" + name + "' is not configured");
         }
 
         if (ey.getSignerType() != null)

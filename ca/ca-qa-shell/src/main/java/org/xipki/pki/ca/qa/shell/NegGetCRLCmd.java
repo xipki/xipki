@@ -47,7 +47,7 @@ import org.xipki.common.RequestResponseDebug;
  */
 
 @Command(scope = "xipki-qa", name = "neg-getcrl",
-        description="download CRL (negative, for QA)")
+        description = "download CRL (negative, for QA)")
 public class NegGetCRLCmd extends NegCRLCmd
 {
 
@@ -60,7 +60,7 @@ public class NegGetCRLCmd extends NegCRLCmd
         try
         {
             return caClient.downloadCRL(caName, debug);
-        }finally
+        } finally
         {
             saveRequestResponse(debug);
         }

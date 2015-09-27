@@ -45,7 +45,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "publisher-check",
-        description="check information of publishers (QA)")
+        description = "check information of publishers (QA)")
 public class PublisherCheckCmd extends PublisherUpdateCmd
 {
     @Override
@@ -57,7 +57,7 @@ public class PublisherCheckCmd extends PublisherUpdateCmd
         PublisherEntry cp = caManager.getPublisher(name);
         if (cp == null)
         {
-            throw new CmdFailure("publisher named '" +name + "' is not configured");
+            throw new CmdFailure("publisher named '" + name + "' is not configured");
         }
 
         if (cp.getType() != null)

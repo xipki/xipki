@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-ca-rm",
-        description="remove CA (negative, QA)")
+        description = "remove CA (negative, QA)")
 public class NegCaRemoveCmd extends CaRemoveCmd
 {
 

@@ -154,6 +154,10 @@ public class SunNamedCurveExtender
         }
     }
 
+    private SunNamedCurveExtender()
+    {
+    }
+
     public static void main(
             final String[] args)
     {
@@ -407,7 +411,7 @@ public class SunNamedCurveExtender
 
         try
         {
-            Map<?,?> oidMap = (Map<?, ?>) field_oidMap.get(null);
+            Map<?, ?> oidMap = (Map<?, ?>) field_oidMap.get(null);
             Collection<?> namedCurves = Collections.unmodifiableCollection(oidMap.values());
 
             field_specCollection.set(null, namedCurves);
@@ -516,7 +520,7 @@ public class SunNamedCurveExtender
         return true;
     }
 
-    private static final Method getMethod(
+    private static Method getMethod(
             final Class<?> clz,
             final String methodName,
             final Class<?>[] params)
@@ -550,7 +554,7 @@ public class SunNamedCurveExtender
         return null;
     }
 
-    private static final Field getField(
+    private static Field getField(
             final Class<?> clazz,
             final String fieldName)
     {
@@ -672,7 +676,7 @@ public class SunNamedCurveExtender
     {
         try
         {
-            return (String) method_NamedCurve_getObjectId.invoke(namedCurve, (Object)null);
+            return (String) method_NamedCurve_getObjectId.invoke(namedCurve, (Object) null);
         } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
         {
             LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());

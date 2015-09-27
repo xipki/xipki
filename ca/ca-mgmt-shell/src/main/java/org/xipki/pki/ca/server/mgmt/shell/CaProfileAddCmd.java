@@ -44,7 +44,7 @@ import org.xipki.common.util.StringUtil;
  */
 
 @Command(scope = "xipki-ca", name = "caprofile-add",
-        description="add certificate profile to CA")
+        description = "add certificate profile to CA")
 public class CaProfileAddCmd extends CaCmd
 {
     @Option(name = "--ca",

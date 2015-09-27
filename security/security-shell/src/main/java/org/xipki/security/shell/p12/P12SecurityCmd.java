@@ -78,7 +78,7 @@ public abstract class P12SecurityCmd extends SecurityCmd
             fIn = new FileInputStream(expandFilepath(p12File));
             ks = KeyStore.getInstance("PKCS12", "BC");
             ks.load(fIn, getPassword());
-        }finally
+        } finally
         {
             if (fIn != null)
             {

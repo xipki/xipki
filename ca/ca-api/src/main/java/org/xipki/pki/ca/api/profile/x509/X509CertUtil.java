@@ -67,6 +67,10 @@ import org.xipki.common.util.CollectionUtil;
 public class X509CertUtil
 {
 
+    private X509CertUtil()
+    {
+    }
+
     public static BasicConstraints createBasicConstraints(
             final boolean isCa,
             final Integer pathLen)
@@ -204,7 +208,7 @@ public class X509CertUtil
         List<PolicyQualifierInfo> qualifierInfos = new ArrayList<>(qualifiers.size());
         for (CertificatePolicyQualifier qualifier : qualifiers)
         {
-            PolicyQualifierInfo qualifierInfo ;
+            PolicyQualifierInfo qualifierInfo;
             if (qualifier.getCpsUri() != null)
             {
                 qualifierInfo = new PolicyQualifierInfo(qualifier.getCpsUri());

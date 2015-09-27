@@ -52,7 +52,7 @@ import org.xipki.common.util.CollectionUtil;
  */
 
 @Command(scope = "xipki-ca", name = "ca-info",
-        description="show information of CA")
+        description = "show information of CA")
 public class CaInfoCmd extends CaCmd
 {
     @Argument(index = 0, name = "name", description = "CA name")

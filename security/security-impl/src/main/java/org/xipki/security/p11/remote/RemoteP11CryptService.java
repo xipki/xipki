@@ -609,7 +609,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     {
         if (moduleConf.isSlotIncluded(slotId) == false)
         {
-            throw new SignerException("cound not find slot ("+ slotId.toString() + ")");
+            throw new SignerException("cound not find slot (" + slotId.toString() + ")");
         }
     }
 

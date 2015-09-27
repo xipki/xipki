@@ -43,7 +43,7 @@ import org.apache.karaf.shell.commands.Command;
  */
 
 @Command(scope = "xipki-ca", name = "caalias-rm",
-        description="remove CA alias")
+        description = "remove CA alias")
 public class CaAliasRemoveCmd extends CaCmd
 {
     @Argument(index = 0, name = "alias", description = "CA alias", required = true)

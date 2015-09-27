@@ -48,7 +48,7 @@ import org.xipki.security.speed.p11.P11DSAKeyGenLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-gen",
-        description="performance test of PKCS#11 DSA key generation (batch)")
+        description = "performance test of PKCS#11 DSA key generation (batch)")
 public class BSpeedP11DSAKeyGenCmd extends BSpeedP11Cmd
 {
 
@@ -64,7 +64,7 @@ public class BSpeedP11DSAKeyGenCmd extends BSpeedP11Cmd
         for (int i = 0; i < pqLens.length; i += 2)
         {
             int pLen = pqLens[i];
-            int qLen = pqLens[i+1];
+            int qLen = pqLens[i + 1];
 
             ret.add(
                     new P11DSAKeyGenLoadTest(slot, pLen, qLen));

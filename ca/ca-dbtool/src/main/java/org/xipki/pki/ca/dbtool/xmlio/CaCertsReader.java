@@ -81,7 +81,7 @@ public class CaCertsReader extends DbiXmlReader
 
             lastEvent = event;
 
-            switch(event)
+            switch (event)
             {
             case XMLStreamConstants.START_ELEMENT:
                 if (CaCertType.TAG_ROOT.equals(reader.getLocalName()))
@@ -98,7 +98,7 @@ public class CaCertsReader extends DbiXmlReader
                     break;
                 }
 
-                switch(reader.getLocalName())
+                switch (reader.getLocalName())
                 {
                 case CaCertType.TAG_ROOT:
                     ret.validate();
@@ -137,10 +137,10 @@ public class CaCertsReader extends DbiXmlReader
                     ret.setRr(Integer.parseInt(tagContent));
                     break;
                 case CaCertType.TAG_rs:
-                    ret.setRs(tagContent);;
+                    ret.setRs(tagContent);
                     break;
                 case CaCertType.TAG_rt:
-                    ret.setRt(Long.parseLong(tagContent));;
+                    ret.setRt(Long.parseLong(tagContent));
                     break;
                 case CaCertType.TAG_sn:
                     ret.setSn(tagContent);
@@ -149,13 +149,17 @@ public class CaCertsReader extends DbiXmlReader
                     ret.setTid(tagContent);
                     break;
                 case CaCertType.TAG_update:
-                    ret.setUpdate(Long.parseLong(tagContent));;
+                    ret.setUpdate(Long.parseLong(tagContent));
                     break;
                 case CaCertType.TAG_user:
                     ret.setUser(tagContent);
                     break;
-                } // end switch(reader.getLocalName())
-            } // end switch(event)
+                default:
+                    break;
+                } // end switch (reader.getLocalName())
+            default:
+                break;
+            } // end switch (event)
         } // end while
 
         return null;

@@ -48,7 +48,7 @@ import org.xipki.security.speed.p12.P12RSASignLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-rsa-sign-p12",
-        description="performance test of PKCS#12 RSA signature creation (batch)")
+        description = "performance test of PKCS#12 RSA signature creation (batch)")
 public class BSpeedP12RSASignCmd extends BSpeedP12SignCmd
 {
 

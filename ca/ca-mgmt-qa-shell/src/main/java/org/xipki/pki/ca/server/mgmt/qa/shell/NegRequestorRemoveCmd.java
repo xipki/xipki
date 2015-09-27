@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-requestor-rm",
-        description="remove requestor (negative, QA)")
+        description = "remove requestor (negative, QA)")
 public class NegRequestorRemoveCmd extends RequestorRemoveCmd
 {
 

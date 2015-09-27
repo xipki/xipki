@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-caprofile-rm",
-        description="remove certificate profile from CA (negative, QA)")
+        description = "remove certificate profile from CA (negative, QA)")
 public class NegCaProfileRemoveCmd extends CaProfileRemoveCmd
 {
 

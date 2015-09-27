@@ -50,7 +50,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 @Command(scope = "xipki-tk", name = "update-cert",
-        description="update certificate in PKCS#11 device")
+        description = "update certificate in PKCS#11 device")
 public class P11CertUpdateCmd extends P11SecurityCmd
 {
 

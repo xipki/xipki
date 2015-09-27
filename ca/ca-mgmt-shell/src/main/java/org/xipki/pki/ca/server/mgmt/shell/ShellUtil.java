@@ -48,6 +48,10 @@ import org.xipki.security.api.util.SecurityUtil;
 
 class ShellUtil
 {
+    private ShellUtil()
+    {
+    }
+
     static String canonicalizeSignerConf(
             final String keystoreType,
             final String signerConf,

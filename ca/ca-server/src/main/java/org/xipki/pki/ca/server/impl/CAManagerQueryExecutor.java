@@ -265,7 +265,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -303,7 +303,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(stmt, rs);
         }
@@ -335,7 +335,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(stmt, rs);
         }
@@ -443,7 +443,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(stmt, rs);
         }
@@ -474,7 +474,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(stmt, rs);
         }
@@ -513,7 +513,7 @@ class CAManagerQueryExecutor
         } catch (InvalidConfException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
-        }finally
+        } finally
         {
             dataSource.releaseResources(stmt, rs);
         }
@@ -545,7 +545,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(stmt, rs);
         }
@@ -578,7 +578,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(stmt, rs);
         }
@@ -750,7 +750,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(stmt, rs);
         }
@@ -798,7 +798,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(stmt, rs);
         }
@@ -832,7 +832,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(stmt, rs);
         }
@@ -873,7 +873,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(stmt, rs);
         }
@@ -897,7 +897,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -918,7 +918,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(stmt, null);
         }
@@ -1009,7 +1009,7 @@ class CAManagerQueryExecutor
         } catch (CertificateEncodingException | DataAccessException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -1034,7 +1034,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -1064,7 +1064,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -1092,7 +1092,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -1120,7 +1120,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -1152,7 +1152,7 @@ class CAManagerQueryExecutor
         } catch (CertificateEncodingException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -1191,7 +1191,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -1244,7 +1244,7 @@ class CAManagerQueryExecutor
         } catch (CertificateEncodingException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -1269,7 +1269,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -1297,7 +1297,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -1321,7 +1321,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -1426,7 +1426,7 @@ class CAManagerQueryExecutor
             {
                 DataAccessException tEx = dataSource.translate(sql, e);
                 throw new CAMgmtException(tEx.getMessage(), tEx);
-            }finally
+            } finally
             {
                 dataSource.releaseResources(stmt, rs);
             }
@@ -1652,7 +1652,7 @@ class CAManagerQueryExecutor
         } catch (CertificateEncodingException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -1742,7 +1742,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
             if (failed)
@@ -1787,7 +1787,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -1830,7 +1830,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -1939,7 +1939,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2087,7 +2087,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2108,7 +2108,7 @@ class CAManagerQueryExecutor
         AtomicInteger index = new AtomicInteger(1);
         Integer iType = addToSqlIfNotNull(sqlBuilder, index, responderType, "RESPONDER_TYPE");
         Integer iCert = addToSqlIfNotNull(sqlBuilder, index, responderBase64Cert, "RESPONDER_CERT");
-        Integer iControl= addToSqlIfNotNull(sqlBuilder, index, control, "CONTROL");
+        Integer iControl = addToSqlIfNotNull(sqlBuilder, index, control, "CONTROL");
         Integer iConf = addToSqlIfNotNull(sqlBuilder, index, responderConf, "RESPONDER_CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE CA_NAME=?");
@@ -2222,7 +2222,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2253,7 +2253,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2331,7 +2331,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2353,7 +2353,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2380,7 +2380,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2408,7 +2408,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2436,7 +2436,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2464,7 +2464,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2501,7 +2501,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2541,7 +2541,7 @@ class CAManagerQueryExecutor
         } catch (CertificateEncodingException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2588,7 +2588,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2704,7 +2704,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2771,7 +2771,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2833,7 +2833,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }
@@ -2857,7 +2857,7 @@ class CAManagerQueryExecutor
         {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
+        } finally
         {
             dataSource.releaseResources(ps, null);
         }

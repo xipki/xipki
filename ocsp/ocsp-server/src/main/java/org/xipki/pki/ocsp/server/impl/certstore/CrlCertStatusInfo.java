@@ -109,7 +109,7 @@ class CrlCertStatusInfo
             final Date thisUpdate,
             final Date nextUpdate)
     {
-        switch(certStatus)
+        switch (certStatus)
         {
         case ISSUER_UNKNOWN:
         case UNKNOWN:
@@ -125,19 +125,19 @@ class CrlCertStatusInfo
                         ? null
                         : certHashes.get(hashAlgo);
             }
+
             if (certStatus == CertStatus.GOOD)
             {
                 return CertStatusInfo.getGoodCertStatusInfo(hashAlgo, certHash, thisUpdate,
                         nextUpdate, certprofile);
-            }
-            else
+            } else
             {
                 return CertStatusInfo.getRevokedCertStatusInfo(revocationInfo, hashAlgo,
                         certHash, thisUpdate, nextUpdate, certprofile);
             }
+        default:
+            throw new RuntimeException("unknown certStatus: " + certStatus);
         }
-
-        return null;
     }
 
 }

@@ -76,7 +76,7 @@ public class X509IssuerInfo
         if (CollectionUtil.isEmpty(caIssuerURLs))
         {
             this.caIssuerURLs = null;
-        }else
+        } else
         {
             Set<String> set = new HashSet<>();
             set.addAll(caIssuerURLs);
@@ -86,7 +86,7 @@ public class X509IssuerInfo
         if (CollectionUtil.isEmpty(ocspURLs))
         {
             this.ocspURLs = null;
-        }else
+        } else
         {
             Set<String> set = new HashSet<>();
             set.addAll(ocspURLs);
@@ -96,7 +96,7 @@ public class X509IssuerInfo
         if (CollectionUtil.isEmpty(crlURLs))
         {
             this.crlURLs = null;
-        }else
+        } else
         {
             Set<String> set = new HashSet<>();
             set.addAll(crlURLs);
@@ -106,7 +106,7 @@ public class X509IssuerInfo
         if (CollectionUtil.isEmpty(deltaCrlURLs))
         {
             this.deltaCrlURLs = null;
-        }else
+        } else
         {
             Set<String> set = new HashSet<>();
             set.addAll(deltaCrlURLs);

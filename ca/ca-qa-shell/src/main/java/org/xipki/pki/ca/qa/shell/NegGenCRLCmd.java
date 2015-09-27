@@ -47,7 +47,7 @@ import org.xipki.common.RequestResponseDebug;
  */
 
 @Command(scope = "xipki-qa", name = "neg-gencrl",
-        description="generate CRL (negative, for QA)")
+        description = "generate CRL (negative, for QA)")
 public class NegGenCRLCmd extends NegCRLCmd
 {
 
@@ -60,7 +60,7 @@ public class NegGenCRLCmd extends NegCRLCmd
         try
         {
             return caClient.generateCRL(caName, debug);
-        }finally
+        } finally
         {
             saveRequestResponse(debug);
         }

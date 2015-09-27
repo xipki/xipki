@@ -65,7 +65,7 @@ public class OCSPResponseUnsuccessfulException extends OCSPResponseException
     private static String getOCSPResponseStatus(
             final int statusCode)
     {
-        switch(statusCode)
+        switch (statusCode)
         {
         case 1:
             return "malformedRequest";

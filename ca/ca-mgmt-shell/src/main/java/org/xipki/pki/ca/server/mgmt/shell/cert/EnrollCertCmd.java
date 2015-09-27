@@ -50,7 +50,7 @@ import org.xipki.common.util.IoUtil;
  */
 
 @Command(scope = "xipki-ca", name = "enroll-cert",
-        description="enroll certificate")
+        description = "enroll certificate")
 public class EnrollCertCmd extends CaCmd
 {
     @Option(name = "--ca",

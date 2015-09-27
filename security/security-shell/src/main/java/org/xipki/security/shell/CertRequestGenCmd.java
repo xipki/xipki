@@ -374,7 +374,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd
         try
         {
             p10Req  = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN, attributes);
-        }finally
+        } finally
         {
             identifiedSigner.returnContentSigner(signer);
         }

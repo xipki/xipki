@@ -49,6 +49,10 @@ public class KeyParametersOption
 {
     public static final AllowAllParametersOption allowAll = new AllowAllParametersOption();
 
+    private KeyParametersOption()
+    {
+    }
+
     public static class AllowAllParametersOption extends KeyParametersOption
     {
     }

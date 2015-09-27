@@ -544,7 +544,7 @@ public class X509CAInfo
         boolean signerRequired = false;
         for (Permission permission : permissions)
         {
-            switch(permission)
+            switch (permission)
             {
             case REMOVE_CERT:
             case UNREVOKE_CERT:
@@ -553,7 +553,7 @@ public class X509CAInfo
             default:
                 signerRequired = true;
                 break;
-            } // end switch(permission)
+            } // end switch (permission)
 
             if (signerRequired)
             {

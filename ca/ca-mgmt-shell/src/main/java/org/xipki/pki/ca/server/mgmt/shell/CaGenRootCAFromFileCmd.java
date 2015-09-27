@@ -48,7 +48,7 @@ import org.xipki.common.util.IoUtil;
  */
 
 @Command(scope = "xipki-ca", name = "gen-rcaf",
-        description="generate selfsigned CA from configuration file")
+        description = "generate selfsigned CA from configuration file")
 public class CaGenRootCAFromFileCmd extends CaAddFromFileCmd
 {
     @Option(name = "--p10",

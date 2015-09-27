@@ -59,7 +59,7 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
  */
 
 @Command(scope = "xipki-qa", name = "check-cert",
-        description="check the certificate")
+        description = "check the certificate")
 public class CheckCertCmd extends XipkiOsgiCommandSupport
 {
     @Option(name = "--cert", aliases = "-c",
@@ -85,7 +85,7 @@ public class CheckCertCmd extends XipkiOsgiCommandSupport
                     + "(required)")
     private String profileName;
 
-    @Option(name = "--verbose", aliases="-v",
+    @Option(name = "--verbose", aliases = "-v",
             description = "show status verbosely")
     private Boolean verbose = Boolean.FALSE;
 

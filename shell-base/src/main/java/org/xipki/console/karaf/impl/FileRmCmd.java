@@ -49,7 +49,7 @@ import jline.console.ConsoleReader;
  */
 
 @Command(scope = "xipki-cmd", name = "rm",
-        description="remove file or directory")
+        description = "remove file or directory")
 public class FileRmCmd extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "file",
@@ -58,11 +58,11 @@ public class FileRmCmd extends XipkiOsgiCommandSupport
                     + "(required)")
     private String targetPath;
 
-    @Option(name = "--recursive", aliases="-r",
+    @Option(name = "--recursive", aliases = "-r",
             description = "remove directories and their contents recursively")
     private Boolean recursive = Boolean.FALSE;
 
-    @Option(name = "--force", aliases="-f",
+    @Option(name = "--force", aliases = "-f",
             description = "ignore nonexistent files, never prompt")
     private Boolean force = Boolean.FALSE;
 
@@ -82,7 +82,7 @@ public class FileRmCmd extends XipkiOsgiCommandSupport
         {
             if (recursive == false)
             {
-                out("Please use option --recursive to delete directory");
+                out("Please use option--recursive to delete directory");
                 return null;
             }
 

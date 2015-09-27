@@ -47,6 +47,10 @@ import org.xipki.console.karaf.CmdFailure;
 public class MgmtQAShellUtil
 {
 
+    private MgmtQAShellUtil()
+    {
+    }
+
     public static void assertEquals(
             final String desc,
             String ex,

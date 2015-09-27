@@ -53,7 +53,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 @Command(scope = "xipki-ca", name = "crlsigner-up",
-        description="update CRL signer")
+        description = "update CRL signer")
 public class CrlSignerUpdateCmd extends CaCmd
 {
     @Option(name = "--name", aliases = "-n",
@@ -101,7 +101,7 @@ public class CrlSignerUpdateCmd extends CaCmd
             signerCertConf = Base64.toBase64String(certBytes);
         }
 
-        if (signerConf !=null)
+        if (signerConf != null)
         {
             String _signerType = signerType;
             if (_signerType == null)

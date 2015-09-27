@@ -257,7 +257,7 @@ public class SoftTokenContentSignerBuilder
                     signature.initSign(key);
                     if (i == 0)
                     {
-                        signature.update(new byte[]{1,2,3,4});
+                        signature.update(new byte[]{1, 2, 3, 4});
                         signature.sign();
                     }
                     ContentSigner signer = new SignatureSigner(signatureAlgId, signature, key);
@@ -508,13 +508,13 @@ public class SoftTokenContentSignerBuilder
 
             if (param instanceof ParametersWithRandom)
             {
-                ParametersWithRandom    rParam = (ParametersWithRandom)param;
+                ParametersWithRandom rParam = (ParametersWithRandom) param;
 
-                key = (RSAKeyParameters)rParam.getParameters();
+                key = (RSAKeyParameters) rParam.getParameters();
             }
             else
             {
-                key = (RSAKeyParameters)param;
+                key = (RSAKeyParameters) param;
             }
 
             RSAPrivateKey signingKey;

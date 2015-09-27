@@ -394,7 +394,7 @@ public class TargetDigestRetriever
         {
             for (int i = 0; i < n; i++)
             {
-                batchSelectStmt.setLong(i+2, serialNumbers.get(i));
+                batchSelectStmt.setLong(i + 2, serialNumbers.get(i));
             }
 
             rs = batchSelectStmt.executeQuery();

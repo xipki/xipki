@@ -232,7 +232,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
                     throw e;
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -319,7 +319,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
                     throw e;
                 }
             } // end for
-        }finally
+        } finally
         {
             releaseResources(ps_cert, null);
             releaseResources(ps_certhash, null);

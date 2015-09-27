@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "env-check",
-        description="check information of CA environment parameters (QA)")
+        description = "check information of CA environment parameters (QA)")
 public class EnvCheckCmd extends EnvUpdateCmd
 {
     @Override

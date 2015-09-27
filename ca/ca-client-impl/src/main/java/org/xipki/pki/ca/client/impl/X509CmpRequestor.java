@@ -245,8 +245,9 @@ abstract class X509CmpRequestor extends CmpRequestor
                     + PKIBody.TYPE_ERROR + "]");
         }
 
-        ASN1ObjectIdentifier expectedType = xipkiAction == null ?
-                CMPObjectIdentifiers.it_currentCRL : ObjectIdentifiers.id_xipki_cm_cmpGenmsg;
+        ASN1ObjectIdentifier expectedType = (xipkiAction == null)
+                ? CMPObjectIdentifiers.it_currentCRL
+                : ObjectIdentifiers.id_xipki_cm_cmpGenmsg;
 
         GenRepContent genRep = (GenRepContent) respBody.getContent();
 
@@ -438,7 +439,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         }
 
         int exptectedBodyType;
-        switch(req.getType())
+        switch (req.getType())
         {
         case CERT_REQ:
             exptectedBodyType = PKIBody.TYPE_CERT_REP;
@@ -499,8 +500,9 @@ abstract class X509CmpRequestor extends CmpRequestor
 
         boolean isImplicitConfirm = CmpUtil.isImplictConfirm(response.getPkiMessage().getHeader());
 
-        CertificateConfirmationContentBuilder certConfirmBuilder = isImplicitConfirm ?
-                null : new CertificateConfirmationContentBuilder();
+        CertificateConfirmationContentBuilder certConfirmBuilder = isImplicitConfirm
+                ? null
+                : new CertificateConfirmationContentBuilder();
         boolean requireConfirm = false;
 
         // We only accept the certificates which are requested.
@@ -751,7 +753,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         }
 
         int bodyType;
-        switch(req.getType())
+        switch (req.getType())
         {
         case CERT_REQ:
             bodyType = PKIBody.TYPE_CERT_REQ;

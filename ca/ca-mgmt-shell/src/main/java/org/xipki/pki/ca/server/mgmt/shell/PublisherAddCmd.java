@@ -45,7 +45,7 @@ import org.xipki.common.util.IoUtil;
  */
 
 @Command(scope = "xipki-ca", name = "publisher-add",
-        description="add publisher")
+        description = "add publisher")
 public class PublisherAddCmd extends CaCmd
 {
 

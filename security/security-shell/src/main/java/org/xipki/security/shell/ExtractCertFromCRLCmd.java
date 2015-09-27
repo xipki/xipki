@@ -60,7 +60,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 @Command(scope = "xipki-tk", name = "extract-cert",
-        description="extract certificates from CRL")
+        description = "extract certificates from CRL")
 public class ExtractCertFromCRLCmd extends SecurityCmd
 {
 
@@ -121,7 +121,7 @@ public class ExtractCertFromCRLCmd extends SecurityCmd
             try
             {
                 zip.write(certBytes);
-            }finally
+            } finally
             {
                 zip.closeEntry();
             }

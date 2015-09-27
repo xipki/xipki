@@ -140,7 +140,7 @@ public class ProcessLog
         }
         sb.append(percent).append('%');
 
-        long t = (now - startTime)/1000;  // in s
+        long t = (now - startTime) / 1000;  // in s
         String time = StringUtil.formatTime(t, true);
         sb.append("  ");
         sb.append(time);
@@ -171,7 +171,7 @@ public class ProcessLog
             sb.append(StringUtil.formatTime(remaining, true));
         } else
         {
-            sb.append("         --");
+            sb.append("        --");
         }
 
         // average
@@ -191,7 +191,7 @@ public class ProcessLog
             sb.append(StringUtil.formatTime(remaining, true));
         } else
         {
-            sb.append("         --");
+            sb.append("        --");
         }
 
         System.out.print(sb.toString());

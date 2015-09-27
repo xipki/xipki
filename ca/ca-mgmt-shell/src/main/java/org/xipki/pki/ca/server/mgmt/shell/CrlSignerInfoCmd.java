@@ -51,13 +51,13 @@ import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
  */
 
 @Command(scope = "xipki-ca", name = "crlsigner-info",
-        description="show information of CRL signer")
+        description = "show information of CRL signer")
 public class CrlSignerInfoCmd extends CaCmd
 {
     @Argument(index = 0, name = "name", description = "CRL signer name")
     private String name;
 
-    @Option(name = "--verbose", aliases="-v",
+    @Option(name = "--verbose", aliases = "-v",
             description = "show CRL signer information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
