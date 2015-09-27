@@ -191,8 +191,10 @@ public abstract class Client
                 return httpPOST(url, REQ_CONTENT_TYPE, request);
             } else
             {
-                String url = cAId.buildGetUrl(operation, request == null ?
-                        null : Base64.toBase64String(request));
+                String url = cAId.buildGetUrl(operation,
+                        (request == null)
+                            ? null
+                            : Base64.toBase64String(request));
                 return httpGET(url);
             }
         }

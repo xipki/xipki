@@ -54,7 +54,7 @@ import org.xipki.security.shell.CertRequestGenCmd;
  */
 
 @Command(scope = "xipki-tk", name = "req",
-        description="generate PKCS#10 request with PKCS#11 device")
+        description = "generate PKCS#10 request with PKCS#11 device")
 public class P11CertRequestGenCmd extends CertRequestGenCmd
 {
     @Option(name = "--slot",

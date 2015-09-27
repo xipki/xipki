@@ -106,7 +106,7 @@ public class PSOTemplate extends ASN1Object
     {
         if (obj == null || obj instanceof PSOTemplate)
         {
-            return (PSOTemplate)obj;
+            return (PSOTemplate) obj;
         }
 
         try
@@ -118,7 +118,7 @@ public class PSOTemplate extends ASN1Object
 
             if (obj instanceof byte[])
             {
-                return getInstance(ASN1Primitive.fromByteArray((byte[])obj));
+                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
         }
         catch (IOException | IllegalArgumentException e)

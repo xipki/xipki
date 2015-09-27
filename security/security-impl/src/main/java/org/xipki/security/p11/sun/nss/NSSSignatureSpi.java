@@ -99,7 +99,7 @@ public class NSSSignatureSpi extends SignatureSpi
         String ENCALGO = encrAlgorithmName.toUpperCase();
         if (RSA.equalsIgnoreCase(ENCALGO) || ECDSA.equals(ENCALGO))
         {
-            if (! (SHA1.equals(HASHALGO) || SHA224.equals(HASHALGO) || SHA256.equals(HASHALGO)
+            if (!(SHA1.equals(HASHALGO) || SHA224.equals(HASHALGO) || SHA256.equals(HASHALGO)
                     || SHA384.equals(HASHALGO) || SHA512.equals(HASHALGO)))
             {
                 throw new ProviderException(String.format(MSG_UNSUPPORTED_ALGO, HASHALGO, ENCALGO));
@@ -521,7 +521,7 @@ public class NSSSignatureSpi extends SignatureSpi
         block[0] = 0x01;                                                // type code 1
         for (int i = 1; i != block.length - inLen - 1; i++)
         {
-            block[i] = (byte)0xFF;
+            block[i] = (byte) 0xFF;
         }
 
         block[block.length - inLen - 1] = 0x00;             // mark the end of the padding
@@ -554,14 +554,14 @@ public class NSSSignatureSpi extends SignatureSpi
 
         // find and extract the message block.
         int start;
-        for (start = offset+1; start != block.length; start++)
+        for (start = offset + 1; start != block.length; start++)
         {
             byte pad = block[start];
             if (pad == 0)
             {
                 break;
             }
-            if (pad != (byte)0xff)
+            if (pad != (byte) 0xff)
             {
                 throw new InvalidCipherTextException("block padding incorrect");
             }

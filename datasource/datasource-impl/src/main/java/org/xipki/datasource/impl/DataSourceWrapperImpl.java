@@ -180,7 +180,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             } catch (SQLException e)
             {
                 throw translate(sqlUpdate, e);
-            }finally
+            } finally
             {
                 if (newConn)
                 {
@@ -729,7 +729,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 || databaseType == DatabaseType.HSQL
                 || databaseType == DatabaseType.MYSQL
                 || databaseType == DatabaseType.ORACLE
-                ||databaseType == DatabaseType.POSTGRES)
+                || databaseType == DatabaseType.POSTGRES)
         {
             HikariConfig conf = new HikariConfig(props);
             HikariDataSource service = new HikariDataSource(conf);
@@ -884,7 +884,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             } catch (Throwable t)
             {
                 LOG.warn("could not close statement", t);
-            }finally
+            } finally
             {
                 if (conn != null)
                 {
@@ -1005,7 +1005,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             if (conn == null)
             {
@@ -1057,7 +1057,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             if (conn == null)
             {
@@ -1172,7 +1172,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             if (conn == null)
             {
@@ -1397,7 +1397,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                         throw new DataAccessException(
                                 "could not increment the sequence " + sequenceName);
                     }
-                }finally
+                } finally
                 {
                     releaseStatementAndResultSet(null, rs);
                 }
@@ -1405,7 +1405,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             if (newConn)
             {
@@ -1802,7 +1802,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             if (conn == null)
             {

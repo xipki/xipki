@@ -489,7 +489,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                 try
                 {
                     return reqBuilder.build(singleSigner, signer.getCertificateChainAsBCObjects());
-                }finally
+                } finally
                 {
                     signer.returnContentSigner(singleSigner);
                 }

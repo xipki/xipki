@@ -68,4 +68,8 @@ public class XipkiCmpConstants
     public static final int ACTION_RP11_PSO_DSA_PLAIN    = 94;
     public static final int ACTION_RP11_PSO_DSA_X962     = 95;
 
+    private XipkiCmpConstants()
+    {
+    }
+
 }

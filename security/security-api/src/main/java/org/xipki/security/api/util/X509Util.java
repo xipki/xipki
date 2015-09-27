@@ -101,6 +101,10 @@ import org.xipki.security.api.ObjectIdentifiers;
 
 public class X509Util
 {
+    private X509Util()
+    {
+    }
+
     public static String getCommonName(
             final X500Principal name)
     {
@@ -170,8 +174,9 @@ public class X509Util
 
         List<RDN> rdns = new LinkedList<>();
 
-        List<ASN1ObjectIdentifier> sortedDNs = backwards ?
-                ObjectIdentifiers.getBackwardDNs() : ObjectIdentifiers.getForwardDNs();
+        List<ASN1ObjectIdentifier> sortedDNs = backwards
+                ? ObjectIdentifiers.getBackwardDNs()
+                : ObjectIdentifiers.getForwardDNs();
         int size = sortedDNs.size();
         for (int i = 0; i < size; i++)
         {
@@ -236,7 +241,7 @@ public class X509Util
         try
         {
             return parseCert(in);
-        }finally
+        } finally
         {
             in.close();
         }
@@ -531,7 +536,7 @@ public class X509Util
     {
         if (value instanceof ASN1String && !(value instanceof DERUniversalString))
         {
-            return ((ASN1String)value).getString();
+            return ((ASN1String) value).getString();
         }
         else
         {
@@ -554,7 +559,7 @@ public class X509Util
 
         for (int i = 0; i != cs.length; i++)
         {
-            cs[i] = (char)(data[i] & 0xff);
+            cs[i] = (char) (data[i] & 0xff);
         }
 
         return new String(cs);

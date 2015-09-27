@@ -96,7 +96,7 @@ public class QaCertificatePolicies extends QaExtension
             if (jaxb.getPolicyQualifiers() == null)
             {
                 this.policyQualifiers = null;
-            }else
+            } else
             {
                 this.policyQualifiers = new QaPolicyQualifiers(jaxb.getPolicyQualifiers());
             }

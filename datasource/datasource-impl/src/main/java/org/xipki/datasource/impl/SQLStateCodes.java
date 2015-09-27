@@ -82,7 +82,7 @@ public class SQLStateCodes
     public static SQLStateCodes newInstance(DatabaseType dbType)
     {
         ParamUtil.assertNotNull("dbType", dbType);
-        switch(dbType)
+        switch (dbType)
         {
         case DB2:
             return new DB2();

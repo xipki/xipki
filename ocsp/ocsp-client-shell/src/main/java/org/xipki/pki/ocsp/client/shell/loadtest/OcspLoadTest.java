@@ -178,7 +178,7 @@ public class OcspLoadTest extends LoadExecutor
                 SingleResp singleResp = singleResponses[0];
                 CertificateStatus singleCertStatus = singleResp.getCertStatus();
 
-                String status ;
+                String status;
                 if (singleCertStatus == null)
                 {
                     status = "good";
@@ -191,7 +191,7 @@ public class OcspLoadTest extends LoadExecutor
                     if (revStatus.hasRevocationReason())
                     {
                         int reason = revStatus.getRevocationReason();
-                        status = "revoked, reason = "+ reason + ", revocationTime = " + revTime;
+                        status = "revoked, reason = " + reason + ", revocationTime = " + revTime;
                     }
                     else
                     {

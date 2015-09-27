@@ -46,7 +46,7 @@ import org.xipki.security.api.SignerException;
 
 public interface P11CryptService
 {
-    public void refresh()
+    void refresh()
     throws SignerException;
 
     byte[] CKM_RSA_PKCS(

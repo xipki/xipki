@@ -51,7 +51,7 @@ import org.xipki.security.speed.p12.P12ECKeyGenLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-ec-gen-p12",
-        description="performance test of PKCS#12 EC key generation (batch)")
+        description = "performance test of PKCS#12 EC key generation (batch)")
 public class BSpeedP12ECKeyGenCmd extends BatchSpeedCmd
 {
 

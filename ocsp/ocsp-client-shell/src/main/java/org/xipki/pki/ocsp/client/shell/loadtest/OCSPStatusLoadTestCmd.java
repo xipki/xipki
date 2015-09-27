@@ -53,7 +53,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 @Command(scope = "xipki-ocsp", name = "loadtest-status",
-        description="OCSP Load test")
+        description = "OCSP Load test")
 public class OCSPStatusLoadTestCmd extends AbstractOCSPStatusCmd
 {
     @Option(name = "--serial",

@@ -89,7 +89,7 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
                     + "(multi-valued)")
     private List<String> certFiles;
 
-    @Option(name = "--verbose", aliases="-v",
+    @Option(name = "--verbose", aliases = "-v",
             description = "show status verbosely")
     protected Boolean verbose = Boolean.FALSE;
 
@@ -211,7 +211,7 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
         {
             response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrl,
                 options, debug);
-        }finally
+        } finally
         {
             if (debug != null && debug.size() > 0)
             {

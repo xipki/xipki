@@ -388,7 +388,7 @@ public abstract class EnrollCertCmd extends ClientCmd
         try
         {
             popoSk = popoBuilder.build(contentSigner);
-        }finally
+        } finally
         {
             signer.returnContentSigner(contentSigner);
         }
@@ -404,7 +404,7 @@ public abstract class EnrollCertCmd extends ClientCmd
         try
         {
             result = caClient.requestCerts(request, caName, user, debug);
-        }finally
+        } finally
         {
             saveRequestResponse(debug);
         }

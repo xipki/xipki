@@ -50,7 +50,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 @Command(scope = "jscep", name = "getcrl",
-        description="download CRL")
+        description = "download CRL")
 public class GetCRLCmd extends ClientCmd
 {
     @Option(name = "--cert", aliases = "-c",

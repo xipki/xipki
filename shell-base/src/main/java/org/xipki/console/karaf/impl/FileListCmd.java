@@ -52,7 +52,7 @@ import jline.console.ConsoleReader;
  */
 
 @Command(scope = "xipki-cmd", name = "ls",
-        description="list directory contents")
+        description = "list directory contents")
 public class FileListCmd extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "file",

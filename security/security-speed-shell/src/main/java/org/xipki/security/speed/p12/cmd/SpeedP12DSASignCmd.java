@@ -45,7 +45,7 @@ import org.xipki.security.speed.p12.P12DSASignLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "speed-dsa-sign-p12",
-        description="performance test of PKCS#12 DSA signature creation")
+        description = "performance test of PKCS#12 DSA signature creation")
 public class SpeedP12DSASignCmd extends SpeedP12SignCmd
 {
     @Option(name = "--plen",

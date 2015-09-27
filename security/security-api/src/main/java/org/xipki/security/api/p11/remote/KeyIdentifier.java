@@ -80,7 +80,7 @@ public class KeyIdentifier extends ASN1Object
     {
         if (obj == null || obj instanceof KeyIdentifier)
         {
-            return (KeyIdentifier)obj;
+            return (KeyIdentifier) obj;
         }
 
         try
@@ -100,7 +100,7 @@ public class KeyIdentifier extends ASN1Object
 
             if (obj instanceof byte[])
             {
-                return getInstance(ASN1Primitive.fromByteArray((byte[])obj));
+                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
         } catch (IllegalArgumentException | IOException e)
         {

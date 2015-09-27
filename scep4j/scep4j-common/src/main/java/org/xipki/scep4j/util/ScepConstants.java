@@ -46,4 +46,8 @@ public class ScepConstants
     public static final String CT_x_x509_ca_ra_cert = "application/x-x509-ca-ra-cert";
     public static final String CT_x_pki_message = "application/x-pki-message";
     public static final String CT_text_palin = "text/plain";
+
+    private ScepConstants()
+    {
+    }
 }

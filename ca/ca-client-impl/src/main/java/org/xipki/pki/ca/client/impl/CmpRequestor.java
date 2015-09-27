@@ -140,7 +140,7 @@ public abstract class CmpRequestor
             final X509Certificate responderCert,
             final SecurityFactory securityFactory)
     {
-        this(requestor,responderCert, securityFactory, true);
+        this(requestor, responderCert, securityFactory, true);
     }
 
     public CmpRequestor(ConcurrentContentSigner requestor,

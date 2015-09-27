@@ -83,6 +83,10 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  */
 public class PasswordHash
 {
+    private PasswordHash()
+    {
+    }
+
     // see 'http://stackoverflow.com/questions/22580853/\
     //   reliable-implementation-of-pbkdf2-hmac-sha256-for-java'
     //public static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA1";
@@ -258,7 +262,8 @@ public class PasswordHash
         byte[] binary = new byte[hex.length() / 2];
         for (int i = 0; i < binary.length; i++)
         {
-            binary[i] = (byte)Integer.parseInt(hex.substring(2*i, 2*i+2), 16);
+            binary[i] = (byte) Integer.parseInt(
+                    hex.substring(2 * i, 2 * i + 2), 16);
         }
         return binary;
     }
@@ -276,9 +281,12 @@ public class PasswordHash
         String hex = bi.toString(16);
         int paddingLength = (array.length * 2) - hex.length();
         if (paddingLength > 0)
+        {
             return String.format("%0" + paddingLength + "d", 0) + hex;
-        else
+        } else
+        {
             return hex;
+        }
     }
 
     /**
@@ -294,14 +302,16 @@ public class PasswordHash
             Security.addProvider(new BouncyCastleProvider());
             // Print out 10 hashes
             for (int i = 0; i < 10; i++)
+            {
                 System.out.println(PasswordHash.createHash("p\r\nassw0Rd!"));
+            }
 
             // Test password validation
             boolean failure = false;
             System.out.println("Running tests...");
             for (int i = 0; i < 100; i++)
             {
-                String password = ""+i;
+                String password = "" + i;
                 String hash = createHash(password);
                 String secondHash = createHash(password);
                 if (hash.equals(secondHash))
@@ -309,7 +319,7 @@ public class PasswordHash
                     System.out.println("FAILURE: TWO HASHES ARE EQUAL!");
                     failure = true;
                 }
-                String wrongPassword = ""+(i+1);
+                String wrongPassword = "" + (i + 1);
                 if (validatePassword(wrongPassword, hash))
                 {
                     System.out.println("FAILURE: WRONG PASSWORD ACCEPTED!");
@@ -322,9 +332,12 @@ public class PasswordHash
                 }
             }
             if (failure)
+            {
                 System.out.println("TESTS FAILED!");
-            else
+            } else
+            {
                 System.out.println("TESTS PASSED!");
+            }
         }
         catch (Exception ex)
         {

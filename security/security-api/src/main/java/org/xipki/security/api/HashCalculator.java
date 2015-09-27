@@ -70,6 +70,10 @@ public class HashCalculator
         mdsMap.put(HashAlgoType.SHA512, getMessageDigests(HashAlgoType.SHA512));
     }
 
+    private HashCalculator()
+    {
+    }
+
     private static BlockingDeque<Digest> getMessageDigests(
             final HashAlgoType hashAlgo)
     {
@@ -77,7 +81,7 @@ public class HashCalculator
         for (int i = 0; i < parallelism; i++)
         {
             Digest md;
-            switch(hashAlgo)
+            switch (hashAlgo)
             {
                 case SHA1:
                     md = new SHA1Digest();
@@ -95,8 +99,8 @@ public class HashCalculator
                     md = new SHA512Digest();
                     break;
                 default:
-                    throw new RuntimeException
-                    ("should not reach here, unknown HashAlgoType " + hashAlgo);
+                    throw new RuntimeException(
+                            "should not reach here, unknown HashAlgoType " + hashAlgo);
             }
             mds.addLast(md);
         }
@@ -197,7 +201,7 @@ public class HashCalculator
             byte[] b = new byte[md.getDigestSize()];
             md.doFinal(b, 0);
             return b;
-        }finally
+        } finally
         {
             mds.addLast(md);
         }

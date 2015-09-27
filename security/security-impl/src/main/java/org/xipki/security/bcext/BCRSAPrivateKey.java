@@ -139,7 +139,7 @@ public class BCRSAPrivateKey
             return true;
         }
 
-        RSAPrivateKey key = (RSAPrivateKey)o;
+        RSAPrivateKey key = (RSAPrivateKey) o;
 
         return getModulus().equals(key.getModulus())
             && getPrivateExponent().equals(key.getPrivateExponent());

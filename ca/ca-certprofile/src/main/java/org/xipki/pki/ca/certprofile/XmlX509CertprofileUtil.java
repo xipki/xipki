@@ -125,6 +125,10 @@ public class XmlX509CertprofileUtil
     private final static Object jaxbUnmarshallerLock = new Object();
     private static Unmarshaller jaxbUnmarshaller;
 
+    private XmlX509CertprofileUtil()
+    {
+    }
+
     public static X509ProfileType parse(
             final InputStream xmlConfStream)
     throws CertprofileException
@@ -525,7 +529,7 @@ public class XmlX509CertprofileUtil
         for (UsageType m : usages)
         {
             boolean required = m.isRequired();
-            switch(m.getValue())
+            switch (m.getValue())
             {
             case C_RL_SIGN:
                 controls.add(new KeyUsageControl(KeyUsage.cRLSign, required));
@@ -644,7 +648,7 @@ public class XmlX509CertprofileUtil
         return Collections.unmodifiableSet(oids);
     }
 
-    private static final KeyParametersOption convertKeyParametersOption(
+    private static KeyParametersOption convertKeyParametersOption(
             final AlgorithmType type)
     throws CertprofileException
     {
@@ -757,7 +761,7 @@ public class XmlX509CertprofileUtil
         {
             return null;
         }
-        switch(jaxbType)
+        switch (jaxbType)
         {
         case BMP_STRING:
             return DirectoryStringType.bmpString;
@@ -780,7 +784,7 @@ public class XmlX509CertprofileUtil
         {
             return null;
         }
-        switch(jaxbType)
+        switch (jaxbType)
         {
         case BMP_STRING:
             return StringType.bmpString;

@@ -47,6 +47,10 @@ import org.xipki.pki.ocsp.client.api.OCSPResponseException;
 
 public class OCSPUtils
 {
+    private OCSPUtils()
+    {
+    }
+
     public static BasicOCSPResp extractBasicOCSPResp(
             final OCSPResp response)
     throws OCSPResponseException

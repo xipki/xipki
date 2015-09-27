@@ -47,7 +47,7 @@ import org.xipki.common.RequestResponseDebug;
  */
 
 @Command(scope = "xipki-cli", name = "gencrl",
-        description="generate CRL")
+        description = "generate CRL")
 public class GenCRLCmd extends CRLCmd
 {
     @Override
@@ -59,7 +59,7 @@ public class GenCRLCmd extends CRLCmd
         try
         {
             return caClient.generateCRL(caName, debug);
-        }finally
+        } finally
         {
             saveRequestResponse(debug);
         }

@@ -57,6 +57,10 @@ public class ASN1Util
     private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
     private static final BigInteger MIN_INT = BigInteger.valueOf(Integer.MIN_VALUE);
 
+    private ASN1Util()
+    {
+    }
+
     public static byte[] getBytes(
             final ASN1Encodable obj,
             final String desc)

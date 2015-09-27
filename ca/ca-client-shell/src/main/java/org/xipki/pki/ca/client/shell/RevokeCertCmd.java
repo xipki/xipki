@@ -55,7 +55,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 @Command(scope = "xipki-cli", name = "revoke",
-        description="revoke certificate")
+        description = "revoke certificate")
 public class RevokeCertCmd extends UnRevRemoveCertCmd
 {
     @Option(name = "--reason", aliases = "-r",
@@ -117,7 +117,7 @@ public class RevokeCertCmd extends UnRevRemoveCertCmd
             {
                 certIdOrError = caClient.revokeCert(cert, crlReason.getCode(), invalidityDate,
                         debug);
-            }finally
+            } finally
             {
                 saveRequestResponse(debug);
             }
@@ -130,7 +130,7 @@ public class RevokeCertCmd extends UnRevRemoveCertCmd
             {
                 certIdOrError = caClient.revokeCert(issuer, getSerialNumber(), crlReason.getCode(),
                         invalidityDate, debug);
-            }finally
+            } finally
             {
                 saveRequestResponse(debug);
             }

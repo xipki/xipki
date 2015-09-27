@@ -86,7 +86,7 @@ public class LoadTestEntry
         {
             this.subjectTemplate = X509Util.sortX509Name(new X500Name(subjectTemplate));
 
-            switch(randomDN)
+            switch (randomDN)
             {
                 case GIVENNAME:
                     this.subjectRDNForIncrement = ObjectIdentifiers.DN_GIVENNAME;

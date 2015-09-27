@@ -847,7 +847,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 throw new SignerException(pkcs11Provider + " is not instanceof "
                         + P11CryptServiceFactory.class.getName());
             }
-        }finally
+        } finally
         {
             p11CryptServiciceFactoryInitialized = true;
         }

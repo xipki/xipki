@@ -645,7 +645,7 @@ public class ExtensionsChecker
                 } else if (Extension.issuerAlternativeName.equals(oid))
                 {
                     // IssuerAltName
-                    checkExtensionIssuerAltNames(failureMsg,extensionValue, issuerInfo);
+                    checkExtensionIssuerAltNames(failureMsg, extensionValue, issuerInfo);
                 } else if (Extension.basicConstraints.equals(oid))
                 {
                     // Basic Constraints
@@ -672,7 +672,7 @@ public class ExtensionsChecker
                 } else if (Extension.inhibitAnyPolicy.equals(oid))
                 {
                     // Inhibit anyPolicy
-                    checkExtensionInhibitAnyPolicy(failureMsg, extensionValue,extensions,
+                    checkExtensionInhibitAnyPolicy(failureMsg, extensionValue, extensions,
                             extControl);
                 } else if (Extension.freshestCRL.equals(oid))
                 {
@@ -877,7 +877,7 @@ public class ExtensionsChecker
         type = Extension.policyMappings;
         if (wantedExtensionTypes.contains(type))
         {
-            if (policyMappings != null )
+            if (policyMappings != null)
             {
                 types.add(type);
             }
@@ -1090,7 +1090,7 @@ public class ExtensionsChecker
                         .append("'");
                     failureMsg.append("; ");
                 }
-                else if (BigInteger.valueOf(pathLen).equals(_pathLen)== false)
+                else if (BigInteger.valueOf(pathLen).equals(_pathLen) == false)
                 {
                     failureMsg.append("pathLen is '").append(_pathLen);
                     failureMsg.append("' but expected '").append(pathLen).append("'");
@@ -1705,7 +1705,7 @@ public class ExtensionsChecker
                             .append("' is absent but is required");
                         failureMsg.append("; ");
                     }
-                }else if (qualifierInfo instanceof QaUserNoticePolicyQualifierInfo)
+                } else if (qualifierInfo instanceof QaUserNoticePolicyQualifierInfo)
                 {
                     String value =
                             ((QaUserNoticePolicyQualifierInfo) qualifierInfo).getUserNotice();
@@ -1716,7 +1716,7 @@ public class ExtensionsChecker
                             .append("' is absent but is required");
                         failureMsg.append("; ");
                     }
-                }else
+                } else
                 {
                     throw new RuntimeException("should not reach here");
                 }
@@ -1894,7 +1894,7 @@ public class ExtensionsChecker
             } catch (BadCertTemplateException e)
             {
                 failureMsg.append("error while processing ")
-                    .append(i+1)
+                    .append(i + 1)
                     .append("-th name: ")
                     .append(e.getMessage());
                 failureMsg.append("; ");
@@ -1917,7 +1917,7 @@ public class ExtensionsChecker
         {
             if (is[i].equals(expected[i]) == false)
             {
-                failureMsg.append(i+1)
+                failureMsg.append(i + 1)
                     .append("-th name does not match the requested one");
                 failureMsg.append("; ");
             }
@@ -2079,7 +2079,7 @@ public class ExtensionsChecker
         }
         else if (X509ObjectIdentifiers.id_ad_caIssuers.equals(accessMethod))
         {
-            typeDesc= "caIssuer";
+            typeDesc = "caIssuer";
         }
         else
         {
@@ -2564,7 +2564,7 @@ public class ExtensionsChecker
         }
 
         boolean correctStringType;
-        switch(conf.getType())
+        switch (conf.getType())
         {
         case bmpString:
             correctStringType = (asn1 instanceof DERBMPString);
@@ -3221,7 +3221,7 @@ public class ExtensionsChecker
             throw new BadCertTemplateException("generalName tag " + tag + " is not allowed");
         }
 
-        switch(tag)
+        switch (tag)
         {
         case GeneralName.rfc822Name:
         case GeneralName.dNSName:

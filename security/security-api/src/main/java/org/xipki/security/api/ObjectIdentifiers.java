@@ -55,6 +55,11 @@ import org.xipki.common.util.StringUtil;
 
 public class ObjectIdentifiers
 {
+
+    private ObjectIdentifiers()
+    {
+    }
+
     /**
      * registered PEN for xipki.org: 45522
      */
@@ -172,20 +177,20 @@ public class ObjectIdentifiers
         "1.3.6.1.5.5.7.9.2");
 
     /**
-     * RFC 3039 Gender - PrintableString (SIZE(1)) -- "M", "F", "m" or "f"
+     * RFC 3039 Gender - PrintableString (SIZE(1))-- "M", "F", "m" or "f"
      */
     public static final ASN1ObjectIdentifier DN_GENDER = new ASN1ObjectIdentifier(
         "1.3.6.1.5.5.7.9.3");
 
     /**
-     * RFC 3039 CountryOfCitizenship - PrintableString (SIZE (2)) -- ISO 3166
+     * RFC 3039 CountryOfCitizenship - PrintableString (SIZE (2))-- ISO 3166
      * codes only
      */
     public static final ASN1ObjectIdentifier DN_COUNTRY_OF_CITIZENSHIP
             = new ASN1ObjectIdentifier("1.3.6.1.5.5.7.9.4");
 
     /**
-     * RFC 3039 CountryOfResidence - PrintableString (SIZE (2)) -- ISO 3166
+     * RFC 3039 CountryOfResidence - PrintableString (SIZE (2))-- ISO 3166
      * codes only
      */
     public static final ASN1ObjectIdentifier DN_COUNTRY_OF_RESIDENCE = new ASN1ObjectIdentifier(

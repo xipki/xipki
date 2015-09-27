@@ -224,7 +224,7 @@ public class IaikP11Module implements P11Module
         availableSlots.clear();
         availableSlots = null;
 
-        LOG.info("close", "close pkcs11 module: {}", module );
+        LOG.info("close", "close pkcs11 module: {}", module);
         try
         {
             module.finalize(null);

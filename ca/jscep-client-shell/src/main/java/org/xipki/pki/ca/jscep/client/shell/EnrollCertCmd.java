@@ -50,7 +50,7 @@ import org.jscep.transaction.TransactionException;
  */
 
 @Command(scope = "jscep", name = "enroll",
-        description="enroll certificate via automic selected messageType")
+        description = "enroll certificate via automic selected messageType")
 public class EnrollCertCmd extends AbstractEnrollCertCmd
 {
 

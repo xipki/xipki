@@ -485,7 +485,7 @@ public class SubjectChecker
             final StringType stringType)
     {
         boolean correctStringType = true;
-        switch(stringType)
+        switch (stringType)
         {
         case bmpString:
             correctStringType = (atvValue instanceof DERBMPString);

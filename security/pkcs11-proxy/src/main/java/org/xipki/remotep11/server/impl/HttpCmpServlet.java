@@ -143,8 +143,9 @@ public class HttpCmpServlet extends HttpServlet
             if (moduleName == null)
             {
                 int moduleName_end_index = constructedPath.indexOf('/');
-                moduleName = (moduleName_end_index == -1) ?
-                        constructedPath : constructedPath.substring(0, moduleName_end_index);
+                moduleName = (moduleName_end_index == -1)
+                        ? constructedPath
+                        : constructedPath.substring(0, moduleName_end_index);
             }
 
             PKIMessage pkiResp = responder.processPKIMessage(localP11CryptServicePool,

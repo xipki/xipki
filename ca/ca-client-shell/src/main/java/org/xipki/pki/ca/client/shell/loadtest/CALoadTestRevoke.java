@@ -90,8 +90,7 @@ public class CALoadTestRevoke extends LoadExecutor
     private long nextStartSerial;
     private boolean noUnrevokedCerts = false;
 
-    private CRLReason[] reasons =
-        { CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE,
+    private CRLReason[] reasons = { CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE,
             CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED, CRLReason.CESSATION_OF_OPERATION,
             CRLReason.CERTIFICATE_HOLD,    CRLReason.PRIVILEGE_WITHDRAWN};
 
@@ -156,7 +155,7 @@ public class CALoadTestRevoke extends LoadExecutor
             rs = stmt.executeQuery(sql);
             rs.next();
             maxSerial = rs.getLong(1);
-        }finally
+        } finally
         {
             caDataSource.releaseResources(stmt, null);
         }

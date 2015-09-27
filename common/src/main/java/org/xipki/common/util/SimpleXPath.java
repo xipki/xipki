@@ -151,7 +151,7 @@ public class SimpleXPath
             {
                 for (Element child : children)
                 {
-                    select(results, child, steps, stepIndex+1, onlyFirst);
+                    select(results, child, steps, stepIndex + 1, onlyFirst);
                 }
             }
         }
@@ -196,7 +196,7 @@ public class SimpleXPath
             if (idx != -1)
             {
                 prefix = step.substring(0, idx);
-                this.localPart = step.substring(idx+1);
+                this.localPart = step.substring(idx + 1);
             }
             else
             {

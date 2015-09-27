@@ -80,11 +80,11 @@ public class DSAPlainDigestSigner
 
         if (parameters instanceof ParametersWithRandom)
         {
-            k = (AsymmetricKeyParameter)((ParametersWithRandom)parameters).getParameters();
+            k = (AsymmetricKeyParameter) ((ParametersWithRandom) parameters).getParameters();
         }
         else
         {
-            k = (AsymmetricKeyParameter)parameters;
+            k = (AsymmetricKeyParameter) parameters;
         }
 
         ParamUtil.assertNotNull("k", k);
@@ -203,7 +203,7 @@ public class DSAPlainDigestSigner
             final BigInteger s)
     throws IOException
     {
-        int blockSize = (keyBitLen + 7) / 8;;
+        int blockSize = (keyBitLen + 7) / 8;
         if ((r.bitLength() + 7) / 8 > blockSize)
         {
             throw new IOException("r is too long");

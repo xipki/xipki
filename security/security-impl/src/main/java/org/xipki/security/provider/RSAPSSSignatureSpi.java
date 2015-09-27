@@ -213,7 +213,7 @@ class RSAPSSSignatureSpi
     {
         if (params instanceof PSSParameterSpec)
         {
-            PSSParameterSpec newParamSpec = (PSSParameterSpec)params;
+            PSSParameterSpec newParamSpec = (PSSParameterSpec) params;
 
             if (originalSpec != null)
             {
@@ -236,7 +236,7 @@ class RSAPSSSignatureSpi
                 throw new InvalidParameterException("unkown MGF parameters");
             }
 
-            MGF1ParameterSpec mgfParams = (MGF1ParameterSpec)newParamSpec.getMGFParameters();
+            MGF1ParameterSpec mgfParams = (MGF1ParameterSpec) newParamSpec.getMGFParameters();
 
             if (DigestFactory.isSameDigest(mgfParams.getDigestAlgorithm(),
                     newParamSpec.getDigestAlgorithm()) == false)
@@ -250,7 +250,7 @@ class RSAPSSSignatureSpi
             if (newDigest == null)
             {
                 throw new InvalidParameterException(
-                        "no match on MGF digest algorithm: "+ mgfParams.getDigestAlgorithm());
+                        "no match on MGF digest algorithm: " + mgfParams.getDigestAlgorithm());
             }
 
             this.engineParams = null;

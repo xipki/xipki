@@ -49,7 +49,7 @@ import org.xipki.scep4j.client.exception.ScepClientException;
  */
 
 @Command(scope = "scep", name = "enroll",
-        description="enroll certificate via automic selected messageType")
+        description = "enroll certificate via automic selected messageType")
 public class EnrollCertCmd extends AbstractEnrollCertCmd
 {
 
