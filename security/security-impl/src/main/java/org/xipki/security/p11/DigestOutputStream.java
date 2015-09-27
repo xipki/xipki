@@ -82,7 +82,7 @@ public class DigestOutputStream extends OutputStream
             final int b)
     throws IOException
     {
-        digest.update((byte)b);
+        digest.update((byte) b);
     }
 
     public byte[] digest()

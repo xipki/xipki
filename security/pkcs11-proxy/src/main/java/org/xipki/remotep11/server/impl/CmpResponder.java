@@ -182,7 +182,7 @@ class CmpResponder
             P11CryptService p11CryptService =
                     localP11CryptServicePool.getP11CryptService(moduleName);
 
-            switch(action)
+            switch (action)
             {
             case XipkiCmpConstants.ACTION_RP11_VERSION:
             {
@@ -275,7 +275,7 @@ class CmpResponder
                 {
                     encodeCertOrKey = p11CryptService.getCertificate(slot, keyId).getEncoded();
                 }
-                else if (XipkiCmpConstants.ACTION_RP11_GET_PUBLICKEY== action)
+                else if (XipkiCmpConstants.ACTION_RP11_GET_PUBLICKEY == action)
                 {
                     encodeCertOrKey = p11CryptService.getPublicKey(slot, keyId).getEncoded();
                 }
@@ -318,7 +318,7 @@ class CmpResponder
                 return createRejectionPKIMessage(respHeader,
                         PKIFailureInfo.badRequest, statusMessage);
             }
-            } // end switch(code)
+            } // end switch (code)
 
             ASN1EncodableVector v = new ASN1EncodableVector();
             v.add(new ASN1Integer(action));

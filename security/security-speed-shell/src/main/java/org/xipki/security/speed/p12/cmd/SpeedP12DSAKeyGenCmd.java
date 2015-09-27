@@ -46,7 +46,7 @@ import org.xipki.security.speed.p12.P12DSAKeyGenLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "speed-dsa-gen-p12",
-        description="performance test of PKCS#12 DSA key generation")
+        description = "performance test of PKCS#12 DSA key generation")
 public class SpeedP12DSAKeyGenCmd extends SingleSpeedCmd
 {
     @Option(name = "--plen",

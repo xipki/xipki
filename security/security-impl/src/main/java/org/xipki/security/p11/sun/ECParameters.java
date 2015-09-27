@@ -68,15 +68,15 @@ import org.bouncycastle.math.ec.ECCurve;
  *
  *    ECParameters ::= SEQUENCE
  *    {
- *       version   ECPVer,          -- version is always 1
- *       fieldID   FieldID,         -- identifies the finite field over
- *                                  -- which the curve is defined
- *       curve     Curve,           -- coefficients a and b of the
- *                                  -- elliptic curve
- *       base      ECPoint,         -- specifies the base point P
- *                                  -- on the elliptic curve
- *       order     INTEGER,         -- the order n of the base point
- *       cofactor  INTEGER OPTIONAL -- The integer h = #E(Fq)/n }
+ *       version   ECPVer,         -- version is always 1
+ *       fieldID   FieldID,        -- identifies the finite field over
+ *                                 -- which the curve is defined
+ *       curve     Curve,          -- coefficients a and b of the
+ *                                 -- elliptic curve
+ *       base      ECPoint,        -- specifies the base point P
+ *                                 -- on the elliptic curve
+ *       order     INTEGER,        -- the order n of the base point
+ *       cofactor  INTEGER OPTIONAL-- The integer h = #E(Fq)/n }
  *
  *    ECPVer ::= INTEGER {ecpVer1(1)}
  *
@@ -138,16 +138,16 @@ public final class ECParameters extends AlgorithmParametersSpi
 
         if (paramSpec.getClass().getName().equals("sun.security.ec.NamedCurve"))
         {
-            namedCurve = (ECParameterSpec)paramSpec;
+            namedCurve = (ECParameterSpec) paramSpec;
             return;
         }
 
         if (paramSpec instanceof ECParameterSpec)
         {
-            namedCurve = SunNamedCurveExtender.lookupCurve((ECParameterSpec)paramSpec);
+            namedCurve = SunNamedCurveExtender.lookupCurve((ECParameterSpec) paramSpec);
         } else if (paramSpec instanceof ECGenParameterSpec)
         {
-            String name = ((ECGenParameterSpec)paramSpec).getName();
+            String name = ((ECGenParameterSpec) paramSpec).getName();
             namedCurve = SunNamedCurveExtender.lookupCurve(name);
         } else
         {

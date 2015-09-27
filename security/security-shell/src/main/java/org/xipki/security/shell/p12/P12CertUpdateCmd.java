@@ -55,7 +55,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 @Command(scope = "xipki-tk", name = "update-cert-p12",
-        description="update certificate in PKCS#12 keystore")
+        description = "update certificate in PKCS#12 keystore")
 public class P12CertUpdateCmd extends P12SecurityCmd
 {
     @Option(name = "--cert",
@@ -118,7 +118,7 @@ public class P12CertUpdateCmd extends P12SecurityCmd
             ks.store(fOut, pwd);
             out("updated certificate");
             return null;
-        }finally
+        } finally
         {
             if (fOut != null)
             {

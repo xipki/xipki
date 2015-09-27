@@ -44,6 +44,9 @@ import java.util.Map;
 
 public class ParamUtil
 {
+    private ParamUtil()
+    {
+    }
 
     public static void assertNotNull(
             final String parameterName,

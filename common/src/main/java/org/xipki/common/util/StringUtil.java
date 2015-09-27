@@ -224,7 +224,7 @@ public class StringUtil
                 sb.append(',');
             }
 
-            for (int i = 0; ;i++)
+            for (int i = 0; ; i++)
             {
                 int offset = firstBlockLen + i * 3;
                 if (offset >= n)

@@ -46,7 +46,7 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
  */
 
 @Command(scope = "xipki-cmd", name = "mkdir",
-        description="make directories")
+        description = "make directories")
 public class MkdirCmd extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "directory_name",

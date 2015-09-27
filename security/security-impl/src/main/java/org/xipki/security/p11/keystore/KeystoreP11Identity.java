@@ -192,7 +192,7 @@ public class KeystoreP11Identity extends P11Identity
         }
 
         byte[] padded = SignerUtil.pkcs1padding(encodedDigestInfo,
-                (getSignatureKeyBitLength() + 7)/8);
+                (getSignatureKeyBitLength() + 7) / 8);
         return do_rsa_sign(padded);
     }
 
@@ -228,7 +228,7 @@ public class KeystoreP11Identity extends P11Identity
         } catch (BadPaddingException | IllegalBlockSizeException e)
         {
             throw new SignerException("SignatureException: " + e.getMessage(), e);
-        }finally
+        } finally
         {
             rsaCiphers.add(cipher);
         }
@@ -296,7 +296,7 @@ public class KeystoreP11Identity extends P11Identity
         } catch (SignatureException e)
         {
             throw new SignerException("SignatureException: " + e.getMessage(), e);
-        }finally
+        } finally
         {
             dsaSignatures.add(sig);
         }

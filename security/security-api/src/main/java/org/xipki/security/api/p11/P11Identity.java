@@ -118,9 +118,9 @@ public class P11Identity implements Comparable<P11Identity>
 
     public X509Certificate[] getCertificateChain()
     {
-        return certificateChain == null ?
-                null :
-                java.util.Arrays.copyOf(certificateChain, certificateChain.length);
+        return (certificateChain == null)
+                ? null
+                : java.util.Arrays.copyOf(certificateChain, certificateChain.length);
     }
 
     public PublicKey getPublicKey()

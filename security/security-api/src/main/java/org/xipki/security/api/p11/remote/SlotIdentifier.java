@@ -54,7 +54,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  * <pre>
  * SlotIdentifier ::= SEQUENCE
  * {
- *     slotIndex   INTEGER OPTIONAL, -- At least one of slotIndex and slotId must present.
+ *     slotIndex   INTEGER OPTIONAL,-- At least one of slotIndex and slotId must present.
  *     slotId      [1] EXPLICIT INTEGER OPTIONAL
  * }
  * </pre>
@@ -137,7 +137,7 @@ public class SlotIdentifier extends ASN1Object
     {
         if (obj == null || obj instanceof SlotIdentifier)
         {
-            return (SlotIdentifier)obj;
+            return (SlotIdentifier) obj;
         }
 
         try
@@ -149,7 +149,7 @@ public class SlotIdentifier extends ASN1Object
 
             if (obj instanceof byte[])
             {
-                return getInstance(ASN1Primitive.fromByteArray((byte[])obj));
+                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
         }
         catch (IOException | IllegalArgumentException e)

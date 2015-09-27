@@ -46,6 +46,10 @@ import java.nio.charset.Charset;
 
 public class Configuration
 {
+    private Configuration()
+    {
+    }
+
     public static String getLineSeparator()
     {
         return System.getProperty("line.separator");

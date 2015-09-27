@@ -124,6 +124,23 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
     }
 
     @Override
+    public int hashCode()
+    {
+        int hashCode = 0;
+        if (keyId != null)
+        {
+            hashCode = keyId.hashCode();
+        }
+
+        if (keyLabel != null)
+        {
+            hashCode += 31 * keyLabel.hashCode();
+        }
+
+        return hashCode;
+    }
+
+    @Override
     public boolean equals(
             final Object o)
     {

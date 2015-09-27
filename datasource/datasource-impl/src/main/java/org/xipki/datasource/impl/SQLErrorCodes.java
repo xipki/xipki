@@ -67,7 +67,7 @@ public class SQLErrorCodes
             final DatabaseType dbType)
     {
         ParamUtil.assertNotNull("dbType", dbType);
-        switch(dbType)
+        switch (dbType)
         {
         case DB2:
             return new DB2();
@@ -183,7 +183,7 @@ public class SQLErrorCodes
             duplicateKeyCodes = toSet(23001, 23505);
             dataIntegrityViolationCodes = toSet(22001, 22003, 22012, 22018, 22025, 23000, 23002,
                     23003, 23502, 23503, 23506, 23507, 23513);
-            dataAccessResourceFailureCodes = toSet(90046,90100,90117,90121,90126);
+            dataAccessResourceFailureCodes = toSet(90046, 90100, 90117, 90121, 90126);
             cannotAcquireLockCodes = toSet(50200);
         }
     }

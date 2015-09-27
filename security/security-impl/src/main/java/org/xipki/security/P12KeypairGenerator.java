@@ -129,7 +129,7 @@ public abstract class P12KeypairGenerator
 
         Date now = new Date();
         Date notBefore = new Date(now.getTime() - 10 * MIN); // 10 minutes past
-        Date notAfter = new Date(notBefore.getTime() + validity * DAY );
+        Date notAfter = new Date(notBefore.getTime() + validity * DAY);
 
         X500Name subjectDN = new X500Name(subject);
         subjectDN = X509Util.sortX509Name(subjectDN);
@@ -182,7 +182,7 @@ public abstract class P12KeypairGenerator
         try
         {
             ks.store(ksStream, password);
-        }finally
+        } finally
         {
             ksStream.flush();
         }

@@ -66,6 +66,11 @@ import org.xipki.security.api.SignatureAlgoControl;
 
 public class AlgorithmUtil
 {
+
+    private AlgorithmUtil()
+    {
+    }
+
     public static SubjectPublicKeyInfo toRfc3279Style(
             final SubjectPublicKeyInfo publicKeyInfo)
     throws InvalidKeySpecException

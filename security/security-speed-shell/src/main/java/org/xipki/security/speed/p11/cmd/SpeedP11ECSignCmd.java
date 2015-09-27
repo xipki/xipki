@@ -46,7 +46,7 @@ import org.xipki.security.speed.p11.P11ECSignLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "speed-ec-sign",
-        description="performance test of PKCS#11 EC signature creation")
+        description = "performance test of PKCS#11 EC signature creation")
 public class SpeedP11ECSignCmd extends SpeedP11SignCmd
 {
     @Option(name = "--curve",

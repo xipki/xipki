@@ -61,6 +61,10 @@ public class RSAUtil
         PKCSObjectIdentifiers.id_RSASSA_PSS
     };
 
+    private RSAUtil()
+    {
+    }
+
     public static boolean isRsaOid(
             final ASN1ObjectIdentifier algOid)
     {
@@ -87,7 +91,7 @@ public class RSAUtil
     {
         if (key instanceof RSAPrivateCrtKey)
         {
-            RSAPrivateCrtKey k = (RSAPrivateCrtKey)key;
+            RSAPrivateCrtKey k = (RSAPrivateCrtKey) key;
 
             return new RSAPrivateCrtKeyParameters(k.getModulus(),
                 k.getPublicExponent(), k.getPrivateExponent(),

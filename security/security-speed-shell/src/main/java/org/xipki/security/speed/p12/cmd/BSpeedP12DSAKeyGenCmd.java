@@ -48,7 +48,7 @@ import org.xipki.security.speed.p12.P12DSAKeyGenLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-gen-p12",
-        description="performance test of PKCS#12 DSA key generation (batch)")
+        description = "performance test of PKCS#12 DSA key generation (batch)")
 public class BSpeedP12DSAKeyGenCmd extends BatchSpeedCmd
 {
 
@@ -62,7 +62,7 @@ public class BSpeedP12DSAKeyGenCmd extends BatchSpeedCmd
         for (int i = 0; i < pqLens.length; i += 2)
         {
             int pLen = pqLens[i];
-            int qLen = pqLens[i+1];
+            int qLen = pqLens[i + 1];
 
             ret.add(
                     new P12DSAKeyGenLoadTest(pLen, qLen));

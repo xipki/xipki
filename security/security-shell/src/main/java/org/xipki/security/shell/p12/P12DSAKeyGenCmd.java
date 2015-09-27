@@ -46,7 +46,7 @@ import org.xipki.security.api.P12KeypairGenerationResult;
  */
 
 @Command(scope = "xipki-tk", name = "dsa-p12",
-        description="generate RSA keypair in PKCS#12 keystore")
+        description = "generate RSA keypair in PKCS#12 keystore")
 public class P12DSAKeyGenCmd extends P12KeyGenCmd
 {
     @Option(name = "--plen",

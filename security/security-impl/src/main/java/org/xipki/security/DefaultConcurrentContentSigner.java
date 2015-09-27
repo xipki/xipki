@@ -259,7 +259,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
         {
             signer = borrowContentSigner();
             OutputStream stream = signer.getOutputStream();
-            stream.write(new byte[]{1,2,3,4});
+            stream.write(new byte[]{1, 2, 3, 4});
             byte[] signature = signer.getSignature();
             return signature != null && signature.length > 0;
         } catch (Exception e)

@@ -230,7 +230,7 @@ public class SecurePasswordInputPanel extends Panel
             {
                 return null;
             }
-        }finally
+        } finally
         {
             try
             {
