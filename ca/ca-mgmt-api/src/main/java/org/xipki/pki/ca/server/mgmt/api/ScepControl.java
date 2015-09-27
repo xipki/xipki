@@ -152,6 +152,12 @@ public class ScepControl implements Serializable
     }
 
     @Override
+    public int hashCode()
+    {
+        return toString().hashCode();
+    }
+
+    @Override
     public boolean equals(
             final Object obj)
     {

@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-cmpcontrol-rm",
-        description="remove CMP control (negative, QA)")
+        description = "remove CMP control (negative, QA)")
 public class NegCmpControlRemoveCmd extends CmpControlRemoveCmd
 {
 

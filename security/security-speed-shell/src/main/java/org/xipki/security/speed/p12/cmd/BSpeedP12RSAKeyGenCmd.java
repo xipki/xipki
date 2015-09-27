@@ -49,7 +49,7 @@ import org.xipki.security.speed.p12.P12RSAKeyGenLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-rsa-gen-p12",
-        description="performance test of PKCS#12 RSA key generation (batch)")
+        description = "performance test of PKCS#12 RSA key generation (batch)")
 public class BSpeedP12RSAKeyGenCmd extends BatchSpeedCmd
 {
 

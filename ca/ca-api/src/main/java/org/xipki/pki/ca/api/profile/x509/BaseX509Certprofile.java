@@ -574,7 +574,7 @@ extends X509Certprofile
                 throw new BadCertTemplateException("occurrence of subject DN of type "
                         + oidToDisplayName(type)
                         + " not within the allowed range. " + rdns.length
-                        + " is not within [" +occu.getMinOccurs() + ", "
+                        + " is not within [" + occu.getMinOccurs() + ", "
                         + occu.getMaxOccurs() + "]");
             }
         }
@@ -635,7 +635,7 @@ extends X509Certprofile
             if (prefix != null || suffix != null)
             {
                 String _text = ttext.toLowerCase();
-                if (prefix != null &&_text.startsWith(prefix.toLowerCase()))
+                if (prefix != null && _text.startsWith(prefix.toLowerCase()))
                 {
                     ttext = ttext.substring(prefix.length());
                     _text = ttext.toLowerCase();

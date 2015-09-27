@@ -389,7 +389,7 @@ public class ScepResponder
 
         MessageType messageType = req.getMessageType();
 
-        switch(messageType)
+        switch (messageType)
         {
         case PKCSReq:
         {
@@ -415,7 +415,7 @@ public class ScepResponder
             if (cert != null && control.isPendingCert())
             {
                 rep.setPkiStatus(PkiStatus.PENDING);
-            }else if (cert != null)
+            } else if (cert != null)
             {
                 ContentInfo messageData = createSignedData(cert);
                 rep.setMessageData(messageData);

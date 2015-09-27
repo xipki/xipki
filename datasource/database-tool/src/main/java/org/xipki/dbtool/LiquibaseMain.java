@@ -128,7 +128,7 @@ public class LiquibaseMain
             dbConf.getPassword(), // password
             dbConf.getDriver(), // driver
             (String) null, // defaultCatalogName
-            defaultSchemaName,// defaultSchemaName
+            defaultSchemaName, // defaultSchemaName
             false, // outputDefaultCatalog
             false, // outputDefaultSchema
             (String) null, // databaseClass

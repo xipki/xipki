@@ -1016,7 +1016,7 @@ class IdentifiedX509Certprofile
             throw new BadCertTemplateException("generalName tag " + tag + " is not allowed");
         }
 
-        switch(tag)
+        switch (tag)
         {
         case GeneralName.rfc822Name:
         case GeneralName.dNSName:
@@ -1083,9 +1083,9 @@ class IdentifiedX509Certprofile
         }
         default:
         {
-            throw new RuntimeException("should not reach here, unknown GeneralName tag "+ tag);
+            throw new RuntimeException("should not reach here, unknown GeneralName tag " + tag);
         }
-        }// end switch(tag)
+        } // end switch (tag)
     }
 
     private static boolean addMe(
@@ -1223,7 +1223,8 @@ class IdentifiedX509Certprofile
                         + accessMethod.getId() + " is not allowed");
             }
 
-            GeneralName accessLocation = createGeneralName(ad.getAccessLocation(),generalNameModes);
+            GeneralName accessLocation = createGeneralName(ad.getAccessLocation(),
+                    generalNameModes);
             v.add(new AccessDescription(accessMethod, accessLocation));
         } // end for
 

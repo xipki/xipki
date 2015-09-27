@@ -266,10 +266,9 @@ public class HttpOcspServlet extends HttpServlet
 
                 auditLevel = AuditLevel.ERROR;
                 auditStatus = AuditStatus.FAILED;
-            }
-            else
+            } else
             {
-                OCSPResp resp =ocspRespWithCacheInfo.getResponse();
+                OCSPResp resp = ocspRespWithCacheInfo.getResponse();
                 byte[] encodedOcspResp = resp.getEncoded();
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.setContentLength(encodedOcspResp.length);
@@ -348,7 +347,7 @@ public class HttpOcspServlet extends HttpServlet
             try
             {
                 response.flushBuffer();
-            }finally
+            } finally
             {
                 if (auditEvent != null)
                 {

@@ -111,6 +111,10 @@ public class KeyUtil
 
     private static final Map<String, KeyFactory> keyFactories = new HashMap<>();
 
+    private KeyUtil()
+    {
+    }
+
     public static ContentVerifierProvider getContentVerifierProvider(
             final PublicKey publicKey)
     throws OperatorCreationException, InvalidKeyException
@@ -297,7 +301,7 @@ public class KeyUtil
     {
         if (key instanceof RSAPrivateCrtKey)
         {
-            RSAPrivateCrtKey k = (RSAPrivateCrtKey)key;
+            RSAPrivateCrtKey k = (RSAPrivateCrtKey) key;
 
             return new RSAPrivateCrtKeyParameters(k.getModulus(),
                 k.getPublicExponent(), k.getPrivateExponent(),
@@ -330,7 +334,7 @@ public class KeyUtil
     {
         if (key instanceof RSAPublicKey)
         {
-            RSAPublicKey k = (RSAPublicKey)key;
+            RSAPublicKey k = (RSAPublicKey) key;
             return new RSAKeyParameters(false, k.getModulus(), k.getPublicExponent());
         }
         else if (key instanceof ECPublicKey)

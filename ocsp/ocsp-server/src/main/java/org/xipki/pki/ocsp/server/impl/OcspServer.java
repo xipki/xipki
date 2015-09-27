@@ -311,7 +311,7 @@ public class OcspServer
         {
             do_init();
             successfull = true;
-        }finally
+        } finally
         {
             if (successfull)
             {
@@ -348,7 +348,7 @@ public class OcspServer
 
         OCSPServer conf = parseConf(confFile);
 
-        // ----- check the duplication names
+        //----- check the duplication names
         Set<String> c = new HashSet<>();
 
         // Duplication name check: responder
@@ -470,7 +470,7 @@ public class OcspServer
             }
         }
 
-        // -- initializes the responders
+        //-- initializes the responders
         // signers
         for (SignerType m : conf.getSigners().getSigner())
         {
@@ -935,7 +935,7 @@ public class OcspServer
                 List<Extension> extensions = new LinkedList<>();
                 boolean unknownAsRevoked = false;
                 CertificateStatus bcCertStatus = null;
-                switch(certStatusInfo.getCertStatus())
+                switch (certStatusInfo.getCertStatus())
                 {
                     case GOOD:
                         bcCertStatus = null;
@@ -952,8 +952,7 @@ public class OcspServer
                         if (responderOption.getMode() == OCSPMode.RFC2560)
                         {
                             bcCertStatus = new UnknownStatus();
-                        }
-                        else// (ocspMode == OCSPMode.RFC6960)
+                        } else // (ocspMode == OCSPMode.RFC6960)
                         {
                             unknownAsRevoked = true;
                             includeExtendedRevokeExtension = true;
@@ -984,6 +983,9 @@ public class OcspServer
                             extensions.add(extension);
                         }
                         break;
+                    default:
+                        throw new RuntimeException(
+                                "unknown CertificateStatus:" + certStatusInfo.getCertStatus());
                 }
 
                 byte[] certHash = certStatusInfo.getCertHash();
@@ -1394,7 +1396,7 @@ public class OcspServer
             {
                 ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
                         responderSignerType,
-                        "algo" +ConfPairs.NAME_TERM + sigAlgo + ConfPairs.TOKEN_TERM
+                        "algo" + ConfPairs.NAME_TERM + sigAlgo + ConfPairs.TOKEN_TERM
                             + responderKeyConf,
                         explicitCertificateChain);
                 singleSigners.add(requestorSigner);
@@ -1523,7 +1525,7 @@ public class OcspServer
             if (instance instanceof CertStatusStore)
             {
                 store = (CertStatusStore) instance;
-            }
+            } else
             {
                 throw new InvalidConfException(className + " is not instanceof "
                         + CertStatusStore.class.getName());
@@ -1693,7 +1695,7 @@ public class OcspServer
         CertpathValidationModel model = requestOption.getCertpathValidationModel();
 
         Date now = new Date();
-        if (model == null || model == CertpathValidationModel.PKIX )
+        if (model == null || model == CertpathValidationModel.PKIX)
         {
             for (X509Certificate m : certpath)
             {
@@ -1807,7 +1809,7 @@ public class OcspServer
                 msg += " from file " + certConf.getFile();
             }
             throw new InvalidConfException(msg);
-        }finally
+        } finally
         {
             close(is);
         }

@@ -51,13 +51,13 @@ import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
  */
 
 @Command(scope = "xipki-ca", name = "requestor-info",
-        description="show information of requestor")
+        description = "show information of requestor")
 public class RequestorInfoCmd extends CaCmd
 {
     @Argument(index = 0, name = "name", description = "requestor name")
     private String name;
 
-    @Option(name = "--verbose", aliases="-v",
+    @Option(name = "--verbose", aliases = "-v",
             description = "show requestor information verbosely")
     private Boolean verbose = Boolean.FALSE;
 

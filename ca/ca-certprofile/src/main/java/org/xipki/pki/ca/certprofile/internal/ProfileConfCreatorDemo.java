@@ -151,6 +151,10 @@ public class ProfileConfCreatorDemo
         requestExtensions.add(Extension.subjectInfoAccess);
     }
 
+    private ProfileConfCreatorDemo()
+    {
+    }
+
     private static class ExampleDescription extends AnyType
     {
         public ExampleDescription(
@@ -921,7 +925,7 @@ public class ProfileConfCreatorDemo
         final String regex_ou1 = "[A-Z]{1,1}[\\d]{5,5}";
         final String regex_ou2 = "[\\d]{5,5}";
         rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 2, 2,
-                new String[]{regex_ou1,regex_ou2}, null, null));
+                new String[]{regex_ou1, regex_ou2}, null, null));
         rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
                 new String[]{REGEX_SN}, null, null));
         rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));

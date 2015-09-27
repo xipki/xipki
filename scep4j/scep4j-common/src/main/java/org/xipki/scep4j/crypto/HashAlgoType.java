@@ -122,13 +122,13 @@ public enum HashAlgoType
         if (this == SHA1)
         {
             digest = new SHA1Digest();
-        }else if (this == SHA256)
+        } else if (this == SHA256)
         {
             digest = new SHA256Digest();
-        }else if (this == SHA512)
+        } else if (this == SHA512)
         {
             digest = new SHA512Digest();
-        }else if (this == MD5)
+        } else if (this == MD5)
         {
             digest = new MD5Digest();
         } else

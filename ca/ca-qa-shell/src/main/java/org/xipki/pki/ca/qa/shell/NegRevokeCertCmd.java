@@ -55,7 +55,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 @Command(scope = "xipki-qa", name = "neg-revoke",
-        description="revoke certificate (negative, for QA)")
+        description = "revoke certificate (negative, for QA)")
 public class NegRevokeCertCmd extends UnRevRemoveCertCmd
 {
 
@@ -118,7 +118,7 @@ public class NegRevokeCertCmd extends UnRevRemoveCertCmd
             {
                 certIdOrError = caClient.revokeCert(cert, crlReason.getCode(),
                         invalidityDate, debug);
-            }finally
+            } finally
             {
                 saveRequestResponse(debug);
             }
@@ -132,7 +132,7 @@ public class NegRevokeCertCmd extends UnRevRemoveCertCmd
             {
                 certIdOrError = caClient.revokeCert(issuer, getSerialNumber(), crlReason.getCode(),
                         invalidityDate, debug);
-            }finally
+            } finally
             {
                 saveRequestResponse(debug);
             }

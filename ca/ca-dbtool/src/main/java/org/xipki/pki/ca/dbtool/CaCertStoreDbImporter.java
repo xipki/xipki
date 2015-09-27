@@ -254,7 +254,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw e;
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -291,7 +291,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw translate(sql, e);
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -329,7 +329,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw translate(sql, e);
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -364,7 +364,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw translate(sql, e);
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -407,7 +407,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw e;
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
             usersFileIterator.close();
@@ -552,7 +552,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw translate(sql, e);
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -588,7 +588,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw translate(sql, e);
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         }
@@ -634,7 +634,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw e;
                 }
             }
-        }finally
+        } finally
         {
             releaseResources(ps, null);
             crlsFileIterator.close();
@@ -898,7 +898,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw e;
                 }
             } // end for
-        }finally
+        } finally
         {
             releaseResources(ps_cert, null);
             releaseResources(ps_rawcert, null);

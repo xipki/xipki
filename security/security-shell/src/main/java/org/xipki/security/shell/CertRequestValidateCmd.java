@@ -45,7 +45,7 @@ import org.xipki.common.util.IoUtil;
  */
 
 @Command(scope = "xipki-tk", name = "validate-req",
-        description="Validate PKCS#10 request")
+        description = "Validate PKCS#10 request")
 public class CertRequestValidateCmd extends SecurityCmd
 {
 

@@ -44,7 +44,7 @@ import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
  */
 
 @Command(scope = "xipki-ca", name = "cmpcontrol-add",
-        description="add CMP control")
+        description = "add CMP control")
 public class CmpControlAddCmd extends CaCmd
 {
     @Option(name = "--name", aliases = "-n",

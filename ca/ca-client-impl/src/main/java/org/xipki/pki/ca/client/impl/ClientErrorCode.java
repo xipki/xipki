@@ -44,7 +44,11 @@ public class ClientErrorCode
     /**
      * Intern status to indicate that there are errors in the response
      */
-    public static final int PKIStatus_RESPONSE_ERROR = -1;
+    static final int PKIStatus_RESPONSE_ERROR = -1;
 
-    public static final int PKIStatus_NO_ANSWER = -2;
+    static final int PKIStatus_NO_ANSWER = -2;
+
+    private ClientErrorCode()
+    {
+    }
 }

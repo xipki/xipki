@@ -174,7 +174,7 @@ implements CAManager, CmpResponderManager, ScepManager
                 }
             } catch (Throwable t)
             {
-            }finally
+            } finally
             {
                 inProcess = false;
             }
@@ -257,7 +257,7 @@ implements CAManager, CmpResponderManager, ScepManager
             } catch (Throwable t)
             {
                 LOG.error("ScheduledCArestarter: " + t.getMessage(), t);
-            }finally
+            } finally
             {
                 inProcess = false;
             }
@@ -1439,7 +1439,7 @@ implements CAManager, CmpResponderManager, ScepManager
             } catch (SignerException e)
             {
                 throw new CAMgmtException(
-                        "could not create signer for new CA " + name +": " + e.getMessage(), e);
+                        "could not create signer for new CA " + name + ": " + e.getMessage(), e);
             }
         }
 
@@ -3031,7 +3031,7 @@ implements CAManager, CmpResponderManager, ScepManager
         if (nextSerial > 0)
         {
             serialOfThisCert = nextSerial;
-            nextSerial ++;
+            nextSerial++;
         }
         else
         {
@@ -3115,7 +3115,7 @@ implements CAManager, CmpResponderManager, ScepManager
             final X509Certificate[] certChain)
     throws Exception
     {
-        if (signerConf.contains("file:") == false && signerConf.contains("base64:") == false )
+        if (signerConf.contains("file:") == false && signerConf.contains("base64:") == false)
         {
             return signerConf;
         }
@@ -3341,9 +3341,7 @@ implements CAManager, CmpResponderManager, ScepManager
             pairs = new ConfPairs(typeMap);
         } catch (IllegalArgumentException e)
         {
-            LOG.error("CA environment {}: '{}"
-                    + ""
-                    + "' is not valid CMP UTF-8 pairs",typeMap, type);
+            LOG.error("CA environment {}: '{}' is not valid CMP UTF-8 pairs", typeMap, type);
             return null;
         }
         return pairs.getValue(type);

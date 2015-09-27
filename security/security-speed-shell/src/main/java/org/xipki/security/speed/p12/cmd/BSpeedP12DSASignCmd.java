@@ -47,7 +47,7 @@ import org.xipki.security.speed.p12.P12DSASignLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-sign-p12",
-        description="performance test of PKCS#12 DSA signature creation")
+        description = "performance test of PKCS#12 DSA signature creation")
 public class BSpeedP12DSASignCmd extends BSpeedP12SignCmd
 {
 
@@ -60,7 +60,7 @@ public class BSpeedP12DSASignCmd extends BSpeedP12SignCmd
         for (int i = 0; i < pqLens.length; i += 2)
         {
             int pLen = pqLens[i];
-            int qLen = pqLens[i+1];
+            int qLen = pqLens[i + 1];
             if (pLen == 1024)
             {
                 sigAlgo = "SHA1withDSA";

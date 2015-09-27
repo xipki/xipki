@@ -52,7 +52,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-qa", name = "neg-p10-enroll",
-        description="enroll certificate via PKCS#10 request (negative, for QA)")
+        description = "enroll certificate via PKCS#10 request (negative, for QA)")
 public class NegP10EnrollCertCmd extends ClientCmd
 {
 
@@ -88,7 +88,7 @@ public class NegP10EnrollCertCmd extends ClientCmd
         try
         {
             result = caClient.requestCert(p10Req, profile, caName, user, debug);
-        }finally
+        } finally
         {
             saveRequestResponse(debug);
         }

@@ -336,7 +336,7 @@ public class ScepServlet extends HttpServlet
             try
             {
                 response.flushBuffer();
-            }finally
+            } finally
             {
                 if (auditEvent != null)
                 {
@@ -355,12 +355,14 @@ public class ScepServlet extends HttpServlet
         try
         {
             return PKIMessage.getInstance(asn1Stream.readObject());
-        }finally
+        } finally
         {
             try
             {
                 asn1Stream.close();
-            } catch (Exception e){}
+            } catch (Exception e)
+            {
+            }
         }
     }
 

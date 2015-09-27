@@ -57,9 +57,8 @@ public class IssuerAndSubject
     {
         if (obj instanceof IssuerAndSubject)
         {
-            return (IssuerAndSubject)obj;
-        }
-        else if (obj != null)
+            return (IssuerAndSubject) obj;
+        } else if (obj != null)
         {
             return new IssuerAndSubject(ASN1Sequence.getInstance(obj));
         }

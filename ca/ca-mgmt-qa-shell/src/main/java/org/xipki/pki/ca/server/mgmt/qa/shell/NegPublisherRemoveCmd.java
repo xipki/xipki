@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-publisher-rm",
-        description="remove publisher (negative, QA)")
+        description = "remove publisher (negative, QA)")
 public class NegPublisherRemoveCmd extends PublisherRemoveCmd
 {
 

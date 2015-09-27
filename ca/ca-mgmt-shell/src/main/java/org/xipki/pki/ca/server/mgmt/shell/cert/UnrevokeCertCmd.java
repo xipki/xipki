@@ -42,7 +42,7 @@ import org.apache.karaf.shell.commands.Command;
  */
 
 @Command(scope = "xipki-ca", name = "unrevoke-cert",
-        description="unrevoke certificate")
+        description = "unrevoke certificate")
 public class UnrevokeCertCmd extends UnRevRemoveCertCmd
 {
     @Override

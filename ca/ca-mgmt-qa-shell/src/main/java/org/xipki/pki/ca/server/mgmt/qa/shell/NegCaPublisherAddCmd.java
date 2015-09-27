@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-capub-add",
-        description="add publishers to CA (negative, QA)")
+        description = "add publishers to CA (negative, QA)")
 public class NegCaPublisherAddCmd extends CaPublisherAddCmd
 {
 

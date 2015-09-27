@@ -48,7 +48,7 @@ import org.xipki.security.speed.p11.P11DSASignLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-sign",
-        description="performance test of PKCS#11 DSA signature creation (batch)")
+        description = "performance test of PKCS#11 DSA signature creation (batch)")
 public class BSpeedP11DSASignCmd extends BSpeedP11SignCmd
 {
 
@@ -64,7 +64,7 @@ public class BSpeedP11DSASignCmd extends BSpeedP11SignCmd
         for (int i = 0; i < pqLens.length; i += 2)
         {
             int pLen = pqLens[i];
-            int qLen = pqLens[i+1];
+            int qLen = pqLens[i + 1];
             if (pLen == 1024)
             {
                 sigAlgo = "SHA1withDSA";

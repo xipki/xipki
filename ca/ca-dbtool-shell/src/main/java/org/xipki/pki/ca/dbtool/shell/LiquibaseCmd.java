@@ -73,7 +73,7 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
         yesNo.add("no");
     }
 
-    @Option(name = "--quiet", aliases="-q",
+    @Option(name = "--quiet", aliases = "-q",
             description = "quiet mode")
     private Boolean quiet = Boolean.FALSE;
 
@@ -121,7 +121,7 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
                 liquibase.init(logLevel, logFile);
             }
             liquibase.update();
-        }finally
+        } finally
         {
             liquibase.shutdown();
         }
@@ -148,7 +148,7 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
         {
             liquibase.init(logLevel, logFile);
             liquibase.update();
-        }finally
+        } finally
         {
             liquibase.shutdown();
         }

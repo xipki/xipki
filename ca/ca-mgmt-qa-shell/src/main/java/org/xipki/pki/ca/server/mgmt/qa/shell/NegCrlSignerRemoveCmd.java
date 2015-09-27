@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-crlsigner-rm",
-        description="remove CRL signer (negative, QA)")
+        description = "remove CRL signer (negative, QA)")
 public class NegCrlSignerRemoveCmd extends CrlSignerRemoveCmd
 {
 

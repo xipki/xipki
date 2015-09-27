@@ -43,7 +43,7 @@ import org.apache.karaf.shell.commands.Command;
  */
 
 @Command(scope = "xipki-ca", name = "responder-rm",
-        description="remove responder")
+        description = "remove responder")
 public class ResponderRemoveCmd extends CaCmd
 {
     @Argument(index = 0, name = "name", description = "responder name", required = true)

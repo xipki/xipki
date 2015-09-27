@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-profile-rm",
-        description="remove Profile (negative, QA)")
+        description = "remove Profile (negative, QA)")
 public class NegProfileRemoveCmd extends ProfileRemoveCmd
 {
 

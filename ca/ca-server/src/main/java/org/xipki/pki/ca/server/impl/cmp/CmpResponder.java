@@ -221,7 +221,7 @@ abstract class CmpResponder
 
             long msgTimeMs = messageTime.getTime();
             long currentTimeMs = System.currentTimeMillis();
-            long bias = (msgTimeMs - currentTimeMs)/ 1000L;
+            long bias = (msgTimeMs - currentTimeMs) / 1000L;
             if (bias > messageTimeBias)
             {
                 failureCode = PKIFailureInfo.badTime;
@@ -257,7 +257,7 @@ abstract class CmpResponder
                 ProtectionVerificationResult verificationResult = verifyProtection(tidStr,
                         message, cmpControl);
                 ProtectionResult pr = verificationResult.getProtectionResult();
-                switch(pr)
+                switch (pr)
                 {
                 case VALID:
                     errorStatus = null;

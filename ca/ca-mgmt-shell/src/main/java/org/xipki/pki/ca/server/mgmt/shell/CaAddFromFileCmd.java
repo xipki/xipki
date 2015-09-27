@@ -65,7 +65,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 @Command(scope = "xipki-ca", name = "ca-addf",
-        description="add CA from configuration file")
+        description = "add CA from configuration file")
 public class CaAddFromFileCmd extends CaCmd
 {
     @Option(name = "--name", aliases = "-n",
@@ -109,7 +109,7 @@ public class CaAddFromFileCmd extends CaCmd
         try
         {
             props.load(stream);
-        }finally
+        } finally
         {
             stream.close();
         }

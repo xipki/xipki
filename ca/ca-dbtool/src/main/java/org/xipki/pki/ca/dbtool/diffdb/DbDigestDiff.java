@@ -244,7 +244,7 @@ public class DbDigestDiff
                     diffSingleCA(refReader, caIdCertMap);
                 }
             }
-        }finally
+        } finally
         {
             if (target != null)
             {

@@ -161,9 +161,11 @@ public class CALoadTestEnroll extends LoadExecutor
                 for (Integer certId : certRequests.keySet())
                 {
                     String id = "id-" + certId;
-                    EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType
-                            (id, loadtestEntry.getCertprofile(),
-                                    certRequests.get(certId), RA_VERIFIED);
+                    EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType(
+                            id,
+                            loadtestEntry.getCertprofile(),
+                            certRequests.get(certId),
+                            RA_VERIFIED);
 
                     request.addRequestEntry(requestEntry);
                 }

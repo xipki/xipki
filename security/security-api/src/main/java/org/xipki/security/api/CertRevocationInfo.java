@@ -141,15 +141,15 @@ public class CertRevocationInfo implements Serializable
         this.invalidityTime = invalidityTime;
     }
 
-    // ------------------------------------------------
+    //------------------------------------------------
     // Customized serialization
-    // ------------------------------------------------
+    //------------------------------------------------
     private static final long serialVersionUID = 1L;
 
     private static final String SR_serialVersion = "serialVersion";
     private static final double SERIAL_VERSION = 1.0;
 
-    private static final String SR_reason= "reason";
+    private static final String SR_reason = "reason";
     private static final String SR_revocationTime = "revocationTime";
     private static final String SR_invalidityTime = "invalidityTime";
 

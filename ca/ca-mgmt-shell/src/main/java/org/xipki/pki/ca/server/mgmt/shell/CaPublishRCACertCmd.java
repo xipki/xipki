@@ -44,7 +44,7 @@ import org.apache.karaf.shell.commands.Option;
  */
 
 @Command(scope = "xipki-ca", name = "publish-self",
-        description="publish the certificate of root CA")
+        description = "publish the certificate of root CA")
 public class CaPublishRCACertCmd extends CaCmd
 {
     @Argument(index = 0, name = "name", description = "CA name", required = true)

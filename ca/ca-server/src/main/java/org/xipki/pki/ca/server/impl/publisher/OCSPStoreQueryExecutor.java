@@ -185,7 +185,7 @@ class OCSPStoreQueryExecutor
         BigInteger serialNumber = certificate.getCert().getSerialNumber();
         boolean certRegistered = certRegistered(issuerId, serialNumber);
 
-        if (publishGoodCerts == false && revoked == false && certRegistered == false )
+        if (publishGoodCerts == false && revoked == false && certRegistered == false)
         {
             return;
         }
@@ -199,15 +199,15 @@ class OCSPStoreQueryExecutor
             try
             {
                 int idx = 1;
-                ps.setLong(idx++, new Date().getTime()/1000);
+                ps.setLong(idx++, new Date().getTime() / 1000);
                 setBoolean(ps, idx++, revoked);
                 if (revoked)
                 {
-                    ps.setLong(idx++, revInfo.getRevocationTime().getTime()/1000);
+                    ps.setLong(idx++, revInfo.getRevocationTime().getTime() / 1000);
                     if (revInfo.getInvalidityTime() != null)
                     {
-                        ps.setLong(idx++, revInfo.getInvalidityTime().getTime()/1000);
-                    }else
+                        ps.setLong(idx++, revInfo.getInvalidityTime().getTime() / 1000);
+                    } else
                     {
                         ps.setNull(idx++, Types.INTEGER);
                     }
@@ -225,7 +225,7 @@ class OCSPStoreQueryExecutor
             } catch (SQLException e)
             {
                 throw dataSource.translate(sql, e);
-            }finally
+            } finally
             {
                 releaseDbResources(ps, null);
             }
@@ -260,21 +260,21 @@ class OCSPStoreQueryExecutor
             // CERT
             X509Certificate cert = certificate.getCert();
             int idx = 2;
-            ps_addcert.setLong(idx++, System.currentTimeMillis()/1000);
+            ps_addcert.setLong(idx++, System.currentTimeMillis() / 1000);
             ps_addcert.setLong(idx++, serialNumber.longValue());
-            ps_addcert.setLong(idx++, cert.getNotBefore().getTime()/1000);
-            ps_addcert.setLong(idx++, cert.getNotAfter().getTime()/1000);
+            ps_addcert.setLong(idx++, cert.getNotBefore().getTime() / 1000);
+            ps_addcert.setLong(idx++, cert.getNotAfter().getTime() / 1000);
             setBoolean(ps_addcert, idx++, revoked);
             ps_addcert.setInt(idx++, issuerId);
             ps_addcert.setString(idx++, certprofile);
 
             if (revoked)
             {
-                ps_addcert.setLong(idx++, revInfo.getRevocationTime().getTime()/1000);
+                ps_addcert.setLong(idx++, revInfo.getRevocationTime().getTime() / 1000);
                 if (revInfo.getInvalidityTime() != null)
                 {
-                    ps_addcert.setLong(idx++, revInfo.getInvalidityTime().getTime()/1000);
-                }else
+                    ps_addcert.setLong(idx++, revInfo.getInvalidityTime().getTime() / 1000);
+                } else
                 {
                     ps_addcert.setNull(idx++, Types.BIGINT);
                 }
@@ -417,7 +417,7 @@ class OCSPStoreQueryExecutor
             try
             {
                 int idx = 1;
-                ps.setLong(idx++, new Date().getTime()/1000);
+                ps.setLong(idx++, new Date().getTime() / 1000);
                 setBoolean(ps, idx++, false);
                 ps.setNull(idx++, Types.INTEGER);
                 ps.setNull(idx++, Types.INTEGER);
@@ -428,7 +428,7 @@ class OCSPStoreQueryExecutor
             } catch (SQLException e)
             {
                 throw dataSource.translate(sql, e);
-            }finally
+            } finally
             {
                 releaseDbResources(ps, null);
             }
@@ -446,7 +446,7 @@ class OCSPStoreQueryExecutor
             } catch (SQLException e)
             {
                 throw dataSource.translate(sql, e);
-            }finally
+            } finally
             {
                 releaseDbResources(ps, null);
             }
@@ -477,7 +477,7 @@ class OCSPStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -503,15 +503,15 @@ class OCSPStoreQueryExecutor
         {
             int idx = 1;
             setBoolean(ps, idx++, true);
-            ps.setLong(idx++, revocationTime.getTime()/1000);
-            ps.setLong(idx++, invalidityTime.getTime()/1000);
+            ps.setLong(idx++, revocationTime.getTime() / 1000);
+            ps.setLong(idx++, invalidityTime.getTime() / 1000);
             ps.setInt(idx++, revocationInfo.getReason().getCode());
             ps.setInt(idx++, issuerId);
             ps.executeUpdate();
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -537,7 +537,7 @@ class OCSPStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -593,8 +593,8 @@ class OCSPStoreQueryExecutor
             int idx = 1;
             ps.setInt(idx++, id);
             ps.setString(idx++, subject);
-            ps.setLong  (idx++, issuerCert.getCert().getNotBefore().getTime() / 1000);
-            ps.setLong  (idx++, issuerCert.getCert().getNotAfter() .getTime() / 1000);
+            ps.setLong(idx++, issuerCert.getCert().getNotBefore().getTime() / 1000);
+            ps.setLong(idx++, issuerCert.getCert().getNotAfter() .getTime() / 1000);
             ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedName));
             ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedKey));
             ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA224, encodedName));
@@ -615,7 +615,7 @@ class OCSPStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -713,7 +713,7 @@ class OCSPStoreQueryExecutor
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }finally
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -733,7 +733,7 @@ class OCSPStoreQueryExecutor
             try
             {
                 rs = ps.executeQuery();
-            }finally
+            } finally
             {
                 releaseDbResources(ps, rs);
             }

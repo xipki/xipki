@@ -47,17 +47,17 @@ import org.xipki.pki.ca.dbtool.diffdb.DbDigestDiffWorker;
  */
 
 @Command(scope = "xipki-db", name = "diff-digest-db",
-        description="diff digest XiPKI/EJBCA database")
+        description = "diff digest XiPKI/EJBCA database")
 public class DiffDigestDbCmd extends DbPortCmd
 {
     @Option(name = "--ref-db",
             description = "database configuration file of the reference system\n"
-                    + "(one of --ref-db and --ref-dir must be specified)")
+                    + "(one of--ref-db and--ref-dir must be specified)")
     private String refDbConf;
 
     @Option(name = "--ref-dir",
             description = "directory of exported digest files of the reference system\n"
-                    + "(one of --ref-db and --ref-dir must be specified)")
+                    + "(one of--ref-db and--ref-dir must be specified)")
     private String refDir;
 
     @Option(name = "--target",

@@ -102,11 +102,8 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
 
         int minCertId = (int) getMin("CERT", "ID");
 
-        ProcessLog processLog;
-        {
-            final long total = getCount("CERT");
-            processLog = new ProcessLog(total, System.currentTimeMillis(), 0);
-        }
+        final long total = getCount("CERT");
+        ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), 0);
 
         Map<Integer, String> caIdDirMap = getCaIds();
         Set<CaEntry> caEntries = new HashSet<>(caIdDirMap.size());
@@ -183,7 +180,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -262,7 +259,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
         } catch (SQLException e)
         {
             throw translate(dbControl.getCertSql(), e);
-        }finally
+        } finally
         {
             releaseResources(certPs, null);
         }

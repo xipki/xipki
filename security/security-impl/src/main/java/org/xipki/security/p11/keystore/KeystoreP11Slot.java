@@ -341,7 +341,7 @@ public class KeystoreP11Slot implements P11WritableSlot
             fIn = new FileInputStream(file);
             ks = KeyStore.getInstance("PKCS12", "BC");
             ks.load(fIn, password);
-        }finally
+        } finally
         {
             if (fIn != null)
             {
@@ -376,7 +376,7 @@ public class KeystoreP11Slot implements P11WritableSlot
         {
             fOut = new FileOutputStream(file);
             ks.store(fOut, password);
-        }finally
+        } finally
         {
             if (fOut != null)
             {
@@ -563,7 +563,7 @@ public class KeystoreP11Slot implements P11WritableSlot
                     return p11Identity;
                 }
             }
-        }else if (keyLabel == null)
+        } else if (keyLabel == null)
         {
             for (KeystoreP11Identity p11Identity : identities)
             {

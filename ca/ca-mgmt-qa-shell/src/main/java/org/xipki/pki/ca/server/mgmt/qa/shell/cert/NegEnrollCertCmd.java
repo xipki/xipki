@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-enroll-cert",
-        description="enroll certificate (negative, QA)")
+        description = "enroll certificate (negative, QA)")
 public class NegEnrollCertCmd extends EnrollCertCmd
 {
     @Override

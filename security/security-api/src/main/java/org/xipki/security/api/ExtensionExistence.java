@@ -146,7 +146,7 @@ public class ExtensionExistence extends ASN1Object
     {
         if (obj == null || obj instanceof ExtensionExistence)
         {
-            return (ExtensionExistence)obj;
+            return (ExtensionExistence) obj;
         }
 
         if (obj instanceof ASN1Sequence)
@@ -158,7 +158,7 @@ public class ExtensionExistence extends ASN1Object
         {
             try
             {
-                return getInstance(ASN1Primitive.fromByteArray((byte[])obj));
+                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
             catch (IOException e)
             {

@@ -77,9 +77,9 @@ public class OBFPasswordResolver  implements SinglePasswordResolver
             byte b2 = b[b.length - (i + 1)];
             if (b1 < 0 || b2 < 0)
             {
-                int i0 = (0xff&b1)*256 + (0xff&b2);
+                int i0 = (0xff & b1) * 256 + (0xff & b2);
                 String x = Integer.toString(i0, 36).toLowerCase();
-                buf.append("U0000",0,5-x.length());
+                buf.append("U0000", 0, 5 - x.length());
                 buf.append(x);
             }
             else
@@ -89,7 +89,7 @@ public class OBFPasswordResolver  implements SinglePasswordResolver
                 int i0 = i1 * 256 + i2;
                 String x = Integer.toString(i0, 36).toLowerCase();
 
-                buf.append("000",0,4-x.length());
+                buf.append("000", 0, 4 - x.length());
                 buf.append(x);
             }
 
@@ -98,7 +98,7 @@ public class OBFPasswordResolver  implements SinglePasswordResolver
 
     }
 
-    /* ------------------------------------------------------------ */
+    /*------------------------------------------------------------ */
     public static String deobfuscate(
             String s)
     {
@@ -111,12 +111,12 @@ public class OBFPasswordResolver  implements SinglePasswordResolver
         int l = 0;
         for (int i = 0; i < s.length(); i += 4)
         {
-            if (s.charAt(i)=='U')
+            if (s.charAt(i) == 'U')
             {
                 i++;
                 String x = s.substring(i, i + 4);
                 int i0 = Integer.parseInt(x, 36);
-                byte bx = (byte)(i0>>8);
+                byte bx = (byte) (i0 >> 8);
                 b[l++] = bx;
             }
             else
@@ -130,6 +130,6 @@ public class OBFPasswordResolver  implements SinglePasswordResolver
             }
         }
 
-        return new String(b, 0, l,StandardCharsets.UTF_8);
+        return new String(b, 0, l, StandardCharsets.UTF_8);
     }
 }

@@ -484,7 +484,7 @@ public class Scep
                 audit(auditEvent, "messageType", mt.toString());
             }
 
-            switch(mt)
+            switch (mt)
             {
                 case PKCSReq:
                 case RenewalReq:

@@ -549,7 +549,7 @@ public class DecodedPkiMessage extends PkiMessage
             {
                 ContentInfo ci = ContentInfo.getInstance(encodedMessageData);
                 ret.setMessageData(ci);
-            }else
+            } else
             {
                 throw new RuntimeException("should not reach here, unknown messageType "
                         + messageType);

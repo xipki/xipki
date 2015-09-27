@@ -45,7 +45,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  */
 
 @Command(scope = "xipki-ca", name = "publisher-up",
-        description="update publisher")
+        description = "update publisher")
 public class PublisherUpdateCmd extends CaCmd
 {
 

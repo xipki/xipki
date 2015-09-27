@@ -80,7 +80,7 @@ public class OcspCertsReader extends DbiXmlReader
 
             lastEvent = event;
 
-            switch(event)
+            switch (event)
             {
             case XMLStreamConstants.START_ELEMENT:
                 if (OcspCertType.TAG_ROOT.equals(reader.getLocalName()))
@@ -97,7 +97,7 @@ public class OcspCertsReader extends DbiXmlReader
                     break;
                 }
 
-                switch(reader.getLocalName())
+                switch (reader.getLocalName())
                 {
                 case OcspCertType.TAG_ROOT:
                     ret.validate();
@@ -124,16 +124,20 @@ public class OcspCertsReader extends DbiXmlReader
                     ret.setRr(Integer.parseInt(tagContent));
                     break;
                 case OcspCertType.TAG_rt:
-                    ret.setRt(Long.parseLong(tagContent));;
+                    ret.setRt(Long.parseLong(tagContent));
                     break;
                 case OcspCertType.TAG_sn:
                     ret.setSn(tagContent);
                     break;
                 case OcspCertType.TAG_update:
-                    ret.setUpdate(Long.parseLong(tagContent));;
+                    ret.setUpdate(Long.parseLong(tagContent));
                     break;
-                } // end switch(reader.getLocalName())
-            } // end switch(event)
+                default:
+                    break;
+                } // end switch (reader.getLocalName())
+            default:
+                break;
+            } // end switch (event)
         } // end while
 
         return null;

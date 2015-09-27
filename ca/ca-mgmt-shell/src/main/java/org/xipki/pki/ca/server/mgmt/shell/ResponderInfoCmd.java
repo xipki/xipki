@@ -51,14 +51,14 @@ import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
  */
 
 @Command(scope = "xipki-ca", name = "responder-info",
-        description="show information of responder")
+        description = "show information of responder")
 public class ResponderInfoCmd extends CaCmd
 {
 
     @Argument(index = 0, name = "name", description = "responder name")
     private String name;
 
-    @Option(name = "--verbose", aliases="-v",
+    @Option(name = "--verbose", aliases = "-v",
             description = "show responder information verbosely")
     private Boolean verbose = Boolean.FALSE;
 

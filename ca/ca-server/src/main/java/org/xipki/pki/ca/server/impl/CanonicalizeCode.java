@@ -107,6 +107,10 @@ public class CanonicalizeCode
         }
     }
 
+    private CanonicalizeCode()
+    {
+    }
+
     private static void canonicalizeDir(
             final File dir)
     throws Exception
@@ -184,7 +188,7 @@ public class CanonicalizeCode
                     writer.write('\n');
                 }
             }
-        }finally
+        } finally
         {
             writer.close();
             reader.close();
@@ -255,7 +259,7 @@ public class CanonicalizeCode
 
         if (isCommentLine == false && len > 0 && sb.charAt(len - 1) == '{')
         {
-            if(sb.indexOf("[]") != -1)
+            if (sb.indexOf("[]") != -1)
             {
                 addNewLine = false;
             } else
@@ -327,7 +331,7 @@ public class CanonicalizeCode
             final File file)
     throws Exception
     {
-        if(file.getName().equals("package-info.java"))
+        if (file.getName().equals("package-info.java"))
         {
             return;
         }
@@ -392,7 +396,7 @@ public class CanonicalizeCode
                     continue;
                 }
 
-                if (idx > 0 && line.charAt(idx - 1) == '@' || line.charAt(idx - 1) == '"' )
+                if (idx > 0 && line.charAt(idx - 1) == '@' || line.charAt(idx - 1) == '"')
                 {
                     lastLine = line;
                     continue;
@@ -426,7 +430,7 @@ public class CanonicalizeCode
 
                 lastLine = line;
             }
-        }finally
+        } finally
         {
             reader.close();
         }

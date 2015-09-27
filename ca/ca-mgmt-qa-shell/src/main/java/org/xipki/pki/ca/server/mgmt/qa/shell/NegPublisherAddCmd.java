@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-publisher-add",
-        description="add publisher (negative, QA)")
+        description = "add publisher (negative, QA)")
 public class NegPublisherAddCmd extends PublisherAddCmd
 {
 

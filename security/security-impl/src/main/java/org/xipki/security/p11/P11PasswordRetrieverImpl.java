@@ -102,7 +102,7 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever
             List<char[]> ret = new ArrayList<char[]>(singlePasswords.size());
             for (String singlePassword : singlePasswords)
             {
-                if (passwordResolver ==null)
+                if (passwordResolver == null)
                 {
                     ret.add(singlePassword.toCharArray());
                 }

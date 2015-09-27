@@ -57,6 +57,10 @@ public class PasswordBasedEncryption
 
     private static AtomicBoolean initialized = new AtomicBoolean(false);
 
+    private PasswordBasedEncryption()
+    {
+    }
+
     private static void init()
     {
         synchronized (initialized)

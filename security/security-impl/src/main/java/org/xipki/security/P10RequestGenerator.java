@@ -110,7 +110,7 @@ public class P10RequestGenerator
         try
         {
             return generateRequest(contentSigner, subjectPublicKeyInfo, subjectDN, attributes);
-        }finally
+        } finally
         {
             signer.returnContentSigner(contentSigner);
         }
@@ -261,7 +261,7 @@ public class P10RequestGenerator
             throw new BadInputException("invalid taggedValue " + taggedValue);
         }
 
-        switch(tag)
+        switch (tag)
         {
         case GeneralName.otherName:
         {
@@ -316,7 +316,7 @@ public class P10RequestGenerator
             return new GeneralName(tag, value);
         default:
             throw new RuntimeException("unsupported tag " + tag);
-        } // end switch(tag)
+        } // end switch (tag)
     }
 
 }

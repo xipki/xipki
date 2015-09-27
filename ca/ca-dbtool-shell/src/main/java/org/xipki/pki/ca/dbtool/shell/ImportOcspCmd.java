@@ -47,7 +47,7 @@ import org.xipki.pki.ca.dbtool.OcspDbImportWorker;
  */
 
 @Command(scope = "xipki-db", name = "import-ocsp",
-        description="import OCSP database")
+        description = "import OCSP database")
 public class ImportOcspCmd extends DbPortCmd
 {
     private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";

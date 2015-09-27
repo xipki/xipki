@@ -50,7 +50,7 @@ import org.xipki.scep4j.client.ScepClient;
  */
 
 @Command(scope = "scep", name = "getcrl",
-        description="download CRL")
+        description = "download CRL")
 public class GetCRLCmd extends ClientCmd
 {
     @Option(name = "--cert", aliases = "-c",

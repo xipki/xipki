@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-cmpcontrol-add",
-        description="add CMP control (negative, QA)")
+        description = "add CMP control (negative, QA)")
 public class NegCmpControlAddCmd extends CmpControlAddCmd
 {
 

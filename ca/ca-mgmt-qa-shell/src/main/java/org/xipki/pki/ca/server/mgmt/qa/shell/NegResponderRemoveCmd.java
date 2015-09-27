@@ -44,7 +44,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-responder-rm",
-        description="remove responder (negative, QA)")
+        description = "remove responder (negative, QA)")
 public class NegResponderRemoveCmd extends ResponderRemoveCmd
 {
 

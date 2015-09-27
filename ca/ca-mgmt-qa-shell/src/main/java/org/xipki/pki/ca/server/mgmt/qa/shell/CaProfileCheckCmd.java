@@ -48,7 +48,7 @@ import org.xipki.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-caqa", name = "caprofile-check",
-        description="check information of certificate profiles in given CA (QA)")
+        description = "check information of certificate profiles in given CA (QA)")
 public class CaProfileCheckCmd extends CaCmd
 {
     @Option(name = "--ca",

@@ -73,8 +73,9 @@ public class SubjectControl
         {
             Set<ASN1ObjectIdentifier> oids = controls.keySet();
             List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
-            List<ASN1ObjectIdentifier> _oids = backwardsSubject ?
-                    ObjectIdentifiers.getBackwardDNs() : ObjectIdentifiers.getForwardDNs();
+            List<ASN1ObjectIdentifier> _oids = backwardsSubject
+                    ? ObjectIdentifiers.getBackwardDNs()
+                    : ObjectIdentifiers.getForwardDNs();
             for (ASN1ObjectIdentifier oid : _oids)
             {
                 if (oids.contains(oid))

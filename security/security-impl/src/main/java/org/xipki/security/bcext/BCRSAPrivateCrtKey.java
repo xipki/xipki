@@ -254,7 +254,7 @@ public class BCRSAPrivateCrtKey
             return false;
         }
 
-        RSAPrivateCrtKey key = (RSAPrivateCrtKey)o;
+        RSAPrivateCrtKey key = (RSAPrivateCrtKey) o;
 
         return this.getModulus().equals(key.getModulus())
             && this.getPublicExponent().equals(key.getPublicExponent())

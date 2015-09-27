@@ -273,7 +273,7 @@ public class X509CACmpResponder extends CmpResponder
 
         try
         {
-            switch(type)
+            switch (type)
             {
             case PKIBody.TYPE_CERT_REQ:
             case PKIBody.TYPE_KEY_UPDATE_REQ:
@@ -323,7 +323,7 @@ public class X509CACmpResponder extends CmpResponder
                         "unsupported type " + type);
                 break;
             }
-            } // end switch(type)
+            } // end switch (type)
         } catch (InsuffientPermissionException e)
         {
             ErrorMsgContent emc = new ErrorMsgContent(
@@ -531,8 +531,9 @@ public class X509CACmpResponder extends CmpResponder
             } // end try
         } // end for
 
-        CMPCertificate[] caPubs = sendCaCert ?
-                new CMPCertificate[]{getCA().getCAInfo().getCertInCMPFormat()} : null;
+        CMPCertificate[] caPubs = sendCaCert
+                ? new CMPCertificate[]{getCA().getCAInfo().getCertInCMPFormat()}
+                : null;
         return new CertRepMessage(caPubs, certResponses);
     }
 
@@ -625,8 +626,9 @@ public class X509CACmpResponder extends CmpResponder
             } // end try
         }
 
-        CMPCertificate[] caPubs = sendCaCert ?
-                new CMPCertificate[]{getCA().getCAInfo().getCertInCMPFormat()} : null;
+        CMPCertificate[] caPubs = sendCaCert
+                ? new CMPCertificate[]{getCA().getCAInfo().getCertInCMPFormat()}
+                : null;
         CertRepMessage repMessage = new CertRepMessage(caPubs, new CertResponse[]{certResp});
 
         return new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
@@ -734,7 +736,7 @@ public class X509CACmpResponder extends CmpResponder
             String auditMessage;
 
             int failureInfo;
-            switch(code)
+            switch (code)
             {
             case ALREADY_ISSUED:
                 failureInfo = PKIFailureInfo.badRequest;
@@ -791,7 +793,7 @@ public class X509CACmpResponder extends CmpResponder
                 failureInfo = PKIFailureInfo.systemFailure;
                 auditMessage = "InternalErrorCode " + e.getErrorCode();
                 break;
-            } // end switch(code)
+            } // end switch (code)
 
             if (childAuditEvent != null)
             {
@@ -800,7 +802,7 @@ public class X509CACmpResponder extends CmpResponder
             }
 
             String errorMessage;
-            switch(code)
+            switch (code)
             {
             case DATABASE_FAILURE:
             case SYSTEM_FAILURE:
@@ -992,7 +994,7 @@ public class X509CACmpResponder extends CmpResponder
                 String auditMessage;
 
                 int failureInfo;
-                switch(code)
+                switch (code)
                 {
                 case BAD_REQUEST:
                     failureInfo = PKIFailureInfo.badRequest;
@@ -1038,7 +1040,7 @@ public class X509CACmpResponder extends CmpResponder
                     failureInfo = PKIFailureInfo.systemFailure;
                     auditMessage = "InternalErrorCode " + e.getErrorCode();
                     break;
-                } // end switch(code)
+                } // end switch (code)
 
                 if (childAuditEvent != null)
                 {
@@ -1047,7 +1049,7 @@ public class X509CACmpResponder extends CmpResponder
                 }
 
                 String errorMessage;
-                switch(code)
+                switch (code)
                 {
                 case DATABASE_FAILURE:
                 case SYSTEM_FAILURE:
@@ -1056,7 +1058,7 @@ public class X509CACmpResponder extends CmpResponder
                 default:
                     errorMessage = code.name() + ": " + e.getErrorMessage();
                     break;
-                } // end switch(code)
+                } // end switch (code)
 
                 status = generateCmpRejectionStatus(failureInfo, errorMessage);
             } // end try
@@ -1461,7 +1463,7 @@ public class X509CACmpResponder extends CmpResponder
         PKIBody respBody;
 
         int type = reqBody.getType();
-        switch(type)
+        switch (type)
         {
         case PKIBody.TYPE_CERT_REQ:
             addAutitEventType(auditEvent, "CERT_REQ");
@@ -1670,7 +1672,7 @@ public class X509CACmpResponder extends CmpResponder
                 {
                     String statusMessage = "no CRL is available";
                     return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.systemFailure,
-                            statusMessage) ;
+                            statusMessage);
                 }
 
                 itvResp = new InfoTypeAndValue(infoType, crl);
@@ -1700,7 +1702,7 @@ public class X509CACmpResponder extends CmpResponder
                 ASN1Encodable respValue;
 
                 int action = asn1Code.getPositiveValue().intValue();
-                switch(action)
+                switch (action)
                 {
                 case XipkiCmpConstants.ACTION_GEN_CRL:
                     addAutitEventType(auditEvent, "CRL_GEN_ONDEMAND");
@@ -1756,7 +1758,7 @@ public class X509CACmpResponder extends CmpResponder
                     String statusMessage = "unsupported XiPKI action code '" + action + "'";
                     return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                             statusMessage);
-                } // end switch(action)
+                } // end switch (action)
 
                 ASN1EncodableVector v = new ASN1EncodableVector();
                 v.add(asn1Code);
@@ -1774,7 +1776,7 @@ public class X509CACmpResponder extends CmpResponder
             failureInfo = PKIFailureInfo.systemFailure;
             String statusMessage = null;
             ErrorCode code = e.getErrorCode();
-            switch(code)
+            switch (code)
             {
             case BAD_REQUEST:
                 failureInfo = PKIFailureInfo.badRequest;
@@ -1787,7 +1789,7 @@ public class X509CACmpResponder extends CmpResponder
             default:
                 statusMessage = code.name() + ": " + e.getErrorMessage();
                 break;
-            } // end switch(code)
+            } // end switch (code)
 
             return createErrorMsgPKIBody(PKIStatus.rejection, failureInfo, statusMessage);
         } catch (CRLException e)

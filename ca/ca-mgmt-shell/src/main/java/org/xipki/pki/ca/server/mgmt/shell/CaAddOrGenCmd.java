@@ -106,7 +106,7 @@ public abstract class CaAddOrGenCmd extends CaCmd
             required = true,
             description = "CRL number for the next CRL\n"
                     + "(required)")
-    private Integer nextCrlNumber ;
+    private Integer nextCrlNumber;
 
     @Option(name = "--max-validity",
             required = true,

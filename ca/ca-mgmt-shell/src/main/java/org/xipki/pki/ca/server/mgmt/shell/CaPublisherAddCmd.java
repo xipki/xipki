@@ -45,7 +45,7 @@ import org.apache.karaf.shell.commands.Option;
  */
 
 @Command(scope = "xipki-ca", name = "capub-add",
-        description="add publisher to CA")
+        description = "add publisher to CA")
 public class CaPublisherAddCmd extends CaCmd
 {
     @Option(name = "--ca",

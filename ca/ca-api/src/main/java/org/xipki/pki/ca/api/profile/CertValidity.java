@@ -215,6 +215,12 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
     }
 
     @Override
+    public int hashCode()
+    {
+        return toString().hashCode();
+    }
+
+    @Override
     public int compareTo(
             final CertValidity o)
     {

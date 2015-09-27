@@ -96,7 +96,7 @@ public class CmpUtf8Pairs
                 char b = string.charAt(idx);
                 if (b < '0' || b > '9')
                 {
-                    positions.add(idx-1);
+                    positions.add(idx - 1);
                 }
             }
         }
@@ -188,7 +188,9 @@ public class CmpUtf8Pairs
 
         char c = name.charAt(0);
         if (c >= '0' && c <= '9')
+        {
             throw new IllegalArgumentException("name begin with " + c);
+        }
         pairs.put(name, value);
     }
 

@@ -167,11 +167,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
     {
         System.out.println("digesting database");
 
-        ProcessLog processLog;
-        {
-            final long total = getCount("CertificateData");
-            processLog = new ProcessLog(total, System.currentTimeMillis(), 0);
-        }
+        final long total = getCount("CertificateData");
+        ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), 0);
 
         Map<String, CaInfo> cas = getCas();
         Set<CaEntry> caEntries = new HashSet<>(cas.size());
@@ -257,7 +254,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -443,7 +440,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(ps, null);
             releaseResources(rawCertPs, null);

@@ -110,6 +110,23 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier>
     }
 
     @Override
+    public int hashCode()
+    {
+        int hashCode = 0;
+        if (slotId != null)
+        {
+            hashCode = slotId.hashCode();
+        }
+
+        if (slotIndex != 0)
+        {
+            hashCode += 31 * slotIndex.hashCode();
+        }
+
+        return hashCode;
+    }
+
+    @Override
     public int compareTo(
             final P11SlotIdentifier o)
     {

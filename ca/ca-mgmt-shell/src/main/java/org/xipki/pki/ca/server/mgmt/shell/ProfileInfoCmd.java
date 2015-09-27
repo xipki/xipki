@@ -51,13 +51,13 @@ import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
  */
 
 @Command(scope = "xipki-ca", name = "profile-info",
-        description="show information of certifiate profile")
+        description = "show information of certifiate profile")
 public class ProfileInfoCmd extends CaCmd
 {
     @Argument(index = 0, name = "name", description = "certificate profile name")
     private String name;
 
-    @Option(name = "--verbose", aliases="-v",
+    @Option(name = "--verbose", aliases = "-v",
             description = "show certificate profile information verbosely")
     private Boolean verbose = Boolean.FALSE;
 

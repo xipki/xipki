@@ -375,9 +375,10 @@ public class SyslogAuditServiceImpl implements AuditService
         if (notEmpty(prefix))
         {
             if (prefix.charAt(prefix.length() - 1) != ' ')
-            this.prefix = prefix + " ";
-        }
-        else
+            {
+                this.prefix = prefix + " ";
+            }
+        } else
         {
             this.prefix = null;
         }

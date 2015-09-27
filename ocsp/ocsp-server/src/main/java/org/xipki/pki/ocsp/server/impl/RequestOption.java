@@ -191,7 +191,7 @@ class RequestOption
         }
         else
         {
-            switch(certpathConf.getValidationModel())
+            switch (certpathConf.getValidationModel())
             {
             case CHAIN:
                 certpathValidationModel = CertpathValidationModel.CHAIN;
@@ -327,8 +327,9 @@ class RequestOption
                 is = new ByteArrayInputStream(ksConf.getKeystore().getValue());
             }
 
-            char[] password = ksConf.getPassword() == null ?
-                    null : ksConf.getPassword().toCharArray();
+            char[] password = (ksConf.getPassword() == null)
+                    ? null
+                    : ksConf.getPassword().toCharArray();
             trustStore.load(is, password);
 
             Enumeration<String> aliases = trustStore.aliases();

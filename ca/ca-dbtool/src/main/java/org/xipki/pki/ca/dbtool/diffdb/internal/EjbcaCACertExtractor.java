@@ -46,6 +46,9 @@ import org.xipki.security.api.util.X509Util;
 
 public class EjbcaCACertExtractor
 {
+    private EjbcaCACertExtractor()
+    {
+    }
 
     public static X509Certificate extractCACert(String caData)
     throws Exception

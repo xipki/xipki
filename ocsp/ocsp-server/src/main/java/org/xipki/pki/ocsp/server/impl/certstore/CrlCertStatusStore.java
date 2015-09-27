@@ -299,17 +299,15 @@ public class CrlCertStatusStore extends CertStatusStore
 
             X509CRL crl = X509Util.parseCRL(crlFilename);
             BigInteger crlNumber;
+            byte[] octetString = crl.getExtensionValue(Extension.cRLNumber.getId());
+            if (octetString != null)
             {
-                byte[] octetString = crl.getExtensionValue(Extension.cRLNumber.getId());
-                if (octetString != null)
-                {
-                    byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
-                    crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
-                }
-                else
-                {
-                    crlNumber = null;
-                }
+                byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
+                crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
+            }
+            else
+            {
+                crlNumber = null;
             }
 
             X500Principal issuer = crl.getIssuerX500Principal();
@@ -352,7 +350,7 @@ public class CrlCertStatusStore extends CertStatusStore
                 }
 
                 deltaCrl = X509Util.parseCRL(deltaCrlFilename);
-                byte[] octetString =
+                octetString =
                         deltaCrl.getExtensionValue(Extension.deltaCRLIndicator.getId());
                 if (octetString == null)
                 {
@@ -1065,7 +1063,7 @@ public class CrlCertStatusStore extends CertStatusStore
         return certs;
     }
 
-    private final byte[] sha1Fp(
+    private byte[] sha1Fp(
             final File file)
     throws IOException
     {
@@ -1085,7 +1083,7 @@ public class CrlCertStatusStore extends CertStatusStore
                         sha1.update(buffer, 0, readed);
                     }
                 }
-            }finally
+            } finally
             {
                 try
                 {
@@ -1137,7 +1135,7 @@ public class CrlCertStatusStore extends CertStatusStore
             final byte[] issuerNameHash,
             final byte[] issuerKeyHash)
     {
-        if (! canResolveIssuer(hashAlgo, issuerNameHash, issuerKeyHash))
+        if (!canResolveIssuer(hashAlgo, issuerNameHash, issuerKeyHash))
         {
             return null;
         }

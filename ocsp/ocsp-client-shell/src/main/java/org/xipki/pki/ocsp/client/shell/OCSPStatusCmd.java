@@ -76,7 +76,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 @Command(scope = "xipki-ocsp", name = "status",
-        description="request certificate status")
+        description = "request certificate status")
 public class OCSPStatusCmd extends BaseOCSPStatusCmd
 {
     @Override
@@ -200,14 +200,14 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
         {
             if (n > 1)
             {
-                out("---------------------------- " + i + " ----------------------------");
+                out("---------------------------- " + i + "----------------------------");
             }
             SingleResp singleResp = singleResponses[i];
             BigInteger serialNumber = singleResp.getCertID().getSerialNumber();
 
             CertificateStatus singleCertStatus = singleResp.getCertStatus();
 
-            String status ;
+            String status;
             if (singleCertStatus == null)
             {
                 status = "good";
@@ -238,7 +238,7 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
                         sb.append(CRLReason.forReasonCode(reason).getDescription());
                         sb.append(", revocationTime = ");
                         sb.append(revTime);
-                        if (invTime !=null)
+                        if (invTime != null)
                         {
                             sb.append(", invalidityTime = ");
                             sb.append(invTime);

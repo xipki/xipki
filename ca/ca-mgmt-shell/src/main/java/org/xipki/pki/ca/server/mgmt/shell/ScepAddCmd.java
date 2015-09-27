@@ -47,7 +47,7 @@ import org.xipki.password.api.PasswordResolver;
  */
 
 @Command(scope = "xipki-ca", name = "scep-add",
-        description="add SCEP")
+        description = "add SCEP")
 public class ScepAddCmd extends CaCmd
 {
     @Option(name = "--ca",
@@ -92,7 +92,7 @@ public class ScepAddCmd extends CaCmd
         String base64Cert = null;
         if (certFile != null)
         {
-            base64Cert= IoUtil.base64Encode(IoUtil.read(certFile), false);
+            base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
         }
 
         if ("PKCS12".equalsIgnoreCase(responderType) || "JKS".equalsIgnoreCase(responderType))

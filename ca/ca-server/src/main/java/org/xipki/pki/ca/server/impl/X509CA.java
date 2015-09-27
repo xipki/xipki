@@ -202,7 +202,7 @@ public class X509CA
             }
 
         }
-    }// class ScheduledNextSerialCommitService
+    } // class ScheduledNextSerialCommitService
 
     private class ScheduledExpiredCertsRemover implements Runnable
     {
@@ -244,7 +244,7 @@ public class X509CA
             } finally
             {
                 AuditService audit = getAuditService();
-                if (audit != null);
+                if (audit != null)
                 {
                     AuditEvent auditEvent = newAuditEvent();
                     auditEvent.setDuration(System.currentTimeMillis() - startTime);
@@ -467,7 +467,7 @@ public class X509CA
                                 t.getClass().getName(), t.getMessage());
                     }
                     LOG.debug(message, t);
-                }finally
+                } finally
                 {
                     auditEvent.setDuration(System.currentTimeMillis() - start.getTime());
                 }
@@ -694,7 +694,7 @@ public class X509CA
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                         e.getClass().getName() + ": " + e.getMessage());
             }
-        }finally
+        } finally
         {
             if (successfull == false)
             {
@@ -789,7 +789,7 @@ public class X509CA
             }
 
             return crl;
-        }finally
+        } finally
         {
             crlGenInProcess.set(false);
         }
@@ -917,7 +917,7 @@ public class X509CA
                     Date revocationTime = revInfo.getRevocationTime();
                     Date invalidityTime = revInfo.getInvalidityTime();
 
-                    switch(crlControl.getInvalidityDateMode())
+                    switch (crlControl.getInvalidityDateMode())
                     {
                     case FORBIDDEN:
                         invalidityTime = null;
@@ -974,7 +974,7 @@ public class X509CA
 
                 startSerial = maxSerial.add(BigInteger.ONE);
 
-            }while (revInfos.size() >= numEntries);
+            } while (revInfos.size() >= numEntries);
             // end do
 
             BigInteger crlNumber = caInfo.nextCRLNumber();
@@ -994,9 +994,9 @@ public class X509CA
             try
             {
                 // AuthorityKeyIdentifier
-                byte[] akiValues = directCRL ?
-                        caInfo.getPublicCAInfo().getSubjectKeyIdentifer() :
-                        crlSigner.getSubjectKeyIdentifier();
+                byte[] akiValues = directCRL
+                        ? caInfo.getPublicCAInfo().getSubjectKeyIdentifer()
+                        : crlSigner.getSubjectKeyIdentifier();
                 AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(akiValues);
                 crlBuilder.addExtension(Extension.authorityKeyIdentifier, false, aki);
 
@@ -1076,8 +1076,8 @@ public class X509CA
                     } // end for
 
                     startSerial = maxSerial.add(BigInteger.ONE);
-                }while (serials.size() >= numEntries);
-                // end fo
+                } while (serials.size() >= numEntries);
+                // end do
 
                 try
                 {
@@ -1090,8 +1090,9 @@ public class X509CA
                 }
             }
 
-            ConcurrentContentSigner concurrentSigner = (_crlSigner == null) ?
-                    caInfo.getSigner(null) : _crlSigner;
+            ConcurrentContentSigner concurrentSigner = (_crlSigner == null)
+                    ? caInfo.getSigner(null)
+                    : _crlSigner;
 
             ContentSigner contentSigner;
             try
@@ -1107,7 +1108,7 @@ public class X509CA
             try
             {
                 crlHolder = crlBuilder.build(contentSigner);
-            }finally
+            } finally
             {
                 concurrentSigner.returnContentSigner(contentSigner);
             }
@@ -1141,7 +1142,7 @@ public class X509CA
                 throw new OperationException(ErrorCode.CRL_FAILURE, "CRLException: "
                         + e.getMessage());
             }
-        }finally
+        } finally
         {
             if (successfull == false)
             {
@@ -1267,7 +1268,7 @@ public class X509CA
             LOG.debug(message, e);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, "RuntimeException:  "
                     + e.getMessage());
-        }finally
+        } finally
         {
             if (successfull == false)
             {
@@ -1751,7 +1752,7 @@ public class X509CA
             reason = CRLReason.UNSPECIFIED;
         }
 
-        switch(reason)
+        switch (reason)
         {
         case CA_COMPROMISE:
         case AA_COMPROMISE:
@@ -1767,7 +1768,9 @@ public class X509CA
         case CERTIFICATE_HOLD:
         case PRIVILEGE_WITHDRAWN:
             break;
-        } // switch(reason)
+        default:
+            throw new RuntimeException("unknown CRL reason " + reason);
+        } // switch (reason)
 
         return do_revokeCertificate(serialNumber, reason, invalidityTime, false);
     }
@@ -2240,7 +2243,7 @@ public class X509CA
 
                 // append the commonName with '-' + yyyyMMdd
                 SimpleDateFormat dateF = new SimpleDateFormat("yyyyMMdd");
-                dateF.setTimeZone(new SimpleTimeZone(0,"Z"));
+                dateF.setTimeZone(new SimpleTimeZone(0, "Z"));
                 String yyyyMMdd = dateF.format(gSMC_KFirstNotBefore);
                 String suffix = "-" + yyyyMMdd;
 
@@ -2460,12 +2463,11 @@ public class X509CA
                                 "certificate for the given subject " + grandtedSubjectText
                                 + " and profile " + certprofileName + " already issued");
                     }
-                }
-                else
+                } else
                 {
                     throw new RuntimeException(
                             "should not reach here, unknown subject DuplicationMode " + keyMode);
-                }// end if (subjectMode)
+                } // end if (subjectMode)
 
                 if (certIssued)
                 {
@@ -2656,7 +2658,7 @@ public class X509CA
                 try
                 {
                     bcCert = certBuilder.build(contentSigner).toASN1Structure();
-                }finally
+                } finally
                 {
                     signer.returnContentSigner(contentSigner);
                 }
@@ -2709,7 +2711,7 @@ public class X509CA
             }
 
             return ret;
-        }finally
+        } finally
         {
             try
             {
@@ -2827,7 +2829,7 @@ public class X509CA
             }
             else if (control.isExtendedNextUpdate() == false && control.getDeltaCRLIntervals() > 0)
             {
-                if (i% control.getDeltaCRLIntervals() == 0)
+                if (i % control.getDeltaCRLIntervals() == 0)
                 {
                     intervalsTillNextCRL = i;
                     break;
@@ -2912,7 +2914,7 @@ public class X509CA
                 } finally
                 {
                     AuditService audit = getAuditService();
-                    if (audit != null);
+                    if (audit != null)
                     {
                         AuditEvent auditEvent = newAuditEvent();
                         auditEvent.setLevel(
@@ -2929,7 +2931,7 @@ public class X509CA
                         auditEvent.addEventData(
                                 new AuditEventData("eventType", "REMOVE_EXPIRED_CERT"));
                         audit.logEvent(auditEvent);
-                    }// end if (audit != null)
+                    } // end if (audit != null)
                 } // end finally
             } // end try
         } // end while (true)
@@ -3146,8 +3148,9 @@ public class X509CA
     private X509CrlSignerEntryWrapper getCrlSigner()
     {
         String crlSignerName = caInfo.getCrlSignerName();
-        X509CrlSignerEntryWrapper crlSigner = crlSignerName == null ?
-                null : caManager.getCrlSignerWrapper(crlSignerName);
+        X509CrlSignerEntryWrapper crlSigner = (crlSignerName == null)
+                ? null
+                : caManager.getCrlSignerWrapper(crlSignerName);
         return crlSigner;
     }
 

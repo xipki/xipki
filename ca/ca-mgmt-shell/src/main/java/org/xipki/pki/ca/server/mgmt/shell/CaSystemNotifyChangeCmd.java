@@ -42,7 +42,7 @@ import org.apache.karaf.shell.commands.Command;
  */
 
 @Command(scope = "xipki-ca", name = "notify-change",
-        description="notify the change of CA system")
+        description = "notify the change of CA system")
 public class CaSystemNotifyChangeCmd extends CaCmd
 {
 

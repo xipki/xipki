@@ -71,7 +71,7 @@ public abstract class NegCRLCmd extends ClientCmd
             throw new IllegalCmdParamException("no CA is configured");
         }
 
-        if (caName != null && ! caNames.contains(caName))
+        if (caName != null && !caNames.contains(caName))
         {
             throw new IllegalCmdParamException("CA " + caName
                     + " is not within the configured CAs " + caNames);

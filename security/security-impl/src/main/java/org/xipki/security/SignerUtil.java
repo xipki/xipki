@@ -78,6 +78,10 @@ import org.xipki.security.api.util.AlgorithmUtil;
 
 public class SignerUtil
 {
+    private SignerUtil()
+    {
+    }
+
     static public RSAKeyParameters generateRSAPublicKeyParameter(
             final RSAPublicKey key)
     {
@@ -90,7 +94,7 @@ public class SignerUtil
     {
         if (key instanceof RSAPrivateCrtKey)
         {
-            RSAPrivateCrtKey k = (RSAPrivateCrtKey)key;
+            RSAPrivateCrtKey k = (RSAPrivateCrtKey) key;
 
             return new RSAPrivateCrtKeyParameters(k.getModulus(), k.getPublicExponent(),
                     k.getPrivateExponent(), k.getPrimeP(), k.getPrimeQ(),
@@ -191,7 +195,7 @@ public class SignerUtil
     {
         int inLen = in.length;
 
-        if (inLen+3 > blockSize)
+        if (inLen + 3 > blockSize)
         {
             throw new SignerException("data too long (maximal " + (blockSize - 3) + " allowed): "
                     + inLen);
@@ -204,7 +208,7 @@ public class SignerUtil
 
         for (int i = 2; i != block.length - inLen - 1; i++)
         {
-            block[i] = (byte)0xFF;
+            block[i] = (byte) 0xFF;
         }
 
         block[block.length - inLen - 1] = 0x00;       // mark the end of the padding
@@ -216,7 +220,7 @@ public class SignerUtil
             final byte[] signature)
     throws SignerException
     {
-        byte[] ba = new byte[signature.length/2];
+        byte[] ba = new byte[signature.length / 2];
         ASN1EncodableVector sigder = new ASN1EncodableVector();
 
         System.arraycopy(signature, 0, ba, 0, ba.length);

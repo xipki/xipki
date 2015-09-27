@@ -48,6 +48,10 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 public class IaikP11Util
 {
 
+    private IaikP11Util()
+    {
+    }
+
     public static byte[] generateKeyID(
             final Session session)
     throws Exception

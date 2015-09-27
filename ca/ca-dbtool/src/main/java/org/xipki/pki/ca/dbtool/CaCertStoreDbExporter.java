@@ -265,15 +265,12 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
         System.out.println(getExportingText() + "table CRL from ID " + minId);
 
-        ProcessLog processLog;
+        long total = getCount("CRL");
+        if (total < 1)
         {
-            long total = getCount("CRL");
-            if (total < 1)
-            {
-                total = 1; // to avoid exception
-            }
-            processLog = new ProcessLog(total, System.currentTimeMillis(), 0);
+            total = 1; // to avoid exception
         }
+        ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), 0);
 
         final String sql = "SELECT ID, CA_ID, CRL FROM CRL WHERE ID >= ? AND ID < ?"
                 + " ORDER BY ID ASC";
@@ -374,7 +371,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                         try
                         {
                             currentCrlsZip.write(crlBytes);
-                        }finally
+                        } finally
                         {
                             currentCrlsZip.closeEntry();
                         }
@@ -387,8 +384,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                     crl.setFile(crlFilename);
 
                     crlsInCurrentFile.add(crl);
-                    numCrlsInCurrentFile ++;
-                    sum ++;
+                    numCrlsInCurrentFile++;
+                    sum++;
 
                     if (numCrlsInCurrentFile == numEntriesPerZip)
                     {
@@ -444,7 +441,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         } catch (SQLException e)
         {
             throw translate(null, e);
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         } // end try
@@ -482,7 +479,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -517,7 +514,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -552,7 +549,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -605,15 +602,12 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         final int maxId = (int) getMax("USERNAME", "ID");
         System.out.println(getExportingText() + "table USERNAME from ID " + minId);
 
-        ProcessLog processLog;
+        long total = getCount("USERNAME");
+        if (total < 1)
         {
-            long total = getCount("USERNAME");
-            if (total < 1)
-            {
-                total = 1; // to avoid exception
-            }
-            processLog = new ProcessLog(total, System.currentTimeMillis(), 0);
+            total = 1; // to avoid exception
         }
+        ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), 0);
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -677,8 +671,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                     user.setCnRegex(cnRegex);
                     usersInCurrentFile.add(user);
 
-                    numUsersInCurrentFile ++;
-                    sum ++;
+                    numUsersInCurrentFile++;
+                    sum++;
 
                     if (numUsersInCurrentFile == numEntriesPerZip)
                     {
@@ -722,7 +716,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         } catch (SQLException e)
         {
             throw translate(null, e);
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         } // end try
@@ -757,7 +751,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(stmt, rs);
         }
@@ -829,15 +823,13 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         System.out.println(getExportingText() + "tables CERT and CRAW from ID " + minId);
 
         final int maxId = (int) getMax("CERT", "ID");
-        ProcessLog processLog;
+        long total = getCount("CERT") - numProcessedBefore;
+        if (total < 1)
         {
-            long total = getCount("CERT") - numProcessedBefore;
-            if (total < 1)
-            {
-                total = 1; // to avoid exception
-            }
-            processLog = new ProcessLog(total, System.currentTimeMillis(), numProcessedBefore);
+            total = 1; // to avoid exception
         }
+        ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(),
+                numProcessedBefore);
 
         StringBuilder certSql = new StringBuilder("SELECT ID, SN, CA_ID, PID, RID, ");
         certSql.append("ART, RTYPE, TID, UNAME, LUPDATE, REV, RR, RT, RIT, FP_RS ");
@@ -911,7 +903,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                         try
                         {
                             currentCertsZip.write(certBytes);
-                        }finally
+                        } finally
                         {
                             currentCertsZip.closeEntry();
                         }
@@ -986,8 +978,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                     }
 
                     certsInCurrentFile.add(cert);
-                    numCertsInCurrentFile ++;
-                    sum ++;
+                    numCertsInCurrentFile++;
+                    sum++;
 
                     if (numCertsInCurrentFile == numEntriesPerZip)
                     {
@@ -1050,7 +1042,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         } catch (SQLException e)
         {
             throw translate(null, e);
-        }finally
+        } finally
         {
             releaseResources(ps, null);
         } // end try
@@ -1114,7 +1106,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(ps, rs);
         }
@@ -1158,7 +1150,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         } catch (SQLException e)
         {
             throw translate(sql, e);
-        }finally
+        } finally
         {
             releaseResources(ps, rs);
         }
@@ -1177,7 +1169,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         try
         {
             os.rewriteToZipStream(zipOutStream);
-        }finally
+        } finally
         {
             zipOutStream.closeEntry();
         }
@@ -1207,7 +1199,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         try
         {
             os.rewriteToZipStream(zipOutStream);
-        }finally
+        } finally
         {
             zipOutStream.closeEntry();
         }

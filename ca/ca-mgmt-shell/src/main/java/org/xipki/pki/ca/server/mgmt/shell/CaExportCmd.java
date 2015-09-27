@@ -53,7 +53,7 @@ import org.xipki.security.api.CertRevocationInfo;
  */
 
 @Command(scope = "xipki-ca", name = "ca-export",
-        description="export CA configuration")
+        description = "export CA configuration")
 public class CaExportCmd extends CaCmd
 {
     static final String KEY_ART = "ART";

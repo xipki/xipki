@@ -171,7 +171,7 @@ public class LiquibaseDatabaseConf
                 driverClassName = dbProps.getProperty("db.driverClassName");
                 user = dbProps.getProperty("db.username");
                 password = dbProps.getProperty("db.password");
-                url= dbProps.getProperty("db.url");
+                url = dbProps.getProperty("db.url");
             }
 
             if (MyStringUtil.startsWithIgnoreCase(url, "jdbc:db2:"))

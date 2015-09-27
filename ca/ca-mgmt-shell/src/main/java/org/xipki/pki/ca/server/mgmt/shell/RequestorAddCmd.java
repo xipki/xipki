@@ -45,7 +45,7 @@ import org.xipki.common.util.IoUtil;
  */
 
 @Command(scope = "xipki-ca", name = "requestor-add",
-        description="add requestor")
+        description = "add requestor")
 public class RequestorAddCmd extends CaCmd
 {
     @Option(name = "--name", aliases = "-n",

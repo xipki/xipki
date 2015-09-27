@@ -317,6 +317,6 @@ public class PublicKeyChecker
         default:
             throw new BadCertTemplateException(
                     "invalid point encoding 0x" + Integer.toString(encoded[0], 16));
-        }// end switch
+        } // end switch
     }
 }

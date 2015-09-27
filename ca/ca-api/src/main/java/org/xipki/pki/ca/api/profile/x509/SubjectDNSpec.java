@@ -340,6 +340,10 @@ public class SubjectDNSpec
         }
     }
 
+    private SubjectDNSpec()
+    {
+    }
+
     public static Range getStringLengthRange(
             final ASN1ObjectIdentifier rdnType)
     {

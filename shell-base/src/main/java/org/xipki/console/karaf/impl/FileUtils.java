@@ -61,6 +61,10 @@ public class FileUtils
      */
     private static final long FILE_COPY_BUFFER_SIZE = 1024L * 1024 * 30;
 
+    private FileUtils()
+    {
+    }
+
     /**
      * Copied from the apache commons io project
      *

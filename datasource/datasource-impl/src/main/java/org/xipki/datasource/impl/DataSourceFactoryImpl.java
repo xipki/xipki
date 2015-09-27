@@ -80,7 +80,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
         try
         {
             config.load(conf);
-        }finally
+        } finally
         {
             try
             {

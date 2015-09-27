@@ -203,6 +203,12 @@ public class CRLControl implements Serializable
         }
 
         @Override
+        public int hashCode()
+        {
+            return toString().hashCode();
+        }
+
+        @Override
         public boolean equals(Object obj)
         {
             if (obj instanceof HourMinute == false)
@@ -530,6 +536,12 @@ public class CRLControl implements Serializable
             throw new InvalidConfException(
                     "deltaCRLIntervals could not be less than 0: " + deltaCRLIntervals);
         }
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return toString().hashCode();
     }
 
     @Override

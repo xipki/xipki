@@ -47,7 +47,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  */
 
 @Command(scope = "xipki-cli", name = "health",
-        description="check healty status of CA")
+        description = "check healty status of CA")
 public class HealthCmd extends ClientCmd
 {
 
@@ -70,7 +70,7 @@ public class HealthCmd extends ClientCmd
             throw new IllegalCmdParamException("no CA is configured");
         }
 
-        if (caName != null && ! caNames.contains(caName))
+        if (caName != null && !caNames.contains(caName))
         {
             throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs "
                     + caNames);

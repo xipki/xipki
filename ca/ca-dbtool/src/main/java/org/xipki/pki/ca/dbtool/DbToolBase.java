@@ -371,7 +371,7 @@ public class DbToolBase
         try
         {
             props.load(is);
-        }finally
+        } finally
         {
             try
             {

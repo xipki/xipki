@@ -80,7 +80,7 @@ public class FilePasswordCallback implements PasswordCallback
         } catch (IOException e)
         {
             throw new PasswordResolverException("could not read file " + passwordFile, e);
-        }finally
+        } finally
         {
             if (reader != null)
             {

@@ -50,7 +50,7 @@ import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
  */
 
 @Command(scope = "xipki-ca", name = "publisher-info",
-        description="show information of publisher")
+        description = "show information of publisher")
 public class PublisherInfoCmd extends CaCmd
 {
     @Argument(index = 0, name = "name", description = "publisher name")

@@ -87,7 +87,7 @@ class ResponseOption
                 }
                 else
                 {
-                    throw new InvalidConfException("hash algorithm " +token + " is unsupported");
+                    throw new InvalidConfException("hash algorithm " + token + " is unsupported");
                 }
             }
         }

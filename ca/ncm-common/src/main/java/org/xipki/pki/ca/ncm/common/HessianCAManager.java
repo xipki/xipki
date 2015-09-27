@@ -361,7 +361,7 @@ public interface HessianCAManager
             String name)
     throws HessianCAMgmtException;
 
-    public boolean changeScep(
+    boolean changeScep(
             ChangeScepEntry scepEntry)
     throws HessianCAMgmtException;
 

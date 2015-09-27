@@ -41,6 +41,10 @@ package org.xipki.dbtool;
 
 class MyStringUtil
 {
+    private MyStringUtil()
+    {
+    }
+
     public static boolean isBlank(
             final String s)
     {

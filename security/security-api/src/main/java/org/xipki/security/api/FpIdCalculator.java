@@ -55,6 +55,10 @@ public class FpIdCalculator
     private final static int parallelism = 50;
     private final static BlockingDeque<Digest> mds = getMD5MessageDigests();
 
+    private FpIdCalculator()
+    {
+    }
+
     private static BlockingDeque<Digest> getMD5MessageDigests()
     {
         BlockingDeque<Digest> mds = new LinkedBlockingDeque<>();
@@ -117,7 +121,7 @@ public class FpIdCalculator
             md.doFinal(b, 0);
 
             return bytesToLong(b);
-        }finally
+        } finally
         {
             mds.addLast(md);
         }
@@ -127,7 +131,7 @@ public class FpIdCalculator
     {
         ByteBuffer buffer = ByteBuffer.allocate(8);
         buffer.put(bytes, 0, 8);
-        buffer.flip();//need flip
+        buffer.flip(); //need flip
         return buffer.getLong();
     }
 
