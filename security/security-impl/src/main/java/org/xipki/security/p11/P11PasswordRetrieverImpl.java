@@ -65,8 +65,7 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever
             if (CollectionUtil.isEmpty(singlePasswords))
             {
                 this.singlePasswords = null;
-            }
-            else
+            } else
             {
                 this.singlePasswords = singlePasswords;
             }
@@ -105,8 +104,7 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever
                 if (passwordResolver == null)
                 {
                     ret.add(singlePassword.toCharArray());
-                }
-                else
+                } else
                 {
                     ret.add(passwordResolver.resolvePassword(singlePassword));
                 }

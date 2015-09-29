@@ -63,7 +63,7 @@ public class CollectionUtil
     public static boolean isNotEmpty(
             final Collection<?> c)
     {
-        return c != null && c.isEmpty() == false;
+        return c != null && !c.isEmpty();
     }
 
     public static boolean isEmpty(
@@ -75,7 +75,7 @@ public class CollectionUtil
     public static boolean isNotEmpty(
             final Map<?, ?> m)
     {
-        return m != null && m.isEmpty() == false;
+        return m != null && !m.isEmpty();
     }
 
     public static <K, V> Map<K, V> unmodifiableMap(

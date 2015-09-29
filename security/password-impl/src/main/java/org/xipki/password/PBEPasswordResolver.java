@@ -183,8 +183,7 @@ public class PBEPasswordResolver implements SinglePasswordResolver
         if (delimIndex == -1)
         {
             className = masterPasswordCallback;
-        }
-        else
+        } else
         {
             className = masterPasswordCallback.substring(0, delimIndex);
             conf = masterPasswordCallback.substring(delimIndex + 1);
@@ -198,8 +197,7 @@ public class PBEPasswordResolver implements SinglePasswordResolver
             {
                 ((PasswordCallback) obj).init(conf);
                 this.masterPwdCallback = (PasswordCallback) obj;
-            }
-            else
+            } else
             {
                 throw new IllegalArgumentException(
                         "invalid masterPasswordCallback configuration "

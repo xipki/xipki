@@ -73,14 +73,14 @@ public class FileRmCmd extends XipkiOsgiCommandSupport
         ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
 
         File target = new File(expandFilepath(targetPath));
-        if (target.exists() == false)
+        if (!target.exists())
         {
             return null;
         }
 
         if (target.isDirectory())
         {
-            if (recursive == false)
+            if (!recursive)
             {
                 out("Please use option--recursive to delete directory");
                 return null;
@@ -92,8 +92,7 @@ public class FileRmCmd extends XipkiOsgiCommandSupport
                 FileUtils.deleteDirectory(target);
                 out("removed directory " + targetPath);
             }
-        }
-        else
+        } else
         {
             if (force || FileUtils.confirm(reader,
                     "Do you want o remove file " + targetPath + " [yes/no]?"))

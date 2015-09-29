@@ -54,7 +54,7 @@ class MyStringUtil
     public static boolean isNotBlank(
             final String s)
     {
-        return s != null && s.isEmpty() == false;
+        return s != null && !s.isEmpty();
     }
 
     public static boolean startsWithIgnoreCase(

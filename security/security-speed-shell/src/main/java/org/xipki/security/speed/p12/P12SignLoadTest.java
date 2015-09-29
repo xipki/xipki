@@ -148,7 +148,7 @@ public abstract class P12SignLoadTest extends LoadExecutor
                 return;
             }
 
-            while (stop() == false && getErrorAccout() < 1)
+            while (!stop() && getErrorAccout() < 1)
             {
                 try
                 {

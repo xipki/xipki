@@ -91,12 +91,12 @@ public class P11ContentSignerBuilder
 
         X509Certificate signerCertInP11 = cryptService.getCertificate(slot, keyId);
         boolean keyExists = (signerCertInP11 != null);
-        if (keyExists == false)
+        if (!keyExists)
         {
             keyExists = (cryptService.getPublicKey(slot, keyId) != null);
         }
 
-        if (keyExists == false)
+        if (!keyExists)
         {
             throw new SignerException("key with " + keyId + " does not exist");
         }
@@ -122,8 +122,7 @@ public class P11ContentSignerBuilder
                     caCerts.add(certificateChain[i]);
                 }
             }
-        }
-        else
+        } else
         {
             cert = signerCertInP11;
         }
@@ -155,32 +154,29 @@ public class P11ContentSignerBuilder
 
         if (publicKey instanceof RSAPublicKey)
         {
-            if (AlgorithmUtil.isRSASignatureAlgoId(signatureAlgId) == false)
+            if (!AlgorithmUtil.isRSASignatureAlgoId(signatureAlgId))
             {
                 throw new OperatorCreationException(
                         "the given algorithm is not a valid RSA signature algorithm '"
                         + signatureAlgId.getAlgorithm().getId() + "'");
             }
-        }
-        else if (publicKey instanceof ECPublicKey)
+        } else if (publicKey instanceof ECPublicKey)
         {
-            if (AlgorithmUtil.isECSigAlg(signatureAlgId) == false)
+            if (!AlgorithmUtil.isECSigAlg(signatureAlgId))
             {
                 throw new OperatorCreationException(
                         "the given algorithm is not a valid EC signature algirthm '"
                         + signatureAlgId.getAlgorithm().getId() + "'");
             }
-        }
-        else if (publicKey instanceof DSAPublicKey)
+        } else if (publicKey instanceof DSAPublicKey)
         {
-            if (AlgorithmUtil.isDSASigAlg(signatureAlgId) == false)
+            if (!AlgorithmUtil.isDSASigAlg(signatureAlgId))
             {
                 throw new OperatorCreationException(
                         "the given algorithm is not a valid DSA signature algirthm '"
                         + signatureAlgId.getAlgorithm().getId() + "'");
             }
-        }
-        else
+        } else
         {
             throw new OperatorCreationException("unsupported key "
                     + publicKey.getClass().getName());
@@ -199,40 +195,34 @@ public class P11ContentSignerBuilder
                     {
                         signer = new P11RSAPSSContentSigner(cryptService, slot, keyId,
                                 signatureAlgId);
-                    }
-                    else
+                    } else
                     {
                         signer = new P11RSAContentSigner(cryptService, slot, keyId,
                                 signatureAlgId);
                     }
-                }
-                else if (publicKey instanceof ECPublicKey)
+                } else if (publicKey instanceof ECPublicKey)
                 {
                     if (AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId))
                     {
                         signer = new P11ECDSAPlainContentSigner(cryptService, slot, keyId,
                                 signatureAlgId);
-                    }
-                    else
+                    } else
                     {
                         signer = new P11ECDSAX962ContentSigner(cryptService, slot, keyId,
                                 signatureAlgId);
                     }
-                }
-                else if (publicKey instanceof DSAPublicKey)
+                } else if (publicKey instanceof DSAPublicKey)
                 {
                     if (AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId))
                     {
                         signer = new P11DSAPlainContentSigner(cryptService, slot, keyId,
                                 signatureAlgId);
-                    }
-                    else
+                    } else
                     {
                         signer = new P11DSAX962ContentSigner(cryptService, slot, keyId,
                                 signatureAlgId);
                     }
-                }
-                else
+                } else
                 {
                     throw new OperatorCreationException("unsupported key "
                             + publicKey.getClass().getName());

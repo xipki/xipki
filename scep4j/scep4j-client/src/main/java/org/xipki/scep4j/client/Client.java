@@ -185,7 +185,7 @@ public abstract class Client
             return httpGET(url);
         } else
         {
-            if (httpGetOnly == false && cACaps.containsCapability(CACapability.POSTPKIOperation))
+            if (!httpGetOnly && cACaps.containsCapability(CACapability.POSTPKIOperation))
             {
                 String url = cAId.buildPostUrl(operation);
                 return httpPOST(url, REQ_CONTENT_TYPE, request);
@@ -402,13 +402,13 @@ public abstract class Client
         initIfNotInited();
 
         // draft-nourse-scep
-        if (isGutmannScep() == false)
+        if (!isGutmannScep())
         {
             return scepPkcsReq(csr, identityKey, identityCert);
         }
 
         // draft-gutmann-scep
-        if (ScepUtil.isSelfSigned(identityCert) == false)
+        if (!ScepUtil.isSelfSigned(identityCert))
         {
             X509Certificate cACert = authorityCertStore.getCACert();
             if (identityCert.getIssuerX500Principal().equals(cACert.getSubjectX500Principal()))
@@ -442,7 +442,7 @@ public abstract class Client
         initIfNotInited();
 
         boolean selfSigned = ScepUtil.isSelfSigned(identityCert);
-        if (selfSigned == false)
+        if (!selfSigned)
         {
             throw new IllegalArgumentException("identityCert is not self-signed");
         }
@@ -458,7 +458,7 @@ public abstract class Client
     {
         initIfNotInited();
 
-        if (cACaps.containsCapability(CACapability.Renewal) == false)
+        if (!cACaps.containsCapability(CACapability.Renewal))
         {
             throw new OperationNotSupportedException(
                     "unsupported messageType '" + MessageType.RenewalReq + "'");
@@ -480,7 +480,7 @@ public abstract class Client
     {
         initIfNotInited();
 
-        if (cACaps.containsCapability(CACapability.Update) == false)
+        if (!cACaps.containsCapability(CACapability.Update))
         {
             throw new OperationNotSupportedException(
                     "unsupported messageType '" + MessageType.UpdateReq + "'");
@@ -527,7 +527,7 @@ public abstract class Client
     {
         initIfNotInited();
 
-        if (this.cACaps.containsCapability(CACapability.GetNextCACert) == false)
+        if (!this.cACaps.containsCapability(CACapability.GetNextCACert))
         {
             throw new OperationNotSupportedException(
                     "unsupported operation '" + Operation.GetNextCACert.getCode() + "'");
@@ -544,7 +544,7 @@ public abstract class Client
     throws ScepClientException
     {
         HashAlgoType hashAlgo = cACaps.getMostSecureHashAlgo();
-        if (hashAlgo == HashAlgoType.MD5 && useInsecureAlgorithms == false)
+        if (hashAlgo == HashAlgoType.MD5 && !useInsecureAlgorithms)
         {
             throw new ScepClientException(
                     "Scep server supports only MD5 but it not permitted in client");
@@ -637,8 +637,7 @@ public abstract class Client
                                 "multiple CA certificates is returned, but exactly 1 is expected");
                     }
                     cACert = c;
-                }
-                else
+                } else
                 {
                     rACerts.add(c);
                 }
@@ -653,7 +652,7 @@ public abstract class Client
             throw new ScepClientException("invalid Content-Type '" + ct + "'");
         }
 
-        if (cAValidator.isTrusted(cACert) == false)
+        if (!cAValidator.isTrusted(cACert))
         {
             throw new ScepClientException(
                     "CA certificate '" + cACert.getSubjectX500Principal() + "' is not trusted");
@@ -670,7 +669,7 @@ public abstract class Client
             X509Certificate rASignCert = cs.getSignatureCert();
             try
             {
-                if (ScepUtil.issues(cACert, rAEncCert) == false)
+                if (!ScepUtil.issues(cACert, rAEncCert))
                 {
                     throw new ScepClientException("RA certificate '"
                             + rAEncCert.getSubjectX500Principal()
@@ -696,7 +695,7 @@ public abstract class Client
     {
         String ct = httpResp.getContentType();
 
-        if (ScepConstants.CT_x_x509_next_ca_cert.equalsIgnoreCase(ct) == false)
+        if (!ScepConstants.CT_x_x509_next_ca_cert.equalsIgnoreCase(ct))
         {
             throw new ScepClientException("invalid Content-Type '" + ct + "'");
         }
@@ -728,7 +727,7 @@ public abstract class Client
         }
 
         Boolean b = resp.isSignatureValid();
-        if (b != null && b.booleanValue() == false)
+        if (b != null && !b.booleanValue())
         {
             throw new ScepClientException("Signature is invalid");
         }
@@ -754,7 +753,7 @@ public abstract class Client
             }
         }
 
-        if (resp.getSignatureCert().equals(authorityCertStore.getSignatureCert()) == false)
+        if (!resp.getSignatureCert().equals(authorityCertStore.getSignatureCert()))
         {
             throw new ScepClientException("the signature certificate could not be trusted");
         }
@@ -822,13 +821,13 @@ public abstract class Client
         }
 
         Boolean b = resp.isSignatureValid();
-        if (b != null && b.booleanValue() == false)
+        if (b != null && !b.booleanValue())
         {
             throw new ScepClientException("Signature is invalid");
         }
 
         b = resp.isDecryptionSuccessful();
-        if (b != null && b.booleanValue() == false)
+        if (b != null && !b.booleanValue())
         {
             throw new ScepClientException("Decryption failed");
         }
@@ -854,7 +853,7 @@ public abstract class Client
             }
         }
 
-        if (resp.getSignatureCert().equals(authorityCertStore.getSignatureCert()) == false)
+        if (!resp.getSignatureCert().equals(authorityCertStore.getSignatureCert()))
         {
             throw new ScepClientException("the signature certificate could not be trusted");
         }

@@ -60,8 +60,8 @@ public class CAIdentifier
     {
         URL url = new URL(serverUrl);
         final String protocol = url.getProtocol();
-        if (protocol.equalsIgnoreCase("http") == false
-                && protocol.equalsIgnoreCase("https") == false)
+        if (!protocol.equalsIgnoreCase("http")
+                && !protocol.equalsIgnoreCase("https"))
         {
             throw new IllegalArgumentException(
                     "URL protocol should be HTTP or HTTPS, but not '" + protocol + "'");
@@ -100,7 +100,7 @@ public class CAIdentifier
     {
         StringBuilder ub = new StringBuilder(url);
         ub.append('?').append("operation=").append(operation.getCode());
-        if (ScepUtil.isBlank(message) == false)
+        if (!ScepUtil.isBlank(message))
         {
             String _urlMessage;
             try

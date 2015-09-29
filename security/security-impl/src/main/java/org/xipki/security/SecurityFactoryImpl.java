@@ -219,7 +219,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             verifier.initVerify(cert.getPublicKey());
             verifier.update(dummyContent);
             boolean valid = verifier.verify(signatureValue);
-            if (valid == false)
+            if (!valid)
             {
                 String subject = X509Util.getRFC4519Name(cert.getSubjectX500Principal());
 
@@ -339,8 +339,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 if (keyId != null)
                 {
                     keyIdentifier = new P11KeyIdentifier(keyId);
-                }
-                else
+                } else
                 {
                     keyIdentifier = new P11KeyIdentifier(keyLabel);
                 }
@@ -355,8 +354,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                     if (hashAlgo == null)
                     {
                         signatureAlgId = getSignatureAlgoId(conf);
-                    }
-                    else
+                    } else
                     {
                         PublicKey pubKey;
                         try
@@ -377,22 +375,19 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                     throw new SignerException(e.getMessage(), e);
                 }
 
-            }
-            else
+            } else
             {
                 String passwordHint = keyValues.getValue("password");
                 char[] password;
                 if (passwordHint == null)
                 {
                     password = null;
-                }
-                else
+                } else
                 {
                     if (passwordResolver == null)
                     {
                         password = passwordHint.toCharArray();
-                    }
-                    else
+                    } else
                     {
                         try
                         {
@@ -413,8 +408,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 {
                     keystoreStream = new ByteArrayInputStream(
                             Base64.decode(s.substring("base64:".length())));
-                }
-                else if (StringUtil.startsWithIgnoreCase(s, "file:"))
+                } else if (StringUtil.startsWithIgnoreCase(s, "file:"))
                 {
                     String fn = s.substring("file:".length());
                     try
@@ -424,8 +418,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                     {
                         throw new SignerException("file not found: " + fn);
                     }
-                }
-                else
+                } else
                 {
                     throw new SignerException("unknown keystore content format");
                 }
@@ -439,8 +432,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                     if (hashAlgo == null)
                     {
                         signatureAlgId = getSignatureAlgoId(conf);
-                    }
-                    else
+                    } else
                     {
                         PublicKey pubKey = signerBuilder.getCert().getPublicKey();
                         signatureAlgId = AlgorithmUtil.getSignatureAlgoId(
@@ -455,8 +447,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                     throw new SignerException(e.getMessage());
                 }
             }
-        }
-        else if (StringUtil.startsWithIgnoreCase(type, "java:"))
+        } else if (StringUtil.startsWithIgnoreCase(type, "java:"))
         {
             if (hashAlgo == null)
             {
@@ -478,13 +469,11 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 }
 
                 return contentSigner;
-            }
-            else
+            } else
             {
                 throw new SignerException("unknwon type: " + type);
             }
-        }
-        else
+        } else
         {
             throw new SignerException("unknwon type: " + type);
         }
@@ -716,8 +705,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         if (slotId.getSlotId() != null)
         {
             conf.putPair("slot-id", slotId.getSlotId().toString());
-        }
-        else
+        } else
         {
             conf.putPair("slot", slotId.getSlotIndex().toString());
         }
@@ -754,8 +742,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         if (slotId.getSlotId() != null)
         {
             conf.putPair("slot-id", slotId.getSlotId().toString());
-        }
-        else
+        } else
         {
             conf.putPair("slot", slotId.getSlotIndex().toString());
         }
@@ -814,16 +801,13 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             if (IaikP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
             {
                 p11Provider = new IaikP11CryptServiceFactory();
-            }
-            else if (KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
+            } else if (KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
             {
                 p11Provider = new KeystoreP11CryptServiceFactory();
-            }
-            else if (RemoteP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
+            } else if (RemoteP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
             {
                 p11Provider = new RemoteP11CryptServiceFactory();
-            }
-            else
+            } else
             {
                 try
                 {
@@ -841,8 +825,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                         (P11CryptServiceFactory) p11Provider;
                 p11CryptServiceFact.init(p11Control);
                 this.p11CryptServiceFactory = p11CryptServiceFact;
-            }
-            else
+            } else
             {
                 throw new SignerException(pkcs11Provider + " is not instanceof "
                         + P11CryptServiceFactory.class.getName());
@@ -902,8 +885,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                 if (passwordsType == null || CollectionUtil.isEmpty(passwordsType.getPassword()))
                 {
                     pwdRetriever = P11NullPasswordRetriever.INSTANCE;
-                }
-                else
+                } else
                 {
                     pwdRetriever = new P11PasswordRetrieverImpl();
                     ((P11PasswordRetrieverImpl) pwdRetriever).setPasswordResolver(
@@ -929,8 +911,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                     if (CollectionUtil.isEmpty(osNames))
                     {
                         nativeLibraryPath = library.getPath();
-                    }
-                    else
+                    } else
                     {
                         for (String entry : osNames)
                         {
@@ -960,7 +941,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             }
 
             final String defaultModuleName = modulesType.getDefaultModule();
-            if (confs.containsKey(defaultModuleName) == false)
+            if (!confs.containsKey(defaultModuleName))
             {
                 throw new InvalidConfException("default module " + defaultModuleName
                         + " is not defined");
@@ -995,8 +976,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         if (StringUtil.isBlank(confFile))
         {
             this.pkcs11ConfFile = null;
-        }
-        else
+        } else
         {
             this.pkcs11ConfFile = confFile;
         }
@@ -1023,8 +1003,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
                     if (StringUtil.startsWithIgnoreCase(str, "0X"))
                     {
                         slotId = Long.parseLong(str.substring(2), 16);
-                    }
-                    else
+                    } else
                     {
                         slotId = Long.parseLong(str);
                     }
@@ -1047,8 +1026,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         if (moduleName == null || DEFAULT_P11MODULE_NAME.equals(moduleName))
         {
             return getDefaultPkcs11ModuleName();
-        }
-        else
+        } else
         {
             return moduleName;
         }
@@ -1141,7 +1119,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             final X509Certificate cert)
     throws SignerException
     {
-        if ("PKCS11".equalsIgnoreCase(type) == false && "PKCS12".equalsIgnoreCase(type) == false)
+        if (!"PKCS11".equalsIgnoreCase(type) && !"PKCS12".equalsIgnoreCase(type))
         {
             throw new SignerException("unsupported SCEP responder type '" + type + "'");
         }
@@ -1153,14 +1131,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         if (passwordHint == null)
         {
             password = null;
-        }
-        else
+        } else
         {
             if (passwordResolver == null)
             {
                 password = passwordHint.toCharArray();
-            }
-            else
+            } else
             {
                 try
                 {
@@ -1181,8 +1157,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
         {
             keystoreStream = new ByteArrayInputStream(
                     Base64.decode(s.substring("base64:".length())));
-        }
-        else if (StringUtil.startsWithIgnoreCase(s, "file:"))
+        } else if (StringUtil.startsWithIgnoreCase(s, "file:"))
         {
             String fn = s.substring("file:".length());
             try
@@ -1192,8 +1167,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory
             {
                 throw new SignerException("file not found: " + fn);
             }
-        }
-        else
+        } else
         {
             throw new SignerException("unknown keystore content format");
         }

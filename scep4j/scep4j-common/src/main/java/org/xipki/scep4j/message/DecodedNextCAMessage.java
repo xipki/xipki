@@ -208,7 +208,7 @@ public class DecodedNextCAMessage
         ret.setDigestAlgorithm(digestAlgOID);
 
         String sigAlgOID = signerInfo.getEncryptionAlgOID();
-        if (PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOID) == false)
+        if (!PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOID))
         {
             ASN1ObjectIdentifier _digestAlgOID;
             try
@@ -225,7 +225,7 @@ public class DecodedNextCAMessage
                 ret.setFailureMessage(msg);
                 return ret;
             }
-            if (digestAlgOID.equals(_digestAlgOID) == false)
+            if (!digestAlgOID.equals(_digestAlgOID))
             {
                 ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use"
                         + " the same digestAlgorithm");
@@ -278,7 +278,7 @@ public class DecodedNextCAMessage
         }
 
         ret.setSignatureValid(signatureValid);
-        if (signatureValid == false)
+        if (!signatureValid)
         {
             return ret;
         }
@@ -286,10 +286,10 @@ public class DecodedNextCAMessage
         // MessageData
         CMSTypedData signedContent = pkiMessage.getSignedContent();
         ASN1ObjectIdentifier signedContentType = signedContent.getContentType();
-        if (CMSObjectIdentifiers.signedData.equals(signedContentType) == false)
+        if (!CMSObjectIdentifiers.signedData.equals(signedContentType))
         {
             // fall back: some SCEP client use id-data
-            if (CMSObjectIdentifiers.data.equals(signedContentType) == false)
+            if (!CMSObjectIdentifiers.data.equals(signedContentType))
             {
                 ret.setFailureMessage("either id-signedData or id-data is excepted, but not '"
                         + signedContentType.getId());
@@ -332,8 +332,7 @@ public class DecodedNextCAMessage
                     return ret;
                 }
                 cACert = c;
-            }
-            else
+            } else
             {
                 rACerts.add(c);
             }
@@ -351,8 +350,7 @@ public class DecodedNextCAMessage
         if (rACerts.isEmpty())
         {
             _raCerts = null;
-        }
-        else
+        } else
         {
             _raCerts = rACerts.toArray(new X509Certificate[0]);
         }

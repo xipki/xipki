@@ -142,8 +142,7 @@ public class XMLUtil
         if (calendar instanceof GregorianCalendar)
         {
             c = (GregorianCalendar) calendar;
-        }
-        else
+        } else
         {
             c = new GregorianCalendar();
             c.setTimeZone(UTC);
@@ -275,7 +274,7 @@ public class XMLUtil
         for (int i = 0; i < children.getLength(); i++)
         {
             Node child = children.item(i);
-            if (child instanceof Element == false)
+            if (!(child instanceof Element))
             {
                 continue;
             }
@@ -300,7 +299,7 @@ public class XMLUtil
         for (int i = 0; i < children.getLength(); i++)
         {
             Node child = children.item(i);
-            if (child instanceof Element == false)
+            if (!(child instanceof Element))
             {
                 continue;
             }
@@ -392,13 +391,11 @@ public class XMLUtil
                 if (node == null)
                 {
                     return Collections.emptyList();
-                }
-                else
+                } else
                 {
                     return Arrays.asList(node);
                 }
-            }
-            else
+            } else
             {
                 return sXPath.select(contextNode);
             }

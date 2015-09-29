@@ -231,7 +231,7 @@ public class HealthCheckResult
             sb.append("\"").append(value).append("\"");
         }
 
-        if (lastElement == false)
+        if (!lastElement)
         {
             sb.append(",");
         }
@@ -259,7 +259,7 @@ public class HealthCheckResult
     {
         // remove white spaces and line breaks
         String jsonMsg = jsonMessage.replaceAll(" |\t|\r|\n", "");
-        if (jsonMsg.startsWith("{\"healthy\":") == false)
+        if (!jsonMsg.startsWith("{\"healthy\":"))
         {
             throw new IllegalArgumentException("invalid healthcheck message");
         }
@@ -292,12 +292,12 @@ public class HealthCheckResult
         HealthCheckResult result = new HealthCheckResult(name);
         result.setHealthy(healthy);
 
-        if (containsChildChecks == false)
+        if (!containsChildChecks)
         {
             return result;
         }
 
-        if (jsonMsg.startsWith("\"checks\":", endIdx + 1) == false)
+        if (!jsonMsg.startsWith("\"checks\":", endIdx + 1))
         {
             return result;
         }
@@ -342,7 +342,7 @@ public class HealthCheckResult
             final String text,
             final int offset)
     {
-        if (text.startsWith("{", offset) == false)
+        if (!text.startsWith("{", offset))
         {
             throw new IllegalArgumentException("invalid text: '" + text + "'");
         }

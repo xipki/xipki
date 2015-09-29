@@ -80,7 +80,7 @@ public final class EnrolmentResponse
         }
 
         ASN1Encodable messageData = pkcsRep.getMessageData();
-        if (messageData instanceof ContentInfo == false)
+        if (!(messageData instanceof ContentInfo))
         {
             throw new ScepClientException("pkcsRep is not a ContentInfo");
         }

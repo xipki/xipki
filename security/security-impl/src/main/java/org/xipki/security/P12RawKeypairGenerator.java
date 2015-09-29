@@ -85,8 +85,7 @@ public abstract class P12RawKeypairGenerator
             {
                 this.curveOid = new ASN1ObjectIdentifier(curveNameOrOid);
                 this.curveName =  KeyUtil.getCurveName(this.curveOid);
-            }
-            else
+            } else
             {
                 this.curveName = curveNameOrOid;
                 this.curveOid =  KeyUtil.getCurveOID(this.curveName);

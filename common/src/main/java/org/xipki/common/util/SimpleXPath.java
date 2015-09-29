@@ -89,8 +89,7 @@ public class SimpleXPath
                 {
                     throw new XPathExpressionException(
                             "attribute is only allowed in the last step");
-                }
-                else
+                } else
                 {
                     if (idx > 0)
                     {
@@ -98,8 +97,7 @@ public class SimpleXPath
                     }
                     steps.add(new SimpleXPathStep(step.substring(idx), nsPrefixURIMap));
                 }
-            }
-            else
+            } else
             {
                 steps.add(new SimpleXPathStep(step, nsPrefixURIMap));
             }
@@ -146,16 +144,14 @@ public class SimpleXPath
             if (steps.size() == stepIndex + 1)
             {
                 results.addAll(children);
-            }
-            else
+            } else
             {
                 for (Element child : children)
                 {
                     select(results, child, steps, stepIndex + 1, onlyFirst);
                 }
             }
-        }
-        else
+        } else
         {
             Attr attr = context.getAttributeNodeNS(step.namespaceURI, step.localPart);
             if (attr == null && step.namespaceURI == null)
@@ -181,10 +177,11 @@ public class SimpleXPath
          *        namespace will not be evaluated.
          */
         SimpleXPathStep(
-                String step,
+                final String pStep,
                 final Map<String, String> nsPrefixURIMap)
         throws XPathExpressionException
         {
+        	String step = pStep;
             if (step.charAt(0) == '@')
             {
                 isElement = false;
@@ -197,8 +194,7 @@ public class SimpleXPath
             {
                 prefix = step.substring(0, idx);
                 this.localPart = step.substring(idx + 1);
-            }
-            else
+            } else
             {
                 prefix = isElement
                         ? ""
@@ -214,8 +210,7 @@ public class SimpleXPath
                     throw new XPathExpressionException(
                             "could not find namespace for the prefix '" + prefix + "'");
                 }
-            }
-            else
+            } else
             {
                 this.namespaceURI = null;
             }

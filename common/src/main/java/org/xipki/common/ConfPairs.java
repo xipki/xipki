@@ -67,7 +67,7 @@ public class ConfPairs
     }
 
     public ConfPairs(
-            String string)
+            final String string)
     {
         if (string == null || string.length() < 2)
         {
@@ -185,7 +185,7 @@ public class ConfPairs
     }
 
     private static String encodeNameOrValue(
-            String s)
+            final String s)
     {
         if (s.indexOf(NAME_TERM) == -1 && s.indexOf(TOKEN_TERM) == -1)
         {
@@ -254,7 +254,7 @@ public class ConfPairs
 
         for (String name : pairs.keySet())
         {
-            if (names.contains(name) == false)
+            if (!names.contains(name))
             {
                 names.add(name);
             }
@@ -294,7 +294,7 @@ public class ConfPairs
     public boolean equals(
             final Object obj)
     {
-        if (obj instanceof ConfPairs == false)
+        if (!(obj instanceof ConfPairs))
         {
             return false;
         }

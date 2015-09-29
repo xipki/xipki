@@ -59,7 +59,7 @@ public class PBEDecryptCmd extends SecurityCmd
     protected Object _doExecute()
     throws Exception
     {
-        if (StringUtil.startsWithIgnoreCase(passwordHint, "PBE:") == false)
+        if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:"))
         {
             throw new IllegalCmdParamException("encrypted password '" + passwordHint
                     + "' does not start with PBE:");

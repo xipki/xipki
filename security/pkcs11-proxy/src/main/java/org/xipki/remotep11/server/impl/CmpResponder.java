@@ -222,28 +222,22 @@ class CmpResponder
                 if (XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_PLAIN == action)
                 {
                     signature = p11CryptService.CKM_ECDSA_Plain(psoMessage, slot, keyId);
-                }
-                else if (XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_X962 == action)
+                } else if (XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_X962 == action)
                 {
                     signature = p11CryptService.CKM_ECDSA_X962(psoMessage, slot, keyId);
-                }
-                else if (XipkiCmpConstants.ACTION_RP11_PSO_DSA_PLAIN == action)
+                } else if (XipkiCmpConstants.ACTION_RP11_PSO_DSA_PLAIN == action)
                 {
                     signature = p11CryptService.CKM_DSA_Plain(psoMessage, slot, keyId);
-                }
-                else if (XipkiCmpConstants.ACTION_RP11_PSO_DSA_X962 == action)
+                } else if (XipkiCmpConstants.ACTION_RP11_PSO_DSA_X962 == action)
                 {
                     signature = p11CryptService.CKM_DSA_X962(psoMessage, slot, keyId);
-                }
-                else if (XipkiCmpConstants.ACTION_RP11_PSO_RSA_X509 == action)
+                } else if (XipkiCmpConstants.ACTION_RP11_PSO_RSA_X509 == action)
                 {
                     signature = p11CryptService.CKM_RSA_X509(psoMessage, slot, keyId);
-                }
-                else if (XipkiCmpConstants.ACTION_RP11_PSO_RSA_PKCS == action)
+                } else if (XipkiCmpConstants.ACTION_RP11_PSO_RSA_PKCS == action)
                 {
                     signature = p11CryptService.CKM_RSA_PKCS(psoMessage, slot, keyId);
-                }
-                else
+                } else
                 {
                     throw new RuntimeException("should not reach here");
                 }
@@ -274,12 +268,10 @@ class CmpResponder
                 if (XipkiCmpConstants.ACTION_RP11_GET_CERTIFICATE == action)
                 {
                     encodeCertOrKey = p11CryptService.getCertificate(slot, keyId).getEncoded();
-                }
-                else if (XipkiCmpConstants.ACTION_RP11_GET_PUBLICKEY == action)
+                } else if (XipkiCmpConstants.ACTION_RP11_GET_PUBLICKEY == action)
                 {
                     encodeCertOrKey = p11CryptService.getPublicKey(slot, keyId).getEncoded();
-                }
-                else
+                } else
                 {
                     throw new RuntimeException("should not reach here");
                 }

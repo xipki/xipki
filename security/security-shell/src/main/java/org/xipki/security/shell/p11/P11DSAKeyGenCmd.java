@@ -72,8 +72,7 @@ public class P11DSAKeyGenCmd extends P11KeyGenCmd
             if (pLen >= 2048)
             {
                 qLen = 256;
-            }
-            else
+            } else
             {
                 qLen = 160;
             }

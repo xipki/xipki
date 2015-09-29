@@ -85,8 +85,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
             if (vi < 0 || vi > 60 * 1000)
             {
                 LOG.error("invalid org.xipki.signservice.timeout: {}", vi);
-            }
-            else
+            } else
             {
                 LOG.info("use org.xipki.signservice.timeout: {}", vi);
                 defaultSignServiceTimeout = vi;
@@ -132,8 +131,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
             if (soTimeout == 0)
             {
                 signer = idleSigners.takeFirst();
-            }
-            else
+            } else
             {
                 signer = idleSigners.pollFirst(soTimeout, TimeUnit.MILLISECONDS);
             }
@@ -161,8 +159,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
         if (isBusySigner)
         {
             idleSigners.addLast(signer);
-        }
-        else
+        } else
         {
             final String msg =
                     "signer has not been borrowed before or has been returned more than once: "
@@ -219,8 +216,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
         if (certificateChain != null && certificateChain.length > 0)
         {
             return certificateChain[0];
-        }
-        else
+        } else
         {
             return null;
         }
@@ -232,8 +228,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
         if (certificateChainAsBCObjects != null && certificateChainAsBCObjects.length > 0)
         {
             return certificateChainAsBCObjects[0];
-        }
-        else
+        } else
         {
             return null;
         }

@@ -71,24 +71,19 @@ public enum DatabaseType
         if (className.contains("h2."))
         {
             return DatabaseType.H2;
-        }
-        else if (className.contains("hsqldb."))
+        } else if (className.contains("hsqldb."))
         {
             return DatabaseType.HSQL;
-        }
-        else if (className.contains("mysql."))
+        } else if (className.contains("mysql."))
         {
             return DatabaseType.MYSQL;
-        }
-        else if (className.contains("oracle."))
+        } else if (className.contains("oracle."))
         {
             return DatabaseType.ORACLE;
-        }
-        else if (className.contains("postgres.") || className.contains("postgresql."))
+        } else if (className.contains("postgres.") || className.contains("postgresql."))
         {
             return DatabaseType.POSTGRES;
-        }
-        else
+        } else
         {
             return DatabaseType.UNKNOWN;
         }

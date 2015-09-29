@@ -131,7 +131,7 @@ public class ScepClient extends Client
 
             ScepHttpResponse resp = new ScepHttpResponse(contentType, contentLength, inputstream);
             String contentEncoding = conn.getContentEncoding();
-            if (contentEncoding != null && contentEncoding.isEmpty() == false)
+            if (contentEncoding != null && !contentEncoding.isEmpty())
             {
                 resp.setContentEncoding(contentEncoding);
             }

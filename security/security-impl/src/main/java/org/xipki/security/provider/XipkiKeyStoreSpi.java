@@ -210,7 +210,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
             final char[] password)
     throws NoSuchAlgorithmException, UnrecoverableKeyException
     {
-        if (keyCerts.containsKey(alias) == false)
+        if (!keyCerts.containsKey(alias))
         {
             return null;
         }
@@ -222,7 +222,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
     public Certificate[] engineGetCertificateChain(
             final String alias)
     {
-        if (keyCerts.containsKey(alias) == false)
+        if (!keyCerts.containsKey(alias))
         {
             return null;
         }
@@ -234,7 +234,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
     public Certificate engineGetCertificate(
             final String alias)
     {
-        if (keyCerts.containsKey(alias) == false)
+        if (!keyCerts.containsKey(alias))
         {
             return null;
         }
@@ -246,7 +246,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
     public Date engineGetCreationDate(
             final String alias)
     {
-        if (keyCerts.containsKey(alias) == false)
+        if (!keyCerts.containsKey(alias))
         {
             return null;
         }
@@ -314,7 +314,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
     public boolean engineIsKeyEntry(
             final String alias)
     {
-        if (keyCerts.containsKey(alias) == false)
+        if (!keyCerts.containsKey(alias))
         {
             return false;
         }
@@ -326,7 +326,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi
     public boolean engineIsCertificateEntry(
             final String alias)
     {
-        if (keyCerts.containsKey(alias) == false)
+        if (!keyCerts.containsKey(alias))
         {
             return false;
         }

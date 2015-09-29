@@ -126,8 +126,7 @@ public class SecurityUtil
         if ("JKS".equalsIgnoreCase(keystoreType))
         {
             ks = KeyStore.getInstance(keystoreType);
-        }
-        else
+        } else
         {
             ks = KeyStore.getInstance(keystoreType, "BC");
         }
@@ -145,10 +144,9 @@ public class SecurityUtil
                     break;
                 }
             }
-        }
-        else
+        } else
         {
-            if (ks.isKeyEntry(keyname) == false)
+            if (!ks.isKeyEntry(keyname))
             {
                 throw new KeyStoreException("unknown key named " + keyname);
             }
@@ -170,8 +168,7 @@ public class SecurityUtil
                 return keystoreBytes;
             }
             certs = ks.getCertificateChain(keyname);
-        }
-        else
+        } else
         {
             certs = newCertChain;
         }
@@ -182,8 +179,7 @@ public class SecurityUtil
         if ("JKS".equalsIgnoreCase(keystoreType))
         {
             ks = KeyStore.getInstance(keystoreType);
-        }
-        else
+        } else
         {
             ks = KeyStore.getInstance(keystoreType, "BC");
         }
@@ -324,7 +320,7 @@ public class SecurityUtil
             }
 
             ASN1ObjectIdentifier oid = toOID(oidText);
-            if (ret.contains(oid) == false)
+            if (!ret.contains(oid))
             {
                 ret.add(oid);
             }
@@ -341,13 +337,13 @@ public class SecurityUtil
         for (int i = 0; i < n; i++)
         {
             char c = s.charAt(i);
-            if (((c >= '0' && c <= '1') || c == '.') == false)
+            if (!((c >= '0' && c <= '1') || c == '.'))
             {
                 isName = true;
             }
         }
 
-        if (isName == false)
+        if (!isName)
         {
             try
             {
@@ -378,8 +374,7 @@ public class SecurityUtil
         if (verbose || signerConf.length() < 101)
         {
             return signerConf;
-        }
-        else
+        } else
         {
             return new StringBuilder().append(signerConf.substring(0, 97)).append("...").toString();
         }
@@ -388,7 +383,7 @@ public class SecurityUtil
     private static String eraseSensitiveData(
             final String conf)
     {
-        if (conf == null || conf.contains("password?") == false)
+        if (conf == null || !conf.contains("password?"))
         {
             return conf;
         }
@@ -397,7 +392,7 @@ public class SecurityUtil
         {
             ConfPairs pairs = new ConfPairs(conf);
             String value = pairs.getValue("password");
-            if (value != null && StringUtil.startsWithIgnoreCase(value, "PBE:") == false)
+            if (value != null && !StringUtil.startsWithIgnoreCase(value, "PBE:"))
             {
                 pairs.putPair("password", "<sensitve>");
             }
