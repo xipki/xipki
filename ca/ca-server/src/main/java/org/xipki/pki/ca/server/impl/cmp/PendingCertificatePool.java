@@ -73,10 +73,18 @@ class PendingCertificatePool
         }
 
         @Override
+        public int hashCode()
+        {
+            return certReqId.hashCode()
+                    + 31 * 31 * (int) waitForConfirmTill
+                    + 31 * certInfo.hashCode();
+        }
+
+        @Override
         public boolean equals(
                 final Object b)
         {
-            if (b instanceof MyEntry == false)
+            if (!(b instanceof MyEntry))
             {
                 return false;
             }

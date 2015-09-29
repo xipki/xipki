@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool;
+package org.xipki.pki.ca.dbtool.port;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,8 +59,10 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.pki.ca.dbtool.ProcessLog;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType.Issuers;
+import org.xipki.pki.ca.dbtool.port.internal.DbPortFileNameIterator;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.IssuerType;
 import org.xipki.pki.ca.dbtool.xmlio.OcspCertType;
 import org.xipki.pki.ca.dbtool.xmlio.OcspCertsReader;
@@ -100,12 +102,11 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
         File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
         if (resume)
         {
-            if (processLogFile.exists() == false)
+            if (!processLogFile.exists())
             {
                 throw new Exception("could not process with '--resume' option");
             }
-        }
-        else
+        } else
         {
             if (processLogFile.exists())
             {
@@ -142,7 +143,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
         System.out.println("importing OCSP certstore to database");
         try
         {
-            if (resume == false)
+            if (!resume)
             {
                 dropIndexes();
                 import_issuer(certstore.getIssuers());
@@ -189,8 +190,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
                         if (e instanceof CertificateException)
                         {
                             throw (CertificateException) e;
-                        }
-                        else
+                        } else
                         {
                             throw new CertificateException(e.getMessage(), e);
                         }
@@ -407,8 +407,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
                     if (e instanceof CertificateException)
                     {
                         throw (CertificateException) e;
-                    }
-                    else
+                    } else
                     {
                         throw new CertificateException(e.getMessage(), e);
                     }
@@ -465,7 +464,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
                     throw translate(SQL_ADD_CRAW, e);
                 }
 
-                boolean isLastBlock = certs.hasNext() == false;
+                boolean isLastBlock = !certs.hasNext();
 
                 if (numEntriesInBatch > 0
                         && (numEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock))

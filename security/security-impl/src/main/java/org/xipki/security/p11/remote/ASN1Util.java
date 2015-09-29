@@ -66,7 +66,7 @@ public class ASN1Util
             final String desc)
     throws BadASN1ObjectException
     {
-        if (obj instanceof ASN1OctetString == false)
+        if (!(obj instanceof ASN1OctetString))
         {
             throw new BadASN1ObjectException(desc + " is not an octet string");
         }
@@ -79,7 +79,7 @@ public class ASN1Util
             final String desc)
     throws BadASN1ObjectException
     {
-        if (obj instanceof ASN1Boolean == false)
+        if (!(obj instanceof ASN1Boolean))
         {
             throw new BadASN1ObjectException(desc + " is not a boolean");
         }
@@ -91,7 +91,7 @@ public class ASN1Util
             final String desc)
     throws BadASN1ObjectException
     {
-        if (obj instanceof ASN1Integer == false)
+        if (!(obj instanceof ASN1Integer))
         {
             throw new BadASN1ObjectException(desc + " is not an integer");
         }
@@ -109,7 +109,7 @@ public class ASN1Util
             final String desc)
     throws BadASN1ObjectException
     {
-        if (obj instanceof ASN1Integer == false)
+        if (!(obj instanceof ASN1Integer))
         {
             throw new BadASN1ObjectException(desc + " is not an integer");
         }
@@ -127,7 +127,7 @@ public class ASN1Util
             final String desc)
     throws BadASN1ObjectException
     {
-        if (obj instanceof ASN1String == false)
+        if (!(obj instanceof ASN1String))
         {
             throw new BadASN1ObjectException(desc + " is not a string");
         }
@@ -146,7 +146,7 @@ public class ASN1Util
         {
             StringBuilder sb = new StringBuilder(100);
             sb.append("wrong number of elements in sequence");
-            if (desc != null && desc.isEmpty() == false)
+            if (desc != null && !desc.isEmpty())
             {
                 sb.append("'").append(desc).append("'");
             }

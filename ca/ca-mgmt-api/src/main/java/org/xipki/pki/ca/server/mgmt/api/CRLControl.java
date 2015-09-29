@@ -211,7 +211,7 @@ public class CRLControl implements Serializable
         @Override
         public boolean equals(Object obj)
         {
-            if (obj instanceof HourMinute == false)
+            if (!(obj instanceof HourMinute))
             {
                 return false;
             }
@@ -254,8 +254,7 @@ public class CRLControl implements Serializable
         if (s == null)
         {
             this.updateMode = UpdateMode.interval;
-        }
-        else
+        } else
         {
             this.updateMode = UpdateMode.getUpdateMode(s);
             if (this.updateMode == null)
@@ -277,8 +276,7 @@ public class CRLControl implements Serializable
         if (s == null)
         {
             this.extensionOIDs = Collections.emptySet();
-        }
-        else
+        } else
         {
             Set<String> extensionOIDs = StringUtil.splitAsSet(s, ", ");
             // check the OID
@@ -325,8 +323,7 @@ public class CRLControl implements Serializable
                     throw new InvalidConfException("invalid " + KEY_interval_time + ": '"
                             + s + "'");
                 }
-            }
-            else
+            } else
             {
                 int minutes = getInteger(props, KEY_interval_minutes, 0);
                 if (minutes < this.overlapMinutes + 30)
@@ -374,12 +371,10 @@ public class CRLControl implements Serializable
             if ("true".equalsIgnoreCase(s))
             {
                 return Boolean.TRUE;
-            }
-            else if ("false".equalsIgnoreCase(s))
+            } else if ("false".equalsIgnoreCase(s))
             {
                 return Boolean.FALSE;
-            }
-            else
+            } else
             {
                 throw new InvalidConfException(propKey + " does not have boolean value: " + s);
             }
@@ -548,7 +543,7 @@ public class CRLControl implements Serializable
     public boolean equals(
             final Object obj)
     {
-        if (obj instanceof CRLControl == false)
+        if (!(obj instanceof CRLControl))
         {
             return false;
         }
@@ -571,8 +566,7 @@ public class CRLControl implements Serializable
             {
                 return false;
             }
-        }
-        else if (extensionOIDs.equals(b.extensionOIDs) == false)
+        } else if (!extensionOIDs.equals(b.extensionOIDs))
         {
             return false;
         }
@@ -583,8 +577,7 @@ public class CRLControl implements Serializable
             {
                 return false;
             }
-        }
-        else if (intervalMinutes.equals(b.intervalMinutes) == false)
+        } else if (!intervalMinutes.equals(b.intervalMinutes))
         {
             return false;
         }
@@ -595,8 +588,7 @@ public class CRLControl implements Serializable
             {
                 return false;
             }
-        }
-        else if (intervalDayTime.equals(b.intervalDayTime) == false)
+        } else if (!intervalDayTime.equals(b.intervalDayTime))
         {
             return false;
         }
@@ -607,8 +599,7 @@ public class CRLControl implements Serializable
             {
                 return false;
             }
-        }
-        else if (updateMode.equals(b.updateMode) == false)
+        } else if (!updateMode.equals(b.updateMode))
         {
             return false;
         }

@@ -219,7 +219,7 @@ public class PCIAuditEvent
         final char delimiter = DEFAULT_DELIMITER;
         final String replaceDelimiter = DEFAULT_REPLACE_DELIMITER;
 
-        if (prefix != null && prefix.isEmpty() == false)
+        if (prefix != null && !prefix.isEmpty())
         {
             buffer.append(prefix);
         }
@@ -251,7 +251,7 @@ public class PCIAuditEvent
         }
         for (int i = 0; i < strLen; i++)
         {
-            if (Character.isWhitespace(cs.charAt(i)) == false)
+            if (!Character.isWhitespace(cs.charAt(i)))
             {
                 return false;
             }
@@ -301,7 +301,7 @@ public class PCIAuditEvent
 
         for (String addr : addresses)
         {
-            if (addr.startsWith("192.") == false && addr.startsWith("127.") == false)
+            if (!addr.startsWith("192.") && !addr.startsWith("127."))
             {
                 return addr;
             }
@@ -309,7 +309,7 @@ public class PCIAuditEvent
 
         for (String addr : addresses)
         {
-            if (addr.startsWith("127.") == false)
+            if (!addr.startsWith("127."))
             {
                 return addr;
             }
@@ -318,8 +318,7 @@ public class PCIAuditEvent
         if (addresses.size() > 0)
         {
             return addresses.get(0);
-        }
-        else
+        } else
         {
             try
             {

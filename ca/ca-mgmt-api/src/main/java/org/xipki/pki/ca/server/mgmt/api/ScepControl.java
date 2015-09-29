@@ -101,12 +101,10 @@ public class ScepControl implements Serializable
             if ("true".equalsIgnoreCase(s))
             {
                 return Boolean.TRUE;
-            }
-            else if ("false".equalsIgnoreCase(s))
+            } else if ("false".equalsIgnoreCase(s))
             {
                 return Boolean.FALSE;
-            }
-            else
+            } else
             {
                 throw new InvalidConfException(propKey + " does not have boolean value: " + s);
             }
@@ -161,7 +159,7 @@ public class ScepControl implements Serializable
     public boolean equals(
             final Object obj)
     {
-        if (obj instanceof ScepControl == false)
+        if (!(obj instanceof ScepControl))
         {
             return false;
         }

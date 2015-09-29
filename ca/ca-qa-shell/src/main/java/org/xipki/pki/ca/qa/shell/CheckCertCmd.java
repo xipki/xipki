@@ -111,7 +111,7 @@ public class CheckCertCmd extends XipkiOsgiCommandSupport
             issuerName = issuerNames.iterator().next();
         }
 
-        if (issuerNames.contains(issuerName) == false)
+        if (!issuerNames.contains(issuerName))
         {
             throw new IllegalCmdParamException("issuer " + issuerName
                     + " is not within the configured issuers " + issuerNames);
@@ -160,7 +160,7 @@ public class CheckCertCmd extends XipkiOsgiCommandSupport
         }
 
         out(sb.toString());
-        if (result.isAllSuccessful() == false)
+        if (!result.isAllSuccessful())
         {
             throw new CmdFailure("certificate is invalid");
         }

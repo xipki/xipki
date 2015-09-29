@@ -208,12 +208,12 @@ public class CrlCertStatusStore extends CertStatusStore
     private synchronized void initializeStore(
             final boolean force)
     {
-        Boolean updateCRLSuccessfull = null;
+        Boolean updateCRLSuccessful = null;
 
         try
         {
             File fullCrlFile = new File(crlFilename);
-            if (fullCrlFile.exists() == false)
+            if (!fullCrlFile.exists())
             {
                 // file does not exist
                 LOG.warn("CRL File {} does not exist", crlFilename);
@@ -228,8 +228,7 @@ public class CrlCertStatusStore extends CertStatusStore
             {
                 deltaCrlFile = new File(deltaCrlFilename);
                 deltaCrlExists = deltaCrlFile.exists();
-            }
-            else
+            } else
             {
                 deltaCrlExists = false;
             }
@@ -238,7 +237,7 @@ public class CrlCertStatusStore extends CertStatusStore
                     ? deltaCrlFile.lastModified()
                     : 0;
 
-            if (force  == false)
+            if (!force)
             {
                 long now = System.currentTimeMillis();
                 if (newLastModifed != lastmodifiedOfCrlFile)
@@ -262,9 +261,9 @@ public class CrlCertStatusStore extends CertStatusStore
             } // end if (force)
 
             byte[] newFp = sha1Fp(fullCrlFile);
-            boolean crlFileChanged = Arrays.equals(newFp, fpOfCrlFile) == false;
+            boolean crlFileChanged = !Arrays.equals(newFp, fpOfCrlFile);
 
-            if (crlFileChanged == false)
+            if (!crlFileChanged)
             {
                 auditPCIEvent(AuditLevel.INFO, "UPDATE_CERTSTORE",
                         "current CRL is still up-to-date");
@@ -275,9 +274,9 @@ public class CrlCertStatusStore extends CertStatusStore
                     ? sha1Fp(deltaCrlFile)
                     : null;
             boolean deltaCrlFileChanged =
-                    Arrays.equals(newFpOfDeltaCrl, fpOfDeltaCrlFile) == false;
+                    !Arrays.equals(newFpOfDeltaCrl, fpOfDeltaCrlFile);
 
-            if (crlFileChanged == false && deltaCrlFileChanged == false)
+            if (!crlFileChanged && !deltaCrlFileChanged)
             {
                 return;
             }
@@ -295,7 +294,7 @@ public class CrlCertStatusStore extends CertStatusStore
 
             auditPCIEvent(AuditLevel.INFO, "UPDATE_CERTSTORE",
                     "a newer version of CRL is available");
-            updateCRLSuccessfull = false;
+            updateCRLSuccessful = false;
 
             X509CRL crl = X509Util.parseCRL(crlFilename);
             BigInteger crlNumber;
@@ -304,8 +303,7 @@ public class CrlCertStatusStore extends CertStatusStore
             {
                 byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
                 crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
-            }
-            else
+            } else
             {
                 crlNumber = null;
             }
@@ -313,7 +311,7 @@ public class CrlCertStatusStore extends CertStatusStore
             X500Principal issuer = crl.getIssuerX500Principal();
 
             boolean caAsCrlIssuer = true;
-            if (caCert.getSubjectX500Principal().equals(issuer) == false)
+            if (!caCert.getSubjectX500Principal().equals(issuer))
             {
                 caAsCrlIssuer = false;
                 if (issuerCert == null)
@@ -321,7 +319,7 @@ public class CrlCertStatusStore extends CertStatusStore
                     throw new IllegalArgumentException("issuerCert could not be null");
                 }
 
-                if (issuerCert.getSubjectX500Principal().equals(issuer) == false)
+                if (!issuerCert.getSubjectX500Principal().equals(issuer))
                 {
                     throw new IllegalArgumentException("The issuerCert and CRL do not match");
                 }
@@ -356,18 +354,16 @@ public class CrlCertStatusStore extends CertStatusStore
                 {
                     deltaCrl = null;
                     LOG.warn("{} is a full CRL instead of delta CRL, ignore it", deltaCrlFilename);
-                }
-                else
+                } else
                 {
                     byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
                     baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
-                    if (baseCrlNumber.equals(crlNumber) == false)
+                    if (!baseCrlNumber.equals(crlNumber))
                     {
                         deltaCrl = null;
                         LOG.info("{} is not a deltaCRL for the CRL {}, ignore it",
                                 deltaCrlFilename, crlFilename);
-                    }
-                    else
+                    } else
                     {
                         octetString = deltaCrl.getExtensionValue(Extension.cRLNumber.getId());
                         extnValue = DEROctetString.getInstance(octetString).getOctets();
@@ -376,7 +372,7 @@ public class CrlCertStatusStore extends CertStatusStore
                 }
             }
 
-            if (crlFileChanged == false && deltaCrl == null)
+            if (!crlFileChanged && deltaCrl == null)
             {
                 return;
             }
@@ -390,8 +386,7 @@ public class CrlCertStatusStore extends CertStatusStore
                         crlNumber, deltaCrlNumber);
                 newThisUpdate = deltaCrl.getThisUpdate();
                 newNextUpdate = deltaCrl.getNextUpdate();
-            }
-            else
+            } else
             {
                 newThisUpdate = crl.getThisUpdate();
                 newNextUpdate = crl.getNextUpdate();
@@ -489,7 +484,7 @@ public class CrlCertStatusStore extends CertStatusStore
                         bcCert = Certificate.getInstance(asn1);
                     }
 
-                    if (caName.equals(bcCert.getIssuer()) == false)
+                    if (!caName.equals(bcCert.getIssuer()))
                     {
                         throw new CertStatusStoreException("invalid entry in CRL Extension certs");
                     }
@@ -509,8 +504,7 @@ public class CrlCertStatusStore extends CertStatusStore
                 {
                     LOG.warn("ignore certsDir '{}', since certificates are included in {}",
                             certsDirname, " CRL Extension certs");
-                }
-                else
+                } else
                 {
                     certsIncluded = true;
                     Set<CertWithInfo> tmpCerts = readCertWithInfosFromDir(caCert, certsDirname);
@@ -528,7 +522,7 @@ public class CrlCertStatusStore extends CertStatusStore
                 {
                     X500Principal thisIssuer = revokedCert.getCertificateIssuer();
                     if (thisIssuer != null
-                            && caCert.getSubjectX500Principal().equals(thisIssuer) == false)
+                            && !caCert.getSubjectX500Principal().equals(thisIssuer))
                     {
                         throw new CertStatusStoreException("invalid CRLEntry");
                     }
@@ -545,7 +539,7 @@ public class CrlCertStatusStore extends CertStatusStore
                     {
                         X500Principal thisIssuer = revokedCert.getCertificateIssuer();
                         if (thisIssuer != null
-                                && caCert.getSubjectX500Principal().equals(thisIssuer) == false)
+                                && !caCert.getSubjectX500Principal().equals(thisIssuer))
                         {
                             throw new CertStatusStoreException("invalid CRLEntry");
                         }
@@ -571,8 +565,7 @@ public class CrlCertStatusStore extends CertStatusStore
                     if (reason == java.security.cert.CRLReason.REMOVE_FROM_CRL)
                     {
                         revokedCertMap.remove(serialNumber);
-                    }
-                    else
+                    } else
                     {
                         revokedCertMap.put(serialNumber, entry);
                     }
@@ -583,8 +576,7 @@ public class CrlCertStatusStore extends CertStatusStore
             if (revokedCertMap != null)
             {
                 it = revokedCertMap.values().iterator();
-            }
-            else if (revokedCertListInFullCRL != null)
+            } else if (revokedCertListInFullCRL != null)
             {
                 it = revokedCertListInFullCRL.iterator();
             }
@@ -604,8 +596,7 @@ public class CrlCertStatusStore extends CertStatusStore
                         ASN1Enumerated enumerated = ASN1Enumerated.getInstance(
                                 removeTagAndLenFromExtensionValue(encodedExtnValue));
                         reasonCode = enumerated.getValue().intValue();
-                    }
-                    else
+                    } else
                     {
                         reasonCode = CRLReason.UNSPECIFIED.getCode();
                     }
@@ -651,8 +642,7 @@ public class CrlCertStatusStore extends CertStatusStore
                         {
                             LOG.info("could not find certificate (issuer='{}', serialNumber='{}'",
                                     X509Util.getRFC4519Name(caName), serialNumber);
-                        }
-                        else
+                        } else
                         {
                             certs.remove(cert);
                         }
@@ -703,7 +693,7 @@ public class CrlCertStatusStore extends CertStatusStore
 
             this.initializationFailed = false;
             this.initialized = true;
-            updateCRLSuccessfull = true;
+            updateCRLSuccessful = true;
             LOG.info("updated CertStore {}", getName());
         } catch (Exception e)
         {
@@ -718,17 +708,16 @@ public class CrlCertStatusStore extends CertStatusStore
             initialized = true;
         } finally
         {
-            if (updateCRLSuccessfull != null)
+            if (updateCRLSuccessful != null)
             {
                 AuditLevel auditLevel;
                 AuditStatus auditStatus;
                 String eventType = "UPDATE_CRL";
-                if (updateCRLSuccessfull)
+                if (updateCRLSuccessful)
                 {
                     auditLevel = AuditLevel.INFO;
                     auditStatus = AuditStatus.FAILED;
-                }
-                else
+                } else
                 {
                     auditLevel = AuditLevel.ERROR;
                     auditStatus = AuditStatus.SUCCESSFUL;
@@ -775,7 +764,7 @@ public class CrlCertStatusStore extends CertStatusStore
     {
         // wait for max. 0.5 second
         int n = 5;
-        while (initialized == false && (n-- > 0))
+        while (!initialized && (n-- > 0))
         {
             try
             {
@@ -785,7 +774,7 @@ public class CrlCertStatusStore extends CertStatusStore
             }
         }
 
-        if (initialized == false)
+        if (!initialized)
         {
             throw new CertStatusStoreException("initialization of CertStore is still in process");
         }
@@ -818,15 +807,14 @@ public class CrlCertStatusStore extends CertStatusStore
                     nextUpdate = this.nextUpdate;
                 }
             }
-        }
-        else
+        } else
         {
             thisUpdate = new Date();
         }
 
         IssuerHashNameAndKey issuerHashNameAndKey = issuerHashMap.get(hashAlgo);
 
-        if (issuerHashNameAndKey.match(hashAlgo, issuerNameHash, issuerKeyHash) == false)
+        if (!issuerHashNameAndKey.match(hashAlgo, issuerNameHash, issuerKeyHash))
         {
             return CertStatusInfo.getIssuerUnknownCertStatusInfo(thisUpdate, nextUpdate);
         }
@@ -840,38 +828,36 @@ public class CrlCertStatusStore extends CertStatusStore
             String profileName = crlCertStatusInfo.getCertprofile();
             boolean ignore = profileName != null
                     && certprofileOption != null
-                    && certprofileOption.include(profileName) == false;
+                    && !certprofileOption.include(profileName);
             if (ignore)
             {
                 certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, nextUpdate);
-            }
-            else
+            } else
             {
                 certStatusInfo = crlCertStatusInfo.getCertStatusInfo(certHashAlgo, thisUpdate,
                         nextUpdate);
             }
-        }
-        else
+        } else
         {
             // SerialNumber is unknown
-            if (unknownSerialAsGood)
+            if (isUnknownSerialAsGood())
             {
                 certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(
                         null, null, thisUpdate, nextUpdate, null);
-            }
-            else
+            } else
             {
                 certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
             }
         }
 
-        if (includeCrlID)
+        if (isIncludeCrlID())
         {
             certStatusInfo.setCrlID(crlID);
         }
 
-        if (includeArchiveCutoff)
+        if (isIncludeArchiveCutoff())
         {
+            int retentionInterval = getRetentionInterval();
             Date t;
             if (retentionInterval != 0)
             {
@@ -879,8 +865,7 @@ public class CrlCertStatusStore extends CertStatusStore
                 if (retentionInterval < 0)
                 {
                     t = caNotBefore;
-                }
-                else
+                } else
                 {
                     long nowInMs = System.currentTimeMillis();
                     long tInMs = Math.max(caNotBefore.getTime(), nowInMs - DAY * retentionInterval);
@@ -976,19 +961,19 @@ public class CrlCertStatusStore extends CertStatusStore
     {
         File certsDir = new File(certsDirname);
 
-        if (certsDir.exists() == false)
+        if (!certsDir.exists())
         {
             LOG.warn("the folder " + certsDirname + " does not exist, ignore it");
             return Collections.emptySet();
         }
 
-        if (certsDir.isDirectory() == false)
+        if (!certsDir.isDirectory())
         {
             LOG.warn("the path " + certsDirname + " does not point to a folder, ignore it");
             return Collections.emptySet();
         }
 
-        if (certsDir.canRead() == false)
+        if (!certsDir.canRead())
         {
             LOG.warn("the folder " + certsDirname + " could not be read, ignore it");
             return Collections.emptySet();
@@ -997,7 +982,9 @@ public class CrlCertStatusStore extends CertStatusStore
         File[] certFiles = certsDir.listFiles(new FilenameFilter()
         {
             @Override
-            public boolean accept(File dir, String name)
+            public boolean accept(
+                    final File dir,
+                    final String name)
             {
                 return name.endsWith(".der") || name.endsWith(".crt");
             }
@@ -1029,7 +1016,7 @@ public class CrlCertStatusStore extends CertStatusStore
             }
 
             // not issued by the given issuer
-            if (issuer.equals(bcCert.getIssuer()) == false)
+            if (!issuer.equals(bcCert.getIssuer()))
             {
                 continue;
             }
@@ -1051,7 +1038,7 @@ public class CrlCertStatusStore extends CertStatusStore
                     LOG.debug(message, e);
                 }
 
-                if (aki == null || Arrays.equals(issuerSKI, aki) == false)
+                if (aki == null || !Arrays.equals(issuerSKI, aki))
                 {
                     continue;
                 }

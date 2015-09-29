@@ -73,8 +73,7 @@ public class CaAliasInfoCmd extends CaCmd
                         ? "no"
                         : "1");
                 sb.append(" CA alias is configured\n");
-            }
-            else
+            } else
             {
                 sb.append(n).append(" CA aliases are configured:\n");
             }
@@ -86,15 +85,13 @@ public class CaAliasInfoCmd extends CaCmd
             {
                 sb.append("\t").append(aliasName).append("\n");
             }
-        }
-        else
+        } else
         {
             if (aliasNames.contains(caAlias))
             {
                 String paramValue = caManager.getCaNameForAlias(caAlias);
                 sb.append(caAlias).append("\n\t").append(paramValue);
-            }
-            else
+            } else
             {
                 throw new UnexpectedException("could not find CA alias '" + caAlias + "'");
             }

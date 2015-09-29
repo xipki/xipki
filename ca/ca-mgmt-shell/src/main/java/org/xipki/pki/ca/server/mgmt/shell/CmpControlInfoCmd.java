@@ -73,8 +73,7 @@ public class CmpControlInfoCmd extends CaCmd
                         ? "no"
                         : "1");
                 sb.append(" CMP control is configured\n");
-            }
-            else
+            } else
             {
                 sb.append(n).append(" CMP controls are configured:\n");
             }
@@ -86,15 +85,13 @@ public class CmpControlInfoCmd extends CaCmd
             {
                 sb.append("\t").append(m).append("\n");
             }
-        }
-        else
+        } else
         {
             CmpControlEntry entry = caManager.getCmpControl(name);
             if (entry == null)
             {
                 throw new UnexpectedException("\tno CMP control named '" + name + " is configured");
-            }
-            else
+            } else
             {
                 sb.append(entry.toString());
             }

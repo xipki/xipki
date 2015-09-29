@@ -86,12 +86,12 @@ public abstract class CertStatusStore
     protected static final long DAY = 24L * 60 * 60 * 1000;
 
     private final String name;
-    protected boolean unknownSerialAsGood;
-    protected int retentionInterval;
-    protected boolean includeArchiveCutoff;
-    protected boolean includeCrlID;
+    private boolean unknownSerialAsGood;
+    private int retentionInterval;
+    private boolean includeArchiveCutoff;
+    private boolean includeCrlID;
 
-    protected AuditServiceRegister auditServiceRegister;
+    private AuditServiceRegister auditServiceRegister;
 
     protected CertStatusStore(
             final String name)

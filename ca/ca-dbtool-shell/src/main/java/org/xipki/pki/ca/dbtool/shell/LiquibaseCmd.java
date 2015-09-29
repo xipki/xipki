@@ -95,9 +95,9 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
     throws Exception
     {
         printDatabaseInfo(dbConf, schemaFile);
-        if (quiet == false)
+        if (!quiet)
         {
-            if (confirm("reset and initialize") == false)
+            if (!confirm("reset and initialize"))
             {
                 out("cancelled");
                 return;
@@ -110,13 +110,13 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
             liquibase.init(logLevel, logFile);
             liquibase.releaseLocks();
 
-            if (LiquibaseMain.loglevelIsSevereOrOff(logLevel) == false)
+            if (!LiquibaseMain.loglevelIsSevereOrOff(logLevel))
             {
                 liquibase.init("severe", logFile);
             }
             liquibase.dropAll();
 
-            if (LiquibaseMain.loglevelIsSevereOrOff(logLevel) == false)
+            if (!LiquibaseMain.loglevelIsSevereOrOff(logLevel))
             {
                 liquibase.init(logLevel, logFile);
             }
@@ -134,9 +134,9 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
     throws Exception
     {
         printDatabaseInfo(dbConf, schemaFile);
-        if (quiet == false)
+        if (!quiet)
         {
-            if (confirm("update") == false)
+            if (!confirm("update"))
             {
                 out("cancelled");
                 return;
@@ -265,8 +265,7 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
             if (isEmpty(validValues) || validValues.contains(answer))
             {
                 return answer;
-            }
-            else
+            } else
             {
                 StringBuilder retryPromptBuilder = new StringBuilder("Please answer with ");
                 for (String validValue : validValues)

@@ -52,7 +52,7 @@ class MyFilenameFilter implements FilenameFilter
         String ignoreRegex = System.getProperty("org.xipki.console.ignore.regex");
         if (ignoreRegex == null)
         {
-            if (Configuration.isWindows() == false)
+            if (!Configuration.isWindows())
             {
                 ignoreRegex = "\\..*";
             }
@@ -61,8 +61,7 @@ class MyFilenameFilter implements FilenameFilter
         if (ignoreRegex == null || ignoreRegex.isEmpty())
         {
             ignorePattern = null;
-        }
-        else
+        } else
         {
             ignorePattern = Pattern.compile(ignoreRegex);
         }
@@ -78,7 +77,7 @@ class MyFilenameFilter implements FilenameFilter
             return true;
         }
 
-        return ignorePattern.matcher(name).matches() == false;
+        return !ignorePattern.matcher(name).matches();
     }
 
 }

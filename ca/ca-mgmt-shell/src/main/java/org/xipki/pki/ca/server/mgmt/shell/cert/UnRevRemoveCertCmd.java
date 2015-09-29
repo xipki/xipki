@@ -80,7 +80,7 @@ public abstract class UnRevRemoveCertCmd extends CaCmd
             throw new UnexpectedException("CA " + caName + " not available");
         }
 
-        if (ca instanceof X509CAEntry == false)
+        if (!(ca instanceof X509CAEntry))
         {
             throw new UnexpectedException("CA " + caName + " is not an X.509-CA");
         }
@@ -89,19 +89,17 @@ public abstract class UnRevRemoveCertCmd extends CaCmd
         if (serialNumberS != null)
         {
             serialNumber = toBigInt(serialNumberS);
-        }
-        else if (certFile != null)
+        } else if (certFile != null)
         {
             X509Certificate caCert = ((X509CAEntry) ca).getCertificate();
             X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
-            if (X509Util.issues(caCert, cert) == false)
+            if (!X509Util.issues(caCert, cert))
             {
                 throw new UnexpectedException(
                         "certificate '" + certFile + "' is not issued by CA " + caName);
             }
             serialNumber = cert.getSerialNumber();
-        }
-        else
+        } else
         {
             throw new IllegalCmdParamException("neither serialNumber nor certFile is specified");
         }

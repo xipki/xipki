@@ -39,8 +39,8 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.password.api.PasswordResolver;
-import org.xipki.pki.ca.dbtool.DbPortWorker;
 import org.xipki.pki.ca.dbtool.diffdb.DbDigestDiffWorker;
+import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
 /**
  * @author Lijun Liao
@@ -78,9 +78,13 @@ public class DiffDigestDbCmd extends DbPortCmd
             description = "number of certificates per SELECT")
     private Integer numCertsPerSelect = 1000;
 
-    @Option(name = "-n",
+    @Option(name = "--ref-threads",
             description = "number of threads to query the target database")
-    private Integer numThreads = 10;
+    private Integer numRefThreads = 5;
+
+    @Option(name = "--target-threads",
+            description = "number of threads to query the target database")
+    private Integer numTargetThreads = 10;
 
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
@@ -97,7 +101,8 @@ public class DiffDigestDbCmd extends DbPortCmd
                 dbconfFile,
                 reportDir,
                 numCertsPerSelect,
-                numThreads);
+                numRefThreads,
+                numTargetThreads);
     }
 
     public void setDataSourceFactory(

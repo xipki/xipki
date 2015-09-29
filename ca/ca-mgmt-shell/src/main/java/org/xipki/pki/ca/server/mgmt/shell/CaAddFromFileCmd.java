@@ -298,12 +298,10 @@ public class CaAddFromFileCmd extends CaCmd
         if ("true".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s))
         {
             revoked = true;
-        }
-        else if ("false".equalsIgnoreCase(s) || "no".equalsIgnoreCase(s))
+        } else if ("false".equalsIgnoreCase(s) || "no".equalsIgnoreCase(s))
         {
             revoked = false;
-        }
-        else
+        } else
         {
             throw new IllegalCmdParamException("invalid " + key + ": '" + s + "'");
         }
@@ -332,7 +330,7 @@ public class CaAddFromFileCmd extends CaCmd
         }
 
         // CERT
-        if (ignoreCert == false)
+        if (!ignoreCert)
         {
             key = CaExportCmd.KEY_CERT;
             s = getStrProp(props, key, false);
@@ -342,8 +340,7 @@ public class CaAddFromFileCmd extends CaCmd
                 if (StringUtil.startsWithIgnoreCase(s, "file:"))
                 {
                     certBytes = IoUtil.read(s.substring("file:".length()));
-                }
-                else
+                } else
                 {
                     certBytes = Base64.decode(s);
                 }
@@ -370,13 +367,12 @@ public class CaAddFromFileCmd extends CaCmd
         if (StringUtil.isBlank(s))
         {
             s = "";
-        }
-        else
+        } else
         {
             s = s.trim();
         }
 
-        if (s.isEmpty() == false)
+        if (!s.isEmpty())
         {
             return s;
         }
@@ -385,8 +381,7 @@ public class CaAddFromFileCmd extends CaCmd
         {
             throw new IllegalCmdParamException(
                     "Required property '" + propKey + "' is not defined");
-        }
-        else
+        } else
         {
             return null;
         }

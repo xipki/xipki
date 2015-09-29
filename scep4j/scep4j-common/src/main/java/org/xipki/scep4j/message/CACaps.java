@@ -145,6 +145,12 @@ public class CACaps
         return toScepMessage();
     }
 
+    @Override
+    public int hashCode()
+    {
+        return toScepMessage().hashCode();
+    }
+
     public String toScepMessage()
     {
         if (capabilities.isEmpty())
@@ -195,7 +201,7 @@ public class CACaps
     public boolean equals(
             final Object other)
     {
-        if (other instanceof CACaps == false)
+        if (!(other instanceof CACaps))
         {
             return false;
         }

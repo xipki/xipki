@@ -180,7 +180,7 @@ public class AuditEvent
 
     public boolean containsChildAuditEvents()
     {
-        return childAuditEvents.isEmpty() == false;
+        return !childAuditEvents.isEmpty();
     }
 
     public List<AuditEvent> expandAuditEvents()
@@ -201,8 +201,7 @@ public class AuditEvent
             if (child.getLevel() != null)
             {
                 event.setLevel(child.getLevel());
-            }
-            else
+            } else
             {
                 event.setLevel(level);
             }
@@ -210,8 +209,7 @@ public class AuditEvent
             if (child.getStatus() != null)
             {
                 event.setStatus(child.getStatus());
-            }
-            else
+            } else
             {
                 event.setStatus(status);
             }

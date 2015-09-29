@@ -128,8 +128,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             if (conf.getSignatureAlgorithms() == null)
             {
                 this.signatureAlgorithms = null;
-            }
-            else
+            } else
             {
                 this.signatureAlgorithms = new HashSet<>();
                 for (String algo :conf.getSignatureAlgorithms().getAlgorithm())
@@ -218,7 +217,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
             AlgorithmIdentifier sigAlgId = bcCert.getSignatureAlgorithm();
             AlgorithmIdentifier tbsSigAlgId = bcCert.getTBSCertificate().getSignature();
-            if (tbsSigAlgId.equals(sigAlgId) == false)
+            if (!tbsSigAlgId.equals(sigAlgId))
             {
                 issue.setFailureMessage(
                         "Certificate.tbsCertificate.signature != Certificate.signatureAlgorithm");
@@ -227,7 +226,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 try
                 {
                     String sigAlgo = AlgorithmUtil.getSignatureAlgoName(sigAlgId);
-                    if (signatureAlgorithms.contains(sigAlgo) == false)
+                    if (!signatureAlgorithms.contains(sigAlgo))
                     {
                         issue.setFailureMessage("signatureAlgorithm '" + sigAlgo
                                 + "' is not allowed");
@@ -297,8 +296,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         {
             ValidationIssue issue = new ValidationIssue("X509.ISSUER", "certificate issuer");
             resultIssues.add(issue);
-            if (cert.getIssuerX500Principal().equals(
-                    issuerInfo.getCert().getSubjectX500Principal()) == false)
+            if (!cert.getIssuerX500Principal().equals(
+                    issuerInfo.getCert().getSubjectX500Principal()))
             {
                 issue.setFailureMessage(
                         "issue in certificate does not equal the subject of CA certificate");
@@ -350,7 +349,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
         for (ExtensionType m : extensionsType.getExtension())
         {
-            if (m.getValue() == null || m.getValue().getAny() instanceof ConstantExtValue == false)
+            if (m.getValue() == null || !(m.getValue().getAny() instanceof ConstantExtValue))
             {
                 continue;
             }

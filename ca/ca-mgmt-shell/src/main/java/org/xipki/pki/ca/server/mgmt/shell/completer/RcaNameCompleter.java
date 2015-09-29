@@ -56,7 +56,7 @@ public class RcaNameCompleter extends MgmtNameCompleter
         for (String name : caManager.getCaNames())
         {
             CAEntry caEntry = caManager.getCA(name);
-            if (caEntry instanceof X509CAEntry == false)
+            if (!(caEntry instanceof X509CAEntry))
             {
                 continue;
             }

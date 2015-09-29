@@ -342,8 +342,7 @@ public class CaUpdateCmd extends CaCmd
         if (clearUris)
         {
             return Collections.emptyList();
-        }
-        else
+        } else
         {
             return new ArrayList<>(uris);
         }

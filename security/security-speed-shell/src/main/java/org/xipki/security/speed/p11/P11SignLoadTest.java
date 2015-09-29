@@ -119,7 +119,7 @@ public abstract class P11SignLoadTest extends LoadExecutor
                 return;
             }
 
-            while (stop() == false && getErrorAccout() < 1)
+            while (!stop() && getErrorAccout() < 1)
             {
                 try
                 {

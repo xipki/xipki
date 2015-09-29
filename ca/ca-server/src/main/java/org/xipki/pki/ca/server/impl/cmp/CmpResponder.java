@@ -196,22 +196,20 @@ abstract class CmpResponder
         boolean intentMe = (recipient == null)
                 ? null
                 : intendsMe(recipient);
-        if (intentMe == false)
+        if (!intentMe)
         {
             LOG.warn("tid={}: I am not the intented recipient, but '{}'", tid,
                     reqHeader.getRecipient());
             failureCode = PKIFailureInfo.badRequest;
             statusText = "I am not the intended recipient";
-        }
-        else if (messageTime == null)
+        } else if (messageTime == null)
         {
             if (cmpControl.isMessageTimeRequired())
             {
                 failureCode = PKIFailureInfo.missingTimeStamp;
                 statusText = "missing timestamp";
             }
-        }
-        else
+        } else
         {
             long messageTimeBias = cmpControl.getMessageTimeBias();
             if (messageTimeBias < 0)
@@ -226,8 +224,7 @@ abstract class CmpResponder
             {
                 failureCode = PKIFailureInfo.badTime;
                 statusText = "message time is in the future";
-            }
-            else if (bias * -1 > messageTimeBias)
+            } else if (bias * -1 > messageTimeBias)
             {
                 failureCode = PKIFailureInfo.badTime;
                 statusText = "message too old";
@@ -293,8 +290,7 @@ abstract class CmpResponder
                 LOG.debug(msg, e);
                 errorStatus = "request has invalid signature based protection";
             }
-        }
-        else if (tlsClientCert != null)
+        } else if (tlsClientCert != null)
         {
             boolean authorized = false;
 
@@ -310,15 +306,13 @@ abstract class CmpResponder
             if (authorized)
             {
                 errorStatus = null;
-            }
-            else
+            } else
             {
                 LOG.warn("tid={}: not authorized requestor (TLS client '{}')",
                         tid, X509Util.getRFC4519Name(tlsClientCert.getSubjectX500Principal()));
                 errorStatus = "requestor (TLS client certificate) is not authorized";
             }
-        }
-        else
+        } else
         {
             errorStatus = "request has no protection";
             requestor = null;
@@ -353,8 +347,7 @@ abstract class CmpResponder
         if (isProtected)
         {
             resp = addProtection(resp, auditEvent);
-        }
-        else
+        } else
         {
             // protected by TLS connection
         }
@@ -386,7 +379,7 @@ abstract class CmpResponder
 
         PKIHeader h = pMsg.getHeader();
         AlgorithmIdentifier protectionAlg = h.getProtectionAlg();
-        if (cmpControl.isSigAlgoPermitted(protectionAlg) == false)
+        if (!cmpControl.isSigAlgoPermitted(protectionAlg))
         {
             LOG.warn("SIG_ALGO_FORBIDDEN: {}",
                     pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());

@@ -72,13 +72,13 @@ public class DbDigestDiff
     private static final Logger LOG = LoggerFactory.getLogger(DbDigestDiff.class);
     private final String refDirname;
     private final DataSourceWrapper refDatasource;
-
     private final boolean revokedOnly;
 
     private final String reportDirName;
     private final AtomicBoolean stopMe;
     private final int numPerSelect;
-    private final int numThreads;
+    private final int numRefThreads;
+    private final int numTargetThreads;
 
     private final TargetDigestRetriever target;
 
@@ -89,7 +89,8 @@ public class DbDigestDiff
             final String reportDirName,
             final AtomicBoolean stopMe,
             final int numPerSelect,
-            final int numThreads)
+            final int numRefThreads,
+            final int numTargetThreads)
     throws IOException, DataAccessException
     {
         ParamUtil.assertNotBlank("refDirname", refDirname);
@@ -102,7 +103,8 @@ public class DbDigestDiff
         }
 
         return new DbDigestDiff(revokedOnly, refDirname, null,
-                datasource, reportDirName, stopMe, numPerSelect, numThreads);
+                datasource, reportDirName, stopMe, numPerSelect,
+                numRefThreads, numTargetThreads);
     }
 
     public static DbDigestDiff getInstanceForDbRef(
@@ -112,7 +114,8 @@ public class DbDigestDiff
             final String reportDirName,
             final AtomicBoolean stopMe,
             final int numPerSelect,
-            final int numThreads)
+            final int numRefThreads,
+            final int numTargetThreads)
     throws IOException, DataAccessException
     {
         ParamUtil.assertNotNull("refDatasource", refDatasource);
@@ -125,7 +128,8 @@ public class DbDigestDiff
         }
 
         return new DbDigestDiff(revokedOnly, null, refDatasource,
-                datasource, reportDirName, stopMe, numPerSelect, numThreads);
+                datasource, reportDirName, stopMe, numPerSelect,
+                numRefThreads, numTargetThreads);
     }
 
     private DbDigestDiff(
@@ -136,14 +140,18 @@ public class DbDigestDiff
             final String reportDirName,
             final AtomicBoolean stopMe,
             final int numPerSelect,
-            final int numThreads)
+            final int numRefThreads,
+            final int numTargetThreads)
     throws IOException, DataAccessException
     {
-        if (numThreads < 1)
+        if (numRefThreads < 1)
         {
-            throw new IllegalArgumentException("invalid numThreads: " + numThreads);
+            throw new IllegalArgumentException("invalid numRefThreads: " + numRefThreads);
         }
-
+        if (numTargetThreads < 1)
+        {
+            throw new IllegalArgumentException("invalid numTargetThreads: " + numTargetThreads);
+        }
         this.revokedOnly = revokedOnly;
 
         this.refDirname = (refDir == null)
@@ -155,8 +163,9 @@ public class DbDigestDiff
         this.reportDirName = reportDirName;
         this.stopMe = stopMe;
         this.numPerSelect = numPerSelect;
-        this.numThreads = numThreads;
-        this.target = new TargetDigestRetriever(datasource, numPerSelect, numThreads);
+        this.numRefThreads = numRefThreads;
+        this.numTargetThreads = numTargetThreads;
+        this.target = new TargetDigestRetriever(datasource, numPerSelect, numTargetThreads);
     }
 
     public void diff()
@@ -172,8 +181,8 @@ public class DbDigestDiff
                 File[] childFiles = refDir.listFiles();
                 for (File caDir : childFiles)
                 {
-                    if (caDir.isDirectory() == false
-                            ||  caDir.getName().startsWith("ca-") == false)
+                    if (!caDir.isDirectory()
+                            ||  !caDir.getName().startsWith("ca-"))
                     {
                         continue;
                     }
@@ -193,7 +202,7 @@ public class DbDigestDiff
 
                 if (refDbSchemaType == DbSchemaType.EJBCA_CA_v3)
                 {
-                    if (refDatasource.tableHasColumn(null, "CertificateData", "id") == false)
+                    if (!refDatasource.tableHasColumn(null, "CertificateData", "id"))
                     {
                         throw new RuntimeException(
                                 "EJBCA without column 'CertificateData.id' is not supported, "
@@ -237,10 +246,10 @@ public class DbDigestDiff
                 for (Integer refCaId : refCaIds)
                 {
                     DigestReader refReader = (refDbSchemaType == DbSchemaType.EJBCA_CA_v3)
-                            ? new EjbcaDbDigestReader(refDatasource, refDbSchemaType,
-                                    refCaId, dbContainsMultipleCAs, revokedOnly)
-                            : new XipkiDbDigestReader(refDatasource, refDbSchemaType,
-                                    refCaId, revokedOnly);
+                            ? EjbcaDbDigestReader.getInstance(refDatasource, refDbSchemaType,
+                                    refCaId, dbContainsMultipleCAs, revokedOnly, numRefThreads)
+                            : XipkiDbDigestReader.getInstance(refDatasource, refDbSchemaType,
+                                    refCaId, revokedOnly, numRefThreads);
                     diffSingleCA(refReader, caIdCertMap);
                 }
             }
@@ -322,7 +331,6 @@ public class DbDigestDiff
         ProcessLog.printHeader();
 
         boolean interrupted = false;
-        int numProcessed = 0;
 
         while (true)
         {
@@ -334,11 +342,11 @@ public class DbDigestDiff
             }
 
             int numBundles = 0;
-            for (int i = 0; i < numThreads; i++)
+            for (int i = 0; i < numTargetThreads * 2; i++)
             {
                 CertsBundle myBundle = readerA.nextCerts(numPerSelect);
                 if (myBundle != null
-                        && myBundle.getSerialNumbers().isEmpty() == false)
+                        && !myBundle.getSerialNumbers().isEmpty())
                 {
                     numBundles++;
                     target.addIn(myBundle);
@@ -390,9 +398,6 @@ public class DbDigestDiff
 
                 processLog.addNumProcessed(n);
                 processLog.printStatus();
-
-                numProcessed += n;
-                reporter.setAccout(numProcessed);
             }
         }
 

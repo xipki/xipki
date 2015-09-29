@@ -121,7 +121,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
     {
         try
         {
-            if (X509Util.issues(issuerCert, cert) == false)
+            if (!X509Util.issues(issuerCert, cert))
             {
                 throw new IllegalArgumentException("cert and issuerCert do not match");
             }
@@ -149,7 +149,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             X509Certificate cert = certs[i];
             try
             {
-                if (X509Util.issues(issuerCert, cert) == false)
+                if (!X509Util.issues(issuerCert, cert))
                 {
                     throw new IllegalArgumentException(
                             "cert at index " + i + " and issuerCert do not match");
@@ -251,7 +251,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             return ocspResp;
         }
 
-        if (respObject instanceof BasicOCSPResp == false)
+        if (!(respObject instanceof BasicOCSPResp))
         {
             return ocspResp;
         }
@@ -267,7 +267,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                 throw new OCSPNonceUnmatchedException(nonce, null);
             }
             byte[] receivedNonce = nonceExtn.getExtnValue().getOctets();
-            if (Arrays.equals(nonce, receivedNonce) == false)
+            if (!Arrays.equals(nonce, receivedNonce))
             {
                 throw new OCSPNonceUnmatchedException(nonce, receivedNonce);
             }
@@ -303,18 +303,17 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                     && Arrays.equals(issuerKeyHash, cid.getIssuerKeyHash())
                     && Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
 
-            if (issuerMatch == false)
+            if (!issuerMatch)
             {
                 throw new OCSPTargetUnmatchedException("the issuer is not requested");
             }
 
             BigInteger serialNumber = cid.getSerialNumber();
-            if (serialNumbers[0].equals(serialNumber) == false)
+            if (!serialNumbers[0].equals(serialNumber))
             {
                 throw new OCSPTargetUnmatchedException("the serialNumber is not requested");
             }
-        }
-        else
+        } else
         {
             List<BigInteger> tmpSerials1 = Arrays.asList(serialNumbers);
             List<BigInteger> tmpSerials2 = new ArrayList<>(tmpSerials1);
@@ -327,21 +326,20 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                         && Arrays.equals(issuerKeyHash, cid.getIssuerKeyHash())
                         && Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
 
-                if (issuerMatch == false)
+                if (!issuerMatch)
                 {
                     throw new OCSPTargetUnmatchedException(
                             "the issuer specified in singleResponse[" + i + "] is not requested");
                 }
 
                 BigInteger serialNumber = cid.getSerialNumber();
-                if (tmpSerials2.remove(serialNumber) == false)
+                if (!tmpSerials2.remove(serialNumber))
                 {
                     if (tmpSerials1.contains(serialNumber))
                     {
                         throw new OCSPTargetUnmatchedException("serialNumber " + serialNumber
                                 + "is contained in at least two singleResponses");
-                    }
-                    else
+                    } else
                     {
                         throw new OCSPTargetUnmatchedException(
                                 "the serialNumber specified in singleResponse[" + i
@@ -368,20 +366,16 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         if (NISTObjectIdentifiers.id_sha224.equals(hashAlgId))
         {
             digestCalculator = new SHA224DigestCalculator();
-        }
-        else if (NISTObjectIdentifiers.id_sha256.equals(hashAlgId))
+        } else if (NISTObjectIdentifiers.id_sha256.equals(hashAlgId))
         {
             digestCalculator = new SHA256DigestCalculator();
-        }
-        else if (NISTObjectIdentifiers.id_sha384.equals(hashAlgId))
+        } else if (NISTObjectIdentifiers.id_sha384.equals(hashAlgId))
         {
             digestCalculator = new SHA384DigestCalculator();
-        }
-        else if (NISTObjectIdentifiers.id_sha512.equals(hashAlgId))
+        } else if (NISTObjectIdentifiers.id_sha512.equals(hashAlgId))
         {
             digestCalculator = new SHA512DigestCalculator();
-        }
-        else
+        } else
         {
             digestCalculator = new SHA1DigestCalculator();
         }
@@ -493,8 +487,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                 {
                     signer.returnContentSigner(singleSigner);
                 }
-            }
-            else
+            } else
             {
                 return reqBuilder.build();
             }

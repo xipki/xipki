@@ -170,7 +170,7 @@ public class HashCalculator
     {
         ParamUtil.assertNotNull("hashAlgoType", hashAlgoType);
         ParamUtil.assertNotNull("data", data);
-        if (mdsMap.containsKey(hashAlgoType) == false)
+        if (!mdsMap.containsKey(hashAlgoType))
         {
             throw new IllegalArgumentException("unknown hash algo " + hashAlgoType);
         }

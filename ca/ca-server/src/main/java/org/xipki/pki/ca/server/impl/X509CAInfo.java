@@ -157,8 +157,7 @@ public class X509CAInfo
                     new Object[]{caEntry.getName(), caEntry.getNextSerial(), nextSerial});
             caEntry.setNextSerial(nextSerial);
             certStore.commitNextSerialIfLess(getName(), nextSerial);
-        }
-        else
+        } else
         {
             nextSerial = caEntry.getNextSerial();
         }
@@ -167,7 +166,7 @@ public class X509CAInfo
     public void commitNextSerial()
     throws OperationException
     {
-        if (useRandomSerialNumber == false)
+        if (!useRandomSerialNumber)
         {
             certStore.commitNextSerialIfLess(caEntry.getName(), caEntry.getNextSerial());
         }
@@ -448,7 +447,7 @@ public class X509CAInfo
     public void markMaxSerial()
     throws OperationException
     {
-        if (useRandomSerialNumber == false)
+        if (!useRandomSerialNumber)
         {
             certStore.markMaxSerial(getCertificate(), caEntry.getSerialSeqName());
         }

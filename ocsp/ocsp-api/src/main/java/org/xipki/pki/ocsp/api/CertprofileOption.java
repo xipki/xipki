@@ -58,8 +58,7 @@ public class CertprofileOption
         if (CollectionUtil.isEmpty(includes))
         {
             this.includes = null;
-        }
-        else
+        } else
         {
             this.includes = Collections.unmodifiableSet(
                     new HashSet<>(includes));
@@ -68,8 +67,7 @@ public class CertprofileOption
         if (CollectionUtil.isEmpty(excludes))
         {
             this.excludes = null;
-        }
-        else
+        } else
         {
             this.excludes = Collections.unmodifiableSet(
                     new HashSet<>(excludes));
@@ -93,16 +91,16 @@ public class CertprofileOption
         {
             return (excludes == null)
                     ? true
-                    : excludes.contains(certprofile) == false;
+                    : !excludes.contains(certprofile);
         }
 
-        if (includes.contains(certprofile) == false)
+        if (!includes.contains(certprofile))
         {
             return false;
         }
 
         return (excludes == null)
                 ? true
-                : excludes.contains(certprofile) == false;
+                : !excludes.contains(certprofile);
     }
 }

@@ -154,7 +154,7 @@ public class ScepServlet extends HttpServlet
         try
         {
             CACaps cACaps = responder.getCACaps();
-            if (post && cACaps.containsCapability(CACapability.POSTPKIOperation) == false)
+            if (post && !cACaps.containsCapability(CACapability.POSTPKIOperation))
             {
                 final String message = "HTTP POST is not supported";
                 LOG.error(message);
@@ -246,16 +246,14 @@ public class ScepServlet extends HttpServlet
                 response.setContentType(CT_RESPONSE);
                 response.setContentLength(respBytes.length);
                 respStream.write(respBytes);
-            }
-            else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation))
+            } else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation))
             {
                 // CA-Ident is ignored
                 response.setContentType(ScepConstants.CT_text_palin);
                 byte[] caCapsBytes = responder.getCACaps().getBytes();
                 respStream.write(caCapsBytes);
                 response.setContentLength(caCapsBytes.length);
-            }
-            else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation))
+            } else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation))
             {
                 // CA-Ident is ignored
                 byte[] respBytes;
@@ -264,8 +262,7 @@ public class ScepServlet extends HttpServlet
                 {
                     ct = ScepConstants.CT_x_x509_ca_cert;
                     respBytes = responder.getCAEmulator().getCACertBytes();
-                }
-                else
+                } else
                 {
                     ct = ScepConstants.CT_x_x509_ca_ra_cert;
                     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
@@ -300,8 +297,7 @@ public class ScepServlet extends HttpServlet
                 response.setContentType(ct);
                 response.setContentLength(respBytes.length);
                 respStream.write(respBytes);
-            }
-            else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation))
+            } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation))
             {
                 if (responder.getNextCAandRA() == null)
                 {
@@ -347,8 +343,7 @@ public class ScepServlet extends HttpServlet
                     auditMessage = message;
                     auditStatus = AuditStatus.FAILED;
                 }
-            }
-            else
+            } else
             {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.setContentLength(0);

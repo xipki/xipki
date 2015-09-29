@@ -387,13 +387,12 @@ public class SubjectDNSpec
         if (stringType != null)
         {
             if (stringTypeSets.containsKey(type)
-                    && stringTypeSets.get(type).contains(stringType) == false)
+                    && !stringTypeSets.get(type).contains(stringType))
             {
                 throw new CertprofileException(stringType.name() + " is not allowed "
                         + type.getId());
             }
-        }
-        else
+        } else
         {
             StringType specStrType = defaultStringTypes.get(type);
             if (specStrType != null)
@@ -414,8 +413,7 @@ public class SubjectDNSpec
             if (isRange == null)
             {
                 control.setStringLengthRange(specRange);
-            }
-            else
+            } else
             {
                 boolean changed = false;
                 Integer specMin = specRange.getMin();
@@ -424,8 +422,7 @@ public class SubjectDNSpec
                 {
                     changed = true;
                     min = specMin;
-                }
-                else if (specMin != null && specMin > min)
+                } else if (specMin != null && specMin > min)
                 {
                     changed = true;
                     min = specMin;
@@ -437,8 +434,7 @@ public class SubjectDNSpec
                 {
                     changed = true;
                     max = specMax;
-                }
-                else if (specMax != null && specMax < max)
+                } else if (specMax != null && specMax < max)
                 {
                     changed = true;
                     max = specMax;

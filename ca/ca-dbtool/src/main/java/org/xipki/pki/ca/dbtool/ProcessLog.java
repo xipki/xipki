@@ -35,6 +35,7 @@
 
 package org.xipki.pki.ca.dbtool;
 
+import java.util.Calendar;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.xipki.common.qa.MeasurePoint;
@@ -46,7 +47,8 @@ import org.xipki.common.util.StringUtil;
 
 public class ProcessLog
 {
-    private static final long MS_800 = 900L;
+    private static final long MS_900 = 900L;
+    private static final long DAY_IN_SEC = 24L * 60 * 60;
 
     private final long total;
     private final long startTime;
@@ -59,16 +61,23 @@ public class ProcessLog
     public static void printHeader()
     {
         System.out.println(
-                "----------------------------------------------------------------------------");
+        "------------------------------------------------------------------------------------");
+
         System.out.println(
-                "    processed   percent       time       #/s        ETA   AVG-#/s    AVG-ETA");
+        "   processed   processed     average     current     elapsed   remaining      finish");
+
+        System.out.println(
+        "      number     percent       speed       speed        time        time          at");
+
+        System.out.println();
         System.out.flush();
     }
 
     public static void printTrailer()
     {
         System.out.println(
-                "\n----------------------------------------------------------------------------");
+        "\n------------------------------------------------------------------------------------");
+
         System.out.flush();
     }
 
@@ -119,7 +128,7 @@ public class ProcessLog
             final boolean forcePrint)
     {
         final long now = System.currentTimeMillis();
-        if (forcePrint == false && now - lastPrintTime < MS_800)
+        if (!forcePrint && now - lastPrintTime < MS_900)
         {
             return;
         }
@@ -127,75 +136,128 @@ public class ProcessLog
         measureDeque.addLast(new MeasurePoint(now, numProcessed));
         lastPrintTime = now;
 
-        StringBuilder sb = new StringBuilder("\r");
-        sb.append(StringUtil.formatAccount(numProcessed, true));
-
-        // 10 characters for processed percent
-        String percent = (total > 0)
-                ? Long.toString(numProcessed * 100 / total)
-                : "--";
-        for (int i = 0; i < 9 - percent.length(); i++)
-        {
-            sb.append(" ");
-        }
-        sb.append(percent).append('%');
-
-        long t = (now - startTime) / 1000;  // in s
-        String time = StringUtil.formatTime(t, true);
-        sb.append("  ");
-        sb.append(time);
-
         MeasurePoint referenceMeasurePoint;
         int numMeasurePoints = measureDeque.size();
         if (numMeasurePoints > 10)
         {
             referenceMeasurePoint = measureDeque.removeFirst();
-        }
-        else
+        } else
         {
             referenceMeasurePoint = measureDeque.getFirst();
         }
 
-        long speed = 0;
+        // percent
+        long percent = numProcessed * 100 / total;
+
+        // elapsed time in ms
+        long elapsedTimeMs = now - startTime;
+
+        // current speed
+        long currentSpeed = 0;
         long t2inms = now - referenceMeasurePoint.getMeasureTime(); // in ms
         if (t2inms > 0)
         {
-            speed = (numProcessed - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
-        }
-        sb.append(StringUtil.formatSpeed(speed, true));
-
-        if (total > 0 && speed > 0)
-        {
-            long remaining = (total - numProcessed) / speed;
-            sb.append("  ");
-            sb.append(StringUtil.formatTime(remaining, true));
-        } else
-        {
-            sb.append("        --");
+            currentSpeed =
+                    (numProcessed - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
         }
 
-        // average
-
-        speed = 0;
-        long t2 = now - startTime;
-        if (t2 > 0)
+        // average speed
+        long averageSpeed = 0;
+        if (elapsedTimeMs > 0)
         {
-            speed = numProcessed * 1000 / t2;
+            averageSpeed = numProcessed * 1000 / elapsedTimeMs;
         }
-        sb.append(StringUtil.formatSpeed(speed, true));
 
-        if (total > 0 && speed > 0)
+        // remaining time
+        long remaingTimeMs = 0;
+        if (currentSpeed > 0)
         {
-            long remaining = (total - numProcessed) / speed;
-            sb.append("  ");
-            sb.append(StringUtil.formatTime(remaining, true));
-        } else
-        {
-            sb.append("        --");
+            remaingTimeMs = (total - numProcessed) * 1000 / currentSpeed;
         }
+
+        // finish at
+        long finishAtMs = System.currentTimeMillis() + remaingTimeMs;
+
+        StringBuilder sb = new StringBuilder("\r");
+
+        // processed number
+        sb.append(StringUtil.formatAccount(numProcessed, true));
+
+        // processed percent
+        String percentS = Long.toString(percent);
+        for (int i = 0; i < 11 - percentS.length(); i++)
+        {
+            sb.append(" ");
+        }
+        sb.append(percent).append('%');
+
+        // average speed
+        sb.append(StringUtil.formatAccount(averageSpeed, true));
+
+        // current speed
+        sb.append(StringUtil.formatAccount(currentSpeed, true));
+
+        // elapsed time
+        sb.append(StringUtil.formatTime(elapsedTimeMs / 1000, true));
+
+        // remaining time
+        sb.append(StringUtil.formatTime(remaingTimeMs / 1000, true));
+
+        // finish at
+        sb.append(buildDateTime(finishAtMs));
 
         System.out.print(sb.toString());
         System.out.flush();
+    }
+
+    private static String buildDateTime(long timeMs)
+    {
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(timeMs);
+        int h = c.get(Calendar.HOUR_OF_DAY);
+        int m = c.get(Calendar.MINUTE);
+        int s = c.get(Calendar.SECOND);
+
+        c.setTimeInMillis(System.currentTimeMillis());
+        c.set(Calendar.HOUR, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        long midNightSec = c.getTimeInMillis() / 1000;
+
+        long days = (timeMs / 1000 - midNightSec) / DAY_IN_SEC;
+        StringBuilder sb = new StringBuilder();
+        if (h < 10)
+        {
+            sb.append('0');
+        }
+        sb.append(h);
+
+        sb.append(":");
+        if (m < 10)
+        {
+            sb.append('0');
+        }
+        sb.append(m);
+
+        sb.append(":");
+        if (s < 10)
+        {
+            sb.append('0');
+        }
+        sb.append(s);
+
+        if (days > 0)
+        {
+            sb.append("+").append(days);
+        }
+
+        int size = sb.length();
+        for (int i = 0; i < (12 - size); i++)
+        {
+            sb.insert(0, ' ');
+        }
+
+        return sb.toString();
     }
 
 }

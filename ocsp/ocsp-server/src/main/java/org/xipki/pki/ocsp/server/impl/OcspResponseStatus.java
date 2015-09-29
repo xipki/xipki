@@ -41,7 +41,7 @@ package org.xipki.pki.ocsp.server.impl;
 
 public enum OcspResponseStatus
 {
-    successfull(0),
+    successful(0),
     malformedRequest(1),
     internalError(2),
     tryLater(3),

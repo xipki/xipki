@@ -104,8 +104,7 @@ public class GetCRLCmd extends CRLCmd
             if (caNames.size() == 1)
             {
                 caName = caNames.iterator().next();
-            }
-            else
+            } else
             {
                 throw new IllegalCmdParamException("no caname is specified, one of " + caNames
                         + " is required");
@@ -156,8 +155,7 @@ public class GetCRLCmd extends CRLCmd
                 if (crl == null)
                 {
                     throw new CmdFailure("received no baseCRL from server");
-                }
-                else
+                } else
                 {
                     saveVerbose("saved baseCRL to file", new File(baseCRLOut), crl.getEncoded());
                 }

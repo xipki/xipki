@@ -62,7 +62,7 @@ public class InitDbAllCmd extends LiquibaseCmd
 
         for (String dbName : dbConfs.keySet())
         {
-            if (dbName.toLowerCase().contains("ocsp") == false)
+            if (!dbName.toLowerCase().contains("ocsp"))
             {
                 continue;
             }

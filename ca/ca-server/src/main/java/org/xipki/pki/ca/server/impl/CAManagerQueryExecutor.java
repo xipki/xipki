@@ -534,7 +534,7 @@ class CAManagerQueryExecutor
             stmt.setString(1, name);
             rs = stmt.executeQuery();
 
-            if (rs.next() == false)
+            if (!rs.next())
             {
                 return null;
             }
@@ -565,7 +565,7 @@ class CAManagerQueryExecutor
             stmt.setString(1, name);
             rs = stmt.executeQuery();
 
-            if (rs.next() == false)
+            if (!rs.next())
             {
                 return null;
             }
@@ -928,7 +928,7 @@ class CAManagerQueryExecutor
             final CAEntry caEntry)
     throws CAMgmtException
     {
-        if (caEntry instanceof X509CAEntry == false)
+        if (!(caEntry instanceof X509CAEntry))
         {
             throw new CAMgmtException("unsupported CAEntry " + caEntry.getClass().getName());
         }
@@ -1332,7 +1332,7 @@ class CAManagerQueryExecutor
             final SecurityFactory securityFactory)
     throws CAMgmtException
     {
-        if (changeCAEntry instanceof X509ChangeCAEntry == false)
+        if (!(changeCAEntry instanceof X509ChangeCAEntry))
         {
             throw new CAMgmtException(
                     "unsupported ChangeCAEntry " + changeCAEntry.getClass().getName());
@@ -1373,7 +1373,7 @@ class CAManagerQueryExecutor
                 stmt = prepareStatement(sql);
                 stmt.setString(1, name);
                 rs = stmt.executeQuery();
-                if (rs.next() == false)
+                if (!rs.next())
                 {
                     throw new CAMgmtException("no CA '" + name + "' is defined");
                 }
@@ -1395,8 +1395,7 @@ class CAManagerQueryExecutor
                 if (cert != null)
                 {
                     _cert = cert;
-                }
-                else
+                } else
                 {
                     try
                     {
@@ -1908,8 +1907,7 @@ class CAManagerQueryExecutor
                 if (txt == null)
                 {
                     m.append("null");
-                }
-                else
+                } else
                 {
                     try
                     {
@@ -1982,8 +1980,7 @@ class CAManagerQueryExecutor
         {
             signerConf = null;
             base64Cert = null;
-        }
-        else
+        } else
         {
             if (signerConf == null)
             {
@@ -2184,8 +2181,7 @@ class CAManagerQueryExecutor
                 if (txt == null)
                 {
                     m.append("null");
-                }
-                else
+                } else
                 {
                     try
                     {
@@ -2955,8 +2951,7 @@ class CAManagerQueryExecutor
                 permissions.clear();
                 permissions.add(p);
                 break;
-            }
-            else
+            } else
             {
                 permissions.add(p);
             }

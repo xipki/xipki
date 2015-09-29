@@ -124,7 +124,7 @@ public class HttpCmpServlet extends HttpServlet
                 return;
             }
 
-            if (CT_REQUEST.equalsIgnoreCase(request.getContentType()) == false)
+            if (!CT_REQUEST.equalsIgnoreCase(request.getContentType()))
             {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -152,17 +152,15 @@ public class HttpCmpServlet extends HttpServlet
                 responder = responderManager.getX509CACmpResponder(caName);
             }
 
-            if (caName == null || responder == null || responder.isInService() == false)
+            if (caName == null || responder == null || !responder.isInService())
             {
                 if (caName == null)
                 {
                     auditMessage = "no CA is specified";
-                }
-                else if (responder == null)
+                } else if (responder == null)
                 {
                     auditMessage = "unknown CA '" + caName + "'";
-                }
-                else
+                } else
                 {
                     auditMessage = "CA '" + caName + "' is out of service";
                 }
@@ -315,11 +313,10 @@ public class HttpCmpServlet extends HttpServlet
 
         auditEvent.setDuration(System.currentTimeMillis() - auditEvent.getTimestamp().getTime());
 
-        if (auditEvent.containsChildAuditEvents() == false)
+        if (!auditEvent.containsChildAuditEvents())
         {
             auditService.logEvent(auditEvent);
-        }
-        else
+        } else
         {
             List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
             for (AuditEvent event : expandedAuditEvents)

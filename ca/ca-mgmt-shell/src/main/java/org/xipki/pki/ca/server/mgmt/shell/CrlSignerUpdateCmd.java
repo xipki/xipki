@@ -93,8 +93,7 @@ public class CrlSignerUpdateCmd extends CaCmd
         if (CAManager.NULL.equalsIgnoreCase(signerCert))
         {
             signerCertConf = CAManager.NULL;
-        }
-        else if (signerCert != null)
+        } else if (signerCert != null)
         {
             byte[] certBytes = IoUtil.read(signerCert);
             X509Util.parseCert(new ByteArrayInputStream(certBytes));

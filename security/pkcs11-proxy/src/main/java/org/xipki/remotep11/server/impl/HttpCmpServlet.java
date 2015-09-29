@@ -89,7 +89,7 @@ public class HttpCmpServlet extends HttpServlet
                 return;
             }
 
-            if (CT_REQUEST.equalsIgnoreCase(request.getContentType()) == false)
+            if (!CT_REQUEST.equalsIgnoreCase(request.getContentType()))
             {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -124,7 +124,7 @@ public class HttpCmpServlet extends HttpServlet
             {
                 constructedPath = URLDecoder.decode(encodedUrl, "UTF-8");
                 String servletPath = request.getServletPath();
-                if (servletPath.endsWith("/") == false)
+                if (!servletPath.endsWith("/"))
                 {
                     servletPath += "/";
                     if (servletPath.startsWith(constructedPath))

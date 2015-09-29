@@ -117,7 +117,7 @@ public class NextCAMessage
             {
                 CMSSignedDataGenerator degenerateSignedData = new CMSSignedDataGenerator();
                 degenerateSignedData.addCertificate(new X509CertificateHolder(caCert.getEncoded()));
-                if (raCerts != null && raCerts.isEmpty() == false)
+                if (raCerts != null && !raCerts.isEmpty())
                 {
                     for (X509Certificate m : raCerts)
                     {

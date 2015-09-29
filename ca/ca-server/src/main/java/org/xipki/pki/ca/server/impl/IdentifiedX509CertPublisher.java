@@ -79,8 +79,7 @@ class IdentifiedX509CertPublisher
         if ("ocsp".equalsIgnoreCase(type))
         {
             realPublisher = new OCSPCertPublisher();
-        }
-        else if (StringUtil.startsWithIgnoreCase(type, "java:"))
+        } else if (StringUtil.startsWithIgnoreCase(type, "java:"))
         {
             String className = type.substring("java:".length());
             try
@@ -91,8 +90,7 @@ class IdentifiedX509CertPublisher
             {
                 throw new CertPublisherException("invalid type " + type + ", " + e.getMessage());
             }
-        }
-        else
+        } else
         {
             throw new CertPublisherException("invalid type " + type);
         }

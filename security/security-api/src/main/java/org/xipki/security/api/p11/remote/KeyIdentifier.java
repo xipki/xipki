@@ -90,8 +90,7 @@ public class KeyIdentifier extends ASN1Object
                 byte[] keyIdBytes = ((ASN1OctetString) obj).getOctets();
                 P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(keyIdBytes);
                 return new KeyIdentifier(keyIdentifier);
-            }
-            else if (obj instanceof ASN1String)
+            } else if (obj instanceof ASN1String)
             {
                 String keyLabel = ((ASN1String) obj).getString();
                 P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(keyLabel);
@@ -117,8 +116,7 @@ public class KeyIdentifier extends ASN1Object
         if (keyId.getKeyLabel() != null)
         {
             return new DERUTF8String(keyId.getKeyLabel());
-        }
-        else
+        } else
         {
             return new DEROctetString(keyId.getKeyId());
         }

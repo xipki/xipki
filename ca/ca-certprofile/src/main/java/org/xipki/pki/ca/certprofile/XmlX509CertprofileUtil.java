@@ -172,8 +172,7 @@ public class XmlX509CertprofileUtil
             if (rootType instanceof X509ProfileType)
             {
                 return (X509ProfileType) rootElement.getValue();
-            }
-            else
+            } else
             {
                 throw new CertprofileException("invalid root element type");
             }
@@ -211,8 +210,7 @@ public class XmlX509CertprofileUtil
                     if ("cpsUri".equals(elementName))
                     {
                         qualifier = CertificatePolicyQualifier.getInstanceForCpsUri(elementValue);
-                    }
-                    else
+                    } else
                     {
                         qualifier = CertificatePolicyQualifier.getInstanceForUserNotice(
                                 elementValue);
@@ -295,24 +293,19 @@ public class XmlX509CertprofileUtil
         {
             base = new GeneralName(X509Util.reverse(
                     new X500Name(type.getDirectoryName())));
-        }
-        else if (type.getDNSName() != null)
+        } else if (type.getDNSName() != null)
         {
             base = new GeneralName(GeneralName.dNSName, type.getDNSName());
-        }
-        else if (type.getIpAddress() != null)
+        } else if (type.getIpAddress() != null)
         {
             base = new GeneralName(GeneralName.iPAddress, type.getIpAddress());
-        }
-        else if (type.getRfc822Name() != null)
+        } else if (type.getRfc822Name() != null)
         {
             base = new GeneralName(GeneralName.rfc822Name, type.getRfc822Name());
-        }
-        else if (type.getUri() != null)
+        } else if (type.getUri() != null)
         {
             base = new GeneralName(GeneralName.uniformResourceIdentifier, type.getUri());
-        }
-        else
+        } else
         {
             throw new RuntimeException(
                     "should not reach here, unknown child of GeneralSubtreeBaseType");
@@ -596,7 +589,8 @@ public class XmlX509CertprofileUtil
 
         for (ExtensionType m : extensionsType.getExtension())
         {
-            if (m.getValue() == null || m.getValue().getAny() instanceof ConstantExtValue == false)
+            if (m.getValue() == null
+                    || !(m.getValue().getAny() instanceof ConstantExtValue))
             {
                 continue;
             }
@@ -679,8 +673,7 @@ public class XmlX509CertprofileUtil
             }
 
             return option;
-        }
-        else if (paramsObj instanceof RSAParameters)
+        } else if (paramsObj instanceof RSAParameters)
         {
             RSAParameters params = (RSAParameters) paramsObj;
             KeyParametersOption.RSAParametersOption option =
@@ -690,8 +683,7 @@ public class XmlX509CertprofileUtil
             option.setModulusLengths(modulusLengths);
 
             return option;
-        }
-        else if (paramsObj instanceof RSAPSSParameters)
+        } else if (paramsObj instanceof RSAPSSParameters)
         {
             RSAPSSParameters params = (RSAPSSParameters) paramsObj;
             KeyParametersOption.RSAPSSParametersOption option =
@@ -701,8 +693,7 @@ public class XmlX509CertprofileUtil
             option.setModulusLengths(modulusLengths);
 
             return option;
-        }
-        else if (paramsObj instanceof DSAParameters)
+        } else if (paramsObj instanceof DSAParameters)
         {
             DSAParameters params = (DSAParameters) paramsObj;
             KeyParametersOption.DSAParametersOption option =
@@ -715,8 +706,7 @@ public class XmlX509CertprofileUtil
             option.setQLengths(qLengths);
 
             return option;
-        }
-        else if (paramsObj instanceof DHParameters)
+        } else if (paramsObj instanceof DHParameters)
         {
             DHParameters params = (DHParameters) paramsObj;
             KeyParametersOption.DHParametersOption option =
@@ -729,8 +719,7 @@ public class XmlX509CertprofileUtil
             option.setQLengths(qLengths);
 
             return option;
-        }
-        else if (paramsObj instanceof GostParameters)
+        } else if (paramsObj instanceof GostParameters)
         {
             GostParameters params = (GostParameters) paramsObj;
             KeyParametersOption.GostParametersOption option =
@@ -746,8 +735,7 @@ public class XmlX509CertprofileUtil
             option.setEncryptionParamSets(set);
 
             return option;
-        }
-        else
+        } else
         {
             throw new CertprofileException(
                     "unknown public key parameters type " + paramsObj.getClass().getName());

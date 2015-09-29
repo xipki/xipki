@@ -82,8 +82,7 @@ public class X509CrlSignerEntry implements Serializable
         if ("CA".equalsIgnoreCase(name))
         {
             this.base64Cert = null;
-        }
-        else
+        } else
         {
             this.base64Cert = base64Cert;
         }
@@ -207,8 +206,7 @@ public class X509CrlSignerEntry implements Serializable
                     sb.append("ERROR");
                 }
             }
-        }
-        else
+        } else
         {
             sb.append("cert: null\n");
         }

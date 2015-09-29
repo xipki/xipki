@@ -76,14 +76,13 @@ public class CaProfileInfoCmd extends CaCmd
                 String name = entries.get(localname);
                 sb.append("\t");
                 sb.append(name);
-                if (name.equals(localname) == false)
+                if (!name.equals(localname))
                 {
                     sb.append(" (localname ").append(localname).append(")");
                 }
                 sb.append("\n");
             }
-        }
-        else
+        } else
         {
             sb.append("\tno profile for CA " + caName + " is configured");
         }

@@ -212,8 +212,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         {
             ASN1ObjectIdentifier type = CMPObjectIdentifiers.it_currentCRL;
             request = buildMessageWithGeneralMsgContent(type, null);
-        }
-        else
+        } else
         {
             action = XipkiCmpConstants.ACTION_GET_CRL_WITH_SN;
             request = buildMessageWithXipkAction(action, new ASN1Integer(crlNumber));
@@ -237,8 +236,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
             throw new PKIErrorException(content.getPKIStatusInfo());
-        }
-        else if (PKIBody.TYPE_GEN_REP != bodyType)
+        } else if (PKIBody.TYPE_GEN_REP != bodyType)
         {
             throw new CmpRequestorException("unknown PKI body type " + bodyType
                     + " instead the exceptected [" + PKIBody.TYPE_GEN_REP  + ", "
@@ -274,8 +272,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         if (xipkiAction == null)
         {
             certListAsn1Object = itv.getInfoValue();
-        }
-        else
+        } else
         {
             certListAsn1Object = extractXipkiActionContent(itv.getInfoValue(), xipkiAction);
         }
@@ -342,8 +339,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
             throw new PKIErrorException(content.getPKIStatusInfo());
-        }
-        else if (PKIBody.TYPE_REVOCATION_REP != bodyType)
+        } else if (PKIBody.TYPE_REVOCATION_REP != bodyType)
         {
             throw new CmpRequestorException("unknown PKI body type " + bodyType
                     + " instead the exceptected [" + PKIBody.TYPE_REVOCATION_REP  + ", "
@@ -471,9 +467,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
             throw new PKIErrorException(content.getPKIStatusInfo());
-        }
-
-        else if (expectedBodyType != bodyType)
+        } else if (expectedBodyType != bodyType)
         {
             throw new CmpRequestorException("unknown PKI body type " + bodyType
                     + " instead the exceptected [" + expectedBodyType  + ", "
@@ -515,8 +509,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             if (thisId != null)
             {
                 reqIdIdMap.remove(certReqId);
-            }
-            else if (reqIdIdMap.size() == 1)
+            } else if (reqIdIdMap.size() == 1)
             {
                 thisId = reqIdIdMap.values().iterator().next();
                 reqIdIdMap.clear();
@@ -544,7 +537,7 @@ abstract class X509CmpRequestor extends CmpRequestor
 
                 resultEntry = new EnrollCertResultEntryType(thisId, cmpCert, status);
 
-                if (isImplicitConfirm == false)
+                if (!isImplicitConfirm)
                 {
                     requireConfirm = true;
                     X509CertificateHolder certHolder = null;
@@ -564,8 +557,7 @@ abstract class X509CmpRequestor extends CmpRequestor
                         certConfirmBuilder.addAcceptedCertificate(certHolder, certReqId);
                     }
                 }
-            }
-            else
+            } else
             {
                 PKIFreeText statusString = statusInfo.getStatusString();
                 String errorMessage = (statusString == null)
@@ -588,7 +580,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             }
         }
 
-        if (requireConfirm == false)
+        if (!requireConfirm)
         {
             return result;
         }

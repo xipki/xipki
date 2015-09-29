@@ -322,8 +322,7 @@ public abstract class EnrollCertCmd extends ClientCmd
             if (StringUtil.isNumber(biometricType))
             {
                 _biometricType = new TypeOfBiometricData(Integer.parseInt(biometricType));
-            }
-            else
+            } else
             {
                 _biometricType = new TypeOfBiometricData(new ASN1ObjectIdentifier(biometricType));
             }
@@ -351,12 +350,10 @@ public abstract class EnrollCertCmd extends ClientCmd
             ASN1Sequence extValue = new DERSequence(v);
             extensions.add(new Extension(extType, false, extValue.getEncoded()));
             needExtensionTypes.add(extType.getId());
-        }
-        else if (biometricType == null && biometricHashAlgo == null && biometricFile == null)
+        } else if (biometricType == null && biometricHashAlgo == null && biometricFile == null)
         {
             // Do nothing
-        }
-        else
+        } else
         {
             throw new Exception("either all of biometric triples (type, hash algo, file)"
                     + " must be set or none of them should be set");

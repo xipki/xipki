@@ -66,7 +66,7 @@ public class P11ModuleNameCompleter extends DynamicEnumCompleter
             return Collections.emptySet();
         }
         Set<String> ret = new HashSet<>(names);
-        if (ret.contains(SecurityFactory.DEFAULT_P11MODULE_NAME) == false)
+        if (!ret.contains(SecurityFactory.DEFAULT_P11MODULE_NAME))
         {
             ret.add(SecurityFactory.DEFAULT_P11MODULE_NAME);
         }

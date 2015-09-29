@@ -78,8 +78,7 @@ public class ProfileInfoCmd extends CaCmd
                         ? "no"
                         : "1");
                 sb.append(" profile is configured\n");
-            }
-            else
+            } else
             {
                 sb.append(n).append(" profiles are configured:\n");
             }
@@ -91,15 +90,13 @@ public class ProfileInfoCmd extends CaCmd
             {
                 sb.append("\t").append(name).append("\n");
             }
-        }
-        else
+        } else
         {
             CertprofileEntry entry = caManager.getCertprofile(name);
             if (entry == null)
             {
                 throw new UnexpectedException("\tno certprofile named '" + name + " is configured");
-            }
-            else
+            } else
             {
                 sb.append(entry.toString(verbose));
             }

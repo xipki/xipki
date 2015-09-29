@@ -53,9 +53,9 @@ import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.password.api.PasswordResolverException;
-import org.xipki.pki.ca.dbtool.DbPortWorker;
-import org.xipki.pki.ca.dbtool.DbPorter;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DbSchemaType;
+import org.xipki.pki.ca.dbtool.port.DbPortWorker;
+import org.xipki.pki.ca.dbtool.port.DbPorter;
 
 /**
  * @author Lijun Liao
@@ -77,18 +77,17 @@ public class DbDigestExportWorker extends DbPortWorker
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         File f = new File(destFolder);
-        if (f.exists() == false)
+        if (!f.exists())
         {
             f.mkdirs();
-        }
-        else
+        } else
         {
-            if (f.isDirectory() == false)
+            if (!f.isDirectory())
             {
                 throw new IOException(destFolder + " is not a folder");
             }
 
-            if (f.canWrite() == false)
+            if (!f.canWrite())
             {
                 throw new IOException(destFolder + " is not writable");
             }
@@ -154,13 +153,11 @@ public class DbDigestExportWorker extends DbPortWorker
                     && dataSource.tableExists(conn, "RAWCERT"))
             {
                 return DbSchemaType.XIPKI_CA_v1;
-            }
-            else if (dataSource.tableExists(conn, "ISSUER")
+            } else if (dataSource.tableExists(conn, "ISSUER")
                     && dataSource.tableExists(conn, "CERTHASH"))
             {
                 return DbSchemaType.XIPKI_OCSP_v1;
-            }
-            else if (dataSource.tableExists(conn, "CS_CA")
+            } else if (dataSource.tableExists(conn, "CS_CA")
                     && dataSource.tableExists(conn, "CRAW"))
             {
                 return DbSchemaType.XIPKI_CA_v2;

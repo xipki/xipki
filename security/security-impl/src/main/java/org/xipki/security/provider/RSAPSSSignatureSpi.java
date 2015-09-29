@@ -93,8 +93,7 @@ class RSAPSSSignatureSpi
         if (isRaw)
         {
             this.contentDigest = new NullPssDigest(mgfDigest);
-        }
-        else
+        } else
         {
             this.contentDigest = mgfDigest;
         }
@@ -115,8 +114,7 @@ class RSAPSSSignatureSpi
         if (baseParamSpec == null)
         {
             this.paramSpec = PSSParameterSpec.DEFAULT;
-        }
-        else
+        } else
         {
             this.paramSpec = baseParamSpec;
         }
@@ -141,14 +139,14 @@ class RSAPSSSignatureSpi
             final SecureRandom random)
     throws InvalidKeyException
     {
-        if (privateKey instanceof P11PrivateKey == false)
+        if (!(privateKey instanceof P11PrivateKey))
         {
             throw new InvalidKeyException("privateKey is not instanceof "
                     + P11PrivateKey.class.getName());
         }
 
         String algo = privateKey.getAlgorithm();
-        if ("RSA".equals(algo) == false)
+        if (!"RSA".equals(algo))
         {
             throw new InvalidKeyException("privateKey is not an RSA private key: " + algo);
         }
@@ -217,29 +215,29 @@ class RSAPSSSignatureSpi
 
             if (originalSpec != null)
             {
-                if (DigestFactory.isSameDigest(originalSpec.getDigestAlgorithm(),
-                        newParamSpec.getDigestAlgorithm()) == false)
+                if (!DigestFactory.isSameDigest(originalSpec.getDigestAlgorithm(),
+                        newParamSpec.getDigestAlgorithm()))
                 {
                     throw new InvalidParameterException("parameter must be using "
                 + originalSpec.getDigestAlgorithm());
                 }
             }
-            if ((newParamSpec.getMGFAlgorithm().equalsIgnoreCase("MGF1") == false)
-                    && (newParamSpec.getMGFAlgorithm().equals(
-                            PKCSObjectIdentifiers.id_mgf1.getId()) == false))
+            if (!newParamSpec.getMGFAlgorithm().equalsIgnoreCase("MGF1")
+                    && !newParamSpec.getMGFAlgorithm().equals(
+                            PKCSObjectIdentifiers.id_mgf1.getId()))
             {
                 throw new InvalidParameterException("unknown mask generation function specified");
             }
 
-            if ((newParamSpec.getMGFParameters() instanceof MGF1ParameterSpec) == false)
+            if (!(newParamSpec.getMGFParameters() instanceof MGF1ParameterSpec))
             {
                 throw new InvalidParameterException("unkown MGF parameters");
             }
 
             MGF1ParameterSpec mgfParams = (MGF1ParameterSpec) newParamSpec.getMGFParameters();
 
-            if (DigestFactory.isSameDigest(mgfParams.getDigestAlgorithm(),
-                    newParamSpec.getDigestAlgorithm()) == false)
+            if (!DigestFactory.isSameDigest(mgfParams.getDigestAlgorithm(),
+                    newParamSpec.getDigestAlgorithm()))
             {
                 throw new InvalidParameterException(
                         "digest algorithm for MGF should be the same as for PSS parameters.");
@@ -260,8 +258,7 @@ class RSAPSSSignatureSpi
             this.trailer = getTrailer(paramSpec.getTrailerField());
 
             setupContentDigest();
-        }
-        else
+        } else
         {
             throw new InvalidParameterException("only PSSParameterSpec supported");
         }
@@ -423,8 +420,7 @@ class RSAPSSSignatureSpi
             if (oddTime)
             {
                 System.arraycopy(res, 0, out, outOff, res.length);
-            }
-            else
+            } else
             {
                 baseDigest.update(res, 0, res.length);
 

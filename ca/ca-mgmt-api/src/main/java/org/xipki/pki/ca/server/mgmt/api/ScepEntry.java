@@ -202,8 +202,7 @@ implements Serializable
                     sb.append("ERROR");
                 }
             }
-        }
-        else
+        } else
         {
             sb.append("cert: null\n");
         }

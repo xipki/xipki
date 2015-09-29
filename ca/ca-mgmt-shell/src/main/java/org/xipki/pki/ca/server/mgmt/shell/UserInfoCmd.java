@@ -62,8 +62,7 @@ public class UserInfoCmd extends CaCmd
         if (userEntry == null)
         {
             throw new UnexpectedException("\tno user named '" + name + "' is configured");
-        }
-        else
+        } else
         {
             sb.append(name).append("\n\t").append(userEntry);
         }

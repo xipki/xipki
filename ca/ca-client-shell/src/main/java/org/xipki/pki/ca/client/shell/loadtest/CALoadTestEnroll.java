@@ -133,7 +133,7 @@ public class CALoadTestEnroll extends LoadExecutor
         @Override
         public void run()
         {
-            while (stop() == false && getErrorAccout() < 1)
+            while (!stop() && getErrorAccout() < 1)
             {
                 Map<Integer, CertRequest> certReqs = nextCertRequests();
                 if (certReqs != null)
@@ -143,8 +143,7 @@ public class CALoadTestEnroll extends LoadExecutor
                             ? 0
                             : 1;
                     account(1, numFailed);
-                }
-                else
+                } else
                 {
                     account(1, 1);
                 }

@@ -127,7 +127,7 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
                     isValidContentType = true;
                 }
             }
-            if (isValidContentType == false)
+            if (!isValidContentType)
             {
                 throw new IOException("bad response: mime type "
                         + responseContentType

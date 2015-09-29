@@ -81,8 +81,7 @@ public class DSAPlainDigestSigner
         if (parameters instanceof ParametersWithRandom)
         {
             k = (AsymmetricKeyParameter) ((ParametersWithRandom) parameters).getParameters();
-        }
-        else
+        } else
         {
             k = (AsymmetricKeyParameter) parameters;
         }
@@ -91,20 +90,16 @@ public class DSAPlainDigestSigner
         if (k instanceof ECPublicKeyParameters)
         {
             keyBitLen = ((ECPublicKeyParameters) k).getParameters().getCurve().getFieldSize();
-        }
-        else if (k instanceof ECPrivateKeyParameters)
+        } else if (k instanceof ECPrivateKeyParameters)
         {
             keyBitLen = ((ECPrivateKeyParameters) k).getParameters().getCurve().getFieldSize();
-        }
-        else if (k instanceof DSAPublicKeyParameters)
+        } else if (k instanceof DSAPublicKeyParameters)
         {
             keyBitLen = ((DSAPublicKeyParameters) k).getParameters().getQ().bitLength();
-        }
-        else if (k instanceof DSAPrivateKeyParameters)
+        } else if (k instanceof DSAPrivateKeyParameters)
         {
             keyBitLen = ((DSAPrivateKeyParameters) k).getParameters().getQ().bitLength();
-        }
-        else
+        } else
         {
             throw new IllegalArgumentException("unknown parameters: " + k.getClass().getName());
         }

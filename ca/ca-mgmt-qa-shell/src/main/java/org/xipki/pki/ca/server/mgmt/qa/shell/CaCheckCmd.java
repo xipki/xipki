@@ -75,7 +75,7 @@ public class CaCheckCmd extends CaUpdateCmd
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
 
-        if (entry instanceof X509CAEntry == false)
+        if (!(entry instanceof X509CAEntry))
         {
             throw new UnexpectedException("CA '" + caName + "' is not an X509-CA");
         }
@@ -95,7 +95,7 @@ public class CaCheckCmd extends CaUpdateCmd
         {
             X509Certificate ex = ey.getCert();
             X509Certificate is = ca.getCertificate();
-            if (ex.equals(is) == false)
+            if (!ex.equals(is))
             {
                 throw new CmdFailure("CA cert is not as expected");
             }
@@ -138,7 +138,7 @@ public class CaCheckCmd extends CaUpdateCmd
         {
             DuplicationMode ex = ey.getDuplicateKeyMode();
             DuplicationMode is = ca.getDuplicateKeyMode();
-            if (ex.equals(is) == false)
+            if (!ex.equals(is))
             {
                 throw new CmdFailure("Duplicate key mode: is '" + is
                         + "', but expected '" + ex + "'");
@@ -150,7 +150,7 @@ public class CaCheckCmd extends CaUpdateCmd
         {
             DuplicationMode ex = ey.getDuplicateSubjectMode();
             DuplicationMode is = ca.getDuplicateSubjectMode();
-            if (ex.equals(is) == false)
+            if (!ex.equals(is))
             {
                 throw new CmdFailure("Duplicate subject mode: is '" + is
                         + "', but expected '" + ex + "'");
@@ -162,7 +162,7 @@ public class CaCheckCmd extends CaUpdateCmd
         {
             Integer ex = ey.getExpirationPeriod();
             Integer is = ca.getExpirationPeriod();
-            if (ex.equals(is) == false)
+            if (!ex.equals(is))
             {
                 throw new CmdFailure("Expiration period: is '" + is
                         + "', but expected '" + ex + "'");
@@ -174,7 +174,7 @@ public class CaCheckCmd extends CaUpdateCmd
         {
             String ex = ey.getExtraControl();
             String is = ca.getExtraControl();
-            if (ex.equals(is) == false)
+            if (!ex.equals(is))
             {
                 throw new CmdFailure("Extra control: is '" + is + "', but expected '" + ex + "'");
             }
@@ -185,7 +185,7 @@ public class CaCheckCmd extends CaUpdateCmd
         {
             CertValidity ex = ey.getMaxValidity();
             CertValidity is = ca.getMaxValidity();
-            if (ex.equals(is) == false)
+            if (!ex.equals(is))
             {
                 throw new CmdFailure("Max validity: is '" + is + "', but expected '" + ex + "'");
             }
@@ -252,7 +252,7 @@ public class CaCheckCmd extends CaUpdateCmd
             ex.removePair("keystore");
             ConfPairs is = new ConfPairs(ca.getSignerConf());
             is.removePair("keystore");
-            if (ex.equals(is) == false)
+            if (!ex.equals(is))
             {
                 throw new CmdFailure("signer conf: is '" + is + "', but expected '" + ex + "'");
             }
@@ -263,7 +263,7 @@ public class CaCheckCmd extends CaUpdateCmd
         {
             CAStatus ex = ey.getStatus();
             CAStatus is = ca.getStatus();
-            if (ex.equals(is) == false)
+            if (!ex.equals(is))
             {
                 throw new CmdFailure("status: is '" + is + "', but expected '" + ex + "'");
             }
@@ -274,7 +274,7 @@ public class CaCheckCmd extends CaUpdateCmd
         {
             ValidityMode ex = ey.getValidityMode();
             ValidityMode is = ca.getValidityMode();
-            if (ex.equals(is) == false)
+            if (!ex.equals(is))
             {
                 throw new CmdFailure("validity mode: is '" + is + "', but expected '" + ex + "'");
             }

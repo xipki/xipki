@@ -161,13 +161,13 @@ public class ScepUtil
         Map<ASN1ObjectIdentifier, ASN1Encodable> attributes =
                 new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
 
-        if (challengePassword != null && challengePassword.isEmpty() == false)
+        if (challengePassword != null && !challengePassword.isEmpty())
         {
             DERPrintableString asn1Pwd = new DERPrintableString(challengePassword);
             attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword, asn1Pwd);
         }
 
-        if (extensions != null && extensions.isEmpty() == false)
+        if (extensions != null && !extensions.isEmpty())
         {
             Extensions asn1Extensions = new Extensions(extensions.toArray(new Extension[0]));
             attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest, asn1Extensions);
@@ -281,8 +281,7 @@ public class ScepUtil
             if (eeCert == null && cert.getBasicConstraints() == -1)
             {
                 eeCert = cert;
-            }
-            else
+            } else
             {
                 certs.add(cert);
             }
@@ -430,7 +429,7 @@ public class ScepUtil
             final X509Certificate cert)
     {
         boolean equals = cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
-        if (equals == false)
+        if (!equals)
         {
             return false;
         }
@@ -459,7 +458,7 @@ public class ScepUtil
     throws CertificateEncodingException
     {
         boolean isCA = issuerCert.getBasicConstraints() >= 0;
-        if (isCA == false)
+        if (!isCA)
         {
             return false;
         }
@@ -505,33 +504,26 @@ public class ScepUtil
         if (PKCSObjectIdentifiers.md5WithRSAEncryption.equals(algOid))
         {
             digestAlgOid = PKCSObjectIdentifiers.md5;
-        }
-        else if (PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(algOid))
+        } else if (PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(algOid))
         {
             digestAlgOid = X509ObjectIdentifiers.id_SHA1;
-        }
-        else if (PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(algOid))
+        } else if (PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(algOid))
         {
             digestAlgOid = NISTObjectIdentifiers.id_sha224;
-        }
-        else if (PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(algOid))
+        } else if (PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(algOid))
         {
             digestAlgOid = NISTObjectIdentifiers.id_sha256;
-        }
-        else if (PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(algOid))
+        } else if (PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(algOid))
         {
             digestAlgOid = NISTObjectIdentifiers.id_sha384;
-        }
-        else if (PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid))
+        } else if (PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid))
         {
             digestAlgOid = NISTObjectIdentifiers.id_sha512;
-        }
-        else if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid))
+        } else if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid))
         {
             RSASSAPSSparams param = RSASSAPSSparams.getInstance(sigParams);
             digestAlgOid = param.getHashAlgorithm().getAlgorithm();
-        }
-        else
+        } else
         {
             throw new NoSuchAlgorithmException("unknown signature algorithm" + algOid.getId());
         }
@@ -612,7 +604,7 @@ public class ScepUtil
     public static boolean isNotBlank(
             final String s)
     {
-        return s != null && s.isEmpty() == false;
+        return s != null && !s.isEmpty();
     }
 
 }

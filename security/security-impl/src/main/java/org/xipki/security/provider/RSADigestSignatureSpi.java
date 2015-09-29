@@ -101,14 +101,14 @@ class RSADigestSignatureSpi
             final PrivateKey privateKey)
     throws InvalidKeyException
     {
-        if (privateKey instanceof P11PrivateKey == false)
+        if (!(privateKey instanceof P11PrivateKey))
         {
             throw new InvalidKeyException("privateKey is not instanceof "
                     + P11PrivateKey.class.getName());
         }
 
         String algo = privateKey.getAlgorithm();
-        if ("RSA".equals(algo) == false)
+        if (!"RSA".equals(algo))
         {
             throw new InvalidKeyException("privateKey is not an RSA private key: " + algo);
         }

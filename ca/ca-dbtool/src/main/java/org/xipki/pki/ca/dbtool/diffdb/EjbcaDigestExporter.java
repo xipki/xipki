@@ -137,7 +137,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
             }
 
             String lLang = lang.toLowerCase();
-            if (lLang.startsWith("en_") == false || lLang.endsWith(".utf-8") == false)
+            if (!lLang.startsWith("en_") || !lLang.endsWith(".utf-8"))
             {
                 throw new Exception(
                         "The environment LANG does not satisfy the pattern  'en_*.UTF-8': '"
@@ -145,7 +145,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
             }
 
             String osName = System.getProperty("os.name");
-            if (osName.toLowerCase().contains("linux") == false)
+            if (!osName.toLowerCase().contains("linux"))
             {
                 throw new Exception("Exporting EJBCA database is only possible in Linux, but not '"
                         + osName + "'");
@@ -200,8 +200,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         if (exception == null)
         {
             System.out.println(" digested database");
-        }
-        else
+        } else
         {
             throw exception;
         }
@@ -339,7 +338,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
 
                     CaInfo caInfo = null;
 
-                    if (hexCaFp.equals(hexCertFp) == false)
+                    if (!hexCaFp.equals(hexCertFp))
                     {
                         caInfo = caInfos.get(hexCaFp);
                     }

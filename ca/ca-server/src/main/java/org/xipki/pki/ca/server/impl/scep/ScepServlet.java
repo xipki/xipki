@@ -183,7 +183,7 @@ public class ScepServlet extends HttpServlet
             }
             Scep responder = responderManager.getScep(scepName);
             if (responder == null || responder.getStatus() != CAStatus.ACTIVE
-                    || responder.supportsCertProfile(certProfileName) == false)
+                    || !responder.supportsCertProfile(certProfileName))
             {
                 auditMessage = "unknown SCEP '" + scepName + "/" + certProfileName + "'";
                 LOG.warn(auditMessage);
@@ -274,23 +274,20 @@ public class ScepServlet extends HttpServlet
                 response.setContentType(CT_RESPONSE);
                 response.setContentLength(respBytes.length);
                 respStream.write(respBytes);
-            }
-            else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation))
+            } else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation))
             {
                 // CA-Ident is ignored
                 response.setContentType(ScepConstants.CT_text_palin);
                 byte[] caCapsBytes = responder.getCaCaps().getBytes();
                 respStream.write(caCapsBytes);
-            }
-            else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation))
+            } else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation))
             {
                 // CA-Ident is ignored
                 byte[] respBytes = responder.getCACertResp().getBytes();
                 response.setContentType(ScepConstants.CT_x_x509_ca_ra_cert);
                 response.setContentLength(respBytes.length);
                 respStream.write(respBytes);
-            }
-            else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation))
+            } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation))
             {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.setContentLength(0);
@@ -298,8 +295,7 @@ public class ScepServlet extends HttpServlet
                 auditMessage = "SCEP operation '" + operation + "' is not permitted";
                 auditStatus = AuditStatus.FAILED;
                 return;
-            }
-            else
+            } else
             {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.setContentLength(0);
@@ -402,11 +398,10 @@ public class ScepServlet extends HttpServlet
 
         auditEvent.setDuration(System.currentTimeMillis() - auditEvent.getTimestamp().getTime());
 
-        if (auditEvent.containsChildAuditEvents() == false)
+        if (!auditEvent.containsChildAuditEvents())
         {
             auditService.logEvent(auditEvent);
-        }
-        else
+        } else
         {
             List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
             for (AuditEvent event : expandedAuditEvents)

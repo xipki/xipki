@@ -73,8 +73,7 @@ public class PublisherInfoCmd extends CaCmd
                         ? "no"
                         : "1");
                 sb.append(" publisher is configured\n");
-            }
-            else
+            } else
             {
                 sb.append(n).append(" publishers are configured:\n");
             }
@@ -86,15 +85,13 @@ public class PublisherInfoCmd extends CaCmd
             {
                 sb.append("\t").append(name).append("\n");
             }
-        }
-        else
+        } else
         {
             PublisherEntry entry = caManager.getPublisher(name);
             if (entry == null)
             {
                 throw new UnexpectedException("\tno publisher named '" + name + " is configured");
-            }
-            else
+            } else
             {
                 sb.append(entry.toString());
             }

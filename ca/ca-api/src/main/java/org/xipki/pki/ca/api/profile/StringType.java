@@ -72,8 +72,7 @@ public enum StringType
         } else if (ia5String == this)
         {
             return new DERIA5String(text, true);
-        }
-        else
+        } else
         {
             throw new RuntimeException("should not reach here, unkown StringType '" + text + "'");
         }

@@ -62,8 +62,7 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister
             return services.isEmpty()
                     ? defaultAuditService
                     : services.getLast();
-        }
-        else
+        } else
         {
             return null;
         }
@@ -103,8 +102,7 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister
             if (services.remove(service))
             {
                 LOG.debug("removed AuditService binding for {}", service);
-            }
-            else
+            } else
             {
                 LOG.debug("no AuditService binding found to remove for '{}'", service);
             }

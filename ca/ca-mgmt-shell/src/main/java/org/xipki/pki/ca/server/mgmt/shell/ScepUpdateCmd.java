@@ -115,8 +115,7 @@ public class ScepUpdateCmd extends CaCmd
         if (CAManager.NULL.equalsIgnoreCase(certFile))
         {
             certConf = CAManager.NULL;
-        }
-        else if (certFile != null)
+        } else if (certFile != null)
         {
             byte[] certBytes = IoUtil.read(certFile);
             X509Util.parseCert(new ByteArrayInputStream(certBytes));

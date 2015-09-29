@@ -82,7 +82,7 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
     {
         boolean saveReq = isNotBlank(reqout);
         boolean saveResp = isNotBlank(respout);
-        if (saveReq == false && saveResp == false)
+        if (!saveReq && !saveResp)
         {
             return;
         }

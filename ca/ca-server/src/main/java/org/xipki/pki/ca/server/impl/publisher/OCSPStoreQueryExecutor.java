@@ -185,7 +185,7 @@ class OCSPStoreQueryExecutor
         BigInteger serialNumber = certificate.getCert().getSerialNumber();
         boolean certRegistered = certRegistered(issuerId, serialNumber);
 
-        if (publishGoodCerts == false && revoked == false && certRegistered == false)
+        if (!publishGoodCerts && !revoked && !certRegistered)
         {
             return;
         }
@@ -212,8 +212,7 @@ class OCSPStoreQueryExecutor
                         ps.setNull(idx++, Types.INTEGER);
                     }
                     ps.setInt(idx++, revInfo.getReason().getCode());
-                }
-                else
+                } else
                 {
                     ps.setNull(idx++, Types.INTEGER); // rev_time
                     ps.setNull(idx++, Types.INTEGER); // rev_invalidity_time
@@ -403,7 +402,7 @@ class OCSPStoreQueryExecutor
         BigInteger serialNumber = cert.getCert().getSerialNumber();
         boolean certRegistered = certRegistered(issuerId, serialNumber);
 
-        if (certRegistered == false)
+        if (!certRegistered)
         {
             return;
         }
@@ -767,7 +766,7 @@ class OCSPStoreQueryExecutor
             while (true)
             {
                 int certId = (int) dataSource.nextSeqValue(conn, "CID");
-                if (dataSource.columnExists(conn, "CERT", "ID", certId) == false)
+                if (!dataSource.columnExists(conn, "CERT", "ID", certId))
                 {
                     return certId;
                 }

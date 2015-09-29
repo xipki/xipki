@@ -86,7 +86,7 @@ public class SubjectControl
 
             for (ASN1ObjectIdentifier oid : oids)
             {
-                if (sortedOids.contains(oid) == false)
+                if (!sortedOids.contains(oid))
                 {
                     sortedOids.add(oid);
                 }

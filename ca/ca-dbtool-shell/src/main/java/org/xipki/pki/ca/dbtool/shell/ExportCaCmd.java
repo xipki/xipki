@@ -39,8 +39,8 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.password.api.PasswordResolver;
-import org.xipki.pki.ca.dbtool.CaDbExportWorker;
-import org.xipki.pki.ca.dbtool.DbPortWorker;
+import org.xipki.pki.ca.dbtool.port.CaDbExportWorker;
+import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
 /**
  * @author Lijun Liao
@@ -77,6 +77,10 @@ public class ExportCaCmd extends DbPortCmd
             description = "just test the export, no real export")
     private Boolean onlyTest = Boolean.FALSE;
 
+    @Option(name = "--threads",
+            description = "number of threads to read the database")
+    private Integer numThreads = 10;
+
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
 
@@ -85,7 +89,7 @@ public class ExportCaCmd extends DbPortCmd
     throws Exception
     {
         return new CaDbExportWorker(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume,
-                numCertsInBundle, numCertsPerCommit, onlyTest);
+                numCertsInBundle, numCertsPerCommit, numThreads, onlyTest);
     }
 
     public void setDataSourceFactory(

@@ -65,8 +65,7 @@ public class P11Control
         {
             this.moduleConfs = Collections.emptyMap();
             this.moduleNames = Collections.emptySet();
-        }
-        else
+        } else
         {
             this.moduleConfs = new HashMap<>(moduleConfs.size());
             Set<String> _moduleNames = new HashSet<>();

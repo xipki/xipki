@@ -56,8 +56,7 @@ public class CaSystemStatusCmd extends CaCmd
         if (status != null)
         {
             out(status.toString());
-        }
-        else
+        } else
         {
             throw new UnexpectedException("status is NULL");
         }

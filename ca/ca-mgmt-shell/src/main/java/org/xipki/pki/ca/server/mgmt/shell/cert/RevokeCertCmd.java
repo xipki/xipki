@@ -71,7 +71,7 @@ public class RevokeCertCmd extends UnRevRemoveCertCmd
             throw new InvalidConfException("invalid reason " + reason);
         }
 
-        if (CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason) == false)
+        if (!CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason))
         {
             throw new InvalidConfException("reason " + reason + " is not permitted");
         }

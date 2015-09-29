@@ -78,8 +78,7 @@ public class CaInfoCmd extends CaCmd
                         ? "no"
                         : "1");
                 sb.append(" CA is configured\n");
-            }
-            else
+            } else
             {
                 sb.append(n).append(" CAs are configured:\n");
             }
@@ -96,15 +95,13 @@ public class CaInfoCmd extends CaCmd
                 }
                 sb.append("\n");
             }
-        }
-        else
+        } else
         {
             CAEntry entry = caManager.getCA(caName);
             if (entry == null)
             {
                 throw new UnexpectedException("could not find CA '" + caName + "'");
-            }
-            else
+            } else
             {
                 Set<String> aliases = caManager.getAliasesForCA(caName);
                 sb.append("aliases: ").append(toString(aliases)).append("\n");

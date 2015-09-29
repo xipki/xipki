@@ -79,8 +79,7 @@ public class ResponderInfoCmd extends CaCmd
                         ? "no"
                         : "1");
                 sb.append(" responder is configured\n");
-            }
-            else
+            } else
             {
                 sb.append(n).append(" responders are configured:\n");
             }
@@ -92,15 +91,13 @@ public class ResponderInfoCmd extends CaCmd
             {
                 sb.append("\t").append(name).append("\n");
             }
-        }
-        else
+        } else
         {
             CmpResponderEntry entry = caManager.getCmpResponder(name);
             if (entry == null)
             {
                 throw new UnexpectedException("could not find CMP responder '" + name + "'");
-            }
-            else
+            } else
             {
                 sb.append(entry.toString(verbose));
             }

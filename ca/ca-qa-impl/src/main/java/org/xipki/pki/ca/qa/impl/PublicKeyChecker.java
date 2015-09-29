@@ -130,7 +130,7 @@ public class PublicKeyChecker
         try
         {
             c14nRequestedPublicKey = X509Util.toRfc3279Style(requestedPublicKey);
-            if (c14nRequestedPublicKey.equals(publicKey) == false)
+            if (!c14nRequestedPublicKey.equals(publicKey))
             {
                 issue.setFailureMessage(
                         "public key in the certificate does not equal the requested one");
@@ -153,7 +153,7 @@ public class PublicKeyChecker
         }
 
         ASN1ObjectIdentifier keyType = publicKey.getAlgorithm().getAlgorithm();
-        if (keyAlgorithms.containsKey(keyType) == false)
+        if (!keyAlgorithms.containsKey(keyType))
         {
             throw new BadCertTemplateException("key type " + keyType.getId() + " is not permitted");
         }
@@ -172,7 +172,7 @@ public class PublicKeyChecker
             if (algParam instanceof ASN1ObjectIdentifier)
             {
                 curveOid = (ASN1ObjectIdentifier) algParam;
-                if (ecOption.allowsCurve(curveOid) == false)
+                if (!ecOption.allowsCurve(curveOid))
                 {
                     throw new BadCertTemplateException("EC curve "
                             + SecurityUtil.getCurveName(curveOid)
@@ -193,7 +193,7 @@ public class PublicKeyChecker
                     throw new BadCertTemplateException("invalid publicKeyData");
                 }
                 byte pointEncoding = keyData[0];
-                if (ecOption.getPointEncodings().contains(pointEncoding) == false)
+                if (!ecOption.getPointEncodings().contains(pointEncoding))
                 {
                     throw new BadCertTemplateException(
                             "unaccepted EC point encoding " + pointEncoding);

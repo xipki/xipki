@@ -139,7 +139,7 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
                 byte[] encodedCert = IoUtil.read(certFile);
                 X509Certificate cert = X509Util.parseCert(certFile);
 
-                if (X509Util.issues(issuerCert, cert) == false)
+                if (!X509Util.issues(issuerCert, cert))
                 {
                     throw new IllegalCmdParamException(
                             "certificate " + certFile + " is not issued by the given issuer");
@@ -151,7 +151,7 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
                     if (ocspUrls.size() > 0)
                     {
                         String url = ocspUrls.get(0);
-                        if (ocspUrl != null && ocspUrl.equals(url) == false)
+                        if (ocspUrl != null && !ocspUrl.equals(url))
                         {
                             throw new IllegalCmdParamException("given certificates have different"
                                     + " OCSP responder URL in certificate");
@@ -171,8 +171,7 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
             {
                 serverURL = ocspUrl;
             }
-        }
-        else
+        } else
         {
             for (String serialNumber : serialNumbers)
             {

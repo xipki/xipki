@@ -81,8 +81,7 @@ public class OBFPasswordResolver  implements SinglePasswordResolver
                 String x = Integer.toString(i0, 36).toLowerCase();
                 buf.append("U0000", 0, 5 - x.length());
                 buf.append(x);
-            }
-            else
+            } else
             {
                 int i1 = 127 + b1 + b2;
                 int i2 = 127 + b1 - b2;
@@ -118,8 +117,7 @@ public class OBFPasswordResolver  implements SinglePasswordResolver
                 int i0 = Integer.parseInt(x, 36);
                 byte bx = (byte) (i0 >> 8);
                 b[l++] = bx;
-            }
-            else
+            } else
             {
                 String x = s.substring(i, i + 4);
                 int i0 = Integer.parseInt(x, 36);

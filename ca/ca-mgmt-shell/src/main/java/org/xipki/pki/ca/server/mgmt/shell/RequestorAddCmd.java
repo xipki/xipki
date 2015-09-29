@@ -71,8 +71,7 @@ public class RequestorAddCmd extends CaCmd
         if (entry.getCert() == null)
         {
             b = false;
-        }
-        else
+        } else
         {
             b = caManager.addCmpRequestor(entry);
         }

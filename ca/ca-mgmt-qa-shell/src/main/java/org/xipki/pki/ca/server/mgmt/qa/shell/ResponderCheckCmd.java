@@ -72,15 +72,14 @@ public class ResponderCheckCmd extends ResponderUpdateCmd
             {
                 throw new CmdFailure("Cert: is configured but expected is none");
             }
-        }
-        else if (certFile != null)
+        } else if (certFile != null)
         {
             byte[] ex = IoUtil.read(certFile);
             if (cr.getBase64Cert() == null)
             {
                 throw new CmdFailure("Cert: is not configured explicitly as expected");
             }
-            if (Arrays.equals(ex, Base64.decode(cr.getBase64Cert())) == false)
+            if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert())))
             {
                 throw new CmdFailure("Cert: the expected one and the actual one differ");
             }

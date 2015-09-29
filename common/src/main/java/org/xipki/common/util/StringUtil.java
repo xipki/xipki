@@ -88,7 +88,7 @@ public class StringUtil
     public static boolean isNotBlank(
             final String s)
     {
-        return s != null && s.isEmpty() == false;
+        return s != null && !s.isEmpty();
     }
 
     public static Set<String> splitAsSet(
@@ -170,39 +170,12 @@ public class StringUtil
         }
     }
 
-    public static String formatSpeed(
-            final long speed,
-            final boolean withPrefix)
-    {
-        int minLen = withPrefix
-                ? 10
-                : 0;
-
-        return formatSpeed(speed, minLen);
-    }
-
-    private static String formatSpeed(
-            final long speed,
-            final int minLen)
-    {
-        StringBuilder sb = new StringBuilder(10);
-        String speedS = (speed == 0)
-                ? "--"
-                : Long.toString(speed);
-        for (int i = 0; i < minLen - speedS.length(); i++)
-        {
-            sb.append(' ');
-        }
-        sb.append(speed);
-        return sb.toString();
-    }
-
     public static String formatAccount(
             final long account,
             final boolean withPrefix)
     {
         int minLen = withPrefix
-                ? 13
+                ? 12
                 : 0;
         return formatAccount(account, minLen);
     }
@@ -224,7 +197,7 @@ public class StringUtil
                 sb.append(',');
             }
 
-            for (int i = 0; ; i++)
+            for (int i = 0;; i++)
             {
                 int offset = firstBlockLen + i * 3;
                 if (offset >= n)
@@ -256,7 +229,7 @@ public class StringUtil
             final boolean withPrefix)
     {
         int minLen = withPrefix
-                ? 9
+                ? 12
                 : 0;
         return formatTime(seconds, minLen);
     }

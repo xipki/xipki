@@ -70,12 +70,12 @@ abstract class AbstractP11DSASigner implements Signer
             final boolean forSigning,
             final CipherParameters param)
     {
-        if (forSigning == false)
+        if (!forSigning)
         {
             throw new RuntimeCryptoException("verification mode not supported.");
         }
 
-        if (param instanceof P11KeyParameter == false)
+        if (!(param instanceof P11KeyParameter))
         {
             throw new IllegalArgumentException("invalid param type "  + param.getClass().getName());
         }

@@ -76,7 +76,7 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier>
             return true;
         }
 
-        if (b instanceof P11SlotIdentifier == false)
+        if (!(b instanceof P11SlotIdentifier))
         {
             return false;
         }
@@ -143,17 +143,14 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier>
                 if (sign > 0)
                 {
                     return 1;
-                }
-                else if (sign < 0)
+                } else if (sign < 0)
                 {
                     return -1;
-                }
-                else
+                } else
                 {
                     return 0;
                 }
-            }
-            else
+            } else
             {
                 return -1;
             }

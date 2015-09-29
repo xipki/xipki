@@ -59,8 +59,7 @@ public class IssuerFilter
         if (includes == null)
         {
             includeSha1Fps = null;
-        }
-        else
+        } else
         {
             includeSha1Fps = new HashSet<>(includes.size());
             for (X509Certificate include : includes)
@@ -73,8 +72,7 @@ public class IssuerFilter
         if (excludes == null)
         {
             excludeSha1Fps = null;
-        }
-        else
+        } else
         {
             excludeSha1Fps = new HashSet<>(excludes.size());
             for (X509Certificate exclude : excludes)
@@ -93,13 +91,11 @@ public class IssuerFilter
             if (excludeSha1Fps == null)
             {
                 return true;
-            }
-            else
+            } else
             {
-                return excludeSha1Fps.contains(sha1Fp) == false;
+                return !excludeSha1Fps.contains(sha1Fp);
             }
-        }
-        else
+        } else
         {
             return false;
         }

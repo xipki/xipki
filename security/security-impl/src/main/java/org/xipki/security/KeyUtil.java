@@ -131,16 +131,13 @@ public class KeyUtil
             if ("RSA".equals(keyAlg))
             {
                 builder = new BcRSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
-            }
-            else if ("DSA".equals(keyAlg))
+            } else if ("DSA".equals(keyAlg))
             {
                 builder = new BcDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
-            }
-            else if ("ECDSA".equals(keyAlg))
+            } else if ("ECDSA".equals(keyAlg))
             {
                 builder = new ECDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
-            }
-            else
+            } else
             {
                 throw new OperatorCreationException("unknown key algorithm of the public key "
                         + keyAlg);
@@ -255,16 +252,13 @@ public class KeyUtil
         if (PKCSObjectIdentifiers.rsaEncryption.equals(aid))
         {
             kf = KeyFactory.getInstance("RSA");
-        }
-        else if (X9ObjectIdentifiers.id_dsa.equals(aid))
+        } else if (X9ObjectIdentifiers.id_dsa.equals(aid))
         {
             kf = KeyFactory.getInstance("DSA");
-        }
-        else if (X9ObjectIdentifiers.id_ecPublicKey.equals(aid))
+        } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(aid))
         {
             kf = KeyFactory.getInstance("ECDSA");
-        }
-        else
+        } else
         {
             throw new InvalidKeySpecException("unsupported key algorithm: " + aid);
         }
@@ -307,22 +301,18 @@ public class KeyUtil
                 k.getPublicExponent(), k.getPrivateExponent(),
                 k.getPrimeP(), k.getPrimeQ(), k.getPrimeExponentP(),
                 k.getPrimeExponentQ(), k.getCrtCoefficient());
-        }
-        else if (key instanceof RSAPrivateKey)
+        } else if (key instanceof RSAPrivateKey)
         {
             RSAPrivateKey k = (RSAPrivateKey) key;
 
             return new RSAKeyParameters(true, k.getModulus(), k.getPrivateExponent());
-        }
-        else if (key instanceof ECPrivateKey)
+        } else if (key instanceof ECPrivateKey)
         {
             return ECUtil.generatePrivateKeyParameter(key);
-        }
-        else if (key instanceof DSAPrivateKey)
+        } else if (key instanceof DSAPrivateKey)
         {
             return DSAUtil.generatePrivateKeyParameter(key);
-        }
-        else
+        } else
         {
             throw new InvalidKeyException("unknown key " + key.getClass().getName());
         }
@@ -336,16 +326,13 @@ public class KeyUtil
         {
             RSAPublicKey k = (RSAPublicKey) key;
             return new RSAKeyParameters(false, k.getModulus(), k.getPublicExponent());
-        }
-        else if (key instanceof ECPublicKey)
+        } else if (key instanceof ECPublicKey)
         {
             return ECUtil.generatePublicKeyParameter(key);
-        }
-        else if (key instanceof DSAPublicKey)
+        } else if (key instanceof DSAPublicKey)
         {
             return DSAUtil.generatePublicKeyParameter(key);
-        }
-        else
+        } else
         {
             throw new InvalidKeyException("unknown key " + key.getClass().getName());
         }

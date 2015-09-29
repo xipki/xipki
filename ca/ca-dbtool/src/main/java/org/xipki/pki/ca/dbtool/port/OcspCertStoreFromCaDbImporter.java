@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool;
+package org.xipki.pki.ca.dbtool.port;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,11 +68,13 @@ import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.dbtool.InvalidInputException;
+import org.xipki.pki.ca.dbtool.ProcessLog;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CaHasPublisherType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CaType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Cas;
+import org.xipki.pki.ca.dbtool.port.internal.DbPortFileNameIterator;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertstoreCaType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.NameIdType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.PublisherType;
@@ -121,12 +123,11 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
         File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);
         if (resume)
         {
-            if (processLogFile.exists() == false)
+            if (!processLogFile.exists())
             {
                 throw new InvalidInputException("could not process with '--resume' option");
             }
-        }
-        else
+        } else
         {
             if (processLogFile.exists())
             {
@@ -182,7 +183,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
         System.out.println("importing CA certstore to OCSP database");
         try
         {
-            if (resume == false)
+            if (!resume)
             {
                 dropIndexes();
             }
@@ -202,10 +203,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
             }
 
             String type = publisherType.getType();
-            if ("ocsp".equalsIgnoreCase(type))
-            {
-            }
-            else
+            if (!"ocsp".equalsIgnoreCase(type))
             {
                 throw new InvalidInputException("Unkwown publisher type " + type);
             }
@@ -215,7 +213,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
             boolean revokedOnly = false;
             if (v != null)
             {
-                revokedOnly = (Boolean.parseBoolean(v) == false);
+                revokedOnly = !Boolean.parseBoolean(v);
             }
 
             Set<String> relatedCaNames = new HashSet<>();
@@ -252,8 +250,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
             if (resume)
             {
                 relatedCaIds = getIssuerIds(certstore.getCas(), relatedCas);
-            }
-            else
+            } else
             {
                 relatedCaIds = import_issuer(certstore.getCas(), relatedCas);
             }
@@ -352,8 +349,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                         if (e instanceof CertificateException)
                         {
                             throw (CertificateException) e;
-                        }
-                        else
+                        } else
                         {
                             throw new CertificateException(e.getMessage(), e);
                         }
@@ -574,7 +570,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
 
                 numProcessedEntriesInBatch++;
 
-                if (revokedOnly == false || cert.getRev().booleanValue())
+                if (!revokedOnly || cert.getRev().booleanValue())
                 {
                     int caId = cert.getCaId();
                     if (caIds.contains(caId))
@@ -600,8 +596,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                             if (e instanceof CertificateException)
                             {
                                 throw (CertificateException) e;
-                            }
-                            else
+                            } else
                             {
                                 throw new CertificateException(e.getMessage(), e);
                             }
@@ -672,7 +667,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                     } // end if (caIds.contains(caId))
                 } // end if (revokedOnly
 
-                boolean isLastBlock = (certs.hasNext() == false);
+                boolean isLastBlock = !certs.hasNext();
 
                 if (numImportedEntriesInBatch > 0
                         && (numImportedEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock))

@@ -92,7 +92,7 @@ public class KeystoreP11Module implements P11Module
 
         for (File child : children)
         {
-            if ((child.isDirectory() && child.canRead() && child.exists()) == false)
+            if ((child.isDirectory() && child.canRead() && !child.exists()))
             {
                 LOG.warn("ignore path {}, it does not point to a readable exist directory",
                         child.getPath());

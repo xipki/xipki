@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool;
+package org.xipki.pki.ca.dbtool.port;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -70,6 +70,7 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.pki.ca.dbtool.ProcessLog;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Cas;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.DeltaCRLCache;
@@ -77,6 +78,7 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Profiles;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.PublishQueue;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Publishers;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Requestors;
+import org.xipki.pki.ca.dbtool.port.internal.DbPortFileNameIterator;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertstoreCaType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.DeltaCRLCacheEntryType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.NameIdType;
@@ -149,12 +151,11 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
         File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
         if (resume)
         {
-            if (processLogFile.exists() == false)
+            if (!processLogFile.exists())
             {
                 throw new Exception("could not process with '--resume' option");
             }
-        }
-        else
+        } else
         {
             if (processLogFile.exists())
             {
@@ -189,7 +190,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
         System.out.println("importing CA certstore to database");
         try
         {
-            if (resume == false)
+            if (!resume)
             {
                 dropIndexes();
 
@@ -476,7 +477,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw e;
                 }
 
-                boolean isLastBlock = users.hasNext() == false;
+                boolean isLastBlock = !users.hasNext();
 
                 if (numEntriesInBatch > 0
                         && (numEntriesInBatch % numEntriesPerCommit == 0 || isLastBlock))
@@ -708,8 +709,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     if (e instanceof CRLException)
                     {
                         throw (CRLException) e;
-                    }
-                    else
+                    } else
                     {
                         throw new CRLException(e.getMessage(), e);
                     }
@@ -742,8 +742,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     if (c.getNextUpdate() != null)
                     {
                         ps_addCrl.setLong(idx++, c.getNextUpdate().getTime() / 1000);
-                    }
-                    else
+                    } else
                     {
                         ps_addCrl.setNull(idx++, Types.INTEGER);
                     }
@@ -752,8 +751,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     {
                         setBoolean(ps_addCrl, idx++, false);
                         ps_addCrl.setNull(idx++, Types.BIGINT);
-                    }
-                    else
+                    } else
                     {
                         setBoolean(ps_addCrl, idx++, true);
                         ps_addCrl.setLong(idx++, baseCrlNumber.longValue());
@@ -770,7 +768,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw e;
                 }
 
-                boolean isLastBlock = crls.hasNext() == false;
+                boolean isLastBlock = !crls.hasNext();
 
                 if (numEntriesInBatch > 0
                         && (numEntriesInBatch % numEntriesPerCommit == 0 || isLastBlock))
@@ -989,8 +987,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     if (e instanceof CertificateException)
                     {
                         throw (CertificateException) e;
-                    }
-                    else
+                    } else
                     {
                         throw new CertificateException(e.getMessage(), e);
                     }
@@ -1054,7 +1051,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                         ASN1Encodable asn1 = extension.getParsedValue();
                         try
                         {
-                            ee = BasicConstraints.getInstance(asn1).isCA() == false;
+                            ee = !BasicConstraints.getInstance(asn1).isCA();
                         } catch (Exception e)
                         {
                         }
@@ -1091,7 +1088,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     throw translate(SQL_ADD_CRAW, e);
                 }
 
-                boolean isLastBlock = certs.hasNext() == false;
+                boolean isLastBlock = !certs.hasNext();
                 if (numEntriesInBatch > 0
                         && (numEntriesInBatch % numEntriesPerCommit == 0 || isLastBlock))
                 {
