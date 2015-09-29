@@ -89,8 +89,7 @@ public class UnrevokeCertCmd extends UnRevRemoveCertCmd
             {
                 saveRequestResponse(debug);
             }
-        }
-        else
+        } else
         {
             X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
             RequestResponseDebug debug = getRequestResponseDebug();
@@ -107,8 +106,7 @@ public class UnrevokeCertCmd extends UnRevRemoveCertCmd
         {
             PKIStatusInfo error = certIdOrError.getError();
             throw new CmdFailure("releasing revocation failed: " + error);
-        }
-        else
+        } else
         {
             out("unrevoked certificate");
         }

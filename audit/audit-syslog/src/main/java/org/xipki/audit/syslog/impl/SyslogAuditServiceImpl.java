@@ -121,7 +121,7 @@ public class SyslogAuditServiceImpl implements AuditService
             return;
         }
 
-        if (initialized == false)
+        if (!initialized)
         {
             LOG.error("Syslog audit not initialiazed");
             return;
@@ -202,7 +202,7 @@ public class SyslogAuditServiceImpl implements AuditService
             return;
         }
 
-        if (initialized == false)
+        if (!initialized)
         {
             LOG.error("Syslog audit not initialiazed");
             return;
@@ -253,13 +253,11 @@ public class SyslogAuditServiceImpl implements AuditService
                     || "rfc_3164".equalsIgnoreCase(messageFormat))
             {
                 _messageFormat = MessageFormat.RFC_3164;
-            }
-            else if ("rfc5424".equalsIgnoreCase(messageFormat)
+            } else if ("rfc5424".equalsIgnoreCase(messageFormat)
                     || "rfc_5424".equalsIgnoreCase(messageFormat))
             {
                 _messageFormat = MessageFormat.RFC_5424;
-            }
-            else
+            } else
             {
                 LOG.warn("invalid message format '{}', use the default one '{}'",
                         messageFormat, DFLT_MESSAGE_FORMAT);
@@ -270,8 +268,7 @@ public class SyslogAuditServiceImpl implements AuditService
             {
                 syslog = new UdpSyslogMessageSender();
                 ((UdpSyslogMessageSender) syslog).setSyslogServerPort(port);
-            }
-            else if ("tcp".equalsIgnoreCase(protocol))
+            } else if ("tcp".equalsIgnoreCase(protocol))
             {
                 syslog = new TcpSyslogMessageSender();
                 ((TcpSyslogMessageSender) syslog).setSyslogServerPort(port);
@@ -281,8 +278,7 @@ public class SyslogAuditServiceImpl implements AuditService
                 {
                     ((TcpSyslogMessageSender) syslog).setMaxRetryCount(writeRetries);
                 }
-            }
-            else
+            } else
             {
                 LOG.warn("unknown protocol '{}', use the default one 'udp'", this.protocol);
                 syslog = new UdpSyslogMessageSender();
@@ -390,8 +386,7 @@ public class SyslogAuditServiceImpl implements AuditService
         if (maxMessageLength <= 0)
         {
             this.maxMessageLength = 1023;
-        }
-        else
+        } else
         {
             this.maxMessageLength = maxMessageLength;
         }
@@ -406,7 +401,7 @@ public class SyslogAuditServiceImpl implements AuditService
     private static boolean notEmpty(
             final String text)
     {
-        return text != null && text.isEmpty() == false;
+        return text != null && !text.isEmpty();
     }
 
     private Severity getSeverity(

@@ -187,7 +187,7 @@ public class CAEmulator
             final X500Name issuer,
             final BigInteger serialNumber)
     {
-        if (cASubject.equals(issuer) == false)
+        if (!cASubject.equals(issuer))
         {
             return null;
         }
@@ -199,7 +199,7 @@ public class CAEmulator
             final X500Name issuer,
             final X500Name subject)
     {
-        if (cASubject.equals(issuer) == false)
+        if (!cASubject.equals(issuer))
         {
             return null;
         }

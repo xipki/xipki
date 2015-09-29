@@ -116,23 +116,21 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
                     if ("yes".equalsIgnoreCase(answer))
                     {
                         break;
-                    }
-                    else if ("no".equalsIgnoreCase(answer))
+                    } else if ("no".equalsIgnoreCase(answer))
                     {
                         out("Enter name of file to save to ... ");
                         String newFn = null;
                         while (true)
                         {
                             newFn = reader.readLine();
-                            if (newFn.trim().isEmpty() == false)
+                            if (!newFn.trim().isEmpty())
                             {
                                 break;
                             }
                         }
 
                         saveTo = new File(newFn);
-                    }
-                    else
+                    } else
                     {
                         out("Please answer with yes or no. ");
                         b = false;
@@ -146,7 +144,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         }
 
         File parent = file.getParentFile();
-        if (parent != null && parent.exists() == false)
+        if (parent != null && !parent.exists())
         {
             parent.mkdirs();
         }
@@ -156,7 +154,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
             save(saveTo, encoded);
         } catch (IOException e)
         {
-            if (randomSaveTo == false)
+            if (!randomSaveTo)
             {
                 saveTo = new File("tmp-" + randomHex(6));
                 save(saveTo, encoded);
@@ -178,7 +176,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
     {
         file = expandFilepath(file);
         File parent = file.getParentFile();
-        if (parent != null && parent.exists() == false)
+        if (parent != null && !parent.exists())
         {
             parent.mkdirs();
         }
@@ -235,14 +233,12 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
                 || "true".equalsIgnoreCase(enabledS))
         {
             return true;
-        }
-        else if ("no".equalsIgnoreCase(enabledS)
+        } else if ("no".equalsIgnoreCase(enabledS)
                 || "disabled".equalsIgnoreCase(enabledS)
                 || "false".equalsIgnoreCase(enabledS))
         {
             return false;
-        }
-        else
+        } else
         {
             throw new IllegalArgumentException("invalid option " + optionName + ": " + enabledS);
         }
@@ -271,8 +267,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         if ("gui".equalsIgnoreCase(passwordUi))
         {
             return SecurePasswordInputPanel.readPassword(prompt);
-        }
-        else
+        } else
         {
             ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
             out(prompt);
@@ -345,8 +340,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
             if (s.length() > 2)
             {
                 return new BigInteger(s.substring(2), 16);
-            }
-            else
+            } else
             {
                 throw new NumberFormatException("invalid integer '" + s + "'");
             }

@@ -66,8 +66,7 @@ public class SpeedP12DSAKeyGenCmd extends SingleSpeedCmd
             if (pLen >= 2048)
             {
                 qLen = 256;
-            }
-            else
+            } else
             {
                 qLen = 160;
             }

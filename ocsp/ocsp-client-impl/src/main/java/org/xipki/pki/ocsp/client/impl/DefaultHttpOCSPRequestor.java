@@ -78,7 +78,7 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
             StringBuilder urlBuilder = new StringBuilder();
             String baseUrl = responderURL.toString();
             urlBuilder.append(baseUrl);
-            if (baseUrl.endsWith("/") == false)
+            if (!baseUrl.endsWith("/"))
             {
                 urlBuilder.append('/');
             }
@@ -88,8 +88,7 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
 
             httpUrlConnection = (HttpURLConnection) newURL.openConnection();
             httpUrlConnection.setRequestMethod("GET");
-        }
-        else
+        } else
         {
             httpUrlConnection = (HttpURLConnection) responderURL.openConnection();
             httpUrlConnection.setDoOutput(true);
@@ -121,7 +120,7 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
                 isValidContentType = true;
             }
         }
-        if (isValidContentType == false)
+        if (!isValidContentType)
         {
             inputstream.close();
             throw new IOException("bad response: mime type " + responseContentType

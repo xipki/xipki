@@ -61,7 +61,8 @@ public class IoUtil
     {
     }
 
-    public static void closeStream(OutputStream stream)
+    public static void closeStream(
+    		final OutputStream stream)
     {
         if (stream == null)
         {
@@ -126,14 +127,14 @@ public class IoUtil
     }
 
     public static void save(
-            File file,
+            final File pFile,
             final byte[] content)
     throws IOException
     {
-        file = expandFilepath(file);
+        File file = expandFilepath(pFile);
 
         File parent = file.getParentFile();
-        if (parent != null && parent.exists() == false)
+        if (parent != null && !parent.exists())
         {
             parent.mkdirs();
         }
@@ -208,7 +209,7 @@ public class IoUtil
 
         for (String addr : addresses)
         {
-            if (addr.startsWith("192.") == false && addr.startsWith("127.") == false)
+            if (!addr.startsWith("192.") && !addr.startsWith("127."))
             {
                 return addr;
             }
@@ -216,7 +217,7 @@ public class IoUtil
 
         for (String addr : addresses)
         {
-            if (addr.startsWith("127.") == false)
+            if (!addr.startsWith("127."))
             {
                 return addr;
             }
@@ -288,7 +289,7 @@ public class IoUtil
     {
 
         String b64Str = Base64.encodeToString(data, Base64.NO_WRAP);
-        if (withLineBreak == false)
+        if (!withLineBreak)
         {
             return b64Str;
         }

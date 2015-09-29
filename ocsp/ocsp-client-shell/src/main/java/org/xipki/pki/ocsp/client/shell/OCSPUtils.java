@@ -67,8 +67,7 @@ public class OCSPUtils
                 throw new InvalidOCSPResponseException(e.getMessage(), e);
             }
             return basicOCSPResp;
-        }
-        else
+        } else
         {
             throw new OCSPResponseUnsuccessfulException(status);
         }

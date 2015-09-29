@@ -65,8 +65,7 @@ public class SpeedP12DSASignCmd extends SpeedP12SignCmd
             if (pLen >= 2048)
             {
                 qLen = 256;
-            }
-            else
+            } else
             {
                 qLen = 160;
             }

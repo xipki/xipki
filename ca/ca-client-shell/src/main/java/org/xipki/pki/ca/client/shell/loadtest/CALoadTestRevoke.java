@@ -90,7 +90,7 @@ public class CALoadTestRevoke extends LoadExecutor
     private long nextStartSerial;
     private boolean noUnrevokedCerts = false;
 
-    private CRLReason[] reasons = { CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE,
+    private CRLReason[] reasons = {CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE,
             CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED, CRLReason.CESSATION_OF_OPERATION,
             CRLReason.CERTIFICATE_HOLD,    CRLReason.PRIVILEGE_WITHDRAWN};
 
@@ -138,8 +138,7 @@ public class CALoadTestRevoke extends LoadExecutor
             if (rs.next())
             {
                 caInfoId = rs.getInt("ID");
-            }
-            else
+            } else
             {
                 throw new Exception("CA Certificate and database configuration does not match");
             }
@@ -171,8 +170,7 @@ public class CALoadTestRevoke extends LoadExecutor
             if (serial != null)
             {
                 ret.add(serial);
-            }
-            else
+            } else
             {
                 break;
             }
@@ -200,7 +198,7 @@ public class CALoadTestRevoke extends LoadExecutor
                 return firstSerial;
             }
 
-            if (noUnrevokedCerts == false)
+            if (!noUnrevokedCerts)
             {
                 String sql = "SN FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId
                         + " AND SN > " + (nextStartSerial - 1)
@@ -222,7 +220,7 @@ public class CALoadTestRevoke extends LoadExecutor
                         {
                             nextStartSerial = serial + 1;
                         }
-                        if (excludeSerials.contains(serial) == false)
+                        if (!excludeSerials.contains(serial))
                         {
                             serials.addLast(serial);
                         }
@@ -257,7 +255,7 @@ public class CALoadTestRevoke extends LoadExecutor
         @Override
         public void run()
         {
-            while (stop() == false && getErrorAccout() < 1)
+            while (!stop() && getErrorAccout() < 1)
             {
                 List<Long> serialNumbers;
                 try

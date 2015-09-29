@@ -79,12 +79,10 @@ abstract class PathCompleter
         if (translated.startsWith("~" + separator()))
         {
             translated = homeDir.getPath() + translated.substring(1);
-        }
-        else if (translated.startsWith("~"))
+        } else if (translated.startsWith("~"))
         {
             translated = homeDir.getParentFile().getAbsolutePath();
-        }
-        else if (!(new File(translated).isAbsolute()))
+        } else if (!(new File(translated).isAbsolute()))
         {
             String cwd = getUserDir().getAbsolutePath();
             translated = cwd + separator() + translated;
@@ -96,8 +94,7 @@ abstract class PathCompleter
         if (translated.endsWith(separator()))
         {
             dir = file;
-        }
-        else
+        } else
         {
             dir = file.getParentFile();
         }

@@ -67,7 +67,7 @@ class IaikP11Identity extends P11Identity
             final byte[] encodedDigestInfo)
     throws SignerException
     {
-        if (publicKey instanceof RSAPublicKey == false)
+        if (!(publicKey instanceof RSAPublicKey))
         {
             throw new SignerException("operation CKM_RSA_PKCS is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -87,7 +87,7 @@ class IaikP11Identity extends P11Identity
             final byte[] hash)
     throws SignerException
     {
-        if (publicKey instanceof RSAPublicKey == false)
+        if (!(publicKey instanceof RSAPublicKey))
         {
             throw new SignerException("operation CKM_RSA_X509 is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -107,7 +107,7 @@ class IaikP11Identity extends P11Identity
             final byte[] hash)
     throws SignerException
     {
-        if (publicKey instanceof ECPublicKey == false)
+        if (!(publicKey instanceof ECPublicKey))
         {
             throw new SignerException("operation CKM_ECDSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -129,7 +129,7 @@ class IaikP11Identity extends P11Identity
             final byte[] hash)
     throws SignerException
     {
-        if (publicKey instanceof DSAPublicKey == false)
+        if (!(publicKey instanceof DSAPublicKey))
         {
             throw new SignerException("operation CKM_DSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");

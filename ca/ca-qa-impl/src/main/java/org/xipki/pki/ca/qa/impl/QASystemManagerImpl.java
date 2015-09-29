@@ -263,8 +263,7 @@ public class QASystemManagerImpl implements QASystemManager
         if (rootType instanceof QAConfType)
         {
             return (QAConfType) rootElement.getValue();
-        }
-        else
+        } else
         {
             throw new SAXException("invalid root element type");
         }

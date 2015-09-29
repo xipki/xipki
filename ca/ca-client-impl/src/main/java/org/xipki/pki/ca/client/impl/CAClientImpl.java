@@ -208,14 +208,14 @@ public final class CAClientImpl implements CAClient
         Set<String> errorCANames = new HashSet<>();
         for (String name : casMap.keySet())
         {
-            if (caNamesToBeConfigured != null && caNamesToBeConfigured.contains(name) == false)
+            if (caNamesToBeConfigured != null && !caNamesToBeConfigured.contains(name))
             {
                 continue;
             }
 
             CAConf ca = casMap.get(name);
 
-            if (ca.isCertAutoconf() == false && ca.isCertprofilesAutoconf() == false)
+            if (!ca.isCertAutoconf() && !ca.isCertprofilesAutoconf())
             {
                 continue;
             }
@@ -269,7 +269,7 @@ public final class CAClientImpl implements CAClient
         }
 
         File configFile = new File(IoUtil.expandFilepath(confFile));
-        if (configFile.exists() == false)
+        if (!configFile.exists())
         {
             throw new FileNotFoundException("cound not find configuration file " + confFile);
         }
@@ -279,7 +279,7 @@ public final class CAClientImpl implements CAClient
 
         for (CAType caType : config.getCAs().getCA())
         {
-            if (caType.isEnabled() == false)
+            if (!caType.isEnabled())
             {
                 LOG.info("CA " + caType.getName() + " is disabled");
                 continue;
@@ -325,7 +325,7 @@ public final class CAClientImpl implements CAClient
         for (CAType caType : config.getCAs().getCA())
         {
             b = caType.isEnabled();
-            if (b.booleanValue() == false)
+            if (!b.booleanValue())
             {
                 continue;
             }
@@ -347,8 +347,7 @@ public final class CAClientImpl implements CAClient
                 if (caType.getCaCert().getAutoconf() != null)
                 {
                     ca.setCertAutoconf(true);
-                }
-                else
+                } else
                 {
                     ca.setCertAutoconf(true);
                     ca.setCert(X509Util.parseCert(readData(caType.getCaCert().getCert())));
@@ -359,8 +358,7 @@ public final class CAClientImpl implements CAClient
                 if (certprofilesType.getAutoconf() != null)
                 {
                     ca.setCertprofilesAutoconf(true);
-                }
-                else
+                } else
                 {
                     ca.setCertprofilesAutoconf(false);
 
@@ -396,7 +394,7 @@ public final class CAClientImpl implements CAClient
                 }
                 LOG.debug(message, e);
 
-                if (devMode == false)
+                if (!devMode)
                 {
                     throw new InvalidConfException(e.getMessage(), e);
                 }
@@ -478,8 +476,7 @@ public final class CAClientImpl implements CAClient
                 cmpRequestor = new DefaultHttpX509CmpRequestor(
                         requestorCerts.get(requestorName), ca.getResponder(), ca.getUrl(),
                         securityFactory);
-            }
-            else
+            } else
             {
                 throw new InvalidConfException("could not find requestor named "
                         + requestorName
@@ -496,12 +493,10 @@ public final class CAClientImpl implements CAClient
             if (cAInfoUpdateInterval == null)
             {
                 cAInfoUpdateInterval = 10;
-            }
-            else if (cAInfoUpdateInterval <= 0)
+            } else if (cAInfoUpdateInterval <= 0)
             {
                 cAInfoUpdateInterval = 0;
-            }
-            else if (cAInfoUpdateInterval < 5)
+            } else if (cAInfoUpdateInterval < 5)
             {
                 cAInfoUpdateInterval = 5;
             }
@@ -540,7 +535,7 @@ public final class CAClientImpl implements CAClient
         if (scheduledThreadPoolExecutor != null)
         {
             scheduledThreadPoolExecutor.shutdown();
-            while (scheduledThreadPoolExecutor.isTerminated() == false)
+            while (!scheduledThreadPoolExecutor.isTerminated())
             {
                 try
                 {
@@ -668,14 +663,13 @@ public final class CAClientImpl implements CAClient
     {
         if (caName != null)
         {
-            if (casMap.containsKey(caName) == false)
+            if (!casMap.containsKey(caName))
             {
                 throw new CAClientException("unknown ca: " + caName);
-            }
-            else
+            } else
             {
                 CAConf ca = casMap.get(caName);
-                if (ca.supportsProfile(certprofile) == false)
+                if (!ca.supportsProfile(certprofile))
                 {
                     throw new CAClientException("cert profile " + certprofile
                             + " is not supported by the CA " + caName);
@@ -686,7 +680,7 @@ public final class CAClientImpl implements CAClient
 
         for (CAConf ca : casMap.values())
         {
-            if (ca.isCAInfoConfigured() == false)
+            if (!ca.isCAInfoConfigured())
             {
                 continue;
             }
@@ -695,8 +689,7 @@ public final class CAClientImpl implements CAClient
                 if (caName == null)
                 {
                     caName = ca.getName();
-                }
-                else
+                } else
                 {
                     throw new CAClientException("cert profile " + certprofile
                             + " supported by more than one CA, please specify the CA name.");
@@ -759,7 +752,7 @@ public final class CAClientImpl implements CAClient
         X500Name issuer = requestEntries.get(0).getIssuer();
         for (int i = 1; i < requestEntries.size(); i++)
         {
-            if (issuer.equals(requestEntries.get(i).getIssuer()) == false)
+            if (!issuer.equals(requestEntries.get(i).getIssuer()))
             {
                 throw new PKIErrorException(
                         PKIStatus.REJECTION, PKIFailureInfo.badRequest,
@@ -795,13 +788,11 @@ public final class CAClientImpl implements CAClient
             {
                 RevokeCertResultEntryType entry = (RevokeCertResultEntryType) _entry;
                 certIdOrError = new CertIdOrError(entry.getCertId());
-            }
-            else if (_entry instanceof ErrorResultEntryType)
+            } else if (_entry instanceof ErrorResultEntryType)
             {
                 ErrorResultEntryType entry = (ErrorResultEntryType) _entry;
                 certIdOrError = new CertIdOrError(entry.getStatusInfo());
-            }
-            else
+            } else
             {
                 throw new CAClientException("unknwon type " + _entry);
             }
@@ -830,7 +821,7 @@ public final class CAClientImpl implements CAClient
     {
         ParamUtil.assertNotNull("caName", caName);
 
-        if (casMap.containsKey(caName) == false)
+        if (!casMap.containsKey(caName))
         {
             throw new IllegalArgumentException("unknown CAConf " + caName);
         }
@@ -842,8 +833,7 @@ public final class CAClientImpl implements CAClient
             if (crlNumber == null)
             {
                 result = requestor.downloadCurrentCRL(debug);
-            }
-            else
+            } else
             {
                 result = requestor.downloadCRL(crlNumber, debug);
             }
@@ -863,7 +853,7 @@ public final class CAClientImpl implements CAClient
     {
         ParamUtil.assertNotNull("caName", caName);
 
-        if (casMap.containsKey(caName) == false)
+        if (!casMap.containsKey(caName))
         {
             throw new IllegalArgumentException("unknown CAConf " + caName);
         }
@@ -892,7 +882,7 @@ public final class CAClientImpl implements CAClient
         for (String name : casMap.keySet())
         {
             final CAConf ca = casMap.get(name);
-            if (ca.isCAInfoConfigured() == false)
+            if (!ca.isCAInfoConfigured())
             {
                 continue;
             }
@@ -913,7 +903,7 @@ public final class CAClientImpl implements CAClient
         String caName = null;
         for (CAConf ca : casMap.values())
         {
-            if (ca.isCAInfoConfigured() == false)
+            if (!ca.isCAInfoConfigured())
             {
                 continue;
             }
@@ -923,8 +913,7 @@ public final class CAClientImpl implements CAClient
                 if (caName == null)
                 {
                     caName = ca.getName();
-                }
-                else
+                } else
                 {
                     throw new CAClientException("cert profile " + certprofile
                             + " supported by more than one CA, please specify the CA name.");
@@ -979,8 +968,7 @@ public final class CAClientImpl implements CAClient
                 throw new CAClientException("cert profile " + profileName
                         + " is not supported by any CA");
             }
-        }
-        else
+        } else
         {
             checkCertprofileSupportInCA(profileName, caName);
         }
@@ -1013,11 +1001,11 @@ public final class CAClientImpl implements CAClient
             final java.security.cert.Certificate caCert,
             final java.security.cert.Certificate cert)
     {
-        if (caCert instanceof X509Certificate == false)
+        if (!(caCert instanceof X509Certificate))
         {
             return false;
         }
-        if (cert instanceof X509Certificate == false)
+        if (!(cert instanceof X509Certificate))
         {
             return false;
         }
@@ -1025,7 +1013,7 @@ public final class CAClientImpl implements CAClient
         X509Certificate _caCert = (X509Certificate) caCert;
         X509Certificate _cert = (X509Certificate) cert;
 
-        if (_cert.getIssuerX500Principal().equals(_caCert.getSubjectX500Principal()) == false)
+        if (!_cert.getIssuerX500Principal().equals(_caCert.getSubjectX500Principal()))
         {
             return false;
         }
@@ -1047,8 +1035,7 @@ public final class CAClientImpl implements CAClient
                 {
                     tryXipkiNSStoVerify = Boolean.FALSE;
                     tryXipkiNSStoVerifyMap.put(_caCert, tryXipkiNSStoVerify);
-                }
-                else
+                } else
                 {
                     byte[] tbs = _cert.getTBSCertificate();
                     byte[] signatureValue = _cert.getSignature();
@@ -1082,8 +1069,7 @@ public final class CAClientImpl implements CAClient
                 verifier.initVerify(caPublicKey);
                 verifier.update(tbs);
                 return verifier.verify(signatureValue);
-            }
-            else
+            } else
             {
                 _cert.verify(caPublicKey);
                 return true;
@@ -1177,7 +1163,7 @@ public final class CAClientImpl implements CAClient
         X500Name issuer = requestEntries.get(0).getIssuer();
         for (int i = 1; i < requestEntries.size(); i++)
         {
-            if (issuer.equals(requestEntries.get(i).getIssuer()) == false)
+            if (!issuer.equals(requestEntries.get(i).getIssuer()))
             {
                 throw new PKIErrorException(
                         PKIStatus.REJECTION, PKIFailureInfo.badRequest,
@@ -1244,7 +1230,7 @@ public final class CAClientImpl implements CAClient
         X500Name issuer = requestEntries.get(0).getIssuer();
         for (int i = 1; i < requestEntries.size(); i++)
         {
-            if (issuer.equals(requestEntries.get(i).getIssuer()) == false)
+            if (!issuer.equals(requestEntries.get(i).getIssuer()))
             {
                 throw new PKIErrorException(
                         PKIStatus.REJECTION, PKIFailureInfo.badRequest,
@@ -1297,7 +1283,7 @@ public final class CAClientImpl implements CAClient
     {
         ParamUtil.assertNotNull("caName", caName);
 
-        if (casMap.containsKey(caName) == false)
+        if (!casMap.containsKey(caName))
         {
             throw new IllegalArgumentException("unknown CAConf " + caName);
         }
@@ -1339,7 +1325,7 @@ public final class CAClientImpl implements CAClient
                     isValidContentType = true;
                 }
             }
-            if (isValidContentType == false)
+            if (!isValidContentType)
             {
                 inputStream.close();
                 throw new IOException("bad response: mime type " + responseContentType
@@ -1350,8 +1336,7 @@ public final class CAClientImpl implements CAClient
             if (responseBytes.length == 0)
             {
                 healthCheckResult.setHealthy(responseCode == HttpURLConnection.HTTP_OK);
-            }
-            else
+            } else
             {
                 String response = new String(responseBytes);
                 try
@@ -1424,8 +1409,7 @@ public final class CAClientImpl implements CAClient
             if (root instanceof JAXBElement)
             {
                 return (CAClientType) ((JAXBElement<?>) root).getValue();
-            }
-            else
+            } else
             {
                 throw new InvalidConfException("invalid root element type");
             }
@@ -1454,13 +1438,11 @@ public final class CAClientImpl implements CAClient
                             "CertificateParsingException for request (id=" + entry.getId() + "): "
                             + e.getMessage());
                 }
-            }
-            else if (resultEntry instanceof ErrorResultEntryType)
+            } else if (resultEntry instanceof ErrorResultEntryType)
             {
                 certOrError = new CertOrError(
                         ((ErrorResultEntryType) resultEntry).getStatusInfo());
-            }
-            else
+            } else
             {
                 certOrError = null;
             }
@@ -1530,7 +1512,7 @@ public final class CAClientImpl implements CAClient
                 continue;
             }
 
-            if (verify(caCert, cert) == false)
+            if (!verify(caCert, cert))
             {
                 LOG.warn("not all certificates are issued by CA embedded in caPubs,"
                         + " ignore the caPubs");

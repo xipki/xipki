@@ -203,8 +203,7 @@ public abstract class CmpRequestor
         if (signRequest)
         {
             _request = sign(request);
-        }
-        else
+        } else
         {
             _request = request;
         }
@@ -264,7 +263,7 @@ public abstract class CmpRequestor
         PKIHeader respHeader = response.getHeader();
         ASN1OctetString tid = respHeader.getTransactionID();
         GeneralName recipient = respHeader.getRecipient();
-        if (sender.equals(recipient) == false)
+        if (!sender.equals(recipient))
         {
             LOG.warn("tid={}: unknown CMP requestor '{}'", tid, recipient);
         }
@@ -281,8 +280,7 @@ public abstract class CmpRequestor
             {
                 throw new CmpRequestorException(e.getMessage(), e);
             }
-        }
-        else if (signRequest)
+        } else if (signRequest)
         {
             PKIBody respBody = response.getBody();
             int bodyType = respBody.getType();
@@ -371,8 +369,7 @@ public abstract class CmpRequestor
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
             throw new CmpRequestorException(SecurityUtil.formatPKIStatusInfo(
                     content.getPKIStatusInfo()));
-        }
-        else if (PKIBody.TYPE_GEN_REP != bodyType)
+        } else if (PKIBody.TYPE_GEN_REP != bodyType)
         {
             throw new CmpRequestorException("unknown PKI body type " + bodyType
                     + " instead the exceptected [" + PKIBody.TYPE_GEN_REP  + ", "
@@ -464,8 +461,7 @@ public abstract class CmpRequestor
         if (tid == null)
         {
             _tid = new DEROctetString(randomTransactionId());
-        }
-        else
+        } else
         {
             _tid = tid;
         }
@@ -541,14 +537,13 @@ public abstract class CmpRequestor
             if (h.getSender().getTagNo() != GeneralName.directoryName)
             {
                 authorizedResponder = false;
-            }
-            else
+            } else
             {
                 String c14nMsgSender = getSortedRFC4519Name((X500Name) h.getSender().getName());
                 authorizedResponder = c14nRecipientName.equalsIgnoreCase(c14nMsgSender);
             }
 
-            if (authorizedResponder == false)
+            if (!authorizedResponder)
             {
                 LOG.warn("tid={}: not authorized responder '{}'", tid, h.getSender());
                 return new ProtectionVerificationResult(null,
@@ -603,8 +598,7 @@ public abstract class CmpRequestor
         if (value != null)
         {
             itv = new InfoTypeAndValue(type, value);
-        }
-        else
+        } else
         {
             itv = new InfoTypeAndValue(type);
         }

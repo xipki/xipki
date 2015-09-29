@@ -125,8 +125,7 @@ public class P11ModuleConf
         if (CollectionUtil.isEmpty(includeSlots))
         {
             included = true;
-        }
-        else
+        } else
         {
             included = false;
             for (P11SlotIdentifier _slot : includeSlots)
@@ -139,7 +138,7 @@ public class P11ModuleConf
             }
         }
 
-        if (included == false)
+        if (!included)
         {
             return false;
         }

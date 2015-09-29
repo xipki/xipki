@@ -141,16 +141,13 @@ public class CALoadTestEnrollCmd extends CALoadTestCmd
         if ("EC".equalsIgnoreCase(keyType))
         {
             keyEntry = new ECKeyEntry(curveName);
-        }
-        else if ("RSA".equalsIgnoreCase(keyType))
+        } else if ("RSA".equalsIgnoreCase(keyType))
         {
             keyEntry = new RSAKeyEntry(keysize.intValue());
-        }
-        else if ("DSA".equalsIgnoreCase(keyType))
+        } else if ("DSA".equalsIgnoreCase(keyType))
         {
             keyEntry = new DSAKeyEntry(keysize.intValue());
-        }
-        else
+        } else
         {
             throw new IllegalCmdParamException("invalid keyType " + keyType);
         }

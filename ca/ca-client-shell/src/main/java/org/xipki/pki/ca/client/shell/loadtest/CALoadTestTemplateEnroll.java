@@ -107,7 +107,7 @@ public class CALoadTestTemplateEnroll extends LoadExecutor
         @Override
         public void run()
         {
-            while (stop() == false && getErrorAccout() < 1)
+            while (!stop() && getErrorAccout() < 1)
             {
                 Map<Integer, CertRequestWithProfile> certReqs = nextCertRequests();
                 if (certReqs != null)
@@ -117,8 +117,7 @@ public class CALoadTestTemplateEnroll extends LoadExecutor
                             ? 0
                             : 1;
                     account(1, numFailed);
-                }
-                else
+                } else
                 {
                     account(1, 1);
                 }
@@ -224,16 +223,13 @@ public class CALoadTestTemplateEnroll extends LoadExecutor
             if (entry.getEcKey() != null)
             {
                 keyEntry = new ECKeyEntry(entry.getEcKey().getCurve());
-            }
-            else if (entry.getRsaKey() != null)
+            } else if (entry.getRsaKey() != null)
             {
                 keyEntry = new RSAKeyEntry(entry.getRsaKey().getModulusLength());
-            }
-            else if (entry.getDsaKey() != null)
+            } else if (entry.getDsaKey() != null)
             {
                 keyEntry = new DSAKeyEntry(entry.getDsaKey().getPLength());
-            }
-            else
+            } else
             {
                 throw new RuntimeException("should not reach here, unknown child of KeyEntry");
             }
@@ -330,8 +326,7 @@ public class CALoadTestTemplateEnroll extends LoadExecutor
             if (root instanceof JAXBElement)
             {
                 return (EnrollTemplateType) ((JAXBElement<?>) root).getValue();
-            }
-            else
+            } else
             {
                 throw new InvalidConfException("invalid root element type");
             }

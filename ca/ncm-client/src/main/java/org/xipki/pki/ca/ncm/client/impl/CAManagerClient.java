@@ -122,8 +122,7 @@ public class CAManagerClient implements CAManager
         if (versionS == null)
         {
             version = 0;
-        }
-        else
+        } else
         {
             try
             {

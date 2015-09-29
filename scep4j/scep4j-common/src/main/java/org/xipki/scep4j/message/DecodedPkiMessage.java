@@ -377,7 +377,7 @@ public class DecodedPkiMessage extends PkiMessage
         for (Attribute attr : attrs)
         {
             ASN1ObjectIdentifier type = attr.getAttrType();
-            if (scepAttrTypes.contains(type) == false)
+            if (!scepAttrTypes.contains(type))
             {
                 ret.addSignendAttribute(type, attr.getAttrValues().getObjectAt(0));
             }
@@ -401,7 +401,7 @@ public class DecodedPkiMessage extends PkiMessage
         ret.setDigestAlgorithm(digestAlgOID);
 
         String sigAlgOID = signerInfo.getEncryptionAlgOID();
-        if (PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOID) == false)
+        if (!PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOID))
         {
             ASN1ObjectIdentifier _digestAlgOID;
             try
@@ -418,7 +418,7 @@ public class DecodedPkiMessage extends PkiMessage
                 ret.setFailureMessage(msg);
                 return ret;
             }
-            if (digestAlgOID.equals(_digestAlgOID) == false)
+            if (!digestAlgOID.equals(_digestAlgOID))
             {
                 ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use the"
                         + " same digestAlgorithm");
@@ -471,7 +471,7 @@ public class DecodedPkiMessage extends PkiMessage
         }
 
         ret.setSignatureValid(signatureValid);
-        if (signatureValid == false)
+        if (!signatureValid)
         {
             return ret;
         }
@@ -485,10 +485,10 @@ public class DecodedPkiMessage extends PkiMessage
         // MessageData
         CMSTypedData signedContent = pkiMessage.getSignedContent();
         ASN1ObjectIdentifier signedContentType = signedContent.getContentType();
-        if (CMSObjectIdentifiers.envelopedData.equals(signedContentType) == false)
+        if (!CMSObjectIdentifiers.envelopedData.equals(signedContentType))
         {
             // fall back: some SCEP client, such as JSCEP use id-data
-            if (CMSObjectIdentifiers.data.equals(signedContentType) == false)
+            if (!CMSObjectIdentifiers.data.equals(signedContentType))
             {
                 ret.setFailureMessage("either id-envelopedData or id-data is excepted, but not '"
                         + signedContentType.getId());
@@ -575,13 +575,11 @@ public class DecodedPkiMessage extends PkiMessage
         if (value instanceof DERPrintableString)
         {
             return ((DERPrintableString) value).getString();
-        }
-        else if (value != null)
+        } else if (value != null)
         {
             throw new MessageDecodingException("the value of attribute " + type.getId()
                     + " is not PrintableString");
-        }
-        else
+        } else
         {
             return null;
         }
@@ -617,13 +615,11 @@ public class DecodedPkiMessage extends PkiMessage
         {
             byte[] bytes = ((ASN1OctetString) value).getOctets();
             return new Nonce(bytes);
-        }
-        else if (value != null)
+        } else if (value != null)
         {
             throw new MessageDecodingException("the value of attribute " + type.getId()
                     + " is not OctetString");
-        }
-        else
+        } else
         {
             return null;
         }

@@ -129,8 +129,7 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
         if (null == basicResp.getSignature())
         {
             out("response is not signed");
-        }
-        else
+        } else
         {
             X509CertificateHolder[] responderCerts = basicResp.getCerts();
             if (responderCerts == null || responderCerts.length < 1)
@@ -143,7 +142,7 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
             for (Date thisUpdate : thisUpdates)
             {
                 validOn = respSigner.isValidOn(thisUpdate);
-                if (validOn == false)
+                if (!validOn)
                 {
                     throw new CmdFailure("responder certificate is not valid on " + thisUpdate);
                 }
@@ -156,7 +155,7 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
                 ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(responderPubKey);
                 boolean sigValid = basicResp.isSignatureValid(cvp);
 
-                if (sigValid == false)
+                if (!sigValid)
                 {
                     throw new CmdFailure("response is equipped with invalid signature");
                 }
@@ -178,13 +177,12 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
                         }
                     }
 
-                    if (certValid == false)
+                    if (!certValid)
                     {
                         throw new CmdFailure("response is equipped with valid signature but the"
                                 + " OCSP signer is not trusted");
                     }
-                }
-                else
+                } else
                 {
                     out("response is equipped with valid signature");
                 }
@@ -211,8 +209,7 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
             if (singleCertStatus == null)
             {
                 status = "good";
-            }
-            else if (singleCertStatus instanceof RevokedStatus)
+            } else if (singleCertStatus instanceof RevokedStatus)
             {
                 RevokedStatus revStatus = (RevokedStatus) singleCertStatus;
                 Date revTime = revStatus.getRevocationTime();
@@ -231,8 +228,7 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
                             && revTime.getTime() == 0)
                     {
                         status = "unknown (RFC6960)";
-                    }
-                    else
+                    } else
                     {
                         StringBuilder sb = new StringBuilder("revoked, reason = ");
                         sb.append(CRLReason.forReasonCode(reason).getDescription());
@@ -245,17 +241,14 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
                         }
                         status = sb.toString();
                     }
-                }
-                else
+                } else
                 {
                     status = "revoked, no reason, revocationTime = " + revTime;
                 }
-            }
-            else if (singleCertStatus instanceof UnknownStatus)
+            } else if (singleCertStatus instanceof UnknownStatus)
             {
                 status = "unknown (RFC2560)";
-            }
-            else
+            } else
             {
                 status = "ERROR";
             }
@@ -290,8 +283,7 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
                         if (Arrays.equals(expectedHashValue, hashValue))
                         {
                             msg.append("\tThis matches the requested certificate");
-                        }
-                        else
+                        } else
                         {
                             msg.append("\tThis differs from the requested certificate");
                         }
@@ -312,8 +304,7 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
                 if (sigAlg == null)
                 {
                     msg.append(("\nresponse is not signed"));
-                }
-                else
+                } else
                 {
                     String sigAlgName = AlgorithmUtil.getSignatureAlgoName(sigAlg);
                     if (sigAlgName == null)
@@ -330,8 +321,7 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
                 if (extensionOIDs == null || extensionOIDs.size() == 0)
                 {
                     msg.append("-");
-                }
-                else
+                } else
                 {
                     int size = extensionOIDs.size();
                     for (int j = 0; j < size; j++)

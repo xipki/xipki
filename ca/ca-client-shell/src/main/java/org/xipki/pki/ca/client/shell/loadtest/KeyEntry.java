@@ -222,8 +222,7 @@ public abstract class KeyEntry
                 if (pLength >= 2048)
                 {
                     qLength = 256;
-                }
-                else
+                } else
                 {
                     qLength = 160;
                 }
@@ -310,8 +309,7 @@ public abstract class KeyEntry
             {
                 curveOid = new ASN1ObjectIdentifier(curveNameOrOid);
                 curveName = KeyUtil.getCurveName(curveOid);
-            }
-            else
+            } else
             {
                 curveName = curveNameOrOid;
                 curveOid = KeyUtil.getCurveOID(curveName);

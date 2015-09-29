@@ -167,8 +167,7 @@ public class P11ListSlotCmd extends SecurityCmd
                 if (cert == null)
                 {
                     sb.append("\t\tCertificate: NONE\n");
-                }
-                else
+                } else
                 {
                     formatString(sb, cert);
                 }
@@ -243,13 +242,13 @@ public class P11ListSlotCmd extends SecurityCmd
         for (X509PublicKeyCertificate certObj : certificateObjects)
         {
             if (keyId != null
-                    && (Arrays.equals(keyId, certObj.getId().getByteArrayValue()) == false))
+                    && !Arrays.equals(keyId, certObj.getId().getByteArrayValue()))
             {
                 continue;
             }
 
             if (keyLabel != null
-                    && (Arrays.equals(keyLabel, certObj.getLabel().getCharArrayValue()) == false))
+                    && !Arrays.equals(keyLabel, certObj.getLabel().getCharArrayValue()))
             {
                 continue;
             }
@@ -281,7 +280,7 @@ public class P11ListSlotCmd extends SecurityCmd
             subject = new String(bytes);
         }
 
-        if (verbose.booleanValue() == false)
+        if (!verbose.booleanValue())
         {
             sb.append("\t\tCertificate: ").append(subject).append("\n");
             return;
@@ -338,7 +337,7 @@ public class P11ListSlotCmd extends SecurityCmd
     {
         String subject = X509Util.getRFC4519Name(cert.getSubjectX500Principal());
 
-        if (verbose.booleanValue() == false)
+        if (!verbose.booleanValue())
         {
             sb.append("\t\tCertificate: ").append(subject).append("\n");
             return;
@@ -380,8 +379,7 @@ public class P11ListSlotCmd extends SecurityCmd
         if (key instanceof RSAPublicKey)
         {
             return "RSA";
-        }
-        else if (key instanceof ECDSAPublicKey)
+        } else if (key instanceof ECDSAPublicKey)
         {
             byte[] paramBytes = ((ECDSAPublicKey) key).getEcdsaParams().getByteArrayValue();
             if (paramBytes.length < 50)
@@ -396,17 +394,14 @@ public class P11ListSlotCmd extends SecurityCmd
                 {
                     return "EC";
                 }
-            }
-            else
+            } else
             {
                 return "EC (specified curve)";
             }
-        }
-        else if (key instanceof DSAPublicKey)
+        } else if (key instanceof DSAPublicKey)
         {
             return "DSA";
-        }
-        else
+        } else
         {
             return "UNKNOWN";
         }
@@ -457,19 +452,16 @@ public class P11ListSlotCmd extends SecurityCmd
                 if (o.keyLabel == null)
                 {
                     return 0;
-                }
-                else
+                } else
                 {
                     return 1;
                 }
-            }
-            else
+            } else
             {
                 if (o.keyLabel == null)
                 {
                     return -1;
-                }
-                else
+                } else
                 {
                     return new String(keyLabel).compareTo(new String(o.keyLabel));
                 }
@@ -506,8 +498,7 @@ public class P11ListSlotCmd extends SecurityCmd
                     ? "no"
                     : "1";
             out(numText + " slot is configured");
-        }
-        else
+        } else
         {
             out(n + " slots are configured");
         }

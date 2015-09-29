@@ -198,7 +198,7 @@ public abstract class AbstractCATest
         {
             Certificate expCACert = scepServer.getCACert();
             cACert = client.getAuthorityCertStore().getCACert();
-            if (equals(expCACert, cACert) == false)
+            if (!equals(expCACert, cACert))
             {
                 Assert.fail("Configured and received CA certificate not the same");
             }
@@ -213,7 +213,7 @@ public abstract class AbstractCATest
             X509Certificate rAEncCert = client.getAuthorityCertStore().getEncryptionCert();
             Assert.assertEquals("RA certificate", rASigCert, rAEncCert);
 
-            if (equals(expRACert, rASigCert) == false)
+            if (!equals(expRACert, rASigCert))
             {
                 Assert.fail("Configured and received RA certificate not the same");
             }
@@ -226,7 +226,7 @@ public abstract class AbstractCATest
 
             Certificate expNextCACert = scepServer.getNextCACert();
             X509Certificate nextCACert = nextCA.getCACert();
-            if (equals(expNextCACert, nextCACert) == false)
+            if (!equals(expNextCACert, nextCACert))
             {
                 Assert.fail("Configured and received next CA certificate not the same");
             }
@@ -238,7 +238,7 @@ public abstract class AbstractCATest
                 X509Certificate nextRAEncCert = nextCA.getEncryptionCert();
                 Assert.assertEquals("Next RA certificate", nextRASigCert, nextRAEncCert);
 
-                if (equals(expNextRACert, nextRASigCert) == false)
+                if (!equals(expNextRACert, nextRASigCert))
                 {
                     Assert.fail("Configured and received next RA certificate not the same");
                 }
@@ -349,7 +349,7 @@ public abstract class AbstractCATest
         }
         if (isWithNextCA())
         {
-            if (caCaps.containsCapability(CACapability.GetNextCACert) == false)
+            if (!caCaps.containsCapability(CACapability.GetNextCACert))
             {
                 caCaps.addCapability(CACapability.GetNextCACert);
             }

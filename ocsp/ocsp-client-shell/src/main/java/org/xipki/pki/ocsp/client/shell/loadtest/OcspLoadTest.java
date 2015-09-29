@@ -122,7 +122,7 @@ public class OcspLoadTest extends LoadExecutor
         @Override
         public void run()
         {
-            while (stop() == false && getErrorAccout() < 10)
+            while (!stop() && getErrorAccout() < 10)
             {
                 long sn = nextSerialNumber();
                 int numFailed = testNext(sn)
@@ -166,14 +166,12 @@ public class OcspLoadTest extends LoadExecutor
             {
                 LOG.warn("received no status from server");
                 return false;
-            }
-            else if (n != 1)
+            } else if (n != 1)
             {
                 LOG.warn("received status with {} single responses from server, {}",
                         n, "but 1 was requested");
                 return false;
-            }
-            else
+            } else
             {
                 SingleResp singleResp = singleResponses[0];
                 CertificateStatus singleCertStatus = singleResp.getCertStatus();
@@ -182,8 +180,7 @@ public class OcspLoadTest extends LoadExecutor
                 if (singleCertStatus == null)
                 {
                     status = "good";
-                }
-                else if (singleCertStatus instanceof RevokedStatus)
+                } else if (singleCertStatus instanceof RevokedStatus)
                 {
                     RevokedStatus revStatus = (RevokedStatus) singleCertStatus;
                     Date revTime = revStatus.getRevocationTime();
@@ -192,17 +189,14 @@ public class OcspLoadTest extends LoadExecutor
                     {
                         int reason = revStatus.getRevocationReason();
                         status = "revoked, reason = " + reason + ", revocationTime = " + revTime;
-                    }
-                    else
+                    } else
                     {
                         status = "revoked, no reason, revocationTime = " + revTime;
                     }
-                }
-                else if (singleCertStatus instanceof UnknownStatus)
+                } else if (singleCertStatus instanceof UnknownStatus)
                 {
                     status = "unknown";
-                }
-                else
+                } else
                 {
                     LOG.warn("status: ERROR");
                     return false;

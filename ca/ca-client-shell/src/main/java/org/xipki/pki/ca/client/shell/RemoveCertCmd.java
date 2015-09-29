@@ -91,8 +91,7 @@ public class RemoveCertCmd extends UnRevRemoveCertCmd
             {
                 saveRequestResponse(debug);
             }
-        }
-        else
+        } else
         {
             X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
             RequestResponseDebug debug = getRequestResponseDebug();
@@ -109,8 +108,7 @@ public class RemoveCertCmd extends UnRevRemoveCertCmd
         {
             PKIStatusInfo error = certIdOrError.getError();
             throw new UnexpectedException("removing certificate failed: " + error);
-        }
-        else
+        } else
         {
             out("removed certificate");
         }

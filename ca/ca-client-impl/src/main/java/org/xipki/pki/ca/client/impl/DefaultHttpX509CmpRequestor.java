@@ -131,7 +131,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor
                 isValidContentType = true;
             }
         }
-        if (isValidContentType == false)
+        if (!isValidContentType)
         {
             inputStream.close();
             throw new IOException("bad response: mime type "

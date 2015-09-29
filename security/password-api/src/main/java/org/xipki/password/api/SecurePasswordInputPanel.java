@@ -100,10 +100,10 @@ public class SecurePasswordInputPanel extends Panel
         int n = rows.size();
 
         SecureRandom random = new SecureRandom();
-        while (rows.isEmpty() == false)
+        while (!rows.isEmpty())
         {
             int row = random.nextInt() % n;
-            if (rows.contains(row) == false)
+            if (!rows.contains(row))
             {
                 continue;
             }
@@ -175,12 +175,10 @@ public class SecurePasswordInputPanel extends Panel
                 {
                     password = password.substring(0, password.length() - 1);
                 }
-            }
-            else if (CLEAR.equals(pressedKey))
+            } else if (CLEAR.equals(pressedKey))
             {
                 password = "";
-            }
-            else
+            } else
             {
                 password += btn.getText();
             }
@@ -225,8 +223,7 @@ public class SecurePasswordInputPanel extends Panel
             if (option == 0) // pressing OK button
             {
                 return gui.getPassword();
-            }
-            else
+            } else
             {
                 return null;
             }

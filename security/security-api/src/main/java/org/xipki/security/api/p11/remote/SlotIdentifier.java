@@ -100,8 +100,7 @@ public class SlotIdentifier extends ASN1Object
                 {
                     slotIdASN1Obj = seq.getObjectAt(1);
                 }
-            }
-            else
+            } else
             {
                 slotIdASN1Obj = obj;
             }
@@ -117,8 +116,7 @@ public class SlotIdentifier extends ASN1Object
                 {
                     ASN1Integer i = ASN1Integer.getInstance(tagObj.getObject());
                     slotId = i.getPositiveValue().longValue();
-                }
-                else
+                } else
                 {
                     throw new BadASN1ObjectException("unknown tag " + tagNo);
                 }

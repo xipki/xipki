@@ -284,8 +284,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             {
                 throw new CertprofileException("invalid version " + intVersion);
             }
-        }
-        else
+        } else
         {
             this.version = X509CertVersion.V3;
         }
@@ -341,8 +340,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         if (confParams == null)
         {
             parameters = null;
-        }
-        else
+        } else
         {
             Map<String, String> tMap = new HashMap<>();
             for (NameValueType nv : confParams.getParameter())
@@ -401,8 +399,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             if (t.getMinLen() != null || t.getMaxLen() != null)
             {
                 range = new Range(t.getMinLen(), t.getMaxLen());
-            }
-            else
+            } else
             {
                 range = null;
             }
@@ -724,14 +721,12 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                     {
                         QCStatement qcStatment = new QCStatement(qcStatementId);
                         qcStatementOption = new QcStatementOption(qcStatment);
-                    }
-                    else if (statementValue.getQcRetentionPeriod() != null)
+                    } else if (statementValue.getQcRetentionPeriod() != null)
                     {
                         QCStatement qcStatment = new QCStatement(qcStatementId,
                                 new ASN1Integer(statementValue.getQcRetentionPeriod()));
                         qcStatementOption = new QcStatementOption(qcStatment);
-                    }
-                    else if (statementValue.getConstant() != null)
+                    } else if (statementValue.getConstant() != null)
                     {
                         ASN1Encodable constantStatementValue;
                         try
@@ -746,8 +741,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                         QCStatement qcStatment = new QCStatement(qcStatementId,
                                 constantStatementValue);
                         qcStatementOption = new QcStatementOption(qcStatment);
-                    }
-                    else if (statementValue.getQcEuLimitValue() != null)
+                    } else if (statementValue.getQcEuLimitValue() != null)
                     {
                         QcEuLimitValueType euLimitType = statementValue.getQcEuLimitValue();
                         String sCurrency = euLimitType.getCurrency().toUpperCase();
@@ -763,8 +757,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                         {
                             int cCode = Integer.parseInt(sCurrency);
                             currency = new Iso4217CurrencyCode(cCode);
-                        }
-                        else
+                        } else
                         {
                             currency = new Iso4217CurrencyCode(sCurrency);
                         }
@@ -778,8 +771,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                             QCStatement qcStatment =
                                     new QCStatement(qcStatementId, monetaryValue);
                             qcStatementOption = new QcStatementOption(qcStatment);
-                        }
-                        else
+                        } else
                         {
                             MonetaryValueOption monetaryValueOption =
                                     new MonetaryValueOption(currency, r1, r2);
@@ -788,8 +780,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                             requireInfoFromReq = true;
                         }
                         currencyCodes.add(sCurrency);
-                    }
-                    else
+                    } else
                     {
                         throw new RuntimeException("unknown value of qcStatment");
                     }
@@ -797,7 +788,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                     this.qcStatementsOption.add(qcStatementOption);
                 }
 
-                if (requireInfoFromReq == false)
+                if (!requireInfoFromReq)
                 {
                     ASN1EncodableVector v = new ASN1EncodableVector();
                     for (QcStatementOption m : qcStatementsOption)
@@ -996,8 +987,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             if (privateKeyUsagePeriod == null)
             {
                 _notAfter = notAfter;
-            }
-            else
+            } else
             {
                 _notAfter = privateKeyUsagePeriod.add(notBefore);
                 if (_notAfter.after(notAfter))
@@ -1021,8 +1011,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             if (qCStatments != null)
             {
                 values.addExtension(type, qCStatments);
-            }
-            else if (qcStatementsOption != null)
+            } else if (qcStatementsOption != null)
             {
                 // extract the euLimit data from request
                 Extension extension = requestedExtensions.getExtension(type);
@@ -1038,8 +1027,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                 for (int i = 0; i < n; i++)
                 {
                     QCStatement stmt = QCStatement.getInstance(seq.getObjectAt(i));
-                    if (ObjectIdentifiers.id_etsi_qcs_QcLimitValue.equals(stmt.getStatementId())
-                            == false)
+                    if (!ObjectIdentifiers.id_etsi_qcs_QcLimitValue.equals(stmt.getStatementId()))
                     {
                         continue;
                     }
@@ -1101,8 +1089,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                         extensionControls.get(type).isCritical(),
                         new DERSequence(v));
                 values.addExtension(type, extValue);
-            }
-            else
+            } else
             {
                 throw new RuntimeException("should not reach here");
             }
@@ -1132,14 +1119,14 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             {
                 BiometricData m = BiometricData.getInstance(seq.getObjectAt(i));
                 TypeOfBiometricData t = m.getTypeOfBiometricData();
-                if (biometricDataOption.isTypePermitted(t) == false)
+                if (!biometricDataOption.isTypePermitted(t))
                 {
                     throw new BadCertTemplateException(
                             "biometricInfo[" + i + "].typeOfBiometricData is not permitted");
                 }
 
                 ASN1ObjectIdentifier hashAlgo = m.getHashAlgorithm().getAlgorithm();
-                if (biometricDataOption.isHashAlgorithmPermitted(hashAlgo) == false)
+                if (!biometricDataOption.isHashAlgorithmPermitted(hashAlgo))
                 {
                     throw new BadCertTemplateException(
                             "biometricInfo[" + i + "].hashAlgorithm is not permitted");
@@ -1403,7 +1390,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     {
         for (ExtensionType m : extensionsType.getExtension())
         {
-            if (m.getType().getValue().equals(type.getId()) == false)
+            if (!m.getType().getValue().equals(type.getId()))
             {
                 continue;
             }
@@ -1417,13 +1404,11 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             if (expectedClass.isAssignableFrom(o.getClass()))
             {
                 return o;
-            }
-            else if (ConstantExtValue.class.isAssignableFrom(o.getClass()))
+            } else if (ConstantExtValue.class.isAssignableFrom(o.getClass()))
             {
                 // will be processed later
                 return null;
-            }
-            else
+            } else
             {
                 String displayName = ObjectIdentifiers.oidToDisplayName(type);
                 throw new CertprofileException("the extension configuration for "

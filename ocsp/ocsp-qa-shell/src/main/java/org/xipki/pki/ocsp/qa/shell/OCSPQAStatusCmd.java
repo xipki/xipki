@@ -211,7 +211,7 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCmd
         }
 
         out(sb.toString());
-        if (result.isAllSuccessful() == false)
+        if (!result.isAllSuccessful())
         {
             throw new CmdFailure("OCSP response is invalid");
         }

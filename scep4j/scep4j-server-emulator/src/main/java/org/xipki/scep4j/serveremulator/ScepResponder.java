@@ -260,14 +260,14 @@ public class ScepResponder
         }
 
         Boolean b = req.isSignatureValid();
-        if (b != null && b.booleanValue() == false)
+        if (b != null && !b.booleanValue())
         {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badMessageCheck);
         }
 
         b = req.isDecryptionSuccessful();
-        if (b != null && b.booleanValue() == false)
+        if (b != null && !b.booleanValue())
         {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badRequest);
@@ -280,8 +280,7 @@ public class ScepResponder
             if (signingTime == null)
             {
                 isTimeBad = true;
-            }
-            else
+            } else
             {
                 long now = System.currentTimeMillis();
                 long diff = now - signingTime.getTime();
@@ -316,22 +315,19 @@ public class ScepResponder
                 {
                     supported = true;
                 }
-            }
-            else if (hashAlgoType == HashAlgoType.SHA256)
+            } else if (hashAlgoType == HashAlgoType.SHA256)
             {
                 if (cACaps.containsCapability(CACapability.SHA256))
                 {
                     supported = true;
                 }
-            }
-            else if (hashAlgoType == HashAlgoType.SHA512)
+            } else if (hashAlgoType == HashAlgoType.SHA512)
             {
                 if (cACaps.containsCapability(CACapability.SHA512))
                 {
                     supported = true;
                 }
-            }
-            else if (hashAlgoType == HashAlgoType.MD5)
+            } else if (hashAlgoType == HashAlgoType.MD5)
             {
                 if (control.isUseInsecureAlg())
                 {
@@ -339,7 +335,7 @@ public class ScepResponder
                 }
             }
 
-            if (supported == false)
+            if (!supported)
             {
                 LOG.warn("tid={}: unsupported digest algorithm {}", tid, oid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
@@ -351,7 +347,7 @@ public class ScepResponder
         ASN1ObjectIdentifier encOid = req.getContentEncryptionAlgorithm();
         if (CMSAlgorithm.DES_EDE3_CBC.equals(encOid))
         {
-            if (cACaps.containsCapability(CACapability.DES3) == false)
+            if (!cACaps.containsCapability(CACapability.DES3))
             {
                 LOG.warn("tid={}: encryption with DES3 algorithm is not permitted", tid, encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
@@ -359,7 +355,7 @@ public class ScepResponder
             }
         } else if (aesEncAlgs.contains(encOid))
         {
-            if (cACaps.containsCapability(CACapability.AES) == false)
+            if (!cACaps.containsCapability(CACapability.AES))
             {
                 LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid,
                         encOid);
@@ -368,7 +364,7 @@ public class ScepResponder
             }
         } else if (CMSAlgorithm.DES_CBC.equals(encOid))
         {
-            if (control.isUseInsecureAlg() == false)
+            if (!control.isUseInsecureAlg())
             {
                 LOG.warn("tid={}: encryption with DES algorithm {} is not permitted", tid,
                         encOid);
@@ -396,7 +392,7 @@ public class ScepResponder
             CertificationRequest p10ReqInfo = (CertificationRequest) req.getMessageData();
 
             String challengePwd = getChallengePassword(p10ReqInfo.getCertificationRequestInfo());
-            if (challengePwd == null || control.getSecret().equals(challengePwd) == false)
+            if (challengePwd == null || !control.getSecret().equals(challengePwd))
             {
                 LOG.warn("challengePassword is not trusted");
                 rep.setPkiStatus(PkiStatus.FAILURE);
@@ -460,7 +456,7 @@ public class ScepResponder
         }
         case RenewalReq:
         {
-            if (cACaps.containsCapability(CACapability.Renewal) == false)
+            if (!cACaps.containsCapability(CACapability.Renewal))
             {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badRequest);
@@ -488,7 +484,7 @@ public class ScepResponder
         }
         case UpdateReq:
         {
-            if (cACaps.containsCapability(CACapability.Update) == false)
+            if (!cACaps.containsCapability(CACapability.Update))
             {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badRequest);

@@ -196,7 +196,14 @@ public abstract class LoadExecutor
 
     protected static void printHeader()
     {
-        System.out.println("    processed       time       #/s   AVG-#/s");
+        System.out.println(
+                "------------------------------------------------------------");
+        System.out.println(
+                "   processed     average     current     elapsed");
+        System.out.println(
+                "      number       speed       speed        time");
+        System.out.println();
+        System.out.flush();
     }
 
     protected void printStatus()
@@ -204,15 +211,6 @@ public abstract class LoadExecutor
         long currentAccount = account.get();
         long now = System.currentTimeMillis();
         measureDeque.addLast(new MeasurePoint(now, currentAccount));
-
-        StringBuilder sb = new StringBuilder("\r");
-
-        sb.append(StringUtil.formatAccount(currentAccount, true));
-
-        long t = (now - startTime) / 1000;  // in s
-        String time = StringUtil.formatTime(t, true);
-        sb.append("  ");
-        sb.append(time);
 
         MeasurePoint referenceMeasurePoint;
         int numMeasurePoints = measureDeque.size();
@@ -224,19 +222,39 @@ public abstract class LoadExecutor
             referenceMeasurePoint = measureDeque.getFirst();
         }
 
-        long speed = 0;
+        // elapsed time
+        long elapsedTimeMs = now - startTime;
+
+        // current speed
+        long currentSpeed = 0;
         long t2inms = now - referenceMeasurePoint.getMeasureTime(); // in ms
         if (t2inms > 0)
         {
-            speed = (currentAccount - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
+            currentSpeed = (currentAccount - referenceMeasurePoint.getMeasureAccount())
+                    * 1000 / t2inms;
         }
-        sb.append(StringUtil.formatSpeed(speed, true));
 
-        long t2 = now - startTime;
-        speed = (t2 > 0)
-                ? currentAccount * 1000 / t2
-                : 0;
-        sb.append(StringUtil.formatSpeed(speed, true));
+        // average speed
+        long averageSpeed = 0;
+
+        if (elapsedTimeMs > 0)
+        {
+            averageSpeed = currentAccount * 1000 / elapsedTimeMs;
+        }
+
+        StringBuilder sb = new StringBuilder("\r");
+
+        // processed number
+        sb.append(StringUtil.formatAccount(currentAccount, true));
+
+        // average speed
+        sb.append(StringUtil.formatAccount(averageSpeed, true));
+
+        // current speed
+        sb.append(StringUtil.formatAccount(currentSpeed, true));
+
+        // elapsed time
+        sb.append(StringUtil.formatTime(elapsedTimeMs / 1000, true));
 
         System.out.print(sb.toString());
         System.out.flush();

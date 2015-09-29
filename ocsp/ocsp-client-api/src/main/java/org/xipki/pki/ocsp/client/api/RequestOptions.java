@@ -203,43 +203,34 @@ public class RequestOptions
         if ("SHA1withRSA".equalsIgnoreCase(algoName))
         {
             algOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
-        }
-        else if ("SHA256withRSA".equalsIgnoreCase(algoName))
+        } else if ("SHA256withRSA".equalsIgnoreCase(algoName))
         {
             algOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
-        }
-        else if ("SHA384withRSA".equalsIgnoreCase(algoName))
+        } else if ("SHA384withRSA".equalsIgnoreCase(algoName))
         {
             algOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
-        }
-        else if ("SHA512withRSA".equalsIgnoreCase(algoName))
+        } else if ("SHA512withRSA".equalsIgnoreCase(algoName))
         {
             algOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
-        }
-        else if ("SHA1withECDSA".equalsIgnoreCase(algoName))
+        } else if ("SHA1withECDSA".equalsIgnoreCase(algoName))
         {
             algOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
-        }
-        else if ("SHA256withECDSA".equalsIgnoreCase(algoName))
+        } else if ("SHA256withECDSA".equalsIgnoreCase(algoName))
         {
             algOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
-        }
-        else if ("SHA384withECDSA".equalsIgnoreCase(algoName))
+        } else if ("SHA384withECDSA".equalsIgnoreCase(algoName))
         {
             algOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
-        }
-        else if ("SHA512withECDSA".equalsIgnoreCase(algoName))
+        } else if ("SHA512withECDSA".equalsIgnoreCase(algoName))
         {
             algOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
-        }
-        else if ("SHA1withRSAandMGF1".equalsIgnoreCase(algoName)
+        } else if ("SHA1withRSAandMGF1".equalsIgnoreCase(algoName)
                 || "SHA256withRSAandMGF1".equalsIgnoreCase(algoName)
                 || "SHA384withRSAandMGF1".equalsIgnoreCase(algoName)
                 || "SHA512withRSAandMGF1".equalsIgnoreCase(algoName))
         {
             algOid = PKCSObjectIdentifiers.id_RSASSA_PSS;
-        }
-        else
+        } else
         {
             throw new RuntimeException("Unsupported algorithm " + algoName); // should not happen
         }
@@ -251,22 +242,18 @@ public class RequestOptions
             if ("SHA1withRSAandMGF1".equalsIgnoreCase(algoName))
             {
                 digestAlgOid = X509ObjectIdentifiers.id_SHA1;
-            }
-            else if ("SHA256withRSAandMGF1".equalsIgnoreCase(algoName))
+            } else if ("SHA256withRSAandMGF1".equalsIgnoreCase(algoName))
             {
                 digestAlgOid = NISTObjectIdentifiers.id_sha256;
-            }
-            else if ("SHA384withRSAandMGF1".equalsIgnoreCase(algoName))
+            } else if ("SHA384withRSAandMGF1".equalsIgnoreCase(algoName))
             {
                 digestAlgOid = NISTObjectIdentifiers.id_sha384;
-            }
-            else // if ("SHA512withRSAandMGF1".equalsIgnoreCase(algoName))
+            } else // if ("SHA512withRSAandMGF1".equalsIgnoreCase(algoName))
             {
                 digestAlgOid = NISTObjectIdentifiers.id_sha512;
             }
             params = createPSSRSAParams(digestAlgOid);
-        }
-        else
+        } else
         {
             params = DERNull.INSTANCE;
         }
@@ -282,24 +269,19 @@ public class RequestOptions
         if (X509ObjectIdentifiers.id_SHA1.equals(digestAlgOID))
         {
             saltSize = 20;
-        }
-        else if (NISTObjectIdentifiers.id_sha224.equals(digestAlgOID))
+        } else if (NISTObjectIdentifiers.id_sha224.equals(digestAlgOID))
         {
             saltSize = 28;
-        }
-        else if (NISTObjectIdentifiers.id_sha256.equals(digestAlgOID))
+        } else if (NISTObjectIdentifiers.id_sha256.equals(digestAlgOID))
         {
             saltSize = 32;
-        }
-        else if (NISTObjectIdentifiers.id_sha384.equals(digestAlgOID))
+        } else if (NISTObjectIdentifiers.id_sha384.equals(digestAlgOID))
         {
             saltSize = 48;
-        }
-        else if (NISTObjectIdentifiers.id_sha512.equals(digestAlgOID))
+        } else if (NISTObjectIdentifiers.id_sha512.equals(digestAlgOID))
         {
             saltSize = 64;
-        }
-        else
+        } else
         {
             throw new RuntimeException("unknown digest algorithm " + digestAlgOID);
         }

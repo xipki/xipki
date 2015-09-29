@@ -104,8 +104,7 @@ public class NSSSignatureSpi extends SignatureSpi
             {
                 throw new ProviderException(String.format(MSG_UNSUPPORTED_ALGO, HASHALGO, ENCALGO));
             }
-        }
-        else
+        } else
         {
             throw new ProviderException(String.format(MSG_UNSUPPORTED_ALGO,
                     HASHALGO, encrAlgorithmName));
@@ -117,8 +116,7 @@ public class NSSSignatureSpi extends SignatureSpi
             {
                 this.service = null;
                 this.cipher = getCipherService("RSA/ECB/NoPadding");
-            }
-            else // ECDSA
+            } else // ECDSA
             {
                 this.service = getSignatureService("NONEwithECDSA");
                 this.cipher = null;
@@ -126,8 +124,7 @@ public class NSSSignatureSpi extends SignatureSpi
             this.md = getMessageDigestService(HASHALGO);
 
             hashAlgOid = new ASN1ObjectIdentifier(HashAlgoType.SHA224.getOid());
-        }
-        else
+        } else
         {
             this.service = getSignatureService(digestAlgorithmName + "with" + encrAlgorithmName);
             this.cipher = null;
@@ -230,8 +227,7 @@ public class NSSSignatureSpi extends SignatureSpi
         if (service != null)
         {
             return service.getParameter(param);
-        }
-        else
+        } else
         {
             throw new InvalidParameterException("parametrizing not supported");
         }
@@ -304,8 +300,7 @@ public class NSSSignatureSpi extends SignatureSpi
         if (service != null)
         {
             service.setParameter(params);
-        }
-        else
+        } else
         {
             throw new InvalidAlgorithmParameterException("unsupported method setParameter");
         }
@@ -321,8 +316,7 @@ public class NSSSignatureSpi extends SignatureSpi
         if (service != null)
         {
             service.setParameter(param, value);
-        }
-        else
+        } else
         {
             throw new InvalidParameterException("unsupported method setParameter");
         }
@@ -337,12 +331,10 @@ public class NSSSignatureSpi extends SignatureSpi
             byte[] digest = md.digest();
             service.update(digest);
             return service.sign();
-        }
-        else if (service != null)
+        } else if (service != null)
         {
             return service.sign();
-        }
-        else
+        } else
         {
             return encryptHash(md.digest());
         }
@@ -360,12 +352,10 @@ public class NSSSignatureSpi extends SignatureSpi
             byte[] digest = md.digest();
             service.update(digest);
             return service.sign(outbuf, offset, len);
-        }
-        else if (service != null)
+        } else if (service != null)
         {
             return service.sign(outbuf, offset, len);
-        }
-        else
+        } else
         {
             int sigLen = cipher.getOutputSize(1);
             if (sigLen > len)
@@ -416,8 +406,7 @@ public class NSSSignatureSpi extends SignatureSpi
         if (md != null)
         {
             md.update(b);
-        }
-        else
+        } else
         {
             service.update(b);
         }
@@ -433,8 +422,7 @@ public class NSSSignatureSpi extends SignatureSpi
         if (md != null)
         {
             md.update(b, off, len);
-        }
-        else
+        } else
         {
             service.update(b, off, len);
         }
@@ -450,12 +438,10 @@ public class NSSSignatureSpi extends SignatureSpi
             byte[] digest = md.digest();
             service.update(digest);
             return service.verify(sigBytes);
-        }
-        else if (service != null)
+        } else if (service != null)
         {
             return service.verify(sigBytes);
-        }
-        else
+        } else
         {
             byte[] encodedHash;
             try

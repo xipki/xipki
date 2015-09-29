@@ -127,8 +127,7 @@ public class OcspQAImpl implements OcspQA
                 issue.setFailureMessage("is '" + status + "', but expected '"
                         + expectedOcspError.getStatus() + "'");
             }
-        }
-        else
+        } else
         {
             if (status != 0)
             {
@@ -165,8 +164,7 @@ public class OcspQAImpl implements OcspQA
         if (n == 0)
         {
             issue.setFailureMessage("received no status from server");
-        }
-        else if (n != serialNumbers.size())
+        } else if (n != serialNumbers.size())
         {
             issue.setFailureMessage(
                     "is '" + n + "', but expected '" + serialNumbers.size() +  "'");
@@ -182,7 +180,7 @@ public class OcspQAImpl implements OcspQA
         // check the signature if available
         issue = new ValidationIssue("OCSP.SIG", "signature presence");
         resultIssues.add(issue);
-        if (hasSignature == false)
+        if (!hasSignature)
         {
             issue.setFailureMessage("response is not signed");
         }
@@ -201,7 +199,7 @@ public class OcspQAImpl implements OcspQA
                 try
                 {
                     String sigAlgName = AlgorithmUtil.getSignatureAlgoName(sigAlg);
-                    if (AlgorithmUtil.equalsAlgoName(sigAlgName, expectedSigalgo) == false)
+                    if (!AlgorithmUtil.equalsAlgoName(sigAlgName, expectedSigalgo))
                     {
                         issue.setFailureMessage("is '" + sigAlgName + "', but expected '"
                                 + expectedSigalgo + "'");
@@ -229,8 +227,7 @@ public class OcspQAImpl implements OcspQA
                         "No responder certificate is contained in the response");
                 sigValIssue.setFailureMessage(
                         "could not find certificate to validate signature");
-            }
-            else
+            } else
             {
                 X509CertificateHolder respSigner = responderCerts[0];
 
@@ -241,7 +238,7 @@ public class OcspQAImpl implements OcspQA
                 for (int i = 0; i < singleResponses.length; i++)
                 {
                     SingleResp singleResp = singleResponses[i];
-                    if (respSigner.isValidOn(singleResp.getThisUpdate()) == false)
+                    if (!respSigner.isValidOn(singleResp.getThisUpdate()))
                     {
                         issue.setFailureMessage(
                                 "responder certificate is not valid on the thisUpdate[ " + i
@@ -249,7 +246,7 @@ public class OcspQAImpl implements OcspQA
                     }
                 }
 
-                if (issue.isFailed() == false)
+                if (!issue.isFailed())
                 {
                     X509Certificate respIssuer = responseOption.getRespIssuer();
                     if (respIssuer != null)
@@ -262,8 +259,7 @@ public class OcspQAImpl implements OcspQA
                             if (X509Util.issues(respIssuer, jceRespSigner))
                             {
                                 jceRespSigner.verify(respIssuer.getPublicKey());
-                            }
-                            else
+                            } else
                             {
                                 issue.setFailureMessage("responder signer is not trusted");
                             }
@@ -281,7 +277,7 @@ public class OcspQAImpl implements OcspQA
                     ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(
                             responderPubKey);
                     boolean sigValid = basicResp.isSignatureValid(cvp);
-                    if (sigValid == false)
+                    if (!sigValid)
                     {
                         sigValIssue.setFailureMessage("signature is invalid");
                     }
@@ -346,8 +342,7 @@ public class OcspQAImpl implements OcspQA
         if (singleCertStatus == null)
         {
             status = OcspCertStatus.good;
-        }
-        else if (singleCertStatus instanceof RevokedStatus)
+        } else if (singleCertStatus instanceof RevokedStatus)
         {
             RevokedStatus revStatus = (RevokedStatus) singleCertStatus;
             Date revTime = revStatus.getRevocationTime();
@@ -360,8 +355,7 @@ public class OcspQAImpl implements OcspQA
                         && revTime.getTime() == 0)
                 {
                     status = OcspCertStatus.unknown;
-                }
-                else
+                } else
                 {
                     CRLReason revocationReason = CRLReason.forReasonCode(reason);
                     switch (revocationReason)
@@ -399,23 +393,20 @@ public class OcspQAImpl implements OcspQA
                         break;
                     }
                 }
-            }
-            else
+            } else
             {
                 status = OcspCertStatus.rev_noreason;
             }
-        }
-        else if (singleCertStatus instanceof UnknownStatus)
+        } else if (singleCertStatus instanceof UnknownStatus)
         {
             status = OcspCertStatus.issuerUnknown;
-        }
-        else
+        } else
         {
             issue.setFailureMessage(
                     "unknown certstatus: " + singleCertStatus.getClass().getName());
         }
 
-        if (issue.isFailed() == false && expectedStatus != status)
+        if (!issue.isFailed() && expectedStatus != status)
         {
             issue.setFailureMessage(
                     "is='" + status + "', but expected='" + expectedStatus + "'");
@@ -443,7 +434,7 @@ public class OcspQAImpl implements OcspQA
                 issues.add(issue);
 
                 ASN1ObjectIdentifier is = certHash.getHashAlgorithm().getAlgorithm();
-                if (certhashAlg.equals(is) == false)
+                if (!certhashAlg.equals(is))
                 {
                     issue.setFailureMessage("is '" + is.getId()
                         + "', but expected '" + certhashAlg.getId() + "'");
@@ -461,7 +452,7 @@ public class OcspQAImpl implements OcspQA
                 {
                     MessageDigest md = MessageDigest.getInstance(hashAlgOid.getId());
                     byte[] expectedHashValue = md.digest(encodedCert);
-                    if (Arrays.equals(expectedHashValue, hashValue) == false)
+                    if (!Arrays.equals(expectedHashValue, hashValue))
                     {
                         issue.setFailureMessage(
                                 "certHash does not match the requested certificate");
@@ -488,8 +479,7 @@ public class OcspQAImpl implements OcspQA
             {
                 issue.setFailureMessage(" is present, but none is expected");
             }
-        }
-        else if (occurrence == Occurrence.required)
+        } else if (occurrence == Occurrence.required)
         {
             if (target == null)
             {

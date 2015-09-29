@@ -98,12 +98,10 @@ public class P11EnrollCertCmd extends EnrollCertCmd
         if (keyId != null && keyLabel == null)
         {
             keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
-        }
-        else if (keyId == null && keyLabel != null)
+        } else if (keyId == null && keyLabel != null)
         {
             keyIdentifier = new P11KeyIdentifier(keyLabel);
-        }
-        else
+        } else
         {
             throw new SignerException("exactly one of keyId or keyLabel should be specified");
         }
