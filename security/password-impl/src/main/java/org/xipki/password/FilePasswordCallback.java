@@ -71,7 +71,7 @@ public class FilePasswordCallback implements PasswordCallback
             while ((line = reader.readLine()) != null)
             {
                 line = line.trim();
-                if (StringUtil.isNotBlank(line) && line.startsWith("#") == false)
+                if (StringUtil.isNotBlank(line) && !line.startsWith("#"))
                 {
                     passwordHint = line;
                     break;
@@ -101,8 +101,7 @@ public class FilePasswordCallback implements PasswordCallback
         if (StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordResolver.__OBFUSCATE))
         {
             return OBFPasswordResolver.deobfuscate(passwordHint).toCharArray();
-        }
-        else
+        } else
         {
             return passwordHint.toCharArray();
         }
@@ -126,8 +125,7 @@ public class FilePasswordCallback implements PasswordCallback
         if (path.startsWith("~" + File.separator))
         {
             return System.getProperty("user.home") + path.substring(1);
-        }
-        else
+        } else
         {
             return path;
         }

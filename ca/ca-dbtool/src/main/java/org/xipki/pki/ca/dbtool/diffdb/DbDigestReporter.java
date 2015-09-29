@@ -40,9 +40,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Date;
 
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
 
 /**
@@ -56,6 +58,12 @@ public class DbDigestReporter
     private final BufferedWriter diffWriter;
     private final BufferedWriter goodWriter;
     private final BufferedWriter errorWriter;
+
+    private Date startTime;
+    private int numDiff = 0;
+    private int numGood = 0;
+    private int numMissing = 0;
+    private int numError = 0;
 
     public DbDigestReporter(
             final String reportDirname,
@@ -77,6 +85,13 @@ public class DbDigestReporter
                 new FileWriter(reportDirname + File.separator + "good"));
         this.errorWriter = new BufferedWriter(
                 new FileWriter(reportDirname + File.separator + "error"));
+
+        start();
+    }
+
+    public void start()
+    {
+        startTime = new Date();
     }
 
     public String getReportDirname()
@@ -88,6 +103,7 @@ public class DbDigestReporter
             final long serialNumber)
     throws IOException
     {
+        numMissing++;
         writeSerialNumberLine(missingWriter, serialNumber);
     }
 
@@ -95,6 +111,7 @@ public class DbDigestReporter
             final long serialNumber)
     throws IOException
     {
+        numGood++;
         writeSerialNumberLine(goodWriter, serialNumber);
     }
 
@@ -108,6 +125,7 @@ public class DbDigestReporter
             throw new IllegalArgumentException("certA and certB do not have the same serialNumber");
         }
 
+        numDiff++;
         diffWriter.write(Long.toString(certA.getSerialNumber(), 16));
         diffWriter.write('\t');
         diffWriter.write(certA.getEncodedOmitSeriaNumber());
@@ -120,6 +138,7 @@ public class DbDigestReporter
             final String errorMessage)
     throws IOException
     {
+        numError++;
         errorWriter.write(errorMessage);
         errorWriter.write('\n');
     }
@@ -140,19 +159,39 @@ public class DbDigestReporter
         writer.write('\n');
     }
 
-    public void setAccout(int account)
-    throws IOException
-    {
-        IoUtil.save(reportDirname + File.separator + "accout",
-                Integer.toString(account).getBytes());
-    }
-
     public void close()
     {
         close(missingWriter);
         close(diffWriter);
         close(goodWriter);
         close(errorWriter);
+
+        int sum = numGood + numDiff + numMissing + numError;
+        Date now = new Date();
+        int durationSec = (int) ((now.getTime() - startTime.getTime()) / 1000);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("sum :       ").append(StringUtil.formatAccount(sum, false)).append("\n");
+        sb.append("good:       ").append(StringUtil.formatAccount(numGood, false)).append("\n");
+        sb.append("diff:       ").append(StringUtil.formatAccount(numDiff, false)).append("\n");
+        sb.append("missing:    ").append(StringUtil.formatAccount(numMissing, false)).append("\n");
+        sb.append("error:      ").append(StringUtil.formatAccount(numError, false)).append("\n");
+        sb.append("duration:   ").append(StringUtil.formatTime(durationSec, false)).append("\n");
+        sb.append("start time: ").append(startTime).append("\n");
+        sb.append("end time:   ").append(now).append("\n");
+        sb.append("speed:      ").append(
+                StringUtil.formatAccount(sum / durationSec, false)).append(" /s").append("\n");
+
+        try
+        {
+            IoUtil.save(reportDirname + File.separator + "overview.txt",
+                    sb.toString().getBytes());
+        } catch (IOException e)
+        {
+            System.out.println("Could not write overview.txt with following content\n"
+                    + sb.toString());
+        }
+
     }
 
     private static void close(

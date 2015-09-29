@@ -135,8 +135,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
         if (exception == null)
         {
             System.out.println(" digested database");
-        }
-        else
+        } else
         {
             throw exception;
         }

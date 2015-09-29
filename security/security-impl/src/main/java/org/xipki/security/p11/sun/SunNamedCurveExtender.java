@@ -85,7 +85,7 @@ public class SunNamedCurveExtender
     private static Method method_CurveDB_lookup_name;
     private static Method method_NamedCurve_getEncoded;
     private static Method method_NamedCurve_getObjectId;
-    private static boolean successfull = true;
+    private static boolean successful = true;
 
     static
     {
@@ -109,47 +109,47 @@ public class SunNamedCurveExtender
         {
             LOG.warn("could not load class {}", classname_NamedCurve);
             LOG.debug("could not load class " + classname_NamedCurve, e);
-            successfull = false;
+            successful = false;
         }
 
         if (jdk18on)
         {
-            if (successfull)
+            if (successful)
             {
                 method_CurveDB_lookup_name = getMethod(class_CurveDB, "lookup",
                         new Class<?>[]{String.class});
             }
             if (method_CurveDB_lookup_name == null)
             {
-                successfull = false;
+                successful = false;
             }
 
-            if (successfull)
+            if (successful)
             {
                 method_CurveDB_lookup_paramSpec = getMethod(class_CurveDB, "lookup",
                         new Class<?>[]{ECParameterSpec.class});
             }
             if (method_CurveDB_lookup_paramSpec == null)
             {
-                successfull = false;
+                successful = false;
             }
 
-            if (successfull)
+            if (successful)
             {
                 method_NamedCurve_getObjectId = getMethod(class_NamedCurve, "getObjectId", null);
             }
             if (method_NamedCurve_getObjectId == null)
             {
-                successfull = false;
+                successful = false;
             }
 
-            if (successfull)
+            if (successful)
             {
                 method_NamedCurve_getEncoded = getMethod(class_NamedCurve, "getEncoded", null);
             }
             if (method_NamedCurve_getEncoded == null)
             {
-                successfull = false;
+                successful = false;
             }
         }
     }
@@ -168,7 +168,7 @@ public class SunNamedCurveExtender
     {
         synchronized (EXECUTED)
         {
-            if (successfull == false)
+            if (!successful)
             {
                 LOG.warn("could not initialize");
                 return;
@@ -185,8 +185,7 @@ public class SunNamedCurveExtender
                 if (jdk18on)
                 {
                     addNamedCurves_jdk18on();
-                }
-                else
+                } else
                 {
                     addNamedCurves_jdk17();
                 }
@@ -291,13 +290,11 @@ public class SunNamedCurveExtender
                 {
                     LOG.debug("added {}", curveDesc);
                     addedCurves.put(curveName, curveId.getId());
-                }
-                else
+                } else
                 {
                     LOG.warn("could not add {}", curveDesc);
                 }
-            }
-            else
+            } else
             {
                 LOG.info("unknown curve type {}", curve.getClass().getName());
             }
@@ -397,13 +394,11 @@ public class SunNamedCurveExtender
                 {
                     LOG.debug("added {}", curveDesc);
                     addedCurves.put(curveName, curveId.getId());
-                }
-                else
+                } else
                 {
                     LOG.warn("could not add {}", curveDesc);
                 }
-            }
-            else
+            } else
             {
                 LOG.info("unknown curve type {}", curve.getClass().getName());
             }
@@ -533,8 +528,7 @@ public class SunNamedCurveExtender
             if (params == null)
             {
                 serviceMethod = clz.getDeclaredMethod(methodName);
-            }
-            else
+            } else
             {
                 serviceMethod = clz.getDeclaredMethod(methodName, params);
             }
@@ -607,18 +601,14 @@ public class SunNamedCurveExtender
 
                 ECCurve.Fp c = (ECCurve.Fp) curve;
                 this.sfield = c.getQ().toString(16);
-            }
-            else // if (curve instanceof ECCurve.F2m)
+            } else // if (curve instanceof ECCurve.F2m)
             {
                 this.type = B;
 
                 ECCurve.F2m c = (ECCurve.F2m) curve;
                 int m = c.getM();
 
-                int ks[] = new int[3];
-                ks[0] = c.getK1();
-                ks[1] = c.getK2();
-                ks[2] = c.getK3();
+                int[] ks = new int[]{c.getK1(), c.getK2(), c.getK3()};
 
                 BigInteger rp = BigInteger.ONE;
                 rp = rp.setBit(m);

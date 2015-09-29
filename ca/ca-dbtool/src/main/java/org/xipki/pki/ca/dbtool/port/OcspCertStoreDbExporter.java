@@ -33,15 +33,16 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool;
+package org.xipki.pki.ca.dbtool.port;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -52,7 +53,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.IoUtil;
@@ -60,10 +60,14 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.pki.ca.dbtool.IDRange;
+import org.xipki.pki.ca.dbtool.ProcessLog;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType.Issuers;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.IssuerType;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.ObjectFactory;
+import org.xipki.pki.ca.dbtool.port.internal.OcspDbCert;
+import org.xipki.pki.ca.dbtool.port.internal.OcspDbCertsReader;
 import org.xipki.pki.ca.dbtool.xmlio.DbiXmlWriter;
 import org.xipki.pki.ca.dbtool.xmlio.OcspCertType;
 import org.xipki.pki.ca.dbtool.xmlio.OcspCertsWriter;
@@ -85,6 +89,7 @@ class OcspCertStoreDbExporter extends DbPorter
     private final int numCertsInBundle;
     private final int numCertsPerSelect;
     private final boolean resume;
+    private final int numThreads;
 
     OcspCertStoreDbExporter(
             final DataSourceWrapper dataSource,
@@ -95,6 +100,7 @@ class OcspCertStoreDbExporter extends DbPorter
             final int numCertsPerSelect,
             final boolean resume,
             final AtomicBoolean stopMe,
+            final int numThreads,
             final boolean evaluateOnly)
     throws Exception
     {
@@ -120,12 +126,13 @@ class OcspCertStoreDbExporter extends DbPorter
         if (resume)
         {
             File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
-            if (processLogFile.exists() == false)
+            if (!processLogFile.exists())
             {
                 throw new Exception("could not process with '--resume' option");
             }
         }
         this.resume = resume;
+        this.numThreads = numThreads;
     }
 
     public void export()
@@ -152,15 +159,14 @@ class OcspCertStoreDbExporter extends DbPorter
                 throw new Exception("could not continue with CertStore greater than " + VERSION
                         + ": " + certstore.getVersion());
             }
-        }
-        else
+        } else
         {
             certstore = new CertStoreType();
             certstore.setVersion(VERSION);
         }
         System.out.println("exporting OCSP certstore from database");
 
-        if (resume == false)
+        if (!resume)
         {
             export_issuer(certstore);
         }
@@ -178,8 +184,7 @@ class OcspCertStoreDbExporter extends DbPorter
         if (exception == null)
         {
             System.out.println(" exported OCSP certstore from database");
-        }
-        else
+        } else
         {
             throw exception;
         }
@@ -296,27 +301,15 @@ class OcspCertStoreDbExporter extends DbPorter
         {
             minCertId = (int) getMin("CERT", "ID");
         }
-
-        System.out.println(getExportingText() + "tables CERT, CHASH and CRAW from ID " + minCertId);
-
-        final String certSql = "SELECT ID,SN,IID,LUPDATE,REV,RR,RT,RIT,PN,CERT "
-                + "FROM CERT INNER JOIN CRAW ON "
-                + "CERT.ID>=? AND CERT.ID<? AND CERT.ID=CRAW.CID ORDER BY CERT.ID ASC";
-
         final int maxCertId = (int) getMax("CERT", "ID");
-
         final long total = getCount("CERT") - numProcessedBefore;
         ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(),
                 numProcessedBefore);
-
-        PreparedStatement certPs = prepareStatement(certSql);
 
         int sum = 0;
         int numCertInCurrentFile = 0;
 
         OcspCertsWriter certsInCurrentFile = new OcspCertsWriter();
-
-        final int n = numCertsPerSelect;
 
         File currentCertsZipFile = new File(baseDir,
                 "tmp-certs-" + System.currentTimeMillis() + ".zip");
@@ -325,165 +318,129 @@ class OcspCertStoreDbExporter extends DbPorter
         int minCertIdOfCurrentFile = -1;
         int maxCertIdOfCurrentFile = -1;
 
+        System.out.println(getExportingText() + "tables CERT, CHASH and CRAW from ID " + minCertId);
         ProcessLog.printHeader();
+        OcspDbCertsReader certsReader = new OcspDbCertsReader(dataSource, numThreads);
 
-        String sql = null;
+        List<IDRange> idRanges = new ArrayList<>(numThreads);
 
         Integer id = null;
-        try
+        boolean interrupted = false;
+        for (int i = minCertId; i <= maxCertId;)
         {
-            boolean interrupted = false;
-            for (int i = minCertId; i <= maxCertId; i += n)
+            if (stopMe.get())
             {
-                if (stopMe.get())
+                interrupted = true;
+                break;
+            }
+
+            idRanges.clear();
+            for (int j = 0; j < numThreads; j++)
+            {
+                int to = i + numCertsPerSelect - 1;
+                idRanges.add(new IDRange(i, to));
+                i = to + 1;
+                if (i > maxCertId)
                 {
-                    interrupted = true;
-                    break;
+                    break; // break for (int j; ...)
+                }
+            }
+
+            List<OcspDbCert> certs = certsReader.readCerts(idRanges);
+            for (OcspDbCert cert : certs)
+            {
+                OcspCertType certInfo = cert.getCertInfo();
+                id = certInfo.getId();
+
+                if (minCertIdOfCurrentFile == -1)
+                {
+                    minCertIdOfCurrentFile = id;
+                } else if (minCertIdOfCurrentFile > id)
+                {
+                    minCertIdOfCurrentFile = id;
                 }
 
-                sql = certSql;
-                certPs.setInt(1, i);
-                certPs.setInt(2, i + n);
-
-                ResultSet rs = certPs.executeQuery();
-
-                while (rs.next())
+                if (maxCertIdOfCurrentFile == -1)
                 {
-                    id = rs.getInt("ID");
+                    maxCertIdOfCurrentFile = id;
+                } else if (maxCertIdOfCurrentFile < id)
+                {
+                    maxCertIdOfCurrentFile = id;
+                }
 
-                    if (minCertIdOfCurrentFile == -1)
+                String sha1_cert = HashCalculator.hexSha1(cert.getCertBytes());
+
+                if (!evaulateOnly)
+                {
+                    ZipEntry certZipEntry = new ZipEntry(sha1_cert + ".der");
+                    currentCertsZip.putNextEntry(certZipEntry);
+                    try
                     {
-                        minCertIdOfCurrentFile = id;
+                        currentCertsZip.write(cert.getCertBytes());
+                    } finally
+                    {
+                        currentCertsZip.closeEntry();
                     }
-                    else if (minCertIdOfCurrentFile > id)
-                    {
-                        minCertIdOfCurrentFile = id;
-                    }
+                }
 
-                    if (maxCertIdOfCurrentFile == -1)
-                    {
-                        maxCertIdOfCurrentFile = id;
-                    }
-                    else if (maxCertIdOfCurrentFile < id)
-                    {
-                        maxCertIdOfCurrentFile = id;
-                    }
+                certInfo.setFile(sha1_cert + ".der");
 
-                    String b64Cert = rs.getString("CERT");
-                    byte[] certBytes = Base64.decode(b64Cert);
+                certsInCurrentFile.add(certInfo);
+                numCertInCurrentFile++;
+                sum++;
 
-                    String sha1_cert = HashCalculator.hexSha1(certBytes);
+                if (numCertInCurrentFile == numCertsInBundle)
+                {
+                    finalizeZip(currentCertsZip, certsInCurrentFile);
 
-                    if (evaulateOnly == false)
-                    {
-                        ZipEntry certZipEntry = new ZipEntry(sha1_cert + ".der");
-                        currentCertsZip.putNextEntry(certZipEntry);
-                        try
-                        {
-                            currentCertsZip.write(certBytes);
-                        } finally
-                        {
-                            currentCertsZip.closeEntry();
-                        }
-                    }
+                    String currentCertsFilename = buildFilename("certs_", ".zip",
+                            minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxCertId);
+                    currentCertsZipFile.renameTo(new File(certsDir, currentCertsFilename));
 
-                    OcspCertType cert = new OcspCertType();
+                    writeLine(certsFileOs, currentCertsFilename);
+                    certstore.setCountCerts(numProcessedBefore + sum);
+                    echoToFile(Integer.toString(id), processLogFile);
 
-                    cert.setId(id);
+                    processLog.addNumProcessed(numCertInCurrentFile);
+                    processLog.printStatus();
 
-                    int issuer_id = rs.getInt("IID");
-                    cert.setIid(issuer_id);
+                    // reset
+                    certsInCurrentFile = new OcspCertsWriter();
+                    numCertInCurrentFile = 0;
+                    minCertIdOfCurrentFile = -1;
+                    maxCertIdOfCurrentFile = -1;
+                    currentCertsZipFile = new File(baseDir,
+                            "tmp-certs-" + System.currentTimeMillis() + ".zip");
+                    currentCertsZip = getZipOutputStream(currentCertsZipFile);
+                } // end if
+            } // end while (rs.next))
+        } // end for
 
-                    long serial = rs.getLong("SN");
-                    cert.setSn(Long.toHexString(serial));
+        if (interrupted)
+        {
+            throw new InterruptedException("interrupted by the user");
+        }
 
-                    long update = rs.getLong("LUPDATE");
-                    cert.setUpdate(update);
+        if (numCertInCurrentFile > 0)
+        {
+            finalizeZip(currentCertsZip, certsInCurrentFile);
 
-                    boolean revoked = rs.getBoolean("REV");
-                    cert.setRev(revoked);
+            String currentCertsFilename = buildFilename("certs_", ".zip",
+                    minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxCertId);
+            currentCertsZipFile.renameTo(new File(certsDir, currentCertsFilename));
 
-                    if (revoked)
-                    {
-                        int rev_reason = rs.getInt("RR");
-                        long rev_time = rs.getLong("RT");
-                        long rev_invalidity_time = rs.getLong("RIT");
-                        cert.setRr(rev_reason);
-                        cert.setRt(rev_time);
-                        if (rev_invalidity_time != 0)
-                        {
-                            cert.setRit(rev_invalidity_time);
-                        }
-                    }
-                    cert.setFile(sha1_cert + ".der");
-
-                    String profile = rs.getString("PN");
-                    cert.setProfile(profile);
-
-                    certsInCurrentFile.add(cert);
-                    numCertInCurrentFile++;
-                    sum++;
-
-                    if (numCertInCurrentFile == numCertsInBundle)
-                    {
-                        finalizeZip(currentCertsZip, certsInCurrentFile);
-
-                        String currentCertsFilename = buildFilename("certs_", ".zip",
-                                minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxCertId);
-                        currentCertsZipFile.renameTo(new File(certsDir, currentCertsFilename));
-
-                        writeLine(certsFileOs, currentCertsFilename);
-                        certstore.setCountCerts(numProcessedBefore + sum);
-                        echoToFile(Integer.toString(id), processLogFile);
-
-                        processLog.addNumProcessed(numCertInCurrentFile);
-                        processLog.printStatus();
-
-                        // reset
-                        certsInCurrentFile = new OcspCertsWriter();
-                        numCertInCurrentFile = 0;
-                        minCertIdOfCurrentFile = -1;
-                        maxCertIdOfCurrentFile = -1;
-                        currentCertsZipFile = new File(baseDir,
-                                "tmp-certs-" + System.currentTimeMillis() + ".zip");
-                        currentCertsZip = getZipOutputStream(currentCertsZipFile);
-                    } // end if
-                } // end while (rs.next))
-
-                rs.close();
-            } // end for
-
-            if (interrupted)
+            writeLine(certsFileOs, currentCertsFilename);
+            certstore.setCountCerts(numProcessedBefore + sum);
+            if (id != null)
             {
-                throw new InterruptedException("interrupted by the user");
-            }
-
-            if (numCertInCurrentFile > 0)
-            {
-                finalizeZip(currentCertsZip, certsInCurrentFile);
-
-                String currentCertsFilename = buildFilename("certs_", ".zip",
-                        minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxCertId);
-                currentCertsZipFile.renameTo(new File(certsDir, currentCertsFilename));
-
-                writeLine(certsFileOs, currentCertsFilename);
-                certstore.setCountCerts(numProcessedBefore + sum);
                 echoToFile(Integer.toString(id), processLogFile);
-
-                processLog.addNumProcessed(numCertInCurrentFile);
-                processLog.printStatus(true);
             }
-            else
-            {
-                currentCertsZip.close();
-                currentCertsZipFile.delete();
-            }
-        } catch (SQLException e)
+            processLog.addNumProcessed(numCertInCurrentFile);
+            processLog.printStatus(true);
+        } else
         {
-            throw translate(sql, e);
-        } finally
-        {
-            releaseResources(certPs, null);
+            currentCertsZip.close();
+            currentCertsZipFile.delete();
         }
 
         ProcessLog.printTrailer();
@@ -511,5 +468,4 @@ class OcspCertStoreDbExporter extends DbPorter
 
         zipOutStream.close();
     }
-
 }

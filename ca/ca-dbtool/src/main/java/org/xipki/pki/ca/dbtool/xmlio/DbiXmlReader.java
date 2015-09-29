@@ -80,7 +80,7 @@ public abstract class DbiXmlReader
             }
         }
 
-        if (this.rootElementName.equals(thisRootElement) == false)
+        if (!this.rootElementName.equals(thisRootElement))
         {
             throw new InvalidDataObjectException("the given XML stream does not have root element '"
                     + rootElementName + "', but '" + thisRootElement + "'");

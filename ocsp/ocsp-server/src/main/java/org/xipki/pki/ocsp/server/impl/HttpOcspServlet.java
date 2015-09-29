@@ -109,8 +109,7 @@ public class HttpOcspServlet extends HttpServlet
         if (responder.getRequestOption().supportsHttpGet())
         {
             processRequest(request, response, r, true);
-        }
-        else
+        } else
         {
             super.doGet(request, response);
         }
@@ -199,11 +198,10 @@ public class HttpOcspServlet extends HttpServlet
                 }
 
                 requestStream = new ByteArrayInputStream(Base64.decode(relativeUri));
-            }
-            else
+            } else
             {
                 // accept only "application/ocsp-request" as content type
-                if (CT_REQUEST.equalsIgnoreCase(request.getContentType()) == false)
+                if (!CT_REQUEST.equalsIgnoreCase(request.getContentType()))
                 {
                     response.setContentLength(0);
                     response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -301,8 +299,7 @@ public class HttpOcspServlet extends HttpServlet
                     if (responder.getResponseOption().getCacheMaxAge() != null)
                     {
                         maxAge = responder.getResponseOption().getCacheMaxAge().longValue();
-                    }
-                    else
+                    } else
                     {
                         maxAge = OcspServer.defaultCacheMaxAge;
                     }
@@ -368,11 +365,10 @@ public class HttpOcspServlet extends HttpServlet
 
                     auditEvent.setDuration(System.currentTimeMillis() - start);
 
-                    if (auditEvent.containsChildAuditEvents() == false)
+                    if (!auditEvent.containsChildAuditEvents())
                     {
                         auditService.logEvent(auditEvent);
-                    }
-                    else
+                    } else
                     {
                         List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
                         for (AuditEvent event : expandedAuditEvents)

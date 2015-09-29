@@ -105,7 +105,7 @@ public class DbDigestEntry
 
         i++;
         s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
-        boolean revoked = "0".equals(s) == false;
+        boolean revoked = !"0".equals(s);
 
         Integer revReason = null;
         Long revTime = null;
@@ -228,22 +228,22 @@ public class DbDigestEntry
             return false;
         }
 
-        if (equals(revReason, b.revReason) == false)
+        if (!equals(revReason, b.revReason))
         {
             return false;
         }
 
-        if (equals(revTime, b.revTime) == false)
+        if (!equals(revTime, b.revTime))
         {
             return false;
         }
 
-        if (equals(revInvTime, b.revInvTime) == false)
+        if (!equals(revInvTime, b.revInvTime))
         {
             return false;
         }
 
-        if (equals(base64Sha1, b.base64Sha1) == false)
+        if (!equals(base64Sha1, b.base64Sha1))
         {
             return false;
         }

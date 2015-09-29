@@ -77,12 +77,10 @@ public class CertWithEncoded
         if (className.equals(cert.getClass().getName()))
         {
             return certificate.equals(cert);
-        }
-        else if (certificate.equals(cert))
+        } else if (certificate.equals(cert))
         {
             return true;
-        }
-        else
+        } else
         {
             byte[] encodedCert;
             try

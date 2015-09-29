@@ -90,8 +90,7 @@ public class NegUnrevokeCertCmd extends UnRevRemoveCertCmd
             {
                 saveRequestResponse(debug);
             }
-        }
-        else
+        } else
         {
             X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
             RequestResponseDebug debug = getRequestResponseDebug();

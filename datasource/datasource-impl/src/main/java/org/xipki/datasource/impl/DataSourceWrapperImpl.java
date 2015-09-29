@@ -185,8 +185,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 if (newConn)
                 {
                     releaseResources(stmt, rs);
-                }
-                else
+                } else
                 {
                     super.releaseStatementAndResultSet(stmt, rs);
                 }
@@ -691,14 +690,13 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 if (schema != null)
                 {
                     String upperCaseSchema = schema.toUpperCase();
-                    if (schema.equals(upperCaseSchema) == false)
+                    if (!schema.equals(upperCaseSchema))
                     {
                         props.setProperty(propName, upperCaseSchema);
                     }
                 }
             }
-        }
-        else
+        } else
         {
             String propName = "jdbcUrl";
             final String url = props.getProperty(propName);
@@ -715,7 +713,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                     }
 
                     String upperCaseSchema = schema.toUpperCase();
-                    if (schema.equals(upperCaseSchema) == false)
+                    if (!schema.equals(upperCaseSchema))
                     {
                         String newUrl = url.replace(sep + schema, sep + upperCaseSchema);
                         props.setProperty(propName, newUrl);
@@ -767,7 +765,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         try
         {
             return service.getConnection();
-        } catch (SQLException e)
+        } catch (Exception e)
         {
             Throwable cause = e.getCause();
             if (cause instanceof SQLException)
@@ -776,7 +774,14 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             }
             LOG.error("could not create connection to database {}", e.getMessage());
             LOG.debug("could not create connection to database", e);
-            throw translate(null, e);
+            if (e instanceof SQLException)
+            {
+                throw translate(null, (SQLException) e);
+            } else
+            {
+                throw new DataAccessException("error occured while getting Connection: "
+                        + e.getMessage(), e);
+            }
         }
     }
 
@@ -792,15 +797,15 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         try
         {
             conn.close();
-        } catch (SQLException e)
+        } catch (Exception e)
         {
             Throwable cause = e.getCause();
             if (cause instanceof SQLException)
             {
                 e = (SQLException) cause;
             }
-            LOG.error("could not create connection to database {}", e.getMessage());
-            LOG.debug("could not create connection to database", e);
+            LOG.error("could not close connection to database {}", e.getMessage());
+            LOG.debug("could not close connection to database", e);
         }
     }
 
@@ -974,8 +979,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             if (conn == null)
             {
                 releaseResources(stmt, rs);
-            }
-            else
+            } else
             {
                 releaseStatementAndResultSet(stmt, rs);
             }
@@ -1010,8 +1014,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             if (conn == null)
             {
                 releaseResources(stmt, rs);
-            }
-            else
+            } else
             {
                 releaseStatementAndResultSet(stmt, rs);
             }
@@ -1062,8 +1065,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             if (conn == null)
             {
                 releaseResources(stmt, rs);
-            }
-            else
+            } else
             {
                 releaseStatementAndResultSet(stmt, rs);
             }
@@ -1177,8 +1179,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             if (conn == null)
             {
                 releaseResources(stmt, rs);
-            }
-            else
+            } else
             {
                 releaseStatementAndResultSet(stmt, rs);
             }
@@ -1219,8 +1220,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             if (conn == null)
             {
                 releaseResources(stmt, null);
-            }
-            else
+            } else
             {
                 releaseStatementAndResultSet(stmt, null);
             }
@@ -1260,8 +1260,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             if (conn == null)
             {
                 releaseResources(stmt, null);
-            }
-            else
+            } else
             {
                 releaseStatementAndResultSet(stmt, null);
             }
@@ -1410,8 +1409,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             if (newConn)
             {
                 releaseResources(stmt, null);
-            }
-            else
+            } else
             {
                 releaseStatementAndResultSet(stmt, null);
             }
@@ -1649,8 +1647,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         {
             errorCode = sqlEx.getSQLState();
             sqlState = null;
-        }
-        else
+        } else
         {
             // Try to find SQLException with actual error code, looping through the causes.
             // E.g. applicable to java.sql.DataTruncation as of JDK 1.6.
@@ -1670,48 +1667,39 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             {
                 logTranslation(sql, sqlEx);
                 return new BadSqlGrammarException(buildMessage(sql, sqlEx), sqlEx);
-            }
-            else if (sqlErrorCodes.getInvalidResultSetAccessCodes().contains(errorCode))
+            } else if (sqlErrorCodes.getInvalidResultSetAccessCodes().contains(errorCode))
             {
                 logTranslation(sql, sqlEx);
                 return new InvalidResultSetAccessException(buildMessage(sql, sqlEx), sqlEx);
-            }
-            else if (sqlErrorCodes.getDuplicateKeyCodes().contains(errorCode))
+            } else if (sqlErrorCodes.getDuplicateKeyCodes().contains(errorCode))
             {
                 logTranslation(sql, sqlEx);
                 return new DuplicateKeyException(buildMessage(sql, sqlEx), sqlEx);
-            }
-            else if (sqlErrorCodes.getDataIntegrityViolationCodes().contains(errorCode))
+            } else if (sqlErrorCodes.getDataIntegrityViolationCodes().contains(errorCode))
             {
                 logTranslation(sql, sqlEx);
                 return new DataIntegrityViolationException(buildMessage(sql, sqlEx), sqlEx);
-            }
-            else if (sqlErrorCodes.getPermissionDeniedCodes().contains(errorCode))
+            } else if (sqlErrorCodes.getPermissionDeniedCodes().contains(errorCode))
             {
                 logTranslation(sql, sqlEx);
                 return new PermissionDeniedDataAccessException(buildMessage(sql, sqlEx), sqlEx);
-            }
-            else if (sqlErrorCodes.getDataAccessResourceFailureCodes().contains(errorCode))
+            } else if (sqlErrorCodes.getDataAccessResourceFailureCodes().contains(errorCode))
             {
                 logTranslation(sql, sqlEx);
                 return new DataAccessResourceFailureException(buildMessage(sql, sqlEx), sqlEx);
-            }
-            else if (sqlErrorCodes.getTransientDataAccessResourceCodes().contains(errorCode))
+            } else if (sqlErrorCodes.getTransientDataAccessResourceCodes().contains(errorCode))
             {
                 logTranslation(sql, sqlEx);
                 return new TransientDataAccessResourceException(buildMessage(sql, sqlEx), sqlEx);
-            }
-            else if (sqlErrorCodes.getCannotAcquireLockCodes().contains(errorCode))
+            } else if (sqlErrorCodes.getCannotAcquireLockCodes().contains(errorCode))
             {
                 logTranslation(sql, sqlEx);
                 return new CannotAcquireLockException(buildMessage(sql, sqlEx), sqlEx);
-            }
-            else if (sqlErrorCodes.getDeadlockLoserCodes().contains(errorCode))
+            } else if (sqlErrorCodes.getDeadlockLoserCodes().contains(errorCode))
             {
                 logTranslation(sql, sqlEx);
                 return new DeadlockLoserDataAccessException(buildMessage(sql, sqlEx), sqlEx);
-            }
-            else if (sqlErrorCodes.getCannotSerializeTransactionCodes().contains(errorCode))
+            } else if (sqlErrorCodes.getCannotSerializeTransactionCodes().contains(errorCode))
             {
                 logTranslation(sql, sqlEx);
                 return new CannotSerializeTransactionException(buildMessage(sql, sqlEx), sqlEx);
@@ -1725,20 +1713,16 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             if (sqlStateCodes.getBadSQLGrammarCodes().contains(classCode))
             {
                 return new BadSqlGrammarException(buildMessage(sql, sqlEx), ex);
-            }
-            else if (sqlStateCodes.getDataIntegrityViolationCodes().contains(classCode))
+            } else if (sqlStateCodes.getDataIntegrityViolationCodes().contains(classCode))
             {
                 return new DataIntegrityViolationException(buildMessage(sql, ex), ex);
-            }
-            else if (sqlStateCodes.getDataAccessResourceFailureCodes().contains(classCode))
+            } else if (sqlStateCodes.getDataAccessResourceFailureCodes().contains(classCode))
             {
                 return new DataAccessResourceFailureException(buildMessage(sql, ex), ex);
-            }
-            else if (sqlStateCodes.getTransientDataAccessResourceCodes().contains(classCode))
+            } else if (sqlStateCodes.getTransientDataAccessResourceCodes().contains(classCode))
             {
                 return new TransientDataAccessResourceException(buildMessage(sql, ex), ex);
-            }
-            else if (sqlStateCodes.getConcurrencyFailureCodes().contains(classCode))
+            } else if (sqlStateCodes.getConcurrencyFailureCodes().contains(classCode))
             {
                 return new ConcurrencyFailureException(buildMessage(sql, ex), ex);
             }
@@ -1759,8 +1743,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             {
                 codes = "SQL state '" + sqlEx.getSQLState() + "', error code '"
                         + sqlEx.getErrorCode();
-            }
-            else
+            } else
             {
                 codes = "Error code '" + sqlEx.getErrorCode() + "'";
             }
@@ -1807,8 +1790,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             if (conn == null)
             {
                 releaseResources(stmt, null);
-            }
-            else
+            } else
             {
                 releaseStatementAndResultSet(stmt, null);
             }

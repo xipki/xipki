@@ -60,8 +60,7 @@ public class OCSPNonceUnmatchedException extends OCSPResponseException
         if (is == null || is.length == 0)
         {
             sb.append("none");
-        }
-        else
+        } else
         {
             sb.append(Hex.toHexString(is));
         }
@@ -69,8 +68,7 @@ public class OCSPNonceUnmatchedException extends OCSPResponseException
         if (expected == null || expected.length == 0)
         {
             sb.append("nonce");
-        }
-        else
+        } else
         {
             sb.append(Hex.toHexString(expected));
         }

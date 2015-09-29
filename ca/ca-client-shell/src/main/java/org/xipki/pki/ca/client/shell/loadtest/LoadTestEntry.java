@@ -134,7 +134,7 @@ public class LoadTestEntry
             for (int i = 0; i < n; i++)
             {
                 RDN rdn = baseRDNs[i];
-                if (incremented == false)
+                if (!incremented)
                 {
                     if (rdn.getFirst().getType().equals(subjectRDNForIncrement))
                     {

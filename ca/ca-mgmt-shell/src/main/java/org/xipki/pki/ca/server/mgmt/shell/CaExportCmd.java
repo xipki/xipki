@@ -130,7 +130,7 @@ public class CaExportCmd extends CaCmd
             throw new UnexpectedException("no CA named " + name + " is defined");
         }
 
-        if (_entry instanceof X509CAEntry == false)
+        if (!(_entry instanceof X509CAEntry))
         {
             throw new UnexpectedException(
                     "unsupported CAEntry type " + _entry.getClass().getName());
@@ -242,8 +242,7 @@ public class CaExportCmd extends CaCmd
         if (value instanceof String)
         {
             props.put(key, (String) value);
-        }
-        else if (value != null)
+        } else if (value != null)
         {
             props.put(key, value.toString());
         }

@@ -119,8 +119,7 @@ class RequestOption
             {
                 maxLen = nonceConf.getMaxLen();
             }
-        }
-        else
+        } else
         {
             nonceRequired = false;
         }
@@ -146,8 +145,7 @@ class RequestOption
         if (versionsConf == null)
         {
             this.versions = null;
-        }
-        else
+        } else
         {
             this.versions = new HashSet<>();
             this.versions.addAll(versionsConf.getVersion());
@@ -165,14 +163,12 @@ class RequestOption
                 if (algo != null && supportedHashAlgorithms.contains(algo))
                 {
                     hashAlgos.add(algo);
-                }
-                else
+                } else
                 {
                     throw new InvalidConfException("hash algorithm " + token + " is unsupported");
                 }
             }
-        }
-        else
+        } else
         {
             hashAlgos.addAll(supportedHashAlgorithms);
         }
@@ -188,8 +184,7 @@ class RequestOption
             trustAnchors = null;
             certs = null;
             certpathValidationModel = CertpathValidationModel.PKIX;
-        }
-        else
+        } else
         {
             switch (certpathConf.getValidationModel())
             {
@@ -222,8 +217,7 @@ class RequestOption
             if (certsType == null)
             {
                 this.certs = null;
-            }
-            else
+            } else
             {
                 try
                 {
@@ -321,8 +315,7 @@ class RequestOption
             if (fileName != null)
             {
                 is = new FileInputStream(IoUtil.expandFilepath(fileName));
-            }
-            else
+            } else
             {
                 is = new ByteArrayInputStream(ksConf.getKeystore().getValue());
             }
@@ -341,8 +334,7 @@ class RequestOption
                     certs.add((X509Certificate) trustStore.getCertificate(alias));
                 }
             }
-        }
-        else if (conf.getDir() != null)
+        } else if (conf.getDir() != null)
         {
             File dir = new File(conf.getDir());
             File[] files = dir.listFiles();
@@ -353,8 +345,7 @@ class RequestOption
                     certs.add(X509Util.parseCert(file));
                 }
             }
-        }
-        else
+        } else
         {
             throw new RuntimeException("should not happen, neither keystore nor dir is defined");
         }

@@ -147,8 +147,7 @@ public abstract class P12KeypairGenerator
             ku = new X509KeyUsage(
                     X509KeyUsage.nonRepudiation | X509KeyUsage.digitalSignature
                     | X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
-        }
-        else
+        } else
         {
             ku = new X509KeyUsage(keyUsage);
         }
@@ -207,16 +206,14 @@ public abstract class P12KeypairGenerator
             builder = new BcRSAContentSignerBuilder(
                     buildAlgId(sigOid),
                     buildAlgId(hashOid));
-        }
-        else if (key instanceof DSAPrivateKey)
+        } else if (key instanceof DSAPrivateKey)
         {
             ASN1ObjectIdentifier hashOid = X509ObjectIdentifiers.id_SHA1;
             AlgorithmIdentifier sigId = new AlgorithmIdentifier(
                     X9ObjectIdentifiers.id_dsa_with_sha1);
 
             builder = new BcDSAContentSignerBuilder(sigId, buildAlgId(hashOid));
-        }
-        else if (key instanceof ECPrivateKey)
+        } else if (key instanceof ECPrivateKey)
         {
             ASN1ObjectIdentifier hashOid;
             ASN1ObjectIdentifier sigOid;
@@ -226,23 +223,19 @@ public abstract class P12KeypairGenerator
             {
                 hashOid = NISTObjectIdentifiers.id_sha512;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
-            }
-            else if (keySize > 256)
+            } else if (keySize > 256)
             {
                 hashOid = NISTObjectIdentifiers.id_sha384;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
-            }
-            else if (keySize > 224)
+            } else if (keySize > 224)
             {
                 hashOid = NISTObjectIdentifiers.id_sha224;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
-            }
-            else if (keySize > 160)
+            } else if (keySize > 160)
             {
                 hashOid = NISTObjectIdentifiers.id_sha256;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
-            }
-            else
+            } else
             {
                 hashOid = X509ObjectIdentifiers.id_SHA1;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
@@ -251,8 +244,7 @@ public abstract class P12KeypairGenerator
             builder = new ECDSAContentSignerBuilder(
                     new AlgorithmIdentifier(sigOid),
                     buildAlgId(hashOid));
-        }
-        else
+        } else
         {
             throw new IllegalArgumentException("unknown type of key " + key.getClass().getName());
         }
@@ -353,8 +345,7 @@ public abstract class P12KeypairGenerator
             {
                 this.curveOid = new ASN1ObjectIdentifier(curveNameOrOid);
                 this.curveName = KeyUtil.getCurveName(this.curveOid);
-            }
-            else
+            } else
             {
                 this.curveName = curveNameOrOid;
                 this.curveOid = KeyUtil.getCurveOID(this.curveName);

@@ -158,8 +158,7 @@ public class CmpUtf8Pairs
             {
                 newS.append(c);
                 i++;
-            }
-            else
+            } else
             {
                 if (i + 3 <= s.length())
                 {
@@ -167,8 +166,7 @@ public class CmpUtf8Pairs
                     c = (char) Byte.parseByte(hex, 16);
                     newS.append(c);
                     i += 3;
-                }
-                else
+                } else
                 {
                     newS.append(s.substring(i));
                     break;
@@ -227,7 +225,7 @@ public class CmpUtf8Pairs
 
         for (String name : pairs.keySet())
         {
-            if (names.contains(name) == false)
+            if (!names.contains(name))
             {
                 names.add(name);
             }
@@ -264,7 +262,7 @@ public class CmpUtf8Pairs
     public boolean equals(
             final Object obj)
     {
-        if (obj instanceof CmpUtf8Pairs == false)
+        if (!(obj instanceof CmpUtf8Pairs))
         {
             return false;
         }

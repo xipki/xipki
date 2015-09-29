@@ -329,7 +329,7 @@ public class KeystoreP11CryptService implements P11CryptService
         for (KeystoreP11Identity identity : identities)
         {
             P11SlotIdentifier slotId = identity.getSlotId();
-            if (slotIds.contains(slotId) == false)
+            if (!slotIds.contains(slotId))
             {
                 slotIds.add(slotId);
             }

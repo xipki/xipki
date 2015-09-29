@@ -102,7 +102,7 @@ public final class IaikP11CryptService implements P11CryptService
         refresh();
     }
 
-    private boolean lastRefreshSuccessfull;
+    private boolean lastRefreshSuccessful;
     private long lastRefresh;
 
     private synchronized boolean reconnect()
@@ -111,14 +111,14 @@ public final class IaikP11CryptService implements P11CryptService
         if (System.currentTimeMillis() - lastRefresh < MIN_RECONNECT_INTERVAL)
         {
             LOG.info("just refreshed within one minute, skip this reconnect()");
-            return lastRefreshSuccessfull;
+            return lastRefreshSuccessful;
         }
 
         lastRefresh = System.currentTimeMillis();
 
         IaikP11ModulePool.getInstance().removeModule(moduleConf.getName());
         refresh();
-        return lastRefreshSuccessfull;
+        return lastRefreshSuccessful;
     }
 
     @Override
@@ -126,7 +126,7 @@ public final class IaikP11CryptService implements P11CryptService
     throws SignerException
     {
         LOG.info("refreshing PKCS#11 module {}", moduleConf.getName());
-        lastRefreshSuccessfull = false;
+        lastRefreshSuccessful = false;
         try
         {
             this.extModule = IaikP11ModulePool.getInstance().getModule(moduleConf);
@@ -191,7 +191,7 @@ public final class IaikP11CryptService implements P11CryptService
         currentIdentifies.clear();
         currentIdentifies = null;
 
-        lastRefreshSuccessfull = true;
+        lastRefreshSuccessful = true;
 
         if (LOG.isInfoEnabled())
         {
@@ -234,8 +234,7 @@ public final class IaikP11CryptService implements P11CryptService
             if (reconnect())
             {
                 return CKM_RSA_PKCS_noReconnect(encodedDigestInfo, slotId, keyId);
-            }
-            else
+            } else
             {
                 throw new SignerException("PKCS11RuntimeException: " + e.getMessage(), e);
             }
@@ -275,8 +274,7 @@ public final class IaikP11CryptService implements P11CryptService
             if (reconnect())
             {
                 return CKM_RSA_X509_noReconnect(hash, slotId, keyId);
-            }
-            else
+            } else
             {
                 throw new SignerException("PKCS11RuntimeException: " + e.getMessage(), e);
             }
@@ -327,8 +325,7 @@ public final class IaikP11CryptService implements P11CryptService
             if (reconnect())
             {
                 return CKM_ECDSAPlain_noReconnect(hash, slotId, keyId);
-            }
-            else
+            } else
             {
                 throw new SignerException("PKCS11RuntimeException: " + e.getMessage());
             }
@@ -379,8 +376,7 @@ public final class IaikP11CryptService implements P11CryptService
             if (reconnect())
             {
                 return CKM_DSA_noReconnect(hash, slotId, keyId);
-            }
-            else
+            } else
             {
                 throw new SignerException("PKCS11RuntimeException: " + e.getMessage());
             }
@@ -451,7 +447,7 @@ public final class IaikP11CryptService implements P11CryptService
     private synchronized void checkState()
     throws SignerException
     {
-        if (lastRefreshSuccessfull == false)
+        if (!lastRefreshSuccessful)
         {
             if (System.currentTimeMillis() - lastRefresh >= MIN_RECONNECT_INTERVAL)
             {
@@ -459,7 +455,7 @@ public final class IaikP11CryptService implements P11CryptService
             }
         }
 
-        if (lastRefreshSuccessfull == false)
+        if (!lastRefreshSuccessful)
         {
             throw new SignerException("PKCS#11 module is not initialized");
         }
@@ -491,7 +487,7 @@ public final class IaikP11CryptService implements P11CryptService
         for (IaikP11Identity identity : identities)
         {
             P11SlotIdentifier slotId = identity.getSlotId();
-            if (slotIds.contains(slotId) == false)
+            if (!slotIds.contains(slotId))
             {
                 slotIds.add(slotId);
             }

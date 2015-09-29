@@ -92,8 +92,7 @@ public class PasswordResolverImpl implements PasswordResolver
             if (resolvers.remove(service))
             {
                 LOG.debug("removed SinglePasswordResolver binding for {}", service);
-            }
-            else
+            } else
             {
                 LOG.debug("no SinglePasswordResolver binding found to remove for '{}'", service);
             }

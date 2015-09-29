@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
-import org.xipki.pki.ca.dbtool.DbPortWorker;
+import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
 /**
  * @author Lijun Liao

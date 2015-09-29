@@ -81,13 +81,11 @@ public class X509CertUtil
             if (pathLen != null)
             {
                 basicConstraints = new BasicConstraints(pathLen);
-            }
-            else
+            } else
             {
                 basicConstraints = new BasicConstraints(true);
             }
-        }
-        else
+        } else
         {
             basicConstraints = new BasicConstraints(false);
         }
@@ -152,7 +150,7 @@ public class X509CertUtil
         DistributionPointName pointName = new DistributionPointName(gns);
 
         GeneralNames crlIssuer = null;
-        if (crlSignerSubject != null && crlSignerSubject.equals(caSubject) == false)
+        if (crlSignerSubject != null && !crlSignerSubject.equals(caSubject))
         {
             GeneralName crlIssuerName = new GeneralName(crlSignerSubject);
             crlIssuer = new GeneralNames(crlIssuerName);
@@ -191,8 +189,7 @@ public class X509CertUtil
             if (policyQualifiers == null)
             {
                 pInfos[i] = new PolicyInformation(policyOid);
-            }
-            else
+            } else
             {
                 pInfos[i] = new PolicyInformation(policyOid, policyQualifiers);
             }
@@ -212,14 +209,12 @@ public class X509CertUtil
             if (qualifier.getCpsUri() != null)
             {
                 qualifierInfo = new PolicyQualifierInfo(qualifier.getCpsUri());
-            }
-            else if (qualifier.getUserNotice() != null)
+            } else if (qualifier.getUserNotice() != null)
             {
                 UserNotice userNotice = new UserNotice(null, qualifier.getUserNotice());
                 qualifierInfo = new PolicyQualifierInfo(PKCSObjectIdentifiers.id_spq_ets_unotice,
                         userNotice);
-            }
-            else
+            } else
             {
                 qualifierInfo = null;
             }

@@ -85,8 +85,7 @@ class CAConf
         if (StringUtil.isBlank(healthUrl))
         {
             this.healthUrl = url.replace("cmp", "health");
-        }
-        else
+        } else
         {
             this.healthUrl = healthUrl;
         }
@@ -114,8 +113,7 @@ class CAConf
         if (cert != null)
         {
             this.subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
-        }
-        else
+        } else
         {
             this.subject = null;
         }
@@ -127,8 +125,7 @@ class CAConf
         if (profiles == null)
         {
             this.profiles = Collections.emptyMap();
-        }
-        else
+        } else
         {
             this.profiles = new HashMap<>();
             for (CertprofileInfo m : profiles)

@@ -87,23 +87,19 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
         {
             unit = Unit.YEAR;
             numValdityS = validityS.substring(0, len - 1);
-        }
-        else if (suffix == 'd' || suffix == 'd')
+        } else if (suffix == 'd' || suffix == 'd')
         {
             unit = Unit.DAY;
             numValdityS = validityS.substring(0, len - 1);
-        }
-        else if (suffix == 'h' || suffix == 'h')
+        } else if (suffix == 'h' || suffix == 'h')
         {
             unit = Unit.HOUR;
             numValdityS = validityS.substring(0, len - 1);
-        }
-        else if (suffix >= '0' && suffix <= '9')
+        } else if (suffix >= '0' && suffix <= '9')
         {
             unit = Unit.DAY;
             numValdityS = validityS;
-        }
-        else
+        } else
         {
             throw new IllegalArgumentException("invalid validityS: " + validityS);
         }
@@ -168,8 +164,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
                     if (isLeapYear(year))
                     {
                         day = 29;
-                    }
-                    else
+                    } else
                     {
                         day = 28;
                     }
@@ -188,12 +183,10 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
         if (year % 4 != 0)
         {
             return false;
-        }
-        else if (year % 100 != 0)
+        } else if (year % 100 != 0)
         {
             return true;
-        }
-        else
+        } else
         {
             return year % 400 == 0;
         }
@@ -234,16 +227,14 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
             return (validity < o.validity)
                     ? -1
                     : 1;
-        }
-        else
+        } else
         {
             int thisHours = getApproxHours();
             int thatHours = o.getApproxHours();
             if (thisHours == thatHours)
             {
                 return 0;
-            }
-            else
+            } else
             {
                 return (thisHours < thatHours)
                         ? -1
@@ -256,7 +247,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
     public boolean equals(
             final Object obj)
     {
-        if (obj instanceof CertValidity == false)
+        if (!(obj instanceof CertValidity))
         {
             return false;
         }

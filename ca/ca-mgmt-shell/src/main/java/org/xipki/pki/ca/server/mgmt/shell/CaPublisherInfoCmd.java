@@ -75,8 +75,7 @@ public class CaPublisherInfoCmd extends CaCmd
             {
                 sb.append("\t").append(entry.getName()).append("\n");
             }
-        }
-        else
+        } else
         {
             sb.append("\tno publisher for CA " + caName + " is configured");
         }

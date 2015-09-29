@@ -72,8 +72,7 @@ public class EnvInfoCmd extends CaCmd
                         ? "no"
                         : "1");
                 sb.append(" environment parameter is configured\n");
-            }
-            else
+            } else
             {
                 sb.append(n).append(" enviroment paramters are configured:\n");
             }
@@ -85,15 +84,13 @@ public class EnvInfoCmd extends CaCmd
             {
                 sb.append("\t").append(paramName).append("\n");
             }
-        }
-        else
+        } else
         {
             String paramValue = caManager.getEnvParam(name);
             if (paramValue == null)
             {
                 throw new UnexpectedException("\tno environment named '" + name + " is configured");
-            }
-            else
+            } else
             {
                 sb.append(name).append("\n\t").append(paramValue);
             }

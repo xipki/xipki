@@ -67,12 +67,10 @@ class ResponderOption
         if (s == null || "RFC6960".equalsIgnoreCase(s))
         {
             this.mode = OCSPMode.RFC6960;
-        }
-        else if ("RFC2560".equalsIgnoreCase(s))
+        } else if ("RFC2560".equalsIgnoreCase(s))
         {
             this.mode = OCSPMode.RFC2560;
-        }
-        else
+        } else
         {
             throw new InvalidConfException("invalid OCSP mode '" + s + "'");
         }
@@ -90,8 +88,7 @@ class ResponderOption
         if (conf.getServletPaths() == null)
         {
             this.servletPaths = Collections.emptyList();
-        }
-        else
+        } else
         {
             List<String> paths = conf.getServletPaths().getServletPath();
             for (String path : paths)

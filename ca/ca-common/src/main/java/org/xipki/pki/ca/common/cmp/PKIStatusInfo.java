@@ -73,8 +73,7 @@ public class PKIStatusInfo
         if (bcPKIStatusInfo.getFailInfo() != null)
         {
             this.pkiFailureInfo = bcPKIStatusInfo.getFailInfo().intValue();
-        }
-        else
+        } else
         {
             this.pkiFailureInfo = 0;
         }

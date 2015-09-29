@@ -1064,7 +1064,7 @@ implements HessianCAManager
             throw new ServletException(msg);
         }
 
-        if (trustedUserCerts.contains(clientCert) == false)
+        if (!trustedUserCerts.contains(clientCert))
         {
             String msg = "untrusted TLS client certificate ";
             if (LOG.isInfoEnabled())
@@ -1102,8 +1102,7 @@ implements HessianCAManager
             if (truststoreProvider == null || truststoreProvider.trim().length() == 0)
             {
                 keyStore = KeyStore.getInstance(truststoreType);
-            }
-            else
+            } else
             {
                 keyStore = KeyStore.getInstance(truststoreType, truststoreProvider);
             }
@@ -1112,8 +1111,7 @@ implements HessianCAManager
             if (securityFactory.getPasswordResolver() == null)
             {
                 password = truststorePassword.toCharArray();
-            }
-            else
+            } else
             {
                 password = securityFactory.getPasswordResolver().resolvePassword(
                         truststorePassword);

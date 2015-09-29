@@ -39,8 +39,8 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.password.api.PasswordResolver;
-import org.xipki.pki.ca.dbtool.DbPortWorker;
-import org.xipki.pki.ca.dbtool.OcspDbExportWorker;
+import org.xipki.pki.ca.dbtool.port.DbPortWorker;
+import org.xipki.pki.ca.dbtool.port.OcspDbExportWorker;
 
 /**
  * @author Lijun Liao
@@ -77,6 +77,10 @@ public class ExportOcspCmd extends DbPortCmd
             description = "just test the export, no real export")
     private Boolean testOnly = Boolean.FALSE;
 
+    @Option(name = "--threads",
+            description = "number of threads to read the database")
+    private Integer numThreads = 10;
+
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
 
@@ -85,7 +89,7 @@ public class ExportOcspCmd extends DbPortCmd
     throws Exception
     {
         return new OcspDbExportWorker(dataSourceFactory, passwordResolver, dbconfFile, outdir,
-                resume, numCertsInBundle, numCertsPerSelect, testOnly);
+                resume, numCertsInBundle, numCertsPerSelect, numThreads, testOnly);
     }
 
     public void setDataSourceFactory(

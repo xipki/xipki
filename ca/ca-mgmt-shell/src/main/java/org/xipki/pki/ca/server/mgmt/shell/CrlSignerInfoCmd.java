@@ -78,8 +78,7 @@ public class CrlSignerInfoCmd extends CaCmd
                         ? "no"
                         : "1");
                 sb.append(" CRL signer is configured\n");
-            }
-            else
+            } else
             {
                 sb.append(n).append(" CRL signers are configured:\n");
             }
@@ -91,15 +90,13 @@ public class CrlSignerInfoCmd extends CaCmd
             {
                 sb.append("\t").append(name).append("\n");
             }
-        }
-        else
+        } else
         {
             X509CrlSignerEntry entry = caManager.getCrlSigner(name);
             if (entry == null)
             {
                 throw new UnexpectedException("\tno CRL signer named '" + name + " is configured");
-            }
-            else
+            } else
             {
                 sb.append(entry.toString(verbose.booleanValue()));
             }

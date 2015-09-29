@@ -77,8 +77,7 @@ public class BcRSAContentVerifierProviderBuilder
         if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()))
         {
             return SignerUtil.createPSSRSASigner(sigAlgId);
-        }
-        else
+        } else
         {
             return new RSADigestSigner(dig);
         }

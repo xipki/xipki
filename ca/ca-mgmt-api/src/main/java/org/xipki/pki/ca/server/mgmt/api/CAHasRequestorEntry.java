@@ -95,8 +95,7 @@ public class CAHasRequestorEntry implements Serializable
         if (profiles == null)
         {
             this.profiles = Collections.emptySet();
-        }
-        else
+        } else
         {
             this.profiles = CollectionUtil.unmodifiableSet(profiles);
         }

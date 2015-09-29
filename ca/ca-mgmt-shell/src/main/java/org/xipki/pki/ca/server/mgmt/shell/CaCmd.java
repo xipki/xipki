@@ -99,8 +99,7 @@ public abstract class CaCmd extends XipkiOsgiCommandSupport
         if (successful)
         {
             out(posPrefix + " " + message);
-        }
-        else
+        } else
         {
             throw new CmdFailure(negPrefix + " " + message);
         }

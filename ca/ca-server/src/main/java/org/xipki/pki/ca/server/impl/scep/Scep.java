@@ -184,7 +184,7 @@ public class Scep
     throws CAMgmtException
     {
         String type = dbEntry.getResponderType();
-        if ("PKCS12".equalsIgnoreCase(type) == false && "JKS".equalsIgnoreCase(type) == false)
+        if (!"PKCS12".equalsIgnoreCase(type) && !"JKS".equalsIgnoreCase(type))
         {
             throw new CAMgmtException("unsupported SCEP responder type '" + type + "'");
         }
@@ -203,7 +203,7 @@ public class Scep
         this.responderKey = privKeyAndCert.getPrivateKey();
         this.responderCert = privKeyAndCert.getCertificate();
 
-        if (responderCert.getPublicKey() instanceof RSAPublicKey == false)
+        if (!(responderCert.getPublicKey() instanceof RSAPublicKey))
         {
             throw new IllegalArgumentException(
                     "The responder key is not RSA key (CA=" + caName + ")");
@@ -324,12 +324,12 @@ public class Scep
                 audit(auditEvent, "failureMessage", req.getFailureMessage());
             }
             Boolean b = req.isSignatureValid();
-            if (b != null && b.booleanValue() == false)
+            if (b != null && !b.booleanValue())
             {
                 audit(auditEvent, "signature", "invalid");
             }
             b = req.isDecryptionSuccessful();
-            if (b != null && b.booleanValue() == false)
+            if (b != null && !b.booleanValue())
             {
                 audit(auditEvent, "decryption", "failed");
             }
@@ -346,14 +346,14 @@ public class Scep
         }
 
         Boolean b = req.isSignatureValid();
-        if (b != null && b.booleanValue() == false)
+        if (b != null && !b.booleanValue())
         {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badMessageCheck);
         }
 
         b = req.isDecryptionSuccessful();
-        if (b != null && b.booleanValue() == false)
+        if (b != null && !b.booleanValue())
         {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badRequest);
@@ -366,8 +366,7 @@ public class Scep
             if (signingTime == null)
             {
                 isTimeBad = true;
-            }
-            else
+            } else
             {
                 long now = System.currentTimeMillis();
                 long diff = now - signingTime.getTime();
@@ -402,15 +401,13 @@ public class Scep
                 {
                     supported = true;
                 }
-            }
-            else if (hashAlgoType == HashAlgoType.SHA256)
+            } else if (hashAlgoType == HashAlgoType.SHA256)
             {
                 if (caCaps.containsCapability(CACapability.SHA256))
                 {
                     supported = true;
                 }
-            }
-            else if (hashAlgoType == HashAlgoType.SHA512)
+            } else if (hashAlgoType == HashAlgoType.SHA512)
             {
                 if (caCaps.containsCapability(CACapability.SHA512))
                 {
@@ -418,7 +415,7 @@ public class Scep
                 }
             }
 
-            if (supported == false)
+            if (!supported)
             {
                 LOG.warn("tid={}: unsupported digest algorithm {}", tid, oid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
@@ -430,7 +427,7 @@ public class Scep
         ASN1ObjectIdentifier encOid = req.getContentEncryptionAlgorithm();
         if (CMSAlgorithm.DES_EDE3_CBC.equals(encOid))
         {
-            if (caCaps.containsCapability(CACapability.DES3) == false)
+            if (!caCaps.containsCapability(CACapability.DES3))
             {
                 LOG.warn("tid={}: encryption with DES3 algorithm is not permitted", tid, encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
@@ -438,7 +435,7 @@ public class Scep
             }
         } else if (aesEncAlgs.contains(encOid))
         {
-            if (caCaps.containsCapability(CACapability.AES) == false)
+            if (!caCaps.containsCapability(CACapability.AES))
             {
                 LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid, encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
@@ -496,7 +493,7 @@ public class Scep
                     audit(auditEvent, "req-subject", reqSubjectText);
                     LOG.info("tid={}, subject={}", tid, reqSubjectText);
 
-                    if (caManager.getSecurityFactory().verifyPOPO(p10Req) == false)
+                    if (!caManager.getSecurityFactory().verifyPOPO(p10Req))
                     {
                         LOG.warn("tid={}, POPO verification failed", tid);
                         throw FailInfoException.badMessageCheck;
@@ -532,7 +529,7 @@ public class Scep
                             String password = strs[1];
                             authenticatedByPwd = ca.authenticateUser(user, password.getBytes());
 
-                            if (authenticatedByPwd == false)
+                            if (!authenticatedByPwd)
                             {
                                 LOG.warn("tid={}: could not verify the challengePassword", tid);
                                 throw FailInfoException.badRequest;
@@ -569,7 +566,7 @@ public class Scep
                             // up to draft-nourse-scep-23 the client sends all messages to enroll
                             // certificate via MessageType PKCSReq
                             KnowCertResult knowCertRes = ca.knowsCertificate(reqSignatureCert);
-                            if (knowCertRes.isKnown() == false)
+                            if (!knowCertRes.isKnown())
                             {
                                 LOG.warn("tid={}: signature certiciate is not trusted by the CA",
                                         tid);
@@ -588,13 +585,12 @@ public class Scep
                                 X500Name.getInstance(
                                         reqSignatureCert.getSubjectX500Principal().getEncoded()));
                         boolean b2 = cn.equals(cnInSignatureCert);
-                        if (b2 == false)
+                        if (!b2)
                         {
                             if (user != null)
                             {
                                 checkCN(ca, user, cn);
-                            }
-                            else
+                            } else
                             {
                                 LOG.warn("tid={}: signature certificate is not trusted and {}",
                                         tid, "no challengePassword is contained in the request");
@@ -845,7 +841,7 @@ public class Scep
         if (StringUtil.isNotBlank(cnRegex))
         {
             Pattern pattern = Pattern.compile(cnRegex);
-            if (pattern.matcher(cn).matches() == false)
+            if (!pattern.matcher(cn).matches())
             {
                 throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
                         "commonName '" + cn + "' is not permitted");
@@ -878,7 +874,7 @@ public class Scep
             final X500Name caX500Name)
     throws FailInfoException
     {
-        if (thisCAX500Name.equals(caX500Name) == false)
+        if (!thisCAX500Name.equals(caX500Name))
         {
             throw FailInfoException.badCertId;
         }

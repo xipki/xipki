@@ -75,8 +75,7 @@ public class CaRequestorInfoCmd extends CaCmd
             {
                 sb.append("\t").append(entry).append("\n");
             }
-        }
-        else
+        } else
         {
             sb.append("\tno requestor for CA " + caName + " is configured");
         }

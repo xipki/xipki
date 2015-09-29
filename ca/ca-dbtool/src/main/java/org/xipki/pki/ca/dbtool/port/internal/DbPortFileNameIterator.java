@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool;
+package org.xipki.pki.ca.dbtool.port.internal;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -46,7 +46,7 @@ import org.xipki.common.util.StringUtil;
  * @author Lijun Liao
  */
 
-class DbPortFileNameIterator implements Iterator<String>
+public class DbPortFileNameIterator implements Iterator<String>
 {
     private BufferedReader reader;
     private String nextFilename;
@@ -103,7 +103,7 @@ class DbPortFileNameIterator implements Iterator<String>
         while ((line = reader.readLine()) != null)
         {
             line = line.trim();
-            if (StringUtil.isBlank(line) || line.startsWith("#") || line.endsWith(".zip") == false)
+            if (StringUtil.isBlank(line) || line.startsWith("#") || !line.endsWith(".zip"))
             {
                 continue;
             }
@@ -112,5 +112,4 @@ class DbPortFileNameIterator implements Iterator<String>
 
         return null;
     }
-
 }

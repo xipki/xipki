@@ -84,7 +84,7 @@ public class NegRevokeCertCmd extends UnRevRemoveCertCmd
             throw new IllegalCmdParamException("invalid reason " + reason);
         }
 
-        if (CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason) == false)
+        if (!CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason))
         {
             throw new IllegalCmdParamException("reason " + reason + " is not permitted");
         }
@@ -123,8 +123,7 @@ public class NegRevokeCertCmd extends UnRevRemoveCertCmd
                 saveRequestResponse(debug);
             }
 
-        }
-        else
+        } else
         {
             X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
             RequestResponseDebug debug = getRequestResponseDebug();

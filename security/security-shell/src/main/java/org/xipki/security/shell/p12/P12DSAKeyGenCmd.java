@@ -71,8 +71,7 @@ public class P12DSAKeyGenCmd extends P12KeyGenCmd
             if (pLen >= 2048)
             {
                 qLen = 256;
-            }
-            else
+            } else
             {
                 qLen = 160;
             }

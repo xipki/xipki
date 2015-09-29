@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool;
+package org.xipki.pki.ca.dbtool.port;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -72,6 +72,7 @@ public class OcspDbExportWorker extends DbPortWorker
     private final boolean resume;
     private final int numCertsInBundle;
     private final int numCertsPerSelect;
+    private final int numThreads;
     private final boolean evaluateOnly;
 
     public OcspDbExportWorker(
@@ -82,6 +83,7 @@ public class OcspDbExportWorker extends DbPortWorker
             final boolean resume,
             final int numCertsInBundle,
             final int numCertsPerSelect,
+            final int numThreads,
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
@@ -98,27 +100,27 @@ public class OcspDbExportWorker extends DbPortWorker
 
         unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(schema);
+        this.numThreads = numThreads;
         this.evaluateOnly = evaluateOnly;
 
         File f = new File(destFolder);
-        if (f.exists() == false)
+        if (!f.exists())
         {
             f.mkdirs();
-        }
-        else
+        } else
         {
-            if (f.isDirectory() == false)
+            if (!f.isDirectory())
             {
                 throw new IOException(destFolder + " is not a folder");
             }
 
-            if (f.canWrite() == false)
+            if (!f.canWrite())
             {
                 throw new IOException(destFolder + " is not writable");
             }
         }
 
-        if (resume == false)
+        if (!resume)
         {
             String[] children = f.list();
             if (children != null && children.length > 0)
@@ -143,7 +145,7 @@ public class OcspDbExportWorker extends DbPortWorker
             // CertStore
             OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(
                     dataSource, marshaller, unmarshaller, destFolder,
-                    numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
+                    numCertsInBundle, numCertsPerSelect, resume, stopMe, numThreads, evaluateOnly);
             certStoreExporter.export();
             certStoreExporter.shutdown();
         } finally

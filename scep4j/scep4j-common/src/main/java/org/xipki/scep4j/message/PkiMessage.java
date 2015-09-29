@@ -340,8 +340,7 @@ public class PkiMessage
         if (messageData == null)
         {
             content = new CMSAbsentContent();
-        }
-        else
+        } else
         {
             CMSEnvelopedData envelopedData = encrypt(recipientCert, encAlgId);
             byte[] encoded;

@@ -39,8 +39,8 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.password.api.PasswordResolver;
-import org.xipki.pki.ca.dbtool.DbPortWorker;
-import org.xipki.pki.ca.dbtool.OcspFromCaDbImportWorker;
+import org.xipki.pki.ca.dbtool.port.DbPortWorker;
+import org.xipki.pki.ca.dbtool.port.OcspFromCaDbImportWorker;
 
 /**
  * @author Lijun Liao

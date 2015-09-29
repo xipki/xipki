@@ -84,13 +84,13 @@ public class CaProfileCheckCmd extends CaCmd
             profileLocalname = profileName;
         }
         Map<String, String> entries = caManager.getCertprofilesForCA(caName);
-        if (entries.containsKey(profileLocalname) == false)
+        if (!entries.containsKey(profileLocalname))
         {
             throw new CmdFailure("CA is not associated with profile '" + profileLocalname + "'");
         }
 
         String name = entries.get(profileLocalname);
-        if (profileName.equals(name) == false)
+        if (!profileName.equals(name))
         {
             throw new CmdFailure(
                     "Profile name is '" + name + "', but expected '" + profileName + "'");

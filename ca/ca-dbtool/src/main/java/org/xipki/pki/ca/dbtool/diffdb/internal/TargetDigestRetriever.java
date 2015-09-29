@@ -49,10 +49,9 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.DatabaseType;
 import org.xipki.datasource.api.exception.DataAccessException;
@@ -120,7 +119,7 @@ public class TargetDigestRetriever
         @Override
         public void run()
         {
-            while (stop == false)
+            while (!stop.get())
             {
                 try
                 {
@@ -139,7 +138,6 @@ public class TargetDigestRetriever
                     outQueue.add(bundle);
                 } catch (InterruptedException e)
                 {
-                    LOG.error("InterruptedException", e);
                 }
             }
 
@@ -206,8 +204,6 @@ public class TargetDigestRetriever
         }
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(TargetDigestRetriever.class);
-
     private final XipkiDbControl dbControl;
     private final DataSourceWrapper datasource;
 
@@ -219,7 +215,7 @@ public class TargetDigestRetriever
     private final String singleCertSql;
     private final String inArrayCertsSql;
     private final String rangeCertsSql;
-    private boolean stop;
+    private final AtomicBoolean stop = new AtomicBoolean(false);
 
     private ExecutorService executor;
 
@@ -350,7 +346,7 @@ public class TargetDigestRetriever
 
     public void close()
     {
-        stop = true;
+        stop.set(true);
         closeCA();
         executor.shutdownNow();
     }
@@ -419,7 +415,7 @@ public class TargetDigestRetriever
         while (rs.next())
         {
             long serialNumber = rs.getLong(dbControl.getColSerialNumber());
-            if (serialNumbers.contains(serialNumber) == false)
+            if (!serialNumbers.contains(serialNumber))
             {
                 continue;
             }
@@ -457,7 +453,7 @@ public class TargetDigestRetriever
         {
             singleSelectStmt.setLong(2, serialNumber);
             rs = singleSelectStmt.executeQuery();
-            if (rs.next() == false)
+            if (!rs.next())
             {
                 return null;
             }

@@ -135,7 +135,7 @@ class X509SelfSignedCertBuilder
             final List<String> deltaCrlUris)
     throws OperationException, InvalidConfException
     {
-        if (securityFactory.verifyPOPO(p10Request) == false)
+        if (!securityFactory.verifyPOPO(p10Request))
         {
             throw new InvalidConfException("could not validate POP for the pkcs#10 requst");
         }
@@ -161,8 +161,7 @@ class X509SelfSignedCertBuilder
             if (CollectionUtil.isEmpty(restrictedSigAlgos))
             {
                 thisSignerConf = signerConfs.get(0)[1];
-            }
-            else
+            } else
             {
                 for (String algo : restrictedSigAlgos)
                 {
@@ -375,16 +374,13 @@ class X509SelfSignedCertBuilder
         {
             RSAPublicKey k = (RSAPublicKey) key;
             return new RSAKeyParameters(false, k.getModulus(), k.getPublicExponent());
-        }
-        else if (key instanceof ECPublicKey)
+        } else if (key instanceof ECPublicKey)
         {
             return ECUtil.generatePublicKeyParameter(key);
-        }
-        else if (key instanceof DSAPublicKey)
+        } else if (key instanceof DSAPublicKey)
         {
             return DSAUtil.generatePublicKeyParameter(key);
-        }
-        else
+        } else
         {
             throw new InvalidKeyException("unknown key " + key.getClass().getName());
         }

@@ -172,9 +172,9 @@ public class DbCertStatusStore extends CertStatusStore
                     while (rs.next())
                     {
                         String sha1Fp = rs.getString("S1C");
-                        if (issuerFilter.includeIssuerWithSha1Fp(sha1Fp) == false)
+                        if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp))
                         {
-                                continue;
+                            continue;
                         }
 
                         int id = rs.getInt("ID");
@@ -196,8 +196,7 @@ public class DbCertStatusStore extends CertStatusStore
                     if (issuerStore != null)
                     {
                         ids = issuerStore.getIds();
-                    }
-                    else
+                    } else
                     {
                         ids = Collections.emptySet();
                     }
@@ -246,7 +245,7 @@ public class DbCertStatusStore extends CertStatusStore
                 while (rs.next())
                 {
                     String sha1Fp = rs.getString("S1C");
-                    if (issuerFilter.includeIssuerWithSha1Fp(sha1Fp) == false)
+                    if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp))
                     {
                         continue;
                     }
@@ -326,7 +325,7 @@ public class DbCertStatusStore extends CertStatusStore
     {
         // wait for max. 0.5 second
         int n = 5;
-        while (initialized == false && (n-- > 0))
+        while (!initialized && (n-- > 0))
         {
             try
             {
@@ -336,7 +335,7 @@ public class DbCertStatusStore extends CertStatusStore
             }
         }
 
-        if (initialized == false)
+        if (!initialized)
         {
             throw new CertStatusStoreException("initialization of CertStore is still in process");
         }
@@ -394,12 +393,11 @@ public class DbCertStatusStore extends CertStatusStore
                     String certprofile = rs.getString("PN");
                     boolean ignore = certprofile != null
                             && certprofileOption != null
-                            && certprofileOption.include(certprofile) == false;
+                            && !certprofileOption.include(certprofile);
                     if (ignore)
                     {
                         certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, null);
-                    }
-                    else
+                    } else
                     {
                         byte[] certHash = null;
                         if (includeCertHash)
@@ -425,23 +423,20 @@ public class DbCertStatusStore extends CertStatusStore
                             certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
                                     certHashAlgo, certHash,
                                     thisUpdate, null, certprofile);
-                        }
-                        else
+                        } else
                         {
                             certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo,
                                     certHash, thisUpdate,
                                     null, certprofile);
                         }
                     } // end if (ignore)
-                }
-                else
+                } else
                 {
-                    if (unknownSerialAsGood)
+                    if (isUnknownSerialAsGood())
                     {
                         certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null,
                                 thisUpdate, null, null);
-                    }
-                    else
+                    } else
                     {
                         certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
                     }
@@ -454,8 +449,9 @@ public class DbCertStatusStore extends CertStatusStore
                 releaseDbResources(ps, rs);
             }
 
-            if (includeArchiveCutoff)
+            if (isIncludeArchiveCutoff())
             {
+                int retentionInterval = getRetentionInterval();
                 Date t;
                 if (retentionInterval != 0)
                 {
@@ -463,8 +459,7 @@ public class DbCertStatusStore extends CertStatusStore
                     if (retentionInterval < 0)
                     {
                         t = issuer.getNotBefore();
-                    }
-                    else
+                    } else
                     {
                         long nowInMs = System.currentTimeMillis();
                         long tInMs = Math.max(issuer.getNotBefore().getTime(),

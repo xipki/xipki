@@ -55,7 +55,7 @@ xipki-db:import-ocsp \
 ## Import OCSP FROM CA
 
 echo "============================================================================"
-echo "||                         IMPORT CA DATABASE FROM CA                     ||"
+echo "||                        IMPORT OCSP DATABASE FROM CA                    ||"
 echo "============================================================================"
 
 xipki-db:initdb-ocsp \

@@ -108,8 +108,7 @@ public class DbToolBase
         if (i != null)
         {
             ps.setLong(index, i.longValue());
-        }
-        else
+        } else
         {
             ps.setNull(index, Types.BIGINT);
         }
@@ -124,8 +123,7 @@ public class DbToolBase
         if (i != null)
         {
             ps.setInt(index, i.intValue());
-        }
-        else
+        } else
         {
             ps.setNull(index, Types.INTEGER);
         }
@@ -165,31 +163,6 @@ public class DbToolBase
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
-        }
-    }
-
-    protected void releaseResources(
-            final Statement ps,
-            final ResultSet rs)
-    {
-        if (ps != null)
-        {
-            try
-            {
-                ps.close();
-            } catch (SQLException e)
-            {
-            }
-        }
-
-        if (rs != null)
-        {
-            try
-            {
-                rs.close();
-            } catch (SQLException e)
-            {
-            }
         }
     }
 
@@ -462,5 +435,30 @@ public class DbToolBase
         ZipOutputStream zipOutStream = new ZipOutputStream(out);
         zipOutStream.setLevel(Deflater.BEST_SPEED);
         return zipOutStream;
+    }
+
+    public static void releaseResources(
+            final Statement ps,
+            final ResultSet rs)
+    {
+        if (ps != null)
+        {
+            try
+            {
+                ps.close();
+            } catch (SQLException e)
+            {
+            }
+        }
+
+        if (rs != null)
+        {
+            try
+            {
+                rs.close();
+            } catch (SQLException e)
+            {
+            }
+        }
     }
 }

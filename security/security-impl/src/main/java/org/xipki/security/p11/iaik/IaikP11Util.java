@@ -130,8 +130,7 @@ public class IaikP11Util
         if (index > 1 && data.charAt(index - 1) == '%')
         {
             return data.substring(0, index - 1);
-        }
-        else
+        } else
         {
             return data.substring(0, index);
         }

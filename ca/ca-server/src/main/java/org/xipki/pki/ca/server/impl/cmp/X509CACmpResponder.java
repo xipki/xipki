@@ -187,7 +187,7 @@ public class X509CACmpResponder extends CmpResponder
     @Override
     public boolean isInService()
     {
-        if (super.isInService() == false)
+        if (!super.isInService())
         {
             return false;
         }
@@ -245,7 +245,7 @@ public class X509CACmpResponder extends CmpResponder
             final AuditEvent auditEvent)
     throws InvalidConfException
     {
-        if (requestor instanceof CmpRequestorInfo == false)
+        if (!(requestor instanceof CmpRequestorInfo))
         {
             throw new IllegalArgumentException(
                     "unknown requestor type " + requestor.getClass().getName());
@@ -356,8 +356,7 @@ public class X509CACmpResponder extends CmpResponder
                 {
                     auditEvent.addEventData(new AuditEventData("message", statusString));
                 }
-            }
-            else if (auditEvent.getStatus() == null)
+            } else if (auditEvent.getStatus() == null)
             {
                 auditEvent.setStatus(AuditStatus.SUCCESSFUL);
             }
@@ -457,7 +456,7 @@ public class X509CACmpResponder extends CmpResponder
                         new AuditEventData("certReqId", certReqId.getPositiveValue().toString()));
             }
 
-            if (req.hasProofOfPossession() == false)
+            if (!req.hasProofOfPossession())
             {
                 PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.badPOP, null);
                 certResponses[i] = new CertResponse(certReqId, status);
@@ -470,7 +469,7 @@ public class X509CACmpResponder extends CmpResponder
                 continue;
             }
 
-            if (verifyPOP(req, _requestor.isRA()) == false)
+            if (!verifyPOP(req, _requestor.isRA()))
             {
                 LOG.warn("could not validate POP for requst {}", certReqId.getValue());
                 PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.badPOP, null);
@@ -566,7 +565,7 @@ public class X509CACmpResponder extends CmpResponder
             auditEvent.addChildAuditEvent(childAuditEvent);
         }
 
-        if (securityFactory.verifyPOPO(p10cr) == false)
+        if (!securityFactory.verifyPOPO(p10cr))
         {
             LOG.warn("could not validate POP for the pkcs#10 requst");
             PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.badPOP, null);
@@ -576,8 +575,7 @@ public class X509CACmpResponder extends CmpResponder
                 childAuditEvent.setStatus(AuditStatus.FAILED);
                 childAuditEvent.addEventData(new AuditEventData("message", "invalid POP"));
             }
-        }
-        else
+        } else
         {
             CertificationRequestInfo certTemp = p10cr.getCertificationRequestInfo();
             Extensions extensions = X509Util.getExtensions(certTemp);
@@ -677,8 +675,7 @@ public class X509CACmpResponder extends CmpResponder
                         certprofileName, user,
                         subject, publicKeyInfo,
                         notBefore, notAfter, extensions, RequestType.CMP, tid.getOctets());
-            }
-            else
+            } else
             {
                 certInfo = ca.generateCertificate(requestor.isRA(), requestor, certprofileName,
                         user, subject, publicKeyInfo,
@@ -704,13 +701,11 @@ public class X509CACmpResponder extends CmpResponder
                 {
                     statusInfo = new PKIStatusInfo(PKIStatus.grantedWithMods,
                             new PKIFreeText("ALREADY_ISSUED"));
-                }
-                else
+                } else
                 {
                     statusInfo = new PKIStatusInfo(PKIStatus.granted);
                 }
-            }
-            else
+            } else
             {
                 statusInfo = new PKIStatusInfo(PKIStatus.grantedWithMods,
                         new PKIFreeText(warningMsg));
@@ -845,20 +840,17 @@ public class X509CACmpResponder extends CmpResponder
                     return createErrorMsgPKIBody(PKIStatus.rejection,
                             PKIFailureInfo.badCertTemplate,
                             "issuer is not present");
-                }
-                else if (issuer.equals(caSubject) == false)
+                } else if (!issuer.equals(caSubject))
                 {
                     return createErrorMsgPKIBody(PKIStatus.rejection,
                             PKIFailureInfo.badCertTemplate,
                             "issuer not targets at the CA");
-                }
-                else if (serialNumber == null)
+                } else if (serialNumber == null)
                 {
                     return createErrorMsgPKIBody(PKIStatus.rejection,
                             PKIFailureInfo.badCertTemplate,
                             "serialNumber is not present");
-                }
-                else if (certDetails.getSigningAlg() != null
+                } else if (certDetails.getSigningAlg() != null
                         || certDetails.getValidity() != null
                         || certDetails.getSubject() != null
                         || certDetails.getPublicKey() != null
@@ -913,13 +905,11 @@ public class X509CACmpResponder extends CmpResponder
                 {
                     // unrevoke
                     returnedObj = ca.unrevokeCertificate(snBigInt);
-                }
-                else if (Permission.REMOVE_CERT == permission)
+                } else if (Permission.REMOVE_CERT == permission)
                 {
                     // remove
                     returnedObj = ca.removeCertificate(snBigInt);
-                }
-                else
+                } else
                 {
                     // revoke
                     Date invalidityDate = null;
@@ -1075,7 +1065,7 @@ public class X509CACmpResponder extends CmpResponder
     {
         CertStatus[] certStatuses = certConf.toCertStatusArray();
 
-        boolean successfull = true;
+        boolean successful = true;
         for (CertStatus certStatus : certStatuses)
         {
             ASN1Integer certReqId = certStatus.getCertReqId();
@@ -1123,16 +1113,16 @@ public class X509CACmpResponder extends CmpResponder
                 LOG.debug(msg, e);
             }
 
-            successfull = false;
+            successful = false;
         }
 
         // all other certificates should be revoked
         if (revokePendingCertificates(transactionId))
         {
-            successfull = false;
+            successful = false;
         }
 
-        if (successfull)
+        if (successful)
         {
             return new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
         }
@@ -1155,7 +1145,7 @@ public class X509CACmpResponder extends CmpResponder
             return true;
         }
 
-        boolean successfull = true;
+        boolean successful = true;
         Date invalidityDate = new Date();
         X509CA ca = getCA();
         for (X509CertificateInfo remainingCert : remainingCerts)
@@ -1166,11 +1156,11 @@ public class X509CACmpResponder extends CmpResponder
                     CRLReason.CESSATION_OF_OPERATION, invalidityDate);
             } catch (OperationException e)
             {
-                successfull = false;
+                successful = false;
             }
         }
 
-        return successfull;
+        return successful;
     }
 
     private boolean verifyPOP(
@@ -1308,7 +1298,7 @@ public class X509CACmpResponder extends CmpResponder
         StringBuilder sb = new StringBuilder();
         // current maximal support version is 2
         int version = 2;
-        if (CollectionUtil.isNotEmpty(acceptVersions) && acceptVersions.contains(version) == false)
+        if (CollectionUtil.isNotEmpty(acceptVersions) && !acceptVersions.contains(version))
         {
             Integer v = null;
             for (Integer m : acceptVersions)
@@ -1498,12 +1488,11 @@ public class X509CACmpResponder extends CmpResponder
         } // switch type
 
         InfoTypeAndValue tv = null;
-        if (cmpControl.isConfirmCert() == false && CmpUtil.isImplictConfirm(reqHeader))
+        if (!cmpControl.isConfirmCert() && CmpUtil.isImplictConfirm(reqHeader))
         {
             pendingCertPool.removeCertificates(tid.getOctets());
             tv = CmpUtil.getImplictConfirmGeneralInfo();
-        }
-        else
+        } else
         {
             Date now = new Date();
             respHeader.setMessageTime(new ASN1GeneralizedTime(now));
@@ -1556,34 +1545,29 @@ public class X509CACmpResponder extends CmpResponder
                 {
                     addAutitEventType(auditEvent, "CERT_REMOVE");
                     requiredPermission = Permission.REMOVE_CERT;
-                }
-                else if (requiredPermission != Permission.REMOVE_CERT)
+                } else if (requiredPermission != Permission.REMOVE_CERT)
                 {
                     allRevdetailsOfSameType = false;
                     break;
                 }
-            }
-            else if (reasonCode == CRLReason.REMOVE_FROM_CRL.getCode())
+            } else if (reasonCode == CRLReason.REMOVE_FROM_CRL.getCode())
             {
                 if (requiredPermission == null)
                 {
                     addAutitEventType(auditEvent, "CERT_UNREVOKE");
                     requiredPermission = Permission.UNREVOKE_CERT;
-                }
-                else if (requiredPermission != Permission.UNREVOKE_CERT)
+                } else if (requiredPermission != Permission.UNREVOKE_CERT)
                 {
                     allRevdetailsOfSameType = false;
                     break;
                 }
-            }
-            else
+            } else
             {
                 if (requiredPermission == null)
                 {
                     addAutitEventType(auditEvent, "CERT_REVOKE");
                     requiredPermission = Permission.REVOKE_CERT;
-                }
-                else if (requiredPermission != Permission.REVOKE_CERT)
+                } else if (requiredPermission != Permission.REVOKE_CERT)
                 {
                     allRevdetailsOfSameType = false;
                     break;
@@ -1591,7 +1575,7 @@ public class X509CACmpResponder extends CmpResponder
             }
         }
 
-        if (allRevdetailsOfSameType == false)
+        if (!allRevdetailsOfSameType)
         {
             ErrorMsgContent emc = new ErrorMsgContent(
                     new PKIStatusInfo(PKIStatus.rejection,
@@ -1599,8 +1583,7 @@ public class X509CACmpResponder extends CmpResponder
                     new PKIFailureInfo(PKIFailureInfo.badRequest)));
 
             return new PKIBody(PKIBody.TYPE_ERROR, emc);
-        }
-        else
+        } else
         {
             checkPermission(requestor, requiredPermission);
             return revokeOrUnrevokeOrRemoveCertificates(rr, auditEvent, requiredPermission);
@@ -1660,8 +1643,7 @@ public class X509CACmpResponder extends CmpResponder
                 if (itv.getInfoValue() == null)
                 { // as defined in RFC 4210
                     crl = ca.getCurrentCRL();
-                }
-                else
+                } else
                 {
                     // xipki extension
                     ASN1Integer crlNumber = ASN1Integer.getInstance(itv.getInfoValue());
@@ -1676,8 +1658,7 @@ public class X509CACmpResponder extends CmpResponder
                 }
 
                 itvResp = new InfoTypeAndValue(infoType, crl);
-            }
-            else if (ObjectIdentifiers.id_xipki_cm_cmpGenmsg.equals(infoType))
+            } else if (ObjectIdentifiers.id_xipki_cm_cmpGenmsg.equals(infoType))
             {
                 ASN1Encodable asn1 = itv.getInfoValue();
                 ASN1Integer asn1Code = null;
@@ -1713,8 +1694,7 @@ public class X509CACmpResponder extends CmpResponder
                         String statusMessage = "CRL generation is not activated";
                         return createErrorMsgPKIBody(PKIStatus.rejection,
                                 PKIFailureInfo.systemFailure, statusMessage);
-                    }
-                    else
+                    } else
                     {
                         respValue = CertificateList.getInstance(_crl.getEncoded());
                     }

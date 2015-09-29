@@ -122,8 +122,7 @@ public class KeystoreP11Slot implements P11WritableSlot
         if (password == null)
         {
             throw new IllegalArgumentException("no password is configured");
-        }
-        else if (password.size() != 1)
+        } else if (password.size() != 1)
         {
             throw new IllegalArgumentException("exactly 1 password must be specified, but not "
                     + password.size());
@@ -201,8 +200,8 @@ public class KeystoreP11Slot implements P11WritableSlot
 
                 PrivateKey privKey = (PrivateKey) ks.getKey(keyname, password);
 
-                if ((privKey instanceof RSAPrivateKey || privKey instanceof DSAPrivateKey
-                        || privKey instanceof ECPrivateKey) == false)
+                if (!(privKey instanceof RSAPrivateKey || privKey instanceof DSAPrivateKey
+                        || privKey instanceof ECPrivateKey))
                 {
                     throw new SignerException("unsupported key " + privKey.getClass().getName());
                 }
@@ -283,7 +282,7 @@ public class KeystoreP11Slot implements P11WritableSlot
         }
         String commonName = X509Util.getCommonName(
                 identity.getCertificate().getSubjectX500Principal());
-        if (NOCERT_COMMON_NAME.equals(commonName) == false)
+        if (!NOCERT_COMMON_NAME.equals(commonName))
         {
             throw new SignerException(
                     "could not delete only the key without deleting the certificate");
@@ -572,8 +571,7 @@ public class KeystoreP11Slot implements P11WritableSlot
                     return p11Identity;
                 }
             }
-        }
-        else
+        } else
         {
             for (KeystoreP11Identity p11Identity : identities)
             {

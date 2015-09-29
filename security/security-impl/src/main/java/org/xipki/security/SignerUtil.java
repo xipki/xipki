@@ -99,8 +99,7 @@ public class SignerUtil
             return new RSAPrivateCrtKeyParameters(k.getModulus(), k.getPublicExponent(),
                     k.getPrivateExponent(), k.getPrimeP(), k.getPrimeQ(),
                     k.getPrimeExponentP(), k.getPrimeExponentQ(), k.getCrtCoefficient());
-        }
-        else
+        } else
         {
             RSAPrivateKey k = key;
 
@@ -120,7 +119,7 @@ public class SignerUtil
             AsymmetricBlockCipher cipher)
     throws OperatorCreationException
     {
-        if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()) == false)
+        if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()))
         {
             throw new OperatorCreationException("signature algorithm " + sigAlgId.getAlgorithm()
                 + " is not allowed");

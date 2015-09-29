@@ -85,7 +85,7 @@ public abstract class UnRevRemoveCertCmd extends ClientCmd
             final X509Certificate caCert)
     throws CertificateEncodingException
     {
-        if (cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal()) == false)
+        if (!cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal()))
         {
             return "the given certificate is not issued by the given issuer";
         }
@@ -94,7 +94,7 @@ public abstract class UnRevRemoveCertCmd extends ClientCmd
         byte[] aki = X509Util.extractAKI(cert);
         if (caSki != null && aki != null)
         {
-            if (Arrays.equals(aki, caSki) == false)
+            if (!Arrays.equals(aki, caSki))
             {
                 return "the given certificate is not issued by the given issuer";
             }

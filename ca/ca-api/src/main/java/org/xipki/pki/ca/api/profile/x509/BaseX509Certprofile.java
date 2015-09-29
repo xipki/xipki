@@ -120,7 +120,7 @@ extends X509Certprofile
         {
             for (String value : values)
             {
-                if (result.contains(value) == false && p.matcher(value).matches())
+                if (!result.contains(value) && p.matcher(value).matches())
                 {
                     result.add(value);
                 }
@@ -128,7 +128,7 @@ extends X509Certprofile
         }
         for (String value : values)
         {
-            if (result.contains(value) == false)
+            if (!result.contains(value))
             {
                 result.add(value);
             }
@@ -151,8 +151,7 @@ extends X509Certprofile
         if (notBefore != null && notBefore.after(now))
         {
             return notBefore;
-        }
-        else
+        } else
         {
             return now;
         }
@@ -199,12 +198,10 @@ extends X509Certprofile
                 if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type))
                 {
                     rdn = createDateOfBirthRDN(type, rdnValue);
-                }
-                else if (ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type))
+                } else if (ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type))
                 {
                     rdn = createPostalAddressRDN(type, rdnValue, control, 0);
-                }
-                else
+                } else
                 {
                     String value = X509Util.rdnValueToString(rdnValue);
                     rdn = createSubjectRDN(value, type, control, 0);
@@ -214,8 +211,7 @@ extends X509Certprofile
                 {
                     rdns.add(rdn);
                 }
-            }
-            else
+            } else
             {
                 if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type))
                 {
@@ -224,8 +220,7 @@ extends X509Certprofile
                         RDN rdn = createDateOfBirthRDN(type, thisRDNs[i].getFirst().getValue());
                         rdns.add(rdn);
                     }
-                }
-                else if (ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type))
+                } else if (ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type))
                 {
                     for (int i = 0; i < n; i++)
                     {
@@ -233,8 +228,7 @@ extends X509Certprofile
                                 control, i);
                         rdns.add(rdn);
                     }
-                }
-                else
+                } else
                 {
                     String[] values = new String[n];
                     for (int i = 0; i < n; i++)
@@ -267,8 +261,7 @@ extends X509Certprofile
                 if (group == null)
                 {
                     newRdns.add(rdn);
-                }
-                else if (consideredGroups.contains(group) == false)
+                } else if (!consideredGroups.contains(group))
                 {
                     List<AttributeTypeAndValue> atvs = new LinkedList<>();
                     atvs.add(rdn.getFirst());
@@ -314,7 +307,7 @@ extends X509Certprofile
             throw new BadCertTemplateException("Value of RDN dateOfBirth has incorrect syntax");
         }
 
-        if (SubjectDNSpec.p_dateOfBirth.matcher(text).matches() == false)
+        if (!SubjectDNSpec.p_dateOfBirth.matcher(text).matches())
         {
             throw new BadCertTemplateException(
                     "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
@@ -335,7 +328,7 @@ extends X509Certprofile
             final int index)
     throws BadCertTemplateException
     {
-        if (rdnValue instanceof ASN1Sequence == false)
+        if (!(rdnValue instanceof ASN1Sequence))
         {
             throw new BadCertTemplateException("Value of RDN postalAddress has incorrect syntax");
         }
@@ -356,8 +349,7 @@ extends X509Certprofile
             if (line instanceof ASN1String && !(line instanceof DERUniversalString))
             {
                 text = ((ASN1String) line).getString();
-            }
-            else
+            } else
             {
                 throw new BadCertTemplateException("postalAddress[" + i + "] has incorrect syntax");
             }
@@ -414,7 +406,7 @@ extends X509Certprofile
         }
 
         ASN1ObjectIdentifier keyType = publicKey.getAlgorithm().getAlgorithm();
-        if (keyAlgorithms.containsKey(keyType) == false)
+        if (!keyAlgorithms.containsKey(keyType))
         {
             throw new BadCertTemplateException("key type " + keyType.getId() + " is not permitted");
         }
@@ -423,8 +415,7 @@ extends X509Certprofile
         if (keyParamsOption instanceof AllowAllParametersOption)
         {
             return publicKey;
-        }
-        else if (keyParamsOption instanceof ECParamatersOption)
+        } else if (keyParamsOption instanceof ECParamatersOption)
         {
             ECParamatersOption ecOption = (ECParamatersOption) keyParamsOption;
             // parameters
@@ -434,7 +425,7 @@ extends X509Certprofile
             if (algParam instanceof ASN1ObjectIdentifier)
             {
                 curveOid = (ASN1ObjectIdentifier) algParam;
-                if (ecOption.allowsCurve(curveOid) == false)
+                if (!ecOption.allowsCurve(curveOid))
                 {
                     throw new BadCertTemplateException("EC curve "
                             + SecurityUtil.getCurveName(curveOid)
@@ -455,7 +446,7 @@ extends X509Certprofile
                     throw new BadCertTemplateException("invalid publicKeyData");
                 }
                 byte pointEncoding = keyData[0];
-                if (ecOption.getPointEncodings().contains(pointEncoding) == false)
+                if (!ecOption.getPointEncodings().contains(pointEncoding))
                 {
                     throw new BadCertTemplateException("unaccepted EC point encoding "
                             + pointEncoding);
@@ -475,8 +466,7 @@ extends X509Certprofile
                 throw new BadCertTemplateException("invalid public key: " + e.getMessage());
             }
             return publicKey;
-        }
-        else if (keyParamsOption instanceof RSAParametersOption)
+        } else if (keyParamsOption instanceof RSAParametersOption)
         {
             RSAParametersOption rsaOption = (RSAParametersOption) keyParamsOption;
 
@@ -496,8 +486,7 @@ extends X509Certprofile
             {
                 return publicKey;
             }
-        }
-        else if (keyParamsOption instanceof DSAParametersOption)
+        } else if (keyParamsOption instanceof DSAParametersOption)
         {
             DSAParametersOption dsaOption = (DSAParametersOption) keyParamsOption;
             ASN1Encodable params = publicKey.getAlgorithm().getParameters();
@@ -531,8 +520,7 @@ extends X509Certprofile
             {
                 return publicKey;
             }
-        }
-        else
+        } else
         {
             throw new RuntimeException("should not reach here, unknown KeyParametersOption "
                     + keyParamsOption);
@@ -597,7 +585,7 @@ extends X509Certprofile
                 }
             }
 
-            if (present == false)
+            if (!present)
             {
                 throw new BadCertTemplateException("requied subject DN of type "
                         + oidToDisplayName(occurence.getType()) + " is not present");
@@ -651,7 +639,7 @@ extends X509Certprofile
             if (patterns != null)
             {
                 Pattern p = patterns.get(index);
-                if (p.matcher(ttext).matches() == false)
+                if (!p.matcher(ttext).matches())
                 {
                     throw new BadCertTemplateException("invalid subject "
                             + ObjectIdentifiers.oidToDisplayName(type)

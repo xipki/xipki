@@ -149,7 +149,7 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
             return true;
         }
 
-        if (o instanceof P11KeyIdentifier == false)
+        if (!(o instanceof P11KeyIdentifier))
         {
             return false;
         }
@@ -180,8 +180,7 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
             return (o.keyLabel == null)
                     ? 0
                     : 1;
-        }
-        else
+        } else
         {
             return (o.keyLabel == null)
                     ? -1

@@ -168,8 +168,7 @@ class IdentifiedX509Certprofile
         if (type.equalsIgnoreCase("xml"))
         {
             tmpCertprofile = new XmlX509Certprofile();
-        }
-        else if (StringUtil.startsWithIgnoreCase(type, "java:"))
+        } else if (StringUtil.startsWithIgnoreCase(type, "java:"))
         {
             className = type.substring("java:".length());
             try
@@ -182,8 +181,7 @@ class IdentifiedX509Certprofile
                 throw new CertprofileException("invalid type " + type + ", "
                         + e.getClass().getName() + ": " + e.getMessage());
             }
-        }
-        else
+        } else
         {
             throw new CertprofileException("invalid type " + type);
         }
@@ -322,7 +320,7 @@ class IdentifiedX509Certprofile
                     wantedExtensionTypes.remove(oid);
                 }
 
-                if (controls.containsKey(oid) == false)
+                if (!controls.containsKey(oid))
                 {
                     throw new BadCertTemplateException(
                             "could not add needed extension " + oid.getId());
@@ -369,8 +367,7 @@ class IdentifiedX509Certprofile
                             new GeneralName(publicCaInfo.getX500Subject()));
                     value = new AuthorityKeyIdentifier(ikiValue, x509CaSubject,
                             publicCaInfo.getSerialNumber());
-                }
-                else
+                } else
                 {
                     value = new AuthorityKeyIdentifier(ikiValue);
                 }
@@ -657,7 +654,7 @@ class IdentifiedX509Certprofile
             return;
         }
 
-        if (extControl.isRequired() == false)
+        if (!extControl.isRequired())
         {
             return;
         }
@@ -687,7 +684,7 @@ class IdentifiedX509Certprofile
             return;
         }
 
-        if (extControl.isRequired() == false)
+        if (!extControl.isRequired())
         {
             return;
         }
@@ -814,7 +811,7 @@ class IdentifiedX509Certprofile
         boolean ca = isCA();
 
         set.clear();
-        if (ca == false)
+        if (!ca)
         {
             set.clear();
             for (ASN1ObjectIdentifier type : caOnlyExtensionTypes)
@@ -839,7 +836,7 @@ class IdentifiedX509Certprofile
             ExtensionControl control = controls.get(type);
             if (criticalOnlyExtensionTypes.contains(type))
             {
-                if (control.isCritical() == false)
+                if (!control.isCritical())
                 {
                     set.add(type);
                 }
@@ -875,15 +872,15 @@ class IdentifiedX509Certprofile
         Set<KeyUsageControl> usages = getKeyUsage();
 
         boolean b = containsKeyusage(usages, KeyUsage.digitalSignature);
-        if (b == false)
+        if (!b)
         {
             b = containsKeyusage(usages, KeyUsage.contentCommitment);
         }
-        if (b == false)
+        if (!b)
         {
             b = containsKeyusage(usages, KeyUsage.keyCertSign);
         }
-        if (b == false)
+        if (!b)
         {
             b = containsKeyusage(usages, KeyUsage.cRLSign);
         }
@@ -896,7 +893,7 @@ class IdentifiedX509Certprofile
             set.clear();
             for (ASN1ObjectIdentifier type : types)
             {
-                if (controls.containsKey(type) == false || controls.get(type).isRequired() == false)
+                if (!controls.containsKey(type) || !controls.get(type).isRequired())
                 {
                     set.add(type);
                 }
@@ -912,7 +909,7 @@ class IdentifiedX509Certprofile
 
         if (ca)
         {
-            if (containsKeyusage(usages, KeyUsage.keyCertSign) == false)
+            if (!containsKeyusage(usages, KeyUsage.keyCertSign))
             {
                 msg.append("CA profile does not contain keyUsage ")
                     .append(KeyUsage.keyCertSign)
@@ -1031,7 +1028,7 @@ class IdentifiedX509Certprofile
         {
             ASN1Sequence reqSeq = ASN1Sequence.getInstance(reqName.getName());
             ASN1ObjectIdentifier type = ASN1ObjectIdentifier.getInstance(reqSeq.getObjectAt(0));
-            if (mode.getAllowedTypes().contains(type) == false)
+            if (!mode.getAllowedTypes().contains(type))
             {
                 throw new BadCertTemplateException(
                         "otherName.type " + type.getId() + " is not allowed");
@@ -1039,7 +1036,7 @@ class IdentifiedX509Certprofile
 
             ASN1Encodable value = ((ASN1TaggedObject) reqSeq.getObjectAt(1)).getObject();
             String text;
-            if (value instanceof ASN1String == false)
+            if (!(value instanceof ASN1String))
             {
                 throw new BadCertTemplateException("otherName.value is not a String");
             } else
@@ -1095,7 +1092,7 @@ class IdentifiedX509Certprofile
             final Set<ASN1ObjectIdentifier> wantedExtensionTypes)
     {
         boolean addMe = extControl.isRequired();
-        if (addMe == false)
+        if (!addMe)
         {
             if (neededExtensionTypes.contains(extType) || wantedExtensionTypes.contains(extType))
             {

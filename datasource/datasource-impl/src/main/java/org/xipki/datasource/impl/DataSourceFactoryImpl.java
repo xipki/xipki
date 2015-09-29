@@ -108,8 +108,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
         {
             databaseType = DatabaseType.getDataSourceForDataSource(className);
 
-        }
-        else
+        } else
         {
             className = conf.getProperty("driverClassName");
             databaseType = DatabaseType.getDataSourceForDriver(className);
@@ -154,8 +153,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
         if (path.startsWith("~" + File.separator))
         {
             return System.getProperty("user.home") + path.substring(1);
-        }
-        else
+        } else
         {
             return path;
         }

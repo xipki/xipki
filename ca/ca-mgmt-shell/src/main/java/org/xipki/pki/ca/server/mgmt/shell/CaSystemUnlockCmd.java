@@ -56,8 +56,7 @@ public class CaSystemUnlockCmd extends CaCmd
         if (unlocked)
         {
             out("unlocked CA system, calling xipki-ca:restart to restart CA system");
-        }
-        else
+        } else
         {
             throw new UnexpectedException("could not unlock CA system");
         }

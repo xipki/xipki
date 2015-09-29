@@ -136,10 +136,9 @@ implements Serializable
         {
             this.cert = null;
             this.subject = null;
-        }
-        else
+        } else
         {
-            if (X509Util.hasKeyusage(cert, KeyUsage.keyCertSign) == false)
+            if (!X509Util.hasKeyusage(cert, KeyUsage.keyCertSign))
             {
                 throw new CAMgmtException("CA certificate does not have keyusage keyCertSign");
             }
@@ -257,8 +256,7 @@ implements Serializable
         if (cert == null)
         {
             sb.append("\tnull").append("\n");
-        }
-        else
+        } else
         {
             sb.append("\tissuer: ").append(
                     X509Util.getRFC4519Name(cert.getIssuerX500Principal())).append("\n");

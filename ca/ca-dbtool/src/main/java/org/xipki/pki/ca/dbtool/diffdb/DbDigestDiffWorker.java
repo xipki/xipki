@@ -52,8 +52,8 @@ import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.password.api.PasswordResolverException;
-import org.xipki.pki.ca.dbtool.DbPortWorker;
-import org.xipki.pki.ca.dbtool.DbPorter;
+import org.xipki.pki.ca.dbtool.port.DbPortWorker;
+import org.xipki.pki.ca.dbtool.port.DbPorter;
 
 /**
  * @author Lijun Liao
@@ -69,7 +69,8 @@ public class DbDigestDiffWorker extends DbPortWorker
     private final DataSourceWrapper dataSource;
     private final String reportDir;
     private final int numCertsPerSelect;
-    private final int numThreads;
+    private final int numRefThreads;
+    private final int numTargetThreads;
 
     public DbDigestDiffWorker(
             final DataSourceFactory dataSourceFactory,
@@ -80,7 +81,8 @@ public class DbDigestDiffWorker extends DbPortWorker
             final String dbConfFile,
             final String reportDirName,
             final int numCertsPerSelect,
-            final int numThreads)
+            final int numRefThreads,
+            final int numTargetThreads)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         boolean validRef = false;
@@ -92,25 +94,24 @@ public class DbDigestDiffWorker extends DbPortWorker
             validRef = (refDbConfFile == null);
         }
 
-        if (validRef == false)
+        if (!validRef)
         {
             throw new IllegalArgumentException(
                     "Exactly one of refDirname and refDbConffile must be not null");
         }
 
         File f = new File(reportDirName);
-        if (f.exists() == false)
+        if (!f.exists())
         {
             f.mkdirs();
-        }
-        else
+        } else
         {
-            if (f.isDirectory() == false)
+            if (!f.isDirectory())
             {
                 throw new IOException(reportDirName + " is not a folder");
             }
 
-            if (f.canWrite() == false)
+            if (!f.canWrite())
             {
                 throw new IOException(reportDirName + " is not writable");
             }
@@ -142,7 +143,8 @@ public class DbDigestDiffWorker extends DbPortWorker
 
         this.reportDir = reportDirName;
         this.numCertsPerSelect = numCertsPerSelect;
-        this.numThreads = numThreads;
+        this.numRefThreads = numRefThreads;
+        this.numTargetThreads = numTargetThreads;
     }
 
     @Override
@@ -159,16 +161,27 @@ public class DbDigestDiffWorker extends DbPortWorker
             {
                 diff = DbDigestDiff.getInstanceForDirRef(
                     revokedOnly, refDirname, dataSource, reportDir, stopMe,
-                    numCertsPerSelect, numThreads);
+                    numCertsPerSelect, numRefThreads, numTargetThreads);
             } else
             {
                 diff = DbDigestDiff.getInstanceForDbRef(
                     revokedOnly, refDatasource, dataSource, reportDir, stopMe,
-                    numCertsPerSelect, numThreads);
+                    numCertsPerSelect, numRefThreads, numTargetThreads);
             }
             diff.diff();
         } finally
         {
+            if (refDatasource != null)
+            {
+                try
+                {
+                    refDatasource.shutdown();
+                } catch (Throwable e)
+                {
+                    LOG.error("refDatasource.shutdown()", e);
+                }
+            }
+
             try
             {
                 dataSource.shutdown();

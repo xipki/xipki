@@ -310,8 +310,7 @@ class CertStoreQueryExecutor
             if (requestorId != null)
             {
                 ps_addcert.setInt(idx++, requestorId.intValue());
-            }
-            else
+            } else
             {
                 ps_addcert.setNull(idx++, Types.INTEGER);
             }
@@ -482,8 +481,7 @@ class CertStoreQueryExecutor
             if (rs.next())
             {
                 return rs.getLong(1);
-            }
-            else
+            } else
             {
                 return 0;
             }
@@ -708,8 +706,7 @@ class CertStoreQueryExecutor
             if (crlNumber != null)
             {
                 ps.setInt(idx++, crlNumber.intValue());
-            }
-            else
+            } else
             {
                 ps.setNull(idx++, Types.INTEGER);
             }
@@ -719,8 +716,7 @@ class CertStoreQueryExecutor
             if (d != null)
             {
                 ps.setLong(idx++, d.getTime() / 1000);
-            }
-            else
+            } else
             {
                 ps.setNull(idx++, Types.BIGINT);
             }
@@ -733,8 +729,7 @@ class CertStoreQueryExecutor
             if (baseCrlNumber != null)
             {
                 ps.setLong(idx++, baseCrlNumber);
-            }
-            else
+            } else
             {
                 ps.setNull(idx++, Types.BIGINT);
             }
@@ -781,14 +776,12 @@ class CertStoreQueryExecutor
                     throw new OperationException(ErrorCode.CERT_REVOKED,
                             "certificate already issued with the requested reason "
                             + currentReason.getDescription());
-                }
-                else
+                } else
                 {
                     revInfo.setRevocationTime(currentRevInfo.getRevocationTime());
                     revInfo.setInvalidityTime(currentRevInfo.getInvalidityTime());
                 }
-            }
-            else if (force == false)
+            } else if (!force)
             {
                 throw new OperationException(ErrorCode.CERT_REVOKED,
                         "certificate already issued with reason " + currentReason.getDescription());
@@ -824,8 +817,7 @@ class CertStoreQueryExecutor
                 if (count > 1)
                 {
                     message = count + " rows modified, but exactly one is expected";
-                }
-                else
+                } else
                 {
                     message = "no row is modified, but exactly one is expected";
                 }
@@ -873,7 +865,7 @@ class CertStoreQueryExecutor
         }
 
         CRLReason currentReason = currentRevInfo.getReason();
-        if (force == false)
+        if (!force)
         {
             if (currentReason != CRLReason.CERTIFICATE_HOLD)
             {
@@ -904,8 +896,7 @@ class CertStoreQueryExecutor
                 if (count > 1)
                 {
                     message = count + " rows modified, but exactly one is expected";
-                }
-                else
+                } else
                 {
                     message = "no row is modified, but exactly one is expected";
                 }
@@ -992,8 +983,7 @@ class CertStoreQueryExecutor
                 if (count > 1)
                 {
                     message = count + " rows modified, but exactly one is expected";
-                }
-                else
+                } else
                 {
                     message = "no row is modified, but exactly one is expected";
                 }
@@ -1077,7 +1067,7 @@ class CertStoreQueryExecutor
             while (rs.next() && ret.size() < numEntries)
             {
                 int certId = rs.getInt("CID");
-                if (ret.contains(certId) == false)
+                if (!ret.contains(certId))
                 {
                     ret.add(certId);
                 }
@@ -1119,8 +1109,7 @@ class CertStoreQueryExecutor
             if (rs.next())
             {
                 return rs.getInt(1) > 0;
-            }
-            else
+            } else
             {
                 return false;
             }
@@ -1164,8 +1153,7 @@ class CertStoreQueryExecutor
         if (onlyCACerts)
         {
             sb.append(" AND EE=0");
-        }
-        else if (onlyUserCerts)
+        } else if (onlyUserCerts)
         {
             sb.append(" AND EE=1");
         }
@@ -1242,75 +1230,6 @@ class CertStoreQueryExecutor
             }
 
             return ret;
-        } catch (SQLException e)
-        {
-            throw dataSource.translate(sql, e);
-        } finally
-        {
-            releaseDbResources(ps, rs);
-        }
-    }
-
-    int getNumOfExpiredCerts(
-            final X509Cert caCert,
-            final long expiredAt,
-            final String certprofile,
-            String userLike)
-    throws DataAccessException, OperationException
-    {
-        ParamUtil.assertNotNull("caCert", caCert);
-        ParamUtil.assertNotNull("expiredAt", expiredAt);
-        ParamUtil.assertNotBlank("certprofile", certprofile);
-
-        int caId = getCaId(caCert);
-
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("SELECT COUNT(*) FROM CERT WHERE CA_ID=? AND NAFTER<? AND PID=?");
-        if (userLike != null)
-        {
-            userLike = userLike.trim();
-            if (StringUtil.isBlank(userLike) || "null".equalsIgnoreCase(userLike))
-            {
-                userLike = null;
-            }
-        }
-
-        Integer certprofileId = certprofileStore.getId(certprofile);
-        if (certprofileId == null)
-        {
-            return 0;
-        }
-
-        boolean considerUserLike = false;
-        if (userLike == null)
-        {
-            sqlBuilder.append(" AND UNAME IS NULL");
-        }
-        else if ("all".equalsIgnoreCase(userLike) == false)
-        {
-            considerUserLike = true;
-            sqlBuilder.append(" AND UNAME LIKE ?)");
-        }
-
-        String sql = sqlBuilder.toString();
-        PreparedStatement ps = borrowPreparedStatement(sql);
-
-        ResultSet rs = null;
-        try
-        {
-            int idx = 1;
-            ps.setInt(idx++, caId);
-            ps.setLong(idx++, expiredAt);
-            ps.setInt(idx++, certprofileId);
-
-            if (considerUserLike)
-            {
-                ps.setString(idx++, userLike);
-            }
-
-            rs = ps.executeQuery();
-            rs.next();
-            return rs.getInt(1);
         } catch (SQLException e)
         {
             throw dataSource.translate(sql, e);
@@ -1481,7 +1400,7 @@ class CertStoreQueryExecutor
                         caCert, cert.getPublicKey().getEncoded(), certprofileName);
 
                 boolean revoked = rs.getBoolean("REV");
-                if (revoked == false)
+                if (!revoked)
                 {
                     return certInfo;
                 }
@@ -1682,7 +1601,7 @@ class CertStoreQueryExecutor
                         caCert, subjectPublicKeyInfo, certprofileName);
 
                 boolean revoked = rs.getBoolean("REV");
-                if (revoked == false)
+                if (!revoked)
                 {
                     return certInfo;
                 }
@@ -1800,7 +1719,7 @@ class CertStoreQueryExecutor
             ps.setString(1, user);
             rs = ps.executeQuery();
 
-            if (rs.next() == false)
+            if (!rs.next())
             {
                 return false;
             }
@@ -1874,7 +1793,7 @@ class CertStoreQueryExecutor
             ps.setLong(2, serial.longValue());
             rs = ps.executeQuery();
 
-            if (rs.next() == false)
+            if (!rs.next())
             {
                 return KnowCertResult.UNKNOWN;
             }
@@ -1915,8 +1834,7 @@ class CertStoreQueryExecutor
         if (onlyCACerts)
         {
             sqlBuiler.append(" AND EE=0");
-        }
-        else if (onlyUserCerts)
+        } else if (onlyUserCerts)
         {
             sqlBuiler.append(" AND EE=1");
         }
@@ -2011,8 +1929,7 @@ class CertStoreQueryExecutor
         if (onlyCACerts)
         {
             sqlBuilder.append(" AND EE=0");
-        }
-        else if (onlyUserCerts)
+        } else if (onlyUserCerts)
         {
             sqlBuilder.append(" AND EE=1");
         }
@@ -2029,7 +1946,7 @@ class CertStoreQueryExecutor
                 ps.setLong(2, serial);
                 rs = ps.executeQuery();
 
-                if (rs.next() == false)
+                if (!rs.next())
                 {
                     continue;
                 }
@@ -2048,8 +1965,7 @@ class CertStoreQueryExecutor
                     revInfo = new CertRevInfoWithSerial(
                             BigInteger.valueOf(serial),
                             rev_reason, new Date(1000 * rev_time), invalidityTime);
-                }
-                else
+                } else
                 {
                     long lastUpdate = rs.getLong("LUPDATE");
                     revInfo = new CertRevInfoWithSerial(BigInteger.valueOf(serial),
@@ -2115,8 +2031,7 @@ class CertStoreQueryExecutor
                 return rs.getBoolean("REV")
                         ? CertStatus.Revoked
                         : CertStatus.Good;
-            }
-            else
+            } else
             {
                 return CertStatus.Unknown;
             }
@@ -2207,7 +2122,7 @@ class CertStoreQueryExecutor
 
             rs = ps.executeQuery();
 
-            if (rs.next() == false)
+            if (!rs.next())
             {
                 return null;
             }
@@ -2577,8 +2492,7 @@ class CertStoreQueryExecutor
             if (rdn.getFirst().getType().equals(ObjectIdentifiers.DN_SERIALNUMBER))
             {
                 rdns2[i] = new RDN(ObjectIdentifiers.DN_SERIALNUMBER, new DERPrintableString("%"));
-            }
-            else
+            } else
             {
                 rdns2[i] = rdn;
             }
@@ -2610,8 +2524,7 @@ class CertStoreQueryExecutor
                 if (rdns == null || rdns.length == 0)
                 {
                     return null;
-                }
-                else
+                } else
                 {
                     return X509Util.rdnValueToString(rdns[0].getFirst().getValue());
                 }
@@ -2651,7 +2564,7 @@ class CertStoreQueryExecutor
 
             rs = ps.executeQuery();
 
-            if (rs.next() == false)
+            if (!rs.next())
             {
                 return null;
             }
@@ -2848,7 +2761,7 @@ class CertStoreQueryExecutor
             while (true)
             {
                 long serial = dataSource.nextSeqValue(conn, seqName);
-                if (certExists(caCert, serial) == false)
+                if (!certExists(caCert, serial))
                 {
                     return serial;
                 }
@@ -2868,7 +2781,7 @@ class CertStoreQueryExecutor
             while (true)
             {
                 int certId = (int) dataSource.nextSeqValue(conn, "CID");
-                if (dataSource.columnExists(conn, "CERT", "ID", certId) == false)
+                if (!dataSource.columnExists(conn, "CERT", "ID", certId))
                 {
                     return certId;
                 }
@@ -2888,7 +2801,7 @@ class CertStoreQueryExecutor
             while (true)
             {
                 long id = dataSource.nextSeqValue(conn, "DCC_ID");
-                if (dataSource.columnExists(conn, "DELTACRL_CACHE", "ID", id) == false)
+                if (!dataSource.columnExists(conn, "DELTACRL_CACHE", "ID", id))
                 {
                     return id;
                 }

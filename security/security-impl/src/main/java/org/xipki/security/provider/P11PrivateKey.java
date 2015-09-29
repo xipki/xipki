@@ -90,18 +90,15 @@ public class P11PrivateKey implements PrivateKey
         {
             algorithm = "RSA";
             keysize = ((RSAPublicKey) publicKey).getModulus().bitLength();
-        }
-        else if (publicKey instanceof DSAPublicKey)
+        } else if (publicKey instanceof DSAPublicKey)
         {
             algorithm = "DSA";
             keysize = ((DSAPublicKey) publicKey).getParams().getP().bitLength();
-        }
-        else if (publicKey instanceof ECPublicKey)
+        } else if (publicKey instanceof ECPublicKey)
         {
             algorithm = "EC";
             keysize = ((ECPublicKey) publicKey).getParams().getCurve().getField().getFieldSize();
-        }
-        else
+        } else
         {
             throw new InvalidKeyException("unknown public key: " + publicKey);
         }
@@ -134,7 +131,7 @@ public class P11PrivateKey implements PrivateKey
             final byte[] encodedDigestInfo)
     throws SignatureException
     {
-        if ("RSA".equals(algorithm) == false)
+        if (!"RSA".equals(algorithm))
         {
             throw new SignatureException("could not compute RSA signature with " + algorithm
                     + " key");
@@ -153,7 +150,7 @@ public class P11PrivateKey implements PrivateKey
             final byte[] hash)
     throws SignatureException
     {
-        if ("RSA".equals(algorithm) == false)
+        if (!"RSA".equals(algorithm))
         {
             throw new SignatureException("could not compute RSA signature with " + algorithm
                     + " key");
@@ -172,7 +169,7 @@ public class P11PrivateKey implements PrivateKey
             final byte[] hash)
     throws SignatureException
     {
-        if ("EC".equals(algorithm) == false)
+        if (!"EC".equals(algorithm))
         {
             throw new SignatureException("could not compute ECDSA signature with " + algorithm
                     + " key");
@@ -191,7 +188,7 @@ public class P11PrivateKey implements PrivateKey
             final byte[] hash)
     throws SignatureException
     {
-        if ("EC".equals(algorithm) == false)
+        if (!"EC".equals(algorithm))
         {
             throw new SignatureException("could not compute ECDSA signature with " + algorithm
                     + " key");
@@ -210,7 +207,7 @@ public class P11PrivateKey implements PrivateKey
             final byte[] hash)
     throws SignatureException
     {
-        if ("DSA".equals(algorithm) == false)
+        if (!"DSA".equals(algorithm))
         {
             throw new SignatureException("could not compute DSA signature with " + algorithm
                     + " key");
@@ -229,7 +226,7 @@ public class P11PrivateKey implements PrivateKey
             final byte[] hash)
     throws SignatureException
     {
-        if ("DSA".equals(algorithm) == false)
+        if (!"DSA".equals(algorithm))
         {
             throw new SignatureException("could not compute DSA signature with " + algorithm
                     + " key");

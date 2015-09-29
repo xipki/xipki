@@ -78,8 +78,7 @@ public class RequestorInfoCmd extends CaCmd
                         ? "no"
                         : "1");
                 sb.append(" CMP requestor is configured\n");
-            }
-            else
+            } else
             {
                 sb.append(n).append(" CMP requestors are configured:\n");
             }
@@ -91,15 +90,13 @@ public class RequestorInfoCmd extends CaCmd
             {
                 sb.append("\t").append(name).append("\n");
             }
-        }
-        else
+        } else
         {
             CmpRequestorEntry entry = caManager.getCmpRequestor(name);
             if (entry == null)
             {
                 throw new UnexpectedException("could not find CMP requestor '" + name + "'");
-            }
-            else
+            } else
             {
                 sb.append(entry.toString(verbose.booleanValue()));
             }

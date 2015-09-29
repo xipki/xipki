@@ -78,12 +78,10 @@ public class BiometricInfoOption
             if (m.getPredefined() != null)
             {
                 predefinedTypes.add(m.getPredefined().getValue());
-            }
-            else if (m.getOid() != null)
+            } else if (m.getOid() != null)
             {
                 idTypes.add(new ASN1ObjectIdentifier(m.getOid().getValue()));
-            }
-            else
+            } else
             {
                 throw new RuntimeException("should not reach here, invalid biometricType");
             }
@@ -96,8 +94,7 @@ public class BiometricInfoOption
         if (type.isPredefined())
         {
             return predefinedTypes.contains(type.getPredefinedBiometricType());
-        }
-        else
+        } else
         {
             return idTypes.contains(type.getBiometricDataOid());
         }

@@ -120,13 +120,12 @@ public class CanonicalizeCode
         {
             if (file.isDirectory())
             {
-                if (file.getName().equals("target") == false
-                        && file.getName().equals("tbd") == false)
+                if (!file.getName().equals("target")
+                        && !file.getName().equals("tbd"))
                 {
                     canonicalizeDir(file);
                 }
-            }
-            else if (file.isFile() && file.getName().endsWith(".java"))
+            } else if (file.isFile() && file.getName().endsWith(".java"))
             {
                 canonicalizeFile(file);
             }
@@ -151,7 +150,7 @@ public class CanonicalizeCode
             {
                 if (line.trim().startsWith("package ") || line.trim().startsWith("import "))
                 {
-                    if (licenseTextAdded == false)
+                    if (!licenseTextAdded)
                     {
                         writer.write(licenseText.getBytes());
                         licenseTextAdded = true;
@@ -168,16 +167,14 @@ public class CanonicalizeCode
                 boolean addThisLine = true;
                 if (canonicalizedLine.isEmpty())
                 {
-                    if (lastLineEmpty == false)
+                    if (!lastLineEmpty)
                     {
                         lastLineEmpty = true;
-                    }
-                    else
+                    } else
                     {
                         addThisLine = false;
                     }
-                }
-                else
+                } else
                 {
                     lastLineEmpty = false;
                 }
@@ -196,7 +193,7 @@ public class CanonicalizeCode
 
         byte[] oldBytes = IoUtil.read(file);
         byte[] newBytes = writer.toByteArray();
-        if (Arrays.equals(oldBytes, newBytes) == false)
+        if (!Arrays.equals(oldBytes, newBytes))
         {
             File newFile = new File(file.getPath() + "-new");
             IoUtil.save(file, newBytes);
@@ -232,13 +229,11 @@ public class CanonicalizeCode
             {
                 sb.append("    ");
                 index += 4;
-            }
-            else if (c == ' ')
+            } else if (c == ' ')
             {
                 sb.append(c);
                 index++;
-            }
-            else
+            } else
             {
                 sb.append(c);
                 index++;
@@ -257,7 +252,7 @@ public class CanonicalizeCode
         len = sb.length();
         boolean isCommentLine = sb.toString().trim().startsWith("*");
 
-        if (isCommentLine == false && len > 0 && sb.charAt(len - 1) == '{')
+        if (!isCommentLine && len > 0 && sb.charAt(len - 1) == '{')
         {
             if (sb.indexOf("[]") != -1)
             {
@@ -275,7 +270,7 @@ public class CanonicalizeCode
             }
         }
 
-        if (addNewLine == false)
+        if (!addNewLine)
         {
             return sb.toString();
         }
@@ -294,8 +289,7 @@ public class CanonicalizeCode
             if (sb.charAt(i) == ' ')
             {
                 sb.append(' ');
-            }
-            else
+            } else
             {
                 break;
             }
@@ -314,13 +308,12 @@ public class CanonicalizeCode
         {
             if (file.isDirectory())
             {
-                if (file.getName().equals("target") == false
-                        && file.getName().equals("tbd") == false)
+                if (!file.getName().equals("target")
+                        && !file.getName().equals("tbd"))
                 {
                     checkWarningsInDir(file);
                 }
-            }
-            else if (file.isFile() && file.getName().endsWith(".java"))
+            } else if (file.isFile() && file.getName().endsWith(".java"))
             {
                 checkWarningsInFile(file);
             }
@@ -348,7 +341,7 @@ public class CanonicalizeCode
             String line;
             while ((line = reader.readLine()) != null)
             {
-                if (authorsLineAvailable == false && line.contains("* @author"))
+                if (!authorsLineAvailable && line.contains("* @author"))
                 {
                     authorsLineAvailable = true;
                 }
@@ -369,8 +362,7 @@ public class CanonicalizeCode
                     {
                         lineNumbers.add(lineNumber);
                         continue;
-                    }
-                    else
+                    } else
                     {
                         // check whether the number of leading spaces is multiple of 4
                         int numLeadingSpaces = 0;
@@ -380,8 +372,7 @@ public class CanonicalizeCode
                             if (line.charAt(i) == ' ')
                             {
                                 numLeadingSpaces++;
-                            }
-                            else
+                            } else
                             {
                                 c = line.charAt(i);
                                 break;
@@ -404,7 +395,7 @@ public class CanonicalizeCode
 
                 String prefix = line.substring(0, idx);
 
-                if (prefix.equals(THROWS_PREFIX) == false)
+                if (!prefix.equals(THROWS_PREFIX))
                 {
                     // consider inner-class
                     if (prefix.equals(THROWS_PREFIX + THROWS_PREFIX))
@@ -435,13 +426,13 @@ public class CanonicalizeCode
             reader.close();
         }
 
-        if (lineNumbers.isEmpty() == false)
+        if (!lineNumbers.isEmpty())
         {
             System.out.println("Please check file " + file.getPath()
                 + ": lines " + Arrays.toString(lineNumbers.toArray(new Integer[0])));
         }
 
-        if (authorsLineAvailable == false)
+        if (!authorsLineAvailable)
         {
             System.out.println("Please check file " + file.getPath()
                     + ": no authors line");
@@ -465,8 +456,7 @@ public class CanonicalizeCode
         if (i == n - 1)
         {
             return line;
-        }
-        else
+        } else
         {
             return line.substring(0, i + 1);
         }

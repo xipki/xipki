@@ -88,8 +88,7 @@ public abstract class CRLCmd extends ClientCmd
             if (caNames.size() == 1)
             {
                 caName = caNames.iterator().next();
-            }
-            else
+            } else
             {
                 throw new IllegalCmdParamException("no caname is specified, one of "
                         + caNames + " is required");

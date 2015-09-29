@@ -67,8 +67,7 @@ class ResponseOption
         if (cacheConf != null && cacheConf.getCacheMaxAge() != null)
         {
             this.cacheMaxAge = cacheConf.getCacheMaxAge().longValue();
-        }
-        else
+        } else
         {
             this.cacheMaxAge = null;
         }
@@ -84,8 +83,7 @@ class ResponseOption
                 if (algo != null && RequestOption.supportedHashAlgorithms.contains(algo))
                 {
                     _certHashAlgo = algo;
-                }
-                else
+                } else
                 {
                     throw new InvalidConfException("hash algorithm " + token + " is unsupported");
                 }

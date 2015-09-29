@@ -129,8 +129,7 @@ public class X509Util
                         break;
                     }
                 }
-            }
-            else
+            } else
             {
                 atv = rdn.getFirst();
             }
@@ -216,8 +215,7 @@ public class X509Util
         if (CollectionUtil.isEmpty(ret))
         {
             return null;
-        }
-        else
+        } else
         {
             return ret.toArray(new RDN[0]);
         }
@@ -391,8 +389,7 @@ public class X509Util
                             values.add(textValue);
                         }
                     }
-                }
-                else
+                } else
                 {
                     String textValue =
                             IETFUtils.valueToString(rdn.getFirst().getValue()).toLowerCase();
@@ -537,8 +534,7 @@ public class X509Util
         if (value instanceof ASN1String && !(value instanceof DERUniversalString))
         {
             return ((ASN1String) value).getString();
-        }
-        else
+        } else
         {
             try
             {
@@ -644,7 +640,7 @@ public class X509Util
         certChain.add(cert);
         try
         {
-            if (certs != null && isSelfSigned(cert) == false)
+            if (certs != null && !isSelfSigned(cert))
             {
                 while (true)
                 {
@@ -684,8 +680,7 @@ public class X509Util
         if (len == n)
         {
             return certChain.toArray(new X509Certificate[0]);
-        }
-        else
+        } else
         {
             X509Certificate[] ret = new X509Certificate[len];
             for (int i = 0; i < len; i++)
@@ -721,13 +716,13 @@ public class X509Util
 
         for (Certificate caCert : caCerts)
         {
-            if (caCert instanceof X509Certificate == false)
+            if (!(caCert instanceof X509Certificate))
             {
                 continue;
             }
 
             X509Certificate x509CaCert = (X509Certificate) caCert;
-            if (issues(x509CaCert, cert) == false)
+            if (!issues(x509CaCert, cert))
             {
                 continue;
             }
@@ -767,7 +762,7 @@ public class X509Util
     throws CertificateEncodingException
     {
         boolean isCA = issuerCert.getBasicConstraints() >= 0;
-        if (isCA == false)
+        if (!isCA)
         {
             return false;
         }
@@ -808,8 +803,7 @@ public class X509Util
             if (DERNull.INSTANCE.equals(keyParameters))
             {
                 return publicKeyInfo;
-            }
-            else
+            } else
             {
                 AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(algOid, DERNull.INSTANCE);
                 return new SubjectPublicKeyInfo(keyAlgId,

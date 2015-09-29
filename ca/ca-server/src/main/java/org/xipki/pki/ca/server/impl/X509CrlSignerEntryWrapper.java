@@ -126,7 +126,7 @@ class X509CrlSignerEntryWrapper
         }
         this.subjectKeyIdentifier = ski.getOctets();
 
-        if (X509Util.hasKeyusage(signer.getCertificate(), KeyUsage.cRLSign) == false)
+        if (!X509Util.hasKeyusage(signer.getCertificate(), KeyUsage.cRLSign))
         {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "CRL signer does not have keyusage cRLSign");

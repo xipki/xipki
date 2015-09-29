@@ -126,8 +126,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
             {
                 throw new SignerException("InvalidKeyException: " + e.getMessage(), e);
             }
-        }
-        else if (this.publicKey instanceof ECPublicKey || this.publicKey instanceof DSAPublicKey)
+        } else if (this.publicKey instanceof ECPublicKey || this.publicKey instanceof DSAPublicKey)
         {
             String algorithm;
             if (this.publicKey instanceof ECPublicKey)
@@ -135,14 +134,12 @@ class SunP11Identity implements Comparable<SunP11Identity>
                 signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getCurve()
                         .getField().getFieldSize();
                 algorithm = "NONEwithECDSA";
-            }
-            else if (this.publicKey instanceof DSAPublicKey)
+            } else if (this.publicKey instanceof DSAPublicKey)
             {
                 signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getP()
                         .bitLength();
                 algorithm = "NONEwithDSA";
-            }
-            else
+            } else
             {
                 throw new RuntimeException("should not reach here");
             }
@@ -162,8 +159,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
                 throw new SignerException("InvalidKeyException: " + e.getMessage(), e);
             }
             this.rsaCipher = null;
-        }
-        else
+        } else
         {
             throw new IllegalArgumentException(
                     "currently only RSA, EC and DSA public key are supported, but not "
@@ -226,7 +222,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
             final byte[] hash)
     throws SignerException
     {
-        if (publicKey instanceof RSAPublicKey == false)
+        if (!(publicKey instanceof RSAPublicKey))
         {
             throw new SignerException("operation CKM_RSA_X509 is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -257,7 +253,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
             final byte[] hash)
     throws SignerException
     {
-        if (publicKey instanceof ECPublicKey == false)
+        if (!(publicKey instanceof ECPublicKey))
         {
             throw new SignerException("operation CKM_ECDSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -290,7 +286,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
             final byte[] hash)
     throws SignerException
     {
-        if (publicKey instanceof DSAPublicKey == false)
+        if (!(publicKey instanceof DSAPublicKey))
         {
             throw new SignerException("operation CKM_DSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");

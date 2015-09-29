@@ -217,8 +217,7 @@ public class CertificateStore
             {
                 LOG.info("could not revoke non-existing certificate issuer='{}', serialNumber={}",
                     caCert.getSubject(), serialNumber);
-            }
-            else
+            } else
             {
                 LOG.info("revoked certificate issuer='{}', serialNumber={}",
                     caCert.getSubject(), serialNumber);
@@ -250,8 +249,7 @@ public class CertificateStore
             {
                 LOG.info("could not unrevoke non-existing certificate issuer='{}', serialNumber={}",
                     caCert.getSubject(), serialNumber);
-            }
-            else
+            } else
             {
                 LOG.info("unrevoked certificate issuer='{}', serialNumber={}",
                         caCert.getSubject(), serialNumber);
@@ -551,26 +549,6 @@ public class CertificateStore
         try
         {
             return queryExecutor.getExpiredSerialNumbers(caCert, expiredAt, numEntries);
-        } catch (DataAccessException e)
-        {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e)
-        {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
-        }
-    }
-
-    public int getNumOfExpiredCerts(
-            final X509Cert caCert,
-            final long expiredAt,
-            final String certprofile,
-            final String userLike)
-    throws OperationException
-    {
-        try
-        {
-            return queryExecutor.getNumOfExpiredCerts(caCert, expiredAt, certprofile, userLike);
         } catch (DataAccessException e)
         {
             LOG.debug("DataAccessException", e);

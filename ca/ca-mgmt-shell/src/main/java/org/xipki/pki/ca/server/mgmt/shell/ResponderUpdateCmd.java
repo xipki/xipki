@@ -110,8 +110,7 @@ public class ResponderUpdateCmd extends CaCmd
         if (CAManager.NULL.equalsIgnoreCase(certFile))
         {
             cert = CAManager.NULL;
-        }
-        else if (certFile != null)
+        } else if (certFile != null)
         {
             byte[] certBytes = IoUtil.read(certFile);
             X509Util.parseCert(new ByteArrayInputStream(certBytes));

@@ -159,8 +159,7 @@ public class IaikP11ModulePool
                 LOG.debug(message, e);
                 close(module);
                 throw new SignerException(e.getMessage());
-            }
-            else
+            } else
             {
                 LOG.info("PKCS#11 module already initialized");
                 if (LOG.isInfoEnabled())

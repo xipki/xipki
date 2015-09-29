@@ -91,8 +91,7 @@ public abstract class DbDataObject
         } else if (value instanceof Boolean)
         {
             valueS = value.toString();
-        }
-        else
+        } else
         {
             throw new InvalidDataObjectException("value is not a String or Number ");
         }

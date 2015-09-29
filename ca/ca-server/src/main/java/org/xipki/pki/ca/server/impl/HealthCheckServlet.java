@@ -104,18 +104,16 @@ public class HealthCheckServlet extends HttpServlet
                 responder = responderManager.getX509CACmpResponder(caName);
             }
 
-            if (caName == null || responder == null || responder.isInService() == false)
+            if (caName == null || responder == null || !responder.isInService())
             {
                 String auditMessage;
                 if (caName == null)
                 {
                     auditMessage = "n CA is specified";
-                }
-                else if (responder == null)
+                } else if (responder == null)
                 {
                     auditMessage = "unknown CA '" + caName + "'";
-                }
-                else
+                } else
                 {
                     auditMessage = "CA '" + caName + "' is out of service";
                 }

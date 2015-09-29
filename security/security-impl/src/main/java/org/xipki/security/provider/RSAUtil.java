@@ -97,8 +97,7 @@ public class RSAUtil
                 k.getPublicExponent(), k.getPrivateExponent(),
                 k.getPrimeP(), k.getPrimeQ(), k.getPrimeExponentP(), k.getPrimeExponentQ(),
                 k.getCrtCoefficient());
-        }
-        else
+        } else
         {
             RSAPrivateKey k = key;
 

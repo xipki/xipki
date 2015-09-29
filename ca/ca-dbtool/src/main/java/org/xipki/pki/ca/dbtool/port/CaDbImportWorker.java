@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool;
+package org.xipki.pki.ca.dbtool.port;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -131,12 +131,11 @@ public class CaDbImportWorker extends DbPortWorker
         File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
         if (resume)
         {
-            if (processLogFile.exists() == false)
+            if (!processLogFile.exists())
             {
                 throw new Exception("could not process with '--resume' option");
             }
-        }
-        else
+        } else
         {
             if (processLogFile.exists())
             {
@@ -148,7 +147,7 @@ public class CaDbImportWorker extends DbPortWorker
         long start = System.currentTimeMillis();
         try
         {
-            if (resume == false)
+            if (!resume)
             {
                 // CAConfiguration
                 CaConfigurationDbImporter caConfImporter = new CaConfigurationDbImporter(
@@ -243,7 +242,7 @@ public class CaDbImportWorker extends DbPortWorker
             {
                 ps.setInt(1, entry.CA_id);
                 rs = ps.executeQuery();
-                if (rs.next() == false)
+                if (!rs.next())
                 {
                     continue;
                 }

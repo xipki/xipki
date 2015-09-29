@@ -92,8 +92,7 @@ public class OCSPStatusLoadTestCmd extends AbstractOCSPStatusCmd
                 if (countTokens == 1)
                 {
                     serialNumbers.add(Long.parseLong(subtokens.get(0)));
-                }
-                else if (countTokens == 2)
+                } else if (countTokens == 2)
                 {
                     int startSerial = Integer.parseInt(subtokens.get(0).trim());
                     int endSerial = Integer.parseInt(subtokens.get(1).trim());
@@ -106,8 +105,7 @@ public class OCSPStatusLoadTestCmd extends AbstractOCSPStatusCmd
                     {
                         serialNumbers.add(i);
                     }
-                }
-                else
+                } else
                 {
                     throw new IllegalCmdParamException(
                             "invalid serial number " + this.serialNumbers);

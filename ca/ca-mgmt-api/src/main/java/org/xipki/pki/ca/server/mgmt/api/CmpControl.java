@@ -101,8 +101,7 @@ public class CmpControl
         if (s == null)
         {
             this.sigAlgos = null;
-        }
-        else
+        } else
         {
             Set<String> set = StringUtil.splitAsSet(s, ALGO_DELIMITER);
             this.sigAlgos = canonicalizeAlgos(set);
@@ -163,8 +162,7 @@ public class CmpControl
         if (CollectionUtil.isEmpty(sigAlgos))
         {
             this.sigAlgos = null;
-        }
-        else
+        } else
         {
             this.sigAlgos = canonicalizeAlgos(sigAlgos);
             pairs.putPair(KEY_PROTECTION_SIGALGO,

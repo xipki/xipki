@@ -124,8 +124,7 @@ public final class SunP11CryptService implements P11CryptService
             if ("SunEC".equals(name))
             {
                 idx_sunec = i;
-            }
-            else if (XipkiSunECProvider.NAME.equals(name))
+            } else if (XipkiSunECProvider.NAME.equals(name))
             {
                 xipkiProv = providers[i];
                 idx_xipki = i;
@@ -138,8 +137,7 @@ public final class SunP11CryptService implements P11CryptService
             {
                 xipkiProv = new XipkiSunECProvider();
                 idx_xipki = providers.length;
-            }
-            else if (idx_sunec < idx_xipki)
+            } else if (idx_sunec < idx_xipki)
             {
                 Security.removeProvider(XipkiSunECProvider.NAME);
             }
@@ -178,7 +176,7 @@ public final class SunP11CryptService implements P11CryptService
         {
             P11SlotIdentifier slotId = new P11SlotIdentifier(i, slotList[i]);
 
-            if (moduleConf.isSlotIncluded(slotId) == false)
+            if (!moduleConf.isSlotIncluded(slotId))
             {
                 continue;
             }
@@ -189,8 +187,7 @@ public final class SunP11CryptService implements P11CryptService
                 if (i == 0)
                 {
                     provider = p11ProviderOfSlot0;
-                }
-                else
+                } else
                 {
                     provider = getPKCS11Provider(nativeLib, i);
                 }
@@ -220,7 +217,7 @@ public final class SunP11CryptService implements P11CryptService
                     String alias = aliases.nextElement();
                     try
                     {
-                        if (keystore.isKeyEntry(alias) == false)
+                        if (!keystore.isKeyEntry(alias))
                         {
                             continue;
                         }
@@ -236,7 +233,7 @@ public final class SunP11CryptService implements P11CryptService
                         }
 
                         Key key = keystore.getKey(alias, keyPwd);
-                        if (key instanceof PrivateKey == false)
+                        if (!(key instanceof PrivateKey))
                         {
                             continue;
                         }
@@ -263,7 +260,7 @@ public final class SunP11CryptService implements P11CryptService
 
                         if ("EC".equalsIgnoreCase(pubKey.getAlgorithm()))
                         {
-                            if (pubKey instanceof ECPublicKey == false)
+                            if (!(pubKey instanceof ECPublicKey))
                             {
                                 // reparse the certificate due to bug in bcprov version 1.49
                                 // signatureCert = X509Util.parseCert(signatureCert.getEncoded());
@@ -558,7 +555,7 @@ public final class SunP11CryptService implements P11CryptService
         for (SunP11Identity identity : identities)
         {
             P11SlotIdentifier slotId = identity.getSlotId();
-            if (slotIds.contains(slotId) == false)
+            if (!slotIds.contains(slotId))
             {
                 slotIds.add(slotId);
             }

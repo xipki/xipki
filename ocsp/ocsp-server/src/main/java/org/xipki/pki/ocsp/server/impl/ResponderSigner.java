@@ -139,7 +139,7 @@ class ResponderSigner
             final AlgorithmIdentifier sigAlgId)
     {
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
-        if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid) == false)
+        if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid))
         {
             return algOid.getId();
         }
@@ -179,7 +179,7 @@ class ResponderSigner
     {
         for (ConcurrentContentSigner signer : signers)
         {
-            if (signer.isHealthy() == false)
+            if (!signer.isHealthy())
             {
                 return false;
             }

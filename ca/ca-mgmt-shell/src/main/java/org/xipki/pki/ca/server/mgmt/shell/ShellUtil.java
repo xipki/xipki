@@ -58,8 +58,8 @@ class ShellUtil
             final PasswordResolver passwordResolver)
     throws Exception
     {
-        if (signerConf.contains("file:") == false && signerConf.contains("base64:") == false
-                && signerConf.contains("FILE:") == false && signerConf.contains("BASE64:") == false)
+        if (!signerConf.contains("file:") && !signerConf.contains("base64:")
+                && !signerConf.contains("FILE:") && !signerConf.contains("BASE64:"))
         {
             return signerConf;
         }
@@ -79,12 +79,10 @@ class ShellUtil
         {
             String keystoreFile = keystoreConf.substring("file:".length());
             keystoreBytes = IoUtil.read(keystoreFile);
-        }
-        else if (StringUtil.startsWithIgnoreCase(keystoreConf, "base64:"))
+        } else if (StringUtil.startsWithIgnoreCase(keystoreConf, "base64:"))
         {
             keystoreBytes = Base64.decode(keystoreConf.substring("base64:".length()));
-        }
-        else
+        } else
         {
             return signerConf;
         }
@@ -93,8 +91,7 @@ class ShellUtil
         if (passwordResolver == null)
         {
             password = passwordHint.toCharArray();
-        }
-        else
+        } else
         {
             password = passwordResolver.resolvePassword(passwordHint);
         }

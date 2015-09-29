@@ -66,13 +66,12 @@ public class MgmtQAShellUtil
         if (ex == null)
         {
             b = (is == null);
-        }
-        else
+        } else
         {
             b = ex.equals(is);
         }
 
-        if (b == false)
+        if (!b)
         {
             throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
         }
@@ -87,13 +86,12 @@ public class MgmtQAShellUtil
         if (ex == null)
         {
             b = (is == null);
-        }
-        else
+        } else
         {
             b = ex.equals(is);
         }
 
-        if (b == false)
+        if (!b)
         {
             throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
         }

@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool;
+package org.xipki.pki.ca.dbtool.port;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -48,6 +48,8 @@ import javax.xml.validation.SchemaFactory;
 import org.xipki.common.util.IoUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.pki.ca.dbtool.DbSchemaInfo;
+import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.jaxb.ca.FileOrValueType;
 import org.xml.sax.SAXException;
 
@@ -159,7 +161,7 @@ public class DbPorter extends DbToolBase
 
         File file = new File(baseDir, fileName);
         File parent = file.getParentFile();
-        if (parent != null && parent.exists() == false)
+        if (parent != null && !parent.exists())
         {
             parent.mkdirs();
         }

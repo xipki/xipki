@@ -54,8 +54,8 @@ public class CaSystemRestartCmd extends CaCmd
     protected Object _doExecute()
     throws Exception
     {
-        boolean successfull = caManager.restartCaSystem();
-        if (successfull == false)
+        boolean successful = caManager.restartCaSystem();
+        if (!successful)
         {
             throw new CmdFailure("could not restart CA system");
         }
@@ -82,8 +82,7 @@ public class CaSystemRestartCmd extends CaCmd
 
             int len = sb.length();
             sb.delete(len - 2, len);
-        }
-        else
+        } else
         {
             sb.append(": no CA is configured");
         }

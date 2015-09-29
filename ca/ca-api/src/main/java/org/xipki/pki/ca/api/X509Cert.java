@@ -90,8 +90,7 @@ public class X509Cert
             {
                 throw new RuntimeException("CertificateEncodingException: " + e.getMessage());
             }
-        }
-        else
+        } else
         {
             this.encodedCert = encodedCert;
         }

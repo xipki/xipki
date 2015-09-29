@@ -71,7 +71,7 @@ public class RequestorCheckCmd extends RequestorUpdateCmd
             throw new CmdFailure("Cert: is not configured explicitly as expected");
         }
 
-        if (Arrays.equals(ex, Base64.decode(cr.getBase64Cert())) == false)
+        if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert())))
         {
             throw new CmdFailure("Cert: the expected one and the actual one differ");
         }

@@ -262,8 +262,7 @@ public class IaikP11Slot implements P11WritableSlot
         if (maxSessionCount2 == 0)
         {
             maxSessionCount2 = DEFAULT_MAX_COUNT_SESSION;
-        }
-        else
+        } else
         {
             // 2 sessions as buffer, they may be used elsewhere.
             maxSessionCount2 = (maxSessionCount2 < 3)
@@ -321,8 +320,7 @@ public class IaikP11Slot implements P11WritableSlot
                         continue;
                     }
                     signaturePublicKey = signatureCert.getPublicKey();
-                }
-                else
+                } else
                 {
                     signatureCert = null;
                     PublicKey publicKeyObject = getPublicKeyObject(
@@ -476,8 +474,7 @@ public class IaikP11Slot implements P11WritableSlot
             if (keyId.getKeyId() != null)
             {
                 signingKey = signingKeysById.get(keyId.getKeyIdHex());
-            }
-            else
+            } else
             {
                 signingKey = signingKeysByLabel.get(keyId.getKeyLabel());
             }
@@ -491,8 +488,7 @@ public class IaikP11Slot implements P11WritableSlot
                 {
                     LOG.info("found private key " + keyId);
                     cacheSigningKey(signingKey);
-                }
-                else
+                } else
                 {
                     LOG.warn("could not find private key " + keyId);
                 }
@@ -678,8 +674,7 @@ public class IaikP11Slot implements P11WritableSlot
                 // some driver does not accept null PIN
                 session.login(Session.UserType.USER, "".toCharArray());
                 this.password = null;
-            }
-            else
+            } else
             {
                 LOG.info("verify on PKCS11Module with PIN");
 
@@ -726,7 +721,7 @@ public class IaikP11Slot implements P11WritableSlot
             boolean loginRequired = session.getToken().getTokenInfo().isLoginRequired();
 
             LOG.debug("loginRequired: {}", loginRequired);
-            if (loginRequired == false)
+            if (!loginRequired)
             {
                 return;
             }
@@ -734,8 +729,7 @@ public class IaikP11Slot implements P11WritableSlot
             if (CollectionUtil.isEmpty(password))
             {
                 session.login(Session.UserType.USER, null);
-            }
-            else
+            } else
             {
                 for (char[] singlePwd : password)
                 {
@@ -893,7 +887,7 @@ public class IaikP11Slot implements P11WritableSlot
                 ? null
                 : new String(_label);
 
-        if (b == null || b.booleanValue() == false)
+        if (b == null || !b.booleanValue())
         {
             LOG.warn("key {} is not for signing", new P11KeyIdentifier(id, label));
             return;
@@ -1960,20 +1954,16 @@ public class IaikP11Slot implements P11WritableSlot
             if (keyBitLength > 384)
             {
                 sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
-            }
-            else if (keyBitLength > 256)
+            } else if (keyBitLength > 256)
             {
                 sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
-            }
-            else if (keyBitLength > 224)
+            } else if (keyBitLength > 224)
             {
                 sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
-            }
-            else if (keyBitLength > 160)
+            } else if (keyBitLength > 160)
             {
                 sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
-            }
-            else
+            } else
             {
                 sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
             }
@@ -2100,8 +2090,7 @@ public class IaikP11Slot implements P11WritableSlot
             sigMechanism = Mechanism.get(PKCS11Constants.CKM_SHA256_RSA_PKCS);
             session.signInit(sigMechanism, privateKeyAndPkInfo.getPrivateKey());
             signature = session.sign(encodedTbsCertificate);
-        }
-        else if (sigAlgID.equals(NISTObjectIdentifiers.dsa_with_sha256))
+        } else if (sigAlgID.equals(NISTObjectIdentifiers.dsa_with_sha256))
         {
             digest = new SHA256Digest();
             byte[] digestValue = new byte[digest.getDigestSize()];
@@ -2112,26 +2101,21 @@ public class IaikP11Slot implements P11WritableSlot
                     privateKeyAndPkInfo.getPrivateKey());
             byte[] rawSignature = session.sign(digestValue);
             signature = convertToX962Signature(rawSignature);
-        }
-        else
+        } else
         {
             if (sigAlgID.equals(X9ObjectIdentifiers.ecdsa_with_SHA1))
             {
                 digest = new SHA1Digest();
-            }
-            else if (sigAlgID.equals(X9ObjectIdentifiers.ecdsa_with_SHA256))
+            } else if (sigAlgID.equals(X9ObjectIdentifiers.ecdsa_with_SHA256))
             {
                 digest = new SHA256Digest();
-            }
-            else if (sigAlgID.equals(X9ObjectIdentifiers.ecdsa_with_SHA384))
+            } else if (sigAlgID.equals(X9ObjectIdentifiers.ecdsa_with_SHA384))
             {
                 digest = new SHA384Digest();
-            }
-            else if (sigAlgID.equals(X9ObjectIdentifiers.ecdsa_with_SHA512))
+            } else if (sigAlgID.equals(X9ObjectIdentifiers.ecdsa_with_SHA512))
             {
                 digest = new SHA512Digest();
-            }
-            else
+            } else
             {
                 System.err.println("unknown algorithm ID: " + sigAlgID.getId());
                 return null;
@@ -2383,8 +2367,7 @@ public class IaikP11Slot implements P11WritableSlot
             {
                 throw new SignerException(e.getMessage(), e);
             }
-        }
-        else if (p11Key instanceof DSAPublicKey)
+        } else if (p11Key instanceof DSAPublicKey)
         {
             DSAPublicKey dsaP11Key = (DSAPublicKey) p11Key;
 
@@ -2403,13 +2386,11 @@ public class IaikP11Slot implements P11WritableSlot
             {
                 throw new SignerException(e.getMessage(), e);
             }
-        }
-        else if (p11Key instanceof ECDSAPublicKey)
+        } else if (p11Key instanceof ECDSAPublicKey)
         {
             // FIXME: implement me
             return null;
-        }
-        else
+        } else
         {
             throw new SignerException("unknown public key class " + p11Key.getClass().getName());
         }

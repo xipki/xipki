@@ -78,17 +78,17 @@ public class FileUtils
             final File directory)
     throws IOException
     {
-        if (directory.exists() == false)
+        if (!directory.exists())
         {
             return;
         }
 
-        if (isSymlink(directory) == false)
+        if (!isSymlink(directory))
         {
             cleanDirectory(directory);
         }
 
-        if (directory.delete() == false)
+        if (!directory.delete())
         {
             throw new IOException("Unable to delete directory " + directory + ".");
         }
@@ -152,12 +152,12 @@ public class FileUtils
             final File directory)
     throws IOException
     {
-        if (directory.exists() == false)
+        if (!directory.exists())
         {
             throw new IllegalArgumentException(directory + " does not exist");
         }
 
-        if (directory.isDirectory() == false)
+        if (!directory.isDirectory())
         {
             throw new IllegalArgumentException(directory + " is not a directory");
         }
@@ -213,9 +213,9 @@ public class FileUtils
         } else
         {
             final boolean filePresent = file.exists();
-            if (file.delete() == false)
+            if (!file.delete())
             {
-                if (filePresent == false)
+                if (!filePresent)
                 {
                     throw new FileNotFoundException("File does not exist: " + file);
                 }
@@ -341,7 +341,7 @@ public class FileUtils
         }
         if (destDir.exists())
         {
-            if (destDir.isDirectory() == false)
+            if (!destDir.isDirectory())
             {
                 throw new IOException("Destination '" + destDir
                         + "' exists but is not a directory");
@@ -353,7 +353,7 @@ public class FileUtils
                 throw new IOException("Destination '" + destDir + "' directory cannot be created");
             }
         }
-        if (destDir.canWrite() == false)
+        if (!destDir.canWrite())
         {
             throw new IOException("Destination '" + destDir + "' cannot be written to");
         }
@@ -398,12 +398,10 @@ public class FileUtils
             if ("yes".equalsIgnoreCase(answer))
             {
                 return true;
-            }
-            else if ("no".equalsIgnoreCase(answer))
+            } else if ("no".equalsIgnoreCase(answer))
             {
                 return false;
-            }
-            else
+            } else
             {
                 tries++;
                 System.out.println("Please answer with yes or no. ");

@@ -120,7 +120,7 @@ public class FileDigestReader implements DigestReader
             final int n)
     throws DataAccessException
     {
-        if (hasNext() == false)
+        if (!hasNext())
         {
             return null;
         }
@@ -140,7 +140,7 @@ public class FileDigestReader implements DigestReader
             {
                 throw new DataAccessException("IOException: " + e.getMessage());
             }
-            if (revokedOnly && line.isRevoked() == false)
+            if (revokedOnly && !line.isRevoked())
             {
                 numSkipped++;
                 continue;

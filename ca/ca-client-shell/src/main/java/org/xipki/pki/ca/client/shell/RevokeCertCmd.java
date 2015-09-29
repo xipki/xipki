@@ -83,7 +83,7 @@ public class RevokeCertCmd extends UnRevRemoveCertCmd
             throw new IllegalCmdParamException("invalid reason " + reason);
         }
 
-        if (CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason) == false)
+        if (!CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason))
         {
             throw new IllegalCmdParamException("reason " + reason + " is not permitted");
         }
@@ -121,8 +121,7 @@ public class RevokeCertCmd extends UnRevRemoveCertCmd
             {
                 saveRequestResponse(debug);
             }
-        }
-        else
+        } else
         {
             X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
             RequestResponseDebug debug = getRequestResponseDebug();
@@ -140,8 +139,7 @@ public class RevokeCertCmd extends UnRevRemoveCertCmd
         {
             PKIStatusInfo error = certIdOrError.getError();
             throw new CmdFailure("revocation failed: " + error);
-        }
-        else
+        } else
         {
             out("revoked certificate");
         }

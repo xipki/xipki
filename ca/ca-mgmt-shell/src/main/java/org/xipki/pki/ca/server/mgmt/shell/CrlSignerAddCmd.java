@@ -89,7 +89,7 @@ public class CrlSignerAddCmd extends CaCmd
     throws Exception
     {
         String base64Cert = null;
-        if ("CA".equalsIgnoreCase(signerType) == false)
+        if (!"CA".equalsIgnoreCase(signerType))
         {
             if (signerCertFile != null)
             {

@@ -105,8 +105,7 @@ class PublicCAInfo
         if (encodedSubjectAltName == null)
         {
             subjectAltName = null;
-        }
-        else
+        } else
         {
             try
             {
@@ -193,8 +192,7 @@ class PublicCAInfo
         if (caCertificate.equals(crlSignerCert))
         {
             this.crlSignerCertificate = null;
-        }
-        else
+        } else
         {
             this.crlSignerCertificate = crlSignerCert;
         }
