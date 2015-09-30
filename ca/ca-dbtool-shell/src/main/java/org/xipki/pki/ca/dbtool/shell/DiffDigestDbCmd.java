@@ -84,7 +84,7 @@ public class DiffDigestDbCmd extends DbPortCmd
 
     @Option(name = "--target-threads",
             description = "number of threads to query the target database")
-    private Integer numTargetThreads = 10;
+    private Integer numTargetThreads = 40;
 
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;

@@ -51,11 +51,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.ProcessLog;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.pki.ca.dbtool.ProcessLog;
 import org.xipki.pki.ca.dbtool.diffdb.internal.CertsBundle;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DbSchemaType;
@@ -323,12 +323,11 @@ public class DbDigestDiff
     throws Exception
     {
         target.startCA(caIdB);
-        ProcessLog processLog = new ProcessLog(readerA.getTotalAccount(),
-                System.currentTimeMillis(), 0);
-
+        ProcessLog processLog = new ProcessLog(readerA.getTotalAccount());
         System.out.println("Processing certifiates of CA \n\t'"
                 + readerA.getCaSubjectName() + "'");
-        ProcessLog.printHeader();
+        processLog.printHeader();
+        reporter.start();
 
         boolean interrupted = false;
 
@@ -401,8 +400,7 @@ public class DbDigestDiff
             }
         }
 
-        processLog.printStatus(true);
-        ProcessLog.printTrailer();
+        processLog.printTrailer();
 
         if (interrupted)
         {

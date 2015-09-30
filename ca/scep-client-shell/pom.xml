@@ -15,7 +15,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>scep4j-client</artifactId>
+      <artifactId>scep-client</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

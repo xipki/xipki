@@ -62,13 +62,13 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ConfPairs;
+import org.xipki.common.ProcessLog;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.dbtool.InvalidInputException;
-import org.xipki.pki.ca.dbtool.ProcessLog;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CaHasPublisherType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CaType;
@@ -444,13 +444,12 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
         deleteCertGreatherThan(minId - 1, LOG);
 
         final long total = certstore.getCountCerts() - numProcessedBefore;
-        final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(),
-                numProcessedBefore);
+        final ProcessLog processLog = new ProcessLog(total);
         // all initial values for importLog will be not evaluated, so just any number
-        final ProcessLog importLog = new ProcessLog(total, System.currentTimeMillis(), 0);
+        final ProcessLog importLog = new ProcessLog(total);
 
         System.out.println(getImportingText() + "certificates from ID " + minId);
-        ProcessLog.printHeader();
+        processLog.printHeader();
 
         PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
         PreparedStatement ps_certhash = prepareStatement(SQL_ADD_CHASH);
@@ -488,7 +487,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                 {
                     int lastId = do_import_cert(ps_cert, ps_certhash, ps_rawcert,
                             certsFile, profileMap, revokedOnly, caIds, minId,
-                            processLogFile, processLog, importLog);
+                            processLogFile, processLog, numProcessedBefore, importLog);
                     minId = lastId + 1;
                 } catch (Exception e)
                 {
@@ -506,7 +505,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
             certsFileIterator.close();
         }
 
-        ProcessLog.printTrailer();
+        processLog.printTrailer();
         DbPorter.echoToFile(MSG_CERTS_FINISHED, processLogFile);
         System.out.println("processed " + processLog.getNumProcessed() + " and "
                 + getImportedText() + importLog.getNumProcessed() + " certificates");
@@ -523,6 +522,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
             final int minId,
             final File processLogFile,
             final ProcessLog processLog,
+            final int numProcessedInLastProcess,
             final ProcessLog importLog)
     throws Exception
     {
@@ -716,10 +716,10 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                     numProcessedEntriesInBatch = 0;
                     numImportedEntriesInBatch = 0;
                     echoToFile(
-                            (processLog.getSumInLastProcess() + processLog.getNumProcessed())
+                            (numProcessedInLastProcess + processLog.getNumProcessed())
                             + ":" + lastSuccessfulCertId,
                             processLogFile);
-                    processLog.printStatus(isLastBlock);
+                    processLog.printStatus();
                 } else if (isLastBlock)
                 {
                     lastSuccessfulCertId = id;
@@ -728,10 +728,10 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter
                     numProcessedEntriesInBatch = 0;
                     numImportedEntriesInBatch = 0;
                     echoToFile(
-                            (processLog.getSumInLastProcess() + processLog.getNumProcessed())
+                            (numProcessedInLastProcess + processLog.getNumProcessed())
                             + ":" + lastSuccessfulCertId,
                             processLogFile);
-                    processLog.printStatus(true);
+                    processLog.printStatus();
                 }
                 // if (numImportedEntriesInBatch
             } // end for

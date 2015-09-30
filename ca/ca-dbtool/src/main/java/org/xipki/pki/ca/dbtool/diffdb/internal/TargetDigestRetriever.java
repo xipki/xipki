@@ -71,11 +71,10 @@ public class TargetDigestRetriever
         private PreparedStatement inArraySelectStmt = null;
         private PreparedStatement rangeSelectStmt = null;
 
-        public Retriever(
-                final Connection conn)
+        public Retriever()
         throws DataAccessException
         {
-            this.conn = datasource.getConnection();
+            conn = datasource.getConnection();
         }
 
         public void startCA(int caId)
@@ -284,7 +283,7 @@ public class TargetDigestRetriever
         {
             for (int i = 0; i < numThreads; i++)
             {
-                Retriever retriever = new Retriever(datasource.getConnection());
+                Retriever retriever = new Retriever();
                 retrievers.add(retriever);
             }
 
@@ -348,7 +347,10 @@ public class TargetDigestRetriever
     {
         stop.set(true);
         closeCA();
-        executor.shutdownNow();
+        if (executor != null)
+        {
+            executor.shutdownNow();
+        }
     }
 
     private Map<Long, DbDigestEntry> getCertsViaSingleSelectInB(

@@ -36,7 +36,7 @@
 package org.xipki.pki.ca.server.impl.scep;
 
 import org.xipki.common.util.ParamUtil;
-import org.xipki.scep4j.transaction.FailInfo;
+import org.xipki.scep.transaction.FailInfo;
 
 /**
  * @author Lijun Liao

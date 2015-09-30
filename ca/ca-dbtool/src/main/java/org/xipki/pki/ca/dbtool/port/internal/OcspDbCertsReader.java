@@ -71,8 +71,7 @@ public class OcspDbCertsReader
         private Connection conn;
         private PreparedStatement selectCertStmt;
 
-        public Retriever(
-                final DataSourceWrapper datasource)
+        public Retriever()
         throws DataAccessException
         {
             this.conn = datasource.getConnection();
@@ -202,7 +201,7 @@ public class OcspDbCertsReader
 
         for (int i = 0; i < numThreads; i++)
         {
-            Retriever retriever = new Retriever(datasource);
+            Retriever retriever = new Retriever();
             retrievers.add(retriever);
         }
 

@@ -54,12 +54,12 @@ import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.ProcessLog;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.pki.ca.dbtool.ProcessLog;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType.Issuers;
 import org.xipki.pki.ca.dbtool.port.internal.DbPortFileNameIterator;
@@ -267,11 +267,10 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
         deleteCertGreatherThan(minId - 1, LOG);
 
         final long total = certstore.getCountCerts() - numProcessedBefore;
-        final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(),
-                numProcessedBefore);
+        final ProcessLog processLog = new ProcessLog(total);
 
         System.out.println(getImportingText() + "certificates from ID " + minId);
-        ProcessLog.printHeader();
+        processLog.printHeader();
 
         PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
         PreparedStatement ps_certhash = prepareStatement(SQL_ADD_CHASH);
@@ -309,7 +308,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
                 try
                 {
                     int lastId = do_import_cert(ps_cert, ps_certhash, ps_rawcert, certsFile, minId,
-                            processLogFile, processLog);
+                            processLogFile, processLog, numProcessedBefore);
                     minId = lastId + 1;
                 } catch (Exception e)
                 {
@@ -331,7 +330,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
         String seqName = "CID";
         dataSource.dropAndCreateSequence(seqName, maxId + 1);
 
-        ProcessLog.printTrailer();
+        processLog.printTrailer();
         echoToFile(MSG_CERTS_FINISHED, processLogFile);
         System.out.println(getImportedText() + processLog.getNumProcessed() + " certificates");
     }
@@ -343,7 +342,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
             final String certsZipFile,
             final int minId,
             final File processLogFile,
-            final ProcessLog processLog)
+            final ProcessLog processLog,
+            final int numProcessedInLastProcess)
     throws Exception
     {
         ZipFile zipFile = new ZipFile(new File(certsZipFile));
@@ -510,11 +510,10 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter
                     lastSuccessfulCertId = id;
                     processLog.addNumProcessed(numEntriesInBatch);
                     numEntriesInBatch = 0;
-                    echoToFile((processLog.getSumInLastProcess() + processLog.getNumProcessed())
+                    echoToFile((numProcessedInLastProcess + processLog.getNumProcessed())
                             + ":" + lastSuccessfulCertId,
                             processLogFile);
-
-                    processLog.printStatus(isLastBlock);
+                    processLog.printStatus();
                 }
             } // end for
 

@@ -64,6 +64,7 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.ProcessLog;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XMLUtil;
@@ -71,7 +72,6 @@ import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.dbtool.InvalidInputException;
 import org.xipki.pki.ca.dbtool.IDRange;
-import org.xipki.pki.ca.dbtool.ProcessLog;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Cas;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.DeltaCRLCache;
@@ -275,7 +275,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         {
             total = 1; // to avoid exception
         }
-        ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), 0);
+        ProcessLog processLog = new ProcessLog(total);
 
         final String sql = "SELECT ID, CA_ID, CRL FROM CRL WHERE ID >= ? AND ID < ?"
                 + " ORDER BY ID ASC";
@@ -293,7 +293,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         int minIdOfCurrentFile = -1;
         int maxIdOfCurrentFile = -1;
 
-        ProcessLog.printHeader();
+        processLog.printHeader();
 
         try
         {
@@ -430,8 +430,6 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
 
                 writeLine(filenameListOs, currentCrlsFilename);
                 processLog.addNumProcessed(numCrlsInCurrentFile);
-                processLog.printStatus(true);
-
                 certstore.setCountCrls(sum);
             } else
             {
@@ -447,7 +445,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
             releaseResources(ps, null);
         } // end try
 
-        ProcessLog.printTrailer();
+        processLog.printTrailer();
         System.out.println(getExportedText() + sum + " CRLs from table CRL");
     }
 
@@ -608,7 +606,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         {
             total = 1; // to avoid exception
         }
-        ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), 0);
+        ProcessLog processLog = new ProcessLog(total);
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -620,7 +618,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         int minIdOfCurrentFile = -1;
         int maxIdOfCurrentFile = -1;
 
-        ProcessLog.printHeader();
+        processLog.printHeader();
 
         try
         {
@@ -710,7 +708,6 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
                 writeLine(filenameListOs, currentUsersFilename);
 
                 processLog.addNumProcessed(numUsersInCurrentFile);
-                processLog.printStatus(true);
             }
         } catch (SQLException e)
         {
@@ -720,7 +717,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
             releaseResources(ps, null);
         } // end try
 
-        ProcessLog.printTrailer();
+        processLog.printTrailer();
         System.out.println(getExportedText() + sum + " users from table USERNAME");
     }
 
@@ -823,8 +820,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         {
             total = 1; // to avoid exception
         }
-        ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(),
-                numProcessedBefore);
+        ProcessLog processLog = new ProcessLog(total);
 
         int numCertsInCurrentFile = 0;
         CaCertsWriter certsInCurrentFile = new CaCertsWriter();
@@ -838,7 +834,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
         int maxCertIdOfCurrentFile = -1;
 
         System.out.println(getExportingText() + "tables CERT and CRAW from ID " + minCertId);
-        ProcessLog.printHeader();
+        processLog.printHeader();
         CaDbCertsReader certsReader = new CaDbCertsReader(dataSource, numThreads);
 
         List<IDRange> idRanges = new ArrayList<>(numThreads);
@@ -956,14 +952,13 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter
             }
 
             processLog.addNumProcessed(numCertsInCurrentFile);
-            processLog.printStatus(true);
         } else
         {
             currentCertsZip.close();
             currentCertsZipFile.delete();
         }
 
-        ProcessLog.printTrailer();
+        processLog.printTrailer();
         // all successful, delete the processLogFile
         processLogFile.delete();
         System.out.println(getExportedText() + sum + " certificates from tables CERT and CRAW");

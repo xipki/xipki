@@ -43,9 +43,9 @@ import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
-import org.xipki.scep4j.client.EnrolmentResponse;
-import org.xipki.scep4j.client.ScepClient;
-import org.xipki.scep4j.client.exception.ScepClientException;
+import org.xipki.scep.client.EnrolmentResponse;
+import org.xipki.scep.client.ScepClient;
+import org.xipki.scep.client.exception.ScepClientException;
 
 /**
  * @author Lijun Liao

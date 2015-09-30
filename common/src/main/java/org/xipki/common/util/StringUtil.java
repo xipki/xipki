@@ -170,6 +170,25 @@ public class StringUtil
         }
     }
 
+    public static String formatText(
+            final String text,
+            final int minLen)
+    {
+        int n = text.length();
+        if (n >= minLen)
+        {
+            return text;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < minLen - n; i++)
+        {
+            sb.append(" ");
+        }
+        sb.append(text);
+        return sb.toString();
+    }
+
     public static String formatAccount(
             final long account,
             final boolean withPrefix)
@@ -214,14 +233,7 @@ public class StringUtil
             accountS = sb.toString();
         }
 
-        StringBuilder sb = new StringBuilder();
-        // 13 characters for processed account
-        for (int i = 0; i < minLen - accountS.length(); i++)
-        {
-            sb.append(" ");
-        }
-        sb.append(accountS);
-        return sb.toString();
+        return formatText(accountS, minLen);
     }
 
     public static String formatTime(
@@ -264,12 +276,7 @@ public class StringUtil
         }
         sb.append(s);
 
-        while (sb.length() < minLen)
-        {
-            sb.insert(0, ' ');
-        }
-
-        return sb.toString();
+        return formatText(sb.toString(), minLen);
     }
 
 }

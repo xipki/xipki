@@ -179,8 +179,16 @@ public class DbDigestReporter
         sb.append("duration:   ").append(StringUtil.formatTime(durationSec, false)).append("\n");
         sb.append("start time: ").append(startTime).append("\n");
         sb.append("end time:   ").append(now).append("\n");
-        sb.append("speed:      ").append(
-                StringUtil.formatAccount(sum / durationSec, false)).append(" /s").append("\n");
+        sb.append("speed:      ");
+        if(durationSec > 0)
+        {
+            sb.append(
+                StringUtil.formatAccount(sum / durationSec, false)).append(" /s");
+        } else
+        {
+            sb.append("--");
+        }
+        sb.append("\n");
 
         try
         {

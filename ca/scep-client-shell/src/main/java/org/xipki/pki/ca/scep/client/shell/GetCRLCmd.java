@@ -43,7 +43,7 @@ import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
-import org.xipki.scep4j.client.ScepClient;
+import org.xipki.scep.client.ScepClient;
 
 /**
  * @author Lijun Liao
