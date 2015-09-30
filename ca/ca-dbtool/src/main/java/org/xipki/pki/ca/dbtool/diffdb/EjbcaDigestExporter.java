@@ -53,10 +53,10 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.ProcessLog;
 import org.xipki.common.util.IoUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.pki.ca.dbtool.DbToolBase;
-import org.xipki.pki.ca.dbtool.ProcessLog;
 import org.xipki.pki.ca.dbtool.diffdb.internal.CaEntry;
 import org.xipki.pki.ca.dbtool.diffdb.internal.CaEntryContainer;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
@@ -168,7 +168,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         System.out.println("digesting database");
 
         final long total = getCount("CertificateData");
-        ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), 0);
+        ProcessLog processLog = new ProcessLog(total);
 
         Map<String, CaInfo> cas = getCas();
         Set<CaEntry> caEntries = new HashSet<>(cas.size());
@@ -291,7 +291,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         PreparedStatement ps = prepareStatement(sql);
         PreparedStatement rawCertPs = prepareStatement(certSql);
 
-        ProcessLog.printHeader();
+        processLog.printHeader();
 
         String sql = null;
         int id = 0;
@@ -445,8 +445,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
             releaseResources(rawCertPs, null);
         }
 
-        processLog.printStatus(true);
-        ProcessLog.printTrailer();
+        processLog.printTrailer();
 
         StringBuilder sb = new StringBuilder(200);
         sb.append(" digested ")

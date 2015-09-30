@@ -68,8 +68,7 @@ public class EjbcaDbDigestReader extends DbDigestReader
         private PreparedStatement selectCertStmt;
         private PreparedStatement selectBase64CertStmt;
 
-        public EjbcaDbRetriever(
-                final DataSourceWrapper datasource)
+        public EjbcaDbRetriever()
         throws DataAccessException
         {
             Connection conn = datasource.getConnection();
@@ -337,10 +336,10 @@ public class EjbcaDbDigestReader extends DbDigestReader
     }
 
     @Override
-    protected Retriever getRetriever(DataSourceWrapper dataSource)
+    protected Retriever getRetriever()
     throws DataAccessException
     {
-        return new EjbcaDbRetriever(dataSource);
+        return new EjbcaDbRetriever();
     }
 
     @Override

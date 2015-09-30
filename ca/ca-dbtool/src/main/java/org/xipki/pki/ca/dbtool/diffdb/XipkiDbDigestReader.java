@@ -65,8 +65,7 @@ public class XipkiDbDigestReader extends DbDigestReader
         private Connection conn;
         private PreparedStatement selectCertStmt;
 
-        public XipkiDbRetriever(
-                final DataSourceWrapper datasourc)
+        public XipkiDbRetriever()
         throws DataAccessException
         {
             this.conn = datasource.getConnection();
@@ -351,9 +350,9 @@ public class XipkiDbDigestReader extends DbDigestReader
     }
 
     @Override
-    protected Retriever getRetriever(DataSourceWrapper dataSource)
+    protected Retriever getRetriever()
     throws DataAccessException
     {
-        return new XipkiDbRetriever(dataSource);
+        return new XipkiDbRetriever();
     }
 }

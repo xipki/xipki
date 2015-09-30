@@ -55,13 +55,13 @@ import javax.xml.stream.XMLStreamException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.ProcessLog;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.dbtool.IDRange;
-import org.xipki.pki.ca.dbtool.ProcessLog;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType.Issuers;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.IssuerType;
@@ -303,8 +303,7 @@ class OcspCertStoreDbExporter extends DbPorter
         }
         final int maxCertId = (int) getMax("CERT", "ID");
         final long total = getCount("CERT") - numProcessedBefore;
-        ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(),
-                numProcessedBefore);
+        ProcessLog processLog = new ProcessLog(total);
 
         int sum = 0;
         int numCertInCurrentFile = 0;
@@ -319,7 +318,7 @@ class OcspCertStoreDbExporter extends DbPorter
         int maxCertIdOfCurrentFile = -1;
 
         System.out.println(getExportingText() + "tables CERT, CHASH and CRAW from ID " + minCertId);
-        ProcessLog.printHeader();
+        processLog.printHeader();
         OcspDbCertsReader certsReader = new OcspDbCertsReader(dataSource, numThreads);
 
         List<IDRange> idRanges = new ArrayList<>(numThreads);
@@ -436,14 +435,13 @@ class OcspCertStoreDbExporter extends DbPorter
                 echoToFile(Integer.toString(id), processLogFile);
             }
             processLog.addNumProcessed(numCertInCurrentFile);
-            processLog.printStatus(true);
         } else
         {
             currentCertsZip.close();
             currentCertsZipFile.delete();
         }
 
-        ProcessLog.printTrailer();
+        processLog.printTrailer();
         // all successful, delete the processLogFile
         processLogFile.delete();
 

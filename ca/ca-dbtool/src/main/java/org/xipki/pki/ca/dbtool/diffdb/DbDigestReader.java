@@ -126,7 +126,7 @@ abstract class DbDigestReader implements DigestReader
         {
             for (int i = 0; i < numThreads; i++)
             {
-                Retriever retriever = getRetriever(datasource);
+                Retriever retriever = getRetriever();
                 retrievers.add(retriever);
             }
 
@@ -144,8 +144,7 @@ abstract class DbDigestReader implements DigestReader
         }
     }
 
-    protected abstract Retriever getRetriever(
-            DataSourceWrapper dataSource)
+    protected abstract Retriever getRetriever()
     throws DataAccessException;
 
     protected abstract int getNumSkippedCerts(

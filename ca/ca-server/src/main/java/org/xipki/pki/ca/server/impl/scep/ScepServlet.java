@@ -66,9 +66,9 @@ import org.xipki.common.util.LogUtil;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.server.impl.CAManagerImpl;
 import org.xipki.pki.ca.server.mgmt.api.CAStatus;
-import org.xipki.scep4j.exception.MessageDecodingException;
-import org.xipki.scep4j.transaction.Operation;
-import org.xipki.scep4j.util.ScepConstants;
+import org.xipki.scep.exception.MessageDecodingException;
+import org.xipki.scep.transaction.Operation;
+import org.xipki.scep.util.ScepConstants;
 
 /**
  * URL http://host:port/scep/&lt;name&gt;/&lt;profile-alias&gt;/pkiclient.ext

@@ -64,13 +64,13 @@ import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.ProcessLog;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.pki.ca.dbtool.ProcessLog;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Cas;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.DeltaCRLCache;
@@ -381,10 +381,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
 
         PreparedStatement ps = prepareStatement(SQL_ADD_USER);
 
-        ProcessLog processLog = new ProcessLog(certstore.getCountUsers(),
-                System.currentTimeMillis(), 0);
+        ProcessLog processLog = new ProcessLog(certstore.getCountUsers());
         System.out.println(getImportingText() + "users from ID 1");
-        ProcessLog.printHeader();
+        processLog.printHeader();
 
         DbPortFileNameIterator usersFileIterator = new DbPortFileNameIterator(usersListFile);
 
@@ -414,7 +413,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
             usersFileIterator.close();
         }
 
-        ProcessLog.printTrailer();
+        processLog.printTrailer();
         System.out.println(getImportedText() + sum + " users");
         System.out.println(getImportedText() + "table USERNAME");
     }
@@ -509,7 +508,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     processLog.addNumProcessed(numEntriesInBatch);
                     numProcessed += numEntriesInBatch;
                     numEntriesInBatch = 0;
-                    processLog.printStatus(isLastBlock);
+                    processLog.printStatus();
                 }
             }
             return numProcessed;
@@ -608,10 +607,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
 
         PreparedStatement ps = prepareStatement(SQL_ADD_CRL);
 
-        ProcessLog processLog = new ProcessLog(
-                certstore.getCountCrls(), System.currentTimeMillis(), 0);
+        ProcessLog processLog = new ProcessLog(certstore.getCountCrls());
         System.out.println(getImportingText() + "CRLs from ID 1");
-        ProcessLog.printHeader();
+        processLog.printHeader();
 
         DbPortFileNameIterator crlsFileIterator = new DbPortFileNameIterator(crlsListFile);
 
@@ -641,7 +639,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
             crlsFileIterator.close();
         }
 
-        ProcessLog.printTrailer();
+        processLog.printTrailer();
         System.out.println(getImportedText() + sum + " CRLs");
         System.out.println(getImportedText() + "table CRL");
     }
@@ -800,7 +798,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     processLog.addNumProcessed(numEntriesInBatch);
                     numProcessed += numEntriesInBatch;
                     numEntriesInBatch = 0;
-                    processLog.printStatus(isLastBlock);
+                    processLog.printStatus();
 
                 }
             }
@@ -845,11 +843,10 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
         deleteCertGreatherThan(minId - 1);
 
         final long total = certstore.getCountCerts() - numProcessedBefore;
-        final ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(),
-                numProcessedBefore);
+        final ProcessLog processLog = new ProcessLog(total);
 
         System.out.println(getImportingText() + "certificates from ID " + minId);
-        ProcessLog.printHeader();
+        processLog.printHeader();
 
         PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
         PreparedStatement ps_rawcert = prepareStatement(SQL_ADD_CRAW);
@@ -886,7 +883,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                 try
                 {
                     int lastId = do_import_cert(ps_cert, ps_rawcert, certsFile, minId,
-                            processLogFile, processLog);
+                            processLogFile, processLog, numProcessedBefore);
                     minId = lastId + 1;
                 } catch (Exception e)
                 {
@@ -906,7 +903,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
         long maxId = getMax("CERT", "ID");
         dataSource.dropAndCreateSequence("CID", maxId + 1);
 
-        ProcessLog.printTrailer();
+        processLog.printTrailer();
         echoToFile(MSG_CERTS_FINISHED, processLogFile);
         System.out.println(getImportedText() + processLog.getNumProcessed() + " certificates");
     }
@@ -917,7 +914,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
             final String certsZipFile,
             final int minId,
             final File processLogFile,
-            final ProcessLog processLog)
+            final ProcessLog processLog,
+            final int numProcessedInLastProcess)
     throws Exception
     {
         final int numEntriesPerCommit = numCertsPerCommit;
@@ -1129,10 +1127,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter
                     lastSuccessfulCertId = id;
                     processLog.addNumProcessed(numEntriesInBatch);
                     numEntriesInBatch = 0;
-                    echoToFile((processLog.getSumInLastProcess() + processLog.getNumProcessed())
+                    echoToFile((numProcessedInLastProcess + processLog.getNumProcessed())
                             + ":" + lastSuccessfulCertId, processLogFile);
-
-                    processLog.printStatus(isLastBlock);
+                    processLog.printStatus();
                 }
 
             } // end for

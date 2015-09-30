@@ -38,13 +38,11 @@ package org.xipki.common;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.xipki.common.qa.MeasurePoint;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 
@@ -60,11 +58,14 @@ public abstract class LoadExecutor
 
     private String description;
 
+    private final ProcessLog processLog;
+
     public LoadExecutor(
             final String description)
     {
         ParamUtil.assertNotNull("description", description);
         this.description = description;
+        this.processLog = new ProcessLog(0);
     }
 
     protected abstract Runnable getTestor()
@@ -135,8 +136,6 @@ public abstract class LoadExecutor
         System.getProperties().remove(PROPKEY_LOADTEST);
     }
 
-    private final ConcurrentLinkedDeque<MeasurePoint> measureDeque = new ConcurrentLinkedDeque<>();
-
     public boolean isInterrupted()
     {
         return interrupted;
@@ -164,7 +163,6 @@ public abstract class LoadExecutor
         }
     }
 
-    private AtomicLong account = new AtomicLong(0);
     private AtomicLong errorAccount = new AtomicLong(0);
 
     public long getErrorAccout()
@@ -176,88 +174,30 @@ public abstract class LoadExecutor
             final int all,
             final int failed)
     {
-        account.addAndGet(all);
+        processLog.addNumProcessed(all);
         errorAccount.addAndGet(failed);
     }
 
-    private long startTime = 0;
     protected void resetStartTime()
     {
-        startTime = System.currentTimeMillis();
-        measureDeque.add(new MeasurePoint(startTime, 0));
+        processLog.reset();
     }
 
     protected boolean stop()
     {
         return interrupted
                 || errorAccount.get() > 0
-                || System.currentTimeMillis() - startTime >= duration * 1000L;
+                || System.currentTimeMillis() - processLog.getStartTime() >= duration * 1000L;
     }
 
-    protected static void printHeader()
+    protected void printHeader()
     {
-        System.out.println(
-                "------------------------------------------------------------");
-        System.out.println(
-                "   processed     average     current     elapsed");
-        System.out.println(
-                "      number       speed       speed        time");
-        System.out.println();
-        System.out.flush();
+        processLog.printHeader();
     }
 
     protected void printStatus()
     {
-        long currentAccount = account.get();
-        long now = System.currentTimeMillis();
-        measureDeque.addLast(new MeasurePoint(now, currentAccount));
-
-        MeasurePoint referenceMeasurePoint;
-        int numMeasurePoints = measureDeque.size();
-        if (numMeasurePoints > 5)
-        {
-            referenceMeasurePoint = measureDeque.removeFirst();
-        } else
-        {
-            referenceMeasurePoint = measureDeque.getFirst();
-        }
-
-        // elapsed time
-        long elapsedTimeMs = now - startTime;
-
-        // current speed
-        long currentSpeed = 0;
-        long t2inms = now - referenceMeasurePoint.getMeasureTime(); // in ms
-        if (t2inms > 0)
-        {
-            currentSpeed = (currentAccount - referenceMeasurePoint.getMeasureAccount())
-                    * 1000 / t2inms;
-        }
-
-        // average speed
-        long averageSpeed = 0;
-
-        if (elapsedTimeMs > 0)
-        {
-            averageSpeed = currentAccount * 1000 / elapsedTimeMs;
-        }
-
-        StringBuilder sb = new StringBuilder("\r");
-
-        // processed number
-        sb.append(StringUtil.formatAccount(currentAccount, true));
-
-        // average speed
-        sb.append(StringUtil.formatAccount(averageSpeed, true));
-
-        // current speed
-        sb.append(StringUtil.formatAccount(currentSpeed, true));
-
-        // elapsed time
-        sb.append(StringUtil.formatTime(elapsedTimeMs / 1000, true));
-
-        System.out.print(sb.toString());
-        System.out.flush();
+        processLog.printStatus();
     }
 
     private String unit = "";
@@ -285,12 +225,15 @@ public abstract class LoadExecutor
 
     protected void printSummary()
     {
+        processLog.printTrailer();
+
+        final long account = processLog.getNumProcessed();
         StringBuilder sb = new StringBuilder();
-        long ms = (System.currentTimeMillis() - startTime);
-        sb.append("\nfinished in " + StringUtil.formatTime(ms / 1000, false) + "\n");
-        sb.append("account: " + account.get() + " " + unit + "\n");
+        long elapsedTimeMs = processLog.getTotalElapsedTime();
+        sb.append("finished in " + StringUtil.formatTime(elapsedTimeMs / 1000, false) + "\n");
+        sb.append("account: " + account + " " + unit + "\n");
         sb.append(" failed: " + errorAccount.get() + " " + unit + "\n");
-        sb.append("average: " + (account.get() * 1000 / ms) + " " + unit + "/s\n");
+        sb.append("average: " + processLog.getTotalAverageSpeed() + " " + unit + "/s\n");
         System.out.println(sb.toString());
     }
 

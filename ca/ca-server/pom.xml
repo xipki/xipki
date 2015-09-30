@@ -30,7 +30,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>scep4j-common</artifactId>
+      <artifactId>scep-common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

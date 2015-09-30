@@ -51,11 +51,11 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.ProcessLog;
 import org.xipki.common.util.IoUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbToolBase;
-import org.xipki.pki.ca.dbtool.ProcessLog;
 import org.xipki.pki.ca.dbtool.diffdb.internal.CaEntry;
 import org.xipki.pki.ca.dbtool.diffdb.internal.CaEntryContainer;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
@@ -103,7 +103,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
         int minCertId = (int) getMin("CERT", "ID");
 
         final long total = getCount("CERT");
-        ProcessLog processLog = new ProcessLog(total, System.currentTimeMillis(), 0);
+        ProcessLog processLog = new ProcessLog(total);
 
         Map<Integer, String> caIdDirMap = getCaIds();
         Set<CaEntry> caEntries = new HashSet<>(caIdDirMap.size());
@@ -199,7 +199,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
 
         PreparedStatement certPs = prepareStatement(dbControl.getCertSql());
 
-        ProcessLog.printHeader();
+        processLog.printHeader();
 
         try
         {
@@ -263,8 +263,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
             releaseResources(certPs, null);
         }
 
-        processLog.printStatus(true);
-        ProcessLog.printTrailer();
+        processLog.printTrailer();
 
         System.out.println(" digested " + processLog.getNumProcessed() + " certificates");
     }
