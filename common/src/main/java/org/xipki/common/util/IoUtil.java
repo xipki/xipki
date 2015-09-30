@@ -62,7 +62,7 @@ public class IoUtil
     }
 
     public static void closeStream(
-    		final OutputStream stream)
+            final OutputStream stream)
     {
         if (stream == null)
         {

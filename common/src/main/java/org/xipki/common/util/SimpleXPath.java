@@ -181,7 +181,7 @@ public class SimpleXPath
                 final Map<String, String> nsPrefixURIMap)
         throws XPathExpressionException
         {
-        	String step = pStep;
+            String step = pStep;
             if (step.charAt(0) == '@')
             {
                 isElement = false;

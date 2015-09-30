@@ -45,10 +45,10 @@ import java.util.Enumeration;
 
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
-import org.xipki.scep4j.client.CACertValidator;
-import org.xipki.scep4j.client.CAIdentifier;
-import org.xipki.scep4j.client.PreprovisionedCACertValidator;
-import org.xipki.scep4j.client.ScepClient;
+import org.xipki.scep.client.CACertValidator;
+import org.xipki.scep.client.CAIdentifier;
+import org.xipki.scep.client.PreprovisionedCACertValidator;
+import org.xipki.scep.client.ScepClient;
 import org.xipki.security.api.util.X509Util;
 
 /**
