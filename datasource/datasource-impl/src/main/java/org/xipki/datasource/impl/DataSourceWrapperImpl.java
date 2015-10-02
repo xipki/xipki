@@ -759,6 +759,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     }
 
     @Override
+    public final int getMaximumPoolSize()
+    {
+        return service.getMaximumPoolSize();
+    }
+
+    @Override
     public final Connection getConnection()
     throws DataAccessException
     {
