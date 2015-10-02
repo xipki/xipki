@@ -51,6 +51,8 @@ public interface DataSourceWrapper
 {
     String getDatasourceName();
 
+    int getMaximumPoolSize();
+
     Connection getConnection()
     throws DataAccessException;
 
