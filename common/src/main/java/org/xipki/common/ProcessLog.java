@@ -309,10 +309,10 @@ public class ProcessLog
         System.out.print(sb.toString());
         System.out.flush();
     }
-    
+
     private static String formatText(String text)
     {
-    	return StringUtil.formatText(text, minLen);
+        return StringUtil.formatText(text, minLen);
     }
 
     private static String buildDateTime(long timeMs)
