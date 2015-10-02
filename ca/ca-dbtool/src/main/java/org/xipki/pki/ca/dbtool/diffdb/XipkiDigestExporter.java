@@ -95,9 +95,15 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
                     + numCertsPerSelect);
         }
 
-        this.numThreads = numThreads;
         this.numCertsPerSelect = numCertsPerSelect;
         this.dbControl = new XipkiDbControl(dbSchemaType);
+
+        // number of threads
+        this.numThreads = Math.min(numThreads, datasource.getMaximumPoolSize() - 1);
+        if (this.numThreads != numThreads)
+        {
+            LOG.info("adapted the numThreads from {} to {}", numThreads, this.numThreads);
+        }
     }
 
     @Override

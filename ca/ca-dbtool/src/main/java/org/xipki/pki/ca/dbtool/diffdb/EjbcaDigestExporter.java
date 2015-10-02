@@ -113,7 +113,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
             tblCertHasId = true;
             sql = null;
             certSql = null;
-            this.numThreads = numThreads;
+            this.numThreads = Math.min(numThreads, datasource.getMaximumPoolSize() - 1);
         } else
         {
             String lang = System.getenv("LANG");
@@ -145,11 +145,12 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                     "fingerprint ASC");
             certSql = "SELECT base64Cert FROM CertificateData WHERE fingerprint=?";
 
-            if (numThreads > 1)
-            {
-                LOG.info("reduce number of threads from {} to 1", numThreads);
-            }
             this.numThreads = 1;
+        }
+
+        if (this.numThreads != numThreads)
+        {
+            LOG.info("adapted the numThreads from {} to {}", numThreads, this.numThreads);
         }
     }
 
@@ -167,7 +168,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
 
         for (EjbcaCaInfo caInfo : cas.values())
         {
-            CaEntry caEntry = new CaEntry(caInfo.getCaId(), baseDir + File.separator + caInfo.getCaDirname());
+            CaEntry caEntry = new CaEntry(caInfo.getCaId(),
+                    baseDir + File.separator + caInfo.getCaDirname());
             caEntries.add(caEntry);
         }
 
@@ -178,7 +180,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         {
             if (tblCertHasId)
             {
-                EjbcaDigestExportReader certsReader = new EjbcaDigestExportReader(dataSource, cas, numThreads);
+                EjbcaDigestExportReader certsReader = new EjbcaDigestExportReader(dataSource,
+                        cas, numThreads);
                 doDigest_withTableId(certsReader, processLog, caEntryContainer, cas);
             } else
             {

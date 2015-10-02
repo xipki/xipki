@@ -156,6 +156,7 @@ public class DbDigestDiff
         {
             throw new IllegalArgumentException("invalid numTargetThreads: " + numTargetThreads);
         }
+
         this.revokedOnly = revokedOnly;
 
         this.refDirname = (refDir == null)
@@ -170,8 +171,25 @@ public class DbDigestDiff
         this.reportDirName = reportDirName;
         this.stopMe = stopMe;
         this.numPerSelect = numPerSelect;
-        this.numRefThreads = numRefThreads;
-        this.numTargetThreads = numTargetThreads;
+
+        // number of threads
+        this.numRefThreads = (refDatasource == null)
+                ? 1
+                : Math.min(numRefThreads, refDatasource.getMaximumPoolSize() - 1);
+        if (this.numRefThreads != numRefThreads)
+        {
+            LOG.info("adapted the numRefThreads from {} to {}", numRefThreads, this.numRefThreads);
+        }
+
+        this.numTargetThreads = (targetDatasource == null)
+                ? 1
+                : Math.min(numTargetThreads, targetDatasource.getMaximumPoolSize() - 1);
+
+        if (this.numTargetThreads != numRefThreads)
+        {
+            LOG.info("reduce the numTargetThreads from {} to {}", numTargetThreads,
+                    this.numTargetThreads);
+        }
     }
 
     public void diff()
