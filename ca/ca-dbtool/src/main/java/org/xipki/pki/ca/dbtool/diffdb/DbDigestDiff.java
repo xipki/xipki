@@ -49,6 +49,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bouncycastle.util.encoders.Base64;
@@ -79,6 +80,7 @@ public class DbDigestDiff
 
     private final DataSourceWrapper targetDatasource;
     private final XipkiDbControl targetDbControl;
+    private Set<byte[]> includeCACerts;
 
     private final String reportDirName;
     private final AtomicBoolean stopMe;
@@ -87,10 +89,10 @@ public class DbDigestDiff
     private final int numTargetThreads;
 
     public static DbDigestDiff getInstanceForDirRef(
-            final boolean revokedOnly,
             final String refDirname,
             final DataSourceWrapper targetDatasource,
             final String reportDirName,
+            final boolean revokedOnly,
             final AtomicBoolean stopMe,
             final int numPerSelect,
             final int numRefThreads,
@@ -106,16 +108,16 @@ public class DbDigestDiff
             throw new IllegalArgumentException("invalid numPerSelect: " + numPerSelect);
         }
 
-        return new DbDigestDiff(revokedOnly, refDirname, null,
-                targetDatasource, reportDirName, stopMe, numPerSelect,
-                numRefThreads, numTargetThreads);
+        return new DbDigestDiff(refDirname, null,
+                targetDatasource, reportDirName, revokedOnly, stopMe,
+                numPerSelect, numRefThreads, numTargetThreads);
     }
 
     public static DbDigestDiff getInstanceForDbRef(
-            final boolean revokedOnly,
             final DataSourceWrapper refDatasource,
             final DataSourceWrapper targetDatasource,
             final String reportDirName,
+            final boolean revokedOnly,
             final AtomicBoolean stopMe,
             final int numPerSelect,
             final int numRefThreads,
@@ -131,17 +133,17 @@ public class DbDigestDiff
             throw new IllegalArgumentException("invalid numPerSelect: " + numPerSelect);
         }
 
-        return new DbDigestDiff(revokedOnly, null, refDatasource,
-                targetDatasource, reportDirName, stopMe, numPerSelect,
-                numRefThreads, numTargetThreads);
+        return new DbDigestDiff(null, refDatasource,
+                targetDatasource, reportDirName, revokedOnly, stopMe,
+                numPerSelect, numRefThreads, numTargetThreads);
     }
 
     private DbDigestDiff(
-            final boolean revokedOnly,
             final String refDir,
             final DataSourceWrapper refDatasource,
             final DataSourceWrapper targetDatasource,
             final String reportDirName,
+            final boolean revokedOnly,
             final AtomicBoolean stopMe,
             final int numPerSelect,
             final int numRefThreads,
@@ -192,6 +194,17 @@ public class DbDigestDiff
         }
     }
 
+    public Set<byte[]> getIncludeCACerts()
+    {
+        return includeCACerts;
+    }
+
+    public void setIncludeCACerts(
+            final Set<byte[]> includeCACerts)
+    {
+        this.includeCACerts = includeCACerts;
+    }
+
     public void diff()
     throws Exception
     {
@@ -204,7 +217,7 @@ public class DbDigestDiff
             for (File caDir : childFiles)
             {
                 if (!caDir.isDirectory()
-                        ||  !caDir.getName().startsWith("ca-"))
+                        || !caDir.getName().startsWith("ca-"))
                 {
                     continue;
                 }
@@ -283,6 +296,23 @@ public class DbDigestDiff
     {
         X509Certificate caCert = refReader.getCaCert();
         byte[] caCertBytes = caCert.getEncoded();
+
+        if (includeCACerts != null && !includeCACerts.isEmpty())
+        {
+            boolean include = false;
+            for (byte[] m : includeCACerts)
+            {
+                if (Arrays.equals(m, caCertBytes))
+                {
+                    include = true;
+                    break;
+                }
+            }
+            if (!include)
+            {
+                System.out.println("skipped CA " + refReader.getCaSubjectName());
+            }
+        }
 
         String commonName = X509Util.getCommonName(caCert.getSubjectX500Principal());
         File caReportDir = new File(reportDirName, "ca-" + commonName);
@@ -431,7 +461,7 @@ public class DbDigestDiff
         }
     }
 
-    public static Map<Integer, byte[]> getCAs(
+    private static Map<Integer, byte[]> getCAs(
             DataSourceWrapper datasource, XipkiDbControl dbControl)
     throws DataAccessException
     {

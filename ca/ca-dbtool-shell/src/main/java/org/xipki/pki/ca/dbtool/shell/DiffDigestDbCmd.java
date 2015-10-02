@@ -35,8 +35,13 @@
 
 package org.xipki.pki.ca.dbtool.shell;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.xipki.common.util.IoUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.pki.ca.dbtool.diffdb.DbDigestDiffWorker;
@@ -86,12 +91,28 @@ public class DiffDigestDbCmd extends DbPortCmd
             description = "number of threads to query the target database")
     private Integer numTargetThreads = 40;
 
+    @Option(name = "--ca-cert",
+            multiValued = true,
+            description = "Certificate of CAs to be considered\n"
+                        + "(multi-valued)")
+    private List<String> caCertFiles;
+
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
 
     protected DbPortWorker getDbPortWorker()
     throws Exception
     {
+        Set<byte[]> cACerts = null;
+        if (caCertFiles != null && !caCertFiles.isEmpty())
+        {
+            cACerts = new HashSet<>(caCertFiles.size());
+            for (String fileName : caCertFiles)
+            {
+                cACerts.add(IoUtil.read(fileName));
+            }
+        }
+
         return new DbDigestDiffWorker(
                 dataSourceFactory,
                 passwordResolver,
@@ -102,7 +123,8 @@ public class DiffDigestDbCmd extends DbPortCmd
                 reportDir,
                 numCertsPerSelect,
                 numRefThreads,
-                numTargetThreads);
+                numTargetThreads,
+                cACerts);
     }
 
     public void setDataSourceFactory(

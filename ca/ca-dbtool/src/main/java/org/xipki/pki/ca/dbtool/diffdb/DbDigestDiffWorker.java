@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.JAXBException;
@@ -65,6 +66,7 @@ public class DbDigestDiffWorker extends DbPortWorker
     private final boolean revokedOnly;
     private final String refDirname;
     private final DataSourceWrapper refDatasource;
+    private final Set<byte[]> includeCACerts;
 
     private final DataSourceWrapper dataSource;
     private final String reportDir;
@@ -82,7 +84,8 @@ public class DbDigestDiffWorker extends DbPortWorker
             final String reportDirName,
             final int numCertsPerSelect,
             final int numRefThreads,
-            final int numTargetThreads)
+            final int numTargetThreads,
+            final Set<byte[]> includeCACerts)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         boolean validRef = false;
@@ -99,6 +102,8 @@ public class DbDigestDiffWorker extends DbPortWorker
             throw new IllegalArgumentException(
                     "Exactly one of refDirname and refDbConffile must be not null");
         }
+
+        this.includeCACerts = includeCACerts;
 
         File f = new File(reportDirName);
         if (!f.exists())
@@ -160,14 +165,15 @@ public class DbDigestDiffWorker extends DbPortWorker
             if (refDirname != null)
             {
                 diff = DbDigestDiff.getInstanceForDirRef(
-                    revokedOnly, refDirname, dataSource, reportDir, stopMe,
+                    refDirname, dataSource, reportDir, revokedOnly, stopMe,
                     numCertsPerSelect, numRefThreads, numTargetThreads);
             } else
             {
                 diff = DbDigestDiff.getInstanceForDbRef(
-                    revokedOnly, refDatasource, dataSource, reportDir, stopMe,
+                    refDatasource, dataSource, reportDir, revokedOnly, stopMe,
                     numCertsPerSelect, numRefThreads, numTargetThreads);
             }
+            diff.setIncludeCACerts(includeCACerts);
             diff.diff();
         } finally
         {
