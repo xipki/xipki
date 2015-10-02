@@ -122,7 +122,8 @@ public class DbDigestReporter
     {
         if (refCert.getSerialNumber() != targetCert.getSerialNumber())
         {
-            throw new IllegalArgumentException("refCert and targetCert do not have the same serialNumber");
+            throw new IllegalArgumentException(
+                    "refCert and targetCert do not have the same serialNumber");
         }
 
         numDiff++;

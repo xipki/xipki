@@ -239,7 +239,8 @@ public class EjbcaDigestExportReader
         this.numThreads = numThreads;
         this.fpCaInfoMap = fpCaInfoMap;
 
-        selectCertSql = "SELECT id, fingerprint, serialNumber, cAFingerprint, status, revocationReason,"
+        selectCertSql =
+                "SELECT id, fingerprint, serialNumber, cAFingerprint, status, revocationReason,"
                 + " revocationDate"
                 + " FROM CertificateData WHERE id >= ? AND id < ? ORDER BY id ASC";
 
