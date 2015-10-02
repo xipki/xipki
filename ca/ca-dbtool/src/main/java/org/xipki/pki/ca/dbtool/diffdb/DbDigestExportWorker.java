@@ -67,13 +67,15 @@ public class DbDigestExportWorker extends DbPortWorker
     private final DataSourceWrapper dataSource;
     private final String destFolder;
     private final int numCertsPerSelect;
+    private final int numThreads;
 
     public DbDigestExportWorker(
             final DataSourceFactory dataSourceFactory,
             final PasswordResolver passwordResolver,
             final String dbConfFile,
             final String destFolder,
-            final int numCertsPerSelect)
+            final int numCertsPerSelect,
+            final int numThreads)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         File f = new File(destFolder);
@@ -104,6 +106,7 @@ public class DbDigestExportWorker extends DbPortWorker
         this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
         this.destFolder = destFolder;
         this.numCertsPerSelect = numCertsPerSelect;
+        this.numThreads = numThreads;
     }
 
     @Override
@@ -121,11 +124,11 @@ public class DbDigestExportWorker extends DbPortWorker
             if (dbSchemaType == DbSchemaType.EJBCA_CA_v3)
             {
                 digester = new EjbcaDigestExporter(dataSource, destFolder, stopMe,
-                        numCertsPerSelect, dbSchemaType);
+                        numCertsPerSelect, dbSchemaType, numThreads);
             } else
             {
                 digester = new XipkiDigestExporter(dataSource, destFolder, stopMe,
-                        numCertsPerSelect, dbSchemaType);
+                        numCertsPerSelect, dbSchemaType, numThreads);
             }
             digester.digest();
         } finally

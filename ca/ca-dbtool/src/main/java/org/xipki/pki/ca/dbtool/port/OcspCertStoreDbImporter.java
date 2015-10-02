@@ -62,7 +62,6 @@ import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType.Issuers;
-import org.xipki.pki.ca.dbtool.port.internal.DbPortFileNameIterator;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.IssuerType;
 import org.xipki.pki.ca.dbtool.xmlio.OcspCertType;
 import org.xipki.pki.ca.dbtool.xmlio.OcspCertsReader;

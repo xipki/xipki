@@ -74,7 +74,6 @@ public class CaDbExportWorker extends DbPortWorker
     private final boolean resume;
     private final int numCertsInBundle;
     private final int numCertsPerSelect;
-    private final int numThreads;
     private final boolean evaluateOnly;
 
     public CaDbExportWorker(
@@ -85,7 +84,6 @@ public class CaDbExportWorker extends DbPortWorker
             final boolean resume,
             final int numCertsInBundle,
             final int numCertsPerSelect,
-            final int numThreads,
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
@@ -98,7 +96,6 @@ public class CaDbExportWorker extends DbPortWorker
         this.resume = resume;
         this.numCertsInBundle = numCertsInBundle;
         this.numCertsPerSelect = numCertsPerSelect;
-        this.numThreads = numThreads;
         this.evaluateOnly = evaluateOnly;
         checkDestFolder();
     }
@@ -111,13 +108,12 @@ public class CaDbExportWorker extends DbPortWorker
             final boolean destFolderEmpty,
             final int numCertsInBundle,
             final int numCertsPerSelect,
-            final int numThreads,
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         this(dataSourceFactory, passwordResolver,
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)), destFolder, destFolderEmpty,
-                    numCertsInBundle, numCertsPerSelect, numThreads, evaluateOnly);
+                    numCertsInBundle, numCertsPerSelect, evaluateOnly);
     }
 
     private static Marshaller getMarshaller()
@@ -196,7 +192,7 @@ public class CaDbExportWorker extends DbPortWorker
             // CertStore
             CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(
                     dataSource, marshaller, unmarshaller, destFolder,
-                    numCertsInBundle, numCertsPerSelect, resume, stopMe, numThreads, evaluateOnly);
+                    numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
             certStoreExporter.export();
             certStoreExporter.shutdown();
         } finally

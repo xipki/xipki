@@ -77,10 +77,6 @@ public class ExportCaCmd extends DbPortCmd
             description = "just test the export, no real export")
     private Boolean onlyTest = Boolean.FALSE;
 
-    @Option(name = "--threads",
-            description = "number of threads to read the database")
-    private Integer numThreads = 10;
-
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
 
@@ -89,7 +85,7 @@ public class ExportCaCmd extends DbPortCmd
     throws Exception
     {
         return new CaDbExportWorker(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume,
-                numCertsInBundle, numCertsPerCommit, numThreads, onlyTest);
+                numCertsInBundle, numCertsPerCommit, onlyTest);
     }
 
     public void setDataSourceFactory(

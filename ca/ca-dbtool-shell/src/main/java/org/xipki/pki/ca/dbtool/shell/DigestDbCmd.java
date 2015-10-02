@@ -65,6 +65,10 @@ public class DigestDbCmd extends DbPortCmd
             description = "number of certificates per SELECT")
     private Integer numCertsPerSelect = 1000;
 
+    @Option(name = "--threads",
+            description = "number of threads to query the database")
+    private Integer numThreads = 10;
+
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
 
@@ -77,7 +81,8 @@ public class DigestDbCmd extends DbPortCmd
                 passwordResolver,
                 dbconfFile,
                 outdir,
-                numCertsPerSelect);
+                numCertsPerSelect,
+                numThreads);
     }
 
     public void setDataSourceFactory(

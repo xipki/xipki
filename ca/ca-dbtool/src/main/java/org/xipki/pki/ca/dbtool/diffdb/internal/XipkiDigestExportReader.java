@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.port.internal;
+package org.xipki.pki.ca.dbtool.diffdb.internal;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -48,22 +48,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.IDRange;
-import org.xipki.pki.ca.dbtool.xmlio.OcspCertType;
 
 /**
  * @author Lijun Liao
  */
 
-public class OcspDbCertsReader
+public class XipkiDigestExportReader
 {
-    private static final Logger LOG = LoggerFactory.getLogger(OcspDbCertsReader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XipkiDigestExportReader.class);
 
     private class Retriever
     implements Runnable
@@ -108,7 +106,7 @@ public class OcspDbCertsReader
         private void query(
                 final IDRange idRange)
         {
-            OcspDbCertSet result = new OcspDbCertSet(idRange.getFrom());
+            DigestDBEntrySet result = new DigestDBEntrySet(idRange.getFrom());
 
             ResultSet rs = null;
             try
@@ -120,44 +118,33 @@ public class OcspDbCertsReader
 
                 while (rs.next())
                 {
+                    int caId = rs.getInt(dbControl.getColCaId());
                     int id = rs.getInt("ID");
+                    String hash = rs.getString(dbControl.getColCerthash());
+                    long serial = rs.getLong(dbControl.getColSerialNumber());
+                    boolean revoked = rs.getBoolean(dbControl.getColRevoked());
 
-                    String b64Cert = rs.getString("CERT");
-                    byte[] certBytes = Base64.decode(b64Cert);
-
-                    OcspCertType cert = new OcspCertType();
-
-                    cert.setId(id);
-
-                    int issuer_id = rs.getInt("IID");
-                    cert.setIid(issuer_id);
-
-                    long serial = rs.getLong("SN");
-                    cert.setSn(Long.toHexString(serial));
-
-                    long update = rs.getLong("LUPDATE");
-                    cert.setUpdate(update);
-
-                    boolean revoked = rs.getBoolean("REV");
-                    cert.setRev(revoked);
+                    Integer revReason = null;
+                    Long revTime = null;
+                    Long revInvTime = null;
 
                     if (revoked)
                     {
-                        int rev_reason = rs.getInt("RR");
-                        long rev_time = rs.getLong("RT");
-                        long rev_invalidity_time = rs.getLong("RIT");
-                        cert.setRr(rev_reason);
-                        cert.setRt(rev_time);
-                        if (rev_invalidity_time != 0)
+                        revReason = rs.getInt(dbControl.getColRevReason());
+                        revTime = rs.getLong(dbControl.getColRevTime());
+                        revInvTime = rs.getLong(dbControl.getColRevInvTime());
+                        if (revInvTime == 0)
                         {
-                            cert.setRit(rev_invalidity_time);
+                            revInvTime = null;
                         }
                     }
 
-                    String profile = rs.getString("PN");
-                    cert.setProfile(profile);
+                    DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime,
+                            revInvTime, hash);
+                    IdentifiedDbDigestEntry idCert = new IdentifiedDbDigestEntry(cert, id);
+                    idCert.setCaId(caId);
 
-                    result.addEntry(new OcspDbCert(cert, certBytes));
+                    result.addEntry(idCert);
                 }
             } catch (Exception e)
             {
@@ -169,33 +156,33 @@ public class OcspDbCertsReader
             }
             finally
             {
+                outQueue.add(result);
                 DbToolBase.releaseResources(null, rs);
             }
-
-            outQueue.add(result);
         }
     }
 
     protected final AtomicBoolean stop = new AtomicBoolean(false);
     protected final BlockingDeque<IDRange> inQueue = new LinkedBlockingDeque<>();
-    protected final BlockingDeque<OcspDbCertSet> outQueue = new LinkedBlockingDeque<>();
+    protected final BlockingDeque<DigestDBEntrySet> outQueue = new LinkedBlockingDeque<>();
     private final int numThreads;
     private ExecutorService executor;
     private final List<Retriever> retrievers;
     private final DataSourceWrapper datasource;
+    private final XipkiDbControl dbControl;
 
     private final String selectCertSql;
 
-    public OcspDbCertsReader(
+    public XipkiDigestExportReader(
             final DataSourceWrapper datasource,
+            final XipkiDbControl dbControl,
             final int numThreads)
     throws Exception
     {
-        this.selectCertSql = "SELECT ID,SN,IID,LUPDATE,REV,RR,RT,RIT,PN,CERT "
-                + "FROM CERT INNER JOIN CRAW ON "
-                + "CERT.ID>=? AND CERT.ID<? AND CERT.ID=CRAW.CID ORDER BY CERT.ID ASC";
         this.datasource = datasource;
         this.numThreads = numThreads;
+        this.dbControl = dbControl;
+        this.selectCertSql = dbControl.getCertSql();
 
         retrievers = new ArrayList<>(numThreads);
 
@@ -212,7 +199,7 @@ public class OcspDbCertsReader
         }
     }
 
-    public List<OcspDbCert> readCerts(List<IDRange> idRanges)
+    public List<IdentifiedDbDigestEntry> readCerts(List<IDRange> idRanges)
     throws DataAccessException
     {
         int n = idRanges.size();
@@ -221,13 +208,13 @@ public class OcspDbCertsReader
             inQueue.add(range);
         }
 
-        List<OcspDbCertSet> results = new ArrayList<>(n);
+        List<DigestDBEntrySet> results = new ArrayList<>(n);
         int numCerts = 0;
         for (int i = 0; i < n; i++)
         {
             try
             {
-                OcspDbCertSet result = outQueue.take();
+                DigestDBEntrySet result = outQueue.take();
                 numCerts += result.getEntries().size();
                 results.add(result);
             } catch (InterruptedException e)
@@ -237,9 +224,9 @@ public class OcspDbCertsReader
         }
 
         Collections.sort(results);
-        List<OcspDbCert> ret = new ArrayList<>(numCerts);
+        List<IdentifiedDbDigestEntry> ret = new ArrayList<>(numCerts);
 
-        for (OcspDbCertSet result : results)
+        for (DigestDBEntrySet result : results)
         {
             if (result.getException() != null)
             {

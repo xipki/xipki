@@ -42,6 +42,7 @@ package org.xipki.pki.ca.dbtool.diffdb.internal;
 public class IdentifiedDbDigestEntry
 {
     private final DbDigestEntry content;
+    private Integer caId;
     private final int id;
 
     public IdentifiedDbDigestEntry(
@@ -60,5 +61,15 @@ public class IdentifiedDbDigestEntry
     public DbDigestEntry getContent()
     {
         return content;
+    }
+
+    public void setCaId(Integer caId)
+    {
+        this.caId = caId;
+    }
+
+    public Integer getCaId()
+    {
+        return caId;
     }
 }
