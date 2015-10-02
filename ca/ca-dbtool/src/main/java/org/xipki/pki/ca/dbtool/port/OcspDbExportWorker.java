@@ -72,7 +72,6 @@ public class OcspDbExportWorker extends DbPortWorker
     private final boolean resume;
     private final int numCertsInBundle;
     private final int numCertsPerSelect;
-    private final int numThreads;
     private final boolean evaluateOnly;
 
     public OcspDbExportWorker(
@@ -83,7 +82,6 @@ public class OcspDbExportWorker extends DbPortWorker
             final boolean resume,
             final int numCertsInBundle,
             final int numCertsPerSelect,
-            final int numThreads,
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
@@ -100,7 +98,6 @@ public class OcspDbExportWorker extends DbPortWorker
 
         unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(schema);
-        this.numThreads = numThreads;
         this.evaluateOnly = evaluateOnly;
 
         File f = new File(destFolder);
@@ -145,7 +142,7 @@ public class OcspDbExportWorker extends DbPortWorker
             // CertStore
             OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(
                     dataSource, marshaller, unmarshaller, destFolder,
-                    numCertsInBundle, numCertsPerSelect, resume, stopMe, numThreads, evaluateOnly);
+                    numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
             certStoreExporter.export();
             certStoreExporter.shutdown();
         } finally

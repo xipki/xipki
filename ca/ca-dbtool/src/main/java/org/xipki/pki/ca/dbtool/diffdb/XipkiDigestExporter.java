@@ -37,12 +37,13 @@ package org.xipki.pki.ca.dbtool.diffdb;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -56,11 +57,13 @@ import org.xipki.common.util.IoUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbToolBase;
+import org.xipki.pki.ca.dbtool.IDRange;
 import org.xipki.pki.ca.dbtool.diffdb.internal.CaEntry;
 import org.xipki.pki.ca.dbtool.diffdb.internal.CaEntryContainer;
-import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DbSchemaType;
+import org.xipki.pki.ca.dbtool.diffdb.internal.IdentifiedDbDigestEntry;
 import org.xipki.pki.ca.dbtool.diffdb.internal.XipkiDbControl;
+import org.xipki.pki.ca.dbtool.diffdb.internal.XipkiDigestExportReader;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -74,13 +77,15 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
     private final int numCertsPerSelect;
 
     private final XipkiDbControl dbControl;
+    private final int numThreads;
 
     public XipkiDigestExporter(
             final DataSourceWrapper datasource,
             final String baseDir,
             final AtomicBoolean stopMe,
             final int numCertsPerSelect,
-            final DbSchemaType dbSchemaType)
+            final DbSchemaType dbSchemaType,
+            final int numThreads)
     throws DataAccessException, IOException
     {
         super(datasource, baseDir, stopMe);
@@ -90,6 +95,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
                     + numCertsPerSelect);
         }
 
+        this.numThreads = numThreads;
         this.numCertsPerSelect = numCertsPerSelect;
         this.dbControl = new XipkiDbControl(dbSchemaType);
     }
@@ -99,8 +105,6 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
     throws Exception
     {
         System.out.println("digesting database");
-
-        int minCertId = (int) getMin("CERT", "ID");
 
         final long total = getCount("CERT");
         ProcessLog processLog = new ProcessLog(total);
@@ -115,11 +119,13 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
         }
 
         CaEntryContainer caEntryContainer = new CaEntryContainer(caEntries);
+        XipkiDigestExportReader certsReader = new XipkiDigestExportReader(
+                dataSource, dbControl, numThreads);
 
         Exception exception = null;
         try
         {
-            doDigest(minCertId, processLog, caEntryContainer);
+            doDigest(certsReader, processLog, caEntryContainer);
         } catch (Exception e)
         {
             // delete the temporary files
@@ -130,6 +136,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
         } finally
         {
             caEntryContainer.close();
+            certsReader.stop();
         }
 
         if (exception == null)
@@ -188,79 +195,54 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter
     }
 
     private void doDigest(
-            final int minCertId,
+            XipkiDigestExportReader certsReader,
             final ProcessLog processLog,
             final CaEntryContainer caEntryContainer)
     throws Exception
     {
-        System.out.println("digesting certificates from ID " + minCertId);
-
+        int minCertId = (int) getMin("CERT", "ID");
         final int maxCertId = (int) getMax("CERT", "ID");
-
-        PreparedStatement certPs = prepareStatement(dbControl.getCertSql());
-
+        System.out.println("digesting certificates from ID " + minCertId);
         processLog.printHeader();
 
-        try
+        List<IDRange> idRanges = new ArrayList<>(numThreads);
+
+        boolean interrupted = false;
+
+        for (int i = minCertId; i <= maxCertId;)
         {
-            boolean interrupted = false;
 
-            for (int i = minCertId; i <= maxCertId; i += numCertsPerSelect)
+            if (stopMe.get())
             {
-                if (stopMe.get())
+                interrupted = true;
+                break;
+            }
+
+            idRanges.clear();
+            for (int j = 0; j < numThreads; j++)
+            {
+                int to = i + numCertsPerSelect - 1;
+                idRanges.add(new IDRange(i, to));
+                i = to + 1;
+                if (i > maxCertId)
                 {
-                    interrupted = true;
-                    break;
+                    break; // break for (int j; ...)
                 }
+            }
 
-                certPs.setInt(1, i);
-                certPs.setInt(2, i + numCertsPerSelect);
-
-                ResultSet rs = certPs.executeQuery();
-
-                while (rs.next())
-                {
-                    int caId = rs.getInt(dbControl.getColCaId());
-                    int id = rs.getInt("ID");
-                    String hash = rs.getString(dbControl.getColCerthash());
-                    long serial = rs.getLong(dbControl.getColSerialNumber());
-                    boolean revoked = rs.getBoolean(dbControl.getColRevoked());
-
-                    Integer revReason = null;
-                    Long revTime = null;
-                    Long revInvTime = null;
-
-                    if (revoked)
-                    {
-                        revReason = rs.getInt(dbControl.getColRevReason());
-                        revTime = rs.getLong(dbControl.getColRevTime());
-                        revInvTime = rs.getLong(dbControl.getColRevInvTime());
-                        if (revInvTime == 0)
-                        {
-                            revInvTime = null;
-                        }
-                    }
-
-                    DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime,
-                            revInvTime, hash);
-                    caEntryContainer.addDigestEntry(caId, id, cert);
-
-                    processLog.addNumProcessed(1);
-                    processLog.printStatus();
-                }
-                rs.close();
-            } // end for
+            List<IdentifiedDbDigestEntry> certs = certsReader.readCerts(idRanges);
+            for (IdentifiedDbDigestEntry cert : certs)
+            {
+                caEntryContainer.addDigestEntry(cert.getCaId().intValue(),
+                        cert.getId(), cert.getContent());
+            }
+            processLog.addNumProcessed(certs.size());
+            processLog.printStatus();
 
             if (interrupted)
             {
                 throw new InterruptedException("interrupted by the user");
             }
-        } catch (SQLException e)
-        {
-            throw translate(dbControl.getCertSql(), e);
-        } finally
-        {
-            releaseResources(certPs, null);
         }
 
         processLog.printTrailer();

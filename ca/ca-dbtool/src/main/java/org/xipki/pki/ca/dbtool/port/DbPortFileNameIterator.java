@@ -33,38 +33,83 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.port.internal;
+package org.xipki.pki.ca.dbtool.port;
 
-import org.xipki.common.util.ParamUtil;
-import org.xipki.pki.ca.dbtool.xmlio.OcspCertType;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Iterator;
+
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
  */
 
-public class OcspDbCert
+public class DbPortFileNameIterator implements Iterator<String>
 {
-    private final OcspCertType certInfo;
-    private final byte[] certBytes;
+    private BufferedReader reader;
+    private String nextFilename;
 
-    public OcspDbCert(
-            final OcspCertType certInfo,
-            final byte[] certBytes)
+    public DbPortFileNameIterator(
+            final String filename)
+    throws IOException
     {
-        ParamUtil.assertNotNull("certInfo", certInfo);
-        ParamUtil.assertNotNull("certBytes", certBytes);
-        this.certInfo = certInfo;
-        this.certBytes = certBytes;
+        this.reader = new BufferedReader(new FileReader(filename));
+        this.nextFilename = readNextFilenameLine();
     }
 
-    public OcspCertType getCertInfo()
+    @Override
+    public boolean hasNext()
     {
-        return certInfo;
+        return nextFilename != null;
     }
 
-    public byte[] getCertBytes()
+    @Override
+    public String next()
     {
-        return certBytes;
+        String s = nextFilename;
+        nextFilename = null;
+        try
+        {
+            nextFilename = readNextFilenameLine();
+        } catch (IOException e)
+        {
+            throw new RuntimeException("error while reading next file name");
+        }
+        return s;
     }
 
+    @Override
+    public void remove()
+    {
+        throw new UnsupportedOperationException("remove is not supported");
+    }
+
+    public void close()
+    {
+        try
+        {
+            reader.close();
+        } catch (Throwable t)
+        {
+        }
+    }
+
+    private String readNextFilenameLine()
+    throws IOException
+    {
+        String line;
+        while ((line = reader.readLine()) != null)
+        {
+            line = line.trim();
+            if (StringUtil.isBlank(line) || line.startsWith("#") || !line.endsWith(".zip"))
+            {
+                continue;
+            }
+            return line;
+        }
+
+        return null;
+    }
 }

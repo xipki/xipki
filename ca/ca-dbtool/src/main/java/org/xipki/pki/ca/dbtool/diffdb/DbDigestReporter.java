@@ -116,21 +116,21 @@ public class DbDigestReporter
     }
 
     public void addDiff(
-            final DbDigestEntry certA,
-            final DbDigestEntry certB)
+            final DbDigestEntry refCert,
+            final DbDigestEntry targetCert)
     throws IOException
     {
-        if (certA.getSerialNumber() != certB.getSerialNumber())
+        if (refCert.getSerialNumber() != targetCert.getSerialNumber())
         {
-            throw new IllegalArgumentException("certA and certB do not have the same serialNumber");
+            throw new IllegalArgumentException("refCert and targetCert do not have the same serialNumber");
         }
 
         numDiff++;
-        diffWriter.write(Long.toString(certA.getSerialNumber(), 16));
+        diffWriter.write(Long.toString(refCert.getSerialNumber()));
         diffWriter.write('\t');
-        diffWriter.write(certA.getEncodedOmitSeriaNumber());
+        diffWriter.write(refCert.getEncodedOmitSeriaNumber());
         diffWriter.write('\t');
-        diffWriter.write(certB.getEncodedOmitSeriaNumber());
+        diffWriter.write(targetCert.getEncodedOmitSeriaNumber());
         diffWriter.write('\n');
     }
 
@@ -180,7 +180,7 @@ public class DbDigestReporter
         sb.append("start time: ").append(startTime).append("\n");
         sb.append("end time:   ").append(now).append("\n");
         sb.append("speed:      ");
-        if(durationSec > 0)
+        if (durationSec > 0)
         {
             sb.append(
                 StringUtil.formatAccount(sum / durationSec, false)).append(" /s");

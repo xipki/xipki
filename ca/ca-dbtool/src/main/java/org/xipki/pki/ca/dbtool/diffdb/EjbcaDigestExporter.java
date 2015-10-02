@@ -41,13 +41,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
@@ -57,12 +58,15 @@ import org.xipki.common.ProcessLog;
 import org.xipki.common.util.IoUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.pki.ca.dbtool.DbToolBase;
+import org.xipki.pki.ca.dbtool.IDRange;
 import org.xipki.pki.ca.dbtool.diffdb.internal.CaEntry;
 import org.xipki.pki.ca.dbtool.diffdb.internal.CaEntryContainer;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DbSchemaType;
 import org.xipki.pki.ca.dbtool.diffdb.internal.EjbcaCACertExtractor;
-import org.xipki.security.api.HashCalculator;
+import org.xipki.pki.ca.dbtool.diffdb.internal.EjbcaCaInfo;
+import org.xipki.pki.ca.dbtool.diffdb.internal.EjbcaDigestExportReader;
+import org.xipki.pki.ca.dbtool.diffdb.internal.IdentifiedDbDigestEntry;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -71,25 +75,6 @@ import org.xipki.security.api.util.X509Util;
 
 public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
 {
-    private static class CaInfo
-    {
-        final int caId;
-        final X500Name subject;
-        final String hexSha1;
-        final String caDirname;
-
-        public CaInfo(
-                final int caId,
-                final byte[] certBytes,
-                final String caDirname)
-        {
-            this.caId = caId;
-            this.hexSha1 = HashCalculator.hexSha1(certBytes).toLowerCase();
-            this.subject = Certificate.getInstance(certBytes).getSubject();
-            this.caDirname = caDirname;
-        }
-    }
-
     private static final Logger LOG = LoggerFactory.getLogger(EjbcaDigestExporter.class);
 
     private final int numCertsPerSelect;
@@ -98,13 +83,15 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
 
     private final String sql;
     private final String certSql;
+    private final int numThreads;
 
     public EjbcaDigestExporter(
             final DataSourceWrapper datasource,
             final String baseDir,
             final AtomicBoolean stopMe,
             final int numCertsPerSelect,
-            final DbSchemaType dbSchemaType)
+            final DbSchemaType dbSchemaType,
+            final int numThreads)
     throws Exception
     {
         super(datasource, baseDir, stopMe);
@@ -124,10 +111,9 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         if (dataSource.tableHasColumn(connection, "CertificateData", "id"))
         {
             tblCertHasId = true;
-            sql = "SELECT id, fingerprint, serialNumber, cAFingerprint, status, revocationReason,"
-                    + " revocationDate"
-                    + " FROM CertificateData WHERE id >= ? AND id < ? ORDER BY id ASC";
-            certSql = "SELECT base64Cert FROM CertificateData WHERE id=?";
+            sql = null;
+            certSql = null;
+            this.numThreads = numThreads;
         } else
         {
             String lang = System.getenv("LANG");
@@ -158,6 +144,12 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
             sql = dataSource.createFetchFirstSelectSQL(coreSql, numCertsPerSelect,
                     "fingerprint ASC");
             certSql = "SELECT base64Cert FROM CertificateData WHERE fingerprint=?";
+
+            if (numThreads > 1)
+            {
+                LOG.info("reduce number of threads from {} to 1", numThreads);
+            }
+            this.numThreads = 1;
         }
     }
 
@@ -170,12 +162,12 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         final long total = getCount("CertificateData");
         ProcessLog processLog = new ProcessLog(total);
 
-        Map<String, CaInfo> cas = getCas();
+        Map<String, EjbcaCaInfo> cas = getCas();
         Set<CaEntry> caEntries = new HashSet<>(cas.size());
 
-        for (CaInfo caInfo : cas.values())
+        for (EjbcaCaInfo caInfo : cas.values())
         {
-            CaEntry caEntry = new CaEntry(caInfo.caId, baseDir + File.separator + caInfo.caDirname);
+            CaEntry caEntry = new CaEntry(caInfo.getCaId(), baseDir + File.separator + caInfo.getCaDirname());
             caEntries.add(caEntry);
         }
 
@@ -184,7 +176,14 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         Exception exception = null;
         try
         {
-            doDigest(processLog, caEntryContainer, cas);
+            if (tblCertHasId)
+            {
+                EjbcaDigestExportReader certsReader = new EjbcaDigestExportReader(dataSource, cas, numThreads);
+                doDigest_withTableId(certsReader, processLog, caEntryContainer, cas);
+            } else
+            {
+                doDigest_noTableId(processLog, caEntryContainer, cas);
+            }
         } catch (Exception e)
         {
             // delete the temporary files
@@ -206,10 +205,10 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         }
     }
 
-    private Map<String, CaInfo> getCas()
+    private Map<String, EjbcaCaInfo> getCas()
     throws Exception
     {
-        Map<String, CaInfo> cas = new HashMap<>();
+        Map<String, EjbcaCaInfo> cas = new HashMap<>();
         final String sql = "SELECT NAME, DATA FROM CAData";
 
         Statement stmt = null;
@@ -247,8 +246,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                 caDir.mkdirs();
                 IoUtil.save(caCertFile, certBytes);
 
-                CaInfo caInfo = new CaInfo(caId, certBytes, caDir.getName());
-                cas.put(caInfo.hexSha1, caInfo);
+                EjbcaCaInfo caInfo = new EjbcaCaInfo(caId, certBytes, caDir.getName());
+                cas.put(caInfo.getHexSha1(), caInfo);
             }
         } catch (SQLException e)
         {
@@ -261,32 +260,18 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         return cas;
     }
 
-    private void doDigest(
+    private void doDigest_noTableId(
             final ProcessLog processLog,
             final CaEntryContainer caEntryContainer,
-            final Map<String, CaInfo> caInfos)
+            final Map<String, EjbcaCaInfo> caInfos)
     throws Exception
     {
         int skippedAccount = 0;
-        final int minCertId;
-        final int maxCertId;
         String lastProcessedHexCertFp;
 
-        if (tblCertHasId)
-        {
-            minCertId = (int) getMin("CertificateData", "id");
-            maxCertId = (int) getMax("CertificateData", "id");
-            lastProcessedHexCertFp = null;
-            System.out.println("digesting certificates from id " + minCertId);
-        } else
-        {
-            minCertId = -1;
-            maxCertId = -1;
-
-            lastProcessedHexCertFp = Hex.toHexString(new byte[20]); // 40 zeros
-            System.out.println("digesting certificates from fingerprint (exclusive)\n\t"
-                    + lastProcessedHexCertFp);
-        }
+        lastProcessedHexCertFp = Hex.toHexString(new byte[20]); // 40 zeros
+        System.out.println("digesting certificates from fingerprint (exclusive)\n\t"
+                + lastProcessedHexCertFp);
 
         PreparedStatement ps = prepareStatement(sql);
         PreparedStatement rawCertPs = prepareStatement(certSql);
@@ -299,7 +284,6 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         try
         {
             boolean interrupted = false;
-            int i = minCertId;
             String hexCertFp = lastProcessedHexCertFp;
 
             while (true)
@@ -310,33 +294,18 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                     break;
                 }
 
-                if (tblCertHasId)
-                {
-                    ps.setInt(1, i);
-                    ps.setInt(2, i + numCertsPerSelect);
-                } else
-                {
-                    ps.setString(1, hexCertFp);
-                }
-
+                ps.setString(1, hexCertFp);
                 ResultSet rs = ps.executeQuery();
 
                 int countEntriesInResultSet = 0;
                 while (rs.next())
                 {
-                    if (tblCertHasId)
-                    {
-                        id = rs.getInt("id");
-                    } else
-                    {
-                        id++;
-                    }
-
+                    id++;
                     countEntriesInResultSet++;
                     String hexCaFp = rs.getString("cAFingerprint");
                     hexCertFp = rs.getString("fingerprint");
 
-                    CaInfo caInfo = null;
+                    EjbcaCaInfo caInfo = null;
 
                     if (!hexCaFp.equals(hexCertFp))
                     {
@@ -346,13 +315,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                     if (caInfo == null)
                     {
                         LOG.debug("Found no CA by caFingerprint, try to resolve by issuer");
-                        if (tblCertHasId)
-                        {
-                            rawCertPs.setInt(1, id);
-                        } else
-                        {
-                            rawCertPs.setString(1, hexCertFp);
-                        }
+                        rawCertPs.setString(1, hexCertFp);
 
                         ResultSet certRs = rawCertPs.executeQuery();
 
@@ -360,9 +323,9 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                         {
                             String b64Cert = certRs.getString("base64Cert");
                             Certificate cert = Certificate.getInstance(Base64.decode(b64Cert));
-                            for (CaInfo entry : caInfos.values())
+                            for (EjbcaCaInfo entry : caInfos.values())
                             {
-                                if (entry.subject.equals(cert.getIssuer()))
+                                if (entry.getSubject().equals(cert.getIssuer()))
                                 {
                                     caInfo = entry;
                                     break;
@@ -374,13 +337,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
 
                     if (caInfo == null)
                     {
-                        if (tblCertHasId)
-                        {
-                            LOG.error("FOUND no CA for Cert with id '{}'", id);
-                        } else
-                        {
-                            LOG.error("FOUND no CA for Cert with fingerprint '{}'", hexCertFp);
-                        }
+                        LOG.error("FOUND no CA for Cert with fingerprint '{}'", hexCertFp);
                         skippedAccount++;
                         processLog.addNumProcessed(1);
                         continue;
@@ -409,26 +366,16 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                     DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime,
                             revInvTime, hash);
 
-                    caEntryContainer.addDigestEntry(caInfo.caId, id, cert);
+                    caEntryContainer.addDigestEntry(caInfo.getCaId(), id, cert);
 
                     processLog.addNumProcessed(1);
                     processLog.printStatus();
                 } // end while (rs.next())
                 rs.close();
 
-                if (tblCertHasId)
+                if (countEntriesInResultSet == 0)
                 {
-                    i += numCertsPerSelect;
-                    if (i > maxCertId)
-                    {
-                        break;
-                    }
-                } else
-                {
-                    if (countEntriesInResultSet == 0)
-                    {
-                        break;
-                    }
+                    break;
                 }
             } // end while (true)
 
@@ -451,6 +398,76 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         sb.append(" digested ")
             .append((processLog.getNumProcessed() - skippedAccount))
             .append(" certificates");
+        if (skippedAccount > 0)
+        {
+            sb.append(", ignored ")
+                .append(skippedAccount)
+                .append(" certificates (see log for details)");
+        }
+        System.out.println(sb.toString());
+    }
+
+    private void doDigest_withTableId(
+            final EjbcaDigestExportReader certsReader,
+            final ProcessLog processLog,
+            final CaEntryContainer caEntryContainer,
+            final Map<String, EjbcaCaInfo> caInfos)
+    throws Exception
+    {
+        final int minCertId = (int) getMin("CertificateData", "id");
+        final int maxCertId = (int) getMax("CertificateData", "id");
+        System.out.println("digesting certificates from id " + minCertId);
+
+        processLog.printHeader();
+
+        List<IDRange> idRanges = new ArrayList<>(numThreads);
+
+        boolean interrupted = false;
+
+        for (int i = minCertId; i <= maxCertId;)
+        {
+
+            if (stopMe.get())
+            {
+                interrupted = true;
+                break;
+            }
+
+            idRanges.clear();
+            for (int j = 0; j < numThreads; j++)
+            {
+                int to = i + numCertsPerSelect - 1;
+                idRanges.add(new IDRange(i, to));
+                i = to + 1;
+                if (i > maxCertId)
+                {
+                    break; // break for (int j; ...)
+                }
+            }
+
+            List<IdentifiedDbDigestEntry> certs = certsReader.readCerts(idRanges);
+            for (IdentifiedDbDigestEntry cert : certs)
+            {
+                caEntryContainer.addDigestEntry(cert.getCaId().intValue(),
+                        cert.getId(), cert.getContent());
+            }
+            processLog.addNumProcessed(certs.size());
+            processLog.printStatus();
+
+            if (interrupted)
+            {
+                throw new InterruptedException("interrupted by the user");
+            }
+        }
+
+        processLog.printTrailer();
+
+        StringBuilder sb = new StringBuilder(200);
+        sb.append(" digested ")
+            .append((processLog.getNumProcessed()))
+            .append(" certificates");
+
+        int skippedAccount = certsReader.getNumSkippedCerts();
         if (skippedAccount > 0)
         {
             sb.append(", ignored ")

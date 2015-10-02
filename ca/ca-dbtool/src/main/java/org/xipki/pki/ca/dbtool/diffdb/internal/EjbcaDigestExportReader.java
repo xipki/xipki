@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.port.internal;
+package org.xipki.pki.ca.dbtool.diffdb.internal;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -42,35 +42,38 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.IDRange;
-import org.xipki.pki.ca.dbtool.xmlio.CaCertType;
 
 /**
  * @author Lijun Liao
  */
 
-public class CaDbCertsReader
+public class EjbcaDigestExportReader
 {
-    private static final Logger LOG = LoggerFactory.getLogger(CaDbCertsReader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EjbcaDigestExportReader.class);
 
     private class Retriever
     implements Runnable
     {
         private Connection conn;
         private PreparedStatement selectCertStmt;
+        private PreparedStatement selectRawCertStmt;
 
         public Retriever()
         throws DataAccessException
@@ -79,8 +82,11 @@ public class CaDbCertsReader
             try
             {
                 selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
+                selectRawCertStmt = datasource.prepareStatement(conn, selectRawCertSql);
             } catch (DataAccessException e)
             {
+                DbToolBase.releaseResources(selectCertStmt, null);
+                DbToolBase.releaseResources(selectRawCertStmt, null);
                 datasource.returnConnection(conn);
                 throw e;
             }
@@ -109,7 +115,7 @@ public class CaDbCertsReader
         private void query(
                 final IDRange idRange)
         {
-            CaDbCertSet result = new CaDbCertSet(idRange.getFrom());
+            DigestDBEntrySet result = new DigestDBEntrySet(idRange.getFrom());
 
             ResultSet rs = null;
             try
@@ -119,80 +125,80 @@ public class CaDbCertsReader
 
                 rs = selectCertStmt.executeQuery();
 
+                int id;
+                String hexCaFp;
+                String hexCertFp;
+
                 while (rs.next())
                 {
-                    int id = rs.getInt("ID");
-                    String b64Cert = rs.getString("CERT");
-                    byte[] certBytes = Base64.decode(b64Cert);
+                    id = rs.getInt("id");
+                    hexCaFp = rs.getString("cAFingerprint");
+                    hexCertFp = rs.getString("fingerprint");
 
-                    CaCertType certInfo = new CaCertType();
-                    certInfo.setId(id);
+                    EjbcaCaInfo caInfo = null;
 
-                    byte[] tid = null;
-                    int art = rs.getInt("ART");
-                    int reqType = rs.getInt("RTYPE");
-                    String s = rs.getString("TID");
-                    if (StringUtil.isNotBlank(s))
+                    if (!hexCaFp.equals(hexCertFp))
                     {
-                        tid = Base64.decode(s);
+                        caInfo = fpCaInfoMap.get(hexCaFp);
                     }
 
-                    certInfo.setArt(art);
-                    certInfo.setReqType(reqType);
-                    if (tid != null)
+                    if (caInfo == null)
                     {
-                        certInfo.setTid(Base64.toBase64String(tid));
+                        LOG.debug("Found no CA by caFingerprint, try to resolve by issuer");
+                        selectRawCertStmt.setInt(1, id);
+
+                        ResultSet certRs = selectRawCertStmt.executeQuery();
+
+                        if (certRs.next())
+                        {
+                            String b64Cert = certRs.getString("base64Cert");
+                            Certificate cert = Certificate.getInstance(Base64.decode(b64Cert));
+                            for (EjbcaCaInfo entry : fpCaInfoMap.values())
+                            {
+                                if (entry.getSubject().equals(cert.getIssuer()))
+                                {
+                                    caInfo = entry;
+                                    break;
+                                }
+                            }
+                        }
+                        certRs.close();
                     }
 
-                    int cainfo_id = rs.getInt("CA_ID");
-                    certInfo.setCaId(cainfo_id);
-
-                    long serial = rs.getLong("SN");
-                    certInfo.setSn(Long.toHexString(serial));
-
-                    int certprofile_id = rs.getInt("PID");
-                    certInfo.setPid(certprofile_id);
-
-                    int requestorinfo_id = rs.getInt("RID");
-                    if (requestorinfo_id != 0)
+                    if (caInfo == null)
                     {
-                        certInfo.setRid(requestorinfo_id);
+                        LOG.error("FOUND no CA for Cert with id '{}'", id);
+                        numSkippedCerts.incrementAndGet();
+                        continue;
                     }
 
-                    long last_update = rs.getLong("LUPDATE");
-                    certInfo.setUpdate(last_update);
+                    String hash = Base64.toBase64String(Hex.decode(hexCertFp));
 
-                    boolean revoked = rs.getBoolean("REV");
-                    certInfo.setRev(revoked);
+                    String s = rs.getString("serialNumber");
+                    long serial = Long.parseLong(s);
+
+                    int status = rs.getInt("status");
+                    boolean revoked = (status == 40);
+
+                    Integer revReason = null;
+                    Long revTime = null;
+                    Long revInvTime = null;
 
                     if (revoked)
                     {
-                        int rev_reason = rs.getInt("RR");
-                        long rev_time = rs.getLong("RT");
-                        long rev_inv_time = rs.getLong("RIT");
-                        certInfo.setRr(rev_reason);
-                        certInfo.setRt(rev_time);
-                        if (rev_inv_time != 0)
-                        {
-                            certInfo.setRit(rev_inv_time);
-                        }
+                        revReason = rs.getInt("revocationReason");
+                        long rev_timeInMs = rs.getLong("revocationDate");
+                        // rev_time is milliseconds, convert it to seconds
+                        revTime = rev_timeInMs / 1000;
                     }
 
-                    String user = rs.getString("UNAME");
-                    if (user != null)
-                    {
-                        certInfo.setUser(user);
-                    }
+                    DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime,
+                            revInvTime, hash);
 
-                    long fpReqSubject = rs.getLong("FP_RS");
-                    if (fpReqSubject != 0)
-                    {
-                        certInfo.setFpRs(fpReqSubject);
-                        String reqSubject = rs.getString("REQ_SUBJECT");
-                        certInfo.setRs(reqSubject);
-                    }
+                    IdentifiedDbDigestEntry idCert = new IdentifiedDbDigestEntry(cert, id);
+                    idCert.setCaId(caInfo.getCaId());
 
-                    result.addEntry(new CaDbCert(certInfo, certBytes));
+                    result.addEntry(idCert);
                 }
             } catch (Exception e)
             {
@@ -204,36 +210,40 @@ public class CaDbCertsReader
             }
             finally
             {
+                outQueue.add(result);
                 DbToolBase.releaseResources(null, rs);
             }
-
-            outQueue.add(result);
         }
     }
 
     protected final AtomicBoolean stop = new AtomicBoolean(false);
     protected final BlockingDeque<IDRange> inQueue = new LinkedBlockingDeque<>();
-    protected final BlockingDeque<CaDbCertSet> outQueue = new LinkedBlockingDeque<>();
+    protected final BlockingDeque<DigestDBEntrySet> outQueue = new LinkedBlockingDeque<>();
     private final int numThreads;
     private ExecutorService executor;
     private final List<Retriever> retrievers;
     private final DataSourceWrapper datasource;
+    private final Map<String, EjbcaCaInfo> fpCaInfoMap;
 
     private final String selectCertSql;
+    private final String selectRawCertSql;
+    private final AtomicInteger numSkippedCerts = new AtomicInteger(0);
 
-    public CaDbCertsReader(
+    public EjbcaDigestExportReader(
             final DataSourceWrapper datasource,
+            final Map<String, EjbcaCaInfo> fpCaInfoMap,
             final int numThreads)
     throws Exception
     {
-        StringBuilder sb = new StringBuilder("SELECT ID, SN, CA_ID, PID, RID, ");
-        sb.append("ART, RTYPE, TID, UNAME, LUPDATE, REV, RR, RT, RIT, FP_RS ");
-        sb.append("REQ_SUBJECT, CERT ");
-        sb.append("FROM CERT INNER JOIN CRAW ");
-        sb.append("ON CERT.ID>=? AND CERT.ID<? AND CERT.ID=CRAW.CID ORDER BY CERT.ID ASC");
-        this.selectCertSql = sb.toString();
         this.datasource = datasource;
         this.numThreads = numThreads;
+        this.fpCaInfoMap = fpCaInfoMap;
+
+        selectCertSql = "SELECT id, fingerprint, serialNumber, cAFingerprint, status, revocationReason,"
+                + " revocationDate"
+                + " FROM CertificateData WHERE id >= ? AND id < ? ORDER BY id ASC";
+
+        selectRawCertSql = "SELECT base64Cert FROM CertificateData WHERE id=?";
 
         retrievers = new ArrayList<>(numThreads);
 
@@ -250,7 +260,7 @@ public class CaDbCertsReader
         }
     }
 
-    public List<CaDbCert> readCerts(List<IDRange> idRanges)
+    public List<IdentifiedDbDigestEntry> readCerts(List<IDRange> idRanges)
     throws DataAccessException
     {
         int n = idRanges.size();
@@ -259,13 +269,13 @@ public class CaDbCertsReader
             inQueue.add(range);
         }
 
-        List<CaDbCertSet> results = new ArrayList<>(n);
+        List<DigestDBEntrySet> results = new ArrayList<>(n);
         int numCerts = 0;
         for (int i = 0; i < n; i++)
         {
             try
             {
-                CaDbCertSet result = outQueue.take();
+                DigestDBEntrySet result = outQueue.take();
                 numCerts += result.getEntries().size();
                 results.add(result);
             } catch (InterruptedException e)
@@ -275,9 +285,9 @@ public class CaDbCertsReader
         }
 
         Collections.sort(results);
-        List<CaDbCert> ret = new ArrayList<>(numCerts);
+        List<IdentifiedDbDigestEntry> ret = new ArrayList<>(numCerts);
 
-        for (CaDbCertSet result : results)
+        for (DigestDBEntrySet result : results)
         {
             if (result.getException() != null)
             {
@@ -296,6 +306,11 @@ public class CaDbCertsReader
     public int getNumThreads()
     {
         return numThreads;
+    }
+
+    public int getNumSkippedCerts()
+    {
+        return numSkippedCerts.get();
     }
 
     public void stop()

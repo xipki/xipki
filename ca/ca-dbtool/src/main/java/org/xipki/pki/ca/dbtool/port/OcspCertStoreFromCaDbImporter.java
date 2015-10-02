@@ -74,7 +74,6 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.CaHasPublisherType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CaType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Cas;
-import org.xipki.pki.ca.dbtool.port.internal.DbPortFileNameIterator;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertstoreCaType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.NameIdType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.PublisherType;

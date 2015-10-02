@@ -39,16 +39,19 @@ import java.io.File;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ProcessLog;
@@ -74,18 +77,19 @@ public class DbDigestDiff
     private final DataSourceWrapper refDatasource;
     private final boolean revokedOnly;
 
+    private final DataSourceWrapper targetDatasource;
+    private final XipkiDbControl targetDbControl;
+
     private final String reportDirName;
     private final AtomicBoolean stopMe;
     private final int numPerSelect;
     private final int numRefThreads;
     private final int numTargetThreads;
 
-    private final TargetDigestRetriever target;
-
     public static DbDigestDiff getInstanceForDirRef(
             final boolean revokedOnly,
             final String refDirname,
-            final DataSourceWrapper datasource,
+            final DataSourceWrapper targetDatasource,
             final String reportDirName,
             final AtomicBoolean stopMe,
             final int numPerSelect,
@@ -95,7 +99,7 @@ public class DbDigestDiff
     {
         ParamUtil.assertNotBlank("refDirname", refDirname);
         ParamUtil.assertNotBlank("reportDirName", reportDirName);
-        ParamUtil.assertNotNull("datasource", datasource);
+        ParamUtil.assertNotNull("targetDatasource", targetDatasource);
         ParamUtil.assertNotNull("stopMe", stopMe);
         if (numPerSelect < 1)
         {
@@ -103,14 +107,14 @@ public class DbDigestDiff
         }
 
         return new DbDigestDiff(revokedOnly, refDirname, null,
-                datasource, reportDirName, stopMe, numPerSelect,
+                targetDatasource, reportDirName, stopMe, numPerSelect,
                 numRefThreads, numTargetThreads);
     }
 
     public static DbDigestDiff getInstanceForDbRef(
             final boolean revokedOnly,
             final DataSourceWrapper refDatasource,
-            final DataSourceWrapper datasource,
+            final DataSourceWrapper targetDatasource,
             final String reportDirName,
             final AtomicBoolean stopMe,
             final int numPerSelect,
@@ -120,7 +124,7 @@ public class DbDigestDiff
     {
         ParamUtil.assertNotNull("refDatasource", refDatasource);
         ParamUtil.assertNotBlank("reportDirName", reportDirName);
-        ParamUtil.assertNotNull("datasource", datasource);
+        ParamUtil.assertNotNull("targetDatasource", targetDatasource);
         ParamUtil.assertNotNull("stopMe", stopMe);
         if (numPerSelect < 1)
         {
@@ -128,7 +132,7 @@ public class DbDigestDiff
         }
 
         return new DbDigestDiff(revokedOnly, null, refDatasource,
-                datasource, reportDirName, stopMe, numPerSelect,
+                targetDatasource, reportDirName, stopMe, numPerSelect,
                 numRefThreads, numTargetThreads);
     }
 
@@ -136,7 +140,7 @@ public class DbDigestDiff
             final boolean revokedOnly,
             final String refDir,
             final DataSourceWrapper refDatasource,
-            final DataSourceWrapper datasource,
+            final DataSourceWrapper targetDatasource,
             final String reportDirName,
             final AtomicBoolean stopMe,
             final int numPerSelect,
@@ -159,105 +163,98 @@ public class DbDigestDiff
                 : IoUtil.expandFilepath(refDir);
 
         this.refDatasource = refDatasource;
+        this.targetDatasource = targetDatasource;
+        DbSchemaType dbSchemaType = DbDigestExportWorker.detectDbSchemaType(targetDatasource);
+        this.targetDbControl = new XipkiDbControl(dbSchemaType);
 
         this.reportDirName = reportDirName;
         this.stopMe = stopMe;
         this.numPerSelect = numPerSelect;
         this.numRefThreads = numRefThreads;
         this.numTargetThreads = numTargetThreads;
-        this.target = new TargetDigestRetriever(datasource, numPerSelect, numTargetThreads);
     }
 
     public void diff()
     throws Exception
     {
-        try
+        Map<Integer, byte[]> caIdCertMap = getCAs(targetDatasource, targetDbControl);
+
+        if (refDirname != null)
         {
-            Map<Integer, byte[]> caIdCertMap = target.getCAs();
-
-            if (refDirname != null)
+            File refDir = new File(this.refDirname);
+            File[] childFiles = refDir.listFiles();
+            for (File caDir : childFiles)
             {
-                File refDir = new File(this.refDirname);
-                File[] childFiles = refDir.listFiles();
-                for (File caDir : childFiles)
+                if (!caDir.isDirectory()
+                        ||  !caDir.getName().startsWith("ca-"))
                 {
-                    if (!caDir.isDirectory()
-                            ||  !caDir.getName().startsWith("ca-"))
-                    {
-                        continue;
-                    }
-
-                    String caDirPath = caDir.getPath();
-                    DigestReader refReader = new FileDigestReader(caDirPath, revokedOnly);
-                    diffSingleCA(refReader, caIdCertMap);
+                    continue;
                 }
+
+                String caDirPath = caDir.getPath();
+                DigestReader refReader = new FileDigestReader(caDirPath, revokedOnly);
+                diffSingleCA(refReader, caIdCertMap);
+            }
+        } else
+        {
+            DbSchemaType refDbSchemaType = DbDigestExportWorker
+                    .detectDbSchemaType(refDatasource);
+            List<Integer> refCaIds = new LinkedList<>();
+
+            XipkiDbControl refDbControl = null;
+            String refSql;
+
+            if (refDbSchemaType == DbSchemaType.EJBCA_CA_v3)
+            {
+                if (!refDatasource.tableHasColumn(null, "CertificateData", "id"))
+                {
+                    throw new RuntimeException(
+                            "EJBCA without column 'CertificateData.id' is not supported, "
+                            + "please call 'digest-db' first and then use the exported"
+                            + " folder as the reference");
+                }
+                refSql = "SELECT cAId FROM CAData WHERE cAId != 0";
             } else
             {
-                DbSchemaType refDbSchemaType = DbDigestExportWorker
-                        .detectDbSchemaType(refDatasource);
-                List<Integer> refCaIds = new LinkedList<>();
+                refDbControl = new XipkiDbControl(refDbSchemaType);
+                refSql = "SELECT ID FROM " + refDbControl.getTblCa();
+            }
 
-                XipkiDbControl refDbControl = null;
-                String refSql;
-
-                if (refDbSchemaType == DbSchemaType.EJBCA_CA_v3)
-                {
-                    if (!refDatasource.tableHasColumn(null, "CertificateData", "id"))
-                    {
-                        throw new RuntimeException(
-                                "EJBCA without column 'CertificateData.id' is not supported, "
-                                + "please call 'digest-db' first and then use the exported"
-                                + " folder as reference");
-                    }
-                    refSql = "SELECT cAId FROM CAData WHERE cAId != 0";
-                } else
-                {
-                    refDbControl = new XipkiDbControl(refDbSchemaType);
-                    refSql = "SELECT ID FROM " + refDbControl.getTblCa();
-                }
-
-                Statement refStmt = null;
+            Statement refStmt = null;
+            try
+            {
+                refStmt = refDatasource.createStatement(refDatasource.getConnection());
+                ResultSet refRs = null;
                 try
                 {
-                    refStmt = refDatasource.createStatement(refDatasource.getConnection());
-                    ResultSet refRs = null;
-                    try
+                    refRs = refStmt.executeQuery(refSql);
+                    while (refRs.next())
                     {
-                        refRs = refStmt.executeQuery(refSql);
-                        while (refRs.next())
-                        {
-                            int id = refRs.getInt(1);
-                            refCaIds.add(id);
-                        }
-                    } catch (SQLException e)
-                    {
-                        throw refDatasource.translate(refSql, e);
-                    } finally
-                    {
-                        refDatasource.releaseResources(refStmt, refRs);
+                        int id = refRs.getInt(1);
+                        refCaIds.add(id);
                     }
+                } catch (SQLException e)
+                {
+                    throw refDatasource.translate(refSql, e);
                 } finally
                 {
-                    refDatasource.releaseResources(refStmt, null);
+                    refDatasource.releaseResources(refStmt, refRs);
                 }
-
-                boolean dbContainsMultipleCAs = refCaIds.size() > 1;
-
-                for (Integer refCaId : refCaIds)
-                {
-                    DigestReader refReader = (refDbSchemaType == DbSchemaType.EJBCA_CA_v3)
-                            ? EjbcaDbDigestReader.getInstance(refDatasource, refDbSchemaType,
-                                    refCaId, dbContainsMultipleCAs, revokedOnly, numRefThreads)
-                            : XipkiDbDigestReader.getInstance(refDatasource, refDbSchemaType,
-                                    refCaId, revokedOnly, numRefThreads);
-                    diffSingleCA(refReader, caIdCertMap);
-                }
-            }
-        } finally
-        {
-            if (target != null)
+            } finally
             {
-                target.close();
+                refDatasource.releaseResources(refStmt, null);
+            }
+
+            boolean dbContainsMultipleCAs = refCaIds.size() > 1;
+
+            for (Integer refCaId : refCaIds)
+            {
+                DigestReader refReader = (refDbSchemaType == DbSchemaType.EJBCA_CA_v3)
+                        ? EjbcaDbDigestReader.getInstance(refDatasource, refDbSchemaType,
+                                refCaId, dbContainsMultipleCAs, revokedOnly, numRefThreads)
+                        : XipkiDbDigestReader.getInstance(refDatasource, refDbSchemaType,
+                                refCaId, revokedOnly, numRefThreads);
+                diffSingleCA(refReader, caIdCertMap);
             }
         }
     }
@@ -295,37 +292,44 @@ public class DbDigestDiff
             reporter.addNoCAMatch();
             refReader.close();
             reporter.close();
-        } else
+            return;
+        }
+
+        TargetDigestRetriever target = null;
+
+        try
         {
-            try
+            target = new TargetDigestRetriever(targetDatasource, targetDbControl,
+                    caId, numPerSelect, numTargetThreads);
+            doDiff(refReader, target, reporter);
+        } catch (InterruptedException e)
+        {
+            throw e;
+        } catch (Exception e)
+        {
+            reporter.addError("Exception thrown: " + e.getClass().getName() + ": "
+                    + e.getMessage());
+            LOG.error("exception on doDiff", e);
+        } finally
+        {
+            reporter.close();
+            refReader.close();
+            if (target != null)
             {
-                doDiff(refReader, caId.intValue(), reporter);
-            } catch (InterruptedException e)
-            {
-                throw e;
-            } catch (Exception e)
-            {
-                reporter.addError("Exception thrown: " + e.getClass().getName() + ": "
-                        + e.getMessage());
-                LOG.error("exception on doDiff", e);
-            } finally
-            {
-                reporter.close();
-                refReader.close();
+                target.close();
             }
         }
     }
 
     private void doDiff(
-            final DigestReader readerA,
-            final int caIdB,
+            final DigestReader refReader,
+            final TargetDigestRetriever target,
             final DbDigestReporter reporter)
     throws Exception
     {
-        target.startCA(caIdB);
-        ProcessLog processLog = new ProcessLog(readerA.getTotalAccount());
+        ProcessLog processLog = new ProcessLog(refReader.getTotalAccount());
         System.out.println("Processing certifiates of CA \n\t'"
-                + readerA.getCaSubjectName() + "'");
+                + refReader.getCaSubjectName() + "'");
         processLog.printHeader();
         reporter.start();
 
@@ -336,14 +340,13 @@ public class DbDigestDiff
             if (stopMe.get())
             {
                 interrupted = true;
-                target.close();
                 break;
             }
 
             int numBundles = 0;
             for (int i = 0; i < numTargetThreads * 2; i++)
             {
-                CertsBundle myBundle = readerA.nextCerts(numPerSelect);
+                CertsBundle myBundle = refReader.nextCerts(numPerSelect);
                 if (myBundle != null
                         && !myBundle.getSerialNumbers().isEmpty())
                 {
@@ -373,27 +376,29 @@ public class DbDigestDiff
                 int n = serialNumbers.size();
 
                 List<Long> cloneSerialNumbers = new ArrayList<>(serialNumbers);
-                Map<Long, DbDigestEntry> certs = bundle.getCerts();
+                Map<Long, DbDigestEntry> refCerts = bundle.getCerts();
 
                 for (Long serialNumber : serialNumbers)
                 {
-                    DbDigestEntry certB = bundle.getTargetCert(serialNumber);
+                    DbDigestEntry targetCert = bundle.getTargetCert(serialNumber);
                     cloneSerialNumbers.remove(serialNumber);
-                    DbDigestEntry certA = certs.get(serialNumber);
-                    if (certB != null)
+                    DbDigestEntry refCert = refCerts.get(serialNumber);
+                    if (targetCert != null)
                     {
-                        if (certA.contentEquals(certB))
+                        if (refCert.contentEquals(targetCert))
                         {
                             reporter.addGood(serialNumber);
                         } else
                         {
-                            reporter.addDiff(certA, certB);
+                            reporter.addDiff(refCert, targetCert);
                         }
                     } else
                     {
                         reporter.addMissing(serialNumber);
                     }
                 } // end for
+
+                cloneSerialNumbers.clear();
 
                 processLog.addNumProcessed(n);
                 processLog.printStatus();
@@ -406,6 +411,36 @@ public class DbDigestDiff
         {
             throw new InterruptedException("interrupted by the user");
         }
+    }
+
+    public static Map<Integer, byte[]> getCAs(
+            DataSourceWrapper datasource, XipkiDbControl dbControl)
+    throws DataAccessException
+    {
+        // get a list of available CAs in the target database
+        String sql = "SELECT ID, CERT FROM " + dbControl.getTblCa();
+        Connection conn = datasource.getConnection();
+        Statement stmt = datasource.createStatement(conn);
+        Map<Integer, byte[]> caIdCertMap = new HashMap<>(5);
+        ResultSet rs = null;
+        try
+        {
+            rs = stmt.executeQuery(sql);
+            while (rs.next())
+            {
+                int id = rs.getInt("ID");
+                String b64Cert = rs.getString("CERT");
+                caIdCertMap.put(id, Base64.decode(b64Cert));
+            }
+        } catch (SQLException e)
+        {
+            throw datasource.translate(sql, e);
+        } finally
+        {
+            datasource.releaseResources(stmt, rs);
+        }
+
+        return caIdCertMap;
     }
 
 }

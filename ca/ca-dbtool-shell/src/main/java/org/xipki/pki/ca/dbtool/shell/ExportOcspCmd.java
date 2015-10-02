@@ -77,10 +77,6 @@ public class ExportOcspCmd extends DbPortCmd
             description = "just test the export, no real export")
     private Boolean testOnly = Boolean.FALSE;
 
-    @Option(name = "--threads",
-            description = "number of threads to read the database")
-    private Integer numThreads = 10;
-
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
 
@@ -89,7 +85,7 @@ public class ExportOcspCmd extends DbPortCmd
     throws Exception
     {
         return new OcspDbExportWorker(dataSourceFactory, passwordResolver, dbconfFile, outdir,
-                resume, numCertsInBundle, numCertsPerSelect, numThreads, testOnly);
+                resume, numCertsInBundle, numCertsPerSelect, testOnly);
     }
 
     public void setDataSourceFactory(

@@ -51,11 +51,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.DatabaseType;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.pki.ca.dbtool.diffdb.DbDigestExportWorker;
 
 /**
  * @author Lijun Liao
@@ -75,44 +73,20 @@ public class TargetDigestRetriever
         throws DataAccessException
         {
             conn = datasource.getConnection();
-        }
-
-        public void startCA(int caId)
-        throws DataAccessException
-        {
-            singleSelectStmt = null;
-            inArraySelectStmt = null;
-            rangeSelectStmt = null;
-
-            singleSelectStmt = datasource.prepareStatement(conn, singleCertSql);
-            inArraySelectStmt = datasource.prepareStatement(conn, inArrayCertsSql);
-            rangeSelectStmt = datasource.prepareStatement(conn, rangeCertsSql);
 
             try
             {
-                singleSelectStmt.setInt(1, caId);
-                inArraySelectStmt.setInt(1, caId);
-                rangeSelectStmt.setInt(1, caId);
-            } catch (SQLException e)
+                singleSelectStmt = datasource.prepareStatement(conn, singleCertSql);
+                inArraySelectStmt = datasource.prepareStatement(conn, inArrayCertsSql);
+                rangeSelectStmt = datasource.prepareStatement(conn, rangeCertsSql);
+            } catch (DataAccessException e)
             {
-                try
-                {
-                    closeCA();
-                } catch (Throwable t)
-                {
-                }
-                throw datasource.translate(null, e);
+                releaseResources(singleSelectStmt, null);
+                releaseResources(inArraySelectStmt, null);
+                releaseResources(rangeSelectStmt, null);
+                datasource.returnConnection(conn);
+                throw e;
             }
-        }
-
-        public void closeCA()
-        {
-            releaseResources(singleSelectStmt, null);
-            releaseResources(inArraySelectStmt, null);
-            releaseResources(rangeSelectStmt, null);
-            singleSelectStmt = null;
-            inArraySelectStmt = null;
-            rangeSelectStmt = null;
         }
 
         @Override
@@ -120,26 +94,34 @@ public class TargetDigestRetriever
         {
             while (!stop.get())
             {
+                CertsBundle bundle = null;
                 try
                 {
-                    CertsBundle bundle = inQueue.take();
-                    try
-                    {
-                        Map<Long, DbDigestEntry> resp = query(bundle);
-                        for (Long serialNumber : resp.keySet())
-                        {
-                            bundle.addTargetCert(serialNumber, resp.get(serialNumber));
-                        }
-                    } catch (Exception e)
-                    {
-                        bundle.setTargetException(e);
-                    }
-                    outQueue.add(bundle);
+                    bundle = inQueue.take();
                 } catch (InterruptedException e)
                 {
+                    continue;
+                }
+
+                try
+                {
+                    Map<Long, DbDigestEntry> resp = query(bundle);
+                    for (Long serialNumber : resp.keySet())
+                    {
+                        bundle.addTargetCert(serialNumber, resp.get(serialNumber));
+                    }
+                } catch (Exception e)
+                {
+                    bundle.setTargetException(e);
+                } finally
+                {
+                    outQueue.add(bundle);
                 }
             }
 
+            releaseResources(singleSelectStmt, null);
+            releaseResources(inArraySelectStmt, null);
+            releaseResources(rangeSelectStmt, null);
             datasource.returnConnection(conn);
         }
 
@@ -150,8 +132,8 @@ public class TargetDigestRetriever
             int n = serialNumbers.size();
 
             int numSkipped = bundle.getNumSkipped();
-            long minSerialNumber = 0;
-            long maxSerialNumber = 0;
+            long minSerialNumber = serialNumbers.get(0);
+            long maxSerialNumber = serialNumbers.get(0);
             for (Long m : serialNumbers)
             {
                 if (minSerialNumber > m)
@@ -172,8 +154,8 @@ public class TargetDigestRetriever
                 ResultSet rs = null;
                 try
                 {
-                    rangeSelectStmt.setLong(2, minSerialNumber);
-                    rangeSelectStmt.setLong(3, maxSerialNumber);
+                    rangeSelectStmt.setLong(1, minSerialNumber);
+                    rangeSelectStmt.setLong(2, maxSerialNumber);
                     rs = rangeSelectStmt.executeQuery();
 
                     certsInB = buildResult(rs, serialNumbers);
@@ -222,14 +204,23 @@ public class TargetDigestRetriever
 
     public TargetDigestRetriever(
             final DataSourceWrapper datasource,
+            final XipkiDbControl dbControl,
+            final int caId,
             final int numPerSelect,
             final int numThreads)
     throws DataAccessException
     {
+        try
+        {
+
+        } catch (Exception e)
+        {
+            throw e;
+        }
+
         this.numPerSelect = numPerSelect;
-        DbSchemaType dbSchemaType = DbDigestExportWorker.detectDbSchemaType(datasource);
         this.datasource = datasource;
-        this.dbControl = new XipkiDbControl(dbSchemaType);
+        this.dbControl = dbControl;
 
         String coreSql =
                 dbControl.getColRevoked() + ","
@@ -238,7 +229,7 @@ public class TargetDigestRetriever
                 + dbControl.getColRevInvTime() + ","
                 + dbControl.getColCerthash()
                 + " FROM CERT INNER JOIN " + dbControl.getTblCerthash()
-                + " ON CERT." + dbControl.getColCaId() + "=?"
+                + " ON CERT." + dbControl.getColCaId() + "=" + caId
                 + " AND CERT." + dbControl.getColSerialNumber() + "=?"
                 + " AND CERT.ID=" + dbControl.getTblCerthash() + "."
                 + dbControl.getColCertId();
@@ -258,7 +249,7 @@ public class TargetDigestRetriever
                 + dbControl.getColRevInvTime() + ","
                 + dbControl.getColCerthash()
                 + " FROM CERT INNER JOIN " + dbControl.getTblCerthash()
-                + " ON CERT." + dbControl.getColCaId() + "=?"
+                + " ON CERT." + dbControl.getColCaId() + "=" + caId
                 + " AND CERT." + dbControl.getColSerialNumber() + " IN (" + sb.toString() + ")"
                 + " AND CERT.ID=" + dbControl.getTblCerthash() + "." + dbControl.getColCertId();
         inArrayCertsSql = datasource.createFetchFirstSelectSQL(coreSql, numPerSelect);
@@ -271,7 +262,7 @@ public class TargetDigestRetriever
                 + dbControl.getColRevInvTime() + ","
                 + dbControl.getColCerthash()
                 + " FROM CERT INNER JOIN " + dbControl.getTblCerthash()
-                + " ON CERT." + dbControl.getColCaId() + "=?"
+                + " ON CERT." + dbControl.getColCaId() + "=" + caId
                 + " AND CERT." + dbControl.getColSerialNumber() + ">=?"
                 + " AND CERT." + dbControl.getColSerialNumber() + "<=?"
                 + " AND CERT.ID=" + dbControl.getTblCerthash() + "."
@@ -295,36 +286,8 @@ public class TargetDigestRetriever
         } catch (Exception e)
         {
             close();
+            throw e;
         }
-    }
-
-    public Map<Integer, byte[]> getCAs()
-    throws DataAccessException
-    {
-        // get a list of available CAs in the target database
-        String sql = "SELECT ID, CERT FROM " + dbControl.getTblCa();
-        Connection conn = datasource.getConnection();
-        Statement stmt = datasource.createStatement(conn);
-        Map<Integer, byte[]> caIdCertMap = new HashMap<>(5);
-        ResultSet rs = null;
-        try
-        {
-            rs = stmt.executeQuery(sql);
-            while (rs.next())
-            {
-                int id = rs.getInt("ID");
-                String b64Cert = rs.getString("CERT");
-                caIdCertMap.put(id, Base64.decode(b64Cert));
-            }
-        } catch (SQLException e)
-        {
-            throw datasource.translate(sql, e);
-        } finally
-        {
-            datasource.releaseResources(stmt, rs);
-        }
-
-        return caIdCertMap;
     }
 
     public void addIn(CertsBundle certsBundle)
@@ -346,7 +309,6 @@ public class TargetDigestRetriever
     public void close()
     {
         stop.set(true);
-        closeCA();
         if (executor != null)
         {
             executor.shutdownNow();
@@ -392,7 +354,7 @@ public class TargetDigestRetriever
         {
             for (int i = 0; i < n; i++)
             {
-                batchSelectStmt.setLong(i + 2, serialNumbers.get(i));
+                batchSelectStmt.setLong(i + 1, serialNumbers.get(i));
             }
 
             rs = batchSelectStmt.executeQuery();
@@ -453,7 +415,7 @@ public class TargetDigestRetriever
         ResultSet rs = null;
         try
         {
-            singleSelectStmt.setLong(2, serialNumber);
+            singleSelectStmt.setLong(1, serialNumber);
             rs = singleSelectStmt.executeQuery();
             if (!rs.next())
             {
@@ -482,23 +444,6 @@ public class TargetDigestRetriever
         } finally
         {
             releaseResources(null, rs);
-        }
-    }
-
-    public void startCA(int caId)
-    throws DataAccessException
-    {
-        for (Retriever m : retrievers)
-        {
-            m.startCA(caId);
-        }
-    }
-
-    public void closeCA()
-    {
-        for (Retriever m : retrievers)
-        {
-            m.closeCA();
         }
     }
 
