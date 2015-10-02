@@ -84,6 +84,7 @@
         <entry key="--ref-dir" value-ref="dirPathCompleter"/>
         <entry key="--ref-db" value-ref="filePathCompleter"/>
         <entry key="--target" value-ref="filePathCompleter"/>
+        <entry key="--ca-cert" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
     <!-- Liquibase Cmds -->
