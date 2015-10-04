@@ -170,32 +170,30 @@ class CmpResponder {
                     localP11CryptServicePool.getP11CryptService(moduleName);
 
             switch (action) {
-            case XipkiCmpConstants.ACTION_RP11_VERSION: {
+            case XipkiCmpConstants.ACTION_RP11_VERSION:
                 respItvInfoValue = new ASN1Integer(localP11CryptServicePool.getVersion());
                 break;
-            }
             case XipkiCmpConstants.ACTION_RP11_PSO_DSA_PLAIN:
             case XipkiCmpConstants.ACTION_RP11_PSO_DSA_X962:
             case XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_PLAIN:
             case XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_X962:
             case XipkiCmpConstants.ACTION_RP11_PSO_RSA_PKCS:
-            case XipkiCmpConstants.ACTION_RP11_PSO_RSA_X509: {
+            case XipkiCmpConstants.ACTION_RP11_PSO_RSA_X509:
                 byte[] psoMessage = null;
                 P11SlotIdentifier slot = null;
-                P11KeyIdentifier keyId = null; {
-                    try {
-                        PSOTemplate psoTemplate = PSOTemplate.getInstance(reqValue);
-                        psoMessage = psoTemplate.getMessage();
-                        SlotAndKeyIdentifer slotAndKeyIdentifier =
-                                psoTemplate.getSlotAndKeyIdentifer();
-                        slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
-                        KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
-                        keyId = keyIdentifier.getKeyId();
-                    } catch (IllegalArgumentException e) {
-                        final String statusMessage = "invalid PSOTemplate";
-                        return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest,
-                                statusMessage);
-                    }
+                P11KeyIdentifier keyId = null;
+                try {
+                    PSOTemplate psoTemplate = PSOTemplate.getInstance(reqValue);
+                    psoMessage = psoTemplate.getMessage();
+                    SlotAndKeyIdentifer slotAndKeyIdentifier =
+                            psoTemplate.getSlotAndKeyIdentifer();
+                    slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
+                    KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
+                    keyId = keyIdentifier.getKeyId();
+                } catch (IllegalArgumentException e) {
+                    final String statusMessage = "invalid PSOTemplate";
+                    return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest,
+                            statusMessage);
                 }
 
                 byte[] signature;
@@ -218,11 +216,10 @@ class CmpResponder {
 
                 respItvInfoValue = new DEROctetString(signature);
                 break;
-            }
             case XipkiCmpConstants.ACTION_RP11_GET_CERTIFICATE:
-            case XipkiCmpConstants.ACTION_RP11_GET_PUBLICKEY: {
-                P11SlotIdentifier slot = null;
-                P11KeyIdentifier keyId = null;
+            case XipkiCmpConstants.ACTION_RP11_GET_PUBLICKEY:
+                slot = null;
+                keyId = null;
                 try {
                     SlotAndKeyIdentifer slotAndKeyIdentifier =
                             SlotAndKeyIdentifer.getInstance(reqValue);
@@ -246,8 +243,7 @@ class CmpResponder {
 
                 respItvInfoValue = new DEROctetString(encodeCertOrKey);
                 break;
-            }
-            case XipkiCmpConstants.ACTION_RP11_LIST_SLOTS: {
+            case XipkiCmpConstants.ACTION_RP11_LIST_SLOTS:
                 P11SlotIdentifier[] slotIds = p11CryptService.getSlotIdentifiers();
 
                 ASN1EncodableVector vector = new ASN1EncodableVector();
@@ -256,23 +252,20 @@ class CmpResponder {
                 }
                 respItvInfoValue = new DERSequence(vector);
                 break;
-            }
-            case XipkiCmpConstants.ACTION_RP11_LIST_KEYLABELS: {
+            case XipkiCmpConstants.ACTION_RP11_LIST_KEYLABELS:
                 SlotIdentifier slotId = SlotIdentifier.getInstance(reqValue);
                 String[] keyLabels = p11CryptService.getKeyLabels(slotId.getSlotId());
 
-                ASN1EncodableVector vector = new ASN1EncodableVector();
+                vector = new ASN1EncodableVector();
                 for (String keyLabel : keyLabels) {
                     vector.add(new DERUTF8String(keyLabel));
                 }
                 respItvInfoValue = new DERSequence(vector);
                 break;
-            }
-            default: {
+            default:
                 final String statusMessage = "unsupported XiPKI action code '" + action + "'";
                 return createRejectionPKIMessage(respHeader,
                         PKIFailureInfo.badRequest, statusMessage);
-            }
             } // end switch (code)
 
             ASN1EncodableVector v = new ASN1EncodableVector();
