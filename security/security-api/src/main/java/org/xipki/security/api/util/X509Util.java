@@ -459,8 +459,7 @@ public class X509Util {
             try {
                 return "#" + bytesToString(
                         Hex.encode(value.toASN1Primitive().getEncoded(ASN1Encoding.DER)));
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new IllegalArgumentException("other value has no encoded form");
             }
         }

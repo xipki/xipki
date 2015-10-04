@@ -89,8 +89,7 @@ public class SignatureSigner implements ContentSigner {
     public byte[] getSignature() {
         try {
             return stream.getSignature();
-        }
-        catch (SignatureException e) {
+        } catch (SignatureException e) {
             throw new RuntimeOperatorException(
                     "exception obtaining signature: " + e.getMessage(), e);
         }

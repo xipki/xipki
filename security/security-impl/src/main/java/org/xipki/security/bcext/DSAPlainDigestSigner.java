@@ -142,8 +142,7 @@ public class DSAPlainDigestSigner
 
         try {
             return encode(sig[0], sig[1]);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new IllegalStateException("unable to encode signature");
         }
     }
@@ -160,8 +159,7 @@ public class DSAPlainDigestSigner
         try {
             BigInteger[] sig = decode(signature);
             return dsaSigner.verifySignature(hash, sig[0], sig[1]);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             return false;
         }
     }

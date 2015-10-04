@@ -230,8 +230,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
             }
             LOG.debug(message, e);
             return false;
-        }
-        finally {
+        } finally {
             if (signer != null) {
                 returnContentSigner(signer);
             }

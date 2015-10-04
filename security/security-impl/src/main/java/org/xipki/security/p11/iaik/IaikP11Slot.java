@@ -592,8 +592,7 @@ public class IaikP11Slot implements P11WritableSlot {
                 }
                 this.password = password;
             }
-        }
-        catch (PKCS11Exception p11e) {
+        } catch (PKCS11Exception p11e) {
             // 0x100: user already logged in
             if (p11e.getErrorCode() != 0x100) {
                 throw p11e;
@@ -670,8 +669,7 @@ public class IaikP11Slot implements P11WritableSlot {
             try {
                 LOG.info("close all sessions on token: {}", slot.getSlotID());
                 slot.getToken().closeAllSessions();
-            }
-            catch (Throwable t) {
+            } catch (Throwable t) {
                 final String message = "error while slot.getToken().closeAllSessions()";
                 if (LOG.isWarnEnabled()) {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
@@ -951,8 +949,7 @@ public class IaikP11Slot implements P11WritableSlot {
             }
         } catch (TokenException e) {
             throw new SignerException(e.getMessage(), e);
-        }
-        finally {
+        } finally {
             try {
                 session.findObjectsFinal();
             } catch (Exception e) {
@@ -1456,8 +1453,7 @@ public class IaikP11Slot implements P11WritableSlot {
                     keySize, publicExponent, id, label);
 
             return new P11KeyIdentifier(id, label);
-        }
-        finally {
+        } finally {
             returnWritableSession(session);
         }
     }
@@ -1502,8 +1498,7 @@ public class IaikP11Slot implements P11WritableSlot {
                     signatureAlgId, privateKeyAndPKInfo,
                     keyUsage, extendedKeyusage);
             return new P11KeypairGenerationResult(id, label, certificate);
-        }
-        finally {
+        } finally {
             returnWritableSession(session);
         }
     }
@@ -1534,8 +1529,7 @@ public class IaikP11Slot implements P11WritableSlot {
             byte[] id = IaikP11Util.generateKeyID(session);
             generateDSAKeyPair(session, pLength, qLength, id, label);
             return new P11KeyIdentifier(id, label);
-        }
-        finally {
+        } finally {
             returnWritableSession(session);
         }
     }
@@ -1578,8 +1572,7 @@ public class IaikP11Slot implements P11WritableSlot {
                     signatureAlgId, privateKeyAndPKInfo,
                     keyUsage, extendedKeyusage);
             return new P11KeypairGenerationResult(id, label, certificate);
-        }
-        finally {
+        } finally {
             returnWritableSession(session);
         }
     }

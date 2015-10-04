@@ -277,8 +277,7 @@ public class CALoadTestTemplateEnroll extends LoadExecutor {
                 }
 
                 root = jaxbUnmarshaller.unmarshal(configStream);
-            }
-            catch (SAXException e) {
+            } catch (SAXException e) {
                 throw new InvalidConfException(
                         "parse profile failed, message: " + e.getMessage(),
                         e);
