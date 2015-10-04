@@ -1182,58 +1182,57 @@ public class ProfileConfCreatorDemo {
     }
 
     private static ExtensionValueType createQcStatements() {
-        QCStatements extValue = new QCStatements(); {
-            QCStatementType statement = new QCStatementType();
-            statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcCompliance));
-            extValue.getQCStatement().add(statement);
-        } {
-            QCStatementType statement = new QCStatementType();
-            statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcSSCD));
-            extValue.getQCStatement().add(statement);
-        } {
-            QCStatementType statement = new QCStatementType();
-            statement.setStatementId(
-                    createOidType(ObjectIdentifiers.id_etsi_qcs_QcRetentionPeriod));
-            QCStatementValueType statementValue = new QCStatementValueType();
-            statementValue.setQcRetentionPeriod(10);
-            statement.setStatementValue(statementValue);
-            extValue.getQCStatement().add(statement);
-        } {
-            QCStatementType statement = new QCStatementType();
-            statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcLimitValue));
-            QCStatementValueType statementValue = new QCStatementValueType();
+        QCStatements extValue = new QCStatements();
+        QCStatementType statement = new QCStatementType();
+        statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcCompliance));
+        extValue.getQCStatement().add(statement);
 
-            QcEuLimitValueType euLimit = new QcEuLimitValueType();
-            euLimit.setCurrency("EUR");
-            Range2Type rAmount = new Range2Type();
-            rAmount.setMin(100);
-            rAmount.setMax(200);
-            euLimit.setAmount(rAmount);
+        statement = new QCStatementType();
+        statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcSSCD));
+        extValue.getQCStatement().add(statement);
 
-            Range2Type rExponent = new Range2Type();
-            rExponent.setMin(10);
-            rExponent.setMax(20);
-            euLimit.setExponent(rExponent);
+        statement = new QCStatementType();
+        statement.setStatementId(
+                createOidType(ObjectIdentifiers.id_etsi_qcs_QcRetentionPeriod));
+        QCStatementValueType statementValue = new QCStatementValueType();
+        statementValue.setQcRetentionPeriod(10);
+        statement.setStatementValue(statementValue);
+        extValue.getQCStatement().add(statement);
 
-            statementValue.setQcEuLimitValue(euLimit);
-            statement.setStatementValue(statementValue);
-            extValue.getQCStatement().add(statement);
-        } {
-            QCStatementType statement = new QCStatementType();
-            statement.setStatementId(
-                    createOidType(new ASN1ObjectIdentifier("1.2.3.4.5"), "dummy"));
-            QCStatementValueType statementValue = new QCStatementValueType();
-            ConstantValueType value = new ConstantValueType();
-            try {
-                value.setValue(DERNull.INSTANCE.getEncoded());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            value.setDescription("DER NULL");
-            statementValue.setConstant(value);
-            statement.setStatementValue(statementValue);
-            extValue.getQCStatement().add(statement);
+        statement = new QCStatementType();
+        statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcLimitValue));
+        statementValue = new QCStatementValueType();
+
+        QcEuLimitValueType euLimit = new QcEuLimitValueType();
+        euLimit.setCurrency("EUR");
+        Range2Type rAmount = new Range2Type();
+        rAmount.setMin(100);
+        rAmount.setMax(200);
+        euLimit.setAmount(rAmount);
+
+        Range2Type rExponent = new Range2Type();
+        rExponent.setMin(10);
+        rExponent.setMax(20);
+        euLimit.setExponent(rExponent);
+
+        statementValue.setQcEuLimitValue(euLimit);
+        statement.setStatementValue(statementValue);
+        extValue.getQCStatement().add(statement);
+
+        statement = new QCStatementType();
+        statement.setStatementId(
+                createOidType(new ASN1ObjectIdentifier("1.2.3.4.5"), "dummy"));
+        statementValue = new QCStatementValueType();
+        ConstantValueType value = new ConstantValueType();
+        try {
+            value.setValue(DERNull.INSTANCE.getEncoded());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+        value.setDescription("DER NULL");
+        statementValue.setConstant(value);
+        statement.setStatementValue(statementValue);
+        extValue.getQCStatement().add(statement);
 
         return createExtensionValueType(extValue);
     }

@@ -875,10 +875,8 @@ class IdentifiedX509Certprofile {
         case GeneralName.uniformResourceIdentifier:
         case GeneralName.iPAddress:
         case GeneralName.registeredID:
-        case GeneralName.directoryName: {
             return new GeneralName(tag, reqName.getName());
-        }
-        case GeneralName.otherName: {
+        case GeneralName.otherName:
             ASN1Sequence reqSeq = ASN1Sequence.getInstance(reqName.getName());
             ASN1ObjectIdentifier type = ASN1ObjectIdentifier.getInstance(reqSeq.getObjectAt(0));
             if (!mode.getAllowedTypes().contains(type)) {
@@ -900,9 +898,8 @@ class IdentifiedX509Certprofile {
             DERSequence seq = new DERSequence(vector);
 
             return new GeneralName(GeneralName.otherName, seq);
-        }
-        case GeneralName.ediPartyName: {
-            ASN1Sequence reqSeq = ASN1Sequence.getInstance(reqName.getName());
+        case GeneralName.ediPartyName:
+            reqSeq = ASN1Sequence.getInstance(reqName.getName());
 
             int n = reqSeq.size();
             String nameAssigner = null;
@@ -917,17 +914,15 @@ class IdentifiedX509Certprofile {
                     ((ASN1TaggedObject) reqSeq.getObjectAt(idx++)).getObject());
             String partyName = ds.getString();
 
-            ASN1EncodableVector vector = new ASN1EncodableVector();
+            vector = new ASN1EncodableVector();
             if (nameAssigner != null) {
                 vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
             }
             vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
-            ASN1Sequence seq = new DERSequence(vector);
+            seq = new DERSequence(vector);
             return new GeneralName(GeneralName.ediPartyName, seq);
-        }
-        default: {
+        default:
             throw new RuntimeException("should not reach here, unknown GeneralName tag " + tag);
-        }
         } // end switch (tag)
     }
 

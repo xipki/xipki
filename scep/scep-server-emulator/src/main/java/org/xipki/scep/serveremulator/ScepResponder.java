@@ -341,7 +341,7 @@ public class ScepResponder {
         MessageType messageType = req.getMessageType();
 
         switch (messageType) {
-        case PKCSReq: {
+        case PKCSReq:
             CertificationRequest p10ReqInfo = (CertificationRequest) req.getMessageData();
 
             String challengePwd = getChallengePassword(p10ReqInfo.getCertificationRequestInfo());
@@ -369,10 +369,9 @@ public class ScepResponder {
             }
 
             break;
-        }
-        case CertPoll: {
+        case CertPoll:
             IssuerAndSubject is = (IssuerAndSubject) req.getMessageData();
-            Certificate cert = cAEmulator.pollCert(is.getIssuer(), is.getSubject());
+            cert = cAEmulator.pollCert(is.getIssuer(), is.getSubject());
             if (cert != null) {
                 rep.setMessageData(createSignedData(cert));
             } else {
@@ -381,10 +380,9 @@ public class ScepResponder {
             }
 
             break;
-        }
-        case GetCert: {
+        case GetCert:
             IssuerAndSerialNumber isn = (IssuerAndSerialNumber) req.getMessageData();
-            Certificate cert = cAEmulator.getCert(isn.getName(),
+            cert = cAEmulator.getCert(isn.getName(),
                     isn.getSerialNumber().getValue());
             if (cert != null) {
                 rep.setMessageData(createSignedData(cert));
@@ -394,14 +392,12 @@ public class ScepResponder {
             }
 
             break;
-        }
-        case RenewalReq: {
+        case RenewalReq:
             if (!cACaps.containsCapability(CACapability.Renewal)) {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badRequest);
             } else {
-                CertificationRequest p10ReqInfo = (CertificationRequest) req.getMessageData();
-                Certificate cert;
+                p10ReqInfo = (CertificationRequest) req.getMessageData();
                 try {
                     cert = cAEmulator.generateCert(p10ReqInfo);
                 } catch (Exception e) {
@@ -415,14 +411,12 @@ public class ScepResponder {
                 }
             }
             break;
-        }
-        case UpdateReq: {
+        case UpdateReq:
             if (!cACaps.containsCapability(CACapability.Update)) {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badRequest);
             } else {
-                CertificationRequest p10ReqInfo = (CertificationRequest) req.getMessageData();
-                Certificate cert;
+                p10ReqInfo = (CertificationRequest) req.getMessageData();
                 try {
                     cert = cAEmulator.generateCert(p10ReqInfo);
                 } catch (Exception e) {
@@ -436,9 +430,8 @@ public class ScepResponder {
                 }
             }
             break;
-        }
-        case GetCRL: {
-            IssuerAndSerialNumber isn = (IssuerAndSerialNumber) req.getMessageData();
+        case GetCRL:
+            isn = (IssuerAndSerialNumber) req.getMessageData();
             CertificateList crl;
             try {
                 crl = cAEmulator.getCRL(isn.getName(), isn.getSerialNumber().getValue());
@@ -452,11 +445,9 @@ public class ScepResponder {
                 rep.setFailInfo(FailInfo.badCertId);
             }
             break;
-        }
-        default: {
+        default:
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badRequest);
-        }
         } // end switch
 
         return rep;

@@ -66,26 +66,25 @@ public class SubjectControl {
         ParamUtil.assertNotEmpty("pControls", pControls);
 
         this.controls = pControls;
-        this.typeGroups = new HashMap<>(); {
-            Set<ASN1ObjectIdentifier> oids = controls.keySet();
-            List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
-            List<ASN1ObjectIdentifier> _oids = backwardsSubject
-                    ? ObjectIdentifiers.getBackwardDNs()
-                    : ObjectIdentifiers.getForwardDNs();
-            for (ASN1ObjectIdentifier oid : _oids) {
-                if (oids.contains(oid)) {
-                    sortedOids.add(oid);
-                }
+        this.typeGroups = new HashMap<>();
+        Set<ASN1ObjectIdentifier> oids = controls.keySet();
+        List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
+        List<ASN1ObjectIdentifier> _oids = backwardsSubject
+                ? ObjectIdentifiers.getBackwardDNs()
+                : ObjectIdentifiers.getForwardDNs();
+        for (ASN1ObjectIdentifier oid : _oids) {
+            if (oids.contains(oid)) {
+                sortedOids.add(oid);
             }
-
-            for (ASN1ObjectIdentifier oid : oids) {
-                if (!sortedOids.contains(oid)) {
-                    sortedOids.add(oid);
-                }
-            }
-
-            this.types = Collections.unmodifiableList(sortedOids);
         }
+
+        for (ASN1ObjectIdentifier oid : oids) {
+            if (!sortedOids.contains(oid)) {
+                sortedOids.add(oid);
+            }
+        }
+
+        this.types = Collections.unmodifiableList(sortedOids);
 
         Set<String> groups = new HashSet<>();
         this.groupTypes = new HashMap<>();

@@ -425,7 +425,7 @@ public class Scep {
             switch (mt) {
                 case PKCSReq:
                 case RenewalReq:
-                case UpdateReq: {
+                case UpdateReq:
                     CertificationRequest p10Req = (CertificationRequest) req.getMessageData();
                     X500Name reqSubject = p10Req.getCertificationRequestInfo().getSubject();
                     String reqSubjectText = X509Util.getRFC4519Name(reqSubject);
@@ -542,8 +542,7 @@ public class Scep {
 
                     signedData = buildSignedData(cert.getCert().getCert());
                     break;
-                }
-                case CertPoll: {
+                case CertPoll:
                     IssuerAndSubject is = (IssuerAndSubject) req.getMessageData();
                     if (auditEvent != null) {
                         audit(auditEvent, "isser", X509Util.getRFC4519Name(is.getIssuer()));
@@ -553,8 +552,7 @@ public class Scep {
                     ensureIssuedByThisCA(caX500Name, is.getIssuer());
                     signedData = pollCert(ca, is.getSubject(), req.getTransactionId());
                     break;
-                }
-                case GetCert: {
+                case GetCert:
                     IssuerAndSerialNumber isn = (IssuerAndSerialNumber) req.getMessageData();
                     BigInteger serial = isn.getSerialNumber().getPositiveValue();
                     if (auditEvent != null) {
@@ -564,10 +562,9 @@ public class Scep {
                     ensureIssuedByThisCA(caX500Name, isn.getName());
                     signedData = getCert(ca, isn.getSerialNumber().getPositiveValue());
                     break;
-                }
-                case GetCRL: {
-                    IssuerAndSerialNumber isn = (IssuerAndSerialNumber) req.getMessageData();
-                    BigInteger serial = isn.getSerialNumber().getPositiveValue();
+                case GetCRL:
+                    isn = (IssuerAndSerialNumber) req.getMessageData();
+                    serial = isn.getSerialNumber().getPositiveValue();
                     if (auditEvent != null) {
                         audit(auditEvent, "isser", X509Util.getRFC4519Name(isn.getName()));
                         audit(auditEvent, "serialNumber", serial.toString());
@@ -575,11 +572,9 @@ public class Scep {
                     ensureIssuedByThisCA(caX500Name, isn.getName());
                     signedData = getCRL(ca, serial);
                     break;
-                }
-                default: {
+                default:
                     LOG.error("unknown SCEP messageType '{}'", req.getMessageType());
                     throw FailInfoException.badRequest;
-                }
             } // end switch
 
             ContentInfo ci = new ContentInfo(CMSObjectIdentifiers.signedData, signedData);

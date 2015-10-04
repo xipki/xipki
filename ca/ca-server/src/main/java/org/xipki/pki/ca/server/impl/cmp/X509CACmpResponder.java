@@ -259,44 +259,37 @@ public class X509CACmpResponder extends CmpResponder {
             case PKIBody.TYPE_CERT_REQ:
             case PKIBody.TYPE_KEY_UPDATE_REQ:
             case PKIBody.TYPE_P10_CERT_REQ:
-            case PKIBody.TYPE_CROSS_CERT_REQ: {
+            case PKIBody.TYPE_CROSS_CERT_REQ:
                 respBody = cmpEnrollCert(respHeader, cmpControl, reqHeader, reqBody,
                         _requestor, user, tid, auditEvent);
                 break;
-            }
-            case PKIBody.TYPE_CERT_CONFIRM: {
+            case PKIBody.TYPE_CERT_CONFIRM:
                 addAutitEventType(auditEvent, "CERT_CONFIRM");
                 CertConfirmContent certConf = (CertConfirmContent) reqBody.getContent();
                 respBody = confirmCertificates(tid, certConf);
                 break;
-            }
-            case PKIBody.TYPE_REVOCATION_REQ: {
+            case PKIBody.TYPE_REVOCATION_REQ:
                 respBody = cmpRevokeOrUnrevokeOrRemoveCertificates(respHeader, cmpControl,
                         reqHeader, reqBody,
                         _requestor, user, tid, auditEvent);
                 break;
-            }
-            case PKIBody.TYPE_CONFIRM: {
+            case PKIBody.TYPE_CONFIRM:
                 addAutitEventType(auditEvent, "CONFIRM");
                 respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
-            }
-            case PKIBody.TYPE_ERROR: {
+            case PKIBody.TYPE_ERROR:
                 addAutitEventType(auditEvent, "ERROR");
                 revokePendingCertificates(tid);
                 respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
                 break;
-            }
-            case PKIBody.TYPE_GEN_MSG: {
+            case PKIBody.TYPE_GEN_MSG:
                 respBody = cmpGeneralMsg(respHeader, cmpControl, reqHeader, reqBody, _requestor,
                         user, tid, auditEvent);
                 break;
-            }
-            default: {
+            default:
                 addAutitEventType(auditEvent, "PKIBody." + type);
                 respBody = createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                         "unsupported type " + type);
                 break;
-            }
             } // end switch (type)
         } catch (InsuffientPermissionException e) {
             ErrorMsgContent emc = new ErrorMsgContent(

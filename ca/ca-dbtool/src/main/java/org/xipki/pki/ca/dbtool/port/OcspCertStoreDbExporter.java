@@ -272,10 +272,8 @@ class OcspCertStoreDbExporter extends DbPorter {
 
         final int maxCertId = (int) getMax("CERT", "ID");
 
-        ProcessLog processLog; {
-            final long total = getCount("CERT") - numProcessedBefore;
-            processLog = new ProcessLog(total);
-        }
+        final long total = getCount("CERT") - numProcessedBefore;
+        ProcessLog processLog = new ProcessLog(total);
 
         PreparedStatement certPs = prepareStatement(certSql);
 

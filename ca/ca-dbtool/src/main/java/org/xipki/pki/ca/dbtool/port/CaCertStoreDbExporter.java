@@ -241,13 +241,11 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
         System.out.println(getExportingText() + "table CRL from ID " + minId);
 
-        ProcessLog processLog; {
-            long total = getCount("CRL");
-            if (total < 1) {
-                total = 1; // to avoid exception
-            }
-            processLog = new ProcessLog(total);
+        long total = getCount("CRL");
+        if (total < 1) {
+            total = 1; // to avoid exception
         }
+        ProcessLog processLog = new ProcessLog(total);
 
         final String sql = "SELECT ID, CA_ID, CRL FROM CRL WHERE ID >= ? AND ID < ?"
                 + " ORDER BY ID ASC";
@@ -532,13 +530,11 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         final int maxId = (int) getMax("USERNAME", "ID");
         System.out.println(getExportingText() + "table USERNAME from ID " + minId);
 
-        ProcessLog processLog; {
-            long total = getCount("USERNAME");
-            if (total < 1) {
-                total = 1; // to avoid exception
-            }
-            processLog = new ProcessLog(total);
+        long total = getCount("USERNAME");
+        if (total < 1) {
+            total = 1; // to avoid exception
         }
+        ProcessLog processLog = new ProcessLog(total);
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -725,13 +721,11 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         System.out.println(getExportingText() + "tables CERT and CRAW from ID " + minId);
 
         final int maxId = (int) getMax("CERT", "ID");
-        ProcessLog processLog; {
-            long total = getCount("CERT") - numProcessedBefore;
-            if (total < 1) {
-                total = 1; // to avoid exception
-            }
-            processLog = new ProcessLog(total);
+        long total = getCount("CERT") - numProcessedBefore;
+        if (total < 1) {
+            total = 1; // to avoid exception
         }
+        ProcessLog processLog = new ProcessLog(total);
 
         StringBuilder certSql = new StringBuilder("SELECT ID, SN, CA_ID, PID, RID, ");
         certSql.append("ART, RTYPE, TID, UNAME, LUPDATE, REV, RR, RT, RIT, FP_RS ");
