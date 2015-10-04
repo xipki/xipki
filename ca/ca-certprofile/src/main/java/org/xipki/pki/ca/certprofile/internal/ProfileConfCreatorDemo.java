@@ -1265,12 +1265,12 @@ public class ProfileConfCreatorDemo {
         extValue.getType().add(type);
 
         // hash algorithm
-    	extValue.getHashAlgorithm().add(
+        extValue.getHashAlgorithm().add(
             createOidType(NISTObjectIdentifiers.id_sha256, "SHA256"));
-    	extValue.getHashAlgorithm().add(
+        extValue.getHashAlgorithm().add(
             createOidType(NISTObjectIdentifiers.id_sha384, "SHA384"));
 
-    	extValue.setIncludeSourceDataUri(TripleState.REQUIRED);
+        extValue.setIncludeSourceDataUri(TripleState.REQUIRED);
         return createExtensionValueType(extValue);
     }
 

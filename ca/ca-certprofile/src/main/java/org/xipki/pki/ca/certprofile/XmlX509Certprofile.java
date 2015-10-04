@@ -895,7 +895,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         // QCStatements
         type = Extension.qCStatements;
-        if ((qCStatments != null || qcStatementsOption != null) && occurences.remove(type) != null) {
+        if ((qCStatments != null || qcStatementsOption != null)
+                && occurences.remove(type) != null) {
             if (qCStatments != null) {
                 values.addExtension(type, qCStatments);
             } else if (qcStatementsOption != null) {

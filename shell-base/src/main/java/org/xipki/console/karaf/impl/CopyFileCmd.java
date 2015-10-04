@@ -88,7 +88,7 @@ public class CopyFileCmd extends XipkiOsgiCommandSupport {
                 return null;
             } else {
                 ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
-                if (false == FileUtils.confirm(reader, "Do you want to override the file " + dest)) {
+                if (!FileUtils.confirm(reader, "Do you want to override the file " + dest)) {
                     return null;
                 }
             }

@@ -317,7 +317,8 @@ public class X509CA {
                 long nowInSecond = thisUpdate.getTime() / MS_PER_SECOND;
                 long thisUpdateOfCurrentCRL = certstore.getThisUpdateOfCurrentCRL(
                         caInfo.getCertificate());
-                if (nowInSecond - thisUpdateOfCurrentCRL <= (SIGN_WINDOW_MIN + 5) * SECOND_PER_MIN) {
+                if (nowInSecond - thisUpdateOfCurrentCRL
+                        <= (SIGN_WINDOW_MIN + 5) * SECOND_PER_MIN) {
                     // CRL was just generated within SIGN_WINDOW_MIN + 5 minutes
                     return;
                 }
@@ -2107,7 +2108,7 @@ public class X509CA {
                                     "BadFormatException: " + e.getMessage());
                         }
 
-                        foundUniqueSubject = false == certstore.certIssuedForSubject(
+                        foundUniqueSubject = !certstore.certIssuedForSubject(
                                 caInfo.getCertificate(),
                                 X509Util.fp_canonicalized_name(grantedSubject));
                         if (foundUniqueSubject) {

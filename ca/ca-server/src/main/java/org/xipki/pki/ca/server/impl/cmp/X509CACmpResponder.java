@@ -1130,7 +1130,8 @@ public class X509CACmpResponder extends CmpResponder {
         boolean granted = false;
         if (permissions.contains(Permission.ALL) || permissions.contains(requiredPermission)) {
             Set<Permission> rPermissions = requestor.getCaHasRequestor().getPermissions();
-            if (rPermissions.contains(Permission.ALL) || rPermissions.contains(requiredPermission)) {
+            if (rPermissions.contains(Permission.ALL)
+                    || rPermissions.contains(requiredPermission)) {
                 granted = true;
             }
         }
@@ -1183,7 +1184,8 @@ public class X509CACmpResponder extends CmpResponder {
             Map<String, String> caProfileNames = ca.getCAManager().getCertprofilesForCA(
                     ca.getCAInfo().getName());
             for (String caProfileName : caProfileNames.keySet()) {
-                if (requestorProfiles.contains("all") || requestorProfiles.contains(caProfileName)) {
+                if (requestorProfiles.contains("all")
+                        || requestorProfiles.contains(caProfileName)) {
                     supportedLocalProfileNames.add(caProfileName);
                 }
             }

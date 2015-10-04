@@ -540,7 +540,8 @@ public abstract class CmpRequestor {
                 response.getProtectionVerificationResult();
         if (response.hasProtection()) {
             if (protectionVerificationResult == null
-                    || protectionVerificationResult.getProtectionResult() != ProtectionResult.VALID) {
+                    || protectionVerificationResult.getProtectionResult()
+                            != ProtectionResult.VALID) {
                 throw new PKIErrorException(ClientErrorCode.PKIStatus_RESPONSE_ERROR,
                         PKIFailureInfo.badMessageCheck,
                         "message check of the response failed");

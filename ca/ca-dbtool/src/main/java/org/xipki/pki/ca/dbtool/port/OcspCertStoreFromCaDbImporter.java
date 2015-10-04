@@ -585,7 +585,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
                 boolean isLastBlock = !certs.hasNext();
 
                 if (numImportedEntriesInBatch > 0
-                        && (numImportedEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock)) {
+                        && (numImportedEntriesInBatch % this.numCertsPerCommit == 0
+                                || isLastBlock)) {
                     if (evaulateOnly) {
                         ps_cert.clearBatch();
                         ps_certhash.clearBatch();
