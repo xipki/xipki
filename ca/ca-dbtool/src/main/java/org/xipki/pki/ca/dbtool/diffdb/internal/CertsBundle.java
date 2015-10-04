@@ -35,7 +35,6 @@
 
 package org.xipki.pki.ca.dbtool.diffdb.internal;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,8 +48,6 @@ public class CertsBundle {
     private int numSkipped;
     private Map<Long, DbDigestEntry> certs;
     private List<Long> serialNumbers;
-    private Map<Long, DbDigestEntry> targetCerts;
-    private Exception targetException;
 
     public CertsBundle(
             final int numSkipped,
@@ -65,7 +62,6 @@ public class CertsBundle {
 
         this.certs = certs;
         this.serialNumbers = serialNumbers;
-        this.targetCerts = new HashMap<>(serialNumbers.size());
     }
 
     public int getNumSkipped() {
@@ -78,25 +74,6 @@ public class CertsBundle {
 
     public List<Long> getSerialNumbers() {
         return serialNumbers;
-    }
-
-    public void addTargetCert(
-            final long serialNumber,
-            final DbDigestEntry cert) {
-        targetCerts.put(serialNumber, cert);
-    }
-
-    public DbDigestEntry getTargetCert(
-            final long serialNumber) {
-        return targetCerts.get(serialNumber);
-    }
-
-    public void setTargetException(Exception exception) {
-        this.targetException = exception;
-    }
-
-    public Exception getTargetException() {
-        return targetException;
     }
 
 }

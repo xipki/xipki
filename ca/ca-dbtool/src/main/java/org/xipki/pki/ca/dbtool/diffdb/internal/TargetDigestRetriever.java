@@ -45,15 +45,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.TimeUnit;
 
+import org.xipki.common.ProcessLog;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.DatabaseType;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.pki.ca.dbtool.StopMe;
+import org.xipki.pki.ca.dbtool.diffdb.DbDigestReporter;
+import org.xipki.pki.ca.dbtool.diffdb.DigestReader;
 
 /**
  * @author Lijun Liao
@@ -86,23 +88,47 @@ public class TargetDigestRetriever {
 
         @Override
         public void run() {
-            while (!stop.get()) {
+            while (!stopMe.stopMe()) {
                 CertsBundle bundle = null;
                 try {
-                    bundle = inQueue.take();
-                } catch (InterruptedException e) {
-                    continue;
+                    bundle = reader.nextCerts(numPerSelect);
+                } catch (Exception e) {
+                    exception = e;
+                    break;
+                }
+
+                if (bundle == null) {
+                    break;
                 }
 
                 try {
+                    Map<Long, DbDigestEntry> refCerts = bundle.getCerts();
                     Map<Long, DbDigestEntry> resp = query(bundle);
+
+                    List<Long> serialNumbers = bundle.getSerialNumbers();
+                    int n = serialNumbers.size();
+                    List<Long> cloneSerialNumbers = new ArrayList<>(serialNumbers);
+
                     for (Long serialNumber : resp.keySet()) {
-                        bundle.addTargetCert(serialNumber, resp.get(serialNumber));
+                        cloneSerialNumbers.remove(serialNumber);
+                        DbDigestEntry targetCert = resp.get(serialNumber);
+                        DbDigestEntry refCert = refCerts.get(serialNumber);
+
+                        if (targetCert != null) {
+                            if (refCert.contentEquals(targetCert)) {
+                                reporter.addGood(serialNumber);
+                            } else {
+                                reporter.addDiff(refCert, targetCert);
+                            }
+                        } else {
+                            reporter.addMissing(serialNumber);
+                        }
                     }
+                    processLog.addNumProcessed(n);
+                    processLog.printStatus();
                 } catch (Exception e) {
-                    bundle.setTargetException(e);
-                } finally {
-                    outQueue.add(bundle);
+                    exception = e;
+                    break;
                 }
             }
 
@@ -163,36 +189,39 @@ public class TargetDigestRetriever {
     private final XipkiDbControl dbControl;
     private final DataSourceWrapper datasource;
 
-    private final BlockingDeque<CertsBundle> inQueue = new LinkedBlockingDeque<>();
-    private final BlockingDeque<CertsBundle> outQueue = new LinkedBlockingDeque<>();
-
     private final int numPerSelect;
 
     private final String singleCertSql;
     private final String inArrayCertsSql;
     private final String rangeCertsSql;
-    private final AtomicBoolean stop = new AtomicBoolean(false);
+    private final StopMe stopMe;
+    private Exception exception;
 
     private ExecutorService executor;
 
+    private final DigestReader reader;
+    private final DbDigestReporter reporter;
+    private final ProcessLog processLog;
     private final List<Retriever> retrievers;
 
     public TargetDigestRetriever(
+            final ProcessLog processLog,
+            final DigestReader reader,
+            final DbDigestReporter reporter,
             final DataSourceWrapper datasource,
             final XipkiDbControl dbControl,
             final int caId,
             final int numPerSelect,
-            final int numThreads)
+            final int numThreads,
+            final StopMe stopMe)
     throws DataAccessException {
-        try {
-
-        } catch (Exception e) {
-            throw e;
-        }
-
+        this.processLog = processLog;
         this.numPerSelect = numPerSelect;
         this.datasource = datasource;
         this.dbControl = dbControl;
+        this.reader = reader;
+        this.reporter = reporter;
+        this.stopMe = stopMe;
 
         String coreSql =
                 dbControl.getColRevoked() + ","
@@ -257,21 +286,7 @@ public class TargetDigestRetriever {
         }
     }
 
-    public void addIn(CertsBundle certsBundle) {
-        inQueue.add(certsBundle);
-    }
-
-    public CertsBundle takeOut()
-    throws InterruptedException {
-        return outQueue.take();
-    }
-
-    public boolean hasTasks() {
-        return inQueue.isEmpty() && outQueue.isEmpty();
-    }
-
     public void close() {
-        stop.set(true);
         if (executor != null) {
             executor.shutdownNow();
         }
@@ -402,6 +417,21 @@ public class TargetDigestRetriever {
                 rs.close();
             } catch (Exception e) {
             }
+        }
+    }
+
+    public void awaitTerminiation()
+    throws Exception {
+        executor.shutdown();
+
+        while (!executor.awaitTermination(1000, TimeUnit.MILLISECONDS)) {
+            if (exception != null) {
+                throw exception;
+            }
+        }
+
+        if (exception != null) {
+            throw exception;
         }
     }
 

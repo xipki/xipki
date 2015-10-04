@@ -42,15 +42,15 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -59,7 +59,10 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbToolBase;
+import org.xipki.pki.ca.dbtool.EndOfQueue;
 import org.xipki.pki.ca.dbtool.IDRange;
+import org.xipki.pki.ca.dbtool.QueueEntry;
+import org.xipki.pki.ca.dbtool.StopMe;
 import org.xipki.pki.ca.dbtool.diffdb.internal.CertsBundle;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DigestDBEntrySet;
@@ -74,11 +77,70 @@ abstract class DbDigestReader implements DigestReader {
     interface Retriever extends Runnable {
     }
 
+    private class Dispatcher implements Runnable {
+
+        @Override
+        public void run() {
+            while (nextId <= maxId && !stopMe.stopMe()) {
+                int n = 0;
+                for (int i = 0; i < numThreads; i++) {
+                    if (nextId <= maxId) {
+                        n++;
+                        inQueue.add(new IDRange(nextId, nextId + 999));
+                        nextId += 1000;
+                    } else {
+                        break;
+                    }
+                }
+
+                List<DigestDBEntrySet> results = new ArrayList<>(n);
+                for (int i = 0; i < n; i++) {
+                    try {
+                        results.add(outQueue.take());
+                    } catch (InterruptedException e) {
+                        exception = e;
+                        return;
+                    }
+                }
+
+                for (DigestDBEntrySet result : results) {
+                    if (result.getException() != null) {
+                        exception = new DataAccessException(
+                                "error while reading from ID " + result.getStartId()
+                                    + ": " + result.getException().getMessage(),
+                                result.getException());
+                        return;
+                    }
+                }
+
+                Collections.sort(results);
+                for (DigestDBEntrySet result : results) {
+                    for (IdentifiedDbDigestEntry entry : result.getEntries()) {
+                        try {
+                            fixedSizedCerts.offer(entry, Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
+                        } catch (InterruptedException e) {
+                            exception = e;
+                            return;
+                        }
+                    }
+                }
+            }
+
+            endReached.set(true);
+            try {
+                fixedSizedCerts.offer(EndOfQueue.INSTANCE, Integer.MAX_VALUE,
+                        TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                exception = e;
+                return;
+            }
+        }
+    }
+
     private static Logger LOG = LoggerFactory.getLogger(DbDigestReader.class);
 
-    protected final AtomicBoolean stop = new AtomicBoolean(false);
-    protected final BlockingDeque<IDRange> inQueue = new LinkedBlockingDeque<>();
-    protected final BlockingDeque<DigestDBEntrySet> outQueue = new LinkedBlockingDeque<>();
+    protected final BlockingQueue<IDRange> inQueue;
+    protected final BlockingQueue<DigestDBEntrySet> outQueue;
     private final int numThreads;
     private ExecutorService executor;
     private List<Retriever> retrievers;
@@ -90,9 +152,12 @@ abstract class DbDigestReader implements DigestReader {
     private final String caSubjectName;
     private final int minId;
     private final int maxId;
+    private final AtomicBoolean endReached = new AtomicBoolean(false);
+    private Exception exception;
 
-    protected final Deque<IdentifiedDbDigestEntry> certs = new LinkedList<>();
+    protected final ArrayBlockingQueue<QueueEntry> fixedSizedCerts;
     private int nextId;
+    protected final StopMe stopMe;
 
     public DbDigestReader(
             final DataSourceWrapper datasource,
@@ -101,7 +166,9 @@ abstract class DbDigestReader implements DigestReader {
             final int totalAccount,
             final int minId,
             final int maxId,
-            final int numThreads)
+            final int numThreads,
+            final int numCertsToPredicate,
+            final StopMe stopMe)
     throws DataAccessException, CertificateException, IOException {
         ParamUtil.assertNotNull("datasource", datasource);
         this.datasource = datasource;
@@ -113,6 +180,11 @@ abstract class DbDigestReader implements DigestReader {
         this.minId = minId;
         this.maxId = maxId;
         this.nextId = minId;
+
+        this.stopMe = stopMe;
+        this.inQueue = new LinkedBlockingDeque<>();
+        this.outQueue = new LinkedBlockingDeque<>();
+        this.fixedSizedCerts = new ArrayBlockingQueue<>(numCertsToPredicate);
     }
 
     boolean init() {
@@ -124,10 +196,12 @@ abstract class DbDigestReader implements DigestReader {
                 retrievers.add(retriever);
             }
 
-            executor = Executors.newFixedThreadPool(numThreads);
+            executor = Executors.newFixedThreadPool(numThreads + 1);
             for (Runnable runnable : retrievers) {
                 executor.execute(runnable);
             }
+
+            executor.execute(new Dispatcher());
             return true;
         } catch (Exception e) {
             LOG.error("could not initialize DbDigestReader", e);
@@ -161,26 +235,33 @@ abstract class DbDigestReader implements DigestReader {
     }
 
     @Override
-    public CertsBundle nextCerts(
+    public synchronized CertsBundle nextCerts(
             final int n)
-    throws DataAccessException {
-        if (nextId > maxId && certs.isEmpty()) {
+    throws Exception {
+        if (endReached.get() && fixedSizedCerts.isEmpty()) {
             return null;
+        }
+
+        if (exception != null) {
+            throw exception;
         }
 
         List<IdentifiedDbDigestEntry> entries = new ArrayList<>(n);
         int k = 0;
         while (true) {
-            if (certs.isEmpty()) {
-                readNextCerts();
+            QueueEntry next = null;
+            while (next == null) {
+                next = fixedSizedCerts.poll(1, TimeUnit.SECONDS);
+                if (exception != null) {
+                    throw exception;
+                }
             }
 
-            IdentifiedDbDigestEntry next = certs.poll();
-            if (next == null) {
+            if (next instanceof EndOfQueue) {
                 break;
             }
 
-            entries.add(next);
+            entries.add((IdentifiedDbDigestEntry) next);
             k++;
             if (k >= n) {
                 break;
@@ -208,50 +289,10 @@ abstract class DbDigestReader implements DigestReader {
         return new CertsBundle(numSkipped, certsMap, serialNumbers);
     }
 
-    private void readNextCerts()
-    throws DataAccessException {
-        while (certs.isEmpty() && nextId <= maxId) {
-            int n = 0;
-            for (int i = 0; i < numThreads; i++) {
-                if (nextId <= maxId) {
-                    n++;
-                    inQueue.add(new IDRange(nextId, nextId + 999));
-                    nextId += 1000;
-                } else {
-                    break;
-                }
-            }
-
-            List<DigestDBEntrySet> results = new ArrayList<>(n);
-            for (int i = 0; i < n; i++) {
-                try {
-                    results.add(outQueue.take());
-                } catch (InterruptedException e) {
-                    throw new DataAccessException("InterruptedException " + e.getMessage(), e);
-                }
-            }
-
-            for (DigestDBEntrySet result : results) {
-                if (result.getException() != null) {
-                    throw new DataAccessException(
-                            "error while reading from ID " + result.getStartId()
-                                + ": " + result.getException().getMessage(),
-                            result.getException());
-                }
-            }
-
-            Collections.sort(results);
-            for (DigestDBEntrySet result : results) {
-                for (IdentifiedDbDigestEntry entry : result.getEntries()) {
-                    certs.addLast(entry);
-                }
-            }
-        }
-    }
-
     public void close() {
-        stop.set(true);
-        executor.shutdownNow();
+        if (executor != null) {
+            executor.shutdownNow();
+        }
     }
 
     protected static void releaseResources(

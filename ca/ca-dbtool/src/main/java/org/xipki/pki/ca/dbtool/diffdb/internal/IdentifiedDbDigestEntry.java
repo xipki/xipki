@@ -35,11 +35,13 @@
 
 package org.xipki.pki.ca.dbtool.diffdb.internal;
 
+import org.xipki.pki.ca.dbtool.QueueEntry;
+
 /**
  * @author Lijun Liao
  */
 
-public class IdentifiedDbDigestEntry {
+public class IdentifiedDbDigestEntry implements QueueEntry {
     private final DbDigestEntry content;
     private Integer caId;
     private final int id;

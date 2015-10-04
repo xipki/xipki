@@ -33,26 +33,16 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.diffdb;
-
-import java.security.cert.X509Certificate;
-
-import org.xipki.pki.ca.dbtool.diffdb.internal.CertsBundle;
+package org.xipki.pki.ca.dbtool;
 
 /**
  * @author Lijun Liao
  */
 
-public interface DigestReader {
+public class EndOfQueue implements QueueEntry {
+    public static final EndOfQueue INSTANCE = new EndOfQueue();
 
-    X509Certificate getCaCert();
+    private EndOfQueue() {
+    }
 
-    String getCaSubjectName();
-
-    int getTotalAccount();
-
-    CertsBundle nextCerts(int n)
-    throws Exception;
-
-    void close();
 }

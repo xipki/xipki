@@ -46,6 +46,7 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.dbtool.IDRange;
+import org.xipki.pki.ca.dbtool.StopMe;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DbSchemaType;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DigestDBEntrySet;
@@ -77,7 +78,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
 
         @Override
         public void run() {
-            while (!stop.get()) {
+            while (!stopMe.stopMe()) {
                 try {
                     IDRange idRange = inQueue.take();
                     query(idRange);
@@ -149,7 +150,9 @@ public class XipkiDbDigestReader extends DbDigestReader {
             final DbSchemaType dbSchemaType,
             final int caId,
             final boolean revokedOnly,
-            final int numThreads)
+            final int numThreads,
+            final int numCertsToPredicate,
+            final StopMe stopMe)
     throws Exception {
         ParamUtil.assertNotNull("datasource", datasource);
         Connection conn = datasource.getConnection();
@@ -210,7 +213,8 @@ public class XipkiDbDigestReader extends DbDigestReader {
                     : 1;
 
             return new XipkiDbDigestReader(datasource, caCert, revokedOnly,
-                    totalAccount, minId, maxId, numThreads, dbSchemaType, caId);
+                    totalAccount, minId, maxId, numThreads, dbSchemaType, caId,
+                    numCertsToPredicate, stopMe);
         } catch (SQLException e) {
             throw datasource.translate(sql, e);
         } finally {
@@ -227,9 +231,12 @@ public class XipkiDbDigestReader extends DbDigestReader {
             final int maxId,
             final int numThreads,
             final DbSchemaType dbSchemaType,
-            final int caId)
+            final int caId,
+            final int numCertsToPredicate,
+            final StopMe stopMe)
     throws Exception {
-        super(datasource, caCert, revokedOnly, totalAccount, minId, maxId, numThreads);
+        super(datasource, caCert, revokedOnly, totalAccount, minId, maxId, numThreads,
+                numCertsToPredicate, stopMe);
 
         this.caId = caId;
         this.conn = datasource.getConnection();
