@@ -47,6 +47,7 @@ import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.IDRange;
+import org.xipki.pki.ca.dbtool.StopMe;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DbSchemaType;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DigestDBEntrySet;
@@ -80,7 +81,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
 
         @Override
         public void run() {
-            while (!stop.get()) {
+            while (!stopMe.stopMe()) {
                 try {
                     IDRange idRange = inQueue.take();
                     query(idRange);
@@ -184,7 +185,9 @@ public class EjbcaDbDigestReader extends DbDigestReader {
             final int caId,
             final boolean dbContainsOtherCA,
             final boolean revokedOnly,
-            final int numThreads)
+            final int numThreads,
+            final int numCertsToPredicate,
+            final StopMe stopMe)
     throws Exception {
         ParamUtil.assertNotNull("datasource", datasource);
 
@@ -256,7 +259,8 @@ public class EjbcaDbDigestReader extends DbDigestReader {
         }
 
         return new EjbcaDbDigestReader(datasource, caCert, revokedOnly, totalAccount,
-                minId, maxId, numThreads, dbSchemaType, caId, dbContainsOtherCA);
+                minId, maxId, numThreads, dbSchemaType, caId, dbContainsOtherCA,
+                numCertsToPredicate, stopMe);
     }
 
     private EjbcaDbDigestReader(
@@ -269,9 +273,12 @@ public class EjbcaDbDigestReader extends DbDigestReader {
             final int numThreads,
             final DbSchemaType dbSchemaType,
             final int caId,
-            final boolean dbContainsOtherCA)
+            final boolean dbContainsOtherCA,
+            final int numCertsToPredicate,
+            final StopMe stopMe)
     throws Exception {
-        super(datasource, caCert, revokedOnly, totalAccount, minId, maxId, numThreads);
+        super(datasource, caCert, revokedOnly, totalAccount, minId, maxId, numThreads,
+                numCertsToPredicate, stopMe);
         ParamUtil.assertNotNull("datasource", datasource);
 
         this.caId = caId;

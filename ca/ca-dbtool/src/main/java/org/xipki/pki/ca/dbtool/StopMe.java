@@ -33,26 +33,23 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.diffdb;
+package org.xipki.pki.ca.dbtool;
 
-import java.security.cert.X509Certificate;
-
-import org.xipki.pki.ca.dbtool.diffdb.internal.CertsBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Lijun Liao
  */
 
-public interface DigestReader {
+public class StopMe {
+    private final AtomicBoolean stopMe;
 
-    X509Certificate getCaCert();
+    public StopMe(AtomicBoolean stopMe) {
+        this.stopMe = stopMe;
+    }
 
-    String getCaSubjectName();
+    public boolean stopMe() {
+        return stopMe.get();
+    }
 
-    int getTotalAccount();
-
-    CertsBundle nextCerts(int n)
-    throws Exception;
-
-    void close();
 }

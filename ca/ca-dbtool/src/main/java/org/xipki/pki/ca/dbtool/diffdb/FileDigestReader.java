@@ -111,9 +111,9 @@ public class FileDigestReader implements DigestReader {
     }
 
     @Override
-    public CertsBundle nextCerts(
+    public synchronized CertsBundle nextCerts(
             final int n)
-    throws DataAccessException {
+    throws DataAccessException, InterruptedException {
         if (!hasNext()) {
             return null;
         }

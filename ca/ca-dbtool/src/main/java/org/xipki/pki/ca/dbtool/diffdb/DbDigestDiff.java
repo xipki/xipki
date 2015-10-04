@@ -43,7 +43,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -60,8 +59,7 @@ import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.pki.ca.dbtool.diffdb.internal.CertsBundle;
-import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
+import org.xipki.pki.ca.dbtool.StopMe;
 import org.xipki.pki.ca.dbtool.diffdb.internal.DbSchemaType;
 import org.xipki.pki.ca.dbtool.diffdb.internal.TargetDigestRetriever;
 import org.xipki.pki.ca.dbtool.diffdb.internal.XipkiDbControl;
@@ -252,12 +250,15 @@ public class DbDigestDiff {
 
             boolean dbContainsMultipleCAs = refCaIds.size() > 1;
 
+            final int numCertsToPredicate = (numTargetThreads * 3 / 2) * numPerSelect;
             for (Integer refCaId : refCaIds) {
                 DigestReader refReader = (refDbSchemaType == DbSchemaType.EJBCA_CA_v3)
                         ? EjbcaDbDigestReader.getInstance(refDatasource, refDbSchemaType,
-                                refCaId, dbContainsMultipleCAs, revokedOnly, numRefThreads)
+                                refCaId, dbContainsMultipleCAs, revokedOnly, numRefThreads,
+                                numCertsToPredicate, new StopMe(stopMe))
                         : XipkiDbDigestReader.getInstance(refDatasource, refDbSchemaType,
-                                refCaId, revokedOnly, numRefThreads);
+                                refCaId, revokedOnly, numRefThreads,
+                                numCertsToPredicate, new StopMe(stopMe));
                 diffSingleCA(refReader, caIdCertMap);
             }
         }
@@ -310,9 +311,18 @@ public class DbDigestDiff {
         TargetDigestRetriever target = null;
 
         try {
-            target = new TargetDigestRetriever(targetDatasource, targetDbControl,
-                    caId, numPerSelect, numTargetThreads);
-            doDiff(refReader, target, reporter);
+            reporter.start();
+            ProcessLog processLog = new ProcessLog(refReader.getTotalAccount());
+            System.out.println("Processing certifiates of CA \n\t'"
+                    + refReader.getCaSubjectName() + "'");
+            processLog.printHeader();
+
+            target = new TargetDigestRetriever(processLog, refReader, reporter,
+                    targetDatasource, targetDbControl, caId, numPerSelect, numTargetThreads,
+                    new StopMe(stopMe));
+
+            target.awaitTerminiation();
+            processLog.printTrailer();
         } catch (InterruptedException e) {
             throw e;
         } catch (Exception e) {
@@ -325,83 +335,6 @@ public class DbDigestDiff {
             if (target != null) {
                 target.close();
             }
-        }
-    }
-
-    private void doDiff(
-            final DigestReader refReader,
-            final TargetDigestRetriever target,
-            final DbDigestReporter reporter)
-    throws Exception {
-        ProcessLog processLog = new ProcessLog(refReader.getTotalAccount());
-        System.out.println("Processing certifiates of CA \n\t'"
-                + refReader.getCaSubjectName() + "'");
-        processLog.printHeader();
-        reporter.start();
-
-        boolean interrupted = false;
-
-        while (true) {
-            if (stopMe.get()) {
-                interrupted = true;
-                break;
-            }
-
-            int numBundles = 0;
-            for (int i = 0; i < numTargetThreads * 2; i++) {
-                CertsBundle myBundle = refReader.nextCerts(numPerSelect);
-                if (myBundle != null
-                        && !myBundle.getSerialNumbers().isEmpty()) {
-                    numBundles++;
-                    target.addIn(myBundle);
-                } else {
-                    break; // break for
-                }
-            }
-
-            if (numBundles == 0) {
-                break; // break while (true)
-            }
-
-            for (int i = 0; i < numBundles; i++) {
-                CertsBundle bundle = target.takeOut();
-                Exception targetException = bundle.getTargetException();
-                if (targetException != null) {
-                    throw targetException;
-                }
-
-                List<Long> serialNumbers = bundle.getSerialNumbers();
-                int n = serialNumbers.size();
-
-                List<Long> cloneSerialNumbers = new ArrayList<>(serialNumbers);
-                Map<Long, DbDigestEntry> refCerts = bundle.getCerts();
-
-                for (Long serialNumber : serialNumbers) {
-                    DbDigestEntry targetCert = bundle.getTargetCert(serialNumber);
-                    cloneSerialNumbers.remove(serialNumber);
-                    DbDigestEntry refCert = refCerts.get(serialNumber);
-                    if (targetCert != null) {
-                        if (refCert.contentEquals(targetCert)) {
-                            reporter.addGood(serialNumber);
-                        } else {
-                            reporter.addDiff(refCert, targetCert);
-                        }
-                    } else {
-                        reporter.addMissing(serialNumber);
-                    }
-                } // end for
-
-                cloneSerialNumbers.clear();
-
-                processLog.addNumProcessed(n);
-                processLog.printStatus();
-            }
-        }
-
-        processLog.printTrailer();
-
-        if (interrupted) {
-            throw new InterruptedException("interrupted by the user");
         }
     }
 
