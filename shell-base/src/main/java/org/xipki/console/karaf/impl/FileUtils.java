@@ -124,7 +124,7 @@ public class FileUtils {
             fileInCanonicalDir = new File(canonicalDir, file.getName());
         }
 
-        return false == fileInCanonicalDir.getCanonicalFile().equals(
+        return !fileInCanonicalDir.getCanonicalFile().equals(
                 fileInCanonicalDir.getAbsoluteFile());
     }
 
@@ -301,7 +301,8 @@ public class FileUtils {
         final File[] srcFiles = (filter == null)
                 ? srcDir.listFiles()
                 : srcDir.listFiles(filter);
-        if (srcFiles == null) {  // null if abstract pathname does not denote a directory, or if an I/O error occurs
+        if (srcFiles == null) {
+            // null if abstract pathname does not denote a directory, or if an I/O error occurs
             throw new IOException("Failed to list contents of " + srcDir);
         }
         if (destDir.exists()) {

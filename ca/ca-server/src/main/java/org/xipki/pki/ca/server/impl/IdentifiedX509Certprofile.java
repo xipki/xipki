@@ -767,7 +767,8 @@ class IdentifiedX509Certprofile {
         }
 
         if (b) {
-            ASN1ObjectIdentifier[] types = new ASN1ObjectIdentifier[] {Extension.basicConstraints, Extension.keyUsage};
+            ASN1ObjectIdentifier[] types = new ASN1ObjectIdentifier[] {
+                    Extension.basicConstraints, Extension.keyUsage};
 
             set.clear();
             for (ASN1ObjectIdentifier type : types) {

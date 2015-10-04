@@ -594,7 +594,7 @@ public class IaikP11Slot implements P11WritableSlot {
             }
         }
         catch (PKCS11Exception p11e) {
-        	 // 0x100: user already logged in
+            // 0x100: user already logged in
             if (p11e.getErrorCode() != 0x100) {
                 throw p11e;
             }

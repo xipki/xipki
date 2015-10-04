@@ -116,7 +116,7 @@ class OcspCertStoreDbExporter extends DbPorter {
         this.unmarshaller = unmarshaller;
         if (resume) {
             File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
-            if (processLogFile.exists() == false) {
+            if (!processLogFile.exists()) {
                 throw new Exception("could not process with '--resume' option");
             }
         }
@@ -149,7 +149,7 @@ class OcspCertStoreDbExporter extends DbPorter {
         }
         System.out.println("exporting OCSP certstore from database");
 
-        if (resume == false) {
+        if (!resume) {
             export_issuer(certstore);
         }
         Exception exception = export_cert(certstore, processLogFile);
@@ -336,7 +336,7 @@ class OcspCertStoreDbExporter extends DbPorter {
 
                     String sha1_cert = HashCalculator.hexSha1(certBytes);
 
-                    if (evaulateOnly == false) {
+                    if (!evaulateOnly) {
                         ZipEntry certZipEntry = new ZipEntry(sha1_cert + ".der");
                         currentCertsZip.putNextEntry(certZipEntry);
                         try {

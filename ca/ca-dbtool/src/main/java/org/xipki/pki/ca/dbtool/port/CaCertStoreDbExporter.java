@@ -173,7 +173,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         Exception exception = null;
         System.out.println("exporting CA certstore from database");
         try {
-            if (resume == false) {
+            if (!resume) {
                 export_ca(certstore);
                 export_requestor(certstore);
                 export_publisherinfo(certstore);
@@ -331,7 +331,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                     String sha1_cert = HashCalculator.hexSha1(crlBytes);
 
                     final String crlFilename = sha1_cert + ".crl";
-                    if (evaulateOnly == false) {
+                    if (!evaulateOnly) {
                         ZipEntry certZipEntry = new ZipEntry(crlFilename);
                         currentCrlsZip.putNextEntry(certZipEntry);
                         try {
@@ -799,7 +799,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
                     String sha1_cert = HashCalculator.hexSha1(certBytes);
 
-                    if (evaulateOnly == false) {
+                    if (!evaulateOnly) {
                         ZipEntry certZipEntry = new ZipEntry(sha1_cert + ".der");
                         currentCertsZip.putNextEntry(certZipEntry);
                         try {

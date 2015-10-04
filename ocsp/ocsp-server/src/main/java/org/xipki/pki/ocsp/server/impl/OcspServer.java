@@ -1505,6 +1505,7 @@ public class OcspServer {
             try {
                 stream.close();
             } catch (IOException e) {
+                LOG.warn("could not close stream: {}", e.getMessage());
             }
         }
     }
