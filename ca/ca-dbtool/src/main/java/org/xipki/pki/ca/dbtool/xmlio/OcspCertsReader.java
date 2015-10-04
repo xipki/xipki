@@ -45,46 +45,38 @@ import javax.xml.stream.XMLStreamReader;
  * @author Lijun Liao
  */
 
-public class OcspCertsReader extends DbiXmlReader
-{
+public class OcspCertsReader extends DbiXmlReader {
     public OcspCertsReader(
             final InputStream xmlStream)
-    throws XMLStreamException, InvalidDataObjectException
-    {
+    throws XMLStreamException, InvalidDataObjectException {
         super("certs", xmlStream);
     }
 
     @Override
     protected DbDataObject retrieveNext(
             final XMLStreamReader reader)
-    throws InvalidDataObjectException, XMLStreamException
-    {
+    throws InvalidDataObjectException, XMLStreamException {
         OcspCertType ret = null;
         StringBuilder buffer = new StringBuilder();
         int lastEvent = -1;
 
-        while (reader.hasNext())
-        {
+        while (reader.hasNext()) {
             int event = reader.next();
             String tagContent = null;
 
-            if (event != XMLStreamConstants.CHARACTERS)
-            {
+            if (event != XMLStreamConstants.CHARACTERS) {
                 tagContent = buffer.toString();
 
-                if (lastEvent == XMLStreamConstants.CHARACTERS)
-                {
+                if (lastEvent == XMLStreamConstants.CHARACTERS) {
                     buffer.delete(0, buffer.length());
                 }
             }
 
             lastEvent = event;
 
-            switch (event)
-            {
+            switch (event) {
             case XMLStreamConstants.START_ELEMENT:
-                if (OcspCertType.TAG_ROOT.equals(reader.getLocalName()))
-                {
+                if (OcspCertType.TAG_ROOT.equals(reader.getLocalName())) {
                     ret = new OcspCertType();
                 }
                 break;
@@ -92,13 +84,11 @@ public class OcspCertsReader extends DbiXmlReader
                 buffer.append(reader.getText());
                 break;
             case XMLStreamConstants.END_ELEMENT:
-                if (ret == null)
-                {
+                if (ret == null) {
                     break;
                 }
 
-                switch (reader.getLocalName())
-                {
+                switch (reader.getLocalName()) {
                 case OcspCertType.TAG_ROOT:
                     ret.validate();
                     return ret;

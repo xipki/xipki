@@ -46,16 +46,14 @@ package org.xipki.datasource.api.exception;
  * @author Thomas Risberg
  */
 @SuppressWarnings("serial")
-public class DuplicateKeyException extends DataIntegrityViolationException
-{
+public class DuplicateKeyException extends DataIntegrityViolationException {
 
     /**
      * Constructor for DuplicateKeyException.
      * @param msg the detail message
      */
     public DuplicateKeyException(
-            final String msg)
-    {
+            final String msg) {
         super(msg);
     }
 
@@ -66,8 +64,7 @@ public class DuplicateKeyException extends DataIntegrityViolationException
      */
     public DuplicateKeyException(
             final String msg,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(msg, cause);
     }
 

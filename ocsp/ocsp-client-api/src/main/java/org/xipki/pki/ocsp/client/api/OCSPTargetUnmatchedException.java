@@ -40,30 +40,25 @@ package org.xipki.pki.ocsp.client.api;
  */
 
 @SuppressWarnings("serial")
-public class OCSPTargetUnmatchedException extends OCSPResponseException
-{
+public class OCSPTargetUnmatchedException extends OCSPResponseException {
 
-    public OCSPTargetUnmatchedException()
-    {
+    public OCSPTargetUnmatchedException() {
         super();
     }
 
     public OCSPTargetUnmatchedException(
             final String message,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(message, cause);
     }
 
     public OCSPTargetUnmatchedException(
-            final String message)
-    {
+            final String message) {
         super(message);
     }
 
     public OCSPTargetUnmatchedException(
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(cause);
     }
 

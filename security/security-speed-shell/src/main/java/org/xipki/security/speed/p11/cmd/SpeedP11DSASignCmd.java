@@ -47,8 +47,7 @@ import org.xipki.security.speed.p11.P11DSASignLoadTest;
 
 @Command(scope = "xipki-tk", name = "speed-dsa-sign",
         description = "performance test of PKCS#11 DSA signature creation")
-public class SpeedP11DSASignCmd extends SpeedP11SignCmd
-{
+public class SpeedP11DSASignCmd extends SpeedP11SignCmd {
     @Option(name = "--plen",
             description = "bit length of the prime")
     private Integer pLen = 2048;
@@ -59,15 +58,11 @@ public class SpeedP11DSASignCmd extends SpeedP11SignCmd
 
     @Override
     protected LoadExecutor getTester()
-    throws Exception
-    {
-        if (qLen == null)
-        {
-            if (pLen >= 2048)
-            {
+    throws Exception {
+        if (qLen == null) {
+            if (pLen >= 2048) {
                 qLen = 256;
-            } else
-            {
+            } else {
                 qLen = 160;
             }
         }

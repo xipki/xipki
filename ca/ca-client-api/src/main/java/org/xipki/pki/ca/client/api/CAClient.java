@@ -56,8 +56,7 @@ import org.xipki.common.RequestResponseDebug;
  * @author Lijun Liao
  */
 
-public interface CAClient
-{
+public interface CAClient {
     Set<String> getCaNames();
 
     Set<CertprofileInfo> getCertprofiles(

@@ -45,8 +45,7 @@ import org.xipki.security.api.HashAlgoType;
  * @author Lijun Liao
  */
 
-public class CertStatusInfo
-{
+public class CertStatusInfo {
     private final CertStatus certStatus;
 
     private CertRevocationInfo revocationInfo;
@@ -64,8 +63,7 @@ public class CertStatusInfo
             final CertStatus certStatus,
             final Date thisUpdate,
             final Date nextUpdate,
-            final String certprofile)
-    {
+            final String certprofile) {
         this.certStatus = certStatus;
         this.thisUpdate = thisUpdate;
         this.nextUpdate = nextUpdate;
@@ -74,22 +72,19 @@ public class CertStatusInfo
 
     public static CertStatusInfo getUnknownCertStatusInfo(
             final Date thisUpdate,
-            final Date nextUpdate)
-    {
+            final Date nextUpdate) {
         return new CertStatusInfo(CertStatus.UNKNOWN, thisUpdate, nextUpdate, null);
     }
 
     public static CertStatusInfo getIgnoreCertStatusInfo(
             final Date thisUpdate,
-            final Date nextUpdate)
-    {
+            final Date nextUpdate) {
         return new CertStatusInfo(CertStatus.IGNORE, thisUpdate, nextUpdate, null);
     }
 
     public static CertStatusInfo getIssuerUnknownCertStatusInfo(
             final Date thisUpdate,
-            final Date nextUpdate)
-    {
+            final Date nextUpdate) {
         return new CertStatusInfo(CertStatus.ISSUER_UNKNOWN, thisUpdate, nextUpdate, null);
     }
 
@@ -98,8 +93,7 @@ public class CertStatusInfo
             final byte[] certHash,
             final Date thisUpdate,
             final Date nextUpdate,
-            final String certprofile)
-    {
+            final String certprofile) {
         CertStatusInfo ret = new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate,
                 certprofile);
         ret.certHashAlgo = certHashAlgo;
@@ -113,10 +107,8 @@ public class CertStatusInfo
             final byte[] certHash,
             final Date thisUpdate,
             final Date nextUpdate,
-            final String certprofile)
-    {
-        if (revocationInfo == null)
-        {
+            final String certprofile) {
+        if (revocationInfo == null) {
             throw new IllegalArgumentException("revocationInfo could not be null");
         }
         CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate,
@@ -127,60 +119,49 @@ public class CertStatusInfo
         return ret;
     }
 
-    public Date getThisUpdate()
-    {
+    public Date getThisUpdate() {
         return thisUpdate;
     }
 
-    public Date getNextUpdate()
-    {
+    public Date getNextUpdate() {
         return nextUpdate;
     }
 
-    public CertStatus getCertStatus()
-    {
+    public CertStatus getCertStatus() {
         return certStatus;
     }
 
-    public CertRevocationInfo getRevocationInfo()
-    {
+    public CertRevocationInfo getRevocationInfo() {
         return revocationInfo;
     }
 
-    public HashAlgoType getCertHashAlgo()
-    {
+    public HashAlgoType getCertHashAlgo() {
         return certHashAlgo;
     }
 
-    public byte[] getCertHash()
-    {
+    public byte[] getCertHash() {
         return certHash;
     }
 
-    public String getCertprofile()
-    {
+    public String getCertprofile() {
         return certprofile;
     }
 
-    public CrlID getCrlID()
-    {
+    public CrlID getCrlID() {
         return crlID;
     }
 
     public void setCrlID(
-            final CrlID crlID)
-    {
+            final CrlID crlID) {
         this.crlID = crlID;
     }
 
-    public Date getArchiveCutOff()
-    {
+    public Date getArchiveCutOff() {
         return archiveCutOff;
     }
 
     public void setArchiveCutOff(
-            final Date archiveCutOff)
-    {
+            final Date archiveCutOff) {
         this.archiveCutOff = archiveCutOff;
     }
 

@@ -48,46 +48,38 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-public class CmpResponderEntryWrapper
-{
+public class CmpResponderEntryWrapper {
     private CmpResponderEntry dbEntry;
     private ConcurrentContentSigner signer;
     private X500Name subjectAsX500Name;
     private GeneralName subjectAsGeneralName;
 
-    public CmpResponderEntryWrapper()
-    {
+    public CmpResponderEntryWrapper() {
     }
 
     public void setDbEntry(
-            final CmpResponderEntry dbEntry)
-    {
+            final CmpResponderEntry dbEntry) {
         this.dbEntry = dbEntry;
         signer = null;
-        if (dbEntry.getCertificate() != null)
-        {
+        if (dbEntry.getCertificate() != null) {
             subjectAsX500Name = X500Name.getInstance(
                     dbEntry.getCertificate().getSubjectX500Principal().getEncoded());
             subjectAsGeneralName = new GeneralName(subjectAsX500Name);
         }
     }
 
-    public ConcurrentContentSigner getSigner()
-    {
+    public ConcurrentContentSigner getSigner() {
         return signer;
     }
 
     public void initSigner(
             final SecurityFactory securityFactory)
-    throws SignerException
-    {
-        if (signer != null)
-        {
+    throws SignerException {
+        if (signer != null) {
             return;
         }
 
-        if (dbEntry == null)
-        {
+        if (dbEntry == null) {
             throw new SignerException("dbEntry is null");
         }
 
@@ -96,8 +88,7 @@ public class CmpResponderEntryWrapper
         signer = securityFactory.createSigner(
                 dbEntry.getType(), dbEntry.getConf(), responderCert);
         dbEntry.setConfFaulty(false);
-        if (dbEntry.getBase64Cert() == null)
-        {
+        if (dbEntry.getBase64Cert() == null) {
             dbEntry.setCertificate(signer.getCertificate());
             subjectAsX500Name = X500Name.getInstance(
                     signer.getCertificateAsBCObject().getSubject());
@@ -105,25 +96,21 @@ public class CmpResponderEntryWrapper
         }
     }
 
-    public CmpResponderEntry getDbEntry()
-    {
+    public CmpResponderEntry getDbEntry() {
         return dbEntry;
     }
 
-    public boolean isHealthy()
-    {
+    public boolean isHealthy() {
         return (signer == null)
                 ? false
                 : signer.isHealthy();
     }
 
-    public GeneralName getSubjectAsGeneralName()
-    {
+    public GeneralName getSubjectAsGeneralName() {
         return subjectAsGeneralName;
     }
 
-    public X500Name getSubjectAsX500Name()
-    {
+    public X500Name getSubjectAsX500Name() {
         return subjectAsX500Name;
     }
 

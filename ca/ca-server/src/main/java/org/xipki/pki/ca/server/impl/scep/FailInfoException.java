@@ -42,8 +42,7 @@ import org.xipki.scep.transaction.FailInfo;
  * @author Lijun Liao
  */
 
-public class FailInfoException extends Exception
-{
+public class FailInfoException extends Exception {
     private static final long serialVersionUID = 1L;
 
     public static final FailInfoException badAlg = new FailInfoException(FailInfo.badAlg);
@@ -56,14 +55,12 @@ public class FailInfoException extends Exception
     private final FailInfo failInfo;
 
     private FailInfoException(
-            final FailInfo failInfo)
-    {
+            final FailInfo failInfo) {
         ParamUtil.assertNotNull("failInfo", failInfo);
         this.failInfo = failInfo;
     }
 
-    public FailInfo getFailInfo()
-    {
+    public FailInfo getFailInfo() {
         return failInfo;
     }
 

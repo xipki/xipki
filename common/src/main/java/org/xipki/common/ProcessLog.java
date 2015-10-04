@@ -47,8 +47,7 @@ import org.xipki.common.util.StringUtil;
  * @author Lijun Liao
  */
 
-public class ProcessLog
-{
+public class ProcessLog {
     private static final long MS_900 = 900L;
     private static final long DAY_IN_SEC = 24L * 60 * 60;
     private static final int minLen = 12;
@@ -66,38 +65,33 @@ public class ProcessLog
     private final ConcurrentLinkedDeque<MeasurePoint> measureDeque = new ConcurrentLinkedDeque<>();
 
     public ProcessLog(
-            final long total)
-    {
+            final long total) {
         this.total = total;
         this.hasTotal = total > 0;
         reset();
     }
 
-    public void printHeader()
-    {
+    public void printHeader() {
         StringBuilder sb = new StringBuilder();
 
         // first header line
         int n = hasTotal
                 ? 7
                 : 4;
-        for (int i = 0; i < n * minLen; i++)
-        {
+        for (int i = 0; i < n * minLen; i++) {
             sb.append('-');
         }
         sb.append('\n');
 
         // second header line
         sb.append(formatText("processed"));
-        if (hasTotal)
-        {
+        if (hasTotal) {
             sb.append(formatText("processed"));
         }
         sb.append(formatText("average"));
         sb.append(formatText("current"));
         sb.append(formatText("elapsed"));
-        if (hasTotal)
-        {
+        if (hasTotal) {
             sb.append(formatText("remaining"));
             sb.append(formatText("finish"));
         }
@@ -105,15 +99,13 @@ public class ProcessLog
 
         // third header line
         sb.append(formatText("number"));
-        if (hasTotal)
-        {
+        if (hasTotal) {
             sb.append(formatText("percent"));
         }
         sb.append(formatText("speed"));
         sb.append(formatText("speed"));
         sb.append(formatText("time"));
-        if (hasTotal)
-        {
+        if (hasTotal) {
             sb.append(formatText("time"));
             sb.append(formatText("at"));
         }
@@ -123,20 +115,17 @@ public class ProcessLog
         System.out.flush();
     }
 
-    public void finish()
-    {
+    public void finish() {
         finished.set(true);
         totalElapsedTimeMs = System.currentTimeMillis() - startTimeMs;
 
         totalAverageSpeed = 0;
-        if (totalElapsedTimeMs > 0)
-        {
+        if (totalElapsedTimeMs > 0) {
             totalAverageSpeed = (int) (numProcessed.get() * 1000 / totalElapsedTimeMs);
         }
     }
 
-    public void printTrailer()
-    {
+    public void printTrailer() {
         finish();
         printStatus(true);
         StringBuilder sb = new StringBuilder();
@@ -145,8 +134,7 @@ public class ProcessLog
         int n = hasTotal
                 ? 7
                 : 4;
-        for (int i = 0; i < n * minLen; i++)
-        {
+        for (int i = 0; i < n * minLen; i++) {
             sb.append('-');
         }
 
@@ -154,18 +142,15 @@ public class ProcessLog
         System.out.flush();
     }
 
-    public long getNumProcessed()
-    {
+    public long getNumProcessed() {
         return numProcessed.get();
     }
 
-    public long getTotal()
-    {
+    public long getTotal() {
         return total;
     }
 
-    public void reset()
-    {
+    public void reset() {
         startTimeMs = System.currentTimeMillis();
         numProcessed = new AtomicLong(0);
         lastPrintTimeMs = new AtomicLong(0);
@@ -173,56 +158,46 @@ public class ProcessLog
         measureDeque.add(new MeasurePoint(startTimeMs, 0));
     }
 
-    public long getStartTime()
-    {
+    public long getStartTime() {
         return startTimeMs;
     }
 
     public long addNumProcessed(
-            final long numProcessed)
-    {
+            final long numProcessed) {
         return this.numProcessed.addAndGet(numProcessed);
     }
 
-    public void printStatus()
-    {
+    public void printStatus() {
         printStatus(false);
     }
 
-    public long getTotalElapsedTime()
-    {
-        if (finished.get())
-        {
+    public long getTotalElapsedTime() {
+        if (finished.get()) {
             return totalElapsedTimeMs;
         }
 
         return System.currentTimeMillis() - startTimeMs;
     }
 
-    public int getTotalAverageSpeed()
-    {
-        if (finished.get())
-        {
+    public int getTotalAverageSpeed() {
+        if (finished.get()) {
             return totalAverageSpeed;
         }
 
         long elapsedTimeMs = System.currentTimeMillis() - startTimeMs;
         int averageSpeed = 0;
-        if (elapsedTimeMs > 0)
-        {
+        if (elapsedTimeMs > 0) {
             averageSpeed = (int) (numProcessed.get() * 1000 / elapsedTimeMs);
         }
         return averageSpeed;
     }
 
     private void printStatus(
-            final boolean forcePrint)
-    {
+            final boolean forcePrint) {
         final long lNowMs = System.currentTimeMillis();
         final long lNumProcessed = numProcessed.get();
 
-        if (!forcePrint && lNowMs - lastPrintTimeMs.get() < MS_900)
-        {
+        if (!forcePrint && lNowMs - lastPrintTimeMs.get() < MS_900) {
             return;
         }
 
@@ -232,11 +207,9 @@ public class ProcessLog
 
         MeasurePoint referenceMeasurePoint;
         int numMeasurePoints = measureDeque.size();
-        if (numMeasurePoints > 10)
-        {
+        if (numMeasurePoints > 10) {
             referenceMeasurePoint = measureDeque.removeFirst();
-        } else
-        {
+        } else {
             referenceMeasurePoint = measureDeque.getFirst();
         }
 
@@ -246,8 +219,7 @@ public class ProcessLog
         sb.append(StringUtil.formatAccount(lNumProcessed, true));
 
         // processed percent
-        if (hasTotal)
-        {
+        if (hasTotal) {
             int percent = (int) (lNumProcessed * 100 / total);
             String percentS = Integer.toString(percent) + "%";
             sb.append(formatText(percentS));
@@ -255,8 +227,7 @@ public class ProcessLog
 
         // average speed
         long averageSpeed = 0;
-        if (elapsedTimeMs > 0)
-        {
+        if (elapsedTimeMs > 0) {
             averageSpeed = lNumProcessed * 1000 / elapsedTimeMs;
         }
         sb.append(StringUtil.formatAccount(averageSpeed, true));
@@ -264,8 +235,7 @@ public class ProcessLog
         // current speed
         long currentSpeed = 0;
         long t2inms = lNowMs - referenceMeasurePoint.getMeasureTime(); // in ms
-        if (t2inms > 0)
-        {
+        if (t2inms > 0) {
             currentSpeed =
                     (lNumProcessed - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
         }
@@ -275,33 +245,26 @@ public class ProcessLog
         sb.append(StringUtil.formatTime(elapsedTimeMs / 1000, true));
 
         // remaining time and finish at
-        if (hasTotal)
-        {
+        if (hasTotal) {
             long remaingTimeMs = -1;
-            if (currentSpeed > 0)
-            {
+            if (currentSpeed > 0) {
                 remaingTimeMs = (total - lNumProcessed) * 1000 / currentSpeed;
             }
 
             long finishAtMs = -1;
-            if (remaingTimeMs != -1)
-            {
+            if (remaingTimeMs != -1) {
                 finishAtMs = lNowMs + remaingTimeMs;
             }
 
-            if (remaingTimeMs == -1)
-            {
+            if (remaingTimeMs == -1) {
                 sb.append(formatText("--"));
-            } else
-            {
+            } else {
                 sb.append(StringUtil.formatTime(remaingTimeMs / 1000, true));
             }
 
-            if (finishAtMs == -1)
-            {
+            if (finishAtMs == -1) {
                 sb.append(formatText("--"));
-            } else
-            {
+            } else {
                 sb.append(buildDateTime(finishAtMs));
             }
         }
@@ -310,13 +273,11 @@ public class ProcessLog
         System.out.flush();
     }
 
-    private static String formatText(String text)
-    {
+    private static String formatText(String text) {
         return StringUtil.formatText(text, minLen);
     }
 
-    private static String buildDateTime(long timeMs)
-    {
+    private static String buildDateTime(long timeMs) {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(timeMs);
         int h = c.get(Calendar.HOUR_OF_DAY);
@@ -331,34 +292,29 @@ public class ProcessLog
 
         long days = (timeMs / 1000 - midNightSec) / DAY_IN_SEC;
         StringBuilder sb = new StringBuilder();
-        if (h < 10)
-        {
+        if (h < 10) {
             sb.append('0');
         }
         sb.append(h);
 
         sb.append(":");
-        if (m < 10)
-        {
+        if (m < 10) {
             sb.append('0');
         }
         sb.append(m);
 
         sb.append(":");
-        if (s < 10)
-        {
+        if (s < 10) {
             sb.append('0');
         }
         sb.append(s);
 
-        if (days > 0)
-        {
+        if (days > 0) {
             sb.append('+').append(days);
         }
 
         int size = sb.length();
-        for (int i = 0; i < (minLen - size); i++)
-        {
+        for (int i = 0; i < (minLen - size); i++) {
             sb.insert(0, ' ');
         }
 

@@ -44,8 +44,7 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "user-rm",
         description = "remove user")
-public class UserRemoveCmd extends CaCmd
-{
+public class UserRemoveCmd extends CaCmd {
 
     @Option(name = "--name", aliases = "-n",
             required = true,
@@ -55,8 +54,7 @@ public class UserRemoveCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean b = caManager.removeUser(name);
         output(b, "removed", "could not remove", "user " + name);
         return null;

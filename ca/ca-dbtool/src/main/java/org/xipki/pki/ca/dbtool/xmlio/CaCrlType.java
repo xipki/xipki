@@ -41,8 +41,7 @@ import javax.xml.stream.XMLStreamException;
  * @author Lijun Liao
  */
 
-public class CaCrlType extends DbDataObject
-{
+public class CaCrlType extends DbDataObject {
     public static final String TAG_ROOT = "crl";
 
     public static final String TAG_id = "id";
@@ -57,54 +56,45 @@ public class CaCrlType extends DbDataObject
     public static final String TAG_file = "file";
     private String file;
 
-    public Integer getId()
-    {
+    public Integer getId() {
         return id;
     }
 
     public void setId(
-            final Integer id)
-    {
+            final Integer id) {
         this.id = id;
     }
 
-    public Integer getCaId()
-    {
+    public Integer getCaId() {
         return caId;
     }
 
     public void setCaId(
-            final Integer caId)
-    {
+            final Integer caId) {
         this.caId = caId;
     }
 
-    public String getCrlNo()
-    {
+    public String getCrlNo() {
         return crlNo;
     }
 
     public void setCrlNo(
-            final String crlNo)
-    {
+            final String crlNo) {
         this.crlNo = crlNo;
     }
 
-    public String getFile()
-    {
+    public String getFile() {
         return file;
     }
 
     public void setFile(
-            final String file)
-    {
+            final String file) {
         this.file = file;
     }
 
     @Override
     public void validate()
-    throws InvalidDataObjectException
-    {
+    throws InvalidDataObjectException {
         assertNotNull("id", id);
         assertNotNull("caId", caId);
         assertNotBlank("crlNo", crlNo);
@@ -114,8 +104,7 @@ public class CaCrlType extends DbDataObject
     @Override
     public void writeTo(
             final DbiXmlWriter writer)
-    throws InvalidDataObjectException, XMLStreamException
-    {
+    throws InvalidDataObjectException, XMLStreamException {
         validate();
 
         writer.writeStartElement(TAG_ROOT);

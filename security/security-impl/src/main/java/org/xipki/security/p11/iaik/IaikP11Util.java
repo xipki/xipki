@@ -45,21 +45,17 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
  * @author Lijun Liao
  */
 
-public class IaikP11Util
-{
+public class IaikP11Util {
 
-    private IaikP11Util()
-    {
+    private IaikP11Util() {
     }
 
     public static byte[] generateKeyID(
             final Session session)
-    throws Exception
-    {
+    throws Exception {
         SecureRandom random = new SecureRandom();
         byte[] keyID = null;
-        do
-        {
+        do {
             keyID = new byte[8];
             random.nextBytes(keyID);
         } while (idExists(session, keyID));
@@ -69,16 +65,14 @@ public class IaikP11Util
 
     public static boolean idExists(
             final Session session, final byte[] keyID)
-    throws Exception
-    {
+    throws Exception {
         Key k = new Key();
         k.getId().setByteArrayValue(keyID);
 
         session.findObjectsInit(k);
         Object[] objects = session.findObjects(1);
         session.findObjectsFinal();
-        if (objects.length > 0)
-        {
+        if (objects.length > 0) {
             return true;
         }
 
@@ -95,16 +89,14 @@ public class IaikP11Util
     public static boolean labelExists(
             final Session session,
             final String keyLabel)
-    throws Exception
-    {
+    throws Exception {
         Key k = new Key();
         k.getLabel().setCharArrayValue(keyLabel.toCharArray());
 
         session.findObjectsInit(k);
         Object[] objects = session.findObjects(1);
         session.findObjectsFinal();
-        if (objects.length > 0)
-        {
+        if (objects.length > 0) {
             return true;
         }
 
@@ -119,19 +111,15 @@ public class IaikP11Util
     }
 
     static String eraseSensitiveInfo(
-            final String data)
-    {
+            final String data) {
         int index = data.indexOf("password");
-        if (index == -1)
-        {
+        if (index == -1) {
             return data;
         }
 
-        if (index > 1 && data.charAt(index - 1) == '%')
-        {
+        if (index > 1 && data.charAt(index - 1) == '%') {
             return data.substring(0, index - 1);
-        } else
-        {
+        } else {
             return data.substring(0, index);
         }
     }

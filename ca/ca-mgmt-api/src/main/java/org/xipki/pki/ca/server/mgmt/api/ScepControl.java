@@ -56,8 +56,7 @@ import org.xipki.common.util.StringUtil;
  * @author Lijun Liao
  */
 
-public class ScepControl implements Serializable
-{
+public class ScepControl implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public static final String KEY_caCertIncluded = "caCert.included";
@@ -68,19 +67,15 @@ public class ScepControl implements Serializable
 
     public ScepControl(
             final String conf)
-    throws InvalidConfException
-    {
-        if (StringUtil.isBlank(conf))
-        {
+    throws InvalidConfException {
+        if (StringUtil.isBlank(conf)) {
             return;
         }
         ParamUtil.assertNotBlank("conf", conf);
         ConfPairs props;
-        try
-        {
+        try {
             props = new ConfPairs(conf);
-        } catch (RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             throw new InvalidConfException(e.getClass().getName() + ": " + e.getMessage(), e);
         }
 
@@ -92,28 +87,22 @@ public class ScepControl implements Serializable
             final ConfPairs props,
             final String propKey,
             final boolean dfltValue)
-    throws InvalidConfException
-    {
+    throws InvalidConfException {
         String s = props.getValue(propKey);
-        if (s != null)
-        {
+        if (s != null) {
             s = s.trim();
-            if ("true".equalsIgnoreCase(s))
-            {
+            if ("true".equalsIgnoreCase(s)) {
                 return Boolean.TRUE;
-            } else if ("false".equalsIgnoreCase(s))
-            {
+            } else if ("false".equalsIgnoreCase(s)) {
                 return Boolean.FALSE;
-            } else
-            {
+            } else {
                 throw new InvalidConfException(propKey + " does not have boolean value: " + s);
             }
         }
         return dfltValue;
     }
 
-    public String getConf()
-    {
+    public String getConf() {
         ConfPairs pairs = new ConfPairs();
         pairs.putPair(KEY_caCertIncluded, Boolean.toString(includeCACert));
         pairs.putPair(KEY_signerCertIncluded, Boolean.toString(includeSignerCert));
@@ -121,53 +110,44 @@ public class ScepControl implements Serializable
         return pairs.getEncoded();
     }
 
-    public boolean isIncludeCACert()
-    {
+    public boolean isIncludeCACert() {
         return includeCACert;
     }
 
     public void setIncludeCACert(
-            final boolean includeCACert)
-    {
+            final boolean includeCACert) {
         this.includeCACert = includeCACert;
     }
 
-    public boolean isIncludeSignerCert()
-    {
+    public boolean isIncludeSignerCert() {
         return includeSignerCert;
     }
 
     public void setIncludeSignerCert(
-            final boolean includeSignerCert)
-    {
+            final boolean includeSignerCert) {
         this.includeSignerCert = includeSignerCert;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getConf();
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return toString().hashCode();
     }
 
     @Override
     public boolean equals(
-            final Object obj)
-    {
-        if (!(obj instanceof ScepControl))
-        {
+            final Object obj) {
+        if (!(obj instanceof ScepControl)) {
             return false;
         }
 
         ScepControl b = (ScepControl) obj;
         if (includeCACert != b.includeCACert
-                || includeSignerCert != b.includeSignerCert)
-        {
+                || includeSignerCert != b.includeSignerCert) {
             return false;
         }
 

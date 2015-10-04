@@ -49,8 +49,7 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ca", name = "requestor-up",
         description = "update requestor")
-public class RequestorUpdateCmd extends CaCmd
-{
+public class RequestorUpdateCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "requestor name\n"
@@ -65,8 +64,7 @@ public class RequestorUpdateCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         // check if the certificate is valid
         byte[] certBytes = IoUtil.read(certFile);
         X509Util.parseCert(new ByteArrayInputStream(certBytes));

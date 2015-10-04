@@ -47,8 +47,7 @@ import org.xipki.password.api.PasswordResolver;
  * @author Lijun Liao
  */
 
-public interface ConcurrentContentSigner
-{
+public interface ConcurrentContentSigner {
 
     AlgorithmIdentifier getAlgorithmIdentifier();
 

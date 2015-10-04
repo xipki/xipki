@@ -45,20 +45,16 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-publish-self",
         description = "publish the certificate of root CA")
-public class NegCaPublishRCACertCmd extends CaPublishRCACertCmd
-{
+public class NegCaPublishRCACertCmd extends CaPublishRCACertCmd {
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("neg-publish-self");
 
-        try
-        {
+        try {
             super._doExecute();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return null;
         }
 

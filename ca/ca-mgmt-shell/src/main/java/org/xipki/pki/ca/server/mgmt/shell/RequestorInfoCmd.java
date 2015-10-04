@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 
 @Command(scope = "xipki-ca", name = "requestor-info",
         description = "show information of requestor")
-public class RequestorInfoCmd extends CaCmd
-{
+public class RequestorInfoCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "requestor name")
     private String name;
 
@@ -63,41 +62,33 @@ public class RequestorInfoCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         StringBuilder sb = new StringBuilder();
 
-        if (name == null)
-        {
+        if (name == null) {
             Set<String> names = caManager.getCmpRequestorNames();
             int n = names.size();
 
-            if (n == 0 || n == 1)
-            {
+            if (n == 0 || n == 1) {
                 sb.append((n == 0)
                         ? "no"
                         : "1");
                 sb.append(" CMP requestor is configured\n");
-            } else
-            {
+            } else {
                 sb.append(n).append(" CMP requestors are configured:\n");
             }
 
             List<String> sorted = new ArrayList<>(names);
             Collections.sort(sorted);
 
-            for (String name : sorted)
-            {
+            for (String name : sorted) {
                 sb.append("\t").append(name).append("\n");
             }
-        } else
-        {
+        } else {
             CmpRequestorEntry entry = caManager.getCmpRequestor(name);
-            if (entry == null)
-            {
+            if (entry == null) {
                 throw new UnexpectedException("could not find CMP requestor '" + name + "'");
-            } else
-            {
+            } else {
                 sb.append(entry.toString(verbose.booleanValue()));
             }
         }

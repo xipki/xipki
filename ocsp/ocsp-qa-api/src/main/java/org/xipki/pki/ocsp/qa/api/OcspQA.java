@@ -47,8 +47,7 @@ import org.xipki.common.qa.ValidationResult;
  * @author Lijun Liao
  */
 
-public interface OcspQA
-{
+public interface OcspQA {
     ValidationResult checkOCSP(
             OCSPResp response,
             X509Certificate issuer,

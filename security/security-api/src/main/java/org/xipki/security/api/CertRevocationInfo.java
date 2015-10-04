@@ -47,29 +47,25 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class CertRevocationInfo implements Serializable
-{
+public class CertRevocationInfo implements Serializable {
     private CRLReason reason;
     private Date revocationTime;
     private Date invalidityTime;
 
     public CertRevocationInfo(
-            final CRLReason reason)
-    {
+            final CRLReason reason) {
         this(reason, new Date(), null);
     }
 
     public CertRevocationInfo(
-            final int reasonCode)
-    {
+            final int reasonCode) {
         this(reasonCode, new Date(), null);
     }
 
     public CertRevocationInfo(
             final CRLReason reason,
             final Date revocationTime,
-            final Date invalidityTime)
-    {
+            final Date invalidityTime) {
         ParamUtil.assertNotNull("reason", reason);
         ParamUtil.assertNotNull("revocationTime", revocationTime);
         this.reason = reason;
@@ -81,13 +77,11 @@ public class CertRevocationInfo implements Serializable
     public CertRevocationInfo(
             final int reasonCode,
             final Date revocationTime,
-            final Date invalidityTime)
-    {
+            final Date invalidityTime) {
         ParamUtil.assertNotNull("revocationTime", revocationTime);
 
         this.reason = CRLReason.forReasonCode(reasonCode);
-        if (this.reason == null)
-        {
+        if (this.reason == null) {
             throw new IllegalArgumentException("invalid reason " + reasonCode);
         }
         this.revocationTime = revocationTime;
@@ -96,20 +90,17 @@ public class CertRevocationInfo implements Serializable
     }
 
     public void setReason(
-            final CRLReason reason)
-    {
+            final CRLReason reason) {
         ParamUtil.assertNotNull("reason", reason);
         this.reason = reason;
     }
 
-    public CRLReason getReason()
-    {
+    public CRLReason getReason() {
         return reason;
     }
 
     public void setRevocationTime(
-            final Date revocationTime)
-    {
+            final Date revocationTime) {
         this.revocationTime = revocationTime;
     }
 
@@ -117,10 +108,8 @@ public class CertRevocationInfo implements Serializable
      *
      * @return revocation time, never be null
      */
-    public Date getRevocationTime()
-    {
-        if (revocationTime == null)
-        {
+    public Date getRevocationTime() {
+        if (revocationTime == null) {
             revocationTime = new Date();
         }
         return revocationTime;
@@ -130,14 +119,12 @@ public class CertRevocationInfo implements Serializable
      *
      * @return invalidity time, may be null
      */
-    public Date getInvalidityTime()
-    {
+    public Date getInvalidityTime() {
         return invalidityTime;
     }
 
     public void setInvalidityTime(
-            final Date invalidityTime)
-    {
+            final Date invalidityTime) {
         this.invalidityTime = invalidityTime;
     }
 
@@ -157,8 +144,7 @@ public class CertRevocationInfo implements Serializable
 
     private void writeObject(
             final java.io.ObjectOutputStream out)
-    throws IOException
-    {
+    throws IOException {
         final Map<String, Object> serialMap = new HashMap<String, Object>();
 
         serialMap.put(SR_serialVersion, serialVersion);
@@ -172,8 +158,7 @@ public class CertRevocationInfo implements Serializable
     @SuppressWarnings("unchecked")
     private void readObject(
             final java.io.ObjectInputStream in)
-    throws IOException, ClassNotFoundException
-    {
+    throws IOException, ClassNotFoundException {
         final Map<String, Object> serialMap = (Map<String, Object>) in.readObject();
         serialVersion = (double) serialMap.get(SR_serialVersion);
         reason = (CRLReason) serialMap.get(SR_reason);

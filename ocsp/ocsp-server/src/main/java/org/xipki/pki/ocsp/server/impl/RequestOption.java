@@ -67,12 +67,10 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-class RequestOption
-{
+class RequestOption {
     static final Set<HashAlgoType> supportedHashAlgorithms = new HashSet<>();
 
-    static
-    {
+    static {
         supportedHashAlgorithms.add(HashAlgoType.SHA1);
         supportedHashAlgorithms.add(HashAlgoType.SHA224);
         supportedHashAlgorithms.add(HashAlgoType.SHA256);
@@ -96,8 +94,7 @@ class RequestOption
 
     public RequestOption(
             final RequestOptionType conf)
-    throws InvalidConfException
-    {
+    throws InvalidConfException {
         NonceType nonceConf = conf.getNonce();
 
         supportsHttpGet = conf.isSupportsHttpGet();
@@ -107,31 +104,25 @@ class RequestOption
         int minLen = 4;
         int maxLen = 32;
         // Request nonce
-        if (nonceConf != null)
-        {
+        if (nonceConf != null) {
             nonceRequired = nonceConf.isRequired();
-            if (nonceConf.getMinLen() != null)
-            {
+            if (nonceConf.getMinLen() != null) {
                 minLen = nonceConf.getMinLen();
             }
 
-            if (nonceConf.getMaxLen() != null)
-            {
+            if (nonceConf.getMaxLen() != null) {
                 maxLen = nonceConf.getMaxLen();
             }
-        } else
-        {
+        } else {
             nonceRequired = false;
         }
 
         int _maxSize = 0;
-        if (conf.getMaxRequestSize() != null)
-        {
+        if (conf.getMaxRequestSize() != null) {
             _maxSize = conf.getMaxRequestSize().intValue();
         }
 
-        if (_maxSize < 255)
-        {
+        if (_maxSize < 255) {
             _maxSize = 4 * 1024; // 4 KB
         }
         this.maxRequestSize = _maxSize;
@@ -142,11 +133,9 @@ class RequestOption
         // Request versions
 
         VersionsType versionsConf = conf.getVersions();
-        if (versionsConf == null)
-        {
+        if (versionsConf == null) {
             this.versions = null;
-        } else
-        {
+        } else {
             this.versions = new HashSet<>();
             this.versions.addAll(versionsConf.getVersion());
         }
@@ -155,39 +144,30 @@ class RequestOption
         hashAlgos = new HashSet<>();
 
         HashAlgorithms reqHashAlgosConf = conf.getHashAlgorithms();
-        if (reqHashAlgosConf != null)
-        {
-            for (String token : reqHashAlgosConf.getAlgorithm())
-            {
+        if (reqHashAlgosConf != null) {
+            for (String token : reqHashAlgosConf.getAlgorithm()) {
                 HashAlgoType algo = HashAlgoType.getHashAlgoType(token);
-                if (algo != null && supportedHashAlgorithms.contains(algo))
-                {
+                if (algo != null && supportedHashAlgorithms.contains(algo)) {
                     hashAlgos.add(algo);
-                } else
-                {
+                } else {
                     throw new InvalidConfException("hash algorithm " + token + " is unsupported");
                 }
             }
-        } else
-        {
+        } else {
             hashAlgos.addAll(supportedHashAlgorithms);
         }
 
         // certpath validiation
         CertpathValidation certpathConf = conf.getCertpathValidation();
-        if (certpathConf == null)
-        {
-            if (validateSignature)
-            {
+        if (certpathConf == null) {
+            if (validateSignature) {
                 throw new InvalidConfException("certpathValidation is not specified");
             }
             trustAnchors = null;
             certs = null;
             certpathValidationModel = CertpathValidationModel.PKIX;
-        } else
-        {
-            switch (certpathConf.getValidationModel())
-            {
+        } else {
+            switch (certpathConf.getValidationModel()) {
             case CHAIN:
                 certpathValidationModel = CertpathValidationModel.CHAIN;
                 break;
@@ -199,31 +179,24 @@ class RequestOption
                         + certpathConf.getValidationModel());
             } // end switch
 
-            try
-            {
+            try {
                 Set<X509Certificate> tmpCerts = getCerts(certpathConf.getTrustAnchors());
                 trustAnchors = new HashSet<>(tmpCerts.size());
-                for (X509Certificate m : tmpCerts)
-                {
+                for (X509Certificate m : tmpCerts) {
                     trustAnchors.add(new CertWithEncoded(m));
                 }
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 throw new InvalidConfException(
                         "error while initializing the trustAnchors: " + e.getMessage(), e);
             }
 
             CertCollectionType certsType = certpathConf.getCerts();
-            if (certsType == null)
-            {
+            if (certsType == null) {
                 this.certs = null;
-            } else
-            {
-                try
-                {
+            } else {
+                try {
                     this.certs = getCerts(certsType);
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
                     throw new InvalidConfException(
                             "error while initializing the certs: " + e.getMessage(), e);
                 }
@@ -232,91 +205,74 @@ class RequestOption
 
     }
 
-    public Set<HashAlgoType> getHashAlgos()
-    {
+    public Set<HashAlgoType> getHashAlgos() {
         return hashAlgos;
     }
 
-    public boolean isSignatureRequired()
-    {
+    public boolean isSignatureRequired() {
         return signatureRequired;
     }
 
-    public boolean isValidateSignature()
-    {
+    public boolean isValidateSignature() {
         return validateSignature;
     }
 
-    public boolean supportsHttpGet()
-    {
+    public boolean supportsHttpGet() {
         return supportsHttpGet;
     }
 
-    public boolean isNonceRequired()
-    {
+    public boolean isNonceRequired() {
         return nonceRequired;
     }
 
-    public int getMaxRequestSize()
-    {
+    public int getMaxRequestSize() {
         return maxRequestSize;
     }
 
-    public int getNonceMinLen()
-    {
+    public int getNonceMinLen() {
         return nonceMinLen;
     }
 
-    public int getNonceMaxLen()
-    {
+    public int getNonceMaxLen() {
         return nonceMaxLen;
     }
 
     public boolean allows(
-            final HashAlgoType hashAlgo)
-    {
+            final HashAlgoType hashAlgo) {
         return hashAlgos.contains(hashAlgo);
     }
 
-    public CertpathValidationModel getCertpathValidationModel()
-    {
+    public CertpathValidationModel getCertpathValidationModel() {
         return certpathValidationModel;
     }
 
-    public Set<CertWithEncoded> getTrustAnchors()
-    {
+    public Set<CertWithEncoded> getTrustAnchors() {
         return trustAnchors;
     }
 
-    public Set<X509Certificate> getCerts()
-    {
+    public Set<X509Certificate> getCerts() {
         return certs;
     }
 
     public boolean isVersionAllowed(
-            final Integer version)
-    {
+            final Integer version) {
         return versions == null || versions.contains(version);
     }
 
     private Set<X509Certificate> getCerts(
             final CertCollectionType conf)
-    throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException
-    {
+    throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
         Set<X509Certificate> certs = new HashSet<>();
 
-        if (conf.getKeystore() != null)
-        {
+        if (conf.getKeystore() != null) {
             Keystore ksConf = conf.getKeystore();
             KeyStore trustStore = KeyStore.getInstance(ksConf.getType());
             InputStream is = null;
 
             String fileName = ksConf.getKeystore().getFile();
-            if (fileName != null)
-            {
+            if (fileName != null) {
                 is = new FileInputStream(IoUtil.expandFilepath(fileName));
-            } else
-            {
+            } else {
                 is = new ByteArrayInputStream(ksConf.getKeystore().getValue());
             }
 
@@ -326,27 +282,21 @@ class RequestOption
             trustStore.load(is, password);
 
             Enumeration<String> aliases = trustStore.aliases();
-            while (aliases.hasMoreElements())
-            {
+            while (aliases.hasMoreElements()) {
                 String alias = aliases.nextElement();
-                if (trustStore.isCertificateEntry(alias))
-                {
+                if (trustStore.isCertificateEntry(alias)) {
                     certs.add((X509Certificate) trustStore.getCertificate(alias));
                 }
             }
-        } else if (conf.getDir() != null)
-        {
+        } else if (conf.getDir() != null) {
             File dir = new File(conf.getDir());
             File[] files = dir.listFiles();
-            for (File file : files)
-            {
-                if (file.exists() && file.isFile())
-                {
+            for (File file : files) {
+                if (file.exists() && file.isFile()) {
                     certs.add(X509Util.parseCert(file));
                 }
             }
-        } else
-        {
+        } else {
             throw new RuntimeException("should not happen, neither keystore nor dir is defined");
         }
 

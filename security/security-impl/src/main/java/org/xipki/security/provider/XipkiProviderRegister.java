@@ -43,27 +43,21 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-public class XipkiProviderRegister
-{
-    public void regist()
-    {
-        if (Security.getProperty(XipkiProvider.PROVIDER_NAME) == null)
-        {
+public class XipkiProviderRegister {
+    public void regist() {
+        if (Security.getProperty(XipkiProvider.PROVIDER_NAME) == null) {
             Security.addProvider(new XipkiProvider());
         }
     }
 
-    public void unregist()
-    {
-        if (Security.getProperty(XipkiProvider.PROVIDER_NAME) != null)
-        {
+    public void unregist() {
+        if (Security.getProperty(XipkiProvider.PROVIDER_NAME) != null) {
             Security.removeProvider(XipkiProvider.PROVIDER_NAME);
         }
     }
 
     public void setSecurityFactory(
-            final SecurityFactory securityFactory)
-    {
+            final SecurityFactory securityFactory) {
         XipkiKeyStoreSpi.setSecurityFactory(securityFactory);
     }
 

@@ -39,31 +39,26 @@ package org.xipki.pki.ca.api;
  * @author Lijun Liao
  */
 
-public class BadFormatException extends Exception
-{
+public class BadFormatException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public BadFormatException()
-    {
+    public BadFormatException() {
     }
 
     public BadFormatException(
-            final String message)
-    {
+            final String message) {
         super(message);
     }
 
     public BadFormatException(
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(cause);
     }
 
     public BadFormatException(
             final String message,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(message, cause);
     }
 

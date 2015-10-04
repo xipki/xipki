@@ -50,29 +50,24 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "requestor-check",
         description = "check information of requestors (QA)")
-public class RequestorCheckCmd extends RequestorUpdateCmd
-{
+public class RequestorCheckCmd extends RequestorUpdateCmd {
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("checking requestor " + name);
 
         CmpRequestorEntry cr = caManager.getCmpRequestor(name);
-        if (cr == null)
-        {
+        if (cr == null) {
             throw new CmdFailure("CMP requestor named '" + name + "' is not configured");
         }
 
         byte[] ex = IoUtil.read(certFile);
-        if (cr.getBase64Cert() == null)
-        {
+        if (cr.getBase64Cert() == null) {
             throw new CmdFailure("Cert: is not configured explicitly as expected");
         }
 
-        if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert())))
-        {
+        if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert()))) {
             throw new CmdFailure("Cert: the expected one and the actual one differ");
         }
 

@@ -39,8 +39,7 @@ package org.xipki.pki.ca.server.mgmt.api;
  * @author Lijun Liao
  */
 
-public enum CASystemStatus
-{
+public enum CASystemStatus {
     STARTED_AS_MASTER,
     STARTED_AS_SLAVE,
     NOT_INITED,

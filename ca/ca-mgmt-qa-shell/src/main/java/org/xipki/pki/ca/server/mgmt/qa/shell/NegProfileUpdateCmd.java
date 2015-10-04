@@ -45,20 +45,16 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-profile-up",
         description = "update certificate profile (negative, QA)")
-public class NegProfileUpdateCmd extends ProfileUpdateCmd
-{
+public class NegProfileUpdateCmd extends ProfileUpdateCmd {
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("neg-profile-up");
 
-        try
-        {
+        try {
             super._doExecute();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return null;
         }
 

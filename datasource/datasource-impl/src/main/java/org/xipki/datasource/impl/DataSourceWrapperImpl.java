@@ -73,24 +73,20 @@ import com.zaxxer.hikari.HikariDataSource;
  * @author Lijun Liao
  */
 
-public abstract class DataSourceWrapperImpl implements DataSourceWrapper
-{
+public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     private static final Logger LOG = LoggerFactory.getLogger(DataSourceWrapperImpl.class);
     private final ConcurrentHashMap<String, Long> lastUsedSeqValues
             = new ConcurrentHashMap<String, Long>();
 
-    private static class MySQL extends DataSourceWrapperImpl
-    {
+    private static class MySQL extends DataSourceWrapperImpl {
         MySQL(
                 final String name,
-                final HikariDataSource service)
-        {
+                final HikariDataSource service) {
             super(name, service, DatabaseType.MYSQL);
         }
 
         @Override
-        public final DatabaseType getDatabaseType()
-        {
+        public final DatabaseType getDatabaseType() {
             return DatabaseType.MYSQL;
         }
 
@@ -98,13 +94,11 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         public String createFetchFirstSelectSQL(
                 final String coreSql,
                 final int rows,
-                final String orderBy)
-        {
+                final String orderBy) {
             StringBuilder sql = new StringBuilder(coreSql.length() + 50);
             sql.append("SELECT ").append(coreSql);
 
-            if (StringUtil.isNotBlank(orderBy))
-            {
+            if (StringUtil.isNotBlank(orderBy)) {
                 sql.append(" ORDER BY ").append(orderBy);
             }
 
@@ -115,8 +109,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         @Override
         protected String buildCreateSequenceSql(
                 final String sequenceName,
-                final long startValue)
-        {
+                final long startValue) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
             sql.append("INSERT INTO SEQ_TBL (SEQ_NAME, SEQ_VALUE) VALUES('");
             sql.append(sequenceName).append("', ").append(startValue).append(")");
@@ -125,8 +118,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
         @Override
         protected String buildDropSequenceSql(
-                final String sequenceName)
-        {
+                final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 40);
             sql.append("DELETE FROM SEQ_TBL WHERE SEQ_NAME='").append(sequenceName).append("'");
             return sql.toString();
@@ -134,8 +126,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
         @Override
         protected String buildNextSeqValueSql(
-                final String sequenceName)
-        {
+                final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 100);
             sql.append("UPDATE SEQ_TBL SET SEQ_VALUE=(@cur_value:=SEQ_VALUE)+1 WHERE SEQ_NAME = '");
             sql.append(sequenceName).append("'");
@@ -146,47 +137,38 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         public long nextSeqValue(
                 Connection conn,
                 final String sequenceName)
-        throws DataAccessException
-        {
+        throws DataAccessException {
             final String sqlUpdate = buildNextSeqValueSql(sequenceName);
             final String SQL_SELECT = "SELECT @cur_value";
             String sql = null;
 
             boolean newConn = conn == null;
-            if (newConn)
-            {
+            if (newConn) {
                 conn = getConnection();
             }
             Statement stmt = null;
             ResultSet rs = null;
 
             long ret;
-            try
-            {
+            try {
                 stmt = conn.createStatement();
                 sql = sqlUpdate;
                 stmt.executeUpdate(sql);
 
                 sql = SQL_SELECT;
                 rs = stmt.executeQuery(sql);
-                if (rs.next())
-                {
+                if (rs.next()) {
                     ret = rs.getLong(1);
-                } else
-                {
+                } else {
                     throw new DataAccessException(
                             "could not increment the sequence " + sequenceName);
                 }
-            } catch (SQLException e)
-            {
+            } catch (SQLException e) {
                 throw translate(sqlUpdate, e);
-            } finally
-            {
-                if (newConn)
-                {
+            } finally {
+                if (newConn) {
                     releaseResources(stmt, rs);
-                } else
-                {
+                } else {
                     super.releaseStatementAndResultSet(stmt, rs);
                 }
             }
@@ -199,41 +181,35 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         protected String getSqlToDropForeignKeyConstraint(
                 final String constraintName,
                 final String baseTable)
-        throws DataAccessException
-        {
+        throws DataAccessException {
             return "ALTER TABLE " + baseTable + " DROP FOREIGN KEY " + constraintName;
         }
 
         @Override
         protected String getSqlToDropIndex(
                 final String table,
-                final String indexName)
-        {
+                final String indexName) {
             return "DROP INDEX " + indexName + " ON " + table;
         }
 
         @Override
         protected String getSqlToDropUniqueConstraint(
                 final String constraintName,
-                final String table)
-        {
+                final String table) {
             return "ALTER TABLE " + table + " DROP KEY " + constraintName;
         }
 
     }
 
-    private static class DB2 extends DataSourceWrapperImpl
-    {
+    private static class DB2 extends DataSourceWrapperImpl {
         DB2(
                 final String name,
-                final HikariDataSource service)
-        {
+                final HikariDataSource service) {
             super(name, service, DatabaseType.DB2);
         }
 
         @Override
-        public final DatabaseType getDatabaseType()
-        {
+        public final DatabaseType getDatabaseType() {
             return DatabaseType.DB2;
         }
 
@@ -241,13 +217,11 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         public String createFetchFirstSelectSQL(
                 final String coreSql,
                 final int rows,
-                final String orderBy)
-        {
+                final String orderBy) {
             StringBuilder sql = new StringBuilder(coreSql.length() + 50);
             sql.append("SELECT ").append(coreSql);
 
-            if (StringUtil.isNotBlank(orderBy))
-            {
+            if (StringUtil.isNotBlank(orderBy)) {
                 sql.append(" ORDER BY ").append(orderBy);
             }
 
@@ -258,8 +232,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         @Override
         protected String buildCreateSequenceSql(
                 final String sequenceName,
-                final long startValue)
-        {
+                final long startValue) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
             sql.append("CREATE SEQUENCE ").append(sequenceName);
             sql.append(" AS BIGINT START WITH ").append(startValue);
@@ -269,8 +242,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
         @Override
         protected String buildDropSequenceSql(
-                final String sequenceName)
-        {
+                final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
             sql.append("DROP SEQUENCE ").append(sequenceName);
             return sql.toString();
@@ -278,8 +250,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
         @Override
         protected String buildNextSeqValueSql(
-                final String sequenceName)
-        {
+                final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 50);
             sql.append("SELECT NEXT VALUE FOR ")
                 .append(sequenceName)
@@ -289,18 +260,15 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     }
 
-    private static class PostgreSQL extends DataSourceWrapperImpl
-    {
+    private static class PostgreSQL extends DataSourceWrapperImpl {
         PostgreSQL(
                 final String name,
-                final HikariDataSource service)
-        {
+                final HikariDataSource service) {
             super(name, service, DatabaseType.POSTGRES);
         }
 
         @Override
-        public final DatabaseType getDatabaseType()
-        {
+        public final DatabaseType getDatabaseType() {
             return DatabaseType.POSTGRES;
         }
 
@@ -308,13 +276,11 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         public String createFetchFirstSelectSQL(
                 final String coreSql,
                 final int rows,
-                final String orderBy)
-        {
+                final String orderBy) {
             StringBuilder sql = new StringBuilder(coreSql.length() + 50);
             sql.append("SELECT ").append(coreSql);
 
-            if (StringUtil.isNotBlank(orderBy))
-            {
+            if (StringUtil.isNotBlank(orderBy)) {
                 sql.append(" ORDER BY ").append(orderBy);
             }
 
@@ -325,8 +291,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         @Override
         protected String buildCreateSequenceSql(
                 final String sequenceName,
-                final long startValue)
-        {
+                final long startValue) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
             sql.append("CREATE SEQUENCE ").append(sequenceName);
             sql.append(" START WITH ").append(startValue);
@@ -336,8 +301,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
         @Override
         protected String buildDropSequenceSql(
-                final String sequenceName)
-        {
+                final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
             sql.append("DROP SEQUENCE ").append(sequenceName);
             return sql.toString();
@@ -345,24 +309,21 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
         @Override
         protected String buildNextSeqValueSql(
-                final String sequenceName)
-        {
+                final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
             sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')");
             return sql.toString();
         }
 
         @Override
-        protected boolean isUseSqlStateAsCode()
-        {
+        protected boolean isUseSqlStateAsCode() {
             return true;
         }
 
         @Override
         protected String getSqlToDropPrimaryKey(
                 final String primaryKeyName,
-                final String table)
-        {
+                final String table) {
             StringBuilder sb = new StringBuilder(200);
             sb.append("DO $$ DECLARE constraint_name varchar;\n");
             sb.append("BEGIN\n");
@@ -379,18 +340,15 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     }
 
-    private static class Oracle extends DataSourceWrapperImpl
-    {
+    private static class Oracle extends DataSourceWrapperImpl {
         Oracle(
                 final String name,
-                final HikariDataSource service)
-        {
+                final HikariDataSource service) {
             super(name, service, DatabaseType.ORACLE);
         }
 
         @Override
-        public final DatabaseType getDatabaseType()
-        {
+        public final DatabaseType getDatabaseType() {
             return DatabaseType.ORACLE;
         }
 
@@ -402,22 +360,17 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         public String createFetchFirstSelectSQL(
                 final String coreSql,
                 final int rows,
-                final String orderBy)
-        {
+                final String orderBy) {
             StringBuilder sql = new StringBuilder(coreSql.length() + 50);
 
-            if (StringUtil.isBlank(orderBy))
-            {
+            if (StringUtil.isBlank(orderBy)) {
                 sql.append("SELECT ").append(coreSql);
-                if (coreSql.contains(" WHERE"))
-                {
+                if (coreSql.contains(" WHERE")) {
                     sql.append(" AND");
-                } else
-                {
+                } else {
                     sql.append(" WHERE");
                 }
-            } else
-            {
+            } else {
                 sql.append("SELECT * FROM (SELECT ");
                 sql.append(coreSql);
                 sql.append(" ORDER BY ").append(orderBy).append(" ) WHERE");
@@ -430,8 +383,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         @Override
         protected String buildCreateSequenceSql(
                 final String sequenceName,
-                final long startValue)
-        {
+                final long startValue) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
             sql.append("CREATE SEQUENCE ").append(sequenceName);
             sql.append(" START WITH ").append(startValue);
@@ -441,8 +393,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
         @Override
         protected String buildDropSequenceSql(
-                final String sequenceName)
-        {
+                final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
             sql.append("DROP SEQUENCE ").append(sequenceName);
             return sql.toString();
@@ -450,8 +401,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
         @Override
         protected String buildNextSeqValueSql(
-                final String sequenceName)
-        {
+                final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 50);
             sql.append("SELECT ").append(sequenceName).append(".NEXTVAL FROM DUAL");
             return sql.toString();
@@ -460,16 +410,14 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         @Override
         protected String getSqlToDropPrimaryKey(
                 final String primaryKeyName,
-                final String table)
-        {
+                final String table) {
             return "ALTER TABLE " + table + " DROP CONSTRAINT " + primaryKeyName + " DROP INDEX";
         }
 
         @Override
         protected String getSqlToDropUniqueConstraint(
                 final String contraintName,
-                final String table)
-        {
+                final String table) {
             return "ALTER TABLE " + table + " DROP CONSTRAINT " + contraintName + " DROP INDEX";
         }
 
@@ -481,8 +429,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 final String referencedTable,
                 final String referencedColumn,
                 final String onDeleteAction,
-                final String onUpdateAction)
-        {
+                final String onUpdateAction) {
             final StringBuilder sb = new StringBuilder(100);
             sb.append("ALTER TABLE ").append(baseTable);
             sb.append(" ADD CONSTRAINT ").append(constraintName);
@@ -497,17 +444,14 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         protected String getSqlToAddPrimaryKey(
                 final String primaryKeyName,
                 final String table,
-                final String... columns)
-        {
+                final String... columns) {
             StringBuilder sb = new StringBuilder(100);
             sb.append("ALTER TABLE ").append(table);
             sb.append(" ADD CONSTRAINT ").append(primaryKeyName);
             sb.append(" PRIMARY KEY(");
             final int n = columns.length;
-            for (int i = 0; i < n; i++)
-            {
-                if (i != 0)
-                {
+            for (int i = 0; i < n; i++) {
+                if (i != 0) {
                     sb.append(",");
                 }
                 sb.append(columns[i]);
@@ -518,18 +462,15 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     }
 
-    private static class H2 extends DataSourceWrapperImpl
-    {
+    private static class H2 extends DataSourceWrapperImpl {
         H2(
                 final String name,
-                final HikariDataSource service)
-        {
+                final HikariDataSource service) {
             super(name, service, DatabaseType.H2);
         }
 
         @Override
-        public final DatabaseType getDatabaseType()
-        {
+        public final DatabaseType getDatabaseType() {
             return DatabaseType.H2;
         }
 
@@ -537,13 +478,11 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         public String createFetchFirstSelectSQL(
                 final String coreSql,
                 final int rows,
-                final String orderBy)
-        {
+                final String orderBy) {
             StringBuilder sql = new StringBuilder(coreSql.length() + 50);
             sql.append("SELECT ").append(coreSql);
 
-            if (StringUtil.isNotBlank(orderBy))
-            {
+            if (StringUtil.isNotBlank(orderBy)) {
                 sql.append(" ORDER BY ").append(orderBy);
             }
 
@@ -554,8 +493,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         @Override
         protected String buildCreateSequenceSql(
                 final String sequenceName,
-                final long startValue)
-        {
+                final long startValue) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
             sql.append("CREATE SEQUENCE ").append(sequenceName);
             sql.append(" START WITH ").append(startValue);
@@ -565,8 +503,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
         @Override
         protected String buildDropSequenceSql(
-                final String sequenceName)
-        {
+                final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
             sql.append("DROP SEQUENCE ").append(sequenceName);
             return sql.toString();
@@ -574,8 +511,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
         @Override
         protected String buildNextSeqValueSql(
-                final String sequenceName)
-        {
+                final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
             sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')");
             return sql.toString();
@@ -583,18 +519,15 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     }
 
-    private static class HSQL extends DataSourceWrapperImpl
-    {
+    private static class HSQL extends DataSourceWrapperImpl {
         HSQL(
                 final String name,
-                final HikariDataSource service)
-        {
+                final HikariDataSource service) {
             super(name, service, DatabaseType.HSQL);
         }
 
         @Override
-        public final DatabaseType getDatabaseType()
-        {
+        public final DatabaseType getDatabaseType() {
             return DatabaseType.H2;
         }
 
@@ -602,13 +535,11 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         public String createFetchFirstSelectSQL(
                 final String coreSql,
                 final int rows,
-                final String orderBy)
-        {
+                final String orderBy) {
             StringBuilder sql = new StringBuilder(coreSql.length() + 80);
             sql.append("SELECT ").append(coreSql);
 
-            if (StringUtil.isNotBlank(orderBy))
-            {
+            if (StringUtil.isNotBlank(orderBy)) {
                 sql.append(" ORDER BY ").append(orderBy);
             }
 
@@ -619,8 +550,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         @Override
         protected String buildCreateSequenceSql(
                 final String sequenceName,
-                final long startValue)
-        {
+                final long startValue) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
             sql.append("CREATE SEQUENCE ").append(sequenceName);
             sql.append(" AS BIGINT START WITH ").append(startValue);
@@ -630,8 +560,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
         @Override
         protected String buildDropSequenceSql(
-                final String sequenceName)
-        {
+                final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
             sql.append("DROP SEQUENCE ").append(sequenceName);
             return sql.toString();
@@ -639,8 +568,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
         @Override
         protected String buildNextSeqValueSql(
-                final String sequenceName)
-        {
+                final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
             sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')");
             return sql.toString();
@@ -662,8 +590,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     private DataSourceWrapperImpl(
             final String name,
             final HikariDataSource service,
-            final DatabaseType dbType)
-    {
+            final DatabaseType dbType) {
         ParamUtil.assertNotNull("service", service);
         this.name = name;
         this.service = service;
@@ -674,47 +601,37 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     static DataSourceWrapper createDataSource(
             final String name,
             final Properties props,
-            final DatabaseType databaseType)
-    {
+            final DatabaseType databaseType) {
         ParamUtil.assertNotEmpty("props", props);
         ParamUtil.assertNotNull("databaseType", databaseType);
 
         // The DB2 schema name is case-sensitive, and must be specified in uppercase characters
         String dataSourceClassName = props.getProperty("dataSourceClassName");
-        if (dataSourceClassName != null)
-        {
-            if (dataSourceClassName.contains(".db2."))
-            {
+        if (dataSourceClassName != null) {
+            if (dataSourceClassName.contains(".db2.")) {
                 String propName = "dataSource.currentSchema";
                 String schema = props.getProperty(propName);
-                if (schema != null)
-                {
+                if (schema != null) {
                     String upperCaseSchema = schema.toUpperCase();
-                    if (!schema.equals(upperCaseSchema))
-                    {
+                    if (!schema.equals(upperCaseSchema)) {
                         props.setProperty(propName, upperCaseSchema);
                     }
                 }
             }
-        } else
-        {
+        } else {
             String propName = "jdbcUrl";
             final String url = props.getProperty(propName);
-            if (StringUtil.startsWithIgnoreCase(url, "jdbc:db2:"))
-            {
+            if (StringUtil.startsWithIgnoreCase(url, "jdbc:db2:")) {
                 String sep = ":currentSchema=";
                 int idx = url.indexOf(sep);
-                if (idx != 1)
-                {
+                if (idx != 1) {
                     String schema = url.substring(idx + sep.length());
-                    if (schema.endsWith(";"))
-                    {
+                    if (schema.endsWith(";")) {
                         schema = schema.substring(0, schema.length() - 1);
                     }
 
                     String upperCaseSchema = schema.toUpperCase();
-                    if (!schema.equals(upperCaseSchema))
-                    {
+                    if (!schema.equals(upperCaseSchema)) {
                         String newUrl = url.replace(sep + schema, sep + upperCaseSchema);
                         props.setProperty(propName, newUrl);
                     }
@@ -727,12 +644,10 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 || databaseType == DatabaseType.HSQL
                 || databaseType == DatabaseType.MYSQL
                 || databaseType == DatabaseType.ORACLE
-                || databaseType == DatabaseType.POSTGRES)
-        {
+                || databaseType == DatabaseType.POSTGRES) {
             HikariConfig conf = new HikariConfig(props);
             HikariDataSource service = new HikariDataSource(conf);
-            switch (databaseType)
-            {
+            switch (databaseType) {
                 case DB2:
                     return new DB2(name, service);
                 case H2:
@@ -746,45 +661,36 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 default: // POSTGRESQL:
                     return new PostgreSQL(name, service);
             }
-        } else
-        {
+        } else {
             throw new IllegalArgumentException("unknown datasource type " + databaseType);
         }
     }
 
     @Override
-    public final String getDatasourceName()
-    {
+    public final String getDatasourceName() {
         return name;
     }
 
     @Override
-    public final int getMaximumPoolSize()
-    {
+    public final int getMaximumPoolSize() {
         return service.getMaximumPoolSize();
     }
 
     @Override
     public final Connection getConnection()
-    throws DataAccessException
-    {
-        try
-        {
+    throws DataAccessException {
+        try {
             return service.getConnection();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             Throwable cause = e.getCause();
-            if (cause instanceof SQLException)
-            {
+            if (cause instanceof SQLException) {
                 e = (SQLException) cause;
             }
             LOG.error("could not create connection to database {}", e.getMessage());
             LOG.debug("could not create connection to database", e);
-            if (e instanceof SQLException)
-            {
+            if (e instanceof SQLException) {
                 throw translate(null, (SQLException) e);
-            } else
-            {
+            } else {
                 throw new DataAccessException("error occured while getting Connection: "
                         + e.getMessage(), e);
             }
@@ -793,21 +699,16 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     @Override
     public void returnConnection(
-            final Connection conn)
-    {
-        if (conn == null)
-        {
+            final Connection conn) {
+        if (conn == null) {
             return;
         }
 
-        try
-        {
+        try {
             conn.close();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             Throwable cause = e.getCause();
-            if (cause instanceof SQLException)
-            {
+            if (cause instanceof SQLException) {
                 e = (SQLException) cause;
             }
             LOG.error("could not close connection to database {}", e.getMessage());
@@ -816,34 +717,27 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     }
 
     @Override
-    public void shutdown()
-    {
-        try
-        {
+    public void shutdown() {
+        try {
             service.close();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             LOG.warn("could not shutdown datasource: {}", e.getMessage());
             LOG.debug("could not close datasource", e);
         }
     }
 
     public final PrintWriter getLogWriter()
-    throws SQLException
-    {
+    throws SQLException {
         return service.getLogWriter();
     }
 
     @Override
     public Statement createStatement(
             final Connection conn)
-    throws DataAccessException
-    {
-        try
-        {
+    throws DataAccessException {
+        try {
             return conn.createStatement();
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw translate(null, e);
         }
     }
@@ -852,13 +746,10 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     public PreparedStatement prepareStatement(
             final Connection conn,
             final String sqlQuery)
-    throws DataAccessException
-    {
-        try
-        {
+    throws DataAccessException {
+        try {
             return conn.prepareStatement(sqlQuery);
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw translate(sqlQuery, e);
         }
     }
@@ -866,39 +757,28 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     @Override
     public void releaseResources(
             final Statement ps,
-            final ResultSet rs)
-    {
-        if (rs != null)
-        {
-            try
-            {
+            final ResultSet rs) {
+        if (rs != null) {
+            try {
                 rs.close();
-            } catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 LOG.warn("could not close ResultSet", t);
             }
         }
 
-        if (ps != null)
-        {
+        if (ps != null) {
             Connection conn = null;
-            try
-            {
+            try {
                 conn = ps.getConnection();
-            } catch (SQLException e)
-            {
+            } catch (SQLException e) {
             }
 
-            try
-            {
+            try {
                 ps.close();
-            } catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 LOG.warn("could not close statement", t);
-            } finally
-            {
-                if (conn != null)
-                {
+            } finally {
+                if (conn != null) {
                     returnConnection(conn);
                 }
             }
@@ -907,26 +787,19 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     private void releaseStatementAndResultSet(
             final Statement ps,
-            final ResultSet rs)
-    {
-        if (rs != null)
-        {
-            try
-            {
+            final ResultSet rs) {
+        if (rs != null) {
+            try {
                 rs.close();
-            } catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 LOG.warn("could not close ResultSet", t);
             }
         }
 
-        if (ps != null)
-        {
-            try
-            {
+        if (ps != null) {
+            try {
                 ps.close();
-            } catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 LOG.warn("could not close statement", t);
             }
         }
@@ -935,8 +808,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     @Override
     public String createFetchFirstSelectSQL(
             final String coreSql,
-            final int rows)
-    {
+            final int rows) {
         return createFetchFirstSelectSQL(coreSql, rows, null);
     }
 
@@ -945,8 +817,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final Connection conn,
             final String table,
             final String column)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         return getMin(conn, table, column, null);
     }
 
@@ -956,12 +827,10 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final String table,
             final String column,
             final String condition)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         StringBuilder sqlBuilder = new StringBuilder(column.length() + table.length() + 20);
         sqlBuilder.append("SELECT MIN(").append(column).append(") FROM ").append(table);
-        if (StringUtil.isNotBlank(condition))
-        {
+        if (StringUtil.isNotBlank(condition)) {
             sqlBuilder.append(" WHERE ").append(condition);
         }
 
@@ -969,24 +838,19 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
         Statement stmt = null;
         ResultSet rs = null;
-        try
-        {
+        try {
             stmt = (conn != null)
                     ? conn.createStatement()
                     : getConnection().createStatement();
             rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getLong(1);
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw translate(sql, e);
-        } finally
-        {
-            if (conn == null)
-            {
+        } finally {
+            if (conn == null) {
                 releaseResources(stmt, rs);
-            } else
-            {
+            } else {
                 releaseStatementAndResultSet(stmt, rs);
             }
         }
@@ -996,32 +860,26 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     public int getCount(
             final Connection conn,
             final String table)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         StringBuilder sqlBuilder = new StringBuilder(table.length() + 25);
         sqlBuilder.append("SELECT COUNT(*) FROM ").append(table);
         final String sql = sqlBuilder.toString();
 
         Statement stmt = null;
         ResultSet rs = null;
-        try
-        {
+        try {
             stmt = (conn != null)
                     ? conn.createStatement()
                     : getConnection().createStatement();
             rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getInt(1);
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw translate(sql, e);
-        } finally
-        {
-            if (conn == null)
-            {
+        } finally {
+            if (conn == null) {
                 releaseResources(stmt, rs);
-            } else
-            {
+            } else {
                 releaseStatementAndResultSet(stmt, rs);
             }
         }
@@ -1032,8 +890,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final Connection conn,
             final String table,
             final String column)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         return getMax(conn, table, column, null);
     }
 
@@ -1043,36 +900,29 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final String table,
             final String column,
             final String condition)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         StringBuilder sqlBuilder = new StringBuilder(column.length() + table.length() + 20);
         sqlBuilder.append("SELECT MAX(").append(column).append(") FROM ").append(table);
-        if (StringUtil.isNotBlank(condition))
-        {
+        if (StringUtil.isNotBlank(condition)) {
             sqlBuilder.append(" WHERE ").append(condition);
         }
         final String sql = sqlBuilder.toString();
 
         Statement stmt = null;
         ResultSet rs = null;
-        try
-        {
+        try {
             stmt = (conn != null)
                     ? conn.createStatement()
                     : getConnection().createStatement();
             rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getLong(1);
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw translate(sql, e);
-        } finally
-        {
-            if (conn == null)
-            {
+        } finally {
+            if (conn == null) {
                 releaseResources(stmt, rs);
-            } else
-            {
+            } else {
                 releaseStatementAndResultSet(stmt, rs);
             }
         }
@@ -1083,8 +933,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final Connection conn,
             final String table,
             final String idColumn,
-            final int id)
-    {
+            final int id) {
         final StringBuilder sb = new StringBuilder(50);
         sb.append("DELETE FROM ")
             .append(table)
@@ -1095,15 +944,11 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         final String sql = sb.toString();
 
         Connection _conn = conn;
-        if (_conn == null)
-        {
-            try
-            {
+        if (_conn == null) {
+            try {
                 _conn = getConnection();
-            } catch (Throwable t)
-            {
-                if (LOG.isWarnEnabled())
-                {
+            } catch (Throwable t) {
+                if (LOG.isWarnEnabled()) {
                     LOG.warn("datasource {} could not get connection: {}", name, t.getMessage());
                 }
                 return false;
@@ -1111,26 +956,20 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         }
 
         Statement stmt = null;
-        try
-        {
+        try {
             stmt = conn.createStatement();
             stmt.execute(sql);
-        } catch (Throwable t)
-        {
-            if (LOG.isWarnEnabled())
-            {
+        } catch (Throwable t) {
+            if (LOG.isWarnEnabled()) {
                 LOG.warn("datasource {} could not deletefrom table {}: {}", name, table,
                         t.getMessage());
             }
             return false;
         }
-        finally
-        {
-            if (conn == null)
-            {
+        finally {
+            if (conn == null) {
                 releaseResources(stmt, null);
-            } else
-            {
+            } else {
                 releaseStatementAndResultSet(stmt, null);
             }
         }
@@ -1144,8 +983,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final String table,
             final String column,
             final Object value)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         StringBuilder sb = new StringBuilder(50);
         sb.append(column)
             .append(" FROM ")
@@ -1157,36 +995,27 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        try
-        {
+        try {
             stmt = (conn != null)
                     ? conn.prepareStatement(sql)
                     : getConnection().prepareStatement(sql);
-            if (value instanceof Integer)
-            {
+            if (value instanceof Integer) {
                 stmt.setInt(1, (Integer) value);
-            } else if (value instanceof Long)
-            {
+            } else if (value instanceof Long) {
                 stmt.setLong(1, (Long) value);
-            } else if (value instanceof String)
-            {
+            } else if (value instanceof String) {
                 stmt.setString(1, (String) value);
-            } else
-            {
+            } else {
                 stmt.setString(1, value.toString());
             }
             rs = stmt.executeQuery();
             return rs.next();
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw translate(sql, e);
-        } finally
-        {
-            if (conn == null)
-            {
+        } finally {
+            if (conn == null) {
                 releaseResources(stmt, rs);
-            } else
-            {
+            } else {
                 releaseStatementAndResultSet(stmt, rs);
             }
         }
@@ -1197,16 +1026,13 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final Connection conn,
             final String table,
             final String column)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         Statement stmt;
-        try
-        {
+        try {
             stmt = (conn != null)
                     ? conn.createStatement()
                     : getConnection().createStatement();
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw translate(null, e);
         }
 
@@ -1214,20 +1040,15 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         sqlBuilder.append(column).append(" FROM ").append(table);
         final String sql = createFetchFirstSelectSQL(sqlBuilder.toString(), 1);
 
-        try
-        {
+        try {
             stmt.execute(sql);
             return true;
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             return false;
-        } finally
-        {
-            if (conn == null)
-            {
+        } finally {
+            if (conn == null) {
                 releaseResources(stmt, null);
-            } else
-            {
+            } else {
                 releaseStatementAndResultSet(stmt, null);
             }
         }
@@ -1237,16 +1058,13 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     public boolean tableExists(
             final Connection conn,
             final String table)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         Statement stmt;
-        try
-        {
+        try {
             stmt = (conn != null)
                     ? conn.createStatement()
                     : getConnection().createStatement();
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw translate(null, e);
         }
 
@@ -1254,20 +1072,15 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         sqlBuilder.append("1 FROM ").append(table);
         final String sql = createFetchFirstSelectSQL(sqlBuilder.toString(), 1);
 
-        try
-        {
+        try {
             stmt.execute(sql);
             return true;
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             return false;
-        } finally
-        {
-            if (conn == null)
-            {
+        } finally {
+            if (conn == null) {
                 releaseResources(stmt, null);
-            } else
-            {
+            } else {
                 releaseStatementAndResultSet(stmt, null);
             }
         }
@@ -1283,8 +1096,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     protected abstract String buildNextSeqValueSql(
             String sequenceName);
 
-    protected boolean isUseSqlStateAsCode()
-    {
+    protected boolean isUseSqlStateAsCode() {
         return false;
     }
 
@@ -1292,13 +1104,10 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     public void dropAndCreateSequence(
             final String sequenceName,
             final long startValue)
-    throws DataAccessException
-    {
-        try
-        {
+    throws DataAccessException {
+        try {
             dropSequence(sequenceName);
-        } catch (DataAccessException e)
-        {
+        } catch (DataAccessException e) {
         }
 
         createSequence(sequenceName, startValue);
@@ -1308,22 +1117,18 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     public void createSequence(
             final String sequenceName,
             final long startValue)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         final String sql = buildCreateSequenceSql(sequenceName, startValue);
         Connection conn = getConnection();
         Statement stmt = null;
-        try
-        {
+        try {
             stmt = conn.createStatement();
             stmt.execute(sql);
             LOG.info("datasource {} CREATESEQ {} START {}", name, sequenceName, startValue);
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw translate(sql, e);
         }
-        finally
-        {
+        finally {
             releaseResources(stmt, null);
         }
 
@@ -1332,23 +1137,19 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     @Override
     public void dropSequence(
             final String sequenceName)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         final String sql = buildDropSequenceSql(sequenceName);
 
         Connection conn = getConnection();
         Statement stmt = null;
-        try
-        {
+        try {
             stmt = conn.createStatement();
             stmt.execute(sql);
             LOG.info("datasource {} DROPSEQ {}", name, sequenceName);
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw translate(sql, e);
         }
-        finally
-        {
+        finally {
             releaseResources(stmt, null);
         }
     }
@@ -1356,8 +1157,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     @Override
     public void setLastUsedSeqValue(
             final String sequenceName,
-            final long sequenceValue)
-    {
+            final long sequenceValue) {
         lastUsedSeqValues.put(sequenceName, sequenceValue);
     }
 
@@ -1365,58 +1165,44 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     public long nextSeqValue(
             Connection conn,
             final String sequenceName)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         final String sql = buildNextSeqValueSql(sequenceName);
         boolean newConn = conn == null;
-        if (newConn)
-        {
+        if (newConn) {
             conn = getConnection();
         }
         Statement stmt = null;
 
         long next;
-        try
-        {
+        try {
             stmt = conn.createStatement();
 
-            while (true)
-            {
+            while (true) {
                 ResultSet rs = stmt.executeQuery(sql);
-                try
-                {
-                    if (rs.next())
-                    {
+                try {
+                    if (rs.next()) {
                         next = rs.getLong(1);
-                        synchronized (lastUsedSeqValues)
-                        {
+                        synchronized (lastUsedSeqValues) {
                             Long lastValue = lastUsedSeqValues.get(sequenceName);
-                            if (lastValue == null || next > lastValue)
-                            {
+                            if (lastValue == null || next > lastValue) {
                                 lastUsedSeqValues.put(sequenceName, next);
                                 break;
                             }
                         }
-                    } else
-                    {
+                    } else {
                         throw new DataAccessException(
                                 "could not increment the sequence " + sequenceName);
                     }
-                } finally
-                {
+                } finally {
                     releaseStatementAndResultSet(null, rs);
                 }
             }
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw translate(sql, e);
-        } finally
-        {
-            if (newConn)
-            {
+        } finally {
+            if (newConn) {
                 releaseResources(stmt, null);
-            } else
-            {
+            } else {
                 releaseStatementAndResultSet(stmt, null);
             }
         }
@@ -1427,8 +1213,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     protected String getSqlToDropPrimaryKey(
             final String primaryKeyName,
-            final String table)
-    {
+            final String table) {
         return "ALTER TABLE " + table + " DROP PRIMARY KEY ";
     }
 
@@ -1437,25 +1222,21 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final Connection conn,
             final String primaryKeyName,
             final String table)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         executeUpdate(conn, getSqlToDropPrimaryKey(primaryKeyName, table));
     }
 
     protected String getSqlToAddPrimaryKey(
             final String primaryKeyName,
             final String table,
-            final String... columns)
-    {
+            final String... columns) {
         final StringBuilder sb = new StringBuilder(100);
         sb.append("ALTER TABLE ").append(table);
         sb.append(" ADD CONSTRAINT ").append(primaryKeyName);
         sb.append(" PRIMARY KEY (");
         final int n = columns.length;
-        for (int i = 0; i < n; i++)
-        {
-            if (i != 0)
-            {
+        for (int i = 0; i < n; i++) {
+            if (i != 0) {
                 sb.append(",");
             }
             sb.append(columns[i]);
@@ -1471,16 +1252,14 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final String primaryKeyName,
             final String table,
             final String... columns)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         executeUpdate(conn, getSqlToAddPrimaryKey(primaryKeyName, table, columns));
     }
 
     protected String getSqlToDropForeignKeyConstraint(
             final String constraintName,
             final String baseTable)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         return "ALTER TABLE " + baseTable + " DROP CONSTRAINT " + constraintName;
     }
 
@@ -1489,8 +1268,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final Connection conn,
             final String constraintName,
             final String baseTable)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         executeUpdate(conn, getSqlToDropForeignKeyConstraint(constraintName, baseTable));
     }
 
@@ -1501,8 +1279,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final String referencedTable,
             final String referencedColumn,
             final String onDeleteAction,
-            final String onUpdateAction)
-    {
+            final String onUpdateAction) {
         final StringBuilder sb = new StringBuilder(100);
         sb.append("ALTER TABLE ").append(baseTable);
         sb.append(" ADD CONSTRAINT ").append(constraintName);
@@ -1524,8 +1301,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final String referencedColumn,
             final String onDeleteAction,
             final String onUpdateAction)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         executeUpdate(conn,
                 getSqlToAddForeignKeyConstraint(
                         constraintName,
@@ -1536,8 +1312,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     protected String getSqlToDropIndex(
             final String table,
-            final String indexName)
-    {
+            final String indexName) {
         return "DROP INDEX " + indexName;
     }
 
@@ -1546,16 +1321,14 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final Connection conn,
             final String table,
             final String indexName)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         executeUpdate(conn, getSqlToDropIndex(table, indexName));
     }
 
     protected String getSqlToCreateIndex(
             final String indexName,
             final String table,
-            final String column)
-    {
+            final String column) {
         final StringBuilder sb = new StringBuilder(100);
         sb.append("CREATE INDEX ").append(indexName);
         sb.append(" ON ").append(table).append("(").append(column).append(")");
@@ -1568,15 +1341,13 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final String indexName,
             final String table,
             final String column)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         executeUpdate(conn, getSqlToCreateIndex(indexName, table, column));
     }
 
     protected String getSqlToDropUniqueConstraint(
             final String constraintName,
-            final String table)
-    {
+            final String table) {
         return "ALTER TABLE " + table + " DROP CONSTRAINT " + constraintName;
     }
 
@@ -1585,25 +1356,21 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final Connection conn,
             final String constraintName,
             final String table)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         executeUpdate(conn, getSqlToDropUniqueConstraint(constraintName, table));
     }
 
     protected String getSqlToAddUniqueConstrain(
             final String constraintName,
             final String table,
-            final String... columns)
-    {
+            final String... columns) {
         final StringBuilder sb = new StringBuilder(100);
         sb.append("ALTER TABLE ").append(table);
         sb.append(" ADD CONSTRAINT ").append(constraintName);
         sb.append(" UNIQUE (");
         final int n = columns.length;
-        for (int i = 0; i < n; i++)
-        {
-            if (i != 0)
-            {
+        for (int i = 0; i < n; i++) {
+            if (i != 0) {
                 sb.append(",");
             }
             sb.append(columns[i]);
@@ -1618,28 +1385,23 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             final String constraintName,
             final String table,
             final String... columns)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         executeUpdate(conn, getSqlToAddUniqueConstrain(constraintName, table, columns));
     }
 
     @Override
     public DataAccessException translate(
             String sql,
-            final SQLException ex)
-    {
+            final SQLException ex) {
         ParamUtil.assertNotNull("ex", ex);
-        if (sql == null)
-        {
+        if (sql == null) {
             sql = "";
         }
 
         SQLException sqlEx = ex;
-        if (sqlEx instanceof BatchUpdateException && sqlEx.getNextException() != null)
-        {
+        if (sqlEx instanceof BatchUpdateException && sqlEx.getNextException() != null) {
             SQLException nestedSqlEx = sqlEx.getNextException();
-            if (nestedSqlEx.getErrorCode() > 0 || nestedSqlEx.getSQLState() != null)
-            {
+            if (nestedSqlEx.getErrorCode() > 0 || nestedSqlEx.getSQLState() != null) {
                 LOG.debug("Using nested SQLException from the BatchUpdateException");
                 sqlEx = nestedSqlEx;
             }
@@ -1649,108 +1411,84 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         String errorCode;
         String sqlState;
 
-        if (sqlErrorCodes.isUseSqlStateForTranslation())
-        {
+        if (sqlErrorCodes.isUseSqlStateForTranslation()) {
             errorCode = sqlEx.getSQLState();
             sqlState = null;
-        } else
-        {
+        } else {
             // Try to find SQLException with actual error code, looping through the causes.
             // E.g. applicable to java.sql.DataTruncation as of JDK 1.6.
             SQLException current = sqlEx;
-            while (current.getErrorCode() == 0 && current.getCause() instanceof SQLException)
-            {
+            while (current.getErrorCode() == 0 && current.getCause() instanceof SQLException) {
                 current = (SQLException) current.getCause();
             }
             errorCode = Integer.toString(current.getErrorCode());
             sqlState = current.getSQLState();
         }
 
-        if (errorCode != null)
-        {
+        if (errorCode != null) {
             // look for grouped error codes.
-            if (sqlErrorCodes.getBadSqlGrammarCodes().contains(errorCode))
-            {
+            if (sqlErrorCodes.getBadSqlGrammarCodes().contains(errorCode)) {
                 logTranslation(sql, sqlEx);
                 return new BadSqlGrammarException(buildMessage(sql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getInvalidResultSetAccessCodes().contains(errorCode))
-            {
+            } else if (sqlErrorCodes.getInvalidResultSetAccessCodes().contains(errorCode)) {
                 logTranslation(sql, sqlEx);
                 return new InvalidResultSetAccessException(buildMessage(sql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getDuplicateKeyCodes().contains(errorCode))
-            {
+            } else if (sqlErrorCodes.getDuplicateKeyCodes().contains(errorCode)) {
                 logTranslation(sql, sqlEx);
                 return new DuplicateKeyException(buildMessage(sql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getDataIntegrityViolationCodes().contains(errorCode))
-            {
+            } else if (sqlErrorCodes.getDataIntegrityViolationCodes().contains(errorCode)) {
                 logTranslation(sql, sqlEx);
                 return new DataIntegrityViolationException(buildMessage(sql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getPermissionDeniedCodes().contains(errorCode))
-            {
+            } else if (sqlErrorCodes.getPermissionDeniedCodes().contains(errorCode)) {
                 logTranslation(sql, sqlEx);
                 return new PermissionDeniedDataAccessException(buildMessage(sql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getDataAccessResourceFailureCodes().contains(errorCode))
-            {
+            } else if (sqlErrorCodes.getDataAccessResourceFailureCodes().contains(errorCode)) {
                 logTranslation(sql, sqlEx);
                 return new DataAccessResourceFailureException(buildMessage(sql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getTransientDataAccessResourceCodes().contains(errorCode))
-            {
+            } else if (sqlErrorCodes.getTransientDataAccessResourceCodes().contains(errorCode)) {
                 logTranslation(sql, sqlEx);
                 return new TransientDataAccessResourceException(buildMessage(sql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getCannotAcquireLockCodes().contains(errorCode))
-            {
+            } else if (sqlErrorCodes.getCannotAcquireLockCodes().contains(errorCode)) {
                 logTranslation(sql, sqlEx);
                 return new CannotAcquireLockException(buildMessage(sql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getDeadlockLoserCodes().contains(errorCode))
-            {
+            } else if (sqlErrorCodes.getDeadlockLoserCodes().contains(errorCode)) {
                 logTranslation(sql, sqlEx);
                 return new DeadlockLoserDataAccessException(buildMessage(sql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getCannotSerializeTransactionCodes().contains(errorCode))
-            {
+            } else if (sqlErrorCodes.getCannotSerializeTransactionCodes().contains(errorCode)) {
                 logTranslation(sql, sqlEx);
                 return new CannotSerializeTransactionException(buildMessage(sql, sqlEx), sqlEx);
             }
         }
 
         // try SQLState
-        if (sqlState != null && sqlState.length() >= 2)
-        {
+        if (sqlState != null && sqlState.length() >= 2) {
             String classCode = sqlState.substring(0, 2);
-            if (sqlStateCodes.getBadSQLGrammarCodes().contains(classCode))
-            {
+            if (sqlStateCodes.getBadSQLGrammarCodes().contains(classCode)) {
                 return new BadSqlGrammarException(buildMessage(sql, sqlEx), ex);
-            } else if (sqlStateCodes.getDataIntegrityViolationCodes().contains(classCode))
-            {
+            } else if (sqlStateCodes.getDataIntegrityViolationCodes().contains(classCode)) {
                 return new DataIntegrityViolationException(buildMessage(sql, ex), ex);
-            } else if (sqlStateCodes.getDataAccessResourceFailureCodes().contains(classCode))
-            {
+            } else if (sqlStateCodes.getDataAccessResourceFailureCodes().contains(classCode)) {
                 return new DataAccessResourceFailureException(buildMessage(sql, ex), ex);
-            } else if (sqlStateCodes.getTransientDataAccessResourceCodes().contains(classCode))
-            {
+            } else if (sqlStateCodes.getTransientDataAccessResourceCodes().contains(classCode)) {
                 return new TransientDataAccessResourceException(buildMessage(sql, ex), ex);
-            } else if (sqlStateCodes.getConcurrencyFailureCodes().contains(classCode))
-            {
+            } else if (sqlStateCodes.getConcurrencyFailureCodes().contains(classCode)) {
                 return new ConcurrencyFailureException(buildMessage(sql, ex), ex);
             }
         }
 
         // For MySQL: exception class name indicating a timeout?
         // (since MySQL doesn't throw the JDBC 4 SQLTimeoutException)
-        if (ex.getClass().getName().contains("Timeout"))
-        {
+        if (ex.getClass().getName().contains("Timeout")) {
             return new QueryTimeoutException(buildMessage(sql, ex), ex);
         }
 
         // We couldn't identify it more precisely
-        if (LOG.isDebugEnabled())
-        {
+        if (LOG.isDebugEnabled()) {
             String codes;
-            if (sqlErrorCodes != null && sqlErrorCodes.isUseSqlStateForTranslation())
-            {
+            if (sqlErrorCodes != null && sqlErrorCodes.isUseSqlStateForTranslation()) {
                 codes = "SQL state '" + sqlEx.getSQLState() + "', error code '"
                         + sqlEx.getErrorCode();
-            } else
-            {
+            } else {
                 codes = "Error code '" + sqlEx.getErrorCode() + "'";
             }
             LOG.debug("Unable to translate SQLException with " + codes);
@@ -1761,10 +1499,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     private void logTranslation(
             final String sql,
-            final SQLException sqlEx)
-    {
-        if (LOG.isDebugEnabled())
-        {
+            final SQLException sqlEx) {
+        if (LOG.isDebugEnabled()) {
             LOG.debug("Translating SQLException with SQL state '{}', error code '{}',"
                     + " message [{}]; SQL was [{}]",
                     sqlEx.getSQLState(), sqlEx.getErrorCode(), sqlEx.getMessage(), sql);
@@ -1773,31 +1509,24 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     private String buildMessage(
             final String sql,
-            final SQLException ex)
-    {
+            final SQLException ex) {
         return "SQL [" + sql + "]; " + ex.getMessage();
     }
 
     private void executeUpdate(Connection conn, String sql)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         Statement stmt = null;
-        try
-        {
+        try {
             stmt = (conn != null)
                     ? conn.createStatement()
                             : getConnection().createStatement();
             stmt.executeUpdate(sql);
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw translate(sql, e);
-        } finally
-        {
-            if (conn == null)
-            {
+        } finally {
+            if (conn == null) {
                 releaseResources(stmt, null);
-            } else
-            {
+            } else {
                 releaseStatementAndResultSet(stmt, null);
             }
         }

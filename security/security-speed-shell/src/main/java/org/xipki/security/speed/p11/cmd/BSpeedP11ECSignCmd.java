@@ -52,20 +52,17 @@ import org.xipki.security.speed.p11.P11ECSignLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-ec-sign",
         description = "performance test of PKCS#11 EC signature creation (batch)")
-public class BSpeedP11ECSignCmd extends BSpeedP11SignCmd
-{
+public class BSpeedP11ECSignCmd extends BSpeedP11SignCmd {
 
     @Override
     protected List<LoadExecutor> getTesters()
-    throws Exception
-    {
+    throws Exception {
         List<LoadExecutor> ret = new LinkedList<>();
         Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOIDMap();
 
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
 
-        for (String curveName : curveNameOidMap.keySet())
-        {
+        for (String curveName : curveNameOidMap.keySet()) {
             ret.add(new P11ECSignLoadTest(securityFactory, slot, sigAlgo, curveName));
         }
 

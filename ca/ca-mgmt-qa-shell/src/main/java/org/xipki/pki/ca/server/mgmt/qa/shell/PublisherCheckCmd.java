@@ -46,29 +46,24 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "publisher-check",
         description = "check information of publishers (QA)")
-public class PublisherCheckCmd extends PublisherUpdateCmd
-{
+public class PublisherCheckCmd extends PublisherUpdateCmd {
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("checking publisher " + name);
 
         PublisherEntry cp = caManager.getPublisher(name);
-        if (cp == null)
-        {
+        if (cp == null) {
             throw new CmdFailure("publisher named '" + name + "' is not configured");
         }
 
-        if (cp.getType() != null)
-        {
+        if (cp.getType() != null) {
             String ex = type;
             String is = cp.getType();
             MgmtQAShellUtil.assertEquals("type", ex, is);
         }
 
-        if (cp.getConf() != null)
-        {
+        if (cp.getConf() != null) {
             String ex = conf;
             String is = cp.getConf();
             MgmtQAShellUtil.assertEquals("signer conf", ex, is);

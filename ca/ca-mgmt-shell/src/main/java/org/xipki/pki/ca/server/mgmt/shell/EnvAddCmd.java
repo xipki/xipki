@@ -44,8 +44,7 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "env-add",
         description = "add CA environment parameter")
-public class EnvAddCmd extends CaCmd
-{
+public class EnvAddCmd extends CaCmd {
 
     @Option(name = "--name", aliases = "-n",
             required = true,
@@ -61,8 +60,7 @@ public class EnvAddCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean b = caManager.addEnvParam(name, value);
         output(b, "added", "could not add", "environment parameter " + name);
         return null;

@@ -55,8 +55,7 @@ import org.xipki.security.api.SecurityFactory;
 
 @Command(scope = "xipki-cli", name = "loadtest-revoke",
         description = "CA Client Revoke Load test")
-public class CALoadTestRevokeCmd extends CALoadTestCmd
-{
+public class CALoadTestRevokeCmd extends CALoadTestCmd {
     @Option(name = "--issuer",
             required = true,
             description = "issuer certificate file\n"
@@ -91,15 +90,12 @@ public class CALoadTestRevokeCmd extends CALoadTestCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
-        if (numThreads < 1)
-        {
+    throws Exception {
+        if (numThreads < 1) {
             throw new IllegalCmdParamException("invalid number of threads " + numThreads);
         }
 
-        if (durationInSecond < 1)
-        {
+        if (durationInSecond < 1) {
             throw new IllegalCmdParamException("invalid duration " + durationInSecond);
         }
 
@@ -109,8 +105,7 @@ public class CALoadTestRevokeCmd extends CALoadTestCmd
         description.append("maxCerts: ").append(maxCerts).append("\n");
         description.append("#certs/req: ").append(n).append("\n");
         description.append("unit: ").append(n).append(" certificate");
-        if (n > 1)
-        {
+        if (n > 1) {
             description.append("s");
         }
         description.append("\n");
@@ -125,16 +120,14 @@ public class CALoadTestRevokeCmd extends CALoadTestCmd
 
         DataSourceWrapper caDataSource = dataSourceFactory.createDataSource(
                 null, props, securityFactory.getPasswordResolver());
-        try
-        {
+        try {
             CALoadTestRevoke loadTest = new CALoadTestRevoke(
                     caClient, caCert, caDataSource, maxCerts, n, description.toString());
 
             loadTest.setDuration(durationInSecond);
             loadTest.setThreads(numThreads);
             loadTest.test();
-        } finally
-        {
+        } finally {
             caDataSource.shutdown();
         }
 
@@ -142,14 +135,12 @@ public class CALoadTestRevokeCmd extends CALoadTestCmd
     }
 
     public void setDataSourceFactory(
-            final DataSourceFactory dataSourceFactory)
-    {
+            final DataSourceFactory dataSourceFactory) {
         this.dataSourceFactory = dataSourceFactory;
     }
 
     public void setSecurityFactory(
-            final SecurityFactory securityFactory)
-    {
+            final SecurityFactory securityFactory) {
         this.securityFactory = securityFactory;
     }
 }

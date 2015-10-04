@@ -41,26 +41,22 @@ import org.xipki.pki.ca.api.X509CertWithDBCertId;
  * @author Lijun Liao
  */
 
-public class X509CertWithRevokedInfo
-{
+public class X509CertWithRevokedInfo {
     private final X509CertWithDBCertId cert;
     private final boolean revoked;
 
     public X509CertWithRevokedInfo(
             final X509CertWithDBCertId cert,
-            final boolean revoked)
-    {
+            final boolean revoked) {
         this.cert = cert;
         this.revoked = revoked;
     }
 
-    public X509CertWithDBCertId getCert()
-    {
+    public X509CertWithDBCertId getCert() {
         return cert;
     }
 
-    public boolean isRevoked()
-    {
+    public boolean isRevoked() {
         return revoked;
     }
 

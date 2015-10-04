@@ -51,31 +51,26 @@ import org.xipki.security.api.util.SecurityUtil;
  * @author Lijun Liao
  */
 
-class IaikP11Identity extends P11Identity
-{
+class IaikP11Identity extends P11Identity {
     public IaikP11Identity(
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId,
             final X509Certificate[] certificateChain,
-            final PublicKey publicKey)
-    {
+            final PublicKey publicKey) {
         super(slotId, keyId, certificateChain, publicKey);
     }
 
     public byte[] CKM_RSA_PKCS(
             final IaikP11Module module,
             final byte[] encodedDigestInfo)
-    throws SignerException
-    {
-        if (!(publicKey instanceof RSAPublicKey))
-        {
+    throws SignerException {
+        if (!(publicKey instanceof RSAPublicKey)) {
             throw new SignerException("operation CKM_RSA_PKCS is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
 
         IaikP11Slot slot = module.getSlot(slotId);
-        if (slot == null)
-        {
+        if (slot == null) {
             throw new SignerException("could not find slot " + slotId);
         }
 
@@ -85,17 +80,14 @@ class IaikP11Identity extends P11Identity
     public byte[] CKM_RSA_X509(
             final IaikP11Module module,
             final byte[] hash)
-    throws SignerException
-    {
-        if (!(publicKey instanceof RSAPublicKey))
-        {
+    throws SignerException {
+        if (!(publicKey instanceof RSAPublicKey)) {
             throw new SignerException("operation CKM_RSA_X509 is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
 
         IaikP11Slot slot = module.getSlot(slotId);
-        if (slot == null)
-        {
+        if (slot == null) {
             throw new SignerException("could not find slot " + slotId);
         }
 
@@ -105,17 +97,14 @@ class IaikP11Identity extends P11Identity
     public byte[] CKM_ECDSA(
             final IaikP11Module module,
             final byte[] hash)
-    throws SignerException
-    {
-        if (!(publicKey instanceof ECPublicKey))
-        {
+    throws SignerException {
+        if (!(publicKey instanceof ECPublicKey)) {
             throw new SignerException("operation CKM_ECDSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
 
         IaikP11Slot slot = module.getSlot(slotId);
-        if (slot == null)
-        {
+        if (slot == null) {
             throw new SignerException("could not find slot " + slotId);
         }
 
@@ -127,17 +116,14 @@ class IaikP11Identity extends P11Identity
     public byte[] CKM_DSA(
             final IaikP11Module module,
             final byte[] hash)
-    throws SignerException
-    {
-        if (!(publicKey instanceof DSAPublicKey))
-        {
+    throws SignerException {
+        if (!(publicKey instanceof DSAPublicKey)) {
             throw new SignerException("operation CKM_DSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
 
         IaikP11Slot slot = module.getSlot(slotId);
-        if (slot == null)
-        {
+        if (slot == null) {
             throw new SignerException("could not find slot " + slotId);
         }
         byte[] truncatedDigest = SecurityUtil.leftmost(hash, getSignatureKeyBitLength());

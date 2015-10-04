@@ -39,32 +39,27 @@ package org.xipki.pki.ca.server.mgmt.api;
  * @author Lijun Liao
  */
 
-public class CAMgmtException extends Exception
-{
+public class CAMgmtException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public CAMgmtException()
-    {
+    public CAMgmtException() {
         super();
     }
 
     public CAMgmtException(
             final String message,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(message, cause);
     }
 
     public CAMgmtException(
-            final String message)
-    {
+            final String message) {
         super(message);
     }
 
     public CAMgmtException(
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(cause);
     }
 

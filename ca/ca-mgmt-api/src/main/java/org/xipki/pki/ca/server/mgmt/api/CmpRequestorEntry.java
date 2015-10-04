@@ -50,8 +50,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public class CmpRequestorEntry implements Serializable
-{
+public class CmpRequestorEntry implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(CmpRequestorEntry.class);
 
     private static final long serialVersionUID = 1L;
@@ -61,20 +60,16 @@ public class CmpRequestorEntry implements Serializable
 
     public CmpRequestorEntry(
             final String name,
-            final String base64Cert)
-    {
+            final String base64Cert) {
         ParamUtil.assertNotBlank("name", name);
         ParamUtil.assertNotBlank("base64Cert", base64Cert);
         this.name = name;
         this.base64Cert = base64Cert;
-        try
-        {
+        try {
             this.cert = X509Util.parseBase64EncodedCert(base64Cert);
-        } catch (Throwable t)
-        {
+        } catch (Throwable t) {
             final String message = "could not parse the certificate for requestor '" + name + "'";
-            if (LOG.isErrorEnabled())
-            {
+            if (LOG.isErrorEnabled()) {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                         t.getMessage());
             }
@@ -82,36 +77,30 @@ public class CmpRequestorEntry implements Serializable
         }
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getBase64Cert()
-    {
+    public String getBase64Cert() {
         return base64Cert;
     }
 
-    public X509Certificate getCert()
-    {
+    public X509Certificate getCert() {
         return cert;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return toString(false);
     }
 
     public String toString(
-            final boolean verbose)
-    {
+            final boolean verbose) {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
         sb.append("faulty: ").append(cert == null).append('\n');
 
-        if (cert != null)
-        {
+        if (cert != null) {
             sb.append("cert: ").append("\n");
             sb.append("\tissuer: ").append(
                     X509Util.getRFC4519Name(cert.getIssuerX500Principal())).append("\n");
@@ -119,19 +108,15 @@ public class CmpRequestorEntry implements Serializable
             sb.append("\tsubject: ").append(
                     X509Util.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
 
-            if (verbose)
-            {
+            if (verbose) {
                 sb.append("\tencoded: ");
-                try
-                {
+                try {
                     sb.append(Base64.toBase64String(cert.getEncoded()));
-                } catch (CertificateEncodingException e)
-                {
+                } catch (CertificateEncodingException e) {
                     sb.append("ERROR");
                 }
             }
-        } else
-        {
+        } else {
             sb.append("cert: null");
         }
 

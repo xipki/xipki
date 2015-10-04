@@ -39,30 +39,24 @@ package org.xipki.dbtool;
  * @author Lijun Liao
  */
 
-class MyStringUtil
-{
-    private MyStringUtil()
-    {
+class MyStringUtil {
+    private MyStringUtil() {
     }
 
     public static boolean isBlank(
-            final String s)
-    {
+            final String s) {
         return s == null || s.isEmpty();
     }
 
     public static boolean isNotBlank(
-            final String s)
-    {
+            final String s) {
         return s != null && !s.isEmpty();
     }
 
     public static boolean startsWithIgnoreCase(
             final String s,
-            final String prefix)
-    {
-        if (s.length() < prefix.length())
-        {
+            final String prefix) {
+        if (s.length() < prefix.length()) {
             return false;
         }
 

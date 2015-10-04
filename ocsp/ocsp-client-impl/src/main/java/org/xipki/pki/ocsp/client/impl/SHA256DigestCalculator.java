@@ -44,17 +44,14 @@ import org.bouncycastle.crypto.digests.SHA256Digest;
  * @author Lijun Liao
  */
 
-class SHA256DigestCalculator extends AbstractDigestCalculator
-{
+class SHA256DigestCalculator extends AbstractDigestCalculator {
     @Override
-    protected ASN1ObjectIdentifier getObjectIdentifier()
-    {
+    protected ASN1ObjectIdentifier getObjectIdentifier() {
         return NISTObjectIdentifiers.id_sha256;
     }
 
     @Override
-    protected Digest getDigester()
-    {
+    protected Digest getDigester() {
         return new SHA256Digest();
     }
 }

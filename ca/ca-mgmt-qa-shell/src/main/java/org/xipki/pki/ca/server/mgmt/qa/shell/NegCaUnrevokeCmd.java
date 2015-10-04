@@ -45,20 +45,16 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-ca-unrevoke",
         description = "unrevoke CA")
-public class NegCaUnrevokeCmd extends CaUnrevokeCmd
-{
+public class NegCaUnrevokeCmd extends CaUnrevokeCmd {
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("neg-ca-unrevoke");
 
-        try
-        {
+        try {
             super._doExecute();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return null;
         }
 

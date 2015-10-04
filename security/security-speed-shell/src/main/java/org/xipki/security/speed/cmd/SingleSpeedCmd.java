@@ -42,8 +42,7 @@ import org.xipki.common.LoadExecutor;
  * @author Lijun Liao
  */
 
-public abstract class SingleSpeedCmd extends SecurityCmd
-{
+public abstract class SingleSpeedCmd extends SecurityCmd {
 
     @Option(name = "--duration",
             description = "duration in seconds")
@@ -58,8 +57,7 @@ public abstract class SingleSpeedCmd extends SecurityCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         LoadExecutor tester = getTester();
         tester.setDuration(durationInSecond);
         tester.setThreads(Math.max(20, numThreads));

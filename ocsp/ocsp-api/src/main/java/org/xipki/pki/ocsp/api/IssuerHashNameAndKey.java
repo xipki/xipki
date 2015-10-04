@@ -44,8 +44,7 @@ import org.xipki.security.api.HashAlgoType;
  * @author Lijun Liao
  */
 
-public class IssuerHashNameAndKey
-{
+public class IssuerHashNameAndKey {
     private final HashAlgoType algo;
     private final byte[] issuerNameHash;
     private final byte[] issuerKeyHash;
@@ -53,18 +52,15 @@ public class IssuerHashNameAndKey
     public IssuerHashNameAndKey(
             final HashAlgoType algo,
             final byte[] issuerNameHash,
-            final byte[] issuerKeyHash)
-    {
+            final byte[] issuerKeyHash) {
         ParamUtil.assertNotNull("algo", algo);
 
         int len = algo.getLength();
-        if (issuerNameHash == null || issuerNameHash.length != len)
-        {
+        if (issuerNameHash == null || issuerNameHash.length != len) {
             throw new IllegalArgumentException("issuerNameash is invalid");
         }
 
-        if (issuerKeyHash == null || issuerKeyHash.length != len)
-        {
+        if (issuerKeyHash == null || issuerKeyHash.length != len) {
             throw new IllegalArgumentException("issuerKeyHash is invalid");
         }
 
@@ -76,8 +72,7 @@ public class IssuerHashNameAndKey
     public boolean match(
             final HashAlgoType algo,
             final byte[] issuerNameHash,
-            final byte[] issuerKeyHash)
-    {
+            final byte[] issuerKeyHash) {
         return this.algo == algo
                 && Arrays.equals(this.issuerNameHash, issuerNameHash)
                 && Arrays.equals(this.issuerKeyHash, issuerKeyHash);

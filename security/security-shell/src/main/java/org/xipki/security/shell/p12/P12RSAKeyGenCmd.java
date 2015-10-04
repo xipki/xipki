@@ -47,8 +47,7 @@ import org.xipki.security.api.P12KeypairGenerationResult;
 
 @Command(scope = "xipki-tk", name = "rsa-p12",
         description = "generate RSA keypair in PKCS#12 keystore")
-public class P12RSAKeyGenCmd extends P12KeyGenCmd
-{
+public class P12RSAKeyGenCmd extends P12KeyGenCmd {
     @Option(name = "--key-size",
             description = "keysize in bit")
     private Integer keysize = 2048;
@@ -59,10 +58,8 @@ public class P12RSAKeyGenCmd extends P12KeyGenCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
-        if (keysize % 1024 != 0)
-        {
+    throws Exception {
+        if (keysize % 1024 != 0) {
             throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
         }
 

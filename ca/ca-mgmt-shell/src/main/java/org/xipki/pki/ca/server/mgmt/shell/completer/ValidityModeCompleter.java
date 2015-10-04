@@ -42,13 +42,10 @@ import org.xipki.console.karaf.EnumCompleter;
  * @author Lijun Liao
  */
 
-public class ValidityModeCompleter extends EnumCompleter
-{
-    public ValidityModeCompleter()
-    {
+public class ValidityModeCompleter extends EnumCompleter {
+    public ValidityModeCompleter() {
         StringBuilder enums = new StringBuilder();
-        for (ValidityMode mode : ValidityMode.values())
-        {
+        for (ValidityMode mode : ValidityMode.values()) {
             enums.append(mode.name()).append(",");
         }
         enums.deleteCharAt(enums.length() - 1);

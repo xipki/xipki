@@ -39,8 +39,7 @@ package org.xipki.audit.api;
  * @author Lijun Liao
  */
 
-public interface AuditService
-{
+public interface AuditService {
     void logEvent(
             AuditEvent event);
 

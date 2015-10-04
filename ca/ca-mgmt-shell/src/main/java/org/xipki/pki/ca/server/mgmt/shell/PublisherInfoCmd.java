@@ -51,48 +51,39 @@ import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 
 @Command(scope = "xipki-ca", name = "publisher-info",
         description = "show information of publisher")
-public class PublisherInfoCmd extends CaCmd
-{
+public class PublisherInfoCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "publisher name")
     private String name;
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         StringBuilder sb = new StringBuilder();
 
-        if (name == null)
-        {
+        if (name == null) {
             Set<String> names = caManager.getPublisherNames();
             int n = names.size();
 
-            if (n == 0 || n == 1)
-            {
+            if (n == 0 || n == 1) {
                 sb.append((n == 0)
                         ? "no"
                         : "1");
                 sb.append(" publisher is configured\n");
-            } else
-            {
+            } else {
                 sb.append(n).append(" publishers are configured:\n");
             }
 
             List<String> sorted = new ArrayList<>(names);
             Collections.sort(sorted);
 
-            for (String name : sorted)
-            {
+            for (String name : sorted) {
                 sb.append("\t").append(name).append("\n");
             }
-        } else
-        {
+        } else {
             PublisherEntry entry = caManager.getPublisher(name);
-            if (entry == null)
-            {
+            if (entry == null) {
                 throw new UnexpectedException("\tno publisher named '" + name + " is configured");
-            } else
-            {
+            } else {
                 sb.append(entry.toString());
             }
         }

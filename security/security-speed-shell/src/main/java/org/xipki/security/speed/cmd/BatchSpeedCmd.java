@@ -44,8 +44,7 @@ import org.xipki.common.LoadExecutor;
  * @author Lijun Liao
  */
 
-public abstract class BatchSpeedCmd extends SecurityCmd
-{
+public abstract class BatchSpeedCmd extends SecurityCmd {
 
     @Option(name = "--duration",
             description = "duration in seconds for each test case")
@@ -60,17 +59,14 @@ public abstract class BatchSpeedCmd extends SecurityCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         List<LoadExecutor> testers = getTesters();
-        for (LoadExecutor tester : testers)
-        {
+        for (LoadExecutor tester : testers) {
             tester.setDuration(durationInSecond);
             tester.setThreads(Math.min(20, numThreads));
             System.out.println("============================================");
             tester.test();
-            if (tester.isInterrupted())
-            {
+            if (tester.isInterrupted()) {
                 throw new InterruptedException("cancelled by the user");
             }
         }

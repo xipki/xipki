@@ -53,8 +53,7 @@ import org.xipki.security.api.p11.P11ModuleConf;
  * @author Lijun Liao
  */
 
-class DefaultRemoteP11CryptService extends RemoteP11CryptService
-{
+class DefaultRemoteP11CryptService extends RemoteP11CryptService {
     private static final String CMP_REQUEST_MIMETYPE = "application/pkixcmp";
     private static final String CMP_RESPONSE_MIMETYPE = "application/pkixcmp";
 
@@ -62,24 +61,20 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
     private final String serverUrl;
 
     DefaultRemoteP11CryptService(
-            final P11ModuleConf moduleConf)
-    {
+            final P11ModuleConf moduleConf) {
         super(moduleConf);
 
         ParamUtil.assertNotNull("moduleConf", moduleConf);
 
         ConfPairs conf = new ConfPairs(moduleConf.getNativeLibrary());
         serverUrl = conf.getValue("url");
-        if (StringUtil.isBlank(serverUrl))
-        {
+        if (StringUtil.isBlank(serverUrl)) {
             throw new IllegalArgumentException("url is not specified");
         }
 
-        try
-        {
+        try {
             _serverUrl = new URL(serverUrl);
-        } catch (MalformedURLException e)
-        {
+        } catch (MalformedURLException e) {
             throw new IllegalArgumentException("invalid url: " + serverUrl);
         }
     }
@@ -87,8 +82,7 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
     @Override
     public byte[] send(
             final byte[] request)
-    throws IOException
-    {
+    throws IOException {
         HttpURLConnection httpUrlConnection = (HttpURLConnection) _serverUrl.openConnection();
         httpUrlConnection.setDoOutput(true);
         httpUrlConnection.setUseCaches(false);
@@ -103,32 +97,25 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
         outputstream.flush();
 
         InputStream inputstream = null;
-        try
-        {
+        try {
             inputstream = httpUrlConnection.getInputStream();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             InputStream errStream = httpUrlConnection.getErrorStream();
-            if (errStream != null)
-            {
+            if (errStream != null) {
                 errStream.close();
             }
             throw e;
         }
 
-        try
-        {
+        try {
             String responseContentType = httpUrlConnection.getContentType();
             boolean isValidContentType = false;
-            if (responseContentType != null)
-            {
-                if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE))
-                {
+            if (responseContentType != null) {
+                if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE)) {
                     isValidContentType = true;
                 }
             }
-            if (!isValidContentType)
-            {
+            if (!isValidContentType) {
                 throw new IOException("bad response: mime type "
                         + responseContentType
                         + " not supported!");
@@ -136,31 +123,26 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
 
             byte[] buf = new byte[4096];
             ByteArrayOutputStream bytearrayoutputstream = new ByteArrayOutputStream();
-            do
-            {
+            do {
                 int j = inputstream.read(buf);
-                if (j == -1)
-                {
+                if (j == -1) {
                     break;
                 }
                 bytearrayoutputstream.write(buf, 0, j);
             } while (true);
 
             return bytearrayoutputstream.toByteArray();
-        } finally
-        {
+        } finally {
             inputstream.close();
         }
     }
 
     @Override
     public void refresh()
-    throws SignerException
-    {
+    throws SignerException {
     }
 
-    public String getServerUrl()
-    {
+    public String getServerUrl() {
         return serverUrl;
     }
 

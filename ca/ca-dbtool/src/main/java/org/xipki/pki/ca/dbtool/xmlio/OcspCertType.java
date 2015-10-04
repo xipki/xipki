@@ -41,8 +41,7 @@ import javax.xml.stream.XMLStreamException;
  * @author Lijun Liao
  */
 
-public class OcspCertType extends DbDataObject
-{
+public class OcspCertType extends DbDataObject {
     public static final String TAG_ROOT = "cert";
 
     public static final String TAG_id = "id";
@@ -99,127 +98,105 @@ public class OcspCertType extends DbDataObject
     public static final String TAG_file = "file";
     private String file;
 
-    public Integer getId()
-    {
+    public Integer getId() {
         return id;
     }
 
     public void setId(
-            final Integer id)
-    {
+            final Integer id) {
         this.id = id;
     }
 
-    public Integer getIid()
-    {
+    public Integer getIid() {
         return iid;
     }
 
     public void setIid(
-            final Integer iid)
-    {
+            final Integer iid) {
         this.iid = iid;
     }
 
-    public String getSn()
-    {
+    public String getSn() {
         return sn;
     }
 
     public void setSn(
-            final String sn)
-    {
+            final String sn) {
         this.sn = sn;
     }
 
-    public String getProfile()
-    {
+    public String getProfile() {
         return profile;
     }
 
     public void setProfile(
-            final String profile)
-    {
+            final String profile) {
         this.profile = profile;
     }
 
-    public Long getUpdate()
-    {
+    public Long getUpdate() {
         return update;
     }
 
     public void setUpdate(
-            final Long update)
-    {
+            final Long update) {
         this.update = update;
     }
 
-    public Boolean getRev()
-    {
+    public Boolean getRev() {
         return rev;
     }
 
     public void setRev(
-            final Boolean rev)
-    {
+            final Boolean rev) {
         this.rev = rev;
     }
 
-    public Integer getRr()
-    {
+    public Integer getRr() {
         return rr;
     }
 
     public void setRr(
-            final Integer rr)
-    {
+            final Integer rr) {
         this.rr = rr;
     }
 
-    public Long getRt()
-    {
+    public Long getRt() {
         return rt;
     }
 
     public void setRt(
-            final Long rt)
-    {
+            final Long rt) {
         this.rt = rt;
     }
 
-    public Long getRit()
-    {
+    public Long getRit() {
         return rit;
     }
 
     public void setRit(
-            final Long rit)
-    {
+            final Long rit) {
         this.rit = rit;
     }
 
-    public String getFile()
-    {
+    public String getFile() {
         return file;
     }
 
     public void setFile(
-            final String file)
-    {
+            final String file) {
         this.file = file;
     }
 
     @Override
     public void validate()
-    throws InvalidDataObjectException
-    {
+    throws InvalidDataObjectException {
         assertNotNull("id", id);
         assertNotNull("iid", iid);
         assertNotBlank("sn", sn);
         assertNotNull("update", update);
         assertNotNull("rev", rev);
-        if (rev)
-        {
+        if (rev) {
             assertNotNull("rr", rr);
             assertNotNull("rt", rt);
         }
@@ -230,8 +207,7 @@ public class OcspCertType extends DbDataObject
     @Override
     public void writeTo(
             final DbiXmlWriter writer)
-    throws InvalidDataObjectException, XMLStreamException
-    {
+    throws InvalidDataObjectException, XMLStreamException {
         validate();
 
         writer.writeStartElement(TAG_ROOT);

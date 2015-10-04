@@ -45,20 +45,16 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-env-up",
         description = "update environment parameter (negative, QA)")
-public class NegEnvUpdateCmd extends EnvUpdateCmd
-{
+public class NegEnvUpdateCmd extends EnvUpdateCmd {
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("neg-env-up");
 
-        try
-        {
+        try {
             super._doExecute();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return null;
         }
 

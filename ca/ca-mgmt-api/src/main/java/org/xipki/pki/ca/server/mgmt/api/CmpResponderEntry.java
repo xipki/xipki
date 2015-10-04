@@ -48,8 +48,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public class CmpResponderEntry implements Serializable
-{
+public class CmpResponderEntry implements Serializable {
     private static final long serialVersionUID = 1L;
     private final String name;
     private final String type;
@@ -63,8 +62,7 @@ public class CmpResponderEntry implements Serializable
             final String name,
             final String type,
             final String conf,
-            final String base64Cert)
-    {
+            final String base64Cert) {
         ParamUtil.assertNotBlank("name", name);
         ParamUtil.assertNotBlank("type", type);
 
@@ -73,119 +71,96 @@ public class CmpResponderEntry implements Serializable
         this.conf = conf;
         this.base64Cert = base64Cert;
 
-        if (base64Cert == null)
-        {
+        if (base64Cert == null) {
             return;
         }
 
-        try
-        {
+        try {
             this.cert = X509Util.parseBase64EncodedCert(base64Cert);
-        } catch (Throwable t)
-        {
+        } catch (Throwable t) {
             this.certFaulty = true;
         }
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getType()
-    {
+    public String getType() {
         return type;
     }
 
-    public String getConf()
-    {
+    public String getConf() {
         return conf;
     }
 
-    public X509Certificate getCertificate()
-    {
+    public X509Certificate getCertificate() {
         return cert;
     }
 
     public void setCertificate(
-            final X509Certificate cert)
-    {
-        if (base64Cert != null)
-        {
+            final X509Certificate cert) {
+        if (base64Cert != null) {
             throw new IllegalStateException("certificate is already specified by base64Cert");
         }
         this.cert = cert;
     }
 
-    public String getBase64Cert()
-    {
+    public String getBase64Cert() {
         return base64Cert;
     }
 
-    public boolean isFaulty()
-    {
+    public boolean isFaulty() {
         return confFaulty || certFaulty;
     }
 
     public void setConfFaulty(
-            final boolean confFaulty)
-    {
+            final boolean confFaulty) {
         this.confFaulty = confFaulty;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return toString(false);
     }
 
     public String toString(
-            final boolean verbose)
-    {
+            final boolean verbose) {
         return toString(verbose, true);
     }
 
     public String toString(
             final boolean verbose,
-            final boolean ignoreSensitiveInfo)
-    {
+            final boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
         sb.append("faulty: ").append(isFaulty()).append('\n');
         sb.append("type: ").append(type).append('\n');
         sb.append("conf: ");
-        if (conf == null)
-        {
+        if (conf == null) {
             sb.append("null");
-        } else
-        {
+        } else {
             sb.append(SecurityUtil.signerConfToString(conf, verbose, ignoreSensitiveInfo));
         }
         sb.append('\n');
         sb.append("cert: ").append("\n");
-        if (cert != null || base64Cert != null)
-        {
-            if (cert != null)
-            {
+        if (cert != null || base64Cert != null) {
+            if (cert != null) {
                 sb.append("\tissuer: ").append(
                         X509Util.getRFC4519Name(cert.getIssuerX500Principal())).append('\n');
                 sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append('\n');
                 sb.append("\tsubject: ").append(
                         X509Util.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
             }
-            if (verbose)
-            {
+            if (verbose) {
                 sb.append("\tencoded: ");
-                try
-                {
+                try {
                     sb.append(Base64.toBase64String(cert.getEncoded()));
-                } catch (CertificateEncodingException e)
-                {
+                } catch (CertificateEncodingException e) {
                     sb.append("ERROR");
                 }
             }
-        } else
-        {
+        } else {
             sb.append("null");
         }
         return sb.toString();

@@ -50,17 +50,14 @@ import org.xipki.security.speed.p12.P12RSAKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-rsa-gen-p12",
         description = "performance test of PKCS#12 RSA key generation (batch)")
-public class BSpeedP12RSAKeyGenCmd extends BatchSpeedCmd
-{
+public class BSpeedP12RSAKeyGenCmd extends BatchSpeedCmd {
 
     @Override
     protected List<LoadExecutor> getTesters()
-    throws Exception
-    {
+    throws Exception {
         List<LoadExecutor> ret = new LinkedList<>();
         int[] keysizes = new int[]{1024, 2048, 3072, 4096};
-        for (int keysize : keysizes)
-        {
+        for (int keysize : keysizes) {
             ret.add(
                     new P12RSAKeyGenLoadTest(keysize, new BigInteger("0x10001")));
         }

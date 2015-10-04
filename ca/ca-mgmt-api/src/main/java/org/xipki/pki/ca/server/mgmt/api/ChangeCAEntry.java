@@ -45,8 +45,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class ChangeCAEntry implements Serializable
-{
+public class ChangeCAEntry implements Serializable {
     private static final long serialVersionUID = 1L;
     private final String name;
     private CAStatus status;
@@ -64,146 +63,120 @@ public class ChangeCAEntry implements Serializable
 
     public ChangeCAEntry(
             final String name)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         ParamUtil.assertNotBlank("name", name);
         this.name = name;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public CAStatus getStatus()
-    {
+    public CAStatus getStatus() {
         return status;
     }
 
     public void setStatus(
-            final CAStatus status)
-    {
+            final CAStatus status) {
         this.status = status;
     }
 
-    public CertValidity getMaxValidity()
-    {
+    public CertValidity getMaxValidity() {
         return maxValidity;
     }
 
     public void setMaxValidity(
-            final CertValidity maxValidity)
-    {
+            final CertValidity maxValidity) {
         this.maxValidity = maxValidity;
     }
 
-    public String getSignerType()
-    {
+    public String getSignerType() {
         return signerType;
     }
 
     public void setSignerType(
-            final String signerType)
-    {
+            final String signerType) {
         this.signerType = signerType;
     }
 
-    public String getSignerConf()
-    {
+    public String getSignerConf() {
         return signerConf;
     }
 
     public void setSignerConf(
-            final String signerConf)
-    {
+            final String signerConf) {
         this.signerConf = signerConf;
     }
 
-    public String getCmpControlName()
-    {
+    public String getCmpControlName() {
         return cmpControlName;
     }
 
     public void setCmpControlName(
-            final String cmpControlName)
-    {
+            final String cmpControlName) {
         this.cmpControlName = cmpControlName;
     }
 
-    public String getResponderName()
-    {
+    public String getResponderName() {
         return responderName;
     }
 
     public void setResponderName(
-            final String responderName)
-    {
+            final String responderName) {
         this.responderName = responderName;
     }
 
-    public DuplicationMode getDuplicateKeyMode()
-    {
+    public DuplicationMode getDuplicateKeyMode() {
         return duplicateKeyMode;
     }
 
     public void setDuplicateKeyMode(
-            final DuplicationMode duplicateKeyMode)
-    {
+            final DuplicationMode duplicateKeyMode) {
         this.duplicateKeyMode = duplicateKeyMode;
     }
 
-    public DuplicationMode getDuplicateSubjectMode()
-    {
+    public DuplicationMode getDuplicateSubjectMode() {
         return duplicateSubjectMode;
     }
 
     public void setDuplicateSubjectMode(
-            final DuplicationMode duplicateSubjectMode)
-    {
+            final DuplicationMode duplicateSubjectMode) {
         this.duplicateSubjectMode = duplicateSubjectMode;
     }
 
-    public ValidityMode getValidityMode()
-    {
+    public ValidityMode getValidityMode() {
         return validityMode;
     }
 
     public void setValidityMode(
-            final ValidityMode validityMode)
-    {
+            final ValidityMode validityMode) {
         this.validityMode = validityMode;
     }
 
-    public Set<Permission> getPermissions()
-    {
+    public Set<Permission> getPermissions() {
         return permissions;
     }
 
     public void setPermissions(
-            final Set<Permission> permissions)
-    {
+            final Set<Permission> permissions) {
         this.permissions = permissions;
     }
 
-    public Integer getExpirationPeriod()
-    {
+    public Integer getExpirationPeriod() {
         return expirationPeriod;
     }
 
     public void setExpirationPeriod(
-            final Integer expirationPeriod)
-    {
+            final Integer expirationPeriod) {
         this.expirationPeriod = expirationPeriod;
     }
 
-    public Integer getKeepExpiredCertInDays()
-    {
+    public Integer getKeepExpiredCertInDays() {
         return keepExpiredCertInDays;
     }
 
     public void setKeepExpiredCertInDays(
-            final Integer days)
-    {
+            final Integer days) {
         this.keepExpiredCertInDays = days;
     }
 

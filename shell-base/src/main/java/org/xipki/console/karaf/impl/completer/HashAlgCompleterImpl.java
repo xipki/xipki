@@ -43,10 +43,8 @@ import org.xipki.console.karaf.HashAlgCompleter;
  */
 
 public class HashAlgCompleterImpl extends EnumCompleter
-implements HashAlgCompleter
-{
-    public HashAlgCompleterImpl()
-    {
+implements HashAlgCompleter {
+    public HashAlgCompleterImpl() {
         setTokens("SHA1,SHA224,SHA256,SHA384,SHA512");
     }
 }

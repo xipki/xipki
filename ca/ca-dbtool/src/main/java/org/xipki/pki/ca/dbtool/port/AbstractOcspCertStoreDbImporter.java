@@ -48,8 +48,7 @@ import org.xipki.security.api.HashCalculator;
  * @author Lijun Liao
  */
 
-abstract class AbstractOcspCertStoreDbImporter extends DbPorter
-{
+abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
     protected static final String SQL_ADD_ISSUER =
         "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1S,S1K,S224S,S224K,S256S,S256K,S384S,S384K,"
         + "S512S,S512K,S1C,CERT,REV,RR,RT,RIT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -78,53 +77,45 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter
             final String srcDir,
             final AtomicBoolean stopMe,
             final boolean evaluateOnly)
-    throws Exception
-    {
+    throws Exception {
         super(dataSource, srcDir, stopMe, evaluateOnly);
     }
 
     protected String sha1(
-            final byte[] data)
-    {
+            final byte[] data) {
         return HashCalculator.base64Hash(HashAlgoType.SHA1, data);
     }
 
     protected String sha224(
-            final byte[] data)
-    {
+            final byte[] data) {
         return HashCalculator.base64Hash(HashAlgoType.SHA224, data);
     }
 
     protected String sha256(
-            final byte[] data)
-    {
+            final byte[] data) {
         return HashCalculator.base64Hash(HashAlgoType.SHA256, data);
     }
 
     protected String sha384(
-            final byte[] data)
-    {
+            final byte[] data) {
         return HashCalculator.base64Hash(HashAlgoType.SHA384, data);
     }
 
     protected String sha512(
-            final byte[] data)
-    {
+            final byte[] data) {
         return HashCalculator.base64Hash(HashAlgoType.SHA512, data);
     }
 
     protected void deleteCertGreatherThan(
             final int id,
-            final Logger log)
-    {
+            final Logger log) {
         deleteFromTableWithLargerId("CRAW", "CID", id, log);
         deleteFromTableWithLargerId("CHASH", "CID", id, log);
         deleteFromTableWithLargerId("CERT", "ID", id, log);
     }
 
     protected void dropIndexes()
-    throws DataAccessException
-    {
+    throws DataAccessException {
         System.out.println("dropping indexes");
         long start = System.currentTimeMillis();
 
@@ -143,8 +134,7 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter
     }
 
     protected void recoverIndexes()
-    throws DataAccessException
-    {
+    throws DataAccessException {
         System.out.println("recovering indexes");
         long start = System.currentTimeMillis();
 

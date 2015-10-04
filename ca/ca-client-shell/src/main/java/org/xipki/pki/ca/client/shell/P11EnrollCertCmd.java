@@ -54,8 +54,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
 
 @Command(scope = "xipki-cli", name = "enroll",
         description = "enroll certificate (PKCS#11 token)")
-public class P11EnrollCertCmd extends EnrollCertCmd
-{
+public class P11EnrollCertCmd extends EnrollCertCmd {
     @Option(name = "--slot",
             required = true,
             description = "slot index\n"
@@ -80,8 +79,7 @@ public class P11EnrollCertCmd extends EnrollCertCmd
     protected ConcurrentContentSigner getSigner(
             final String hashAlgo,
             final SignatureAlgoControl signatureAlgoControl)
-    throws SignerException
-    {
+    throws SignerException {
         P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, null);
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
 
@@ -92,17 +90,13 @@ public class P11EnrollCertCmd extends EnrollCertCmd
     }
 
     private P11KeyIdentifier getKeyIdentifier()
-    throws SignerException
-    {
+    throws SignerException {
         P11KeyIdentifier keyIdentifier;
-        if (keyId != null && keyLabel == null)
-        {
+        if (keyId != null && keyLabel == null) {
             keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
-        } else if (keyId == null && keyLabel != null)
-        {
+        } else if (keyId == null && keyLabel != null) {
             keyIdentifier = new P11KeyIdentifier(keyLabel);
-        } else
-        {
+        } else {
             throw new SignerException("exactly one of keyId or keyLabel should be specified");
         }
         return keyIdentifier;

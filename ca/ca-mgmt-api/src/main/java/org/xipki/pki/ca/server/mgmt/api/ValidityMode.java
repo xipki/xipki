@@ -39,19 +39,15 @@ package org.xipki.pki.ca.server.mgmt.api;
  * @author Lijun Liao
  */
 
-public enum ValidityMode
-{
+public enum ValidityMode {
     STRICT,
     LAX,
     CUTOFF;
 
     public static ValidityMode getInstance(
-            final String text)
-    {
-        for (ValidityMode value : values())
-        {
-            if (value.name().equalsIgnoreCase(text))
-            {
+            final String text) {
+        for (ValidityMode value : values()) {
+            if (value.name().equalsIgnoreCase(text)) {
                 return value;
             }
         }

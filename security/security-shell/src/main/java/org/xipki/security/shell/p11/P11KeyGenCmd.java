@@ -49,8 +49,7 @@ import org.xipki.security.shell.KeyGenCmd;
  * @author Lijun Liao
  */
 
-public abstract class P11KeyGenCmd extends KeyGenCmd
-{
+public abstract class P11KeyGenCmd extends KeyGenCmd {
 
     @Option(name = "--slot",
             required = true,
@@ -81,24 +80,20 @@ public abstract class P11KeyGenCmd extends KeyGenCmd
             description = "Name of the PKCS#11 module.")
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
-    protected String getSubject()
-    {
-        if (isBlank(subject))
-        {
+    protected String getSubject() {
+        if (isBlank(subject)) {
             return "CN=" + label;
         }
         return subject;
     }
 
-    protected P11SlotIdentifier getSlotId()
-    {
+    protected P11SlotIdentifier getSlotId() {
         return new P11SlotIdentifier(slotIndex, null);
     }
 
     protected void finalize(
             final P11KeyIdentifier keyId)
-    throws Exception
-    {
+    throws Exception {
         out("generate PKCS#11 key");
         out("\tkey id: " + Hex.toHexString(keyId.getKeyId()));
         out("\tkey label: " + keyId.getKeyLabel());
@@ -108,13 +103,11 @@ public abstract class P11KeyGenCmd extends KeyGenCmd
 
     protected void finalize(
             final P11KeypairGenerationResult keyAndCert)
-    throws Exception
-    {
+    throws Exception {
         out("generate PKCS#11 key");
         out("\tkey id: " + Hex.toHexString(keyAndCert.getId()));
         out("\tkey label: " + keyAndCert.getLabel());
-        if (outputFilename != null)
-        {
+        if (outputFilename != null) {
             File certFile = new File(outputFilename);
             saveVerbose("\tsaved self-signed certificate to file", certFile,
                     keyAndCert.getCertificate().getEncoded());

@@ -87,8 +87,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public class X509CertprofileQAImpl implements X509CertprofileQA
-{
+public class X509CertprofileQAImpl implements X509CertprofileQA {
     private static final Logger LOG = LoggerFactory.getLogger(X509CertprofileQAImpl.class);
     private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     private static final long SECOND = 1000L;
@@ -105,40 +104,31 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
     public X509CertprofileQAImpl(
             final String data)
-    throws CertprofileException
-    {
+    throws CertprofileException {
         this(data.getBytes());
     }
 
     public X509CertprofileQAImpl(
             final byte[] dataBytes)
-    throws CertprofileException
-    {
-        try
-        {
+    throws CertprofileException {
+        try {
             X509ProfileType conf = XmlX509CertprofileUtil.parse(
                     new ByteArrayInputStream(dataBytes));
 
             this.version = X509CertVersion.getInstance(conf.getVersion());
-            if (this.version == null)
-            {
+            if (this.version == null) {
                 throw new CertprofileException("invalid version " + conf.getVersion());
             }
 
-            if (conf.getSignatureAlgorithms() == null)
-            {
+            if (conf.getSignatureAlgorithms() == null) {
                 this.signatureAlgorithms = null;
-            } else
-            {
+            } else {
                 this.signatureAlgorithms = new HashSet<>();
-                for (String algo :conf.getSignatureAlgorithms().getAlgorithm())
-                {
+                for (String algo :conf.getSignatureAlgorithms().getAlgorithm()) {
                     String c14nAlgo;
-                    try
-                    {
+                    try {
                         c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(algo);
-                    } catch (NoSuchAlgorithmException e)
-                    {
+                    } catch (NoSuchAlgorithmException e) {
                         throw new CertprofileException(e.getMessage(), e);
                     }
                     this.signatureAlgorithms.add(c14nAlgo);
@@ -150,11 +140,9 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             this.publicKeyChecker = new PublicKeyChecker(conf);
             this.subjectChecker = new SubjectChecker(conf);
             this.extensionsChecker = new ExtensionsChecker(conf);
-        } catch (RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             final String message = "RuntimeException";
-            if (LOG.isErrorEnabled())
-            {
+            if (LOG.isErrorEnabled()) {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
             }
@@ -170,8 +158,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             final X509IssuerInfo issuerInfo,
             final X500Name requestedSubject,
             final SubjectPublicKeyInfo requestedPublicKey,
-            final Extensions requestedExtensions)
-    {
+            final Extensions requestedExtensions) {
         ParamUtil.assertNotNull("certBytes", certBytes);
         ParamUtil.assertNotNull("issuerInfo", issuerInfo);
         ParamUtil.assertNotNull("requestedSubject", requestedSubject);
@@ -183,56 +170,43 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         X509Certificate cert;
 
         // certificate encoding
-        {
-            ValidationIssue issue = new ValidationIssue("X509.ENCODING", "certificate encoding");
-            resultIssues.add(issue);
-            try
-            {
-                bcCert = Certificate.getInstance(certBytes);
-                cert = X509Util.parseCert(certBytes);
-            } catch (CertificateException | IOException e)
-            {
-                issue.setFailureMessage("certificate is not corrected encoded");
-                return new ValidationResult(resultIssues);
-            }
+        ValidationIssue issue = new ValidationIssue("X509.ENCODING", "certificate encoding");
+        resultIssues.add(issue);
+        try {
+            bcCert = Certificate.getInstance(certBytes);
+            cert = X509Util.parseCert(certBytes);
+        } catch (CertificateException | IOException e) {
+            issue.setFailureMessage("certificate is not corrected encoded");
+            return new ValidationResult(resultIssues);
         }
 
         // syntax version
-        {
-            ValidationIssue issue = new ValidationIssue("X509.VERSION", "certificate version");
-            resultIssues.add(issue);
-            int versionNumber = cert.getVersion();
-            if (versionNumber != version.getVersion())
-            {
-                issue.setFailureMessage("is '" + versionNumber
-                        + "' but expected '" + version.getVersion() + "'");
-            }
+        issue = new ValidationIssue("X509.VERSION", "certificate version");
+        resultIssues.add(issue);
+        int versionNumber = cert.getVersion();
+        if (versionNumber != version.getVersion()) {
+            issue.setFailureMessage("is '" + versionNumber
+                    + "' but expected '" + version.getVersion() + "'");
         }
 
         // signatureAlgorithm
-        if (CollectionUtil.isNotEmpty(signatureAlgorithms))
-        {
-            ValidationIssue issue = new ValidationIssue("X509.SIGALG", "signature algorithm");
+        if (CollectionUtil.isNotEmpty(signatureAlgorithms)) {
+            issue = new ValidationIssue("X509.SIGALG", "signature algorithm");
             resultIssues.add(issue);
 
             AlgorithmIdentifier sigAlgId = bcCert.getSignatureAlgorithm();
             AlgorithmIdentifier tbsSigAlgId = bcCert.getTBSCertificate().getSignature();
-            if (!tbsSigAlgId.equals(sigAlgId))
-            {
+            if (!tbsSigAlgId.equals(sigAlgId)) {
                 issue.setFailureMessage(
                         "Certificate.tbsCertificate.signature != Certificate.signatureAlgorithm");
-            } else
-            {
-                try
-                {
+            } else {
+                try {
                     String sigAlgo = AlgorithmUtil.getSignatureAlgoName(sigAlgId);
-                    if (!signatureAlgorithms.contains(sigAlgo))
-                    {
+                    if (!signatureAlgorithms.contains(sigAlgo)) {
                         issue.setFailureMessage("signatureAlgorithm '" + sigAlgo
                                 + "' is not allowed");
                     }
-                } catch (NoSuchAlgorithmException e)
-                {
+                } catch (NoSuchAlgorithmException e) {
                     issue.setFailureMessage("unsupported signature algorithm "
                             + sigAlgId.getAlgorithm().getId());
                 }
@@ -240,9 +214,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
         }
 
         // notBefore
-        if (notBeforeMidnight)
-        {
-            ValidationIssue issue = new ValidationIssue("X509.NOTBEFORE", "not before midnight");
+        if (notBeforeMidnight) {
+            issue = new ValidationIssue("X509.NOTBEFORE", "not before midnight");
             resultIssues.add(issue);
             Calendar c = Calendar.getInstance(UTC);
             c.setTime(cert.getNotBefore());
@@ -250,28 +223,23 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
             int minute = c.get(Calendar.MINUTE);
             int second = c.get(Calendar.SECOND);
 
-            if (hourOfDay != 0 || minute != 0 || second != 0)
-            {
+            if (hourOfDay != 0 || minute != 0 || second != 0) {
                 issue.setFailureMessage(" '" + cert.getNotBefore()
                     + "' is not midnight time (UTC)");
             }
         }
 
         // validity
-        {
-            ValidationIssue issue = new ValidationIssue("X509.VALIDITY", "cert validity");
-            resultIssues.add(issue);
+        issue = new ValidationIssue("X509.VALIDITY", "cert validity");
+        resultIssues.add(issue);
 
-            Date expectedNotAfter = validity.add(cert.getNotBefore());
-            if (expectedNotAfter.getTime() > MAX_CERT_TIME_MS)
-            {
-                expectedNotAfter = new Date(MAX_CERT_TIME_MS);
-            }
+        Date expectedNotAfter = validity.add(cert.getNotBefore());
+        if (expectedNotAfter.getTime() > MAX_CERT_TIME_MS) {
+            expectedNotAfter = new Date(MAX_CERT_TIME_MS);
+        }
 
-            if (Math.abs(expectedNotAfter.getTime() - cert.getNotAfter().getTime()) > 60 * SECOND)
-            {
-                issue.setFailureMessage("cert validity is not within " + validity.toString());
-            }
+        if (Math.abs(expectedNotAfter.getTime() - cert.getNotAfter().getTime()) > 60 * SECOND) {
+            issue.setFailureMessage("cert validity is not within " + validity.toString());
         }
 
         // public key
@@ -279,29 +247,22 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
                 requestedPublicKey));
 
         // Signature
-        {
-            ValidationIssue issue = new ValidationIssue("X509.SIG",
-                    "whether certificate is signed by CA");
-            resultIssues.add(issue);
-            try
-            {
-                cert.verify(issuerInfo.getCert().getPublicKey(), "BC");
-            } catch (Exception e)
-            {
-                issue.setFailureMessage("invalid signature");
-            }
+        issue = new ValidationIssue("X509.SIG",
+                "whether certificate is signed by CA");
+        resultIssues.add(issue);
+        try {
+            cert.verify(issuerInfo.getCert().getPublicKey(), "BC");
+        } catch (Exception e) {
+            issue.setFailureMessage("invalid signature");
         }
 
         // issuer
-        {
-            ValidationIssue issue = new ValidationIssue("X509.ISSUER", "certificate issuer");
-            resultIssues.add(issue);
-            if (!cert.getIssuerX500Principal().equals(
-                    issuerInfo.getCert().getSubjectX500Principal()))
-            {
-                issue.setFailureMessage(
-                        "issue in certificate does not equal the subject of CA certificate");
-            }
+        issue = new ValidationIssue("X509.ISSUER", "certificate issuer");
+        resultIssues.add(issue);
+        if (!cert.getIssuerX500Principal().equals(
+                issuerInfo.getCert().getSubjectX500Principal())) {
+            issue.setFailureMessage(
+                    "issue in certificate does not equal the subject of CA certificate");
         }
 
         // subject
@@ -318,18 +279,14 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
     }
 
     static Set<Range> buildParametersMap(
-            final RangesType ranges)
-    {
-        if (ranges == null)
-        {
+            final RangesType ranges) {
+        if (ranges == null) {
             return null;
         }
 
         Set<Range> ret = new HashSet<>();
-        for (RangeType range : ranges.getRange())
-        {
-            if (range.getMin() != null || range.getMax() != null)
-            {
+        for (RangeType range : ranges.getRange()) {
+            if (range.getMin() != null || range.getMax() != null) {
                 ret.add(new Range(range.getMin(), range.getMax()));
             }
         }
@@ -338,46 +295,38 @@ public class X509CertprofileQAImpl implements X509CertprofileQA
 
     public static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(
             final ExtensionsType extensionsType)
-    throws CertprofileException
-    {
-        if (extensionsType == null)
-        {
+    throws CertprofileException {
+        if (extensionsType == null) {
             return null;
         }
 
         Map<ASN1ObjectIdentifier, QaExtensionValue> map = new HashMap<>();
 
-        for (ExtensionType m : extensionsType.getExtension())
-        {
-            if (m.getValue() == null || !(m.getValue().getAny() instanceof ConstantExtValue))
-            {
+        for (ExtensionType m : extensionsType.getExtension()) {
+            if (m.getValue() == null || !(m.getValue().getAny() instanceof ConstantExtValue)) {
                 continue;
             }
 
             ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
             if (Extension.subjectAlternativeName.equals(oid)
                     || Extension.subjectInfoAccess.equals(oid)
-                    || Extension.biometricInfo.equals(oid))
-            {
+                    || Extension.biometricInfo.equals(oid)) {
                 continue;
             }
 
             ConstantExtValue extConf = (ConstantExtValue) m.getValue().getAny();
             byte[] encodedValue = extConf.getValue();
             ASN1StreamParser parser = new ASN1StreamParser(encodedValue);
-            try
-            {
+            try {
                 parser.readObject();
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 throw new CertprofileException("could not parse the constant extension value", e);
             }
             QaExtensionValue extension = new QaExtensionValue(m.isCritical(), encodedValue);
             map.put(oid, extension);
         }
 
-        if (CollectionUtil.isEmpty(map))
-        {
+        if (CollectionUtil.isEmpty(map)) {
             return null;
         }
 

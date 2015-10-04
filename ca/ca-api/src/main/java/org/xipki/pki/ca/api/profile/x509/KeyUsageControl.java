@@ -42,27 +42,23 @@ import org.xipki.security.api.KeyUsage;
  * @author Lijun Liao
  */
 
-public class KeyUsageControl
-{
+public class KeyUsageControl {
     private final KeyUsage keyUsage;
     private final boolean required;
 
     public KeyUsageControl(
             final KeyUsage keyUsage,
-            final boolean required)
-    {
+            final boolean required) {
         ParamUtil.assertNotNull("keyUsage", keyUsage);
         this.keyUsage = keyUsage;
         this.required = required;
     }
 
-    public KeyUsage getKeyUsage()
-    {
+    public KeyUsage getKeyUsage() {
         return keyUsage;
     }
 
-    public boolean isRequired()
-    {
+    public boolean isRequired() {
         return required;
     }
 

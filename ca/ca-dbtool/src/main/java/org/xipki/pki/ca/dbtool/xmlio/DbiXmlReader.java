@@ -48,8 +48,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public abstract class DbiXmlReader
-{
+public abstract class DbiXmlReader {
     private final XMLInputFactory factory = XMLInputFactory.newInstance();
 
     private final String rootElementName;
@@ -59,29 +58,24 @@ public abstract class DbiXmlReader
     public DbiXmlReader(
             final String rootElementName,
             final InputStream xmlStream)
-    throws XMLStreamException, InvalidDataObjectException
-    {
+    throws XMLStreamException, InvalidDataObjectException {
         ParamUtil.assertNotBlank("rootElementName", rootElementName);
         this.rootElementName = rootElementName;
-        synchronized (factory)
-        {
+        synchronized (factory) {
             reader = factory.createXMLStreamReader(xmlStream);
         }
 
         String thisRootElement = null;
-        while (reader.hasNext())
-        {
+        while (reader.hasNext()) {
             int event = reader.next();
 
-            if (event == XMLStreamConstants.START_ELEMENT)
-            {
+            if (event == XMLStreamConstants.START_ELEMENT) {
                 thisRootElement = reader.getLocalName();
                 break;
             }
         }
 
-        if (!this.rootElementName.equals(thisRootElement))
-        {
+        if (!this.rootElementName.equals(thisRootElement)) {
             throw new InvalidDataObjectException("the given XML stream does not have root element '"
                     + rootElementName + "', but '" + thisRootElement + "'");
         }
@@ -89,21 +83,17 @@ public abstract class DbiXmlReader
         this.next = retrieveNext(this.reader);
     }
 
-    public String getRootElementName()
-    {
+    public String getRootElementName() {
         return rootElementName;
     }
 
-    public boolean hasNext()
-    {
+    public boolean hasNext() {
         return next != null;
     }
 
     public DbDataObject next()
-    throws InvalidDataObjectException, XMLStreamException
-    {
-        if (next == null)
-        {
+    throws InvalidDataObjectException, XMLStreamException {
+        if (next == null) {
             throw new IllegalStateException("no more next element exists");
         }
 

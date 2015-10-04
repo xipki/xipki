@@ -47,8 +47,7 @@ import org.xipki.password.api.PasswordResolverException;
  * @author Lijun Liao
  */
 
-public interface DataSourceFactory
-{
+public interface DataSourceFactory {
     DataSourceWrapper createDataSource(
             String name,
             InputStream conf,

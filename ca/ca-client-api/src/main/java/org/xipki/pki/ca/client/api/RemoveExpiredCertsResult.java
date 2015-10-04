@@ -39,54 +39,45 @@ package org.xipki.pki.ca.client.api;
  * @author Lijun Liao
  */
 
-public class RemoveExpiredCertsResult
-{
+public class RemoveExpiredCertsResult {
     private int numOfCerts;
     private long expiredAt;
     private String userLike;
     private String certprofile;
 
-    public int getNumOfCerts()
-    {
+    public int getNumOfCerts() {
         return numOfCerts;
     }
 
     public void setNumOfCerts(
-            final int numOfCerts)
-    {
+            final int numOfCerts) {
         this.numOfCerts = numOfCerts;
     }
 
-    public long getExpiredAt()
-    {
+    public long getExpiredAt() {
         return expiredAt;
     }
 
     public void setExpiredAt(
-            final long expiredAt)
-    {
+            final long expiredAt) {
         this.expiredAt = expiredAt;
     }
 
-    public String getUserLike()
-    {
+    public String getUserLike() {
         return userLike;
     }
 
     public void setUserLike(
-            final String userLike)
-    {
+            final String userLike) {
         this.userLike = userLike;
     }
 
-    public String getCertprofile()
-    {
+    public String getCertprofile() {
         return certprofile;
     }
 
     public void setCertprofile(
-            final String certprofile)
-    {
+            final String certprofile) {
         this.certprofile = certprofile;
     }
 

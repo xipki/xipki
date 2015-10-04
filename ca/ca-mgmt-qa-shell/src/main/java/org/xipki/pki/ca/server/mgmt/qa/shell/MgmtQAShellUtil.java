@@ -44,35 +44,28 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-public class MgmtQAShellUtil
-{
+public class MgmtQAShellUtil {
 
-    private MgmtQAShellUtil()
-    {
+    private MgmtQAShellUtil() {
     }
 
     public static void assertEquals(
             final String desc,
             String ex,
             final String is)
-    throws CmdFailure
-    {
-        if (CAManager.NULL.equals(ex))
-        {
+    throws CmdFailure {
+        if (CAManager.NULL.equals(ex)) {
             ex = null;
         }
 
         boolean b;
-        if (ex == null)
-        {
+        if (ex == null) {
             b = (is == null);
-        } else
-        {
+        } else {
             b = ex.equals(is);
         }
 
-        if (!b)
-        {
+        if (!b) {
             throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
         }
     }
@@ -80,19 +73,15 @@ public class MgmtQAShellUtil
     public static void assertEquals(
             final String desc,
             final Collection<?> ex, Collection<?> is)
-    throws CmdFailure
-    {
+    throws CmdFailure {
         boolean b;
-        if (ex == null)
-        {
+        if (ex == null) {
             b = (is == null);
-        } else
-        {
+        } else {
             b = ex.equals(is);
         }
 
-        if (!b)
-        {
+        if (!b) {
             throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
         }
     }

@@ -52,8 +52,7 @@ import org.xipki.console.karaf.CmdFailure;
  * @author Lijun Liao
  */
 
-public abstract class AbstractEnrollCertCmd extends ClientCmd
-{
+public abstract class AbstractEnrollCertCmd extends ClientCmd {
     @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request file\n"
@@ -75,28 +74,24 @@ public abstract class AbstractEnrollCertCmd extends ClientCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         Client client = getScepClient();
 
         PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(p10File));
 
         EnrollmentResponse resp = requestCertificate(client, csr, getIdentityKey(),
                 getIdentityCert());
-        if (resp.isFailure())
-        {
+        if (resp.isFailure()) {
             throw new CmdFailure("server returned 'failure'");
         }
 
-        if (resp.isPending())
-        {
+        if (resp.isPending()) {
             throw new CmdFailure("server returned 'pending'");
         }
 
         X509Certificate cert = extractEECerts(resp.getCertStore());
 
-        if (cert == null)
-        {
+        if (cert == null) {
             throw new Exception("received no certificate");
         }
 

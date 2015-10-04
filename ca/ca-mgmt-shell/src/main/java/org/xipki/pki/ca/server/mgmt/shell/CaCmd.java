@@ -45,29 +45,24 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
  * @author Lijun Liao
  */
 
-public abstract class CaCmd extends XipkiOsgiCommandSupport
-{
+public abstract class CaCmd extends XipkiOsgiCommandSupport {
     protected CAManager caManager;
 
     public void setCaManager(
-            final CAManager caManager)
-    {
+            final CAManager caManager) {
         this.caManager = caManager;
     }
 
     protected static String getRealString(
-            final String s)
-    {
+            final String s) {
         return CAManager.NULL.equalsIgnoreCase(s)
                 ? null
                 : s;
     }
 
     protected static String toString(
-            final Collection<? extends Object> c)
-    {
-        if (c == null)
-        {
+            final Collection<? extends Object> c) {
+        if (c == null) {
             return "null";
         }
 
@@ -76,11 +71,9 @@ public abstract class CaCmd extends XipkiOsgiCommandSupport
         int n = c.size();
 
         int i = 0;
-        for (Object o : c)
-        {
+        for (Object o : c) {
             sb.append(o);
-            if (i < n - 1)
-            {
+            if (i < n - 1) {
                 sb.append(", ");
             }
             i++;
@@ -94,13 +87,10 @@ public abstract class CaCmd extends XipkiOsgiCommandSupport
             final String posPrefix,
             final String negPrefix,
             final String message)
-    throws CmdFailure
-    {
-        if (successful)
-        {
+    throws CmdFailure {
+        if (successful) {
             out(posPrefix + " " + message);
-        } else
-        {
+        } else {
             throw new CmdFailure(negPrefix + " " + message);
         }
     }

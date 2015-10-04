@@ -49,8 +49,7 @@ import org.xipki.security.api.CertRevocationInfo;
  * @author Lijun Liao
  */
 
-public interface CAManager
-{
+public interface CAManager {
     String NULL = "NULL";
 
     CASystemStatus getCASystemStatus();

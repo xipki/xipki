@@ -81,10 +81,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  * @author: havoc AT defuse.ca
  * www: http://crackstation.net/hashing-security.htm
  */
-public class PasswordHash
-{
-    private PasswordHash()
-    {
+public class PasswordHash {
+    private PasswordHash() {
     }
 
     // see 'http://stackoverflow.com/questions/22580853/\
@@ -102,8 +100,7 @@ public class PasswordHash
 
     private final static PKCS5S2ParametersGenerator gen;
 
-    static
-    {
+    static {
         gen = new PKCS5S2ParametersGenerator(new SHA256Digest());
     }
 
@@ -115,8 +112,7 @@ public class PasswordHash
      */
     public static String createHash(
             final String password)
-    throws NoSuchAlgorithmException, InvalidKeySpecException
-    {
+    throws NoSuchAlgorithmException, InvalidKeySpecException {
         return createHash(password.getBytes());
     }
 
@@ -128,8 +124,7 @@ public class PasswordHash
      */
     public static String createHash(
             final byte[] password)
-    throws NoSuchAlgorithmException, InvalidKeySpecException
-    {
+    throws NoSuchAlgorithmException, InvalidKeySpecException {
         return createHash(password, SALT_BYTE_SIZE, PBKDF2_ITERATIONS, DERIVED_KEY_SIZE);
     }
 
@@ -144,8 +139,7 @@ public class PasswordHash
             final int saltSize,
             final int iterations,
             final int dkSize)
-    throws NoSuchAlgorithmException, InvalidKeySpecException
-    {
+    throws NoSuchAlgorithmException, InvalidKeySpecException {
         // Generate a random salt
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[saltSize];
@@ -167,8 +161,7 @@ public class PasswordHash
     public static boolean validatePassword(
             final String password,
             final String correctHash)
-    throws NoSuchAlgorithmException, InvalidKeySpecException
-    {
+    throws NoSuchAlgorithmException, InvalidKeySpecException {
         return validatePassword(password.getBytes(), correctHash);
     }
 
@@ -182,8 +175,7 @@ public class PasswordHash
     public static boolean validatePassword(
             final byte[] password,
             final String correctHash)
-    throws NoSuchAlgorithmException, InvalidKeySpecException
-    {
+    throws NoSuchAlgorithmException, InvalidKeySpecException {
         // Decode the hash into its parameters
         String[] params = correctHash.split(":");
         int iterations = Integer.parseInt(params[ITERATION_INDEX]);
@@ -208,11 +200,9 @@ public class PasswordHash
      */
     private static boolean slowEquals(
             final byte[] a,
-            final byte[] b)
-    {
+            final byte[] b) {
         int diff = a.length ^ b.length;
-        for (int i = 0; i < a.length && i < b.length; i++)
-        {
+        for (int i = 0; i < a.length && i < b.length; i++) {
             diff |= a[i] ^ b[i];
         }
         return diff == 0;
@@ -232,18 +222,14 @@ public class PasswordHash
             final byte[] salt,
             final int iterations,
             final int bytes)
-    throws NoSuchAlgorithmException, InvalidKeySpecException
-    {
+    throws NoSuchAlgorithmException, InvalidKeySpecException {
         byte[] pwdBytes;
-        try
-        {
+        try {
             pwdBytes = new String(password).getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e)
-        {
+        } catch (UnsupportedEncodingException e) {
             throw new NoSuchAlgorithmException("no charset UTF-8");
         }
-        synchronized (gen)
-        {
+        synchronized (gen) {
             gen.init(pwdBytes, salt, iterations);
             byte[] dk = ((KeyParameter) gen.generateDerivedParameters(bytes * 8)).getKey();
             return dk;
@@ -257,11 +243,9 @@ public class PasswordHash
      * @return              the hex string decoded into a byte array
      */
     private static byte[] fromHex(
-            final String hex)
-    {
+            final String hex) {
         byte[] binary = new byte[hex.length() / 2];
-        for (int i = 0; i < binary.length; i++)
-        {
+        for (int i = 0; i < binary.length; i++) {
             binary[i] = (byte) Integer.parseInt(
                     hex.substring(2 * i, 2 * i + 2), 16);
         }
@@ -275,16 +259,13 @@ public class PasswordHash
      * @return              a length*2 character string encoding the byte array
      */
     private static String toHex(
-            final byte[] array)
-    {
+            final byte[] array) {
         BigInteger bi = new BigInteger(1, array);
         String hex = bi.toString(16);
         int paddingLength = (array.length * 2) - hex.length();
-        if (paddingLength > 0)
-        {
+        if (paddingLength > 0) {
             return String.format("%0" + paddingLength + "d", 0) + hex;
-        } else
-        {
+        } else {
             return hex;
         }
     }
@@ -295,52 +276,42 @@ public class PasswordHash
      * @param   args        ignored
      */
     public static void main(
-            final String[] args)
-    {
-        try
-        {
+            final String[] args) {
+        try {
             Security.addProvider(new BouncyCastleProvider());
             // Print out 10 hashes
-            for (int i = 0; i < 10; i++)
-            {
+            for (int i = 0; i < 10; i++) {
                 System.out.println(PasswordHash.createHash("p\r\nassw0Rd!"));
             }
 
             // Test password validation
             boolean failure = false;
             System.out.println("Running tests...");
-            for (int i = 0; i < 100; i++)
-            {
+            for (int i = 0; i < 100; i++) {
                 String password = "" + i;
                 String hash = createHash(password);
                 String secondHash = createHash(password);
-                if (hash.equals(secondHash))
-                {
+                if (hash.equals(secondHash)) {
                     System.out.println("FAILURE: TWO HASHES ARE EQUAL!");
                     failure = true;
                 }
                 String wrongPassword = "" + (i + 1);
-                if (validatePassword(wrongPassword, hash))
-                {
+                if (validatePassword(wrongPassword, hash)) {
                     System.out.println("FAILURE: WRONG PASSWORD ACCEPTED!");
                     failure = true;
                 }
-                if (!validatePassword(password, hash))
-                {
+                if (!validatePassword(password, hash)) {
                     System.out.println("FAILURE: GOOD PASSWORD NOT ACCEPTED!");
                     failure = true;
                 }
             }
-            if (failure)
-            {
+            if (failure) {
                 System.out.println("TESTS FAILED!");
-            } else
-            {
+            } else {
                 System.out.println("TESTS PASSED!");
             }
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             System.out.println("ERROR: " + ex);
         }
     }

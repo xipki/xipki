@@ -45,19 +45,15 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-enroll-cert",
         description = "enroll certificate (negative, QA)")
-public class NegEnrollCertCmd extends EnrollCertCmd
-{
+public class NegEnrollCertCmd extends EnrollCertCmd {
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("neg-enroll-cert");
 
-        try
-        {
+        try {
             super._doExecute();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return null;
         }
 

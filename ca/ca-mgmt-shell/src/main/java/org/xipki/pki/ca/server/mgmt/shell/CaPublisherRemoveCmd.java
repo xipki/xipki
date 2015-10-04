@@ -44,8 +44,7 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "capub-rm",
         description = "remove publisher from CA")
-public class CaPublisherRemoveCmd extends CaCmd
-{
+public class CaPublisherRemoveCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -60,8 +59,7 @@ public class CaPublisherRemoveCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean b = caManager.removePublisherFromCA(publisherName, caName);
         output(b, "removed", "could not remove",
                 "publisher " + publisherName + " from CA " + caName);

@@ -64,27 +64,22 @@ import org.xipki.pki.ca.dbtool.IDRange;
  * @author Lijun Liao
  */
 
-public class EjbcaDigestExportReader
-{
+public class EjbcaDigestExportReader {
     private static final Logger LOG = LoggerFactory.getLogger(EjbcaDigestExportReader.class);
 
     private class Retriever
-    implements Runnable
-    {
+    implements Runnable {
         private Connection conn;
         private PreparedStatement selectCertStmt;
         private PreparedStatement selectRawCertStmt;
 
         public Retriever()
-        throws DataAccessException
-        {
+        throws DataAccessException {
             this.conn = datasource.getConnection();
-            try
-            {
+            try {
                 selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
                 selectRawCertStmt = datasource.prepareStatement(conn, selectRawCertSql);
-            } catch (DataAccessException e)
-            {
+            } catch (DataAccessException e) {
                 DbToolBase.releaseResources(selectCertStmt, null);
                 DbToolBase.releaseResources(selectRawCertStmt, null);
                 datasource.returnConnection(conn);
@@ -93,16 +88,12 @@ public class EjbcaDigestExportReader
         }
 
         @Override
-        public void run()
-        {
-            while (!stop.get())
-            {
-                try
-                {
+        public void run() {
+            while (!stop.get()) {
+                try {
                     IDRange idRange = inQueue.take();
                     query(idRange);
-                } catch (InterruptedException e)
-                {
+                } catch (InterruptedException e) {
                     LOG.error("InterruptedException", e);
                 }
             }
@@ -113,13 +104,11 @@ public class EjbcaDigestExportReader
         }
 
         private void query(
-                final IDRange idRange)
-        {
+                final IDRange idRange) {
             DigestDBEntrySet result = new DigestDBEntrySet(idRange.getFrom());
 
             ResultSet rs = null;
-            try
-            {
+            try {
                 selectCertStmt.setInt(1, idRange.getFrom());
                 selectCertStmt.setInt(2, idRange.getTo() + 1);
 
@@ -129,34 +118,28 @@ public class EjbcaDigestExportReader
                 String hexCaFp;
                 String hexCertFp;
 
-                while (rs.next())
-                {
+                while (rs.next()) {
                     id = rs.getInt("id");
                     hexCaFp = rs.getString("cAFingerprint");
                     hexCertFp = rs.getString("fingerprint");
 
                     EjbcaCaInfo caInfo = null;
 
-                    if (!hexCaFp.equals(hexCertFp))
-                    {
+                    if (!hexCaFp.equals(hexCertFp)) {
                         caInfo = fpCaInfoMap.get(hexCaFp);
                     }
 
-                    if (caInfo == null)
-                    {
+                    if (caInfo == null) {
                         LOG.debug("Found no CA by caFingerprint, try to resolve by issuer");
                         selectRawCertStmt.setInt(1, id);
 
                         ResultSet certRs = selectRawCertStmt.executeQuery();
 
-                        if (certRs.next())
-                        {
+                        if (certRs.next()) {
                             String b64Cert = certRs.getString("base64Cert");
                             Certificate cert = Certificate.getInstance(Base64.decode(b64Cert));
-                            for (EjbcaCaInfo entry : fpCaInfoMap.values())
-                            {
-                                if (entry.getSubject().equals(cert.getIssuer()))
-                                {
+                            for (EjbcaCaInfo entry : fpCaInfoMap.values()) {
+                                if (entry.getSubject().equals(cert.getIssuer())) {
                                     caInfo = entry;
                                     break;
                                 }
@@ -165,8 +148,7 @@ public class EjbcaDigestExportReader
                         certRs.close();
                     }
 
-                    if (caInfo == null)
-                    {
+                    if (caInfo == null) {
                         LOG.error("FOUND no CA for Cert with id '{}'", id);
                         numSkippedCerts.incrementAndGet();
                         continue;
@@ -184,8 +166,7 @@ public class EjbcaDigestExportReader
                     Long revTime = null;
                     Long revInvTime = null;
 
-                    if (revoked)
-                    {
+                    if (revoked) {
                         revReason = rs.getInt("revocationReason");
                         long rev_timeInMs = rs.getLong("revocationDate");
                         // rev_time is milliseconds, convert it to seconds
@@ -200,16 +181,13 @@ public class EjbcaDigestExportReader
 
                     result.addEntry(idCert);
                 }
-            } catch (Exception e)
-            {
-                if (e instanceof SQLException)
-                {
+            } catch (Exception e) {
+                if (e instanceof SQLException) {
                     e = datasource.translate(selectCertSql, (SQLException) e);
                 }
                 result.setException(e);
             }
-            finally
-            {
+            finally {
                 outQueue.add(result);
                 DbToolBase.releaseResources(null, rs);
             }
@@ -233,8 +211,7 @@ public class EjbcaDigestExportReader
             final DataSourceWrapper datasource,
             final Map<String, EjbcaCaInfo> fpCaInfoMap,
             final int numThreads)
-    throws Exception
-    {
+    throws Exception {
         this.datasource = datasource;
         this.numThreads = numThreads;
         this.fpCaInfoMap = fpCaInfoMap;
@@ -248,39 +225,32 @@ public class EjbcaDigestExportReader
 
         retrievers = new ArrayList<>(numThreads);
 
-        for (int i = 0; i < numThreads; i++)
-        {
+        for (int i = 0; i < numThreads; i++) {
             Retriever retriever = new Retriever();
             retrievers.add(retriever);
         }
 
         executor = Executors.newFixedThreadPool(numThreads);
-        for (Runnable runnable : retrievers)
-        {
+        for (Runnable runnable : retrievers) {
             executor.execute(runnable);
         }
     }
 
     public List<IdentifiedDbDigestEntry> readCerts(List<IDRange> idRanges)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         int n = idRanges.size();
-        for (IDRange range : idRanges)
-        {
+        for (IDRange range : idRanges) {
             inQueue.add(range);
         }
 
         List<DigestDBEntrySet> results = new ArrayList<>(n);
         int numCerts = 0;
-        for (int i = 0; i < n; i++)
-        {
-            try
-            {
+        for (int i = 0; i < n; i++) {
+            try {
                 DigestDBEntrySet result = outQueue.take();
                 numCerts += result.getEntries().size();
                 results.add(result);
-            } catch (InterruptedException e)
-            {
+            } catch (InterruptedException e) {
                 throw new DataAccessException("InterruptedException " + e.getMessage(), e);
             }
         }
@@ -288,10 +258,8 @@ public class EjbcaDigestExportReader
         Collections.sort(results);
         List<IdentifiedDbDigestEntry> ret = new ArrayList<>(numCerts);
 
-        for (DigestDBEntrySet result : results)
-        {
-            if (result.getException() != null)
-            {
+        for (DigestDBEntrySet result : results) {
+            if (result.getException() != null) {
                 throw new DataAccessException(
                         "error while reading from ID " + result.getStartId()
                             + ": " + result.getException().getMessage(),
@@ -304,18 +272,15 @@ public class EjbcaDigestExportReader
         return ret;
     }
 
-    public int getNumThreads()
-    {
+    public int getNumThreads() {
         return numThreads;
     }
 
-    public int getNumSkippedCerts()
-    {
+    public int getNumSkippedCerts() {
         return numSkippedCerts.get();
     }
 
-    public void stop()
-    {
+    public void stop() {
         stop.set(true);
         executor.shutdownNow();
     }

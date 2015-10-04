@@ -46,65 +46,52 @@ import org.xipki.common.util.StringUtil;
  * @author Lijun Liao
  */
 
-public class DbPortFileNameIterator implements Iterator<String>
-{
+public class DbPortFileNameIterator implements Iterator<String> {
     private BufferedReader reader;
     private String nextFilename;
 
     public DbPortFileNameIterator(
             final String filename)
-    throws IOException
-    {
+    throws IOException {
         this.reader = new BufferedReader(new FileReader(filename));
         this.nextFilename = readNextFilenameLine();
     }
 
     @Override
-    public boolean hasNext()
-    {
+    public boolean hasNext() {
         return nextFilename != null;
     }
 
     @Override
-    public String next()
-    {
+    public String next() {
         String s = nextFilename;
         nextFilename = null;
-        try
-        {
+        try {
             nextFilename = readNextFilenameLine();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new RuntimeException("error while reading next file name");
         }
         return s;
     }
 
     @Override
-    public void remove()
-    {
+    public void remove() {
         throw new UnsupportedOperationException("remove is not supported");
     }
 
-    public void close()
-    {
-        try
-        {
+    public void close() {
+        try {
             reader.close();
-        } catch (Throwable t)
-        {
+        } catch (Throwable t) {
         }
     }
 
     private String readNextFilenameLine()
-    throws IOException
-    {
+    throws IOException {
         String line;
-        while ((line = reader.readLine()) != null)
-        {
+        while ((line = reader.readLine()) != null) {
             line = line.trim();
-            if (StringUtil.isBlank(line) || line.startsWith("#") || !line.endsWith(".zip"))
-            {
+            if (StringUtil.isBlank(line) || line.startsWith("#") || !line.endsWith(".zip")) {
                 continue;
             }
             return line;

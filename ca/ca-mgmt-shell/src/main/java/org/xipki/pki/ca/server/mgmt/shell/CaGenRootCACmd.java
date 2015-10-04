@@ -49,8 +49,7 @@ import org.xipki.common.util.IoUtil;
 
 @Command(scope = "xipki-ca", name = "gen-rca",
         description = "generate selfsigned CA")
-public class CaGenRootCACmd extends CaAddOrGenCmd
-{
+public class CaGenRootCACmd extends CaAddOrGenCmd {
     @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request of the Root CA\n"
@@ -69,13 +68,11 @@ public class CaGenRootCACmd extends CaAddOrGenCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         X509CAEntry caEntry = getCAEntry();
         byte[] p10Req = IoUtil.read(p10ReqFile);
         X509Certificate rcaCert = caManager.generateRootCA(caEntry, rcaProfile, p10Req);
-        if (rcaCertOutFile != null)
-        {
+        if (rcaCertOutFile != null) {
             saveVerbose("saved root certificate to file", new File(rcaCertOutFile),
                     rcaCert.getEncoded());
         }

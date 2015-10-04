@@ -45,20 +45,16 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-caalias-rm",
         description = "remove CA alias (negative, QA)")
-public class NegCaAliasRemoveCmd extends CaAliasRemoveCmd
-{
+public class NegCaAliasRemoveCmd extends CaAliasRemoveCmd {
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("neg-caalias-rm");
 
-        try
-        {
+        try {
             super._doExecute();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return null;
         }
 

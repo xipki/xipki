@@ -39,8 +39,7 @@ package org.xipki.pki.ca.server.impl;
  * @author Lijun Liao
  */
 
-public enum CertStatus
-{
+public enum CertStatus {
     Unknown,
     Revoked,
     Good

@@ -54,8 +54,7 @@ import org.xipki.password.api.PasswordResolver;
  * @author Lijun Liao
  */
 
-public abstract class CaAddOrGenCmd extends CaCmd
-{
+public abstract class CaAddOrGenCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CA name\n"
@@ -171,42 +170,34 @@ public abstract class CaAddOrGenCmd extends CaCmd
     private PasswordResolver passwordResolver;
 
     public void setPasswordResolver(
-            final PasswordResolver passwordResolver)
-    {
+            final PasswordResolver passwordResolver) {
         this.passwordResolver = passwordResolver;
     }
 
     protected X509CAEntry getCAEntry()
-    throws Exception
-    {
-        if (nextSerial < 0)
-        {
+    throws Exception {
+        if (nextSerial < 0) {
             throw new IllegalCmdParamException("invalid serial number: " + nextSerial);
         }
 
-        if (nextCrlNumber < 1)
-        {
+        if (nextCrlNumber < 1) {
             throw new IllegalCmdParamException("invalid CRL number: " + nextCrlNumber);
         }
 
-        if (numCrls < 0)
-        {
+        if (numCrls < 0) {
             throw new IllegalCmdParamException("invalid numCrls: " + numCrls);
         }
 
-        if (expirationPeriod < 0)
-        {
+        if (expirationPeriod < 0) {
             throw new IllegalCmdParamException("invalid expirationPeriod: " + expirationPeriod);
         }
 
         CAStatus status = CAStatus.getCAStatus(caStatus);
-        if (status == null)
-        {
+        if (status == null) {
             throw new IllegalCmdParamException("invalid status: " + caStatus);
         }
 
-        if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
-        {
+        if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
             signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf,
                     passwordResolver);
         }
@@ -219,41 +210,35 @@ public abstract class CaAddOrGenCmd extends CaCmd
         entry.setKeepExpiredCertInDays(keepExpiredCertInDays.intValue());
 
         DuplicationMode duplicateKey = DuplicationMode.getInstance(duplicateKeyS);
-        if (duplicateKey == null)
-        {
+        if (duplicateKey == null) {
             throw new IllegalCmdParamException("invalid duplication mode: " + duplicateKeyS);
         }
         entry.setDuplicateKeyMode(duplicateKey);
 
         DuplicationMode duplicateSubject = DuplicationMode.getInstance(duplicateSubjectS);
-        if (duplicateSubject == null)
-        {
+        if (duplicateSubject == null) {
             throw new IllegalCmdParamException("invalid duplication mode: " + duplicateSubjectS);
         }
         entry.setDuplicateSubjectMode(duplicateSubject);
 
         DuplicationMode duplicateCN = DuplicationMode.getInstance(duplicateCNS);
-        if (duplicateCN == null)
-        {
+        if (duplicateCN == null) {
             throw new IllegalCmdParamException("invalid duplication mode: " + duplicateCNS);
         }
         entry.setDuplicateCNMode(duplicateCN);
 
         ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
-        if (validityMode == null)
-        {
+        if (validityMode == null) {
             throw new IllegalCmdParamException("invalid validity: " + validityModeS);
         }
         entry.setValidityMode(validityMode);
 
         entry.setStatus(status);
-        if (crlSignerName != null)
-        {
+        if (crlSignerName != null) {
             entry.setCrlSignerName(crlSignerName);
         }
 
-        if (responderName != null)
-        {
+        if (responderName != null) {
             entry.setResponderName(responderName);
         }
 
@@ -262,17 +247,14 @@ public abstract class CaAddOrGenCmd extends CaCmd
 
         entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
 
-        if (cmpControlName != null)
-        {
+        if (cmpControlName != null) {
             entry.setCmpControlName(cmpControlName);
         }
 
         Set<Permission> _permissions = new HashSet<>();
-        for (String permission : permissions)
-        {
+        for (String permission : permissions) {
             Permission _permission = Permission.getPermission(permission);
-            if (_permission == null)
-            {
+            if (_permission == null) {
                 throw new IllegalCmdParamException("invalid permission: " + permission);
             }
             _permissions.add(_permission);
@@ -280,8 +262,7 @@ public abstract class CaAddOrGenCmd extends CaCmd
 
         entry.setPermissions(_permissions);
 
-        if (StringUtil.isNotBlank(extraControl))
-        {
+        if (StringUtil.isNotBlank(extraControl)) {
             entry.setExtraControl(extraControl.trim());
         }
         return entry;

@@ -41,28 +41,24 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-class ResponderAndRelativeUri
-{
+class ResponderAndRelativeUri {
     private final Responder responder;
     private final String relativeUri;
 
     public ResponderAndRelativeUri(
             final Responder responder,
-            final String relativeUri)
-    {
+            final String relativeUri) {
         ParamUtil.assertNotNull("responder", responder);
         ParamUtil.assertNotNull("relativeUri", relativeUri);
         this.responder = responder;
         this.relativeUri = relativeUri;
     }
 
-    public Responder getResponder()
-    {
+    public Responder getResponder() {
         return responder;
     }
 
-    public String getRelativeUri()
-    {
+    public String getRelativeUri() {
         return relativeUri;
     }
 

@@ -41,22 +41,18 @@ import java.security.cert.X509CRL;
  * @author Lijun Liao
  */
 
-public class CRLResultType
-{
+public class CRLResultType {
     private X509CRL crl;
 
-    public CRLResultType()
-    {
+    public CRLResultType() {
     }
 
     public void setCRL(
-            final X509CRL crl)
-    {
+            final X509CRL crl) {
         this.crl = crl;
     }
 
-    public X509CRL getCRL()
-    {
+    public X509CRL getCRL() {
         return crl;
     }
 }

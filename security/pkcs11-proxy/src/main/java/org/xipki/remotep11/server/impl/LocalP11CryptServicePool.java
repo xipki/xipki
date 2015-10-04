@@ -50,8 +50,7 @@ import org.xipki.security.api.p11.P11CryptService;
  * @author Lijun Liao
  */
 
-public class LocalP11CryptServicePool
-{
+public class LocalP11CryptServicePool {
     private static final Logger LOG = LoggerFactory.getLogger(LocalP11CryptServicePool.class);
 
     public static final int version = 2;
@@ -60,51 +59,41 @@ public class LocalP11CryptServicePool
     private String defaultPkcs11ModuleName;
     private Map<String, P11CryptService> p11CryptServices = new HashMap<>();
 
-    public LocalP11CryptServicePool()
-    {
+    public LocalP11CryptServicePool() {
     }
 
     public void setSecurityFactory(
-            final SecurityFactory securityFactory)
-    {
+            final SecurityFactory securityFactory) {
         this.securityFactory = securityFactory;
     }
 
     private boolean initialized = false;
     public void init()
-    throws Exception
-    {
-        if (initialized)
-        {
+    throws Exception {
+        if (initialized) {
             return;
         }
 
-        if (Security.getProvider("BC") == null)
-        {
+        if (Security.getProvider("BC") == null) {
             Security.addProvider(new BouncyCastleProvider());
         }
 
-        try
-        {
-            if (securityFactory == null)
-            {
+        try {
+            if (securityFactory == null) {
                 throw new IllegalStateException("securityFactory is not configured");
             }
 
             this.defaultPkcs11ModuleName = securityFactory.getDefaultPkcs11ModuleName();
             Set<String> moduleNames = securityFactory.getPkcs11ModuleNames();
-            for (String moduleName : moduleNames)
-            {
+            for (String moduleName : moduleNames) {
                 P11CryptService p11Service = securityFactory.getP11CryptService(moduleName);
-                if (p11Service != null)
-                {
+                if (p11Service != null) {
                     p11CryptServices.put(moduleName, p11Service);
                 }
             }
 
             initialized = true;
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             LOG.error("exception thrown. {}: {}", e.getClass().getName(), e.getMessage());
             LOG.debug("exception thrown", e);
             throw e;
@@ -112,19 +101,16 @@ public class LocalP11CryptServicePool
     }
 
     public P11CryptService getP11CryptService(
-            String moduleName)
-    {
+            String moduleName) {
         if (moduleName == null
-                || SecurityFactory.DEFAULT_P11MODULE_NAME.equalsIgnoreCase(moduleName))
-        {
+                || SecurityFactory.DEFAULT_P11MODULE_NAME.equalsIgnoreCase(moduleName)) {
             moduleName = defaultPkcs11ModuleName;
         }
         P11CryptService p11Service = p11CryptServices.get(moduleName);
         return p11Service;
     }
 
-    public int getVersion()
-    {
+    public int getVersion() {
         return version;
     }
 

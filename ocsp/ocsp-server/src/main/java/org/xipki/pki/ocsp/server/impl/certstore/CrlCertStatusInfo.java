@@ -48,8 +48,7 @@ import org.xipki.security.api.HashAlgoType;
  * @author Lijun Liao
  */
 
-class CrlCertStatusInfo
-{
+class CrlCertStatusInfo {
     private final CertStatus certStatus;
     private final CertRevocationInfo revocationInfo;
     private final String certprofile;
@@ -59,23 +58,20 @@ class CrlCertStatusInfo
             final CertStatus certStatus,
             final CertRevocationInfo revocationInfo,
             final String certprofile,
-            final Map<HashAlgoType, byte[]> certHashes)
-    {
+            final Map<HashAlgoType, byte[]> certHashes) {
         this.certStatus = certStatus;
         this.revocationInfo = revocationInfo;
         this.certprofile = certprofile;
         this.certHashes = certHashes;
     }
 
-    static CrlCertStatusInfo getIgnoreCertStatusInfo()
-    {
+    static CrlCertStatusInfo getIgnoreCertStatusInfo() {
         return new CrlCertStatusInfo(CertStatus.IGNORE, null, null, null);
     }
 
     static CrlCertStatusInfo getGoodCertStatusInfo(
             final String certprofile,
-            final Map<HashAlgoType, byte[]> certHashes)
-    {
+            final Map<HashAlgoType, byte[]> certHashes) {
         ParamUtil.assertNotBlank("certprofile", certprofile);
         return new CrlCertStatusInfo(CertStatus.GOOD, null, certprofile, certHashes);
     }
@@ -83,34 +79,28 @@ class CrlCertStatusInfo
     static CrlCertStatusInfo getRevokedCertStatusInfo(
             final CertRevocationInfo revocationInfo,
             final String certprofile,
-            final Map<HashAlgoType, byte[]> certHashes)
-    {
+            final Map<HashAlgoType, byte[]> certHashes) {
         ParamUtil.assertNotNull("revocationInfo", revocationInfo);
         return new CrlCertStatusInfo(CertStatus.REVOKED, revocationInfo, certprofile, certHashes);
     }
 
-    CertStatus getCertStatus()
-    {
+    CertStatus getCertStatus() {
         return certStatus;
     }
 
-    CertRevocationInfo getRevocationInfo()
-    {
+    CertRevocationInfo getRevocationInfo() {
         return revocationInfo;
     }
 
-    String getCertprofile()
-    {
+    String getCertprofile() {
         return certprofile;
     }
 
     CertStatusInfo getCertStatusInfo(
             final HashAlgoType hashAlgo,
             final Date thisUpdate,
-            final Date nextUpdate)
-    {
-        switch (certStatus)
-        {
+            final Date nextUpdate) {
+        switch (certStatus) {
         case ISSUER_UNKNOWN:
         case UNKNOWN:
             throw new RuntimeException("should not reach here");
@@ -119,19 +109,16 @@ class CrlCertStatusInfo
         case GOOD:
         case REVOKED:
             byte[] certHash = null;
-            if (hashAlgo != null)
-            {
+            if (hashAlgo != null) {
                 certHash = (certHashes == null)
                         ? null
                         : certHashes.get(hashAlgo);
             }
 
-            if (certStatus == CertStatus.GOOD)
-            {
+            if (certStatus == CertStatus.GOOD) {
                 return CertStatusInfo.getGoodCertStatusInfo(hashAlgo, certHash, thisUpdate,
                         nextUpdate, certprofile);
-            } else
-            {
+            } else {
                 return CertStatusInfo.getRevokedCertStatusInfo(revocationInfo, hashAlgo,
                         certHash, thisUpdate, nextUpdate, certprofile);
             }

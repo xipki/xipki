@@ -46,8 +46,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class P11ModuleConf
-{
+public class P11ModuleConf {
     private final String name;
     private final String nativeLibrary;
     private final Set<P11SlotIdentifier> excludeSlots;
@@ -57,8 +56,7 @@ public class P11ModuleConf
     public P11ModuleConf(
             final String name,
             final String nativeLibrary,
-            final P11PasswordRetriever passwordRetriever)
-    {
+            final P11PasswordRetriever passwordRetriever) {
         this(name, nativeLibrary, passwordRetriever, null, null);
     }
 
@@ -67,8 +65,7 @@ public class P11ModuleConf
             final String nativeLibrary,
             final P11PasswordRetriever passwordRetriever,
             final Set<P11SlotIdentifier> includeSlots,
-            final Set<P11SlotIdentifier> excludeSlots)
-    {
+            final Set<P11SlotIdentifier> excludeSlots) {
         ParamUtil.assertNotBlank("name", name);
         ParamUtil.assertNotBlank("nativeLibrary", nativeLibrary);
 
@@ -79,79 +76,63 @@ public class P11ModuleConf
                 : passwordRetriever;
 
         Set<P11SlotIdentifier> set = new HashSet<>();
-        if (includeSlots != null)
-        {
+        if (includeSlots != null) {
             set.addAll(includeSlots);
         }
         this.includeSlots = Collections.unmodifiableSet(set);
 
         set = new HashSet<>();
-        if (excludeSlots != null)
-        {
+        if (excludeSlots != null) {
             set.addAll(excludeSlots);
         }
         this.excludeSlots = Collections.unmodifiableSet(set);
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getNativeLibrary()
-    {
+    public String getNativeLibrary() {
         return nativeLibrary;
     }
 
-    public Set<P11SlotIdentifier> getExcludeSlots()
-    {
+    public Set<P11SlotIdentifier> getExcludeSlots() {
         return excludeSlots;
     }
 
-    public Set<P11SlotIdentifier> getIncludeSlots()
-    {
+    public Set<P11SlotIdentifier> getIncludeSlots() {
         return includeSlots;
     }
 
-    public P11PasswordRetriever getPasswordRetriever()
-    {
+    public P11PasswordRetriever getPasswordRetriever() {
         return passwordRetriever;
     }
 
     public boolean isSlotIncluded(
-            final P11SlotIdentifier slot)
-    {
+            final P11SlotIdentifier slot) {
         boolean included;
-        if (CollectionUtil.isEmpty(includeSlots))
-        {
+        if (CollectionUtil.isEmpty(includeSlots)) {
             included = true;
-        } else
-        {
+        } else {
             included = false;
-            for (P11SlotIdentifier _slot : includeSlots)
-            {
-                if (_slot.equals(slot))
-                {
+            for (P11SlotIdentifier _slot : includeSlots) {
+                if (_slot.equals(slot)) {
                     included = true;
                     break;
                 }
             }
         }
 
-        if (!included)
-        {
+        if (!included) {
             return false;
         }
 
-        if (CollectionUtil.isEmpty(excludeSlots))
-        {
+        if (CollectionUtil.isEmpty(excludeSlots)) {
             return included;
         }
 
-        for (P11SlotIdentifier _slot : excludeSlots)
-        {
-            if (_slot.equals(slot))
-            {
+        for (P11SlotIdentifier _slot : excludeSlots) {
+            if (_slot.equals(slot)) {
                 return false;
             }
         }

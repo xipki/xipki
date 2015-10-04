@@ -48,12 +48,10 @@ import org.xipki.security.api.ObjectIdentifiers;
  */
 
 public class ExtKeyusageCompleterImpl extends DynamicEnumCompleter
-implements ExtKeyusageCompleter
-{
+implements ExtKeyusageCompleter {
     private static final Set<String> usages;
 
-    static
-    {
+    static {
         Set<String> set = new HashSet<>();
         set.add(ObjectIdentifiers.id_kp_clientAuth.getId());
         set.add(ObjectIdentifiers.id_kp_codeSigning.getId());
@@ -68,8 +66,7 @@ implements ExtKeyusageCompleter
     }
 
     @Override
-    protected Set<String> getEnums()
-    {
+    protected Set<String> getEnums() {
         return usages;
     }
 

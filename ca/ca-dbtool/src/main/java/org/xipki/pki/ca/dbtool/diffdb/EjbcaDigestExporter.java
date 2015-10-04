@@ -73,8 +73,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
-{
+public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter {
     private static final Logger LOG = LoggerFactory.getLogger(EjbcaDigestExporter.class);
 
     private final int numCertsPerSelect;
@@ -92,47 +91,39 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
             final int numCertsPerSelect,
             final DbSchemaType dbSchemaType,
             final int numThreads)
-    throws Exception
-    {
+    throws Exception {
         super(datasource, baseDir, stopMe);
-        if (numCertsPerSelect < 1)
-        {
+        if (numCertsPerSelect < 1) {
             throw new IllegalArgumentException("numCertsPerSelect could not be less than 1: "
                     + numCertsPerSelect);
         }
 
-        if (dbSchemaType != DbSchemaType.EJBCA_CA_v3)
-        {
+        if (dbSchemaType != DbSchemaType.EJBCA_CA_v3) {
             throw new RuntimeException("unsupported DbSchemaType " + dbSchemaType);
         }
         this.numCertsPerSelect = numCertsPerSelect;
 
         // detect whether the table CertificateData has the column id
-        if (dataSource.tableHasColumn(connection, "CertificateData", "id"))
-        {
+        if (dataSource.tableHasColumn(connection, "CertificateData", "id")) {
             tblCertHasId = true;
             sql = null;
             certSql = null;
             this.numThreads = Math.min(numThreads, datasource.getMaximumPoolSize() - 1);
-        } else
-        {
+        } else {
             String lang = System.getenv("LANG");
-            if (lang == null)
-            {
+            if (lang == null) {
                 throw new Exception("no environment LANG is set");
             }
 
             String lLang = lang.toLowerCase();
-            if (!lLang.startsWith("en_") || !lLang.endsWith(".utf-8"))
-            {
+            if (!lLang.startsWith("en_") || !lLang.endsWith(".utf-8")) {
                 throw new Exception(
                         "The environment LANG does not satisfy the pattern  'en_*.UTF-8': '"
                         + lang + "'");
             }
 
             String osName = System.getProperty("os.name");
-            if (!osName.toLowerCase().contains("linux"))
-            {
+            if (!osName.toLowerCase().contains("linux")) {
                 throw new Exception("Exporting EJBCA database is only possible in Linux, but not '"
                         + osName + "'");
             }
@@ -148,16 +139,14 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
             this.numThreads = 1;
         }
 
-        if (this.numThreads != numThreads)
-        {
+        if (this.numThreads != numThreads) {
             LOG.info("adapted the numThreads from {} to {}", numThreads, this.numThreads);
         }
     }
 
     @Override
     public void digest()
-    throws Exception
-    {
+    throws Exception {
         System.out.println("digesting database");
 
         final long total = getCount("CertificateData");
@@ -166,8 +155,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         Map<String, EjbcaCaInfo> cas = getCas();
         Set<CaEntry> caEntries = new HashSet<>(cas.size());
 
-        for (EjbcaCaInfo caInfo : cas.values())
-        {
+        for (EjbcaCaInfo caInfo : cas.values()) {
             CaEntry caEntry = new CaEntry(caInfo.getCaId(),
                     baseDir + File.separator + caInfo.getCaDirname());
             caEntries.add(caEntry);
@@ -176,58 +164,47 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         CaEntryContainer caEntryContainer = new CaEntryContainer(caEntries);
 
         Exception exception = null;
-        try
-        {
-            if (tblCertHasId)
-            {
+        try {
+            if (tblCertHasId) {
                 EjbcaDigestExportReader certsReader = new EjbcaDigestExportReader(dataSource,
                         cas, numThreads);
                 doDigest_withTableId(certsReader, processLog, caEntryContainer, cas);
-            } else
-            {
+            } else {
                 doDigest_noTableId(processLog, caEntryContainer, cas);
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-");
             System.err.println("\ndigesting process has been cancelled due to error");
             LOG.error("Exception", e);
             exception = e;
-        } finally
-        {
+        } finally {
             caEntryContainer.close();
         }
 
-        if (exception == null)
-        {
+        if (exception == null) {
             System.out.println(" digested database");
-        } else
-        {
+        } else {
             throw exception;
         }
     }
 
     private Map<String, EjbcaCaInfo> getCas()
-    throws Exception
-    {
+    throws Exception {
         Map<String, EjbcaCaInfo> cas = new HashMap<>();
         final String sql = "SELECT NAME, DATA FROM CAData";
 
         Statement stmt = null;
         ResultSet rs = null;
-        try
-        {
+        try {
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
             int caId = 0;
 
-            while (rs.next())
-            {
+            while (rs.next()) {
                 String name = rs.getString("NAME");
                 String data = rs.getString("DATA");
-                if (name == null || name.isEmpty())
-                {
+                if (name == null || name.isEmpty()) {
                     continue;
                 }
 
@@ -238,8 +215,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                 String fn = XipkiDigestExporter.toAsciiFilename("ca-" + commonName);
                 File caDir = new File(baseDir, fn);
                 int i = 2;
-                while (caDir.exists())
-                {
+                while (caDir.exists()) {
                     caDir = new File(baseDir, fn + "." + (i++));
                 }
 
@@ -252,11 +228,9 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                 EjbcaCaInfo caInfo = new EjbcaCaInfo(caId, certBytes, caDir.getName());
                 cas.put(caInfo.getHexSha1(), caInfo);
             }
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw translate(sql, e);
-        } finally
-        {
+        } finally {
             releaseResources(stmt, rs);
         }
 
@@ -267,8 +241,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
             final ProcessLog processLog,
             final CaEntryContainer caEntryContainer,
             final Map<String, EjbcaCaInfo> caInfos)
-    throws Exception
-    {
+    throws Exception {
         int skippedAccount = 0;
         String lastProcessedHexCertFp;
 
@@ -284,15 +257,12 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         String sql = null;
         int id = 0;
 
-        try
-        {
+        try {
             boolean interrupted = false;
             String hexCertFp = lastProcessedHexCertFp;
 
-            while (true)
-            {
-                if (stopMe.get())
-                {
+            while (true) {
+                if (stopMe.get()) {
                     interrupted = true;
                     break;
                 }
@@ -301,8 +271,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                 ResultSet rs = ps.executeQuery();
 
                 int countEntriesInResultSet = 0;
-                while (rs.next())
-                {
+                while (rs.next()) {
                     id++;
                     countEntriesInResultSet++;
                     String hexCaFp = rs.getString("cAFingerprint");
@@ -310,26 +279,21 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
 
                     EjbcaCaInfo caInfo = null;
 
-                    if (!hexCaFp.equals(hexCertFp))
-                    {
+                    if (!hexCaFp.equals(hexCertFp)) {
                         caInfo = caInfos.get(hexCaFp);
                     }
 
-                    if (caInfo == null)
-                    {
+                    if (caInfo == null) {
                         LOG.debug("Found no CA by caFingerprint, try to resolve by issuer");
                         rawCertPs.setString(1, hexCertFp);
 
                         ResultSet certRs = rawCertPs.executeQuery();
 
-                        if (certRs.next())
-                        {
+                        if (certRs.next()) {
                             String b64Cert = certRs.getString("base64Cert");
                             Certificate cert = Certificate.getInstance(Base64.decode(b64Cert));
-                            for (EjbcaCaInfo entry : caInfos.values())
-                            {
-                                if (entry.getSubject().equals(cert.getIssuer()))
-                                {
+                            for (EjbcaCaInfo entry : caInfos.values()) {
+                                if (entry.getSubject().equals(cert.getIssuer())) {
                                     caInfo = entry;
                                     break;
                                 }
@@ -338,8 +302,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                         certRs.close();
                     }
 
-                    if (caInfo == null)
-                    {
+                    if (caInfo == null) {
                         LOG.error("FOUND no CA for Cert with fingerprint '{}'", hexCertFp);
                         skippedAccount++;
                         processLog.addNumProcessed(1);
@@ -358,8 +321,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                     Long revTime = null;
                     Long revInvTime = null;
 
-                    if (revoked)
-                    {
+                    if (revoked) {
                         revReason = rs.getInt("revocationReason");
                         long rev_timeInMs = rs.getLong("revocationDate");
                         // rev_time is milliseconds, convert it to seconds
@@ -376,21 +338,17 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
                 } // end while (rs.next())
                 rs.close();
 
-                if (countEntriesInResultSet == 0)
-                {
+                if (countEntriesInResultSet == 0) {
                     break;
                 }
             } // end while (true)
 
-            if (interrupted)
-            {
+            if (interrupted) {
                 throw new InterruptedException("interrupted by the user");
             }
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw translate(sql, e);
-        } finally
-        {
+        } finally {
             releaseResources(ps, null);
             releaseResources(rawCertPs, null);
         }
@@ -401,8 +359,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
         sb.append(" digested ")
             .append((processLog.getNumProcessed() - skippedAccount))
             .append(" certificates");
-        if (skippedAccount > 0)
-        {
+        if (skippedAccount > 0) {
             sb.append(", ignored ")
                 .append(skippedAccount)
                 .append(" certificates (see log for details)");
@@ -415,8 +372,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
             final ProcessLog processLog,
             final CaEntryContainer caEntryContainer,
             final Map<String, EjbcaCaInfo> caInfos)
-    throws Exception
-    {
+    throws Exception {
         final int minCertId = (int) getMin("CertificateData", "id");
         final int maxCertId = (int) getMax("CertificateData", "id");
         System.out.println("digesting certificates from id " + minCertId);
@@ -427,38 +383,32 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
 
         boolean interrupted = false;
 
-        for (int i = minCertId; i <= maxCertId;)
-        {
+        for (int i = minCertId; i <= maxCertId;) {
 
-            if (stopMe.get())
-            {
+            if (stopMe.get()) {
                 interrupted = true;
                 break;
             }
 
             idRanges.clear();
-            for (int j = 0; j < numThreads; j++)
-            {
+            for (int j = 0; j < numThreads; j++) {
                 int to = i + numCertsPerSelect - 1;
                 idRanges.add(new IDRange(i, to));
                 i = to + 1;
-                if (i > maxCertId)
-                {
+                if (i > maxCertId) {
                     break; // break for (int j; ...)
                 }
             }
 
             List<IdentifiedDbDigestEntry> certs = certsReader.readCerts(idRanges);
-            for (IdentifiedDbDigestEntry cert : certs)
-            {
+            for (IdentifiedDbDigestEntry cert : certs) {
                 caEntryContainer.addDigestEntry(cert.getCaId().intValue(),
                         cert.getId(), cert.getContent());
             }
             processLog.addNumProcessed(certs.size());
             processLog.printStatus();
 
-            if (interrupted)
-            {
+            if (interrupted) {
                 throw new InterruptedException("interrupted by the user");
             }
         }
@@ -471,8 +421,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter
             .append(" certificates");
 
         int skippedAccount = certsReader.getNumSkippedCerts();
-        if (skippedAccount > 0)
-        {
+        if (skippedAccount > 0) {
             sb.append(", ignored ")
                 .append(skippedAccount)
                 .append(" certificates (see log for details)");

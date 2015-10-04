@@ -90,36 +90,30 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-class X509SelfSignedCertBuilder
-{
+class X509SelfSignedCertBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(X509SelfSignedCertBuilder.class);
 
-    static class GenerateSelfSignedResult
-    {
+    static class GenerateSelfSignedResult {
         private final String signerConf;
         private final X509Certificate cert;
 
         GenerateSelfSignedResult(
                 final String signerConf,
-                final X509Certificate cert)
-        {
+                final X509Certificate cert) {
             this.signerConf = signerConf;
             this.cert = cert;
         }
 
-        String getSignerConf()
-        {
+        String getSignerConf() {
             return signerConf;
         }
 
-        X509Certificate getCert()
-        {
+        X509Certificate getCert() {
             return cert;
         }
     }
 
-    private X509SelfSignedCertBuilder()
-    {
+    private X509SelfSignedCertBuilder() {
     }
 
     public static GenerateSelfSignedResult generateSelfSigned(
@@ -133,75 +127,60 @@ class X509SelfSignedCertBuilder
             final List<String> ocspUris,
             final List<String> crlUris,
             final List<String> deltaCrlUris)
-    throws OperationException, InvalidConfException
-    {
-        if (!securityFactory.verifyPOPO(p10Request))
-        {
+    throws OperationException, InvalidConfException {
+        if (!securityFactory.verifyPOPO(p10Request)) {
             throw new InvalidConfException("could not validate POP for the pkcs#10 requst");
         }
 
-        if ("pkcs12".equalsIgnoreCase(signerType) || "jks".equalsIgnoreCase(signerType))
-        {
+        if ("pkcs12".equalsIgnoreCase(signerType) || "jks".equalsIgnoreCase(signerType)) {
             ConfPairs keyValues = new ConfPairs(signerConf);
             String keystoreConf = keyValues.getValue("keystore");
-            if (keystoreConf == null)
-            {
+            if (keystoreConf == null) {
                 throw new InvalidConfException(
                     "required parameter 'keystore' for types PKCS12 and JKS, is not specified");
             }
         }
 
         ConcurrentContentSigner signer;
-        try
-        {
+        try {
             List<String[]> signerConfs = CAManagerImpl.splitCASignerConfs(signerConf);
             List<String> restrictedSigAlgos = certprofile.getSignatureAlgorithms();
 
             String thisSignerConf = null;
-            if (CollectionUtil.isEmpty(restrictedSigAlgos))
-            {
+            if (CollectionUtil.isEmpty(restrictedSigAlgos)) {
                 thisSignerConf = signerConfs.get(0)[1];
-            } else
-            {
-                for (String algo : restrictedSigAlgos)
-                {
-                    for (String[] m : signerConfs)
-                    {
-                        if (m[0].equals(algo))
-                        {
+            } else {
+                for (String algo : restrictedSigAlgos) {
+                    for (String[] m : signerConfs) {
+                        if (m[0].equals(algo)) {
                             thisSignerConf = m[1];
                             break;
                         }
                     }
 
-                    if (thisSignerConf != null)
-                    {
+                    if (thisSignerConf != null) {
                         break;
                     }
                 }
             }
 
-            if (thisSignerConf == null)
-            {
+            if (thisSignerConf == null) {
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "CA does not support any signature algorithm restricted by the cert profile");
             }
 
             signer = securityFactory.createSigner(signerType, thisSignerConf,
                     (X509Certificate[]) null);
-        } catch (SignerException e)
-        {
+        } catch (SignerException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     e.getClass().getName() + ": " + e.getMessage());
         }
 
         // this certificate is the dummy one which can be considered only as public key container
         Certificate bcCert;
-        try
-        {
+        try {
             bcCert = Certificate.getInstance(signer.getCertificate().getEncoded());
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "could not reparse certificate: " + e.getMessage());
         }
@@ -224,22 +203,17 @@ class X509SelfSignedCertBuilder
             final List<String> ocspUris,
             final List<String> crlUris,
             final List<String> deltaCrlUris)
-    throws OperationException
-    {
-        try
-        {
+    throws OperationException {
+        try {
             publicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
-        } catch (InvalidKeySpecException e)
-        {
+        } catch (InvalidKeySpecException e) {
             LOG.warn("SecurityUtil.toRfc3279Style", e);
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
         }
 
-        try
-        {
+        try {
             certprofile.checkPublicKey(publicKeyInfo);
-        } catch (BadCertTemplateException e)
-        {
+        } catch (BadCertTemplateException e) {
             LOG.warn("certprofile.checkPublicKey", e);
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
         }
@@ -248,28 +222,23 @@ class X509SelfSignedCertBuilder
 
         SubjectInfo subjectInfo;
         // subject
-        try
-        {
+        try {
             subjectInfo = certprofile.getSubject(requestedSubject);
-        } catch (CertprofileException e)
-        {
+        } catch (CertprofileException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "exception in cert profile " + certprofile.getName());
-        } catch (BadCertTemplateException e)
-        {
+        } catch (BadCertTemplateException e) {
             LOG.warn("certprofile.getSubject", e);
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
         }
 
         Date notBefore = certprofile.getNotBefore(null);
-        if (notBefore == null)
-        {
+        if (notBefore == null) {
             notBefore = new Date();
         }
 
         CertValidity validity = certprofile.getValidity();
-        if (validity == null)
-        {
+        if (validity == null) {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
                     "no validity specified in the profile " + certprofile.getName());
         }
@@ -293,17 +262,14 @@ class X509SelfSignedCertBuilder
 
         Extensions extensions = null;
         ASN1Set attrs = p10Request.getCertificationRequestInfo().getAttributes();
-        for (int i = 0; i < attrs.size(); i++)
-        {
+        for (int i = 0; i < attrs.size(); i++) {
             Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-            if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
-            {
+            if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {
                 extensions = Extensions.getInstance(attr.getAttributeValues()[0]);
             }
         }
 
-        try
-        {
+        try {
             addExtensions(
                     certBuilder,
                     certprofile,
@@ -317,11 +283,9 @@ class X509SelfSignedCertBuilder
             ContentSigner contentSigner = signer.borrowContentSigner();
 
             Certificate bcCert;
-            try
-            {
+            try {
                 bcCert = certBuilder.build(contentSigner).toASN1Structure();
-            } finally
-            {
+            } finally {
                 signer.returnContentSigner(contentSigner);
             }
 
@@ -329,12 +293,10 @@ class X509SelfSignedCertBuilder
 
             CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
             return (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(encodedCert));
-        } catch (BadCertTemplateException e)
-        {
+        } catch (BadCertTemplateException e) {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
         } catch (NoIdleSignerException | CertificateException | IOException
-                | CertprofileException | NoSuchAlgorithmException | NoSuchProviderException e)
-        {
+                | CertprofileException | NoSuchAlgorithmException | NoSuchProviderException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     e.getClass().getName() + ": " + e.getMessage());
         }
@@ -349,18 +311,15 @@ class X509SelfSignedCertBuilder
             final PublicCAInfo publicCaInfo,
             final Date notBefore,
             final Date notAfter)
-    throws CertprofileException, IOException, BadCertTemplateException, NoSuchAlgorithmException
-    {
+    throws CertprofileException, IOException, BadCertTemplateException, NoSuchAlgorithmException {
         ExtensionValues extensionTuples = profile.getExtensions(
                 requestedSubject, extensions, requestedPublicKeyInfo,
                 publicCaInfo, null, notBefore, notAfter);
-        if (extensionTuples == null)
-        {
+        if (extensionTuples == null) {
             return;
         }
 
-        for (ASN1ObjectIdentifier extType : extensionTuples.getExtensionTypes())
-        {
+        for (ASN1ObjectIdentifier extType : extensionTuples.getExtensionTypes()) {
             ExtensionValue extValue = extensionTuples.getExtensionValue(extType);
             certBuilder.addExtension(extType, extValue.isCritical(), extValue.getValue());
         }
@@ -368,20 +327,15 @@ class X509SelfSignedCertBuilder
 
     public static AsymmetricKeyParameter generatePublicKeyParameter(
             final PublicKey key)
-    throws InvalidKeyException
-    {
-        if (key instanceof RSAPublicKey)
-        {
+    throws InvalidKeyException {
+        if (key instanceof RSAPublicKey) {
             RSAPublicKey k = (RSAPublicKey) key;
             return new RSAKeyParameters(false, k.getModulus(), k.getPublicExponent());
-        } else if (key instanceof ECPublicKey)
-        {
+        } else if (key instanceof ECPublicKey) {
             return ECUtil.generatePublicKeyParameter(key);
-        } else if (key instanceof DSAPublicKey)
-        {
+        } else if (key instanceof DSAPublicKey) {
             return DSAUtil.generatePublicKeyParameter(key);
-        } else
-        {
+        } else {
             throw new InvalidKeyException("unknown key " + key.getClass().getName());
         }
     }

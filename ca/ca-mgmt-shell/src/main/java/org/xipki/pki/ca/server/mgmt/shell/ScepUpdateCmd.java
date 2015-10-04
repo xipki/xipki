@@ -54,8 +54,7 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ca", name = "scep-up",
         description = "Update SCEP")
-public class ScepUpdateCmd extends CaCmd
-{
+public class ScepUpdateCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -81,24 +80,19 @@ public class ScepUpdateCmd extends CaCmd
     private PasswordResolver passwordResolver;
 
     public void setPasswordResolver(
-            final PasswordResolver passwordResolver)
-    {
+            final PasswordResolver passwordResolver) {
         this.passwordResolver = passwordResolver;
     }
 
     private String getResponderConf()
-    throws Exception
-    {
-        if (responderConf == null)
-        {
+    throws Exception {
+        if (responderConf == null) {
             return responderConf;
         }
         String _respType = responderType;
-        if (_respType == null)
-        {
+        if (_respType == null) {
             ScepEntry entry = caManager.getScepEntry(caName);
-            if (entry == null)
-            {
+            if (entry == null) {
                 throw new IllegalCmdParamException("please specify the responderType");
             }
             _respType = entry.getResponderType();
@@ -109,38 +103,31 @@ public class ScepUpdateCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         String certConf = null;
-        if (CAManager.NULL.equalsIgnoreCase(certFile))
-        {
+        if (CAManager.NULL.equalsIgnoreCase(certFile)) {
             certConf = CAManager.NULL;
-        } else if (certFile != null)
-        {
+        } else if (certFile != null) {
             byte[] certBytes = IoUtil.read(certFile);
             X509Util.parseCert(new ByteArrayInputStream(certBytes));
             certConf = Base64.toBase64String(certBytes);
         }
 
         ChangeScepEntry entry = new ChangeScepEntry(caName);
-        if (responderType != null)
-        {
+        if (responderType != null) {
             entry.setResponderType(responderType);
         }
 
         String conf = getResponderConf();
-        if (conf != null)
-        {
+        if (conf != null) {
             entry.setResponderConf(conf);
         }
 
-        if (certConf != null)
-        {
+        if (certConf != null) {
             entry.setBase64Cert(certConf);
         }
 
-        if (control != null)
-        {
+        if (control != null) {
             entry.setControl(control);
         }
 

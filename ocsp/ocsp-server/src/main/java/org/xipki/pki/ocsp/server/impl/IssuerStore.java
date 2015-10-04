@@ -48,23 +48,18 @@ import org.xipki.security.api.HashAlgoType;
  * @author Lijun Liao
  */
 
-public class IssuerStore
-{
+public class IssuerStore {
     private final Set<Integer> ids;
     private final List<IssuerEntry> entries;
 
     public IssuerStore(
-            final List<IssuerEntry> entries)
-    {
+            final List<IssuerEntry> entries) {
         this.entries = new ArrayList<>(entries.size());
         Set<Integer> ids = new HashSet<>(entries.size());
 
-        for (IssuerEntry entry : entries)
-        {
-            for (IssuerEntry existingEntry : this.entries)
-            {
-                if (existingEntry.getId() == entry.getId())
-                {
+        for (IssuerEntry entry : entries) {
+            for (IssuerEntry existingEntry : this.entries) {
+                if (existingEntry.getId() == entry.getId()) {
                     throw new IllegalArgumentException(
                             "issuer with the same id " + entry.getId() + " already available");
                 }
@@ -76,16 +71,14 @@ public class IssuerStore
         this.ids = Collections.unmodifiableSet(ids);
     }
 
-    public Set<Integer> getIds()
-    {
+    public Set<Integer> getIds() {
         return ids;
     }
 
     public Integer getIssuerIdForFp(
             final HashAlgoType hashAlgo,
             final byte[] issuerNameHash,
-            final byte[] issuerKeyHash)
-    {
+            final byte[] issuerKeyHash) {
         IssuerEntry issuerEntry = getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
         return (issuerEntry == null)
                 ? null
@@ -93,12 +86,9 @@ public class IssuerStore
     }
 
     public IssuerEntry getIssuerForId(
-            final int id)
-    {
-        for (IssuerEntry entry : entries)
-        {
-            if (entry.getId() == id)
-            {
+            final int id) {
+        for (IssuerEntry entry : entries) {
+            if (entry.getId() == id) {
                 return entry;
             }
         }
@@ -109,12 +99,9 @@ public class IssuerStore
     public IssuerEntry getIssuerForFp(
             final HashAlgoType hashAlgo,
             final byte[] issuerNameHash,
-            final byte[] issuerKeyHash)
-    {
-        for (IssuerEntry entry : entries)
-        {
-            if (entry.matchHash(hashAlgo, issuerNameHash, issuerKeyHash))
-            {
+            final byte[] issuerKeyHash) {
+        for (IssuerEntry entry : entries) {
+            if (entry.matchHash(hashAlgo, issuerNameHash, issuerKeyHash)) {
                 return entry;
             }
         }
@@ -122,11 +109,9 @@ public class IssuerStore
         return null;
     }
 
-    public Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys()
-    {
+    public Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys() {
         Set<IssuerHashNameAndKey> ret = new HashSet<>();
-        for (IssuerEntry issuerEntry : entries)
-        {
+        for (IssuerEntry issuerEntry : entries) {
             ret.addAll(issuerEntry.getIssuerHashNameAndKeys());
         }
         return ret;

@@ -48,8 +48,7 @@ import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
 @Command(scope = "xipki-db", name = "digest-db",
         description = "digest XiPKI/EJBCA database")
-public class DigestDbCmd extends DbPortCmd
-{
+public class DigestDbCmd extends DbPortCmd {
     @Option(name = "--db-conf",
             required = true,
             description = "database configuration file")
@@ -74,8 +73,7 @@ public class DigestDbCmd extends DbPortCmd
 
     @Override
     protected DbPortWorker getDbPortWorker()
-    throws Exception
-    {
+    throws Exception {
         return new DbDigestExportWorker(
                 dataSourceFactory,
                 passwordResolver,
@@ -86,14 +84,12 @@ public class DigestDbCmd extends DbPortCmd
     }
 
     public void setDataSourceFactory(
-            final DataSourceFactory dataSourceFactory)
-    {
+            final DataSourceFactory dataSourceFactory) {
         this.dataSourceFactory = dataSourceFactory;
     }
 
     public void setPasswordResolver(
-            final PasswordResolver passwordResolver)
-    {
+            final PasswordResolver passwordResolver) {
         this.passwordResolver = passwordResolver;
     }
 }

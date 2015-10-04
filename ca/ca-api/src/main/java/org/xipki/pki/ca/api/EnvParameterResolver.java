@@ -41,8 +41,7 @@ import java.util.Set;
  * @author Lijun Liao
  */
 
-public interface EnvParameterResolver
-{
+public interface EnvParameterResolver {
 
     Set<String> getAllParameterNames();
 

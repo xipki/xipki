@@ -48,8 +48,7 @@ import org.xipki.pki.ca.dbtool.port.OcspFromCaDbImportWorker;
 
 @Command(scope = "xipki-db", name = "import-ocspfromca",
         description = "import OCSP database from CA data")
-public class ImportOcspFromCaCmd extends DbPortCmd
-{
+public class ImportOcspFromCaCmd extends DbPortCmd {
     private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
     private static final String DFLT_PUBLISHER = "OCSP.PUBLISHER";
 
@@ -83,22 +82,19 @@ public class ImportOcspFromCaCmd extends DbPortCmd
 
     @Override
     protected DbPortWorker getDbPortWorker()
-    throws Exception
-    {
+    throws Exception {
         return new OcspFromCaDbImportWorker(
                 dataSourceFactory, passwordResolver, dbconfFile, publisherName, resume,
                 indir, numCertsPerCommit.intValue(), testOnly.booleanValue());
     }
 
     public void setDataSourceFactory(
-            final DataSourceFactory dataSourceFactory)
-    {
+            final DataSourceFactory dataSourceFactory) {
         this.dataSourceFactory = dataSourceFactory;
     }
 
     public void setPasswordResolver(
-            final PasswordResolver passwordResolver)
-    {
+            final PasswordResolver passwordResolver) {
         this.passwordResolver = passwordResolver;
     }
 }

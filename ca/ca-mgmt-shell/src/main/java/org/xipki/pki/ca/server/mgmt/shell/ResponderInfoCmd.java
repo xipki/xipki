@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 
 @Command(scope = "xipki-ca", name = "responder-info",
         description = "show information of responder")
-public class ResponderInfoCmd extends CaCmd
-{
+public class ResponderInfoCmd extends CaCmd {
 
     @Argument(index = 0, name = "name", description = "responder name")
     private String name;
@@ -64,41 +63,33 @@ public class ResponderInfoCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         StringBuilder sb = new StringBuilder();
 
-        if (name == null)
-        {
+        if (name == null) {
             Set<String> names = caManager.getCmpResponderNames();
             int n = names.size();
 
-            if (n == 0 || n == 1)
-            {
+            if (n == 0 || n == 1) {
                 sb.append((n == 0)
                         ? "no"
                         : "1");
                 sb.append(" responder is configured\n");
-            } else
-            {
+            } else {
                 sb.append(n).append(" responders are configured:\n");
             }
 
             List<String> sorted = new ArrayList<>(names);
             Collections.sort(sorted);
 
-            for (String name : sorted)
-            {
+            for (String name : sorted) {
                 sb.append("\t").append(name).append("\n");
             }
-        } else
-        {
+        } else {
             CmpResponderEntry entry = caManager.getCmpResponder(name);
-            if (entry == null)
-            {
+            if (entry == null) {
                 throw new UnexpectedException("could not find CMP responder '" + name + "'");
-            } else
-            {
+            } else {
                 sb.append(entry.toString(verbose));
             }
         }

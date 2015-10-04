@@ -44,39 +44,33 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-class NameIdStore
-{
+class NameIdStore {
     private final String table;
     private final Map<String, Integer> entries;
 
     NameIdStore(
             final String table,
-            final Map<String, Integer> entries)
-    {
+            final Map<String, Integer> entries) {
         this.table = table;
         this.entries = new HashMap<>();
 
-        for (String name : entries.keySet())
-        {
+        for (String name : entries.keySet()) {
             addEntry(name, entries.get(name));
         }
     }
 
     void addEntry(
             final String name,
-            final Integer id)
-    {
+            final Integer id) {
         ParamUtil.assertNotBlank("name", name);
         ParamUtil.assertNotNull("id", id);
 
-        if (entries.containsKey(name))
-        {
+        if (entries.containsKey(name)) {
             throw new IllegalArgumentException(
                     "entry with the same name " + name + " already available");
         }
 
-        if (entries.containsValue(id))
-        {
+        if (entries.containsValue(id)) {
             throw new IllegalArgumentException(
                     "entry with the same id " + id + " already available");
         }
@@ -85,12 +79,9 @@ class NameIdStore
     }
 
     String getName(
-            final Integer id)
-    {
-        for (String name : entries.keySet())
-        {
-            if (id == entries.get(name))
-            {
+            final Integer id) {
+        for (String name : entries.keySet()) {
+            if (id == entries.get(name)) {
                 return name;
             }
         }
@@ -99,13 +90,11 @@ class NameIdStore
     }
 
     Integer getId(
-            final String name)
-    {
+            final String name) {
         return entries.get(name);
     }
 
-    public String getTable()
-    {
+    public String getTable() {
         return table;
     }
 

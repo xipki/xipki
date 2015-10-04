@@ -59,8 +59,7 @@ import org.xipki.pki.ca.dbtool.jaxb.ocsp.ObjectFactory;
  * @author Lijun Liao
  */
 
-public class OcspDbImportWorker extends DbPortWorker
-{
+public class OcspDbImportWorker extends DbPortWorker {
     private static final Logger LOG = LoggerFactory.getLogger(OcspDbImportWorker.class);
     private final DataSourceWrapper dataSource;
     private final Unmarshaller unmarshaller;
@@ -77,8 +76,7 @@ public class OcspDbImportWorker extends DbPortWorker
             final String srcFolder,
             final int batchEntriesPerCommit,
             final boolean evaluateOnly)
-    throws DataAccessException, PasswordResolverException, IOException, JAXBException
-    {
+    throws DataAccessException, PasswordResolverException, IOException, JAXBException {
         Properties props = DbPorter.getDbConfProperties(
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
         this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
@@ -94,24 +92,19 @@ public class OcspDbImportWorker extends DbPortWorker
     @Override
     public void doRun(
             final AtomicBoolean stopMe)
-    throws Exception
-    {
+    throws Exception {
         long start = System.currentTimeMillis();
         // CertStore
-        try
-        {
+        try {
             OcspCertStoreDbImporter certStoreImporter = new OcspCertStoreDbImporter(
                     dataSource, unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe,
                     evaluateOnly);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
-        } finally
-        {
-            try
-            {
+        } finally {
+            try {
                 dataSource.shutdown();
-            } catch (Throwable e)
-            {
+            } catch (Throwable e) {
                 LOG.error("dataSource.shutdown()", e);
             }
             long end = System.currentTimeMillis();

@@ -42,28 +42,24 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class SubjectInfo
-{
+public class SubjectInfo {
     private final X500Name grantedSubject;
     private final String warning;
 
     public SubjectInfo(
             final X500Name grantedSubject,
-            final String warning)
-    {
+            final String warning) {
         ParamUtil.assertNotNull("grantedSubject", grantedSubject);
 
         this.grantedSubject = grantedSubject;
         this.warning = warning;
     }
 
-    public X500Name getGrantedSubject()
-    {
+    public X500Name getGrantedSubject() {
         return grantedSubject;
     }
 
-    public String getWarning()
-    {
+    public String getWarning() {
         return warning;
     }
 

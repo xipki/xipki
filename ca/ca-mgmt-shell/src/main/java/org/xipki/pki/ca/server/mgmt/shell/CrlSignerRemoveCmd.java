@@ -44,15 +44,13 @@ import org.apache.karaf.shell.commands.Command;
 
 @Command(scope = "xipki-ca", name = "crlsigner-rm",
         description = "remove CRL signer")
-public class CrlSignerRemoveCmd extends CaCmd
-{
+public class CrlSignerRemoveCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "CRL signer name", required = true)
     private String name;
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean b = caManager.removeCrlSigner(name);
         output(b, "removed", "could not remove", "CRL signer " + name);
         return null;

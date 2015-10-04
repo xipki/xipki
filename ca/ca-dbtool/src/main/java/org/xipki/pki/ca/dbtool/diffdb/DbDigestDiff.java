@@ -71,8 +71,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public class DbDigestDiff
-{
+public class DbDigestDiff {
     private static final Logger LOG = LoggerFactory.getLogger(DbDigestDiff.class);
     private final String refDirname;
     private final DataSourceWrapper refDatasource;
@@ -97,14 +96,12 @@ public class DbDigestDiff
             final int numPerSelect,
             final int numRefThreads,
             final int numTargetThreads)
-    throws IOException, DataAccessException
-    {
+    throws IOException, DataAccessException {
         ParamUtil.assertNotBlank("refDirname", refDirname);
         ParamUtil.assertNotBlank("reportDirName", reportDirName);
         ParamUtil.assertNotNull("targetDatasource", targetDatasource);
         ParamUtil.assertNotNull("stopMe", stopMe);
-        if (numPerSelect < 1)
-        {
+        if (numPerSelect < 1) {
             throw new IllegalArgumentException("invalid numPerSelect: " + numPerSelect);
         }
 
@@ -122,14 +119,12 @@ public class DbDigestDiff
             final int numPerSelect,
             final int numRefThreads,
             final int numTargetThreads)
-    throws IOException, DataAccessException
-    {
+    throws IOException, DataAccessException {
         ParamUtil.assertNotNull("refDatasource", refDatasource);
         ParamUtil.assertNotBlank("reportDirName", reportDirName);
         ParamUtil.assertNotNull("targetDatasource", targetDatasource);
         ParamUtil.assertNotNull("stopMe", stopMe);
-        if (numPerSelect < 1)
-        {
+        if (numPerSelect < 1) {
             throw new IllegalArgumentException("invalid numPerSelect: " + numPerSelect);
         }
 
@@ -148,14 +143,11 @@ public class DbDigestDiff
             final int numPerSelect,
             final int numRefThreads,
             final int numTargetThreads)
-    throws IOException, DataAccessException
-    {
-        if (numRefThreads < 1)
-        {
+    throws IOException, DataAccessException {
+        if (numRefThreads < 1) {
             throw new IllegalArgumentException("invalid numRefThreads: " + numRefThreads);
         }
-        if (numTargetThreads < 1)
-        {
+        if (numTargetThreads < 1) {
             throw new IllegalArgumentException("invalid numTargetThreads: " + numTargetThreads);
         }
 
@@ -178,8 +170,7 @@ public class DbDigestDiff
         this.numRefThreads = (refDatasource == null)
                 ? 1
                 : Math.min(numRefThreads, refDatasource.getMaximumPoolSize() - 1);
-        if (this.numRefThreads != numRefThreads)
-        {
+        if (this.numRefThreads != numRefThreads) {
             LOG.info("adapted the numRefThreads from {} to {}", numRefThreads, this.numRefThreads);
         }
 
@@ -187,38 +178,31 @@ public class DbDigestDiff
                 ? 1
                 : Math.min(numTargetThreads, targetDatasource.getMaximumPoolSize() - 1);
 
-        if (this.numTargetThreads != numRefThreads)
-        {
+        if (this.numTargetThreads != numRefThreads) {
             LOG.info("reduce the numTargetThreads from {} to {}", numTargetThreads,
                     this.numTargetThreads);
         }
     }
 
-    public Set<byte[]> getIncludeCACerts()
-    {
+    public Set<byte[]> getIncludeCACerts() {
         return includeCACerts;
     }
 
     public void setIncludeCACerts(
-            final Set<byte[]> includeCACerts)
-    {
+            final Set<byte[]> includeCACerts) {
         this.includeCACerts = includeCACerts;
     }
 
     public void diff()
-    throws Exception
-    {
+    throws Exception {
         Map<Integer, byte[]> caIdCertMap = getCAs(targetDatasource, targetDbControl);
 
-        if (refDirname != null)
-        {
+        if (refDirname != null) {
             File refDir = new File(this.refDirname);
             File[] childFiles = refDir.listFiles();
-            for (File caDir : childFiles)
-            {
+            for (File caDir : childFiles) {
                 if (!caDir.isDirectory()
-                        || !caDir.getName().startsWith("ca-"))
-                {
+                        || !caDir.getName().startsWith("ca-")) {
                     continue;
                 }
 
@@ -226,8 +210,7 @@ public class DbDigestDiff
                 DigestReader refReader = new FileDigestReader(caDirPath, revokedOnly);
                 diffSingleCA(refReader, caIdCertMap);
             }
-        } else
-        {
+        } else {
             DbSchemaType refDbSchemaType = DbDigestExportWorker
                     .detectDbSchemaType(refDatasource);
             List<Integer> refCaIds = new LinkedList<>();
@@ -235,51 +218,41 @@ public class DbDigestDiff
             XipkiDbControl refDbControl = null;
             String refSql;
 
-            if (refDbSchemaType == DbSchemaType.EJBCA_CA_v3)
-            {
-                if (!refDatasource.tableHasColumn(null, "CertificateData", "id"))
-                {
+            if (refDbSchemaType == DbSchemaType.EJBCA_CA_v3) {
+                if (!refDatasource.tableHasColumn(null, "CertificateData", "id")) {
                     throw new RuntimeException(
                             "EJBCA without column 'CertificateData.id' is not supported, "
                             + "please call 'digest-db' first and then use the exported"
                             + " folder as the reference");
                 }
                 refSql = "SELECT cAId FROM CAData WHERE cAId != 0";
-            } else
-            {
+            } else {
                 refDbControl = new XipkiDbControl(refDbSchemaType);
                 refSql = "SELECT ID FROM " + refDbControl.getTblCa();
             }
 
             Statement refStmt = null;
-            try
-            {
+            try {
                 refStmt = refDatasource.createStatement(refDatasource.getConnection());
                 ResultSet refRs = null;
-                try
-                {
+                try {
                     refRs = refStmt.executeQuery(refSql);
-                    while (refRs.next())
-                    {
+                    while (refRs.next()) {
                         int id = refRs.getInt(1);
                         refCaIds.add(id);
                     }
-                } catch (SQLException e)
-                {
+                } catch (SQLException e) {
                     throw refDatasource.translate(refSql, e);
-                } finally
-                {
+                } finally {
                     refDatasource.releaseResources(refStmt, refRs);
                 }
-            } finally
-            {
+            } finally {
                 refDatasource.releaseResources(refStmt, null);
             }
 
             boolean dbContainsMultipleCAs = refCaIds.size() > 1;
 
-            for (Integer refCaId : refCaIds)
-            {
+            for (Integer refCaId : refCaIds) {
                 DigestReader refReader = (refDbSchemaType == DbSchemaType.EJBCA_CA_v3)
                         ? EjbcaDbDigestReader.getInstance(refDatasource, refDbSchemaType,
                                 refCaId, dbContainsMultipleCAs, revokedOnly, numRefThreads)
@@ -292,24 +265,19 @@ public class DbDigestDiff
 
     private void diffSingleCA(DigestReader refReader,
             Map<Integer, byte[]> caIdCertBytesMap)
-    throws CertificateException, IOException, InterruptedException
-    {
+    throws CertificateException, IOException, InterruptedException {
         X509Certificate caCert = refReader.getCaCert();
         byte[] caCertBytes = caCert.getEncoded();
 
-        if (includeCACerts != null && !includeCACerts.isEmpty())
-        {
+        if (includeCACerts != null && !includeCACerts.isEmpty()) {
             boolean include = false;
-            for (byte[] m : includeCACerts)
-            {
-                if (Arrays.equals(m, caCertBytes))
-                {
+            for (byte[] m : includeCACerts) {
+                if (Arrays.equals(m, caCertBytes)) {
                     include = true;
                     break;
                 }
             }
-            if (!include)
-            {
+            if (!include) {
                 System.out.println("skipped CA " + refReader.getCaSubjectName());
             }
         }
@@ -318,8 +286,7 @@ public class DbDigestDiff
         File caReportDir = new File(reportDirName, "ca-" + commonName);
 
         int idx = 2;
-        while (caReportDir.exists())
-        {
+        while (caReportDir.exists()) {
             caReportDir = new File(reportDirName, "ca-" + commonName + "-" + (idx++));
         }
 
@@ -327,16 +294,13 @@ public class DbDigestDiff
                 caReportDir.getPath(), caCertBytes);
 
         Integer caId = null;
-        for (Integer i : caIdCertBytesMap.keySet())
-        {
-            if (Arrays.equals(caCertBytes, caIdCertBytesMap.get(i)))
-            {
+        for (Integer i : caIdCertBytesMap.keySet()) {
+            if (Arrays.equals(caCertBytes, caIdCertBytesMap.get(i))) {
                 caId = i;
             }
         }
 
-        if (caId == null)
-        {
+        if (caId == null) {
             reporter.addNoCAMatch();
             refReader.close();
             reporter.close();
@@ -345,25 +309,20 @@ public class DbDigestDiff
 
         TargetDigestRetriever target = null;
 
-        try
-        {
+        try {
             target = new TargetDigestRetriever(targetDatasource, targetDbControl,
                     caId, numPerSelect, numTargetThreads);
             doDiff(refReader, target, reporter);
-        } catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             throw e;
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             reporter.addError("Exception thrown: " + e.getClass().getName() + ": "
                     + e.getMessage());
             LOG.error("exception on doDiff", e);
-        } finally
-        {
+        } finally {
             reporter.close();
             refReader.close();
-            if (target != null)
-            {
+            if (target != null) {
                 target.close();
             }
         }
@@ -373,8 +332,7 @@ public class DbDigestDiff
             final DigestReader refReader,
             final TargetDigestRetriever target,
             final DbDigestReporter reporter)
-    throws Exception
-    {
+    throws Exception {
         ProcessLog processLog = new ProcessLog(refReader.getTotalAccount());
         System.out.println("Processing certifiates of CA \n\t'"
                 + refReader.getCaSubjectName() + "'");
@@ -383,40 +341,32 @@ public class DbDigestDiff
 
         boolean interrupted = false;
 
-        while (true)
-        {
-            if (stopMe.get())
-            {
+        while (true) {
+            if (stopMe.get()) {
                 interrupted = true;
                 break;
             }
 
             int numBundles = 0;
-            for (int i = 0; i < numTargetThreads * 2; i++)
-            {
+            for (int i = 0; i < numTargetThreads * 2; i++) {
                 CertsBundle myBundle = refReader.nextCerts(numPerSelect);
                 if (myBundle != null
-                        && !myBundle.getSerialNumbers().isEmpty())
-                {
+                        && !myBundle.getSerialNumbers().isEmpty()) {
                     numBundles++;
                     target.addIn(myBundle);
-                } else
-                {
+                } else {
                     break; // break for
                 }
             }
 
-            if (numBundles == 0)
-            {
+            if (numBundles == 0) {
                 break; // break while (true)
             }
 
-            for (int i = 0; i < numBundles; i++)
-            {
+            for (int i = 0; i < numBundles; i++) {
                 CertsBundle bundle = target.takeOut();
                 Exception targetException = bundle.getTargetException();
-                if (targetException != null)
-                {
+                if (targetException != null) {
                     throw targetException;
                 }
 
@@ -426,22 +376,17 @@ public class DbDigestDiff
                 List<Long> cloneSerialNumbers = new ArrayList<>(serialNumbers);
                 Map<Long, DbDigestEntry> refCerts = bundle.getCerts();
 
-                for (Long serialNumber : serialNumbers)
-                {
+                for (Long serialNumber : serialNumbers) {
                     DbDigestEntry targetCert = bundle.getTargetCert(serialNumber);
                     cloneSerialNumbers.remove(serialNumber);
                     DbDigestEntry refCert = refCerts.get(serialNumber);
-                    if (targetCert != null)
-                    {
-                        if (refCert.contentEquals(targetCert))
-                        {
+                    if (targetCert != null) {
+                        if (refCert.contentEquals(targetCert)) {
                             reporter.addGood(serialNumber);
-                        } else
-                        {
+                        } else {
                             reporter.addDiff(refCert, targetCert);
                         }
-                    } else
-                    {
+                    } else {
                         reporter.addMissing(serialNumber);
                     }
                 } // end for
@@ -455,36 +400,30 @@ public class DbDigestDiff
 
         processLog.printTrailer();
 
-        if (interrupted)
-        {
+        if (interrupted) {
             throw new InterruptedException("interrupted by the user");
         }
     }
 
     private static Map<Integer, byte[]> getCAs(
             DataSourceWrapper datasource, XipkiDbControl dbControl)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         // get a list of available CAs in the target database
         String sql = "SELECT ID, CERT FROM " + dbControl.getTblCa();
         Connection conn = datasource.getConnection();
         Statement stmt = datasource.createStatement(conn);
         Map<Integer, byte[]> caIdCertMap = new HashMap<>(5);
         ResultSet rs = null;
-        try
-        {
+        try {
             rs = stmt.executeQuery(sql);
-            while (rs.next())
-            {
+            while (rs.next()) {
                 int id = rs.getInt("ID");
                 String b64Cert = rs.getString("CERT");
                 caIdCertMap.put(id, Base64.decode(b64Cert));
             }
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw datasource.translate(sql, e);
-        } finally
-        {
+        } finally {
             datasource.releaseResources(stmt, rs);
         }
 

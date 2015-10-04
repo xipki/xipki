@@ -51,8 +51,7 @@ import java.sql.SQLException;
  * @see InvalidResultSetAccessException
  */
 @SuppressWarnings("serial")
-public class BadSqlGrammarException extends InvalidDataAccessResourceUsageException
-{
+public class BadSqlGrammarException extends InvalidDataAccessResourceUsageException {
 
     private String sql;
 
@@ -64,8 +63,7 @@ public class BadSqlGrammarException extends InvalidDataAccessResourceUsageExcept
      */
     public BadSqlGrammarException(
             final String sql,
-            final SQLException ex)
-    {
+            final SQLException ex) {
         super("bad SQL grammar [" + sql + "]", ex);
         this.sql = sql;
     }
@@ -73,16 +71,14 @@ public class BadSqlGrammarException extends InvalidDataAccessResourceUsageExcept
     /**
      * Return the wrapped SQLException.
      */
-    public SQLException getSQLException()
-    {
+    public SQLException getSQLException() {
         return (SQLException) getCause();
     }
 
     /**
      * Return the SQL that caused the problem.
      */
-    public String getSql()
-    {
+    public String getSql() {
         return this.sql;
     }
 

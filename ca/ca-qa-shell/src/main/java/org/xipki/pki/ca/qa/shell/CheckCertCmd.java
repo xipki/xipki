@@ -60,8 +60,7 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 @Command(scope = "xipki-qa", name = "check-cert",
         description = "check the certificate")
-public class CheckCertCmd extends XipkiOsgiCommandSupport
-{
+public class CheckCertCmd extends XipkiOsgiCommandSupport {
     @Option(name = "--cert", aliases = "-c",
             required = true,
             description = "certificate file\n"
@@ -93,26 +92,21 @@ public class CheckCertCmd extends XipkiOsgiCommandSupport
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         Set<String> issuerNames = qaSystemManager.getIssuerNames();
-        if (isEmpty(issuerNames))
-        {
+        if (isEmpty(issuerNames)) {
             throw new IllegalCmdParamException("no issuer is configured");
         }
 
-        if (issuerName == null)
-        {
-            if (issuerNames.size() != 1)
-            {
+        if (issuerName == null) {
+            if (issuerNames.size() != 1) {
                 throw new IllegalCmdParamException("no issuer is specified");
             }
 
             issuerName = issuerNames.iterator().next();
         }
 
-        if (!issuerNames.contains(issuerName))
-        {
+        if (!issuerNames.contains(issuerName)) {
             throw new IllegalCmdParamException("issuer " + issuerName
                     + " is not within the configured issuers " + issuerNames);
         }
@@ -120,8 +114,7 @@ public class CheckCertCmd extends XipkiOsgiCommandSupport
         X509IssuerInfo issuerInfo = qaSystemManager.getIssuer(issuerName);
 
         X509CertprofileQA qa = qaSystemManager.getCertprofile(profileName);
-        if (qa == null)
-        {
+        if (qa == null) {
             throw new IllegalCmdParamException("found no certificate profile named '"
                     + profileName + "'");
         }
@@ -129,11 +122,9 @@ public class CheckCertCmd extends XipkiOsgiCommandSupport
         CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));
         Extensions extensions = null;
         ASN1Set attrs = p10Req.getCertificationRequestInfo().getAttributes();
-        for (int i = 0; i < attrs.size(); i++)
-        {
+        for (int i = 0; i < attrs.size(); i++) {
             Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-            if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
-            {
+            if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {
                 extensions = Extensions.getInstance(attr.getAttributeValues()[0]);
             }
         }
@@ -150,33 +141,28 @@ public class CheckCertCmd extends XipkiOsgiCommandSupport
                 ? "valid"
                 : "invalid");
 
-        if (verbose.booleanValue())
-        {
-            for (ValidationIssue issue : result.getValidationIssues())
-            {
+        if (verbose.booleanValue()) {
+            for (ValidationIssue issue : result.getValidationIssues()) {
                 sb.append("\n");
                 format(issue, "    ", sb);
             }
         }
 
         out(sb.toString());
-        if (!result.isAllSuccessful())
-        {
+        if (!result.isAllSuccessful()) {
             throw new CmdFailure("certificate is invalid");
         }
         return null;
     }
 
-    public void setQaSystemManager(QASystemManager qaSystemManager)
-    {
+    public void setQaSystemManager(QASystemManager qaSystemManager) {
         this.qaSystemManager = qaSystemManager;
     }
 
     private static void format(
             final ValidationIssue issue,
             final String prefix,
-            final StringBuilder sb)
-    {
+            final StringBuilder sb) {
         sb.append(prefix);
         sb.append(issue.getCode());
         sb.append(", ").append(issue.getDescription());
@@ -184,8 +170,7 @@ public class CheckCertCmd extends XipkiOsgiCommandSupport
                 issue.isFailed()
                     ? "failed"
                     : "successful");
-        if (issue.getMessage() != null)
-        {
+        if (issue.getMessage() != null) {
             sb.append(", ").append(issue.getMessage());
         }
     }

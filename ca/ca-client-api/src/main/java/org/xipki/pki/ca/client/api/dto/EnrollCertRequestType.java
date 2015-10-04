@@ -46,10 +46,8 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class EnrollCertRequestType
-{
-    public static enum Type
-    {
+public class EnrollCertRequestType {
+    public static enum Type {
         CERT_REQ,
         KEY_UPDATE,
         CROSS_CERT_REQ;
@@ -59,31 +57,25 @@ public class EnrollCertRequestType
     private final List<EnrollCertRequestEntryType> requestEntries = new LinkedList<>();
 
     public EnrollCertRequestType(
-            final Type type)
-    {
+            final Type type) {
         ParamUtil.assertNotNull("type", type);
         this.type = type;
     }
 
-    public Type getType()
-    {
+    public Type getType() {
         return type;
     }
 
     public boolean addRequestEntry(
-            final EnrollCertRequestEntryType requestEntry)
-    {
+            final EnrollCertRequestEntryType requestEntry) {
         String id = requestEntry.getId();
         ASN1Integer certReqId = requestEntry.getCertReq().getCertReqId();
-        for (EnrollCertRequestEntryType re : requestEntries)
-        {
-            if (re.getId().equals(id))
-            {
+        for (EnrollCertRequestEntryType re : requestEntries) {
+            if (re.getId().equals(id)) {
                 return false;
             }
 
-            if (re.getCertReq().getCertReqId().equals(certReqId))
-            {
+            if (re.getCertReq().getCertReqId().equals(certReqId)) {
                 return false;
             }
         }
@@ -92,8 +84,7 @@ public class EnrollCertRequestType
         return true;
     }
 
-    public List<EnrollCertRequestEntryType> getRequestEntries()
-    {
+    public List<EnrollCertRequestEntryType> getRequestEntries() {
         return Collections.unmodifiableList(requestEntries);
     }
 }

@@ -39,35 +39,30 @@ package org.xipki.scep.transaction;
  * @author Lijun Liao
  */
 
-public class TransactionException extends Exception
-{
+public class TransactionException extends Exception {
     private static final long serialVersionUID = 1L;
 
     public TransactionException(
             final String message,
             final Throwable cause,
             final boolean enableSuppression,
-            final boolean writableStackTrace)
-    {
+            final boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
     public TransactionException(
             final String message,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(message, cause);
     }
 
     public TransactionException(
-            final String message)
-    {
+            final String message) {
         super(message);
     }
 
     public TransactionException(
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(cause);
     }
 

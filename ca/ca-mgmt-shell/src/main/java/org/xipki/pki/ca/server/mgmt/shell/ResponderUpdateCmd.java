@@ -53,8 +53,7 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ca", name = "responder-up",
         description = "update responder")
-public class ResponderUpdateCmd extends CaCmd
-{
+public class ResponderUpdateCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "responder name\n"
@@ -76,24 +75,19 @@ public class ResponderUpdateCmd extends CaCmd
     protected PasswordResolver passwordResolver;
 
     public void setPasswordResolver(
-            final PasswordResolver passwordResolver)
-    {
+            final PasswordResolver passwordResolver) {
         this.passwordResolver = passwordResolver;
     }
 
     protected String getSignerConf()
-    throws Exception
-    {
-        if (signerConf == null)
-        {
+    throws Exception {
+        if (signerConf == null) {
             return signerConf;
         }
         String _signerType = signerType;
-        if (_signerType == null)
-        {
+        if (_signerType == null) {
             CmpResponderEntry entry = caManager.getCmpResponder(name);
-            if (entry == null)
-            {
+            if (entry == null) {
                 throw new IllegalCmdParamException("please specify the signerType");
             }
             _signerType = entry.getType();
@@ -104,14 +98,11 @@ public class ResponderUpdateCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         String cert = null;
-        if (CAManager.NULL.equalsIgnoreCase(certFile))
-        {
+        if (CAManager.NULL.equalsIgnoreCase(certFile)) {
             cert = CAManager.NULL;
-        } else if (certFile != null)
-        {
+        } else if (certFile != null) {
             byte[] certBytes = IoUtil.read(certFile);
             X509Util.parseCert(new ByteArrayInputStream(certBytes));
             cert = Base64.toBase64String(certBytes);

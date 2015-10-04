@@ -43,8 +43,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class MonetaryValueOption
-{
+public class MonetaryValueOption {
     private final Iso4217CurrencyCode currency;
     private final String currencyString;
     private final Range2Type amountRange;
@@ -53,8 +52,7 @@ public class MonetaryValueOption
     public MonetaryValueOption(
             final Iso4217CurrencyCode currency,
             final Range2Type amountRange,
-            final Range2Type exponentRange)
-    {
+            final Range2Type exponentRange) {
         ParamUtil.assertNotNull("currency", currency);
         ParamUtil.assertNotNull("amountRange", amountRange);
         ParamUtil.assertNotNull("exponentRange", exponentRange);
@@ -68,23 +66,19 @@ public class MonetaryValueOption
         this.exponentRange = exponentRange;
     }
 
-    public Iso4217CurrencyCode getCurrency()
-    {
+    public Iso4217CurrencyCode getCurrency() {
         return currency;
     }
 
-    public Range2Type getAmountRange()
-    {
+    public Range2Type getAmountRange() {
         return amountRange;
     }
 
-    public Range2Type getExponentRange()
-    {
+    public Range2Type getExponentRange() {
         return exponentRange;
     }
 
-    public String getCurrencyString()
-    {
+    public String getCurrencyString() {
         return currencyString;
     }
 

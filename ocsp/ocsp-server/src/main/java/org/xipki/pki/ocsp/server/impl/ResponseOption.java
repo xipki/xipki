@@ -46,8 +46,7 @@ import org.xipki.security.api.HashAlgoType;
  * @author Lijun Liao
  */
 
-class ResponseOption
-{
+class ResponseOption {
     private final boolean includeInvalidityDate;
     private final boolean includeRevReason;
     private final EmbedCertsMode embedCertsMode;
@@ -57,34 +56,27 @@ class ResponseOption
 
     public ResponseOption(
             final ResponseOptionType conf)
-    throws InvalidConfException
-    {
+    throws InvalidConfException {
         this.includeInvalidityDate = getBoolean(conf.isIncludeInvalidityDate(), true);
         this.includeRevReason = getBoolean(conf.isIncludeRevReason(), true);
         this.embedCertsMode = conf.getEmbedCertsMode();
         this.includeCerthash = getBoolean(conf.isIncludeCertHash(), false);
         CacheType cacheConf = conf.getCache();
-        if (cacheConf != null && cacheConf.getCacheMaxAge() != null)
-        {
+        if (cacheConf != null && cacheConf.getCacheMaxAge() != null) {
             this.cacheMaxAge = cacheConf.getCacheMaxAge().longValue();
-        } else
-        {
+        } else {
             this.cacheMaxAge = null;
         }
 
         HashAlgoType _certHashAlgo = null;
         String s = conf.getCerthashAlgorithm();
-        if (s != null)
-        {
+        if (s != null) {
             String token = s.trim();
-            if (StringUtil.isNotBlank(token))
-            {
+            if (StringUtil.isNotBlank(token)) {
                 HashAlgoType algo = HashAlgoType.getHashAlgoType(token);
-                if (algo != null && RequestOption.supportedHashAlgorithms.contains(algo))
-                {
+                if (algo != null && RequestOption.supportedHashAlgorithms.contains(algo)) {
                     _certHashAlgo = algo;
-                } else
-                {
+                } else {
                     throw new InvalidConfException("hash algorithm " + token + " is unsupported");
                 }
             }
@@ -92,40 +84,33 @@ class ResponseOption
         this.certHashAlgo = _certHashAlgo;
     }
 
-    public boolean isIncludeInvalidityDate()
-    {
+    public boolean isIncludeInvalidityDate() {
         return includeInvalidityDate;
     }
 
-    public boolean isIncludeRevReason()
-    {
+    public boolean isIncludeRevReason() {
         return includeRevReason;
     }
 
-    public boolean isIncludeCerthash()
-    {
+    public boolean isIncludeCerthash() {
         return includeCerthash;
     }
 
-    public Long getCacheMaxAge()
-    {
+    public Long getCacheMaxAge() {
         return cacheMaxAge;
     }
 
-    public EmbedCertsMode getEmbedCertsMode()
-    {
+    public EmbedCertsMode getEmbedCertsMode() {
         return embedCertsMode;
     }
 
-    public HashAlgoType getCertHashAlgo()
-    {
+    public HashAlgoType getCertHashAlgo() {
         return certHashAlgo;
     }
 
     private static boolean getBoolean(
             final Boolean b,
-            final boolean dflt)
-    {
+            final boolean dflt) {
         return (b == null)
                 ? dflt
                 : b.booleanValue();

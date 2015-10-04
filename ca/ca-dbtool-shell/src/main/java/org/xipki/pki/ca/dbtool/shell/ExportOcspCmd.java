@@ -48,8 +48,7 @@ import org.xipki.pki.ca.dbtool.port.OcspDbExportWorker;
 
 @Command(scope = "xipki-db", name = "export-ocsp",
         description = "export OCSP database")
-public class ExportOcspCmd extends DbPortCmd
-{
+public class ExportOcspCmd extends DbPortCmd {
     private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
 
     @Option(name = "--db-conf",
@@ -82,21 +81,18 @@ public class ExportOcspCmd extends DbPortCmd
 
     @Override
     protected DbPortWorker getDbPortWorker()
-    throws Exception
-    {
+    throws Exception {
         return new OcspDbExportWorker(dataSourceFactory, passwordResolver, dbconfFile, outdir,
                 resume, numCertsInBundle, numCertsPerSelect, testOnly);
     }
 
     public void setDataSourceFactory(
-            final DataSourceFactory dataSourceFactory)
-    {
+            final DataSourceFactory dataSourceFactory) {
         this.dataSourceFactory = dataSourceFactory;
     }
 
     public void setPasswordResolver(
-            final PasswordResolver passwordResolver)
-    {
+            final PasswordResolver passwordResolver) {
         this.passwordResolver = passwordResolver;
     }
 }

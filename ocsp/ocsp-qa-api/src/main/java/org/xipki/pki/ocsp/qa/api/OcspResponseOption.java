@@ -43,8 +43,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
  * @author Lijun Liao
  */
 
-public class OcspResponseOption
-{
+public class OcspResponseOption {
     private X509Certificate respIssuer;
     private Occurrence nonceOccurrence;
     private Occurrence certhashOccurrence;
@@ -52,73 +51,60 @@ public class OcspResponseOption
     private ASN1ObjectIdentifier certhashAlgId;
     private String signatureAlgName;
 
-    public OcspResponseOption()
-    {
+    public OcspResponseOption() {
     }
 
-    public X509Certificate getRespIssuer()
-    {
+    public X509Certificate getRespIssuer() {
         return respIssuer;
     }
 
     public void setRespIssuer(
-            final X509Certificate respIssuer)
-    {
+            final X509Certificate respIssuer) {
         this.respIssuer = respIssuer;
     }
 
-    public Occurrence getNonceOccurrence()
-    {
+    public Occurrence getNonceOccurrence() {
         return nonceOccurrence;
     }
 
     public void setNonceOccurrence(
-            final Occurrence nonceOccurrence)
-    {
+            final Occurrence nonceOccurrence) {
         this.nonceOccurrence = nonceOccurrence;
     }
 
-    public Occurrence getCerthashOccurrence()
-    {
+    public Occurrence getCerthashOccurrence() {
         return certhashOccurrence;
     }
 
     public void setCerthashOccurrence(
-            final Occurrence certhashOccurrence)
-    {
+            final Occurrence certhashOccurrence) {
         this.certhashOccurrence = certhashOccurrence;
     }
 
-    public Occurrence getNextUpdateOccurrence()
-    {
+    public Occurrence getNextUpdateOccurrence() {
         return nextUpdateOccurrence;
     }
 
     public void setNextUpdateOccurrence(
-            final Occurrence nextUpdateOccurrence)
-    {
+            final Occurrence nextUpdateOccurrence) {
         this.nextUpdateOccurrence = nextUpdateOccurrence;
     }
 
-    public ASN1ObjectIdentifier getCerthashAlgId()
-    {
+    public ASN1ObjectIdentifier getCerthashAlgId() {
         return certhashAlgId;
     }
 
     public void setCerthashAlgId(
-            final ASN1ObjectIdentifier certhashAlgId)
-    {
+            final ASN1ObjectIdentifier certhashAlgId) {
         this.certhashAlgId = certhashAlgId;
     }
 
-    public String getSignatureAlgName()
-    {
+    public String getSignatureAlgName() {
         return signatureAlgName;
     }
 
     public void setSignatureAlgName(
-            final String signatureAlgName)
-    {
+            final String signatureAlgName) {
         this.signatureAlgName = signatureAlgName;
     }
 

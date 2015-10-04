@@ -50,20 +50,17 @@ import org.xipki.security.speed.p11.P11RSASignLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-rsa-sign",
         description = "performance test of PKCS#11 RSA signature creation (batch)")
-public class BSpeedP11RSASignCmd extends BSpeedP11SignCmd
-{
+public class BSpeedP11RSASignCmd extends BSpeedP11SignCmd {
 
     @Override
     protected List<LoadExecutor> getTesters()
-    throws Exception
-    {
+    throws Exception {
         List<LoadExecutor> ret = new LinkedList<>();
         int[] keysizes = new int[]{1024, 2048, 3072, 4096};
 
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
 
-        for (int keysize : keysizes)
-        {
+        for (int keysize : keysizes) {
             ret.add(
                     new P11RSASignLoadTest(securityFactory, slot, sigAlgo, keysize,
                             new BigInteger("0x10001")));

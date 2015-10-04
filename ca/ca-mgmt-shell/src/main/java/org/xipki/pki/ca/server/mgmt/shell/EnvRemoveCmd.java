@@ -44,15 +44,13 @@ import org.apache.karaf.shell.commands.Command;
 
 @Command(scope = "xipki-ca", name = "env-rm",
         description = "remove CA environment parameter")
-public class EnvRemoveCmd extends CaCmd
-{
+public class EnvRemoveCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "environment parameter name", required = true)
     private String name;
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean b = caManager.removeEnvParam(name);
         output(b, "removed", "could not remove", "environment parameter " + name);
         return null;

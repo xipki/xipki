@@ -42,27 +42,23 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class ExtKeyUsageControl
-{
+public class ExtKeyUsageControl {
     private final ASN1ObjectIdentifier extKeyUsage;
     private final boolean required;
 
     public ExtKeyUsageControl(
             final ASN1ObjectIdentifier extKeyUsage,
-            final boolean required)
-    {
+            final boolean required) {
         ParamUtil.assertNotNull("extKeyUsage", extKeyUsage);
         this.extKeyUsage = extKeyUsage;
         this.required = required;
     }
 
-    public ASN1ObjectIdentifier getExtKeyUsage()
-    {
+    public ASN1ObjectIdentifier getExtKeyUsage() {
         return extKeyUsage;
     }
 
-    public boolean isRequired()
-    {
+    public boolean isRequired() {
         return required;
     }
 

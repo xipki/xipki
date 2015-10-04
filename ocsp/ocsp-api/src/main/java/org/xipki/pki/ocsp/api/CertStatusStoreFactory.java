@@ -39,7 +39,6 @@ package org.xipki.pki.ocsp.api;
  * @author Lijun Liao
  */
 
-public interface CertStatusStoreFactory
-{
+public interface CertStatusStoreFactory {
     CertStatusStore generateCertStatusStore();
 }

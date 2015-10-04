@@ -45,19 +45,15 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-caalias-add",
         description = "add CA alias (negative, QA)")
-public class NegCaAliasAddCmd extends CaAliasAddCmd
-{
+public class NegCaAliasAddCmd extends CaAliasAddCmd {
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("neg-caalias-add");
 
-        try
-        {
+        try {
             super._doExecute();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return null;
         }
 

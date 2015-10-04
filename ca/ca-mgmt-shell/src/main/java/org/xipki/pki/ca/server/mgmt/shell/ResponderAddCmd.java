@@ -50,8 +50,7 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ca", name = "responder-add",
         description = "add responder")
-public class ResponderAddCmd extends CaCmd
-{
+public class ResponderAddCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "responder name\n"
@@ -75,25 +74,21 @@ public class ResponderAddCmd extends CaCmd
     private PasswordResolver passwordResolver;
 
     public void setPasswordResolver(
-            final PasswordResolver passwordResolver)
-    {
+            final PasswordResolver passwordResolver) {
         this.passwordResolver = passwordResolver;
     }
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         String base64Cert = null;
         X509Certificate signerCert = null;
-        if (certFile != null)
-        {
+        if (certFile != null) {
             signerCert = X509Util.parseCert(certFile);
             base64Cert = IoUtil.base64Encode(signerCert.getEncoded(), false);
         }
 
-        if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
-        {
+        if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
             signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
         }
         CmpResponderEntry entry = new CmpResponderEntry(name, signerType, signerConf, base64Cert);

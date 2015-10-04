@@ -49,8 +49,7 @@ import org.xipki.security.api.CertRevocationInfo;
  * @author Lijun Liao
  */
 
-public class X509CertificateInfo
-{
+public class X509CertificateInfo {
     private final byte[] subjectPublicKey;
     private final X509CertWithDBCertId cert;
     private final X509Cert issuerCert;
@@ -72,8 +71,7 @@ public class X509CertificateInfo
             final X509Cert issuerCert,
             final byte[] subjectPublicKey,
             final String profileName)
-    throws CertificateEncodingException
-    {
+    throws CertificateEncodingException {
         ParamUtil.assertNotNull("cert", cert);
         ParamUtil.assertNotNull("issuerCert", issuerCert);
         ParamUtil.assertNotBlank("profileName", profileName);
@@ -86,116 +84,95 @@ public class X509CertificateInfo
         this.profileName = profileName;
     }
 
-    public byte[] getSubjectPublicKey()
-    {
+    public byte[] getSubjectPublicKey() {
         return subjectPublicKey;
     }
 
-    public X509CertWithDBCertId getCert()
-    {
+    public X509CertWithDBCertId getCert() {
         return cert;
     }
 
-    public X509Cert getIssuerCert()
-    {
+    public X509Cert getIssuerCert() {
         return issuerCert;
     }
 
-    public String getProfileName()
-    {
+    public String getProfileName() {
         return profileName;
     }
 
-    public String getWarningMessage()
-    {
+    public String getWarningMessage() {
         return warningMessage;
     }
 
     public void setWarningMessage(
-            final String warningMessage)
-    {
+            final String warningMessage) {
         this.warningMessage = warningMessage;
     }
 
-    public RequestorInfo getRequestor()
-    {
+    public RequestorInfo getRequestor() {
         return requestor;
     }
 
     public void setRequestor(
-            final RequestorInfo requestor)
-    {
+            final RequestorInfo requestor) {
         this.requestor = requestor;
     }
 
-    public String getUser()
-    {
+    public String getUser() {
         return user;
     }
 
     public void setUser(
-            final String user)
-    {
+            final String user) {
         this.user = user;
     }
 
-    public boolean isRevoked()
-    {
+    public boolean isRevoked() {
         return revInfo != null;
     }
 
-    public CertRevocationInfo getRevocationInfo()
-    {
+    public CertRevocationInfo getRevocationInfo() {
         return revInfo;
     }
 
     public void setRevocationInfo(
-            final CertRevocationInfo revInfo)
-    {
+            final CertRevocationInfo revInfo) {
         this.revInfo = revInfo;
     }
 
-    public boolean isAlreadyIssued()
-    {
+    public boolean isAlreadyIssued() {
         return alreadyIssued;
     }
 
     public void setAlreadyIssued(
-            final boolean alreadyIssued)
-    {
+            final boolean alreadyIssued) {
         this.alreadyIssued = alreadyIssued;
     }
 
-    public RequestType getReqType()
-    {
+    public RequestType getReqType() {
         return reqType;
     }
 
-    public byte[] getTransactionId()
-    {
+    public byte[] getTransactionId() {
         return transactionId;
     }
 
     public void setReqType(
-            final RequestType reqType)
-    {
+            final RequestType reqType) {
         this.reqType = reqType;
     }
 
     public void setTransactionId(
-            final byte[] transactionId)
-    {
+            final byte[] transactionId) {
         this.transactionId = transactionId;
     }
 
-    public X500Name getRequestedSubject()
-    {
+    public X500Name getRequestedSubject() {
         return requestedSubject;
     }
 
     public void setRequestedSubject(
-            final X500Name requestedSubject)
-    {
+            final X500Name requestedSubject) {
         this.requestedSubject = requestedSubject;
     }
 

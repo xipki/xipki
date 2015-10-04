@@ -39,8 +39,7 @@ package org.xipki.pki.ca.server.mgmt.api;
  * @author Lijun Liao
  */
 
-public enum DuplicationMode
-{
+public enum DuplicationMode {
     FORBIDDEN (1, "forbidden"),
     FORBIDDEN_WITHIN_PROFILE (2, "forbiddenWithinProfile"),
     PERMITTED (3, "permitted");
@@ -50,31 +49,25 @@ public enum DuplicationMode
 
     private DuplicationMode(
             final int mode,
-            final String description)
-    {
+            final String description) {
         this.mode = mode;
         this.description = description;
     }
 
-    public int getMode()
-    {
+    public int getMode() {
         return mode;
     }
 
-    public String getDescription()
-    {
+    public String getDescription() {
         return description;
     }
 
     public static DuplicationMode getInstance(
-            final String text)
-    {
-        for (DuplicationMode value : values())
-        {
+            final String text) {
+        for (DuplicationMode value : values()) {
             if (value.description.equalsIgnoreCase(text)
                     || value.name().equalsIgnoreCase(text)
-                    || Integer.toString(value.mode).equalsIgnoreCase(text))
-            {
+                    || Integer.toString(value.mode).equalsIgnoreCase(text)) {
                 return value;
             }
         }
@@ -83,12 +76,9 @@ public enum DuplicationMode
     }
 
     public static DuplicationMode getInstance(
-            final int mode)
-    {
-        for (DuplicationMode value : values())
-        {
-            if (mode == value.mode)
-            {
+            final int mode) {
+        for (DuplicationMode value : values()) {
+            if (mode == value.mode) {
                 return value;
             }
         }

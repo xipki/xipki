@@ -42,12 +42,10 @@ import java.util.Set;
  * @author Lijun Liao
  */
 
-public class CmpControlNamePlusNullCompleter extends MgmtNameCompleter
-{
+public class CmpControlNamePlusNullCompleter extends MgmtNameCompleter {
 
     @Override
-    protected Set<String> getEnums()
-    {
+    protected Set<String> getEnums() {
         Set<String> ret = new HashSet<>();
         ret.addAll(caManager.getCmpControlNames());
         ret.add("NULL");

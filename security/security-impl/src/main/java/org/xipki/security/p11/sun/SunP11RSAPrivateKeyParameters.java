@@ -43,19 +43,16 @@ import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
  * @author Lijun Liao
  */
 
-public class SunP11RSAPrivateKeyParameters extends AsymmetricKeyParameter
-{
+public class SunP11RSAPrivateKeyParameters extends AsymmetricKeyParameter {
     private PrivateKey privateKey;
 
     public SunP11RSAPrivateKeyParameters(
-            final PrivateKey privateKey)
-    {
+            final PrivateKey privateKey) {
         super(true);
         this.privateKey = privateKey;
     }
 
-    public PrivateKey getPrivateKey()
-    {
+    public PrivateKey getPrivateKey() {
         return privateKey;
     }
 }

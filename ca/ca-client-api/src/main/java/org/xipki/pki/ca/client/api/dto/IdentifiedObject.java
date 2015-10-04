@@ -41,19 +41,16 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class IdentifiedObject
-{
+public class IdentifiedObject {
     private final String id;
 
     public IdentifiedObject(
-            final String id)
-    {
+            final String id) {
         ParamUtil.assertNotBlank("id", id);
         this.id = id;
     }
 
-    public String getId()
-    {
+    public String getId() {
         return id;
     }
 }

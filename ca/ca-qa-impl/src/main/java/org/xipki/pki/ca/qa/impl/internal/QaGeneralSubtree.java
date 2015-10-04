@@ -42,61 +42,50 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class QaGeneralSubtree
-{
+public class QaGeneralSubtree {
     private final GeneralSubtreeBaseType jaxb;
 
     public QaGeneralSubtree(
-            final GeneralSubtreeBaseType jaxb)
-    {
+            final GeneralSubtreeBaseType jaxb) {
         ParamUtil.assertNotNull("jaxb", jaxb);
         Integer i = jaxb.getMinimum();
-        if (i != null && i < 0)
-        {
+        if (i != null && i < 0) {
             throw new IllegalArgumentException("negative minimum is not allowed: " + i);
         }
 
         i = jaxb.getMaximum();
-        if (i != null && i < 0)
-        {
+        if (i != null && i < 0) {
             throw new IllegalArgumentException("negative maximum is not allowed: " + i);
         }
 
         this.jaxb = jaxb;
     }
 
-    public String getRfc822Name()
-    {
+    public String getRfc822Name() {
         return jaxb.getRfc822Name();
     }
 
-    public String getDNSName()
-    {
+    public String getDNSName() {
         return jaxb.getDNSName();
     }
 
-    public String getDirectoryName()
-    {
+    public String getDirectoryName() {
         return jaxb.getDirectoryName();
     }
 
-    public String getUri()
-    {
+    public String getUri() {
         return jaxb.getUri();
     }
 
-    public String getIpAddress()
-    {
+    public String getIpAddress() {
         return jaxb.getIpAddress();
     }
 
-    public Integer getMinimum()
-    {
+    public Integer getMinimum() {
         return jaxb.getMinimum();
     }
 
-    public Integer getMaximum()
-    {
+    public Integer getMaximum() {
         return jaxb.getMaximum();
     }
 

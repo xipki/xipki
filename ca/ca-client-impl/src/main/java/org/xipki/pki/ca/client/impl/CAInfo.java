@@ -44,26 +44,22 @@ import org.xipki.pki.ca.client.api.CertprofileInfo;
  * @author Lijun Liao
  */
 
-class CAInfo
-{
+class CAInfo {
     private final X509Certificate cert;
     private final Set<CertprofileInfo> certprofiles;
 
     CAInfo(
             final X509Certificate cert,
-            final Set<CertprofileInfo> certprofiles)
-    {
+            final Set<CertprofileInfo> certprofiles) {
         this.cert = cert;
         this.certprofiles = certprofiles;
     }
 
-    X509Certificate getCert()
-    {
+    X509Certificate getCert() {
         return cert;
     }
 
-    Set<CertprofileInfo> getCertprofiles()
-    {
+    Set<CertprofileInfo> getCertprofiles() {
         return certprofiles;
     }
 }

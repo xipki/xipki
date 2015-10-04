@@ -42,28 +42,24 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class QaExtensionValue
-{
+public class QaExtensionValue {
     private final boolean critical;
     private final byte[] value;
 
     public QaExtensionValue(
             final boolean critical,
-            final byte[] value)
-    {
+            final byte[] value) {
         ParamUtil.assertNotNull("value", value);
 
         this.critical = critical;
         this.value = Arrays.clone(value);
     }
 
-    public boolean isCritical()
-    {
+    public boolean isCritical() {
         return critical;
     }
 
-    public byte[] getValue()
-    {
+    public byte[] getValue() {
         return Arrays.clone(value);
     }
 

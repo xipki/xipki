@@ -65,27 +65,22 @@ import org.xipki.security.SignerUtil;
  * @author Lijun Liao
  */
 
-public abstract class KeyEntry
-{
+public abstract class KeyEntry {
     private static final Logger LOG = LoggerFactory.getLogger(KeyEntry.class);
 
-    public static final class RSAKeyEntry extends KeyEntry
-    {
+    public static final class RSAKeyEntry extends KeyEntry {
         private final BigInteger baseN;
 
         public RSAKeyEntry(
                 final int keysize)
-        throws Exception
-        {
-            if (keysize % 1024 != 0)
-            {
+        throws Exception {
+            if (keysize % 1024 != 0) {
                 throw new IllegalArgumentException("invalid RSA keysize " + keysize);
             }
 
             BigInteger _baseN = BigInteger.valueOf(0);
             _baseN = _baseN.setBit(keysize - 1);
-            for (int i = 32; i < keysize - 1; i += 2)
-            {
+            for (int i = 32; i < keysize - 1; i += 2) {
             _baseN = _baseN.setBit(i);
             }
             this.baseN = _baseN;
@@ -93,30 +88,25 @@ public abstract class KeyEntry
 
         @Override
         public SubjectPublicKeyInfo getSubjectPublicKeyInfo(
-                final long index)
-        {
+                final long index) {
             BigInteger modulus = baseN.add(BigInteger.valueOf(index));
 
-            try
-            {
+            try {
                 return SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(
                         SignerUtil.generateRSAPublicKeyParameter(
                                 org.xipki.security.KeyUtil.generateRSAPublicKey(modulus,
                                         BigInteger.valueOf(65537))));
-            } catch (InvalidKeySpecException e)
-            {
+            } catch (InvalidKeySpecException e) {
                 LOG.warn("InvalidKeySpecException: {}", e.getMessage());
                 return null;
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 LOG.warn("IOException: {}", e.getMessage());
                 return null;
             }
         }
     }
 
-    public static final class DSAKeyEntry extends KeyEntry
-    {
+    public static final class DSAKeyEntry extends KeyEntry {
         private static final String P_1024 =
                 "AM/6AjYLnnzRa99zmdhuMmikFKF/HhotHagBxoHlT4alq415sX94psaJPI3D5+/e"
                 + "YUaZbnFMn/IEBh6YyEL4zPQs4xOYdcNoMJ6XccGelEHjVWDvocf00L417XiTJObM"
@@ -200,30 +190,22 @@ public abstract class KeyEntry
 
         public DSAKeyEntry(
                 final int pLength)
-        throws Exception
-        {
-            if (pLength == 1024)
-            {
+        throws Exception {
+            if (pLength == 1024) {
                 init(P_1024, Q_1024, G_1024, Y_1024);
-            } else if (pLength == 2048)
-            {
+            } else if (pLength == 2048) {
                 init(P_2048, Q_2048, G_2048, Y_2048);
-            } else if (pLength == 3072)
-            {
+            } else if (pLength == 3072) {
                 init(P_3072, Q_3072, G_3072, Y_3072);
-            } else
-            {
-                if (pLength % 1024 != 0)
-                {
+            } else {
+                if (pLength % 1024 != 0) {
                     throw new IllegalArgumentException("invalid DSA pLength " + pLength);
                 }
 
                 int qLength;
-                if (pLength >= 2048)
-                {
+                if (pLength >= 2048) {
                     qLength = 256;
-                } else
-                {
+                } else {
                     qLength = 160;
                 }
 
@@ -239,14 +221,12 @@ public abstract class KeyEntry
                 final String p,
                 final String q,
                 final String g,
-                final String y)
-        {
+                final String y) {
             init(base64ToInt(p), base64ToInt(q), base64ToInt(g), base64ToInt(y));
         }
 
         private static BigInteger base64ToInt(
-                final String base64Str)
-        {
+                final String base64Str) {
             return new BigInteger(1, Base64.decode(base64Str));
         }
 
@@ -254,8 +234,7 @@ public abstract class KeyEntry
                 final BigInteger p,
                 final BigInteger q,
                 final BigInteger g,
-                final BigInteger y)
-        {
+                final BigInteger y) {
             ASN1EncodableVector v = new ASN1EncodableVector();
             v.add(new ASN1Integer(p));
             v.add(new ASN1Integer(q));
@@ -267,54 +246,44 @@ public abstract class KeyEntry
 
         @Override
         public SubjectPublicKeyInfo getSubjectPublicKeyInfo(
-                final long index)
-        {
+                final long index) {
             BigInteger y = baseY.add(BigInteger.valueOf(index));
 
-            try
-            {
+            try {
                 return new SubjectPublicKeyInfo(
                         algId,
                         new ASN1Integer(y));
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 LOG.warn("IOException: {}", e.getMessage());
                 return null;
             }
         }
     }
 
-    public static final class ECKeyEntry extends KeyEntry
-    {
+    public static final class ECKeyEntry extends KeyEntry {
         private final AlgorithmIdentifier algId;
         private final BigInteger basePublicKey;
 
         public ECKeyEntry(
                 final String curveNameOrOid)
-        throws Exception
-        {
+        throws Exception {
             boolean isOid;
-            try
-            {
+            try {
                 new ASN1ObjectIdentifier(curveNameOrOid);
                 isOid = true;
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 isOid = false;
             }
 
             ASN1ObjectIdentifier curveOid;
             String curveName;
-            if (isOid)
-            {
+            if (isOid) {
                 curveOid = new ASN1ObjectIdentifier(curveNameOrOid);
                 curveName = KeyUtil.getCurveName(curveOid);
-            } else
-            {
+            } else {
                 curveName = curveNameOrOid;
                 curveOid = KeyUtil.getCurveOID(curveName);
-                if (curveOid == null)
-                {
+                if (curveOid == null) {
                     throw new IllegalArgumentException(
                             "no OID is defined for the curve " + curveName);
                 }
@@ -333,8 +302,7 @@ public abstract class KeyEntry
 
         @Override
         public SubjectPublicKeyInfo getSubjectPublicKeyInfo(
-                final long index)
-        {
+                final long index) {
             BigInteger publicKey = basePublicKey.add(BigInteger.valueOf(index));
             return new SubjectPublicKeyInfo(algId, publicKey.toByteArray());
         }

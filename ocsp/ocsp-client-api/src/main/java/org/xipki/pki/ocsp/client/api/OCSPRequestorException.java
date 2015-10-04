@@ -39,31 +39,26 @@ package org.xipki.pki.ocsp.client.api;
  * @author Lijun Liao
  */
 
-public class OCSPRequestorException extends Exception
-{
+public class OCSPRequestorException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public OCSPRequestorException()
-    {
+    public OCSPRequestorException() {
     }
 
     public OCSPRequestorException(
-            final String message)
-    {
+            final String message) {
         super(message);
     }
 
     public OCSPRequestorException(
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(cause);
     }
 
     public OCSPRequestorException(
             final String message,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(message, cause);
     }
 

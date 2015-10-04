@@ -51,8 +51,7 @@ import java.sql.SQLException;
  * @see org.springframework.jdbc.support.rowset.SqlRowSet
  */
 @SuppressWarnings("serial")
-public class InvalidResultSetAccessException extends InvalidDataAccessResourceUsageException
-{
+public class InvalidResultSetAccessException extends InvalidDataAccessResourceUsageException {
 
     private String sql;
 
@@ -64,8 +63,7 @@ public class InvalidResultSetAccessException extends InvalidDataAccessResourceUs
      */
     public InvalidResultSetAccessException(
             final String sql,
-            final SQLException ex)
-    {
+            final SQLException ex) {
         super("invalid ResultSet access for SQL [" + sql + "]", ex);
         this.sql = sql;
     }
@@ -75,16 +73,14 @@ public class InvalidResultSetAccessException extends InvalidDataAccessResourceUs
      * @param ex the root cause
      */
     public InvalidResultSetAccessException(
-            final SQLException ex)
-    {
+            final SQLException ex) {
         super(ex.getMessage(), ex);
     }
 
     /**
      * Return the wrapped SQLException.
      */
-    public SQLException getSQLException()
-    {
+    public SQLException getSQLException() {
         return (SQLException) getCause();
     }
 
@@ -92,8 +88,7 @@ public class InvalidResultSetAccessException extends InvalidDataAccessResourceUs
      * Return the SQL that caused the problem.
      * @return the offending SQL, if known
      */
-    public String getSql()
-    {
+    public String getSql() {
         return this.sql;
     }
 

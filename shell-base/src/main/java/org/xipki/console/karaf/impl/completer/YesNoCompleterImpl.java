@@ -43,10 +43,8 @@ import org.xipki.console.karaf.YesNoCompleter;
  */
 
 public class YesNoCompleterImpl extends EnumCompleter
-implements YesNoCompleter
-{
-    public YesNoCompleterImpl()
-    {
+implements YesNoCompleter {
+    public YesNoCompleterImpl() {
         setTokens("yes, no");
     }
 }

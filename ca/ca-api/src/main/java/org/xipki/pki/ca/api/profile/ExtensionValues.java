@@ -48,19 +48,16 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class ExtensionValues
-{
+public class ExtensionValues {
     private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions = new HashMap<>();
 
     public boolean addExtension(
             final ASN1ObjectIdentifier type,
             final boolean critical,
-            final ASN1Encodable value)
-    {
+            final ASN1Encodable value) {
         ParamUtil.assertNotNull("type", type);
         ParamUtil.assertNotNull("value", value);
-        if (extensions.containsKey(type))
-        {
+        if (extensions.containsKey(type)) {
             return false;
         }
         extensions.put(type, new ExtensionValue(critical, value));
@@ -69,38 +66,32 @@ public class ExtensionValues
 
     public boolean addExtension(
             final ASN1ObjectIdentifier type,
-            final ExtensionValue value)
-    {
+            final ExtensionValue value) {
         ParamUtil.assertNotNull("type", type);
         ParamUtil.assertNotNull("value", value);
-        if (extensions.containsKey(type))
-        {
+        if (extensions.containsKey(type)) {
             return false;
         }
         extensions.put(type, value);
         return true;
     }
 
-    public Set<ASN1ObjectIdentifier> getExtensionTypes()
-    {
+    public Set<ASN1ObjectIdentifier> getExtensionTypes() {
         return Collections.unmodifiableSet(extensions.keySet());
     }
 
     public ExtensionValue getExtensionValue(
-            final ASN1ObjectIdentifier type)
-    {
+            final ASN1ObjectIdentifier type) {
         return extensions.get(type);
     }
 
     public boolean removeExtensionTuple(
-            final ASN1ObjectIdentifier type)
-    {
+            final ASN1ObjectIdentifier type) {
         return extensions.remove(type) != null;
     }
 
     public boolean containsExtension(
-            final ASN1ObjectIdentifier type)
-    {
+            final ASN1ObjectIdentifier type) {
         return extensions.containsKey(type);
     }
 

@@ -57,36 +57,30 @@ import org.xipki.security.SignerUtil;
  */
 
 public class BcRSAContentVerifierProviderBuilder
-    extends BcContentVerifierProviderBuilder
-{
+    extends BcContentVerifierProviderBuilder {
     private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
 
     public BcRSAContentVerifierProviderBuilder(
-            final DigestAlgorithmIdentifierFinder digestAlgorithmFinder)
-    {
+            final DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
         this.digestAlgorithmFinder = digestAlgorithmFinder;
     }
 
     protected Signer createSigner(
             final AlgorithmIdentifier sigAlgId)
-    throws OperatorCreationException
-    {
+    throws OperatorCreationException {
         AlgorithmIdentifier digAlgId = digestAlgorithmFinder.find(sigAlgId);
         Digest dig = digestProvider.get(digAlgId);
 
-        if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()))
-        {
+        if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
             return SignerUtil.createPSSRSASigner(sigAlgId);
-        } else
-        {
+        } else {
             return new RSADigestSigner(dig);
         }
     }
 
     protected AsymmetricKeyParameter extractKeyParameters(
             final SubjectPublicKeyInfo publicKeyInfo)
-    throws IOException
-    {
+    throws IOException {
         return PublicKeyFactory.createKey(publicKeyInfo);
     }
 }

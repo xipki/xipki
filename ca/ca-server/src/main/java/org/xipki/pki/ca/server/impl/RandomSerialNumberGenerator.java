@@ -94,8 +94,7 @@ import java.util.Random;
  * @author Lijun Liao
  */
 
-class RandomSerialNumberGenerator
-{
+class RandomSerialNumberGenerator {
 
     /** random generator algorithm, default SHA1PRNG */
     private String algorithm = "SHA1PRNG";
@@ -118,37 +117,29 @@ class RandomSerialNumberGenerator
     /**
      * Creates a serial number generator using SecureRandom
      */
-    private RandomSerialNumberGenerator()
-    {
+    private RandomSerialNumberGenerator() {
         init();
     }
 
-    private void init()
-    {
-        try
-        {
+    private void init() {
+        try {
             random = SecureRandom.getInstance(algorithm);
-        } catch (NoSuchAlgorithmException e)
-        {
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         long seed = Math.abs((new Date().getTime()) + this.hashCode());
         random.setSeed(seed);
     }
 
-    public static synchronized RandomSerialNumberGenerator getInstance()
-    {
-        if (instance == null)
-        {
+    public static synchronized RandomSerialNumberGenerator getInstance() {
+        if (instance == null) {
             instance = new RandomSerialNumberGenerator();
         }
         return instance;
     }
 
-    public BigInteger getSerialNumber()
-    {
-        if (noOctets == 0)
-        {
+    public BigInteger getSerialNumber() {
+        if (noOctets == 0) {
             Random rand = new Random();
             return new java.math.BigInteger(Long.toString(rand.nextInt(4)));
         }
@@ -157,13 +148,11 @@ class RandomSerialNumberGenerator
         boolean ok = false;
         BigInteger serno = null;
 
-        while (!ok)
-        {
+        while (!ok) {
             random.nextBytes(sernobytes);
             serno = (new java.math.BigInteger(sernobytes)).abs();
             // Must be within the range 0080000000000000 - 7FFFFFFFFFFFFFFF
-            if ((serno.compareTo(lowest) >= 0) && (serno.compareTo(highest) <= 0))
-            {
+            if ((serno.compareTo(lowest) >= 0) && (serno.compareTo(highest) <= 0)) {
                 ok = true;
             }
         }
@@ -171,37 +160,31 @@ class RandomSerialNumberGenerator
         return serno;
     }
 
-    public int getNoSernoBytes()
-    {
+    public int getNoSernoBytes() {
         return noOctets;
     }
 
     public void setSeed(
-            final long seed)
-    {
+            final long seed) {
         random.setSeed(seed);
     }
 
     public void setAlgorithm(
             final String algo)
-    throws NoSuchAlgorithmException
-    {
+    throws NoSuchAlgorithmException {
         this.algorithm = algo;
         // We must re-init after choosing a new algorithm
         init();
     }
 
     public void setSernoOctetSize(
-            final int noOctets)
-    {
-        if (noOctets == 4)
-        {
+            final int noOctets) {
+        if (noOctets == 4) {
             lowest = new BigInteger("00800000", 16);
             highest = new BigInteger("7FFFFFFF", 16);
         }
 
-        if ((noOctets != 4) && (noOctets != 8) && (noOctets != 0))
-        {
+        if ((noOctets != 4) && (noOctets != 8) && (noOctets != 0)) {
             throw new IllegalArgumentException(
                     "SernoOctetSize must be 4 or 8 for this generator.");
         }

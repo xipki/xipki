@@ -55,8 +55,7 @@ import org.xipki.pki.ca.server.impl.cmp.X509CACmpResponder;
  * @author Lijun Liao
  */
 
-public class HealthCheckServlet extends HttpServlet
-{
+public class HealthCheckServlet extends HttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);
 
     private static final long serialVersionUID = 1L;
@@ -65,21 +64,17 @@ public class HealthCheckServlet extends HttpServlet
 
     private CmpResponderManager responderManager;
 
-    public HealthCheckServlet()
-    {
+    public HealthCheckServlet() {
     }
 
     @Override
     protected void doGet(
             final HttpServletRequest request,
             final HttpServletResponse response)
-    throws ServletException, IOException
-    {
+    throws ServletException, IOException {
         response.setHeader("Access-Control-Allow-Origin", "*");
-        try
-        {
-            if (responderManager == null)
-            {
+        try {
+            if (responderManager == null) {
                 LOG.error("responderManager in servlet not configured");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.setContentLength(0);
@@ -92,29 +87,23 @@ public class HealthCheckServlet extends HttpServlet
             String caName = null;
             X509CACmpResponder responder = null;
             int n = servletPath.length();
-            if (requestURI.length() > n + 1)
-            {
+            if (requestURI.length() > n + 1) {
                 String caAlias = URLDecoder.decode(requestURI.substring(n + 1), "UTF-8");
                 caName = responderManager.getCaNameForAlias(caAlias);
-                if (caName == null)
-                {
+                if (caName == null) {
                     caName = caAlias;
                 }
                 caName = caName.toUpperCase();
                 responder = responderManager.getX509CACmpResponder(caName);
             }
 
-            if (caName == null || responder == null || !responder.isInService())
-            {
+            if (caName == null || responder == null || !responder.isInService()) {
                 String auditMessage;
-                if (caName == null)
-                {
+                if (caName == null) {
                     auditMessage = "n CA is specified";
-                } else if (responder == null)
-                {
+                } else if (responder == null) {
                     auditMessage = "unknown CA '" + caName + "'";
-                } else
-                {
+                } else {
                     auditMessage = "CA '" + caName + "' is out of service";
                 }
                 LOG.warn(auditMessage);
@@ -126,11 +115,9 @@ public class HealthCheckServlet extends HttpServlet
             }
 
             HealthCheckResult healthResult = responder.healthCheck();
-            if (healthResult.isHealthy())
-            {
+            if (healthResult.isHealthy()) {
                 response.setStatus(HttpServletResponse.SC_OK);
-            } else
-            {
+            } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
 
@@ -139,11 +126,9 @@ public class HealthCheckServlet extends HttpServlet
             response.setContentLength(respBytes.length);
             response.getOutputStream().write(respBytes);
         }
-        catch (EOFException e)
-        {
+        catch (EOFException e) {
             final String message = "connection reset by peer";
-            if (LOG.isErrorEnabled())
-            {
+            if (LOG.isErrorEnabled()) {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message),
                         e.getClass().getName(), e.getMessage());
             }
@@ -152,8 +137,7 @@ public class HealthCheckServlet extends HttpServlet
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         }
-        catch (Throwable t)
-        {
+        catch (Throwable t) {
             final String message = "Throwable thrown, this should not happen!";
             LOG.warn(message, t);
 
@@ -165,8 +149,7 @@ public class HealthCheckServlet extends HttpServlet
     }
 
     public void setResponderManager(
-            final CmpResponderManager responderManager)
-    {
+            final CmpResponderManager responderManager) {
         this.responderManager = responderManager;
     }
 

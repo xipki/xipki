@@ -41,8 +41,7 @@ import javax.xml.stream.XMLStreamException;
  * @author Lijun Liao
  */
 
-public class CaCertType extends DbDataObject
-{
+public class CaCertType extends DbDataObject {
     public static final String TAG_ROOT = "cert";
 
     public static final String TAG_id = "id";
@@ -129,186 +128,153 @@ public class CaCertType extends DbDataObject
     public static final String TAG_file = "file";
     private String file;
 
-    public Integer getId()
-    {
+    public Integer getId() {
         return id;
     }
 
     public void setId(
-            final Integer id)
-    {
+            final Integer id) {
         this.id = id;
     }
 
-    public Integer getArt()
-    {
+    public Integer getArt() {
         return art;
     }
 
     public void setArt(
-            final Integer art)
-    {
+            final Integer art) {
         this.art = art;
     }
 
-    public Integer getCaId()
-    {
+    public Integer getCaId() {
         return caId;
     }
 
     public void setCaId(
-            final Integer caId)
-    {
+            final Integer caId) {
         this.caId = caId;
     }
 
-    public String getSn()
-    {
+    public String getSn() {
         return sn;
     }
 
     public void setSn(
-            final String sn)
-    {
+            final String sn) {
         this.sn = sn;
     }
 
-    public Integer getPid()
-    {
+    public Integer getPid() {
         return pid;
     }
 
     public void setPid(
-            final Integer pid)
-    {
+            final Integer pid) {
         this.pid = pid;
     }
 
-    public Integer getRid()
-    {
+    public Integer getRid() {
         return rid;
     }
 
     public void setRid(
-            final Integer rid)
-    {
+            final Integer rid) {
         this.rid = rid;
     }
 
-    public Long getUpdate()
-    {
+    public Long getUpdate() {
         return update;
     }
 
     public void setUpdate(
-            final Long update)
-    {
+            final Long update) {
         this.update = update;
     }
 
-    public Boolean getRev()
-    {
+    public Boolean getRev() {
         return rev;
     }
 
     public void setRev(
-            final Boolean rev)
-    {
+            final Boolean rev) {
         this.rev = rev;
     }
 
-    public Integer getRr()
-    {
+    public Integer getRr() {
         return rr;
     }
 
     public void setRr(
-            final Integer rr)
-    {
+            final Integer rr) {
         this.rr = rr;
     }
 
-    public Long getRt()
-    {
+    public Long getRt() {
         return rt;
     }
 
     public void setRt(
-            final Long rt)
-    {
+            final Long rt) {
         this.rt = rt;
     }
 
-    public Long getRit()
-    {
+    public Long getRit() {
         return rit;
     }
 
     public void setRit(
-            final Long rit)
-    {
+            final Long rit) {
         this.rit = rit;
     }
 
-    public String getTid()
-    {
+    public String getTid() {
         return tid;
     }
 
     public void setTid(
-            final String tid)
-    {
+            final String tid) {
         this.tid = tid;
     }
 
-    public Integer getReqType()
-    {
+    public Integer getReqType() {
         return reqType;
     }
 
     public void setReqType(
-            final Integer reqType)
-    {
+            final Integer reqType) {
         this.reqType = reqType;
     }
 
-    public Long getFpRs()
-    {
+    public Long getFpRs() {
         return fpRs;
     }
 
     public void setFpRs(
-            final Long fpRs)
-    {
+            final Long fpRs) {
         this.fpRs = fpRs;
     }
 
-    public String getRs()
-    {
+    public String getRs() {
         return rs;
     }
 
     public void setRs(
-            final String rs)
-    {
+            final String rs) {
         this.rs = rs;
     }
 
-    public String getFile()
-    {
+    public String getFile() {
         return file;
     }
 
     public void setFile(
-            final String file)
-    {
+            final String file) {
         this.file = file;
     }
 
     @Override
     public void validate()
-    throws InvalidDataObjectException
-    {
+    throws InvalidDataObjectException {
         assertNotNull("id", id);
         assertNotNull("art", art);
         assertNotNull("caId", caId);
@@ -316,37 +282,32 @@ public class CaCertType extends DbDataObject
         assertNotNull("pid", pid);
         assertNotNull("update", update);
         assertNotNull("rev", rev);
-        if (rev)
-        {
+        if (rev) {
             assertNotNull("rr", rr);
             assertNotNull("rt", rt);
         }
 
         assertNotNull("reqType", reqType);
-        if (rs != null)
-        {
+        if (rs != null) {
             assertNotNull("fpRs", fpRs);
             assertNotBlank("rs", rs);
         }
         assertNotBlank("file", file);
     }
 
-    public String getUser()
-    {
+    public String getUser() {
         return user;
     }
 
     public void setUser(
-            final String user)
-    {
+            final String user) {
         this.user = user;
     }
 
     @Override
     public void writeTo(
             final DbiXmlWriter writer)
-    throws InvalidDataObjectException, XMLStreamException
-    {
+    throws InvalidDataObjectException, XMLStreamException {
         validate();
 
         writer.writeStartElement(TAG_ROOT);

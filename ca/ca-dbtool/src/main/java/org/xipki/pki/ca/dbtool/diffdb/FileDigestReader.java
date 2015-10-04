@@ -60,8 +60,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public class FileDigestReader implements DigestReader
-{
+public class FileDigestReader implements DigestReader {
     private final int totalAccount;
     private final String caDirname;
     private final String caSubjectName;
@@ -74,8 +73,7 @@ public class FileDigestReader implements DigestReader
     public FileDigestReader(
             final String caDirname,
             final boolean revokedOnly)
-    throws IOException, CertificateException
-    {
+    throws IOException, CertificateException {
         ParamUtil.assertNotBlank("caDirname", caDirname);
         this.caDirname = caDirname;
         this.revokedOnly = revokedOnly;
@@ -98,30 +96,25 @@ public class FileDigestReader implements DigestReader
     }
 
     @Override
-    public X509Certificate getCaCert()
-    {
+    public X509Certificate getCaCert() {
         return caCert;
     }
 
     @Override
-    public String getCaSubjectName()
-    {
+    public String getCaSubjectName() {
         return this.caSubjectName;
     }
 
     @Override
-    public int getTotalAccount()
-    {
+    public int getTotalAccount() {
         return totalAccount;
     }
 
     @Override
     public CertsBundle nextCerts(
             final int n)
-    throws DataAccessException
-    {
-        if (!hasNext())
-        {
+    throws DataAccessException {
+        if (!hasNext()) {
             return null;
         }
 
@@ -130,18 +123,14 @@ public class FileDigestReader implements DigestReader
         Map<Long, DbDigestEntry> certs = new HashMap<>(n);
 
         int k = 0;
-        while (hasNext())
-        {
+        while (hasNext()) {
             DbDigestEntry line;
-            try
-            {
+            try {
                 line = nextCert();
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 throw new DataAccessException("IOException: " + e.getMessage());
             }
-            if (revokedOnly && !line.isRevoked())
-            {
+            if (revokedOnly && !line.isRevoked()) {
                 numSkipped++;
                 continue;
             }
@@ -149,8 +138,7 @@ public class FileDigestReader implements DigestReader
             serialNumbers.add(line.getSerialNumber());
             certs.put(line.getSerialNumber(), line);
             k++;
-            if (k >= n)
-            {
+            if (k >= n) {
                 break;
             }
         }
@@ -161,10 +149,8 @@ public class FileDigestReader implements DigestReader
     }
 
     private DbDigestEntry nextCert()
-    throws IOException
-    {
-        if (next == null)
-        {
+    throws IOException {
+        if (next == null) {
             throw new IllegalStateException("reach end of the stream");
         }
 
@@ -176,17 +162,14 @@ public class FileDigestReader implements DigestReader
 
     private DbDigestEntry retrieveNext(
             final boolean firstTime)
-    throws IOException
-    {
+    throws IOException {
         String line = firstTime
                 ? null
                 : certsReader.readLine();
-        if (line == null)
-        {
+        if (line == null) {
             close(certsReader);
             String nextFileName = certsFilesReader.readLine();
-            if (nextFileName == null)
-            {
+            if (nextFileName == null) {
                 return null;
             }
             String filePath = "certs" + File.separator + nextFileName;
@@ -201,30 +184,24 @@ public class FileDigestReader implements DigestReader
     }
 
     @Override
-    public void close()
-    {
+    public void close() {
         close(certsFilesReader);
         close(certsReader);
     }
 
-    private boolean hasNext()
-    {
+    private boolean hasNext() {
         return next != null;
     }
 
     private static void close(
-            final Reader reader)
-    {
-        if (reader == null)
-        {
+            final Reader reader) {
+        if (reader == null) {
             return;
         }
 
-        try
-        {
+        try {
             reader.close();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
         }
     }
 

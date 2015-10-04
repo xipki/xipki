@@ -44,29 +44,24 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class RevokeCertResultType
-{
+public class RevokeCertResultType {
     private List<ResultEntryType> resultEntries;
 
-    public List<ResultEntryType> getResultEntries()
-    {
+    public List<ResultEntryType> getResultEntries() {
         return resultEntries;
     }
 
     public void addResultEntry(
-            final ResultEntryType resultEntry)
-    {
+            final ResultEntryType resultEntry) {
         ParamUtil.assertNotNull("resultEntry", resultEntry);
 
         if (!(resultEntry instanceof RevokeCertResultEntryType
-                || resultEntry instanceof ErrorResultEntryType))
-        {
+                || resultEntry instanceof ErrorResultEntryType)) {
             throw new IllegalArgumentException("unaccepted parameter of class "
                     + resultEntry.getClass().getName());
         }
 
-        if (resultEntries == null)
-        {
+        if (resultEntries == null) {
             resultEntries = new ArrayList<>(1);
         }
 

@@ -48,8 +48,7 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
  * @author Lijun Liao
  */
 
-public abstract class ClientCmd extends XipkiOsgiCommandSupport
-{
+public abstract class ClientCmd extends XipkiOsgiCommandSupport {
     @Option(name = "--req-out",
             description = "where to save the request")
     private String reqout;
@@ -61,72 +60,57 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
     protected CAClient caClient;
 
     public void setCaClient(
-            final CAClient caClient)
-    {
+            final CAClient caClient) {
         this.caClient = caClient;
     }
 
-    protected RequestResponseDebug getRequestResponseDebug()
-    {
+    protected RequestResponseDebug getRequestResponseDebug() {
         boolean saveReq = isNotBlank(reqout);
         boolean saveResp = isNotBlank(respout);
-        if (saveReq || saveResp)
-        {
+        if (saveReq || saveResp) {
             return new RequestResponseDebug();
         }
         return null;
     }
 
     protected void saveRequestResponse(
-            final RequestResponseDebug debug)
-    {
+            final RequestResponseDebug debug) {
         boolean saveReq = isNotBlank(reqout);
         boolean saveResp = isNotBlank(respout);
-        if (!saveReq && !saveResp)
-        {
+        if (!saveReq && !saveResp) {
             return;
         }
 
-        if (debug == null || debug.size() == 0)
-        {
+        if (debug == null || debug.size() == 0) {
             return;
         }
 
         final int n = debug.size();
-        for (int i = 0; i < n; i++)
-        {
+        for (int i = 0; i < n; i++) {
             RequestResponsePair reqResp = debug.get(i);
-            if (saveReq)
-            {
+            if (saveReq) {
                 byte[] bytes = reqResp.getRequest();
-                if (bytes != null)
-                {
+                if (bytes != null) {
                     String fn = (n == 1)
                             ? reqout
                             : appendIndex(reqout, i);
-                    try
-                    {
+                    try {
                         IoUtil.save(fn, bytes);
-                    } catch (IOException e)
-                    {
+                    } catch (IOException e) {
                         System.err.println("IOException: " + e.getMessage());
                     }
                 }
             }
 
-            if (saveResp)
-            {
+            if (saveResp) {
                 byte[] bytes = reqResp.getResponse();
-                if (bytes != null)
-                {
+                if (bytes != null) {
                     String fn = (n == 1)
                             ? respout
                             : appendIndex(respout, i);
-                    try
-                    {
+                    try {
                         IoUtil.save(fn, bytes);
-                    } catch (IOException e)
-                    {
+                    } catch (IOException e) {
                         System.err.println("IOException: " + e.getMessage());
                     }
                 }
@@ -136,11 +120,9 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
 
     private static String appendIndex(
             final String filename,
-            final int index)
-    {
+            final int index) {
         int idx = filename.lastIndexOf('.');
-        if (idx == -1 || idx == filename.length() - 1)
-        {
+        if (idx == -1 || idx == filename.length() - 1) {
             return filename + "-" + index;
         }
 

@@ -47,8 +47,7 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 @Command(scope = "xipki-cmd", name = "copy-dir",
         description = "copy content of the directory to destination")
-public class CopyDirCmd extends XipkiOsgiCommandSupport
-{
+public class CopyDirCmd extends XipkiOsgiCommandSupport {
     @Argument(index = 0, name = "source_directory",
             required = true,
             description = "content of this directory will be copied\n"
@@ -63,31 +62,25 @@ public class CopyDirCmd extends XipkiOsgiCommandSupport
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         File sourceDir = new File(expandFilepath(source));
-        if (!sourceDir.exists())
-        {
+        if (!sourceDir.exists()) {
             System.err.println(source + " does not exist");
             return null;
         }
 
-        if (!sourceDir.isDirectory())
-        {
+        if (!sourceDir.isDirectory()) {
             System.err.println(source + " is not a directory");
             return null;
         }
 
         File destDir = new File(dest);
-        if (destDir.exists())
-        {
-            if (destDir.isFile())
-            {
+        if (destDir.exists()) {
+            if (destDir.isFile()) {
                 System.err.println(dest + " is not a directory");
                 return null;
             }
-        } else
-        {
+        } else {
             destDir.mkdirs();
         }
 

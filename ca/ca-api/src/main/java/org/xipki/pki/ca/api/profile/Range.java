@@ -39,38 +39,31 @@ package org.xipki.pki.ca.api.profile;
  * @author Lijun Liao
  */
 
-public class Range
-{
+public class Range {
     private Integer min;
     private Integer max;
 
     public Range(
             final Integer min,
-            final Integer max)
-    {
+            final Integer max) {
         setRange(min, max);
     }
 
-    public Integer getMin()
-    {
+    public Integer getMin() {
         return min;
     }
 
-    public Integer getMax()
-    {
+    public Integer getMax() {
         return max;
     }
 
     public void setRange(
             final Integer min,
-            final Integer max)
-    {
-        if (min == null && max == null)
-        {
+            final Integer max) {
+        if (min == null && max == null) {
             throw new IllegalArgumentException("min and max cannot be both null");
         }
-        if (min != null && max != null && min > max)
-        {
+        if (min != null && max != null && min > max) {
             throw new IllegalArgumentException("min cannot be greater than max: "
                     + min + " > " + max);
         }
@@ -79,14 +72,11 @@ public class Range
     }
 
     public boolean match(
-            final int i)
-    {
-        if (min != null && i < min)
-        {
+            final int i) {
+        if (min != null && i < min) {
             return false;
         }
-        if (max != null && i > max)
-        {
+        if (max != null && i > max) {
             return false;
         }
 
@@ -96,17 +86,14 @@ public class Range
     /**
      * @Override
      */
-    public String toString()
-    {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
-        if (min != null)
-        {
+        if (min != null) {
             sb.append(min);
         }
         sb.append(", ");
-        if (max != null)
-        {
+        if (max != null) {
             sb.append(max);
         }
         sb.append("]");

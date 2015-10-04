@@ -47,8 +47,7 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 @Command(scope = "xipki-cmd", name = "mkdir",
         description = "make directories")
-public class MkdirCmd extends XipkiOsgiCommandSupport
-{
+public class MkdirCmd extends XipkiOsgiCommandSupport {
     @Argument(index = 0, name = "directory_name",
             required = true,
             description = "directory\n"
@@ -57,18 +56,14 @@ public class MkdirCmd extends XipkiOsgiCommandSupport
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         File target = new File(expandFilepath(dirName));
-        if (target.exists())
-        {
-            if (!target.isDirectory())
-            {
+        if (target.exists()) {
+            if (!target.isDirectory()) {
                 System.err.println(dirName + " exists but is not a directory, cannot override it");
                 return null;
             }
-        } else
-        {
+        } else {
             target.mkdirs();
         }
 

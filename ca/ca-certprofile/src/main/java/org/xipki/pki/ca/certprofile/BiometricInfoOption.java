@@ -51,8 +51,7 @@ import org.xipki.security.api.util.AlgorithmUtil;
  * @author Lijun Liao
  */
 
-public class BiometricInfoOption
-{
+public class BiometricInfoOption {
     private final Set<Integer> predefinedTypes;
     private final Set<ASN1ObjectIdentifier> idTypes;
     private final Set<ASN1ObjectIdentifier> hashAlgorithms;
@@ -60,54 +59,43 @@ public class BiometricInfoOption
 
     public BiometricInfoOption(
             final BiometricInfo jaxb)
-    throws NoSuchAlgorithmException
-    {
+    throws NoSuchAlgorithmException {
         ParamUtil.assertNotNull("jaxb", jaxb);
         this.sourceDataUriOccurrence = jaxb.getIncludeSourceDataUri();
         this.hashAlgorithms = XmlX509CertprofileUtil.toOIDSet(jaxb.getHashAlgorithm());
 
-        for (ASN1ObjectIdentifier m : hashAlgorithms)
-        {
+        for (ASN1ObjectIdentifier m : hashAlgorithms) {
             AlgorithmUtil.getHashOutputSizeInOctets(m);
         }
 
         this.predefinedTypes = new HashSet<>();
         this.idTypes = new HashSet<>();
-        for (BiometricTypeType m : jaxb.getType())
-        {
-            if (m.getPredefined() != null)
-            {
+        for (BiometricTypeType m : jaxb.getType()) {
+            if (m.getPredefined() != null) {
                 predefinedTypes.add(m.getPredefined().getValue());
-            } else if (m.getOid() != null)
-            {
+            } else if (m.getOid() != null) {
                 idTypes.add(new ASN1ObjectIdentifier(m.getOid().getValue()));
-            } else
-            {
+            } else {
                 throw new RuntimeException("should not reach here, invalid biometricType");
             }
         }
     }
 
     public boolean isTypePermitted(
-            final TypeOfBiometricData type)
-    {
-        if (type.isPredefined())
-        {
+            final TypeOfBiometricData type) {
+        if (type.isPredefined()) {
             return predefinedTypes.contains(type.getPredefinedBiometricType());
-        } else
-        {
+        } else {
             return idTypes.contains(type.getBiometricDataOid());
         }
     }
 
     public boolean isHashAlgorithmPermitted(
-            final ASN1ObjectIdentifier hashAlgorithm)
-    {
+            final ASN1ObjectIdentifier hashAlgorithm) {
         return hashAlgorithms.contains(hashAlgorithm);
     }
 
-    public TripleState getSourceDataUriOccurrence()
-    {
+    public TripleState getSourceDataUriOccurrence() {
         return sourceDataUriOccurrence;
     }
 

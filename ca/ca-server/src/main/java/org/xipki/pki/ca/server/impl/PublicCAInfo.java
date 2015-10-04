@@ -59,8 +59,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-class PublicCAInfo
-{
+class PublicCAInfo {
     private final X500Principal subject;
     private final X500Name x500Subject;
     private final String c14nSubject;
@@ -80,19 +79,16 @@ class PublicCAInfo
             final List<String> ocspUris,
             final List<String> crlUris,
             final List<String> deltaCrlUris)
-    throws OperationException
-    {
+    throws OperationException {
         ParamUtil.assertNotNull("caCertificate", caCertificate);
         this.caCertificate = new X509Cert(caCertificate);
         this.serialNumber = caCertificate.getSerialNumber();
         this.subject = caCertificate.getSubjectX500Principal();
         this.x500Subject = X500Name.getInstance(subject.getEncoded());
         this.c14nSubject = X509Util.canonicalizName(x500Subject);
-        try
-        {
+        try {
             this.subjectKeyIdentifier = X509Util.extractSKI(caCertificate);
-        } catch (CertificateEncodingException e)
-        {
+        } catch (CertificateEncodingException e) {
             throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
         }
         this.caCertUris = CollectionUtil.unmodifiableList(caCertUris, true, true);
@@ -102,17 +98,13 @@ class PublicCAInfo
 
         byte[] encodedSubjectAltName = caCertificate.getExtensionValue(
                 Extension.subjectAlternativeName.getId());
-        if (encodedSubjectAltName == null)
-        {
+        if (encodedSubjectAltName == null) {
             subjectAltName = null;
-        } else
-        {
-            try
-            {
+        } else {
+            try {
                 subjectAltName = GeneralNames.getInstance(
                         X509ExtensionUtil.fromExtensionValue(encodedSubjectAltName));
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 throw new OperationException(ErrorCode.INVALID_EXTENSION,
                         "invalid SubjectAltName extension in CA certificate");
             }
@@ -128,28 +120,23 @@ class PublicCAInfo
             final List<String> ocspUris,
             final List<String> crlUris,
             final List<String> deltaCrlUris)
-    throws OperationException
-    {
+    throws OperationException {
         ParamUtil.assertNotNull("subject", subject);
         ParamUtil.assertNotNull("serialNumber", serialNumber);
 
         this.caCertificate = null;
         this.x500Subject = subject;
         this.c14nSubject = X509Util.canonicalizName(subject);
-        try
-        {
+        try {
             this.subject = new X500Principal(subject.getEncoded());
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "invalid SubjectAltName extension in CA certificate");
         }
 
-        if (subjectKeyIdentifier == null)
-        {
+        if (subjectKeyIdentifier == null) {
             this.subjectKeyIdentifier = null;
-        } else
-        {
+        } else {
             this.subjectKeyIdentifier = Arrays.clone(subjectKeyIdentifier);
         }
 
@@ -161,83 +148,66 @@ class PublicCAInfo
         this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris, true, true);
     }
 
-    public List<String> getCaCertUris()
-    {
+    public List<String> getCaCertUris() {
         return caCertUris;
     }
 
-    public List<String> getOcspUris()
-    {
+    public List<String> getOcspUris() {
         return ocspUris;
     }
 
-    public List<String> getCrlUris()
-    {
+    public List<String> getCrlUris() {
         return crlUris;
     }
 
-    public List<String> getDeltaCrlUris()
-    {
+    public List<String> getDeltaCrlUris() {
         return deltaCrlUris;
     }
 
-    public X509Certificate getCrlSignerCertificate()
-    {
+    public X509Certificate getCrlSignerCertificate() {
         return crlSignerCertificate;
     }
 
     public void setCrlSignerCertificate(
-            final X509Certificate crlSignerCert)
-    {
-        if (caCertificate.equals(crlSignerCert))
-        {
+            final X509Certificate crlSignerCert) {
+        if (caCertificate.equals(crlSignerCert)) {
             this.crlSignerCertificate = null;
-        } else
-        {
+        } else {
             this.crlSignerCertificate = crlSignerCert;
         }
     }
 
-    public X500Principal getSubject()
-    {
+    public X500Principal getSubject() {
         return subject;
     }
 
-    public X500Name getX500Subject()
-    {
+    public X500Name getX500Subject() {
         return x500Subject;
     }
 
-    public String getC14nSubject()
-    {
+    public String getC14nSubject() {
         return c14nSubject;
     }
 
-    public GeneralNames getSubjectAltName()
-    {
+    public GeneralNames getSubjectAltName() {
         return subjectAltName;
     }
 
-    public byte[] getSubjectKeyIdentifer()
-    {
-        if (caCertificate != null)
-        {
+    public byte[] getSubjectKeyIdentifer() {
+        if (caCertificate != null) {
             return caCertificate.getSubjectKeyIdentifier();
-        } else
-        {
+        } else {
             return (subjectKeyIdentifier == null)
                     ? null
                     : Arrays.clone(subjectKeyIdentifier);
         }
     }
 
-    public BigInteger getSerialNumber()
-    {
+    public BigInteger getSerialNumber() {
         return serialNumber;
     }
 
-    public X509Cert getCaCertificate()
-    {
+    public X509Cert getCaCertificate() {
         return caCertificate;
     }
 

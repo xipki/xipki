@@ -45,20 +45,16 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-requestor-add",
         description = "add requestor (negative, QA)")
-public class NegRequestorAddCmd extends RequestorAddCmd
-{
+public class NegRequestorAddCmd extends RequestorAddCmd {
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("neg-requestor-add");
 
-        try
-        {
+        try {
             super._doExecute();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return null;
         }
 

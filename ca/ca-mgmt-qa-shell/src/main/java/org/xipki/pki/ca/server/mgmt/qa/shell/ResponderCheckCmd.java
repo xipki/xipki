@@ -51,43 +51,34 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "responder-check",
         description = "check information of responder (QA)")
-public class ResponderCheckCmd extends ResponderUpdateCmd
-{
+public class ResponderCheckCmd extends ResponderUpdateCmd {
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("checking responder " + name);
 
         CmpResponderEntry cr = caManager.getCmpResponder(name);
-        if (cr == null)
-        {
+        if (cr == null) {
             throw new CmdFailure("CMP responder named '" + name + "' is not configured");
         }
 
-        if (CAManager.NULL.equalsIgnoreCase(certFile))
-        {
-            if (cr.getBase64Cert() != null)
-            {
+        if (CAManager.NULL.equalsIgnoreCase(certFile)) {
+            if (cr.getBase64Cert() != null) {
                 throw new CmdFailure("Cert: is configured but expected is none");
             }
-        } else if (certFile != null)
-        {
+        } else if (certFile != null) {
             byte[] ex = IoUtil.read(certFile);
-            if (cr.getBase64Cert() == null)
-            {
+            if (cr.getBase64Cert() == null) {
                 throw new CmdFailure("Cert: is not configured explicitly as expected");
             }
-            if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert())))
-            {
+            if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert()))) {
                 throw new CmdFailure("Cert: the expected one and the actual one differ");
             }
         }
 
         String signerConf = getSignerConf();
-        if (signerConf != null)
-        {
+        if (signerConf != null) {
             MgmtQAShellUtil.assertEquals("conf", signerConf, cr.getConf());
         }
 

@@ -53,8 +53,7 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-cli", name = "p10-enroll",
         description = "enroll certificate via PKCS#10 request")
-public class P10EnrollCertCmd extends ClientCmd
-{
+public class P10EnrollCertCmd extends ClientCmd {
 
     @Option(name = "--p10",
             required = true,
@@ -85,31 +84,26 @@ public class P10EnrollCertCmd extends ClientCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         CertificationRequest p10Req = CertificationRequest.getInstance(
                 IoUtil.read(p10File));
 
         EnrollCertResult result;
         RequestResponseDebug debug = getRequestResponseDebug();
-        try
-        {
+        try {
             result = caClient.requestCert(p10Req, profile, caName, user, debug);
-        } finally
-        {
+        } finally {
             saveRequestResponse(debug);
         }
 
         X509Certificate cert = null;
-        if (result != null)
-        {
+        if (result != null) {
             String id = result.getAllIds().iterator().next();
             CertOrError certOrError = result.getCertificateOrError(id);
             cert = (X509Certificate) certOrError.getCertificate();
         }
 
-        if (cert == null)
-        {
+        if (cert == null) {
             throw new CmdFailure("no certificate received from the server");
         }
 

@@ -66,8 +66,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public class OCSPCertPublisher extends X509CertPublisher
-{
+public class OCSPCertPublisher extends X509CertPublisher {
     private static final Logger LOG = LoggerFactory.getLogger(OCSPCertPublisher.class);
 
     @SuppressWarnings("unused")
@@ -78,8 +77,7 @@ public class OCSPCertPublisher extends X509CertPublisher
 
     private AuditServiceRegister auditServiceRegister;
 
-    public OCSPCertPublisher()
-    {
+    public OCSPCertPublisher() {
     }
 
     @Override
@@ -87,8 +85,7 @@ public class OCSPCertPublisher extends X509CertPublisher
             final String conf,
             final PasswordResolver passwordResolver,
             final Map<String, DataSourceWrapper> dataSources)
-    throws CertPublisherException
-    {
+    throws CertPublisherException {
         ParamUtil.assertNotNull("conf", conf);
         ParamUtil.assertNotEmpty("dataSources", dataSources);
 
@@ -105,52 +102,42 @@ public class OCSPCertPublisher extends X509CertPublisher
 
         String datasourceName = null;
         ConfPairs confPairs = null;
-        try
-        {
+        try {
             confPairs = new ConfPairs(conf);
             datasourceName = confPairs.getValue("datasource");
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
         }
 
         DataSourceWrapper dataSource = null;
-        if (datasourceName != null)
-        {
+        if (datasourceName != null) {
             dataSource = dataSources.get(datasourceName);
         }
 
-        if (dataSource == null)
-        {
+        if (dataSource == null) {
             throw new CertPublisherException(
                     "no datasource named '" + datasourceName + "' is specified");
         }
 
-        try
-        {
+        try {
             queryExecutor = new OCSPStoreQueryExecutor(dataSource, this.publishsGoodCert);
-        } catch (NoSuchAlgorithmException | DataAccessException e)
-        {
+        } catch (NoSuchAlgorithmException | DataAccessException e) {
             throw new CertPublisherException(e.getMessage(), e);
         }
     }
 
     @Override
     public void setEnvParameterResolver(
-            final EnvParameterResolver parameterResolver)
-    {
+            final EnvParameterResolver parameterResolver) {
         this.envParameterResolver = parameterResolver;
     }
 
     @Override
     public boolean issuerAdded(
-            final X509Cert issuer)
-    {
-        try
-        {
+            final X509Cert issuer) {
+        try {
             queryExecutor.addIssuer(issuer);
             return true;
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             logAndAudit(issuer.getSubject(), issuer, e, "could not publish issuer");
             return false;
         }
@@ -158,18 +145,15 @@ public class OCSPCertPublisher extends X509CertPublisher
 
     @Override
     public boolean certificateAdded(
-            final X509CertificateInfo certInfo)
-    {
+            final X509CertificateInfo certInfo) {
         X509Cert caCert = certInfo.getIssuerCert();
         X509CertWithDBCertId cert = certInfo.getCert();
 
-        try
-        {
+        try {
             queryExecutor.addCert(caCert, cert, certInfo.getProfileName(),
                     certInfo.getRevocationInfo());
             return true;
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             logAndAudit(caCert.getSubject(), cert, e, "could not save certificate");
             return false;
         }
@@ -180,14 +164,11 @@ public class OCSPCertPublisher extends X509CertPublisher
             final X509Cert caCert,
             final X509CertWithDBCertId cert,
             final String certprofile,
-            final CertRevocationInfo revInfo)
-    {
-        try
-        {
+            final CertRevocationInfo revInfo) {
+        try {
             queryExecutor.revokeCert(caCert, cert, certprofile, revInfo);
             return true;
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             logAndAudit(caCert.getSubject(), cert, e, "could not publish revoked certificate");
             return false;
         }
@@ -196,14 +177,11 @@ public class OCSPCertPublisher extends X509CertPublisher
     @Override
     public boolean certificateUnrevoked(
             final X509Cert caCert,
-            final X509CertWithDBCertId cert)
-    {
-        try
-        {
+            final X509CertWithDBCertId cert) {
+        try {
             queryExecutor.unrevokeCert(caCert, cert);
             return true;
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             logAndAudit(caCert.getSubject(), cert, e,
                     "could not publish unrevocation of certificate");
             return false;
@@ -214,8 +192,7 @@ public class OCSPCertPublisher extends X509CertPublisher
             final String issuer,
             final X509Cert cert,
             final Exception e,
-            final String messagePrefix)
-    {
+            final String messagePrefix) {
         String subjectText = cert.getSubject();
         String serialText = cert.getCert().getSerialNumber().toString();
 
@@ -228,8 +205,7 @@ public class OCSPCertPublisher extends X509CertPublisher
                 ? null
                 : auditServiceRegister.getAuditService();
 
-        if (auditService == null)
-        {
+        if (auditService == null) {
             return;
         }
 
@@ -238,11 +214,9 @@ public class OCSPCertPublisher extends X509CertPublisher
         auditEvent.setName("SYSTEM");
         auditEvent.setLevel(AuditLevel.ERROR);
         auditEvent.setStatus(AuditStatus.FAILED);
-        if (cert instanceof X509CertWithDBCertId)
-        {
+        if (cert instanceof X509CertWithDBCertId) {
             Integer certId = ((X509CertWithDBCertId) cert).getCertId();
-            if (certId != null)
-            {
+            if (certId != null) {
                 auditEvent.addEventData(new AuditEventData("id", certId.toString()));
             }
         }
@@ -256,35 +230,29 @@ public class OCSPCertPublisher extends X509CertPublisher
     @Override
     public boolean crlAdded(
             final X509Cert caCert,
-            final X509CRL crl)
-    {
+            final X509CRL crl) {
         return true;
     }
 
     @Override
-    public boolean isHealthy()
-    {
+    public boolean isHealthy() {
         return queryExecutor.isHealthy();
     }
 
     @Override
     public void setAuditServiceRegister(
-            final AuditServiceRegister auditServiceRegister)
-    {
+            final AuditServiceRegister auditServiceRegister) {
         this.auditServiceRegister = auditServiceRegister;
     }
 
     @Override
     public boolean caRevoked(
             final X509Cert caCert,
-            final CertRevocationInfo revocationInfo)
-    {
-        try
-        {
+            final CertRevocationInfo revocationInfo) {
+        try {
             queryExecutor.revokeCa(caCert, revocationInfo);
             return true;
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             String issuerText = X509Util.getRFC4519Name(caCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, caCert, e, "could not publish revocation of CA");
             return false;
@@ -293,14 +261,11 @@ public class OCSPCertPublisher extends X509CertPublisher
 
     @Override
     public boolean caUnrevoked(
-            final X509Cert caCert)
-    {
-        try
-        {
+            final X509Cert caCert) {
+        try {
             queryExecutor.unrevokeCa(caCert);
             return true;
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             String issuerText = X509Util.getRFC4519Name(
                     caCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, caCert, e, "could not publish unrevocation of CA");
@@ -311,14 +276,11 @@ public class OCSPCertPublisher extends X509CertPublisher
     @Override
     public boolean certificateRemoved(
             final X509Cert issuerCert,
-            final X509CertWithDBCertId cert)
-    {
-        try
-        {
+            final X509CertWithDBCertId cert) {
+        try {
             queryExecutor.removeCert(issuerCert, cert);
             return true;
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             String issuerText = X509Util.getRFC4519Name(
                     issuerCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, issuerCert, e, "could not publish removal of certificate");
@@ -327,14 +289,12 @@ public class OCSPCertPublisher extends X509CertPublisher
     }
 
     @Override
-    public boolean isAsyn()
-    {
+    public boolean isAsyn() {
         return asyn;
     }
 
     @Override
-    public boolean publishsGoodCert()
-    {
+    public boolean publishsGoodCert() {
         return publishsGoodCert;
     }
 

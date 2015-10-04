@@ -45,8 +45,7 @@ package org.xipki.datasource.api.exception;
  * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public abstract class UncategorizedDataAccessException extends NonTransientDataAccessException
-{
+public abstract class UncategorizedDataAccessException extends NonTransientDataAccessException {
 
     /**
      * Constructor for UncategorizedDataAccessException.
@@ -55,8 +54,7 @@ public abstract class UncategorizedDataAccessException extends NonTransientDataA
      */
     public UncategorizedDataAccessException(
             final String msg,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(msg, cause);
     }
 

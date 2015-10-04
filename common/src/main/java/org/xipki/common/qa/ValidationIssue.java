@@ -41,8 +41,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class ValidationIssue
-{
+public class ValidationIssue {
     private final String code;
     private final String description;
     private boolean failed;
@@ -50,8 +49,7 @@ public class ValidationIssue
 
     public ValidationIssue(
             final String code,
-            final String description)
-    {
+            final String description) {
         ParamUtil.assertNotBlank("code", code);
         ParamUtil.assertNotBlank("description", description);
         this.code = code;
@@ -59,30 +57,25 @@ public class ValidationIssue
         this.failed = false;
     }
 
-    public boolean isFailed()
-    {
+    public boolean isFailed() {
         return failed;
     }
 
-    public String getMessage()
-    {
+    public String getMessage() {
         return message;
     }
 
     public void setFailureMessage(
-            final String message)
-    {
+            final String message) {
         this.failed = true;
         this.message = message;
     }
 
-    public String getCode()
-    {
+    public String getCode() {
         return code;
     }
 
-    public String getDescription()
-    {
+    public String getDescription() {
         return description;
     }
 

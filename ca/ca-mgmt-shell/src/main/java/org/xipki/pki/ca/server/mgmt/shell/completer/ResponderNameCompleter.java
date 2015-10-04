@@ -41,12 +41,10 @@ import java.util.Set;
  * @author Lijun Liao
  */
 
-public class ResponderNameCompleter extends MgmtNameCompleter
-{
+public class ResponderNameCompleter extends MgmtNameCompleter {
 
     @Override
-    protected Set<String> getEnums()
-    {
+    protected Set<String> getEnums() {
         return caManager.getCmpResponderNames();
     }
 }

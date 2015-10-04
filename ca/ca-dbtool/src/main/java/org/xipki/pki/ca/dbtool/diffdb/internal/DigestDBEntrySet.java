@@ -42,56 +42,45 @@ import java.util.List;
  * @author Lijun Liao
  */
 
-public class DigestDBEntrySet implements Comparable<DigestDBEntrySet>
-{
+public class DigestDBEntrySet implements Comparable<DigestDBEntrySet> {
     private final int startId;
     private Exception exception;
     private List<IdentifiedDbDigestEntry> entries = new LinkedList<>();
 
     public DigestDBEntrySet(
-            final int startId)
-    {
+            final int startId) {
         this.startId = startId;
     }
 
     public void setException(
-            final Exception exception)
-    {
+            final Exception exception) {
         this.exception = exception;
     }
 
-    public Exception getException()
-    {
+    public Exception getException() {
         return exception;
     }
 
     public void addEntry(
-            final IdentifiedDbDigestEntry entry)
-    {
+            final IdentifiedDbDigestEntry entry) {
         entries.add(entry);
     }
 
-    public int getStartId()
-    {
+    public int getStartId() {
         return startId;
     }
 
-    public List<IdentifiedDbDigestEntry> getEntries()
-    {
+    public List<IdentifiedDbDigestEntry> getEntries() {
         return entries;
     }
 
     @Override
-    public int compareTo(DigestDBEntrySet o)
-    {
-        if (startId < o.startId)
-        {
+    public int compareTo(DigestDBEntrySet o) {
+        if (startId < o.startId) {
             return -1;
-        } else if (startId == o.startId)
-        {
+        } else if (startId == o.startId) {
             return 0;
-        } else
-        {
+        } else {
             return 1;
         }
     }

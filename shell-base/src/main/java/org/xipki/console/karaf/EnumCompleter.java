@@ -45,17 +45,14 @@ import org.apache.karaf.shell.console.completer.StringsCompleter;
  * @author Lijun Liao
  */
 
-public class EnumCompleter implements XipkiCompleter
-{
+public class EnumCompleter implements XipkiCompleter {
     private final List<String> enums = new LinkedList<>();
 
     public void setTokens(
-            final String tokens)
-    {
+            final String tokens) {
         enums.clear();
         StringTokenizer st = new StringTokenizer(tokens, ", ");
-        while (st.hasMoreTokens())
-        {
+        while (st.hasMoreTokens()) {
             enums.add(st.nextToken());
         }
     }
@@ -64,11 +61,9 @@ public class EnumCompleter implements XipkiCompleter
     public int complete(
             final String buffer,
             final int cursor,
-            final List<String> candidates)
-    {
+            final List<String> candidates) {
         StringsCompleter delegate = new StringsCompleter();
-        for (String entry : enums)
-        {
+        for (String entry : enums) {
             delegate.getStrings().add(entry);
         }
         return delegate.complete(buffer, cursor, candidates);

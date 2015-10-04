@@ -43,12 +43,10 @@ import org.apache.karaf.shell.commands.Command;
 
 @Command(scope = "xipki-ca", name = "remove-cert",
         description = "remove certificate")
-public class RemoveCertCmd extends UnRevRemoveCertCmd
-{
+public class RemoveCertCmd extends UnRevRemoveCertCmd {
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean successful =
                 caManager.removeCertificate(caName, getSerialNumber());
         output(successful, "removed", "could not remove", "certificate");

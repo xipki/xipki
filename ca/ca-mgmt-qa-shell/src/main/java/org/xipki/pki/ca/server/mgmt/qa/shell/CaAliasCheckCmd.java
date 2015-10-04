@@ -46,8 +46,7 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "caalias-check",
         description = "check CA aliases (QA)")
-public class CaAliasCheckCmd extends CaCmd
-{
+public class CaAliasCheckCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -62,12 +61,10 @@ public class CaAliasCheckCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("checking CA alias='" + aliasName + "', CA='" + caName + "'");
         String _caName = caManager.getCaNameForAlias(aliasName);
-        if (_caName == null)
-        {
+        if (_caName == null) {
             throw new CmdFailure("alias '" + aliasName + "' is not configured");
         }
 

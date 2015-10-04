@@ -51,48 +51,39 @@ import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
 
 @Command(scope = "xipki-ca", name = "cmpcontrol-info",
         description = "show information of CMP control")
-public class CmpControlInfoCmd extends CaCmd
-{
+public class CmpControlInfoCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "CMP control name")
     private String name;
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         StringBuilder sb = new StringBuilder();
 
-        if (name == null)
-        {
+        if (name == null) {
             Set<String> names = caManager.getCmpControlNames();
             int n = names.size();
 
-            if (n == 0 || n == 1)
-            {
+            if (n == 0 || n == 1) {
                 sb.append((n == 0)
                         ? "no"
                         : "1");
                 sb.append(" CMP control is configured\n");
-            } else
-            {
+            } else {
                 sb.append(n).append(" CMP controls are configured:\n");
             }
 
             List<String> sorted = new ArrayList<>(names);
             Collections.sort(sorted);
 
-            for (String m : sorted)
-            {
+            for (String m : sorted) {
                 sb.append("\t").append(m).append("\n");
             }
-        } else
-        {
+        } else {
             CmpControlEntry entry = caManager.getCmpControl(name);
-            if (entry == null)
-            {
+            if (entry == null) {
                 throw new UnexpectedException("\tno CMP control named '" + name + " is configured");
-            } else
-            {
+            } else {
                 sb.append(entry.toString());
             }
         }

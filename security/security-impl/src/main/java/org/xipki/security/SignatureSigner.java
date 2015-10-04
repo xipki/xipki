@@ -51,8 +51,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class SignatureSigner implements ContentSigner
-{
+public class SignatureSigner implements ContentSigner {
     private final AlgorithmIdentifier sigAlgId;
     private final Signature signer;
     private final SignatureStream stream = new SignatureStream();
@@ -61,8 +60,7 @@ public class SignatureSigner implements ContentSigner
     public SignatureSigner(
             final AlgorithmIdentifier sigAlgId,
             final Signature signer,
-            final PrivateKey key)
-    {
+            final PrivateKey key) {
         ParamUtil.assertNotNull("sigAlgId", sigAlgId);
         ParamUtil.assertNotNull("signer", signer);
         ParamUtil.assertNotNull("key", key);
@@ -73,56 +71,44 @@ public class SignatureSigner implements ContentSigner
     }
 
     @Override
-    public AlgorithmIdentifier getAlgorithmIdentifier()
-    {
+    public AlgorithmIdentifier getAlgorithmIdentifier() {
         return sigAlgId;
     }
 
     @Override
-    public OutputStream getOutputStream()
-    {
-        try
-        {
+    public OutputStream getOutputStream() {
+        try {
             signer.initSign(key);
-        } catch (InvalidKeyException e)
-        {
+        } catch (InvalidKeyException e) {
             throw new RuntimeOperatorException("could not initSign", e);
         }
         return stream;
     }
 
     @Override
-    public byte[] getSignature()
-    {
-        try
-        {
+    public byte[] getSignature() {
+        try {
             return stream.getSignature();
         }
-        catch (SignatureException e)
-        {
+        catch (SignatureException e) {
             throw new RuntimeOperatorException(
                     "exception obtaining signature: " + e.getMessage(), e);
         }
     }
 
-    private class SignatureStream extends OutputStream
-    {
+    private class SignatureStream extends OutputStream {
         public byte[] getSignature()
-        throws SignatureException
-        {
+        throws SignatureException {
             return signer.sign();
         }
 
         @Override
         public void write(
                 final int b)
-        throws IOException
-        {
-            try
-            {
+        throws IOException {
+            try {
                 signer.update((byte) b);
-            } catch (SignatureException e)
-            {
+            } catch (SignatureException e) {
                 throw new IOException(e.getMessage(), e);
             }
         }
@@ -130,13 +116,10 @@ public class SignatureSigner implements ContentSigner
         @Override
         public void write(
                 final byte[] b)
-        throws IOException
-        {
-            try
-            {
+        throws IOException {
+            try {
                 signer.update(b);
-            } catch (SignatureException e)
-            {
+            } catch (SignatureException e) {
                 throw new IOException(e.getMessage(), e);
             }
         }
@@ -146,13 +129,10 @@ public class SignatureSigner implements ContentSigner
                 final byte[] b,
                 final int off,
                 final int len)
-        throws IOException
-        {
-            try
-            {
+        throws IOException {
+            try {
                 signer.update(b, off, len);
-            } catch (SignatureException e)
-            {
+            } catch (SignatureException e) {
                 throw new IOException(e.getMessage(), e);
             }
         }

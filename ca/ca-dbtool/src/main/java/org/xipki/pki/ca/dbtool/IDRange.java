@@ -39,18 +39,15 @@ package org.xipki.pki.ca.dbtool;
  * @author Lijun Liao
  */
 
-public class IDRange
-{
+public class IDRange {
 
     private final int from;
     private final int to;
 
     public IDRange(
             final int from,
-            final int to)
-    {
-        if (from > to)
-        {
+            final int to) {
+        if (from > to) {
             throw new IllegalArgumentException(
                     "from could not be greater than to: " + from + " > " + to);
         }
@@ -58,13 +55,11 @@ public class IDRange
         this.to = to;
     }
 
-    public int getFrom()
-    {
+    public int getFrom() {
         return from;
     }
 
-    public int getTo()
-    {
+    public int getTo() {
         return to;
     }
 

@@ -53,8 +53,7 @@ import org.xipki.common.util.CollectionUtil;
 
 @Command(scope = "xipki-ca", name = "ca-info",
         description = "show information of CA")
-public class CaInfoCmd extends CaCmd
-{
+public class CaInfoCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "CA name")
     private String caName;
 
@@ -64,45 +63,36 @@ public class CaInfoCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         StringBuilder sb = new StringBuilder();
 
-        if (caName == null)
-        {
+        if (caName == null) {
             Set<String> names = caManager.getCaNames();
             int n = names.size();
-            if (n == 0 || n == 1)
-            {
+            if (n == 0 || n == 1) {
                 sb.append((n == 0)
                         ? "no"
                         : "1");
                 sb.append(" CA is configured\n");
-            } else
-            {
+            } else {
                 sb.append(n).append(" CAs are configured:\n");
             }
 
             List<String> sorted = new ArrayList<>(names);
             Collections.sort(sorted);
-            for (String paramName : sorted)
-            {
+            for (String paramName : sorted) {
                 sb.append("\t").append(paramName);
                 Set<String> aliases = caManager.getAliasesForCA(paramName);
-                if (CollectionUtil.isNotEmpty(aliases))
-                {
+                if (CollectionUtil.isNotEmpty(aliases)) {
                     sb.append(" (aliases: ").append(toString(aliases)).append(")");
                 }
                 sb.append("\n");
             }
-        } else
-        {
+        } else {
             CAEntry entry = caManager.getCA(caName);
-            if (entry == null)
-            {
+            if (entry == null) {
                 throw new UnexpectedException("could not find CA '" + caName + "'");
-            } else
-            {
+            } else {
                 Set<String> aliases = caManager.getAliasesForCA(caName);
                 sb.append("aliases: ").append(toString(aliases)).append("\n");
                 sb.append(entry.toString(verbose.booleanValue()));

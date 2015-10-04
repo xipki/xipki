@@ -50,16 +50,14 @@ import org.xipki.pki.ocsp.client.api.RequestOptions;
  * @author Lijun Liao
  */
 
-public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
-{
+public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor {
     // result in maximal 254 Base-64 encoded octets
     private static final int MAX_LEN_GET = 190;
 
     private static final String CT_REQUEST  = "application/ocsp-request";
     private static final String CT_RESPONSE = "application/ocsp-response";
 
-    public DefaultHttpOCSPRequestor()
-    {
+    public DefaultHttpOCSPRequestor() {
     }
 
     @Override
@@ -67,19 +65,16 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
             final byte[] request,
             final URL responderURL,
             final RequestOptions requestOptions)
-    throws IOException
-    {
+    throws IOException {
         int size = request.length;
         HttpURLConnection httpUrlConnection;
-        if (size <= MAX_LEN_GET && requestOptions.isUseHttpGetForRequest())
-        {
+        if (size <= MAX_LEN_GET && requestOptions.isUseHttpGetForRequest()) {
             String b64Request = Base64.toBase64String(request);
             String urlEncodedReq = URLEncoder.encode(b64Request, "UTF-8");
             StringBuilder urlBuilder = new StringBuilder();
             String baseUrl = responderURL.toString();
             urlBuilder.append(baseUrl);
-            if (!baseUrl.endsWith("/"))
-            {
+            if (!baseUrl.endsWith("/")) {
                 urlBuilder.append('/');
             }
             urlBuilder.append(urlEncodedReq);
@@ -88,8 +83,7 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
 
             httpUrlConnection = (HttpURLConnection) newURL.openConnection();
             httpUrlConnection.setRequestMethod("GET");
-        } else
-        {
+        } else {
             httpUrlConnection = (HttpURLConnection) responderURL.openConnection();
             httpUrlConnection.setDoOutput(true);
             httpUrlConnection.setUseCaches(false);
@@ -104,8 +98,7 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
         }
 
         InputStream inputstream = httpUrlConnection.getInputStream();
-        if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK)
-        {
+        if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
             inputstream.close();
             throw new IOException("bad response: "
                     + httpUrlConnection.getResponseCode() + "  "
@@ -113,15 +106,12 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
         }
         String responseContentType = httpUrlConnection.getContentType();
         boolean isValidContentType = false;
-        if (responseContentType != null)
-        {
-            if (responseContentType.equalsIgnoreCase(CT_RESPONSE))
-            {
+        if (responseContentType != null) {
+            if (responseContentType.equalsIgnoreCase(CT_RESPONSE)) {
                 isValidContentType = true;
             }
         }
-        if (!isValidContentType)
-        {
+        if (!isValidContentType) {
             inputstream.close();
             throw new IOException("bad response: mime type " + responseContentType
                     + " not supported!");

@@ -49,8 +49,7 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-abstract class AbstractP11DSASigner implements Signer
-{
+abstract class AbstractP11DSASigner implements Signer {
     private final Digest digest;
     protected P11KeyParameter param;
 
@@ -59,8 +58,7 @@ abstract class AbstractP11DSASigner implements Signer
     throws SignerException;
 
     public AbstractP11DSASigner(
-            final Digest digest)
-    {
+            final Digest digest) {
         ParamUtil.assertNotNull("digest", digest);
         this.digest = digest;
     }
@@ -68,15 +66,12 @@ abstract class AbstractP11DSASigner implements Signer
     @Override
     public void init(
             final boolean forSigning,
-            final CipherParameters param)
-    {
-        if (!forSigning)
-        {
+            final CipherParameters param) {
+        if (!forSigning) {
             throw new RuntimeCryptoException("verification mode not supported.");
         }
 
-        if (!(param instanceof P11KeyParameter))
-        {
+        if (!(param instanceof P11KeyParameter)) {
             throw new IllegalArgumentException("invalid param type "  + param.getClass().getName());
         }
         this.param = (P11KeyParameter) param;
@@ -85,8 +80,7 @@ abstract class AbstractP11DSASigner implements Signer
 
     @Override
     public void update(
-            final byte b)
-    {
+            final byte b) {
         digest.update(b);
     }
 
@@ -94,37 +88,31 @@ abstract class AbstractP11DSASigner implements Signer
     public void update(
             final byte[] in,
             final int off,
-            final int len)
-    {
+            final int len) {
         digest.update(in, off, len);
     }
 
     @Override
     public byte[] generateSignature()
-    throws CryptoException, DataLengthException
-    {
+    throws CryptoException, DataLengthException {
         byte[] digestValue = new byte[digest.getDigestSize()];
         digest.doFinal(digestValue, 0);
 
-        try
-        {
+        try {
             return sign(digestValue);
-        } catch (SignerException e)
-        {
+        } catch (SignerException e) {
             throw new InvalidCipherTextException("SignerException: " + e.getMessage());
         }
     }
 
     @Override
     public boolean verifySignature(
-            final byte[] signature)
-    {
+            final byte[] signature) {
         throw new UnsupportedOperationException("verifySignature not supported");
     }
 
     @Override
-    public void reset()
-    {
+    public void reset() {
         digest.reset();
     }
 

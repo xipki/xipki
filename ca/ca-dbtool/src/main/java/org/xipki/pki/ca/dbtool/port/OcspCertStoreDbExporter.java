@@ -74,8 +74,7 @@ import org.xipki.security.api.HashCalculator;
  * @author Lijun Liao
  */
 
-class OcspCertStoreDbExporter extends DbPorter
-{
+class OcspCertStoreDbExporter extends DbPorter {
     public static final String PROCESS_LOG_FILENAME = "export.process";
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbExporter.class);
@@ -97,18 +96,15 @@ class OcspCertStoreDbExporter extends DbPorter
             final boolean resume,
             final AtomicBoolean stopMe,
             final boolean evaluateOnly)
-    throws Exception
-    {
+    throws Exception {
         super(dataSource, baseDir, stopMe, evaluateOnly);
         ParamUtil.assertNotNull("marshaller", marshaller);
         ParamUtil.assertNotNull("unmarshaller", unmarshaller);
-        if (numCertsInBundle < 1)
-        {
+        if (numCertsInBundle < 1) {
             throw new IllegalArgumentException("numCertsInBundle could not be less than 1: "
                     + numCertsInBundle);
         }
-        if (numCertsPerSelect < 1)
-        {
+        if (numCertsPerSelect < 1) {
             throw new IllegalArgumentException("numCertsPerSelect could not be less than 1: "
                     + numCertsPerSelect);
         }
@@ -118,11 +114,9 @@ class OcspCertStoreDbExporter extends DbPorter
 
         this.marshaller = marshaller;
         this.unmarshaller = unmarshaller;
-        if (resume)
-        {
+        if (resume) {
             File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
-            if (processLogFile.exists() == false)
-            {
+            if (processLogFile.exists() == false) {
                 throw new Exception("could not process with '--resume' option");
             }
         }
@@ -130,66 +124,54 @@ class OcspCertStoreDbExporter extends DbPorter
     }
 
     public void export()
-    throws Exception
-    {
+    throws Exception {
         File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
 
         CertStoreType certstore;
-        if (resume)
-        {
-            try
-            {
+        if (resume) {
+            try {
                 @SuppressWarnings("unchecked")
                 JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
                         unmarshaller.unmarshal(new File(baseDir, FILENAME_OCSP_CertStore));
                 certstore = root.getValue();
-            } catch (JAXBException e)
-            {
+            } catch (JAXBException e) {
                 throw XMLUtil.convert(e);
             }
 
-            if (certstore.getVersion() > VERSION)
-            {
+            if (certstore.getVersion() > VERSION) {
                 throw new Exception("could not continue with CertStore greater than " + VERSION
                         + ": " + certstore.getVersion());
             }
         }
-        else
-        {
+        else {
             certstore = new CertStoreType();
             certstore.setVersion(VERSION);
         }
         System.out.println("exporting OCSP certstore from database");
 
-        if (resume == false)
-        {
+        if (resume == false) {
             export_issuer(certstore);
         }
         Exception exception = export_cert(certstore, processLogFile);
 
         JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
-        try
-        {
+        try {
             marshaller.marshal(root, new File(baseDir, FILENAME_OCSP_CertStore));
-        } catch (JAXBException e)
-        {
+        } catch (JAXBException e) {
             throw XMLUtil.convert(e);
         }
 
-        if (exception == null)
-        {
+        if (exception == null) {
             System.out.println(" exported OCSP certstore from database");
         }
-        else
-        {
+        else {
             throw exception;
         }
     }
 
     private void export_issuer(
             final CertStoreType certstore)
-    throws DataAccessException, IOException
-    {
+    throws DataAccessException, IOException {
         System.out.println("exporting table ISSUER");
         Issuers issuers = new Issuers();
         certstore.setIssuers(issuers);
@@ -198,16 +180,14 @@ class OcspCertStoreDbExporter extends DbPorter
         Statement stmt = null;
         ResultSet rs = null;
 
-        try
-        {
+        try {
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
 
             String issuerCertsDir = "issuer-conf";
             new File(issuerCertsDir).mkdirs();
 
-            while (rs.next())
-            {
+            while (rs.next()) {
                 int id = rs.getInt("ID");
                 String cert = rs.getString("CERT");
 
@@ -220,26 +200,22 @@ class OcspCertStoreDbExporter extends DbPorter
 
                 boolean revoked = rs.getBoolean("REV");
                 issuer.setRevoked(revoked);
-                if (revoked)
-                {
+                if (revoked) {
                     int rev_reason = rs.getInt("RR");
                     long rev_time = rs.getLong("RT");
                     long rev_invalidity_time = rs.getLong("RIT");
                     issuer.setRevReason(rev_reason);
                     issuer.setRevTime(rev_time);
-                    if (rev_invalidity_time != 0)
-                    {
+                    if (rev_invalidity_time != 0) {
                         issuer.setRevInvTime(rev_invalidity_time);
                     }
                 }
 
                 issuers.getIssuer().add(issuer);
             }
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw translate(sql, e);
-        } finally
-        {
+        } finally {
             releaseResources(stmt, rs);
         }
 
@@ -248,28 +224,24 @@ class OcspCertStoreDbExporter extends DbPorter
 
     private Exception export_cert(
             final CertStoreType certstore,
-            final File processLogFile)
-    {
+            final File processLogFile) {
         File fCertsDir = new File(certsDir);
         fCertsDir.mkdirs();
 
         FileOutputStream certsFileOs = null;
 
-        try
-        {
+        try {
             certsFileOs = new FileOutputStream(certsListFile, true);
             do_export_cert(certstore, processLogFile, certsFileOs);
             return null;
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-certs-");
             System.err.println("\nexporting table CERT and CRAW has been cancelled due to error,\n"
                     + "please continue with the option '--resume'");
             LOG.error("Exception", e);
             return e;
-        } finally
-        {
+        } finally {
             IoUtil.closeStream(certsFileOs);
         }
     }
@@ -278,23 +250,19 @@ class OcspCertStoreDbExporter extends DbPorter
             final CertStoreType certstore,
             final File processLogFile,
             final FileOutputStream certsFileOs)
-    throws Exception
-    {
+    throws Exception {
         int numProcessedBefore = certstore.getCountCerts();
 
         Integer minCertId = null;
-        if (processLogFile.exists())
-        {
+        if (processLogFile.exists()) {
             byte[] content = IoUtil.read(processLogFile);
-            if (content != null && content.length > 0)
-            {
+            if (content != null && content.length > 0) {
                 minCertId = Integer.parseInt(new String(content).trim());
                 minCertId++;
             }
         }
 
-        if (minCertId == null)
-        {
+        if (minCertId == null) {
             minCertId = (int) getMin("CERT", "ID");
         }
 
@@ -306,8 +274,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
         final int maxCertId = (int) getMax("CERT", "ID");
 
-        ProcessLog processLog;
-        {
+        ProcessLog processLog; {
             final long total = getCount("CERT") - numProcessedBefore;
             processLog = new ProcessLog(total);
         }
@@ -333,13 +300,10 @@ class OcspCertStoreDbExporter extends DbPorter
         String sql = null;
 
         Integer id = null;
-        try
-        {
+        try {
             boolean interrupted = false;
-            for (int i = minCertId; i <= maxCertId; i += n)
-            {
-                if (stopMe.get())
-                {
+            for (int i = minCertId; i <= maxCertId; i += n) {
+                if (stopMe.get()) {
                     interrupted = true;
                     break;
                 }
@@ -350,25 +314,20 @@ class OcspCertStoreDbExporter extends DbPorter
 
                 ResultSet rs = certPs.executeQuery();
 
-                while (rs.next())
-                {
+                while (rs.next()) {
                     id = rs.getInt("ID");
 
-                    if (minCertIdOfCurrentFile == -1)
-                    {
+                    if (minCertIdOfCurrentFile == -1) {
                         minCertIdOfCurrentFile = id;
                     }
-                    else if (minCertIdOfCurrentFile > id)
-                    {
+                    else if (minCertIdOfCurrentFile > id) {
                         minCertIdOfCurrentFile = id;
                     }
 
-                    if (maxCertIdOfCurrentFile == -1)
-                    {
+                    if (maxCertIdOfCurrentFile == -1) {
                         maxCertIdOfCurrentFile = id;
                     }
-                    else if (maxCertIdOfCurrentFile < id)
-                    {
+                    else if (maxCertIdOfCurrentFile < id) {
                         maxCertIdOfCurrentFile = id;
                     }
 
@@ -377,15 +336,12 @@ class OcspCertStoreDbExporter extends DbPorter
 
                     String sha1_cert = HashCalculator.hexSha1(certBytes);
 
-                    if (evaulateOnly == false)
-                    {
+                    if (evaulateOnly == false) {
                         ZipEntry certZipEntry = new ZipEntry(sha1_cert + ".der");
                         currentCertsZip.putNextEntry(certZipEntry);
-                        try
-                        {
+                        try {
                             currentCertsZip.write(certBytes);
-                        } finally
-                        {
+                        } finally {
                             currentCertsZip.closeEntry();
                         }
                     }
@@ -406,15 +362,13 @@ class OcspCertStoreDbExporter extends DbPorter
                     boolean revoked = rs.getBoolean("REV");
                     cert.setRev(revoked);
 
-                    if (revoked)
-                    {
+                    if (revoked) {
                         int rev_reason = rs.getInt("RR");
                         long rev_time = rs.getLong("RT");
                         long rev_invalidity_time = rs.getLong("RIT");
                         cert.setRr(rev_reason);
                         cert.setRt(rev_time);
-                        if (rev_invalidity_time != 0)
-                        {
+                        if (rev_invalidity_time != 0) {
                             cert.setRit(rev_invalidity_time);
                         }
                     }
@@ -427,8 +381,7 @@ class OcspCertStoreDbExporter extends DbPorter
                     numCertInCurrentFile++;
                     sum++;
 
-                    if (numCertInCurrentFile == numCertsInBundle)
-                    {
+                    if (numCertInCurrentFile == numCertsInBundle) {
                         finalizeZip(currentCertsZip, certsInCurrentFile);
 
                         String currentCertsFilename = buildFilename("certs_", ".zip",
@@ -456,13 +409,11 @@ class OcspCertStoreDbExporter extends DbPorter
                 rs.close();
             } // end for
 
-            if (interrupted)
-            {
+            if (interrupted) {
                 throw new InterruptedException("interrupted by the user");
             }
 
-            if (numCertInCurrentFile > 0)
-            {
+            if (numCertInCurrentFile > 0) {
                 finalizeZip(currentCertsZip, certsInCurrentFile);
 
                 String currentCertsFilename = buildFilename("certs_", ".zip",
@@ -475,16 +426,13 @@ class OcspCertStoreDbExporter extends DbPorter
 
                 processLog.addNumProcessed(numCertInCurrentFile);
             }
-            else
-            {
+            else {
                 currentCertsZip.close();
                 currentCertsZipFile.delete();
             }
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw translate(sql, e);
-        } finally
-        {
+        } finally {
             releaseResources(certPs, null);
         }
 
@@ -499,15 +447,12 @@ class OcspCertStoreDbExporter extends DbPorter
     private void finalizeZip(
             final ZipOutputStream zipOutStream,
             final DbiXmlWriter certsType)
-    throws JAXBException, IOException, XMLStreamException
-    {
+    throws JAXBException, IOException, XMLStreamException {
         ZipEntry certZipEntry = new ZipEntry("certs.xml");
         zipOutStream.putNextEntry(certZipEntry);
-        try
-        {
+        try {
             certsType.rewriteToZipStream(zipOutStream);
-        } finally
-        {
+        } finally {
             zipOutStream.closeEntry();
         }
 

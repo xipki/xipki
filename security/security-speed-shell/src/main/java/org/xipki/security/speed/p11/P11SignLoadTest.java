@@ -54,8 +54,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
  * @author Lijun Liao
  */
 
-public abstract class P11SignLoadTest extends LoadExecutor
-{
+public abstract class P11SignLoadTest extends LoadExecutor {
     private static final Logger LOG = LoggerFactory.getLogger(P11SignLoadTest.class);
 
     private final P11WritableSlot slot;
@@ -68,8 +67,7 @@ public abstract class P11SignLoadTest extends LoadExecutor
             final String signatureAlgorithm,
             final P11KeyIdentifier keyId,
             final String description)
-    throws SignerException
-    {
+    throws SignerException {
         super(description + "\nsignature algorithm: " + signatureAlgorithm);
 
         ParamUtil.assertNotNull("securityFactory", securityFactory);
@@ -86,48 +84,37 @@ public abstract class P11SignLoadTest extends LoadExecutor
 
     }
 
-    private void close()
-    {
-        try
-        {
+    private void close() {
+        try {
             slot.removeKeyAndCerts(keyId);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             LOG.error("could not delete PKCS#11 key {}", keyId);
         }
     }
 
     @Override
     protected Runnable getTestor()
-    throws Exception
-    {
+    throws Exception {
         return new Testor();
     }
 
-    class Testor implements Runnable
-    {
+    class Testor implements Runnable {
         @Override
-        public void run()
-        {
+        public void run() {
             ContentSigner singleSigner;
-            try
-            {
+            try {
                 singleSigner = signer.borrowContentSigner();
-            } catch (NoIdleSignerException e)
-            {
+            } catch (NoIdleSignerException e) {
                 account(1, 1);
                 return;
             }
 
-            while (!stop() && getErrorAccout() < 1)
-            {
-                try
-                {
+            while (!stop() && getErrorAccout() < 1) {
+                try {
                     singleSigner.getOutputStream().write(new byte[]{1, 2, 3, 4});
                     singleSigner.getSignature();
                     account(1, 0);
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
                     account(1, 1);
                 }
             }

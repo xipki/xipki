@@ -45,8 +45,7 @@ import org.xipki.datasource.api.exception.DataAccessException;
  * @author Lijun Liao
  */
 
-class AbstractCaCertStoreDbPorter extends DbPorter
-{
+class AbstractCaCertStoreDbPorter extends DbPorter {
     private static final String CRLS_DIRNAME = "crls";
     private static final String CRLS_MANIFEST_FILENAME = "crls-manifest";
 
@@ -64,8 +63,7 @@ class AbstractCaCertStoreDbPorter extends DbPorter
             final String baseDir,
             final AtomicBoolean stopMe,
             final boolean evaluateOnly)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         super(dataSource, baseDir, stopMe, evaluateOnly);
 
         this.crlsDir = this.baseDir + File.separator + CRLS_DIRNAME;

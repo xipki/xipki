@@ -43,17 +43,14 @@ import org.xipki.password.api.PasswordResolverException;
  * @author Lijun Liao
  */
 
-public class DummyPBEPasswordResolver extends PBEPasswordResolver
-{
+public class DummyPBEPasswordResolver extends PBEPasswordResolver {
 
     private char[] masterPassword;
 
     @Override
     protected char[] getMasterPassword()
-    throws PasswordResolverException
-    {
-        if (masterPassword != null)
-        {
+    throws PasswordResolverException {
+        if (masterPassword != null) {
             return masterPassword;
         }
 
@@ -61,8 +58,7 @@ public class DummyPBEPasswordResolver extends PBEPasswordResolver
     }
 
     public void setMasterPassword(
-            final char[] masterPassword)
-    {
+            final char[] masterPassword) {
         this.masterPassword = masterPassword;
     }
 

@@ -42,13 +42,11 @@ import org.xipki.console.karaf.DynamicEnumCompleter;
  * @author Lijun Liao
  */
 
-public abstract class MgmtNameCompleter extends DynamicEnumCompleter
-{
+public abstract class MgmtNameCompleter extends DynamicEnumCompleter {
     protected CAManager caManager;
 
     public void setCaManager(
-            final CAManager caManager)
-    {
+            final CAManager caManager) {
         this.caManager = caManager;
     }
 

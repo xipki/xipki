@@ -45,20 +45,16 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-crlsigner-rm",
         description = "remove CRL signer (negative, QA)")
-public class NegCrlSignerRemoveCmd extends CrlSignerRemoveCmd
-{
+public class NegCrlSignerRemoveCmd extends CrlSignerRemoveCmd {
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("neg-crlsigner-rm");
 
-        try
-        {
+        try {
             super._doExecute();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return null;
         }
 

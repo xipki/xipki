@@ -42,11 +42,9 @@ import org.xipki.security.P12RawKeypairGenerator;
  * @author Lijun Liao
  */
 
-public abstract class P12KeyGenLoadTest extends LoadExecutor
-{
+public abstract class P12KeyGenLoadTest extends LoadExecutor {
     public P12KeyGenLoadTest(
-            final String description)
-    {
+            final String description) {
         super(description);
     }
 
@@ -54,25 +52,19 @@ public abstract class P12KeyGenLoadTest extends LoadExecutor
 
     @Override
     protected Runnable getTestor()
-    throws Exception
-    {
+    throws Exception {
         return new Testor();
     }
 
-    class Testor implements Runnable
-    {
+    class Testor implements Runnable {
         @Override
-        public void run()
-        {
+        public void run() {
             P12RawKeypairGenerator kpGen = getKeypairGenerator();
-            while (!stop() && getErrorAccout() < 1)
-            {
-                try
-                {
+            while (!stop() && getErrorAccout() < 1) {
+                try {
                     kpGen.genKeypair();
                     account(1, 0);
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
                     account(1, 1);
                 }
             }

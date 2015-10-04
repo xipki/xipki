@@ -41,32 +41,26 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
  * @author Lijun Liao
  */
 
-class OcspRespWithCacheInfo
-{
-    final static class ResponseCacheInfo
-    {
+class OcspRespWithCacheInfo {
+    final static class ResponseCacheInfo {
         private final long thisUpdate;
         private Long nextUpdate;
 
         ResponseCacheInfo(
-                final long thisUpdate)
-        {
+                final long thisUpdate) {
             this.thisUpdate = thisUpdate;
         }
 
-        public long getThisUpdate()
-        {
+        public long getThisUpdate() {
             return thisUpdate;
         }
 
         public void setNextUpdate(
-                final Long nextUpdate)
-        {
+                final Long nextUpdate) {
             this.nextUpdate = nextUpdate;
         }
 
-        public Long getNextUpdate()
-        {
+        public Long getNextUpdate() {
             return nextUpdate;
         }
 
@@ -77,19 +71,16 @@ class OcspRespWithCacheInfo
 
     public OcspRespWithCacheInfo(
             final OCSPResp response,
-            final ResponseCacheInfo cacheInfo)
-    {
+            final ResponseCacheInfo cacheInfo) {
         this.response = response;
         this.cacheInfo = cacheInfo;
     }
 
-    public OCSPResp getResponse()
-    {
+    public OCSPResp getResponse() {
         return response;
     }
 
-    public ResponseCacheInfo getCacheInfo()
-    {
+    public ResponseCacheInfo getCacheInfo() {
         return cacheInfo;
     }
 

@@ -47,58 +47,47 @@ import org.xipki.common.util.CollectionUtil;
  * @author Lijun Liao
  */
 
-public class QaNameConstraints extends QaExtension
-{
+public class QaNameConstraints extends QaExtension {
     private final List<QaGeneralSubtree> permittedSubtrees;
     private final List<QaGeneralSubtree> excludedSubtrees;
 
     public QaNameConstraints(
-            final NameConstraints jaxb)
-    {
+            final NameConstraints jaxb) {
         if (jaxb.getPermittedSubtrees() != null
-                && CollectionUtil.isNotEmpty(jaxb.getPermittedSubtrees().getBase()))
-        {
+                && CollectionUtil.isNotEmpty(jaxb.getPermittedSubtrees().getBase())) {
             List<QaGeneralSubtree> list = new LinkedList<>();
             List<GeneralSubtreeBaseType> bases =  jaxb.getPermittedSubtrees().getBase();
-            for (GeneralSubtreeBaseType base : bases)
-            {
+            for (GeneralSubtreeBaseType base : bases) {
                 list.add(new QaGeneralSubtree(base));
             }
             this.permittedSubtrees = Collections.unmodifiableList(list);
-        } else
-        {
+        } else {
             permittedSubtrees = null;
         }
 
         if (jaxb.getExcludedSubtrees() != null
-                && CollectionUtil.isNotEmpty(jaxb.getExcludedSubtrees().getBase()))
-        {
+                && CollectionUtil.isNotEmpty(jaxb.getExcludedSubtrees().getBase())) {
             List<QaGeneralSubtree> list = new LinkedList<>();
             List<GeneralSubtreeBaseType> bases =  jaxb.getExcludedSubtrees().getBase();
-            for (GeneralSubtreeBaseType base : bases)
-            {
+            for (GeneralSubtreeBaseType base : bases) {
                 list.add(new QaGeneralSubtree(base));
             }
             this.excludedSubtrees = Collections.unmodifiableList(list);
-        } else
-        {
+        } else {
             excludedSubtrees = null;
         }
 
-        if (permittedSubtrees == null && excludedSubtrees == null)
-        {
+        if (permittedSubtrees == null && excludedSubtrees == null) {
             throw new IllegalArgumentException(
                     "at least one of permittedSubtrees and excludesSubtrees should be non-null");
         }
     }
 
-    public List<QaGeneralSubtree> getPermittedSubtrees()
-    {
+    public List<QaGeneralSubtree> getPermittedSubtrees() {
         return permittedSubtrees;
     }
 
-    public List<QaGeneralSubtree> getExcludedSubtrees()
-    {
+    public List<QaGeneralSubtree> getExcludedSubtrees() {
         return excludedSubtrees;
     }
 

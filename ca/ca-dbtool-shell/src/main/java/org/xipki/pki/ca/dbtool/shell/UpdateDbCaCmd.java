@@ -46,14 +46,12 @@ import org.xipki.dbtool.LiquibaseDatabaseConf;
 
 @Command(scope = "xipki-db", name = "updatedb-ca",
         description = "update the CA database schema")
-public class UpdateDbCaCmd extends LiquibaseCmd
-{
+public class UpdateDbCaCmd extends LiquibaseCmd {
     private static final String schemaFile = "xipki/sql/ca-init.xml";
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
         LiquibaseDatabaseConf dbConf = dbConfs.get("ca");

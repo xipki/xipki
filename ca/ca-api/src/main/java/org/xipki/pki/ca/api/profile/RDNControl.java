@@ -45,8 +45,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class RDNControl
-{
+public class RDNControl {
     private final int minOccurs;
     private final int maxOccurs;
     private final ASN1ObjectIdentifier type;
@@ -58,19 +57,16 @@ public class RDNControl
     private String group;
 
     public RDNControl(
-            final ASN1ObjectIdentifier type)
-    {
+            final ASN1ObjectIdentifier type) {
         this(type, 1, 1);
     }
 
     public RDNControl(
             final ASN1ObjectIdentifier type,
             final int minOccurs,
-            final int maxOccurs)
-    {
+            final int maxOccurs) {
         ParamUtil.assertNotNull("type", type);
-        if (minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs)
-        {
+        if (minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs) {
             throw new IllegalArgumentException("illegal minOccurs=" + minOccurs
                     + ", maxOccurs=" + maxOccurs);
         }
@@ -79,84 +75,69 @@ public class RDNControl
         this.maxOccurs = maxOccurs;
     }
 
-    public int getMinOccurs()
-    {
+    public int getMinOccurs() {
         return minOccurs;
     }
 
-    public int getMaxOccurs()
-    {
+    public int getMaxOccurs() {
         return maxOccurs;
     }
 
-    public ASN1ObjectIdentifier getType()
-    {
+    public ASN1ObjectIdentifier getType() {
         return type;
     }
 
-    public StringType getStringType()
-    {
+    public StringType getStringType() {
         return stringType;
     }
 
-    public List<Pattern> getPatterns()
-    {
+    public List<Pattern> getPatterns() {
         return patterns;
     }
 
-    public Range getStringLengthRange()
-    {
+    public Range getStringLengthRange() {
         return stringLengthRange;
     }
 
     public void setStringType(
-            final StringType stringType)
-    {
+            final StringType stringType) {
         this.stringType = stringType;
     }
 
     public void setStringLengthRange(
-            final Range stringLengthRange)
-    {
+            final Range stringLengthRange) {
         this.stringLengthRange = stringLengthRange;
     }
 
     public void setPatterns(
-            final List<Pattern> patterns)
-    {
+            final List<Pattern> patterns) {
         this.patterns = patterns;
     }
 
-    public String getPrefix()
-    {
+    public String getPrefix() {
         return prefix;
     }
 
     public void setPrefix(
-            final String prefix)
-    {
+            final String prefix) {
         this.prefix = prefix;
     }
 
-    public String getSuffix()
-    {
+    public String getSuffix() {
         return suffix;
     }
 
     public void setSuffix(
-            final String suffix)
-    {
+            final String suffix) {
         this.suffix = suffix;
     }
 
-    public String getGroup()
-    {
+    public String getGroup() {
         return group;
     }
 
     public void setGroup(
-            final String group)
-    {
+            final String group) {
         this.group = group;
     }
 

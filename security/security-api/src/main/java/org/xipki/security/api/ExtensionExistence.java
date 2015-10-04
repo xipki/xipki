@@ -65,26 +65,22 @@ import org.xipki.common.util.CollectionUtil;
  * @author Lijun Liao
  */
 
-public class ExtensionExistence extends ASN1Object
-{
+public class ExtensionExistence extends ASN1Object {
     private List<ASN1ObjectIdentifier> needExtensions;
     private List<ASN1ObjectIdentifier> wantExtensions;
 
     public ExtensionExistence(
             final List<ASN1ObjectIdentifier> needExtensions,
-            final List<ASN1ObjectIdentifier> wantExtensions)
-    {
+            final List<ASN1ObjectIdentifier> wantExtensions) {
         this.needExtensions = needExtensions;
         this.wantExtensions = wantExtensions;
 
-        if (this.needExtensions == null)
-        {
+        if (this.needExtensions == null) {
             List<ASN1ObjectIdentifier> list = Collections.emptyList();
             this.needExtensions = Collections.unmodifiableList(list);
         }
 
-        if (this.wantExtensions == null)
-        {
+        if (this.wantExtensions == null) {
             List<ASN1ObjectIdentifier> list = Collections.emptyList();
             this.wantExtensions = Collections.unmodifiableList(list);
         }
@@ -92,49 +88,39 @@ public class ExtensionExistence extends ASN1Object
     }
 
     private ExtensionExistence(
-            final ASN1Sequence seq)
-    {
+            final ASN1Sequence seq) {
         int size = seq.size();
-        if (size > 2)
-        {
+        if (size > 2) {
             throw new IllegalArgumentException("wrong number of elements in sequence");
         }
 
-        for (int i = 0; i < size; i++)
-        {
+        for (int i = 0; i < size; i++) {
             ASN1TaggedObject tagObject = ASN1TaggedObject.getInstance(seq.getObjectAt(i));
             int tag = tagObject.getTagNo();
-            if (tag == 0 || tag == 1)
-            {
+            if (tag == 0 || tag == 1) {
                 ASN1Sequence subSeq = ASN1Sequence.getInstance(tagObject.getObject());
                 List<ASN1ObjectIdentifier> oids = new LinkedList<>();
                 int subSize = subSeq.size();
-                for (int j = 0; j < subSize; j++)
-                {
+                for (int j = 0; j < subSize; j++) {
                     oids.add(ASN1ObjectIdentifier.getInstance(subSeq.getObjectAt(j)));
                 }
 
-                if (tag == 0)
-                {
+                if (tag == 0) {
                     needExtensions = Collections.unmodifiableList(oids);
-                } else
-                {
+                } else {
                     wantExtensions = Collections.unmodifiableList(oids);
                 }
-            } else
-            {
+            } else {
                 throw new IllegalArgumentException("tag " + tag + " is not permitted");
             }
         }
 
-        if (needExtensions == null)
-        {
+        if (needExtensions == null) {
             List<ASN1ObjectIdentifier> list = Collections.emptyList();
             needExtensions = Collections.unmodifiableList(list);
         }
 
-        if (wantExtensions == null)
-        {
+        if (wantExtensions == null) {
             List<ASN1ObjectIdentifier> list = Collections.emptyList();
             wantExtensions = Collections.unmodifiableList(list);
         }
@@ -142,26 +128,20 @@ public class ExtensionExistence extends ASN1Object
     }
 
     public static ExtensionExistence getInstance(
-            final Object obj)
-    {
-        if (obj == null || obj instanceof ExtensionExistence)
-        {
+            final Object obj) {
+        if (obj == null || obj instanceof ExtensionExistence) {
             return (ExtensionExistence) obj;
         }
 
-        if (obj instanceof ASN1Sequence)
-        {
+        if (obj instanceof ASN1Sequence) {
             return new ExtensionExistence((ASN1Sequence) obj);
         }
 
-        if (obj instanceof byte[])
-        {
-            try
-            {
+        if (obj instanceof byte[]) {
+            try {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
-            catch (IOException e)
-            {
+            catch (IOException e) {
                 throw new IllegalArgumentException("unable to parse encoded general name");
             }
         }
@@ -171,24 +151,19 @@ public class ExtensionExistence extends ASN1Object
     }
 
     @Override
-    public ASN1Primitive toASN1Primitive()
-    {
+    public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        if (CollectionUtil.isNotEmpty(needExtensions))
-        {
+        if (CollectionUtil.isNotEmpty(needExtensions)) {
             ASN1EncodableVector v = new ASN1EncodableVector();
-            for (ASN1ObjectIdentifier m : needExtensions)
-            {
+            for (ASN1ObjectIdentifier m : needExtensions) {
                 v.add(m);
             }
             vector.add(new DERTaggedObject(true, 0, new DERSequence(v)));
         }
 
-        if (CollectionUtil.isNotEmpty(wantExtensions))
-        {
+        if (CollectionUtil.isNotEmpty(wantExtensions)) {
             ASN1EncodableVector v = new ASN1EncodableVector();
-            for (ASN1ObjectIdentifier m : wantExtensions)
-            {
+            for (ASN1ObjectIdentifier m : wantExtensions) {
                 v.add(m);
             }
             vector.add(new DERTaggedObject(true, 1, new DERSequence(v)));
@@ -197,13 +172,11 @@ public class ExtensionExistence extends ASN1Object
         return new DERSequence(vector);
     }
 
-    public List<ASN1ObjectIdentifier> getNeedExtensions()
-    {
+    public List<ASN1ObjectIdentifier> getNeedExtensions() {
         return needExtensions;
     }
 
-    public List<ASN1ObjectIdentifier> getWantExtensions()
-    {
+    public List<ASN1ObjectIdentifier> getWantExtensions() {
         return wantExtensions;
     }
 

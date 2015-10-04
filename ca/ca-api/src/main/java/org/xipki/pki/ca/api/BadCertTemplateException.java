@@ -39,31 +39,26 @@ package org.xipki.pki.ca.api;
  * @author Lijun Liao
  */
 
-public class BadCertTemplateException extends Exception
-{
+public class BadCertTemplateException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public BadCertTemplateException()
-    {
+    public BadCertTemplateException() {
     }
 
     public BadCertTemplateException(
-            final String message)
-    {
+            final String message) {
         super(message);
     }
 
     public BadCertTemplateException(
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(cause);
     }
 
     public BadCertTemplateException(
             final String message,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(message, cause);
     }
 

@@ -46,8 +46,7 @@ import org.xipki.scep.client.exception.ScepClientException;
  * @author Lijun Liao
  */
 
-public class ScepHttpResponse
-{
+public class ScepHttpResponse {
     private final String contentType;
     private final int contentLength;
     private final InputStream content;
@@ -56,8 +55,7 @@ public class ScepHttpResponse
     public ScepHttpResponse(
             final String contentType,
             final int contentLength,
-            final InputStream content)
-    {
+            final InputStream content) {
         this.contentType = contentType;
         this.content = content;
         this.contentLength = contentLength;
@@ -66,70 +64,55 @@ public class ScepHttpResponse
     public ScepHttpResponse(
             final String contentType,
             final int contentLength,
-            final byte[] contentBytes)
-    {
+            final byte[] contentBytes) {
         this.contentType = contentType;
         this.content = new ByteArrayInputStream(contentBytes);
         this.contentLength = contentLength;
     }
 
-    public String getContentType()
-    {
+    public String getContentType() {
         return contentType;
     }
 
-    public int getContentLength()
-    {
+    public int getContentLength() {
         return contentLength;
     }
 
-    public String getEncoding()
-    {
+    public String getEncoding() {
         return contentEncoding;
     }
 
     public void setContentEncoding(
-            final String contentEncoding)
-    {
+            final String contentEncoding) {
         this.contentEncoding = contentEncoding;
     }
 
-    public InputStream getContent()
-    {
+    public InputStream getContent() {
         return content;
     }
 
     public byte[] getContentBytes()
-    throws ScepClientException
-    {
-        if (content == null)
-        {
+    throws ScepClientException {
+        if (content == null) {
             return null;
         }
 
-        try
-        {
+        try {
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             int readed = 0;
             byte[] buffer = new byte[2048];
-            while ((readed = content.read(buffer)) != -1)
-            {
+            while ((readed = content.read(buffer)) != -1) {
                 bout.write(buffer, 0, readed);
             }
 
             return bout.toByteArray();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new ScepClientException(e);
-        } finally
-        {
-            if (content != null)
-            {
-                try
-                {
+        } finally {
+            if (content != null) {
+                try {
                     content.close();
-                } catch (IOException e)
-                {
+                } catch (IOException e) {
                 }
             }
         }

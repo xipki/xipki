@@ -44,8 +44,7 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "caalias-add",
         description = "add CA alias")
-public class CaAliasAddCmd extends CaCmd
-{
+public class CaAliasAddCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -60,8 +59,7 @@ public class CaAliasAddCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean b = caManager.addCaAlias(caAlias, caName);
         output(b, "added", "could not add",
                 "CA alias " + caAlias + " associated with CA " + caName);

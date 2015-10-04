@@ -61,8 +61,7 @@ import com.cloudbees.syslog.sender.UdpSyslogMessageSender;
  * @author Lijun Liao
  */
 
-public class SyslogAuditServiceImpl implements AuditService
-{
+public class SyslogAuditServiceImpl implements AuditService {
     private static final Logger LOG = LoggerFactory.getLogger(SyslogAuditServiceImpl.class);
 
     /**
@@ -108,58 +107,48 @@ public class SyslogAuditServiceImpl implements AuditService
 
     private boolean initialized;
 
-    public SyslogAuditServiceImpl()
-    {
+    public SyslogAuditServiceImpl() {
     }
 
     @Override
     public void logEvent(
-            final AuditEvent event)
-    {
-        if (event == null)
-        {
+            final AuditEvent event) {
+        if (event == null) {
             return;
         }
 
-        if (!initialized)
-        {
+        if (!initialized) {
             LOG.error("Syslog audit not initialiazed");
             return;
         }
 
         CharArrayWriter sb = new CharArrayWriter();
-        if (notEmpty(prefix))
-        {
+        if (notEmpty(prefix)) {
             sb.append(prefix);
         }
 
         AuditStatus status = event.getStatus();
-        if (status == null)
-        {
+        if (status == null) {
             status = AuditStatus.UNDEFINED;
         }
 
         sb.append("\tstatus: ").append(status.name());
 
         long duration = event.getDuration();
-        if (duration >= 0)
-        {
+        if (duration >= 0) {
             sb.append("\tduration: ").append(Long.toString(duration));
         }
 
         List<AuditEventData> eventDataArray = event.getEventDatas();
-        for (AuditEventData m : eventDataArray)
-        {
-            if (duration >= 0 && "duration".equalsIgnoreCase(m.getName()))
-            {
+        for (AuditEventData m : eventDataArray) {
+            if (duration >= 0 && "duration".equalsIgnoreCase(m.getName())) {
                 continue;
             }
             sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
         }
 
         final int n = sb.size();
-        if (n > maxMessageLength)
-        {
+        if (n > maxMessageLength) {
             LOG.warn("syslog message exceeds the maximal allowed length: {} > {}, ignore it",
                     n, maxMessageLength);
             return;
@@ -167,27 +156,23 @@ public class SyslogAuditServiceImpl implements AuditService
 
         SyslogMessage sm = new SyslogMessage();
         sm.setFacility(syslog.getDefaultFacility());
-        if (notEmpty(localname))
-        {
+        if (notEmpty(localname)) {
             sm.setHostname(localname);
         }
         sm.setAppName(event.getApplicationName());
         sm.setSeverity(getSeverity(event.getLevel()));
 
         Date timestamp = event.getTimestamp();
-        if (timestamp != null)
-        {
+        if (timestamp != null) {
             sm.setTimestamp(timestamp);
         }
 
         sm.setMsgId(event.getName());
         sm.setMsg(sb);
 
-        try
-        {
+        try {
             syslog.sendMessage(sm);
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             LOG.error("Could not send syslog message: " + e.getMessage());
             LOG.debug("Could not send syslog message", e);
         }
@@ -195,23 +180,19 @@ public class SyslogAuditServiceImpl implements AuditService
 
     @Override
     public void logEvent(
-            final PCIAuditEvent event)
-    {
-        if (event == null)
-        {
+            final PCIAuditEvent event) {
+        if (event == null) {
             return;
         }
 
-        if (!initialized)
-        {
+        if (!initialized) {
             LOG.error("Syslog audit not initialiazed");
             return;
         }
 
         CharArrayWriter msg = event.toCharArrayWriter(prefix);
         final int n = msg.size();
-        if (n > maxMessageLength)
-        {
+        if (n > maxMessageLength) {
             LOG.warn("syslog message exceeds the maximal allowed length: {} > {}, ignore it",
                     n, maxMessageLength);
             return;
@@ -219,67 +200,54 @@ public class SyslogAuditServiceImpl implements AuditService
 
         SyslogMessage sm = new SyslogMessage();
         sm.setFacility(syslog.getDefaultFacility());
-        if (notEmpty(localname))
-        {
+        if (notEmpty(localname)) {
             sm.setHostname(localname);
         }
 
         sm.setSeverity(getSeverity(event.getLevel()));
         sm.setMsg(msg);
 
-        try
-        {
+        try {
             syslog.sendMessage(sm);
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             LOG.error("Could not send syslog message: " + e.getMessage());
             LOG.debug("Could not send syslog message", e);
         }
     }
 
-    public void init()
-    {
-        if (initialized)
-        {
+    public void init() {
+        if (initialized) {
             return;
         }
 
         LOG.info("initializing: {}", SyslogAuditServiceImpl.class);
 
-        try
-        {
+        try {
             MessageFormat _messageFormat;
             if ("rfc3164".equalsIgnoreCase(messageFormat)
-                    || "rfc_3164".equalsIgnoreCase(messageFormat))
-            {
+                    || "rfc_3164".equalsIgnoreCase(messageFormat)) {
                 _messageFormat = MessageFormat.RFC_3164;
             } else if ("rfc5424".equalsIgnoreCase(messageFormat)
-                    || "rfc_5424".equalsIgnoreCase(messageFormat))
-            {
+                    || "rfc_5424".equalsIgnoreCase(messageFormat)) {
                 _messageFormat = MessageFormat.RFC_5424;
-            } else
-            {
+            } else {
                 LOG.warn("invalid message format '{}', use the default one '{}'",
                         messageFormat, DFLT_MESSAGE_FORMAT);
                 _messageFormat = MessageFormat.RFC_5424;
             }
 
-            if ("udp".equalsIgnoreCase(protocol))
-            {
+            if ("udp".equalsIgnoreCase(protocol)) {
                 syslog = new UdpSyslogMessageSender();
                 ((UdpSyslogMessageSender) syslog).setSyslogServerPort(port);
-            } else if ("tcp".equalsIgnoreCase(protocol))
-            {
+            } else if ("tcp".equalsIgnoreCase(protocol)) {
                 syslog = new TcpSyslogMessageSender();
                 ((TcpSyslogMessageSender) syslog).setSyslogServerPort(port);
                 ((TcpSyslogMessageSender) syslog).setSsl(ssl);
 
-                if (writeRetries > 0)
-                {
+                if (writeRetries > 0) {
                     ((TcpSyslogMessageSender) syslog).setMaxRetryCount(writeRetries);
                 }
-            } else
-            {
+            } else {
                 LOG.warn("unknown protocol '{}', use the default one 'udp'", this.protocol);
                 syslog = new UdpSyslogMessageSender();
                 ((UdpSyslogMessageSender) syslog).setSyslogServerPort(port);
@@ -289,19 +257,16 @@ public class SyslogAuditServiceImpl implements AuditService
             syslog.setMessageFormat(_messageFormat);
 
             Facility sysFacility = null;
-            if (notEmpty(facility))
-            {
+            if (notEmpty(facility)) {
                 sysFacility = Facility.fromLabel(facility.toUpperCase());
             }
 
-            if (sysFacility == null)
-            {
+            if (sysFacility == null) {
                 LOG.warn("unknown facility, use the default one '" + DFLT_SYSLOG_FACILITY);
                 sysFacility = Facility.fromLabel(DFLT_SYSLOG_FACILITY.toUpperCase());
             }
 
-            if (sysFacility == null)
-            {
+            if (sysFacility == null) {
                 throw new RuntimeException("should not reach here, sysFacility is null");
             }
 
@@ -311,109 +276,88 @@ public class SyslogAuditServiceImpl implements AuditService
             this.initialized = true;
             LOG.info("Initialized: {}", SyslogAuditServiceImpl.class);
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             LOG.error("error while configuring syslog sender: "  + e.toString());
         }
     }
 
-    public void destroy()
-    {
+    public void destroy() {
         LOG.info("destroying: {}", SyslogAuditServiceImpl.class);
         LOG.info("destroyed: {}", SyslogAuditServiceImpl.class);
     }
 
     public void setFacility(
-            final String facility)
-    {
+            final String facility) {
         this.facility = facility;
     }
 
     public void setHost(
-            final String host)
-    {
+            final String host) {
         this.host = host;
     }
 
     public void setPort(
-            final int port)
-    {
+            final int port) {
         this.port = port;
     }
 
     public void setProtocol(
-            final String protocol)
-    {
+            final String protocol) {
         this.protocol = protocol;
     }
 
     public void setLocalname(
-            final String localname)
-    {
+            final String localname) {
         this.localname = localname;
     }
 
     public void setMessageFormat(
-            final String messageFormat)
-    {
+            final String messageFormat) {
         this.messageFormat = messageFormat;
     }
 
     public void setWriteRetries(
-            final int writeRetries)
-    {
+            final int writeRetries) {
         this.writeRetries = writeRetries;
     }
 
     public void setPrefix(
-            final String prefix)
-    {
-        if (notEmpty(prefix))
-        {
-            if (prefix.charAt(prefix.length() - 1) != ' ')
-            {
+            final String prefix) {
+        if (notEmpty(prefix)) {
+            if (prefix.charAt(prefix.length() - 1) != ' ') {
                 this.prefix = prefix + " ";
             }
-        } else
-        {
+        } else {
             this.prefix = null;
         }
     }
 
     public void setMaxMessageLength(
-            final int maxMessageLength)
-    {
-        if (maxMessageLength <= 0)
-        {
+            final int maxMessageLength) {
+        if (maxMessageLength <= 0) {
             this.maxMessageLength = 1023;
-        } else
-        {
+        } else {
             this.maxMessageLength = maxMessageLength;
         }
     }
 
     public void setSsl(
-            final boolean ssl)
-    {
+            final boolean ssl) {
         this.ssl = ssl;
     }
 
     private static boolean notEmpty(
-            final String text)
-    {
+            final String text) {
         return text != null && !text.isEmpty();
     }
 
     private Severity getSeverity(
-            final AuditLevel auditLevel)
-    {
-        if (auditLevel == null)
-        {
+            final AuditLevel auditLevel) {
+        if (auditLevel == null) {
             return Severity.INFORMATIONAL;
         }
 
-        switch (auditLevel)
-        {
+        switch (auditLevel) {
         case DEBUG:
             return Severity.DEBUG;
         case INFO:

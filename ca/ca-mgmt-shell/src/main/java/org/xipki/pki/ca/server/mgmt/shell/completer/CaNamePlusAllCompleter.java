@@ -42,12 +42,10 @@ import java.util.Set;
  * @author Lijun Liao
  */
 
-public class CaNamePlusAllCompleter extends MgmtNameCompleter
-{
+public class CaNamePlusAllCompleter extends MgmtNameCompleter {
 
     @Override
-    protected Set<String> getEnums()
-    {
+    protected Set<String> getEnums() {
         Set<String> ret = new HashSet<>(caManager.getCaNames());
         ret.add("all");
         return ret;

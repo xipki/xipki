@@ -39,8 +39,7 @@ package org.xipki.pki.ca.server.mgmt.api;
  * @author Lijun Liao
  */
 
-public enum CertArt
-{
+public enum CertArt {
     X509PKC(1),
     X509AC(2),
     CVC(3);
@@ -48,23 +47,18 @@ public enum CertArt
     private final int code;
 
     private CertArt(
-            final int code)
-    {
+            final int code) {
         this.code = code;
     }
 
-    public int getCode()
-    {
+    public int getCode() {
         return code;
     }
 
     public static CertArt getInstance(
-            final int code)
-    {
-        for (CertArt value : values())
-        {
-            if (value.code == code)
-            {
+            final int code) {
+        for (CertArt value : values()) {
+            if (value.code == code) {
                 return value;
             }
         }

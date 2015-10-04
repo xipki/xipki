@@ -59,41 +59,32 @@ import org.xipki.pki.ca.dbtool.IDRange;
  * @author Lijun Liao
  */
 
-public class XipkiDigestExportReader
-{
+public class XipkiDigestExportReader {
     private static final Logger LOG = LoggerFactory.getLogger(XipkiDigestExportReader.class);
 
     private class Retriever
-    implements Runnable
-    {
+    implements Runnable {
         private Connection conn;
         private PreparedStatement selectCertStmt;
 
         public Retriever()
-        throws DataAccessException
-        {
+        throws DataAccessException {
             this.conn = datasource.getConnection();
-            try
-            {
+            try {
                 selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
-            } catch (DataAccessException e)
-            {
+            } catch (DataAccessException e) {
                 datasource.returnConnection(conn);
                 throw e;
             }
         }
 
         @Override
-        public void run()
-        {
-            while (!stop.get())
-            {
-                try
-                {
+        public void run() {
+            while (!stop.get()) {
+                try {
                     IDRange idRange = inQueue.take();
                     query(idRange);
-                } catch (InterruptedException e)
-                {
+                } catch (InterruptedException e) {
                     LOG.error("InterruptedException", e);
                 }
             }
@@ -104,20 +95,17 @@ public class XipkiDigestExportReader
         }
 
         private void query(
-                final IDRange idRange)
-        {
+                final IDRange idRange) {
             DigestDBEntrySet result = new DigestDBEntrySet(idRange.getFrom());
 
             ResultSet rs = null;
-            try
-            {
+            try {
                 selectCertStmt.setInt(1, idRange.getFrom());
                 selectCertStmt.setInt(2, idRange.getTo() + 1);
 
                 rs = selectCertStmt.executeQuery();
 
-                while (rs.next())
-                {
+                while (rs.next()) {
                     int caId = rs.getInt(dbControl.getColCaId());
                     int id = rs.getInt("ID");
                     String hash = rs.getString(dbControl.getColCerthash());
@@ -128,13 +116,11 @@ public class XipkiDigestExportReader
                     Long revTime = null;
                     Long revInvTime = null;
 
-                    if (revoked)
-                    {
+                    if (revoked) {
                         revReason = rs.getInt(dbControl.getColRevReason());
                         revTime = rs.getLong(dbControl.getColRevTime());
                         revInvTime = rs.getLong(dbControl.getColRevInvTime());
-                        if (revInvTime == 0)
-                        {
+                        if (revInvTime == 0) {
                             revInvTime = null;
                         }
                     }
@@ -146,16 +132,13 @@ public class XipkiDigestExportReader
 
                     result.addEntry(idCert);
                 }
-            } catch (Exception e)
-            {
-                if (e instanceof SQLException)
-                {
+            } catch (Exception e) {
+                if (e instanceof SQLException) {
                     e = datasource.translate(selectCertSql, (SQLException) e);
                 }
                 result.setException(e);
             }
-            finally
-            {
+            finally {
                 outQueue.add(result);
                 DbToolBase.releaseResources(null, rs);
             }
@@ -177,8 +160,7 @@ public class XipkiDigestExportReader
             final DataSourceWrapper datasource,
             final XipkiDbControl dbControl,
             final int numThreads)
-    throws Exception
-    {
+    throws Exception {
         this.datasource = datasource;
         this.numThreads = numThreads;
         this.dbControl = dbControl;
@@ -186,39 +168,32 @@ public class XipkiDigestExportReader
 
         retrievers = new ArrayList<>(numThreads);
 
-        for (int i = 0; i < numThreads; i++)
-        {
+        for (int i = 0; i < numThreads; i++) {
             Retriever retriever = new Retriever();
             retrievers.add(retriever);
         }
 
         executor = Executors.newFixedThreadPool(numThreads);
-        for (Runnable runnable : retrievers)
-        {
+        for (Runnable runnable : retrievers) {
             executor.execute(runnable);
         }
     }
 
     public List<IdentifiedDbDigestEntry> readCerts(List<IDRange> idRanges)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         int n = idRanges.size();
-        for (IDRange range : idRanges)
-        {
+        for (IDRange range : idRanges) {
             inQueue.add(range);
         }
 
         List<DigestDBEntrySet> results = new ArrayList<>(n);
         int numCerts = 0;
-        for (int i = 0; i < n; i++)
-        {
-            try
-            {
+        for (int i = 0; i < n; i++) {
+            try {
                 DigestDBEntrySet result = outQueue.take();
                 numCerts += result.getEntries().size();
                 results.add(result);
-            } catch (InterruptedException e)
-            {
+            } catch (InterruptedException e) {
                 throw new DataAccessException("InterruptedException " + e.getMessage(), e);
             }
         }
@@ -226,10 +201,8 @@ public class XipkiDigestExportReader
         Collections.sort(results);
         List<IdentifiedDbDigestEntry> ret = new ArrayList<>(numCerts);
 
-        for (DigestDBEntrySet result : results)
-        {
-            if (result.getException() != null)
-            {
+        for (DigestDBEntrySet result : results) {
+            if (result.getException() != null) {
                 throw new DataAccessException(
                         "error while reading from ID " + result.getStartId()
                             + ": " + result.getException().getMessage(),
@@ -242,13 +215,11 @@ public class XipkiDigestExportReader
         return ret;
     }
 
-    public int getNumThreads()
-    {
+    public int getNumThreads() {
         return numThreads;
     }
 
-    public void stop()
-    {
+    public void stop() {
         stop.set(true);
         executor.shutdownNow();
     }

@@ -42,16 +42,14 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class P10EnrollCertRequestType extends IdentifiedObject
-{
+public class P10EnrollCertRequestType extends IdentifiedObject {
     private final String certprofile;
     private final CertificationRequest p10Req;
 
     public P10EnrollCertRequestType(
             final String id,
             final String certprofile,
-            final CertificationRequest p10Req)
-    {
+            final CertificationRequest p10Req) {
         super(id);
         ParamUtil.assertNotNull("p10Req", p10Req);
         ParamUtil.assertNotBlank("certprofile", certprofile);
@@ -60,13 +58,11 @@ public class P10EnrollCertRequestType extends IdentifiedObject
         this.p10Req = p10Req;
     }
 
-    public CertificationRequest getP10Req()
-    {
+    public CertificationRequest getP10Req() {
         return p10Req;
     }
 
-    public String getCertprofile()
-    {
+    public String getCertprofile() {
         return certprofile;
     }
 }

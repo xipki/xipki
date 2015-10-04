@@ -51,8 +51,7 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-tk", name = "update-cert",
         description = "update certificate in PKCS#11 device")
-public class P11CertUpdateCmd extends P11SecurityCmd
-{
+public class P11CertUpdateCmd extends P11SecurityCmd {
 
     @Option(name = "--cert",
             required = true,
@@ -68,16 +67,13 @@ public class P11CertUpdateCmd extends P11SecurityCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
         X509Certificate newCert = X509Util.parseCert(certFile);
         Set<X509Certificate> caCerts = new HashSet<>();
-        if (isNotEmpty(caCertFiles))
-        {
-            for (String caCertFile : caCertFiles)
-            {
+        if (isNotEmpty(caCertFiles)) {
+            for (String caCertFile : caCertFiles) {
                 caCerts.add(X509Util.parseCert(caCertFile));
             }
         }

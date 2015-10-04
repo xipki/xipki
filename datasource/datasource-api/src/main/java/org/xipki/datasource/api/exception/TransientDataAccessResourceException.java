@@ -45,16 +45,14 @@ package org.xipki.datasource.api.exception;
  * @see java.sql.SQLTransientConnectionException
  */
 @SuppressWarnings("serial")
-public class TransientDataAccessResourceException extends TransientDataAccessException
-{
+public class TransientDataAccessResourceException extends TransientDataAccessException {
 
     /**
      * Constructor for TransientDataAccessResourceException.
      * @param msg the detail message
      */
     public TransientDataAccessResourceException(
-            final String msg)
-    {
+            final String msg) {
         super(msg);
     }
 
@@ -65,8 +63,7 @@ public class TransientDataAccessResourceException extends TransientDataAccessExc
      */
     public TransientDataAccessResourceException(
             final String msg,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(msg, cause);
     }
 

@@ -48,27 +48,23 @@ import org.xipki.scep.util.ScepUtil;
  * @author Lijun Liao
  */
 
-public class CAIdentifier
-{
+public class CAIdentifier {
     private final String url;
     private final String profile;
 
     public CAIdentifier(
             final String serverUrl,
             final String profile)
-    throws MalformedURLException
-    {
+    throws MalformedURLException {
         URL url = new URL(serverUrl);
         final String protocol = url.getProtocol();
         if (!protocol.equalsIgnoreCase("http")
-                && !protocol.equalsIgnoreCase("https"))
-        {
+                && !protocol.equalsIgnoreCase("https")) {
             throw new IllegalArgumentException(
                     "URL protocol should be HTTP or HTTPS, but not '" + protocol + "'");
         }
 
-        if (url.getQuery() != null)
-        {
+        if (url.getQuery() != null) {
             throw new IllegalArgumentException("URL should contain no query string");
         }
 
@@ -76,38 +72,31 @@ public class CAIdentifier
         this.profile = profile;
     }
 
-    public String getUrl()
-    {
+    public String getUrl() {
         return url;
     }
 
-    public String getProfile()
-    {
+    public String getProfile() {
         return profile;
     }
 
     public String buildGetUrl(
             final Operation operation)
-    throws TransactionException
-    {
+    throws TransactionException {
         return buildGetUrl(operation, null);
     }
 
     @SuppressWarnings("deprecation")
     public String buildGetUrl(
             final Operation operation,
-            final String message)
-    {
+            final String message) {
         StringBuilder ub = new StringBuilder(url);
         ub.append('?').append("operation=").append(operation.getCode());
-        if (!ScepUtil.isBlank(message))
-        {
+        if (!ScepUtil.isBlank(message)) {
             String _urlMessage;
-            try
-            {
+            try {
                 _urlMessage = URLEncoder.encode(message, "UTF-8");
-            } catch (UnsupportedEncodingException e)
-            {
+            } catch (UnsupportedEncodingException e) {
                 _urlMessage = URLEncoder.encode(message);
             }
             ub.append("&message=").append(_urlMessage);
@@ -116,20 +105,17 @@ public class CAIdentifier
     }
 
     public String buildPostUrl(
-            final Operation operation)
-    {
+            final Operation operation) {
         StringBuilder ub = new StringBuilder(url);
         ub.append('?').append("operation=").append(operation.getCode());
         return ub.toString();
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("URL: ").append(url);
-        if (ScepUtil.isNotBlank(profile))
-        {
+        if (ScepUtil.isNotBlank(profile)) {
             sb.append(", CA-Ident: ").append(profile);
         }
         return sb.toString();
@@ -137,10 +123,8 @@ public class CAIdentifier
 
     @Override
     public boolean equals(
-            final Object object)
-    {
-        if (object instanceof CAIdentifier)
-        {
+            final Object object) {
+        if (object instanceof CAIdentifier) {
             CAIdentifier b = (CAIdentifier) object;
             return url == b.url && profile == b.profile;
         }
@@ -148,8 +132,7 @@ public class CAIdentifier
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return toString().hashCode();
     }
 

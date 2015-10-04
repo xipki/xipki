@@ -46,28 +46,24 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class CertValidity implements Comparable<CertValidity>, Serializable
-{
+public class CertValidity implements Comparable<CertValidity>, Serializable {
     private static final long serialVersionUID = 1917871166917453960L;
 
     private static final long SECOND = 1000L;
     private static final TimeZone utc = TimeZone.getTimeZone("UTC");
 
-    public static enum Unit
-    {
+    public static enum Unit {
         YEAR("y"),
         DAY("d"),
         HOUR("h");
 
         private String suffix;
         private Unit(
-                String suffix)
-        {
+                String suffix) {
             this.suffix = suffix;
         }
 
-        public String getSuffix()
-        {
+        public String getSuffix() {
             return suffix;
         }
     }
@@ -76,40 +72,32 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
     private final Unit unit;
 
     public static CertValidity getInstance(
-            final String validityS)
-    {
+            final String validityS) {
         ParamUtil.assertNotBlank("validityS", validityS);
         final int len = validityS.length();
         final char suffix = validityS.charAt(len - 1);
         Unit unit;
         String numValdityS;
-        if (suffix == 'y' || suffix == 'Y')
-        {
+        if (suffix == 'y' || suffix == 'Y') {
             unit = Unit.YEAR;
             numValdityS = validityS.substring(0, len - 1);
-        } else if (suffix == 'd' || suffix == 'd')
-        {
+        } else if (suffix == 'd' || suffix == 'd') {
             unit = Unit.DAY;
             numValdityS = validityS.substring(0, len - 1);
-        } else if (suffix == 'h' || suffix == 'h')
-        {
+        } else if (suffix == 'h' || suffix == 'h') {
             unit = Unit.HOUR;
             numValdityS = validityS.substring(0, len - 1);
-        } else if (suffix >= '0' && suffix <= '9')
-        {
+        } else if (suffix >= '0' && suffix <= '9') {
             unit = Unit.DAY;
             numValdityS = validityS;
-        } else
-        {
+        } else {
             throw new IllegalArgumentException("invalid validityS: " + validityS);
         }
 
         int validity;
-        try
-        {
+        try {
             validity = Integer.parseInt(numValdityS);
-        } catch (NumberFormatException e)
-        {
+        } catch (NumberFormatException e) {
             throw new IllegalArgumentException("invalid validityS: " + validityS);
         }
         return new CertValidity(validity, unit);
@@ -117,10 +105,8 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
 
     public CertValidity(
             final int validity,
-            final Unit unit)
-    {
-        if (validity < 1)
-        {
+            final Unit unit) {
+        if (validity < 1) {
             throw new IllegalArgumentException("validity could not be less than 1");
         }
         ParamUtil.assertNotNull("unit", unit);
@@ -128,21 +114,17 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
         this.unit = unit;
     }
 
-    public int getValidity()
-    {
+    public int getValidity() {
         return validity;
     }
 
-    public Unit getUnit()
-    {
+    public Unit getUnit() {
         return unit;
     }
 
     public Date add(
-            final Date referenceDate)
-    {
-        switch (unit)
-        {
+            final Date referenceDate) {
+        switch (unit) {
         case HOUR:
             return new Date(referenceDate.getTime() + 60L * 60 * SECOND - SECOND);
         case DAY:
@@ -155,17 +137,13 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
 
             int month = c.get(Calendar.MONTH);
             // february
-            if (month == 1)
-            {
+            if (month == 1) {
                 int day = c.get(Calendar.DAY_OF_MONTH);
-                if (day > 28)
-                {
+                if (day > 28) {
                     int year = c.get(Calendar.YEAR);
-                    if (isLeapYear(year))
-                    {
+                    if (isLeapYear(year)) {
                         day = 29;
-                    } else
-                    {
+                    } else {
                         day = 28;
                     }
                 }
@@ -178,24 +156,18 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
     }
 
     private static boolean isLeapYear(
-            final int year)
-    {
-        if (year % 4 != 0)
-        {
+            final int year) {
+        if (year % 4 != 0) {
             return false;
-        } else if (year % 100 != 0)
-        {
+        } else if (year % 100 != 0) {
             return true;
-        } else
-        {
+        } else {
             return year % 400 == 0;
         }
     }
 
-    private int getApproxHours()
-    {
-        switch (unit)
-        {
+    private int getApproxHours() {
+        switch (unit) {
         case HOUR:
             return validity;
         case DAY:
@@ -208,34 +180,27 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return toString().hashCode();
     }
 
     @Override
     public int compareTo(
-            final CertValidity o)
-    {
-        if (unit == o.unit)
-        {
-            if (validity == o.validity)
-            {
+            final CertValidity o) {
+        if (unit == o.unit) {
+            if (validity == o.validity) {
                 return 0;
             }
 
             return (validity < o.validity)
                     ? -1
                     : 1;
-        } else
-        {
+        } else {
             int thisHours = getApproxHours();
             int thatHours = o.getApproxHours();
-            if (thisHours == thatHours)
-            {
+            if (thisHours == thatHours) {
                 return 0;
-            } else
-            {
+            } else {
                 return (thisHours < thatHours)
                         ? -1
                         : 1;
@@ -245,10 +210,8 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
 
     @Override
     public boolean equals(
-            final Object obj)
-    {
-        if (!(obj instanceof CertValidity))
-        {
+            final Object obj) {
+        if (!(obj instanceof CertValidity)) {
             return false;
         }
 
@@ -257,10 +220,8 @@ public class CertValidity implements Comparable<CertValidity>, Serializable
     }
 
     @Override
-    public String toString()
-    {
-        switch (unit)
-        {
+    public String toString() {
+        switch (unit) {
         case HOUR:
             return validity + "h";
         case DAY:

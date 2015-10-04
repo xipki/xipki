@@ -42,51 +42,42 @@ import org.xipki.security.api.CertRevocationInfo;
  * @author Lijun Liao
  */
 
-public class X509CertWithRevocationInfo
-{
+public class X509CertWithRevocationInfo {
     private X509CertWithDBCertId cert;
     private CertRevocationInfo revInfo;
     private String certprofile;
 
-    public X509CertWithRevocationInfo()
-    {
+    public X509CertWithRevocationInfo() {
     }
 
-    public X509CertWithDBCertId getCert()
-    {
+    public X509CertWithDBCertId getCert() {
         return cert;
     }
 
-    public boolean isRevoked()
-    {
+    public boolean isRevoked() {
         return revInfo != null;
     }
 
-    public CertRevocationInfo getRevInfo()
-    {
+    public CertRevocationInfo getRevInfo() {
         return revInfo;
     }
 
     public void setCert(
-            final X509CertWithDBCertId cert)
-    {
+            final X509CertWithDBCertId cert) {
         this.cert = cert;
     }
 
     public void setRevInfo(
-            final CertRevocationInfo revInfo)
-    {
+            final CertRevocationInfo revInfo) {
         this.revInfo = revInfo;
     }
 
-    public String getCertprofile()
-    {
+    public String getCertprofile() {
         return certprofile;
     }
 
     public void setCertprofile(
-            final String certprofile)
-    {
+            final String certprofile) {
         this.certprofile = certprofile;
     }
 

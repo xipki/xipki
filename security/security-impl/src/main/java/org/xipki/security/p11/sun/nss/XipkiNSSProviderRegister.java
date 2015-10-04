@@ -45,22 +45,16 @@ import org.xipki.common.util.LogUtil;
  * @author Lijun Liao
  */
 
-public class XipkiNSSProviderRegister
-{
+public class XipkiNSSProviderRegister {
     private static Logger LOG = LoggerFactory.getLogger(XipkiNSSProviderRegister.class);
-    public void regist()
-    {
-        if (Security.getProvider(XipkiNSSProvider.PROVIDER_NAME) == null)
-        {
-            try
-            {
+    public void regist() {
+        if (Security.getProvider(XipkiNSSProvider.PROVIDER_NAME) == null) {
+            try {
                 XipkiNSSProvider provider = new XipkiNSSProvider();
                 Security.addProvider(provider);
-            } catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 final String message = "could not add provider " + XipkiNSSProvider.PROVIDER_NAME;
-                if (LOG.isWarnEnabled())
-                {
+                if (LOG.isWarnEnabled()) {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                             t.getMessage());
                 }
@@ -69,10 +63,8 @@ public class XipkiNSSProviderRegister
         }
     }
 
-    public void unregist()
-    {
-        if (Security.getProperty(XipkiNSSProvider.PROVIDER_NAME) != null)
-        {
+    public void unregist() {
+        if (Security.getProperty(XipkiNSSProvider.PROVIDER_NAME) != null) {
             Security.removeProvider(XipkiNSSProvider.PROVIDER_NAME);
         }
     }

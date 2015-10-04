@@ -48,8 +48,7 @@ import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 
 @Command(scope = "xipki-ca", name = "capub-info",
         description = "show information of publisher in given CA")
-public class CaPublisherInfoCmd extends CaCmd
-{
+public class CaPublisherInfoCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -58,25 +57,20 @@ public class CaPublisherInfoCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
-        if (caManager.getCA(caName) == null)
-        {
+    throws Exception {
+        if (caManager.getCA(caName) == null) {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
 
         StringBuilder sb = new StringBuilder();
 
         List<PublisherEntry> entries = caManager.getPublishersForCA(caName);
-        if (isNotEmpty(entries))
-        {
+        if (isNotEmpty(entries)) {
             sb.append("publishers for CA " + caName).append("\n");
-            for (PublisherEntry entry  : entries)
-            {
+            for (PublisherEntry entry  : entries) {
                 sb.append("\t").append(entry.getName()).append("\n");
             }
-        } else
-        {
+        } else {
             sb.append("\tno publisher for CA " + caName + " is configured");
         }
 

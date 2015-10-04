@@ -53,16 +53,14 @@ import jline.console.ConsoleReader;
  * @author Lijun Liao
  */
 
-public class FileUtils
-{
+public class FileUtils {
 
     /**
      * The file copy buffer size (30 MB)
      */
     private static final long FILE_COPY_BUFFER_SIZE = 1024L * 1024 * 30;
 
-    private FileUtils()
-    {
+    private FileUtils() {
     }
 
     /**
@@ -76,20 +74,16 @@ public class FileUtils
      */
     public static void deleteDirectory(
             final File directory)
-    throws IOException
-    {
-        if (!directory.exists())
-        {
+    throws IOException {
+        if (!directory.exists()) {
             return;
         }
 
-        if (!isSymlink(directory))
-        {
+        if (!isSymlink(directory)) {
             cleanDirectory(directory);
         }
 
-        if (!directory.delete())
-        {
+        if (!directory.delete()) {
             throw new IOException("Unable to delete directory " + directory + ".");
         }
     }
@@ -115,22 +109,17 @@ public class FileUtils
      */
     public static boolean isSymlink(
             final File file)
-    throws IOException
-    {
-        if (file == null)
-        {
+    throws IOException {
+        if (file == null) {
             throw new NullPointerException("File must not be null");
         }
-        if (Configuration.isWindows())
-        {
+        if (Configuration.isWindows()) {
             return false;
         }
         File fileInCanonicalDir = null;
-        if (file.getParent() == null)
-        {
+        if (file.getParent() == null) {
             fileInCanonicalDir = file;
-        } else
-        {
+        } else {
             final File canonicalDir = file.getParentFile().getCanonicalFile();
             fileInCanonicalDir = new File(canonicalDir, file.getName());
         }
@@ -150,38 +139,30 @@ public class FileUtils
      */
     public static void cleanDirectory(
             final File directory)
-    throws IOException
-    {
-        if (!directory.exists())
-        {
+    throws IOException {
+        if (!directory.exists()) {
             throw new IllegalArgumentException(directory + " does not exist");
         }
 
-        if (!directory.isDirectory())
-        {
+        if (!directory.isDirectory()) {
             throw new IllegalArgumentException(directory + " is not a directory");
         }
 
         final File[] files = directory.listFiles();
-        if (files == null)
-        {  // null if security restricted
+        if (files == null) {  // null if security restricted
             throw new IOException("Failed to list contents of " + directory);
         }
 
         IOException exception = null;
-        for (final File file : files)
-        {
-            try
-            {
+        for (final File file : files) {
+            try {
                 forceDelete(file);
-            } catch (final IOException ioe)
-            {
+            } catch (final IOException ioe) {
                 exception = ioe;
             }
         }
 
-        if (null != exception)
-        {
+        if (null != exception) {
             throw exception;
         }
     }
@@ -205,18 +186,13 @@ public class FileUtils
      */
     public static void forceDelete(
             final File file)
-    throws IOException
-    {
-        if (file.isDirectory())
-        {
+    throws IOException {
+        if (file.isDirectory()) {
             deleteDirectory(file);
-        } else
-        {
+        } else {
             final boolean filePresent = file.exists();
-            if (!file.delete())
-            {
-                if (!filePresent)
-                {
+            if (!file.delete()) {
+                if (!filePresent) {
                     throw new FileNotFoundException("File does not exist: " + file);
                 }
                 throw new IOException("Unable to delete file: " + file);
@@ -249,10 +225,8 @@ public class FileUtils
             final File srcFile,
             final File destFile,
             final boolean preserveFileDate)
-    throws IOException
-    {
-        if (destFile.exists() && destFile.isDirectory())
-        {
+    throws IOException {
+        if (destFile.exists() && destFile.isDirectory()) {
             throw new IOException("Destination '" + destFile + "' exists but is a directory");
         }
 
@@ -260,8 +234,7 @@ public class FileUtils
         FileOutputStream fos = null;
         FileChannel input = null;
         FileChannel output = null;
-        try
-        {
+        try {
             fis = new FileInputStream(srcFile);
             fos = new FileOutputStream(destFile);
             input = fis.getChannel();
@@ -269,35 +242,30 @@ public class FileUtils
             final long size = input.size(); // TODO See IO-386
             long pos = 0;
             long count = 0;
-            while (pos < size)
-            {
+            while (pos < size) {
                 final long remain = size - pos;
                 count = (remain > FILE_COPY_BUFFER_SIZE)
                         ? FILE_COPY_BUFFER_SIZE
                         : remain;
                 final long bytesCopied = output.transferFrom(input, pos, count);
-                if (bytesCopied == 0)
-                {
+                if (bytesCopied == 0) {
                     // IO-385 - can happen if file is truncated after caching the size
                     break; // ensure we don't loop forever
                 }
                 pos += bytesCopied;
             }
-        } finally
-        {
+        } finally {
             closeQuietly(output, fos, input, fis);
         }
 
         final long srcLen = srcFile.length(); // TODO See IO-386
         final long dstLen = destFile.length(); // TODO See IO-386
-        if (srcLen != dstLen)
-        {
+        if (srcLen != dstLen) {
             throw new IOException("Failed to copy full contents from '"
                     + srcFile + "' to '" + destFile + "' Expected length: " + srcLen
                     + " Actual: " + dstLen);
         }
-        if (preserveFileDate)
-        {
+        if (preserveFileDate) {
             destFile.setLastModified(srcFile.lastModified());
         }
     }
@@ -305,8 +273,7 @@ public class FileUtils
     public static void copyDirectory(
             final File srcDir,
             final File destDir)
-    throws IOException
-    {
+    throws IOException {
         copyDirectory(srcDir, destDir, null, true, null);
     }
 
@@ -329,52 +296,40 @@ public class FileUtils
             final FileFilter filter,
             final boolean preserveFileDate,
             final List<String> exclusionList)
-    throws IOException
-    {
+    throws IOException {
         // recurse
         final File[] srcFiles = (filter == null)
                 ? srcDir.listFiles()
                 : srcDir.listFiles(filter);
-        if (srcFiles == null)
-        {  // null if abstract pathname does not denote a directory, or if an I/O error occurs
+        if (srcFiles == null) {  // null if abstract pathname does not denote a directory, or if an I/O error occurs
             throw new IOException("Failed to list contents of " + srcDir);
         }
-        if (destDir.exists())
-        {
-            if (!destDir.isDirectory())
-            {
+        if (destDir.exists()) {
+            if (!destDir.isDirectory()) {
                 throw new IOException("Destination '" + destDir
                         + "' exists but is not a directory");
             }
-        } else
-        {
-            if (!destDir.mkdirs() && !destDir.isDirectory())
-            {
+        } else {
+            if (!destDir.mkdirs() && !destDir.isDirectory()) {
                 throw new IOException("Destination '" + destDir + "' directory cannot be created");
             }
         }
-        if (!destDir.canWrite())
-        {
+        if (!destDir.canWrite()) {
             throw new IOException("Destination '" + destDir + "' cannot be written to");
         }
-        for (final File srcFile : srcFiles)
-        {
+        for (final File srcFile : srcFiles) {
             final File dstFile = new File(destDir, srcFile.getName());
-            if (exclusionList == null || !exclusionList.contains(srcFile.getCanonicalPath()))
-            {
-                if (srcFile.isDirectory())
-                {
+            if (exclusionList == null || !exclusionList.contains(srcFile.getCanonicalPath())) {
+                if (srcFile.isDirectory()) {
                     copyDirectory(srcFile, dstFile, filter, preserveFileDate, exclusionList);
-                } else
-                {
+                } else {
                     copyFile(srcFile, dstFile, preserveFileDate);
                 }
             }
         }
 
         // Do this last, as the above has probably affected directory metadata
-        if (preserveFileDate)
-        {
+        if (preserveFileDate) {
             destDir.setLastModified(srcDir.lastModified());
         }
     }
@@ -382,27 +337,21 @@ public class FileUtils
     public static boolean confirm(
             final ConsoleReader reader,
             final String prompt)
-    throws IOException
-    {
+    throws IOException {
         System.out.println(prompt);
         String answer = reader.readLine();
-        if (answer == null)
-        {
+        if (answer == null) {
             throw new IOException("interrupted");
         }
 
         int tries = 0;
 
-        while (tries < 3)
-        {
-            if ("yes".equalsIgnoreCase(answer))
-            {
+        while (tries < 3) {
+            if ("yes".equalsIgnoreCase(answer)) {
                 return true;
-            } else if ("no".equalsIgnoreCase(answer))
-            {
+            } else if ("no".equalsIgnoreCase(answer)) {
                 return false;
-            } else
-            {
+            } else {
                 tries++;
                 System.out.println("Please answer with yes or no. ");
             }
@@ -417,31 +366,24 @@ public class FileUtils
      * @param closeables
      */
     public static void closeQuietly(
-            final Closeable... closeables)
-    {
-        if (closeables == null)
-        {
+            final Closeable... closeables) {
+        if (closeables == null) {
             return;
         }
-        for (final Closeable closeable : closeables)
-        {
+        for (final Closeable closeable : closeables) {
             doCloseQuietly(closeable);
         }
     }
 
     private static void doCloseQuietly(
-            final Closeable closable)
-    {
-        if (closable == null)
-        {
+            final Closeable closable) {
+        if (closable == null) {
             return;
         }
 
-        try
-        {
+        try {
             closable.close();
-        } catch (Throwable t)
-        {
+        } catch (Throwable t) {
         }
     }
 

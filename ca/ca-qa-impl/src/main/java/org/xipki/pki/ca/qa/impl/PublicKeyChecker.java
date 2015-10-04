@@ -70,8 +70,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public class PublicKeyChecker
-{
+public class PublicKeyChecker {
     private static final Logger LOG = LoggerFactory.getLogger(PublicKeyChecker.class);
     private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
 
@@ -79,22 +78,17 @@ public class PublicKeyChecker
 
     public PublicKeyChecker(
             final X509ProfileType conf)
-    throws CertprofileException
-    {
-        try
-        {
+    throws CertprofileException {
+        try {
             // KeyAlgorithms
-            if (conf.getKeyAlgorithms() != null)
-            {
+            if (conf.getKeyAlgorithms() != null) {
                 this.keyAlgorithms = XmlX509CertprofileUtil.buildKeyAlgorithms(
                         conf.getKeyAlgorithms());
             }
 
-        } catch (RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             final String message = "RuntimeException";
-            if (LOG.isErrorEnabled())
-            {
+            if (LOG.isErrorEnabled()) {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
             }
@@ -106,19 +100,15 @@ public class PublicKeyChecker
 
     public List<ValidationIssue> checkPublicKey(
             final SubjectPublicKeyInfo publicKey,
-            final SubjectPublicKeyInfo requestedPublicKey)
-    {
+            final SubjectPublicKeyInfo requestedPublicKey) {
         List<ValidationIssue> resultIssues = new LinkedList<>();
-        if (keyAlgorithms != null)
-        {
+        if (keyAlgorithms != null) {
             ValidationIssue issue = new ValidationIssue("X509.PUBKEY.SYN",
                     "whether the public key in certificate is permitted");
             resultIssues.add(issue);
-            try
-            {
+            try {
                 checkPublicKey(publicKey);
-            } catch (BadCertTemplateException e)
-            {
+            } catch (BadCertTemplateException e) {
                 issue.setFailureMessage(e.getMessage());
             }
         }
@@ -127,16 +117,13 @@ public class PublicKeyChecker
                 "X509.PUBKEY.REQ", "whether public key matches the request one");
         resultIssues.add(issue);
         SubjectPublicKeyInfo c14nRequestedPublicKey;
-        try
-        {
+        try {
             c14nRequestedPublicKey = X509Util.toRfc3279Style(requestedPublicKey);
-            if (!c14nRequestedPublicKey.equals(publicKey))
-            {
+            if (!c14nRequestedPublicKey.equals(publicKey)) {
                 issue.setFailureMessage(
                         "public key in the certificate does not equal the requested one");
             }
-        } catch (InvalidKeySpecException e)
-        {
+        } catch (InvalidKeySpecException e) {
             issue.setFailureMessage("public key in request is invalid");
         }
 
@@ -145,130 +132,105 @@ public class PublicKeyChecker
 
     private void checkPublicKey(
             final SubjectPublicKeyInfo publicKey)
-    throws BadCertTemplateException
-    {
-        if (CollectionUtil.isEmpty(keyAlgorithms))
-        {
+    throws BadCertTemplateException {
+        if (CollectionUtil.isEmpty(keyAlgorithms)) {
             return;
         }
 
         ASN1ObjectIdentifier keyType = publicKey.getAlgorithm().getAlgorithm();
-        if (!keyAlgorithms.containsKey(keyType))
-        {
+        if (!keyAlgorithms.containsKey(keyType)) {
             throw new BadCertTemplateException("key type " + keyType.getId() + " is not permitted");
         }
 
         KeyParametersOption keyParamsOption = keyAlgorithms.get(keyType);
-        if (keyParamsOption instanceof AllowAllParametersOption)
-        {
+        if (keyParamsOption instanceof AllowAllParametersOption) {
             return;
-        } else if (keyParamsOption instanceof ECParamatersOption)
-        {
+        } else if (keyParamsOption instanceof ECParamatersOption) {
             ECParamatersOption ecOption = (ECParamatersOption) keyParamsOption;
             // parameters
             ASN1Encodable algParam = publicKey.getAlgorithm().getParameters();
             ASN1ObjectIdentifier curveOid;
 
-            if (algParam instanceof ASN1ObjectIdentifier)
-            {
+            if (algParam instanceof ASN1ObjectIdentifier) {
                 curveOid = (ASN1ObjectIdentifier) algParam;
-                if (!ecOption.allowsCurve(curveOid))
-                {
+                if (!ecOption.allowsCurve(curveOid)) {
                     throw new BadCertTemplateException("EC curve "
                             + SecurityUtil.getCurveName(curveOid)
                             + " (OID: " + curveOid.getId() + ") is not allowed");
                 }
-            } else
-            {
+            } else {
                 throw new BadCertTemplateException(
                         "only namedCurve or implictCA EC public key is supported");
             }
 
             // point encoding
-            if (ecOption.getPointEncodings() != null)
-            {
+            if (ecOption.getPointEncodings() != null) {
                 byte[] keyData = publicKey.getPublicKeyData().getBytes();
-                if (keyData.length < 1)
-                {
+                if (keyData.length < 1) {
                     throw new BadCertTemplateException("invalid publicKeyData");
                 }
                 byte pointEncoding = keyData[0];
-                if (!ecOption.getPointEncodings().contains(pointEncoding))
-                {
+                if (!ecOption.getPointEncodings().contains(pointEncoding)) {
                     throw new BadCertTemplateException(
                             "unaccepted EC point encoding " + pointEncoding);
                 }
             }
 
-            try
-            {
+            try {
                 checkECSubjectPublicKeyInfo(curveOid, publicKey.getPublicKeyData().getBytes());
-            } catch (BadCertTemplateException e)
-            {
+            } catch (BadCertTemplateException e) {
                 throw e;
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 LOG.debug("populateFromPubKeyInfo", e);
                 throw new BadCertTemplateException("invalid public key: " + e.getMessage());
             }
 
             return;
-        } else if (keyParamsOption instanceof RSAParametersOption)
-        {
+        } else if (keyParamsOption instanceof RSAParametersOption) {
             RSAParametersOption rsaOption = (RSAParametersOption) keyParamsOption;
 
             ASN1Integer modulus;
-            try
-            {
+            try {
                 ASN1Sequence seq = ASN1Sequence.getInstance(
                         publicKey.getPublicKeyData().getBytes());
                 modulus = ASN1Integer.getInstance(seq.getObjectAt(0));
-            } catch (IllegalArgumentException e)
-            {
+            } catch (IllegalArgumentException e) {
                 throw new BadCertTemplateException("invalid publicKeyData");
             }
 
             int modulusLength = modulus.getPositiveValue().bitLength();
-            if ((rsaOption.allowsModulusLength(modulusLength)))
-            {
+            if ((rsaOption.allowsModulusLength(modulusLength))) {
                 return;
             }
-        } else if (keyParamsOption instanceof DSAParametersOption)
-        {
+        } else if (keyParamsOption instanceof DSAParametersOption) {
             DSAParametersOption dsaOption = (DSAParametersOption) keyParamsOption;
             ASN1Encodable params = publicKey.getAlgorithm().getParameters();
-            if (params == null)
-            {
+            if (params == null) {
                 throw new BadCertTemplateException("null Dss-Parms is not permitted");
             }
 
             int pLength;
             int qLength;
 
-            try
-            {
+            try {
                 ASN1Sequence seq = ASN1Sequence.getInstance(params);
                 ASN1Integer p = ASN1Integer.getInstance(seq.getObjectAt(0));
                 ASN1Integer q = ASN1Integer.getInstance(seq.getObjectAt(1));
                 pLength = p.getPositiveValue().bitLength();
                 qLength = q.getPositiveValue().bitLength();
-            } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException e)
-            {
+            } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
                 throw new BadCertTemplateException("illegal Dss-Parms");
             }
 
             boolean match = dsaOption.allowsPLength(pLength);
-            if (match)
-            {
+            if (match) {
                 match = dsaOption.allowsQLength(qLength);
             }
 
-            if (match)
-            {
+            if (match) {
                 return;
             }
-        } else
-        {
+        } else {
             String txt = (keyParamsOption == null)
                     ? "null"
                     : keyParamsOption.getClass().getName();
@@ -281,34 +243,27 @@ public class PublicKeyChecker
     private static void checkECSubjectPublicKeyInfo(
             final ASN1ObjectIdentifier curveOid,
             final byte[] encoded)
-    throws BadCertTemplateException
-    {
+    throws BadCertTemplateException {
         Integer expectedLength = ecCurveFieldSizes.get(curveOid);
-        if (expectedLength == null)
-        {
+        if (expectedLength == null) {
             X9ECParameters ecP = ECUtil.getNamedCurveByOid(curveOid);
             ECCurve curve = ecP.getCurve();
             expectedLength = (curve.getFieldSize() + 7) / 8;
             ecCurveFieldSizes.put(curveOid, expectedLength);
         }
 
-        switch (encoded[0])
-        {
+        switch (encoded[0]) {
         case 0x02: // compressed
-        case 0x03: // compressed
-        {
-            if (encoded.length != (expectedLength + 1))
-            {
+        case 0x03: { // compressed
+            if (encoded.length != (expectedLength + 1)) {
                 throw new BadCertTemplateException("incorrect length for compressed encoding");
             }
             break;
         }
         case 0x04: // uncompressed
         case 0x06: // hybrid
-        case 0x07: // hybrid
-        {
-            if (encoded.length != (2 * expectedLength + 1))
-            {
+        case 0x07: { // hybrid
+            if (encoded.length != (2 * expectedLength + 1)) {
                 throw new BadCertTemplateException(
                         "incorrect length for uncompressed/hybrid encoding");
             }

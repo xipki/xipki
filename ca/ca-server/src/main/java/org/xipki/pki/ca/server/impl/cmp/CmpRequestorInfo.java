@@ -44,40 +44,34 @@ import org.xipki.pki.ca.server.mgmt.api.CAHasRequestorEntry;
  * @author Lijun Liao
  */
 
-public class CmpRequestorInfo implements RequestorInfo
-{
+public class CmpRequestorInfo implements RequestorInfo {
     private final CAHasRequestorEntry caHasRequestor;
     private final X509CertWithDBCertId cert;
 
     public CmpRequestorInfo(
             final CAHasRequestorEntry caHasRequestor,
-            final X509CertWithDBCertId cert)
-    {
+            final X509CertWithDBCertId cert) {
         ParamUtil.assertNotNull("caHasRequestor", caHasRequestor);
         ParamUtil.assertNotNull("cert", cert);
         this.caHasRequestor = caHasRequestor;
         this.cert = cert;
     }
 
-    public CAHasRequestorEntry getCaHasRequestor()
-    {
+    public CAHasRequestorEntry getCaHasRequestor() {
         return caHasRequestor;
     }
 
-    public X509CertWithDBCertId getCert()
-    {
+    public X509CertWithDBCertId getCert() {
         return cert;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return caHasRequestor.getRequestorName();
     }
 
     @Override
-    public boolean isRA()
-    {
+    public boolean isRA() {
         return caHasRequestor.isRa();
     }
 

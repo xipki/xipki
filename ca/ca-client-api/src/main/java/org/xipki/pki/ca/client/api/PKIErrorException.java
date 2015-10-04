@@ -42,8 +42,7 @@ import org.xipki.security.api.util.SecurityUtil;
  * @author Lijun Liao
  */
 
-public class PKIErrorException extends Exception
-{
+public class PKIErrorException extends Exception {
     private static final long serialVersionUID = 1L;
 
     private final int status;
@@ -51,22 +50,19 @@ public class PKIErrorException extends Exception
     private final String statusMessage;
 
     public PKIErrorException(
-            final PKIStatusInfo statusInfo)
-    {
+            final PKIStatusInfo statusInfo) {
         this(new org.xipki.pki.ca.common.cmp.PKIStatusInfo(statusInfo));
     }
 
     public PKIErrorException(
-            final org.xipki.pki.ca.common.cmp.PKIStatusInfo statusInfo)
-    {
+            final org.xipki.pki.ca.common.cmp.PKIStatusInfo statusInfo) {
         this(statusInfo.getStatus(), statusInfo.getPkiFailureInfo(), statusInfo.getStatusMessage());
     }
 
     public PKIErrorException(
             final int status,
             final int pkiFailureInfo,
-            final String statusMessage)
-    {
+            final String statusMessage) {
         super(SecurityUtil.formatPKIStatusInfo(status, pkiFailureInfo, statusMessage));
         this.status = status;
         this.pkiFailureInfo = pkiFailureInfo;
@@ -74,25 +70,21 @@ public class PKIErrorException extends Exception
     }
 
     public PKIErrorException(
-            final int status)
-    {
+            final int status) {
         this.status = status;
         this.pkiFailureInfo = 0;
         this.statusMessage = null;
     }
 
-    public int getStatus()
-    {
+    public int getStatus() {
         return status;
     }
 
-    public int getPkiFailureInfo()
-    {
+    public int getPkiFailureInfo() {
         return pkiFailureInfo;
     }
 
-    public String getStatusMessage()
-    {
+    public String getStatusMessage() {
         return statusMessage;
     }
 

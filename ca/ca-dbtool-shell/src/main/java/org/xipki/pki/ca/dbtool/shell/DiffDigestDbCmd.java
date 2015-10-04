@@ -53,8 +53,7 @@ import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
 @Command(scope = "xipki-db", name = "diff-digest-db",
         description = "diff digest XiPKI/EJBCA database")
-public class DiffDigestDbCmd extends DbPortCmd
-{
+public class DiffDigestDbCmd extends DbPortCmd {
     @Option(name = "--ref-db",
             description = "database configuration file of the reference system\n"
                     + "(one of--ref-db and--ref-dir must be specified)")
@@ -101,14 +100,11 @@ public class DiffDigestDbCmd extends DbPortCmd
     private PasswordResolver passwordResolver;
 
     protected DbPortWorker getDbPortWorker()
-    throws Exception
-    {
+    throws Exception {
         Set<byte[]> cACerts = null;
-        if (caCertFiles != null && !caCertFiles.isEmpty())
-        {
+        if (caCertFiles != null && !caCertFiles.isEmpty()) {
             cACerts = new HashSet<>(caCertFiles.size());
-            for (String fileName : caCertFiles)
-            {
+            for (String fileName : caCertFiles) {
                 cACerts.add(IoUtil.read(fileName));
             }
         }
@@ -128,14 +124,12 @@ public class DiffDigestDbCmd extends DbPortCmd
     }
 
     public void setDataSourceFactory(
-            final DataSourceFactory dataSourceFactory)
-    {
+            final DataSourceFactory dataSourceFactory) {
         this.dataSourceFactory = dataSourceFactory;
     }
 
     public void setPasswordResolver(
-            final PasswordResolver passwordResolver)
-    {
+            final PasswordResolver passwordResolver) {
         this.passwordResolver = passwordResolver;
     }
 

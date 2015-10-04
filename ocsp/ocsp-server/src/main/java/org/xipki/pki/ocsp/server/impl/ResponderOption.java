@@ -47,8 +47,7 @@ import org.xipki.pki.ocsp.server.impl.jaxb.ResponderType;
  * @author Lijun Liao
  */
 
-class ResponderOption
-{
+class ResponderOption {
     private final OCSPMode mode;
     private final boolean inheritCaRevocation;
     private final String requestOptionName;
@@ -61,17 +60,13 @@ class ResponderOption
 
     public ResponderOption(
             final ResponderType conf)
-    throws InvalidConfException
-    {
+    throws InvalidConfException {
         String s = conf.getMode();
-        if (s == null || "RFC6960".equalsIgnoreCase(s))
-        {
+        if (s == null || "RFC6960".equalsIgnoreCase(s)) {
             this.mode = OCSPMode.RFC6960;
-        } else if ("RFC2560".equalsIgnoreCase(s))
-        {
+        } else if ("RFC2560".equalsIgnoreCase(s)) {
             this.mode = OCSPMode.RFC2560;
-        } else
-        {
+        } else {
             throw new InvalidConfException("invalid OCSP mode '" + s + "'");
         }
 
@@ -85,22 +80,17 @@ class ResponderOption
         List<String> list = new ArrayList<>(conf.getStores().getStore());
         this.storeNames = Collections.unmodifiableList(list);
 
-        if (conf.getServletPaths() == null)
-        {
+        if (conf.getServletPaths() == null) {
             this.servletPaths = Collections.emptyList();
-        } else
-        {
+        } else {
             List<String> paths = conf.getServletPaths().getServletPath();
-            for (String path : paths)
-            {
+            for (String path : paths) {
                 int n = path.length();
-                if (n > 0 && path.charAt(0) == '/')
-                {
+                if (n > 0 && path.charAt(0) == '/') {
                     throw new InvalidConfException(
                             "servlet path '" + path + "' must not start with '/'");
                 }
-                if (n > 1 && path.charAt(n - 1) == '/')
-                {
+                if (n > 1 && path.charAt(n - 1) == '/') {
                     throw new InvalidConfException(
                             "servlet path '" + path + "' must not end with '/'");
                 }
@@ -110,48 +100,39 @@ class ResponderOption
         }
     }
 
-    public OCSPMode getMode()
-    {
+    public OCSPMode getMode() {
         return mode;
     }
 
-    public boolean isInheritCaRevocation()
-    {
+    public boolean isInheritCaRevocation() {
         return inheritCaRevocation;
     }
 
-    public String getSignerName()
-    {
+    public String getSignerName() {
         return signerName;
     }
 
-    public String getRequestOptionName()
-    {
+    public String getRequestOptionName() {
         return requestOptionName;
     }
 
-    public String getResponseOptionName()
-    {
+    public String getResponseOptionName() {
         return responseOptionName;
     }
 
-    public String getAuditOptionName()
-    {
+    public String getAuditOptionName() {
         return auditOptionName;
     }
 
-    public List<String> getStoreNames()
-    {
+    public List<String> getStoreNames() {
         return storeNames;
     }
 
-    public String getCertprofileOptionName()
-    {
+    public String getCertprofileOptionName() {
         return certprofileOptionName;
     }
 
-    public List<String> getServletPaths()
-    {
+    public List<String> getServletPaths() {
         return servletPaths;
     }
 

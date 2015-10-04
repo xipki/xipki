@@ -44,8 +44,7 @@ import org.xipki.pki.ca.dbtool.diffdb.internal.CertsBundle;
  * @author Lijun Liao
  */
 
-public interface DigestReader
-{
+public interface DigestReader {
     X509Certificate getCaCert();
 
     String getCaSubjectName();

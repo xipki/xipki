@@ -45,12 +45,10 @@ import org.xipki.security.api.KeyUsage;
  * @author Lijun Liao
  */
 
-public abstract class AbstractCAX509Certprofile extends BaseX509Certprofile
-{
+public abstract class AbstractCAX509Certprofile extends BaseX509Certprofile {
     protected Set<KeyUsageControl> keyUsages;
 
-    public AbstractCAX509Certprofile()
-    {
+    public AbstractCAX509Certprofile() {
         Set<KeyUsageControl> keyUsages = new HashSet<>();
         keyUsages.add(new KeyUsageControl(KeyUsage.keyCertSign, true));
         keyUsages.add(new KeyUsageControl(KeyUsage.cRLSign, false));
@@ -58,14 +56,12 @@ public abstract class AbstractCAX509Certprofile extends BaseX509Certprofile
     }
 
     @Override
-    public boolean isCA()
-    {
+    public boolean isCA() {
         return true;
     }
 
     @Override
-    public Set<KeyUsageControl> getKeyUsage()
-    {
+    public Set<KeyUsageControl> getKeyUsage() {
         return keyUsages;
     }
 

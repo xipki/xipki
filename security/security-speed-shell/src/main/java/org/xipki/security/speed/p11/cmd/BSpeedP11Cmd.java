@@ -44,8 +44,7 @@ import org.xipki.security.speed.cmd.BatchSpeedCmd;
  * @author Lijun Liao
  */
 
-public abstract class BSpeedP11Cmd extends BatchSpeedCmd
-{
+public abstract class BSpeedP11Cmd extends BatchSpeedCmd {
 
     @Option(name = "--slot",
             required = true,
@@ -57,8 +56,7 @@ public abstract class BSpeedP11Cmd extends BatchSpeedCmd
             description = "Name of the PKCS#11 module.")
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
-    protected P11SlotIdentifier getSlotId()
-    {
+    protected P11SlotIdentifier getSlotId() {
         return new P11SlotIdentifier(slotIndex, null);
     }
 

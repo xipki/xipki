@@ -53,8 +53,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  * @author Lijun Liao
  */
 
-public interface SecurityFactory
-{
+public interface SecurityFactory {
     String DEFAULT_P11MODULE_NAME = "default";
 
     Set<String> getPkcs11ModuleNames();

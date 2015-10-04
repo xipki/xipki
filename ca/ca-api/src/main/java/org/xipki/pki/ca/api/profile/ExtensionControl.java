@@ -39,8 +39,7 @@ package org.xipki.pki.ca.api.profile;
  * @author Lijun Liao
  */
 
-public class ExtensionControl
-{
+public class ExtensionControl {
     private final boolean critical;
     private final boolean required;
     private final boolean request;
@@ -48,25 +47,21 @@ public class ExtensionControl
     public ExtensionControl(
             final boolean critical,
             final boolean required,
-            final boolean request)
-    {
+            final boolean request) {
         this.critical = critical;
         this.required = required;
         this.request = request;
     }
 
-    public boolean isCritical()
-    {
+    public boolean isCritical() {
         return critical;
     }
 
-    public boolean isRequired()
-    {
+    public boolean isRequired() {
         return required;
     }
 
-    public boolean isRequest()
-    {
+    public boolean isRequest() {
         return request;
     }
 }

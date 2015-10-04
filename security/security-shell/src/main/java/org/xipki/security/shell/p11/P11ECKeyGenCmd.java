@@ -47,8 +47,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
 
 @Command(scope = "xipki-tk", name = "ec",
         description = "generate EC keypair in PKCS#11 device")
-public class P11ECKeyGenCmd extends P11KeyGenCmd
-{
+public class P11ECKeyGenCmd extends P11KeyGenCmd {
     @Option(name = "--curve",
             required = true,
             description = "EC curve name\n"
@@ -57,15 +56,12 @@ public class P11ECKeyGenCmd extends P11KeyGenCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        if (noCert)
-        {
+        if (noCert) {
             P11KeyIdentifier keyId = slot.generateECKeypair(curveName, label);
             finalize(keyId);
-        } else
-        {
+        } else {
             P11KeypairGenerationResult keyAndCert = slot.generateECDSAKeypairAndCert(
                     curveName, label, getSubject(),
                     getKeyUsage(), getExtendedKeyUsage());

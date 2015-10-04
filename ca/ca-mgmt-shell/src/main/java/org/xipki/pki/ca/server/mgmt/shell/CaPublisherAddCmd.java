@@ -46,8 +46,7 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "capub-add",
         description = "add publisher to CA")
-public class CaPublisherAddCmd extends CaCmd
-{
+public class CaPublisherAddCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -62,10 +61,8 @@ public class CaPublisherAddCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
-        for (String publisherName : publisherNames)
-        {
+    throws Exception {
+        for (String publisherName : publisherNames) {
             boolean b = caManager.addPublisherToCA(publisherName, caName);
             output(b, "added", "could not add", "publisher " + publisherName + " to CA " + caName);
         }

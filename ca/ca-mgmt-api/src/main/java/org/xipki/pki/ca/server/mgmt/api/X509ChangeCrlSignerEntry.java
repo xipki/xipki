@@ -44,8 +44,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class X509ChangeCrlSignerEntry implements Serializable
-{
+public class X509ChangeCrlSignerEntry implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String name;
@@ -56,58 +55,48 @@ public class X509ChangeCrlSignerEntry implements Serializable
 
     public X509ChangeCrlSignerEntry(
             final String name)
-    throws InvalidConfException
-    {
+    throws InvalidConfException {
         ParamUtil.assertNotBlank("name", name);
         this.name = name;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getSignerType()
-    {
+    public String getSignerType() {
         return signerType;
     }
 
     public void setSignerType(
-            final String signerType)
-    {
+            final String signerType) {
         this.signerType = signerType;
     }
 
-    public String getSignerConf()
-    {
+    public String getSignerConf() {
         return signerConf;
     }
 
     public void setSignerConf(
-            final String signerConf)
-    {
+            final String signerConf) {
         this.signerConf = signerConf;
     }
 
-    public String getBase64Cert()
-    {
+    public String getBase64Cert() {
         return base64Cert;
     }
 
     public void setBase64Cert(
-            final String base64Cert)
-    {
+            final String base64Cert) {
         this.base64Cert = base64Cert;
     }
 
-    public String getCrlControl()
-    {
+    public String getCrlControl() {
         return crlControl;
     }
 
     public void setCrlControl(
-            final String crlControl)
-    {
+            final String crlControl) {
         this.crlControl = crlControl;
     }
 

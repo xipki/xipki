@@ -44,16 +44,14 @@ package org.xipki.datasource.api.exception;
  * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public class CannotAcquireLockException extends PessimisticLockingFailureException
-{
+public class CannotAcquireLockException extends PessimisticLockingFailureException {
 
     /**
      * Constructor for could notAcquireLockException.
      * @param msg the detail message
      */
     public CannotAcquireLockException(
-            final String msg)
-    {
+            final String msg) {
         super(msg);
     }
 
@@ -64,8 +62,7 @@ public class CannotAcquireLockException extends PessimisticLockingFailureExcepti
      */
     public CannotAcquireLockException(
             final String msg,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(msg, cause);
     }
 

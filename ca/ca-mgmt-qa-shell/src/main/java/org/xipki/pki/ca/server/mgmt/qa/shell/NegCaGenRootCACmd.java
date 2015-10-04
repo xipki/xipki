@@ -45,19 +45,15 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-gen-rca",
         description = "generate selfsigned CA (negative, QA)")
-public class NegCaGenRootCACmd extends CaGenRootCACmd
-{
+public class NegCaGenRootCACmd extends CaGenRootCACmd {
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("neg-gen-rca");
 
-        try
-        {
+        try {
             super._doExecute();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return null;
         }
 

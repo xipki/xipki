@@ -56,8 +56,7 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "jscep", name = "certpoll",
         description = "poll certificate")
-public class CertPollCmd extends ClientCmd
-{
+public class CertPollCmd extends ClientCmd {
     @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request file\n"
@@ -72,8 +71,7 @@ public class CertPollCmd extends ClientCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(p10File));
 
         Client client = getScepClient();
@@ -84,20 +82,17 @@ public class CertPollCmd extends ClientCmd
                 getIdentityKey(),
                 new X500Principal(csr.getSubject().getEncoded()),
                 transId);
-        if (resp.isFailure())
-        {
+        if (resp.isFailure()) {
             throw new CmdFailure("server returned 'failure'");
         }
 
-        if (resp.isPending())
-        {
+        if (resp.isPending()) {
             throw new CmdFailure("server returned 'pending'");
         }
 
         X509Certificate cert = extractEECerts(resp.getCertStore());
 
-        if (cert == null)
-        {
+        if (cert == null) {
             throw new Exception("received no certificate");
         }
 

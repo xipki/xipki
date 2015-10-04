@@ -46,56 +46,45 @@ import org.xipki.common.util.CollectionUtil;
  * @author Lijun Liao
  */
 
-public class CertprofileOption
-{
+public class CertprofileOption {
     private final Set<String> includes;
     private final Set<String> excludes;
 
     public CertprofileOption(
             final Collection<String> includes,
-            final Collection<String> excludes)
-    {
-        if (CollectionUtil.isEmpty(includes))
-        {
+            final Collection<String> excludes) {
+        if (CollectionUtil.isEmpty(includes)) {
             this.includes = null;
-        } else
-        {
+        } else {
             this.includes = Collections.unmodifiableSet(
                     new HashSet<>(includes));
         }
 
-        if (CollectionUtil.isEmpty(excludes))
-        {
+        if (CollectionUtil.isEmpty(excludes)) {
             this.excludes = null;
-        } else
-        {
+        } else {
             this.excludes = Collections.unmodifiableSet(
                     new HashSet<>(excludes));
         }
     }
 
-    public Set<String> getIncludes()
-    {
+    public Set<String> getIncludes() {
         return includes;
     }
 
-    public Set<String> getExcludes()
-    {
+    public Set<String> getExcludes() {
         return excludes;
     }
 
     public boolean include(
-            final String certprofile)
-    {
-        if (includes == null)
-        {
+            final String certprofile) {
+        if (includes == null) {
             return (excludes == null)
                     ? true
                     : !excludes.contains(certprofile);
         }
 
-        if (!includes.contains(certprofile))
-        {
+        if (!includes.contains(certprofile)) {
             return false;
         }
 

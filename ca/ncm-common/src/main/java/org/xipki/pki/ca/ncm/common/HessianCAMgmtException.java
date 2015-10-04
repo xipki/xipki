@@ -41,13 +41,11 @@ import org.xipki.pki.ca.server.mgmt.api.CAMgmtException;
  * @author Lijun Liao
  */
 
-public class HessianCAMgmtException extends CAMgmtException
-{
+public class HessianCAMgmtException extends CAMgmtException {
     private static final long serialVersionUID = 1L;
 
     public HessianCAMgmtException(
-            final String message)
-    {
+            final String message) {
         super(message);
     }
 }

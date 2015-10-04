@@ -88,8 +88,7 @@ import com.caucho.hessian.server.HessianServlet;
  */
 
 public class CAManagerServlet extends HessianServlet
-implements HessianCAManager
-{
+implements HessianCAManager {
     private static final Logger LOG = LoggerFactory.getLogger(CAManagerServlet.class);
 
     private static final long serialVersionUID = 1L;
@@ -102,25 +101,21 @@ implements HessianCAManager
     private SecurityFactory securityFactory;
     private Set<X509Certificate> trustedUserCerts = new HashSet<>();
 
-    public CAManagerServlet()
-    {
+    public CAManagerServlet() {
     }
 
     public  void setCaManager(
-            CAManager caManager)
-    {
+            CAManager caManager) {
         this.caManager = caManager;
     }
 
     @Override
-    public CASystemStatus getCASystemStatus()
-    {
+    public CASystemStatus getCASystemStatus() {
         return caManager.getCASystemStatus();
     }
 
     @Override
-    public boolean unlockCA()
-    {
+    public boolean unlockCA() {
         return caManager.unlockCA();
     }
 
@@ -128,13 +123,10 @@ implements HessianCAManager
     public boolean publishRootCA(
             final String caName,
             final String certprofile)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.publishRootCA(caName, certprofile);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -143,13 +135,10 @@ implements HessianCAManager
     public boolean republishCertificates(
             final String caName,
             final List<String> publisherNames)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.republishCertificates(caName, publisherNames);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -158,13 +147,10 @@ implements HessianCAManager
     public boolean clearPublishQueue(
             final String caName,
             final List<String> publisherNames)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.clearPublishQueue(caName, publisherNames);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -172,32 +158,25 @@ implements HessianCAManager
     @Override
     public boolean removeCA(
             final String caName)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.removeCA(caName);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
 
     @Override
-    public boolean restartCaSystem()
-    {
+    public boolean restartCaSystem() {
         return caManager.restartCaSystem();
     }
 
     @Override
     public boolean notifyCAChange()
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.notifyCAChange();
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -206,13 +185,10 @@ implements HessianCAManager
     public boolean addCaAlias(
             final String aliasName,
             final String caName)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.addCaAlias(aliasName, caName);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -220,110 +196,90 @@ implements HessianCAManager
     @Override
     public boolean removeCaAlias(
             final String aliasName)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.removeCaAlias(aliasName);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
 
     @Override
     public Set<String> getAliasesForCA(
-            final String caName)
-    {
+            final String caName) {
         return caManager.getAliasesForCA(caName);
     }
 
     @Override
     public String getCaName(
-            final String aliasName)
-    {
+            final String aliasName) {
         return caManager.getCaNameForAlias(aliasName);
     }
 
     @Override
-    public Set<String> getCaAliasNames()
-    {
+    public Set<String> getCaAliasNames() {
         return caManager.getCaAliasNames();
     }
 
     @Override
-    public Set<String> getCertprofileNames()
-    {
+    public Set<String> getCertprofileNames() {
         return caManager.getCertprofileNames();
     }
 
     @Override
-    public Set<String> getPublisherNames()
-    {
+    public Set<String> getPublisherNames() {
         return caManager.getPublisherNames();
     }
 
     @Override
-    public Set<String> getCmpRequestorNames()
-    {
+    public Set<String> getCmpRequestorNames() {
         return caManager.getCmpRequestorNames();
     }
 
     @Override
-    public Set<String> getCmpResponderNames()
-    {
+    public Set<String> getCmpResponderNames() {
         return caManager.getCmpResponderNames();
     }
 
     @Override
-    public Set<String> getCrlSignerNames()
-    {
+    public Set<String> getCrlSignerNames() {
         return caManager.getCrlSignerNames();
     }
 
     @Override
-    public Set<String> getCmpControlNames()
-    {
+    public Set<String> getCmpControlNames() {
         return caManager.getCmpControlNames();
     }
 
     @Override
-    public Set<String> getCaNames()
-    {
+    public Set<String> getCaNames() {
         return caManager.getCaNames();
     }
 
     @Override
     public boolean addCA(
             final CAEntry newCaDbEntry)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.addCA(newCaDbEntry);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
 
     @Override
     public CAEntry getCA(
-            final String caName)
-    {
+            final String caName) {
         return caManager.getCA(caName);
     }
 
     @Override
     public boolean changeCA(
             final ChangeCAEntry changeCAentry)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.changeCA(changeCAentry);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -332,13 +288,10 @@ implements HessianCAManager
     public boolean removeCertprofileFromCA(
             final String profileName,
             final String caName)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.removeCertprofileFromCA(profileName, caName);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -348,13 +301,10 @@ implements HessianCAManager
             final String profileName,
             final String profileLocalname,
             final String caName)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.addCertprofileToCA(profileName, profileLocalname, caName);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -363,13 +313,10 @@ implements HessianCAManager
     public boolean removePublisherFromCA(
             final String publisherName,
             final String caName)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.removePublisherFromCA(publisherName, caName);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -378,48 +325,39 @@ implements HessianCAManager
     public boolean addPublisherToCA(
             final String publisherName,
             final String caName)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.addPublisherToCA(publisherName, caName);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
 
     @Override
     public Map<String, String> getCertprofilesForCA(
-            final String caName)
-    {
+            final String caName) {
         return caManager.getCertprofilesForCA(caName);
     }
 
     @Override
     public Set<CAHasRequestorEntry> getCmpRequestorsForCA(
-            final String caName)
-    {
+            final String caName) {
         return caManager.getCmpRequestorsForCA(caName);
     }
 
     @Override
     public CmpRequestorEntry getCmpRequestor(
-            final String name)
-    {
+            final String name) {
         return caManager.getCmpRequestor(name);
     }
 
     @Override
     public boolean addCmpRequestor(
             final CmpRequestorEntry dbEntry)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.addCmpRequestor(dbEntry);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -427,13 +365,10 @@ implements HessianCAManager
     @Override
     public boolean removeCmpRequestor(
             final String requestorName)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.removeCmpRequestor(requestorName);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -442,13 +377,10 @@ implements HessianCAManager
     public boolean changeCmpRequestor(
             final String name,
             final String base64Cert)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.changeCmpRequestor(name, base64Cert);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -457,13 +389,10 @@ implements HessianCAManager
     public boolean removeCmpRequestorFromCA(
             final String requestorName,
             final String caName)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.removeCmpRequestorFromCA(requestorName, caName);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -472,34 +401,27 @@ implements HessianCAManager
     public boolean addCmpRequestorToCA(
             final CAHasRequestorEntry requestor,
             final String caName)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.addCmpRequestorToCA(requestor, caName);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
 
     @Override
     public CertprofileEntry getCertprofile(
-            final String profileName)
-    {
+            final String profileName) {
         return caManager.getCertprofile(profileName);
     }
 
     @Override
     public boolean removeCertprofile(
             final String profileName)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.removeCertprofile(profileName);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -509,13 +431,10 @@ implements HessianCAManager
             final String name,
             final String type,
             final String conf)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.changeCertprofile(name, type, conf);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -523,13 +442,10 @@ implements HessianCAManager
     @Override
     public boolean addCertprofile(
             final CertprofileEntry dbEntry)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.addCertprofile(dbEntry);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -537,13 +453,10 @@ implements HessianCAManager
     @Override
     public boolean addCmpResponder(
             final CmpResponderEntry dbEntry)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.addCmpResponder(dbEntry);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -551,13 +464,10 @@ implements HessianCAManager
     @Override
     public boolean removeCmpResponder(
             final String name)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.removeCmpResponder(name);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -568,33 +478,26 @@ implements HessianCAManager
             final String type,
             final String conf,
             final String base64Cert)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.changeCmpResponder(name, type, conf, base64Cert);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
 
     @Override
-    public CmpResponderEntry getCmpResponder(String name)
-    {
+    public CmpResponderEntry getCmpResponder(String name) {
         return caManager.getCmpResponder(name);
     }
 
     @Override
     public boolean addCrlSigner(
             final X509CrlSignerEntry dbEntry)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.addCrlSigner(dbEntry);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -602,13 +505,10 @@ implements HessianCAManager
     @Override
     public boolean removeCrlSigner(
             final String crlSignerName)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.removeCrlSigner(crlSignerName);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -616,62 +516,50 @@ implements HessianCAManager
     @Override
     public boolean changeCrlSigner(
             final X509ChangeCrlSignerEntry dbEntry)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.changeCrlSigner(dbEntry);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
 
     @Override
     public X509CrlSignerEntry getCrlSigner(
-            final String name)
-    {
+            final String name) {
         return caManager.getCrlSigner(name);
     }
 
     @Override
     public boolean addPublisher(
             final PublisherEntry dbEntry)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.addPublisher(dbEntry);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
 
     @Override
     public List<PublisherEntry> getPublishersForCA(
-            final String caName)
-    {
+            final String caName) {
         return caManager.getPublishersForCA(caName);
     }
 
     @Override
     public PublisherEntry getPublisher(
-            final String publisherName)
-    {
+            final String publisherName) {
         return caManager.getPublisher(publisherName);
     }
 
     @Override
     public boolean removePublisher(
             final String publisherName)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.removePublisher(publisherName);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -681,34 +569,27 @@ implements HessianCAManager
             final String name,
             final String type,
             final String conf)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.changePublisher(name, type, conf);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
 
     @Override
     public CmpControlEntry getCmpControl(
-            final String name)
-    {
+            final String name) {
         return caManager.getCmpControl(name);
     }
 
     @Override
     public boolean addCmpControl(
             final CmpControlEntry dbEntry)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.addCmpControl(dbEntry);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -716,13 +597,10 @@ implements HessianCAManager
     @Override
     public boolean removeCmpControl(
             final String name)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.removeCmpControl(name);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -731,27 +609,22 @@ implements HessianCAManager
     public boolean changeCmpControl(
             final String name,
             final String conf)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.changeCmpControl(name, conf);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
 
     @Override
-    public Set<String> getEnvParamNames()
-    {
+    public Set<String> getEnvParamNames() {
         return caManager.getEnvParamNames();
     }
 
     @Override
     public String getEnvParam(
-            final String name)
-    {
+            final String name) {
         return caManager.getEnvParam(name);
     }
 
@@ -759,13 +632,10 @@ implements HessianCAManager
     public boolean addEnvParam(
             final String name,
             final String value)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.addEnvParam(name, value);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -773,13 +643,10 @@ implements HessianCAManager
     @Override
     public boolean removeEnvParam(
             final String envParamName)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.removeEnvParam(envParamName);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -788,13 +655,10 @@ implements HessianCAManager
     public boolean changeEnvParam(
             final String name,
             final String value)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.changeEnvParam(name, value);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -803,13 +667,10 @@ implements HessianCAManager
     public boolean revokeCa(
             final String caName,
             final CertRevocationInfo revocationInfo)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.revokeCa(caName, revocationInfo);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -817,13 +678,10 @@ implements HessianCAManager
     @Override
     public boolean unrevokeCa(
             final String caName)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.unrevokeCa(caName);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -834,13 +692,10 @@ implements HessianCAManager
             final BigInteger serialNumber,
             final CRLReason reason,
             final Date invalidityTime)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.revokeCertificate(caName, serialNumber, reason, invalidityTime);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -849,13 +704,10 @@ implements HessianCAManager
     public boolean unrevokeCertificate(
             final String caName,
             final BigInteger serialNumber)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.unrevokeCertificate(caName, serialNumber);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -864,13 +716,10 @@ implements HessianCAManager
     public boolean removeCertificate(
             final String caName,
             final BigInteger serialNumber)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.removeCertificate(caName, serialNumber);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -881,18 +730,14 @@ implements HessianCAManager
             final String profileName,
             final String user,
             final byte[] encodedPkcs10Request)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             X509Certificate cert = caManager.generateCertificate(caName, profileName, user,
                     encodedPkcs10Request);
             return cert.getEncoded();
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
-        } catch (CertificateEncodingException e)
-        {
+        } catch (CertificateEncodingException e) {
             throw new HessianCAMgmtException("could not encode generated certificate: "
                     + e.getMessage());
         }
@@ -903,23 +748,18 @@ implements HessianCAManager
             final X509CAEntry caEntry,
             final String certprofileName,
             final byte[] p10Req)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.generateRootCA(caEntry, certprofileName, p10Req);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
 
     @Override
     public String getAttribute(
-            final String attributeKey)
-    {
-        if ("version".equalsIgnoreCase(attributeKey))
-        {
+            final String attributeKey) {
+        if ("version".equalsIgnoreCase(attributeKey)) {
             return "1";
         }
         return null;
@@ -928,13 +768,10 @@ implements HessianCAManager
     @Override
     public boolean addUser(
             final AddUserEntry userEntry)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.addUser(userEntry);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -942,13 +779,10 @@ implements HessianCAManager
     @Override
     public UserEntry getUser(
             final String username)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.getUser(username);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -958,13 +792,10 @@ implements HessianCAManager
             final String username,
             final String password,
             final String cnRegex)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.changeUser(username, password, cnRegex);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -972,13 +803,10 @@ implements HessianCAManager
     @Override
     public boolean removeUser(
             final String username)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.removeUser(username);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -986,13 +814,10 @@ implements HessianCAManager
     @Override
     public boolean addScep(
             final ScepEntry scepEntry)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.addScep(scepEntry);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -1000,13 +825,10 @@ implements HessianCAManager
     @Override
     public boolean removeScep(
             final String name)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.removeScep(name);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -1014,33 +836,26 @@ implements HessianCAManager
     @Override
     public boolean changeScep(
             final ChangeScepEntry scepEntry)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.changeScep(scepEntry);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
 
     @Override
-    public Set<String> getScepNames()
-    {
+    public Set<String> getScepNames() {
         return caManager.getScepNames();
     }
 
     @Override
     public ScepEntry getScepEntry(
             final String name)
-    throws HessianCAMgmtException
-    {
-        try
-        {
+    throws HessianCAMgmtException {
+        try {
             return caManager.getScepEntry(name);
-        } catch (CAMgmtException e)
-        {
+        } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
     }
@@ -1049,26 +864,22 @@ implements HessianCAManager
     public void service(
             final ServletRequest request,
             final ServletResponse response)
-    throws IOException, ServletException
-    {
+    throws IOException, ServletException {
         X509Certificate[] certs = (X509Certificate[]) request.getAttribute(
                 "javax.servlet.request.X509Certificate");
         X509Certificate clientCert = (certs == null || certs.length < 1)
                 ? null
                 : certs[0];
 
-        if (clientCert == null)
-        {
+        if (clientCert == null) {
             String msg = "not authorizated (not in TLS session)";
             LOG.info(msg);
             throw new ServletException(msg);
         }
 
-        if (!trustedUserCerts.contains(clientCert))
-        {
+        if (!trustedUserCerts.contains(clientCert)) {
             String msg = "untrusted TLS client certificate ";
-            if (LOG.isInfoEnabled())
-            {
+            if (LOG.isInfoEnabled()) {
                 LOG.info(msg + "with subject='{}', issuer='{}' and serialNumber={}",
                         new Object[]{clientCert.getSubjectX500Principal().getName(),
                         clientCert.getIssuerX500Principal().getName(),
@@ -1080,55 +891,44 @@ implements HessianCAManager
         super.service(request, response);
     }
 
-    public void initialize()
-    {
-        if (truststoreFile == null)
-        {
+    public void initialize() {
+        if (truststoreFile == null) {
             LOG.error("truststoreFile is not set");
             return;
         }
 
-        if (truststorePassword == null)
-        {
+        if (truststorePassword == null) {
             LOG.error("truststorePassword is not set");
             return;
         }
 
-        try
-        {
+        try {
             String storePath = IoUtil.expandFilepath(truststoreFile);
 
             KeyStore keyStore;
-            if (truststoreProvider == null || truststoreProvider.trim().length() == 0)
-            {
+            if (truststoreProvider == null || truststoreProvider.trim().length() == 0) {
                 keyStore = KeyStore.getInstance(truststoreType);
-            } else
-            {
+            } else {
                 keyStore = KeyStore.getInstance(truststoreType, truststoreProvider);
             }
 
             char[] password;
-            if (securityFactory.getPasswordResolver() == null)
-            {
+            if (securityFactory.getPasswordResolver() == null) {
                 password = truststorePassword.toCharArray();
-            } else
-            {
+            } else {
                 password = securityFactory.getPasswordResolver().resolvePassword(
                         truststorePassword);
             }
             keyStore.load(new FileInputStream(storePath), password);
             Enumeration<String> aliases = keyStore.aliases();
 
-            while (aliases.hasMoreElements())
-            {
+            while (aliases.hasMoreElements()) {
                 String alias = aliases.nextElement();
                 Certificate cert = keyStore.getCertificate(alias);
-                if (cert instanceof X509Certificate)
-                {
+                if (cert instanceof X509Certificate) {
                     X509Certificate x509Cert = (X509Certificate) cert;
                     trustedUserCerts.add(x509Cert);
-                    if (LOG.isInfoEnabled())
-                    {
+                    if (LOG.isInfoEnabled()) {
                         LOG.info("added trusted user certificate with subject='{}', issuer='{}'"
                                 + " and serialNumber={}",
                                 new Object[]{x509Cert.getSubjectX500Principal().getName(),
@@ -1137,11 +937,9 @@ implements HessianCAManager
                     }
                 }
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             final String message = "could not initialize CAManagerServlet";
-            if (LOG.isErrorEnabled())
-            {
+            if (LOG.isErrorEnabled()) {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
             }
@@ -1149,38 +947,32 @@ implements HessianCAManager
         }
     }
 
-    public void shutdown()
-    {
+    public void shutdown() {
         trustedUserCerts.clear();
     }
 
     public  void setTruststoreFile(
-            final String truststoreFile)
-    {
+            final String truststoreFile) {
         this.truststoreFile = truststoreFile;
     }
 
     public  void setTruststoreType(
-            final String truststoreType)
-    {
+            final String truststoreType) {
         this.truststoreType = truststoreType;
     }
 
     public  void setTruststoreProvider(
-            final String truststoreProvider)
-    {
+            final String truststoreProvider) {
         this.truststoreProvider = truststoreProvider;
     }
 
     public  void setTruststorePassword(
-            final String truststorePassword)
-    {
+            final String truststorePassword) {
         this.truststorePassword = truststorePassword;
     }
 
     public  void setSecurityFactory(
-            final SecurityFactory securityFactory)
-    {
+            final SecurityFactory securityFactory) {
         this.securityFactory = securityFactory;
     }
 

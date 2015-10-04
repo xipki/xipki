@@ -44,15 +44,13 @@ import org.xipki.security.P12RawKeypairGenerator.RSAKeypairGenerator;
  * @author Lijun Liao
  */
 
-public class P12RSAKeyGenLoadTest extends P12KeyGenLoadTest
-{
+public class P12RSAKeyGenLoadTest extends P12KeyGenLoadTest {
     private final RSAKeypairGenerator kpGen;
 
     public P12RSAKeyGenLoadTest(
             final int keysize,
             final BigInteger publicExponent)
-    throws Exception
-    {
+    throws Exception {
         super("PKCS#12 RSA key generation\n"
                 + "keysize: " + keysize + "\n"
                 + "public exponent: " + publicExponent);
@@ -61,8 +59,7 @@ public class P12RSAKeyGenLoadTest extends P12KeyGenLoadTest
     }
 
     @Override
-    protected P12RawKeypairGenerator getKeypairGenerator()
-    {
+    protected P12RawKeypairGenerator getKeypairGenerator() {
         return kpGen;
     }
 }

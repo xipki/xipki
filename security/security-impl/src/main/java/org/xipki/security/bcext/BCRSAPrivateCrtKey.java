@@ -57,8 +57,7 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.KeyUtil;
 
 public class BCRSAPrivateCrtKey
     extends BCRSAPrivateKey
-    implements RSAPrivateCrtKey
-{
+    implements RSAPrivateCrtKey {
     static final long serialVersionUID = 7834723820638524718L;
 
     private BigInteger  publicExponent;
@@ -74,8 +73,7 @@ public class BCRSAPrivateCrtKey
      * @param key the parameters object representing the private key.
      */
     public BCRSAPrivateCrtKey(
-            final RSAPrivateCrtKeyParameters key)
-    {
+            final RSAPrivateCrtKeyParameters key) {
         super(key);
 
         this.publicExponent = key.getPublicExponent();
@@ -92,8 +90,7 @@ public class BCRSAPrivateCrtKey
      * @param spec the spec to be used in construction.
      */
     public BCRSAPrivateCrtKey(
-            final RSAPrivateCrtKeySpec spec)
-    {
+            final RSAPrivateCrtKeySpec spec) {
         this.modulus = spec.getModulus();
         this.publicExponent = spec.getPublicExponent();
         this.privateExponent = spec.getPrivateExponent();
@@ -110,8 +107,7 @@ public class BCRSAPrivateCrtKey
      * @param key the object implementing the RSAPrivateCrtKey interface.
      */
     public BCRSAPrivateCrtKey(
-            final RSAPrivateCrtKey key)
-    {
+            final RSAPrivateCrtKey key) {
         this.modulus = key.getModulus();
         this.publicExponent = key.getPublicExponent();
         this.privateExponent = key.getPrivateExponent();
@@ -127,8 +123,7 @@ public class BCRSAPrivateCrtKey
      */
     public BCRSAPrivateCrtKey(
             final PrivateKeyInfo info)
-    throws IOException
-    {
+    throws IOException {
         this(RSAPrivateKey.getInstance(info.parsePrivateKey()));
     }
 
@@ -136,8 +131,7 @@ public class BCRSAPrivateCrtKey
      * construct an RSA key from a ASN.1 RSA private key object.
      */
     public BCRSAPrivateCrtKey(
-            final RSAPrivateKey key)
-    {
+            final RSAPrivateKey key) {
         this.modulus = key.getModulus();
         this.publicExponent = key.getPublicExponent();
         this.privateExponent = key.getPrivateExponent();
@@ -153,8 +147,7 @@ public class BCRSAPrivateCrtKey
      *
      * @return the encoding format we produce in getEncoded().
      */
-    public String getFormat()
-    {
+    public String getFormat() {
         return "PKCS#8";
     }
 
@@ -164,8 +157,7 @@ public class BCRSAPrivateCrtKey
      *
      * @return a PKCS8 representation of the key.
      */
-    public byte[] getEncoded()
-    {
+    public byte[] getEncoded() {
         AlgorithmIdentifier algId = new AlgorithmIdentifier(
                 PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
         RSAPrivateKey key = new RSAPrivateKey(
@@ -180,8 +172,7 @@ public class BCRSAPrivateCrtKey
      *
      * @return the public exponent.
      */
-    public BigInteger getPublicExponent()
-    {
+    public BigInteger getPublicExponent() {
         return publicExponent;
     }
 
@@ -190,8 +181,7 @@ public class BCRSAPrivateCrtKey
      *
      * @return the prime P.
      */
-    public BigInteger getPrimeP()
-    {
+    public BigInteger getPrimeP() {
         return primeP;
     }
 
@@ -200,8 +190,7 @@ public class BCRSAPrivateCrtKey
      *
      * @return the prime Q.
      */
-    public BigInteger getPrimeQ()
-    {
+    public BigInteger getPrimeQ() {
         return primeQ;
     }
 
@@ -210,8 +199,7 @@ public class BCRSAPrivateCrtKey
      *
      * @return the prime exponent for P.
      */
-    public BigInteger getPrimeExponentP()
-    {
+    public BigInteger getPrimeExponentP() {
         return primeExponentP;
     }
 
@@ -220,8 +208,7 @@ public class BCRSAPrivateCrtKey
      *
      * @return the prime exponent for Q.
      */
-    public BigInteger getPrimeExponentQ()
-    {
+    public BigInteger getPrimeExponentQ() {
         return primeExponentQ;
     }
 
@@ -230,27 +217,22 @@ public class BCRSAPrivateCrtKey
      *
      * @return the CRT coefficient.
      */
-    public BigInteger getCrtCoefficient()
-    {
+    public BigInteger getCrtCoefficient() {
         return crtCoefficient;
     }
 
-    public int hashCode()
-    {
+    public int hashCode() {
         return this.getModulus().hashCode()
                 ^ this.getPublicExponent().hashCode()
                 ^ this.getPrivateExponent().hashCode();
     }
 
-    public boolean equals(Object o)
-    {
-        if (o == this)
-        {
+    public boolean equals(Object o) {
+        if (o == this) {
             return true;
         }
 
-        if (!(o instanceof RSAPrivateCrtKey))
-        {
+        if (!(o instanceof RSAPrivateCrtKey)) {
             return false;
         }
 
@@ -266,8 +248,7 @@ public class BCRSAPrivateCrtKey
             && this.getCrtCoefficient().equals(key.getCrtCoefficient());
     }
 
-    public String toString()
-    {
+    public String toString() {
         StringBuilder    buf = new StringBuilder();
         String          nl = System.getProperty("line.separator");
 

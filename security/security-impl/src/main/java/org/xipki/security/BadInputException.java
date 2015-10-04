@@ -39,31 +39,26 @@ package org.xipki.security;
  * @author Lijun Liao
  */
 
-public class BadInputException extends Exception
-{
+public class BadInputException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public BadInputException()
-    {
+    public BadInputException() {
     }
 
     public BadInputException(
-            final String message)
-    {
+            final String message) {
         super(message);
     }
 
     public BadInputException(
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(cause);
     }
 
     public BadInputException(
             final String message,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(message, cause);
     }
 

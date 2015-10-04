@@ -74,8 +74,7 @@ import sun.security.pkcs11.wrapper.PKCS11Exception;
  */
 
 @SuppressWarnings("restriction")
-public final class SunP11CryptService implements P11CryptService
-{
+public final class SunP11CryptService implements P11CryptService {
     private static final Logger LOG = LoggerFactory.getLogger(SunP11CryptService.class);
 
     private final ConcurrentSkipListSet<SunP11Identity> identities =
@@ -87,16 +86,13 @@ public final class SunP11CryptService implements P11CryptService
 
     public static SunP11CryptService getInstance(
             final P11ModuleConf moduleConf)
-    throws SignerException
-    {
+    throws SignerException {
         SunNamedCurveExtender.addNamedCurves();
 
-        synchronized (instances)
-        {
+        synchronized (instances) {
             final String name = moduleConf.getName();
             SunP11CryptService instance = instances.get(name);
-            if (instance == null)
-            {
+            if (instance == null) {
                 instance = new SunP11CryptService(moduleConf);
                 instances.put(name, instance);
             }
@@ -107,8 +103,7 @@ public final class SunP11CryptService implements P11CryptService
 
     private SunP11CryptService(
             final P11ModuleConf moduleConf)
-    throws SignerException
-    {
+    throws SignerException {
         ParamUtil.assertNotNull("moduleConf", moduleConf);
         this.moduleConf = moduleConf;
 
@@ -118,39 +113,31 @@ public final class SunP11CryptService implements P11CryptService
         Provider xipkiProv = null;
         Provider[] providers = Security.getProviders();
         int n = providers.length;
-        for (int i = 0; i < n; i++)
-        {
+        for (int i = 0; i < n; i++) {
             String name = providers[i].getName();
-            if ("SunEC".equals(name))
-            {
+            if ("SunEC".equals(name)) {
                 idx_sunec = i;
-            } else if (XipkiSunECProvider.NAME.equals(name))
-            {
+            } else if (XipkiSunECProvider.NAME.equals(name)) {
                 xipkiProv = providers[i];
                 idx_xipki = i;
             }
         }
 
-        if (idx_sunec != -1)
-        {
-            if (xipkiProv == null)
-            {
+        if (idx_sunec != -1) {
+            if (xipkiProv == null) {
                 xipkiProv = new XipkiSunECProvider();
                 idx_xipki = providers.length;
-            } else if (idx_sunec < idx_xipki)
-            {
+            } else if (idx_sunec < idx_xipki) {
                 Security.removeProvider(XipkiSunECProvider.NAME);
             }
 
-            if (idx_sunec < idx_xipki)
-            {
+            if (idx_sunec < idx_xipki) {
                 Security.insertProviderAt(xipkiProv, idx_sunec + 1);
             }
 
             providers = Security.getProviders();
             n = providers.length;
-            for (int i = 0; i < n; i++)
-            {
+            for (int i = 0; i < n; i++) {
                 String name = providers[i].getName();
                 LOG.info("provider[" + i + "]: " + name);
             }
@@ -161,8 +148,7 @@ public final class SunP11CryptService implements P11CryptService
 
     @Override
     public synchronized void refresh()
-    throws SignerException
-    {
+    throws SignerException {
         final String nativeLib = moduleConf.getNativeLibrary();
 
         Set<SunP11Identity> currentIdentifies = new HashSet<>();
@@ -172,23 +158,18 @@ public final class SunP11CryptService implements P11CryptService
 
         long[] slotList = allSlots(nativeLib);
 
-        for (int i = 0; i < slotList.length; i++)
-        {
+        for (int i = 0; i < slotList.length; i++) {
             P11SlotIdentifier slotId = new P11SlotIdentifier(i, slotList[i]);
 
-            if (!moduleConf.isSlotIncluded(slotId))
-            {
+            if (!moduleConf.isSlotIncluded(slotId)) {
                 continue;
             }
 
-            try
-            {
+            try {
                 Provider provider;
-                if (i == 0)
-                {
+                if (i == 0) {
                     provider = p11ProviderOfSlot0;
-                } else
-                {
+                } else {
                     provider = getPKCS11Provider(nativeLib, i);
                 }
 
@@ -196,52 +177,41 @@ public final class SunP11CryptService implements P11CryptService
 
                 List<char[]> password = moduleConf.getPasswordRetriever().getPassword(slotId);
 
-                for (char[] singlePassword : password)
-                {
-                    if (singlePassword == null)
-                    { // keystore does not allow empty password
+                for (char[] singlePassword : password) {
+                    if (singlePassword == null) { // keystore does not allow empty password
                         singlePassword = "dummy".toCharArray();
                     }
-                    try
-                    {
+                    try {
                         keystore.load(null, singlePassword);
-                    } catch (Exception e)
-                    {
+                    } catch (Exception e) {
                         throw new SignerException(e.getMessage(), e);
                     }
                 }
 
                 Enumeration<String> aliases = keystore.aliases();
-                while (aliases.hasMoreElements())
-                {
+                while (aliases.hasMoreElements()) {
                     String alias = aliases.nextElement();
-                    try
-                    {
-                        if (!keystore.isKeyEntry(alias))
-                        {
+                    try {
+                        if (!keystore.isKeyEntry(alias)) {
                             continue;
                         }
 
                         char[] keyPwd = null;
-                        if (CollectionUtil.isNotEmpty(password))
-                        {
+                        if (CollectionUtil.isNotEmpty(password)) {
                             keyPwd = password.get(0);
                         }
-                        if (keyPwd == null)
-                        { // keystore does not allow empty password
+                        if (keyPwd == null) { // keystore does not allow empty password
                             keyPwd = "dummy".toCharArray();
                         }
 
                         Key key = keystore.getKey(alias, keyPwd);
-                        if (!(key instanceof PrivateKey))
-                        {
+                        if (!(key instanceof PrivateKey)) {
                             continue;
                         }
 
                         SunP11Identity oldIdentity = getIdentity(slotId,
                                 new P11KeyIdentifier(alias));
-                        if (oldIdentity != null)
-                        {
+                        if (oldIdentity != null) {
                             currentIdentifies.add(oldIdentity);
                             continue;
                         }
@@ -253,15 +223,12 @@ public final class SunP11CryptService implements P11CryptService
 
                         Certificate[] certchain = keystore.getCertificateChain(alias);
                         X509Certificate[] x509Certchain = new X509Certificate[certchain.length];
-                        for (int j = 0; j < certchain.length; j++)
-                        {
+                        for (int j = 0; j < certchain.length; j++) {
                             x509Certchain[j] = (X509Certificate) certchain[j];
                         }
 
-                        if ("EC".equalsIgnoreCase(pubKey.getAlgorithm()))
-                        {
-                            if (!(pubKey instanceof ECPublicKey))
-                            {
+                        if ("EC".equalsIgnoreCase(pubKey.getAlgorithm())) {
+                            if (!(pubKey instanceof ECPublicKey)) {
                                 // reparse the certificate due to bug in bcprov version 1.49
                                 // signatureCert = X509Util.parseCert(signatureCert.getEncoded());
                                 pubKey = signatureCert.getPublicKey();
@@ -271,8 +238,7 @@ public final class SunP11CryptService implements P11CryptService
                         SunP11Identity p11Identity = new SunP11Identity(provider, slotId, alias,
                                 signatureKey, x509Certchain, pubKey);
                         currentIdentifies.add(p11Identity);
-                    } catch (SignerException e)
-                    {
+                    } catch (SignerException e) {
                         String msg = "SignerException while constructing SunP11Identity for alias "
                                 + alias + " (slot: " + i + ", module: " + moduleConf.getName()
                                 + ")";
@@ -281,12 +247,10 @@ public final class SunP11CryptService implements P11CryptService
                         continue;
                     }
                 }
-            } catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 final String message = "could not initialize PKCS11 slot " + i + " (module: "
                         + moduleConf.getName() + ")";
-                if (LOG.isWarnEnabled())
-                {
+                if (LOG.isWarnEnabled()) {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                             t.getMessage());
                 }
@@ -300,12 +264,10 @@ public final class SunP11CryptService implements P11CryptService
         currentIdentifies.clear();
         currentIdentifies = null;
 
-        if (LOG.isInfoEnabled())
-        {
+        if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("Initialized ").append(this.identities.size()).append(" PKCS#11 Keys:\n");
-            for (SunP11Identity identity : this.identities)
-            {
+            for (SunP11Identity identity : this.identities) {
                 sb.append("\t(slot ").append(identity.getSlotId());
                 sb.append(", algo=").append(identity.getPublicKey().getAlgorithm());
                 sb.append(", label=").append(identity.getKeyLabel()).append(")\n");
@@ -317,8 +279,7 @@ public final class SunP11CryptService implements P11CryptService
 
     private static Provider getPKCS11Provider(
             final String pkcs11Module,
-            final int slotIndex)
-    {
+            final int slotIndex) {
         File f = new File(pkcs11Module);
 
         StringBuilder sb = new StringBuilder();
@@ -328,8 +289,7 @@ public final class SunP11CryptService implements P11CryptService
         String name = sb.toString();
 
         Provider p = Security.getProvider("SunPKCS11-" + name);
-        if (p != null)
-        {
+        if (p != null) {
             return p;
         }
 
@@ -350,28 +310,23 @@ public final class SunP11CryptService implements P11CryptService
 
     private static long[] allSlots(
             final String pkcs11Module)
-    throws SignerException
-    {
+    throws SignerException {
         String functionList = null;
         sun.security.pkcs11.wrapper.CK_C_INITIALIZE_ARGS pInitArgs = null;
         boolean omitInitialize = true;
 
         sun.security.pkcs11.wrapper.PKCS11 pkcs11;
-        try
-        {
+        try {
             pkcs11 = sun.security.pkcs11.wrapper.PKCS11.getInstance(
                     pkcs11Module, functionList, pInitArgs, omitInitialize);
-        } catch (IOException | PKCS11Exception e)
-        {
+        } catch (IOException | PKCS11Exception e) {
             throw new SignerException(e.getClass().getName() + ": " + e.getMessage(), e);
         }
 
         long[] slotList;
-        try
-        {
+        try {
             slotList = pkcs11.C_GetSlotList(false);
-        } catch (PKCS11Exception e)
-        {
+        } catch (PKCS11Exception e) {
             throw new SignerException("PKCS11Exception: " + e.getMessage(), e);
         }
         return slotList;
@@ -382,13 +337,11 @@ public final class SunP11CryptService implements P11CryptService
             final byte[] encodedDigestInfo,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
-    throws SignerException
-    {
+    throws SignerException {
         ensureResource();
 
         SunP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null)
-        {
+        if (identity == null) {
             throw new SignerException("found no key with " + keyId);
         }
 
@@ -400,13 +353,11 @@ public final class SunP11CryptService implements P11CryptService
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
-    throws SignerException
-    {
+    throws SignerException {
         ensureResource();
 
         SunP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null)
-        {
+        if (identity == null) {
             throw new SignerException("found no key with " + keyId);
         }
 
@@ -418,13 +369,11 @@ public final class SunP11CryptService implements P11CryptService
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
-    throws SignerException
-    {
+    throws SignerException {
         ensureResource();
 
         SunP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null)
-        {
+        if (identity == null) {
             throw new SignerException("found no key with " + keyId);
         }
 
@@ -436,13 +385,11 @@ public final class SunP11CryptService implements P11CryptService
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
-    throws SignerException
-    {
+    throws SignerException {
         ensureResource();
 
         SunP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null)
-        {
+        if (identity == null) {
             throw new SignerException("found no key with " + keyId);
         }
         return identity.CKM_ECDSA_X962(hash);
@@ -453,13 +400,11 @@ public final class SunP11CryptService implements P11CryptService
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
-    throws SignerException
-    {
+    throws SignerException {
         ensureResource();
 
         SunP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null)
-        {
+        if (identity == null) {
             throw new SignerException("found no key with " + keyId);
         }
 
@@ -471,13 +416,11 @@ public final class SunP11CryptService implements P11CryptService
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
-    throws SignerException
-    {
+    throws SignerException {
         ensureResource();
 
         SunP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null)
-        {
+        if (identity == null) {
             throw new SignerException("found no key with " + keyId);
         }
 
@@ -488,8 +431,7 @@ public final class SunP11CryptService implements P11CryptService
     public PublicKey getPublicKey(
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
-    throws SignerException
-    {
+    throws SignerException {
         SunP11Identity identity = getIdentity(slotId, keyId);
         return (identity == null)
                 ? null
@@ -500,8 +442,7 @@ public final class SunP11CryptService implements P11CryptService
     public X509Certificate getCertificate(
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
-    throws SignerException
-    {
+    throws SignerException {
         SunP11Identity identity = getIdentity(slotId, keyId);
         return (identity == null)
                 ? null
@@ -511,17 +452,13 @@ public final class SunP11CryptService implements P11CryptService
     private SunP11Identity getIdentity(
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
-    throws SignerException
-    {
-        if (keyId.getKeyLabel() == null)
-        {
+    throws SignerException {
+        if (keyId.getKeyLabel() == null) {
             throw new SignerException("only key referencing by key-label is supported");
         }
 
-        for (SunP11Identity identity : identities)
-        {
-            if (identity.match(slotId, keyId.getKeyLabel()))
-            {
+        for (SunP11Identity identity : identities) {
+            if (identity.match(slotId, keyId.getKeyLabel())) {
                 return identity;
             }
         }
@@ -530,8 +467,7 @@ public final class SunP11CryptService implements P11CryptService
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return moduleConf.toString();
     }
 
@@ -539,8 +475,7 @@ public final class SunP11CryptService implements P11CryptService
     public X509Certificate[] getCertificates(
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
-    throws SignerException
-    {
+    throws SignerException {
         SunP11Identity identity = getIdentity(slotId, keyId);
         return (identity == null)
                 ? null
@@ -549,14 +484,11 @@ public final class SunP11CryptService implements P11CryptService
 
     @Override
     public P11SlotIdentifier[] getSlotIdentifiers()
-    throws SignerException
-    {
+    throws SignerException {
         List<P11SlotIdentifier> slotIds = new LinkedList<>();
-        for (SunP11Identity identity : identities)
-        {
+        for (SunP11Identity identity : identities) {
             P11SlotIdentifier slotId = identity.getSlotId();
-            if (!slotIds.contains(slotId))
-            {
+            if (!slotIds.contains(slotId)) {
                 slotIds.add(slotId);
             }
         }
@@ -567,13 +499,10 @@ public final class SunP11CryptService implements P11CryptService
     @Override
     public String[] getKeyLabels(
             final P11SlotIdentifier slotId)
-    throws SignerException
-    {
+    throws SignerException {
         List<String> keyLabels = new LinkedList<>();
-        for (SunP11Identity identity : identities)
-        {
-            if (slotId.equals(identity.getSlotId()))
-            {
+        for (SunP11Identity identity : identities) {
+            if (slotId.equals(identity.getSlotId())) {
                 keyLabels.add(identity.getKeyLabel());
             }
         }
@@ -581,7 +510,6 @@ public final class SunP11CryptService implements P11CryptService
         return keyLabels.toArray(new String[0]);
     }
 
-    private synchronized void ensureResource()
-    {
+    private synchronized void ensureResource() {
     }
 }

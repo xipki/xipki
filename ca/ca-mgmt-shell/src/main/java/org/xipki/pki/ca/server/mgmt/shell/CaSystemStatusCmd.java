@@ -46,18 +46,14 @@ import org.xipki.pki.ca.server.mgmt.api.CASystemStatus;
 
 @Command(scope = "xipki-ca", name = "system-status",
         description = "show CA system status")
-public class CaSystemStatusCmd extends CaCmd
-{
+public class CaSystemStatusCmd extends CaCmd {
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         CASystemStatus status = caManager.getCASystemStatus();
-        if (status != null)
-        {
+        if (status != null) {
             out(status.toString());
-        } else
-        {
+        } else {
             throw new UnexpectedException("status is NULL");
         }
         return null;

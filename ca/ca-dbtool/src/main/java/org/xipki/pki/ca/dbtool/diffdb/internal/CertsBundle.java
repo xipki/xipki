@@ -45,8 +45,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class CertsBundle
-{
+public class CertsBundle {
     private int numSkipped;
     private Map<Long, DbDigestEntry> certs;
     private List<Long> serialNumbers;
@@ -56,10 +55,8 @@ public class CertsBundle
     public CertsBundle(
             final int numSkipped,
             final Map<Long, DbDigestEntry> certs,
-            final List<Long> serialNumbers)
-    {
-        if (numSkipped < 0)
-        {
+            final List<Long> serialNumbers) {
+        if (numSkipped < 0) {
             throw new IllegalArgumentException("numSkipped could not be negative: " + numSkipped);
         }
 
@@ -71,41 +68,34 @@ public class CertsBundle
         this.targetCerts = new HashMap<>(serialNumbers.size());
     }
 
-    public int getNumSkipped()
-    {
+    public int getNumSkipped() {
         return numSkipped;
     }
 
-    public Map<Long, DbDigestEntry> getCerts()
-    {
+    public Map<Long, DbDigestEntry> getCerts() {
         return certs;
     }
 
-    public List<Long> getSerialNumbers()
-    {
+    public List<Long> getSerialNumbers() {
         return serialNumbers;
     }
 
     public void addTargetCert(
             final long serialNumber,
-            final DbDigestEntry cert)
-    {
+            final DbDigestEntry cert) {
         targetCerts.put(serialNumber, cert);
     }
 
     public DbDigestEntry getTargetCert(
-            final long serialNumber)
-    {
+            final long serialNumber) {
         return targetCerts.get(serialNumber);
     }
 
-    public void setTargetException(Exception exception)
-    {
+    public void setTargetException(Exception exception) {
         this.targetException = exception;
     }
 
-    public Exception getTargetException()
-    {
+    public Exception getTargetException() {
         return targetException;
     }
 

@@ -43,8 +43,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class CertprofileEntry implements Serializable
-{
+public class CertprofileEntry implements Serializable {
     private static final long serialVersionUID = 1L;
     private final String name;
     private final String type;
@@ -54,13 +53,11 @@ public class CertprofileEntry implements Serializable
     public CertprofileEntry(
             final String name,
             final String type,
-            final String conf)
-    {
+            final String conf) {
         ParamUtil.assertNotBlank("name", name);
         ParamUtil.assertNotBlank("type", type);
 
-        if ("all".equalsIgnoreCase(name) || "null".equalsIgnoreCase(name))
-        {
+        if ("all".equalsIgnoreCase(name) || "null".equalsIgnoreCase(name)) {
             throw new IllegalArgumentException(
                     "certificate profile name could not be 'all' and 'null'");
         }
@@ -69,51 +66,42 @@ public class CertprofileEntry implements Serializable
         this.conf = conf;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getType()
-    {
+    public String getType() {
         return type;
     }
 
-    public String getConf()
-    {
+    public String getConf() {
         return conf;
     }
 
-    public boolean isFaulty()
-    {
+    public boolean isFaulty() {
         return faulty;
     }
 
     public void setFaulty(
-            final boolean faulty)
-    {
+            final boolean faulty) {
         this.faulty = faulty;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return toString(false);
     }
 
     public String toString(
-            final boolean verbose)
-    {
+            final boolean verbose) {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
         sb.append("faulty: ").append(faulty).append('\n');
         sb.append("type: ").append(type).append('\n');
         sb.append("conf: ");
-        if (verbose || conf == null || conf.length() < 301)
-        {
+        if (verbose || conf == null || conf.length() < 301) {
             sb.append(conf);
-        } else
-        {
+        } else {
             sb.append(conf.substring(0, 297)).append("...");
         }
         return sb.toString();
