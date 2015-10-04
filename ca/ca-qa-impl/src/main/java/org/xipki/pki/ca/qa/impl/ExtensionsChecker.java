@@ -1316,14 +1316,13 @@ public class ExtensionsChecker {
             final byte[] extensionValue,
             final Extensions requestExtensions,
             final ExtensionControl extControl) {
-        Set<String> isUsages = new HashSet<>(); {
-            org.bouncycastle.asn1.x509.ExtendedKeyUsage keyusage =
-                    org.bouncycastle.asn1.x509.ExtendedKeyUsage.getInstance(extensionValue);
-            KeyPurposeId[] usages = keyusage.getUsages();
-            if (usages != null) {
-                for (KeyPurposeId usage : usages) {
-                    isUsages.add(usage.getId());
-                }
+        Set<String> isUsages = new HashSet<>();
+        org.bouncycastle.asn1.x509.ExtendedKeyUsage keyusage =
+                org.bouncycastle.asn1.x509.ExtendedKeyUsage.getInstance(extensionValue);
+        KeyPurposeId[] usages = keyusage.getUsages();
+        if (usages != null) {
+            for (KeyPurposeId usage : usages) {
+                isUsages.add(usage.getId());
             }
         }
 
@@ -2402,39 +2401,35 @@ public class ExtensionsChecker {
                     QcEuLimitValueType euLimitConf = expStatementValue.getQcEuLimitValue();
                     String expCurrency = euLimitConf.getCurrency().toUpperCase();
                     int[] expAmountExp = reqQcEuLimits.get(expCurrency);
-                    String expAmount; {
-                        Range2Type range = euLimitConf.getAmount();
-                        int value;
-                        if (range.getMin() == range.getMax()) {
-                            value = range.getMin();
-                        } else if (expAmountExp != null) {
-                            value = expAmountExp[0];
-                        } else {
-                            failureMsg.append("found no QcEuLimit for currency '")
-                                .append(expCurrency)
-                                .append("'");
-                            failureMsg.append("; ");
-                            return;
-                        }
-                        expAmount = Integer.toString(value);
-                    }
 
-                    String expExponent; {
-                        Range2Type range = euLimitConf.getExponent();
-                        int value;
-                        if (range.getMin() == range.getMax()) {
-                            value = range.getMin();
-                        } else if (expAmountExp != null) {
-                            value = expAmountExp[1];
-                        } else {
-                            failureMsg.append("found no QcEuLimit for currency '")
-                                .append(expCurrency)
-                                .append("'");
-                            failureMsg.append("; ");
-                            return;
-                        }
-                        expExponent = Integer.toString(value);
+                    Range2Type range = euLimitConf.getAmount();
+                    int value;
+                    if (range.getMin() == range.getMax()) {
+                        value = range.getMin();
+                    } else if (expAmountExp != null) {
+                        value = expAmountExp[0];
+                    } else {
+                        failureMsg.append("found no QcEuLimit for currency '")
+                            .append(expCurrency)
+                            .append("'");
+                        failureMsg.append("; ");
+                        return;
                     }
+                    String expAmount = Integer.toString(value);
+
+                    range = euLimitConf.getExponent();
+                    if (range.getMin() == range.getMax()) {
+                        value = range.getMin();
+                    } else if (expAmountExp != null) {
+                        value = expAmountExp[1];
+                    } else {
+                        failureMsg.append("found no QcEuLimit for currency '")
+                            .append(expCurrency)
+                            .append("'");
+                        failureMsg.append("; ");
+                        return;
+                    }
+                    String expExponent = Integer.toString(value);
 
                     MonetaryValue monterayValue = MonetaryValue.getInstance(is.getStatementInfo());
                     Iso4217CurrencyCode currency = monterayValue.getCurrency();
@@ -2527,118 +2522,118 @@ public class ExtensionsChecker {
 
         for (int i = 0; i < expSize; i++) {
             BiometricData isData = BiometricData.getInstance(extValue.getObjectAt(i));
-            BiometricData expData = BiometricData.getInstance(extValueInReq.getObjectAt(i)); {
-                TypeOfBiometricData isType = isData.getTypeOfBiometricData();
-                TypeOfBiometricData expType = expData.getTypeOfBiometricData();
-                if (!isType.equals(expType)) {
-                    String isStr = isType.isPredefined()
-                            ? Integer.toString(isType.getPredefinedBiometricType())
-                            : isType.getBiometricDataOid().getId();
-                    String expStr = expType.isPredefined()
-                            ? Integer.toString(expType.getPredefinedBiometricType())
-                            : expType.getBiometricDataOid().getId();
+            BiometricData expData = BiometricData.getInstance(extValueInReq.getObjectAt(i));
 
-                    failureMsg.append("biometricData[")
-                        .append(i)
-                        .append("].typeOfBiometricData is '")
-                        .append(isStr);
-                    failureMsg.append("' but expected '")
-                        .append(expStr)
-                        .append("'");
-                    failureMsg.append("; ");
-                }
-            } {
-                ASN1ObjectIdentifier is = isData.getHashAlgorithm().getAlgorithm();
-                ASN1ObjectIdentifier exp = expData.getHashAlgorithm().getAlgorithm();
-                if (!is.equals(exp)) {
-                    failureMsg.append("biometricData[")
-                        .append(i)
-                        .append("].hashAlgorithm is '")
-                        .append(is.getId());
-                    failureMsg.append("' but expected '")
-                        .append(exp.getId())
-                        .append("'");
-                    failureMsg.append("; ");
-                }
+            TypeOfBiometricData isType = isData.getTypeOfBiometricData();
+            TypeOfBiometricData expType = expData.getTypeOfBiometricData();
+            if (!isType.equals(expType)) {
+                String isStr = isType.isPredefined()
+                        ? Integer.toString(isType.getPredefinedBiometricType())
+                        : isType.getBiometricDataOid().getId();
+                String expStr = expType.isPredefined()
+                        ? Integer.toString(expType.getPredefinedBiometricType())
+                        : expType.getBiometricDataOid().getId();
 
-                ASN1Encodable isHashAlgoParam = isData.getHashAlgorithm().getParameters();
-                if (isHashAlgoParam == null) {
-                    failureMsg.append("biometricData[")
-                        .append(i)
-                        .append("].hashAlgorithm.parameters is 'present'");
-                    failureMsg.append(" but expected 'absent'");
-                    failureMsg.append("; ");
-                } else {
-                    try {
-                        byte[] isBytes = isHashAlgoParam.toASN1Primitive().getEncoded();
-                        if (!Arrays.equals(isBytes, DERNull)) {
-                            failureMsg.append("biometricData[")
-                                .append(i)
-                                .append("].biometricDataHash.parameters is '")
-                                .append(hex(isBytes));
-                            failureMsg.append("' but expected '")
-                                .append(hex(DERNull))
-                                .append("'");
-                            failureMsg.append("; ");
-                        }
-                    } catch (IOException e) {
+                failureMsg.append("biometricData[")
+                    .append(i)
+                    .append("].typeOfBiometricData is '")
+                    .append(isStr);
+                failureMsg.append("' but expected '")
+                    .append(expStr)
+                    .append("'");
+                failureMsg.append("; ");
+            }
+
+            ASN1ObjectIdentifier is = isData.getHashAlgorithm().getAlgorithm();
+            ASN1ObjectIdentifier exp = expData.getHashAlgorithm().getAlgorithm();
+            if (!is.equals(exp)) {
+                failureMsg.append("biometricData[")
+                    .append(i)
+                    .append("].hashAlgorithm is '")
+                    .append(is.getId());
+                failureMsg.append("' but expected '")
+                    .append(exp.getId())
+                    .append("'");
+                failureMsg.append("; ");
+            }
+
+            ASN1Encodable isHashAlgoParam = isData.getHashAlgorithm().getParameters();
+            if (isHashAlgoParam == null) {
+                failureMsg.append("biometricData[")
+                    .append(i)
+                    .append("].hashAlgorithm.parameters is 'present'");
+                failureMsg.append(" but expected 'absent'");
+                failureMsg.append("; ");
+            } else {
+                try {
+                    byte[] isBytes = isHashAlgoParam.toASN1Primitive().getEncoded();
+                    if (!Arrays.equals(isBytes, DERNull)) {
                         failureMsg.append("biometricData[")
                             .append(i)
-                            .append("].biometricDataHash.parameters has incorrect syntax");
+                            .append("].biometricDataHash.parameters is '")
+                            .append(hex(isBytes));
+                        failureMsg.append("' but expected '")
+                            .append(hex(DERNull))
+                            .append("'");
                         failureMsg.append("; ");
                     }
-                }
-            } {
-                byte[] is = isData.getBiometricDataHash().getOctets();
-                byte[] exp = expData.getBiometricDataHash().getOctets();
-                if (!Arrays.equals(is, exp)) {
+                } catch (IOException e) {
                     failureMsg.append("biometricData[")
                         .append(i)
-                        .append("].biometricDataHash is '")
-                        .append(hex(is));
-                    failureMsg.append("' but expected '")
-                        .append(hex(exp))
-                        .append("'");
+                        .append("].biometricDataHash.parameters has incorrect syntax");
                     failureMsg.append("; ");
                 }
-            } {
-                DERIA5String str = isData.getSourceDataUri();
-                String isSourceDataUri = (str == null)
+            }
+
+            byte[] isBytes = isData.getBiometricDataHash().getOctets();
+            byte[] expBytes = expData.getBiometricDataHash().getOctets();
+            if (!Arrays.equals(isBytes, expBytes)) {
+                failureMsg.append("biometricData[")
+                    .append(i)
+                    .append("].biometricDataHash is '")
+                    .append(hex(isBytes));
+                failureMsg.append("' but expected '")
+                    .append(hex(expBytes))
+                    .append("'");
+                failureMsg.append("; ");
+            }
+
+            DERIA5String str = isData.getSourceDataUri();
+            String isSourceDataUri = (str == null)
+                    ? null
+                    : str.getString();
+
+            String expSourceDataUri = null;
+            if (biometricInfo.getSourceDataUriOccurrence() != TripleState.FORBIDDEN) {
+                str = expData.getSourceDataUri();
+                expSourceDataUri = (str == null)
                         ? null
                         : str.getString();
+            }
 
-                String expSourceDataUri = null;
-                if (biometricInfo.getSourceDataUriOccurrence() != TripleState.FORBIDDEN) {
-                    str = expData.getSourceDataUri();
-                    expSourceDataUri = (str == null)
-                            ? null
-                            : str.getString();
+            if (expSourceDataUri == null) {
+                if (isSourceDataUri != null) {
+                    failureMsg.append("biometricData[")
+                        .append(i)
+                        .append("].sourceDataUri is 'present'");
+                    failureMsg.append(" but expected 'absent'");
+                    failureMsg.append("; ");
                 }
-
-                if (expSourceDataUri == null) {
-                    if (isSourceDataUri != null) {
-                        failureMsg.append("biometricData[")
-                            .append(i)
-                            .append("].sourceDataUri is 'present'");
-                        failureMsg.append(" but expected 'absent'");
-                        failureMsg.append("; ");
-                    }
-                } else {
-                    if (isSourceDataUri == null) {
-                        failureMsg.append("biometricData[")
-                            .append(i)
-                            .append("].sourceDataUri is 'absent'");
-                        failureMsg.append(" but expected 'present'");
-                        failureMsg.append("; ");
-                    } else if (!isSourceDataUri.equals(expSourceDataUri)) {
-                        failureMsg.append("biometricData[")
-                            .append(i)
-                            .append("].sourceDataUri is '")
-                            .append(isSourceDataUri);
-                        failureMsg.append("' but expected '")
-                            .append(expSourceDataUri).append("'");
-                        failureMsg.append("; ");
-                    }
+            } else {
+                if (isSourceDataUri == null) {
+                    failureMsg.append("biometricData[")
+                        .append(i)
+                        .append("].sourceDataUri is 'absent'");
+                    failureMsg.append(" but expected 'present'");
+                    failureMsg.append("; ");
+                } else if (!isSourceDataUri.equals(expSourceDataUri)) {
+                    failureMsg.append("biometricData[")
+                        .append(i)
+                        .append("].sourceDataUri is '")
+                        .append(isSourceDataUri);
+                    failureMsg.append("' but expected '")
+                        .append(expSourceDataUri).append("'");
+                    failureMsg.append("; ");
                 }
             }
         }
@@ -2744,10 +2739,9 @@ public class ExtensionsChecker {
         case GeneralName.uniformResourceIdentifier:
         case GeneralName.iPAddress:
         case GeneralName.registeredID:
-        case GeneralName.directoryName: {
+        case GeneralName.directoryName:
             return new GeneralName(tag, reqName.getName());
-        }
-        case GeneralName.otherName: {
+        case GeneralName.otherName:
             ASN1Sequence reqSeq = ASN1Sequence.getInstance(reqName.getName());
             ASN1ObjectIdentifier type = ASN1ObjectIdentifier.getInstance(reqSeq.getObjectAt(0));
             if (!mode.getAllowedTypes().contains(type)) {
@@ -2769,9 +2763,8 @@ public class ExtensionsChecker {
             DERSequence seq = new DERSequence(vector);
 
             return new GeneralName(GeneralName.otherName, seq);
-        }
-        case GeneralName.ediPartyName: {
-            ASN1Sequence reqSeq = ASN1Sequence.getInstance(reqName.getName());
+        case GeneralName.ediPartyName:
+            reqSeq = ASN1Sequence.getInstance(reqName.getName());
 
             int n = reqSeq.size();
             String nameAssigner = null;
@@ -2786,17 +2779,15 @@ public class ExtensionsChecker {
                     ((ASN1TaggedObject) reqSeq.getObjectAt(idx++)).getObject());
             String partyName = ds.getString();
 
-            ASN1EncodableVector vector = new ASN1EncodableVector();
+            vector = new ASN1EncodableVector();
             if (nameAssigner != null) {
                 vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
             }
             vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
-            ASN1Sequence seq = new DERSequence(vector);
+            seq = new DERSequence(vector);
             return new GeneralName(GeneralName.ediPartyName, seq);
-        }
-        default: {
+        default:
             throw new RuntimeException("should not reach here, unknwon GeneralName tag " + tag);
-        }
         } // end switch
     }
 

@@ -230,7 +230,7 @@ public class P10RequestGenerator {
         }
 
         switch (tag) {
-        case GeneralName.otherName: {
+        case GeneralName.otherName:
             int idxSep = value.indexOf("=");
             if (idxSep == -1 || idxSep == 0 || idxSep == value.length() - 1) {
                 throw new BadInputException("invalid otherName " + value);
@@ -243,17 +243,15 @@ public class P10RequestGenerator {
             vector.add(new DERTaggedObject(true, 0, new DERUTF8String(otherValue)));
             DERSequence seq = new DERSequence(vector);
             return new GeneralName(GeneralName.otherName, seq);
-        }
         case GeneralName.rfc822Name:
             return new GeneralName(tag, value);
         case GeneralName.dNSName:
             return new GeneralName(tag, value);
-        case GeneralName.directoryName: {
+        case GeneralName.directoryName:
             X500Name x500Name = X509Util.reverse(new X500Name(value));
             return new GeneralName(GeneralName.directoryName, x500Name);
-        }
-        case GeneralName.ediPartyName: {
-            int idxSep = value.indexOf("=");
+        case GeneralName.ediPartyName:
+            idxSep = value.indexOf("=");
             if (idxSep == -1 || idxSep == value.length() - 1) {
                 throw new BadInputException("invalid ediPartyName " + value);
             }
@@ -261,14 +259,13 @@ public class P10RequestGenerator {
                     ? null
                     : value.substring(0, idxSep);
             String partyName = value.substring(idxSep + 1);
-            ASN1EncodableVector vector = new ASN1EncodableVector();
+            vector = new ASN1EncodableVector();
             if (nameAssigner != null) {
                 vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
             }
             vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
-            ASN1Sequence seq = new DERSequence(vector);
+            seq = new DERSequence(vector);
             return new GeneralName(GeneralName.ediPartyName, seq);
-        }
         case GeneralName.uniformResourceIdentifier:
             return new GeneralName(tag, value);
         case GeneralName.iPAddress:

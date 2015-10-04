@@ -228,37 +228,31 @@ public class DecodedPkiMessage extends PkiMessage {
         }
 
         // transactionId
-        TransactionId transactionId; {
-            String s = getPrintableStringAttrValue(signedAttrs,
-                    ScepObjectIdentifiers.id_transactionID);
-            if (s == null || s.isEmpty()) {
-                throw new MessageDecodingException("missing required SCEP attribute transactionId");
-            }
-            transactionId = new TransactionId(s);
+        String s = getPrintableStringAttrValue(signedAttrs,
+                ScepObjectIdentifiers.id_transactionID);
+        if (s == null || s.isEmpty()) {
+            throw new MessageDecodingException("missing required SCEP attribute transactionId");
         }
+        TransactionId transactionId = new TransactionId(s);
 
         // messageType
-        MessageType messageType; {
-            Integer i = getIntegerPrintStringAttrValue(signedAttrs,
-                    ScepObjectIdentifiers.id_messageType);
-            if (i == null) {
-                throw new MessageDecodingException("tid " + transactionId.getId()
-                        + ": missing required SCEP attribute messageType");
-            }
-            messageType = MessageType.valueForCode(i);
-            if (messageType == null) {
-                throw new MessageDecodingException("tid " + transactionId.getId()
-                        + ": invalid messageType '" + i + "'");
-            }
+        Integer i = getIntegerPrintStringAttrValue(signedAttrs,
+                ScepObjectIdentifiers.id_messageType);
+        if (i == null) {
+            throw new MessageDecodingException("tid " + transactionId.getId()
+                    + ": missing required SCEP attribute messageType");
+        }
+        MessageType messageType = MessageType.valueForCode(i);
+        if (messageType == null) {
+            throw new MessageDecodingException("tid " + transactionId.getId()
+                    + ": invalid messageType '" + i + "'");
         }
 
         // senderNonce
-        Nonce senderNonce; {
-            senderNonce = getNonceAttrValue(signedAttrs, ScepObjectIdentifiers.id_senderNonce);
-            if (senderNonce == null) {
-                throw new MessageDecodingException("tid " + transactionId.getId()
-                        + ": missing required SCEP attribute senderNonce");
-            }
+        Nonce senderNonce = getNonceAttrValue(signedAttrs, ScepObjectIdentifiers.id_senderNonce);
+        if (senderNonce == null) {
+            throw new MessageDecodingException("tid " + transactionId.getId()
+                    + ": missing required SCEP attribute senderNonce");
         }
 
         DecodedPkiMessage ret = new DecodedPkiMessage(transactionId, messageType, senderNonce);
@@ -282,7 +276,6 @@ public class DecodedPkiMessage extends PkiMessage {
         FailInfo failInfo = null;
         if (MessageType.CertRep == messageType) {
             // pkiStatus
-            Integer i;
             try {
                 i = getIntegerPrintStringAttrValue(signedAttrs, ScepObjectIdentifiers.id_pkiStatus);
             } catch (MessageDecodingException e) {
