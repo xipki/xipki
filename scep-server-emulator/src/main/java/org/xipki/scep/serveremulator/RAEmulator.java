@@ -43,26 +43,22 @@ import org.bouncycastle.asn1.x509.Certificate;
  * @author Lijun Liao
  */
 
-public class RAEmulator
-{
+public class RAEmulator {
     private final PrivateKey rAKey;
     private final Certificate rACert;
 
     public RAEmulator(
             final PrivateKey rAKey,
-            final Certificate rACert)
-    {
+            final Certificate rACert) {
         this.rAKey = rAKey;
         this.rACert = rACert;
     }
 
-    public PrivateKey getRAKey()
-    {
+    public PrivateKey getRAKey() {
         return rAKey;
     }
 
-    public Certificate getRACert()
-    {
+    public Certificate getRACert() {
         return rACert;
     }
 

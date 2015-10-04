@@ -41,8 +41,7 @@ import java.security.cert.X509Certificate;
  * @author Lijun Liao
  */
 
-public interface CACertValidator
-{
+public interface CACertValidator {
     boolean isTrusted(
             X509Certificate cert);
 }

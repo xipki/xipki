@@ -39,8 +39,7 @@ package org.xipki.scep.transaction;
  * @author Lijun Liao
  */
 
-public enum PkiStatus
-{
+public enum PkiStatus {
     /**
      * request granted
      */
@@ -59,23 +58,18 @@ public enum PkiStatus
     private final int code;
 
     private PkiStatus(
-            final int code)
-    {
+            final int code) {
         this.code = code;
     }
 
-    public int getCode()
-    {
+    public int getCode() {
         return code;
     }
 
     public static PkiStatus valueForCode(
-            final int code)
-    {
-        for (PkiStatus m : values())
-        {
-            if (m.code == code)
-            {
+            final int code) {
+        for (PkiStatus m : values()) {
+            if (m.code == code) {
                 return m;
             }
         }

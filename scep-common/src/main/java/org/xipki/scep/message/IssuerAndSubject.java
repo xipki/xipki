@@ -47,19 +47,15 @@ import org.bouncycastle.asn1.x500.X500Name;
  */
 
 public class IssuerAndSubject
-    extends ASN1Object
-{
+    extends ASN1Object {
     private X500Name issuer;
     private X500Name subject;
 
     public static IssuerAndSubject getInstance(
-            final Object obj)
-    {
-        if (obj instanceof IssuerAndSubject)
-        {
+            final Object obj) {
+        if (obj instanceof IssuerAndSubject) {
             return (IssuerAndSubject) obj;
-        } else if (obj != null)
-        {
+        } else if (obj != null) {
             return new IssuerAndSubject(ASN1Sequence.getInstance(obj));
         }
 
@@ -67,32 +63,27 @@ public class IssuerAndSubject
     }
 
     private IssuerAndSubject(
-            final ASN1Sequence seq)
-    {
+            final ASN1Sequence seq) {
         this.issuer = X500Name.getInstance(seq.getObjectAt(0));
         this.subject = X500Name.getInstance(seq.getObjectAt(1));
     }
 
     public IssuerAndSubject(
             final X500Name issuer,
-            final X500Name subject)
-    {
+            final X500Name subject) {
         this.issuer = issuer;
         this.subject = subject;
     }
 
-    public X500Name getIssuer()
-    {
+    public X500Name getIssuer() {
         return issuer;
     }
 
-    public X500Name getSubject()
-    {
+    public X500Name getSubject() {
         return subject;
     }
 
-    public ASN1Primitive toASN1Primitive()
-    {
+    public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector    v = new ASN1EncodableVector();
 
         v.add(issuer);

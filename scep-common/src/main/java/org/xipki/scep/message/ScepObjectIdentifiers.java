@@ -41,8 +41,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
  * @author Lijun Liao
  */
 
-public class ScepObjectIdentifiers
-{
+public class ScepObjectIdentifiers {
     public static final ASN1ObjectIdentifier id_VeriSign
             = new ASN1ObjectIdentifier("2.16.840.1.113733");
     public static final ASN1ObjectIdentifier id_pki = id_VeriSign.branch("1");
@@ -54,7 +53,6 @@ public class ScepObjectIdentifiers
     public static final ASN1ObjectIdentifier id_senderNonce = id_attributes.branch("5");
     public static final ASN1ObjectIdentifier id_recipientNonce = id_attributes.branch("6");
 
-    private ScepObjectIdentifiers()
-    {
+    private ScepObjectIdentifiers() {
     }
 }

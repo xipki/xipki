@@ -69,8 +69,7 @@ import org.xipki.scep.util.ScepUtil;
  * @author Lijun Liao
  */
 
-public class CAEmulator
-{
+public class CAEmulator {
     public static final long MIN_IN_MS = 60L * 1000;
     public static final long DAY_IN_MS = 24L * 60 * MIN_IN_MS;
 
@@ -92,8 +91,7 @@ public class CAEmulator
             final PrivateKey cAKey,
             final Certificate cACert,
             final boolean generateCRL)
-    throws CertificateEncodingException
-    {
+    throws CertificateEncodingException {
         ParamUtil.assertNotNull("cAKey", cAKey);
         ParamUtil.assertNotNull("cACert", cACert);
 
@@ -101,39 +99,32 @@ public class CAEmulator
         this.cACert = cACert;
         this.cASubject = cACert.getSubject();
         this.generateCRL = generateCRL;
-        try
-        {
+        try {
             this.cACertBytes = cACert.getEncoded();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new CertificateEncodingException(e.getMessage(), e);
         }
     }
 
-    public PrivateKey getCAKey()
-    {
+    public PrivateKey getCAKey() {
         return cAKey;
     }
 
-    public Certificate getCACert()
-    {
+    public Certificate getCACert() {
         return cACert;
     }
 
-    public byte[] getCACertBytes()
-    {
+    public byte[] getCACertBytes() {
         return Arrays.clone(cACertBytes);
     }
 
-    public boolean isGenerateCRL()
-    {
+    public boolean isGenerateCRL() {
         return generateCRL;
     }
 
     public Certificate generateCert(
             final CertificationRequest p10ReqInfo)
-    throws Exception
-    {
+    throws Exception {
         // TODO: verify the PKCS#10 request
         CertificationRequestInfo reqInfo = p10ReqInfo.getCertificationRequestInfo();
         return generateCert(reqInfo.getSubjectPublicKeyInfo(), reqInfo.getSubject());
@@ -142,8 +133,7 @@ public class CAEmulator
     public Certificate generateCert(
             final SubjectPublicKeyInfo pubKeyInfo,
             final X500Name subjectDN)
-    throws Exception
-    {
+    throws Exception {
         return generateCert(pubKeyInfo, subjectDN,
                 new Date(System.currentTimeMillis() - 10 * CAEmulator.MIN_IN_MS));
     }
@@ -152,8 +142,7 @@ public class CAEmulator
             final SubjectPublicKeyInfo pubKeyInfo,
             final X500Name subjectDN,
             final Date notBefore)
-    throws Exception
-    {
+    throws Exception {
         Date notAfter = new Date(notBefore.getTime() + 730 * DAY_IN_MS);
 
         BigInteger _serialNumber = BigInteger.valueOf(serialNumber.getAndAdd(1));
@@ -185,10 +174,8 @@ public class CAEmulator
 
     public Certificate getCert(
             final X500Name issuer,
-            final BigInteger serialNumber)
-    {
-        if (!cASubject.equals(issuer))
-        {
+            final BigInteger serialNumber) {
+        if (!cASubject.equals(issuer)) {
             return null;
         }
 
@@ -197,10 +184,8 @@ public class CAEmulator
 
     public Certificate pollCert(
             final X500Name issuer,
-            final X500Name subject)
-    {
-        if (!cASubject.equals(issuer))
-        {
+            final X500Name subject) {
+        if (!cASubject.equals(issuer)) {
             return null;
         }
 
@@ -210,10 +195,8 @@ public class CAEmulator
     public synchronized CertificateList getCRL(
             final X500Name issuer,
             final BigInteger serialNumber)
-    throws Exception
-    {
-        if (crl != null)
-        {
+    throws Exception {
+        if (crl != null) {
             return crl;
         }
 
@@ -223,8 +206,7 @@ public class CAEmulator
         crlBuilder.setNextUpdate(nextUpdate);
         Date cAStartTime = cACert.getTBSCertificate().getStartDate().getDate();
         Date revocationTime = new Date(cAStartTime.getTime() + 1);
-        if (revocationTime.after(thisUpdate))
-        {
+        if (revocationTime.after(thisUpdate)) {
             revocationTime = cAStartTime;
         }
         crlBuilder.addCRLEntry(BigInteger.valueOf(2), revocationTime, CRLReason.keyCompromise);

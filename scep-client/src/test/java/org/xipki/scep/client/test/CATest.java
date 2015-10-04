@@ -41,17 +41,14 @@ import org.xipki.scep.transaction.CACapability;
  * @author Lijun Liao
  */
 
-public class CATest extends AbstractCATest
-{
+public class CATest extends AbstractCATest {
     @Override
-    protected boolean isWithRA()
-    {
+    protected boolean isWithRA() {
         return true;
     }
 
     @Override
-    protected CACapability[] getExcludedCACaps()
-    {
+    protected CACapability[] getExcludedCACaps() {
         return null;
     }
 

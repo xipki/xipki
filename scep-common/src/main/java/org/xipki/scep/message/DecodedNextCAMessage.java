@@ -74,8 +74,7 @@ import org.xipki.scep.util.ScepUtil;
  * @author Lijun Liao
  */
 
-public class DecodedNextCAMessage
-{
+public class DecodedNextCAMessage {
     private final static Logger LOG = LoggerFactory.getLogger(DecodedNextCAMessage.class);
 
     private AuthorityCertStore authorityCertStore;
@@ -85,62 +84,51 @@ public class DecodedNextCAMessage
     private Date signingTime;
     private String failureMessage;
 
-    public DecodedNextCAMessage()
-    {
+    public DecodedNextCAMessage() {
     }
 
-    public AuthorityCertStore getAuthorityCertStore()
-    {
+    public AuthorityCertStore getAuthorityCertStore() {
         return authorityCertStore;
     }
 
     public void setAuthorityCertStore(
-            final AuthorityCertStore authorityCertStore)
-    {
+            final AuthorityCertStore authorityCertStore) {
         this.authorityCertStore = authorityCertStore;
     }
 
-    public X509Certificate getSignatureCert()
-    {
+    public X509Certificate getSignatureCert() {
         return signatureCert;
     }
 
     public void setSignatureCert(
-            final X509Certificate signatureCert)
-    {
+            final X509Certificate signatureCert) {
         this.signatureCert = signatureCert;
     }
 
     public void setDigestAlgorithm(
-            final ASN1ObjectIdentifier digestAlgorithm)
-    {
+            final ASN1ObjectIdentifier digestAlgorithm) {
         this.digestAlgorithm = digestAlgorithm;
     }
 
     public void setSignatureValid(
-            final Boolean signatureValid)
-    {
+            final Boolean signatureValid) {
         this.signatureValid = signatureValid;
     }
 
-    public ASN1ObjectIdentifier getDigestAlgorithm()
-    {
+    public ASN1ObjectIdentifier getDigestAlgorithm() {
         return digestAlgorithm;
     }
 
-    public String getFailureMessage()
-    {
+    public String getFailureMessage() {
         return failureMessage;
     }
 
     public void setFailureMessage(
-            final String failureMessage)
-    {
+            final String failureMessage) {
         this.failureMessage = failureMessage;
     }
 
-    public Boolean isSignatureValid()
-    {
+    public Boolean isSignatureValid() {
         return signatureValid;
     }
 
@@ -148,14 +136,12 @@ public class DecodedNextCAMessage
     public static DecodedNextCAMessage decode(
             final CMSSignedData pkiMessage,
             final CollectionStore<X509CertificateHolder> certStore)
-    throws MessageDecodingException
-    {
+    throws MessageDecodingException {
         ParamUtil.assertNotNull("pkiMessage", pkiMessage);
 
         SignerInformationStore signerStore = pkiMessage.getSignerInfos();
         Collection<SignerInformation> signerInfos = signerStore.getSigners();
-        if (signerInfos.size() != 1)
-        {
+        if (signerInfos.size() != 1) {
             throw new MessageDecodingException(
                     "number of signerInfos is not 1, but " + signerInfos.size());
         }
@@ -165,42 +151,34 @@ public class DecodedNextCAMessage
         SignerId sid = signerInfo.getSID();
 
         Collection<?> signedDataCerts = null;
-        if (certStore != null)
-        {
+        if (certStore != null) {
             signedDataCerts = certStore.getMatches(sid);
         }
 
-        if (signedDataCerts == null || signedDataCerts.isEmpty())
-        {
+        if (signedDataCerts == null || signedDataCerts.isEmpty()) {
             signedDataCerts = pkiMessage.getCertificates().getMatches(signerInfo.getSID());
         }
 
-        if (signedDataCerts == null || signedDataCerts.size() != 1)
-        {
+        if (signedDataCerts == null || signedDataCerts.size() != 1) {
             throw new MessageDecodingException(
                     "could not find embedded certificate to verify the signature");
         }
 
         AttributeTable signedAttrs = signerInfo.getSignedAttributes();
-        if (signedAttrs == null)
-        {
+        if (signedAttrs == null) {
             throw new MessageDecodingException("missing signed attributes");
         }
 
         Date signingTime = null;
         // signingTime
-        {
-            ASN1Encodable attrValue = ScepUtil.getFirstAttrValue(signedAttrs,
-                    CMSAttributes.signingTime);
-            if (attrValue != null)
-            {
-                signingTime = Time.getInstance(attrValue).getDate();
-            }
+        ASN1Encodable attrValue = ScepUtil.getFirstAttrValue(signedAttrs,
+                CMSAttributes.signingTime);
+        if (attrValue != null) {
+            signingTime = Time.getInstance(attrValue).getDate();
         }
 
         DecodedNextCAMessage ret = new DecodedNextCAMessage();
-        if (signingTime != null)
-        {
+        if (signingTime != null) {
             ret.setSigningTime(signingTime);
         }
 
@@ -208,15 +186,12 @@ public class DecodedNextCAMessage
         ret.setDigestAlgorithm(digestAlgOID);
 
         String sigAlgOID = signerInfo.getEncryptionAlgOID();
-        if (!PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOID))
-        {
+        if (!PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOID)) {
             ASN1ObjectIdentifier _digestAlgOID;
-            try
-            {
+            try {
                 _digestAlgOID = ScepUtil.extractDigesetAlgorithmIdentifier(
                         signerInfo.getEncryptionAlgOID(), signerInfo.getEncryptionAlgParams());
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 final String msg =
                         "could not extract digest algorithm from signerInfo.signatureAlgorithm: "
                         + e.getMessage();
@@ -225,8 +200,7 @@ public class DecodedNextCAMessage
                 ret.setFailureMessage(msg);
                 return ret;
             }
-            if (!digestAlgOID.equals(_digestAlgOID))
-            {
+            if (!digestAlgOID.equals(_digestAlgOID)) {
                 ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use"
                         + " the same digestAlgorithm");
                 return ret;
@@ -236,11 +210,9 @@ public class DecodedNextCAMessage
         X509CertificateHolder _signerCert =
                 (X509CertificateHolder) signedDataCerts.iterator().next();
         X509Certificate signerCert;
-        try
-        {
+        try {
             signerCert = new X509CertificateObject(_signerCert.toASN1Structure());
-        } catch (CertificateParsingException e)
-        {
+        } catch (CertificateParsingException e) {
             final String msg = "could not construct X509CertificateObject: " + e.getMessage();
             LOG.error(msg);
             LOG.debug(msg, e);
@@ -251,12 +223,10 @@ public class DecodedNextCAMessage
 
         // validate the signature
         SignerInformationVerifier verifier;
-        try
-        {
+        try {
             verifier = new JcaSimpleSignerInfoVerifierBuilder().build(
                     signerCert.getPublicKey());
-        } catch (OperatorCreationException e)
-        {
+        } catch (OperatorCreationException e) {
             final String msg = "could not build signature verifier: " + e.getMessage();
             LOG.error(msg);
             LOG.debug(msg, e);
@@ -265,11 +235,9 @@ public class DecodedNextCAMessage
         }
 
         boolean signatureValid;
-        try
-        {
+        try {
             signatureValid = signerInfo.verify(verifier);
-        } catch (CMSException e)
-        {
+        } catch (CMSException e) {
             final String msg = "could not verify the signature: " + e.getMessage();
             LOG.error(msg);
             LOG.debug(msg, e);
@@ -278,19 +246,16 @@ public class DecodedNextCAMessage
         }
 
         ret.setSignatureValid(signatureValid);
-        if (!signatureValid)
-        {
+        if (!signatureValid) {
             return ret;
         }
 
         // MessageData
         CMSTypedData signedContent = pkiMessage.getSignedContent();
         ASN1ObjectIdentifier signedContentType = signedContent.getContentType();
-        if (!CMSObjectIdentifiers.signedData.equals(signedContentType))
-        {
+        if (!CMSObjectIdentifiers.signedData.equals(signedContentType)) {
             // fall back: some SCEP client use id-data
-            if (!CMSObjectIdentifiers.data.equals(signedContentType))
-            {
+            if (!CMSObjectIdentifiers.data.equals(signedContentType)) {
                 ret.setFailureMessage("either id-signedData or id-data is excepted, but not '"
                         + signedContentType.getId());
                 return ret;
@@ -301,11 +266,9 @@ public class DecodedNextCAMessage
         SignedData signedData = SignedData.getInstance(contentInfo.getContent());
 
         List<X509Certificate> certs;
-        try
-        {
+        try {
             certs = ScepUtil.getCertsFromSignedData(signedData);
-        } catch (CertificateException e)
-        {
+        } catch (CertificateException e) {
             final String msg = "error while extracting Certificates from the message: "
                     + e.getMessage();
             LOG.error(msg);
@@ -318,13 +281,10 @@ public class DecodedNextCAMessage
 
         X509Certificate cACert = null;
         List<X509Certificate> rACerts = new LinkedList<X509Certificate>();
-        for (int i = 0; i < n; i++)
-        {
+        for (int i = 0; i < n; i++) {
             X509Certificate c = certs.get(i);
-            if (c.getBasicConstraints() > -1)
-            {
-                if (cACert != null)
-                {
+            if (c.getBasicConstraints() > -1) {
+                if (cACert != null) {
                     final String msg =
                             "multiple CA certificates is returned, but exactly 1 is expected";
                     LOG.error(msg);
@@ -332,14 +292,12 @@ public class DecodedNextCAMessage
                     return ret;
                 }
                 cACert = c;
-            } else
-            {
+            } else {
                 rACerts.add(c);
             }
         }
 
-        if (cACert == null)
-        {
+        if (cACert == null) {
             final String msg = "no CA certificate is returned";
             LOG.error(msg);
             ret.setFailureMessage(msg);
@@ -347,11 +305,9 @@ public class DecodedNextCAMessage
         }
 
         X509Certificate[] _raCerts;
-        if (rACerts.isEmpty())
-        {
+        if (rACerts.isEmpty()) {
             _raCerts = null;
-        } else
-        {
+        } else {
             _raCerts = rACerts.toArray(new X509Certificate[0]);
         }
 
@@ -361,14 +317,12 @@ public class DecodedNextCAMessage
         return ret;
     }
 
-    public Date getSigningTime()
-    {
+    public Date getSigningTime() {
         return signingTime;
     }
 
     public void setSigningTime(
-            final Date signingTime)
-    {
+            final Date signingTime) {
         this.signingTime = signingTime;
     }
 
